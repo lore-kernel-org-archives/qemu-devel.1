@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <root@devhost2.servers.provps.com>)
-	id 1ebb51-0002w4-1n
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:55:48 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ebb53-0002wN-48
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <root@devhost2.servers.provps.com>)
-	id 1ebb4w-0004OU-TY
+	(envelope-from <alistair23@gmail.com>) id 1ebb51-0004R0-Pj
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:55:49 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35771)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ebb51-0004QK-DI
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:55:47 -0500
-Received: from devhost2.servers.provps.com ([208.82.112.163]:43840)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <root@devhost2.servers.provps.com>)
-	id 1ebb4w-0004Nt-Kj
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:55:42 -0500
-From: Shaun Reitan <shaun.reitan@ndchost.com>
-Date: Tue, 16 Jan 2018 15:18:24 -0800
-Message-Id: <20180116231824.27114-1-shaun.reitan@ndchost.com>
-Subject: [Qemu-devel] [PATCH] Add ability to provide ifname when using
- netdev bridge or tap helper
+Received: by mail-lf0-x241.google.com with SMTP id a204so11308937lfa.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 15:55:47 -0800 (PST)
+MIME-Version: 1.0
+Sender: alistair23@gmail.com
+In-Reply-To: <CAFEAcA-ht8NXMhdXdtnJRQFJSiNH4JRAUdygjdCg+Y=U_8_TuA@mail.gmail.com>
+References: <cover.1515796549.git.alistair.francis@xilinx.com>
+	<5d3528b2428e0eb4ea7a058fbb12b6b1229a496f.1515796549.git.alistair.francis@xilinx.com>
+	<CAFEAcA-ht8NXMhdXdtnJRQFJSiNH4JRAUdygjdCg+Y=U_8_TuA@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 16 Jan 2018 15:55:15 -0800
+Message-ID: <CAKmqyKMPbLRCc9FbSJN8kjxAHP=wxXXCY4gLx45=C6MYE=h94Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] xlnx-zynqmp-rtc: Initial commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,178 +32,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Shaun Reitan <shaun.reitan@ndchost.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-This patch replaces the patch I sent yesturday. This one fixes
-a bug in my original code as well as corrects a few styling
-issues. Hopfully this one comes out correct!  Sorry for the
-inconvienece.
- 
-When currently using -netdev bridge or -netdev tap with a helper
-you are unable to set an ifname. This patch adds that ability so
-that you can now specify an ifname.
+On Mon, Jan 15, 2018 at 5:25 AM, Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+> On 12 January 2018 at 22:36, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> Initial commit of the ZynqMP RTC device.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>> V2:
+>>  - Delete unused realise function
+>>  - Remove DB_PRINT()
+>>
+>>  hw/timer/Makefile.objs             |   1 +
+>>  hw/timer/xlnx-zynqmp-rtc.c         | 218 ++++++++++++++++++++++++++++++=
++++++++
+>>  include/hw/timer/xlnx-zynqmp-rtc.h |  84 ++++++++++++++
+>>  3 files changed, 303 insertions(+)
+>>  create mode 100644 hw/timer/xlnx-zynqmp-rtc.c
+>>  create mode 100644 include/hw/timer/xlnx-zynqmp-rtc.h
+>>
+>> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+>> index 8c19eac3b6..8b27a4b7ef 100644
+>> --- a/hw/timer/Makefile.objs
+>> +++ b/hw/timer/Makefile.objs
+>> @@ -21,6 +21,7 @@ common-obj-$(CONFIG_IMX) +=3D imx_epit.o
+>>  common-obj-$(CONFIG_IMX) +=3D imx_gpt.o
+>>  common-obj-$(CONFIG_LM32) +=3D lm32_timer.o
+>>  common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
+>> +common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
+>>
+>>  obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
+>>  obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
+>> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
+>> new file mode 100644
+>> index 0000000000..ead40fc42d
+>> --- /dev/null
+>> +++ b/hw/timer/xlnx-zynqmp-rtc.c
+>> @@ -0,0 +1,218 @@
+>> +/*
+>> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
+>> + *
+>> + * Copyright (c) 2017 Xilinx Inc.
+>> + *
+>> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
+>> + *
+>> + * Permission is hereby granted, free of charge, to any person obtainin=
+g a copy
+>> + * of this software and associated documentation files (the "Software")=
+, to deal
+>> + * in the Software without restriction, including without limitation th=
+e rights
+>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or=
+ sell
+>> + * copies of the Software, and to permit persons to whom the Software i=
+s
+>> + * furnished to do so, subject to the following conditions:
+>> + *
+>> + * The above copyright notice and this permission notice shall be inclu=
+ded in
+>> + * all copies or substantial portions of the Software.
+>> + *
+>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPR=
+ESS OR
+>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABIL=
+ITY,
+>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SH=
+ALL
+>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR=
+ OTHER
+>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARIS=
+ING FROM,
+>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALIN=
+GS IN
+>> + * THE SOFTWARE.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "hw/sysbus.h"
+>> +#include "hw/register.h"
+>> +#include "qemu/bitops.h"
+>> +#include "qemu/log.h"
+>> +#include "hw/timer/xlnx-zynqmp-rtc.h"
+>> +
+>> +#ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
+>> +#define XLNX_ZYNQMP_RTC_ERR_DEBUG 0
+>> +#endif
+>
+> This #define doesn't seem to be used, or have I missed it?
 
-Signed-off-by: Shaun Reitan <shaun.reitan@ndchost.com>
----
- net/tap.c            | 33 ++++++++++++++++++++++++---------
- qapi/net.json        |  1 +
- qemu-bridge-helper.c | 11 +++++++++--
- qemu-options.hx      |  2 +-
- 4 files changed, 35 insertions(+), 12 deletions(-)
+As Philippe said, it is used in the init() function.
 
-diff --git a/net/tap.c b/net/tap.c
-index 979e622..c4f3bb0 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -472,7 +472,7 @@ static int recv_fd(int c)
- }
- 
- static int net_bridge_run_helper(const char *helper, const char *bridge,
--                                 Error **errp)
-+                                 const char *ifname, Error **errp)
- {
-     sigset_t oldmask, mask;
-     int pid, status;
-@@ -499,7 +499,9 @@ static int net_bridge_run_helper(const char *helper, const char *bridge,
-         int open_max = sysconf(_SC_OPEN_MAX), i;
-         char fd_buf[6+10];
-         char br_buf[6+IFNAMSIZ] = {0};
--        char helper_cmd[PATH_MAX + sizeof(fd_buf) + sizeof(br_buf) + 15];
-+        char ifname_buf[10 + IFNAMSIZ];
-+        char helper_cmd[PATH_MAX + sizeof(fd_buf) + sizeof(br_buf)
-+                        + sizeof(ifname_buf) + 16];
- 
-         for (i = 3; i < open_max; i++) {
-             if (i != sv[1]) {
-@@ -516,8 +518,13 @@ static int net_bridge_run_helper(const char *helper, const char *bridge,
-                 snprintf(br_buf, sizeof(br_buf), "%s%s", "--br=", bridge);
-             }
- 
--            snprintf(helper_cmd, sizeof(helper_cmd), "%s %s %s %s",
--                     helper, "--use-vnet", fd_buf, br_buf);
-+            if (strstr(helper, "--ifname=") == NULL && ifname != NULL) {
-+                snprintf(ifname_buf, sizeof(ifname_buf), "%s%s", "--ifname=",
-+                         ifname);
-+            }
-+
-+            snprintf(helper_cmd, sizeof(helper_cmd), "%s %s %s %s %s",
-+                     helper, "--use-vnet", fd_buf, br_buf, ifname_buf);
- 
-             parg = args;
-             *parg++ = (char *)"sh";
-@@ -536,6 +543,13 @@ static int net_bridge_run_helper(const char *helper, const char *bridge,
-             *parg++ = (char *)"--use-vnet";
-             *parg++ = fd_buf;
-             *parg++ = br_buf;
-+
-+            if (ifname != NULL) {
-+                snprintf(ifname_buf, sizeof(ifname_buf), "%s%s", "--ifname=",
-+                         ifname);
-+                *parg++ = ifname_buf;
-+            }
-+
-             *parg++ = NULL;
- 
-             execv(helper, args);
-@@ -586,7 +600,7 @@ int net_init_bridge(const Netdev *netdev, const char *name,
-     helper = bridge->has_helper ? bridge->helper : DEFAULT_BRIDGE_HELPER;
-     br     = bridge->has_br     ? bridge->br     : DEFAULT_BRIDGE_INTERFACE;
- 
--    fd = net_bridge_run_helper(helper, br, errp);
-+    fd = net_bridge_run_helper(helper, br, bridge->ifname, errp);
-     if (fd == -1) {
-         return -1;
-     }
-@@ -854,16 +868,17 @@ free_fail:
-         g_free(vhost_fds);
-         return -1;
-     } else if (tap->has_helper) {
--        if (tap->has_ifname || tap->has_script || tap->has_downscript ||
--            tap->has_vnet_hdr || tap->has_queues || tap->has_vhostfds) {
--            error_setg(errp, "ifname=, script=, downscript=, vnet_hdr=, "
--                       "queues=, and vhostfds= are invalid with helper=");
-+        if (tap->has_script || tap->has_downscript || tap->has_vnet_hdr ||
-+            tap->has_queues || tap->has_vhostfds) {
-+            error_setg(errp, "script=, downscript=, vnet_hdr=, queues=, and "
-+                       "vhostfds= are invalid with helper=");
-             return -1;
-         }
- 
-         fd = net_bridge_run_helper(tap->helper,
-                                    tap->has_br ?
-                                    tap->br : DEFAULT_BRIDGE_INTERFACE,
-+                                   tap->ifname,
-                                    errp);
-         if (fd == -1) {
-             return -1;
-diff --git a/qapi/net.json b/qapi/net.json
-index 4beff5d..5b5b281 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -402,6 +402,7 @@
- { 'struct': 'NetdevBridgeOptions',
-   'data': {
-     '*br':     'str',
-+    '*ifname': 'str',
-     '*helper': 'str' } }
- 
- ##
-diff --git a/qemu-bridge-helper.c b/qemu-bridge-helper.c
-index 5396fbf..7b01cd5 100644
---- a/qemu-bridge-helper.c
-+++ b/qemu-bridge-helper.c
-@@ -57,7 +57,7 @@ typedef QSIMPLEQ_HEAD(ACLList, ACLRule) ACLList;
- static void usage(void)
- {
-     fprintf(stderr,
--            "Usage: qemu-bridge-helper [--use-vnet] --br=bridge --fd=unixfd\n");
-+            "Usage: qemu-bridge-helper [--use-vnet] --br=bridge --fd=unixfd [--ifname=name]\n");
- }
- 
- static int parse_acl_file(const char *filename, ACLList *acl_list)
-@@ -223,6 +223,7 @@ int main(int argc, char **argv)
-     int use_vnet = 0;
-     int mtu;
-     const char *bridge = NULL;
-+    const char *ifname = NULL;
-     char iface[IFNAMSIZ];
-     int index;
-     ACLRule *acl_rule;
-@@ -249,6 +250,8 @@ int main(int argc, char **argv)
-             bridge = &argv[index][5];
-         } else if (strncmp(argv[index], "--fd=", 5) == 0) {
-             unixfd = atoi(&argv[index][5]);
-+        } else if (strncmp(argv[index], "--ifname=", 9) == 0) {
-+            ifname = &argv[index][9];
-         } else {
-             usage();
-             return EXIT_FAILURE;
-@@ -320,7 +323,11 @@ int main(int argc, char **argv)
- 
-     /* request a tap device, disable PI, and add vnet header support if
-      * requested and it's available. */
--    prep_ifreq(&ifr, "tap%d");
-+    if (ifname == NULL) {
-+        prep_ifreq(&ifr, "tap%d");
-+    } else {
-+        prep_ifreq(&ifr, ifname);
-+    }
-     ifr.ifr_flags = IFF_TAP|IFF_NO_PI;
-     if (use_vnet && has_vnet_hdr(fd)) {
-         ifr.ifr_flags |= IFF_VNET_HDR;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 678181c..81cbc3c 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1961,7 +1961,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-     "                use 'queues=n' to specify the number of queues to be created for multiqueue TAP\n"
-     "                use 'poll-us=n' to speciy the maximum number of microseconds that could be\n"
-     "                spent on busy polling for vhost net\n"
--    "-netdev bridge,id=str[,br=bridge][,helper=helper]\n"
-+    "-netdev bridge,id=str[,br=bridge][,helper=helper][,ifname=name]\n"
-     "                configure a host TAP network backend with ID 'str' that is\n"
-     "                connected to a bridge (default=" DEFAULT_BRIDGE_INTERFACE ")\n"
-     "                using the program 'helper (default=" DEFAULT_BRIDGE_HELPER ")\n"
--- 
-2.9.5
+>
+>> +
+>> +static void rtc_int_update_irq(XlnxZynqMPRTC *s)
+>> +{
+>> +    bool pending =3D s->regs[R_RTC_INT_STATUS] & ~s->regs[R_RTC_INT_MAS=
+K];
+>> +    qemu_set_irq(s->irq_rtc_int, pending);
+>> +}
+>> +
+>> +static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
+>> +{
+>> +    bool pending =3D s->regs[R_ADDR_ERROR] & ~s->regs[R_ADDR_ERROR_INT_=
+MASK];
+>> +    qemu_set_irq(s->irq_addr_error_int, pending);
+>> +}
+>> +
+>> +static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
+>> +{
+>> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
+>> +    rtc_int_update_irq(s);
+>> +}
+>> +
+>> +static uint64_t rtc_int_en_prew(RegisterInfo *reg, uint64_t val64)
+>> +{
+>> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
+>> +    uint32_t val =3D val64;
+>> +
+>> +    s->regs[R_RTC_INT_MASK] &=3D ~val;
+>> +    rtc_int_update_irq(s);
+>> +    return 0;
+>> +}
+>
+> I have to say I find all this pre-write/post-write stuff confusing
+> compared to just having a straightforward pair of read and write function=
+s
+> for the device. Why do we update the interrupt state in a post-write
+> for the status register but a pre-write for the int_en register ?
+
+There isn't really a specific reason, I think this is just how it was
+auto generated. Would you prefer them all to be post write?
+
+>
+>
+>
+>> +static void rtc_reset(DeviceState *dev)
+>> +{
+>> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(dev);
+>> +    unsigned int i;
+>> +
+>> +    for (i =3D 0; i < ARRAY_SIZE(s->regs_info); ++i) {
+>> +        register_reset(&s->regs_info[i]);
+>> +    }
+>> +
+>> +    rtc_int_update_irq(s);
+>> +    addr_error_int_update_irq(s);
+>> +}
+>
+> Updating irq lines in reset functions is a bit dubious.
+> (We really should figure out how to do that properly some day.)
+
+Is there a better way though?
+
+>
+>> This email and any attachments are intended for the sole use of the name=
+d recipient(s) and contain(s) confidential information that may be propriet=
+ary, privileged or copyrighted under applicable law. If you are not the int=
+ended recipient, do not read, copy, or forward this email message or any at=
+tachments. Delete this email message and any attachments immediately.
+>
+>
+> You probably don't really mean this :-)  Can you fix your email
+> config for sending patch mails, please?
+
+Yeah, apparently they re-enabled this. I'll work on getting it
+disabled again. Thanks for pointing it out.
+
+Alistair
+
+>
+> thanks
+> -- PMM
