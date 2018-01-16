@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ebUzR-00007s-8A
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:25:43 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ebV06-0000fU-SP
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:26:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ebUzO-0001PN-9M
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:25:37 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:59942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ebUzN-0001Nw-GI
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:25:34 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 16 Jan 2018 18:25:06 +0100
-Message-Id: <20180116172510.28878-1-laurent@vivier.eu>
+	(envelope-from <pbonzini@redhat.com>) id 1ebV03-0001zR-Nu
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:26:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50749)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ebV03-0001xP-F6
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:26:15 -0500
+References: <20180110131832.16623-1-klim.kireev@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <71031eb9-06a0-21fe-dd89-4b49e23b97be@redhat.com>
+Date: Tue, 16 Jan 2018 18:25:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 0/4] linux-user: select CPU type according
- ELF header values
+In-Reply-To: <20180110131832.16623-1-klim.kireev@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] chardev/char-socket: add POLLHUP handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +27,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: YunQiang Su <syq@debian.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Aaron Sierra <asierra@xes-inc.com>, Laurent Vivier <laurent@vivier.eu>
+To: Klim Kireev <klim.kireev@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, den@virtuozzo.com
 
-This idea has been suggested to me before by Philippe
-Mathieu-Daudé, and recently YunQiang Su has proposed a
-patch to manage the MIPS r6 case.
+On 10/01/2018 14:18, Klim Kireev wrote:
+> The following behavior was observed for QEMU configured by libvirt
+> to use guest agent as usual for the guests without virtio-serial
+> driver (Windows or the guest remaining in BIOS stage).
+>=20
+> In QEMU on first connect to listen character device socket
+> the listen socket is removed from poll just after the accept().
+> virtio_serial_guest_ready() returns 0 and the descriptor
+> of the connected Unix socket is removed from poll and it will
+> not be present in poll() until the guest will initialize the driver
+> and change the state of the serial to "guest connected".
+>=20
+> In libvirt connect() to guest agent is performed on restart and
+> is run under VM state lock. Connect() is blocking and can
+> wait forever.
+> In this case libvirt can not perform ANY operation on that VM.
+>=20
+> The bug can be easily reproduced this way:
+>=20
+> Terminal 1:
+> qemu-system-x86_64 -m 512 -device pci-serial,chardev=3Dserial1 -chardev=
+ socket,id=3Dserial1,path=3D/tmp/console.sock,server,nowait
+> (virtio-serial and isa-serial also fit)
+>=20
+> Terminal 2:
+> minicom -D unix\#/tmp/console.sock
+> (type something and pres enter)
+> C-a x (to exit)
+>=20
+> Do 3 times:
+> minicom -D unix\#/tmp/console.sock
+> C-a x
+>=20
+> It needs 4 connections, because the first one is accepted by QEMU, then=
+ two are queued by
+> the kernel, and the 4th blocks.
+>=20
+> The problem is that QEMU doesn't add a read watcher after succesful rea=
+d
+> until the guest device wants to acquire recieved data, so
+> I propose to install a separate pullhup watcher regardless of
+> whether the device waits for data or not. After closing the connection,
+> the guest has a capability to read the data within timeout.
 
-Based on this, this series tries to clean-up the original
-patch, and introduces the use for m68k architecture and
-port the patch from YunQiang Su.
+I don't understand the timeout part.
 
-v2: move cpu_model selection to linux-user/*/target_elf.h
-   provide eflags to cpu_get_model() instead of fd
-   (and modify other patches accordingly)
+Apart from that, maybe the bug is in io_watch_poll_prepare, which needs=20
+to _always_ set up a "G_IO_ERR | G_IO_HUP | G_IO_NVAL" watch.  Only=20
+G_IO_IN depends on iwp->fd_can_read(...) > 0.
 
-Laurent Vivier (2):
-  linux-user: Move CPU type name selection to a function
-  linux-user,m68k: select CPU according to ELF header values
+So the change would start with something like this:
 
-YunQiang Su (2):
-  linux-user: introduce functions to detect CPU type
-  linux-user: MIPS set cpu to r6 CPU if binary is R6
+diff --git a/chardev/char-io.c b/chardev/char-io.c
+index f81052481a..a5e65d4e7c 100644
+--- a/chardev/char-io.c
++++ b/chardev/char-io.c
+@@ -29,6 +29,7 @@ typedef struct IOWatchPoll {
+=20
+     QIOChannel *ioc;
+     GSource *src;
++    GIOCondition cond;
+=20
+     IOCanReadHandler *fd_can_read;
+     GSourceFunc fd_read;
+@@ -41,25 +42,32 @@ static IOWatchPoll *io_watch_poll_from_source(GSource=
+ *source)
+     return container_of(source, IOWatchPoll, parent);
+ }
+=20
++static void io_watch_poll_destroy_source(IOWatchPoll *iwp)
++{
++    if (iwp->src) {
++        g_source_destroy(iwp->src);
++        g_source_unref(iwp->src);
++        iwp->src =3D NULL;
++        iwp->cond =3D 0;
++    }
++}
++
+ static gboolean io_watch_poll_prepare(GSource *source,
+                                       gint *timeout)
+ {
+     IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
+     bool now_active =3D iwp->fd_can_read(iwp->opaque) > 0;
+-    bool was_active =3D iwp->src !=3D NULL;
+-    if (was_active =3D=3D now_active) {
+-        return FALSE;
++    GIOCondition cond =3D G_IO_ERR | G_IO_HUP | G_IO_NVAL;
++    if (now_active) {
++        cond |=3D G_IO_IN;
+     }
+=20
+-    if (now_active) {
+-        iwp->src =3D qio_channel_create_watch(
+-            iwp->ioc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL);
++    if (iwp->cond !=3D cond) {
++        io_watch_poll_destroy_source(iwp);
++        iwp->cond =3D cond;
++        iwp->src =3D qio_channel_create_watch(iwp->ioc, cond);
+         g_source_set_callback(iwp->src, iwp->fd_read, iwp->opaque, NULL)=
+;
+         g_source_attach(iwp->src, iwp->context);
+-    } else {
+-        g_source_destroy(iwp->src);
+-        g_source_unref(iwp->src);
+-        iwp->src =3D NULL;
+     }
+     return FALSE;
+ }
+@@ -131,11 +139,7 @@ static void io_remove_watch_poll(GSource *source)
+     IOWatchPoll *iwp;
+=20
+     iwp =3D io_watch_poll_from_source(source);
+-    if (iwp->src) {
+-        g_source_destroy(iwp->src);
+-        g_source_unref(iwp->src);
+-        iwp->src =3D NULL;
+-    }
++    io_watch_poll_destroy_source(iwp);
+     g_source_destroy(&iwp->parent);
+ }
+=20
 
- include/elf.h                      |  4 +++
- linux-user/aarch64/target_elf.h    | 14 +++++++++
- linux-user/alpha/target_elf.h      | 14 +++++++++
- linux-user/arm/target_elf.h        | 14 +++++++++
- linux-user/cris/target_elf.h       | 14 +++++++++
- linux-user/elfload.c               | 35 ++++++++++++++++++++++
- linux-user/hppa/target_elf.h       | 14 +++++++++
- linux-user/i386/target_elf.h       | 14 +++++++++
- linux-user/m68k/target_elf.h       | 20 +++++++++++++
- linux-user/main.c                  | 59 +++++++-------------------------------
- linux-user/microblaze/target_elf.h | 14 +++++++++
- linux-user/mips/target_elf.h       | 17 +++++++++++
- linux-user/mips64/target_elf.h     | 17 +++++++++++
- linux-user/nios2/target_elf.h      | 14 +++++++++
- linux-user/openrisc/target_elf.h   | 14 +++++++++
- linux-user/ppc/target_elf.h        | 21 ++++++++++++++
- linux-user/qemu.h                  |  1 +
- linux-user/s390x/target_elf.h      | 14 +++++++++
- linux-user/sh4/target_elf.h        | 14 +++++++++
- linux-user/sparc/target_elf.h      | 14 +++++++++
- linux-user/sparc64/target_elf.h    | 14 +++++++++
- linux-user/tilegx/target_elf.h     | 14 +++++++++
- linux-user/unicore32/target_elf.h  | 14 +++++++++
- linux-user/x86_64/target_elf.h     | 14 +++++++++
- 24 files changed, 350 insertions(+), 48 deletions(-)
- create mode 100644 linux-user/aarch64/target_elf.h
- create mode 100644 linux-user/alpha/target_elf.h
- create mode 100644 linux-user/arm/target_elf.h
- create mode 100644 linux-user/cris/target_elf.h
- create mode 100644 linux-user/hppa/target_elf.h
- create mode 100644 linux-user/i386/target_elf.h
- create mode 100644 linux-user/m68k/target_elf.h
- create mode 100644 linux-user/microblaze/target_elf.h
- create mode 100644 linux-user/mips/target_elf.h
- create mode 100644 linux-user/mips64/target_elf.h
- create mode 100644 linux-user/nios2/target_elf.h
- create mode 100644 linux-user/openrisc/target_elf.h
- create mode 100644 linux-user/ppc/target_elf.h
- create mode 100644 linux-user/s390x/target_elf.h
- create mode 100644 linux-user/sh4/target_elf.h
- create mode 100644 linux-user/sparc/target_elf.h
- create mode 100644 linux-user/sparc64/target_elf.h
- create mode 100644 linux-user/tilegx/target_elf.h
- create mode 100644 linux-user/unicore32/target_elf.h
- create mode 100644 linux-user/x86_64/target_elf.h
 
--- 
-2.14.3
+Thanks,
+
+Paolo
