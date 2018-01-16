@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS48-00035w-1B
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:18 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4A-00038S-DI
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3y-0004dF-1F
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:15 -0500
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:42681)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS47-0004oA-3o
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:18 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36079)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS3x-0004cZ-Or
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:05 -0500
-Received: by mail-wr0-x22b.google.com with SMTP id e41so14999974wre.9
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:05 -0800 (PST)
+	id 1ebS46-0004mB-Tj
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:15 -0500
+Received: by mail-wm0-x242.google.com with SMTP id f3so9003648wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:14 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:17:01 +0100
-Message-Id: <1516112253-14480-20-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:17:08 +0100
+Message-Id: <1516112253-14480-27-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/51] crypto: fix stack-buffer-overflow error
+Subject: [Qemu-devel] [PULL 26/51] tests/boot-serial-test: Add tests for
+ microblaze boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +29,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-ASAN complains about:
+This adds two simple TCG + UART tests for the microblaze boards,
+one in big endian mode, and one in little endian mode.
 
-==8856==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffd8a1fe168 at pc 0x561136cb4451 bp 0x7ffd8a1fe130 sp 0x7ffd8a1fd8e0
-READ of size 16 at 0x7ffd8a1fe168 thread T0
-    #0 0x561136cb4450 in __asan_memcpy (/home/elmarco/src/qq/build/tests/test-crypto-ivgen+0x110450)
-    #1 0x561136d2a6a7 in qcrypto_ivgen_essiv_calculate /home/elmarco/src/qq/crypto/ivgen-essiv.c:83:5
-    #2 0x561136d29af8 in qcrypto_ivgen_calculate /home/elmarco/src/qq/crypto/ivgen.c:72:12
-    #3 0x561136d07c8e in test_ivgen /home/elmarco/src/qq/tests/test-crypto-ivgen.c:148:5
-    #4 0x7f77772c3b04 in test_case_run /home/elmarco/src/gnome/glib/builddir/../glib/gtestutils.c:2237
-    #5 0x7f77772c3ec4 in g_test_run_suite_internal /home/elmarco/src/gnome/glib/builddir/../glib/gtestutils.c:2321
-    #6 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gnome/glib/builddir/../glib/gtestutils.c:2333
-    #7 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gnome/glib/builddir/../glib/gtestutils.c:2333
-    #8 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gnome/glib/builddir/../glib/gtestutils.c:2333
-    #9 0x7f77772c4184 in g_test_run_suite /home/elmarco/src/gnome/glib/builddir/../glib/gtestutils.c:2408
-    #10 0x7f77772c2e0d in g_test_run /home/elmarco/src/gnome/glib/builddir/../glib/gtestutils.c:1674
-    #11 0x561136d0799b in main /home/elmarco/src/qq/tests/test-crypto-ivgen.c:173:12
-    #12 0x7f77756e6039 in __libc_start_main (/lib64/libc.so.6+0x21039)
-    #13 0x561136c13d89 in _start (/home/elmarco/src/qq/build/tests/test-crypto-ivgen+0x6fd89)
-
-Address 0x7ffd8a1fe168 is located in stack of thread T0 at offset 40 in frame
-    #0 0x561136d2a40f in qcrypto_ivgen_essiv_calculate /home/elmarco/src/qq/crypto/ivgen-essiv.c:76
-
-  This frame has 1 object(s):
-    [32, 40) 'sector.addr' <== Memory access at offset 40 overflows this variable
-HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
-      (longjmp and C++ exceptions *are* supported)
-SUMMARY: AddressSanitizer: stack-buffer-overflow (/home/elmarco/src/qq/build/tests/test-crypto-ivgen+0x110450) in __asan_memcpy
-Shadow bytes around the buggy address:
-  0x100031437bd0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437be0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437bf0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=>0x100031437c20: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00[f3]f3 f3
-  0x100031437c30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-Shadow byte legend (one shadow byte represents 8 application bytes):
-  Addressable:           00
-  Partially addressable: 01 02 03 04 05 06 07
-  Heap left redzone:       fa
-  Freed heap region:       fd
-  Stack left redzone:      f1
-  Stack mid redzone:       f2
-  Stack right redzone:     f3
-  Stack after return:      f5
-  Stack use after scope:   f8
-  Global redzone:          f9
-  Global init order:       f6
-  Poisoned by user:        f7
-  Container overflow:      fc
-  Array cookie:            ac
-  Intra object redzone:    bb
-  ASan internal:           fe
-  Left alloca redzone:     ca
-  Right alloca redzone:    cb
-
-It looks like the rest of the code copes with ndata being larger than
-sizeof(sector), so limit the memcpy() range.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-Id: <20180104160523.22995-13-marcandre.lureau@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1512031988-32490-5-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- crypto/ivgen-essiv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/Makefile.include   |  2 ++
+ tests/boot-serial-test.c | 20 ++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/crypto/ivgen-essiv.c b/crypto/ivgen-essiv.c
-index cba20bd..ad4d926 100644
---- a/crypto/ivgen-essiv.c
-+++ b/crypto/ivgen-essiv.c
-@@ -79,7 +79,7 @@ static int qcrypto_ivgen_essiv_calculate(QCryptoIVGen *ivgen,
-     uint8_t *data = g_new(uint8_t, ndata);
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 39a4b53..561e14b 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -300,6 +300,8 @@ check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
  
-     sector = cpu_to_le64(sector);
--    memcpy(data, (uint8_t *)&sector, ndata);
-+    memcpy(data, (uint8_t *)&sector, MIN(sizeof(sector), ndata));
-     if (sizeof(sector) < ndata) {
-         memset(data + sizeof(sector), 0, ndata - sizeof(sector));
-     }
+ check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
+ 
++check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
++
+ check-qtest-mips-y = tests/endianness-test$(EXESUF)
+ 
+ check-qtest-mips64-y = tests/endianness-test$(EXESUF)
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index dd3828c..a39273a 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -24,6 +24,22 @@ static const uint8_t kernel_mcf5208[] = {
+     0x60, 0xfa                              /* bra.s  loop */
+ };
+ 
++static const uint8_t kernel_pls3adsp1800[] = {
++    0xb0, 0x00, 0x84, 0x00,                 /* imm   0x8400 */
++    0x30, 0x60, 0x00, 0x04,                 /* addik r3,r0,4 */
++    0x30, 0x80, 0x00, 0x54,                 /* addik r4,r0,'T' */
++    0xf0, 0x83, 0x00, 0x00,                 /* sbi   r4,r3,0 */
++    0xb8, 0x00, 0xff, 0xfc                  /* bri   -4  loop */
++};
++
++static const uint8_t kernel_plml605[] = {
++    0xe0, 0x83, 0x00, 0xb0,                 /* imm   0x83e0 */
++    0x00, 0x10, 0x60, 0x30,                 /* addik r3,r0,0x1000 */
++    0x54, 0x00, 0x80, 0x30,                 /* addik r4,r0,'T' */
++    0x00, 0x00, 0x83, 0xf0,                 /* sbi   r4,r3,0 */
++    0xfc, 0xff, 0x00, 0xb8                  /* bri   -4  loop */
++};
++
+ typedef struct testdef {
+     const char *arch;       /* Target architecture */
+     const char *machine;    /* Name of the machine */
+@@ -50,6 +66,10 @@ static testdef_t tests[] = {
+     { "s390x", "s390-ccw-virtio",
+       "-nodefaults -device sclpconsole,chardev=serial0", "virtio device" },
+     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
++    { "microblaze", "petalogix-s3adsp1800", "", "TT",
++      sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
++    { "microblazeel", "petalogix-ml605", "", "TT",
++      sizeof(kernel_plml605), kernel_plml605 },
+ 
+     { NULL }
+ };
 -- 
 1.8.3.1
