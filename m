@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ebNQ9-0005e9-Ka
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:20:42 -0500
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ebNjP-00034U-27
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ebNQ6-0002qe-GY
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:20:41 -0500
-Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:41104)
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ebNjK-0007Qy-3H
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:40:35 -0500
+Received: from smtp1.lauterbach.com ([62.154.241.196]:39021)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ebNQ6-0002nH-9W
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:20:38 -0500
-Received: from player695.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 5395017DD04
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 10:20:28 +0100 (CET)
-Date: Tue, 16 Jan 2018 10:20:18 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180116102018.382fd035@bahia.lan>
-In-Reply-To: <20180116044714.12571-2-david@gibson.dropbear.id.au>
-References: <20180116044714.12571-1-david@gibson.dropbear.id.au>
-	<20180116044714.12571-2-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1ebNjJ-0007EI-JU
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:40:30 -0500
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Message-ID: <c2d2d787-8e45-f26a-54cf-9670a27dc836@lauterbach.com>
+Date: Tue, 16 Jan 2018 10:40:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv2 1/2] spapr: Allow some cases where we
- can't set VSMT mode in the kernel
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH RFC] target-arm:Add a dynamic XML-description
+ of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +29,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org
+Cc: Khaled Jmal <khaled.jmal@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On Tue, 16 Jan 2018 15:47:13 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+[PATCH RFC] target-arm:Add a dynamic XML-description of the cp-registers 
+to GDB
 
-> At present if we require a vsmt mode that's not equal to the kernel's
-> default, and the kernel doesn't let us change it (e.g. because it's an old
-> kernel without support) then we always fail.
-> 
-> But in fact we can cope with the kernel having a different vsmt as long as
->   a) it's >= the actual number of vthreads/vcore (so that guest threads
->      that are supposed to be on the same core act like it)
->   b) it's a submultiple of the requested vsmt mode (so that guest threads
->      spaced by the vsmt value will act like they're on different cores)
-> 
-> Allowing this case gives us a bit more freedom to adjust the vsmt behaviour
-> without breaking existing cases.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+This patch offers to GDB the ability to read/write all the coprocessor
+registers for ARM and ARM64 by generating dynamically an XML-description for
+these registers.
 
-I could check the following on a POWER9 host:
+- gdbstub.c :
+         *Extend the get_feature_xml() to handle the dynamic XML 
+generation for
+            architectures that support this 
+(gdb_coprocessor_dynnamic_xml == true)
+         *Extend the gdb_write_register() and gdb_read_register() to 
+handle the
+           write and the read of these registers.
+- include/qom/cpu.h:
+         *Add a new structure "XMLDynamicDescription".
+         *Declare the new variables and function pointers.
+- target/arm/cpu.c:
+         *Initialize the new variables and function pointers for ARM.
+- target/arm/cpu.h:
+         *Declare the new read, write and XML dynamic generation functions.
+         *Declare the write_raw_cp_reg() as I have changed it to non static.
+- target/arm/gdbstub.c:
+         *Define the new functions for ARM:
+             arm_generate_xml(): is called for each register of the 
+hashtable cp_regs
+                          to generate the right XML "<reg />" line for it.
+             arm_get_feature_xml_dynamically(): generate the XML 
+dynamically.
+             arm_cpu_gdb_read_cpregister(): To read the coprocessor 
+registers.
+             arm_cpu_gdb_write_cpregister(): To write the coprocessor 
+registers.
 
-$ ./ppc64-softmmu/qemu-system-ppc64 -accel kvm -smp threads=1
-qemu-system-ppc64: warning: Failed to set KVM's VSMT mode to 8 (errno -22)
+This patch is tagged as [RFC] because I need help to review the 
+following points:
+*I only take the registers that (!(ri->type & (ARM_CP_NO_RAW|ARM_CP_ALIAS)))
+So, am I covering all the Coprocessor registers with that?
+*For the ARM64, should I differentiate the registers that have two views 
+(32 and 64)
+Maybe by adding in the XML description a "32" tag for the registers name 
+for the
+32bit view and a "64" for the 64bit view.
+*How to properly handle the secure and the non secure views?
 
-and the guest boots.
+Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+---
+  gdbstub.c            | 18 +++++++++++
+  include/qom/cpu.h    | 19 +++++++++++
+  target/arm/cpu.c     |  5 +++
+  target/arm/cpu.h     |  6 +++-
+  target/arm/gdbstub.c | 90 
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+  target/arm/helper.c  |  3 +-
+  6 files changed, 138 insertions(+), 3 deletions(-)
 
-$ ./ppc64-softmmu/qemu-system-ppc64 -accel kvm -smp threads=2
-qemu-system-ppc64: Failed to set KVM's VSMT mode to 8 (errno -22)
-On PPC, a VM with 2 threads/core on a host with 1 threads/core requires the
- use of VSMT mode 8.
-This KVM seems to be too old to support VSMT.
+diff --git a/gdbstub.c b/gdbstub.c
+index f1d5148..b0124c8 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -670,10 +670,20 @@ static const char *get_feature_xml(const char *p, 
+const char **newp,
+                  pstrcat(target_xml, sizeof(target_xml), r->xml);
+                  pstrcat(target_xml, sizeof(target_xml), "\"/>");
+              }
++            if (cc->gdb_coprocessor_dynamic_xml) {
++                pstrcat(target_xml, sizeof(target_xml), "<xi:include 
+href=\"");
++                pstrcat(target_xml, sizeof(target_xml), \
++                        "coprocessor_dynamic.xml");
++                pstrcat(target_xml, sizeof(target_xml), "\"/>");
++            }
+              pstrcat(target_xml, sizeof(target_xml), "</target>");
+          }
+          return target_xml;
+      }
++    if (strncmp(p, "coprocessor_dynamic.xml", len) == 0) {
++        CPUState *cpu = first_cpu;
++        return cc->get_feature_xml_dynamically(cpu);
++    }
+      for (i = 0; ; i++) {
+          name = xml_builtin[i][0];
+          if (!name || (strncmp(name, p, len) == 0 && strlen(name) == len))
+@@ -697,6 +707,10 @@ static int gdb_read_register(CPUState *cpu, uint8_t 
+*mem_buf, int reg)
+              return r->get_reg(env, mem_buf, reg - r->base_reg);
+          }
+      }
++
++    if (reg < cpu->gdb_num_regs + cc->gdb_num_cpregs) {
++        return cc->gdb_read_cpregister(cpu, mem_buf, reg - 
+cpu->gdb_num_regs);
++    }
+      return 0;
+  }
 
-and QEMU exits.
+@@ -715,6 +729,10 @@ static int gdb_write_register(CPUState *cpu, 
+uint8_t *mem_buf, int reg)
+              return r->set_reg(env, mem_buf, reg - r->base_reg);
+          }
+      }
++
++    if (reg < cpu->gdb_num_regs + cc->gdb_num_cpregs) {
++        return cc->gdb_write_cpregister(cpu, mem_buf, reg - 
+cpu->gdb_num_regs);
++    }
+      return 0;
+  }
 
-Tested-by: Greg Kurz <groug@kaod.org>
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 93bd546..f40ee59 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -76,6 +76,19 @@ typedef void (*CPUUnassignedAccess)(CPUState *cpu, 
+hwaddr addr,
+  struct TranslationBlock;
 
-Just one minor remark below but anyway:
+  /**
++ * XMLDynamicDescription:
++ * @desc: Contains the XML descriptions.
++ * @num_cpregs: Number of the Coprocessor registers seen by GDB.
++ * @xml_cpregs_ordred_keys: Array that contains the corresponding Key of
++ * a given cpreg with the same order of the cpreg in the XML description.
++ */
++typedef struct XMLDynamicDescription {
++    char * desc;
++    int num_cpregs;
++    uint32_t *xml_cpregs_ordred_keys;
++} XMLDynamicDescription;
++
++/**
+   * CPUClass:
+   * @class_by_name: Callback to map -cpu command line model name to an
+   * instantiatable CPU type.
+@@ -196,6 +209,12 @@ typedef struct CPUClass {
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+      const struct VMStateDescription *vmsd;
+      const char *gdb_core_xml_file;
++    bool gdb_coprocessor_dynamic_xml;
++    XMLDynamicDescription dyn_xml;
++    int gdb_num_cpregs;
++    char * (*get_feature_xml_dynamically)(CPUState *cpu);
++    int (*gdb_read_cpregister)(CPUState *cpu, uint8_t *buf, int reg);
++    int (*gdb_write_cpregister)(CPUState *cpu, uint8_t *buf, int reg);
+      gchar * (*gdb_arch_name)(CPUState *cpu);
 
->  hw/ppc/spapr.c | 26 +++++++++++++++++++-------
->  1 file changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e35214bfc3..6d3613d934 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2314,17 +2314,29 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
->      if (kvm_enabled() && (spapr->vsmt != kvm_smt)) {
->          ret = kvmppc_set_smt_threads(spapr->vsmt);
->          if (ret) {
-> +            /* Looks like KVM isn't able to change VSMT mode */
->              error_setg(&local_err,
->                         "Failed to set KVM's VSMT mode to %d (errno %d)",
->                         spapr->vsmt, ret);
-> -            if (!vsmt_user) {
-> -                error_append_hint(&local_err, "On PPC, a VM with %d threads/"
-> -                             "core on a host with %d threads/core requires "
-> -                             " the use of VSMT mode %d.\n",
-> -                             smp_threads, kvm_smt, spapr->vsmt);
-> +            /* We can live with that if the default one is big enough
-> +             * for the number of threads, and a submultiple of the one
-> +             * we want.  In this case we'll waste some vcpu ids, but
-> +             * behaviour will be correct */
-> +            if ((kvm_smt >= smp_threads) && (spapr->vsmt % kvm_smt) == 0) {
+      void (*cpu_exec_enter)(CPUState *cpu);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index cc1856c..00efae4 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1751,6 +1751,11 @@ static void arm_cpu_class_init(ObjectClass *oc, 
+void *data)
+  #endif
+      cc->gdb_num_core_regs = 26;
+      cc->gdb_core_xml_file = "arm-core.xml";
++    cc->gdb_coprocessor_dynamic_xml=true;
++    cc->gdb_num_cpregs = 0;
++    cc->get_feature_xml_dynamically = arm_get_feature_xml_dynamically;
++    cc->gdb_read_cpregister = arm_cpu_gdb_read_cpregister;
++    cc->gdb_write_cpregister = arm_cpu_gdb_write_cpregister;
+      cc->gdb_arch_name = arm_gdb_arch_name;
+      cc->gdb_stop_before_watchpoint = true;
+      cc->debug_excp_handler = arm_debug_excp_handler;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9631670..16f84e3 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -797,6 +797,9 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState 
+*cpu, vaddr addr,
 
-Inconsistent use of parens in the left and right operands of &&
+  int arm_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+  int arm_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
++char *arm_get_feature_xml_dynamically(CPUState *cpu);
++int arm_cpu_gdb_read_cpregister(CPUState *cpu, uint8_t *buf, int reg);
++int arm_cpu_gdb_write_cpregister(CPUState *cpu, uint8_t *buf, int reg);
 
-> +                warn_report_err(local_err);
-> +                local_err = NULL;
-> +                goto out;
-> +            } else {
-> +                if (!vsmt_user) {
-> +                    error_append_hint(&local_err,
-> +                                      "On PPC, a VM with %d threads/core"
-> +                                      " on a host with %d threads/core"
-> +                                      " requires the use of VSMT mode %d.\n",
-> +                                      smp_threads, kvm_smt, spapr->vsmt);
-> +                }
-> +                kvmppc_hint_smt_possible(&local_err);
-> +                goto out;
->              }
-> -            kvmppc_hint_smt_possible(&local_err);
-> -            goto out;
->          }
->      }
->      /* else TCG: nothing to do currently */
+  int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+                               int cpuid, void *opaque);
+@@ -2005,7 +2008,8 @@ static inline bool cp_access_ok(int current_el,
+
+  /* Raw read of a coprocessor register (as needed for migration, etc) */
+  uint64_t read_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri);
+-
++void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri,
++                             uint64_t v);
+  /**
+   * write_list_to_cpustate
+   * @cpu: ARMCPU
+diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+index 04c1208..123da12 100644
+--- a/target/arm/gdbstub.c
++++ b/target/arm/gdbstub.c
+@@ -101,3 +101,93 @@ int arm_cpu_gdb_write_register(CPUState *cs, 
+uint8_t *mem_buf, int n)
+      /* Unknown register.  */
+      return 0;
+  }
++
++static void arm_generate_xml(gpointer key, gpointer value, gpointer cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUClass *cc = CPU_GET_CLASS(cpu);
++    XMLDynamicDescription *dyn_xml = &cc->dyn_xml;
++    ARMCPRegInfo *ri = value;
++    uint32_t ri_key= *(uint32_t *)key;
++    CPUARMState *env = &cpu->env;
++    char **target_xml=(char **)&(dyn_xml->desc);
++    char *tmp_xml=*target_xml;
++
++    if (!(ri->type & (ARM_CP_NO_RAW|ARM_CP_ALIAS))) {
++        if (cpreg_field_is_64bit(ri)){
++            if (arm_feature(env, ARM_FEATURE_AARCH64)) {
++                *target_xml=g_strconcat(*target_xml, "<reg name=\"", \
++                        ri->name, "\" bitsize=\"64\"/>", NULL);
++            } else {
++                return;
++            }
++        } else {
++            *target_xml=g_strconcat(*target_xml, "<reg name=\"", \
++                    ri->name, "\" bitsize=\"32\"/>", NULL);
++        }
++        g_free(tmp_xml);
++        dyn_xml->num_cpregs++;
++        dyn_xml->xml_cpregs_ordred_keys=g_renew(uint32_t, \
++                dyn_xml->xml_cpregs_ordred_keys, dyn_xml->num_cpregs);
++        dyn_xml->xml_cpregs_ordred_keys[dyn_xml->num_cpregs - 1] = ri_key;
++    }
++}
++
++char *arm_get_feature_xml_dynamically(CPUState *cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUClass *cc = CPU_GET_CLASS(cpu);
++
++    cc->dyn_xml.num_cpregs=0;
++    cc->dyn_xml.desc=g_strconcat("<?xml version=\"1.0\"?>", \
++                       "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">", \
++                       "<feature name=\"org.gnu.gdb.dynamic.cp\">", NULL);
++    g_hash_table_foreach(cpu->cp_regs, arm_generate_xml, cs);
++    cc->dyn_xml.desc=g_strconcat( cc->dyn_xml.desc, "</feature>", NULL);
++    cc->gdb_num_cpregs=cc->dyn_xml.num_cpregs;
++    return  cc->dyn_xml.desc;
++}
++
++int arm_cpu_gdb_read_cpregister(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUClass *cc = CPU_GET_CLASS(cpu);
++    ARMCPRegInfo *ri;
++    CPUARMState *env = &cpu->env;
++    uint32_t key;
++
++    key = cc->dyn_xml.xml_cpregs_ordred_keys[n];
++    ri=(ARMCPRegInfo 
+*)get_arm_cp_reginfo(arm_env_get_cpu(env)->cp_regs, key);
++       if (ri) {
++           if(cpreg_field_is_64bit(ri)){
++               return gdb_get_reg64(mem_buf, 
+(uint64_t)read_raw_cp_reg(env,ri));
++           } else {
++               return gdb_get_reg32(mem_buf, 
+(uint32_t)read_raw_cp_reg(env,ri));
++           }
++       }
++       return 0;
++}
++
++int arm_cpu_gdb_write_cpregister(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUClass *cc = CPU_GET_CLASS(cpu);
++    ARMCPRegInfo *ri;
++    CPUARMState *env = &cpu->env;
++    uint32_t tmp_buf,key;
++
++    tmp_buf = ldl_p(mem_buf);
++    key = cc->dyn_xml.xml_cpregs_ordred_keys[n];
++       ri=(ARMCPRegInfo 
+*)get_arm_cp_reginfo(arm_env_get_cpu(env)->cp_regs, key);
++       if (ri) {
++        if (!(ri->type & ARM_CP_CONST)) {
++            write_raw_cp_reg(env, ri, tmp_buf);
++            if (cpreg_field_is_64bit(ri)) {
++                return 8;
++            } else {
++                return 4;
++            }
++        }
++    }
++    return 0;
++}
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index d1395f9..fedc6bc 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -191,8 +191,7 @@ uint64_t read_raw_cp_reg(CPUARMState *env, const 
+ARMCPRegInfo *ri)
+      }
+  }
+
+-static void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri,
+-                             uint64_t v)
++void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t v)
+  {
+      /* Raw write of a coprocessor register (as needed for migration, etc).
+       * Note that constant registers are treated as write-ignored; the
+-- 
+1.9.1
