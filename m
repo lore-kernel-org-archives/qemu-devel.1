@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3o-0002kw-3O
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:57 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3l-0002hF-69
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3m-0004Wz-SM
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:56 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:45573)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3e-0004Rm-QK
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:53 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:40318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS3m-0004Wb-Mn
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:54 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id i186so8655080wmi.4
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:17:54 -0800 (PST)
+	id 1ebS3e-0004RO-Hy
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:46 -0500
+Received: by mail-wr0-x241.google.com with SMTP id 100so15331034wrb.7
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:17:46 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:16:53 +0100
-Message-Id: <1516112253-14480-12-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:16:47 +0100
+Message-Id: <1516112253-14480-6-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/51] build-sys: add a rule to print a variable
+Subject: [Qemu-devel] [PULL 05/51] i386/cpu/kvm: look at PMU's CPUID before
+ setting MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +29,159 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
 
-$ make print-CFLAGS
-CFLAGS=-fsanitize=address -Og -g
+Certain PMU-related MSRs are not supported for CPUs with PMU
+architecture below version 2. KVM rejects any access to them (see
+intel_is_valid_msr_idx routine in KVM), and QEMU fails on the following
+assertion:
 
-Trick from various sources:
-https://stackoverflow.com/questions/16467718/how-to-print-out-a-variable-in-makefile
-https://www.cmcrossroads.com/article/printing-value-makefile-variable
+  kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180104160523.22995-4-marcandre.lureau@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+QEMU also could fail if KVM exposes less fixed counters then 3. It could
+happen if host system run inside another hypervisor, which is tweaking
+PMU-related CPUID. To prevent possible fail, number of fixed counters now is
+obtained in the same way as number of GP counters.
+
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Message-Id: <1514383466-7257-1-git-send-email-jan.dakinevich@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                    |  5 ++++-
- docs/devel/build-system.txt | 13 +++++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ target/i386/kvm.c | 80 +++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 48 insertions(+), 32 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 1671db3..f26ef1b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -8,9 +8,12 @@ SRC_PATH=.
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6f69e2f..d23127c 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -92,8 +92,9 @@ static bool has_msr_hv_stimer;
+ static bool has_msr_hv_frequencies;
+ static bool has_msr_xss;
  
- UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
-     html info pdf txt \
--    help check-help \
-+    help check-help print-% \
-     docker docker-% vm-test vm-build-%
+-static bool has_msr_architectural_pmu;
+-static uint32_t num_architectural_pmu_counters;
++static uint32_t has_architectural_pmu_version;
++static uint32_t num_architectural_pmu_gp_counters;
++static uint32_t num_architectural_pmu_fixed_counters;
  
-+print-%:
-+	@echo '$*=$($*)'
+ static int has_xsave;
+ static int has_xcrs;
+@@ -872,19 +873,28 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     }
+ 
+     if (limit >= 0x0a) {
+-        uint32_t ver;
++        uint32_t eax, edx;
+ 
+-        cpu_x86_cpuid(env, 0x0a, 0, &ver, &unused, &unused, &unused);
+-        if ((ver & 0xff) > 0) {
+-            has_msr_architectural_pmu = true;
+-            num_architectural_pmu_counters = (ver & 0xff00) >> 8;
++        cpu_x86_cpuid(env, 0x0a, 0, &eax, &unused, &unused, &edx);
 +
- # All following code might depend on configuration variables
- ifneq ($(wildcard config-host.mak),)
- # Put the all: rule here so that config-host.mak can contain dependencies.
-diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
-index 386ef36..52501f2 100644
---- a/docs/devel/build-system.txt
-+++ b/docs/devel/build-system.txt
-@@ -510,3 +510,16 @@ default-configs/$TARGET-NAME file as input.
- This is the entrypoint used when make recurses to build a single system
- or userspace emulator target. It is merely a symlink back to the
- Makefile.target in the top level.
++        has_architectural_pmu_version = eax & 0xff;
++        if (has_architectural_pmu_version > 0) {
++            num_architectural_pmu_gp_counters = (eax & 0xff00) >> 8;
+ 
+             /* Shouldn't be more than 32, since that's the number of bits
+              * available in EBX to tell us _which_ counters are available.
+              * Play it safe.
+              */
+-            if (num_architectural_pmu_counters > MAX_GP_COUNTERS) {
+-                num_architectural_pmu_counters = MAX_GP_COUNTERS;
++            if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
++                num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
++            }
 +
++            if (has_architectural_pmu_version > 1) {
++                num_architectural_pmu_fixed_counters = edx & 0x1f;
 +
-+Useful make targets
-+===================
++                if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
++                    num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
++                }
+             }
+         }
+     }
+@@ -1650,32 +1660,36 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+         if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
+             kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, env->steal_time_msr);
+         }
+-        if (has_msr_architectural_pmu) {
+-            /* Stop the counter.  */
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
++        if (has_architectural_pmu_version > 0) {
++            if (has_architectural_pmu_version > 1) {
++                /* Stop the counter.  */
++                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
++                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
++            }
+ 
+             /* Set the counter values.  */
+-            for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
++            for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
+                                   env->msr_fixed_counters[i]);
+             }
+-            for (i = 0; i < num_architectural_pmu_counters; i++) {
++            for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
+                 kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i,
+                                   env->msr_gp_counters[i]);
+                 kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i,
+                                   env->msr_gp_evtsel[i]);
+             }
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
+-                              env->msr_global_status);
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+-                              env->msr_global_ovf_ctrl);
+-
+-            /* Now start the PMU.  */
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
+-                              env->msr_fixed_ctr_ctrl);
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
+-                              env->msr_global_ctrl);
++            if (has_architectural_pmu_version > 1) {
++                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
++                                  env->msr_global_status);
++                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
++                                  env->msr_global_ovf_ctrl);
 +
-+- help
-+
-+  Print a help message for the most common build targets.
-+
-+- print-VAR
-+
-+  Print the value of the variable VAR. Useful for debugging the build
-+  system.
++                /* Now start the PMU.  */
++                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
++                                  env->msr_fixed_ctr_ctrl);
++                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
++                                  env->msr_global_ctrl);
++            }
+         }
+         /*
+          * Hyper-V partition-wide MSRs: to avoid clearing them on cpu hot-add,
+@@ -2030,15 +2044,17 @@ static int kvm_get_msrs(X86CPU *cpu)
+     if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
+         kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, 0);
+     }
+-    if (has_msr_architectural_pmu) {
+-        kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+-        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+-        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
+-        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
+-        for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
++    if (has_architectural_pmu_version > 0) {
++        if (has_architectural_pmu_version > 1) {
++            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
++            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
++            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
++            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
++        }
++        for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
+         }
+-        for (i = 0; i < num_architectural_pmu_counters; i++) {
++        for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
+             kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i, 0);
+             kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i, 0);
+         }
 -- 
 1.8.3.1
