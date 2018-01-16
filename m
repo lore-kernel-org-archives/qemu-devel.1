@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ebXgn-0006lY-Ai
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:18:34 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebXiz-0000mA-3J
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:20:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ebXgi-00049k-Gz
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:18:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ebXgi-00049A-Ab
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:18:28 -0500
-References: <CAFEAcA8F4iO91c8OGtDbHQ_hqzY+9ka41PW4q+ES9sYGRUha0g@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <176e66bb-7990-20da-a82f-fbabd9b4ed88@redhat.com>
-Date: Tue, 16 Jan 2018 21:18:20 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebXiu-0004s9-3z
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:20:49 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:43749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebXit-0004s1-V6
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:20:44 -0500
+Received: by mail-qt0-x242.google.com with SMTP id s3so19843104qtb.10
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 12:20:43 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20180115143500.22631-1-f4bug@amsat.org>
+	<20180115143500.22631-7-f4bug@amsat.org>
+	<20180115162728.GS8218@redhat.com>
+	<25b03edb-0db9-4ad4-538c-72255cf310cf@amsat.org>
+Message-ID: <96410715-6dce-252a-33c1-0772a43b195b@amsat.org>
+Date: Tue, 16 Jan 2018 17:20:39 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8F4iO91c8OGtDbHQ_hqzY+9ka41PW4q+ES9sYGRUha0g@mail.gmail.com>
+In-Reply-To: <25b03edb-0db9-4ad4-538c-72255cf310cf@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU virt board: extending various limits
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] docker: add the Fedora 27 base image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Wei Huang <wei@redhat.com>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-(adding Ard, Igor, Wei, Leif)
-
-On 01/16/18 16:07, Peter Maydell wrote:
-> We've had discussions before about the various limits in the virt
-> board imposed by its current address space layout:
->  * number of CPUs limited to 123 (not enough space for more redistributors)
->  * number of PCIe devices limited by size of ECAM space
->  * max memory size limits
->  * (anything else?)
+On 01/15/2018 01:38 PM, Philippe Mathieu-Daudé wrote:
+> On 01/15/2018 01:27 PM, Daniel P. Berrange wrote:
+>> On Mon, Jan 15, 2018 at 11:34:57AM -0300, Philippe Mathieu-Daudé wrote:
+>>> straight copy on Fedora 25 base.
+>>>
+>>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>  tests/docker/dockerfiles/fedora27.docker | 18 ++++++++++++++++++
+>>>  1 file changed, 18 insertions(+)
+>>>  create mode 100644 tests/docker/dockerfiles/fedora27.docker
+>>>
+>>> diff --git a/tests/docker/dockerfiles/fedora27.docker b/tests/docker/dockerfiles/fedora27.docker
+>>> new file mode 100644
+>>> index 0000000000..7cba4dcc2c
+>>> --- /dev/null
+>>> +++ b/tests/docker/dockerfiles/fedora27.docker
+>>> @@ -0,0 +1,18 @@
+>>> +FROM fedora:27
+>>> +ENV PACKAGES \
+>>> +    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
+>>> +    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+>>
+>> Perhaps SDL2 here too
+>>
+>>> +    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+>>> +    nettle-devel \
+>>> +    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+>>> +    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+>>
+>> Is there a reason we have both GTK2 and GTK3 installed ? We've deprecated GTK2
+>> and configure will pick GTK3 by default. IIUC there's no way to override
+>> that in the docker builds to force GTK2, so it can possibly be dropped.
 > 
-> If we want to try to fix these this release cycle now would be a good
-> point to figure out our approach so that we have plenty of time to do
-> it in.
-> 
-> (Relatedly, I notice patches on list for kvm that allow userspace to
-> set the guest physical address size, which may affect how we want
-> to do this.)
-> 
-> I'm not going to have time to look at this but am happy to provide
-> my opinions on whatever proposals other people would like to suggest.
-> 
-> Probably the first thing to do is figure out whether we can
-> raise these limits without having to have a flag day (ie just
-> with changing the device tree we provide the guest), or if we
-> really have a hard compat break here. We should also try to
-> fix all these things at once rather than potentially breaking
-> guests several times...
+> No clue, Fam?
 
-I've quite lost the context on this since we last talked about it. :) My
-request would be that Drew and Igor please (re)state their preferences,
-and Ard and myself should put "firmware price tags" on those ideas.
+This series no longer applies since the c08d08b27cad "Build fedora image
+with ASAN/UBSan", I'll respin.
 
-As far as I remember, the sticking point from last time was whether
-guest UEFI remains permitted to rely on the RAM base being fixed at 1GB
-(i.e. if UEFI is at liberty to ignore x0 on entry). This decision
-provides a framework for all further area movements, and represents a
-large difference in firmware difficulty.
+Now since GTK2+3 are use in this docker image since it's origin, I'll
+wait for Fam to confirm we can drop GTK2.
 
-(Personally I'd be ready to *accept* a consensus that UEFI should cope
-with a dynamic x0 on entry -- I'm neither proposing nor arguing against
-the notion. The large additional complexity in the firmware should be
-clear up-front however -- it'll take more time, more bugs, more human
-resources. My last writeup is at
-<http://mid.mail-archive.com/4cce2b8b-a411-bd5d-a06f-b0b80a5fb2f1@redhat.com>,
-although I think Ard has modified some of the code since, so parts of
-that text are no longer up to date.)
-
-Thanks,
-Laszlo
+>>> +    mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+>>> +    mingw32-bzip2 \
+>>> +    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
+>>> +    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
+>>
+>> Repeated here.
+>>
+>>> +    mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
+>>> +    mingw64-bzip2
+>>> +
+>>> +RUN dnf install -y $PACKAGES
+>>> +RUN rpm -q $PACKAGES | sort > /packages.txt
+>>> +ENV FEATURES mingw clang pyyaml
