@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ebRNv-0008Ch-Vv
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:41 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNu-0008BT-Jc
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ebRNs-0002nn-0i
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:40 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45886)
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNt-0002pM-Ck
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:38 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ebRNr-0002gG-Pj
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:35 -0500
+	id 1ebRNt-0002ll-4E
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:37 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ebRNn-0002s2-1y
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:34:31 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNk-0002qh-Sy
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:34:28 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jan 2018 13:34:02 +0000
-Message-Id: <1516109659-1557-8-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 16 Jan 2018 13:33:59 +0000
+Message-Id: <1516109659-1557-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1516109659-1557-1-git-send-email-peter.maydell@linaro.org>
 References: <1516109659-1557-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/24] hw/sd/ssi-sd: Reset SD card on controller
- reset
+Subject: [Qemu-devel] [PULL 04/24] target/arm: Handle page table walk load
+ failures correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +30,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Since ssi-sd is still using the legacy SD card API, the SD
-card created by sd_init() is not plugged into any bus. This
-means that the controller has to reset it manually.
+Instead of ignoring the response from address_space_ld*()
+(indicating an attempt to read a page table descriptor from
+an invalid physical address), use it to report the failure
+correctly.
 
-Failing to do this mostly didn't affect the guest since the
-guest typically does a programmed SD card reset as part of
-its SD controller driver initialization, but meant that
-migration failed because it's only in sd_reset() that we
-set up the wpgrps_size field.
+Since this is another couple of locations where we need to
+decide the value of the ARMMMUFaultInfo ea bit based on a
+MemTxResult, we factor out that operation into a helper
+function.
 
-In the case of sd-ssi, we have to implement an entire
-reset function since there wasn't one previously, and
-that requires a QOM cast macro that got omitted when this
-device was QOMified.
-
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1515506513-31961-4-git-send-email-peter.maydell@linaro.org
 ---
- hw/sd/ssi-sd.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ target/arm/internals.h | 10 ++++++++++
+ target/arm/helper.c    | 39 ++++++++++++++++++++++++++++++++++-----
+ target/arm/op_helper.c |  7 +------
+ 3 files changed, 45 insertions(+), 11 deletions(-)
 
-diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-index 24001dc..f88f509 100644
---- a/hw/sd/ssi-sd.c
-+++ b/hw/sd/ssi-sd.c
-@@ -50,6 +50,9 @@ typedef struct {
-     SDState *sd;
- } ssi_sd_state;
- 
-+#define TYPE_SSI_SD "ssi-sd"
-+#define SSI_SD(obj) OBJECT_CHECK(ssi_sd_state, (obj), TYPE_SSI_SD)
-+
- /* State word bits.  */
- #define SSI_SDR_LOCKED          0x0001
- #define SSI_SDR_WP_ERASE        0x0002
-@@ -241,7 +244,6 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
-     ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
-     DriveInfo *dinfo;
- 
--    s->mode = SSI_SD_CMD;
-     /* FIXME use a qdev drive property instead of drive_get_next() */
-     dinfo = drive_get_next(IF_SD);
-     s->sd = sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, true);
-@@ -251,6 +253,24 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
-     }
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 876854d..89f5d2f 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -687,6 +687,16 @@ static inline uint32_t arm_fi_to_lfsc(ARMMMUFaultInfo *fi)
+     return fsc;
  }
  
-+static void ssi_sd_reset(DeviceState *dev)
++static inline bool arm_extabort_type(MemTxResult result)
 +{
-+    ssi_sd_state *s = SSI_SD(dev);
-+
-+    s->mode = SSI_SD_CMD;
-+    s->cmd = 0;
-+    memset(s->cmdarg, 0, sizeof(s->cmdarg));
-+    memset(s->response, 0, sizeof(s->response));
-+    s->arglen = 0;
-+    s->response_pos = 0;
-+    s->stopping = 0;
-+
-+    /* Since we're still using the legacy SD API the card is not plugged
-+     * into any bus, and we must reset it manually.
++    /* The EA bit in syndromes and fault status registers is an
++     * IMPDEF classification of external aborts. ARM implementations
++     * usually use this to indicate AXI bus Decode error (0) or
++     * Slave error (1); in QEMU we follow that.
 +     */
-+    device_reset(DEVICE(s->sd));
++    return result != MEMTX_DECODE_ERROR;
 +}
 +
- static void ssi_sd_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -260,10 +280,11 @@ static void ssi_sd_class_init(ObjectClass *klass, void *data)
-     k->transfer = ssi_sd_transfer;
-     k->cs_polarity = SSI_CS_LOW;
-     dc->vmsd = &vmstate_ssi_sd;
-+    dc->reset = ssi_sd_reset;
+ /* Do a page table walk and add page to TLB if possible */
+ bool arm_tlb_fill(CPUState *cpu, vaddr address,
+                   MMUAccessType access_type, int mmu_idx,
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index eb80f79..c83c901 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -8305,6 +8305,7 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
+         ret = get_phys_addr_lpae(env, addr, 0, ARMMMUIdx_S2NS, &s2pa,
+                                  &txattrs, &s2prot, &s2size, fi, NULL);
+         if (ret) {
++            assert(fi->type != ARMFault_None);
+             fi->s2addr = addr;
+             fi->stage2 = true;
+             fi->s1ptw = true;
+@@ -8328,7 +8329,9 @@ static uint32_t arm_ldl_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+     ARMCPU *cpu = ARM_CPU(cs);
+     CPUARMState *env = &cpu->env;
+     MemTxAttrs attrs = {};
++    MemTxResult result = MEMTX_OK;
+     AddressSpace *as;
++    uint32_t data;
+ 
+     attrs.secure = is_secure;
+     as = arm_addressspace(cs, attrs);
+@@ -8337,10 +8340,16 @@ static uint32_t arm_ldl_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+         return 0;
+     }
+     if (regime_translation_big_endian(env, mmu_idx)) {
+-        return address_space_ldl_be(as, addr, attrs, NULL);
++        data = address_space_ldl_be(as, addr, attrs, &result);
+     } else {
+-        return address_space_ldl_le(as, addr, attrs, NULL);
++        data = address_space_ldl_le(as, addr, attrs, &result);
+     }
++    if (result == MEMTX_OK) {
++        return data;
++    }
++    fi->type = ARMFault_SyncExternalOnWalk;
++    fi->ea = arm_extabort_type(result);
++    return 0;
  }
  
- static const TypeInfo ssi_sd_info = {
--    .name          = "ssi-sd",
-+    .name          = TYPE_SSI_SD,
-     .parent        = TYPE_SSI_SLAVE,
-     .instance_size = sizeof(ssi_sd_state),
-     .class_init    = ssi_sd_class_init,
+ static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+@@ -8349,7 +8358,9 @@ static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+     ARMCPU *cpu = ARM_CPU(cs);
+     CPUARMState *env = &cpu->env;
+     MemTxAttrs attrs = {};
++    MemTxResult result = MEMTX_OK;
+     AddressSpace *as;
++    uint32_t data;
+ 
+     attrs.secure = is_secure;
+     as = arm_addressspace(cs, attrs);
+@@ -8358,10 +8369,16 @@ static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+         return 0;
+     }
+     if (regime_translation_big_endian(env, mmu_idx)) {
+-        return address_space_ldq_be(as, addr, attrs, NULL);
++        data = address_space_ldq_be(as, addr, attrs, &result);
+     } else {
+-        return address_space_ldq_le(as, addr, attrs, NULL);
++        data = address_space_ldq_le(as, addr, attrs, &result);
++    }
++    if (result == MEMTX_OK) {
++        return data;
+     }
++    fi->type = ARMFault_SyncExternalOnWalk;
++    fi->ea = arm_extabort_type(result);
++    return 0;
+ }
+ 
+ static bool get_phys_addr_v5(CPUARMState *env, uint32_t address,
+@@ -8390,6 +8407,9 @@ static bool get_phys_addr_v5(CPUARMState *env, uint32_t address,
+     }
+     desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+                        mmu_idx, fi);
++    if (fi->type != ARMFault_None) {
++        goto do_fault;
++    }
+     type = (desc & 3);
+     domain = (desc >> 5) & 0x0f;
+     if (regime_el(env, mmu_idx) == 1) {
+@@ -8426,6 +8446,9 @@ static bool get_phys_addr_v5(CPUARMState *env, uint32_t address,
+         }
+         desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+                            mmu_idx, fi);
++        if (fi->type != ARMFault_None) {
++            goto do_fault;
++        }
+         switch (desc & 3) {
+         case 0: /* Page translation fault.  */
+             fi->type = ARMFault_Translation;
+@@ -8508,6 +8531,9 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
+     }
+     desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+                        mmu_idx, fi);
++    if (fi->type != ARMFault_None) {
++        goto do_fault;
++    }
+     type = (desc & 3);
+     if (type == 0 || (type == 3 && !arm_feature(env, ARM_FEATURE_PXN))) {
+         /* Section translation fault, or attempt to use the encoding
+@@ -8559,6 +8585,9 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
+         table = (desc & 0xfffffc00) | ((address >> 10) & 0x3fc);
+         desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+                            mmu_idx, fi);
++        if (fi->type != ARMFault_None) {
++            goto do_fault;
++        }
+         ap = ((desc >> 4) & 3) | ((desc >> 7) & 4);
+         switch (desc & 3) {
+         case 0: /* Page translation fault.  */
+@@ -8964,7 +8993,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+         descaddr &= ~7ULL;
+         nstable = extract32(tableattrs, 4, 1);
+         descriptor = arm_ldq_ptw(cs, descaddr, !nstable, mmu_idx, fi);
+-        if (fi->s1ptw) {
++        if (fi->type != ARMFault_None) {
+             goto do_fault;
+         }
+ 
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index b362063..712c5c5 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -220,12 +220,7 @@ void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+     /* now we have a real cpu fault */
+     cpu_restore_state(cs, retaddr);
+ 
+-    /* The EA bit in syndromes and fault status registers is an
+-     * IMPDEF classification of external aborts. ARM implementations
+-     * usually use this to indicate AXI bus Decode error (0) or
+-     * Slave error (1); in QEMU we follow that.
+-     */
+-    fi.ea = (response != MEMTX_DECODE_ERROR);
++    fi.ea = arm_extabort_type(response);
+     fi.type = ARMFault_SyncExternal;
+     deliver_fault(cpu, addr, access_type, mmu_idx, &fi);
+ }
 -- 
 2.7.4
