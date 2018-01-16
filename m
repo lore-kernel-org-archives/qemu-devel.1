@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebXU3-0007PM-TV
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:05:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebXVF-00082A-AZ
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:06:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebXU0-0007If-8q
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:05:23 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:51213
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1ebXU0-0007IT-1p
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:05:20 -0500
-References: <20180115205848.26027-1-mark.cave-ayland@ilande.co.uk>
-	<b706db4f-b103-9433-9973-762c7c594005@amsat.org>
-	<3012b56d-9242-47ee-eb58-530080ba8c43@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <f59cf77f-e796-19a7-148f-d91fbd09b9b8@ilande.co.uk>
-Date: Tue, 16 Jan 2018 20:05:11 +0000
+	(envelope-from <eblake@redhat.com>) id 1ebXVE-0007uV-5W
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:06:37 -0500
+References: <20180111195225.4226-1-kwolf@redhat.com>
+	<20180111195225.4226-11-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6303b684-cd5c-4c99-518e-896f2b5a68f7@redhat.com>
+Date: Tue, 16 Jan 2018 14:06:27 -0600
 MIME-Version: 1.0
-In-Reply-To: <3012b56d-9242-47ee-eb58-530080ba8c43@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] sun4u: implement power device
+In-Reply-To: <20180111195225.4226-11-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jNOQjeK4y0WY72f8kMsBEUlHApBd3ByVW"
+Subject: Re: [Qemu-devel] [RFC PATCH 10/10] block: x-blockdev-create QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +25,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, atar4qemu@gmail.com, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On 16/01/18 14:23, Marcel Apfelbaum wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jNOQjeK4y0WY72f8kMsBEUlHApBd3ByVW
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+Message-ID: <6303b684-cd5c-4c99-518e-896f2b5a68f7@redhat.com>
+Subject: Re: [RFC PATCH 10/10] block: x-blockdev-create QMP command
+References: <20180111195225.4226-1-kwolf@redhat.com>
+ <20180111195225.4226-11-kwolf@redhat.com>
+In-Reply-To: <20180111195225.4226-11-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Hi Philippe,
-> 
-> On 16/01/2018 2:54, Philippe Mathieu-Daudé wrote:
->> CC'ing PCI maintainers.
->>
->> Hi Mark,
->>
->> On 01/15/2018 05:58 PM, Mark Cave-Ayland wrote:
->>> This inbuilt device contains a single 4-byte register, of which bit 
->>> 24 is used
->>> to power down the machine on a real Ultra 5.
->>>
->>> The power device exists at offset 0x724000 on a real machine, but due 
->>> to the
->>> current configuration of the BARs in QEMU it must be located lower in 
->>> PCI IO
->>> space.
->> Is is some issue in pci_bar_address()?
->>
-> 
-> The QEMU IO layout:
-> 
->      /*
->       * QEMU I/O address space usage:
->       *   0000 - 0fff    legacy isa, pci config, pci root bus, ...
->       *   1000 - 9fff    free
->       *   a000 - afff    hotplug (cpu, pci via acpi, i440fx/piix only)
->       *   b000 - bfff    power management (PORT_ACPI_PM_BASE)
->       *                  [ qemu 1.4+ implements pci config registers
->       *                    properly so guests can place the registers
->       *                    where they want, on older versions its fixed ]
->       *   c000 - ffff    free, traditionally used for pci io
->       */
-> 
-> As you can see we don't have IO address space over ffff.
+On 01/11/2018 01:52 PM, Kevin Wolf wrote:
+> This adds a synchronous x-blockdev-create QMP command that can create
+> qcow2 images on a given node name.
+>=20
+> We don't want to block while creating an image, so this is not the fina=
+l
+> interface in all aspects, but BlockdevCreateOptionsQcow2 and
+> .bdrv_co_create() are what they actually might look like in the end. In=
 
-Well that's not actually quite true - we use a separate ebus address 
-space for the onboard devices (and that does have 32-bit PCI IO accesses 
-enabled), but the issue here is one of the sun4u PCI host/onboard device 
-configuration rather than anything to do with QEMU.
+> any case, this should be good enough to test whether we interpret
+> BlockdevCreateOptions as we should.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json      | 12 ++++++++++++
+>  include/block/block_int.h |  2 ++
+>  block.c                   | 48 +++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/qcow2.c             |  3 ++-
+>  4 files changed, 64 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 9341f6708d..93357a4d5d 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3415,6 +3415,18 @@
+>    } }
+> =20
+>  ##
+> +# @x-blockdev-create:
+> +#
+> +# Create an image format on a given node.
+> +# TODO Replace with something asynchronous (block job?)
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'x-blockdev-create',
+> +  'data': 'BlockdevCreateOptions',
+> +  'boxed': true }
+> +
+
+So simple, compared to all the prep work in earlier patches ;)
+
+I like the approach.  As you say, there's still more work before we can
+remove the x- prefix, but I think you're headed on a good track.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-ATB,
+--jNOQjeK4y0WY72f8kMsBEUlHApBd3ByVW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Mark.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeW0MACgkQp6FrSiUn
+Q2peiAf/ektEItl+rJQlTptifT2XhUxPtkmEnA4yPrIlx/sus7FJpKwQHnmZiv6m
+RzimXL6v1v8LhxCF7NadNjR59XzCrWH7I7RM852LeXhkbvTL1STH+PXLObcq+q/c
+Rhp7bS+T7KRU5PZaRyJJsv+RPE8uKUGbj0e7ylKSh1O85lt+P784PI0hiYS4Cu9D
+4wk+OTdFmF0hg1wq4lecKwkpOsP+vrhbRVwQjxZw90qkQMJNJEYVrNvqcqxJz4Dc
+zZgHCS5wjE+ZT7nAsqJeniuWQ0jXJpku9aFf0liAKxhX5ceetXwzyyx+mTitlGEw
+l6QscOoRzSpPfsYj643NRtVVMq1WBA==
+=jObl
+-----END PGP SIGNATURE-----
+
+--jNOQjeK4y0WY72f8kMsBEUlHApBd3ByVW--
