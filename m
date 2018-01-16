@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebRVK-0006Ul-Ih
+	(envelope-from <dgibson@ozlabs.org>) id 1ebRVL-0006VU-Cb
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebRVE-0008KP-KJ
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:18 -0500
-Date: Tue, 16 Jan 2018 23:24:32 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ebRVF-0008L5-Dz
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:19 -0500
+Date: Wed, 17 Jan 2018 00:39:46 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180116122432.GJ30352@umbus.fritz.box>
+Message-ID: <20180116133946.GM30352@umbus.fritz.box>
 References: <20180116044714.12571-1-david@gibson.dropbear.id.au>
 	<20180116044714.12571-2-david@gibson.dropbear.id.au>
-	<20180116102018.382fd035@bahia.lan>
+	<ab350665-cb32-72d3-a548-0572f5275775@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="sT9gWZPUZYhvPS56"
+	protocol="application/pgp-signature"; boundary="37nyS7qXrnu4wN2o"
 Content-Disposition: inline
-In-Reply-To: <20180116102018.382fd035@bahia.lan>
+In-Reply-To: <ab350665-cb32-72d3-a548-0572f5275775@redhat.com>
 Subject: Re: [Qemu-devel] [PATCHv2 1/2] spapr: Allow some cases where we
  can't set VSMT mode in the kernel
 List-Id: <qemu-devel.nongnu.org>
@@ -26,19 +26,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: groug@kaod.org, joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---sT9gWZPUZYhvPS56
+--37nyS7qXrnu4wN2o
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 16, 2018 at 10:20:18AM +0100, Greg Kurz wrote:
-> On Tue, 16 Jan 2018 15:47:13 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
+On Tue, Jan 16, 2018 at 11:34:52AM +0100, Laurent Vivier wrote:
+> On 16/01/2018 05:47, David Gibson wrote:
 > > At present if we require a vsmt mode that's not equal to the kernel's
 > > default, and the kernel doesn't let us change it (e.g. because it's an =
 old
@@ -59,33 +57,6 @@ iour
 > >=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > > ---
->=20
-> I could check the following on a POWER9 host:
->=20
-> $ ./ppc64-softmmu/qemu-system-ppc64 -accel kvm -smp threads=3D1
-> qemu-system-ppc64: warning: Failed to set KVM's VSMT mode to 8 (errno -22)
->=20
-> and the guest boots.
->=20
-> $ ./ppc64-softmmu/qemu-system-ppc64 -accel kvm -smp threads=3D2
-> qemu-system-ppc64: Failed to set KVM's VSMT mode to 8 (errno -22)
-> On PPC, a VM with 2 threads/core on a host with 1 threads/core requires t=
-he
->  use of VSMT mode 8.
-> This KVM seems to be too old to support VSMT.
->=20
-> and QEMU exits.
-
-I assume the above is with an old kernel that doesn't have the ability
-to set the SMT cap?
-
->=20
-> Tested-by: Greg Kurz <groug@kaod.org>
->=20
-> Just one minor remark below but anyway:
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
 > >  hw/ppc/spapr.c | 26 +++++++++++++++++++-------
 > >  1 file changed, 19 insertions(+), 7 deletions(-)
 > >=20
@@ -117,30 +88,18 @@ ires "
 > > +            if ((kvm_smt >=3D smp_threads) && (spapr->vsmt % kvm_smt) =
 =3D=3D 0) {
 >=20
-> Inconsistent use of parens in the left and right operands of &&
+> I agree with Greg: inconsistent use of parenthesis, should be
 >=20
-> > +                warn_report_err(local_err);
-> > +                local_err =3D NULL;
-> > +                goto out;
-> > +            } else {
-> > +                if (!vsmt_user) {
-> > +                    error_append_hint(&local_err,
-> > +                                      "On PPC, a VM with %d threads/co=
-re"
-> > +                                      " on a host with %d threads/core"
-> > +                                      " requires the use of VSMT mode =
-%d.\n",
-> > +                                      smp_threads, kvm_smt, spapr->vsm=
-t);
-> > +                }
-> > +                kvmppc_hint_smt_possible(&local_err);
-> > +                goto out;
-> >              }
-> > -            kvmppc_hint_smt_possible(&local_err);
-> > -            goto out;
-> >          }
-> >      }
-> >      /* else TCG: nothing to do currently */
+>     if (kvm_smt >=3D smp_threads && (spapr->vsmt % kvm_smt) =3D=3D 0) {
+
+Corrected in my tree.
+
+> Anyway:
+>=20
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+>=20
+> Thanks,
+> Laurent
 >=20
 
 --=20
@@ -149,24 +108,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---sT9gWZPUZYhvPS56
+--37nyS7qXrnu4wN2o
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpd7v4ACgkQbDjKyiDZ
-s5I68xAAsq30VV2w46w5D6d2dYSlNQeuTbh9cpzCENOd09/Mh7S3dRKKC9ctKqWJ
-41IcJswuX+pcdvPoAkZuAfGvbV5lNW9zXXg1JYITOUQMHuU1Azg4fAv1TVGq2A4n
-TivDPAq2feg/imRY5zxXei/piuznHmNJ4zD6f+sjmBq53RFC9HANwLdZwteLl3Cu
-6VwcdldsfRXj2aDKoIns94JDAJy1tLP6L+j0g+0O+60uVhBqEhGV0H6Iqf4C0NbD
-2n6hKAjurvNcVNpwabDGa9xLieRXSZhK96KceGoNa5KKc1mG016cnKojn0xva3wZ
-Zz1VebiLx3uNdwODOINEKkOTjhFwFDBrFqyl9LB1zSlYy2NJ7RZXFhdcBCmTli+G
-pdI9YXeY4MeHhjfI/gKZCAfWlPsCs1CA4uuXj/9TqkUjdOXdLAyrHXs6AW7TSl1+
-0fDpjQWqQh826rMmiZJv320XhYb/l9MmXXpoH08aTORSKbl7XGgaLm8y5c0QcD6o
-zQeHFr3uiMHhhhaMlxssuKjlEKTIQ+DGX6Vc3EuCdZuf1mddNehGomWutFcbt0uI
-ZRDG4PGIhoZjg9DD8XYGM4HjebCvEe4iWz7QdlW3528rSQ2FMaInw9LZf5qxapsQ
-gPKRRcoUKSdTAyYz4PThtDRczcUBCHoVAVjCrwO86Y0ir1VWIFs=
-=r4uB
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpeAKIACgkQbDjKyiDZ
+s5JfTBAA5doUNBZ60eMSxOZRJqB7OxLUZEgMkhs0nf3uurBCZrHpqq9v0L2brx9p
+Z5MafHVKlvzRRPNQjove4Vqkv669Pr0mT31dJnJjfHSylmqDsyAprzcvT6yu4A0T
+vD8beV24wfIJpxW8/VAerJG3qfs8TtpraL2vhsdmJFO4t/bdsgoX3WdJeYtMl4z8
+kiybTWS95mc46tOFct0d+CEFulLL/dt/vXtx0o2ju8pqe93vCsHsd6RjxQrvcNjP
+whSv70TUio7bxiLWkaQaIXRORVJYk7+rCUmjat/oAd3a+WB0uXUgepr0l97Gwsv8
+SJG92tekVokzIsgJeCUeWRJ7Df4LaZzVMPtDaJXDhXnMTWrCbBurLJrQk5Fqgxj2
+IfkUaeCcQFz2UzbtAbdTowMJWKaeg3jzyRLvsbgCGZ1ArDyF4jxGcdLs0c9hZNGF
+opwF4XssB+PVjgWl/YSwd+I3LTD3pVW0Ag2b/2WxCWmsW2g+opILoEGae/GBxCyE
+gEO7+5Ctxex9r/EsgP9OmaJk8dctgNP5b3F+ILE9ZSu31borhEuzQj6bD0/RUDN4
+z3zhvVtxb7IXNUs0WFWnZICXWfm3ovePejpuEWbqXAsqIaOZ+yNNq6FxI6F5boy9
+1QJYvygeQP5m7ETMo/SdDJx6zmCxIBPhI7X4ZXe4RYJ5exFXT+M=
+=deA8
 -----END PGP SIGNATURE-----
 
---sT9gWZPUZYhvPS56--
+--37nyS7qXrnu4wN2o--
