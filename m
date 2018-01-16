@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3d-0002XX-8V
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3e-0002Z9-QR
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3c-0004QZ-2o
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:45 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:41869)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3Z-0004Ph-5h
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:46 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39446)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS3b-0004QL-Sd
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:44 -0500
-Received: by mail-wm0-x243.google.com with SMTP id f71so8699289wmf.0
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:17:43 -0800 (PST)
+	id 1ebS3Y-0004PR-VA
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:41 -0500
+Received: by mail-wm0-x243.google.com with SMTP id i11so8890441wmf.4
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:17:40 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:16:45 +0100
-Message-Id: <1516112253-14480-4-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:16:43 +0100
+Message-Id: <1516112253-14480-2-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 03/51] pc: fail memory hot-plug/unplug with
- -no-acpi and Q35 machine type
+Subject: [Qemu-devel] [PULL 01/51] scsi-generic: Add share-rw option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +28,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: Fam Zheng <famz@redhat.com>
 
-From: Haozhong Zhang <haozhong.zhang@intel.com>
+From: Fam Zheng <famz@redhat.com>
 
-When -no-acpi option is used with Q35 machine type, no guest ACPI is
-built, but the ACPI device is still created, so only checking the
-presence of ACPI device before memory plug/unplug is not enough in
-such cases. Check whether ACPI is disabled globally in addition and
-fail memory plug/unplug if it's disabled.
+Add the property to the device model, then parse it by calling
+blkconf_apply_backend_options().
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-Id: <20171222015120.31730-1-haozhong.zhang@intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+In addition to blk_set_perm(), the called function also handles error
+options and wce. For error options we've already checked that the
+default values are used, for wce we don't have the option either so it
+is always the default (true). In other words there is no change of
+behavior in these regards.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20171205151553.7834-1-famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ hw/scsi/scsi-generic.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3fcf318..55686bf 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1695,9 +1695,14 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-         align = memory_region_get_alignment(mr);
-     }
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index bd0d9ff..ba70c0d 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -482,6 +482,7 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
+     int rc;
+     int sg_version;
+     struct sg_scsi_id scsiid;
++    Error *local_err = NULL;
  
--    if (!pcms->acpi_dev) {
-+    /*
-+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
-+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
-+     * addition to cover this case.
-+     */
-+    if (!pcms->acpi_dev || !acpi_enabled) {
-         error_setg(&local_err,
--                   "memory hotplug is not enabled: missing acpi device");
-+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
-         goto out;
+     if (!s->conf.blk) {
+         error_setg(errp, "drive property not set");
+@@ -515,6 +516,13 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
+         error_setg(errp, "SG_GET_SCSI_ID ioctl failed");
+         return;
      }
++    blkconf_apply_backend_options(&s->conf,
++                                  blk_is_read_only(s->conf.blk),
++                                  true, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
  
-@@ -1729,9 +1734,14 @@ static void pc_dimm_unplug_request(HotplugHandler *hotplug_dev,
-     Error *local_err = NULL;
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+     /* define device state */
+     s->type = scsiid.scsi_type;
+@@ -565,6 +573,7 @@ static SCSIRequest *scsi_new_request(SCSIDevice *d, uint32_t tag, uint32_t lun,
  
--    if (!pcms->acpi_dev) {
-+    /*
-+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
-+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
-+     * addition to cover this case.
-+     */
-+    if (!pcms->acpi_dev || !acpi_enabled) {
-         error_setg(&local_err,
--                   "memory hotplug is not enabled: missing acpi device");
-+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
-         goto out;
-     }
+ static Property scsi_generic_properties[] = {
+     DEFINE_PROP_DRIVE("drive", SCSIDevice, conf.blk),
++    DEFINE_PROP_BOOL("share-rw", SCSIDevice, conf.share_rw, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
 -- 
 1.8.3.1
