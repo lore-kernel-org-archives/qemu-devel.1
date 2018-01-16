@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebHni-00013t-Kw
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:20:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ebI0r-0004l0-NX
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebHnd-0005mo-M6
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:20:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebHnd-0005mY-CO
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:20:33 -0500
-Date: Tue, 16 Jan 2018 05:20:28 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180116051952-mutt-send-email-mst@kernel.org>
-References: <20171218201340.27583-1-dgilbert@redhat.com>
-	<20171218201340.27583-5-dgilbert@redhat.com>
-	<20171227133403.42d43cf1@igors-macbook-pro.local>
-	<20180108180729.GI2462@work-vm>
+	(envelope-from <richard.henderson@linaro.org>) id 1ebI0o-000386-K6
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:34:13 -0500
+Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:45420)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ebI0o-00037r-DJ
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:34:10 -0500
+Received: by mail-pf0-x22d.google.com with SMTP id a88so7487056pfe.12
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 19:34:10 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 15 Jan 2018 19:33:38 -0800
+Message-Id: <20180116033404.31532-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180108180729.GI2462@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v5 4/7] vhost: Merge sections added to
- temporary list
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v9 00/26] tcg: generic vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,152 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Mon, Jan 08, 2018 at 06:07:30PM +0000, Dr. David Alan Gilbert wrote:
-> * Igor Mammedov (imammedo@redhat.com) wrote:
-> > On Mon, 18 Dec 2017 20:13:37 +0000
-> > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > 
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > As sections are reported by the listener to the _nop and _add
-> > > methods, add them to the temporary section list but now merge them
-> > > with the previous section if the new one abuts and the backend allows.
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > beside small nit patch looks good to me, so with it fixed
-> > 
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > 
-> > > ---
-> > >  hw/virtio/trace-events |  2 ++
-> > >  hw/virtio/vhost.c      | 70 +++++++++++++++++++++++++++++++++++++++++++-------
-> > >  2 files changed, 63 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > > index 4a493bcd46..0e63c8739d 100644
-> > > --- a/hw/virtio/trace-events
-> > > +++ b/hw/virtio/trace-events
-> > > @@ -1,6 +1,8 @@
-> > >  # See docs/devel/tracing.txt for syntax documentation.
-> > >  
-> > >  # hw/virtio/vhost.c
-> > > +vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
-> > > +vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
-> > >  vhost_section(const char *name, int r) "%s:%d"
-> > >  
-> > >  # hw/virtio/virtio.c
-> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > > index 18611f0d40..57d15acd2b 100644
-> > > --- a/hw/virtio/vhost.c
-> > > +++ b/hw/virtio/vhost.c
-> > > @@ -709,14 +709,65 @@ out:
-> > >      return;
-> > >  }
-> > >  
-> > > -static void vhost_add_section(struct vhost_dev *dev,
-> > > -                              MemoryRegionSection *section)
-> > > +/* Adds the section data to the tmp_section structure.
-> > > + * It relies on the listener calling us in memory address order
-> > > + * and for each region (via the _add and _nop methods) to
-> > > + * join neighbours.
-> > > + */
-> > > +static void vhost_region_add_section(struct vhost_dev *dev,
-> > > +                                 MemoryRegionSection *section)
-> > wrong alignment, should be on '('
-> 
-> Fixed, thanks.
-> 
-> Dave
+I think this will be the last revision before queueing for pull.
 
-This is too big by now. I'm applying as is and you can fix with
-a patch on top.
+Peter, the target/arm patches here are primarily for testing,
+without having to go all the way through to SVE.  It also shows
+how the generic vector interface ought to be used.  I'm happy
+to drop the patches from the tcg pull and feed them through
+target-arm.next, or keep them here as you wish.
 
-> > >  {
-> > > -    ++dev->n_tmp_sections;
-> > > -    dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
-> > > -                                dev->n_tmp_sections);
-> > > -    dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
-> > > -    memory_region_ref(section->mr);
-> > > +    bool need_add = true;
-> > > +    uint64_t mrs_size = int128_get64(section->size);
-> > > +    uint64_t mrs_gpa = section->offset_within_address_space;
-> > > +    uintptr_t mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
-> > > +                         section->offset_within_region;
-> > > +
-> > > +    trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
-> > > +                                   mrs_host);
-> > > +
-> > > +    if (dev->n_tmp_sections) {
-> > > +        /* Since we already have at least one section, lets see if
-> > > +         * this extends it; since we're scanning in order, we only
-> > > +         * have to look at the last one, and the FlatView that calls
-> > > +         * us shouldn't have overlaps.
-> > > +         */
-> > > +        MemoryRegionSection *prev_sec = dev->tmp_sections +
-> > > +                                               (dev->n_tmp_sections - 1);
-> > > +        uint64_t prev_gpa_start = prev_sec->offset_within_address_space;
-> > > +        uint64_t prev_size = int128_get64(prev_sec->size);
-> > > +        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start, prev_size);
-> > > +        uint64_t prev_host_start =
-> > > +                        (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
-> > > +                        prev_sec->offset_within_region;
-> > > +        uint64_t prev_host_end   = range_get_last(prev_host_start, prev_size);
-> > > +
-> > > +        if (prev_gpa_end + 1 == mrs_gpa &&
-> > > +            prev_host_end + 1 == mrs_host &&
-> > > +            section->mr == prev_sec->mr &&
-> > > +            (!dev->vhost_ops->vhost_backend_can_merge ||
-> > > +                dev->vhost_ops->vhost_backend_can_merge(dev,
-> > > +                    mrs_host, mrs_size,
-> > > +                    prev_host_start, prev_size))) {
-> > > +            /* The two sections abut */
-> > > +            need_add = false;
-> > > +            prev_sec->size = int128_add(prev_sec->size, section->size);
-> > > +            trace_vhost_region_add_section_abut(section->mr->name,
-> > > +                                                mrs_size + prev_size);
-> > > +        }
-> > > +    }
-> > > +
-> > > +    if (need_add) {
-> > > +        ++dev->n_tmp_sections;
-> > > +        dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
-> > > +                                    dev->n_tmp_sections);
-> > > +        dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
-> > > +        /* The flatview isn't stable and we don't use it, making it NULL
-> > > +         * means we can memcmp the list.
-> > > +         */
-> > > +        dev->tmp_sections[dev->n_tmp_sections - 1].fv = NULL;
-> > > +        memory_region_ref(section->mr);
-> > > +    }
-> > >  }
-> > >  
-> > >  static void vhost_region_add(MemoryListener *listener,
-> > > @@ -728,11 +779,12 @@ static void vhost_region_add(MemoryListener *listener,
-> > >      if (!vhost_section(section)) {
-> > >          return;
-> > >      }
-> > > +    vhost_region_add_section(dev, section);
-> > >  
-> > > -    vhost_add_section(dev, section);
-> > >      vhost_set_memory(listener, section, true);
-> > >  }
-> > >  
-> > > +/* Called on regions that have not changed */
-> > >  static void vhost_region_nop(MemoryListener *listener,
-> > >                               MemoryRegionSection *section)
-> > >  {
-> > > @@ -743,7 +795,7 @@ static void vhost_region_nop(MemoryListener *listener,
-> > >          return;
-> > >      }
-> > >  
-> > > -    vhost_add_section(dev, section);
-> > > +    vhost_region_add_section(dev, section);
-> > >  }
-> > >  
-> > >  static void vhost_region_del(MemoryListener *listener,
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+r~
+
+
+Minor changes since v8:
+  * Reduce some code duplication within the patches.
+  * Add vector op scalar interface.
+
+Minor changes since v7:
+  * Rearranged the patches into groups for readability.
+  * Squished the tcg/i386 patches.
+  * Fixed an encoding bug for vmovd xmm, reg (Kirill).
+  * Fixed expansion bugs for i386 sar, trn.
+
+Minor changes since v6:
+  * Two bugs fixed pointed out by Kirill.
+  * Allow for 4 and 5 operand operations.
+
+
+Richard Henderson (26):
+  tcg: Allow multiple word entries into the constant pool
+  tcg: Add types and basic operations for host vectors
+  tcg: Standardize integral arguments to expanders
+  tcg: Add generic vector expanders
+  tcg: Add generic vector ops for interleave
+  tcg: Add generic vector ops for constant shifts
+  tcg: Add generic vector ops for comparisons
+  tcg: Add generic vector ops for multiplication
+  tcg: Add generic vector ops for extension
+  tcg: Add generic helpers for saturating arithmetic
+  tcg: Loosen vec_gen_op* typecheck rules
+  tcg: Add generic vector helpers with a scalar immediate operand
+  tcg: Add generic vector helpers with a scalar variable operand
+  tcg/optimize: Handle vector opcodes during optimize
+  target/arm: Align vector registers
+  target/arm: Use vector infrastructure for aa64 add/sub/logic
+  target/arm: Use vector infrastructure for aa64 mov/not/neg
+  target/arm: Use vector infrastructure for aa64 dup/movi
+  target/arm: Use vector infrastructure for aa64 zip/uzp/trn/xtn
+  target/arm: Use vector infrastructure for aa64 constant shifts
+  target/arm: Use vector infrastructure for aa64 compares
+  target/arm: Use vector infrastructure for aa64 multiplies
+  target/arm: Use vector infrastructure for aa64 widening shifts
+  target/arm: Use vector infrastructure for aa64 orr/bic immediate
+  tcg/i386: Add vector operations
+  tcg/aarch64: Add vector operations
+
+ Makefile.target              |    4 +-
+ accel/tcg/tcg-runtime.h      |  141 +++
+ target/arm/cpu.h             |    2 +-
+ tcg/aarch64/tcg-target.h     |   30 +-
+ tcg/aarch64/tcg-target.opc.h |    3 +
+ tcg/i386/tcg-target.h        |   46 +-
+ tcg/i386/tcg-target.opc.h    |   13 +
+ tcg/tcg-gvec-desc.h          |   49 +
+ tcg/tcg-op-gvec.h            |  319 +++++
+ tcg/tcg-op.h                 |   67 +-
+ tcg/tcg-opc.h                |   59 +
+ tcg/tcg.h                    |   84 ++
+ accel/tcg/tcg-runtime-gvec.c | 1064 +++++++++++++++++
+ target/arm/translate-a64.c   | 1106 ++++++++++++------
+ tcg/aarch64/tcg-target.inc.c |  674 ++++++++++-
+ tcg/i386/tcg-target.inc.c    | 1331 ++++++++++++++++++++-
+ tcg/optimize.c               |  150 +--
+ tcg/tcg-op-gvec.c            | 2653 ++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg-op-vec.c             |  566 +++++++++
+ tcg/tcg-op.c                 |   42 +-
+ tcg/tcg-pool.inc.c           |  115 +-
+ tcg/tcg.c                    |  144 ++-
+ accel/tcg/Makefile.objs      |    2 +-
+ tcg/README                   |  148 +++
+ 24 files changed, 8244 insertions(+), 568 deletions(-)
+ create mode 100644 tcg/aarch64/tcg-target.opc.h
+ create mode 100644 tcg/i386/tcg-target.opc.h
+ create mode 100644 tcg/tcg-gvec-desc.h
+ create mode 100644 tcg/tcg-op-gvec.h
+ create mode 100644 accel/tcg/tcg-runtime-gvec.c
+ create mode 100644 tcg/tcg-op-gvec.c
+ create mode 100644 tcg/tcg-op-vec.c
+
+-- 
+2.14.3
