@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebVtL-0002JH-ET
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:23:24 -0500
+	(envelope-from <juterry@microsoft.com>) id 1ebVzu-0008Vc-9D
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:30:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebVtG-0008B6-3R
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:23:23 -0500
-References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516034665-27606-5-git-send-email-walling@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6e4c6445-0b78-1709-b724-e35daeefb1c1@redhat.com>
-Date: Tue, 16 Jan 2018 19:23:06 +0100
-MIME-Version: 1.0
-In-Reply-To: <1516034665-27606-5-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <juterry@microsoft.com>) id 1ebVzp-0003UA-Q9
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:30:10 -0500
+Received: from mail-sn1nam02on0115.outbound.protection.outlook.com
+	([104.47.36.115]:22896
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
+	id 1ebVzp-0003S1-GK
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:30:05 -0500
+From: "Justin Terry (VM)" <juterry@microsoft.com>
+Date: Tue, 16 Jan 2018 18:29:24 +0000
+Message-ID: <CY4PR2101MB0866F7724807C02CE1C0484EB6EA0@CY4PR2101MB0866.namprd21.prod.outlook.com>
+References: <1515788548-3570-1-git-send-email-juterry@microsoft.com>
+	<129c0f17-ada9-92ce-eb0d-1596da397638@weilnetz.de>
+In-Reply-To: <129c0f17-ada9-92ce-eb0d-1596da397638@weilnetz.de>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] s390-ccw: interactive boot menu for
- eckd dasd (menu setup)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/4] Implements the Windows Hypervisor
+ Platform accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
+To: Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>
 
-On 15.01.2018 17:44, Collin L. Walling wrote:
-> Reads boot menu flag and timeout values from the iplb and
-> sets the respective fields for the menu.
->=20
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> ---
-[...]
-> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-> index fe909d2..da29e6e 100644
-> --- a/pc-bios/s390-ccw/iplb.h
-> +++ b/pc-bios/s390-ccw/iplb.h
-> @@ -81,6 +81,9 @@ extern IplParameterBlock iplb __attribute__((__aligne=
-d__(PAGE_SIZE)));
->  #define S390_IPL_TYPE_CCW 0x02
->  #define S390_IPL_TYPE_QEMU_SCSI 0xff
-> =20
-> +#define LOADPARM_PROMPT "PROMPT  "
-> +#define LOADPARM_EMPTY  "........"
-
-I've got a question: Is there a (public) specification document
-available somewhere for the loadparm field?
-
-[...]
-> diff --git a/pc-bios/s390-ccw/menu.h b/pc-bios/s390-ccw/menu.h
-> new file mode 100644
-> index 0000000..04b1db1
-> --- /dev/null
-> +++ b/pc-bios/s390-ccw/menu.h
-> @@ -0,0 +1,23 @@
-> +/*
-> + * QEMU S390 Interactive Boot Menu
-> + *
-> + * Copyright 2017 IBM Corp.
-> + * Author: Collin L. Walling <walling@linux.vnet.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-(at
-> + * your option) any later version. See the COPYING file in the top-lev=
-el
-> + * directory.
-> + */
-> +
-> +#ifndef MENU_H
-> +#define MENU_H
-> +
-> +#include "libc.h"
-> +
-> +#define BOOT_MENU_FLAG_BOOT_OPTS 0x80
-> +#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
-> +
-> +void menu_set_parms(uint8_t boot_menu_flags, uint16_t boot_menu_timeou=
-t);
-> +bool menu_check_flags(uint8_t check_flags);
-> +
-> +#endif /* MENU_H */
->=20
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+SGV5IFN0ZWZhbiwNCg0KVGhhbmtzIGZvciB0aGUgZmVlZGJhY2suIEkgcmVhbGx5IGFwb2xvZ2l6
+ZSBJIGZvcmdvdCB0byBydW4gdGhlIGNoZWNrcGF0aC5wbCBzY3JpcHQgYmVmb3JlIHN1Ym1pc3Np
+b24uIEkgaGF2ZSBmaXhlZCB1cCBhbGwgdGhlIGlzc3VlcyBhbmQgd2lsbCBzZW5kIHRoZW0gaW4g
+cGF0Y2ggdjIgb25jZSBJIGZpeHVwIHRoZSBvdGhlciBmZWVkYmFjay4NCg0KVGhhbmtzLA0KSnVz
+dGluDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBTdGVmYW4gV2VpbCBbbWFp
+bHRvOnN3QHdlaWxuZXR6LmRlXSANClNlbnQ6IEZyaWRheSwgSmFudWFyeSAxMiwgMjAxOCAxOjU3
+IFBNDQpUbzogSnVzdGluIFRlcnJ5IChWTSkgPGp1dGVycnlAbWljcm9zb2Z0LmNvbT47IHFlbXUt
+ZGV2ZWxAbm9uZ251Lm9yZw0KQ2M6IHBib256aW5pQHJlZGhhdC5jb207IHJ0aEB0d2lkZGxlLm5l
+dDsgZWhhYmtvc3RAcmVkaGF0LmNvbTsgY3Jvc3Rod2FpdGUucGV0ZXJAZ21haWwuY29tDQpTdWJq
+ZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzRdIEltcGxlbWVudHMgdGhlIFdpbmRvd3Mg
+SHlwZXJ2aXNvciBQbGF0Zm9ybSBhY2NlbGVyYXRvcg0KDQpBbSAxMi4wMS4yMDE4IHVtIDIxOjIy
+IHNjaHJpZWIgSnVzdGluIFRlcnJ5IChWTSkgdmlhIFFlbXUtZGV2ZWw6DQo+IEhlbGxvIFFFTVUg
+Q29tbXVuaXR5IQ0KPiANCj4gT3ZlciB0aGUgcGFzdCBmZXcgbW9udGhzIHRoZSBIeXBlci1WIHRl
+YW0gYXQgTWljcm9zb2Z0IGhhcyBiZWVuIA0KPiB3b3JraW5nIGhhcmQgb24gYSBuZXcgdXNlci1t
+b2RlIEFQSSBmb3Igb3VyIGh5cGVydmlzb3IgdGhhdCB3aWxsIGJlIA0KPiByZWxlYXNlZCBhcyBw
+YXJ0IG9mIHRoZSB1cGNvbWluZyBTREsuIFRoaXMgbmV3IEFQSSBhZGRzIHVzZXItbW9kZSANCj4g
+Y2FwYWJpbGl0aWVzIHRvIGNyZWF0ZSBhbmQgbWFuYWdlIHBhcnRpdGlvbnMgYXQgdGhlIGh5cGVy
+dmlzb3IgbGV2ZWwsIA0KPiBjb25maWd1cmUgbWVtb3J5IG1hcHBpbmdzIGZvciB0aGUgcGFydGl0
+aW9uLCBhbmQgY3JlYXRlIGFuZCBjb250cm9sIGV4ZWN1dGlvbiBvZiB2aXJ0dWFsIHByb2Nlc3Nv
+cnMuDQo+IA0KPiBXaXRoIHRoaXMgbmV3IEFQSSB3ZSBhcmUgbm93IGFibGUgdG8gYnJpbmcgb3Vy
+IGh5cGVydmlzb3IgdG8gdGhlIFFFTVUgDQo+IGNvbW11bml0eSEgVGhlIGZvbGxvd2luZyBwYXRj
+aGVzIGltcGxlbWVudCB0aGUgV2luZG93cyBIeXBlcnZpc29yIA0KPiBQbGF0Zm9ybSBhY2NlbGVy
+YXRvciAoV0hQWCkgZm9yIFFFTVUgb24gV2luZG93cyAxMCBob3N0cy4NCj4gDQo+IFdoZW4gY29t
+cGlsaW5nIFFFTVUgZm9yIHg4Nl82NCBwYXNzaW5nIHRoZSAtLWVuYWJsZS13aHB4IGZsYWcgd2ls
+bCANCj4gY29tcGlsZSB0aGUgYWNjZWxlcmF0b3IgZm9yIHVzZS4gQXQgcnVudGltZSB1c2luZyB0
+aGUgJy1hY2NlbCB3aHB4JyANCj4gc2hvdWxkIHNlZSBhIHNpZ25pZmljYW50IHBlcmZvcm1hbmNl
+IGltcHJvdmVtZW50IG92ZXIgZW11bGF0aW9uLCBtdWNoIGxpa2Ugd2hlbiB1c2luZyAnaGF4Jw0K
+PiBvbiBXaW5kb3dzLg0KPiANCj4gT3ZlciB0aGUgbmV4dCBmZXcgZGF5cyB0aGUgcHJlLXJlbGVh
+c2UgdmVyc2lvbiBvZiB0aGUgZG9jdW1lbnRhdGlvbiANCj4gZm9yIHRoaXMgbmV3IEFQSSB3aWxs
+IGJlIHZpc2libGUgYXQgDQo+IGh0dHBzOi8vbmEwMS5zYWZlbGlua3MucHJvdGVjdGlvbi5vdXRs
+b29rLmNvbS8/dXJsPWh0dHBzJTNBJTJGJTJGZG9jcy4NCj4gbWljcm9zb2Z0LmNvbSUyRmVuLXVz
+JTJGdmlydHVhbGl6YXRpb24mZGF0YT0wMiU3QzAxJTdDanV0ZXJyeSU0MG1pY3Jvc29mdC5jb20l
+N0NhZjQyNjEwMTk4MDQ0OTFlYjQ5NjA4ZDU1YTA3NmVhNCU3QzcyZjk4OGJmODZmMTQxYWY5MWFi
+MmQ3Y2QwMTFkYjQ3JTdDMSU3QzElN0M2MzY1MTM5MTAzMzQxNjY4NDkmc2RhdGE9dXAlMkZHQ1gw
+NnFFNFJnZXJYV0xKaHhMc3JzcHZ6cnZUWm5ZNTNuUDQ1MDRjJTNEJnJlc2VydmVkPTAgdW5kZXIg
+dGhlICdXaW5kb3dzIEh5cGVydmlzb3IgUGxhdGZvcm0nIHNlY3Rpb24uIEhlcmUgeW91IHdpbGwg
+c2VlIHRoZSByZXF1aXJlbWVudHMsIEFQSSwgYW5kIGV4YW1wbGVzLg0KPiANCj4gVGhhbmsgeW91
+IGZvciB5b3VyIGZlZWRiYWNrLiANCj4gDQo+IEp1c3RpbiBUZXJyeSAoVk0pICg0KToNCj4gICBB
+ZGQgdGhlIFdpbmRvd3MgSHlwZXJ2aXNvciBQbGF0Zm9ybSBhY2NlbGVyYXRvci4NCj4gICBBZGQg
+dGhlIFdIUFggdmNwdSBBUEkNCj4gICBJbnRyb2R1Y2UgdGhlIFdIUFggaW1wbA0KPiAgIEFkZCB0
+aGUgV0hQWCBhY2NlbGVyYXRpb24gZW5saWdodGVubWVudHMNCj4gDQo+ICBhY2NlbC9zdHVicy9N
+YWtlZmlsZS5vYmpzIHwgICAgOSArLQ0KPiAgYWNjZWwvc3R1YnMvd2hweC1zdHViLmMgICB8ICAg
+NDggKysNCj4gIGNvbmZpZ3VyZSAgICAgICAgICAgICAgICAgfCAgIDQ4ICstDQo+ICBjcHVzLmMg
+ICAgICAgICAgICAgICAgICAgIHwgICA2NiArKy0NCj4gIGluY2x1ZGUvc3lzZW11L2h3X2FjY2Vs
+LmggfCAgIDEzICsNCj4gIGluY2x1ZGUvc3lzZW11L3docHguaCAgICAgfCAgIDQwICsrDQo+ICBx
+ZW11LW9wdGlvbnMuaHggICAgICAgICAgIHwgICAgOCArLQ0KPiAgdGFyZ2V0L2kzODYvTWFrZWZp
+bGUub2JqcyB8ICAgIDEgKw0KPiAgdGFyZ2V0L2kzODYvaGVscGVyLmMgICAgICB8ICAgIDIgKy0N
+Cj4gIHRhcmdldC9pMzg2L3docHgtYWxsLmMgICAgfCAxMzk1ICsrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAgMTAgZmlsZXMgY2hhbmdlZCwgMTYxOSBpbnNl
+cnRpb25zKCspLCAxMSBkZWxldGlvbnMoLSkgIGNyZWF0ZSBtb2RlIA0KPiAxMDA2NDQgYWNjZWwv
+c3R1YnMvd2hweC1zdHViLmMgIGNyZWF0ZSBtb2RlIDEwMDY0NCANCj4gaW5jbHVkZS9zeXNlbXUv
+d2hweC5oICBjcmVhdGUgbW9kZSAxMDA2NDQgdGFyZ2V0L2kzODYvd2hweC1hbGwuYw0KDQoNClRo
+YW5rIHlvdSBmb3IgdGhpcyBjb250cmlidXRpb24g4oCTIEknbGwgdGVzdCBpdC4NCg0KVGhlIHBh
+dGNoZXMgMiBhbmQgMyBmYWlsIHRoZSB0ZXN0IHdpdGggc2NyaXB0cy9jaGVja3BhdGNoLnBsLiBQ
+bGVhc2UgZml4IHRoYXQgaW4gdGhlIG5leHQgaXRlcmF0aW9uIChtYXliZSB3YWl0IGEgbGl0dGxl
+IHVudGlsIHRoZXJlIHdhcyBtb3JlIGZlZWRiYWNrKS4NCg0KUmVnYXJkcywNClN0ZWZhbg0K
