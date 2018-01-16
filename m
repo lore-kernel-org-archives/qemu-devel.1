@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ebQvU-0002op-O8
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:05:17 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ebQvT-0002n7-26
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ebQvL-0006WQ-8P
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:05:16 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ebQvJ-0006VK-Jc
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:05:15 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 16 Jan 2018 16:04:28 +0300
-Message-Id: <1516107870-8110-8-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue, 16 Jan 2018 16:04:27 +0300
+Message-Id: <1516107870-8110-7-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 7/9] qcow2: move is_zero() up
+Subject: [Qemu-devel] [PATCH v6 6/9] block: support BDRV_REQ_ALLOCATE in
+ passthrough drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-To be used in the following commit without a forward declaration.
+Support the flag if the underlying BDS supports it
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.c | 35 +++++++++++++++++------------------
- 1 file changed, 17 insertions(+), 18 deletions(-)
+ block/blkdebug.c   | 3 ++-
+ block/blkverify.c  | 2 +-
+ block/mirror.c     | 2 +-
+ block/raw-format.c | 3 ++-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4348b2c..2ed21ff 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1858,6 +1858,23 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
-     return false;
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index e216699..7d5773d 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -400,7 +400,8 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->file->bs->supported_write_flags;
+-    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags;
+     ret = -EINVAL;
+ 
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 9ba65d0..b249636 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -145,7 +145,7 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
+         s->test_file->bs->supported_write_flags;
+ 
+     bs->supported_zero_flags =
+-        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags &
+         s->test_file->bs->supported_zero_flags;
+ 
+diff --git a/block/mirror.c b/block/mirror.c
+index d18ec65..eb41deb 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1067,7 +1067,7 @@ static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->backing->bs->supported_write_flags;
+     bs->supported_zero_flags =
+-        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->backing->bs->supported_zero_flags;
  }
  
-+static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
-+{
-+    int64_t nr;
-+    int res;
-+
-+    /* Clamp to image length, before checking status of underlying sectors */
-+    if (offset + bytes > bs->total_sectors * BDRV_SECTOR_SIZE) {
-+        bytes = bs->total_sectors * BDRV_SECTOR_SIZE - offset;
-+    }
-+
-+    if (!bytes) {
-+        return true;
-+    }
-+    res = bdrv_block_status_above(bs, NULL, offset, bytes, &nr, NULL, NULL);
-+    return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == bytes;
-+}
-+
- static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-                                          uint64_t bytes, QEMUIOVector *qiov,
-                                          int flags)
-@@ -2975,24 +2992,6 @@ finish:
-     return ret;
- }
+diff --git a/block/raw-format.c b/block/raw-format.c
+index ab552c0..b1deb93 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -416,7 +416,8 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->sg = bs->file->bs->sg;
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->file->bs->supported_write_flags;
+-    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags;
  
--
--static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
--{
--    int64_t nr;
--    int res;
--
--    /* Clamp to image length, before checking status of underlying sectors */
--    if (offset + bytes > bs->total_sectors * BDRV_SECTOR_SIZE) {
--        bytes = bs->total_sectors * BDRV_SECTOR_SIZE - offset;
--    }
--
--    if (!bytes) {
--        return true;
--    }
--    res = bdrv_block_status_above(bs, NULL, offset, bytes, &nr, NULL, NULL);
--    return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == bytes;
--}
--
- static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     int64_t offset, int bytes, BdrvRequestFlags flags)
- {
+     if (bs->probed && !bdrv_is_read_only(bs)) {
 -- 
 2.7.4
