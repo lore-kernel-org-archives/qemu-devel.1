@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ebQlP-0002nw-T1
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ebQlU-0002sh-ME
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:55:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ebQlL-000779-Sq
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:51 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:31368 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ebQlO-0007Ap-Al
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:56 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:23768 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1ebQlL-00076R-Hq
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:47 -0500
+	id 1ebQlN-00076m-Q4
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:50 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 16 Jan 2018 15:54:24 +0300
-Message-Id: <20180116125427.18540-4-vsementsov@virtuozzo.com>
+Date: Tue, 16 Jan 2018 15:54:22 +0300
+Message-Id: <20180116125427.18540-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20180116125427.18540-1-vsementsov@virtuozzo.com>
 References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] qapi: add
- block-dirty-bitmap-enable/disable
+Subject: [Qemu-devel] [PATCH v2 1/6] block: maintain persistent disabled
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +28,207 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
+To maintain load/store disabled bitmap there is new approach:
+
+ - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored
+ - store enabled bitmaps as "auto" to qcow2
+ - store disabled bitmaps without "auto" flag to qcow2
+ - on qcow2 open load "auto" bitmaps as enabled and others
+   as disabled (except in_use bitmaps)
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json | 42 ++++++++++++++++++++++++++++++++++++++++++
- blockdev.c           | 42 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+ qapi/block-core.json         |  6 +++---
+ block/qcow2.h                |  2 +-
+ include/block/dirty-bitmap.h |  1 -
+ block/dirty-bitmap.c         | 18 ------------------
+ block/qcow2-bitmap.c         | 12 +++++++-----
+ block/qcow2.c                |  2 +-
+ blockdev.c                   | 10 ++--------
+ 7 files changed, 14 insertions(+), 37 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 827254db22..b3851ee760 100644
+index ab96e348e6..827254db22 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -1672,6 +1672,48 @@
-   'data': 'BlockDirtyBitmap' }
- 
- ##
-+# @block-dirty-bitmap-enable:
-+#
-+# Enable dirty bitmap, so that it will continue tracking disk changes.
-+#
-+# Returns: nothing on success
-+#          If @node is not a valid block device, DeviceNotFound
-+#          If @name is not found, GenericError with an explanation
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "block-dirty-bitmap-enable",
-+#      "arguments": { "node": "drive0", "name": "bitmap0" } }
-+# <- { "return": {} }
-+#
-+##
-+  { 'command': 'block-dirty-bitmap-enable',
-+    'data': 'BlockDirtyBitmap' }
-+
-+##
-+# @block-dirty-bitmap-disable:
-+#
-+# Disable dirty bitmap, so that it will stop tracking disk changes.
-+#
-+# Returns: nothing on success
-+#          If @node is not a valid block device, DeviceNotFound
-+#          If @name is not found, GenericError with an explanation
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "block-dirty-bitmap-disable",
-+#      "arguments": { "node": "drive0", "name": "bitmap0" } }
-+# <- { "return": {} }
-+#
-+##
-+    { 'command': 'block-dirty-bitmap-disable',
-+      'data': 'BlockDirtyBitmap' }
-+
-+##
- # @BlockDirtyBitmapSha256:
+@@ -1593,9 +1593,9 @@
+ #              Qcow2 disks support persistent bitmaps. Default is false for
+ #              block-dirty-bitmap-add. (Since: 2.10)
  #
- # SHA256 hash of dirty bitmap data
-diff --git a/blockdev.c b/blockdev.c
-index 8068cbd606..997a6f514c 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2821,6 +2821,48 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-     bdrv_clear_dirty_bitmap(bitmap, NULL);
+-# @autoload: the bitmap will be automatically loaded when the image it is stored
+-#            in is opened. This flag may only be specified for persistent
+-#            bitmaps. Default is false for block-dirty-bitmap-add. (Since: 2.10)
++# @autoload: ignored and deprecated since 2.12.
++#            Currently, all dirty tracking bitmaps are loaded from Qcow2 on
++#            open.
+ #
+ # Since: 2.4
+ ##
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 782a206ecb..a3e29276fc 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -672,7 +672,7 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
+ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+-bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 3579a7597c..144e77a879 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -65,7 +65,6 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
+ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+ 
+ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+-void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
+ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+                                        bool persistent);
+ 
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index bd04e991b1..3777be1985 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -52,8 +52,6 @@ struct BdrvDirtyBitmap {
+                                    Such operations must fail and both the image
+                                    and this bitmap must remain unchanged while
+                                    this flag is set. */
+-    bool autoload;              /* For persistent bitmaps: bitmap must be
+-                                   autoloaded on image opening */
+     bool persistent;            /* bitmap must be saved to owner disk image */
+     QLIST_ENTRY(BdrvDirtyBitmap) list;
+ };
+@@ -104,7 +102,6 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
+     g_free(bitmap->name);
+     bitmap->name = NULL;
+     bitmap->persistent = false;
+-    bitmap->autoload = false;
  }
  
-+void qmp_block_dirty_bitmap_enable(const char *node, const char *name,
-+                                   Error **errp)
-+{
-+    BlockDriverState *bs;
-+    BdrvDirtyBitmap *bitmap;
-+
-+    bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
-+    if (!bitmap || !bs) {
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_frozen(bitmap)) {
-+        error_setg(errp,
-+                   "Bitmap '%s' is currently frozen and cannot be enabled",
-+                   name);
-+        return;
-+    }
-+
-+    bdrv_enable_dirty_bitmap(bitmap);
-+}
-+
-+void qmp_block_dirty_bitmap_disable(const char *node, const char *name,
-+                                    Error **errp)
-+{
-+    BlockDriverState *bs;
-+    BdrvDirtyBitmap *bitmap;
-+
-+    bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
-+    if (!bitmap || !bs) {
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_frozen(bitmap)) {
-+        error_setg(errp,
-+                   "Bitmap '%s' is currently frozen and cannot be disabled",
-+                   name);
-+        return;
-+    }
-+
-+    bdrv_disable_dirty_bitmap(bitmap);
-+}
-+
- BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
-                                                               const char *name,
-                                                               Error **errp)
+ /* Called with BQL taken.  */
+@@ -261,8 +258,6 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+     bitmap->successor = NULL;
+     successor->persistent = bitmap->persistent;
+     bitmap->persistent = false;
+-    successor->autoload = bitmap->autoload;
+-    bitmap->autoload = false;
+     bdrv_release_dirty_bitmap(bs, bitmap);
+ 
+     return successor;
+@@ -667,19 +662,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+ }
+ 
+ /* Called with BQL taken. */
+-void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
+-{
+-    qemu_mutex_lock(bitmap->mutex);
+-    bitmap->autoload = autoload;
+-    qemu_mutex_unlock(bitmap->mutex);
+-}
+-
+-bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
+-{
+-    return bitmap->autoload;
+-}
+-
+-/* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
+ {
+     qemu_mutex_lock(bitmap->mutex);
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index f45e46cfbd..ae14464de6 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -933,14 +933,14 @@ static void set_readonly_helper(gpointer bitmap, gpointer value)
+     bdrv_dirty_bitmap_set_readonly(bitmap, (bool)value);
+ }
+ 
+-/* qcow2_load_autoloading_dirty_bitmaps()
++/* qcow2_load_dirty_bitmaps()
+  * Return value is a hint for caller: true means that the Qcow2 header was
+  * updated. (false doesn't mean that the header should be updated by the
+  * caller, it just means that updating was not needed or the image cannot be
+  * written to).
+  * On failure the function returns false.
+  */
+-bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
++bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     Qcow2BitmapList *bm_list;
+@@ -960,14 +960,16 @@ bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+     }
+ 
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+-        if ((bm->flags & BME_FLAG_AUTO) && !(bm->flags & BME_FLAG_IN_USE)) {
++        if (!(bm->flags & BME_FLAG_IN_USE)) {
+             BdrvDirtyBitmap *bitmap = load_bitmap(bs, bm, errp);
+             if (bitmap == NULL) {
+                 goto fail;
+             }
+ 
++            if (!(bm->flags & BME_FLAG_AUTO)) {
++                bdrv_disable_dirty_bitmap(bitmap);
++            }
+             bdrv_dirty_bitmap_set_persistance(bitmap, true);
+-            bdrv_dirty_bitmap_set_autoload(bitmap, true);
+             bm->flags |= BME_FLAG_IN_USE;
+             created_dirty_bitmaps =
+                     g_slist_append(created_dirty_bitmaps, bitmap);
+@@ -1369,7 +1371,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+             bm->table.size = 0;
+             QSIMPLEQ_INSERT_TAIL(&drop_tables, tb, entry);
+         }
+-        bm->flags = bdrv_dirty_bitmap_get_autoload(bitmap) ? BME_FLAG_AUTO : 0;
++        bm->flags = bdrv_dirty_bitmap_enabled(bitmap) ? BME_FLAG_AUTO : 0;
+         bm->granularity_bits = ctz32(bdrv_dirty_bitmap_granularity(bitmap));
+         bm->dirty_bitmap = bitmap;
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 92cb9f9bfa..93c3a97cfe 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1441,7 +1441,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+         s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+     }
+ 
+-    if (qcow2_load_autoloading_dirty_bitmaps(bs, &local_err)) {
++    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
+         update_header = false;
+     }
+     if (local_err != NULL) {
+diff --git a/blockdev.c b/blockdev.c
+index 56a6b24a0b..8068cbd606 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2738,14 +2738,9 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     if (!has_persistent) {
+         persistent = false;
+     }
+-    if (!has_autoload) {
+-        autoload = false;
+-    }
+ 
+-    if (has_autoload && !persistent) {
+-        error_setg(errp, "Autoload flag must be used only for persistent "
+-                         "bitmaps");
+-        return;
++    if (has_autoload) {
++        warn_report("Autoload option is deprected and its value is ignored");
+     }
+ 
+     if (persistent &&
+@@ -2760,7 +2755,6 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     }
+ 
+     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
+-    bdrv_dirty_bitmap_set_autoload(bitmap, autoload);
+ }
+ 
+ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
 -- 
 2.11.1
