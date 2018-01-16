@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAg-0000Re-F1
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:27 -0500
+	(envelope-from <mst@redhat.com>) id 1ebJAh-0000Rj-LV
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAf-00056b-KM
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54332)
+	(envelope-from <mst@redhat.com>) id 1ebJAg-00057G-LL
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAf-00056D-EF
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:25 -0500
-Date: Tue, 16 Jan 2018 06:48:23 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAg-00056n-Fb
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:26 -0500
+Date: Tue, 16 Jan 2018 06:48:24 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516077852-7974-29-git-send-email-mst@redhat.com>
+Message-ID: <1516077852-7974-30-git-send-email-mst@redhat.com>
 References: <1516077852-7974-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516077852-7974-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 28/33] tests: acpi: init table descriptor in
- test_dst_table()
+Subject: [Qemu-devel] [PULL 29/33] tests: acpi: rename
+ test_acpi_tables()/test_dst_table() to reflect its usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +32,72 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-remove code duplication and make sure that table descriptor
-passed in for initialization is in expected state.
+Main purpose of test_dst_table() is loading a table from QEMU
+with checking that checksum in header matches actual one,
+rename it reflect main action it performs.
+
+Likewise test_acpi_tables() name is to broad, while the function
+only loads tables referenced by RSDT, rename it to reflect it.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/bios-tables-test.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ tests/bios-tables-test.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index a2f64c8..4b357cd 100644
+index 4b357cd..1314ad8 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -214,6 +214,7 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
+@@ -210,7 +210,11 @@ static void test_acpi_facs_table(test_data *data)
+     ACPI_ASSERT_CMP(facs_table->signature, "FACS");
+ }
+ 
+-static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
++/** fetch_table
++ *   load ACPI table at @addr into table descriptor @sdt_table
++ *   and check that header checksum matches actual one.
++ */
++static void fetch_table(AcpiSdtTable *sdt_table, uint32_t addr)
  {
      uint8_t checksum;
  
-+    memset(sdt_table, 0, sizeof(*sdt_table));
-     ACPI_READ_TABLE_HEADER(&sdt_table->header, addr);
- 
-     sdt_table->aml_len = le32_to_cpu(sdt_table->header.length)
-@@ -233,8 +234,6 @@ static void test_acpi_dsdt_table(test_data *data)
+@@ -234,14 +238,15 @@ static void test_acpi_dsdt_table(test_data *data)
      AcpiSdtTable dsdt_table;
      uint32_t addr = le32_to_cpu(data->fadt_table.dsdt);
  
--    memset(&dsdt_table, 0, sizeof(dsdt_table));
--
-     test_dst_table(&dsdt_table, addr);
+-    test_dst_table(&dsdt_table, addr);
++    fetch_table(&dsdt_table, addr);
      ACPI_ASSERT_CMP(dsdt_table.header.signature, "DSDT");
  
-@@ -251,7 +250,6 @@ static void test_acpi_tables(test_data *data)
-         AcpiSdtTable ssdt_table;
+     /* Since DSDT isn't in RSDT, add DSDT to ASL test tables list manually */
+     g_array_append_val(data->tables, dsdt_table);
+ }
+ 
+-static void test_acpi_tables(test_data *data)
++/* Load all tables and add to test list directly RSDT referenced tables */
++static void fetch_rsdt_referenced_tables(test_data *data)
+ {
+     int tables_nr = data->rsdt_tables_nr - 1; /* fadt is first */
+     int i;
+@@ -251,7 +256,7 @@ static void test_acpi_tables(test_data *data)
          uint32_t addr;
  
--        memset(&ssdt_table, 0, sizeof(ssdt_table));
          addr = le32_to_cpu(data->rsdt_tables_addr[i + 1]); /* fadt is first */
-         test_dst_table(&ssdt_table, addr);
+-        test_dst_table(&ssdt_table, addr);
++        fetch_table(&ssdt_table, addr);
          g_array_append_val(data->tables, ssdt_table);
+     }
+ }
+@@ -640,7 +645,7 @@ static void test_acpi_one(const char *params, test_data *data)
+     test_acpi_fadt_table(data);
+     test_acpi_facs_table(data);
+     test_acpi_dsdt_table(data);
+-    test_acpi_tables(data);
++    fetch_rsdt_referenced_tables(data);
+ 
+     if (iasl) {
+         if (getenv(ACPI_REBUILD_EXPECTED_AML)) {
 -- 
 MST
