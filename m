@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4k-0003ky-NU
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:59 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4l-0003mB-UJ
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:19:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4j-0005aD-De
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:54 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:42430)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4f-0005W3-Rr
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:55 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS4j-0005Zc-4J
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:53 -0500
-Received: by mail-wm0-x243.google.com with SMTP id b141so8774386wme.1
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:53 -0800 (PST)
+	id 1ebS4f-0005V4-MD
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:49 -0500
+Received: by mail-wm0-x244.google.com with SMTP id v123so8966212wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:49 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:17:32 +0100
-Message-Id: <1516112253-14480-51-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:17:30 +0100
+Message-Id: <1516112253-14480-49-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 50/51] util/qemu-thread-*: add qemu_lock,
- locked and unlock trace events
+Subject: [Qemu-devel] [PULL 48/51] block/iscsi: fix initialization of iTask
+ in iscsi_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,223 +29,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Lieven <pl@kamp.de>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+From: Peter Lieven <pl@kamp.de>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+in case of unaligned requests or on a target that does not support
+block provisioning we leave iTask uninitialized and check iTask.task
+for NULL later.
+
+Fixes: e38bc23454ef763deb4405ebdee6a1081aa00bc8
+Signed-off-by: Peter Lieven <pl@kamp.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1515425247-21730-1-git-send-email-pl@kamp.de>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/thread.h    | 39 +++++++++++++++++++++++++++++++++++----
- util/qemu-thread-posix.c | 21 ++++++++++++---------
- util/qemu-thread-win32.c | 20 +++++++++++---------
- util/trace-events        |  7 ++++---
- 4 files changed, 62 insertions(+), 25 deletions(-)
+ block/iscsi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index 9910f49..9af4e94 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -22,9 +22,31 @@ typedef struct QemuThread QemuThread;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 5c0a9e5..6a1c537 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -658,6 +658,8 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+     uint64_t lba;
+     int64_t ret;
  
- void qemu_mutex_init(QemuMutex *mutex);
- void qemu_mutex_destroy(QemuMutex *mutex);
--void qemu_mutex_lock(QemuMutex *mutex);
--int qemu_mutex_trylock(QemuMutex *mutex);
--void qemu_mutex_unlock(QemuMutex *mutex);
-+int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line);
-+void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int line);
-+void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const int line);
++    iscsi_co_init_iscsitask(iscsilun, &iTask);
 +
-+#define qemu_mutex_lock(mutex) \
-+        qemu_mutex_lock_impl(mutex, __FILE__, __LINE__)
-+#define qemu_mutex_trylock(mutex) \
-+        qemu_mutex_trylock_impl(mutex, __FILE__, __LINE__)
-+#define qemu_mutex_unlock(mutex) \
-+        qemu_mutex_unlock_impl(mutex, __FILE__, __LINE__)
-+
-+static inline void (qemu_mutex_lock)(QemuMutex *mutex)
-+{
-+    qemu_mutex_lock(mutex);
-+}
-+
-+static inline int (qemu_mutex_trylock)(QemuMutex *mutex)
-+{
-+    return qemu_mutex_trylock(mutex);
-+}
-+
-+static inline void (qemu_mutex_unlock)(QemuMutex *mutex)
-+{
-+    qemu_mutex_unlock(mutex);
-+}
+     if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
+         ret = -EINVAL;
+         goto out;
+@@ -675,7 +677,6 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
  
- /* Prototypes for other functions are in thread-posix.h/thread-win32.h.  */
- void qemu_rec_mutex_init(QemuRecMutex *mutex);
-@@ -39,7 +61,16 @@ void qemu_cond_destroy(QemuCond *cond);
-  */
- void qemu_cond_signal(QemuCond *cond);
- void qemu_cond_broadcast(QemuCond *cond);
--void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex);
-+void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex,
-+                         const char *file, const int line);
-+
-+#define qemu_cond_wait(cond, mutex) \
-+        qemu_cond_wait_impl(cond, mutex, __FILE__, __LINE__)
-+
-+static inline void (qemu_cond_wait)(QemuCond *cond, QemuMutex *mutex)
-+{
-+    qemu_cond_wait(cond, mutex);
-+}
+     lba = sector_qemu2lun(sector_num, iscsilun);
  
- void qemu_sem_init(QemuSemaphore *sem, int init);
- void qemu_sem_post(QemuSemaphore *sem);
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 959a570..b789cf3 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -57,26 +57,28 @@ void qemu_mutex_destroy(QemuMutex *mutex)
-         error_exit(err, __func__);
- }
- 
--void qemu_mutex_lock(QemuMutex *mutex)
-+void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int line)
- {
-     int err;
- 
-     assert(mutex->initialized);
-+    trace_qemu_mutex_lock(mutex, file, line);
-+
-     err = pthread_mutex_lock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
- 
--    trace_qemu_mutex_locked(mutex);
-+    trace_qemu_mutex_locked(mutex, file, line);
- }
- 
--int qemu_mutex_trylock(QemuMutex *mutex)
-+int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
- {
-     int err;
- 
-     assert(mutex->initialized);
-     err = pthread_mutex_trylock(&mutex->lock);
-     if (err == 0) {
--        trace_qemu_mutex_locked(mutex);
-+        trace_qemu_mutex_locked(mutex, file, line);
-         return 0;
-     }
-     if (err != EBUSY) {
-@@ -85,15 +87,16 @@ int qemu_mutex_trylock(QemuMutex *mutex)
-     return -EBUSY;
- }
- 
--void qemu_mutex_unlock(QemuMutex *mutex)
-+void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const int line)
- {
-     int err;
- 
-     assert(mutex->initialized);
--    trace_qemu_mutex_unlocked(mutex);
-     err = pthread_mutex_unlock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-+
-+    trace_qemu_mutex_unlock(mutex, file, line);
- }
- 
- void qemu_rec_mutex_init(QemuRecMutex *mutex)
-@@ -152,14 +155,14 @@ void qemu_cond_broadcast(QemuCond *cond)
-         error_exit(err, __func__);
- }
- 
--void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
-+void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *file, const int line)
- {
-     int err;
- 
-     assert(cond->initialized);
--    trace_qemu_mutex_unlocked(mutex);
-+    trace_qemu_mutex_unlock(mutex, file, line);
-     err = pthread_cond_wait(&cond->cond, &mutex->lock);
--    trace_qemu_mutex_locked(mutex);
-+    trace_qemu_mutex_locked(mutex, file, line);
-     if (err)
-         error_exit(err, __func__);
- }
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 94f3491..ab60c0d 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -56,30 +56,32 @@ void qemu_mutex_destroy(QemuMutex *mutex)
-     InitializeSRWLock(&mutex->lock);
- }
- 
--void qemu_mutex_lock(QemuMutex *mutex)
-+void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int line)
- {
-     assert(mutex->initialized);
-+    trace_qemu_mutex_lock(mutex, file, line);
-+
-     AcquireSRWLockExclusive(&mutex->lock);
--    trace_qemu_mutex_locked(mutex);
-+    trace_qemu_mutex_locked(mutex, file, line);
- }
- 
--int qemu_mutex_trylock(QemuMutex *mutex)
-+int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
- {
-     int owned;
- 
-     assert(mutex->initialized);
-     owned = TryAcquireSRWLockExclusive(&mutex->lock);
-     if (owned) {
--        trace_qemu_mutex_locked(mutex);
-+        trace_qemu_mutex_locked(mutex, file, line);
-         return 0;
-     }
-     return -EBUSY;
- }
- 
--void qemu_mutex_unlock(QemuMutex *mutex)
-+void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const int line)
- {
-     assert(mutex->initialized);
--    trace_qemu_mutex_unlocked(mutex);
-+    trace_qemu_mutex_unlock(mutex, file, line);
-     ReleaseSRWLockExclusive(&mutex->lock);
- }
- 
-@@ -140,12 +142,12 @@ void qemu_cond_broadcast(QemuCond *cond)
-     WakeAllConditionVariable(&cond->var);
- }
- 
--void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
-+void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *file, const int line)
- {
-     assert(cond->initialized);
--    trace_qemu_mutex_unlocked(mutex);
-+    trace_qemu_mutex_unlock(mutex, file, line);
-     SleepConditionVariableSRW(&cond->var, &mutex->lock, INFINITE, 0);
--    trace_qemu_mutex_locked(mutex);
-+    trace_qemu_mutex_locked(mutex, file, line);
- }
- 
- void qemu_sem_init(QemuSemaphore *sem, int init)
-diff --git a/util/trace-events b/util/trace-events
-index 025499f..515e625 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -56,6 +56,7 @@ lockcnt_futex_wait(const void *lockcnt, int val) "lockcnt %p waiting on %d"
- lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p after wait: %d"
- lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter"
- 
--# util/qemu-thread-posix.c
--qemu_mutex_locked(void *lock) "locked mutex %p"
--qemu_mutex_unlocked(void *lock) "unlocked mutex %p"
-+# util/qemu-thread.c
-+qemu_mutex_lock(void *mutex, const char *file, const int line) "waiting on mutex %p (%s:%d)"
-+qemu_mutex_locked(void *mutex, const char *file, const int line) "taken mutex %p (%s:%d)"
-+qemu_mutex_unlock(void *mutex, const char *file, const int line) "released mutex %p (%s:%d)"
+-    iscsi_co_init_iscsitask(iscsilun, &iTask);
+     qemu_mutex_lock(&iscsilun->mutex);
+ retry:
+     if (iscsi_get_lba_status_task(iscsilun->iscsi, iscsilun->lun,
 -- 
 1.8.3.1
