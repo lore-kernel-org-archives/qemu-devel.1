@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebY5K-00036n-Qy
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:43:55 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebY79-0004eR-Ah
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:45:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebY5J-0002SG-UV
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:43:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebY78-0003i1-GQ
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:45:47 -0500
 References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <45a18aa0-113b-a87e-39ee-97beb205c922@redhat.com>
-Date: Tue, 16 Jan 2018 14:43:28 -0600
+Message-ID: <55baeb92-f476-20de-0bec-cb8bf42e2155@redhat.com>
+Date: Tue, 16 Jan 2018 14:45:32 -0600
 MIME-Version: 1.0
-In-Reply-To: <1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="nDIlh0zswpni3gKFb7CizEITdFEZSBw3N"
-Subject: Re: [Qemu-devel] [PATCH v6 4/9] block: treat BDRV_REQ_ALLOCATE as
- serialising
+	boundary="ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR"
+Subject: Re: [Qemu-devel] [PATCH v6 9/9] iotest 134: test cluster-misaligned
+ encrypted write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +29,28 @@ To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@virtuozzo.com, berto@igalia.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nDIlh0zswpni3gKFb7CizEITdFEZSBw3N
+--ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR
 From: Eric Blake <eblake@redhat.com>
 To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
  den@virtuozzo.com, berto@igalia.com
-Message-ID: <45a18aa0-113b-a87e-39ee-97beb205c922@redhat.com>
-Subject: Re: [PATCH v6 4/9] block: treat BDRV_REQ_ALLOCATE as serialising
+Message-ID: <55baeb92-f476-20de-0bec-cb8bf42e2155@redhat.com>
+Subject: Re: [PATCH v6 9/9] iotest 134: test cluster-misaligned encrypted
+ write
 References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 01/16/2018 07:04 AM, Anton Nefedov wrote:
-> The idea is that ALLOCATE requests may overlap with other requests.
-> Reuse the existing block layer infrastructure for serialising requests.=
-
-> Use the following approach:
->   - mark ALLOCATE serialising, so subsequent requests to the area wait
->   - ALLOCATE request itself must never wait if another request is in fl=
-ight
->     already. Return EAGAIN, let the caller reconsider.
+> COW (even empty/zero) areas require encryption too
 >=20
 > Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 > ---
->  block/io.c | 27 +++++++++++++++++++--------
->  1 file changed, 19 insertions(+), 8 deletions(-)
->=20
+>  tests/qemu-iotests/134     |  9 +++++++++
+>  tests/qemu-iotests/134.out | 10 ++++++++++
+>  2 files changed, 19 insertions(+)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -66,7 +60,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---nDIlh0zswpni3gKFb7CizEITdFEZSBw3N
+--ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -75,14 +69,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeY/AACgkQp6FrSiUn
-Q2pvwwf9HfSDCQ9EQ8pb7wRKHujLpIpH2e6XiPTrQbN4ckQ5QBWpCsk3NeJ3WhPd
-RcCzp2OBdOOk9Ak8XiQqza7aXDffGXY0Ar1r2ggrmfCGUhAt8BWPkS+Vxxd4qguI
-bKlUaCyGO/InhHZs3b/2TijOMbkc2RRNtZGYB/ddXpkhwRpLLtY9fCG1C0Aecnjq
-4vdAMKcbVgErXQOaaVqidRKh7lhpMZTiQlldleNoAy0JH3AnKEprd8lZKutcaFzH
-b24YaaaRvQ9xp0GEPU5h8VSRn65Rg3Dp/kiPHsflW4/DaLOsTPUVKiGa3AUQW9ZI
-zYKF8TXUbY5nZL478txC1VXT8VtpQQ==
-=N3Zl
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeZGwACgkQp6FrSiUn
+Q2rz+gf/dDeF+FmWb3G/xssIzwEBdB8YpMCo5mm4ssGDJ6kYEXJcqVNuI0FgHUoQ
+UV1EVhzU4H6gCBGjkbXzKTz1bE5ZfSdWqBBEBVf769phIeXdRBw/eBxmq0tc/Yyz
+datHar+GLWUH2pZIxm07EMjg9VBl1M6z7UHbV5h/74ssDWQ/ESLZy+hjrTh6CisK
+bKXWMHAPY86tmR5tqqCSXn2QxmpU+cMqzVTjlMgPhl+/ZLtBWo8Hsb5Y5vz439jn
+Xc1kWa/h+6uY4ByfN30RlmJeCwYzcV3Niljz3MAYIpo+CZ6Ea/Fzs7DOlISIjG8T
+P1eYV07a6eRo7Fj+BuX1eDSS/8zxlg==
+=tQfX
 -----END PGP SIGNATURE-----
 
---nDIlh0zswpni3gKFb7CizEITdFEZSBw3N--
+--ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR--
