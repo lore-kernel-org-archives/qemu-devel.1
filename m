@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC6-00065B-R3
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC6-000659-Qy
 	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:37:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC4-0005HV-12
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC4-0005HQ-0H
 	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:37:42 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 15 Jan 2018 17:36:59 -0800
-Message-Id: <20180116013709.13830-5-andrew.smirnov@gmail.com>
+Date: Mon, 15 Jan 2018 17:36:58 -0800
+Message-Id: <20180116013709.13830-4-andrew.smirnov@gmail.com>
 In-Reply-To: <20180116013709.13830-1-andrew.smirnov@gmail.com>
 References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 04/14] i.MX: Add code to emulate i.MX2
- watchdog IP block
+Subject: [Qemu-devel] [PATCH v4 03/14] i.MX: Add code to emulate i.MX7 CCM,
+ PMU and ANALOG IP blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +26,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Add enough code to emulate i.MX2 watchdog IP block so it would be
-possible to reboot the machine running Linux Guest.
+Add minimal code needed to allow upstream Linux guest to boot.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -35,38 +34,37 @@ Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Cc: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/misc/Makefile.objs      |  1 +
- hw/misc/imx2_wdt.c         | 89 ++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/imx2_wdt.h | 33 +++++++++++++++++
- 3 files changed, 123 insertions(+)
- create mode 100644 hw/misc/imx2_wdt.c
- create mode 100644 include/hw/misc/imx2_wdt.h
+ hw/misc/Makefile.objs      |   1 +
+ hw/misc/imx7_ccm.c         | 277 +++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/imx7_ccm.h | 139 +++++++++++++++++++++++
+ 3 files changed, 417 insertions(+)
+ create mode 100644 hw/misc/imx7_ccm.c
+ create mode 100644 include/hw/misc/imx7_ccm.h
 
 diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index a28e5e49b0..4b2b705a6c 100644
+index d517f83e81..a28e5e49b0 100644
 --- a/hw/misc/Makefile.objs
 +++ b/hw/misc/Makefile.objs
-@@ -34,6 +34,7 @@ obj-$(CONFIG_IMX) += imx25_ccm.o
+@@ -33,6 +33,7 @@ obj-$(CONFIG_IMX) += imx31_ccm.o
+ obj-$(CONFIG_IMX) += imx25_ccm.o
  obj-$(CONFIG_IMX) += imx6_ccm.o
  obj-$(CONFIG_IMX) += imx6_src.o
- obj-$(CONFIG_IMX) += imx7_ccm.o
-+obj-$(CONFIG_IMX) += imx2_wdt.o
++obj-$(CONFIG_IMX) += imx7_ccm.o
  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+diff --git a/hw/misc/imx7_ccm.c b/hw/misc/imx7_ccm.c
 new file mode 100644
-index 0000000000..76bb98a525
+index 0000000000..23855df02a
 --- /dev/null
-+++ b/hw/misc/imx2_wdt.c
-@@ -0,0 +1,89 @@
++++ b/hw/misc/imx7_ccm.c
+@@ -0,0 +1,277 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * i.MX2 Watchdog IP block
++ * i.MX7 CCM, PMU and ANALOG IP blocks emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
@@ -74,40 +72,119 @@ index 0000000000..76bb98a525
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#include "qemu/bitops.h"
 +#include "qemu/osdep.h"
-+#include "sysemu/watchdog.h"
++#include "qemu/log.h"
 +
-+#include "hw/misc/imx2_wdt.h"
++#include "hw/misc/imx7_ccm.h"
 +
-+#define IMX2_WDT_WCR_WDA    BIT(5)      /* -> External Reset WDOG_B */
-+#define IMX2_WDT_WCR_SRS    BIT(4)      /* -> Software Reset Signal */
-+
-+static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
-+                              unsigned int size)
++static void imx7_analog_reset(DeviceState *dev)
 +{
-+    return 0;
++    IMX7AnalogState *s = IMX7_ANALOG(dev);
++
++    memset(s->pmu, 0, sizeof(s->pmu));
++    memset(s->analog, 0, sizeof(s->analog));
++
++    s->analog[ANALOG_PLL_ARM]         = 0x00002042;
++    s->analog[ANALOG_PLL_DDR]         = 0x0060302c;
++    s->analog[ANALOG_PLL_DDR_SS]      = 0x00000000;
++    s->analog[ANALOG_PLL_DDR_NUM]     = 0x06aaac4d;
++    s->analog[ANALOG_PLL_DDR_DENOM]   = 0x100003ec;
++    s->analog[ANALOG_PLL_480]         = 0x00002000;
++    s->analog[ANALOG_PLL_480A]        = 0x52605a56;
++    s->analog[ANALOG_PLL_480B]        = 0x52525216;
++    s->analog[ANALOG_PLL_ENET]        = 0x00001fc0;
++    s->analog[ANALOG_PLL_AUDIO]       = 0x0001301b;
++    s->analog[ANALOG_PLL_AUDIO_SS]    = 0x00000000;
++    s->analog[ANALOG_PLL_AUDIO_NUM]   = 0x05f5e100;
++    s->analog[ANALOG_PLL_AUDIO_DENOM] = 0x2964619c;
++    s->analog[ANALOG_PLL_VIDEO]       = 0x0008201b;
++    s->analog[ANALOG_PLL_VIDEO_SS]    = 0x00000000;
++    s->analog[ANALOG_PLL_VIDEO_NUM]   = 0x0000f699;
++    s->analog[ANALOG_PLL_VIDEO_DENOM] = 0x000f4240;
++    s->analog[ANALOG_PLL_MISC0]       = 0x00000000;
++
++    /* all PLLs need to be locked */
++    s->analog[ANALOG_PLL_ARM]   |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_DDR]   |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_480]   |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_480A]  |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_480B]  |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_ENET]  |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_AUDIO] |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_VIDEO] |= ANALOG_PLL_LOCK;
++    s->analog[ANALOG_PLL_MISC0] |= ANALOG_PLL_LOCK;
++
++    /*
++     * Since I couldn't find any info about this in the reference
++     * manual the value of this register is based strictly on matching
++     * what Linux kernel expects it to be.
++     */
++    s->analog[ANALOG_DIGPROG]  = 0x720000;
++    /*
++     * Set revision to be 1.0 (Arbitrary choice, no particular
++     * reason).
++     */
++    s->analog[ANALOG_DIGPROG] |= 0x000010;
 +}
 +
-+static void imx2_wdt_write(void *opaque, hwaddr addr,
-+                           uint64_t value, unsigned int size)
++static void imx7_ccm_reset(DeviceState *dev)
 +{
-+    if (addr == IMX2_WDT_WCR &&
-+        (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))) {
-+        watchdog_perform_action();
-+    }
++    IMX7CCMState *s = IMX7_CCM(dev);
++
++    memset(s->ccm, 0, sizeof(s->ccm));
 +}
 +
-+static const MemoryRegionOps imx2_wdt_ops = {
-+    .read  = imx2_wdt_read,
-+    .write = imx2_wdt_write,
++#define CCM_INDEX(offset)   (((offset) & ~(hwaddr)0xF) / sizeof(uint32_t))
++#define CCM_BITOP(offset)   ((offset) & (hwaddr)0xF)
++
++enum {
++    CCM_BITOP_NONE = 0x00,
++    CCM_BITOP_SET  = 0x04,
++    CCM_BITOP_CLR  = 0x08,
++    CCM_BITOP_TOG  = 0x0C,
++};
++
++static uint64_t imx7_set_clr_tog_read(void *opaque, hwaddr offset,
++                                      unsigned size)
++{
++    const uint32_t *mmio = opaque;
++
++    return mmio[CCM_INDEX(offset)];
++}
++
++static void imx7_set_clr_tog_write(void *opaque, hwaddr offset,
++                                   uint64_t value, unsigned size)
++{
++    const uint8_t  bitop = CCM_BITOP(offset);
++    const uint32_t index = CCM_INDEX(offset);
++    uint32_t *mmio = opaque;
++
++    switch (bitop) {
++    case CCM_BITOP_NONE:
++        mmio[index]  = value;
++        break;
++    case CCM_BITOP_SET:
++        mmio[index] |= value;
++        break;
++    case CCM_BITOP_CLR:
++        mmio[index] &= ~value;
++        break;
++    case CCM_BITOP_TOG:
++        mmio[index] ^= value;
++        break;
++    };
++}
++
++static const struct MemoryRegionOps imx7_set_clr_tog_ops = {
++    .read = imx7_set_clr_tog_read,
++    .write = imx7_set_clr_tog_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
 +         * Our device would not work correctly if the guest was doing
-+         * unaligned access. This might not be a limitation on the
-+         * real device but in practice there is no reason for a guest
-+         * to access this device unaligned.
++         * unaligned access. This might not be a limitation on the real
++         * device but in practice there is no reason for a guest to access
++         * this device unaligned.
 +         */
 +        .min_access_size = 4,
 +        .max_access_size = 4,
@@ -115,53 +192,162 @@ index 0000000000..76bb98a525
 +    },
 +};
 +
-+static void imx2_wdt_realize(DeviceState *dev, Error **errp)
-+{
-+    IMX2WdtState *s = IMX2_WDT(dev);
++static const struct MemoryRegionOps imx7_digprog_ops = {
++    .read = imx7_set_clr_tog_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++        .unaligned = false,
++    },
++};
 +
-+    memory_region_init_io(&s->mmio, OBJECT(dev),
-+                          &imx2_wdt_ops, s,
-+                          TYPE_IMX2_WDT".mmio",
-+                          IMX2_WDT_REG_NUM * sizeof(uint16_t));
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
++static void imx7_ccm_init(Object *obj)
++{
++    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
++    IMX7CCMState *s = IMX7_CCM(obj);
++
++    memory_region_init_io(&s->iomem,
++                          obj,
++                          &imx7_set_clr_tog_ops,
++                          s->ccm,
++                          TYPE_IMX7_CCM ".ccm",
++                          sizeof(s->ccm));
++
++    sysbus_init_mmio(sd, &s->iomem);
 +}
 +
-+static void imx2_wdt_class_init(ObjectClass *klass, void *data)
++static void imx7_analog_init(Object *obj)
++{
++    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
++    IMX7AnalogState *s = IMX7_ANALOG(obj);
++
++    memory_region_init(&s->mmio.container, obj, TYPE_IMX7_ANALOG,
++                       0x10000);
++
++    memory_region_init_io(&s->mmio.analog,
++                          obj,
++                          &imx7_set_clr_tog_ops,
++                          s->analog,
++                          TYPE_IMX7_ANALOG,
++                          sizeof(s->analog));
++
++    memory_region_add_subregion(&s->mmio.container,
++                                0x60, &s->mmio.analog);
++
++    memory_region_init_io(&s->mmio.pmu,
++                          obj,
++                          &imx7_set_clr_tog_ops,
++                          s->pmu,
++                          TYPE_IMX7_ANALOG ".pmu",
++                          sizeof(s->pmu));
++
++    memory_region_add_subregion(&s->mmio.container,
++                                0x200, &s->mmio.pmu);
++
++    memory_region_init_io(&s->mmio.digprog,
++                          obj,
++                          &imx7_digprog_ops,
++                          &s->analog[ANALOG_DIGPROG],
++                          TYPE_IMX7_ANALOG ".digprog",
++                          sizeof(uint32_t));
++
++    memory_region_add_subregion_overlap(&s->mmio.container,
++                                        0x800, &s->mmio.digprog, 10);
++
++
++    sysbus_init_mmio(sd, &s->mmio.container);
++}
++
++static const VMStateDescription vmstate_imx7_ccm = {
++    .name = TYPE_IMX7_CCM,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(ccm, IMX7CCMState, CCM_MAX),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static uint32_t imx7_ccm_get_clock_frequency(IMXCCMState *dev, IMXClk clock)
++{
++    /*
++     * This function is "consumed" by GPT emulation code, however on
++     * i.MX7 each GPT block can have their own clock root. This means
++     * that this functions needs somehow to know requester's identity
++     * and the way to pass it: be it via additional IMXClk constants
++     * or by adding another argument to this method needs to be
++     * figured out
++     */
++    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Not implemented\n",
++                  TYPE_IMX7_CCM, __func__);
++    return 0;
++}
++
++static void imx7_ccm_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    IMXCCMClass *ccm = IMX_CCM_CLASS(klass);
++
++    dc->reset = imx7_ccm_reset;
++    dc->vmsd  = &vmstate_imx7_ccm;
++    dc->desc  = "i.MX7 Clock Control Module";
++
++    ccm->get_clock_frequency = imx7_ccm_get_clock_frequency;
++}
++
++static const TypeInfo imx7_ccm_info = {
++    .name          = TYPE_IMX7_CCM,
++    .parent        = TYPE_IMX_CCM,
++    .instance_size = sizeof(IMX7CCMState),
++    .instance_init = imx7_ccm_init,
++    .class_init    = imx7_ccm_class_init,
++};
++
++static const VMStateDescription vmstate_imx7_analog = {
++    .name = TYPE_IMX7_ANALOG,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(analog, IMX7AnalogState, ANALOG_MAX),
++        VMSTATE_UINT32_ARRAY(pmu,    IMX7AnalogState, PMU_MAX),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static void imx7_analog_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->realize = imx2_wdt_realize;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->reset = imx7_analog_reset;
++    dc->vmsd  = &vmstate_imx7_analog;
++    dc->desc  = "i.MX7 Analog Module";
 +}
 +
-+static const TypeInfo imx2_wdt_info = {
-+    .name          = TYPE_IMX2_WDT,
++static const TypeInfo imx7_analog_info = {
++    .name          = TYPE_IMX7_ANALOG,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMX2WdtState),
-+    .class_init    = imx2_wdt_class_init,
++    .instance_size = sizeof(IMX7AnalogState),
++    .instance_init = imx7_analog_init,
++    .class_init    = imx7_analog_class_init,
 +};
 +
-+static WatchdogTimerModel model = {
-+    .wdt_name = "imx2-watchdog",
-+    .wdt_description = "i.MX2 Watchdog",
-+};
-+
-+static void imx2_wdt_register_type(void)
++static void imx7_ccm_register_type(void)
 +{
-+    watchdog_add_model(&model);
-+    type_register_static(&imx2_wdt_info);
++    type_register_static(&imx7_ccm_info);
++    type_register_static(&imx7_analog_info);
 +}
-+type_init(imx2_wdt_register_type)
-diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
++type_init(imx7_ccm_register_type)
+diff --git a/include/hw/misc/imx7_ccm.h b/include/hw/misc/imx7_ccm.h
 new file mode 100644
-index 0000000000..8afc99a10e
+index 0000000000..9538f37d98
 --- /dev/null
-+++ b/include/hw/misc/imx2_wdt.h
-@@ -0,0 +1,33 @@
++++ b/include/hw/misc/imx7_ccm.h
+@@ -0,0 +1,139 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * i.MX2 Watchdog IP block
++ * i.MX7 CCM, PMU and ANALOG IP blocks emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
@@ -169,27 +355,133 @@ index 0000000000..8afc99a10e
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef IMX2_WDT_H
-+#define IMX2_WDT_H
++#ifndef IMX7_CCM_H
++#define IMX7_CCM_H
 +
-+#include "hw/sysbus.h"
++#include "hw/misc/imx_ccm.h"
++#include "qemu/bitops.h"
 +
-+#define TYPE_IMX2_WDT "imx2.wdt"
-+#define IMX2_WDT(obj) OBJECT_CHECK(IMX2WdtState, (obj), TYPE_IMX2_WDT)
++enum IMX7AnalogRegisters {
++    ANALOG_PLL_ARM,
++    ANALOG_PLL_ARM_SET,
++    ANALOG_PLL_ARM_CLR,
++    ANALOG_PLL_ARM_TOG,
++    ANALOG_PLL_DDR,
++    ANALOG_PLL_DDR_SET,
++    ANALOG_PLL_DDR_CLR,
++    ANALOG_PLL_DDR_TOG,
++    ANALOG_PLL_DDR_SS,
++    ANALOG_PLL_DDR_SS_SET,
++    ANALOG_PLL_DDR_SS_CLR,
++    ANALOG_PLL_DDR_SS_TOG,
++    ANALOG_PLL_DDR_NUM,
++    ANALOG_PLL_DDR_NUM_SET,
++    ANALOG_PLL_DDR_NUM_CLR,
++    ANALOG_PLL_DDR_NUM_TOG,
++    ANALOG_PLL_DDR_DENOM,
++    ANALOG_PLL_DDR_DENOM_SET,
++    ANALOG_PLL_DDR_DENOM_CLR,
++    ANALOG_PLL_DDR_DENOM_TOG,
++    ANALOG_PLL_480,
++    ANALOG_PLL_480_SET,
++    ANALOG_PLL_480_CLR,
++    ANALOG_PLL_480_TOG,
++    ANALOG_PLL_480A,
++    ANALOG_PLL_480A_SET,
++    ANALOG_PLL_480A_CLR,
++    ANALOG_PLL_480A_TOG,
++    ANALOG_PLL_480B,
++    ANALOG_PLL_480B_SET,
++    ANALOG_PLL_480B_CLR,
++    ANALOG_PLL_480B_TOG,
++    ANALOG_PLL_ENET,
++    ANALOG_PLL_ENET_SET,
++    ANALOG_PLL_ENET_CLR,
++    ANALOG_PLL_ENET_TOG,
++    ANALOG_PLL_AUDIO,
++    ANALOG_PLL_AUDIO_SET,
++    ANALOG_PLL_AUDIO_CLR,
++    ANALOG_PLL_AUDIO_TOG,
++    ANALOG_PLL_AUDIO_SS,
++    ANALOG_PLL_AUDIO_SS_SET,
++    ANALOG_PLL_AUDIO_SS_CLR,
++    ANALOG_PLL_AUDIO_SS_TOG,
++    ANALOG_PLL_AUDIO_NUM,
++    ANALOG_PLL_AUDIO_NUM_SET,
++    ANALOG_PLL_AUDIO_NUM_CLR,
++    ANALOG_PLL_AUDIO_NUM_TOG,
++    ANALOG_PLL_AUDIO_DENOM,
++    ANALOG_PLL_AUDIO_DENOM_SET,
++    ANALOG_PLL_AUDIO_DENOM_CLR,
++    ANALOG_PLL_AUDIO_DENOM_TOG,
++    ANALOG_PLL_VIDEO,
++    ANALOG_PLL_VIDEO_SET,
++    ANALOG_PLL_VIDEO_CLR,
++    ANALOG_PLL_VIDEO_TOG,
++    ANALOG_PLL_VIDEO_SS,
++    ANALOG_PLL_VIDEO_SS_SET,
++    ANALOG_PLL_VIDEO_SS_CLR,
++    ANALOG_PLL_VIDEO_SS_TOG,
++    ANALOG_PLL_VIDEO_NUM,
++    ANALOG_PLL_VIDEO_NUM_SET,
++    ANALOG_PLL_VIDEO_NUM_CLR,
++    ANALOG_PLL_VIDEO_NUM_TOG,
++    ANALOG_PLL_VIDEO_DENOM,
++    ANALOG_PLL_VIDEO_DENOM_SET,
++    ANALOG_PLL_VIDEO_DENOM_CLR,
++    ANALOG_PLL_VIDEO_DENOM_TOG,
++    ANALOG_PLL_MISC0,
++    ANALOG_PLL_MISC0_SET,
++    ANALOG_PLL_MISC0_CLR,
++    ANALOG_PLL_MISC0_TOG,
 +
-+enum IMX2WdtRegisters {
-+    IMX2_WDT_WCR     = 0x0000,
-+    IMX2_WDT_REG_NUM = 0x0008 / sizeof(uint16_t) + 1,
++    ANALOG_DIGPROG = 0x800 / sizeof(uint32_t),
++    ANALOG_MAX,
++
++    ANALOG_PLL_LOCK = BIT(31)
 +};
 +
++enum IMX7CCMRegisters {
++    CCM_MAX = 0xBE00 / sizeof(uint32_t) + 1,
++};
 +
-+typedef struct IMX2WdtState {
++enum IMX7PMURegisters {
++    PMU_MAX = 0x140 / sizeof(uint32_t),
++};
++
++#define TYPE_IMX7_CCM "imx7.ccm"
++#define IMX7_CCM(obj) OBJECT_CHECK(IMX7CCMState, (obj), TYPE_IMX7_CCM)
++
++typedef struct IMX7CCMState {
 +    /* <private> */
-+    SysBusDevice parent_obj;
++    IMXCCMState parent_obj;
 +
-+    MemoryRegion mmio;
-+} IMX2WdtState;
++    /* <public> */
++    MemoryRegion iomem;
 +
-+#endif /* IMX7_SNVS_H */
++    uint32_t ccm[CCM_MAX];
++} IMX7CCMState;
++
++
++#define TYPE_IMX7_ANALOG "imx7.analog"
++#define IMX7_ANALOG(obj) OBJECT_CHECK(IMX7AnalogState, (obj), TYPE_IMX7_ANALOG)
++
++typedef struct IMX7AnalogState {
++    /* <private> */
++    IMXCCMState parent_obj;
++
++    /* <public> */
++    struct {
++        MemoryRegion container;
++        MemoryRegion analog;
++        MemoryRegion digprog;
++        MemoryRegion pmu;
++    } mmio;
++
++    uint32_t analog[ANALOG_MAX];
++    uint32_t pmu[PMU_MAX];
++} IMX7AnalogState;
++
++#endif /* IMX7_CCM_H */
 -- 
 2.14.3
