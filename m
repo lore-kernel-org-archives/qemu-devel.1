@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ebY4G-0001rv-EF
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:42:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebY5K-00036n-Qy
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:43:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ebY4C-0001fw-GO
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:42:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ebY4C-0001fL-7O
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:42:44 -0500
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-3-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8fa53398-2a94-a0ce-d093-390869f2b974@redhat.com>
-Date: Tue, 16 Jan 2018 21:42:35 +0100
+	(envelope-from <eblake@redhat.com>) id 1ebY5J-0002SG-UV
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:43:54 -0500
+References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <45a18aa0-113b-a87e-39ee-97beb205c922@redhat.com>
+Date: Tue, 16 Jan 2018 14:43:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <1516117900-11382-3-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] acpi: build QEMU table for PPI
- virtual memory device
+In-Reply-To: <1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nDIlh0zswpni3gKFb7CizEITdFEZSBw3N"
+Subject: Re: [Qemu-devel] [PATCH v6 4/9] block: treat BDRV_REQ_ALLOCATE as
+ serialising
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, kevin@koconnor.net, marcandre.lureau@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@virtuozzo.com, berto@igalia.com
 
-On 01/16/18 16:51, Stefan Berger wrote:
-> To avoid having to hard code the base address of the PPI virtual memory
-> device we introduce a QEMU ACPI table that holds the base address, if a
-> TPM 1.2 or 2 is used. This table gives us flexibility to move the base
-> address later on.
-> 
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nDIlh0zswpni3gKFb7CizEITdFEZSBw3N
+From: Eric Blake <eblake@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ den@virtuozzo.com, berto@igalia.com
+Message-ID: <45a18aa0-113b-a87e-39ee-97beb205c922@redhat.com>
+Subject: Re: [PATCH v6 4/9] block: treat BDRV_REQ_ALLOCATE as serialising
+References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1516107870-8110-5-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/16/2018 07:04 AM, Anton Nefedov wrote:
+> The idea is that ALLOCATE requests may overlap with other requests.
+> Reuse the existing block layer infrastructure for serialising requests.=
+
+> Use the following approach:
+>   - mark ALLOCATE serialising, so subsequent requests to the area wait
+>   - ALLOCATE request itself must never wait if another request is in fl=
+ight
+>     already. Return EAGAIN, let the caller reconsider.
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 > ---
->  hw/i386/acpi-build.c        | 19 +++++++++++++++++++
->  include/hw/acpi/acpi-defs.h |  8 ++++++++
->  2 files changed, 27 insertions(+)
+>  block/io.c | 27 +++++++++++++++++++--------
+>  1 file changed, 19 insertions(+), 8 deletions(-)
+>=20
 
-I don't understand how the guest OS is supposed to consume the QEMU
-table. The AML code in patch #4 does not seem to consume the QEMU table,
-for locating the operation region. I'm not saying that it *should*
-consume the QEMU table, only that I'm currently not seeing a use for the
-QEMU table.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-How is the QEMU table useful? What breaks if we drop it?
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-(Sorry if we've been through this; then I must have lost context.)
 
-Thanks,
-Laszlo
+--nDIlh0zswpni3gKFb7CizEITdFEZSBw3N
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 18b939e..522d6d2 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2628,6 +2628,20 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
->      return true;
->  }
->  
-> +static void build_qemu(GArray *table_data, BIOSLinker *linker,
-> +                       TPMVersion tpm_version)
-> +{
-> +    AcpiTableQemu *qemu = acpi_data_push(table_data, sizeof(*qemu));
-> +
-> +    if (tpm_version != TPM_VERSION_UNSPEC) {
-> +        qemu->tpmppi_addr = TPM_PPI_ADDR_BASE;
-> +        qemu->tpm_version = tpm_version;
-> +    }
-> +
-> +    build_header(linker, table_data,
-> +                 (void *)qemu, "QEMU", sizeof(*qemu), 1, "QEMU", "CONF");
-> +}
-> +
->  static
->  void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->  {
-> @@ -2734,6 +2748,11 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->                            &pcms->acpi_nvdimm_state, machine->ram_slots);
->      }
->  
-> +    if (misc.tpm_version != TPM_VERSION_UNSPEC) {
-> +        acpi_add_table(table_offsets, tables_blob);
-> +        build_qemu(tables_blob, tables->linker, misc.tpm_version);
-> +    }
-> +
->      /* Add tables supplied by user (if any) */
->      for (u = acpi_table_first(); u; u = acpi_table_next(u)) {
->          unsigned len = acpi_table_len(u);
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index 80c8099..98764c1 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -573,6 +573,14 @@ struct Acpi20TPM2 {
->  } QEMU_PACKED;
->  typedef struct Acpi20TPM2 Acpi20TPM2;
->  
-> +/* QEMU - Custom QEMU table */
-> +struct AcpiTableQemu {
-> +    ACPI_TABLE_HEADER_DEF
-> +    uint32_t tpmppi_addr;
-> +    uint8_t tpm_version; /* 1 = 1.2, 2 = 2 */
-> +};
-> +typedef struct AcpiTableQemu AcpiTableQemu;
-> +
->  /* DMAR - DMA Remapping table r2.2 */
->  struct AcpiTableDmar {
->      ACPI_TABLE_HEADER_DEF
-> 
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeY/AACgkQp6FrSiUn
+Q2pvwwf9HfSDCQ9EQ8pb7wRKHujLpIpH2e6XiPTrQbN4ckQ5QBWpCsk3NeJ3WhPd
+RcCzp2OBdOOk9Ak8XiQqza7aXDffGXY0Ar1r2ggrmfCGUhAt8BWPkS+Vxxd4qguI
+bKlUaCyGO/InhHZs3b/2TijOMbkc2RRNtZGYB/ddXpkhwRpLLtY9fCG1C0Aecnjq
+4vdAMKcbVgErXQOaaVqidRKh7lhpMZTiQlldleNoAy0JH3AnKEprd8lZKutcaFzH
+b24YaaaRvQ9xp0GEPU5h8VSRn65Rg3Dp/kiPHsflW4/DaLOsTPUVKiGa3AUQW9ZI
+zYKF8TXUbY5nZL478txC1VXT8VtpQQ==
+=N3Zl
+-----END PGP SIGNATURE-----
+
+--nDIlh0zswpni3gKFb7CizEITdFEZSBw3N--
