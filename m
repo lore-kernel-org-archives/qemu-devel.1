@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC8-00066r-7Y
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:37:45 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC9-00068b-Pr
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:37:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC7-0005KK-0K
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:37:44 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ebGC8-0005MC-Gy
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:37:45 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 15 Jan 2018 17:37:00 -0800
-Message-Id: <20180116013709.13830-6-andrew.smirnov@gmail.com>
+Date: Mon, 15 Jan 2018 17:37:01 -0800
+Message-Id: <20180116013709.13830-7-andrew.smirnov@gmail.com>
 In-Reply-To: <20180116013709.13830-1-andrew.smirnov@gmail.com>
 References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 05/14] i.MX: Add code to emulate i.MX7 SNVS
- IP-block
+Subject: [Qemu-devel] [PATCH v4 06/14] i.MX: Add code to emulate GPCv2 IP
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +26,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Add code to emulate SNVS IP-block. Currently only the bits needed to
-be able to emulate machine shutdown are implemented.
+Add minimal code needed to allow upstream Linux guest to boot.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -38,69 +37,97 @@ Cc: yurovsky@gmail.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/misc/Makefile.objs       |  1 +
- hw/misc/imx7_snvs.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
- 3 files changed, 119 insertions(+)
- create mode 100644 hw/misc/imx7_snvs.c
- create mode 100644 include/hw/misc/imx7_snvs.h
+ hw/intc/Makefile.objs       |   2 +-
+ hw/intc/imx_gpcv2.c         | 125 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/intc/imx_gpcv2.h |  22 ++++++++
+ 3 files changed, 148 insertions(+), 1 deletion(-)
+ create mode 100644 hw/intc/imx_gpcv2.c
+ create mode 100644 include/hw/intc/imx_gpcv2.h
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 4b2b705a6c..019886912c 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx6_ccm.o
- obj-$(CONFIG_IMX) += imx6_src.o
- obj-$(CONFIG_IMX) += imx7_ccm.o
- obj-$(CONFIG_IMX) += imx2_wdt.o
-+obj-$(CONFIG_IMX) += imx7_snvs.o
- obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
- obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
- obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index ae358569a1..2252181ac9 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -4,7 +4,7 @@ common-obj-$(CONFIG_PL190) += pl190.o
+ common-obj-$(CONFIG_PUV3) += puv3_intc.o
+ common-obj-$(CONFIG_XILINX) += xilinx_intc.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_pic.o
+-common-obj-$(CONFIG_IMX) += imx_avic.o
++common-obj-$(CONFIG_IMX) += imx_avic.o imx_gpcv2.o
+ common-obj-$(CONFIG_LM32) += lm32_pic.o
+ common-obj-$(CONFIG_REALVIEW) += realview_gic.o
+ common-obj-$(CONFIG_SLAVIO) += slavio_intctl.o
+diff --git a/hw/intc/imx_gpcv2.c b/hw/intc/imx_gpcv2.c
 new file mode 100644
-index 0000000000..670b9f4639
+index 0000000000..496ed31b78
 --- /dev/null
-+++ b/hw/misc/imx7_snvs.c
-@@ -0,0 +1,83 @@
++++ b/hw/intc/imx_gpcv2.c
+@@ -0,0 +1,125 @@
 +/*
-+ * IMX7 Secure Non-Volatile Storage
-+ *
 + * Copyright (c) 2017, Impinj, Inc.
++ *
++ * i.MX7 GPCv2 block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
-+ *
-+ * Bare minimum emulation code needed to support being able to shut
-+ * down linux guest gracefully.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/misc/imx7_snvs.h"
++#include "hw/intc/imx_gpcv2.h"
 +#include "qemu/log.h"
-+#include "sysemu/sysemu.h"
 +
-+static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
++#define GPC_PU_PGC_SW_PUP_REQ       0x0f8
++#define GPC_PU_PGC_SW_PDN_REQ       0x104
++
++#define USB_HSIC_PHY_SW_Pxx_REQ     BIT(4)
++#define USB_OTG2_PHY_SW_Pxx_REQ     BIT(3)
++#define USB_OTG1_PHY_SW_Pxx_REQ     BIT(2)
++#define PCIE_PHY_SW_Pxx_REQ         BIT(1)
++#define MIPI_PHY_SW_Pxx_REQ         BIT(0)
++
++
++static void imx_gpcv2_reset(DeviceState *dev)
 +{
-+    return 0;
++    IMXGPCv2State *s = IMX_GPCV2(dev);
++
++    memset(s->regs, 0, sizeof(s->regs));
 +}
 +
-+static void imx7_snvs_write(void *opaque, hwaddr offset,
-+                            uint64_t v, unsigned size)
++static uint64_t imx_gpcv2_read(void *opaque, hwaddr offset,
++                               unsigned size)
 +{
-+    const uint32_t value = v;
-+    const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
++    IMXGPCv2State *s = opaque;
 +
-+    if (offset == SNVS_LPCR && ((value & mask) == mask)) {
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    return s->regs[offset / sizeof(uint32_t)];
++}
++
++static void imx_gpcv2_write(void *opaque, hwaddr offset,
++                            uint64_t value, unsigned size)
++{
++    IMXGPCv2State *s = opaque;
++    const size_t idx = offset / sizeof(uint32_t);
++
++    s->regs[idx] = value;
++
++    /*
++     * Real HW will clear those bits once as a way to indicate that
++     * power up request is complete
++     */
++    if (offset == GPC_PU_PGC_SW_PUP_REQ ||
++        offset == GPC_PU_PGC_SW_PDN_REQ) {
++        s->regs[idx] &= ~(USB_HSIC_PHY_SW_Pxx_REQ |
++                          USB_OTG2_PHY_SW_Pxx_REQ |
++                          USB_OTG1_PHY_SW_Pxx_REQ |
++                          PCIE_PHY_SW_Pxx_REQ     |
++                          MIPI_PHY_SW_Pxx_REQ);
 +    }
 +}
 +
-+static const struct MemoryRegionOps imx7_snvs_ops = {
-+    .read = imx7_snvs_read,
-+    .write = imx7_snvs_write,
++static const struct MemoryRegionOps imx_gpcv2_ops = {
++    .read = imx_gpcv2_read,
++    .write = imx_gpcv2_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
@@ -115,77 +142,79 @@ index 0000000000..670b9f4639
 +    },
 +};
 +
-+static void imx7_snvs_init(Object *obj)
++static void imx_gpcv2_init(Object *obj)
 +{
 +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7SNVSState *s = IMX7_SNVS(obj);
++    IMXGPCv2State *s = IMX_GPCV2(obj);
 +
-+    memory_region_init_io(&s->mmio, obj, &imx7_snvs_ops, s,
-+                          TYPE_IMX7_SNVS, 0x1000);
-+
-+    sysbus_init_mmio(sd, &s->mmio);
++    memory_region_init_io(&s->iomem,
++                          obj,
++                          &imx_gpcv2_ops,
++                          s,
++                          TYPE_IMX_GPCV2 ".iomem",
++                          sizeof(s->regs));
++    sysbus_init_mmio(sd, &s->iomem);
 +}
 +
-+static void imx7_snvs_class_init(ObjectClass *klass, void *data)
++static const VMStateDescription vmstate_imx_gpcv2 = {
++    .name = TYPE_IMX_GPCV2,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, IMXGPCv2State, GPC_NUM),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static void imx_gpcv2_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->desc  = "i.MX7 Secure Non-Volatile Storage Module";
++    dc->reset = imx_gpcv2_reset;
++    dc->vmsd  = &vmstate_imx_gpcv2;
++    dc->desc  = "i.MX GPCv2 Module";
 +}
 +
-+static const TypeInfo imx7_snvs_info = {
-+    .name          = TYPE_IMX7_SNVS,
++static const TypeInfo imx_gpcv2_info = {
++    .name          = TYPE_IMX_GPCV2,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMX7SNVSState),
-+    .instance_init = imx7_snvs_init,
-+    .class_init    = imx7_snvs_class_init,
++    .instance_size = sizeof(IMXGPCv2State),
++    .instance_init = imx_gpcv2_init,
++    .class_init    = imx_gpcv2_class_init,
 +};
 +
-+static void imx7_snvs_register_type(void)
++static void imx_gpcv2_register_type(void)
 +{
-+    type_register_static(&imx7_snvs_info);
++    type_register_static(&imx_gpcv2_info);
 +}
-+type_init(imx7_snvs_register_type)
-diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
++type_init(imx_gpcv2_register_type)
+diff --git a/include/hw/intc/imx_gpcv2.h b/include/hw/intc/imx_gpcv2.h
 new file mode 100644
-index 0000000000..255f8f26f9
+index 0000000000..ed978b24bb
 --- /dev/null
-+++ b/include/hw/misc/imx7_snvs.h
-@@ -0,0 +1,35 @@
-+/*
-+ * Copyright (c) 2017, Impinj, Inc.
-+ *
-+ * i.MX7 SNVS block emulation code
-+ *
-+ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
++++ b/include/hw/intc/imx_gpcv2.h
+@@ -0,0 +1,22 @@
++#ifndef IMX_GPCV2_H
++#define IMX_GPCV2_H
 +
-+#ifndef IMX7_SNVS_H
-+#define IMX7_SNVS_H
-+
-+#include "qemu/bitops.h"
 +#include "hw/sysbus.h"
 +
-+
-+enum IMX7SNVSRegisters {
-+    SNVS_LPCR = 0x38,
-+    SNVS_LPCR_TOP   = BIT(6),
-+    SNVS_LPCR_DP_EN = BIT(5)
++enum IMXGPCv2Registers {
++    GPC_NUM        = 0xE00 / sizeof(uint32_t),
 +};
 +
-+#define TYPE_IMX7_SNVS "imx7.snvs"
-+#define IMX7_SNVS(obj) OBJECT_CHECK(IMX7SNVSState, (obj), TYPE_IMX7_SNVS)
-+
-+typedef struct IMX7SNVSState {
-+    /* <private> */
++typedef struct IMXGPCv2State {
++    /*< private >*/
 +    SysBusDevice parent_obj;
 +
-+    MemoryRegion mmio;
-+} IMX7SNVSState;
++    /*< public >*/
++    MemoryRegion iomem;
++    uint32_t     regs[GPC_NUM];
++} IMXGPCv2State;
 +
-+#endif /* IMX7_SNVS_H */
++#define TYPE_IMX_GPCV2 "imx-gpcv2"
++#define IMX_GPCV2(obj) OBJECT_CHECK(IMXGPCv2State, (obj), TYPE_IMX_GPCV2)
++
++#endif /* IMX_GPCV2_H */
 -- 
 2.14.3
