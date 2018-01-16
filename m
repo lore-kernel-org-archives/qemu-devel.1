@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ebFZu-0007sD-Kr
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 19:58:15 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebFxR-0001Nw-Vh
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:22:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ebFZt-0000lz-Hn
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 19:58:14 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33988)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ebFZt-0000ls-Dl
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 19:58:13 -0500
-Received: by mail-ot0-x242.google.com with SMTP id p16so12206718otf.1
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 16:58:13 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Mon, 15 Jan 2018 18:57:55 -0600
-Message-Id: <1516064279-14816-4-git-send-email-minyard@acm.org>
-In-Reply-To: <1516064279-14816-1-git-send-email-minyard@acm.org>
-References: <1516064279-14816-1-git-send-email-minyard@acm.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1ebFxN-0006cq-UY
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 20:22:33 -0500
+Date: Tue, 16 Jan 2018 12:19:35 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180116011935.GA30352@umbus.fritz.box>
+References: <1516008655-31732-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA8X+p=oWWBTquGjceZJVEfcD8eWDxdZnRe=jVaL7t+LEA@mail.gmail.com>
+	<e83d019b-2a88-f4e4-4be8-79f93731b549@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 3/7] ipmi: Don't set the timestamp on add
- events that don't have it
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="G4iJoqBmSsgzjUCe"
+Content-Disposition: inline
+In-Reply-To: <e83d019b-2a88-f4e4-4be8-79f93731b549@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/2] Clean up the ppc default
+ configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Eric Blake <eblake@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
 
-According to the spec, from section "32.3 OEM SEL Record - Type
-E0h-FFh", event types from 0x0e to 0xff do not have a timestamp.
-So don't set it when adding those types.  This required putting
-the timestamp in a temporary buffer, since it's still required
-to set the last addition time.
+--G4iJoqBmSsgzjUCe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
----
- hw/ipmi/ipmi_bmc_sim.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+On Mon, Jan 15, 2018 at 03:42:09PM +0100, Thomas Huth wrote:
+> On 15.01.2018 14:01, Peter Maydell wrote:
+> > On 15 January 2018 at 09:30, Thomas Huth <thuth@redhat.com> wrote:
+> >> (off-topic question: Do we still need a separate ppcemb-softmmu nowada=
+ys?
+> >> It seemed to be useful 10 years ago when everybody was doing KVM on
+> >> embedded PPC, but these days seem to be pretty much over now, so IMHO
+> >> just using ppc-softmmu for embedded should be enough nowadays? We could
+> >> save quite some compilation- and "make check"-time if we could finally=
+ get
+> >> rid of ppcemb-softmmu again...)
+> >=20
+> > There are some specific differences guarded by TARGET_PPCEMB, like
+> > the way it has a different TARGET_PAGE_BITS value, and some code
+> > in target/ppc/kvm.c related to telling KVM about interrupts. You
+> > would need to make those all be runtime decisions I assume.
+>=20
+> True ... but while we maybe could turn those into runtime checks, I now
+> rather think it's maybe better to go the other way round: Maybe we
+> should not include each and everything into ppc64-softmmu, but put the
+> embedded stuff only in ppcemb-softmmu and the 32-bit stuff only in
+> ppc-softmmu instead? That way we could, for example, also make the
+> output of "-cpu help" and "-device help" a little bit more user friendly.=
+=2E.
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index cc068f2..a0bbfd5 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -443,16 +443,21 @@ static void sel_inc_reservation(IPMISel *sel)
- /* Returns 1 if the SEL is full and can't hold the event. */
- static int sel_add_event(IPMIBmcSim *ibs, uint8_t *event)
- {
-+    uint8_t ts[4];
-+
-     event[0] = 0xff;
-     event[1] = 0xff;
--    set_timestamp(ibs, event + 3);
-+    set_timestamp(ibs, ts);
-+    if (event[2] < 0xe0) { /* Don't set timestamps for type 0xe0-0xff. */
-+        memcpy(event + 3, ts, 4);
-+    }
-     if (ibs->sel.next_free == MAX_SEL_SIZE) {
-         ibs->sel.overflow = 1;
-         return 1;
-     }
-     event[0] = ibs->sel.next_free & 0xff;
-     event[1] = (ibs->sel.next_free >> 8) & 0xff;
--    memcpy(ibs->sel.last_addition, event + 3, 4);
-+    memcpy(ibs->sel.last_addition, ts, 4);
-     memcpy(ibs->sel.sel[ibs->sel.next_free], event, 16);
-     ibs->sel.next_free++;
-     sel_inc_reservation(&ibs->sel);
--- 
-2.7.4
+I tend to agree.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--G4iJoqBmSsgzjUCe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpdUyQACgkQbDjKyiDZ
+s5JmoA//eyk9grjPfVMiVlxccGTIvLDoWlq2uq6TnT4fUiQQKSfe6Q4Ep5dlWGPD
+5PN7EGi3g6eUjQ4/UJZTmjeJIzTg8oUp8RwZzvUPDeCBPDdIdU+4Gbc2awhT+pBx
+gKEnMFOPNapv9YKzjKDTWZiQ4woqjl3OgHz/lBxFJAOd1Vi426CLF41lqUKwvIWs
+4//tuz2+LjmLTQ7aBsAp4UYqBUUVwKWCQsh/j14BTlqwv2srhpNNpwtd0ap4EgX5
+fFU49AACI6ZIHrYBwlWwzj4iTwK5v0RP9xtXBRZgfpJRfeZako6ggX4XuHJM7PAT
+dL8m3q5FiNeCUUq/T7hRJxm7U7JGwJjNp+cGpFOFfbxRIRzIsKcDqcvaDu9OC6nK
+n+xwllByTaMkh48y2X1Vpwd5rtOKskwXC3kLCGhCj7vkRNKGEjm09GFn29a0OTsw
+kASjnTG9G+djIts9TrGIhKTr+JDiek9ioP+FZw7mNaUxRjAoI1J0t0x916uwynlk
+uPovocMZU6MPLlssisSbZ2kTNh6M/1bOKSGxMKH4QgXqaWdC5qE75lC1eMuZP4hx
+XFUc3yjIg8SkKeUj74nhjuQiVCC0adxlvUBqfDoQ2hx0Gt2IEfwiHPfQntZyMq9G
+Av7ZiEE+9HO46yHExiFLI6mHgR3+oA6QLoIUh4gazJ8IAvVskH8=
+=4LkD
+-----END PGP SIGNATURE-----
+
+--G4iJoqBmSsgzjUCe--
