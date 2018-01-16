@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebYol-0006w9-Nm
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:30:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebYq9-0007gS-TR
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebYok-00057Q-Nk
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:30:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebYq8-0005sg-VZ
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:32:17 -0500
 References: <cover.1513342045.git.berto@igalia.com>
-	<5acef77483178b4ab6b63dfaf63f4737fc376a20.1513342045.git.berto@igalia.com>
+	<dd49ca34767c46886ef775739c3a3611b7d5a65b.1513342045.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <4590388c-d66c-6cab-5790-26aa78b78312@redhat.com>
-Date: Tue, 16 Jan 2018 15:30:27 -0600
+Message-ID: <03840926-d189-f617-aeae-58de6c0fcd3c@redhat.com>
+Date: Tue, 16 Jan 2018 15:32:02 -0600
 MIME-Version: 1.0
-In-Reply-To: <5acef77483178b4ab6b63dfaf63f4737fc376a20.1513342045.git.berto@igalia.com>
+In-Reply-To: <dd49ca34767c46886ef775739c3a3611b7d5a65b.1513342045.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Hk6ebTobB4kKwPqNhze86A0SEllpNddXq"
-Subject: Re: [Qemu-devel] [PATCH v2 04/32] qcow2: Remove BDS parameter from
- qcow2_cache_get_table_idx()
+	boundary="ANi90WktkFvP7u1mePm44d4zA0KzeltLR"
+Subject: Re: [Qemu-devel] [PATCH v2 05/32] qcow2: Remove BDS parameter from
+ qcow2_cache_table_release()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,17 +29,17 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Hk6ebTobB4kKwPqNhze86A0SEllpNddXq
+--ANi90WktkFvP7u1mePm44d4zA0KzeltLR
 From: Eric Blake <eblake@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
  qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <4590388c-d66c-6cab-5790-26aa78b78312@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 04/32] qcow2: Remove BDS parameter from
- qcow2_cache_get_table_idx()
+Message-ID: <03840926-d189-f617-aeae-58de6c0fcd3c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 05/32] qcow2: Remove BDS parameter from
+ qcow2_cache_table_release()
 References: <cover.1513342045.git.berto@igalia.com>
- <5acef77483178b4ab6b63dfaf63f4737fc376a20.1513342045.git.berto@igalia.com>
-In-Reply-To: <5acef77483178b4ab6b63dfaf63f4737fc376a20.1513342045.git.berto@igalia.com>
+ <dd49ca34767c46886ef775739c3a3611b7d5a65b.1513342045.git.berto@igalia.com>
+In-Reply-To: <dd49ca34767c46886ef775739c3a3611b7d5a65b.1513342045.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
@@ -62,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---Hk6ebTobB4kKwPqNhze86A0SEllpNddXq
+--ANi90WktkFvP7u1mePm44d4zA0KzeltLR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -71,14 +71,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpebvMACgkQp6FrSiUn
-Q2o8hwgAjImy6izqUF7F/TB2/KcTZ4LExYm7o5hhqOl3NGA/AS9AeEst366Rgvqb
-L9u8+7FPBsNEPwLw3/iWI9dTUL143HSg6YJ9mExAKtXHg+/TPsBMa+PFU/CRm0Yu
-02pKeXvRalGIixxCbdIwHkclZ5XG9ATqCTsHvrjzjvSZvtTwcui8b9r6WL0ZW8qf
-f3yjGzi5cXm3pWZGUDRRs9Fl2sK7svjzXfefIVQd5k1A1WGpzApnU4tMSecOklGd
-BYvR4OFB0ERADN2gCMEyihZBzsBAeM/dkwWJQc83K5CSnyDr5DGtlng6HfqlrdeE
-PhZN3VRvu+7jtORR1Us6VhQthlemFQ==
-=qmwR
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeb1IACgkQp6FrSiUn
+Q2qAwgf/Qem7bXKYfUBzpluh/rB2wwW7TeozXZdVlxlYyK1Q6XXmquEWizkjmmCX
+O9gwQ7ISRsU3J9SuGOJjAKEK8e5brTOgNxVytRlEgpRSx9q+0h4xTRoYgjCg+Dtf
+7xB0jJz971Ngm2d9C7xHZyNkmmwuQWZE0MNnrsn1kxU7yJi3tjJ4RdnktZzqIUIH
+D321MufX6Q7jEvA+Bkvh9ICWA+gxO8CwzRfvEOmVkCbBRUOcCE9bmPtdd1ICXxIL
+56spbDb84+Nui2mumJczuXgEoOAt8tTYpD/zug3h4meQ+UHKlR8wH5xKpX0jiCUI
+fvmaXgz7UfrgS0Y1XahTYEZ4khxIbg==
+=VJXH
 -----END PGP SIGNATURE-----
 
---Hk6ebTobB4kKwPqNhze86A0SEllpNddXq--
+--ANi90WktkFvP7u1mePm44d4zA0KzeltLR--
