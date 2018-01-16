@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebaEA-00011u-PN
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:01:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebaMN-0003XI-Qc
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:09:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebaE9-0002No-Pm
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:01:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebaMM-0008Ur-Er
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:09:39 -0500
 References: <cover.1513342045.git.berto@igalia.com>
-	<192f0a4a1888e7e18cb7cec9fdbeadad5417b4ef.1513342045.git.berto@igalia.com>
+	<1fb1816d471d712f2001ca3ce42c6682273c7daf.1513342045.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <fab2e9e4-50a0-1f21-9d06-969a90d0644a@redhat.com>
-Date: Tue, 16 Jan 2018 17:00:59 -0600
+Message-ID: <08064c0c-438a-963a-847b-450a21be5e2f@redhat.com>
+Date: Tue, 16 Jan 2018 17:09:29 -0600
 MIME-Version: 1.0
-In-Reply-To: <192f0a4a1888e7e18cb7cec9fdbeadad5417b4ef.1513342045.git.berto@igalia.com>
+In-Reply-To: <1fb1816d471d712f2001ca3ce42c6682273c7daf.1513342045.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="TNkHqIIHfU2TsW18Heo5mnfsE4CkpPrWT"
-Subject: Re: [Qemu-devel] [PATCH v2 24/32] qcow2: Update
- qcow2_update_snapshot_refcount() to support L2 slices
+	boundary="Mc5kChytSCi6pBA2LsweMqDLdoSHDswFO"
+Subject: Re: [Qemu-devel] [PATCH v2 25/32] qcow2: Update
+ expand_zero_clusters_in_l1() to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +29,98 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TNkHqIIHfU2TsW18Heo5mnfsE4CkpPrWT
+--Mc5kChytSCi6pBA2LsweMqDLdoSHDswFO
 From: Eric Blake <eblake@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
  qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <fab2e9e4-50a0-1f21-9d06-969a90d0644a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 24/32] qcow2: Update
- qcow2_update_snapshot_refcount() to support L2 slices
+Message-ID: <08064c0c-438a-963a-847b-450a21be5e2f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 25/32] qcow2: Update
+ expand_zero_clusters_in_l1() to support L2 slices
 References: <cover.1513342045.git.berto@igalia.com>
- <192f0a4a1888e7e18cb7cec9fdbeadad5417b4ef.1513342045.git.berto@igalia.com>
-In-Reply-To: <192f0a4a1888e7e18cb7cec9fdbeadad5417b4ef.1513342045.git.berto@igalia.com>
+ <1fb1816d471d712f2001ca3ce42c6682273c7daf.1513342045.git.berto@igalia.com>
+In-Reply-To: <1fb1816d471d712f2001ca3ce42c6682273c7daf.1513342045.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 12/15/2017 06:53 AM, Alberto Garcia wrote:
-> qcow2_update_snapshot_refcount() increases the refcount of all
-> clusters of a given snapshot. In order to do that it needs to load all
-> its L2 tables and iterate over their entries. Since we'll be loading
-> L2 slices instead of full tables we need to add an extra loop that
-> iterates over all slices of each L2 table.
+> expand_zero_clusters_in_l1() expands zero clusters as a necessary step
+> to downgrade qcow2 images to a version that doesn't support metadata
+> zero clusters. This function takes an L1 table (which may or may not
+> be active) and iterates over all its L2 tables looking for zero
+> clusters.
+>=20
+> Since we'll be loading L2 slices instead of full tables we need to add
+> an extra loop that iterates over all slices of each L2 table, and we
+> should also use the slice size when allocating the buffer used when
+> the L1 table is not active.
+>=20
+> As a consequence of the new loop the refcount data also needs to be
+> loaded before the L2 data, but this is a trivial change with no side
+> effects.
 >=20
 > This function doesn't need any additional changes so apart from that
 > this patch simply updates the variable name from l2_table to l2_slice.
 >=20
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/qcow2-refcount.c | 150 ++++++++++++++++++++++++++---------------=
+>  block/qcow2-cluster.c | 207 +++++++++++++++++++++++++++---------------=
 --------
->  1 file changed, 80 insertions(+), 70 deletions(-)
+>  1 file changed, 110 insertions(+), 97 deletions(-)
 >=20
 
-> -    l2_table =3D NULL;
-> +    l2_slice =3D NULL;
->      l1_table =3D NULL;
->      l1_size2 =3D l1_size * sizeof(uint64_t);
+Even hairier diff than the previous patch. Would it be feasible to split
+this into two or three parts - one that just adds an additional {}
+scoping (but no variable renames or loop condition changes) (where git
+diff -b can easily check the change in isolation); the other that
+renames the variable and switches the new scope to be a loop over the
+smaller slice limits (possibly as two patches, if the change in refcount
+vs. L2 data load ordering deserves separation from the slice conversion)?=
+
+
+> -        } else {
+> -            /* load inactive L2 tables from disk */
+> -            ret =3D bdrv_read(bs->file, l2_offset / BDRV_SECTOR_SIZE,
+> -                            (void *)l2_table, s->cluster_sectors);
+
+Pre-existing...
+
+> -        }
+> -        if (ret < 0) {
+> -            goto fail;
+> -        }
+> -
+>          ret =3D qcow2_get_refcount(bs, l2_offset >> s->cluster_bits,
+>                                   &l2_refcount);
+>          if (ret < 0) {
+>              goto fail;
+>          }
 > =20
-> +    slice_size =3D s->l2_slice_size * sizeof(uint64_t);
+> -        for (j =3D 0; j < s->l2_size; j++) {
+> -            uint64_t l2_entry =3D be64_to_cpu(l2_table[j]);
+> -            int64_t offset =3D l2_entry & L2E_OFFSET_MASK;
+> -            QCow2ClusterType cluster_type =3D qcow2_get_cluster_type(l=
+2_entry);
+> -
+> -            if (cluster_type !=3D QCOW2_CLUSTER_ZERO_PLAIN &&
+> -                cluster_type !=3D QCOW2_CLUSTER_ZERO_ALLOC) {
+> -                continue;
+> +        for (slice =3D 0; slice < n_slices; slice++) {
+> +            uint64_t slice_offset =3D l2_offset + slice * slice_size;
+> +            if (is_active_l1) {
+> +                /* get active L2 tables from cache */
+> +                ret =3D qcow2_cache_get(bs, s->l2_table_cache, slice_o=
+ffset,
+> +                                      (void **)&l2_slice);
+> +            } else {
+> +                /* load inactive L2 tables from disk */
+> +                ret =3D bdrv_read(bs->file, slice_offset >> BDRV_SECTO=
+R_BITS,
+> +                                (void *)l2_slice,
+> +                                slice_size >> BDRV_SECTOR_BITS);
 
-Again, better naming on s->l2_slice_size in an earlier patch may make
-this more readable, at a cost of slight rebase churn.
-
-The diff looks hideous, but that's thanks to indentation changes.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+=2E..but is it time to convert this to use bdrv_pread[v](), for one less
+use of the older sector-based interfaces?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -80,7 +128,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---TNkHqIIHfU2TsW18Heo5mnfsE4CkpPrWT
+--Mc5kChytSCi6pBA2LsweMqDLdoSHDswFO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -89,14 +137,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpehCsACgkQp6FrSiUn
-Q2og1wf/d8i6EhsCol2nfX8ZXtLb7MTJaq0ufbYr08tF7ZImOsz0QDbh9/Xn2hjc
-+njfwWdMb1I1q7eO+WWxJ+rDSH+nqGpOQEkRgw+ZxzG9GFFPmVZRllYwdrSIemJT
-etk9TAisSc7TcsoVkYCwAbiHOOVcdqpCgC1ce/5bac7io6TmEGLxeiCt0iKhVkO8
-3jXQbyVKj2Z6B3rOiZuo4gnLj89RM5Z9Kj4f17Ge7y4DA0UMxTiEvLOnk/hbi+DR
-cOqm6AonUedcvKZDJETEQEacu6V1nKt9XyigcF7hsmmEIBA0MN2lCJbHvQf+s4j1
-TOCVzPQLH6PBSVMEdIhLZ2pJPrijvA==
-=zAWT
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpehikACgkQp6FrSiUn
+Q2oGtgf9Gg+Ze5y9mOwbaZWPhxrnHHbilypI8DC5qZYTSt6YHjCx8Kf0YkfLxZOL
+e/yhnvLeuBIA4PdNCjUft3c61rv8thsi7AdY/flwjc9fAityFocanDDjb3Vitg/I
+qwAqGlmaPrREaDXvE4ILK/L+BTYUF5ZUIwD5V8HHNKFcRPr9J2EkQyy5m3BNxL71
+dZ1KG9xgL+91zhp7MVnq6jlF8GOXtc31qTMKkuLngnTsB/2jlnELNVJYPu8GfT9X
+LQeArQ/CtnjoY83ecfQ3mByQdGNfCXpY2i5empA+LIYPxEVgpGSWpyb6TlbWsEWO
+simAGfiCSKQy7HHlU1DoVSXPiFEQjg==
+=E4y6
 -----END PGP SIGNATURE-----
 
---TNkHqIIHfU2TsW18Heo5mnfsE4CkpPrWT--
+--Mc5kChytSCi6pBA2LsweMqDLdoSHDswFO--
