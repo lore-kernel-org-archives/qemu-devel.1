@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebSF6-0004fG-Iw
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:29:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ebSG8-0005cg-Ih
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:30:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebSF0-00021q-LO
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:29:36 -0500
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:43390)
+	(envelope-from <peter.maydell@linaro.org>) id 1ebSG4-0002gp-Mg
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:30:40 -0500
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:42265)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ebSF0-00021i-Gx
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:29:30 -0500
-Received: by mail-oi0-x230.google.com with SMTP id t16so10692568oif.10
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:29:30 -0800 (PST)
+	id 1ebSG4-0002gU-I9
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:30:36 -0500
+Received: by mail-ot0-x234.google.com with SMTP id s3so13738804otc.9
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:30:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180116013709.13830-8-andrew.smirnov@gmail.com>
+In-Reply-To: <20180116013709.13830-9-andrew.smirnov@gmail.com>
 References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-8-andrew.smirnov@gmail.com>
+	<20180116013709.13830-9-andrew.smirnov@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jan 2018 14:29:09 +0000
-Message-ID: <CAFEAcA9h+mnkZrC7A=jxX7+X+ggjzCSPaUVWHc1Aj4UZd6HCuw@mail.gmail.com>
+Date: Tue, 16 Jan 2018 14:30:15 +0000
+Message-ID: <CAFEAcA-1t0aSBP4dx7+4yagQKL+-wGPgGFKmquFeXk32RAO1=w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 07/14] i.MX: Add i.MX7 GPT variant
+Subject: Re: [Qemu-devel] [PATCH v4 08/14] i.MX: Add implementation of i.MX7
+ GPR IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
