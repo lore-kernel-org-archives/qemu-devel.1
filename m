@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4C-0003Bf-QV
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:24 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4B-00039N-1j
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4B-0004vB-Gv
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:20 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:42401)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS49-0004rx-VM
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:19 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:47000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS4B-0004tS-6i
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:19 -0500
-Received: by mail-wr0-x244.google.com with SMTP id e41so15000715wre.9
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:19 -0800 (PST)
+	id 1ebS49-0004rT-OX
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:17 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id g21so15302535wrb.13
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:17 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:17:11 +0100
-Message-Id: <1516112253-14480-30-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:17:10 +0100
+Message-Id: <1516112253-14480-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 29/51] target/i386: move hflags update code to a
- function
+Subject: [Qemu-devel] [PULL 28/51] tests/boot-serial-test: Add support for
+ the raspi2 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +29,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Tao Wu <lepton@google.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Tao Wu <lepton@google.com>
+From: Thomas Huth <thuth@redhat.com>
 
-We will share the same code for hax/kvm.
+The raspi2 machine supports loading firmware images, so we can easily
+load a small test sequence as raw binary blob here to test the UART.
 
-Signed-off-by: Tao Wu <lepton@google.com>
-Message-Id: <20180110195056.85403-1-lepton@google.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1512031988-32490-8-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- target/i386/cpu.h |  2 ++
- target/i386/kvm.c | 40 +---------------------------------------
- 3 files changed, 45 insertions(+), 39 deletions(-)
+ tests/Makefile.include   | 1 +
+ tests/boot-serial-test.c | 9 +++++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3818d72..ad8196b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4147,6 +4147,48 @@ static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
-     info->cap_insn_split = 8;
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 13d6684..8883274 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -362,6 +362,7 @@ check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
+ gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
+ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+ gcov-files-arm-y += hw/timer/arm_mptimer.c
++check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
  
-+void x86_update_hflags(CPUX86State *env)
-+{
-+   uint32_t hflags;
-+#define HFLAG_COPY_MASK \
-+    ~( HF_CPL_MASK | HF_PE_MASK | HF_MP_MASK | HF_EM_MASK | \
-+       HF_TS_MASK | HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK | \
-+       HF_OSFXSR_MASK | HF_LMA_MASK | HF_CS32_MASK | \
-+       HF_SS32_MASK | HF_CS64_MASK | HF_ADDSEG_MASK)
-+
-+    hflags = env->hflags & HFLAG_COPY_MASK;
-+    hflags |= (env->segs[R_SS].flags >> DESC_DPL_SHIFT) & HF_CPL_MASK;
-+    hflags |= (env->cr[0] & CR0_PE_MASK) << (HF_PE_SHIFT - CR0_PE_SHIFT);
-+    hflags |= (env->cr[0] << (HF_MP_SHIFT - CR0_MP_SHIFT)) &
-+                (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK);
-+    hflags |= (env->eflags & (HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK));
-+
-+    if (env->cr[4] & CR4_OSFXSR_MASK) {
-+        hflags |= HF_OSFXSR_MASK;
-+    }
-+
-+    if (env->efer & MSR_EFER_LMA) {
-+        hflags |= HF_LMA_MASK;
-+    }
-+
-+    if ((hflags & HF_LMA_MASK) && (env->segs[R_CS].flags & DESC_L_MASK)) {
-+        hflags |= HF_CS32_MASK | HF_SS32_MASK | HF_CS64_MASK;
-+    } else {
-+        hflags |= (env->segs[R_CS].flags & DESC_B_MASK) >>
-+                    (DESC_B_SHIFT - HF_CS32_SHIFT);
-+        hflags |= (env->segs[R_SS].flags & DESC_B_MASK) >>
-+                    (DESC_B_SHIFT - HF_SS32_SHIFT);
-+        if (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK) ||
-+            !(hflags & HF_CS32_MASK)) {
-+            hflags |= HF_ADDSEG_MASK;
-+        } else {
-+            hflags |= ((env->segs[R_DS].base | env->segs[R_ES].base |
-+                        env->segs[R_SS].base) != 0) << HF_ADDSEG_SHIFT;
-+        }
-+    }
-+    env->hflags = hflags;
-+}
-+
- static Property x86_cpu_properties[] = {
- #ifdef CONFIG_USER_ONLY
-     /* apic_id = 0 by default for *-user, see commit 9886e834 */
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 62c4742..f64e5ed 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1778,4 +1778,6 @@ bool cpu_is_bsp(X86CPU *cpu);
+ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
  
- void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf);
- void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf);
-+void x86_update_hflags(CPUX86State* env);
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index 1deddb8..663b78b 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -47,6 +47,14 @@ static const uint8_t bios_moxiesim[] = {
+     0x1a, 0x00, 0x00, 0x00, 0x10, 0x00      /* jmpa  0x1000 */
+ };
+ 
++static const uint8_t bios_raspi2[] = {
++    0x08, 0x30, 0x9f, 0xe5,                 /* ldr   r3,[pc,#8]    Get base */
++    0x54, 0x20, 0xa0, 0xe3,                 /* mov     r2,#'T' */
++    0x00, 0x20, 0xc3, 0xe5,                 /* strb    r2,[r3] */
++    0xfb, 0xff, 0xff, 0xea,                 /* b       loop */
++    0x00, 0x10, 0x20, 0x3f,                 /* 0x3f201000 = UART0 base addr */
++};
 +
- #endif /* I386_CPU_H */
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index d23127c..825aea5 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1891,7 +1891,6 @@ static int kvm_get_sregs(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
-     struct kvm_sregs sregs;
--    uint32_t hflags;
-     int bit, i, ret;
+ typedef struct testdef {
+     const char *arch;       /* Target architecture */
+     const char *machine;    /* Name of the machine */
+@@ -78,6 +86,7 @@ static testdef_t tests[] = {
+     { "microblazeel", "petalogix-ml605", "", "TT",
+       sizeof(kernel_plml605), kernel_plml605 },
+     { "moxie", "moxiesim", "", "TT", sizeof(bios_moxiesim), 0, bios_moxiesim },
++    { "arm", "raspi2", "", "TT", sizeof(bios_raspi2), 0, bios_raspi2 },
  
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS, &sregs);
-@@ -1933,44 +1932,7 @@ static int kvm_get_sregs(X86CPU *cpu)
-     env->efer = sregs.efer;
- 
-     /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
--
--#define HFLAG_COPY_MASK \
--    ~( HF_CPL_MASK | HF_PE_MASK | HF_MP_MASK | HF_EM_MASK | \
--       HF_TS_MASK | HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK | \
--       HF_OSFXSR_MASK | HF_LMA_MASK | HF_CS32_MASK | \
--       HF_SS32_MASK | HF_CS64_MASK | HF_ADDSEG_MASK)
--
--    hflags = env->hflags & HFLAG_COPY_MASK;
--    hflags |= (env->segs[R_SS].flags >> DESC_DPL_SHIFT) & HF_CPL_MASK;
--    hflags |= (env->cr[0] & CR0_PE_MASK) << (HF_PE_SHIFT - CR0_PE_SHIFT);
--    hflags |= (env->cr[0] << (HF_MP_SHIFT - CR0_MP_SHIFT)) &
--                (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK);
--    hflags |= (env->eflags & (HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK));
--
--    if (env->cr[4] & CR4_OSFXSR_MASK) {
--        hflags |= HF_OSFXSR_MASK;
--    }
--
--    if (env->efer & MSR_EFER_LMA) {
--        hflags |= HF_LMA_MASK;
--    }
--
--    if ((hflags & HF_LMA_MASK) && (env->segs[R_CS].flags & DESC_L_MASK)) {
--        hflags |= HF_CS32_MASK | HF_SS32_MASK | HF_CS64_MASK;
--    } else {
--        hflags |= (env->segs[R_CS].flags & DESC_B_MASK) >>
--                    (DESC_B_SHIFT - HF_CS32_SHIFT);
--        hflags |= (env->segs[R_SS].flags & DESC_B_MASK) >>
--                    (DESC_B_SHIFT - HF_SS32_SHIFT);
--        if (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK) ||
--            !(hflags & HF_CS32_MASK)) {
--            hflags |= HF_ADDSEG_MASK;
--        } else {
--            hflags |= ((env->segs[R_DS].base | env->segs[R_ES].base |
--                        env->segs[R_SS].base) != 0) << HF_ADDSEG_SHIFT;
--        }
--    }
--    env->hflags = hflags;
-+    x86_update_hflags(env);
- 
-     return 0;
- }
+     { NULL }
+ };
 -- 
 1.8.3.1
