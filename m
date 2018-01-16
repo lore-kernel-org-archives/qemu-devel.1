@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebO3O-0000dK-RS
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 05:01:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ebOHs-0004c3-0D
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 05:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebO3L-0002PJ-RM
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 05:01:14 -0500
-References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516034665-27606-2-git-send-email-walling@linux.vnet.ibm.com>
-	<34c87c41-eb49-0e2b-3857-9bb3ba86c8d4@redhat.com>
-	<e0653416-ea6a-f801-2c30-4d01ed1fcf42@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <272fa2f6-8a75-3c05-e373-d7d1b65a7e23@redhat.com>
-Date: Tue, 16 Jan 2018 11:00:54 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1ebOHm-0003CQ-0V
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 05:16:11 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34852)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ebOHl-0003Bi-PD
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 05:16:05 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r78so7453233wme.0
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 02:16:05 -0800 (PST)
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-13-alex.bennee@linaro.org>
+	<CAFEAcA_DiOa8jkpRcm5yytR+L=UL7xR74nRwWvPNt6dkMdWh+g@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_DiOa8jkpRcm5yytR+L=UL7xR74nRwWvPNt6dkMdWh+g@mail.gmail.com>
+Date: Tue, 16 Jan 2018 10:16:02 +0000
+Message-ID: <87fu76nm71.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <e0653416-ea6a-f801-2c30-4d01ed1fcf42@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] s390-ccw: update libc
+Subject: Re: [Qemu-devel] [PATCH v2 12/20] fpu/softfloat: re-factor mul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 15.01.2018 18:23, Collin L. Walling wrote:
-> On 01/15/2018 12:05 PM, Eric Blake wrote:
->> On 01/15/2018 10:44 AM, Collin L. Walling wrote:
-[...]
->>> +/**
->>> + * atoi:
->>> + * @str: the string to be converted.
->>> + *
->>> + * Given a string @str, convert it to an integer. Any non-numerical
->>> value
->>> + * will terminate the conversion.
->>> + *
->>> + * Returns: an integer converted from the string @str.
->>> + */
->>> +int atoi(const char *str)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 int i;
->>> +=C2=A0=C2=A0=C2=A0 int val =3D 0;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; str[i]; i++) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char c =3D str[i];
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!isdigit(c)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
-reak;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val *=3D 10;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val +=3D c - '0';
->> Silently gives garbage on integer overflow, but matches the fact that
->> POSIX atoi() can't flag errors.=C2=A0 However, it does not handle lead=
-ing
->> whitespace nor '-', which means it is NOT doing a POSIX-compatible
->> atoi() implementation; naming it atoi() is perhaps thus a disservice t=
-o
->> end users.
->=20
-> Fair enough. Perhaps the "strtoi" convention suits this better.
 
-Or maybe simply add an assert(str[0] !=3D '-') for now. If we ever hit th=
-e
-assert, we can still add the support for negative numbers if necessary.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
->>> +static inline size_t strlen(const char *str)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 size_t i;
->>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; *str; i++) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str++;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 return i;
->> Again, not the fastest implementation, but that shouldn't matter.
+> On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>> We can now add float16_mul and use the common decompose and
+>> canonicalize functions to have a single implementation for
+>> float16/32/64 versions.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  fpu/softfloat.c         | 207 ++++++++++++++++++-----------------------=
+-------
+>>  include/fpu/softfloat.h |   1 +
+>>  2 files changed, 80 insertions(+), 128 deletions(-)
+>>
+>> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+>> index f89e47e3ef..6e9d4c172c 100644
+>> --- a/fpu/softfloat.c
+>> +++ b/fpu/softfloat.c
+>> @@ -730,6 +730,85 @@ float64 float64_sub(float64 a, float64 b, float_sta=
+tus *status)
+>>      return float64_round_pack_canonical(pr, status);
+>>  }
+>>
+>> +/*
+>> + * Returns the result of multiplying the floating-point values `a' and
+>> + * `b'. The operation is performed according to the IEC/IEEE Standard
+>> + * for Binary Floating-Point Arithmetic.
+>> + */
+>> +
+>> +static decomposed_parts mul_decomposed(decomposed_parts a, decomposed_p=
+arts b,
+>> +                                       float_status *s)
+>> +{
+>> +    bool sign =3D a.sign ^ b.sign;
+>> +
+>> +    if (a.cls =3D=3D float_class_normal && b.cls =3D=3D float_class_nor=
+mal) {
+>> +        uint64_t hi, lo;
+>> +        int exp =3D a.exp + b.exp;
+>> +
+>> +        mul64To128(a.frac, b.frac, &hi, &lo);
+>> +        shift128RightJamming(hi, lo, DECOMPOSED_BINARY_POINT, &hi, &lo);
+>> +        if (lo & DECOMPOSED_OVERFLOW_BIT) {
+>> +            shift64RightJamming(lo, 1, &lo);
+>> +            exp +=3D 1;
+>> +        }
+>> +
+>> +        /* Re-use a */
+>> +        a.exp =3D exp;
+>> +        a.sign =3D sign;
+>> +        a.frac =3D lo;
+>> +        return a;
+>> +    }
+>> +    /* handle all the NaN cases */
+>> +    if (a.cls >=3D float_class_qnan || b.cls >=3D float_class_qnan) {
+>> +        return pick_nan_parts(a, b, s);
+>> +    }
+>> +    /* Inf * Zero =3D=3D NaN */
+>> +    if (((1 << a.cls) | (1 << b.cls)) =3D=3D
+>> +        ((1 << float_class_inf) | (1 << float_class_zero))) {
+>
+> This is kinda confusing...
 
-Yes, indeed, speed does not really matter here for the some few bytes
-that are handled during the life-time of the s390-ccw bios.
+Yeah it's a bit of a shortcut to:
 
->>> +}
->>> +
->>> +static inline int isdigit(int c)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 return (c >=3D '0') && (c <=3D '9');
->>> +}
->>> +
->>> +int atoi(const char *str);
->>> +char *itostr(int num, char *str, size_t len);
->>> +
->>> =C2=A0 #endif
->=20
->=20
+  if ((a.cls =3D=3D float_class_inf && b.cls =3D=3D float_class_zero)
+     ||
+      (a.cls =3D=3D float_class_zero && b.cls =3D=3D float_class_inf))
 
- Thomas
+Would you prefer it long hand or tidied away to a helper?
+
+  if (cls_combination(a, b, float_class_inf, float_class_zero))
+
+?
+
+>
+>> +        s->float_exception_flags |=3D float_flag_invalid;
+>> +        a.cls =3D float_class_dnan;
+>> +        a.sign =3D sign;
+>> +        return a;
+>> +    }
+>> +    /* Multiply by 0 or Inf */
+>> +    if (a.cls =3D=3D float_class_inf || a.cls =3D=3D float_class_zero) {
+>> +        a.sign =3D sign;
+>> +        return a;
+>> +    }
+>> +    if (b.cls =3D=3D float_class_inf || b.cls =3D=3D float_class_zero) {
+>> +        b.sign =3D sign;
+>> +        return b;
+>> +    }
+>> +    g_assert_not_reached();
+>> +}
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
