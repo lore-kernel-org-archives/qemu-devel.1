@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4m-0003ma-8Y
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:57 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4k-0003kx-KO
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4l-0005bc-5p
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:56 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:43932)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4h-0005YH-A5
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:54 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45382)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS4k-0005at-Sp
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:55 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id g1so8680182wmg.2
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:54 -0800 (PST)
+	id 1ebS4h-0005X7-3c
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:51 -0500
+Received: by mail-wm0-x243.google.com with SMTP id i186so8661858wmi.4
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:51 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:17:33 +0100
-Message-Id: <1516112253-14480-52-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:17:31 +0100
+Message-Id: <1516112253-14480-50-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 51/51] scripts/analyse-locks-simpletrace.py:
- script to analyse lock times
+Subject: [Qemu-devel] [PULL 49/51] cpu: flush TB cache when loading VMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,136 +28,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Maria Klimushenkova <maria.klimushenkova@ispras.ru>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This script allows analysis of mutex acquisition and hold times based
-on a trace file. Given a trace control file of:
+Flushing TB cache is required because TBs key in the cache may match
+different code which existed in the previous state.
 
-  qemu_mutex_lock
-  qemu_mutex_locked
-  qemu_mutex_unlock
-
-And running with:
-
-  $QEMU $QEMU_ARGS -trace events=./lock-trace
-
-You can analyse the results with:
-
-  ./scripts/analyse-locks-simpletrace.py trace-events-all ./trace-21812
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+Message-Id: <20180110134846.12940.99993.stgit@pasha-VirtualBox>
+[Add comment suggested by Peter Maydell. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 99 insertions(+)
- create mode 100755 scripts/analyse-locks-simpletrace.py
+ exec.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-locks-simpletrace.py
-new file mode 100755
-index 0000000..101e84d
---- /dev/null
-+++ b/scripts/analyse-locks-simpletrace.py
-@@ -0,0 +1,99 @@
-+#!/usr/bin/env python
-+# -*- coding: utf-8 -*-
-+#
-+# Analyse lock events and compute statistics
-+#
-+# Author: Alex Bennée <alex.bennee@linaro.org>
-+#
+diff --git a/exec.c b/exec.c
+index 9f4f450..d28fc0c 100644
+--- a/exec.c
++++ b/exec.c
+@@ -623,6 +623,13 @@ static int cpu_common_post_load(void *opaque, int version_id)
+     cpu->interrupt_request &= ~0x01;
+     tlb_flush(cpu);
+ 
++    /* loadvm has just updated the content of RAM, bypassing the
++     * usual mechanisms that ensure we flush TBs for writes to
++     * memory we've translated code from. So we must flush all TBs,
++     * which will now be stale.
++     */
++    tb_flush(cpu);
 +
-+import os
-+import simpletrace
-+import argparse
-+import numpy as np
-+
-+class MutexAnalyser(simpletrace.Analyzer):
-+    "A simpletrace Analyser for checking locks."
-+
-+    def __init__(self):
-+        self.locks = 0
-+        self.locked = 0
-+        self.unlocks = 0
-+        self.mutex_records = {}
-+
-+    def _get_mutex(self, mutex):
-+        if not mutex in self.mutex_records:
-+            self.mutex_records[mutex] = {"locks": 0,
-+                                         "lock_time": 0,
-+                                         "acquire_times": [],
-+                                         "locked": 0,
-+                                         "locked_time": 0,
-+                                         "held_times": [],
-+                                         "unlocked": 0}
-+
-+        return self.mutex_records[mutex]
-+
-+    def qemu_mutex_lock(self, timestamp, mutex, filename, line):
-+        self.locks += 1
-+        rec = self._get_mutex(mutex)
-+        rec["locks"] += 1
-+        rec["lock_time"] = timestamp[0]
-+        rec["lock_loc"] = (filename, line)
-+
-+    def qemu_mutex_locked(self, timestamp, mutex, filename, line):
-+        self.locked += 1
-+        rec = self._get_mutex(mutex)
-+        rec["locked"] += 1
-+        rec["locked_time"] = timestamp[0]
-+        acquire_time = rec["locked_time"] - rec["lock_time"]
-+        rec["locked_loc"] = (filename, line)
-+        rec["acquire_times"].append(acquire_time)
-+
-+    def qemu_mutex_unlock(self, timestamp, mutex, filename, line):
-+        self.unlocks += 1
-+        rec = self._get_mutex(mutex)
-+        rec["unlocked"] += 1
-+        held_time = timestamp[0] - rec["locked_time"]
-+        rec["held_times"].append(held_time)
-+        rec["unlock_loc"] = (filename, line)
-+
-+
-+def get_args():
-+    "Grab options"
-+    parser = argparse.ArgumentParser()
-+    parser.add_argument("--output", "-o", type=str, help="Render plot to file")
-+    parser.add_argument("events", type=str, help='trace file read from')
-+    parser.add_argument("tracefile", type=str, help='trace file read from')
-+    return parser.parse_args()
-+
-+if __name__ == '__main__':
-+    args = get_args()
-+
-+    # Gather data from the trace
-+    analyser = MutexAnalyser()
-+    simpletrace.process(args.events, args.tracefile, analyser)
-+
-+    print ("Total locks: %d, locked: %d, unlocked: %d" %
-+           (analyser.locks, analyser.locked, analyser.unlocks))
-+
-+    # Now dump the individual lock stats
-+    for key, val in sorted(analyser.mutex_records.iteritems(),
-+                           key=lambda (k,v): v["locks"]):
-+        print ("Lock: %#x locks: %d, locked: %d, unlocked: %d" %
-+               (key, val["locks"], val["locked"], val["unlocked"]))
-+
-+        acquire_times = np.array(val["acquire_times"])
-+        if len(acquire_times) > 0:
-+            print ("  Acquire Time: min:%d median:%d avg:%.2f max:%d" %
-+                   (acquire_times.min(), np.median(acquire_times),
-+                    acquire_times.mean(), acquire_times.max()))
-+
-+        held_times = np.array(val["held_times"])
-+        if len(held_times) > 0:
-+            print ("  Held Time: min:%d median:%d avg:%.2f max:%d" %
-+                   (held_times.min(), np.median(held_times),
-+                    held_times.mean(), held_times.max()))
-+
-+        # Check if any locks still held
-+        if val["locks"] > val["locked"]:
-+            print ("  LOCK HELD (%s:%s)" % (val["locked_loc"]))
-+            print ("  BLOCKED   (%s:%s)" % (val["lock_loc"]))
+     return 0;
+ }
+ 
 -- 
 1.8.3.1
