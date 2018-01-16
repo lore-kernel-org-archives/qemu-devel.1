@@ -1,42 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ebT8H-0002LC-Ld
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:26:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ebTCY-0006SR-27
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ebT8B-00023f-Re
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:26:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44726
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <no-reply@patchew.org>) id 1ebTCR-0005ON-H5
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:31:02 -0500
+Resent-Message-Id: <E1ebTCR-0005ON-H5@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21077)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ebT8B-00023K-LI
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:26:31 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0GFOseV065906
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 10:26:29 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fhh59hntb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 10:26:28 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 16 Jan 2018 08:21:28 -0700
-References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516034665-27606-3-git-send-email-walling@linux.vnet.ibm.com>
-	<4d5caff2-335e-d936-5540-00ae755d55a9@redhat.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 16 Jan 2018 10:21:24 -0500
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ebTCR-0005Np-B9
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:30:55 -0500
+In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151611660320.569.12444955562557233768@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <4d5caff2-335e-d936-5540-00ae755d55a9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <41ef6471-8a81-ffe3-c080-75db07d9edf0@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 2/8] s390-ccw: ipl structs
- for eckd cdl/ldl
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 16 Jan 2018 07:30:04 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL v4 00/51] Misc patches for 2018-01-12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,146 +28,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, frankja@linux.vnet.ibm.com
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-On 01/16/2018 07:32 AM, Thomas Huth wrote:
-> On 15.01.2018 17:44, Collin L. Walling wrote:
->> ECKD DASDs have different IPL structures for CDL and LDL
->> formats. The current Ipl1 and Ipl2 structs follow the CDL
->> format, so we prepend "EckdCdl" to them. Boot info for LDL
->> has been moved to a new struct: EckdLdlIpl1.
->>
->> Also introduce structs for IPL stages 1 and 1b and for
->> disk geometry.
->>
->> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
->> ---
->>   pc-bios/s390-ccw/bootmap.c | 29 +++++++++++++-----------
->>   pc-bios/s390-ccw/bootmap.h | 55 +++++++++++++++++++++++++++++++++---=
-----------
->>   2 files changed, 56 insertions(+), 28 deletions(-)
->>
->> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
->> index 6f8e30f..29915e4 100644
->> --- a/pc-bios/s390-ccw/bootmap.c
->> +++ b/pc-bios/s390-ccw/bootmap.c
->> @@ -221,9 +221,9 @@ static void run_eckd_boot_script(block_number_t mb=
-r_block_nr)
->>   static void ipl_eckd_cdl(void)
->>   {
->>       XEckdMbr *mbr;
->> -    Ipl2 *ipl2 =3D (void *)sec;
->> +    EckdCdlIpl2 *ipl2 =3D (void *)sec;
->>       IplVolumeLabel *vlbl =3D (void *)sec;
->> -    block_number_t block_nr;
->> +    block_number_t mbr_block_nr;
->>  =20
->>       /* we have just read the block #0 and recognized it as "IPL1" */
->>       sclp_print("CDL\n");
->> @@ -231,16 +231,13 @@ static void ipl_eckd_cdl(void)
->>       memset(sec, FREE_SPACE_FILLER, sizeof(sec));
->>       read_block(1, ipl2, "Cannot read IPL2 record at block 1");
->>  =20
->> -    mbr =3D &ipl2->u.x.mbr;
->> +    mbr =3D &ipl2->mbr;
->>       IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL=
-2 record.");
->>       IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
->>                  "Bad block size in zIPL section of IPL2 record.");
->>       IPL_assert(mbr->dev_type =3D=3D DEV_TYPE_ECKD,
->>                  "Non-ECKD device type in zIPL section of IPL2 record.=
-");
->>  =20
->> -    /* save pointer to Boot Script */
->> -    block_nr =3D eckd_block_num((void *)&(mbr->blockptr));
->> -
->>       memset(sec, FREE_SPACE_FILLER, sizeof(sec));
->>       read_block(2, vlbl, "Cannot read Volume Label at block 2");
-> Why did you move the block_nr =3D eckd_block_num(...) behind the
-> read_block() ? That sounds like you could different values here now. If
-> that has been done on purpose and is not a mistake, please add a proper
-> sentence about this to the patch description.
-
-
-Yes you are definitely correct... a guest running cdl formatted dasd shou=
-ld
-fail to IPL with this.=C2=A0 I must've made this error somewhere along th=
-e way
-when cleaning up the commits.=C2=A0 Thank you for catching this.
-
-
->
->>       IPL_assert(magic_match(vlbl->key, VOL1_MAGIC),
->> @@ -249,7 +246,10 @@ static void ipl_eckd_cdl(void)
->>                  "Invalid magic of volser block");
->>       print_volser(vlbl->f.volser);
->>  =20
->> -    run_eckd_boot_script(block_nr);
->> +    /* save pointer to Boot Script */
->> +    mbr_block_nr =3D eckd_block_num((void *)&mbr->blockptr);
->> +
->> +    run_eckd_boot_script(mbr_block_nr);
->>       /* no return */
->>   }
->>  =20
->> @@ -280,8 +280,8 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mod=
-e)
->>  =20
->>   static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
->>   {
->> -    block_number_t block_nr;
->> -    BootInfo *bip =3D (void *)(sec + 0x70); /* BootInfo is MBR for LD=
-L */
->> +    block_number_t mbr_block_nr;
->> +    EckdLdlIpl1 *ipl1 =3D (void *)sec;
->>  =20
->>       if (mode !=3D ECKD_LDL_UNLABELED) {
->>           print_eckd_ldl_msg(mode);
->> @@ -292,15 +292,18 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
->>       memset(sec, FREE_SPACE_FILLER, sizeof(sec));
->>       read_block(0, sec, "Cannot read block 0 to grab boot info.");
->>       if (mode =3D=3D ECKD_LDL_UNLABELED) {
->> -        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
->> +        if (!magic_match(ipl1->boot_info.magic, ZIPL_MAGIC)) {
->>               return; /* not applicable layout */
->>           }
->>           sclp_print("unlabeled LDL.\n");
->>       }
->> -    verify_boot_info(bip);
->> +    verify_boot_info(&ipl1->boot_info);
->> +
->> +    /* save pointer to Boot Script */
->> +    mbr_block_nr =3D
->> +        eckd_block_num((void *)&ipl1->boot_info.bp.ipl.bm_ptr.eckd.bp=
-tr);
-> Well, the original code fitted nicely in one line ... thus maybe better
-> keep the original variable name? (or use mbr_blk_nr or something simila=
-r
-> shorter?)
-
-
-Maybe a voidptr to ipl1->boot_info... and pass that to eckd_block_num?
-(or something along those lines?)
-
-or
-
-EckdBlockPtr bptr =3D ipl1->....bptr
-
-I'll play with the options.
-
-
->
->> -    block_nr =3D eckd_block_num((void *)&(bip->bp.ipl.bm_ptr.eckd.bpt=
-r));
->> -    run_eckd_boot_script(block_nr);
->> +    run_eckd_boot_script(mbr_block_nr);
->>       /* no return */
->>   }
->   Thomas
->
-
-
---=20
-- Collin L Walling
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTYxMTIyNTMtMTQ0ODAtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCB2NCAwMC81MV0gTWlzYyBwYXRjaGVz
+IGZvciAyMDE4LTAxLTEyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
+QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
+YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
+SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
+Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
+CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
+Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
+ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
+RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgZjUyMWVlZWUz
+Yi4uYWFlMzlkMjRhMyAgbWFzdGVyICAgICAtPiBtYXN0ZXIKICogW25ldyB0YWddICAgICAgICAg
+ICAgICAgcGF0Y2hldy8xNTE2MTEyMjUzLTE0NDgwLTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlA
+cmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE1MTYxMTIyNTMtMTQ0ODAtMS1naXQtc2VuZC1lbWFpbC1w
+Ym9uemluaUByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAx
+ODAxMTYxMzQyMTcuODcyNS0xLWJlcnJhbmdlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDEx
+NjEzNDIxNy44NzI1LTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCjhkNWMxOWVlNTkgc2NyaXB0cy9hbmFseXNlLWxvY2tzLXNpbXBsZXRyYWNlLnB5
+OiBzY3JpcHQgdG8gYW5hbHlzZSBsb2NrIHRpbWVzCjAyOGI0ODk4NzEgdXRpbC9xZW11LXRocmVh
+ZC0qOiBhZGQgcWVtdV9sb2NrLCBsb2NrZWQgYW5kIHVubG9jayB0cmFjZSBldmVudHMKOWNlNDY5
+YjhkMyBjcHU6IGZsdXNoIFRCIGNhY2hlIHdoZW4gbG9hZGluZyBWTVN0YXRlCjQ1OTJjNmZjNmQg
+YmxvY2svaXNjc2k6IGZpeCBpbml0aWFsaXphdGlvbiBvZiBpVGFzayBpbiBpc2NzaV9jb19nZXRf
+YmxvY2tfc3RhdHVzCmE3YTgwMzYyYmQgZmluZF9yYW1fb2Zmc2V0OiBBbGlnbiByYW1fYWRkcl90
+IGFsbG9jYXRpb24gb24gbG9uZyBib3VuZGFyaWVzCmMyNjZlZTUxY2IgZmluZF9yYW1fb2Zmc2V0
+OiBBZGQgY29tbWVudHMgYW5kIHRyYWNpbmcKNWEyOGQ4MzAzNCBjcHVfcGh5c2ljYWxfbWVtb3J5
+X3N5bmNfZGlydHlfYml0bWFwOiBBbm90aGVyIGFsaWdubWVudCBmaXgKMjBjNTg2OTUxNCBjaGVj
+a3BhdGNoOiBFbmZvcmNlIHByb3BlciBkby93aGlsZSAoMCkgc3R5bGUKZGJhNjQ1MGM3NSBtYWlu
+dDogRml4IG1hY3JvcyB3aXRoIGJyb2tlbiAnZG8vd2hpbGUoMCk7ICcgdXNhZ2UKZjcyNjg3YTg4
+OCB0ZXN0czogQXZvaWQgJ2RvL3doaWxlKGZhbHNlKTsgJyBpbiB2aG9zdC11c2VyLWJyaWRnZQo2
+N2RhOWJkZDA0IGNoYXJkZXY6IENsZWFuIHVwIHByZXZpb3VzIHBhdGNoIGluZGVudGF0aW9uCjBi
+NDRjYmU1NTIgY2hhcmRldjogVXNlIGdvdG8vbGFiZWwgaW5zdGVhZCBvZiBkby9icmVhay93aGls
+ZSgwKQplYTIyNjdlZWRjIG1pcHM6IFR3ZWFrIGxvY2F0aW9uIG9mICc7JyBpbiBtYWNyb3MKYjVj
+MzE3MThmZCBuZXQ6IERyb3AgdW51c3VhbCB1c2Ugb2YgZG8geyB9IHdoaWxlICgwKTsKNmQ0Yzg0
+MjM4YyBpcnE6IGZpeCBtZW1vcnkgbGVhawo5ZDA5N2E2ZjQxIGNwdXM6IHVuaWZ5IHFlbXVfKl93
+YWl0X2lvX2V2ZW50CjNhZDgyOGMyNzEgaWNvdW50OiBmaXhlZCBzYXZpbmcvcmVzdG9yaW5nIG9m
+IGljb3VudCB3YXJwIHRpbWVycwpkMjdkMjA2NjU3IHNjcmlwdHMvcWVtdS1nZGIvdGltZXJzLnB5
+OiBuZXcgaGVscGVyIHRvIGR1bXAgdGltZXIgc3RhdGUKMDIxYjEzZmMxOCBzY3JpcHRzL3FlbXUt
+Z2RiOiBhZGQgc2ltcGxlIHRjZyBsb2NrIHN0YXR1cyBoZWxwZXIKNzg4ZDViNmM4ZSB0YXJnZXQt
+aTM4NjogdXBkYXRlIGhmbGFncyBvbiBIeXBlcnZpc29yLmZyYW1ld29yawoyZmU2MGUwMGU0IHRh
+cmdldC9pMzg2OiBoYXg6IE1vdmUgeDg2X3VwZGF0ZV9oZmxhZ3MuCjhiY2Y1ZjMzMmQgdGFyZ2V0
+L2kzODY6IGhheDogY2hhbmdlIHRvIHVzZSB4ODZfdXBkYXRlX2hmbGFncwphYmU4YmEwYjI5IHRh
+cmdldC9pMzg2OiBtb3ZlIGhmbGFncyB1cGRhdGUgY29kZSB0byBhIGZ1bmN0aW9uCmQxMGM5NDQx
+NzggdGVzdHMvYm9vdC1zZXJpYWwtdGVzdDogQWRkIHN1cHBvcnQgZm9yIHRoZSByYXNwaTIgbWFj
+aGluZQo4OGI2YzgzZGI1IHRlc3RzL2Jvb3Qtc2VyaWFsLXRlc3Q6IEFkZCBhIHRlc3QgZm9yIHRo
+ZSBtb3hpZXNpbSBtYWNoaW5lCjFkNjE0NWU3ZGMgdGVzdHMvYm9vdC1zZXJpYWwtdGVzdDogQWRk
+IHRlc3RzIGZvciBtaWNyb2JsYXplIGJvYXJkcwplNzFlZGJlNzI1IHNjc2ktZGlzazogcmVsZWFz
+ZSBBaW9Db250ZXh0IGluIHVuYWxpZ25lZCBXUklURSBTQU1FIGNhc2UKNTY2OTQ4ZGQ5MSBkaXNh
+cy9zMzkwOiBmaXggZ2xvYmFsLWJ1ZmZlci1vdmVyZmxvdwphZTQyY2VmMjk0IG1pcHM6IGZpeCBw
+b3RlbnRpYWwgZm9wZW4oTlVMTCwuLi4pCmNhMTBhMmNiZDcgdGVzdHM6IGZpeCBjb3JvdXRpbmUg
+bGVhayBpbiAvYmFzaWMvZW50ZXJlZAo3ODhjMDRlY2I4IHRlc3RzOiBmaXggcW1wLXRlc3QgbGVh
+awo1N2IyOGNkYjg0IHFlbXUtY29uZmlnOiBmaXggbGVhayBpbiBxdWVyeS1jb21tYW5kLWxpbmUt
+b3B0aW9ucwo3NzNmYzJmMmFlIGNyeXB0bzogZml4IHN0YWNrLWJ1ZmZlci1vdmVyZmxvdyBlcnJv
+cgo0YmI1ZDYyYThiIHJlYWRsaW5lOiBhZGQgYSBmcmVlIGZ1bmN0aW9uCjBiN2FkMjcxNzkgdmw6
+IGZpeCBkaXJlY3QgZmlybXdhcmUgZGlyZWN0b3JpZXMgbGVhawo4MWFmODUwMjE0IHRlc3RzOiBm
+aXggY2hlY2stcW9iamVjdCBsZWFrCmE1Mjg2MjA2NzQgdGVzdHMvZG9ja2VyOiBhZGQgdGVzdC1k
+ZWJ1ZwpmZjBmMTRiNWYzIHRlc3RzL2RvY2tlcjogYWRkIHNvbWUgc2FuaXRpemVycyB0byBmZWRv
+cmEgZG9ja2VyZmlsZQoxYTRiYmM4MjFhIGJ1aWxkLXN5czogY29tcGlsZSB3aXRoIC1PZyBvciAt
+TzEgd2hlbiAtLWVuYWJsZS1kZWJ1Zwo1MTI5NmFjMTRhIGJ1aWxkLXN5czogYWRkIGEgcnVsZSB0
+byBwcmludCBhIHZhcmlhYmxlCmQ2MzJhZmRiMTQgYnVpbGQtc3lzOiBzaWxlbmNlIG1ha2UgYnkg
+ZGVmYXVsdCBvciBWPTAKNTkyMWIzNjEwYyBidWlsZC1zeXM6IGZpeCBxZW11LWdhIC1wdGhyZWFk
+IGxpbmtpbmcKZThjMWE2OTg0YSBjaGFyZGV2OiBpbnRyb2R1Y2UgcWVtdV9jaHJfdGltZW91dF9h
+ZGRfbXMoKQo3OGIxMWVlN2ZkIGNoYXJkZXY6IGxldCBnX2lkbGVfYWRkKCkgYmUgd2l0aCBjaGFy
+ZGV2IGdjb250ZXh0CjcyODQxZTA5MzYgY2hhcmRldjogdXNlIGJhY2tlbmQgY2hyIGNvbnRleHQg
+d2hlbiB3YXRjaCBmb3IgZmUKNjUxM2FmYTY0NSBpMzg2L2NwdS9rdm06IGxvb2sgYXQgUE1VJ3Mg
+Q1BVSUQgYmVmb3JlIHNldHRpbmcgTVNScwpmMjFhMWUxMGZjIGhwZXQ6IHJlY292ZXIgdGltZXIg
+b2Zmc2V0IGNvcnJlY3RseQo5Y2Y2ZjVmMDdmIHBjOiBmYWlsIG1lbW9yeSBob3QtcGx1Zy91bnBs
+dWcgd2l0aCAtbm8tYWNwaSBhbmQgUTM1IG1hY2hpbmUgdHlwZQo3ZmE0MzRhZWMxIHNjc2k6IGZp
+eCBzY3NpX2NvbnZlcnRfc2Vuc2UgY3Jhc2ggd2hlbiBpbl9idWYgPT0gTlVMTCAmJiBpbl9sZW4g
+PT0gMApjZGFlM2RkNmFhIHNjc2ktZ2VuZXJpYzogQWRkIHNoYXJlLXJ3IG9wdGlvbgoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81MDogc2NzaS1nZW5lcmljOiBBZGQgc2hh
+cmUtcncgb3B0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIvNTA6IHNjc2k6IGZpeCBzY3NpX2NvbnZl
+cnRfc2Vuc2UgY3Jhc2ggd2hlbiBpbl9idWYgPT0gTlVMTCAmJiBpbl9sZW4gPT0gMC4uLgpDaGVj
+a2luZyBQQVRDSCAzLzUwOiBwYzogZmFpbCBtZW1vcnkgaG90LXBsdWcvdW5wbHVnIHdpdGggLW5v
+LWFjcGkgYW5kIFEzNSBtYWNoaW5lIHR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC81MDogaHBldDog
+cmVjb3ZlciB0aW1lciBvZmZzZXQgY29ycmVjdGx5Li4uCkNoZWNraW5nIFBBVENIIDUvNTA6IGkz
+ODYvY3B1L2t2bTogbG9vayBhdCBQTVUncyBDUFVJRCBiZWZvcmUgc2V0dGluZyBNU1JzLi4uCkNo
+ZWNraW5nIFBBVENIIDYvNTA6IGNoYXJkZXY6IHVzZSBiYWNrZW5kIGNociBjb250ZXh0IHdoZW4g
+d2F0Y2ggZm9yIGZlLi4uCkNoZWNraW5nIFBBVENIIDcvNTA6IGNoYXJkZXY6IGxldCBnX2lkbGVf
+YWRkKCkgYmUgd2l0aCBjaGFyZGV2IGdjb250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDgvNTA6IGNo
+YXJkZXY6IGludHJvZHVjZSBxZW11X2Nocl90aW1lb3V0X2FkZF9tcygpLi4uCkNoZWNraW5nIFBB
+VENIIDkvNTA6IGJ1aWxkLXN5czogZml4IHFlbXUtZ2EgLXB0aHJlYWQgbGlua2luZy4uLgpDaGVj
+a2luZyBQQVRDSCAxMC81MDogYnVpbGQtc3lzOiBzaWxlbmNlIG1ha2UgYnkgZGVmYXVsdCBvciBW
+PTAuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvNTA6IGJ1aWxkLXN5czogYWRkIGEgcnVsZSB0byBwcmlu
+dCBhIHZhcmlhYmxlLi4uCkNoZWNraW5nIFBBVENIIDEyLzUwOiBidWlsZC1zeXM6IGNvbXBpbGUg
+d2l0aCAtT2cgb3IgLU8xIHdoZW4gLS1lbmFibGUtZGVidWcuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMv
+NTA6IHRlc3RzL2RvY2tlcjogYWRkIHNvbWUgc2FuaXRpemVycyB0byBmZWRvcmEgZG9ja2VyZmls
+ZS4uLgpDaGVja2luZyBQQVRDSCAxNC81MDogdGVzdHMvZG9ja2VyOiBhZGQgdGVzdC1kZWJ1Zy4u
+LgpDaGVja2luZyBQQVRDSCAxNS81MDogdGVzdHM6IGZpeCBjaGVjay1xb2JqZWN0IGxlYWsuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTYvNTA6IHZsOiBmaXggZGlyZWN0IGZpcm13YXJlIGRpcmVjdG9yaWVz
+IGxlYWsuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvNTA6IHJlYWRsaW5lOiBhZGQgYSBmcmVlIGZ1bmN0
+aW9uLi4uCkNoZWNraW5nIFBBVENIIDE4LzUwOiBjcnlwdG86IGZpeCBzdGFjay1idWZmZXItb3Zl
+cmZsb3cgZXJyb3IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvNTA6IHFlbXUtY29uZmlnOiBmaXggbGVh
+ayBpbiBxdWVyeS1jb21tYW5kLWxpbmUtb3B0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAyMC81MDog
+dGVzdHM6IGZpeCBxbXAtdGVzdCBsZWFrLi4uCkNoZWNraW5nIFBBVENIIDIxLzUwOiB0ZXN0czog
+Zml4IGNvcm91dGluZSBsZWFrIGluIC9iYXNpYy9lbnRlcmVkLi4uCkNoZWNraW5nIFBBVENIIDIy
+LzUwOiBtaXBzOiBmaXggcG90ZW50aWFsIGZvcGVuKE5VTEwsLi4uKS4uLgpDaGVja2luZyBQQVRD
+SCAyMy81MDogZGlzYXMvczM5MDogZml4IGdsb2JhbC1idWZmZXItb3ZlcmZsb3cuLi4KRVJST1I6
+IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGV2ZW4gZm9yIHNpbmdsZSBzdGF0ZW1lbnQgYmxvY2tz
+CiM4NTogRklMRTogZGlzYXMvczM5MC5jOjIxNjoKKyAgZm9yIChpID0gczM5MF9udW1fb3Bjb2Rl
+czsgaS0tOyApCisgICAgb3BjX2luZGV4W3MzOTBfb3Bjb2Rlc1tpXS5vcGNvZGVbMF1dID0gaTsK
+CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjQvNTA6IHNjc2kt
+ZGlzazogcmVsZWFzZSBBaW9Db250ZXh0IGluIHVuYWxpZ25lZCBXUklURSBTQU1FIGNhc2UuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMjUvNTA6IHRlc3RzL2Jvb3Qtc2VyaWFsLXRlc3Q6IEFkZCB0ZXN0cyBm
+b3IgbWljcm9ibGF6ZSBib2FyZHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjYvNTA6IHRlc3RzL2Jvb3Qt
+c2VyaWFsLXRlc3Q6IEFkZCBhIHRlc3QgZm9yIHRoZSBtb3hpZXNpbSBtYWNoaW5lLi4uCkNoZWNr
+aW5nIFBBVENIIDI3LzUwOiB0ZXN0cy9ib290LXNlcmlhbC10ZXN0OiBBZGQgc3VwcG9ydCBmb3Ig
+dGhlIHJhc3BpMiBtYWNoaW5lLi4uCkNoZWNraW5nIFBBVENIIDI4LzUwOiB0YXJnZXQvaTM4Njog
+bW92ZSBoZmxhZ3MgdXBkYXRlIGNvZGUgdG8gYSBmdW5jdGlvbi4uLgpFUlJPUjogTWFjcm9zIHdp
+dGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMyNDog
+RklMRTogdGFyZ2V0L2kzODYvY3B1LmM6NDE1MzoKKyNkZWZpbmUgSEZMQUdfQ09QWV9NQVNLIFwK
+KyAgICB+KCBIRl9DUExfTUFTSyB8IEhGX1BFX01BU0sgfCBIRl9NUF9NQVNLIHwgSEZfRU1fTUFT
+SyB8IFwKKyAgICAgICBIRl9UU19NQVNLIHwgSEZfVEZfTUFTSyB8IEhGX1ZNX01BU0sgfCBIRl9J
+T1BMX01BU0sgfCBcCisgICAgICAgSEZfT1NGWFNSX01BU0sgfCBIRl9MTUFfTUFTSyB8IEhGX0NT
+MzJfTUFTSyB8IFwKKyAgICAgICBIRl9TUzMyX01BU0sgfCBIRl9DUzY0X01BU0sgfCBIRl9BRERT
+RUdfTUFTSykKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRo
+ZXNpcyAnKCcKIzI1OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzo0MTU0OgorICAgIH4oIEhGX0NQ
+TF9NQVNLIHwgSEZfUEVfTUFTSyB8IEhGX01QX01BU0sgfCBIRl9FTV9NQVNLIHwgXAoKRVJST1I6
+ICJmb28qIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzc0OiBGSUxFOiB0YXJnZXQvaTM4Ni9j
+cHUuaDoxNzgxOgordm9pZCB4ODZfdXBkYXRlX2hmbGFncyhDUFVYODZTdGF0ZSogZW52KTsKCnRv
+dGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMTA2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDI5LzUwOiB0YXJnZXQv
+aTM4NjogaGF4OiBjaGFuZ2UgdG8gdXNlIHg4Nl91cGRhdGVfaGZsYWdzLi4uCkNoZWNraW5nIFBB
+VENIIDMwLzUwOiB0YXJnZXQvaTM4NjogaGF4OiBNb3ZlIHg4Nl91cGRhdGVfaGZsYWdzLi4uLgpD
+aGVja2luZyBQQVRDSCAzMS81MDogdGFyZ2V0LWkzODY6IHVwZGF0ZSBoZmxhZ3Mgb24gSHlwZXJ2
+aXNvci5mcmFtZXdvcmsuLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvNTA6IHNjcmlwdHMvcWVtdS1nZGI6
+IGFkZCBzaW1wbGUgdGNnIGxvY2sgc3RhdHVzIGhlbHBlci4uLgpDaGVja2luZyBQQVRDSCAzMy81
+MDogc2NyaXB0cy9xZW11LWdkYi90aW1lcnMucHk6IG5ldyBoZWxwZXIgdG8gZHVtcCB0aW1lciBz
+dGF0ZS4uLgpDaGVja2luZyBQQVRDSCAzNC81MDogaWNvdW50OiBmaXhlZCBzYXZpbmcvcmVzdG9y
+aW5nIG9mIGljb3VudCB3YXJwIHRpbWVycy4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
+ZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzE3MjogRklMRTogY3B1cy5jOjY4OToKKyAgICAuc3Vic2Vj
+dGlvbnMgPSAoY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uKltdKSB7CiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgMTczIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCkNoZWNraW5nIFBBVENIIDM1LzUwOiBjcHVzOiB1bmlmeSBxZW11Xypfd2FpdF9pb19ldmVu
+dC4uLgpDaGVja2luZyBQQVRDSCAzNi81MDogaXJxOiBmaXggbWVtb3J5IGxlYWsuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMzcvNTA6IG5ldDogRHJvcCB1bnVzdWFsIHVzZSBvZiBkbyB7IH0gd2hpbGUgKDAp
+Oy4uLgpDaGVja2luZyBQQVRDSCAzOC81MDogbWlwczogVHdlYWsgbG9jYXRpb24gb2YgJzsnIGlu
+IG1hY3Jvcy4uLgpDaGVja2luZyBQQVRDSCAzOS81MDogY2hhcmRldjogVXNlIGdvdG8vbGFiZWwg
+aW5zdGVhZCBvZiBkby9icmVhay93aGlsZSgwKS4uLgpDaGVja2luZyBQQVRDSCA0MC81MDogY2hh
+cmRldjogQ2xlYW4gdXAgcHJldmlvdXMgcGF0Y2ggaW5kZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFU
+Q0ggNDEvNTA6IHRlc3RzOiBBdm9pZCAnZG8vd2hpbGUoZmFsc2UpOyAnIGluIHZob3N0LXVzZXIt
+YnJpZGdlLi4uCkNoZWNraW5nIFBBVENIIDQyLzUwOiBtYWludDogRml4IG1hY3JvcyB3aXRoIGJy
+b2tlbiAnZG8vd2hpbGUoMCk7ICcgdXNhZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNDMvNTA6IGNoZWNr
+cGF0Y2g6IEVuZm9yY2UgcHJvcGVyIGRvL3doaWxlICgwKSBzdHlsZS4uLgpDaGVja2luZyBQQVRD
+SCA0NC81MDogY3B1X3BoeXNpY2FsX21lbW9yeV9zeW5jX2RpcnR5X2JpdG1hcDogQW5vdGhlciBh
+bGlnbm1lbnQgZml4Li4uCkNoZWNraW5nIFBBVENIIDQ1LzUwOiBmaW5kX3JhbV9vZmZzZXQ6IEFk
+ZCBjb21tZW50cyBhbmQgdHJhY2luZy4uLgpDaGVja2luZyBQQVRDSCA0Ni81MDogZmluZF9yYW1f
+b2Zmc2V0OiBBbGlnbiByYW1fYWRkcl90IGFsbG9jYXRpb24gb24gbG9uZyBib3VuZGFyaWVzLi4u
+CkNoZWNraW5nIFBBVENIIDQ3LzUwOiBibG9jay9pc2NzaTogZml4IGluaXRpYWxpemF0aW9uIG9m
+IGlUYXNrIGluIGlzY3NpX2NvX2dldF9ibG9ja19zdGF0dXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNDgv
+NTA6IGNwdTogZmx1c2ggVEIgY2FjaGUgd2hlbiBsb2FkaW5nIFZNU3RhdGUuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNDkvNTA6IHV0aWwvcWVtdS10aHJlYWQtKjogYWRkIHFlbXVfbG9jaywgbG9ja2VkIGFu
+ZCB1bmxvY2sgdHJhY2UgZXZlbnRzLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MTMyOiBGSUxFOiB1dGlsL3FlbXUtdGhyZWFkLXBvc2l4LmM6MTU4Ogordm9pZCBxZW11X2NvbmRf
+d2FpdF9pbXBsKFFlbXVDb25kICpjb25kLCBRZW11TXV0ZXggKm11dGV4LCBjb25zdCBjaGFyICpm
+aWxlLCBjb25zdCBpbnQgbGluZSkKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTkz
+OiBGSUxFOiB1dGlsL3FlbXUtdGhyZWFkLXdpbjMyLmM6MTQ1Ogordm9pZCBxZW11X2NvbmRfd2Fp
+dF9pbXBsKFFlbXVDb25kICpjb25kLCBRZW11TXV0ZXggKm11dGV4LCBjb25zdCBjaGFyICpmaWxl
+LCBjb25zdCBpbnQgbGluZSkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTgxIGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDUwLzUwOiBzY3JpcHRzL2FuYWx5c2UtbG9ja3Mtc2ltcGxldHJhY2UucHk6IHNjcmlw
+dCB0byBhbmFseXNlIGxvY2sgdGltZXMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
