@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ebR9p-00068b-Q3
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:20:06 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ebRHa-0004jf-M8
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:28:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ebR9k-0001AO-1u
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:20:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35738)
+	(envelope-from <imammedo@redhat.com>) id 1ebRHU-0006s4-Og
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:28:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43630)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ebR9j-000177-SQ
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:20:00 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <215cfa8f-1f2d-1155-bd0b-17ecd10c4c61@redhat.com> (Max Reitz's
-	message of "Mon, 15 Jan 2018 21:19:10 +0100")
-References: <20180115115309.23982-1-quintela@redhat.com>
-	<20180115115309.23982-10-quintela@redhat.com>
-	<215cfa8f-1f2d-1155-bd0b-17ecd10c4c61@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 16 Jan 2018 14:19:41 +0100
-Message-ID: <87r2qq3pqq.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ebRHU-0006gL-FN
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:28:00 -0500
+Date: Tue, 16 Jan 2018 14:27:37 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180116142737.30a4e4cd@redhat.com>
+In-Reply-To: <1516077852-7974-23-git-send-email-mst@redhat.com>
+References: <1516077852-7974-1-git-send-email-mst@redhat.com>
+	<1516077852-7974-23-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 09/27] migration: calculate vCPU blocktime
- on dst side
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 22/33] vhost: Move log_dirty check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +27,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>
 
-Max Reitz <mreitz@redhat.com> wrote:
-> On 2018-01-15 12:52, Juan Quintela wrote:
->> From: Alexey Perevalov <a.perevalov@samsung.com>
->> 
->> This patch provides blocktime calculation per vCPU,
->> as a summary and as a overlapped value for all vCPUs.
->> 
->> This approach was suggested by Peter Xu, as an improvements of
->> previous approch where QEMU kept tree with faulted page address and cpus bitmask
->> in it. Now QEMU is keeping array with faulted page address as value and vCPU
->> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
->> list for blocktime per vCPU (could be traced with page_fault_addr)
->> 
->> Blocktime will not calculated if postcopy_blocktime field of
->> MigrationIncomingState wasn't initialized.
->> 
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Reviewed-by: Juan Quintela <quintela@redhat.com>
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/postcopy-ram.c | 143 ++++++++++++++++++++++++++++++++++++++++++++++-
->>  migration/trace-events   |   5 +-
->>  2 files changed, 146 insertions(+), 2 deletions(-)
->
-> For me, this breaks compilation with clang -m32:
->
->   LINK    x86_64-softmmu/qemu-system-x86_64
-> ../migration/postcopy-ram.o: In function `mark_postcopy_blocktime_begin':
-> /home/maxx/projects/qemu/migration/postcopy-ram.c:599: undefined
-> reference to `__atomic_exchange_8'
-> /home/maxx/projects/qemu/migration/postcopy-ram.c:600: undefined
-> reference to `__atomic_exchange_8'
-> /home/maxx/projects/qemu/migration/postcopy-ram.c:609: undefined
-> reference to `__atomic_exchange_8'
-> ../migration/postcopy-ram.o: In function `mark_postcopy_blocktime_end':
-> /home/maxx/projects/qemu/migration/postcopy-ram.c:665: undefined
-> reference to `__atomic_fetch_add_8'
-> /home/maxx/projects/qemu/migration/postcopy-ram.c:686: undefined
-> reference to `__atomic_fetch_add_8'
->
-> Am I doing something wrong?
+On Tue, 16 Jan 2018 06:48:06 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-I have never used clang so .... I guess I should install.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Move the log_dirty check into vhost_section.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+As it change looks unsafe to me with current vhost_set_memory(),
 
-I am assuming you are using x86 here, right?
+I'd leave it out and merge only after switching new
+table generation algorithm.
 
-Later, Juan.
+David agreed to take care of it on respin.
+
+> ---
+>  hw/virtio/vhost.c      | 20 +++++++++++++-------
+>  hw/virtio/trace-events |  3 +++
+>  2 files changed, 16 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 8a85dde..83df043 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -27,6 +27,7 @@
+>  #include "hw/virtio/virtio-access.h"
+>  #include "migration/blocker.h"
+>  #include "sysemu/dma.h"
+> +#include "trace.h"
+>  
+>  /* enabled until disconnected backend stabilizes */
+>  #define _VHOST_DEBUG 1
+> @@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
+>                                           memory_listener);
+>      hwaddr start_addr = section->offset_within_address_space;
+>      ram_addr_t size = int128_get64(section->size);
+> -    bool log_dirty =
+> -        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
+>      int s = offsetof(struct vhost_memory, regions) +
+>          (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
+>      void *ram;
+>  
+>      dev->mem = g_realloc(dev->mem, s);
+>  
+> -    if (log_dirty) {
+> -        add = false;
+> -    }
+> -
+>      assert(size);
+>  
+>      /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
+> @@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
+>  
+>  static bool vhost_section(MemoryRegionSection *section)
+>  {
+> -    return memory_region_is_ram(section->mr) &&
+> +    bool result;
+> +    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
+> +                     ~(1 << DIRTY_MEMORY_MIGRATION);
+> +    result = memory_region_is_ram(section->mr) &&
+>          !memory_region_is_rom(section->mr);
+> +
+> +    /* Vhost doesn't handle any block which is doing dirty-tracking other
+> +     * than migration; this typically fires on VGA areas.
+> +     */
+> +    result &= !log_dirty;
+> +
+> +    trace_vhost_section(section->mr->name, result);
+> +    return result;
+>  }
+>  
+>  static void vhost_begin(MemoryListener *listener)
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 775461a..4a493bc 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -1,5 +1,8 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>  
+> +# hw/virtio/vhost.c
+> +vhost_section(const char *name, int r) "%s:%d"
+> +
+>  # hw/virtio/virtio.c
+>  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+>  virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
