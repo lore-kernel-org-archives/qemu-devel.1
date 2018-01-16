@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJ9r-00087j-DH
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:47:36 -0500
+	(envelope-from <mst@redhat.com>) id 1ebJ9w-0008DE-Cj
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:47:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJ9q-0004q3-Ip
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:47:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45020)
+	(envelope-from <mst@redhat.com>) id 1ebJ9v-0004qm-Dp
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:47:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJ9q-0004py-Cd
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:47:34 -0500
-Date: Tue, 16 Jan 2018 06:47:28 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJ9v-0004qe-7O
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:47:39 -0500
+Date: Tue, 16 Jan 2018 06:47:32 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516077852-7974-16-git-send-email-mst@redhat.com>
+Message-ID: <1516077852-7974-17-git-send-email-mst@redhat.com>
 References: <1516077852-7974-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1516077852-7974-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 15/33] hw/acpi-build: Make next_base easy to
- follow
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 16/33] vhost-user-test: fix features mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Dou Liyang <douly.fnst@cn.fujitsu.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-It may be hard to read the assignment statement of "next_base", so
+VIRTIO_NET_F_MAC is a bit position, not a bit mask.
 
-S/next_base += (1ULL << 32) - pcms->below_4g_mem_size;
- /next_base = mem_base + mem_len;
-
-... for readability.
-
-No functionality change.
-
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/i386/acpi-build.c | 2 +-
+ tests/vhost-user-test.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6f38fb9..dc4b2b9 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2394,7 +2394,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-             }
-             mem_base = 1ULL << 32;
-             mem_len = next_base - pcms->below_4g_mem_size;
--            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
-+            next_base = mem_base + mem_len;
-         }
-         numamem = acpi_data_push(table_data, sizeof *numamem);
-         build_srat_memory(numamem, mem_base, mem_len, i - 1,
--- 
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index e2c89ed..43c6528 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -177,7 +177,7 @@ static void init_virtio_dev(TestServer *s)
+     qvirtio_set_driver(&dev->vdev);
+=20
+     features =3D qvirtio_get_features(&dev->vdev);
+-    features =3D features & VIRTIO_NET_F_MAC;
++    features =3D features & (1u << VIRTIO_NET_F_MAC);
+     qvirtio_set_features(&dev->vdev, features);
+=20
+     qvirtio_set_driver_ok(&dev->vdev);
+--=20
 MST
