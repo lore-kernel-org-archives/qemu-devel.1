@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sagart@cse.iitb.ac.in>) id 1ebNNg-000553-W1
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:18:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ebPUw-00059V-FH
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:33:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sagart@cse.iitb.ac.in>) id 1ebNNb-0001Xc-Ef
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:18:08 -0500
-Received: from smtp1.iitb.ac.in ([103.21.127.13]:56546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sagart@cse.iitb.ac.in>)
-	id 1ebNNb-0001E0-2S
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:18:03 -0500
-Received: from ldns1.iitb.ac.in (ldns1.iitb.ac.in [10.200.12.1])
-	by smtp1.iitb.ac.in (Postfix) with SMTP id 63B07B7
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 14:47:43 +0530 (IST)
-Received: from jeeves.cse.iitb.ac.in (miller.cse.iitb.ac.in [10.129.3.1])
-	by ldns1.iitb.ac.in (Postfix) with ESMTP id 8D268360045
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 14:47:42 +0530 (IST)
-Received: from www.cse.iitb.ac.in (localhost [127.0.0.1])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by jeeves.cse.iitb.ac.in (Postfix) with ESMTPSA id E16A58C270C
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 14:47:41 +0530 (IST)
+	(envelope-from <peter.maydell@linaro.org>) id 1ebPUv-0004kZ-F5
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:33:46 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ebPUv-0004k1-A7
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:33:45 -0500
+Received: by mail-ot0-x242.google.com with SMTP id s3so13300306otc.9
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 03:33:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 16 Jan 2018 14:47:41 +0530
-From: sagart <sagart@cse.iitb.ac.in>
-Message-ID: <3f97e5fca675d8561f2291e6fbd673b6@cse.iitb.ac.in>
-Subject: [Qemu-devel] Help regarding configuring qemu with
- '--enable-ptnetmap' option
+In-Reply-To: <20180116034503.31926-2-richard.henderson@linaro.org>
+References: <20180116034503.31926-1-richard.henderson@linaro.org>
+	<20180116034503.31926-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Jan 2018 11:33:24 +0000
+Message-ID: <CAFEAcA-4exmbQqx+f9OYcGwsnDyKNJRnd=d2mPLTfshG6UJNiA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] tcg/arm: Fix double-word comparisons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,12 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-Hello,
-  I am trying to configure qemu with ptnet. But it seems like, now there 
-is no 'ptnet' branch to checkout,
-so I am unable to configure using '--enable-ptnetmap' option.
-please help in this regard.
+On 16 January 2018 at 03:45, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The code sequence we were generating was only good for unsigned
+> comparisons.  For signed comparisions, use the sequence from gcc.
+>
+> Fixes booting of ppc64 firmware, with a patch changing the code
+> sequence for ppc comparisons.
+>
+> Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  tcg/arm/tcg-target.inc.c | 97 ++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 65 insertions(+), 32 deletions(-)
+>
+> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+> index 98a12535a5..0ff283d84f 100644
+> --- a/tcg/arm/tcg-target.inc.c
+> +++ b/tcg/arm/tcg-target.inc.c
+> @@ -239,10 +239,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
+>      }
+>  }
+>
+> -#define TCG_CT_CONST_ARM  0x100
+> -#define TCG_CT_CONST_INV  0x200
+> -#define TCG_CT_CONST_NEG  0x400
+> -#define TCG_CT_CONST_ZERO 0x800
+> +#define TCG_CT_CONST_ARM     0x0100
+> +#define TCG_CT_CONST_INV     0x0200
+> +#define TCG_CT_CONST_NEG     0x0400
+> +#define TCG_CT_CONST_ZERO    0x1000
 
-Thank you.
+You might as well just drop this hunk now you're not adding a new entry.
+
+>  /* parse target specific constraints */
+>  static const char *target_parse_constraint(TCGArgConstraint *ct,
+> @@ -351,8 +351,7 @@ static inline int check_fit_imm(uint32_t imm)
+>  static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+>                                           const TCGArgConstraint *arg_ct)
+>  {
+> -    int ct;
+> -    ct = arg_ct->ct;
+> +    int ct = arg_ct->ct;
+>      if (ct & TCG_CT_CONST) {
+>          return 1;
+>      } else if ((ct & TCG_CT_CONST_ARM) && check_fit_imm(val)) {
+
+Ditto.
+
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
