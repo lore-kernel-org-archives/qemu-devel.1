@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdr@ashroe.eu>) id 1ebTuz-0000aP-Rn
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:16:58 -0500
+	(envelope-from <mst@redhat.com>) id 1ebUDK-00042q-PR
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdr@ashroe.eu>) id 1ebTuw-0001cE-JJ
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:16:57 -0500
-Received: from mail.ashroe.eu ([94.176.239.133]:59722)
+	(envelope-from <mst@redhat.com>) id 1ebUD8-0000ce-3X
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:35:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57240)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdr@ashroe.eu>) id 1ebTuw-0001bM-Cb
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:16:54 -0500
-References: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
-From: "Kinsella, Ray" <mdr@ashroe.eu>
-Message-ID: <4a649398-c643-33d2-f4ec-cd031b963e2f@ashroe.eu>
-Date: Tue, 16 Jan 2018 15:40:21 +0000
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebUD7-0000c7-Qq
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:35:42 -0500
+Date: Tue, 16 Jan 2018 18:35:34 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180116183120-mutt-send-email-mst@kernel.org>
+References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1516117900-11382-3-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/3 v2] virtio: improve virtio devices
- initialization time
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1516117900-11382-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] acpi: build QEMU table for PPI
+ virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gal Hammer <ghammer@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, kevin@koconnor.net, marcandre.lureau@redhat.com, lersek@redhat.com
 
-Hi Gal,
+On Tue, Jan 16, 2018 at 10:51:38AM -0500, Stefan Berger wrote:
+> To avoid having to hard code the base address of the PPI virtual memory
+> device we introduce a QEMU ACPI table that holds the base address, if a
+> TPM 1.2 or 2 is used. This table gives us flexibility to move the base
+> address later on.
+> 
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> ---
+>  hw/i386/acpi-build.c        | 19 +++++++++++++++++++
+>  include/hw/acpi/acpi-defs.h |  8 ++++++++
+>  2 files changed, 27 insertions(+)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 18b939e..522d6d2 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2628,6 +2628,20 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+>      return true;
+>  }
+>  
+> +static void build_qemu(GArray *table_data, BIOSLinker *linker,
+> +                       TPMVersion tpm_version)
+> +{
+> +    AcpiTableQemu *qemu = acpi_data_push(table_data, sizeof(*qemu));
+> +
+> +    if (tpm_version != TPM_VERSION_UNSPEC) {
+> +        qemu->tpmppi_addr = TPM_PPI_ADDR_BASE;
+> +        qemu->tpm_version = tpm_version;
+> +    }
+> +
+> +    build_header(linker, table_data,
+> +                 (void *)qemu, "QEMU", sizeof(*qemu), 1, "QEMU", "CONF");
+> +}
+> +
+>  static
+>  void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>  {
+> @@ -2734,6 +2748,11 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>                            &pcms->acpi_nvdimm_state, machine->ram_slots);
+>      }
+>  
+> +    if (misc.tpm_version != TPM_VERSION_UNSPEC) {
+> +        acpi_add_table(table_offsets, tables_blob);
+> +        build_qemu(tables_blob, tables->linker, misc.tpm_version);
+> +    }
+> +
+>      /* Add tables supplied by user (if any) */
+>      for (u = acpi_table_first(); u; u = acpi_table_next(u)) {
+>          unsigned len = acpi_table_len(u);
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 80c8099..98764c1 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -573,6 +573,14 @@ struct Acpi20TPM2 {
+>  } QEMU_PACKED;
+>  typedef struct Acpi20TPM2 Acpi20TPM2;
+>  
+> +/* QEMU - Custom QEMU table */
+> +struct AcpiTableQemu {
+> +    ACPI_TABLE_HEADER_DEF
 
-Brilliant - will test this in the next day or two.
-Hopefully this will help resolve the issues I reported last summer.
+Since we already have an 8 byte QEMU table due to patching of MCFG
+(which we should drop eventually I think) I think it's a good idea to
+reserve the first 8 bytes here after the header.
 
-http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg05268.html
 
-Ray K
+> +    uint32_t tpmppi_addr;
+> +    uint8_t tpm_version; /* 1 = 1.2, 2 = 2 */
 
-On 14/01/2018 10:06, Gal Hammer wrote:
-> A bug was reported about a very slow boot time and a 100% CPU usage of
-> both Windows and Linux guests when running a VM with multiple
-> virtio-serial devices (https://bugzilla.redhat.com/1528588).
->
-> For example, running a VM with 25 virtio-serial devices, each one with
-> max_ports=511, could have a boot time of around 30 minutes. With this
-> patch (and another patch to kvm) the boot time is reduced to
-> approximately 3 minutes.
->
-> The patch wraps all the changes made to the Memory Regions during the
-> eventfd registrations in a memory regions transaction. I had to add a
-> cleanup callback function to the EventNotifier struct, so it will be
-> possible to use a transaction in the shutdown code path as well.
->
-> Gal Hammer (3):
->    qemu: add a cleanup callback function to EventNotifier
->    virtio: postpone the execution of event_notifier_cleanup function
->    virtio: improve virtio devices initialization time
->
->   accel/kvm/kvm-all.c           |  4 ++++
->   hw/virtio/virtio-bus.c        | 19 +++++++++++--------
->   hw/virtio/virtio.c            |  5 +++++
->   include/qemu/event_notifier.h |  1 +
->   util/event_notifier-posix.c   |  5 ++++-
->   util/event_notifier-win32.c   |  2 ++
->   6 files changed, 27 insertions(+), 9 deletions(-)
->
+There are 3 bytes of padding here. Pls make them explicit
+as a reserved field.
+
+> +};
+> +typedef struct AcpiTableQemu AcpiTableQemu;
+> +
+
+>  /* DMAR - DMA Remapping table r2.2 */
+>  struct AcpiTableDmar {
+>      ACPI_TABLE_HEADER_DEF
+> -- 
+> 2.5.5
