@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ebUXw-0000hw-4f
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:57:17 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ebUYH-0000rV-Mo
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:57:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ebUXs-0007Jj-85
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:57:12 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:58126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ebUXr-0007Iz-UX
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:57:08 -0500
-References: <20180113144847.8403-1-laurent@vivier.eu>
-	<20180113144847.8403-2-laurent@vivier.eu>
-	<8106f80a-6bd2-8ba6-125a-6d5e58fcb035@linaro.org>
-	<addf3223-da94-6573-5e87-408ec8367d4a@vivier.eu>
-	<f6ba6a57-43fe-f4ee-4dac-0e5e7a3b49fd@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9ec4c7b4-50fd-5f8d-d238-1c92f76357fa@vivier.eu>
-Date: Tue, 16 Jan 2018 17:56:47 +0100
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ebUYG-0007Y6-Tl
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:57:33 -0500
+References: <cover.1513342045.git.berto@igalia.com>
+	<8525e16caa2fecac537aa62a449ea8626f5c7e36.1513342045.git.berto@igalia.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <67060769-70fc-e6d4-673c-81f1382fe735@virtuozzo.com>
+Date: Tue, 16 Jan 2018 19:57:22 +0300
 MIME-Version: 1.0
-In-Reply-To: <f6ba6a57-43fe-f4ee-4dac-0e5e7a3b49fd@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <8525e16caa2fecac537aa62a449ea8626f5c7e36.1513342045.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] linux-user: introduce functions to
- detect CPU type
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 31/32] qcow2: Allow configuring the L2
+ slice size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, Aaron Sierra <asierra@xes-inc.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Le 16/01/2018 à 16:54, Richard Henderson a écrit :
-> On 01/16/2018 06:13 AM, Laurent Vivier wrote:
->>> There is no reason to read the elf header twice -- e_flags has already been
->>> stored in the struct image_info.
->>
->> When we set cpu_model, image_info is not initialized.
->> Do you propose to move cpu_init() after loader_exec()?
-> 
-> Sure.
 
-After checking, I think we can't move cpu_init() after loader_exec():
 
-load_elf_binary() needs to fill AT_HWCAP and in the case of i386 it
-depends on cpu->env.features[FEAT_1_EDX] that comes from the cpu model.
+On 15/12/2017 3:53 PM, Alberto Garcia wrote:
+> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+> index 2fcecbd7a8..fe58d1ec70 100644
+> --- a/block/qcow2-cache.c
+> +++ b/block/qcow2-cache.c
+[..]
+> @@ -879,9 +896,13 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+>           }
+>       }
+>   
+> -    r->l2_slice_size = s->cluster_size / sizeof(uint64_t);
+> -    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size);
+> -    r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size);
+> +    l2_cache_size *= s->cluster_size / l2_cache_entry_size;
+> +
 
-Thanks,
-Laurent
+A bit confusing; l2_cache_size first means the size in bytes, then the
+size in clusters and now the size in entries.
+
+Maybe in the comparison with MIN_L2_CACHE_SIZE, we should multiply
+MIN_L2_CACHE_SIZE to cluster_size instead.
+And perhaps MIN_L2_CACHE_CLUSTERS is a better name. Or should it even be
+MIN_L2_CACHE_ENTRIES instead, taking into account its motivation to make
+it possible to handle COW.
+
+Also, I guess the final size-in-entries needs to be compared with
+INT_MAX, not the size-in-clusters.
+
+> +    r->l2_slice_size = l2_cache_entry_size / sizeof(uint64_t);
+> +    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size,
+> +                                           l2_cache_entry_size);
+
+my gcc thinks l2_cache_entry_size may be used uninitialized here.
+can't quite see how that may happen though..
