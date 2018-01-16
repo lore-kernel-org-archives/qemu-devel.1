@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ebMgO-0000ZQ-Oc
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 03:33:26 -0500
+	(envelope-from <groug@kaod.org>) id 1ebNQ9-0005e9-Ka
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:20:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ebMgK-0002e1-CP
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 03:33:24 -0500
-Received: from [45.249.212.255] (port=39825 helo=huawei.com)
+	(envelope-from <groug@kaod.org>) id 1ebNQ6-0002qe-GY
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:20:41 -0500
+Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:41104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ebMgJ-0002cw-MY
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 03:33:20 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Tue, 16 Jan 2018 08:32:54 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB45B6C@DGGEMM505-MBS.china.huawei.com>
-References: <1515043788-38300-1-git-send-email-jianjay.zhou@huawei.com>
-In-Reply-To: <1515043788-38300-1-git-send-email-jianjay.zhou@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ebNQ6-0002nH-9W
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:20:38 -0500
+Received: from player695.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 5395017DD04
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 10:20:28 +0100 (CET)
+Date: Tue, 16 Jan 2018 10:20:18 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180116102018.382fd035@bahia.lan>
+In-Reply-To: <20180116044714.12571-2-david@gibson.dropbear.id.au>
+References: <20180116044714.12571-1-david@gibson.dropbear.id.au>
+	<20180116044714.12571-2-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] memory: update comments and fix some typos
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2 1/2] spapr: Allow some cases where we
+ can't set VSMT mode in the kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,183 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hi Paolo,
-Maybe it is a little boring to review updated comments, but I think it is t=
-he
-right thing to do, so could you have a look when you're free?
+On Tue, 16 Jan 2018 15:47:13 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Regards,
-Jay
-
-> -----Original Message-----
-> From: Zhoujian (jay)
-> Sent: Thursday, January 04, 2018 1:30 PM
-> To: qemu-devel@nongnu.org
-> Cc: pbonzini@redhat.com; Huangweidong (C) <weidong.huang@huawei.com>; wan=
-gxin
-> (U) <wangxinxin.wang@huawei.com>; Zhoujian (jay) <jianjay.zhou@huawei.com=
->
-> Subject: [PATCH] memory: update comments and fix some typos
->=20
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> At present if we require a vsmt mode that's not equal to the kernel's
+> default, and the kernel doesn't let us change it (e.g. because it's an old
+> kernel without support) then we always fail.
+> 
+> But in fact we can cope with the kernel having a different vsmt as long as
+>   a) it's >= the actual number of vthreads/vcore (so that guest threads
+>      that are supposed to be on the same core act like it)
+>   b) it's a submultiple of the requested vsmt mode (so that guest threads
+>      spaced by the vsmt value will act like they're on different cores)
+> 
+> Allowing this case gives us a bit more freedom to adjust the vsmt behaviour
+> without breaking existing cases.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  include/exec/memory.h | 27 +++++++++++++++------------
->  1 file changed, 15 insertions(+), 12 deletions(-)
->=20
-> diff --git a/include/exec/memory.h b/include/exec/memory.h index
-> a4cabdf..6e5684d 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -324,7 +324,7 @@ FlatView *address_space_to_flatview(AddressSpace *as)=
-;
->   * MemoryRegionSection: describes a fragment of a #MemoryRegion
->   *
->   * @mr: the region, or %NULL if empty
-> - * @address_space: the address space the region is mapped in
-> + * @fv: the flat view of the address space the region is mapped in
->   * @offset_within_region: the beginning of the section, relative to @mr'=
-s
-> start
->   * @size: the size of the section; will not exceed @mr's boundaries
->   * @offset_within_address_space: the address of the first byte of the
-> section @@ -607,6 +607,7 @@ void
-> memory_region_init_rom_nomigrate(MemoryRegion *mr,
->   * @mr: the #MemoryRegion to be initialized.
->   * @owner: the object that tracks the region's reference count
->   * @ops: callbacks for write access handling (must not be NULL).
-> + * @opaque: passed to the read and write callbacks of the @ops structure=
-.
->   * @name: Region name, becomes part of RAMBlock name used in migration
-> stream
->   *        must be unique within any device
->   * @size: size of the region.
-> @@ -650,11 +651,10 @@ static inline void
-> memory_region_init_reservation(MemoryRegion *mr,
->   * An IOMMU region translates addresses and forwards accesses to a targe=
-t
->   * memory region.
->   *
-> - * @typename: QOM class name
->   * @_iommu_mr: the #IOMMUMemoryRegion to be initialized
->   * @instance_size: the IOMMUMemoryRegion subclass instance size
-> + * @mrtypename: the type name of the #IOMMUMemoryRegion
->   * @owner: the object that tracks the region's reference count
-> - * @ops: a function that translates addresses into the @target region
->   * @name: used for debugging; not visible to the user or ABI
->   * @size: size of the region.
->   */
-> @@ -824,8 +824,8 @@ static inline IOMMUMemoryRegion
-> *memory_region_get_iommu(MemoryRegion *mr)
->   * memory_region_get_iommu_class_nocheck: returns iommu memory region cl=
-ass
->   *   if an iommu or NULL if not
->   *
-> - * Returns pointer to IOMMUMemoryRegioniClass if a memory region is an i=
-ommu,
-> - * otherwise NULL. This is fast path avoinding QOM checking, use with
-> caution.
-> + * Returns pointer to IOMMUMemoryRegionClass if a memory region is an
-> + iommu,
-> + * otherwise NULL. This is fast path avoiding QOM checking, use with cau=
-tion.
->   *
->   * @mr: the memory region being queried
->   */
-> @@ -990,7 +990,8 @@ int memory_region_get_fd(MemoryRegion *mr);
->   * protecting the pointer, such as a reference to the region that includ=
-es
->   * the incoming ram_addr_t.
->   *
-> - * @mr: the memory region being queried.
-> + * @ptr: the host pointer to be converted
-> + * @offset: the offset within memory region
->   */
->  MemoryRegion *memory_region_from_host(void *ptr, ram_addr_t *offset);
->=20
-> @@ -1267,7 +1268,7 @@ void memory_region_clear_global_locking(MemoryRegio=
-n
-> *mr);
->   * @size: the size of the access to trigger the eventfd
->   * @match_data: whether to match against @data, instead of just @addr
->   * @data: the data to match against the guest write
-> - * @fd: the eventfd to be triggered when @addr, @size, and @data all mat=
-ch.
-> + * @e: event notifier to be triggered when @addr, @size, and @data all m=
-atch.
->   **/
->  void memory_region_add_eventfd(MemoryRegion *mr,
->                                 hwaddr addr, @@ -1287,7 +1288,7 @@ void
-> memory_region_add_eventfd(MemoryRegion *mr,
->   * @size: the size of the access to trigger the eventfd
->   * @match_data: whether to match against @data, instead of just @addr
->   * @data: the data to match against the guest write
-> - * @fd: the eventfd to be triggered when @addr, @size, and @data all mat=
-ch.
-> + * @e: event notifier to be triggered when @addr, @size, and @data all m=
-atch.
->   */
->  void memory_region_del_eventfd(MemoryRegion *mr,
->                                 hwaddr addr, @@ -1523,7 +1524,7 @@ bool
-> memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
->   * will need to request the pointer again.
->   *
->   * @mr: #MemoryRegion associated to the pointer.
-> - * @addr: address within that region
-> + * @offset: offset within the memory region
->   * @size: size of that area.
->   */
->  void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset, =
-@@ -
-> 1592,6 +1593,7 @@ void address_space_destroy(AddressSpace *as);
->   * @addr: address within that address space
->   * @attrs: memory transaction attributes
->   * @buf: buffer with the data transferred
-> + * @len: the number of bytes to read or write
->   * @is_write: indicates the transfer direction
->   */
->  MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, @@ -1609,6
-> +1611,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
->   * @addr: address within that address space
->   * @attrs: memory transaction attributes
->   * @buf: buffer with the data transferred
-> + * @len: the number of bytes to write
->   */
->  MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
->                                  MemTxAttrs attrs, @@ -1807,7 +1810,7 @@
-> IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr=
-,
->   * called from an RCU critical section, to avoid that the last reference
->   * to the returned region disappears after address_space_translate retur=
-ns.
->   *
-> - * @as: #AddressSpace to be accessed
-> + * @fv: #FlatView to be accessed
->   * @addr: address within that address space
->   * @xlat: pointer to address within the returned memory region section's
->   * #MemoryRegion.
-> @@ -1865,7 +1868,7 @@ void *address_space_map(AddressSpace *as, hwaddr ad=
-dr,
->   * the amount of memory that was actually read or written by the caller.
->   *
->   * @as: #AddressSpace used
-> - * @addr: address within that address space
-> + * @buffer: host pointer as returned by address_space_map()
->   * @len: buffer length as returned by address_space_map()
->   * @access_len: amount of data actually transferred
->   * @is_write: indicates the transfer direction @@ -1902,7 +1905,7 @@ sta=
-tic
-> inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
->   * or failed (eg unassigned memory, device rejected the transaction,
->   * IOMMU fault).
->   *
-> - * @as: #AddressSpace to be accessed
-> + * @fv: #FlatView to be accessed
->   * @addr: address within that address space
->   * @attrs: memory transaction attributes
->   * @buf: buffer with the data transferred
-> --
-> 1.8.3.1
->=20
+
+I could check the following on a POWER9 host:
+
+$ ./ppc64-softmmu/qemu-system-ppc64 -accel kvm -smp threads=1
+qemu-system-ppc64: warning: Failed to set KVM's VSMT mode to 8 (errno -22)
+
+and the guest boots.
+
+$ ./ppc64-softmmu/qemu-system-ppc64 -accel kvm -smp threads=2
+qemu-system-ppc64: Failed to set KVM's VSMT mode to 8 (errno -22)
+On PPC, a VM with 2 threads/core on a host with 1 threads/core requires the
+ use of VSMT mode 8.
+This KVM seems to be too old to support VSMT.
+
+and QEMU exits.
+
+Tested-by: Greg Kurz <groug@kaod.org>
+
+Just one minor remark below but anyway:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr.c | 26 +++++++++++++++++++-------
+>  1 file changed, 19 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e35214bfc3..6d3613d934 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2314,17 +2314,29 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+>      if (kvm_enabled() && (spapr->vsmt != kvm_smt)) {
+>          ret = kvmppc_set_smt_threads(spapr->vsmt);
+>          if (ret) {
+> +            /* Looks like KVM isn't able to change VSMT mode */
+>              error_setg(&local_err,
+>                         "Failed to set KVM's VSMT mode to %d (errno %d)",
+>                         spapr->vsmt, ret);
+> -            if (!vsmt_user) {
+> -                error_append_hint(&local_err, "On PPC, a VM with %d threads/"
+> -                             "core on a host with %d threads/core requires "
+> -                             " the use of VSMT mode %d.\n",
+> -                             smp_threads, kvm_smt, spapr->vsmt);
+> +            /* We can live with that if the default one is big enough
+> +             * for the number of threads, and a submultiple of the one
+> +             * we want.  In this case we'll waste some vcpu ids, but
+> +             * behaviour will be correct */
+> +            if ((kvm_smt >= smp_threads) && (spapr->vsmt % kvm_smt) == 0) {
+
+Inconsistent use of parens in the left and right operands of &&
+
+> +                warn_report_err(local_err);
+> +                local_err = NULL;
+> +                goto out;
+> +            } else {
+> +                if (!vsmt_user) {
+> +                    error_append_hint(&local_err,
+> +                                      "On PPC, a VM with %d threads/core"
+> +                                      " on a host with %d threads/core"
+> +                                      " requires the use of VSMT mode %d.\n",
+> +                                      smp_threads, kvm_smt, spapr->vsmt);
+> +                }
+> +                kvmppc_hint_smt_possible(&local_err);
+> +                goto out;
+>              }
+> -            kvmppc_hint_smt_possible(&local_err);
+> -            goto out;
+>          }
+>      }
+>      /* else TCG: nothing to do currently */
