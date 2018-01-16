@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebRVL-0006VU-Cb
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1ebRVp-0006ur-4i
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebRVF-0008L5-Dz
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:19 -0500
-Date: Wed, 17 Jan 2018 00:39:46 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180116133946.GM30352@umbus.fritz.box>
-References: <20180116044714.12571-1-david@gibson.dropbear.id.au>
-	<20180116044714.12571-2-david@gibson.dropbear.id.au>
-	<ab350665-cb32-72d3-a548-0572f5275775@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1ebRVl-0000IR-V8
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ebRVl-0000HT-MT
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:42:45 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 16 Jan 2018 13:42:03 +0000
+Message-Id: <20180116134217.8725-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="37nyS7qXrnu4wN2o"
-Content-Disposition: inline
-In-Reply-To: <ab350665-cb32-72d3-a548-0572f5275775@redhat.com>
-Subject: Re: [Qemu-devel] [PATCHv2 1/2] spapr: Allow some cases where we
- can't set VSMT mode in the kernel
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 00/14]  Support building with py2 or py3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +24,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: groug@kaod.org, joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+This is an update for my previously posted series:
 
---37nyS7qXrnu4wN2o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ v2: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06528.html
+ v3: https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg02978.html
+ v4: https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg03150.html
 
-On Tue, Jan 16, 2018 at 11:34:52AM +0100, Laurent Vivier wrote:
-> On 16/01/2018 05:47, David Gibson wrote:
-> > At present if we require a vsmt mode that's not equal to the kernel's
-> > default, and the kernel doesn't let us change it (e.g. because it's an =
-old
-> > kernel without support) then we always fail.
-> >=20
-> > But in fact we can cope with the kernel having a different vsmt as long=
- as
-> >   a) it's >=3D the actual number of vthreads/vcore (so that guest threa=
-ds
-> >      that are supposed to be on the same core act like it)
-> >   b) it's a submultiple of the requested vsmt mode (so that guest threa=
-ds
-> >      spaced by the vsmt value will act like they're on different cores)
-> >=20
-> > Allowing this case gives us a bit more freedom to adjust the vsmt behav=
-iour
-> > without breaking existing cases.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr.c | 26 +++++++++++++++++++-------
-> >  1 file changed, 19 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index e35214bfc3..6d3613d934 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2314,17 +2314,29 @@ static void spapr_set_vsmt_mode(sPAPRMachineSta=
-te *spapr, Error **errp)
-> >      if (kvm_enabled() && (spapr->vsmt !=3D kvm_smt)) {
-> >          ret =3D kvmppc_set_smt_threads(spapr->vsmt);
-> >          if (ret) {
-> > +            /* Looks like KVM isn't able to change VSMT mode */
-> >              error_setg(&local_err,
-> >                         "Failed to set KVM's VSMT mode to %d (errno %d)=
-",
-> >                         spapr->vsmt, ret);
-> > -            if (!vsmt_user) {
-> > -                error_append_hint(&local_err, "On PPC, a VM with %d th=
-reads/"
-> > -                             "core on a host with %d threads/core requ=
-ires "
-> > -                             " the use of VSMT mode %d.\n",
-> > -                             smp_threads, kvm_smt, spapr->vsmt);
-> > +            /* We can live with that if the default one is big enough
-> > +             * for the number of threads, and a submultiple of the one
-> > +             * we want.  In this case we'll waste some vcpu ids, but
-> > +             * behaviour will be correct */
-> > +            if ((kvm_smt >=3D smp_threads) && (spapr->vsmt % kvm_smt) =
-=3D=3D 0) {
->=20
-> I agree with Greg: inconsistent use of parenthesis, should be
->=20
->     if (kvm_smt >=3D smp_threads && (spapr->vsmt % kvm_smt) =3D=3D 0) {
+This series enables some level of CI testing for py3 so that our CI jobs =
+will
+get coverage of both py2 and py3 builds to avoid bitrot.
 
-Corrected in my tree.
+I did a test travis build with py 3.0 and py 3.6 and got success:
 
-> Anyway:
->=20
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
->=20
-> Thanks,
-> Laurent
->=20
+  https://travis-ci.org/berrange/qemu/builds/328223261
+
+The goal was to achieve the following
+
+  ./configure --python=3D/usr/bin/python3
+  make
+  make check
+
+This still requires passing python path to configure explicitly. A
+further improvement would be for configure to automatically detect
+a pythjon 3 binary and use it preferentially to python 2.
+
+I have not attempted to fix/validate the block I/O tests. I would expect
+them to be broken, but easily fixable with the similar kind of scope
+changes as seen here. I felt it better to tackle that separately to
+avoid this initial series getting too large.
+
+Although the Python 2 EOL date is 2020, we already have distros which
+are not shipping Python 2 by default (Fedora >=3D 26 has dropped Py2 from
+the default install). Any new releases of long life and/or enterprise
+distros may well not ship Python 2 given that it would go EOL long
+before the EOL of the distro itself. IOW QEMU does have a fairly pressing
+need to be able to support Python 3 for building.
+
+A request for py3 is tracked here:
+
+   https://bugs.launchpad.net/qemu/+bug/1708462
+
+If, rather than supporting py2+py3 in parallel, we wish to entirely drop
+py2 support, this series would not change significantly
+
+ - The "from __future__ import print_function" line can be removed
+   from patch 1.
+ - The code in patches 2, 3, 4 to deal with changed module names
+   for a few functions can be simpified to only try the py3 location
+ - The travis + docker jobs would be fully updated to install py3,
+   or delete jobs which can't support py3
+
+Given how little code is removed should we drop py2 support, I don't
+believe it is in our immediate interests to do this. It would create
+extra pain for consumers of QEMU, with little benefit to QEMU code
+maintainance. The key thing is ensuring our travis+docker jobs provide
+satisfactory automated test coverage for the variety of python versions
+in the distros we care about targetting.
+
+NB, Patch 11 here is not related to python 3 work - it was just a
+temporary pre-requisite of pulling in the keycodemapdb update.
+
+Changes since v4:
+
+ - Fix broken rebase which accidentally squashed first two
+   patches together
+ - Unset LC_ALL, and set LANG + LC_CTYPE, instead of only LANG (Eric)
+
+Changes since v3:
+
+ - Remove space before '(' in print() function calls (Phillippe)
+ - Force use of en_US.UTF-8 for QAPI code generation (Patchew)
+
+Changes since v2:
+
+ - Pull in fix for keycodemapdb
+ - Enable testing with Travis
+ - Enable testing with Fedora Docker images
+ - Fix for sort ordering to fix 'make check-qapi-schema'
+ - Fix for signrom data
+
+Daniel P. Berrange (13):
+  qapi: convert to use python print function instead of statement
+  qapi: use items()/values() intead of iteritems()/itervalues()
+  qapi: Use OrderedDict from standard library if available
+  qapi: adapt to moved location of StringIO module in py3
+  qapi: Adapt to moved location of 'maketrans' function in py3
+  qapi: remove '-q' arg to diff when comparing QAPI output
+  qapi: ensure stable sort ordering when checking QAPI entities
+  qapi: force a UTF-8 locale for running Python
+  scripts: ensure signrom treats data as bytes
+  configure: allow use of python 3
+  ui: update keycodemapdb to get py3 fixes
+  travis: improve python version test coverage
+  docker: change Fedora images to run with python3
+
+Miika S (1):
+  input: add missing JIS keys to virtio input
+
+ .travis.yml                            | 14 +++++++----
+ Makefile                               | 22 +++++++++--------
+ configure                              |  5 ++--
+ hw/input/virtio-input-hid.c            |  7 ++++++
+ qapi/ui.json                           |  5 +++-
+ scripts/qapi.py                        | 43 ++++++++++++++++++++--------=
+------
+ scripts/qapi2texi.py                   | 11 +++++----
+ scripts/signrom.py                     |  4 ++--
+ tests/Makefile.include                 |  6 ++---
+ tests/docker/dockerfiles/fedora.docker |  3 ++-
+ tests/qapi-schema/test-qapi.py         | 43 +++++++++++++++++-----------=
+------
+ ui/keycodemapdb                        |  2 +-
+ 12 files changed, 96 insertions(+), 69 deletions(-)
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---37nyS7qXrnu4wN2o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpeAKIACgkQbDjKyiDZ
-s5JfTBAA5doUNBZ60eMSxOZRJqB7OxLUZEgMkhs0nf3uurBCZrHpqq9v0L2brx9p
-Z5MafHVKlvzRRPNQjove4Vqkv669Pr0mT31dJnJjfHSylmqDsyAprzcvT6yu4A0T
-vD8beV24wfIJpxW8/VAerJG3qfs8TtpraL2vhsdmJFO4t/bdsgoX3WdJeYtMl4z8
-kiybTWS95mc46tOFct0d+CEFulLL/dt/vXtx0o2ju8pqe93vCsHsd6RjxQrvcNjP
-whSv70TUio7bxiLWkaQaIXRORVJYk7+rCUmjat/oAd3a+WB0uXUgepr0l97Gwsv8
-SJG92tekVokzIsgJeCUeWRJ7Df4LaZzVMPtDaJXDhXnMTWrCbBurLJrQk5Fqgxj2
-IfkUaeCcQFz2UzbtAbdTowMJWKaeg3jzyRLvsbgCGZ1ArDyF4jxGcdLs0c9hZNGF
-opwF4XssB+PVjgWl/YSwd+I3LTD3pVW0Ag2b/2WxCWmsW2g+opILoEGae/GBxCyE
-gEO7+5Ctxex9r/EsgP9OmaJk8dctgNP5b3F+ILE9ZSu31borhEuzQj6bD0/RUDN4
-z3zhvVtxb7IXNUs0WFWnZICXWfm3ovePejpuEWbqXAsqIaOZ+yNNq6FxI6F5boy9
-1QJYvygeQP5m7ETMo/SdDJx6zmCxIBPhI7X4ZXe4RYJ5exFXT+M=
-=deA8
------END PGP SIGNATURE-----
-
---37nyS7qXrnu4wN2o--
+2.14.3
