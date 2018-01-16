@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ebFZu-0007s9-AE
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 19:58:15 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ebFZs-0000lS-Bq
+	(envelope-from <tcminyard@gmail.com>) id 1ebFZs-0007rq-Rg
 	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 19:58:14 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ebFZs-0000kr-7V
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <tcminyard@gmail.com>) id 1ebFZr-0000ke-Lp
 	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 19:58:12 -0500
-Received: by mail-ot0-x242.google.com with SMTP id w4so12197116otg.3
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 16:58:12 -0800 (PST)
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34855)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ebFZr-0000kK-Go
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 19:58:11 -0500
+Received: by mail-oi0-x243.google.com with SMTP id j139so6479824oih.2
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 16:58:11 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Mon, 15 Jan 2018 18:57:57 -0600
-Message-Id: <1516064279-14816-6-git-send-email-minyard@acm.org>
+Date: Mon, 15 Jan 2018 18:57:56 -0600
+Message-Id: <1516064279-14816-5-git-send-email-minyard@acm.org>
 In-Reply-To: <1516064279-14816-1-git-send-email-minyard@acm.org>
 References: <1516064279-14816-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 5/7] ipmi: Fix macro issues
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 4/7] ipmi: Add the platform event message
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +35,63 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Macro parameters should almost always have () around them when used.
-llvm reported an error on this.
-
-Remove redundant parenthesis and put parenthesis around the entire
-macros with assignments in case they are used in an expression.
-
-The macros were doing ((v) & 1) for a binary input, but that only works
-if v == 0 or if v & 1.  Changed to !!(v) so they work for all values.
-
-Remove some unused macros.
-
-Reported in https://bugs.launchpad.net/bugs/1651167
-
-An audit of these changes found no semantic changes; this is just
-cleanups for proper style and to avoid a compiler warning.
+This lets an event be added to the SEL as if a sensor had generated
+it.  The OpenIPMI driver uses it for storing panic event information.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/ipmi/isa_ipmi_bt.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/ipmi/ipmi_bmc_sim.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index e098fd5..e946030 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -45,21 +45,21 @@
- #define IPMI_BT_B2H_ATN_MASK       (1 << IPMI_BT_B2H_ATN_BIT)
- #define IPMI_BT_GET_B2H_ATN(d)     (((d) >> IPMI_BT_B2H_ATN_BIT) & 0x1)
- #define IPMI_BT_SET_B2H_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
--                                        (((v) & 1) << IPMI_BT_B2H_ATN_BIT)))
-+                                        (!!(v) << IPMI_BT_B2H_ATN_BIT)))
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index a0bbfd5..e84d710 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -38,6 +38,7 @@
  
- #define IPMI_BT_SMS_ATN_MASK       (1 << IPMI_BT_SMS_ATN_BIT)
- #define IPMI_BT_GET_SMS_ATN(d)     (((d) >> IPMI_BT_SMS_ATN_BIT) & 0x1)
- #define IPMI_BT_SET_SMS_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
--                                        (((v) & 1) << IPMI_BT_SMS_ATN_BIT)))
-+                                        (!!(v) << IPMI_BT_SMS_ATN_BIT)))
+ #define IPMI_NETFN_SENSOR_EVENT       0x04
  
- #define IPMI_BT_HBUSY_MASK         (1 << IPMI_BT_HBUSY_BIT)
- #define IPMI_BT_GET_HBUSY(d)       (((d) >> IPMI_BT_HBUSY_BIT) & 0x1)
- #define IPMI_BT_SET_HBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
--                                       (((v) & 1) << IPMI_BT_HBUSY_BIT)))
-+                                       (!!(v) << IPMI_BT_HBUSY_BIT)))
++#define IPMI_CMD_PLATFORM_EVENT_MSG       0x02
+ #define IPMI_CMD_SET_SENSOR_EVT_ENABLE    0x28
+ #define IPMI_CMD_GET_SENSOR_EVT_ENABLE    0x29
+ #define IPMI_CMD_REARM_SENSOR_EVTS        0x2a
+@@ -1581,6 +1582,28 @@ static void set_sel_time(IPMIBmcSim *ibs,
+     ibs->sel.time_offset = now.tv_sec - ((long) val);
+ }
  
- #define IPMI_BT_BBUSY_MASK         (1 << IPMI_BT_BBUSY_BIT)
- #define IPMI_BT_SET_BBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
--                                       (((v) & 1) << IPMI_BT_BBUSY_BIT)))
-+                                       (!!(v) << IPMI_BT_BBUSY_BIT)))
++static void platform_event_msg(IPMIBmcSim *ibs,
++                               uint8_t *cmd, unsigned int cmd_len,
++                               RspBuffer *rsp)
++{
++    uint8_t event[16];
++
++    event[2] = 2; /* System event record */
++    event[7] = cmd[2]; /* Generator ID */
++    event[8] = 0;
++    event[9] = cmd[3]; /* EvMRev */
++    event[10] = cmd[4]; /* Sensor type */
++    event[11] = cmd[5]; /* Sensor number */
++    event[12] = cmd[6]; /* Event dir / Event type */
++    event[13] = cmd[7]; /* Event data 1 */
++    event[14] = cmd[8]; /* Event data 2 */
++    event[15] = cmd[9]; /* Event data 3 */
++
++    if (sel_add_event(ibs, event)) {
++        rsp_buffer_set_error(rsp, IPMI_CC_OUT_OF_SPACE);
++    }
++}
++
+ static void set_sensor_evt_enable(IPMIBmcSim *ibs,
+                                   uint8_t *cmd, unsigned int cmd_len,
+                                   RspBuffer *rsp)
+@@ -1757,6 +1780,7 @@ static const IPMINetfn chassis_netfn = {
+ };
  
- 
- /* Mask register */
-@@ -69,12 +69,12 @@
- #define IPMI_BT_B2H_IRQ_EN_MASK      (1 << IPMI_BT_B2H_IRQ_EN_BIT)
- #define IPMI_BT_GET_B2H_IRQ_EN(d)    (((d) >> IPMI_BT_B2H_IRQ_EN_BIT) & 0x1)
- #define IPMI_BT_SET_B2H_IRQ_EN(d, v) ((d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) |\
--                                        (((v) & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
-+                                        (!!(v) << IPMI_BT_B2H_IRQ_EN_BIT)))
- 
- #define IPMI_BT_B2H_IRQ_MASK         (1 << IPMI_BT_B2H_IRQ_BIT)
- #define IPMI_BT_GET_B2H_IRQ(d)       (((d) >> IPMI_BT_B2H_IRQ_BIT) & 0x1)
- #define IPMI_BT_SET_B2H_IRQ(d, v)    ((d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
--                                        (((v) & 1) << IPMI_BT_B2H_IRQ_BIT)))
-+                                        (!!(v) << IPMI_BT_B2H_IRQ_BIT)))
- 
- typedef struct IPMIBT {
-     IPMIBmc *bmc;
+ static const IPMICmdHandler sensor_event_cmds[] = {
++    [IPMI_CMD_PLATFORM_EVENT_MSG] = { platform_event_msg, 10 },
+     [IPMI_CMD_SET_SENSOR_EVT_ENABLE] = { set_sensor_evt_enable, 4 },
+     [IPMI_CMD_GET_SENSOR_EVT_ENABLE] = { get_sensor_evt_enable, 3 },
+     [IPMI_CMD_REARM_SENSOR_EVTS] = { rearm_sensor_evts, 4 },
 -- 
 2.7.4
