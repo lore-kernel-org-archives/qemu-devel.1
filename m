@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ebRO0-0008HT-HJ
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:48 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNy-0008Fk-UE
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ebRNu-0002qm-Jo
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:44 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45892)
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNv-0002rK-4d
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:42 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ebRNu-0002oE-Co
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:38 -0500
+	id 1ebRNu-0002qb-TD
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:39 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ebRNi-0002pF-Mq
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:34:26 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNt-0002vu-Qu
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:34:37 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jan 2018 13:33:56 +0000
-Message-Id: <1516109659-1557-2-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 16 Jan 2018 13:34:11 +0000
+Message-Id: <1516109659-1557-17-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1516109659-1557-1-git-send-email-peter.maydell@linaro.org>
 References: <1516109659-1557-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/24] hw/intc/armv7m: Support byte and halfword
- accesses to CFSR
+Subject: [Qemu-devel] [PULL 16/24] sdhci: refactor common sysbus/pci
+ unrealize() into sdhci_common_unrealize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +33,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The Configurable Fault Status Register for ARMv7M and v8M is
-supposed to be byte and halfword accessible, but we were only
-implementing word accesses. Add support for the other access
-sizes, which are used by the Zephyr RTOS.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-id: 20180115182436.2066-7-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reported-by: Andy Gross <andy.gross@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1512742372-31517-1-git-send-email-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 38 ++++++++++++++++++++++----------------
- 1 file changed, 22 insertions(+), 16 deletions(-)
+ hw/sd/sdhci.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index dd49b6c..8ca6cee 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -896,13 +896,6 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-             val |= (1 << 8);
-         }
-         return val;
--    case 0xd28: /* Configurable Fault Status.  */
--        /* The BFSR bits [15:8] are shared between security states
--         * and we store them in the NS copy
--         */
--        val = cpu->env.v7m.cfsr[attrs.secure];
--        val |= cpu->env.v7m.cfsr[M_REG_NS] & R_V7M_CFSR_BFSR_MASK;
--        return val;
-     case 0xd2c: /* Hard Fault Status.  */
-         return cpu->env.v7m.hfsr;
-     case 0xd30: /* Debug Fault Status.  */
-@@ -1280,15 +1273,6 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         s->vectors[ARMV7M_EXCP_DEBUG].active = (value & (1 << 8)) != 0;
-         nvic_irq_update(s);
-         break;
--    case 0xd28: /* Configurable Fault Status.  */
--        cpu->env.v7m.cfsr[attrs.secure] &= ~value; /* W1C */
--        if (attrs.secure) {
--            /* The BFSR bits [15:8] are shared between security states
--             * and we store them in the NS copy.
--             */
--            cpu->env.v7m.cfsr[M_REG_NS] &= ~(value & R_V7M_CFSR_BFSR_MASK);
--        }
--        break;
-     case 0xd2c: /* Hard Fault Status.  */
-         cpu->env.v7m.hfsr &= ~value; /* W1C */
-         break;
-@@ -1667,6 +1651,14 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-             val = deposit32(val, i * 8, 8, get_prio(s, hdlidx, sbank));
-         }
-         break;
-+    case 0xd28 ... 0xd2b: /* Configurable Fault Status (CFSR) */
-+        /* The BFSR bits [15:8] are shared between security states
-+         * and we store them in the NS copy
-+         */
-+        val = s->cpu->env.v7m.cfsr[attrs.secure];
-+        val |= s->cpu->env.v7m.cfsr[M_REG_NS] & R_V7M_CFSR_BFSR_MASK;
-+        val = extract32(val, (offset - 0xd28) * 8, size * 8);
-+        break;
-     case 0xfe0 ... 0xfff: /* ID.  */
-         if (offset & 3) {
-             val = 0;
-@@ -1765,6 +1757,20 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-         }
-         nvic_irq_update(s);
-         return MEMTX_OK;
-+    case 0xd28 ... 0xd2b: /* Configurable Fault Status (CFSR) */
-+        /* All bits are W1C, so construct 32 bit value with 0s in
-+         * the parts not written by the access size
-+         */
-+        value <<= ((offset - 0xd28) * 8);
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index cf0c079..bbe4570 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -32,6 +32,7 @@
+ #include "qemu/bitops.h"
+ #include "hw/sd/sdhci.h"
+ #include "sdhci-internal.h"
++#include "qapi/error.h"
+ #include "qemu/log.h"
+ 
+ /* host controller debug messages */
+@@ -1223,6 +1224,17 @@ static void sdhci_common_realize(SDHCIState *s, Error **errp)
+                           SDHC_REGISTERS_MAP_SIZE);
+ }
+ 
++static void sdhci_common_unrealize(SDHCIState *s, Error **errp)
++{
++    /* This function is expected to be called only once for each class:
++     * - SysBus:    via DeviceClass->unrealize(),
++     * - PCI:       via PCIDeviceClass->exit().
++     * However to avoid double-free and/or use-after-free we still nullify
++     * this variable (better safe than sorry!). */
++    g_free(s->fifo_buffer);
++    s->fifo_buffer = NULL;
++}
 +
-+        s->cpu->env.v7m.cfsr[attrs.secure] &= ~value;
-+        if (attrs.secure) {
-+            /* The BFSR bits [15:8] are shared between security states
-+             * and we store them in the NS copy.
-+             */
-+            s->cpu->env.v7m.cfsr[M_REG_NS] &= ~(value & R_V7M_CFSR_BFSR_MASK);
-+        }
-+        return MEMTX_OK;
-     }
-     if (size == 4) {
-         nvic_writel(s, offset, value, attrs);
+ static bool sdhci_pending_insert_vmstate_needed(void *opaque)
+ {
+     SDHCIState *s = opaque;
+@@ -1317,6 +1329,8 @@ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+ static void sdhci_pci_exit(PCIDevice *dev)
+ {
+     SDHCIState *s = PCI_SDHCI(dev);
++
++    sdhci_common_unrealize(s, &error_abort);
+     sdhci_uninitfn(s);
+ }
+ 
+@@ -1382,12 +1396,20 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
+     sysbus_init_mmio(sbd, &s->iomem);
+ }
+ 
++static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
++{
++    SDHCIState *s = SYSBUS_SDHCI(dev);
++
++    sdhci_common_unrealize(s, &error_abort);
++}
++
+ static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->props = sdhci_sysbus_properties;
+     dc->realize = sdhci_sysbus_realize;
++    dc->unrealize = sdhci_sysbus_unrealize;
+ 
+     sdhci_common_class_init(klass, data);
+ }
 -- 
 2.7.4
