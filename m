@@ -1,29 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ebLwK-0004r5-Ld
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 02:45:50 -0500
+	(envelope-from <dmitry.fleytman@gmail.com>) id 1ebMDW-0001D2-HA
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 03:03:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ebLwF-0001EO-MY
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 02:45:48 -0500
-Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:58130)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ebLwF-0001Dq-Cw
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 02:45:43 -0500
-Received: from player168.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 192F5917B2
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 08:45:42 +0100 (CET)
-References: <20180116074157.16886-1-clg@kaod.org>
-	<20180116074157.16886-4-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1f9a62da-273b-dccb-2c89-ebb3bf20cbff@kaod.org>
-Date: Tue, 16 Jan 2018 08:45:38 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180116074157.16886-4-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(envelope-from <dmitry.fleytman@gmail.com>) id 1ebMDT-0002FL-CV
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 03:03:34 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry.fleytman@gmail.com>)
+	id 1ebMDT-0002Dk-20
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 03:03:31 -0500
+Received: by mail-wr0-x242.google.com with SMTP id g38so11043133wrd.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 00:03:30 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+In-Reply-To: <84d463e9-1cd6-f3aa-7554-f1ef95bdebc9@redhat.com>
+Date: Tue, 16 Jan 2018 10:03:26 +0200
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: add support for hypervisor
- doorbells on book3s CPUs
+Message-Id: <1E9A8998-E3A8-4D00-AB60-23D0E13BFB88@gmail.com>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
+	<20171221223704-mutt-send-email-mst@kernel.org>
+	<CAAdtpL74ZyVsLwgBjpbsdSHbWdY_Uq6ouRAvgo00UdVevTKq8A@mail.gmail.com>
+	<20171222014258-mutt-send-email-mst@kernel.org>
+	<CAFEAcA8eKTEh3zSOPNm1WgUujNOU+zcNSgBAE5G68QcObQd8sA@mail.gmail.com>
+	<20180108200725-mutt-send-email-mst@kernel.org>
+	<20180109011010.GI2131@umbus.fritz.box>
+	<20180116044747-mutt-send-email-mst@kernel.org>
+	<84d463e9-1cd6-f3aa-7554-f1ef95bdebc9@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,237 +40,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philippe@mathieu-daude.net>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/16/2018 08:41 AM, C=C3=A9dric Le Goater wrote:
-> The hypervisor doorbells are used by skiboot and Linux on POWER9
-> processors to wake up secondaries.
+
+
+> On 16 Jan 2018, at 8:28, Jason Wang <jasowang@redhat.com> wrote:
 >=20
-> This adds processor control support to the Server architecture by
-> reusing the Embedded support. They are very similar, only the bits
-> definition of the CPU identifier differ.
 >=20
-> Still to be done is message broadcast to all threads of the same
-> processor.
 >=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  target/ppc/cpu.h            |  8 ++++++--
->  target/ppc/excp_helper.c    | 39 ++++++++++++++++++++++++++++++++-----=
---
->  target/ppc/helper.h         |  2 +-
->  target/ppc/translate.c      | 13 ++++++++++++-
->  target/ppc/translate_init.c |  2 +-
->  5 files changed, 52 insertions(+), 12 deletions(-)
+> On 2018=E5=B9=B401=E6=9C=8816=E6=97=A5 10:48, Michael S. Tsirkin =
+wrote:
+>> On Tue, Jan 09, 2018 at 12:10:10PM +1100, David Gibson wrote:
+>>> On Mon, Jan 08, 2018 at 08:10:23PM +0200, Michael S. Tsirkin wrote:
+>>>> On Mon, Jan 08, 2018 at 09:14:41AM +0000, Peter Maydell wrote:
+>>>>> On 21 December 2017 at 23:43, Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>>>>>>> you also need to drop "hw/pci: remove obsolete =
+PCIDevice->init()"
+>>>>>>> (applied in your tree as =
+18951fce55d5aa58cd1629b4cb704ee51bab4420)
+>>>>>>> else the not-yet-QOM'ified NVME won't work anymore.
+>>>>>> Done that too, thanks a lot
+>>>>> Hi. I'm afraid this pullreq (merge of 880b1ff) has new runtime
+>>>>> errors from the clang sanitizer:
+>>>>>=20
+>>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:201:27:
+>>>>> runtime error: member access within misaligned address =
+0x55b4ffee8246
+>>>>> for type 'struct ip_header', which requires 4 byte alignment
+>>>>> 0x55b4ffee8246: note: pointer points here
+>>>>>  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff =
+ff
+>>>>> ff ff 00 00 00 00 00 00  00 00
+>>>>>              ^
+>>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:201:27:
+>>>>> runtime error: load of misaligned address 0x55b4ffee8246 for type
+>>>>> 'uint8_t' (aka 'unsigned char'), which requires 4 byte alignment
+>>>>> 0x55b4ffee8246: note: pointer points here
+>>>>>  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff =
+ff
+>>>>> ff ff 00 00 00 00 00 00  00 00
+>>>>>              ^
+>>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:208:65:
+>>>>> runtime error: member access within misaligned address =
+0x55b4ffee8246
+>>>>> for type 'struct ip_header', which requires 4 byte alignment
+>>>>> 0x55b4ffee8246: note: pointer points here
+>>>>>  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff =
+ff
+>>>>> ff ff 00 00 00 00 00 00  00 00
+>>>>>              ^
+>>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:210:13:
+>>>>> runtime error: member access within misaligned address =
+0x55b4ffee8246
+>>>>> for type 'struct ip_header', which requires 4 byte alignment
+>>>>> 0x55b4ffee8246: note: pointer points here
+>>>>>  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff =
+ff
+>>>>> ff ff 00 00 00 00 00 00  00 00
+>>>>>              ^
+>>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:210:13:
+>>>>> runtime error: load of misaligned address 0x55b4ffee8246 for type
+>>>>> 'uint8_t' (aka 'unsigned char'), which requires 4 byte alignment
+>>>>> 0x55b4ffee8246: note: pointer points here
+>>>>>  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff =
+ff
+>>>>> ff ff 00 00 00 00 00 00  00 00
+>>>>>              ^
+>>>>>=20
+>>>>> Sorry for the late report, I didn't quite have time
+>>>>> to process the pull before Christmas holidays.
+>>>>>=20
+>>>>> thanks
+>>>>> -- PMM
+>>>> So I bisected and the reason is this commit:
+>>>>=20
+>>>> commit 18b20bb43a2f37f0c8ae23a3e9b3d9a4a05b6bd4
+>>>> Author: David Gibson <david@gibson.dropbear.id.au>
+>>>> Date:   Tue Dec 19 15:45:22 2017 +1100
+>>>>=20
+>>>>     tests/pxe-test: Add some extra tests
+>>>>          Previously virtio-net was only tested for ppc64 in "slow" =
+mode.  That
+>>>>     doesn't make much sense since virtio-net is used much more =
+often in
+>>>>     practice than the spapr-vlan device which was tested always.  =
+So, move
+>>>>     virtio-net to always be tested on ppc64.
+>>>>          We had no tests at all for the q35 machine, which doesn't =
+seem wise
+>>>>     given its increasing prominence.  Add a couple of tests for it,
+>>>>     including testing the newer e1000e adapter.
+>>>>          Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>>     Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>>     Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>=20
+>>>> :040000 040000 5a982bfea24b9ac3c651b84425a39b3c85f4871e =
+771af3fdfb2778c6d6ed6b1098d1e79c181d6fb0 M      tests
+>>>>=20
+>>>> Pls either fix or drop e1000e test
+>>> Feel free to drop this patch for now.  I'll debug and repost it when =
+I
+>>> have a chance.
+>>>=20
+>>> --=20
+>>> David Gibson			| I'll have my music baroque, =
+and my code
+>>> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT =
+_the_ _other_
+>>> 				| _way_ _around_!
+>>> http://www.ozlabs.org/~dgibson
+>> BTw, Jason, you might want to take a look.
+>> I suspect it's a bug somewhere in the e1000e emulation.
+>>=20
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index b8f4dfc1084a..603a38cae83f 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -930,7 +930,7 @@ enum {
->  #define BOOKE206_MAX_TLBN      4
-> =20
->  /*********************************************************************=
-********/
-> -/* Embedded.Processor Control */
-> +/* Server and Embedded Processor Control */
-> =20
->  #define DBELL_TYPE_SHIFT               27
->  #define DBELL_TYPE_MASK                (0x1f << DBELL_TYPE_SHIFT)
-> @@ -940,11 +940,15 @@ enum {
->  #define DBELL_TYPE_G_DBELL_CRIT        (0x03 << DBELL_TYPE_SHIFT)
->  #define DBELL_TYPE_G_DBELL_MC          (0x04 << DBELL_TYPE_SHIFT)
-> =20
-> -#define DBELL_BRDCAST                  (1 << 26)
-> +#define DBELL_TYPE_DBELL_SERVER        (0x05 << DBELL_TYPE_SHIFT)
-> +
-> +#define DBELL_BRDCAST                  PPC_BIT(37)
->  #define DBELL_LPIDTAG_SHIFT            14
->  #define DBELL_LPIDTAG_MASK             (0xfff << DBELL_LPIDTAG_SHIFT)
->  #define DBELL_PIRTAG_MASK              0x3fff
-> =20
-> +#define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
-> +
->  /*********************************************************************=
-********/
->  /* Segment page size information, used by recent hash MMUs
->   * The format of this structure mirrors kvm_ppc_smmu_info
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 4e548a448747..0f32cab1ff57 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -417,6 +417,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, in=
-t excp_model, int excp)
->      case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage exc=
-eption */
->      case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception =
-       */
->      case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment exc=
-eption */
-> +    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt     =
-       */
->      case POWERPC_EXCP_HV_EMU:
->          srr0 =3D SPR_HSRR0;
->          srr1 =3D SPR_HSRR1;
-> @@ -846,6 +847,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
->              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
->              return;
->          }
-> +        if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL)) =
-{
-> +            env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDOORBEL=
-L);
-> +            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR_HV);
-> +            return;
-> +        }
->          if (env->pending_interrupts & (1 << PPC_INTERRUPT_PERFM)) {
->              env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_PERFM);
->              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_PERFM);
-> @@ -1088,8 +1094,8 @@ void helper_rfsvc(CPUPPCState *env)
->      do_rfi(env, env->lr, env->ctr & 0x0000FFFF);
->  }
-> =20
-> -/* Embedded.Processor Control */
-> -static int dbell2irq(target_ulong rb)
-> +/* Server and Embedded Processor Control */
-> +static int dbell2irq(target_ulong rb, bool book3s)
->  {
->      int msg =3D rb & DBELL_TYPE_MASK;
->      int irq =3D -1;
-> @@ -1109,12 +1115,21 @@ static int dbell2irq(target_ulong rb)
->          break;
->      }
-> =20
-> +    /* A Directed Hypervisor Doorbell message is sent only if the
-> +     * message type is 5. All other types are reserved and the
-> +     * instruction is a no-op */
-> +    if (book3s && msg =3D=3D DBELL_TYPE_DBELL_SERVER) {
-> +        irq =3D PPC_INTERRUPT_HDOORBELL;
-> +    }
-> +
->      return irq;
->  }
-> =20
->  void helper_msgclr(CPUPPCState *env, target_ulong rb)
->  {
-> -    int irq =3D dbell2irq(rb);
-> +    /* 64-bit server processors compliant with arch 2.x */
-> +    bool book3s =3D (env->insns_flags & PPC_SEGMENT_64B);
-> +    int irq =3D dbell2irq(rb, book3s);
-> =20
->      if (irq < 0) {
->          return;
-> @@ -1123,10 +1138,11 @@ void helper_msgclr(CPUPPCState *env, target_ulo=
-ng rb)
->      env->pending_interrupts &=3D ~(1 << irq);
->  }
-> =20
-> -void helper_msgsnd(target_ulong rb)
-> +void helper_msgsnd(CPUPPCState *env, target_ulong rb)
->  {
-> -    int irq =3D dbell2irq(rb);
-> -    int pir =3D rb & DBELL_PIRTAG_MASK;
-> +    /* 64-bit server processors compliant with arch 2.x */
-> +    bool book3s =3D (env->insns_flags & PPC_SEGMENT_64B);
-> +    int irq =3D dbell2irq(rb, book3s);
->      CPUState *cs;
-> =20
->      if (irq < 0) {
-> @@ -1137,8 +1153,17 @@ void helper_msgsnd(target_ulong rb)
->      CPU_FOREACH(cs) {
->          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->          CPUPPCState *cenv =3D &cpu->env;
-> +        bool send;
-> =20
-> -        if ((rb & DBELL_BRDCAST) || (cenv->spr[SPR_BOOKE_PIR] =3D=3D p=
-ir)) {
-> +        /* TODO: broadcast message to all threads of the same  process=
-or */
-> +        if (book3s) {
-> +            int pir =3D rb & DBELL_PROCIDTAG_MASK;
-> +            send =3D (cenv->spr_cb[SPR_PIR].default_value =3D=3D pir);
-> +        } else {
-> +            int pir =3D rb & DBELL_PROCIDTAG_MASK;
-
-sigh. I missed that one. It should be=20
-
-		int pir =3D rb & DBELL_PIRTAG_MASK
-
-Tell me if it needs a resend.
-
-Thanks,
-
-C.=20
-
-> +            send =3D (rb & DBELL_BRDCAST) || (cenv->spr[SPR_BOOKE_PIR]=
- =3D=3D pir);
-> +        }
-> +        if (send) {
->              cenv->pending_interrupts |=3D 1 << irq;
->              cpu_interrupt(cs, CPU_INTERRUPT_HARD);
->          }
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index bb6a94a8b390..3e98bd9eecb8 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -677,7 +677,7 @@ DEF_HELPER_FLAGS_2(load_sr, TCG_CALL_NO_RWG, tl, en=
-v, tl)
->  DEF_HELPER_FLAGS_3(store_sr, TCG_CALL_NO_RWG, void, env, tl, tl)
-> =20
->  DEF_HELPER_FLAGS_1(602_mfrom, TCG_CALL_NO_RWG_SE, tl, tl)
-> -DEF_HELPER_1(msgsnd, void, tl)
-> +DEF_HELPER_2(msgsnd, void, env, tl)
->  DEF_HELPER_2(msgclr, void, env, tl)
->  #endif
-> =20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index bcd36d53537f..1ad7e0fd4efd 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6180,10 +6180,19 @@ static void gen_msgsnd(DisasContext *ctx)
->      GEN_PRIV;
->  #else
->      CHK_HV;
-> -    gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-> +    gen_helper_msgsnd(cpu_env, cpu_gpr[rB(ctx->opcode)]);
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
-> =20
-> +static void gen_msgsync(DisasContext *ctx)
-> +{
-> +#if defined(CONFIG_USER_ONLY)
-> +    GEN_PRIV;
-> +#else
-> +    CHK_HV;
-> +#endif /* defined(CONFIG_USER_ONLY) */
-> +    /* interpreted as no-op */
-> +}
-> =20
->  #if defined(TARGET_PPC64)
->  static void gen_maddld(DisasContext *ctx)
-> @@ -6664,6 +6673,8 @@ GEN_HANDLER2_E(msgsnd, "msgsnd", 0x1F, 0x0E, 0x06=
-, 0x03ff0001,
->                 PPC_NONE, PPC2_PRCNTL),
->  GEN_HANDLER2_E(msgclr, "msgclr", 0x1F, 0x0E, 0x07, 0x03ff0001,
->                 PPC_NONE, PPC2_PRCNTL),
-> +GEN_HANDLER2_E(msgsync, "msgsync", 0x1F, 0x16, 0x1B, 0x00000000,
-> +               PPC_NONE, PPC2_PRCNTL),
->  GEN_HANDLER(wrtee, 0x1F, 0x03, 0x04, 0x000FFC01, PPC_WRTEE),
->  GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
->  GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 70ff15a51a6b..55c99c97e377 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8866,7 +8866,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *dat=
-a)
->                          PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
->                          PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
->                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-> -                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300;
-> +                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_=
-PRCNTL;
->      pcc->msr_mask =3D (1ull << MSR_SF) |
->                      (1ull << MSR_TM) |
->                      (1ull << MSR_VR) |
+> Will have a look.
 >=20
+> cc Dmitry for more thoughts.
+
+Not all uint8_t fields in IP header are aligned by 32 bit. Should type =
+of those fields be changed to something that does not require alignment?
+
+>=20
+> Thanks
