@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ebZd2-0004wQ-2r
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:22:49 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ebZd3-0004wR-Dv
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:22:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ebZcy-0003We-Ue
+	(envelope-from <laurent@vivier.eu>) id 1ebZd1-0003Xw-AV
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:22:48 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:58761)
+Received: from mout.kundenserver.de ([212.227.126.133]:64616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ebZcy-0003W4-JZ
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:22:44 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ebZd0-0003XT-VT
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:22:47 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 16 Jan 2018 23:22:12 +0100
-Message-Id: <20180116222212.1266-5-laurent@vivier.eu>
-In-Reply-To: <20180116222212.1266-1-laurent@vivier.eu>
-References: <20180116222212.1266-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v3 4/4] linux-user: MIPS set cpu to r6 CPU if
- binary is R6
+Date: Tue, 16 Jan 2018 23:22:08 +0100
+Message-Id: <20180116222212.1266-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 0/4] linux-user: select CPU type according
+ ELF header values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +28,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aaron Sierra <asierra@xes-inc.com>, YunQiang Su <syq@debian.org>, Richard Henderson <richard.henderson@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-From: YunQiang Su <syq@debian.org>
+This idea has been suggested to me before by Philippe
+Mathieu-Daudé, and recently YunQiang Su has proposed a
+patch to manage the MIPS r6 case.
 
-So here we need to detect the version of binaries and set
-cpu_model for it.
+Based on this, this series tries to clean-up the original
+patch, and introduces the use for m68k architecture and
+port the patch from YunQiang Su.
 
-[lv: original patch modified to move code into cpu_get_model()]
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
+v3: fix code indent problem reported by patchew
+    remove useless "!= 0"
+    check for EF_M68K_M68000
+    add EF_M68K_* flags in elf.h
+    set 680x0 default CPU to m68040
+    change "#if ... #endif" structure for ppc
+v2: move cpu_model selection to linux-user/*/target_elf.h
+    provide eflags to cpu_get_model() instead of fd
+    (and modify other patches accordingly)
 
-Notes:
-    YunQiang Su, please add your Signed-off-by that was
-    missing in your original patch.
-    
-    v3: fix code indent problem reported by patchew
-        remove useless "!= 0"
-    v2: call cpu_get_model() with the result of get_elf_eflags()
+Laurent Vivier (2):
+  linux-user: Move CPU type name selection to a function
+  linux-user,m68k: select CPU according to ELF header values
 
- include/elf.h                  | 4 ++++
- linux-user/mips/target_elf.h   | 3 +++
- linux-user/mips64/target_elf.h | 3 +++
- 3 files changed, 10 insertions(+)
+YunQiang Su (2):
+  linux-user: introduce functions to detect CPU type
+  linux-user: MIPS set cpu to r6 CPU if binary is R6
 
-diff --git a/include/elf.h b/include/elf.h
-index ca9a419043..746b6d393b 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -40,6 +40,10 @@ typedef int64_t  Elf64_Sxword;
- #define EF_MIPS_ARCH_5		0x40000000	/* -mips5 code.  */
- #define EF_MIPS_ARCH_32		0x50000000	/* MIPS32 code.  */
- #define EF_MIPS_ARCH_64		0x60000000	/* MIPS64 code.  */
-+#define EF_MIPS_ARCH_32R2       0x70000000      /* MIPS32r2 code.  */
-+#define EF_MIPS_ARCH_64R2       0x80000000      /* MIPS64r2 code.  */
-+#define EF_MIPS_ARCH_32R6       0x90000000      /* MIPS32r6 code.  */
-+#define EF_MIPS_ARCH_64R6       0xa0000000      /* MIPS64r6 code.  */
- 
- /* The ABI of a file. */
- #define EF_MIPS_ABI_O32		0x00001000	/* O32 ABI.  */
-diff --git a/linux-user/mips/target_elf.h b/linux-user/mips/target_elf.h
-index bed0b43259..14b53d7469 100644
---- a/linux-user/mips/target_elf.h
-+++ b/linux-user/mips/target_elf.h
-@@ -9,6 +9,9 @@
- #define MIPS_TARGET_ELF_H
- static inline const char *cpu_get_model(uint32_t eflags)
- {
-+    if (eflags & EF_MIPS_ARCH_32R6) {
-+        return "mips32r6-generic";
-+    }
-     return "24Kf";
- }
- #endif
-diff --git a/linux-user/mips64/target_elf.h b/linux-user/mips64/target_elf.h
-index 5b6f4692e0..ae14b38bfa 100644
---- a/linux-user/mips64/target_elf.h
-+++ b/linux-user/mips64/target_elf.h
-@@ -9,6 +9,9 @@
- #define MIPS64_TARGET_ELF_H
- static inline const char *cpu_get_model(uint32_t eflags)
- {
-+    if (eflags & EF_MIPS_ARCH_64R6) {
-+        return "I6400";
-+    }
-     return "5KEf";
- }
- #endif
+ include/elf.h                      | 32 +++++++++++++++++++++
+ linux-user/aarch64/target_elf.h    | 14 +++++++++
+ linux-user/alpha/target_elf.h      | 14 +++++++++
+ linux-user/arm/target_elf.h        | 14 +++++++++
+ linux-user/cris/target_elf.h       | 14 +++++++++
+ linux-user/elfload.c               | 35 ++++++++++++++++++++++
+ linux-user/hppa/target_elf.h       | 14 +++++++++
+ linux-user/i386/target_elf.h       | 14 +++++++++
+ linux-user/m68k/target_elf.h       | 20 +++++++++++++
+ linux-user/main.c                  | 59 +++++++-------------------------------
+ linux-user/microblaze/target_elf.h | 14 +++++++++
+ linux-user/mips/target_elf.h       | 17 +++++++++++
+ linux-user/mips64/target_elf.h     | 17 +++++++++++
+ linux-user/nios2/target_elf.h      | 14 +++++++++
+ linux-user/openrisc/target_elf.h   | 14 +++++++++
+ linux-user/ppc/target_elf.h        | 18 ++++++++++++
+ linux-user/qemu.h                  |  1 +
+ linux-user/s390x/target_elf.h      | 14 +++++++++
+ linux-user/sh4/target_elf.h        | 14 +++++++++
+ linux-user/sparc/target_elf.h      | 14 +++++++++
+ linux-user/sparc64/target_elf.h    | 14 +++++++++
+ linux-user/tilegx/target_elf.h     | 14 +++++++++
+ linux-user/unicore32/target_elf.h  | 14 +++++++++
+ linux-user/x86_64/target_elf.h     | 14 +++++++++
+ 24 files changed, 375 insertions(+), 48 deletions(-)
+ create mode 100644 linux-user/aarch64/target_elf.h
+ create mode 100644 linux-user/alpha/target_elf.h
+ create mode 100644 linux-user/arm/target_elf.h
+ create mode 100644 linux-user/cris/target_elf.h
+ create mode 100644 linux-user/hppa/target_elf.h
+ create mode 100644 linux-user/i386/target_elf.h
+ create mode 100644 linux-user/m68k/target_elf.h
+ create mode 100644 linux-user/microblaze/target_elf.h
+ create mode 100644 linux-user/mips/target_elf.h
+ create mode 100644 linux-user/mips64/target_elf.h
+ create mode 100644 linux-user/nios2/target_elf.h
+ create mode 100644 linux-user/openrisc/target_elf.h
+ create mode 100644 linux-user/ppc/target_elf.h
+ create mode 100644 linux-user/s390x/target_elf.h
+ create mode 100644 linux-user/sh4/target_elf.h
+ create mode 100644 linux-user/sparc/target_elf.h
+ create mode 100644 linux-user/sparc64/target_elf.h
+ create mode 100644 linux-user/tilegx/target_elf.h
+ create mode 100644 linux-user/unicore32/target_elf.h
+ create mode 100644 linux-user/x86_64/target_elf.h
+
 -- 
 2.14.3
