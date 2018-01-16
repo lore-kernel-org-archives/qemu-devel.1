@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebTSB-0007DA-Ea
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:47:12 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebTU2-0000Ni-KR
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebTSA-00010z-O8
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:47:11 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:43047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ebTSA-00010Z-Ii
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:47:10 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id p36so5933247otd.10
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 07:47:10 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ebTTy-0002AZ-Oc
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:49:06 -0500
+References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516034665-27606-2-git-send-email-walling@linux.vnet.ibm.com>
+	<34c87c41-eb49-0e2b-3857-9bb3ba86c8d4@redhat.com>
+	<e0653416-ea6a-f801-2c30-4d01ed1fcf42@linux.vnet.ibm.com>
+	<b0f8289b-287b-a0c5-ab85-82e6c39d24b9@de.ibm.com>
+	<b86618f5-e5cb-8953-508f-e73339b1a475@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e5a8a7a7-676f-1aa9-79b5-651d4494bc84@redhat.com>
+Date: Tue, 16 Jan 2018 16:48:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <e0132595-a110-fa09-aa7c-378caf0f885c@redhat.com>
-References: <1516059302-7169-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA-wnvhRfOAQySLXWqvwtPXwj+r+wn_sRGM5ti6wWe_c-Q@mail.gmail.com>
-	<CAJ+F1CLzuv4CevvT+gM_ZOnC67_=-3EpRiQBoQXqNYDiFLBw+A@mail.gmail.com>
-	<CAFEAcA9dsWKLitCfxy+HV66rBMruxX67Aq-n4Bpmx5b2QzC2YA@mail.gmail.com>
-	<26d847ad-b3ba-bdab-a79b-79ad486ae80a@redhat.com>
-	<CAFEAcA87VxcTz710LKTLCkre+DoBhqgRtShObU-CYp1XU9TgWg@mail.gmail.com>
-	<5edb00c6-382e-5a36-a61b-47d3fc5b8408@redhat.com>
-	<CAJ+F1CKKdHYBgWWf6zucKB25gD0zG9Lrvbh51FCir2MvTRkJbQ@mail.gmail.com>
-	<e0132595-a110-fa09-aa7c-378caf0f885c@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jan 2018 15:46:49 +0000
-Message-ID: <CAFEAcA8w5vhXB4wqyQy7Za4OSJ7GKKD2yHx=BidAZijk=ujxhw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <b86618f5-e5cb-8953-508f-e73339b1a475@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v3 00/53] Misc changes for 2017-01-12
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/8] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,23 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Eric Blake <eblake@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: alifm@linux.vnet.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com
 
-On 16 January 2018 at 14:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 16/01/2018 15:22, Marc-Andr=C3=A9 Lureau wrote:
->>> * if not, and assuming --enable-debug tries to enable ASAN, should
->>> --enable-debug complain if fiber support is not required?  Should
->>> --enable-debug enable ASAN if fiber support is not available?
+On 16.01.2018 16:32, Collin L. Walling wrote:
+> On 01/16/2018 06:07 AM, Christian Borntraeger wrote:
 >>
->> I propose to simply print a warning during configure
->
-> Yes, it could do the same as --enable-asan.
+>> On 01/15/2018 06:23 PM, Collin L. Walling wrote:
+>>> On 01/15/2018 12:05 PM, Eric Blake wrote:
+[...]
+>>>> I'm not a lawyer, but generically, the GPL and its variants depend o=
+n a
+>>>> copyright owner to actually work.=C2=A0 You may want to add a copyri=
+ght
+>>>> line.
+>>>
+>>> I'll have to check on that.=C2=A0 I was not the original author of th=
+e
+>>> libc.h file.
+>> I think you can add the normal IBM Copyright statement. (I think all
+>> authors could add theirs as well)
+>=20
+> "Copyright 2018 IBM Corp."
+>=20
+> @Thomas, git shows you as the initial creator of libc.h.=C2=A0 Shall I =
+add
+> "Copyright 2018 Thomas Huth, Red Hat Inc." in there as well?
 
-The thing you want to avoid here is having one of my standard
-build configs produce new text saying 'warning' or 'error',
-because that will flag up to me as a build failure and I'll
-bounce the pullreq...
+Actually, I only moved the functions from s390-ccw.h and sclp.c into
+that header file. I just tried to trace who introduced them first, and
+it seems like it was Alex who added them. So I guess you should add:
 
-thanks
--- PMM
+ Copyright (c) 2013 Alexander Graf <agraf@suse.de>
+
+to libc.h for that. Sorry that I did not do that right from the start.
+
+ Thomas
