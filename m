@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAH-0008WI-RQ
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:02 -0500
+	(envelope-from <mst@redhat.com>) id 1ebJAN-00008N-DF
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAE-0004x6-Q7
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:10854)
+	(envelope-from <mst@redhat.com>) id 1ebJAM-000503-IQ
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAE-0004wu-JU
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:47:58 -0500
-Date: Tue, 16 Jan 2018 06:47:46 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAM-0004zp-8l
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:06 -0500
+Date: Tue, 16 Jan 2018 06:47:57 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516077852-7974-20-git-send-email-mst@redhat.com>
+Message-ID: <1516077852-7974-21-git-send-email-mst@redhat.com>
 References: <1516077852-7974-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1516077852-7974-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/33] vhost-user-test: make features mask an
- init_virtio_dev() argument
+Subject: [Qemu-devel] [PULL 20/33] vhost-user-test: use init_virtio_dev in
+ multiqueue test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +33,112 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@r
 
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-The goal is to generalize the use of [un]init_virtio_dev() to
-all tests, which does not necessarily expose the same features
-set.
+Now that init_virtio_dev() has been generalized to all cases,
+use it in test_multiqueue() to avoid code duplication.
 
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/vhost-user-test.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ tests/vhost-user-test.c | 65 ++++++-------------------------------------=
+------
+ 1 file changed, 8 insertions(+), 57 deletions(-)
 
 diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 969e393..6a144e8 100644
+index 6a144e8..ec6ac9d 100644
 --- a/tests/vhost-user-test.c
 +++ b/tests/vhost-user-test.c
-@@ -164,7 +164,7 @@ typedef struct TestServer {
- static const char *tmpfs;
- static const char *root;
+@@ -892,79 +892,30 @@ static void test_flags_mismatch(void)
 =20
--static void init_virtio_dev(TestServer *s)
-+static void init_virtio_dev(TestServer *s, uint32_t features_mask)
+ #endif
+=20
+-static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
+-{
+-    QVirtioPCIDevice *dev;
+-
+-    dev =3D qvirtio_pci_device_find(bus, VIRTIO_ID_NET);
+-    g_assert(dev !=3D NULL);
+-    g_assert_cmphex(dev->vdev.device_type, =3D=3D, VIRTIO_ID_NET);
+-
+-    qvirtio_pci_device_enable(dev);
+-    qvirtio_reset(&dev->vdev);
+-    qvirtio_set_acknowledge(&dev->vdev);
+-    qvirtio_set_driver(&dev->vdev);
+-
+-    return dev;
+-}
+-
+-static void driver_init(QVirtioDevice *dev)
+-{
+-    uint32_t features;
+-
+-    features =3D qvirtio_get_features(dev);
+-    features =3D features & ~(QVIRTIO_F_BAD_FEATURE |
+-                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
+-                            (1u << VIRTIO_RING_F_EVENT_IDX));
+-    qvirtio_set_features(dev, features);
+-
+-    qvirtio_set_driver_ok(dev);
+-}
+-
+-#define PCI_SLOT                0x04
+-
+ static void test_multiqueue(void)
  {
-     uint32_t features;
-     int i;
-@@ -187,7 +187,7 @@ static void init_virtio_dev(TestServer *s)
-     }
+-    const int queues =3D 2;
+     TestServer *s =3D test_server_new("mq");
+-    QVirtioPCIDevice *dev;
+-    QPCIBus *bus;
+-    QVirtQueuePCI *vq[queues * 2];
+-    QGuestAllocator *alloc;
+     char *cmd;
+-    int i;
+-
+-    s->queues =3D queues;
++    uint32_t features_mask =3D ~(QVIRTIO_F_BAD_FEATURE |
++                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
++                            (1u << VIRTIO_RING_F_EVENT_IDX));
++    s->queues =3D 2;
+     test_server_listen(s);
 =20
-     features =3D qvirtio_get_features(&s->dev->vdev);
--    features =3D features & (1u << VIRTIO_NET_F_MAC);
-+    features =3D features & features_mask;
-     qvirtio_set_features(&s->dev->vdev, features);
-=20
-     qvirtio_set_driver_ok(&s->dev->vdev);
-@@ -652,7 +652,7 @@ static void test_read_guest_mem(void)
-     s =3D qtest_start(qemu_cmd);
-     g_free(qemu_cmd);
-=20
--    init_virtio_dev(server);
-+    init_virtio_dev(server, 1u << VIRTIO_NET_F_MAC);
-=20
-     read_guest_mem(server);
-=20
-@@ -681,7 +681,7 @@ static void test_migrate(void)
-     from =3D qtest_start(cmd);
-     g_free(cmd);
-=20
--    init_virtio_dev(s);
-+    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
-     wait_for_fds(s);
-     size =3D get_log_size(s);
-     g_assert_cmpint(size, =3D=3D, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * =
-8));
-@@ -803,7 +803,7 @@ static void test_reconnect_subprocess(void)
+     cmd =3D g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",=
+queues=3D%d "
+                           "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,=
+vectors=3D%d",
+                           512, 512, root, s->chr_name,
+                           s->socket_path, "", s->chr_name,
+-                          queues, queues * 2 + 2);
++                          s->queues, s->queues * 2 + 2);
      qtest_start(cmd);
      g_free(cmd);
 =20
--    init_virtio_dev(s);
-+    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
-     wait_for_fds(s);
-     wait_for_rings_started(s, 2);
+-    bus =3D qpci_init_pc(NULL);
+-    dev =3D virtio_net_pci_init(bus, PCI_SLOT);
++    init_virtio_dev(s, features_mask);
 =20
-@@ -841,7 +841,7 @@ static void test_connect_fail_subprocess(void)
-     qtest_start(cmd);
-     g_free(cmd);
+-    alloc =3D pc_alloc_init();
+-    for (i =3D 0; i < queues * 2; i++) {
+-        vq[i] =3D (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, alloc, i=
+);
+-    }
++    wait_for_rings_started(s, s->queues * 2);
 =20
--    init_virtio_dev(s);
-+    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
-     wait_for_fds(s);
-     wait_for_rings_started(s, 2);
+-    driver_init(&dev->vdev);
+-    wait_for_rings_started(s, queues * 2);
++    uninit_virtio_dev(s);
 =20
-@@ -871,7 +871,7 @@ static void test_flags_mismatch_subprocess(void)
-     qtest_start(cmd);
-     g_free(cmd);
+-    /* End test */
+-    for (i =3D 0; i < queues * 2; i++) {
+-        qvirtqueue_cleanup(dev->vdev.bus, &vq[i]->vq, alloc);
+-    }
+-    pc_alloc_uninit(alloc);
+-    qvirtio_pci_device_disable(dev);
+-    g_free(dev->pdev);
+-    g_free(dev);
+-    qpci_free_pc(bus);
+     qtest_end();
 =20
--    init_virtio_dev(s);
-+    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
-     wait_for_fds(s);
-     wait_for_rings_started(s, 2);
-=20
+     test_server_free(s);
 --=20
 MST
