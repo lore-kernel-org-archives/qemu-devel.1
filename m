@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ebSTF-0007zp-B7
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:44:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebSUn-0000uP-IS
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:45:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ebSTC-0001QF-M2
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:44:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59054)
+	(envelope-from <eblake@redhat.com>) id 1ebSUk-0002Jh-Uu
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:45:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ebSTC-0001On-Cp
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:44:10 -0500
-References: <1515043788-38300-1-git-send-email-jianjay.zhou@huawei.com>
-	<B2D15215269B544CADD246097EACE7473AB45B6C@DGGEMM505-MBS.china.huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <316d6764-c0e8-8ca9-e75e-d604e3249623@redhat.com>
-Date: Tue, 16 Jan 2018 15:43:53 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ebSUk-0002Gk-M5
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:45:46 -0500
+References: <20180116134217.8725-1-berrange@redhat.com>
+	<20180116134217.8725-9-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <829ceebd-4edb-44a4-7d91-828352e33fe1@redhat.com>
+Date: Tue, 16 Jan 2018 08:45:25 -0600
 MIME-Version: 1.0
-In-Reply-To: <B2D15215269B544CADD246097EACE7473AB45B6C@DGGEMM505-MBS.china.huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory: update comments and fix some typos
+In-Reply-To: <20180116134217.8725-9-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2Vgc9bqEZPMH3L5hsYlCXwoMPhNcRUaRq"
+Subject: Re: [Qemu-devel] [PATCH v5 08/14] qapi: force a UTF-8 locale for
+ running Python
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,171 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 16/01/2018 09:32, Zhoujian (jay) wrote:
-> Hi Paolo,
-> Maybe it is a little boring to review updated comments, but I think it is the
-> right thing to do, so could you have a look when you're free?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2Vgc9bqEZPMH3L5hsYlCXwoMPhNcRUaRq
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <829ceebd-4edb-44a4-7d91-828352e33fe1@redhat.com>
+Subject: Re: [PATCH v5 08/14] qapi: force a UTF-8 locale for running Python
+References: <20180116134217.8725-1-berrange@redhat.com>
+ <20180116134217.8725-9-berrange@redhat.com>
+In-Reply-To: <20180116134217.8725-9-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On the contrary, it's useful!  I just missed it among the email after
-new year's break.
+On 01/16/2018 07:42 AM, Daniel P. Berrange wrote:
+> Python2 did not validate locale correctness when reading input data, so=
 
-I queued it now.
+> would happily read UTF-8 data in non-UTF-8 locales. Python3 is strict s=
+o
+> if you try to read UTF-8 data in the C locale, it will raise an error
+> for any UTF-8 bytes that aren't representable in 7-bit ascii encoding.
+> e.g.
+>=20
 
-Paolo
+>=20
+> Many distros support a new C.UTF-8 locale that is like the C locale,
+> but with UTF-8 instead of 7-bit ASCII. That is not entirely portable
+> though. This patch thus sets the LANG to "C", but overrides LC_CTYPE
+> to be en_US.UTF-8 locale. This gets us pretty close to C.UTF-8, but
+> in a way that should be portable to everywhere QEMU builds.
+>=20
+> This patch only forces UTF-8 for QAPI scripts, since that is the one
+> showing the immediate error under Python3 with C locale, but potentiall=
+y
+> we ought to force this for all python scripts used in the build process=
+=2E
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  Makefile | 22 ++++++++++++----------
+>  1 file changed, 12 insertions(+), 10 deletions(-)
 
-> Regards,
-> Jay
-> 
->> -----Original Message-----
->> From: Zhoujian (jay)
->> Sent: Thursday, January 04, 2018 1:30 PM
->> To: qemu-devel@nongnu.org
->> Cc: pbonzini@redhat.com; Huangweidong (C) <weidong.huang@huawei.com>; wangxin
->> (U) <wangxinxin.wang@huawei.com>; Zhoujian (jay) <jianjay.zhou@huawei.com>
->> Subject: [PATCH] memory: update comments and fix some typos
->>
->> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
->> ---
->>  include/exec/memory.h | 27 +++++++++++++++------------
->>  1 file changed, 15 insertions(+), 12 deletions(-)
->>
->> diff --git a/include/exec/memory.h b/include/exec/memory.h index
->> a4cabdf..6e5684d 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -324,7 +324,7 @@ FlatView *address_space_to_flatview(AddressSpace *as);
->>   * MemoryRegionSection: describes a fragment of a #MemoryRegion
->>   *
->>   * @mr: the region, or %NULL if empty
->> - * @address_space: the address space the region is mapped in
->> + * @fv: the flat view of the address space the region is mapped in
->>   * @offset_within_region: the beginning of the section, relative to @mr's
->> start
->>   * @size: the size of the section; will not exceed @mr's boundaries
->>   * @offset_within_address_space: the address of the first byte of the
->> section @@ -607,6 +607,7 @@ void
->> memory_region_init_rom_nomigrate(MemoryRegion *mr,
->>   * @mr: the #MemoryRegion to be initialized.
->>   * @owner: the object that tracks the region's reference count
->>   * @ops: callbacks for write access handling (must not be NULL).
->> + * @opaque: passed to the read and write callbacks of the @ops structure.
->>   * @name: Region name, becomes part of RAMBlock name used in migration
->> stream
->>   *        must be unique within any device
->>   * @size: size of the region.
->> @@ -650,11 +651,10 @@ static inline void
->> memory_region_init_reservation(MemoryRegion *mr,
->>   * An IOMMU region translates addresses and forwards accesses to a target
->>   * memory region.
->>   *
->> - * @typename: QOM class name
->>   * @_iommu_mr: the #IOMMUMemoryRegion to be initialized
->>   * @instance_size: the IOMMUMemoryRegion subclass instance size
->> + * @mrtypename: the type name of the #IOMMUMemoryRegion
->>   * @owner: the object that tracks the region's reference count
->> - * @ops: a function that translates addresses into the @target region
->>   * @name: used for debugging; not visible to the user or ABI
->>   * @size: size of the region.
->>   */
->> @@ -824,8 +824,8 @@ static inline IOMMUMemoryRegion
->> *memory_region_get_iommu(MemoryRegion *mr)
->>   * memory_region_get_iommu_class_nocheck: returns iommu memory region class
->>   *   if an iommu or NULL if not
->>   *
->> - * Returns pointer to IOMMUMemoryRegioniClass if a memory region is an iommu,
->> - * otherwise NULL. This is fast path avoinding QOM checking, use with
->> caution.
->> + * Returns pointer to IOMMUMemoryRegionClass if a memory region is an
->> + iommu,
->> + * otherwise NULL. This is fast path avoiding QOM checking, use with caution.
->>   *
->>   * @mr: the memory region being queried
->>   */
->> @@ -990,7 +990,8 @@ int memory_region_get_fd(MemoryRegion *mr);
->>   * protecting the pointer, such as a reference to the region that includes
->>   * the incoming ram_addr_t.
->>   *
->> - * @mr: the memory region being queried.
->> + * @ptr: the host pointer to be converted
->> + * @offset: the offset within memory region
->>   */
->>  MemoryRegion *memory_region_from_host(void *ptr, ram_addr_t *offset);
->>
->> @@ -1267,7 +1268,7 @@ void memory_region_clear_global_locking(MemoryRegion
->> *mr);
->>   * @size: the size of the access to trigger the eventfd
->>   * @match_data: whether to match against @data, instead of just @addr
->>   * @data: the data to match against the guest write
->> - * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
->> + * @e: event notifier to be triggered when @addr, @size, and @data all match.
->>   **/
->>  void memory_region_add_eventfd(MemoryRegion *mr,
->>                                 hwaddr addr, @@ -1287,7 +1288,7 @@ void
->> memory_region_add_eventfd(MemoryRegion *mr,
->>   * @size: the size of the access to trigger the eventfd
->>   * @match_data: whether to match against @data, instead of just @addr
->>   * @data: the data to match against the guest write
->> - * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
->> + * @e: event notifier to be triggered when @addr, @size, and @data all match.
->>   */
->>  void memory_region_del_eventfd(MemoryRegion *mr,
->>                                 hwaddr addr, @@ -1523,7 +1524,7 @@ bool
->> memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
->>   * will need to request the pointer again.
->>   *
->>   * @mr: #MemoryRegion associated to the pointer.
->> - * @addr: address within that region
->> + * @offset: offset within the memory region
->>   * @size: size of that area.
->>   */
->>  void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset, @@ -
->> 1592,6 +1593,7 @@ void address_space_destroy(AddressSpace *as);
->>   * @addr: address within that address space
->>   * @attrs: memory transaction attributes
->>   * @buf: buffer with the data transferred
->> + * @len: the number of bytes to read or write
->>   * @is_write: indicates the transfer direction
->>   */
->>  MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, @@ -1609,6
->> +1611,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
->>   * @addr: address within that address space
->>   * @attrs: memory transaction attributes
->>   * @buf: buffer with the data transferred
->> + * @len: the number of bytes to write
->>   */
->>  MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
->>                                  MemTxAttrs attrs, @@ -1807,7 +1810,7 @@
->> IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
->>   * called from an RCU critical section, to avoid that the last reference
->>   * to the returned region disappears after address_space_translate returns.
->>   *
->> - * @as: #AddressSpace to be accessed
->> + * @fv: #FlatView to be accessed
->>   * @addr: address within that address space
->>   * @xlat: pointer to address within the returned memory region section's
->>   * #MemoryRegion.
->> @@ -1865,7 +1868,7 @@ void *address_space_map(AddressSpace *as, hwaddr addr,
->>   * the amount of memory that was actually read or written by the caller.
->>   *
->>   * @as: #AddressSpace used
->> - * @addr: address within that address space
->> + * @buffer: host pointer as returned by address_space_map()
->>   * @len: buffer length as returned by address_space_map()
->>   * @access_len: amount of data actually transferred
->>   * @is_write: indicates the transfer direction @@ -1902,7 +1905,7 @@ static
->> inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
->>   * or failed (eg unassigned memory, device rejected the transaction,
->>   * IOMMU fault).
->>   *
->> - * @as: #AddressSpace to be accessed
->> + * @fv: #FlatView to be accessed
->>   * @addr: address within that address space
->>   * @attrs: memory transaction attributes
->>   * @buf: buffer with the data transferred
->> --
->> 1.8.3.1
->>
-> 
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--2Vgc9bqEZPMH3L5hsYlCXwoMPhNcRUaRq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeEAoACgkQp6FrSiUn
+Q2qCJwgAnAaptDDDC2WaKGAUigDLAm4+AC2xwjAioi1ZdDt/XD97FoP8zRa1eOvs
+IW5KwabkqNCzlqoAgro7QNIyZEW7xnGg6TEE97DTinfuq6ZtPygXd0vw2i9iz1f7
+1Vh6/YDjLLz4uWkaBGjVSsm6s9k2JHrMWtLi7K0KaZBgVffFUGmwq1BbrNCwpRaK
+FwQ0q6RFmrwhDIKScX7mwirtytuIeKQiZyQXErkYxfSR3Qgc9QA3RYcwUSLNILAT
+prl5lfQtYspfnFojMKNrazoSi3lVi8BdgZIbKKkD5n2kQD8JuyMocCUTyAR5WnPq
+1jQNcntMgIQxQdQ3xgVsUcgUi55T/Q==
+=qCRK
+-----END PGP SIGNATURE-----
+
+--2Vgc9bqEZPMH3L5hsYlCXwoMPhNcRUaRq--
