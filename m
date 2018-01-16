@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebQHz-0000Lo-Jb
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:24:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebQPr-0003Ly-BO
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:32:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebQHy-0006Ak-DM
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:24:27 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ebQHy-0006Aa-7R
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:24:26 -0500
-Received: by mail-ot0-x241.google.com with SMTP id p16so13436476otf.1
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 04:24:26 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ebQPj-0002ij-Hw
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:32:35 -0500
+References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516034665-27606-3-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4d5caff2-335e-d936-5540-00ae755d55a9@redhat.com>
+Date: Tue, 16 Jan 2018 13:32:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <1516077852-7974-1-git-send-email-mst@redhat.com>
-References: <1516077852-7974-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jan 2018 12:24:04 +0000
-Message-ID: <CAFEAcA9xYNvJ5rwog7HCV=WYfC8n5aR=xc0i9Uc3WS3xkmz7tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/33] pc, pci, virtio: features, fixes,
- cleanups
+In-Reply-To: <1516034665-27606-3-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] s390-ccw: ipl structs for eckd
+ cdl/ldl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +25,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
 
-On 16 January 2018 at 04:46, Michael S. Tsirkin <mst@redhat.com> wrote:
-> A large pull due to patch buildup over the holiday period.
-> Most notable here is probably the addition of vhost-user-blk.
->
-> The following changes since commit f521eeee3bd060b460c99e605472b7e03967db43:
->
->   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20180115' into staging (2018-01-15 13:17:47 +0000)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 631ae6adb1fcea786e0db8c6f1b19570bad0f90c:
->
->   vhost: remove assertion to prevent crash (2018-01-16 06:36:19 +0200)
->
-> ----------------------------------------------------------------
-> pc, pci, virtio: features, fixes, cleanups
->
-> A bunch of fixes, cleanus and new features all over the place.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+On 15.01.2018 17:44, Collin L. Walling wrote:
+> ECKD DASDs have different IPL structures for CDL and LDL
+> formats. The current Ipl1 and Ipl2 structs follow the CDL
+> format, so we prepend "EckdCdl" to them. Boot info for LDL
+> has been moved to a new struct: EckdLdlIpl1.
+> 
+> Also introduce structs for IPL stages 1 and 1b and for
+> disk geometry.
+> 
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> ---
+>  pc-bios/s390-ccw/bootmap.c | 29 +++++++++++++-----------
+>  pc-bios/s390-ccw/bootmap.h | 55 +++++++++++++++++++++++++++++++++-------------
+>  2 files changed, 56 insertions(+), 28 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+> index 6f8e30f..29915e4 100644
+> --- a/pc-bios/s390-ccw/bootmap.c
+> +++ b/pc-bios/s390-ccw/bootmap.c
+> @@ -221,9 +221,9 @@ static void run_eckd_boot_script(block_number_t mbr_block_nr)
+>  static void ipl_eckd_cdl(void)
+>  {
+>      XEckdMbr *mbr;
+> -    Ipl2 *ipl2 = (void *)sec;
+> +    EckdCdlIpl2 *ipl2 = (void *)sec;
+>      IplVolumeLabel *vlbl = (void *)sec;
+> -    block_number_t block_nr;
+> +    block_number_t mbr_block_nr;
+>  
+>      /* we have just read the block #0 and recognized it as "IPL1" */
+>      sclp_print("CDL\n");
+> @@ -231,16 +231,13 @@ static void ipl_eckd_cdl(void)
+>      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+>      read_block(1, ipl2, "Cannot read IPL2 record at block 1");
+>  
+> -    mbr = &ipl2->u.x.mbr;
+> +    mbr = &ipl2->mbr;
+>      IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
+>      IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
+>                 "Bad block size in zIPL section of IPL2 record.");
+>      IPL_assert(mbr->dev_type == DEV_TYPE_ECKD,
+>                 "Non-ECKD device type in zIPL section of IPL2 record.");
+>  
+> -    /* save pointer to Boot Script */
+> -    block_nr = eckd_block_num((void *)&(mbr->blockptr));
+> -
+>      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+>      read_block(2, vlbl, "Cannot read Volume Label at block 2");
 
-Build failure, 32 bit:
+Why did you move the block_nr = eckd_block_num(...) behind the
+read_block() ? That sounds like you could different values here now. If
+that has been done on purpose and is not a mistake, please add a proper
+sentence about this to the patch description.
 
-/home/peter.maydell/qemu/hw/virtio/vhost.c: In function 'vhost_commit':
-/home/peter.maydell/qemu/hw/virtio/vhost.c:666:28: error: cast to
-pointer from integer of different size [-Werror=int-to-pointer-cast]
-                            (void *)dev->mem->regions[i].userspace_addr,
-                            ^
+>      IPL_assert(magic_match(vlbl->key, VOL1_MAGIC),
+> @@ -249,7 +246,10 @@ static void ipl_eckd_cdl(void)
+>                 "Invalid magic of volser block");
+>      print_volser(vlbl->f.volser);
+>  
+> -    run_eckd_boot_script(block_nr);
+> +    /* save pointer to Boot Script */
+> +    mbr_block_nr = eckd_block_num((void *)&mbr->blockptr);
+> +
+> +    run_eckd_boot_script(mbr_block_nr);
+>      /* no return */
+>  }
+>  
+> @@ -280,8 +280,8 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+>  
+>  static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+>  {
+> -    block_number_t block_nr;
+> -    BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
+> +    block_number_t mbr_block_nr;
+> +    EckdLdlIpl1 *ipl1 = (void *)sec;
+>  
+>      if (mode != ECKD_LDL_UNLABELED) {
+>          print_eckd_ldl_msg(mode);
+> @@ -292,15 +292,18 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+>      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+>      read_block(0, sec, "Cannot read block 0 to grab boot info.");
+>      if (mode == ECKD_LDL_UNLABELED) {
+> -        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
+> +        if (!magic_match(ipl1->boot_info.magic, ZIPL_MAGIC)) {
+>              return; /* not applicable layout */
+>          }
+>          sclp_print("unlabeled LDL.\n");
+>      }
+> -    verify_boot_info(bip);
+> +    verify_boot_info(&ipl1->boot_info);
+> +
+> +    /* save pointer to Boot Script */
+> +    mbr_block_nr =
+> +        eckd_block_num((void *)&ipl1->boot_info.bp.ipl.bm_ptr.eckd.bptr);
 
-Test failures, ppc64, s390x, sparc64 hosts (so likely all bigendian):
+Well, the original code fitted nicely in one line ... thus maybe better
+keep the original variable name? (or use mbr_blk_nr or something similar
+shorter?)
 
-TEST: tests/device-introspect-test... (pid=57202)
-  /s390x/device/introspect/list:                                       OK
-  /s390x/device/introspect/list-fields:                                OK
-  /s390x/device/introspect/none:                                       OK
-  /s390x/device/introspect/abstract:                                   OK
-  /s390x/device/introspect/concrete:                                   **
-ERROR:/home/linux1/qemu/qom/object.c:372:object_initialize_with_type:
-assertion failed: (type != NULL)
-Broken pipe
-FAIL
-GTester: last random seed: R02S51c433c8a3c2fab5dd7233079b9dac7f
-(pid=57214)
-  /s390x/device/introspect/abstract-interfaces:                        OK
-FAIL: tests/device-introspect-test
+> -    block_nr = eckd_block_num((void *)&(bip->bp.ipl.bm_ptr.eckd.bptr));
+> -    run_eckd_boot_script(block_nr);
+> +    run_eckd_boot_script(mbr_block_nr);
+>      /* no return */
+>  }
 
-Looks like vhost-user-blk-pci is at fault:
-
-$ gdb --args s390x-softmmu/qemu-system-s390x -device
-vhost-user-blk-pci -display none
-
-Thread 1 "qemu-system-s39" received signal SIGABRT, Aborted.
-0x000003ffe91381b8 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:54
-54      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-(gdb) bt
-#0  0x000003ffe91381b8 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:54
-#1  0x000003ffe9139726 in __GI_abort () at abort.c:89
-#2  0x000003ffe96f9d1c in g_assertion_message () from
-/lib/s390x-linux-gnu/libglib-2.0.so.0
-#3  0x000003ffe96f9dc6 in g_assertion_message_expr () from
-/lib/s390x-linux-gnu/libglib-2.0.so.0
-#4  0x000002aa002f7f82 in object_initialize_with_type (data=<optimized
-out>, size=<optimized out>,
-    type=<optimized out>) at /home/linux1/qemu/qom/object.c:372
-#5  0x000002aa0018f84e in virtio_instance_init_common
-(proxy_obj=0x2aa00d49e10, data=0x2aa00d51f60,
-    vdev_size=<optimized out>, vdev_name=<optimized out>) at
-/home/linux1/qemu/hw/virtio/virtio.c:2232
-#6  0x000002aa002881fe in vhost_user_blk_pci_instance_init (obj=0x2aa00d49e10)
-    at /home/linux1/qemu/hw/virtio/virtio-pci.c:2018
-#7  0x000002aa002f7e02 in object_initialize_with_type
-(data=data@entry=0x2aa00d49e10, size=34200,
-    type=type@entry=0x2aa00c87c90) at /home/linux1/qemu/qom/object.c:384
-#8  0x000002aa002f7fd8 in object_new_with_type (type=0x2aa00c87c90) at
-/home/linux1/qemu/qom/object.c:492
-#9  0x000002aa001fb344 in qdev_device_add (opts=<optimized out>,
-errp=<optimized out>)
-    at /home/linux1/qemu/qdev-monitor.c:612
-#10 0x000002aa001fe2fc in device_init_func (opaque=<optimized out>,
-opts=<optimized out>,
-    errp=<optimized out>) at /home/linux1/qemu/vl.c:2387
-#11 0x000002aa003f59b6 in qemu_opts_foreach (list=<optimized out>,
-func=0x2aa001fe2c8 <device_init_func>,
-    opaque=0x0, errp=0x0) at /home/linux1/qemu/util/qemu-option.c:1070
-#12 0x000002aa000ebc40 in main (argc=<optimized out>, argv=<optimized
-out>, envp=<optimized out>)
-    at /home/linux1/qemu/vl.c:4648
-
-(required QOM type not compiled in ?)
-
-thanks
--- PMM
+ Thomas
