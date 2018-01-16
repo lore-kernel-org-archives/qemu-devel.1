@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebZlY-0002wc-Aa
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:31:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebZwU-0007EU-Gn
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:42:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebZlX-0000os-9J
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:31:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebZwT-0007CD-JY
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 17:42:54 -0500
 References: <cover.1513342045.git.berto@igalia.com>
-	<a54e0dd26c8894b31890a0681a7b95dbe444451c.1513342045.git.berto@igalia.com>
+	<ef848b9847fecf18fbb05f9a9824436e6601a09d.1513342045.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <45b4a5de-034f-b669-5180-b37c58a7f27b@redhat.com>
-Date: Tue, 16 Jan 2018 16:31:20 -0600
+Message-ID: <6d5d984f-5d25-a2da-b50d-71c7a49e3de3@redhat.com>
+Date: Tue, 16 Jan 2018 16:42:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <a54e0dd26c8894b31890a0681a7b95dbe444451c.1513342045.git.berto@igalia.com>
+In-Reply-To: <ef848b9847fecf18fbb05f9a9824436e6601a09d.1513342045.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="7sDl5ua5XAd1iaXQnuU6ymLcGCwWHWQ9m"
-Subject: Re: [Qemu-devel] [PATCH v2 17/32] qcow2: Update get_cluster_table()
- to support L2 slices
+	boundary="9wjKVtgw5HIlodafb8qbol3ZbihlCpszd"
+Subject: Re: [Qemu-devel] [PATCH v2 18/32] qcow2: Update
+ qcow2_get_cluster_offset() to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +29,48 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7sDl5ua5XAd1iaXQnuU6ymLcGCwWHWQ9m
+--9wjKVtgw5HIlodafb8qbol3ZbihlCpszd
 From: Eric Blake <eblake@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
  qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <45b4a5de-034f-b669-5180-b37c58a7f27b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 17/32] qcow2: Update get_cluster_table()
- to support L2 slices
+Message-ID: <6d5d984f-5d25-a2da-b50d-71c7a49e3de3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 18/32] qcow2: Update
+ qcow2_get_cluster_offset() to support L2 slices
 References: <cover.1513342045.git.berto@igalia.com>
- <a54e0dd26c8894b31890a0681a7b95dbe444451c.1513342045.git.berto@igalia.com>
-In-Reply-To: <a54e0dd26c8894b31890a0681a7b95dbe444451c.1513342045.git.berto@igalia.com>
+ <ef848b9847fecf18fbb05f9a9824436e6601a09d.1513342045.git.berto@igalia.com>
+In-Reply-To: <ef848b9847fecf18fbb05f9a9824436e6601a09d.1513342045.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 12/15/2017 06:53 AM, Alberto Garcia wrote:
-> This patch updates get_cluster_table() to return L2 slices instead of
-> full L2 tables.
+> qcow2_get_cluster_offset() checks how many contiguous bytes are
+> available at a given offset. The returned number of bytes is limited
+> by the amount that can be addressed without having to load more than
+> one L2 table.
 >=20
-> The code itself needs almost no changes, it only needs to call
-> offset_to_l2_slice_index() instead of offset_to_l2_index(). This patch
-> also renames all the relevant variables and the documentation.
+> Since we'll be loading L2 slices instead of full tables this patch
+> changes the limit accordingly using the size of the L2 slice for the
+> calculations instead of the full table size.
+>=20
+> The l2_table variable is also renamed to l2_slice to reflect this, and
+> offset_to_l2_index() is replaced with offset_to_l2_slice_index().
 >=20
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/qcow2-cluster.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
+>  block/qcow2-cluster.c | 30 +++++++++++++++---------------
+>  1 file changed, 15 insertions(+), 15 deletions(-)
 >=20
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index ecb75b6be6..3d43dc2307 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -660,20 +660,20 @@ fail:
->   * get_cluster_table
->   *
->   * for a given disk offset, load (and allocate if needed)
-> - * the l2 table.
-> + * the appropiate slice of its l2 table.
 
-s/appropiate/appropriate/
+Callers like 'qemu-img map' will potentially have to iterate in more
+steps over an entire image; but that's not a severe limitation.  The
+block_status() functions already document that as long as drivers make
+progress, callers must be prepared for back-to-back calls that return
+the same status, so you are not breaking semantics with a shorter
+clamping limit.
+
+Maybe some of that is worth mentioning in the commit message.  Either way=
+,
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -77,7 +80,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---7sDl5ua5XAd1iaXQnuU6ymLcGCwWHWQ9m
+--9wjKVtgw5HIlodafb8qbol3ZbihlCpszd
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -86,14 +89,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpefTgACgkQp6FrSiUn
-Q2oMTAf6AjzwsWSvW68VMEXbF9vO1AQHvNxhDtpAkqbVY/wGTdUc5b+h5ddsHgAz
-gU6fqPqQpPQ3pl8Shz4cI1Q4OIGDblxZ/+RvThmYcFmlN3n50n9xvROxm3IvhJAa
-G9bTtohJ5a4iglBRoc3s4MaPxKMcWBUB9jQm+FCW1iXDtSFUa9/YZ5aKUhg1v++m
-u9H7nA8rs/Zanl6yU5iFtgsx1d7SvVSUGLgc1GUsqq5sFY1iXK3ajg+PPHEX3jw4
-v8bq/mHi4Lf272ekwvBVB8eDUhxarrlstaLmI1uPoqjRAo5uuzYYGEysd5ZWxbPl
-NYVLFxIwsAUEjz6EWPawdb8TR+LphA==
-=QjsM
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpef+UACgkQp6FrSiUn
+Q2r74ggAlkkf44rAS7khwPMScnWa0/lRG1p1PqrnU1hy7BOKfdvdC1Hl27ZtGAOt
+UgkUvHEXmoYh6xLRDLbO0CIOiiUqaJ5d7QOnckyhvk9XL94sof/VEt86QaTJMcSH
+PXCFPTBKObRBt2lVXptqOi6fFMQjYs0/gOlcD1D8+YYQvjdM3syJkE//BpBr2y+0
+no40RkJp5/JsETTrBLl1KGJ9qp/TqANijp3neDDmaybqKYjFzfs/s5ldQzLqQZ2g
+WfZhTZwK8S+KDwLuC55HMqPKSDZDk71vdM8mRQ0XawZVdzQ2gKHwnkmYlBzabBhE
+yxtw7wKRDCoDpvUewjcFS079PM/gng==
+=mnaF
 -----END PGP SIGNATURE-----
 
---7sDl5ua5XAd1iaXQnuU6ymLcGCwWHWQ9m--
+--9wjKVtgw5HIlodafb8qbol3ZbihlCpszd--
