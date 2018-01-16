@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebQbY-0008DR-8j
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:44:41 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ebQlO-0002n0-VG
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebQbU-0000SB-8O
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:44:40 -0500
-References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516034665-27606-4-git-send-email-walling@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <00a32f3a-0665-56ae-7f35-6da83e2ccdc3@redhat.com>
-Date: Tue, 16 Jan 2018 13:44:25 +0100
-MIME-Version: 1.0
-In-Reply-To: <1516034665-27606-4-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/8] s390-ccw: parse and set boot menu
- options
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ebQlN-00078E-9X
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:51 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:13489 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1ebQlM-000773-T9
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:54:49 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 16 Jan 2018 15:54:25 +0300
+Message-Id: <20180116125427.18540-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 4/6] qmp: transaction support for
+ block-dirty-bitmap-enable/disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +25,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
-On 15.01.2018 17:44, Collin L. Walling wrote:
-> Set boot menu options for an s390 guest and store them in
-> the iplb. These options are set via the QEMU command line
-> option:
-> 
->     -boot menu=on|off[,splash-time=X]
-> 
-> or via the libvirt domain xml:
-> 
->     <os>
->       <bootmenu enable='yes|no' timeout='X'/>
->     </os>
-> 
-> Where X represents some positive integer representing
-> milliseconds.
-> 
-> A loadparm other than 'prompt' will disable the menu and
-> just boot the specified entry.
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c          | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/ipl.h          | 11 ++++++++--
->  pc-bios/s390-ccw/iplb.h |  8 ++++++--
->  3 files changed, 69 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 0d06fc1..81ba9ed 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -23,6 +23,8 @@
->  #include "hw/s390x/ebcdic.h"
->  #include "ipl.h"
->  #include "qemu/error-report.h"
-> +#include "qemu/config-file.h"
-> +#include "qemu/cutils.h"
->  
->  #define KERN_IMAGE_START                0x010000UL
->  #define KERN_PARM_AREA                  0x010480UL
-> @@ -219,6 +221,55 @@ static Property s390_ipl_properties[] = {
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> +static void s390_ipl_set_boot_menu(IplParameterBlock *iplb)
-> +{
-> +    QemuOptsList *plist = qemu_find_opts("boot-opts");
-> +    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
-> +    uint8_t *flags;
-> +    uint16_t *timeout;
-> +    const char *tmp;
-> +    unsigned long result = 0;
-> +
-> +    switch (iplb->pbt) {
-> +    case S390_IPL_TYPE_CCW:
-> +        flags = &iplb->ccw.boot_menu_flags;
-> +        timeout = &iplb->ccw.boot_menu_timeout;
-> +        break;
-> +    case S390_IPL_TYPE_QEMU_SCSI:
-> +        flags = &iplb->scsi.boot_menu_flags;
-> +        timeout = &iplb->scsi.boot_menu_timeout;
-> +        break;
-> +    default:
-> +        error_report("boot menu is not supported for this device type.");
-> +        return;
-> +    }
-> +
-> +    /* In the absence of -boot menu, use zipl parameters */
-> +    if (!qemu_opt_get(opts, "menu")) {
-> +        *flags = BOOT_MENU_FLAG_ZIPL_OPTS;
-> +    } else if (boot_menu) {
-> +        *flags = BOOT_MENU_FLAG_BOOT_OPTS;
-> +
-> +        tmp = qemu_opt_get(opts, "splash-time");
-> +
-> +        if (tmp && qemu_strtoul(tmp, NULL, 10, &result)) {
-> +            error_report("splash-time value is invalid, forcing it to 0.");
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qapi/transaction.json |  4 +++
+ blockdev.c            | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 83 insertions(+)
 
-It's likely not needed, but an explicit "*timeout = 0" would be fine
-here, I think.
-
-> +            return;
-> +        }
-> +
-> +        result /= 1000; /* Store timeout value as seconds */
-
-Maybe rather do proper rounding:
-
-    result = (result + 500) / 1000;
-
-?
-
-> +        if (result > 0xffff) {
-> +            error_report("splash-time value is greater than 65535000,"
-> +                         " forcing it to 65535000.");
-> +            *timeout = 0xffff;
-> +            return;
-> +        }
-> +
-> +        *timeout = cpu_to_be16(result);
-> +    }
-> +}
-> +
-
-I've found just some nits ... patch looks fine in general, so feel free
-to add:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/qapi/transaction.json b/qapi/transaction.json
+index bd312792da..b643d848f8 100644
+--- a/qapi/transaction.json
++++ b/qapi/transaction.json
+@@ -46,6 +46,8 @@
+ # - @abort: since 1.6
+ # - @block-dirty-bitmap-add: since 2.5
+ # - @block-dirty-bitmap-clear: since 2.5
++# - @block-dirty-bitmap-enable: since 2.12
++# - @block-dirty-bitmap-disable: since 2.12
+ # - @blockdev-backup: since 2.3
+ # - @blockdev-snapshot: since 2.5
+ # - @blockdev-snapshot-internal-sync: since 1.7
+@@ -59,6 +61,8 @@
+        'abort': 'Abort',
+        'block-dirty-bitmap-add': 'BlockDirtyBitmapAdd',
+        'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
++       'block-dirty-bitmap-enable': 'BlockDirtyBitmap',
++       'block-dirty-bitmap-disable': 'BlockDirtyBitmap',
+        'blockdev-backup': 'BlockdevBackup',
+        'blockdev-snapshot': 'BlockdevSnapshot',
+        'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
+diff --git a/blockdev.c b/blockdev.c
+index 997a6f514c..d338363d78 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1962,6 +1962,7 @@ typedef struct BlockDirtyBitmapState {
+     AioContext *aio_context;
+     HBitmap *backup;
+     bool prepared;
++    bool was_enabled;
+ } BlockDirtyBitmapState;
+ 
+ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+@@ -2069,6 +2070,74 @@ static void block_dirty_bitmap_clear_clean(BlkActionState *common)
+     }
+ }
+ 
++static void block_dirty_bitmap_enable_prepare(BlkActionState *common,
++                                              Error **errp)
++{
++    BlockDirtyBitmap *action;
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (action_check_completion_mode(common, errp) < 0) {
++        return;
++    }
++
++    action = common->action->u.block_dirty_bitmap_enable.data;
++    state->bitmap = block_dirty_bitmap_lookup(action->node,
++                                              action->name,
++                                              &state->bs,
++                                              errp);
++    if (!state->bitmap) {
++        return;
++    }
++
++    state->was_enabled = bdrv_dirty_bitmap_enabled(state->bitmap);
++    bdrv_enable_dirty_bitmap(state->bitmap);
++}
++
++static void block_dirty_bitmap_enable_abort(BlkActionState *common)
++{
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (!state->was_enabled) {
++        bdrv_disable_dirty_bitmap(state->bitmap);
++    }
++}
++
++static void block_dirty_bitmap_disable_prepare(BlkActionState *common,
++                                               Error **errp)
++{
++    BlockDirtyBitmap *action;
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (action_check_completion_mode(common, errp) < 0) {
++        return;
++    }
++
++    action = common->action->u.block_dirty_bitmap_disable.data;
++    state->bitmap = block_dirty_bitmap_lookup(action->node,
++                                              action->name,
++                                              &state->bs,
++                                              errp);
++    if (!state->bitmap) {
++        return;
++    }
++
++    state->was_enabled = bdrv_dirty_bitmap_enabled(state->bitmap);
++    bdrv_disable_dirty_bitmap(state->bitmap);
++}
++
++static void block_dirty_bitmap_disable_abort(BlkActionState *common)
++{
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (state->was_enabled) {
++        bdrv_enable_dirty_bitmap(state->bitmap);
++    }
++}
++
+ static void abort_prepare(BlkActionState *common, Error **errp)
+ {
+     error_setg(errp, "Transaction aborted using Abort action");
+@@ -2130,6 +2199,16 @@ static const BlkActionOps actions[] = {
+         .commit = block_dirty_bitmap_clear_commit,
+         .abort = block_dirty_bitmap_clear_abort,
+         .clean = block_dirty_bitmap_clear_clean,
++    },
++    [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_ENABLE] = {
++        .instance_size = sizeof(BlockDirtyBitmapState),
++        .prepare = block_dirty_bitmap_enable_prepare,
++        .abort = block_dirty_bitmap_enable_abort,
++    },
++    [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_DISABLE] = {
++        .instance_size = sizeof(BlockDirtyBitmapState),
++        .prepare = block_dirty_bitmap_disable_prepare,
++        .abort = block_dirty_bitmap_disable_abort,
+     }
+ };
+ 
+-- 
+2.11.1
