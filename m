@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebNzZ-0007d1-Kh
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:57:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebO3O-0000dK-RS
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 05:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebNzY-00006h-Ra
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:57:17 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:45759)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ebNzY-00006L-Mc
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:57:16 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id r4so9269496oti.12
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 01:57:16 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ebO3L-0002PJ-RM
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 05:01:14 -0500
+References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516034665-27606-2-git-send-email-walling@linux.vnet.ibm.com>
+	<34c87c41-eb49-0e2b-3857-9bb3ba86c8d4@redhat.com>
+	<e0653416-ea6a-f801-2c30-4d01ed1fcf42@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <272fa2f6-8a75-3c05-e373-d7d1b65a7e23@redhat.com>
+Date: Tue, 16 Jan 2018 11:00:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <8bc803bf-c062-6ee0-d7c2-74262ffe12dc@amsat.org>
-References: <20171214151934.3647-1-andrew.smirnov@gmail.com>
-	<CAKmqyKOV7kYBTDmjLaFTtKAF7KyZQ56F2LiwE5D+Hzzh9nvmxA@mail.gmail.com>
-	<CAHQ1cqFhHRVNOT4Fo+AbF9CXYn77Npy2g6hzWJ+Lh90aRxT=0A@mail.gmail.com>
-	<8bc803bf-c062-6ee0-d7c2-74262ffe12dc@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jan 2018 09:56:55 +0000
-Message-ID: <CAFEAcA-MaS_y-kroAZuX48-bh6YrN8-ULoQUqJD_cM2K7jmonw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <e0653416-ea6a-f801-2c30-4d01ed1fcf42@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/misc: Add code to emulate
- Xilinx Slave Serial port
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +26,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
 
-On 16 January 2018 at 05:04, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> If devices have qtests for code coverage, I think we should accept them
-> upstream, even if they are not yet plugged into a board.
->
-> The other way, there are motivated contributors who start sending
-> patches but then never finish due to changes in life and reduced spare
-> time, or lack of motivation due to the high quality asked by some
-> maintainer or daily paid reviewers, which is a shame IMHO.
+On 15.01.2018 18:23, Collin L. Walling wrote:
+> On 01/15/2018 12:05 PM, Eric Blake wrote:
+>> On 01/15/2018 10:44 AM, Collin L. Walling wrote:
+[...]
+>>> +/**
+>>> + * atoi:
+>>> + * @str: the string to be converted.
+>>> + *
+>>> + * Given a string @str, convert it to an integer. Any non-numerical
+>>> value
+>>> + * will terminate the conversion.
+>>> + *
+>>> + * Returns: an integer converted from the string @str.
+>>> + */
+>>> +int atoi(const char *str)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int i;
+>>> +=C2=A0=C2=A0=C2=A0 int val =3D 0;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; str[i]; i++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char c =3D str[i];
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!isdigit(c)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+reak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val *=3D 10;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val +=3D c - '0';
+>> Silently gives garbage on integer overflow, but matches the fact that
+>> POSIX atoi() can't flag errors.=C2=A0 However, it does not handle lead=
+ing
+>> whitespace nor '-', which means it is NOT doing a POSIX-compatible
+>> atoi() implementation; naming it atoi() is perhaps thus a disservice t=
+o
+>> end users.
+>=20
+> Fair enough. Perhaps the "strtoi" convention suits this better.
 
-The other side of this argument is that every new board and
-device we accept upstream is increased maintenance workload
-for us as upstream maintainers. If there's no board model
-that uses the device then it is completely useless to us and
-to our users, and so it's all downside.
+Or maybe simply add an assert(str[0] !=3D '-') for now. If we ever hit th=
+e
+assert, we can still add the support for negative numbers if necessary.
 
-thanks
--- PMM
+>>> +static inline size_t strlen(const char *str)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 size_t i;
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; *str; i++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str++;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 return i;
+>> Again, not the fastest implementation, but that shouldn't matter.
+
+Yes, indeed, speed does not really matter here for the some few bytes
+that are handled during the life-time of the s390-ccw bios.
+
+>>> +}
+>>> +
+>>> +static inline int isdigit(int c)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return (c >=3D '0') && (c <=3D '9');
+>>> +}
+>>> +
+>>> +int atoi(const char *str);
+>>> +char *itostr(int num, char *str, size_t len);
+>>> +
+>>> =C2=A0 #endif
+>=20
+>=20
+
+ Thomas
