@@ -1,16 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ebKRk-0007gC-0S
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:08 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1ebKS3-00081k-AH
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ebKRj-0001LO-7X
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:07 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 16 Jan 2018 14:08:58 +0800
-Message-Id: <20180116060901.17413-7-famz@redhat.com>
-In-Reply-To: <20180116060901.17413-1-famz@redhat.com>
-References: <20180116060901.17413-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 6/9] qemu-img: Map bench buffer
+	(envelope-from <luwei.kang@intel.com>) id 1ebKRy-0001Xa-BC
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:27 -0500
+Received: from mga11.intel.com ([192.55.52.93]:37221)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1ebKRy-0001X1-1e
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:22 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Tue, 16 Jan 2018 06:10:17 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
+References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+	<20180112142252.GG6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
+	<97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
+	<20180115140455.GN6646@localhost.localdomain>
+	<20180115142518.GN1602429@orkuz.home>
+	<20180115143156.GO6646@localhost.localdomain>
+In-Reply-To: <20180115143156.GO6646@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,51 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, alex.williamson@redhat.com, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20180110091846.10699-7-famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qemu-img.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+> > On Mon, Jan 15, 2018 at 12:04:55 -0200, Eduardo Habkost wrote:
+> > > CCing libvirt developers.
+> > ...
+> > > This case is slightly more problematic, however: the new feature is
+> > > actually migratable (under very controlled circumstances) because of
+> > > patch 2/2, but it is not migration-safe[1].  This means libvirt
+> > > shouldn't include it in "host-model" expansion (which uses the
+> > > query-cpu-model-expansion QMP command) until we make the feature
+> > > migration-safe.
+> > >
+> > > For QEMU, this means the feature shouldn't be returned by
+> > > "query-cpu-model-expansion type=3Dstatic model=3Dmax" (but it can be
+> > > returned by "query-cpu-model-expansion type=3Dfull model=3Dmax").
+> > >
+> > > Jiri, it looks like libvirt uses type=3Dfull on
+> > > query-cpu-model-expansion on x86.  It needs to use type=3Dstatic[2],
+> > > or it will have no way to find out if a feature is migration-safe or
+> > > not.
+> > ...
+> > > [2] It looks like libvirt uses type=3Dfull because it wants to get
+> > >     all QOM property aliases returned.  In this case, one
+> > >     solution for libvirt is to use:
+> > >
+> > >     static_expansion =3D query_cpu_model_expansion(type=3Dstatic, mod=
+el)
+> > >     all_props =3D query_cpu_model_expansion(type=3Dfull,
+> > > static_expansion)
+> >
+> > This is exactly what libvirt is doing (with model =3D "host") ever sinc=
+e
+> > query-cpu-model-expansion support was implemented for x86.
+>=20
+> Oh, now I see that the x86 code uses
+> QEMU_MONITOR_CPU_MODEL_EXPANSION_STATIC_FULL and not just QEMU_MONITOR_CP=
+U_MODEL_EXPANSION_FULL.  Nice!
+>=20
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 68b375f998..28d0e4e9f8 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3862,6 +3862,7 @@ static int img_bench(int argc, char **argv)
-     struct timeval t1, t2;
-     int i;
-     bool force_share = false;
-+    size_t buf_size;
- 
-     for (;;) {
-         static const struct option long_options[] = {
-@@ -4050,9 +4051,12 @@ static int img_bench(int argc, char **argv)
-         printf("Sending flush every %d requests\n", flush_interval);
-     }
- 
--    data.buf = blk_blockalign(blk, data.nrreq * data.bufsize);
-+    buf_size = data.nrreq * data.bufsize;
-+    data.buf = blk_blockalign(blk, buf_size);
-     memset(data.buf, pattern, data.nrreq * data.bufsize);
- 
-+    blk_register_buf(blk, data.buf, buf_size);
-+
-     data.qiov = g_new(QEMUIOVector, data.nrreq);
-     for (i = 0; i < data.nrreq; i++) {
-         qemu_iovec_init(&data.qiov[i], 1);
-@@ -4073,6 +4077,9 @@ static int img_bench(int argc, char **argv)
-            + ((double)(t2.tv_usec - t1.tv_usec) / 1000000));
- 
- out:
-+    if (data.buf) {
-+        blk_unregister_buf(blk, data.buf);
-+    }
-     qemu_vfree(data.buf);
-     blk_unref(blk);
- 
--- 
-2.14.3
+So, I need to add Intel PT feature in "X86CPUDefinition builtin_x86_defs[]"=
+ so that we can get this CPUID in specific CPU model not only "-cpu host". =
+Is that right?
+
+Intel PT is first supported in Intel Core M and 5th generation Intel Core p=
+rocessors that are based on the Intel micro-architecture code name Broadwel=
+l but Intel PT use EPT is first supported in Ice Lake. Intel PT virtualizat=
+ion depend on PT use EPT.  I will add Intel PT to "Broadwell" CPU model and=
+ later to make sure a "Broadwell" guest can use Intel PT if the host is Ice=
+ Lake.
+
+Thanks,
+Luwei Kang
