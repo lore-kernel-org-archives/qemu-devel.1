@@ -1,22 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebYQC-00041Y-2p
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:05:31 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ebYeu-0001ny-60
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:20:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebYQA-0000F5-Dc
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:05:27 -0500
-References: <cover.1513342045.git.berto@igalia.com>
-	<97419f591a3aeb5c69c9b24a495f3e603cacb32f.1513342045.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <82955b47-0b64-fccf-2173-711ad86d1a6f@redhat.com>
-Date: Tue, 16 Jan 2018 15:05:08 -0600
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ebYep-00054S-7j
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:20:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51004
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ebYep-00054D-2e
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:20:35 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0GLKATu158893
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 16:20:34 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fhm6w62ca-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 16:20:33 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 16 Jan 2018 16:20:32 -0500
+References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1516117900-11382-3-git-send-email-stefanb@linux.vnet.ibm.com>
+	<8fa53398-2a94-a0ce-d093-390869f2b974@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 16 Jan 2018 16:20:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <97419f591a3aeb5c69c9b24a495f3e603cacb32f.1513342045.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3pNxSNQPQLrzNrrXOxBDr4RmLw4iywt3R"
-Subject: Re: [Qemu-devel] [PATCH v2 02/32] qcow2: Add table size field to
- Qcow2Cache
+In-Reply-To: <8fa53398-2a94-a0ce-d093-390869f2b974@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <5f662f71-f134-f990-0efe-8b78271ccd67@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] acpi: build QEMU table for PPI
+ virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +44,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, kevin@koconnor.net, marcandre.lureau@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3pNxSNQPQLrzNrrXOxBDr4RmLw4iywt3R
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <82955b47-0b64-fccf-2173-711ad86d1a6f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/32] qcow2: Add table size field to
- Qcow2Cache
-References: <cover.1513342045.git.berto@igalia.com>
- <97419f591a3aeb5c69c9b24a495f3e603cacb32f.1513342045.git.berto@igalia.com>
-In-Reply-To: <97419f591a3aeb5c69c9b24a495f3e603cacb32f.1513342045.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 01/16/2018 03:42 PM, Laszlo Ersek wrote:
+> On 01/16/18 16:51, Stefan Berger wrote:
+>> To avoid having to hard code the base address of the PPI virtual memory
+>> device we introduce a QEMU ACPI table that holds the base address, if a
+>> TPM 1.2 or 2 is used. This table gives us flexibility to move the base
+>> address later on.
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> ---
+>>   hw/i386/acpi-build.c        | 19 +++++++++++++++++++
+>>   include/hw/acpi/acpi-defs.h |  8 ++++++++
+>>   2 files changed, 27 insertions(+)
+> I don't understand how the guest OS is supposed to consume the QEMU
+> table. The AML code in patch #4 does not seem to consume the QEMU table,
+> for locating the operation region. I'm not saying that it *should*
+> consume the QEMU table, only that I'm currently not seeing a use for the
+> QEMU table.
+>
+> How is the QEMU table useful? What breaks if we drop it?
 
-On 12/15/2017 06:53 AM, Alberto Garcia wrote:
-> The table size in the qcow2 cache is currently equal to the cluster
-> size. This doesn't allow us to use the cache memory efficiently,
-> particularly with large cluster sizes, so we need to be able to have
-> smaller cache tables that are independent from the cluster size. This
-> patch adds a new field to Qcow2Cache that we can use instead of the
-> cluster size.
->=20
-> The current table size is still being initialized to the cluster size,
-> so there are no semantic changes yet, but this patch will allow us to
-> prepare the rest of the code and simplify a few function calls.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cache.c | 29 ++++++++++++++---------------
->  1 file changed, 14 insertions(+), 15 deletions(-)
->=20
-> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+The QEMU table would only be consumed by SeaBIOS. Following the 
+discussion on the SeaBIOS ML, we'll move this into a new fw_cfg file.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+     Stefan
 
->=20
-> @@ -331,7 +330,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs,=
- Qcow2Cache *c,
->      trace_qcow2_cache_get(qemu_coroutine_self(), c =3D=3D s->l2_table_=
-cache,
->                            offset, read_from_disk);
-> =20
-> -    if (offset_into_cluster(s, offset)) {
-> +    if (offset & (c->table_size - 1)) {
-
-Worth writing that as QEMU_IS_ALIGNED(offset, c->table_size) instead of
-open-coding the bit-wise math?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---3pNxSNQPQLrzNrrXOxBDr4RmLw4iywt3R
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeaQQACgkQp6FrSiUn
-Q2pgUQf/Y5zHy1iI0jp/so0XI6mSIV914YJsKmFRGmXgPW/2gMDWbc6GV0LaCroY
-gxmQNNzLjQzCYeqch5yJfVYIIwnDLhvO3SYdAIa7B5Gb24UvXG7nek7bDHuFXTTX
-vadEyG8o2RqAAJp1pnZmikAHeknj313CvclUEdjjf4r0/F7GLAZ9h1bpOQ89Zsv/
-s1XOmQfhB5fYrxVW/NsjdugqYn993cxSaRiZ/GDKbQqsJJn5UdBbY7OEKbyIGrXZ
-5UyH8yCsTL7UdFOVErvwiJBCljAVd0Ru2V7RVOrHEaA5xzgbBp+Lxy82dog5emtw
-QL5Dy6J7xeil3Fd3WTLBMWZ/L8EOBg==
-=K03z
------END PGP SIGNATURE-----
-
---3pNxSNQPQLrzNrrXOxBDr4RmLw4iywt3R--
+>
+> (Sorry if we've been through this; then I must have lost context.)
+>
+> Thanks,
+> Laszlo
+>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 18b939e..522d6d2 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2628,6 +2628,20 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+>>       return true;
+>>   }
+>>   
+>> +static void build_qemu(GArray *table_data, BIOSLinker *linker,
+>> +                       TPMVersion tpm_version)
+>> +{
+>> +    AcpiTableQemu *qemu = acpi_data_push(table_data, sizeof(*qemu));
+>> +
+>> +    if (tpm_version != TPM_VERSION_UNSPEC) {
+>> +        qemu->tpmppi_addr = TPM_PPI_ADDR_BASE;
+>> +        qemu->tpm_version = tpm_version;
+>> +    }
+>> +
+>> +    build_header(linker, table_data,
+>> +                 (void *)qemu, "QEMU", sizeof(*qemu), 1, "QEMU", "CONF");
+>> +}
+>> +
+>>   static
+>>   void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>   {
+>> @@ -2734,6 +2748,11 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>                             &pcms->acpi_nvdimm_state, machine->ram_slots);
+>>       }
+>>   
+>> +    if (misc.tpm_version != TPM_VERSION_UNSPEC) {
+>> +        acpi_add_table(table_offsets, tables_blob);
+>> +        build_qemu(tables_blob, tables->linker, misc.tpm_version);
+>> +    }
+>> +
+>>       /* Add tables supplied by user (if any) */
+>>       for (u = acpi_table_first(); u; u = acpi_table_next(u)) {
+>>           unsigned len = acpi_table_len(u);
+>> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+>> index 80c8099..98764c1 100644
+>> --- a/include/hw/acpi/acpi-defs.h
+>> +++ b/include/hw/acpi/acpi-defs.h
+>> @@ -573,6 +573,14 @@ struct Acpi20TPM2 {
+>>   } QEMU_PACKED;
+>>   typedef struct Acpi20TPM2 Acpi20TPM2;
+>>   
+>> +/* QEMU - Custom QEMU table */
+>> +struct AcpiTableQemu {
+>> +    ACPI_TABLE_HEADER_DEF
+>> +    uint32_t tpmppi_addr;
+>> +    uint8_t tpm_version; /* 1 = 1.2, 2 = 2 */
+>> +};
+>> +typedef struct AcpiTableQemu AcpiTableQemu;
+>> +
+>>   /* DMAR - DMA Remapping table r2.2 */
+>>   struct AcpiTableDmar {
+>>       ACPI_TABLE_HEADER_DEF
+>>
