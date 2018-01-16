@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebQ0a-0000my-11
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:06:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebQA0-0003fs-52
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebQ0U-00059M-4G
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:06:27 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:40020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ebQ0T-00058t-VL
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:06:22 -0500
-Received: by mail-oi0-x244.google.com with SMTP id u83so10421052oie.7
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 04:06:21 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLzuv4CevvT+gM_ZOnC67_=-3EpRiQBoQXqNYDiFLBw+A@mail.gmail.com>
-References: <1516059302-7169-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA-wnvhRfOAQySLXWqvwtPXwj+r+wn_sRGM5ti6wWe_c-Q@mail.gmail.com>
-	<CAJ+F1CLzuv4CevvT+gM_ZOnC67_=-3EpRiQBoQXqNYDiFLBw+A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jan 2018 12:06:00 +0000
-Message-ID: <CAFEAcA9dsWKLitCfxy+HV66rBMruxX67Aq-n4Bpmx5b2QzC2YA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v3 00/53] Misc changes for 2017-01-12
+	(envelope-from <thuth@redhat.com>) id 1ebQ9w-0002oE-9M
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:12 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 16 Jan 2018 13:15:55 +0100
+Message-Id: <1516104958-3881-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1516104958-3881-1-git-send-email-thuth@redhat.com>
+References: <1516104958-3881-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] default-configs/ppc64-softmmu: Include
+ 32-bit configs instead of copying them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,131 +20,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, BALATON Zoltan <balaton@eik.bme.hu>
 
-On 16 January 2018 at 11:58, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
-> Hi
->
-> On Tue, Jan 16, 2018 at 12:25 PM, Peter Maydell
-> <peter.maydell@linaro.org> wrote:
->> On 15 January 2018 at 23:35, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75=
-b9ff:
->>>
->>>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-2=
-0180111' into staging (2018-01-11 14:34:41 +0000)
->>>
->>> are available in the git repository at:
->>>
->>>
->>>   git://github.com/bonzini/qemu.git tags/for-upstream
->>>
->>> for you to fetch changes up to ff9adba50bf8a4c080b8aee9be2314ef179a7b5f=
-:
->>>
->>>   ucontext: annotate coroutine stack for ASAN (2018-01-12 15:21:14 +010=
-0)
->>>
->>> ----------------------------------------------------------------
->>> * QemuMutex tracing improvements (Alex)
->>> * ram_addr_t optimization (David)
->>> * SCSI fixes (Fam, Stefan, me)
->>> * do {} while (0) fixes (Eric)
->>> * KVM fix for PMU (Jan)
->>> * memory leak fixes from ASAN (Marc-Andr=C3=A9)
->>> * migration fix for HPET, icount, loadvm (Maria, Pavel)
->>> * hflags fixes (me, Tao)
->>> * block/iscsi uninitialized variable (Peter L.)
->>> * full support for GMainContexts in character devices (Peter Xu)
->>> * more boot-serial-test (Thomas)
->>> * Memory leak fix (Zhecheng)
->>
->> Various build failures, I'm afraid:
->>
->
-> damn, sorry..
->
->> x86-64/Linux/gcc:
->>
->> configure produces an error message:
->>
->> ERROR: ASAN build enabled, but ASAN header is too old.
->>        Without code annotation, the report may be inferior.
->>
->> even though this configure did not explicitly request ASAN.
->> Then configure seems to exit successfully anyway, since the
->> build proceeds.
->
-> ASAN is enabled by default if available when --enable-debug. We could
-> add more flags if that helps.
+qemu-softmmu-ppc64 is supposed to be a superset of qemu-softmmu-ppc.
+However, instead of simply including the 32-bit config file, we've
+duplicated all CONFIG_xxx settings there instead. This way, we've missed
+some CONFIG switches in ppc64-softmmu.mak which were only added to the
+32-bit config file (e.g. CONFIG_SUNGEM). Let's fix this problem by
+including the 32-bit config file into the 64-bit config file instead
+of duplicating all the CONFIG switches there.
 
-Configure switches should work like this:
- * default: use feature if present, but don't complain if not present
-   or not usable
- * --enable-foo: use feature. if feature not present, complain and
-   fail configure
- * --disable-foo: don't test for or use feature
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ default-configs/ppc64-softmmu.mak | 61 +++++----------------------------------
+ 1 file changed, 8 insertions(+), 53 deletions(-)
 
->> For some reason the build creates config-target.h a lot:
-
-> One per target no? (the build should be more silent than before)
-
-Oh, I guess that makes sense. It's a bit odd that the message neither
-gives the target part of the filename nor has those entering/leaving
-directory messages...
-
->>
->> Then it runs configure again, this time without the ERROR message,
->> and eventually fails with:
->>
->>   CC      hw/display/exynos4210_fimd.o
->> /home/petmay01/linaro/qemu-for-merges/hw/display/exynos4210_fimd.c: In
->> function =E2=80=98fimd_get_buffer_id=E2=80=99:
->> /home/petmay01/linaro/qemu-for-merges/hw/display/exynos4210_fimd.c:1105:=
-5:
->> error: case label does not reduce to an integer constant
->>      case FIMD_WINCON_BUF2_STAT:
->
-> never saw that error, hmm interesting. This is related to
-> -fsanitize=3Daddress ? Is this on Debian stable?
-
-Ubuntu xenial (16.04.3 LTS). No idea if it's related to the
-sanitizer or not.
-
->
->>      ^
->>
->> On sparc64 host configure fails:
-
-> Hmm, I guess the check -fsanitize=3Daddress doesn't return an error
-> unless -Werror is given. Perhaps it needs:
->
-> diff --git a/configure b/configure
-> index f5550f3289..ba68c550c9 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5190,7 +5190,7 @@ fi
->
->  have_asan=3Dno
->  write_c_skeleton
-> -if compile_prog "-fsanitize=3Daddress" ""; then
-> +if compile_prog "-Werror -fsanitize=3Daddress" ""; then
->      have_asan=3Dyes
->  fi
->
-> @@ -5207,7 +5207,7 @@ int main(void) {
->    return 0;
->  }
->  EOF
-> -if compile_prog "-fsanitize=3Daddress" "" ; then
-> +if compile_prog "-Werror -fsanitize=3Daddress" "" ; then
->      have_asan_iface_fiber=3Dyes
->  fi
->
-
-Looks plausible.
-
-thanks
--- PMM
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index d1b3a6d..b94af6c 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -1,64 +1,19 @@
+ # Default configuration for ppc64-softmmu
+ 
+-include pci.mak
+-include sound.mak
+-include usb.mak
+-CONFIG_PPC4XX=y
+-CONFIG_VIRTIO_VGA=y
+-CONFIG_ESCC=y
+-CONFIG_M48T59=y
++# Include all 32-bit boards
++include ppc-softmmu.mak
++
++# For PowerNV
++CONFIG_POWERNV=y
+ CONFIG_IPMI=y
+ CONFIG_IPMI_LOCAL=y
+ CONFIG_IPMI_EXTERN=y
+ CONFIG_ISA_IPMI_BT=y
+-CONFIG_SERIAL=y
+-CONFIG_PARALLEL=y
+-CONFIG_I8254=y
+-CONFIG_PCKBD=y
+-CONFIG_FDC=y
+-CONFIG_I8257=y
+-CONFIG_I82374=y
+-CONFIG_OPENPIC=y
+-CONFIG_PREP_PCI=y
+-CONFIG_I82378=y
+-CONFIG_PC87312=y
+-CONFIG_MACIO=y
+-CONFIG_PCSPK=y
+-CONFIG_CUDA=y
+-CONFIG_ADB=y
+-CONFIG_MAC_NVRAM=y
+-CONFIG_MAC_DBDMA=y
+-CONFIG_HEATHROW_PIC=y
+-CONFIG_GRACKLE_PCI=y
+-CONFIG_UNIN_PCI=y
+-CONFIG_DEC_PCI=y
+-CONFIG_PPCE500_PCI=y
+-CONFIG_IDE_ISA=y
+-CONFIG_IDE_CMD646=y
+-CONFIG_IDE_MACIO=y
+-CONFIG_NE2000_ISA=y
+-CONFIG_PFLASH_CFI01=y
+-CONFIG_PFLASH_CFI02=y
+-CONFIG_PTIMER=y
+-CONFIG_I8259=y
+-CONFIG_XILINX=y
+-CONFIG_XILINX_ETHLITE=y
+-CONFIG_PSERIES=y
+-CONFIG_POWERNV=y
+-CONFIG_PREP=y
+-CONFIG_MAC=y
+-CONFIG_E500=y
+-CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+-CONFIG_PLATFORM_BUS=y
+-CONFIG_ETSEC=y
+-CONFIG_SM501=y
++
+ # For pSeries
++CONFIG_PSERIES=y
++CONFIG_VIRTIO_VGA=y
+ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+ CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+-# For PReP
+-CONFIG_SERIAL_ISA=y
+-CONFIG_MC146818RTC=y
+-CONFIG_ISA_TESTDEV=y
+ CONFIG_MEM_HOTPLUG=y
+-CONFIG_RS6000_MC=y
+-- 
+1.8.3.1
