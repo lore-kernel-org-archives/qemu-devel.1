@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebpmj-0000Z1-5O
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:37:55 -0500
+	(envelope-from <berto@igalia.com>) id 1ebprk-0003UU-QE
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebpme-0000Ac-8O
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:37:53 -0500
-References: <20180112125452.8569-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ce17da50-7036-6fb6-07a6-0c1d1e5fa60f@redhat.com>
-Date: Wed, 17 Jan 2018 16:37:37 +0100
+	(envelope-from <berto@igalia.com>) id 1ebprf-0004XA-4h
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:43:04 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <b4f7c92c-4690-6b0e-1a24-e320d9a9dace@virtuozzo.com>
+References: <cover.1513342045.git.berto@igalia.com>
+	<192986ad741749064e855bc67916a11460911992.1513342045.git.berto@igalia.com>
+	<b4f7c92c-4690-6b0e-1a24-e320d9a9dace@virtuozzo.com>
+Date: Wed, 17 Jan 2018 16:42:56 +0100
+Message-ID: <w51inc01ofz.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180112125452.8569-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/tcg: fixup TEST PROTECTION
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 16/32] qcow2: Update l2_allocate() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,121 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 12.01.2018 13:54, David Hildenbrand wrote:
-> CC == 2 can only happen due to a protection exception, not if memory is
-> not available (PGM_ADDRESSING). So all PGM_ADDRESSING exceptions have to
-> be forwarded to the guest.
-> 
-> Since the initial definition of TEST PROTECTION, we now read globals
-> (e.g. PSW mask), so we have to correctly mark the instruction
-> (otherwise, e.g. booting fedora 27 fails).
-> 
-> Also, the architecture explicitly specifies which exceptions are
-> forwarded to the guest, this makes the code a little nicer.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h        |  2 ++
->  target/s390x/helper.h     |  2 +-
->  target/s390x/EM_helper.c | 41 +++++++++++++++++++----------------------
->  3 files changed, 22 insertions(+), 23 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 1a8b6b9ae9..915bccbc75 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -759,6 +759,8 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
->          s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, false)
->  #define s390_cpu_virt_mem_write(cpu, laddr, ar, dest, len)       \
->          s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, true)
-> +#define s390_cpu_virt_mem_check_read(cpu, laddr, ar, len)   \
-> +        s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, false)
->  #define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
->          s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
->  void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra);
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 26c1b07b44..59a1d9869b 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -137,7 +137,7 @@ DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->  DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->  DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->  DEF_HELPER_FLAGS_2(testblock, TCG_CALL_NO_WG, i32, env, i64)
-> -DEF_HELPER_FLAGS_3(tprot, TCG_CALL_NO_RWG, i32, env, i64, i64)
-> +DEF_HELPER_FLAGS_3(tprot, TCG_CALL_NO_WG, i32, env, i64, i64)
->  DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
->  DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
->  DEF_HELPER_FLAGS_2(rrbe, TCG_CALL_NO_RWG, i32, env, i64)
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 359e446c6f..c957febc6d 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -1730,34 +1730,31 @@ uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t a1, uint64_t a2)
->          /* Fetching permitted; storing permitted */
->          return 0;
->      }
-> +
-> +    if (env->int_pgm_code == PGM_PROTECTION) {
-> +        /* retry if reading is possible */
-> +        cs->exception_index = 0;
-> +        if (!s390_cpu_virt_mem_check_read(cpu, a1, 0, 1)) {
-> +            /* Fetching permitted; storing not permitted */
-> +            return 1;
-> +        }
-> +    }
-> +
->      switch (env->int_pgm_code) {
->      case PGM_PROTECTION:
-> -        /* Fetching permitted; storing not permitted */
-> -        cs->exception_index = 0;
-> -        return 1;
-> -    case PGM_ADDRESSING:
->          /* Fetching not permitted; storing not permitted */
->          cs->exception_index = 0;
->          return 2;
-> -    case PGM_ASCE_TYPE:
-> -    case PGM_REG_FIRST_TRANS:
-> -    case PGM_REG_SEC_TRANS:
-> -    case PGM_REG_THIRD_TRANS:
-> -    case PGM_SEGMENT_TRANS:
-> -    case PGM_PAGE_TRANS:
-> -    case PGM_ALET_SPEC:
-> -    case PGM_ALEN_SPEC:
-> -    case PGM_ALE_SEQ:
-> -    case PGM_ASTE_VALID:
-> -    case PGM_ASTE_SEQ:
-> -    case PGM_EXT_AUTH:
-> -        /* Translation not available */
-> -        cs->exception_index = 0;
-> -        return 3;
-> +    case PGM_ADDRESSING:
-> +    case PGM_TRANS_SPEC:
-> +        /* exceptions forwarded to the guest */
-> +        s390_cpu_virt_mem_handle_exc(cpu, GETPC());
-> +        return 0;
->      }
-> -    /* any other exception is forwarded to the guest */
-> -    s390_cpu_virt_mem_handle_exc(cpu, GETPC());
-> -    return 0;
-> +
-> +    /* Translation not available */
-> +    cs->exception_index = 0;
-> +    return 3;
->  }
->  
->  /* insert storage key extended */
-> 
+On Tue 16 Jan 2018 05:52:36 PM CET, Anton Nefedov wrote:
+>> @@ -299,42 +300,50 @@ static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
+>>   
+> [..]>
+>> -    /* write the l2 table to the file */
+>> -    BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_WRITE);
+>> +        trace_qcow2_l2_allocate_write_l2(bs, l1_index);
+>> +        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+>> +        ret = qcow2_cache_flush(bs, s->l2_table_cache);
+>> +        if (ret < 0) {
+>> +            goto fail;
+>> +        }
+>>   
+>
+> Might be an overoptimization but do we really have to flush each slice
+> separately?
+> Otherwise a number of write ops will remain the same but at least we
+> would bdrv_flush() just once.
 
-Ping, this is certainly better than the current (queued) state. Would
-love to see some review. But if nobody volunteers to read the PoP, I
-think my current use case (Linux and kvm-unit-tests) have to be
-sufficient for now.
+You're completely right, I'll fix that.
 
--- 
+>>       } else {
+>> +        uint64_t new_l2_offset;
+>>           /* First allocate a new L2 table (and do COW if needed) */
+>> -        ret = l2_allocate(bs, l1_index, &l2_table);
+>> +        ret = l2_allocate(bs, l1_index);
+>> +        if (ret < 0) {
+>> +            return ret;
+>> +        }
+>> +
+>> +        /* Get the offset of the newly-allocated l2 table */
+>> +        new_l2_offset = s->l1_table[l1_index] & L1E_OFFSET_MASK;
+>> +        assert(offset_into_cluster(s, new_l2_offset) == 0);
+>> +        /* Load the l2 table in memory */
+>> +        ret = l2_load(bs, offset, new_l2_offset, &l2_table);
+>
+> Cosmetic: maybe this l2_load() better be merged with the copied L2 case?
+> e.g.
+>
+>    if (!(l1_table[l1_index] & COPIED))
+>      l2_allocate();
+>    l2_load();
 
-Thanks,
+I'm not sure about that, since there's also the qcow2_free_clusters()
+call afterwards, so the final code might be harder to follow.
 
-David / dhildenb
+Berto
