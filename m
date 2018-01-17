@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ebxLS-0005Js-Qy
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:16 -0500
+	(envelope-from <juterry@microsoft.com>) id 1ebxLo-0005Vd-Qe
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ebxLR-0002NK-7i
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:14 -0500
-Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:43807)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ebxLQ-0002MX-Ru
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:13 -0500
-Received: by mail-lf0-x234.google.com with SMTP id o89so20067947lfg.10
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 15:42:12 -0800 (PST)
+	(envelope-from <juterry@microsoft.com>) id 1ebxLl-0002Y6-MK
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:36 -0500
+Received: from mail-sn1nam02on0123.outbound.protection.outlook.com
+	([104.47.36.123]:52458
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
+	id 1ebxLl-0002XK-4a
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:33 -0500
+From: "Justin Terry (VM)" <juterry@microsoft.com>
+Date: Wed, 17 Jan 2018 23:41:13 +0000
+Message-ID: <CY4PR2101MB0866DEFFAF6DB80EBA4CFBF3B6E90@CY4PR2101MB0866.namprd21.prod.outlook.com>
+References: <1515788548-3570-1-git-send-email-juterry@microsoft.com>
+	<1728988755.33187824.1515790085358.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1728988755.33187824.1515790085358.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <7e30d2cc-6c42-15e9-78ef-1085e081a386@redhat.com>
-References: <7e30d2cc-6c42-15e9-78ef-1085e081a386@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 17 Jan 2018 15:41:40 -0800
-Message-ID: <CAKmqyKOgFg09RAQQVfxHr2OfaNmYouhH=2nu+NT1uD87qZXzUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Functional tests (AKA Avocado-based tests)
+Subject: Re: [Qemu-devel] [PATCH 0/4] Implements the Windows Hypervisor
+ Platform accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,161 +32,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, Jeff Nelson <jen@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Wed, Jan 17, 2018 at 12:05 AM, Cleber Rosa <crosa@redhat.com> wrote:
-> TL;DR
-> =====
->
-> This is about how QEMU developers can get started with functional
-> tests that are built on top of the Avocado libraries (and meant to be
-> run with the Avocado test runner).
->
-> The past
-> ========
->
-> The Avocado project[1] has been working, for quite some time now, on a
-> "set of tools and libraries" with the goal of making writing tests
-> easier.  It is supposed to be a framework agnostic to the exact
-> software that will be under test.
->
-> But, at the same time, the Avocado project cannot deny its inheritance
-> and influences.  Those come from Autotest[2], which had "KVM Autotest"
-> as its largest and most developed "test".  This large Autotest test
-> (KVM Autotest) became virt-test[3] and later got integrated into
-> Avocado and became Avocado-VT[4] which is quite relevant here,
-> together with its QEMU test provider[5].
->
-> Avocado-VT and the QEMU test provider attempt to provide coverage
-> across platform and QEMU versions, which increases its complexity.
-> Also, it's built on a legacy set of principles and tools that makes
-> some developers stir away from it.
->
-> What's new?
-> ===========
->
-> A few months ago, the Avocado developers returned to its
-> "virtualization origins", in an attempt to learn from the QEMU
-> project, and try to help with a way to have more functional tests in
-> the upstream QEMU repo.
->
-> We believe it's possible to expand the test coverage for QEMU by
-> facilitating
-> the creation of more functional tests QEMU.  This is no different than how
-> other types of tests are already included in the tree itself.
->
-> How
-> ===
->
-> How we did it (so far)
-> ----------------------
->
-> We're aware that there's a dilemma here: to be able to easily write
-> more powerful tests, a lot of the complexity has to be moved
-> elsewhere.  Here, it means moving complexity from the test itself to a
-> framework.  The QEMU source tree itself has proofs of this approach,
-> being the "scripts" and "tests/qemu-iotests" some of the examples.
->
-> Avocado itself[1] provides a lot of the code that should help to
-> absorb some of the complexities in writing tests, but not exactly
-> everything that is needed for QEMU.  The approach we believe will have
-> the best balance is to reuse upstream Avocado libraries whenever they
-> are useful and generic enough, and on top of that, libraries that are
-> part of QEMU itself.
->
-> How can you get started with it
-> -------------------------------
->
-> First of all, get Avocado installed.  Besides the Avocado test runner
-> itself, this will give you the basic libraries on which the other part
-> of this work was built on.  We want that to be simple and painless, so
-> here's our best bet for a one-liner installation:
->
->   pip install --user avocado-framework
-> avocado-framework-plugin-varianter-yaml-to-mux aexpect
->
-> That will install Avocado within the user's home directory.  If you
-> give up on it, it can be uninstalled with another simple one-liner:
->
->   pip uninstall -y avocado-framework
-> avocado-framework-plugin-varianter-yaml-to-mux aexpect
->
-> Now, suppose you're working on a given feature, and want to try your
-> luck writing a test using this work.  To avoid having you fetching and
-> rebasing from our currently in development fork[6] and branch[7], you
-> can just
-> add one commit to your tree with:
->
->   curl
-> https://patch-diff.githubusercontent.com/raw/apahim/qemu/pull/17.patch |
-> git am -
->
-> This will get a simple patch from a snapshot branch[8].  You can, of course,
-> do it "the git way", fetching from that repo[6] and using the
-> non-snapshotted branch.
->
-> After that, we'd love for you to take a look at some of the existing
-> tests[9][10] and then attempt to create test for your own use case.
-> The basic README[11] file, and the Avocado documentation[12] are also
-> important resources not to be missed.
->
-> What's next?
-> ============
->
-> Initially, feedback is what we're looking for.  It would be greatly
-> appreciated to understand if/how this suits (or not) use cases out
-> there.
->
-> After feedback, further refinements, and more tests are written, the
-> Avocado developers will follow up with an initial patch series for
-> upstream QEMU.  In such a proposal, we intend to have further
-> integration.  Ideally in way that "configure" can be given a
-> "--with-functional-[avocado-]tests" parameter of sorts, and a "make
->  [functional-]check" would seamlessly include them.
-
-I have a few thoughts.
-
-We use pytest/pexpect internally to kick off QEMU runs and monitor the
-output (no interaction with the QEMU source tree) and I think it is
-extremely useful. So I am all for using Python to test things and this
-looks really well done!
-
-What I don't understand though is what this gives us compared to the
-existing QEMU test infrastructure? Besides being able to use Python
-and a better interface what are the main benefits? I think that is
-something worth documenting somewhere.
-
-Also, it looks like this will require images checked into git
-somewhere is that correct? Is there a good plan on how to handle that?
-
-Alistair
-
->
-> Thanks!
->
-> References
-> ==========
->
->  [1] http://avocado-framework.github.io/
->  [2] http://autotest.github.io/
->  [3] https://github.com/autotest/virt-test
->  [4] https://github.com/avocado-framework/avocado-vt
->  [5] https://github.com/autotest/tp-qemu
->  [6] https://github.com/apahim/qemu
->  [7] https://github.com/apahim/qemu/tree/avocado_qemu
->  [8] https://github.com/apahim/qemu/tree/avocado_qemu_snapshot
->  [9]
-> https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/test_info_memdev_host_nodes.py
-> [10]
-> https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/test_ovmf_with_240_vcpus.py
-> [11]
-> https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/README.rst
-> [12] http://avocado-framework.readthedocs.io/
->
-> --
-> Cleber Rosa
-> [ Sr Software Engineer - Virtualization Team - Red Hat ]
-> [ Avocado Test Framework - avocado-framework.github.io ]
-> [  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
->
+SGV5IFBhb2xvLA0KDQpUaGFua3MgZm9yIGFsbCB0aGUgZmVlZGJhY2suIEFmdGVyIHRhbGtpbmcg
+d2l0aCB2YXJpb3VzIG1lbWJlcnMgb2YgdGhlIHRlYW0gYXJvdW5kIHRoZXNlIHNjZW5hcmlvcyBJ
+IHRoaW5rIGl0cyBiZXN0IHdlIGFkZCB0aGUgbWlncmF0aW9uIGJsb2NrZXJzIGZvciBhbGwgb2Yg
+eW91ciBjb21tZW50cyB1bmZvcnR1bmF0ZWx5LiBUaGUgYW5zd2VycyB0byB5b3VyIHF1ZXN0aW9u
+IGFyZSBiZWxvdzoNCg0KMS4gRm9yIENQVUlELiBUaGUgQVBJIGhhcyBzdXBwb3J0IGZvciBhbiAi
+RVhURU5ERURfVk1fRVhJVFMiIG9mIHR5cGUgV0h2UnVuVnBFeGl0UmVhc29uWDY0Q3B1aWQgYWZ0
+ZXIgYSBjYWxsIHRvIFdIdlJ1blZpcnR1YWxQcm9jZXNzb3IuIFRoaXMgd2lsbCBvbmUgZGF5IGFs
+bG93IGZvciB0aGUgQ1BVSUQgaW5zdHJ1Y3Rpb24gdG8gYmUgcmVzb2x2ZWQgaG93ZXZlciBpdCBp
+cyBub3QgY3VycmVudGx5IGltcGxlbWVudGVkIGluIHRoZSBwbGF0Zm9ybS4gU28gZm9yIHJpZ2h0
+IG5vdyB3ZSB3aWxsIGhhdmUgdG8gYmxvY2sgb24gQ1BVSUQuDQoNCjIuIEZvciBkaXJ0eSBtZW1v
+cnkgdHJhY2tpbmcuIFdlIGN1cnJlbnRseSBkb27igJl0IGhhdmUgc3VwcG9ydCBpbiB0aGUgcGxh
+dGZvcm0gb3IgQVBJIGZvciB0aGlzLiBJIGhhdmUgYWRkZWQgdGhhdCB0byB0aGUgZmVhdHVyZSBi
+YWNrbG9nIGFuZCB3aWxsIHVwZGF0ZSBRRU1VIGFzIHRoYXQgZ2V0cyBpbXBsZW1lbnRlZCBpbiB0
+aGUgcGxhdGZvcm0uIEhvd2V2ZXIsIFZHQSBkb2VzIGluZGVlZCB3b3JrIHdpdGggdGhlIGN1cnJl
+bnQgaW1wbCBvZiBsb2dfc3luYy4NCg0KMy4gQWxzbywgZm9yIFhTQVZFL1JTVE9SIHdlIGFnYWlu
+IGRvbuKAmXQgaGF2ZSBwbGF0Zm9ybSBzdXBwb3J0IGZvciB0aGUgcmVxdWlyZWQgcmVnaXN0ZXJz
+LiBJIGhhdmUgYWRkZWQgdGhpcyB0byB0aGUgZmVhdHVyZSBwbGF0Zm9ybSBiYWNrbG9nIHRvIGdh
+aW4gYWNjZXNzIGZvciB0aGF0IGZ1bmN0aW9uYWxpdHkgYXMgd2VsbC4NCg0KNC4gVGhpcyB3aWxs
+IGJlIHN1cHBvcnRlZCBvbiBXaW5kb3dzIDEwIGhvc3RzIChJIGRvbuKAmXQgaGF2ZSB0aGUgaW5z
+aWRlciBidWlsZCBudW1iZXIgeWV0KSBhbmQgaXQgd2lsbCByZXF1aXJlIGFuIEludGVsIHByb2Nl
+c3NvciB3aXRoIFZULXggYW5kIFVucmVzdHJpY3RlZCBHdWVzdCBzdXBwb3J0LiBXaWxsIHVwZGF0
+ZSB0aGUgcWVtdS1kZXZlbCBsaXN0IG9uY2Ugd2UgaGF2ZSBhbiBpbnNpZGVyIGJ1aWxkIHRoYXQg
+aXMgcHVibGljIHRoYXQgaGFzIHRoZSBwbGF0Zm9ybSBiaXRzLg0KDQpTbywgaWYgeW91ciBvayB3
+aXRoIGl0IEkgd2lsbCBibG9jayBvbiBDUFVJRCwgTWVtb3J5IFRyYWNraW5nLCBhbmQgWFNBVkUv
+UlNUT1IgZnVuY3Rpb25hbGl0eSBhbmQgc2VuZCBvdXQgdGhlIHVwZGF0ZWQgUFIuDQoNCi1KdXN0
+aW4NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5p
+IFttYWlsdG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBKYW51YXJ5IDEy
+LCAyMDE4IDEyOjQ4IFBNDQo+IFRvOiBKdXN0aW4gVGVycnkgKFZNKSA8anV0ZXJyeUBtaWNyb3Nv
+ZnQuY29tPg0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnIHFlbXUtZGV2ZWwgPHFlbXUtZGV2
+ZWxAbm9uZ251Lm9yZz4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCAwLzRdIEltcGxlbWVudHMgdGhl
+IFdpbmRvd3MgSHlwZXJ2aXNvciBQbGF0Zm9ybQ0KPiBhY2NlbGVyYXRvcg0KPiANCj4gDQo+ID4g
+SGVsbG8gUUVNVSBDb21tdW5pdHkhDQo+ID4NCj4gPiBPdmVyIHRoZSBwYXN0IGZldyBtb250aHMg
+dGhlIEh5cGVyLVYgdGVhbSBhdCBNaWNyb3NvZnQgaGFzIGJlZW4NCj4gPiB3b3JraW5nIGhhcmQg
+b24gYSBuZXcgdXNlci1tb2RlIEFQSSBmb3Igb3VyIGh5cGVydmlzb3IgdGhhdCB3aWxsIGJlDQo+
+ID4gcmVsZWFzZWQgYXMgcGFydCBvZiB0aGUgdXBjb21pbmcgU0RLLiBUaGlzIG5ldyBBUEkgYWRk
+cyB1c2VyLW1vZGUNCj4gPiBjYXBhYmlsaXRpZXMgdG8gY3JlYXRlIGFuZCBtYW5hZ2UgcGFydGl0
+aW9ucyBhdCB0aGUgaHlwZXJ2aXNvciBsZXZlbCwNCj4gPiBjb25maWd1cmUgbWVtb3J5IG1hcHBp
+bmdzIGZvciB0aGUgcGFydGl0aW9uLCBhbmQgY3JlYXRlIGFuZCBjb250cm9sDQo+IGV4ZWN1dGlv
+biBvZiB2aXJ0dWFsIHByb2Nlc3NvcnMuDQo+ID4NCj4gPiBXaXRoIHRoaXMgbmV3IEFQSSB3ZSBh
+cmUgbm93IGFibGUgdG8gYnJpbmcgb3VyIGh5cGVydmlzb3IgdG8gdGhlIFFFTVUNCj4gPiBjb21t
+dW5pdHkhIFRoZSBmb2xsb3dpbmcgcGF0Y2hlcyBpbXBsZW1lbnQgdGhlIFdpbmRvd3MgSHlwZXJ2
+aXNvcg0KPiA+IFBsYXRmb3JtIGFjY2VsZXJhdG9yIChXSFBYKSBmb3IgUUVNVSBvbiBXaW5kb3dz
+IDEwIGhvc3RzLg0KPiA+DQo+ID4gV2hlbiBjb21waWxpbmcgUUVNVSBmb3IgeDg2XzY0IHBhc3Np
+bmcgdGhlIC0tZW5hYmxlLXdocHggZmxhZyB3aWxsDQo+ID4gY29tcGlsZSB0aGUgYWNjZWxlcmF0
+b3IgZm9yIHVzZS4gQXQgcnVudGltZSB1c2luZyB0aGUgJy1hY2NlbCB3aHB4Jw0KPiA+IHNob3Vs
+ZCBzZWUgYSBzaWduaWZpY2FudCBwZXJmb3JtYW5jZSBpbXByb3ZlbWVudCBvdmVyIGVtdWxhdGlv
+biwgbXVjaA0KPiA+IGxpa2Ugd2hlbiB1c2luZyAnaGF4JyBvbiBXaW5kb3dzLg0KPiA+DQo+ID4g
+T3ZlciB0aGUgbmV4dCBmZXcgZGF5cyB0aGUgcHJlLXJlbGVhc2UgdmVyc2lvbiBvZiB0aGUgZG9j
+dW1lbnRhdGlvbg0KPiA+IGZvciB0aGlzIG5ldyBBUEkgd2lsbCBiZSB2aXNpYmxlIGF0DQo+ID4N
+Cj4gaHR0cHM6Ly9uYTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0
+cHMlM0ElMkYlMkZkb2NzLg0KPiA+IG1pY3Jvc29mdC5jb20lMkZlbi0NCj4gdXMlMkZ2aXJ0dWFs
+aXphdGlvbiZkYXRhPTAyJTdDMDElN0NqdXRlcnJ5JTQwbWljcm9zb2Z0LmNvbSU3Q2U5NzljNQ0K
+PiAwYWI1NTQ0YWIyZGVjNzA4ZDU1OWZkYzg2ZiU3QzcyZjk4OGJmODZmMTQxYWY5MWFiMmQ3Y2Qw
+MTFkYjQ3JTdDMQ0KPiAlN0MwJTdDNjM2NTEzODY4ODg0OTg3NzcyJnNkYXRhPUUlMkJFNURYJTJG
+SnFzSzIlMkJaSlZXelEzcUZ5DQo+IEtnMFlMS3JnNkV0ekxrdm5KcWJVJTNEJnJlc2VydmVkPTAg
+dW5kZXIgdGhlICdXaW5kb3dzIEh5cGVydmlzb3INCj4gUGxhdGZvcm0nIHNlY3Rpb24uIEhlcmUg
+eW91IHdpbGwgc2VlIHRoZSByZXF1aXJlbWVudHMsIEFQSSwgYW5kIGV4YW1wbGVzLg0KPiANCj4g
+VGhhdCdzIGdyZWF0ISAgQWNjZWxlcmF0b3IgZ2Fsb3JlLiA6KQ0KPiANCj4gRnJvbSBhIHF1aWNr
+IHNraW0gdGhleSBwYXRjaGVzIHNlZW0gdG8gYmUgZ2VuZXJhbGx5IHByZXR0eSBnb29kISAgSSBo
+YXZlIGENCj4gZmV3IHF1aWNrIHF1ZXN0aW9uIG9uIGEgY291cGxlIGZlYXR1cmVzIHRoYXQgc2Vl
+bSB0byBiZSBtaXNzaW5nOg0KPiANCj4gLSBhbiBpbXBvcnRhbnQgbWlzc2luZyBmZWF0dXJlIGlz
+IHN1cHBvcnQgZm9yIENQVSBtb2RlbHMgKGUuZy4gIi1jcHUNCj4gSGFzd2VsbCIpLiAgQ29kZQ0K
+PiAgIGZvciB0aGF0IHdhcyBhZGRlZCByZWNlbnRseSBmb3IgSHlwZXJ2aXNvci5mcmFtZXdvcmsg
+YW5kIHlvdSBzaG91bGQgYmUNCj4gYWJsZSB0byBjb3B5DQo+ICAgc29tZSBvZiBpdCBhbmQgdGhl
+biBtb3JlIGZvciB5b3VyIENQVUlEIGludGVyY2VwdC4gIEhvd2V2ZXIsIHRoZSBxdWVzdGlvbg0K
+PiBJIGhhdmUgaXM6DQo+ICAgd2hhdCBpbnRlcmZhY2VzIGRvZXMgV0hQWCBzdXBwb3J0IHRvIHF1
+ZXJ5IHRoZSBoeXBlcnZpc29yJ3MgQ1BVSUQNCj4gY2FwYWJpbGl0aWVzPw0KPiANCj4gLSBpcyBk
+aXJ0eSBtZW1vcnkgc3VwcG9ydCBhdmFpbGFibGU/ICBUaGUgbG9nX3N5bmMgY2FsbGJhY2sgc2Vl
+bXMgYSBiaXQNCj4gaW5jb21wbGV0ZSA6KQ0KPiAgIElmIGl0J3Mgbm90LCBWR0Egb3V0cHV0IHBy
+b2JhYmx5IHdpbGwgbm90IHdvcmsuDQo+IA0KPiAtIEkgbWlnaHQgaGF2ZSBtaXNzZWQgdGhpcyBi
+ZWNhdXNlIHRoZSByZWxldmFudCBjb2RlIGlzIHF1aXRlIHJlcGV0aXRpdmUgLQ0KPiB3aGF0IGFi
+b3V0DQo+ICAgZ2V0L3NldCBvZiBYU0FWRSBhcmVhcz8gIElmIGVpdGhlciB0aGlzIG9yIGRpcnR5
+IG1lbW9yeSBpcyBub3QgcHJlc2VudCwgaXQncw0KPiBwcm9iYWJseQ0KPiAgIGJlc3QgdG8gYmxv
+Y2sgbWlncmF0aW9uIChncmVwIGZvciBtaWdyYXRpb25fYmxvY2tlcnMpLg0KPiANCj4gQWxzbywg
+d2hhdCB2ZXJzaW9ucyBvZiBXaW5kb3dzIHdpbGwgc3VwcG9ydCBXSFBYPw0KPiANCj4gVGhhbmtz
+LA0KPiANCj4gUGFvbG8NCj4gPiBUaGFuayB5b3UgZm9yIHlvdXIgZmVlZGJhY2suDQo+ID4NCj4g
+PiBKdXN0aW4gVGVycnkgKFZNKSAoNCk6DQo+ID4gICBBZGQgdGhlIFdpbmRvd3MgSHlwZXJ2aXNv
+ciBQbGF0Zm9ybSBhY2NlbGVyYXRvci4NCj4gPiAgIEFkZCB0aGUgV0hQWCB2Y3B1IEFQSQ0KPiA+
+ICAgSW50cm9kdWNlIHRoZSBXSFBYIGltcGwNCj4gPiAgIEFkZCB0aGUgV0hQWCBhY2NlbGVyYXRp
+b24gZW5saWdodGVubWVudHMNCj4gPg0KPiA+ICBhY2NlbC9zdHVicy9NYWtlZmlsZS5vYmpzIHwg
+ICAgOSArLQ0KPiA+ICBhY2NlbC9zdHVicy93aHB4LXN0dWIuYyAgIHwgICA0OCArKw0KPiA+ICBj
+b25maWd1cmUgICAgICAgICAgICAgICAgIHwgICA0OCArLQ0KPiA+ICBjcHVzLmMgICAgICAgICAg
+ICAgICAgICAgIHwgICA2NiArKy0NCj4gPiAgaW5jbHVkZS9zeXNlbXUvaHdfYWNjZWwuaCB8ICAg
+MTMgKw0KPiA+ICBpbmNsdWRlL3N5c2VtdS93aHB4LmggICAgIHwgICA0MCArKw0KPiA+ICBxZW11
+LW9wdGlvbnMuaHggICAgICAgICAgIHwgICAgOCArLQ0KPiA+ICB0YXJnZXQvaTM4Ni9NYWtlZmls
+ZS5vYmpzIHwgICAgMSArDQo+ID4gIHRhcmdldC9pMzg2L2hlbHBlci5jICAgICAgfCAgICAyICst
+DQo+ID4gIHRhcmdldC9pMzg2L3docHgtYWxsLmMgICAgfCAxMzk1DQo+ID4gICsrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+ICAxMCBmaWxlcyBjaGFuZ2Vk
+LCAxNjE5IGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKSAgY3JlYXRlIG1vZGUNCj4gPiAx
+MDA2NDQgYWNjZWwvc3R1YnMvd2hweC1zdHViLmMgIGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiA+IGlu
+Y2x1ZGUvc3lzZW11L3docHguaCAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRhcmdldC9pMzg2L3docHgt
+YWxsLmMNCj4gPg0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiA+DQo=
