@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ebbe7-0007DX-JY
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:32:04 -0500
+	(envelope-from <famz@redhat.com>) id 1ebby3-00043C-Ap
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:52:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ebbe6-0003Su-7k
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:32:03 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:45084)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ebbe5-0003S1-Sr
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:32:02 -0500
-Received: by mail-lf0-x241.google.com with SMTP id y71so19659662lfd.12
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 16:32:01 -0800 (PST)
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAFEAcA-4vkZEJDaNfPLavKK3=_JBfi9u1o=-0kGb0ui26SV3VA@mail.gmail.com>
-References: <cover.1515796549.git.alistair.francis@xilinx.com>
-	<9443d0cbb39ca4173d40b4116655c0309cc05983.1515796549.git.alistair.francis@xilinx.com>
-	<CAFEAcA-4vkZEJDaNfPLavKK3=_JBfi9u1o=-0kGb0ui26SV3VA@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 16 Jan 2018 16:31:29 -0800
-Message-ID: <CAKmqyKPwFm1-2gFzFr5yCXqG=nLbTqWt8_yhNdcU8N0H6WiB5g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] xlnx-zynqmp-rtc: Add basic time
- support
+	(envelope-from <famz@redhat.com>) id 1ebby0-00014Y-7y
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:52:39 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 17 Jan 2018 08:52:22 +0800
+Message-Id: <20180117005222.4781-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] usb-storage: Fix share-rw option parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,178 +17,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Jan 15, 2018 at 5:35 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 12 January 2018 at 22:37, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
->> Allow the guest to determine the time set from the QEMU command line.
->>
->> This includes adding a trace event to debug the new time.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> ---
->>  - Convert DB_PRINT() macro to trace
->>
->>  hw/timer/trace-events              |  3 +++
->>  hw/timer/xlnx-zynqmp-rtc.c         | 23 +++++++++++++++++++++++
->>  include/hw/timer/xlnx-zynqmp-rtc.h |  3 +++
->>  3 files changed, 29 insertions(+)
->>
->> diff --git a/hw/timer/trace-events b/hw/timer/trace-events
->> index 640722b5d1..e6e042fddb 100644
->> --- a/hw/timer/trace-events
->> +++ b/hw/timer/trace-events
->> @@ -60,3 +60,6 @@ systick_write(uint64_t addr, uint32_t value, unsigned size) "systick write addr
->>  cmsdk_apb_timer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
->>  cmsdk_apb_timer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
->>  cmsdk_apb_timer_reset(void) "CMSDK APB timer: reset"
->> +
->> +# hw/timer/xlnx-zynqmp-rtc.c
->> +xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min, int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
->> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
->> index ead40fc42d..4adcc4701a 100644
->> --- a/hw/timer/xlnx-zynqmp-rtc.c
->> +++ b/hw/timer/xlnx-zynqmp-rtc.c
->> @@ -29,6 +29,7 @@
->>  #include "hw/register.h"
->>  #include "qemu/bitops.h"
->>  #include "qemu/log.h"
->> +#include "hw/ptimer.h"
->>  #include "hw/timer/xlnx-zynqmp-rtc.h"
->>
->>  #ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
->> @@ -47,6 +48,13 @@ static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
->>      qemu_set_irq(s->irq_addr_error_int, pending);
->>  }
->>
->> +static uint64_t current_time_postr(RegisterInfo *reg, uint64_t val64)
->> +{
->> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
->> +
->> +    return mktime(&s->current_tm);
->
-> No other timer device calls mktime(), so I suspect this is the wrong
-> approach. (You may want something involving the QEMU mktimegm() utility
-> function.)
+Because usb-storage creates an internal scsi device, we should propagate
+options. We already do so for bootindex etc, but failed to take care of
+share-rw. Fix it in an apparent way: add a new parameter to
+scsi_bus_legacy_add_drive and pass in s->conf.share_rw.
 
-Ah, mktimegm() gives me the correct timezone, that does work better.
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Fam Zheng <famz@redhat.com>
 
->
-> Also, looking at mc146818rtc.c it has logic for tracking what the
-> guest thinks the RTC is, which might be at an offset from what the
-> host's idea of the RTC is. I don't see anything like that here, which
-> makes me think this patch is missing something.
+---
 
-My testing shows that what I have works with the date function in the
-Xilinx kernel
+v2: Rebase to master.
+---
+ hw/scsi/scsi-bus.c     | 9 ++++++++-
+ hw/usb/dev-storage.c   | 3 ++-
+ include/hw/scsi/scsi.h | 1 +
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
-If I start QEMU with
--rtc base=2017-10-17T16:01:21
-
-I can run this:
-root@xilinx-zcu102-2017_3:~# date
-Tue Oct 17 16:01:28 UTC 2017
-<Wait ~40 seconds>
-root@xilinx-zcu102-2017_3:~# date
-Tue Oct 17 16:02:18 UTC 2017
-
-The offset seems fine to me
-
->
->> +}
->> +
->>  static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
->>  {
->>      XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
->> @@ -103,11 +111,13 @@ static const RegisterAccessInfo rtc_regs_info[] = {
->>      {   .name = "SET_TIME_WRITE",  .addr = A_SET_TIME_WRITE,
->>      },{ .name = "SET_TIME_READ",  .addr = A_SET_TIME_READ,
->>          .ro = 0xffffffff,
->> +        .post_read = current_time_postr,
->>      },{ .name = "CALIB_WRITE",  .addr = A_CALIB_WRITE,
->>      },{ .name = "CALIB_READ",  .addr = A_CALIB_READ,
->>          .ro = 0x1fffff,
->>      },{ .name = "CURRENT_TIME",  .addr = A_CURRENT_TIME,
->>          .ro = 0xffffffff,
->> +        .post_read = current_time_postr,
->>      },{ .name = "CURRENT_TICK",  .addr = A_CURRENT_TICK,
->>          .ro = 0xffff,
->>      },{ .name = "ALARM",  .addr = A_ALARM,
->> @@ -147,6 +157,12 @@ static void rtc_reset(DeviceState *dev)
->>          register_reset(&s->regs_info[i]);
->>      }
->>
->> +    qemu_get_timedate(&s->current_tm, 0);
->> +
->> +    trace_xlnx_zynqmp_rtc_gettime(s->current_tm.tm_year, s->current_tm.tm_mon,
->> +                                  s->current_tm.tm_mday, s->current_tm.tm_hour,
->> +                                  s->current_tm.tm_min, s->current_tm.tm_sec);
->> +
->>      rtc_int_update_irq(s);
->>      addr_error_int_update_irq(s);
->>  }
->> @@ -190,6 +206,13 @@ static const VMStateDescription vmstate_rtc = {
->>      .minimum_version_id = 1,
->>      .fields = (VMStateField[]) {
->>          VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPRTC, XLNX_ZYNQMP_RTC_R_MAX),
->> +        VMSTATE_INT32(current_tm.tm_sec, XlnxZynqMPRTC),
->> +        VMSTATE_INT32(current_tm.tm_min, XlnxZynqMPRTC),
->> +        VMSTATE_INT32(current_tm.tm_hour, XlnxZynqMPRTC),
->> +        VMSTATE_INT32(current_tm.tm_wday, XlnxZynqMPRTC),
->> +        VMSTATE_INT32(current_tm.tm_mday, XlnxZynqMPRTC),
->> +        VMSTATE_INT32(current_tm.tm_mon, XlnxZynqMPRTC),
->> +        VMSTATE_INT32(current_tm.tm_year, XlnxZynqMPRTC),
->
-> Presumably the timer device has an internal representation of the
-> current time (in registers or something). I think it would make more
-> sense to have the migration state representation be whatever the
-> hardware does. (Compare eg mc146818rtc.c where we interpret a
-> struct tm into the various cmos_data[] fields, and then migration
-> works with those.)
-
-The problem with this is that it requires the overhead of
-saving/loading an internal state while at the moment we don't have to.
-Admittedly this falls apart if the guest wants to edit the RTC, at the
-moment that isn't supported.
-
-I'll repsin a new version with a tick_offset similar to pl031. Even if
-we don't support guest setting the RTC it puts us in a better position
-for the future.
-
-Alistair
-
->
->>          VMSTATE_END_OF_LIST(),
->>      }
->>  };
->> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
->> index 87649836cc..daecb646f0 100644
->> --- a/include/hw/timer/xlnx-zynqmp-rtc.h
->> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
->> @@ -25,6 +25,7 @@
->>   */
->>
->>  #include "hw/register.h"
->> +#include "trace.h"
->
-> I think this include should be in the .c file.
->
->>
->>  #define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
->>
->> @@ -79,6 +80,8 @@ typedef struct XlnxZynqMPRTC {
->>      qemu_irq irq_rtc_int;
->>      qemu_irq irq_addr_error_int;
->>
->> +    struct tm current_tm;
->> +
->>      uint32_t regs[XLNX_ZYNQMP_RTC_R_MAX];
->>      RegisterInfo regs_info[XLNX_ZYNQMP_RTC_R_MAX];
->>  } XlnxZynqMPRTC;
->> --
->> 2.14.1
->
-> thanks
-> -- PMM
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 965becf31f..05e501efd3 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -224,6 +224,7 @@ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+ /* handle legacy '-drive if=scsi,...' cmd line args */
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
++                                      bool share_rw,
+                                       const char *serial, Error **errp)
+ {
+     const char *driver;
+@@ -254,6 +255,12 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+         object_unparent(OBJECT(dev));
+         return NULL;
+     }
++    object_property_set_bool(OBJECT(dev), share_rw, "share-rw", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        object_unparent(OBJECT(dev));
++        return NULL;
++    }
+     object_property_set_bool(OBJECT(dev), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+@@ -288,7 +295,7 @@ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, bool deprecated)
+             }
+         }
+         scsi_bus_legacy_add_drive(bus, blk_by_legacy_dinfo(dinfo),
+-                                  unit, false, -1, NULL, &error_fatal);
++                                  unit, false, -1, false, NULL, &error_fatal);
+     }
+     loc_pop(&loc);
+ }
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index 9722ac854c..80c03eff35 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -633,7 +633,8 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
+     scsi_bus_new(&s->bus, sizeof(s->bus), DEVICE(dev),
+                  &usb_msd_scsi_info_storage, NULL);
+     scsi_dev = scsi_bus_legacy_add_drive(&s->bus, blk, 0, !!s->removable,
+-                                         s->conf.bootindex, dev->serial,
++                                         s->conf.bootindex, s->conf.share_rw,
++                                         dev->serial,
+                                          errp);
+     blk_unref(blk);
+     if (!scsi_dev) {
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index 23a8ee6a7d..802a647cdc 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -151,6 +151,7 @@ static inline SCSIBus *scsi_bus_from_device(SCSIDevice *d)
+ 
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
++                                      bool share_rw,
+                                       const char *serial, Error **errp);
+ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, bool deprecated);
+ void scsi_legacy_handle_cmdline(void);
+-- 
+2.14.3
