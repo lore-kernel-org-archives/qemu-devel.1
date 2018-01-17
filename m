@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebne3-0005yS-LQ
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:20:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ebnlW-0001h9-JX
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:28:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebne2-0001zH-PU
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:20:47 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1516144891.git.alistair.francis@xilinx.com>
-	<d1049a00a3c00d8310584f7732492a2064a982ae.1516144891.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b366c117-c4be-50bc-0c34-3e61c6bebb72@amsat.org>
-Date: Wed, 17 Jan 2018 10:20:36 -0300
+	(envelope-from <mreitz@redhat.com>) id 1ebnlS-0000bt-LP
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:28:30 -0500
+References: <20171110224302.14424-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e6d13697-b7b5-5c8f-1a1f-61ac30ad8016@redhat.com>
+Date: Wed, 17 Jan 2018 14:28:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <d1049a00a3c00d8310584f7732492a2064a982ae.1516144891.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 1/9] microblaze: boot.c:
- Don't try to find NULL pointer
+In-Reply-To: <20171110224302.14424-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA"
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] blockdev: Mark BD-{remove,
+ insert}-medium stable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair23@gmail.com, qemu-arm@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Hi Alistair,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <e6d13697-b7b5-5c8f-1a1f-61ac30ad8016@redhat.com>
+Subject: Re: [PATCH for-2.12 0/4] blockdev: Mark BD-{remove,insert}-medium
+ stable
+References: <20171110224302.14424-1-mreitz@redhat.com>
+In-Reply-To: <20171110224302.14424-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Maybe reworded "Don't try to find NULL file"
+On 2017-11-10 23:42, Max Reitz wrote:
+> Berto's "Test I/O limits with removable media" patch proves that
+> throttling survives a blockdev-remove-medium/blockdev-insert-medium pai=
+r
+> now, so let's mark them stable (because that was the reason they were
+> considered experimental, see commit
+> 6e0abc251dd4f8eba1f53656dfede12e5840e83b for more).
+>=20
+> But before we do that, let's use the chance and drop the @device
+> parameter.
+>=20
+>=20
+> Based-on: <cover.1510339534.git.berto@igalia.com>
+> ("Fix throttling crashes in BlockBackend with no BlockDriverState",
+>  because of the test case added there)
+>=20
+>=20
+> Max Reitz (4):
+>   iotests: Make BD-{remove,insert}-medium use @id
+>   tests/ahci: Switch tray and medium commands to @id
+>   blockdev: Drop BD-{remove,insert}-medium's @device
+>   blockdev: Mark BD-{remove,insert}-medium stable
+>=20
+>  qapi/block-core.json   |  42 ++++-------
+>  blockdev.c             |  30 ++++++--
+>  tests/ahci-test.c      |  16 ++---
+>  tests/qemu-iotests/093 |   6 +-
+>  tests/qemu-iotests/118 | 184 +++++++++++++++++++++++------------------=
+--------
+>  tests/qemu-iotests/139 |   2 +-
+>  tests/qemu-iotests/155 |  60 ++++++++--------
+>  7 files changed, 163 insertions(+), 177 deletions(-)
 
-On 01/16/2018 08:22 PM, Alistair Francis wrote:
-> Previously if no device tree was passed to microblaze_load_kernel() then
-> qemu_find_file() would try to find a NULL pointer. To avoid this put a
-> check around qemu_find_file().
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Applied to my block branch.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Max
 
-> ---
-> 
->  hw/microblaze/boot.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
-> index 457a08a2fe..35bfeda7aa 100644
-> --- a/hw/microblaze/boot.c
-> +++ b/hw/microblaze/boot.c
-> @@ -124,7 +124,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
->      kernel_cmdline = qemu_opt_get(machine_opts, "append");
->      dtb_arg = qemu_opt_get(machine_opts, "dtb");
->      /* default to pcbios dtb as passed by machine_init */
-> -    if (!dtb_arg) {
-> +    if (!dtb_arg && dtb_filename) {
->          filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, dtb_filename);
->      }
-> 
-> --
-> 2.14.1
+
+--0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpfT20SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ABIUH/jVv/2ohy80ib9hH9HXoiHcPtnESUAwo
+G726UZ6YVUO2+54SvizKcvOHgzS22tQ2l+pZOfh2gPV5IkQfudlege+qtcKK8Zsn
+7cPHGKuz3RElkdc7+XaV3wmRxP8B7YWq/e67Q72AakE89ViNjqP0JsiJR642GRdE
+KHlBtvm9klVEF23S55QgwW7wsFva/uGc/Oa4dLJ0w02WWZ8WAbTbN+zttFwSTS8z
+ty5SqYshCscvS4z676rCGENF8mBprFNXyEVQhcqGRjnuWcAPpy2/AVKPAQLxVnZb
+Mr5MY52tJL0wy6rmasuSjGK5y8+py/30cBcHJ63DU172zKLIbaqHiUs=
+=7kOz
+-----END PGP SIGNATURE-----
+
+--0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA--
