@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ebjt6-0000HI-Ds
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:05 -0500
+	(envelope-from <groug@kaod.org>) id 1ebjtW-0000cf-29
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ebjt2-0006DR-6O
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:04 -0500
-Resent-Message-Id: <E1ebjt2-0006DR-6O@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21103)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ebjt1-0006Cd-W9
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:00 -0500
-In-Reply-To: <20180116172510.28878-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151612398961.572.16792629272777090560@5adcb62bf0d6>
+	(envelope-from <groug@kaod.org>) id 1ebjtS-0006gE-FM
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:29 -0500
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:33438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ebjtS-0006f9-3X
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:26 -0500
+Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 33BC585EB0
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 10:20:22 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 17 Jan 2018 10:20:14 +0100
+Message-ID: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 16 Jan 2018 09:33:10 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] linux-user: select CPU type
- according ELF header values
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH 0/3] spapr: fix CPU device tree nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, syq@debian.org, riku.voipio@iki.fi, richard.henderson@linaro.org, f4bug@amsat.org, asierra@xes-inc.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTE2MTcyNTEwLjI4ODc4LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzRdIGxpbnV4LXVzZXI6IHNlbGVjdCBDUFUgdHlw
-ZSBhY2NvcmRpbmcgRUxGIGhlYWRlciB2YWx1ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogICBhYWUzOWQyNGEzLi5jMWQ1YjlhZGQ3ICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMTE2MTcyNTEwLjI4ODc4LTEtbGF1cmVu
-dEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE4MDExNjE3MjUxMC4yODg3OC0xLWxhdXJlbnRAdml2
-aWVyLmV1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYTYzYTA5YmZlNSBsaW51eC11
-c2VyOiBNSVBTIHNldCBjcHUgdG8gcjYgQ1BVIGlmIGJpbmFyeSBpcyBSNgoyNGYzNzYwMWUyIGxp
-bnV4LXVzZXIsIG02OGs6IHNlbGVjdCBDUFUgYWNjb3JkaW5nIHRvIEVMRiBoZWFkZXIgdmFsdWVz
-CjVlNzNhZDg2ZjUgbGludXgtdXNlcjogaW50cm9kdWNlIGZ1bmN0aW9ucyB0byBkZXRlY3QgQ1BV
-IHR5cGUKMmVlZjIwNGUzZCBsaW51eC11c2VyOiBNb3ZlIENQVSB0eXBlIG5hbWUgc2VsZWN0aW9u
-IHRvIGEgZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDog
-bGludXgtdXNlcjogTW92ZSBDUFUgdHlwZSBuYW1lIHNlbGVjdGlvbiB0byBhIGZ1bmN0aW9uLi4u
-CkNoZWNraW5nIFBBVENIIDIvNDogbGludXgtdXNlcjogaW50cm9kdWNlIGZ1bmN0aW9ucyB0byBk
-ZXRlY3QgQ1BVIHR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiBsaW51eC11c2VyLCBtNjhrOiBz
-ZWxlY3QgQ1BVIGFjY29yZGluZyB0byBFTEYgaGVhZGVyIHZhbHVlcy4uLgpDaGVja2luZyBQQVRD
-SCA0LzQ6IGxpbnV4LXVzZXI6IE1JUFMgc2V0IGNwdSB0byByNiBDUFUgaWYgYmluYXJ5IGlzIFI2
-Li4uCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRz
-ICg1LCA5KQojMzY6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy90YXJnZXRfZWxmLmg6MTI6CisgICAg
-IGlmICgoZWZsYWdzICYgRUZfTUlQU19BUkNIXzMyUjYpICE9IDApIHsKKyAgICAgICAgIHJldHVy
-biAibWlwczMycjYtZ2VuZXJpYyI7CgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29u
-ZGl0aW9uYWwgc3RhdGVtZW50cyAoNSwgOSkKIzUwOiBGSUxFOiBsaW51eC11c2VyL21pcHM2NC90
-YXJnZXRfZWxmLmg6MTI6CisgICAgIGlmICgoZWZsYWdzICYgRUZfTUlQU19BUkNIXzY0UjYpICE9
-IDApIHsKKyAgICAgICAgIHJldHVybiAiSTY0MDAiOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5p
-bmdzLCAyOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-ZnJlZWxpc3RzLm9yZw==
+When a compatibility mode is requested on the command line,
+only the boot CPU core is correctly advertised in the device
+tree. Any other CPU core, either hot-plugged or cold-plugged,
+appears to be in raw mode with the host PVR.
+
+Guest started on a POWER8 host with:
+     -smp cores=2 -machine pseries,max-cpu-compat=compat7
+
+# dtc -f -I fs -O dts /proc/device-tree | egrep 'cpu-version|pa-features'
+                        ibm,pa-features = [18 00 f6 3f c7 c0 80 f0 80 00
+ 00 00 00 00 00 00 00 00 80 00 80 00 80 00 00 00];
+                        cpu-version = <0x4d0200>;
+
+                               ^^^
+                        second CPU core
+
+                        ibm,pa-features = <0x600f63f 0xc70080c0>;
+                        cpu-version = <0xf000003>;
+
+                               ^^^
+                          boot CPU core
+
+This happens because the compatibility mode for any CPU but
+the boot one is set after the device tree was populated, and
+exposed to the guest.
+
+This series fixes the issue by setting the compatibility mode
+during CPU reset. This is done in the last patch.
+
+The first two patches are preliminary cleanup of the CPU reset
+and CPU hotplug paths. They are not strictly needed, but I
+think they are valuable anyway.
+
+--
+Greg
+
+---
+
+Greg Kurz (3):
+      spapr: drop duplicate variable in spapr_core_plug()
+      spapr_cpu_core: don't reset CPUs during realization
+      spapr: fix device tree properties when using compatibility mode
+
+
+ hw/ppc/spapr.c                  |   30 ++++++++++++++++++------------
+ hw/ppc/spapr_cpu_core.c         |   15 +++++++++++++--
+ hw/ppc/spapr_rtas.c             |    9 ---------
+ include/hw/ppc/spapr_cpu_core.h |    2 ++
+ 4 files changed, 33 insertions(+), 23 deletions(-)
