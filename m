@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cristian.ancuta@intel.com>) id 1ebcrs-0005WC-HO
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 20:50:21 -0500
+	(envelope-from <fzheng@redhat.com>) id 1ebdC4-0002qS-UN
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:11:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cristian.ancuta@intel.com>) id 1ebcrp-0001hN-FO
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 20:50:20 -0500
-Received: from mga07.intel.com ([134.134.136.100]:2354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cristian.ancuta@intel.com>)
-	id 1ebcrp-0001eT-6W
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 20:50:17 -0500
-From: "Ancuta, Cristian" <cristian.ancuta@intel.com>
-Date: Wed, 17 Jan 2018 01:50:09 +0000
-Message-ID: <54990469B118604BB659B7D5A1E9A462323C2A8F@HASMSX111.ger.corp.intel.com>
-References: <54990469B118604BB659B7D5A1E9A462323C2A6E@HASMSX111.ger.corp.intel.com>
-	<87AE25C4-E8EA-47FB-A23D-25F9F76737D2@livius.net>
-In-Reply-To: <87AE25C4-E8EA-47FB-A23D-25F9F76737D2@livius.net>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <fzheng@redhat.com>) id 1ebdC0-0000os-0J
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:11:12 -0500
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:37966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1ebdBz-0000o6-RO
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:11:07 -0500
+Received: by mail-pf0-f196.google.com with SMTP id k19so10710425pfj.5
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 18:11:07 -0800 (PST)
+From: Fam Zheng <fzheng@redhat.com>
+References: <20180112125000.27256-1-f4bug@amsat.org>
+	<20180112125000.27256-3-f4bug@amsat.org>
+Message-ID: <c90deebc-f06f-4d68-ed27-d210849eb5c0@redhat.com>
+Date: Wed, 17 Jan 2018 10:10:54 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Qemu c++ build question
+In-Reply-To: <20180112125000.27256-3-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/7] docker: do not display deprecated
+ images in 'make docker' help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liviu Ionescu <ilg@livius.net>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-
-Hi and thanks for the answer,
-
-Yes, not quite what I expected but your suggestion might indeed be the solu=
-tion I need.
-
-Even if the problem that I'm encountering doesn't seeem to be related to th=
-e one you had, I'd will just export a C interface from the C++ code and kee=
-p the two isolated, rather than mess around with the build system since tha=
-t looks like it's going nowhere.
-
-Regards,
-Cristi
-
------Original Message-----
-From: Liviu Ionescu [mailto:ilg@livius.net]=20
-Sent: Wednesday, January 17, 2018 3:37 AM
-To: Ancuta, Cristian <cristian.ancuta@intel.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] Qemu c++ build question
 
 
 
-> On 17 Jan 2018, at 03:14, Ancuta, Cristian <cristian.ancuta@intel.com> wr=
-ote:
->=20
-> I'm currently working on implementing an emulation target in QEMU and the=
- implementation is in C++.
+On 01/12/2018 08:49 PM, Philippe Mathieu-Daudé wrote:
+> the 'debian' base image is deprecated since 3e11974988d8
+>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>   tests/docker/Makefile.include | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index ef95703cef..f0cd26c2b6 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -4,7 +4,8 @@
+>   
+>   DOCKER_SUFFIX := .docker
+>   DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
+> -DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker))))
+> +DOCKER_DEPRECATED_IMAGES := debian
+> +DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+>   DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+>   # Use a global constant ccache directory to speed up repetitive builds
+>   DOCKER_CCACHE_DIR := $$HOME/.cache/qemu-docker-ccache
 
-it might not be the answer you expect, but last time I tried to do a simila=
-r thing I encountered a problem that prevented the direct C++ integration i=
-nto QEMU.
-
-I don't know if it is still the case, but a field in one of the main header=
-s defining objects was called `class`, a reserved name in C++.
-
-so be sure you isolate the C++ code outside QEMU and access it only via a C=
- interface; also be sure you do not include the QEMU headers in C++ files.
-
-
-regards,
-
-Liviu
+While we are at it, could you please just spell out this list 
+explicitly, consistent to how we build obj-y variables?
