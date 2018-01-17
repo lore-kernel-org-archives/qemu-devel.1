@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ebtuh-0000VY-Uz
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:02:25 -0500
+	(envelope-from <jack.schwartz@oracle.com>) id 1ebtyB-0001zA-8w
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:06:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ebtud-0003uv-0C
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:02:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32998
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <jack.schwartz@oracle.com>) id 1ebty4-0006PM-Uu
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:05:59 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:38658)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ebtuc-0003uc-QJ
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:02:18 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0HJtSrn076563
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 15:02:17 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fjag47jqe-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 15:02:17 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 17 Jan 2018 20:02:15 -0000
-References: <20180117193757.73471-1-borntraeger@de.ibm.com>
-	<20180117193757.73471-2-borntraeger@de.ibm.com>
-	<c309fedd-29c0-e627-11e4-64fcbb7f09f5@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 17 Jan 2018 21:02:11 +0100
+	(Exim 4.71) (envelope-from <jack.schwartz@oracle.com>)
+	id 1ebty4-0006MC-N9
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:05:52 -0500
+References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
+	<20180115155413.GJ32271@localhost.localdomain>
+From: Jack Schwartz <jack.schwartz@oracle.com>
+Message-ID: <2f56a075-ba01-4329-b46c-33b3d40000cb@oracle.com>
+Date: Wed, 17 Jan 2018 12:06:15 -0800
 MIME-Version: 1.0
-In-Reply-To: <c309fedd-29c0-e627-11e4-64fcbb7f09f5@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180115155413.GJ32271@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <746ffa7a-1452-ffcb-e305-a4cac7aee113@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] header sync
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH QEMU v1 0/4] multiboot: bss_end_addr can be
+ zero / cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,36 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: ehabkost@redhat.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, daniel.kiper@oracle.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org
 
-It is just a header sync and mimics the kernel.
-The previous header sync added the the commit that added the SPDX tag and this
-header sync added the commit that removed the now redundant licence text.
+Hi Kevin and Anatol.
 
-On 01/17/2018 08:46 PM, Eric Blake wrote:
-> On 01/17/2018 01:37 PM, Christian Borntraeger wrote:
->> replace with proper header sync
+Kevin, thanks for your review.
+
+More inline below...
+
+On 01/15/18 07:54, Kevin Wolf wrote:
+> Am 21.12.2017 um 18:25 hat Jack Schwartz geschrieben:
+>> Properly account for the possibility of multiboot kernels with a zero
+>> bss_end_addr.  The Multiboot Specification, section 3.1.3 allows for
+>> kernels without a bss section, by allowing a zeroed bss_end_addr multi=
+boot
+>> header field.
 >>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  linux-headers/asm-s390/kvm.h | 9 ++++-----
->>  linux-headers/linux/kvm.h    | 5 +++--
->>  2 files changed, 7 insertions(+), 7 deletions(-)
->>tag
->> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
->> index 32d372e..11def14 100644
->> --- a/linux-headers/asm-s390/kvm.h
->> +++ b/linux-headers/asm-s390/kvm.h
->> @@ -6,10 +6,6 @@
->>   *
->>   * Copyright IBM Corp. 2008
->>   *
->> - * This program is free software; you can redistribute it and/or modify
->> - * it under the terms of the GNU General Public License (version 2 only)
->> - * as published by the Free Software Foundation.
->> - *
-> 
-> Is dropping a license clause intentional?  If so, the commit message may
-> want to go into more details why it is okay.
-> 
+>> Do some cleanup to multiboot.c as well:
+>> - Remove some unused variables.
+>> - Use more intuitive header names when displaying fields in messages.
+>> - Change fprintf(stderr...) to error_report
+> There are some conflicts with Anatol's (CCed) multiboot series:
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03003.html
+>
+> None if these should be hard to resolve, but it would be good if you
+> could agree with each other whose patch series should come first, and
+> then the other one should be rebased on top of that.
+Anatol,
+
+from my side, there are pros and cons to either patch set going in=20
+first, but advantages to either are pretty negligible.=C2=A0 Pro for you=20
+going first: I can use the constants you will define in header files.=C2=A0=
+=20
+Pro for me going first: your merge should be about the same as if you=20
+went first (since my changes are small, more localized and affect only=20
+multiboot.c) and my merge will be easier.
+
+What are your thoughts?
+> Testing:
+>    1) Ran the "make check" test suite.
+>    2) Booted multiboot kernel with bss_end_addr=3D0.  (I rolled my own
+>       grub multiboot.elf test "kernel" by modifying source.)  Verified
+>       with gdb that new code that reads addresses/offsets from multiboo=
+t
+>       header was accessed.
+>    3) Booted multiboot kernel with non-zero bss_end_addr.
+>    4) Uncommented DEBUG_MULTIBOOT in multiboot.c and verified messages =
+worked.
+>    5) Code has soaked in an internal repo for two months.
+> Can you integrate your test kernel from 2) in tests/multiboot/ so we ca=
+n
+> keep this as a regression test?
+Kevin and alias,
+
+Before I proceed with adding my multiboot test file, I'll clarify here=20
+that I started with a version from the grub2 tree.=C2=A0 In that file I=20
+expanded a header file, also from the same tree.=C2=A0 Neither file had a=
+ny=20
+license header, though the tree I got them from (Dated October 2017)=20
+contains the GNU GPLv3 license file.
+
+I'll need to check with my company before I can say I can deliver this=20
+file.=C2=A0 If I deliver it, I'll add a header stating the GPL license, t=
+hat=20
+it came from grub2 and to check its repository for contributors.
+>> Jack Schwartz (4):
+>>    multiboot: bss_end_addr can be zero
+>>    multiboot: Remove unused variables from multiboot.c
+>>    multiboot: Use header names when displaying fields
+>>    multiboot: fprintf(stderr...) -> error_report()
+> Apart from the conflicts, the patches look good to me.
+ =C2=A0=C2=A0=C2=A0 Thanks,
+ =C2=A0=C2=A0=C2=A0 Jack
+>
+> Kevin
+>
