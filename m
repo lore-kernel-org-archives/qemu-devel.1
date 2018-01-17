@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebjlg-00065L-Mp
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:12:29 -0500
+	(envelope-from <clg@kaod.org>) id 1ebjsn-0008W6-RQ
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:19:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebjlc-00005S-LJ
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:12:24 -0500
-From: Thomas Huth <thuth@redhat.com>
-References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516034665-27606-6-git-send-email-walling@linux.vnet.ibm.com>
-	<315c794c-7e75-fd90-8327-b22847247983@redhat.com>
-Message-ID: <a3545fd6-0756-9328-0790-ede139fcc996@redhat.com>
-Date: Wed, 17 Jan 2018 10:12:13 +0100
+	(envelope-from <clg@kaod.org>) id 1ebjsj-0005vR-Gs
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:19:45 -0500
+Received: from 16.mo3.mail-out.ovh.net ([188.165.56.217]:41695)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ebjsj-0005kt-92
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:19:41 -0500
+Received: from player732.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id D7B4017B1BF
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 10:19:26 +0100 (CET)
+References: <20171209084338.29395-1-clg@kaod.org>
+	<20171209084338.29395-3-clg@kaod.org>
+	<20171220050947.GC5981@umbus.fritz.box>
+	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+Date: Wed, 17 Jan 2018 10:18:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <315c794c-7e75-fd90-8327-b22847247983@redhat.com>
+In-Reply-To: <1513896817.2743.63.camel@kernel.crashing.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 5/8] s390-ccw: interactive
- boot menu for eckd dasd (read stage2 data)
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, frankja@linux.vnet.ibm.com
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On 17.01.2018 09:38, Thomas Huth wrote:
-> On 15.01.2018 17:44, Collin L. Walling wrote:
-[...]
->> +        if (find_zipl_boot_menu_banner(&offset)) {
->> +            /* Load the adjacent blocks to account for the
->> +             * possibility of menu data spanning multiple blocks.
->> +             */
->> +            if (prev_block_nr) {
+>>> Also, have we decided how the process of switching between XICS and
+>>> XIVE will work vs. CAS ? 
+>>
+>> That's how it is described in the architecture. The current choice is
+>> to create both XICS and XIVE objects and choose at CAS which one to
+>> use. It relies today on the capability of the pseries machine to 
+>> allocate IRQ numbers for both interrupt controller backends. These
+>> patches have been merged in QEMU.
+>>
+>> A change of interrupt mode results in a reset. The device tree is 
+>> populated accordingly and the ICPs are switched for the model in 
+>> use. 
 > 
-> You did not pre-initialize prev_block_nr = 0 at the beginning of the
-> function. Do you feel confident enough that the first block never
-> contains the zipl banner? If not, please set prev_block_nr = 0 before
-> entering the for-loop.
+> For KVM we need to only instanciate one of them though.
 
-Ah, I just noticed that this is also the issue that has been reported by
-patchew. So you've got to set prev_block_nr = 0 anyway to keep all
-compilers happy ;-)
+Hmm,
 
- Thomas
+How would we handle a guest rebooting on a kernel without XIVE support ? 
+Are you suggesting to create the XICS or XIVE device in the CAS negotiation 
+process ? So, the machine would not have any interrupt controller before 
+CAS. That seems really late to me. grub uses the console for instance. 
+
+I think it should prepare for both options, start in XIVE legacy mode, 
+which is XICS, then possibly switch to XIVE exploitation mode.
+
+>>> And how that will interact with KVM ? 
+>>
+>> I expect we will do the same, which is to create two KVM devices to 
+>> be able to handle both interrupt controller backends depending on the 
+>> mode negotiated by the guest.  
+> 
+> That will be an ungodly mess, I'd rather we only instanciate the right
+> one.
+
+It's rather transparent currently in the emulated version. There are two 
+sets of objects in QEMU, switching is done in CAS. KVM support should not 
+change anything in that area. 
+
+I expect the 'xive-kvm' object to get/set states for migration, just like 
+for XICS and to setup the ESB+TIMA memory regions, which is new. 
+
+C. 
+ 
+>>> I was
+>>> thinking the kernel would implement a different KVM device type, ie
+>>> the "emulated XICS" would remain KVM_DEV_TYPE_XICS and XIVE would be
+>>> KVM_DEV_TYPE_XIVE.
+>>
+>> yes. it makes sense. The new device will have a lot in common with the 
+>> KVM_DEV_TYPE_XICS using kvm_xive_ops.
+> 
+> Ben.
+> 
