@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ebm95-0005zz-Pg
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:44:45 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ebmIm-0000Bq-Vt
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:54:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ebm91-0002qX-Tq
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:44:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ebm91-0002py-OU
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:44:39 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E626DC04BD5A
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 11:44:38 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 17 Jan 2018 12:44:30 +0100
-Message-Id: <20180117114430.19110-1-marcandre.lureau@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ebmIj-0001IT-T9
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:54:45 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40645)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ebmIj-0001Hx-LJ
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:54:41 -0500
+Received: by mail-wm0-x244.google.com with SMTP id v123so15178830wmd.5
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 03:54:41 -0800 (PST)
+References: <20180115143500.22631-1-f4bug@amsat.org>
+	<20180115143500.22631-5-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180115143500.22631-5-f4bug@amsat.org>
+Date: Wed, 17 Jan 2018 11:54:38 +0000
+Message-ID: <873734og3l.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] dump-guest-memory.py: fix python 2 support
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] docker: do not use Trusty APT
+ source in Xenial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Python GDB support may use Python 2 or 3.
 
-Inferior.read_memory() may return a buffer with Python 2 or a
-memoryview with Python 3 (see also
-https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-The elf.add_vmcoreinfo_note() method expect a byte string, but Python 2
-buffer doesn't provide the tobyes() method. Wrap the read_memory()
-result to a memoryview, available in Python 2.7. (if the return object
-is already a memoryview, this adds a useless identity view on top)
+> probably missed in 7fc581c29518
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  tests/docker/dockerfiles/ubuntu.docker | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/docker=
+files/ubuntu.docker
+> index dabbf2a8a4..686d90ae8c 100644
+> --- a/tests/docker/dockerfiles/ubuntu.docker
+> +++ b/tests/docker/dockerfiles/ubuntu.docker
+> @@ -1,6 +1,4 @@
+>  FROM ubuntu:16.04
+> -RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiver=
+se" >> \
+> -    /etc/apt/sources.list
 
-Fixes a regression introduced with commit
-d23bfa91b7789534d16ede6cb7d925bfac3f3c4c ("add vmcoreinfo").
+do we not need anything in universe or multiverse?
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- scripts/dump-guest-memory.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+>  RUN apt-get update
+>  ENV PACKAGES flex bison \
+>      libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncurse=
+sw5-dev \
 
-diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-index 09bec92b50..6f7e1a83b3 100644
---- a/scripts/dump-guest-memory.py
-+++ b/scripts/dump-guest-memory.py
-@@ -564,7 +564,9 @@ shape and this command should mostly work."""
-=20
-         vmcoreinfo =3D self.phys_memory_read(addr, size)
-         if vmcoreinfo:
--            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
-+            # Python 2.7 returns a buffer
-+            vmciview =3D memoryview(vmcoreinfo)
-+            self.elf.add_vmcoreinfo_note(vmciview.tobytes())
-=20
-     def invoke(self, args, from_tty):
-         """Handles command invocation from gdb."""
---=20
-2.16.0.rc1.1.gef27df75a1
+
+--
+Alex Benn=C3=A9e
