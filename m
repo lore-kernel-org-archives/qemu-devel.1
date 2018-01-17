@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebqNt-0007Z6-TY
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:16:19 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ebqOJ-0007xN-Jp
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebqNq-0004Bw-K5
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:16:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ebqNq-0004BU-BF
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:16:14 -0500
-Date: Wed, 17 Jan 2018 17:15:40 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180117171540.7e892ce7@redhat.com>
-In-Reply-To: <CAKv+Gu__twgv27OxV=ORHywzeotk3+TNYo_-=bSjdFokfmXyGw@mail.gmail.com>
-References: <CAFEAcA8F4iO91c8OGtDbHQ_hqzY+9ka41PW4q+ES9sYGRUha0g@mail.gmail.com>
-	<176e66bb-7990-20da-a82f-fbabd9b4ed88@redhat.com>
-	<CAKv+Gu__twgv27OxV=ORHywzeotk3+TNYo_-=bSjdFokfmXyGw@mail.gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1ebqOG-0004Ls-Bv
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:16:43 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:60621)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ebqOG-0004Kl-2m
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:16:40 -0500
+References: <20180116222212.1266-1-laurent@vivier.eu>
+	<20180117164950.3c818541@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <7b35a1bc-e7ce-4a8a-e71e-1ffaa6aff010@vivier.eu>
+Date: Wed, 17 Jan 2018 17:15:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU virt board: extending various limits
+In-Reply-To: <20180117164950.3c818541@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] linux-user: select CPU type
+ according ELF header values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, "Leif Lindholm
-	(Linaro address)" <leif.lindholm@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Aaron Sierra <asierra@xes-inc.com>
 
-On Tue, 16 Jan 2018 20:28:49 +0000
-Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-
-> On 16 January 2018 at 20:18, Laszlo Ersek <lersek@redhat.com> wrote:
-> > (adding Ard, Igor, Wei, Leif)
-> >
-> > On 01/16/18 16:07, Peter Maydell wrote:  
-> >> We've had discussions before about the various limits in the virt
-> >> board imposed by its current address space layout:
-> >>  * number of CPUs limited to 123 (not enough space for more redistributors)
-> >>  * number of PCIe devices limited by size of ECAM space
-> >>  * max memory size limits
-> >>  * (anything else?)
-> >>
-> >> If we want to try to fix these this release cycle now would be a good
-> >> point to figure out our approach so that we have plenty of time to do
-> >> it in.
-> >>
-> >> (Relatedly, I notice patches on list for kvm that allow userspace to
-> >> set the guest physical address size, which may affect how we want
-> >> to do this.)
-> >>
-> >> I'm not going to have time to look at this but am happy to provide
-> >> my opinions on whatever proposals other people would like to suggest.
-> >>
-> >> Probably the first thing to do is figure out whether we can
-> >> raise these limits without having to have a flag day (ie just
-> >> with changing the device tree we provide the guest), or if we
-> >> really have a hard compat break here. We should also try to
-> >> fix all these things at once rather than potentially breaking
-> >> guests several times...  
-> >
-> > I've quite lost the context on this since we last talked about it. :) My
-> > request would be that Drew and Igor please (re)state their preferences,
-> > and Ard and myself should put "firmware price tags" on those ideas.
-> >
-> > As far as I remember, the sticking point from last time was whether
-> > guest UEFI remains permitted to rely on the RAM base being fixed at 1GB
-> > (i.e. if UEFI is at liberty to ignore x0 on entry). This decision
-> > provides a framework for all further area movements, and represents a
-> > large difference in firmware difficulty.
-> >
-> > (Personally I'd be ready to *accept* a consensus that UEFI should cope
-> > with a dynamic x0 on entry -- I'm neither proposing nor arguing against
-> > the notion. The large additional complexity in the firmware should be
-> > clear up-front however -- it'll take more time, more bugs, more human
-> > resources. My last writeup is at
-> > <http://mid.mail-archive.com/4cce2b8b-a411-bd5d-a06f-b0b80a5fb2f1@redhat.com>,
-> > although I think Ard has modified some of the code since, so parts of
-> > that text are no longer up to date.)
-> >  
+Le 17/01/2018 à 16:49, Igor Mammedov a écrit :
+> On Tue, 16 Jan 2018 23:22:08 +0100
+> Laurent Vivier <laurent@vivier.eu> wrote:
 > 
-> The 'contract' was 1 MB at 0x40000000 but UEFI never used more than
-> 512 KB of that without checking the DT. With only very minor changes,
-> we could repurpose this range as 'non-secure SRAM', use it as
-> temporary PEI memory and use whatever the DT describes for DRAM, PCIe
-> etc.
+>> This idea has been suggested to me before by Philippe
+>> Mathieu-Daudé, and recently YunQiang Su has proposed a
+>> patch to manage the MIPS r6 case.
+>>
+>> Based on this, this series tries to clean-up the original
+>> patch, and introduces the use for m68k architecture and
+>> port the patch from YunQiang Su.
+>>
+>> v3: fix code indent problem reported by patchew
+>>     remove useless "!= 0"
+>>     check for EF_M68K_M68000
+>>     add EF_M68K_* flags in elf.h
+>>     set 680x0 default CPU to m68040
+>>     change "#if ... #endif" structure for ppc
+>> v2: move cpu_model selection to linux-user/*/target_elf.h
+>>     provide eflags to cpu_get_model() instead of fd
+>>     (and modify other patches accordingly)
+> Sorry for not noticing it earlier, but could you please
+> fix series to use cpu type names instead of cpu_model?
 > 
-> For the firmware side, this would be a very natural fit with what the
-> code currently does, and with what many x86 and ARM bare metal
-> platforms do as well. Of course, I am clueless when it comes to the
-> QEMU side of these things, so perhaps this is a terrible idea.
+> I've just posted series that completes cpu_model refactoring
+>   [PATCH 00/24] generalize parsing of cpu_model (part 4)
+> which removes remnants of the code using cpu_model to
+> instantiate CPUs, including reworking how default
+> cpu type for *-user is picked up.
+> 
+> After that cpu_model shouldn't be used anywhere in the code
+> except of routines that process "-cpu" CLI and cpu types
+> should be used directly.
+> 
+> So you might not need 1/4 after that or it would have
+> to be reworked and probably other patches where where
+> cpu_model is used.
 
-my idea was to drop fixed RAM base for virt board (at least for
-new machine types) so that QEMU could specify it dynamically and
-firmware would get base from x0 instead of compiled in constant.
+If I understand correctly, in linux-user/main.c we have to use
+cpu_create() instead of cpu_init(), and provide the cpu_type instead of
+the cpu_model?
 
-Though it's more complex for firmware, It should benefit both qemu
-and firmware in the long run.
-  - we won't have to update lockstep updates if there will be need
-    to move base in the future
-  - not need maintain/invent compat machinery to make sure that
-    old/new firmware will work fine on old/new qemu
-  - qemu won't have to introduce fragmented RAM layout and keep it
-    in as continuous region which is simpler to maintain and hard
-    to break by accident.
+In linux-user/main.c, How can I detect we want to use the default one
+(we were relying on "cpu_model == NULL" until now) to be able to compute
+the default one from the ELF header?
 
-So I think that dynamic memory base would be better approach to
-maintain zoo of qemu and firmware and reduce chances of breaking
-some combo that used to work by accident.
+Thanks,
+Laurent
