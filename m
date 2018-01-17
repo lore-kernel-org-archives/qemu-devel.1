@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56371)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnzT-00030O-57
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:43:01 -0500
+	id 1ebo3w-0006So-UG
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:47:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnzP-0005jk-82
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:42:55 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33740)
+	id 1ebo3s-0002YM-U7
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:47:32 -0500
+Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:37458)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnzP-0005iE-4S
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:42:51 -0500
-Received: by mail-qk0-x243.google.com with SMTP id i141so25268508qke.0
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:42:51 -0800 (PST)
+	id 1ebo3s-0002Xz-P6
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:47:28 -0500
+Received: by mail-vk0-x244.google.com with SMTP id g83so11509276vki.4
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:47:28 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180112125000.27256-1-f4bug@amsat.org>
-	<20180112125000.27256-4-f4bug@amsat.org>
-	<329211f4-e244-2524-96ba-4dfa694c4daf@redhat.com>
+	<efc62dcb-cd6f-97c4-20b7-b2a4d210e55a@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a78a7be4-36c4-b043-0d0f-b3d8202498a0@amsat.org>
-Date: Wed, 17 Jan 2018 10:42:46 -0300
+Message-ID: <725d8315-8dce-3465-7f5c-77f467d65a37@amsat.org>
+Date: Wed, 17 Jan 2018 10:47:19 -0300
 MIME-Version: 1.0
-In-Reply-To: <329211f4-e244-2524-96ba-4dfa694c4daf@redhat.com>
+In-Reply-To: <efc62dcb-cd6f-97c4-20b7-b2a4d210e55a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/7] docker: add the Ubuntu Trusty base
- image
+Subject: Re: [Qemu-devel] [PATCH 0/7] docker: update Ubuntu and Fedora
+ images, deprecate old ones
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,52 +39,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Fam Zheng <fzheng@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-On 01/16/2018 11:12 PM, Fam Zheng wrote:
+On 01/16/2018 11:26 PM, Fam Zheng wrote:
 > On 01/12/2018 08:49 PM, Philippe Mathieu-Daudé wrote:
->> based on QEMU v2.10 ubuntu.docker (ca853f0c76e3 and 2346b12fc52d)
+>> Hi,
 >>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   tests/docker/dockerfiles/ubuntu14.04.docker | 17 +++++++++++++++++
->>   1 file changed, 17 insertions(+)
->>   create mode 100644 tests/docker/dockerfiles/ubuntu14.04.docker
+>> This series is to be clearer about which upstream version we are using.
 >>
->> diff --git a/tests/docker/dockerfiles/ubuntu14.04.docker
->> b/tests/docker/dockerfiles/ubuntu14.04.docker
->> new file mode 100644
->> index 0000000000..cd24e759a7
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/ubuntu14.04.docker
->> @@ -0,0 +1,17 @@
->> +FROM ubuntu:14.04
->> +RUN apt-get update
->> +ENV PACKAGES flex bison \
->> +    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev
->> libncursesw5-dev \
->> +    libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
->> +    libspice-protocol-dev libnss3-dev libfdt-dev \
->> +    libgtk-3-dev libvte-2.90-dev libsdl1.2-dev libpng12-dev
->> libpixman-1-dev \
->> +    libvdeplug-dev liblzo2-dev libsnappy-dev libbz2-dev libxen-dev
->> librdmacm-dev libibverbs-dev \
->> +    libsasl2-dev libjpeg-turbo8-dev xfslibs-dev libcap-ng-dev
->> libbrlapi-dev libcurl4-gnutls-dev \
->> +    libbluetooth-dev librbd-dev libaio-dev glusterfs-common
->> libnuma-dev libepoxy-dev libdrm-dev libgbm-dev \
->> +    libjemalloc-dev libusbredirhost-dev libnfs-dev libcap-dev
->> libattr1-dev \
->> +    texinfo dpkg-dev \
->> +    gettext git make ccache python-yaml gcc clang sparse
->> +RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends
->> install $PACKAGES
->> +RUN dpkg -l $PACKAGES | sort > /packages.txt
->> +ENV FEATURES clang pyyaml
->> +ENV QEMU_CONFIGURE_OPTS --disable-opengl
+>> All "FROM distrib:latest" entries have now been removed and replaced by
+>> explicit "FROM distrib:version" ones.
+>>
+>> To keep backward compatibility, a warning is displayed to the user,
+>> suggesting which correct base image to use.
+>>
+>> To be consistent, we remove the deprecated images of the "make docker"
+>> output.
 > 
-> Why is this option needed?
+> Changing image names when a new release comes out is not maintainable
+> for Fedora and Ubuntu because of the fast pace. Therefore I prefer
+> Paolo's simple patch.
+> 
+> Maybe you can somehow create an alias in Makefile to point "fedora" to
+> "fedora${last_release_num}", and update it when adding a new release.
+> But still I don't think keeping more than one fedora dockerfiles is very
+> useful.
+> 
+> In principle, we use Debian, CentOS and ubuntu-lts to cover long living
+> releases and {ubuntu,fedora}:latest to cover cutting edge releases.
+> Spending effort on tests is better than adding more versions, IMO.
 
-Indeed I forgot to comment about this, I couldn't get it built in the
-Trusty image (remember, current 'ubuntu' contains 'Trusty' strings but
-'latest' points to Xenial).
-
-I assumed the stable release is interested of keeping Trusty builds.
+I went this way following your previous advice in
+http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg05282.html
+but I get your point.
