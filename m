@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnm2-000228-5N
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:03 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ebnmv-0002bb-Pi
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnlx-0000yT-9N
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:02 -0500
-Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:35146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnlw-0000xr-Sw
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:28:57 -0500
-Received: by mail-qk0-x234.google.com with SMTP id w1so25211121qka.2
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:28:56 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180116231824.27114-1-shaun.reitan@ndchost.com>
-	<20180117103148.GE19227@redhat.com>
-	<39294893-a458-9f40-dc9c-bcac14d8be5e@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6fa6797b-c57f-5635-4c60-1a0714089638@amsat.org>
-Date: Wed, 17 Jan 2018 10:28:52 -0300
+	(envelope-from <mreitz@redhat.com>) id 1ebnmu-0001ta-ND
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:57 -0500
+References: <20171129185102.29390-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <27daf5bc-00a1-ca51-a158-0d466569b095@redhat.com>
+Date: Wed, 17 Jan 2018 14:29:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <39294893-a458-9f40-dc9c-bcac14d8be5e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Add ability to provide ifname when using
- netdev bridge or tap helper
+In-Reply-To: <20171129185102.29390-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr"
+Subject: Re: [Qemu-devel] [PATCH for-2.12] qemu-iotests: Fix locking issue
+ in 102
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,29 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Shaun Reitan <shaun.reitan@ndchost.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 01/17/2018 07:39 AM, Paolo Bonzini wrote:
-> On 17/01/2018 11:31, Daniel P. Berrange wrote:
->>
->> eg consider the user asks for a tap device called  eth1. To the
->> sysadmin the user's tap device now looks like a physical NIC.
->> This can be even worse if the host does physical NIC hotplug,
->> or uses SRIOV. eg consider the host as eth0 -> eth7 for SRIOV
->> NICs, and eth3 is given to a guest. Now a user uses the setuid
->> helper to ask for a TAP called eth3. When the SRIOV device is
->> later released by the guest it will end up called eth8, as the
->> TAP device occupies eth3. In bad cases this could even cause
->> the host mgmt layer to configure bogus addresses on the eth3
->> TAP device instead of the SRIOV device.
->>
->> If we want to allow ifname to be set via the setuid helper, then IMHO,
->> the config file for the helper *must* whitelist the various permitted
->> naming patterns.
-> 
-> Indeed, a similar patch has been proposed several times, and always the
-> response was the same as Daniel's. :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <27daf5bc-00a1-ca51-a158-0d466569b095@redhat.com>
+Subject: Re: [PATCH for-2.12] qemu-iotests: Fix locking issue in 102
+References: <20171129185102.29390-1-mreitz@redhat.com>
+In-Reply-To: <20171129185102.29390-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Can this be added to docs/netdev-helpers.rst and with a comment
-referencing this file in qemu-bridge-helper.c ?
+On 2017-11-29 19:51, Max Reitz wrote:
+> 102 truncates a qcow2 file (the raw file) on purpose while a VM is
+> running.  However, image locking will usually prevent exactly this.
+>=20
+> The fact that most people have not noticed until now (I suppose you may=
+
+> have seen sporadic failures, but not taken them too seriously, like me)=
+
+> further shows that this truncation is actually not really done
+> concurrently, but that the VM is still starting up by this point and ha=
+s
+> not yet opened the image.  Remedy this by waiting for the monitor shell=
+
+> to appear before the qemu-img invocation so we know the VM is up.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/102     | 7 ++++++-
+>  tests/qemu-iotests/102.out | 3 ++-
+>  2 files changed, 8 insertions(+), 2 deletions(-)
+
+Applied to my block branch.
+
+Max
+
+
+--u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpfT8kSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A0qMIAJojMPhziYF3zQUEVq7AM3z6vvPODXhT
+1NT0qjKn/qv7j7NMt2oreR6NXrPY+w8lMHEZeOLOAEWt8jmCRtl7gjK7DrSxJCWu
+psVqs6QHKLKg8MGQTjckPgVfF2xDBVny3sagnaFgpP39zBlxWdUT2Ndx74co7TCy
+kAex5YutecjkoobAgXli6Y53WMOEiN3tfE9ZcKTeL28vhyn0KrDaXBQMLlBW/CXC
+hr5J0tog7nE8ZDW2xUkuv2N1VhaOoh4XNteabry0HXPZNwWaMwYqpWmd2KOlULRX
+raGBaGtnurFxTYjvXQo3xsxGYS2IN2OpcBcrpBkpRpsqJnZk9ycTeBE=
+=vY5D
+-----END PGP SIGNATURE-----
+
+--u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr--
