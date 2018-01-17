@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1ebijl-0000yk-LZ
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:06:23 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1ebita-0003qS-8u
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:16:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1ebijh-0006lO-PY
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:06:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57444)
+	(envelope-from <haozhong.zhang@intel.com>) id 1ebitV-0005us-7S
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:16:30 -0500
+Received: from mga11.intel.com ([192.55.52.93]:63045)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ebijh-0006iL-HC
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:06:17 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AEC1380469
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:06:15 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <7e30d2cc-6c42-15e9-78ef-1085e081a386@redhat.com>
-Date: Wed, 17 Jan 2018 03:05:54 -0500
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Functional tests (AKA Avocado-based tests)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1ebitV-0005tV-04
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:16:25 -0500
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Wed, 17 Jan 2018 16:13:22 +0800
+Message-Id: <20180117081325.11924-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,140 +24,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Amador Pahim <apahim@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Jeff Nelson <jen@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-TL;DR
-=====
+v3 is based on Eduardo's machine-next tree. Changes of
+memory-backend-file are based on my previous patches in that tree.
 
-This is about how QEMU developers can get started with functional
-tests that are built on top of the Avocado libraries (and meant to be
-run with the Avocado test runner).
 
-The past
-========
+Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+files on ext4/xfs file system mounted with '-o dax').
 
-The Avocado project[1] has been working, for quite some time now, on a
-"set of tools and libraries" with the goal of making writing tests
-easier.  It is supposed to be a framework agnostic to the exact
-software that will be under test.
+A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+    https://patchwork.kernel.org/patch/10028151/
 
-But, at the same time, the Avocado project cannot deny its inheritance
-and influences.  Those come from Autotest[2], which had "KVM Autotest"
-as its largest and most developed "test".  This large Autotest test
-(KVM Autotest) became virt-test[3] and later got integrated into
-Avocado and became Avocado-VT[4] which is quite relevant here,
-together with its QEMU test provider[5].
+This patchset enables QEMU to use MAP_SYNC flag for memory-backend-file,
+in order to guarantee the guest write persistence to backend files
+supporting DAX.
 
-Avocado-VT and the QEMU test provider attempt to provide coverage
-across platform and QEMU versions, which increases its complexity.
-Also, it's built on a legacy set of principles and tools that makes
-some developers stir away from it.
+A new auto on/off option 'sync' is added to memory-backend-file:
+ - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+        'share=off', QEMU will abort
+ - off: never pass MAP_SYNC to mmap(2)
+ - auto (default): if MAP_SYNC is supported and 'share=on', work as if
+        'sync=on'; otherwise, work as if 'sync=off'
 
-What's new?
-===========
+Changes in v3:
+ * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+   cases, and add back the retry mechanism. MAP_SYNC will be ignored
+   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+ * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+   platforms in order to make qemu_ram_mmap() compile on those platforms.
+ * Patch 2&3: include more information in error messages of
+   memory-backend in hope to help user to identify the error.
+   (Dr. David Alan Gilbert)
+ * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
 
-A few months ago, the Avocado developers returned to its
-"virtualization origins", in an attempt to learn from the QEMU
-project, and try to help with a way to have more functional tests in
-the upstream QEMU repo.
+Changes in v2:
+ * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+ * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+ * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+   to osdep.h. (Michael S. Tsirkin)
 
-We believe it's possible to expand the test coverage for QEMU by
-facilitating
-the creation of more functional tests QEMU.  This is no different than how
-other types of tests are already included in the tree itself.
+Haozhong Zhang (3):
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+  hostmem: add hostmem type name and id in error messages
+  hostmem-file: add 'sync' option
 
-How
-===
-
-How we did it (so far)
-----------------------
-
-We're aware that there's a dilemma here: to be able to easily write
-more powerful tests, a lot of the complexity has to be moved
-elsewhere.  Here, it means moving complexity from the test itself to a
-framework.  The QEMU source tree itself has proofs of this approach,
-being the "scripts" and "tests/qemu-iotests" some of the examples.
-
-Avocado itself[1] provides a lot of the code that should help to
-absorb some of the complexities in writing tests, but not exactly
-everything that is needed for QEMU.  The approach we believe will have
-the best balance is to reuse upstream Avocado libraries whenever they
-are useful and generic enough, and on top of that, libraries that are
-part of QEMU itself.
-
-How can you get started with it
--------------------------------
-
-First of all, get Avocado installed.  Besides the Avocado test runner
-itself, this will give you the basic libraries on which the other part
-of this work was built on.  We want that to be simple and painless, so
-here's our best bet for a one-liner installation:
-
-  pip install --user avocado-framework
-avocado-framework-plugin-varianter-yaml-to-mux aexpect
-
-That will install Avocado within the user's home directory.  If you
-give up on it, it can be uninstalled with another simple one-liner:
-
-  pip uninstall -y avocado-framework
-avocado-framework-plugin-varianter-yaml-to-mux aexpect
-
-Now, suppose you're working on a given feature, and want to try your
-luck writing a test using this work.  To avoid having you fetching and
-rebasing from our currently in development fork[6] and branch[7], you
-can just
-add one commit to your tree with:
-
-  curl
-https://patch-diff.githubusercontent.com/raw/apahim/qemu/pull/17.patch |
-git am -
-
-This will get a simple patch from a snapshot branch[8].  You can, of course,
-do it "the git way", fetching from that repo[6] and using the
-non-snapshotted branch.
-
-After that, we'd love for you to take a look at some of the existing
-tests[9][10] and then attempt to create test for your own use case.
-The basic README[11] file, and the Avocado documentation[12] are also
-important resources not to be missed.
-
-What's next?
-============
-
-Initially, feedback is what we're looking for.  It would be greatly
-appreciated to understand if/how this suits (or not) use cases out
-there.
-
-After feedback, further refinements, and more tests are written, the
-Avocado developers will follow up with an initial patch series for
-upstream QEMU.  In such a proposal, we intend to have further
-integration.  Ideally in way that "configure" can be given a
-"--with-functional-[avocado-]tests" parameter of sorts, and a "make
- [functional-]check" would seamlessly include them.
-
-Thanks!
-
-References
-==========
-
- [1] http://avocado-framework.github.io/
- [2] http://autotest.github.io/
- [3] https://github.com/autotest/virt-test
- [4] https://github.com/avocado-framework/avocado-vt
- [5] https://github.com/autotest/tp-qemu
- [6] https://github.com/apahim/qemu
- [7] https://github.com/apahim/qemu/tree/avocado_qemu
- [8] https://github.com/apahim/qemu/tree/avocado_qemu_snapshot
- [9]
-https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/test_info_memdev_host_nodes.py
-[10]
-https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/test_ovmf_with_240_vcpus.py
-[11]
-https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/README.rst
-[12] http://avocado-framework.readthedocs.io/
+ backends/hostmem-file.c   | 49 +++++++++++++++++++++++++++++++++++++++++++----
+ backends/hostmem.c        | 11 +++++++----
+ docs/nvdimm.txt           | 15 ++++++++++++++-
+ exec.c                    | 13 ++++++++-----
+ include/exec/memory.h     |  4 ++++
+ include/exec/ram_addr.h   |  6 +++---
+ include/qemu/mmap-alloc.h |  3 ++-
+ include/qemu/osdep.h      | 18 +++++++++++++++++
+ memory.c                  |  6 ++++--
+ numa.c                    |  2 +-
+ qemu-options.hx           | 21 +++++++++++++++++++-
+ util/mmap-alloc.c         | 24 +++++++++++++++++++++--
+ util/oslib-posix.c        |  2 +-
+ 13 files changed, 149 insertions(+), 25 deletions(-)
 
 -- 
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+2.14.1
