@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebrix-0000gY-I6
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:42:10 -0500
+	(envelope-from <david@redhat.com>) id 1ebrj3-0000lH-MA
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:42:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebriw-00009F-BV
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:42:07 -0500
+	(envelope-from <david@redhat.com>) id 1ebrj1-0000Hq-MT
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:42:13 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 17 Jan 2018 18:40:45 +0100
-Message-Id: <20180117174047.6382-17-david@redhat.com>
+Date: Wed, 17 Jan 2018 18:40:47 +0100
+Message-Id: <20180117174047.6382-19-david@redhat.com>
 In-Reply-To: <20180117174047.6382-1-david@redhat.com>
 References: <20180117174047.6382-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 16/18] s390x/tcg: cache the qemu flic in a
- central function
+Subject: [Qemu-devel] [PATCH v2 18/18] s390x/flic: cache the common flic
+ class in a central function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +27,157 @@ This avoids tons of conversions when handling interrupts.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/intc/s390_flic.c          | 23 +++++++++++++++++------
+ hw/intc/s390_flic.c          | 13 ++++++++++++-
+ hw/s390x/css.c               | 10 +++++-----
+ hw/s390x/virtio-ccw.c        |  4 ++--
  include/hw/s390x/s390_flic.h |  1 +
  target/s390x/interrupt.c     |  6 +++---
- target/s390x/misc_helper.c   |  2 +-
- 4 files changed, 22 insertions(+), 10 deletions(-)
+ 5 files changed, 23 insertions(+), 11 deletions(-)
 
 diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index 5febde2d65..b46c0f1bb4 100644
+index b46c0f1bb4..a85a149c6d 100644
 --- a/hw/intc/s390_flic.c
 +++ b/hw/intc/s390_flic.c
 @@ -22,6 +22,17 @@
  #include "qapi/error.h"
  #include "hw/s390x/s390-virtio-ccw.h"
  
-+QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs)
++S390FLICStateClass *s390_get_flic_class(S390FLICState *fs)
 +{
-+    static QEMUS390FLICState *flic;
++    static S390FLICStateClass *class;
 +
-+    if (!flic) {
++    if (!class) {
 +        /* we only have one flic device, so this is fine to cache */
-+        flic = QEMU_S390_FLIC(fs);
++        class = S390_FLIC_COMMON_GET_CLASS(fs);
 +    }
-+    return flic;
++    return class;
 +}
 +
- S390FLICState *s390_get_flic(void)
+ QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs)
  {
-     static S390FLICState *fs;
-@@ -79,7 +90,7 @@ static void qemu_s390_release_adapter_routes(S390FLICState *fs,
- static int qemu_s390_clear_io_flic(S390FLICState *fs, uint16_t subchannel_id,
-                            uint16_t subchannel_nr)
- {
--    QEMUS390FLICState *flic  = QEMU_S390_FLIC(fs);
-+    QEMUS390FLICState *flic  = s390_get_qemu_flic(fs);
-     QEMUS390FlicIO *cur, *next;
-     uint8_t isc;
- 
-@@ -113,7 +124,7 @@ static int qemu_s390_clear_io_flic(S390FLICState *fs, uint16_t subchannel_id,
- static int qemu_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
-                                      uint16_t mode)
- {
--    QEMUS390FLICState *flic  = QEMU_S390_FLIC(fs);
-+    QEMUS390FLICState *flic  = s390_get_qemu_flic(fs);
- 
-     switch (mode) {
-     case SIC_IRQ_MODE_ALL:
-@@ -134,7 +145,7 @@ static int qemu_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
- static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
+     static QEMUS390FLICState *flic;
+@@ -146,7 +157,7 @@ static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
                                   uint8_t isc, uint8_t flags)
  {
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(fs);
-     S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
+     QEMUS390FLICState *flic = s390_get_qemu_flic(fs);
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
      bool flag = flags & S390_ADAPTER_SUPPRESSIBLE;
      uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
-@@ -246,7 +257,7 @@ void qemu_s390_flic_dequeue_crw_mchk(QEMUS390FLICState *flic)
  
- static void qemu_s390_inject_service(S390FLICState *fs, uint32_t parm)
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 1c526fd7e2..301bf1772f 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -439,7 +439,7 @@ static int s390_io_adapter_map(AdapterInfo *adapter, uint64_t map_addr,
+                                bool do_map)
  {
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(fs);
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
  
-     g_assert(qemu_mutex_iothread_locked());
-     /* multiplexing is good enough for sclp - kvm does it internally as well */
-@@ -261,7 +272,7 @@ static void qemu_s390_inject_io(S390FLICState *fs, uint16_t subchannel_id,
-                                 uint32_t io_int_word)
+     return fsc->io_adapter_map(fs, adapter->adapter_id, map_addr, do_map);
+ }
+@@ -520,7 +520,7 @@ void css_register_io_adapters(CssIoAdapterType type, bool swap, bool maskable,
+     int ret, isc;
+     IoAdapter *adapter;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     /*
+      * Disallow multiple registrations for the same device type.
+@@ -566,7 +566,7 @@ static void css_clear_io_interrupt(uint16_t subchannel_id,
+     Error *err = NULL;
+     static bool no_clear_irq;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+     int r;
+ 
+     if (unlikely(no_clear_irq)) {
+@@ -640,7 +640,7 @@ void css_conditional_io_interrupt(SubchDev *sch)
+ int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode)
  {
-     const uint8_t isc = IO_INT_WORD_ISC(io_int_word);
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(fs);
-     QEMUS390FlicIO *io;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+     int r;
  
-     g_assert(qemu_mutex_iothread_locked());
-@@ -279,7 +290,7 @@ static void qemu_s390_inject_io(S390FLICState *fs, uint16_t subchannel_id,
- 
- static void qemu_s390_inject_crw_mchk(S390FLICState *fs)
+     if (env->psw.mask & PSW_MASK_PSTATE) {
+@@ -666,7 +666,7 @@ out:
+ void css_adapter_interrupt(CssIoAdapterType type, uint8_t isc)
  {
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(fs);
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(fs);
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
+     IoAdapter *adapter = channel_subsys.io_adapters[type][isc];
  
-     g_assert(qemu_mutex_iothread_locked());
-     flic->pending |= FLIC_PENDING_MCHK_CR;
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 3d8f26949b..8f7fbc2ab7 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1111,7 +1111,7 @@ static int virtio_ccw_setup_irqroutes(VirtioCcwDevice *dev, int nvqs)
+     VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+     int ret;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     ret = virtio_ccw_get_mappings(dev);
+     if (ret) {
+@@ -1129,7 +1129,7 @@ static int virtio_ccw_setup_irqroutes(VirtioCcwDevice *dev, int nvqs)
+ static void virtio_ccw_release_irqroutes(VirtioCcwDevice *dev, int nvqs)
+ {
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
+ 
+     fsc->release_adapter_routes(fs, &dev->routes);
+ }
 diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-index 566d153371..a636afce42 100644
+index a636afce42..4687ecfe83 100644
 --- a/include/hw/s390x/s390_flic.h
 +++ b/include/hw/s390x/s390_flic.h
-@@ -135,6 +135,7 @@ bool qemu_s390_flic_has_any(QEMUS390FLICState *flic);
- void s390_flic_init(void);
+@@ -136,6 +136,7 @@ void s390_flic_init(void);
  
  S390FLICState *s390_get_flic(void);
-+QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs);
+ QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs);
++S390FLICStateClass *s390_get_flic_class(S390FLICState *fs);
  bool ais_needed(void *opaque);
  
  #endif /* HW_S390_FLIC_H */
 diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index 61691aa3a4..1947012b25 100644
+index 1947012b25..25cfb3eef8 100644
 --- a/target/s390x/interrupt.c
 +++ b/target/s390x/interrupt.c
-@@ -158,7 +158,7 @@ void s390_crw_mchk(void)
- 
- bool s390_cpu_has_mcck_int(S390CPU *cpu)
+@@ -134,7 +134,7 @@ void cpu_inject_stop(S390CPU *cpu)
+ void s390_sclp_extint(uint32_t parm)
  {
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(s390_get_flic());
-     CPUS390XState *env = &cpu->env;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
  
-     if (!(env->psw.mask & PSW_MASK_MCHECK)) {
-@@ -176,7 +176,7 @@ bool s390_cpu_has_mcck_int(S390CPU *cpu)
- 
- bool s390_cpu_has_ext_int(S390CPU *cpu)
+     fsc->inject_service(fs, parm);
+ }
+@@ -143,7 +143,7 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+                        uint32_t io_int_parm, uint32_t io_int_word)
  {
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(s390_get_flic());
-     CPUS390XState *env = &cpu->env;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
  
-     if (!(env->psw.mask & PSW_MASK_EXT)) {
-@@ -218,7 +218,7 @@ bool s390_cpu_has_ext_int(S390CPU *cpu)
- 
- bool s390_cpu_has_io_int(S390CPU *cpu)
+     fsc->inject_io(fs, subchannel_id, subchannel_nr, io_int_parm, io_int_word);
+ }
+@@ -151,7 +151,7 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+ void s390_crw_mchk(void)
  {
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(s390_get_flic());
-     CPUS390XState *env = &cpu->env;
+     S390FLICState *fs = s390_get_flic();
+-    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    S390FLICStateClass *fsc = s390_get_flic_class(fs);
  
-     if (!(env->psw.mask & PSW_MASK_IO)) {
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 083eb2d91b..a6a7dac623 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -452,7 +452,7 @@ uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
- {
-     const uintptr_t ra = GETPC();
-     S390CPU *cpu = s390_env_get_cpu(env);
--    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-+    QEMUS390FLICState *flic = s390_get_qemu_flic(s390_get_flic());
-     QEMUS390FlicIO *io = NULL;
-     LowCore *lowcore;
- 
+     fsc->inject_crw_mchk(fs);
+ }
 -- 
 2.14.3
