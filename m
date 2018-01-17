@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ebhYB-00053Y-8r
+	(envelope-from <wei.w.wang@intel.com>) id 1ebhYB-00053W-8B
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ebhY9-0003pg-W7
+	(envelope-from <wei.w.wang@intel.com>) id 1ebhY8-0003n1-4p
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:19 -0500
-Received: from mga11.intel.com ([192.55.52.93]:59302)
+Received: from mga11.intel.com ([192.55.52.93]:59300)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ebhY9-0003no-LR
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:17 -0500
+	id 1ebhY7-0003ju-RV
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:16 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Wed, 17 Jan 2018 14:31:58 +0800
-Message-Id: <1516170720-4948-3-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1516170720-4948-1-git-send-email-wei.w.wang@intel.com>
-References: <1516170720-4948-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 2/4] migration: call balloon to clear bits
- of free pages from dirty bitmap
+Date: Wed, 17 Jan 2018 14:31:56 +0800
+Message-Id: <1516170720-4948-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v1 0/4] virtio-balloon: support free page
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +26,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 Cc: pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-When migration starts, call the related balloon functions to clear the
-bits of guest free pages from the dirty bitmap. The dirty bitmap should
-be ready to use when sending pages to the destination, so stop the guest
-from reporting free pages before sending pages.
+This is the deivce part implementation to add a new feature,
+VIRTIO_BALLOON_F_FREE_PAGE_VQ to the virtio-balloon device. The device
+receives the guest free page hint from the driver and clears the
+corresponding bits in the dirty bitmap, so that those free pages are
+not transferred to the destination. Please see the results in the
+commit log of patch 1.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
----
- migration/ram.c | 28 ++++++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+Link to the driver patches:
+https://marc.info/?l=kvm&m=151616696828185&w=2
 
-diff --git a/migration/ram.c b/migration/ram.c
-index d6f462c..9b8d102 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -49,6 +49,7 @@
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
- #include "migration/block.h"
-+#include "sysemu/balloon.h"
- 
- /***********************************************************/
- /* ram save/restore */
-@@ -206,6 +207,10 @@ struct RAMState {
-     uint32_t last_version;
-     /* We are in the first round */
-     bool ram_bulk_stage;
-+    /* The feature, skipping the transfer of free pages, is supported */
-+    bool free_page_support;
-+    /* Skip the transfer of free pages in the bulk stage */
-+    bool free_page_done;
-     /* How many times we have dirty too many pages */
-     int dirty_rate_high_cnt;
-     /* these variables are used for bitmap sync */
-@@ -773,7 +778,7 @@ unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-     unsigned long *bitmap = rb->bmap;
-     unsigned long next;
- 
--    if (rs->ram_bulk_stage && start > 0) {
-+    if (rs->ram_bulk_stage && start > 0 && !rs->free_page_support) {
-         next = start + 1;
-     } else {
-         next = find_next_bit(bitmap, size, start);
-@@ -1653,6 +1658,8 @@ static void ram_state_reset(RAMState *rs)
-     rs->last_page = 0;
-     rs->last_version = ram_list.version;
-     rs->ram_bulk_stage = true;
-+    rs->free_page_support = balloon_free_page_support();
-+    rs->free_page_done = false;
- }
- 
- #define MAX_WAIT 50 /* ms, half buffered_file limit */
-@@ -2135,7 +2142,7 @@ static int ram_state_init(RAMState **rsp)
-     return 0;
- }
- 
--static void ram_list_init_bitmaps(void)
-+static void ram_list_init_bitmaps(RAMState *rs)
- {
-     RAMBlock *block;
-     unsigned long pages;
-@@ -2145,7 +2152,11 @@ static void ram_list_init_bitmaps(void)
-         QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-             pages = block->max_length >> TARGET_PAGE_BITS;
-             block->bmap = bitmap_new(pages);
--            bitmap_set(block->bmap, 0, pages);
-+            if (rs->free_page_support) {
-+                bitmap_set(block->bmap, 1, pages);
-+            } else {
-+                bitmap_set(block->bmap, 0, pages);
-+            }
-             if (migrate_postcopy_ram()) {
-                 block->unsentmap = bitmap_new(pages);
-                 bitmap_set(block->unsentmap, 0, pages);
-@@ -2161,8 +2172,11 @@ static void ram_init_bitmaps(RAMState *rs)
-     qemu_mutex_lock_ramlist();
-     rcu_read_lock();
- 
--    ram_list_init_bitmaps();
-+    ram_list_init_bitmaps(rs);
-     memory_global_dirty_log_start();
-+    if (rs->free_page_support) {
-+        balloon_free_page_start();
-+    }
-     migration_bitmap_sync(rs);
- 
-     rcu_read_unlock();
-@@ -2275,6 +2289,12 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
- 
-     ram_control_before_iterate(f, RAM_CONTROL_ROUND);
- 
-+    /* Before sending the pages, stop the guest from reporting free pages. */
-+    if (rs->free_page_support && !rs->free_page_done) {
-+        balloon_free_page_stop();
-+        rs->free_page_done = true;
-+    }
-+
-     t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-     i = 0;
-     while ((ret = qemu_file_rate_limit(f)) == 0) {
+Wei Wang (4):
+  virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_VQ
+  migration: call balloon to clear bits of free pages from dirty bitmap
+  virtio-balloon: add a timer to limit the free page report wating time
+  virtio-balloon: Don't skip free pages if the poison val is non-zero
+
+ balloon.c                                       |  46 ++++-
+ hw/virtio/virtio-balloon.c                      | 224 ++++++++++++++++++++++--
+ hw/virtio/virtio-pci.c                          |   3 +
+ include/hw/virtio/virtio-balloon.h              |  12 +-
+ include/migration/misc.h                        |   3 +
+ include/standard-headers/linux/virtio_balloon.h |   6 +
+ include/sysemu/balloon.h                        |  15 +-
+ migration/ram.c                                 |  38 +++-
+ 8 files changed, 316 insertions(+), 31 deletions(-)
+
 -- 
 1.8.3.1
