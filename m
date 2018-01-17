@@ -1,20 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebtfD-0003F4-WF
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:46:24 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebtuh-0000VY-Uz
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:02:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebtfD-0008G8-4i
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:46:24 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebtud-0003uv-0C
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:02:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32998
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ebtuc-0003uc-QJ
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:02:18 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0HJtSrn076563
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 15:02:17 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fjag47jqe-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 15:02:17 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 17 Jan 2018 20:02:15 -0000
 References: <20180117193757.73471-1-borntraeger@de.ibm.com>
 	<20180117193757.73471-2-borntraeger@de.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c309fedd-29c0-e627-11e4-64fcbb7f09f5@redhat.com>
-Date: Wed, 17 Jan 2018 13:46:04 -0600
+	<c309fedd-29c0-e627-11e4-64fcbb7f09f5@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 17 Jan 2018 21:02:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180117193757.73471-2-borntraeger@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jw6BMPTsYK41mbUFIsMCEEDqUEmtUhc28"
+In-Reply-To: <c309fedd-29c0-e627-11e4-64fcbb7f09f5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <746ffa7a-1452-ffcb-e305-a4cac7aee113@de.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH v2 1/3] header sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,78 +44,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jw6BMPTsYK41mbUFIsMCEEDqUEmtUhc28
-From: Eric Blake <eblake@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>
-Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth
- <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>,
- qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>,
- Richard Henderson <rth@twiddle.net>
-Message-ID: <c309fedd-29c0-e627-11e4-64fcbb7f09f5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] header sync
-References: <20180117193757.73471-1-borntraeger@de.ibm.com>
- <20180117193757.73471-2-borntraeger@de.ibm.com>
-In-Reply-To: <20180117193757.73471-2-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+It is just a header sync and mimics the kernel.
+The previous header sync added the the commit that added the SPDX tag and this
+header sync added the commit that removed the now redundant licence text.
 
-On 01/17/2018 01:37 PM, Christian Borntraeger wrote:
-> replace with proper header sync
->=20
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  linux-headers/asm-s390/kvm.h | 9 ++++-----
->  linux-headers/linux/kvm.h    | 5 +++--
->  2 files changed, 7 insertions(+), 7 deletions(-)
->=20
-> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.=
-h
-> index 32d372e..11def14 100644
-> --- a/linux-headers/asm-s390/kvm.h
-> +++ b/linux-headers/asm-s390/kvm.h
-> @@ -6,10 +6,6 @@
->   *
->   * Copyright IBM Corp. 2008
->   *
-> - * This program is free software; you can redistribute it and/or modif=
-y
-> - * it under the terms of the GNU General Public License (version 2 onl=
-y)
-> - * as published by the Free Software Foundation.
-> - *
-
-Is dropping a license clause intentional?  If so, the commit message may
-want to go into more details why it is okay.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---jw6BMPTsYK41mbUFIsMCEEDqUEmtUhc28
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpfp/wACgkQp6FrSiUn
-Q2qxwAf6AvUplrAPdnN5HrrKkrn8p1nPQj+leVOaFQEKyKFNY4JGjBfuawZNQ9g4
-C3zDYdFM8ib51GwsQ1QEyQ3bWc80KWYsCylWCa3NfTO+lbbLZAh6flZlvpFOo6Re
-VwUrfxIemduhl87brBX7je2W2bmKpaQuVShCXC49OoT9y2j1ffWN2NL3MBh14MOb
-S6GFhytNToqkLDJ7nOW1pMKJE2F2zmJHLpnQPRGmUknrYJHb+u7UPZvo1iey44Re
-vkWnlVS6ONB0Qz8W2e2sMdhuE9ujY+YJmLH6XPWTUOQq6PnPUec1BP4Q6fu0mDFF
-kWO0SdavNc+z2AvvmFTlMuulyrvEtw==
-=YRnN
------END PGP SIGNATURE-----
-
---jw6BMPTsYK41mbUFIsMCEEDqUEmtUhc28--
+On 01/17/2018 08:46 PM, Eric Blake wrote:
+> On 01/17/2018 01:37 PM, Christian Borntraeger wrote:
+>> replace with proper header sync
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  linux-headers/asm-s390/kvm.h | 9 ++++-----
+>>  linux-headers/linux/kvm.h    | 5 +++--
+>>  2 files changed, 7 insertions(+), 7 deletions(-)
+>>tag
+>> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+>> index 32d372e..11def14 100644
+>> --- a/linux-headers/asm-s390/kvm.h
+>> +++ b/linux-headers/asm-s390/kvm.h
+>> @@ -6,10 +6,6 @@
+>>   *
+>>   * Copyright IBM Corp. 2008
+>>   *
+>> - * This program is free software; you can redistribute it and/or modify
+>> - * it under the terms of the GNU General Public License (version 2 only)
+>> - * as published by the Free Software Foundation.
+>> - *
+> 
+> Is dropping a license clause intentional?  If so, the commit message may
+> want to go into more details why it is okay.
+> 
