@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqMO-00068V-H0
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:45 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqMY-0006Iu-E1
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqML-0003Nj-96
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:44 -0500
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:35323)
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqMX-0003Tb-2h
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:54 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:41077)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ebqMK-0003NO-Vs
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:41 -0500
-Received: by mail-pf0-x22e.google.com with SMTP id t12so11803752pfg.2
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:14:40 -0800 (PST)
+	id 1ebqMW-0003T5-RP
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:53 -0500
+Received: by mail-pg0-x243.google.com with SMTP id 136so10948494pgd.8
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:14:52 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 17 Jan 2018 08:14:15 -0800
-Message-Id: <20180117161435.28981-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10.5 00/20] tcg: generic vector operations
+Date: Wed, 17 Jan 2018 08:14:18 -0800
+Message-Id: <20180117161435.28981-4-richard.henderson@linaro.org>
+In-Reply-To: <20180117161435.28981-1-richard.henderson@linaro.org>
+References: <20180117161435.28981-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v10.5 03/20] tcg: Standardize integral
+ arguments to expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +30,196 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Changes since v10:
-  * Squashed a fixup patch which escaped my attention while preparing
-    the patch set.  Ho hum.
+Some functions use intN_t arguments, some use uintN_t, some just
+used "unsigned".  To aid putting function pointers in tables, we
+need consistency.
 
-Changes since v9:
-  * Detect whether __attribute__((vector_size(16))) operations are
-    supported by the host compiler.  This includes the case affecting
-    ppc64 where gcc-4.8.5 crashes.  Note that gcc-7.2 does pass the
-    test on ppc64.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-op.h | 16 ++++++++--------
+ tcg/tcg-op.c | 42 +++++++++++++++++++++---------------------
+ 2 files changed, 29 insertions(+), 29 deletions(-)
 
-  * Dropped support for vector interleaves and element size changes.
-    My target/arm patches were failing RISU checks on a big-endian host.
-    I need to re-think what to do about host endianness and target
-    representation of vector operations crossing lanes.  For now, only
-    support generic vector operations that are agnostic to element order.
-
-
-r~
-
-
-Richard Henderson (21):
-  tcg: Allow multiple word entries into the constant pool
-  tcg: Add types and basic operations for host vectors
-  tcg: Standardize integral arguments to expanders
-  tcg: Add generic vector expanders
-  tcg: Loosen vec_gen_op* typecheck rules
-  tcg: Add generic vector ops for constant shifts
-  tcg: Add generic vector ops for comparisons
-  tcg: Add generic vector ops for multiplication
-  tcg: Add generic helpers for saturating arithmetic
-  tcg: Add generic vector helpers with a scalar operand
-  tcg/optimize: Handle vector opcodes during optimize
-  target/arm: Align vector registers
-  target/arm: Use vector infrastructure for aa64 add/sub/logic
-  target/arm: Use vector infrastructure for aa64 mov/not/neg
-  target/arm: Use vector infrastructure for aa64 dup/movi
-  target/arm: Use vector infrastructure for aa64 constant shifts
-  target/arm: Use vector infrastructure for aa64 compares
-  target/arm: Use vector infrastructure for aa64 multiplies
-  target/arm: Use vector infrastructure for aa64 orr/bic immediate
-  tcg/i386: Add vector operations
-  tcg/aarch64: Add vector operations
-
- Makefile.target              |    4 +-
- accel/tcg/tcg-runtime.h      |  118 +++
- target/arm/cpu.h             |    2 +-
- tcg/aarch64/tcg-target.h     |   25 +-
- tcg/aarch64/tcg-target.opc.h |    3 +
- tcg/i386/tcg-target.h        |   41 +-
- tcg/i386/tcg-target.opc.h    |   13 +
- tcg/tcg-gvec-desc.h          |   49 +
- tcg/tcg-op-gvec.h            |  297 ++++++
- tcg/tcg-op.h                 |   55 +-
- tcg/tcg-opc.h                |   47 +
- tcg/tcg.h                    |   78 ++
- accel/tcg/tcg-runtime-gvec.c |  997 +++++++++++++++++++
- target/arm/translate-a64.c   |  974 +++++++++++++-----
- tcg/aarch64/tcg-target.inc.c |  607 +++++++++++-
- tcg/i386/tcg-target.inc.c    | 1043 +++++++++++++++++++-
- tcg/optimize.c               |  150 +--
- tcg/tcg-op-gvec.c            | 2226 ++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-vec.c             |  474 +++++++++
- tcg/tcg-op.c                 |   42 +-
- tcg/tcg-pool.inc.c           |  115 ++-
- tcg/tcg.c                    |  129 ++-
- accel/tcg/Makefile.objs      |    2 +-
- configure                    |   48 +
- tcg/README                   |   95 ++
- 25 files changed, 7151 insertions(+), 483 deletions(-)
- create mode 100644 tcg/aarch64/tcg-target.opc.h
- create mode 100644 tcg/i386/tcg-target.opc.h
- create mode 100644 tcg/tcg-gvec-desc.h
- create mode 100644 tcg/tcg-op-gvec.h
- create mode 100644 accel/tcg/tcg-runtime-gvec.c
- create mode 100644 tcg/tcg-op-gvec.c
- create mode 100644 tcg/tcg-op-vec.c
-
--- 
-2.14.3
-
-
-Richard Henderson (20):
-  tcg: Allow multiple word entries into the constant pool
-  tcg: Add types and basic operations for host vectors
-  tcg: Standardize integral arguments to expanders
-  tcg: Add generic vector expanders
-  tcg: Add generic vector ops for constant shifts
-  tcg: Add generic vector ops for comparisons
-  tcg: Add generic vector ops for multiplication
-  tcg: Add generic helpers for saturating arithmetic
-  tcg: Add generic vector helpers with a scalar operand
-  tcg/optimize: Handle vector opcodes during optimize
-  target/arm: Align vector registers
-  target/arm: Use vector infrastructure for aa64 add/sub/logic
-  target/arm: Use vector infrastructure for aa64 mov/not/neg
-  target/arm: Use vector infrastructure for aa64 dup/movi
-  target/arm: Use vector infrastructure for aa64 constant shifts
-  target/arm: Use vector infrastructure for aa64 compares
-  target/arm: Use vector infrastructure for aa64 multiplies
-  target/arm: Use vector infrastructure for aa64 orr/bic immediate
-  tcg/i386: Add vector operations
-  tcg/aarch64: Add vector operations
-
- Makefile.target              |    4 +-
- accel/tcg/tcg-runtime.h      |  118 +++
- target/arm/cpu.h             |    2 +-
- tcg/aarch64/tcg-target.h     |   25 +-
- tcg/aarch64/tcg-target.opc.h |    3 +
- tcg/i386/tcg-target.h        |   41 +-
- tcg/i386/tcg-target.opc.h    |   13 +
- tcg/tcg-gvec-desc.h          |   49 +
- tcg/tcg-op-gvec.h            |  297 ++++++
- tcg/tcg-op.h                 |   55 +-
- tcg/tcg-opc.h                |   47 +
- tcg/tcg.h                    |   78 ++
- accel/tcg/tcg-runtime-gvec.c |  997 +++++++++++++++++++
- target/arm/translate-a64.c   |  974 +++++++++++++-----
- tcg/aarch64/tcg-target.inc.c |  607 +++++++++++-
- tcg/i386/tcg-target.inc.c    | 1043 +++++++++++++++++++-
- tcg/optimize.c               |  150 +--
- tcg/tcg-op-gvec.c            | 2226 ++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-vec.c             |  474 +++++++++
- tcg/tcg-op.c                 |   42 +-
- tcg/tcg-pool.inc.c           |  115 ++-
- tcg/tcg.c                    |  129 ++-
- accel/tcg/Makefile.objs      |    2 +-
- configure                    |   48 +
- tcg/README                   |   95 ++
- 25 files changed, 7151 insertions(+), 483 deletions(-)
- create mode 100644 tcg/aarch64/tcg-target.opc.h
- create mode 100644 tcg/i386/tcg-target.opc.h
- create mode 100644 tcg/tcg-gvec-desc.h
- create mode 100644 tcg/tcg-op-gvec.h
- create mode 100644 accel/tcg/tcg-runtime-gvec.c
- create mode 100644 tcg/tcg-op-gvec.c
- create mode 100644 tcg/tcg-op-vec.c
-
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 9b0560e4d3..df2eabaa67 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -269,12 +269,12 @@ void tcg_gen_mb(TCGBar);
+ void tcg_gen_addi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_subfi_i32(TCGv_i32 ret, int32_t arg1, TCGv_i32 arg2);
+ void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+-void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2);
++void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_ori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_xori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+-void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
+-void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
+-void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
++void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
++void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
++void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_muli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_div_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
+ void tcg_gen_rem_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
+@@ -458,12 +458,12 @@ static inline void tcg_gen_not_i32(TCGv_i32 ret, TCGv_i32 arg)
+ void tcg_gen_addi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_subfi_i64(TCGv_i64 ret, int64_t arg1, TCGv_i64 arg2);
+ void tcg_gen_subi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+-void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2);
++void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_ori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_xori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+-void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2);
+-void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2);
+-void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2);
++void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
++void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
++void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_muli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_div_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
+ void tcg_gen_rem_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 0c509bfe46..3467787323 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -140,7 +140,7 @@ void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     }
+ }
+ 
+-void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
++void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+     TCGv_i32 t0;
+     /* Some cases can be optimized here.  */
+@@ -148,17 +148,17 @@ void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
+     case 0:
+         tcg_gen_movi_i32(ret, 0);
+         return;
+-    case 0xffffffffu:
++    case -1:
+         tcg_gen_mov_i32(ret, arg1);
+         return;
+-    case 0xffu:
++    case 0xff:
+         /* Don't recurse with tcg_gen_ext8u_i32.  */
+         if (TCG_TARGET_HAS_ext8u_i32) {
+             tcg_gen_op2_i32(INDEX_op_ext8u_i32, ret, arg1);
+             return;
+         }
+         break;
+-    case 0xffffu:
++    case 0xffff:
+         if (TCG_TARGET_HAS_ext16u_i32) {
+             tcg_gen_op2_i32(INDEX_op_ext16u_i32, ret, arg1);
+             return;
+@@ -199,9 +199,9 @@ void tcg_gen_xori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     }
+ }
+ 
+-void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
++void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 32);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 32);
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+@@ -211,9 +211,9 @@ void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
++void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 32);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 32);
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+@@ -223,9 +223,9 @@ void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2)
++void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 32);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 32);
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+@@ -1201,7 +1201,7 @@ void tcg_gen_subi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     }
+ }
+ 
+-void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
++void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+     TCGv_i64 t0;
+ 
+@@ -1216,23 +1216,23 @@ void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
+     case 0:
+         tcg_gen_movi_i64(ret, 0);
+         return;
+-    case 0xffffffffffffffffull:
++    case -1:
+         tcg_gen_mov_i64(ret, arg1);
+         return;
+-    case 0xffull:
++    case 0xff:
+         /* Don't recurse with tcg_gen_ext8u_i64.  */
+         if (TCG_TARGET_HAS_ext8u_i64) {
+             tcg_gen_op2_i64(INDEX_op_ext8u_i64, ret, arg1);
+             return;
+         }
+         break;
+-    case 0xffffu:
++    case 0xffff:
+         if (TCG_TARGET_HAS_ext16u_i64) {
+             tcg_gen_op2_i64(INDEX_op_ext16u_i64, ret, arg1);
+             return;
+         }
+         break;
+-    case 0xffffffffull:
++    case 0xffffffffu:
+         if (TCG_TARGET_HAS_ext32u_i64) {
+             tcg_gen_op2_i64(INDEX_op_ext32u_i64, ret, arg1);
+             return;
+@@ -1332,9 +1332,9 @@ static inline void tcg_gen_shifti_i64(TCGv_i64 ret, TCGv_i64 arg1,
+     }
+ }
+ 
+-void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
++void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 64);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 64);
+     if (TCG_TARGET_REG_BITS == 32) {
+         tcg_gen_shifti_i64(ret, arg1, arg2, 0, 0);
+     } else if (arg2 == 0) {
+@@ -1346,9 +1346,9 @@ void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
++void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 64);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 64);
+     if (TCG_TARGET_REG_BITS == 32) {
+         tcg_gen_shifti_i64(ret, arg1, arg2, 1, 0);
+     } else if (arg2 == 0) {
+@@ -1360,9 +1360,9 @@ void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
+     }
+ }
+ 
+-void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2)
++void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+ {
+-    tcg_debug_assert(arg2 < 64);
++    tcg_debug_assert(arg2 >= 0 && arg2 < 64);
+     if (TCG_TARGET_REG_BITS == 32) {
+         tcg_gen_shifti_i64(ret, arg1, arg2, 1, 1);
+     } else if (arg2 == 0) {
 -- 
 2.14.3
