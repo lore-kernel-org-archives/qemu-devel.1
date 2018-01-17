@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebpyZ-0000Ke-E6
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:50:08 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ebq0H-0001na-1T
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:51:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebpyT-0006o0-Hz
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:50:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50975)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ebpyT-0006ng-93
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:50:01 -0500
-Date: Wed, 17 Jan 2018 16:49:50 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180117164950.3c818541@redhat.com>
-In-Reply-To: <20180116222212.1266-1-laurent@vivier.eu>
-References: <20180116222212.1266-1-laurent@vivier.eu>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ebq0G-0007vz-2k
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:51:53 -0500
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-4-vsementsov@virtuozzo.com>
+	<74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
+	<7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
+	<d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
+	<4e97de9a-bcdd-5e5d-275f-e6cac9473f0d@virtuozzo.com>
+	<79e5851b-f35e-23ea-4842-cc3b1d1e30ee@virtuozzo.com>
+	<1e2fd96e-5d07-3c52-33df-cf31490eb6ca@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <eccba06f-3a5f-7926-7fb5-ce56f01e94c7@virtuozzo.com>
+Date: Wed, 17 Jan 2018 18:51:38 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1e2fd96e-5d07-3c52-33df-cf31490eb6ca@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] linux-user: select CPU type
- according ELF header values
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +30,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, Philippe =?UTF-8?B?TWF0aGlldS1E?= =?UTF-8?B?YXVkw6k=?= <f4bug@amsat.org>, Aaron Sierra <asierra@xes-inc.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
 
-On Tue, 16 Jan 2018 23:22:08 +0100
-Laurent Vivier <laurent@vivier.eu> wrote:
+17.01.2018 18:23, Eric Blake wrote:
+> On 01/17/2018 07:36 AM, Vladimir Sementsov-Ogievskiy wrote:
+>
+>>>>> looks interesting. what about the following naming?
+>>>>>
+>>>>> @mode: possible values:
+>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 hide - just hide server from new clients, maintain
+>>>>> existing connections,
+>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 remove after all clients disconnected
+>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 soft - like hide, but answer with ESHUTDOWN for all
+>>>>> further requests from
+>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0 =
+=C2=A0 existing connections
+>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 hard - hard disconnect all clients and remove server
+>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 (default: soft)
+>>>> Or even a fourth mode that causes an immediate error return without
+>>>> state change if there are any connected clients, but otherwise removes
+>>>> the server.
+>>>>
+>>>>> new corresponding states of nbd export:
+>>>>> hidden, shutting_down
+>>>>>
+>>>>> and we allow transitions:
+>>>>>
+>>>>> normal_execution -> hidden
+>>>>> normal_execution -> shutting_down
+>>>>> normal_execution -> exit
+>>>>> hidden -> shutting_down
+>>>>> hidden -> exit
+>>>>> shutting_down -> exit
+>>>> Seems reasonable.=C2=A0 Are you planning on tackling a respin of this =
+series
+>>>> incorporating that idea?
+>>>>
+>>> yes, will do.
+>>>
+>>>
+>> Discussed with Nikolay.
+>> For now we actually need only one mode: hard.
+>> In near future we _may be_ will need your proposed fourth mode (what
+>> about "safe" name for it ?)
+> 'safe' sounds reasonable.
+>
+> Of course, if we only have two modes at front ('safe' which returns an
+> error if a client is connected, and 'hard' which disconnects all clients
+> immediately; leaving 'hide' and 'soft' for the future), then we don't
+> have to worry about a state transition or any hidden exports.
+>
+> A QAPI enum with only two values now is at least extensible in the
+> future if someone has a need for another mode, and introspectible to
+> learn which modes are currently supported.
+>
+>> I was going to implement all 4 modes, but now I doubt, isn't it too
+>> hastily, to introduce 3 new modes to the
+>> interface, which we (personally) do not need. May be it is better to
+>> start from one or two modes.
+> Starting with just two modes is fine as well.
+>
+>> Finally what do you think, Eric? Which modes do you need?
+> 'hide' may be interesting for the purpose of connecting a single client,
+> then hiding the export so no other clients can connect, while waiting
+> for the first client to take its time.  But right now, I don't have
+> actual use cases in mind so much as making sure we aren't limiting
+> ourself from future expansion as needs are identified, so a conservative
+> choice of just 'safe' and 'hard' for now is reasonable.
 
-> This idea has been suggested to me before by Philippe
-> Mathieu-Daud=C3=A9, and recently YunQiang Su has proposed a
-> patch to manage the MIPS r6 case.
->=20
-> Based on this, this series tries to clean-up the original
-> patch, and introduces the use for m68k architecture and
-> port the patch from YunQiang Su.
->=20
-> v3: fix code indent problem reported by patchew
->     remove useless "!=3D 0"
->     check for EF_M68K_M68000
->     add EF_M68K_* flags in elf.h
->     set 680x0 default CPU to m68040
->     change "#if ... #endif" structure for ppc
-> v2: move cpu_model selection to linux-user/*/target_elf.h
->     provide eflags to cpu_get_model() instead of fd
->     (and modify other patches accordingly)
-Sorry for not noticing it earlier, but could you please
-fix series to use cpu type names instead of cpu_model?
+ok, I agree. 'safe' looks like better option for default behavior. So=20
+I'll post these two options in v3.
 
-I've just posted series that completes cpu_model refactoring
-  [PATCH 00/24] generalize parsing of cpu_model (part 4)
-which removes remnants of the code using cpu_model to
-instantiate CPUs, including reworking how default
-cpu type for *-user is picked up.
+>
+>> ps: I've created hmp version for 2/6, it will be in v2.
+>>  =C2=A0also, I'm going to add query-nbd-server, which should list all ex=
+ports
+> Sounds good.
+>
+>> also, about HMP: If I understand correctly, people use it because
+>> writing qmp command by hand is not very comfortable.
+>> I have a script (for managing libvirt guest, but it can be adopted for
+>> qemu or even used for qemu monitor), which allows
+>> me run qmp commands on vms as easy as:
+>>
+>> |qmp VMNAME query-block-jobs or qmp VMNAME nbd-server-remove name exp1
+>> mode hard or even |
+>>
+>> |qmp VMNAME blockdev-add id disk driver qcow2 cache {writeback true
+>> direct true} aio native discard unmap file {driver file filename
+>> /tmp/somedisk} |||
+> Yeah, there are various scripting solutions around QMP that can make it
+> easier; but HMP is often still an easy front-line interface for experimen=
+ts.
+>
 
-After that cpu_model shouldn't be used anywhere in the code
-except of routines that process "-cpu" CLI and cpu types
-should be used directly.
+isn't it because these solutions are not available directly in monitor,=20
+when HMP is?
+may be, we need third type of monitor HQMP which is QMP with simplified=20
+syntax? Or
+allow qmp commands in simplified syntax directly in HMP?
 
-So you might not need 1/4 after that or it would have
-to be reworked and probably other patches where where
-cpu_model is used.
-
-
-> Laurent Vivier (2):
->   linux-user: Move CPU type name selection to a function
->   linux-user,m68k: select CPU according to ELF header values
->=20
-> YunQiang Su (2):
->   linux-user: introduce functions to detect CPU type
->   linux-user: MIPS set cpu to r6 CPU if binary is R6
->=20
->  include/elf.h                      | 32 +++++++++++++++++++++
->  linux-user/aarch64/target_elf.h    | 14 +++++++++
->  linux-user/alpha/target_elf.h      | 14 +++++++++
->  linux-user/arm/target_elf.h        | 14 +++++++++
->  linux-user/cris/target_elf.h       | 14 +++++++++
->  linux-user/elfload.c               | 35 ++++++++++++++++++++++
->  linux-user/hppa/target_elf.h       | 14 +++++++++
->  linux-user/i386/target_elf.h       | 14 +++++++++
->  linux-user/m68k/target_elf.h       | 20 +++++++++++++
->  linux-user/main.c                  | 59 +++++++-------------------------=
-------
->  linux-user/microblaze/target_elf.h | 14 +++++++++
->  linux-user/mips/target_elf.h       | 17 +++++++++++
->  linux-user/mips64/target_elf.h     | 17 +++++++++++
->  linux-user/nios2/target_elf.h      | 14 +++++++++
->  linux-user/openrisc/target_elf.h   | 14 +++++++++
->  linux-user/ppc/target_elf.h        | 18 ++++++++++++
->  linux-user/qemu.h                  |  1 +
->  linux-user/s390x/target_elf.h      | 14 +++++++++
->  linux-user/sh4/target_elf.h        | 14 +++++++++
->  linux-user/sparc/target_elf.h      | 14 +++++++++
->  linux-user/sparc64/target_elf.h    | 14 +++++++++
->  linux-user/tilegx/target_elf.h     | 14 +++++++++
->  linux-user/unicore32/target_elf.h  | 14 +++++++++
->  linux-user/x86_64/target_elf.h     | 14 +++++++++
->  24 files changed, 375 insertions(+), 48 deletions(-)
->  create mode 100644 linux-user/aarch64/target_elf.h
->  create mode 100644 linux-user/alpha/target_elf.h
->  create mode 100644 linux-user/arm/target_elf.h
->  create mode 100644 linux-user/cris/target_elf.h
->  create mode 100644 linux-user/hppa/target_elf.h
->  create mode 100644 linux-user/i386/target_elf.h
->  create mode 100644 linux-user/m68k/target_elf.h
->  create mode 100644 linux-user/microblaze/target_elf.h
->  create mode 100644 linux-user/mips/target_elf.h
->  create mode 100644 linux-user/mips64/target_elf.h
->  create mode 100644 linux-user/nios2/target_elf.h
->  create mode 100644 linux-user/openrisc/target_elf.h
->  create mode 100644 linux-user/ppc/target_elf.h
->  create mode 100644 linux-user/s390x/target_elf.h
->  create mode 100644 linux-user/sh4/target_elf.h
->  create mode 100644 linux-user/sparc/target_elf.h
->  create mode 100644 linux-user/sparc64/target_elf.h
->  create mode 100644 linux-user/tilegx/target_elf.h
->  create mode 100644 linux-user/unicore32/target_elf.h
->  create mode 100644 linux-user/x86_64/target_elf.h
->=20
+--=20
+Best regards,
+Vladimir
