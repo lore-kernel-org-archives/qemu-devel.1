@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqNE-00071C-Tn
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqNE-00070u-Fg
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqND-0003su-Qx
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqNB-0003rS-8P
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:36 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:44253)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:39422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ebqND-0003sZ-JU
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:35 -0500
-Received: by mail-pf0-x242.google.com with SMTP id m26so11804371pfj.11
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:15:35 -0800 (PST)
+	id 1ebqNA-0003qu-JW
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:32 -0500
+Received: by mail-pf0-x244.google.com with SMTP id e11so11794441pff.6
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:15:32 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 17 Jan 2018 08:14:29 -0800
-Message-Id: <20180117161435.28981-15-richard.henderson@linaro.org>
+Date: Wed, 17 Jan 2018 08:14:28 -0800
+Message-Id: <20180117161435.28981-14-richard.henderson@linaro.org>
 In-Reply-To: <20180117161435.28981-1-richard.henderson@linaro.org>
 References: <20180117161435.28981-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v10.5 14/20] target/arm: Use vector
- infrastructure for aa64 dup/movi
+Subject: [Qemu-devel] [PATCH v10.5 13/20] target/arm: Use vector
+ infrastructure for aa64 mov/not/neg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,149 +32,102 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 83 +++++++++++++++++++---------------------------
- 1 file changed, 34 insertions(+), 49 deletions(-)
+ target/arm/translate-a64.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 38 insertions(+), 5 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 219cc1e19d..2495414603 100644
+index b97bc9b83c..219cc1e19d 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5863,38 +5863,24 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
-  *
-  * size: encoded in imm5 (see ARM ARM LowestSetBit())
-  */
-+
- static void handle_simd_dupe(DisasContext *s, int is_q, int rd, int rn,
-                              int imm5)
- {
-     int size = ctz32(imm5);
--    int esize = 8 << size;
--    int elements = (is_q ? 128 : 64) / esize;
--    int index, i;
--    TCGv_i64 tmp;
-+    int index = imm5 >> (size + 1);
+@@ -85,6 +85,7 @@ typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
+ typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
  
-     if (size > 3 || (size == 3 && !is_q)) {
-         unallocated_encoding(s);
-         return;
-     }
--
-     if (!fp_access_check(s)) {
-         return;
-     }
+ /* Note that the gvec expanders operate on offsets + sizes.  */
++typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
+ typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
+                         uint32_t, uint32_t, uint32_t);
  
--    index = imm5 >> (size + 1);
--
--    tmp = tcg_temp_new_i64();
--    read_vec_element(s, tmp, rn, index, size);
--
--    for (i = 0; i < elements; i++) {
--        write_vec_element(s, tmp, rd, i, size);
--    }
--
--    if (!is_q) {
--        clear_vec_high(s, rd);
--    }
--
--    tcg_temp_free_i64(tmp);
-+    tcg_gen_gvec_dup_mem(size, vec_full_reg_offset(s, rd),
-+                         vec_reg_offset(s, rn, index, size),
-+                         is_q ? 16 : 8, vec_full_reg_size(s));
- }
+@@ -4579,14 +4580,19 @@ static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
+     TCGv_i64 tcg_op;
+     TCGv_i64 tcg_res;
  
- /* DUP (element, scalar)
-@@ -5943,9 +5929,7 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
-                              int imm5)
- {
-     int size = ctz32(imm5);
--    int esize = 8 << size;
--    int elements = (is_q ? 128 : 64)/esize;
--    int i = 0;
-+    uint32_t dofs, oprsz, maxsz;
- 
-     if (size > 3 || ((size == 3) && !is_q)) {
-         unallocated_encoding(s);
-@@ -5956,12 +5940,11 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
-         return;
-     }
- 
--    for (i = 0; i < elements; i++) {
--        write_vec_element(s, cpu_reg(s, rn), rd, i, size);
--    }
--    if (!is_q) {
--        clear_vec_high(s, rd);
--    }
-+    dofs = vec_full_reg_offset(s, rd);
-+    oprsz = is_q ? 16 : 8;
-+    maxsz = vec_full_reg_size(s);
-+
-+    tcg_gen_gvec_dup_i64(size, dofs, oprsz, maxsz, cpu_reg(s, rn));
- }
- 
- /* INS (Element)
-@@ -6152,7 +6135,6 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
-     bool is_neg = extract32(insn, 29, 1);
-     bool is_q = extract32(insn, 30, 1);
-     uint64_t imm = 0;
--    TCGv_i64 tcg_rd, tcg_imm;
-     int i;
- 
-     if (o2 != 0 || ((cmode == 0xf) && is_neg && !is_q)) {
-@@ -6234,32 +6216,35 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
-         imm = ~imm;
-     }
- 
--    tcg_imm = tcg_const_i64(imm);
--    tcg_rd = new_tmp_a64(s);
-+    if (!((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9)) {
-+        /* MOVI or MVNI, with MVNI negation handled above.  */
-+        tcg_gen_gvec_dup64i(vec_full_reg_offset(s, rd), is_q ? 16 : 8,
-+                            vec_full_reg_size(s), imm);
-+    } else {
-+        TCGv_i64 tcg_imm = tcg_const_i64(imm);
-+        TCGv_i64 tcg_rd = new_tmp_a64(s);
- 
--    for (i = 0; i < 2; i++) {
--        int foffs = i ? fp_reg_hi_offset(s, rd) : fp_reg_offset(s, rd, MO_64);
-+        for (i = 0; i < 2; i++) {
-+            int foffs = vec_reg_offset(s, rd, i, MO_64);
- 
--        if (i == 1 && !is_q) {
--            /* non-quad ops clear high half of vector */
--            tcg_gen_movi_i64(tcg_rd, 0);
--        } else if ((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9) {
--            tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
--            if (is_neg) {
--                /* AND (BIC) */
--                tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
-+            if (i == 1 && !is_q) {
-+                /* non-quad ops clear high half of vector */
-+                tcg_gen_movi_i64(tcg_rd, 0);
-             } else {
--                /* ORR */
--                tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
-+                tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
-+                if (is_neg) {
-+                    /* AND (BIC) */
-+                    tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
-+                } else {
-+                    /* ORR */
-+                    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
-+                }
-             }
--        } else {
--            /* MOVI */
--            tcg_gen_mov_i64(tcg_rd, tcg_imm);
-+            tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
-         }
--        tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
--    }
- 
--    tcg_temp_free_i64(tcg_imm);
-+        tcg_temp_free_i64(tcg_imm);
++    switch (opcode) {
++    case 0x0: /* FMOV */
++        tcg_gen_gvec_mov(0, vec_full_reg_offset(s, rd),
++                         vec_full_reg_offset(s, rn),
++                         8, vec_full_reg_size(s));
++        return;
 +    }
- }
++
+     fpst = get_fpstatus_ptr();
+     tcg_op = read_fp_dreg(s, rn);
+     tcg_res = tcg_temp_new_i64();
  
- /* AdvSIMD scalar copy
+     switch (opcode) {
+-    case 0x0: /* FMOV */
+-        tcg_gen_mov_i64(tcg_res, tcg_op);
+-        break;
+     case 0x1: /* FABS */
+         gen_helper_vfp_absd(tcg_res, tcg_op);
+         break;
+@@ -9170,6 +9176,12 @@ static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
+         gvec_fn = tcg_gen_gvec_andc;
+         goto do_fn;
+     case 2: /* ORR */
++        if (rn == rm) { /* MOV */
++            tcg_gen_gvec_mov(0, vec_full_reg_offset(s, rd),
++                             vec_full_reg_offset(s, rn),
++                             is_q ? 16 : 8, vec_full_reg_size(s));
++            return;
++        }
+         gvec_fn = tcg_gen_gvec_or;
+         goto do_fn;
+     case 3: /* ORN */
+@@ -10049,6 +10061,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+     int rmode = -1;
+     TCGv_i32 tcg_rmode;
+     TCGv_ptr tcg_fpstatus;
++    GVecGen2Fn *gvec_fn;
+ 
+     switch (opcode) {
+     case 0x0: /* REV64, REV32 */
+@@ -10057,8 +10070,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+         return;
+     case 0x5: /* CNT, NOT, RBIT */
+         if (u && size == 0) {
+-            /* NOT: adjust size so we can use the 64-bits-at-a-time loop. */
+-            size = 3;
++            /* NOT */
+             break;
+         } else if (u && size == 1) {
+             /* RBIT */
+@@ -10310,6 +10322,27 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+         tcg_rmode = NULL;
+     }
+ 
++    switch (opcode) {
++    case 0x5:
++        if (u && size == 0) { /* NOT */
++            gvec_fn = tcg_gen_gvec_not;
++            goto do_fn;
++        }
++        break;
++    case 0xb:
++        if (u) { /* NEG */
++            gvec_fn = tcg_gen_gvec_neg;
++            goto do_fn;
++        }
++        break;
++
++    do_fn:
++        gvec_fn(size, vec_full_reg_offset(s, rd),
++                vec_full_reg_offset(s, rn),
++                is_q ? 16 : 8, vec_full_reg_size(s));
++        return;
++    }
++
+     if (size == 3) {
+         /* All 64-bit element operations can be shared with scalar 2misc */
+         int pass;
 -- 
 2.14.3
