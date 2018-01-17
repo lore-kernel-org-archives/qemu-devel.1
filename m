@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebrj4-0000lq-Bf
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:42:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ebrrS-0000ZV-V9
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebrj3-0000K0-EB
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:42:14 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 17 Jan 2018 18:40:46 +0100
-Message-Id: <20180117174047.6382-18-david@redhat.com>
-In-Reply-To: <20180117174047.6382-1-david@redhat.com>
-References: <20180117174047.6382-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 17/18] s390x/kvm: cache the kvm flic in a
- central function
+	(envelope-from <kwolf@redhat.com>) id 1ebrrS-0003AW-3g
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:50:55 -0500
+Date: Wed, 17 Jan 2018 18:50:29 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180117175029.GD3860@localhost.localdomain>
+References: <20180111195225.4226-1-kwolf@redhat.com>
+	<20180111195225.4226-11-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180111195225.4226-11-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 10/10] block: x-blockdev-create QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,82 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, jsnow@redhat.com
 
-This avoids tons of conversions when handling interrupts.
+Am 11.01.2018 um 20:52 hat Kevin Wolf geschrieben:
+> This adds a synchronous x-blockdev-create QMP command that can create
+> qcow2 images on a given node name.
+> 
+> We don't want to block while creating an image, so this is not the final
+> interface in all aspects, but BlockdevCreateOptionsQcow2 and
+> .bdrv_co_create() are what they actually might look like in the end. In
+> any case, this should be good enough to test whether we interpret
+> BlockdevCreateOptions as we should.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json      | 12 ++++++++++++
+>  include/block/block_int.h |  2 ++
+>  block.c                   | 48 +++++++++++++++++++++++++++++++++++++++++++++++
+>  block/qcow2.c             |  3 ++-
+>  4 files changed, 64 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 9341f6708d..93357a4d5d 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3415,6 +3415,18 @@
+>    } }
+>  
+>  ##
+> +# @x-blockdev-create:
+> +#
+> +# Create an image format on a given node.
+> +# TODO Replace with something asynchronous (block job?)
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/intc/s390_flic_kvm.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+I just realised that this won't be a block job. It will be a job without
+block, because there isn't necessarily any BlockDriverState involved
+(when you create the protocol layer).
 
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index d277ffdd2e..3f804ad52e 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -35,6 +35,17 @@ typedef struct KVMS390FLICState {
-     bool clear_io_supported;
- } KVMS390FLICState;
- 
-+static KVMS390FLICState *s390_get_kvm_flic(S390FLICState *fs)
-+{
-+    static KVMS390FLICState *flic;
-+
-+    if (!flic) {
-+        /* we only have one flic device, so this is fine to cache */
-+        flic = KVM_S390_FLIC(fs);
-+    }
-+    return flic;
-+}
-+
- /**
-  * flic_get_all_irqs - store all pending irqs in buffer
-  * @buf: pointer to buffer which is passed to kernel
-@@ -117,7 +128,7 @@ static void kvm_s390_inject_flic(S390FLICState *fs, struct kvm_s390_irq *irq)
-     int r;
- 
-     if (use_flic) {
--        r = flic_enqueue_irqs(irq, sizeof(*irq), KVM_S390_FLIC(fs));
-+        r = flic_enqueue_irqs(irq, sizeof(*irq), s390_get_kvm_flic(fs));
-         if (r == -ENOSYS) {
-             use_flic = false;
-         }
-@@ -174,7 +185,7 @@ static void kvm_s390_inject_crw_mchk(S390FLICState *fs)
- static int kvm_s390_clear_io_flic(S390FLICState *fs, uint16_t subchannel_id,
-                            uint16_t subchannel_nr)
- {
--    KVMS390FLICState *flic = KVM_S390_FLIC(fs);
-+    KVMS390FLICState *flic = s390_get_kvm_flic(fs);
-     int rc;
-     uint32_t sid = subchannel_id << 16 | subchannel_nr;
-     struct kvm_device_attr attr = {
-@@ -192,7 +203,7 @@ static int kvm_s390_clear_io_flic(S390FLICState *fs, uint16_t subchannel_id,
- static int kvm_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
-                                     uint16_t mode)
- {
--    KVMS390FLICState *flic = KVM_S390_FLIC(fs);
-+    KVMS390FLICState *flic = s390_get_kvm_flic(fs);
-     struct kvm_s390_ais_req req = {
-         .isc = isc,
-         .mode = mode,
-@@ -212,7 +223,7 @@ static int kvm_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
- static int kvm_s390_inject_airq(S390FLICState *fs, uint8_t type,
-                                 uint8_t isc, uint8_t flags)
- {
--    KVMS390FLICState *flic = KVM_S390_FLIC(fs);
-+    KVMS390FLICState *flic = s390_get_kvm_flic(fs);
-     uint32_t id = css_get_adapter_id(type, isc);
-     struct kvm_device_attr attr = {
-         .group = KVM_DEV_FLIC_AIRQ_INJECT,
-@@ -301,7 +312,7 @@ static int kvm_s390_io_adapter_map(S390FLICState *fs, uint32_t id,
-         .group = KVM_DEV_FLIC_ADAPTER_MODIFY,
-         .addr = (uint64_t)&req,
-     };
--    KVMS390FLICState *flic = KVM_S390_FLIC(fs);
-+    KVMS390FLICState *flic = s390_get_kvm_flic(fs);
-     int r;
- 
-     if (!kvm_gsi_routing_enabled()) {
--- 
-2.14.3
+So it looks like my first job there is to make block jobs work with
+bs == NULL... Or actually, we should probably try and do the proper
+thing with the whole new job API that we were planning anyway?
+
+Kevin
