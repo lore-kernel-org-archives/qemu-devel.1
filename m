@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41419)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnbt-0004GX-Q0
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:18:38 -0500
+	id 1ebnbz-0004K8-D9
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:18:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnbo-0007i1-NK
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:18:33 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34740)
+	id 1ebnbv-0007p0-J5
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:18:39 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:38241)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebnbo-0007hd-Gp
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:18:28 -0500
-Received: by mail-qk0-x243.google.com with SMTP id b76so25193300qkc.1
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:18:28 -0800 (PST)
+	id 1ebnbv-0007oL-FL
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:18:35 -0500
+Received: by mail-qk0-x242.google.com with SMTP id j185so25164502qkc.5
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:18:35 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 17 Jan 2018 10:18:18 -0300
-Message-Id: <20180117131821.18700-1-f4bug@amsat.org>
+Date: Wed, 17 Jan 2018 10:18:20 -0300
+Message-Id: <20180117131821.18700-3-f4bug@amsat.org>
+In-Reply-To: <20180117131821.18700-1-f4bug@amsat.org>
+References: <20180117131821.18700-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 0/3] add QEMU_WARN_NONNULL_ARGS() macro
+Subject: [Qemu-devel] [RFC PATCH 2/3] virtio: let virtio_add/clear_feature()
+ use QEMU_WARN_NONNULL_ARGS()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +35,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Stefan Weil <sw@weilnetz.de>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Some old PoC series I remember after reading
-http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg03545.html
-
-I had few more changes but then I found the code was harder to read
-so I didn't continue further.
-Only 2 patches are included as example.
-
-This might still be useful in few cases, so I'm still sending as RFC
-to have different thoughts.
-
-This macro is, however, helpful to the Clang static analizer (reducing
-false positive).
-
-BTW another useful macro for the static analizer I used is:
-
-    #define QEMU_FALLTHROUGH __attribute__((fallthrough))
-
-It replaces the /* fall through */ comment, i.e.:
-
-    switch (rap) {
-    case BCR_SWS:
-        if (!(CSR_STOP(s) || CSR_SPND(s)))
-            return;
-        val &= ~0x0300;
-        QEMU_FALLTHROUGH;
-    case BCR_LNKST:
-    case BCR_LED1:
-    case BCR_LED2:
-    case BCR_LED3:
-    case BCR_MC:
-    case BCR_FDC:
-    case BCR_BSBC:
-    case BCR_EECAS:
-    case BCR_PLAT:
-        s->bcr[rap] = val;
-        break;
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (3):
-  compiler: add QEMU_WARN_NONNULL_ARGS()
-  virtio: let virtio_add/clear_feature() use QEMU_WARN_NONNULL_ARGS()
-  utils: let qemu_find_file() use QEMU_WARN_NONNULL_ARGS()
-
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
  include/hw/virtio/virtio.h | 2 ++
- include/qemu-common.h      | 2 +-
- include/qemu/compiler.h    | 2 ++
- 3 files changed, 5 insertions(+), 1 deletion(-)
+ 1 file changed, 2 insertions(+)
 
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 098bdaaea3..d63be28039 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -292,12 +292,14 @@ void virtio_queue_aio_set_host_notifier_handler(VirtQueue *vq, AioContext *ctx,
+ VirtQueue *virtio_vector_first_queue(VirtIODevice *vdev, uint16_t vector);
+ VirtQueue *virtio_vector_next_queue(VirtQueue *vq);
+ 
++QEMU_WARN_NONNULL_ARGS(1)
+ static inline void virtio_add_feature(uint64_t *features, unsigned int fbit)
+ {
+     assert(fbit < 64);
+     *features |= (1ULL << fbit);
+ }
+ 
++QEMU_WARN_NONNULL_ARGS(1)
+ static inline void virtio_clear_feature(uint64_t *features, unsigned int fbit)
+ {
+     assert(fbit < 64);
 -- 
 2.15.1
