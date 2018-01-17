@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQP-0007vo-Pu
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQQ-0007wN-D0
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQN-0001PT-MB
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:01 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQN-0001PX-Kz
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:02 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jan 2018 13:25:19 +1100
-Message-Id: <20180117022525.31767-17-david@gibson.dropbear.id.au>
+Date: Wed, 17 Jan 2018 13:25:25 +1100
+Message-Id: <20180117022525.31767-23-david@gibson.dropbear.id.au>
 In-Reply-To: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 References: <20180117022525.31767-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/22] ppc/pnv: use POWER9 DD2 processor
+Subject: [Qemu-devel] [PULL 22/22] target-ppc: Fix booke206 tlbwe TLB
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +21,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, Luc MICHEL <luc.michel@git.antfield.fr>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Luc MICHEL <luc.michel@git.antfield.fr>
 
-commit 1ed9c8af501f ("target/ppc: Add POWER9 DD2.0 model information")
-deprecated the POWER9 model v1.0.
+When overwritting a valid TLB entry with a new one, the previous page
+were not flushed in QEMU TLB, leading to incoherent mapping. This commit
+fixes this.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Luc MICHEL <luc.michel@git.antfield.fr>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c           | 2 +-
- tests/pnv-xscom-test.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ target/ppc/mmu_helper.c | 32 +++++++++++++++++++++++++++-----
+ 1 file changed, 27 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 9475e8479c..536162b274 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -759,7 +759,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
-lass, void *data)
-     PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
-=20
-     k->chip_type =3D PNV_CHIP_POWER9;
--    k->chip_cfam_id =3D 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
-+    k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
-     k->cores_mask =3D POWER9_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p9;
-     k->xscom_base =3D 0x00603fc00000000ull;
-diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
-index 89fa6282d3..a1a119c091 100644
---- a/tests/pnv-xscom-test.c
-+++ b/tests/pnv-xscom-test.c
-@@ -48,7 +48,7 @@ static const PnvChip pnv_chips[] =3D {
-         .cpu_model  =3D "POWER9",
-         .xscom_base =3D 0x000603fc00000000ull,
-         .xscom_core_base =3D 0x0ull,
--        .cfam_id    =3D 0x100d104980000000ull,
-+        .cfam_id    =3D 0x220d104900008000ull,
-         .first_core =3D 0x20,
-     },
- #endif
---=20
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index 2a1f9902c9..298c15e961 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -2570,6 +2570,17 @@ void helper_booke_setpid(CPUPPCState *env, uint32_t pidn, target_ulong pid)
+     tlb_flush(CPU(cpu));
+ }
+ 
++static inline void flush_page(CPUPPCState *env, ppcmas_tlb_t *tlb)
++{
++    PowerPCCPU *cpu = ppc_env_get_cpu(env);
++
++    if (booke206_tlb_to_page_size(env, tlb) == TARGET_PAGE_SIZE) {
++        tlb_flush_page(CPU(cpu), tlb->mas2 & MAS2_EPN_MASK);
++    } else {
++        tlb_flush(CPU(cpu));
++    }
++}
++
+ void helper_booke206_tlbwe(CPUPPCState *env)
+ {
+     PowerPCCPU *cpu = ppc_env_get_cpu(env);
+@@ -2628,6 +2639,21 @@ void helper_booke206_tlbwe(CPUPPCState *env)
+     if (msr_gs) {
+         cpu_abort(CPU(cpu), "missing HV implementation\n");
+     }
++
++    if (tlb->mas1 & MAS1_VALID) {
++        /* Invalidate the page in QEMU TLB if it was a valid entry.
++         *
++         * In "PowerPC e500 Core Family Reference Manual, Rev. 1",
++         * Section "12.4.2 TLB Write Entry (tlbwe) Instruction":
++         * (https://www.nxp.com/docs/en/reference-manual/E500CORERM.pdf)
++         *
++         * "Note that when an L2 TLB entry is written, it may be displacing an
++         * already valid entry in the same L2 TLB location (a victim). If a
++         * valid L1 TLB entry corresponds to the L2 MMU victim entry, that L1
++         * TLB entry is automatically invalidated." */
++        flush_page(env, tlb);
++    }
++
+     tlb->mas7_3 = ((uint64_t)env->spr[SPR_BOOKE_MAS7] << 32) |
+         env->spr[SPR_BOOKE_MAS3];
+     tlb->mas1 = env->spr[SPR_BOOKE_MAS1];
+@@ -2663,11 +2689,7 @@ void helper_booke206_tlbwe(CPUPPCState *env)
+         tlb->mas1 &= ~MAS1_IPROT;
+     }
+ 
+-    if (booke206_tlb_to_page_size(env, tlb) == TARGET_PAGE_SIZE) {
+-        tlb_flush_page(CPU(cpu), tlb->mas2 & MAS2_EPN_MASK);
+-    } else {
+-        tlb_flush(CPU(cpu));
+-    }
++    flush_page(env, tlb);
+ }
+ 
+ static inline void booke206_tlb_to_mas(CPUPPCState *env, ppcmas_tlb_t *tlb)
+-- 
 2.14.3
