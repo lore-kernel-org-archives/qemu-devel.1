@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQK-0007rf-In
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQJ-0007rU-Pe
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQI-0001Jm-FO
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:56 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQI-0001JX-A2
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:55 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jan 2018 13:25:14 +1100
-Message-Id: <20180117022525.31767-12-david@gibson.dropbear.id.au>
+Date: Wed, 17 Jan 2018 13:25:12 +1100
+Message-Id: <20180117022525.31767-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 References: <20180117022525.31767-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/22] target/ppc: Clarify compat mode
- max_threads value
+Subject: [Qemu-devel] [PULL 09/22] spapr: Remove unnecessary 'options' field
+ from sPAPRCapabilityInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-We recently had some discussions that were sidetracked for a while, because
-nearly everyone misapprehended the purpose of the 'max_threads' field in
-the compatiblity modes table.  It's all about guest expectations, not host
-expectations or support (that's handled elsewhere).
+The options field here is intended to list the available values for the
+capability.  It's not used yet, because the existing capabilities are
+boolean.
 
-In an attempt to avoid a repeat of that confusion, rename the field to
-'max_vthreads' and add an explanatory comment.
+We're going to add capabilities that aren't, but in that case the info on
+the possible values can be folded into the .description field.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c      |  4 ++--
- target/ppc/compat.c | 25 +++++++++++++++++--------
- target/ppc/cpu.h    |  2 +-
- 3 files changed, 20 insertions(+), 11 deletions(-)
+ hw/ppc/spapr_caps.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3e528fe91e..e35214bfc3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -345,7 +345,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
-         int index = spapr_vcpu_id(cpu);
--        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-+        int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index f95a78547d..d5c9ce774a 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -35,7 +35,6 @@
+ typedef struct sPAPRCapabilityInfo {
+     const char *name;
+     const char *description;
+-    const char *options;                        /* valid capability values */
+     int index;
  
-         if ((index % smt) != 0) {
-             continue;
-@@ -503,7 +503,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     size_t page_sizes_prop_size;
-     uint32_t vcpus_per_socket = smp_threads * smp_cores;
-     uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
--    int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-+    int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
-     sPAPRDRConnector *drc;
-     int drc_index;
-     uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index 276b5b52c2..807c906f68 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -32,7 +32,16 @@ typedef struct {
-     uint32_t pvr;
-     uint64_t pcr;
-     uint64_t pcr_level;
--    int max_threads;
-+
-+    /*
-+     * Maximum allowed virtual threads per virtual core
-+     *
-+     * This is to stop older guests getting confused by seeing more
-+     * threads than they think the cpu can support.  Usually it's
-+     * equal to the number of threads supported on bare metal
-+     * hardware, but not always (see POWER9).
-+     */
-+    int max_vthreads;
- } CompatInfo;
+     /* Getter and Setter Function Pointers */
+@@ -126,7 +125,6 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_HTM] = {
+         .name = "htm",
+         .description = "Allow Hardware Transactional Memory (HTM)",
+-        .options = "",
+         .index = SPAPR_CAP_HTM,
+         .get = spapr_cap_get_bool,
+         .set = spapr_cap_set_bool,
+@@ -136,7 +134,6 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_VSX] = {
+         .name = "vsx",
+         .description = "Allow Vector Scalar Extensions (VSX)",
+-        .options = "",
+         .index = SPAPR_CAP_VSX,
+         .get = spapr_cap_get_bool,
+         .set = spapr_cap_set_bool,
+@@ -146,7 +143,6 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_DFP] = {
+         .name = "dfp",
+         .description = "Allow Decimal Floating Point (DFP)",
+-        .options = "",
+         .index = SPAPR_CAP_DFP,
+         .get = spapr_cap_get_bool,
+         .set = spapr_cap_set_bool,
+@@ -338,7 +334,7 @@ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
+             return;
+         }
  
- static const CompatInfo compat_table[] = {
-@@ -45,28 +54,28 @@ static const CompatInfo compat_table[] = {
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
-                PCR_COMPAT_2_05 | PCR_TM_DIS | PCR_VSX_DIS,
-         .pcr_level = PCR_COMPAT_2_05,
--        .max_threads = 2,
-+        .max_vthreads = 2,
-     },
-     { /* POWER7, ISA2.06 */
-         .name = "power7",
-         .pvr = CPU_POWERPC_LOGICAL_2_06,
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
-         .pcr_level = PCR_COMPAT_2_06,
--        .max_threads = 4,
-+        .max_vthreads = 4,
-     },
-     {
-         .name = "power7+",
-         .pvr = CPU_POWERPC_LOGICAL_2_06_PLUS,
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
-         .pcr_level = PCR_COMPAT_2_06,
--        .max_threads = 4,
-+        .max_vthreads = 4,
-     },
-     { /* POWER8, ISA2.07 */
-         .name = "power8",
-         .pvr = CPU_POWERPC_LOGICAL_2_07,
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
-         .pcr_level = PCR_COMPAT_2_07,
--        .max_threads = 8,
-+        .max_vthreads = 8,
-     },
-     { /* POWER9, ISA3.00 */
-         .name = "power9",
-@@ -80,7 +89,7 @@ static const CompatInfo compat_table[] = {
-          * confusing if half of the threads disappear from the guest
-          * if it announces it's POWER9 aware at CAS time.
-          */
--        .max_threads = 8,
-+        .max_vthreads = 8,
-     },
- };
- 
-@@ -192,14 +201,14 @@ void ppc_set_compat_all(uint32_t compat_pvr, Error **errp)
-     }
- }
- 
--int ppc_compat_max_threads(PowerPCCPU *cpu)
-+int ppc_compat_max_vthreads(PowerPCCPU *cpu)
- {
-     const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
-     int n_threads = CPU(cpu)->nr_threads;
- 
-     if (cpu->compat_pvr) {
-         g_assert(compat);
--        n_threads = MIN(n_threads, compat->max_threads);
-+        n_threads = MIN(n_threads, compat->max_vthreads);
-     }
- 
-     return n_threads;
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index a5e49f23e9..dc6820c5eb 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1395,7 +1395,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
- #if !defined(CONFIG_USER_ONLY)
- void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
- #endif
--int ppc_compat_max_threads(PowerPCCPU *cpu);
-+int ppc_compat_max_vthreads(PowerPCCPU *cpu);
- void ppc_compat_add_property(Object *obj, const char *name,
-                              uint32_t *compat_pvr, const char *basedesc,
-                              Error **errp);
+-        desc = g_strdup_printf("%s%s", cap->description, cap->options);
++        desc = g_strdup_printf("%s", cap->description);
+         object_class_property_set_description(klass, name, desc, &local_err);
+         g_free(desc);
+         if (local_err) {
 -- 
 2.14.3
