@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ebjId-0004xn-EA
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:42:24 -0500
+	(envelope-from <abologna@redhat.com>) id 1ebjUz-0000Rv-Q3
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:55:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ebjIa-0007Ro-7b
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:42:23 -0500
-Received: from mga04.intel.com ([192.55.52.120]:53107)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ebjIZ-0007RE-VR
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:42:20 -0500
-Message-ID: <5A5F0CFD.5030204@intel.com>
-Date: Wed, 17 Jan 2018 16:44:45 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <20180110161438.GA28096@stefanha-x1.localdomain>
-	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
-	<20180111152345.GA7353@stefanha-x1.localdomain>
-	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
-	<20180112101807.GE7356@stefanha-x1.localdomain>
-	<a45c1da8-03e8-140f-725c-af0f31e3da62@redhat.com>
-	<5A5C5F7D.8070403@intel.com>
-	<6b618d06-0891-fb3b-b845-8beae5649b22@redhat.com>
-	<5A5C85DD.10705@intel.com>
-	<dffa9693-18d8-6bb9-e024-0f137624494d@redhat.com>
-In-Reply-To: <dffa9693-18d8-6bb9-e024-0f137624494d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
+	(envelope-from <abologna@redhat.com>) id 1ebjUu-0002Lk-0G
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 03:55:09 -0500
+Message-ID: <1516179297.3278.6.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 17 Jan 2018 09:54:57 +0100
+In-Reply-To: <62449abf-fdd1-44f3-4a5c-0695e8607cea@ozlabs.ru>
+References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
+	<1516110433.10494.5.camel@redhat.com>
+	<20180116135459.GN30352@umbus.fritz.box>
+	<1516113980.3278.1.camel@redhat.com>
+	<20180116223413.GQ30352@umbus.fritz.box>
+	<62449abf-fdd1-44f3-4a5c-0695e8607cea@ozlabs.ru>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 0/6] target/ppc:
+ Rework spapr_caps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>
+Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On 01/16/2018 01:33 PM, Jason Wang wrote:
->
->
-> On 2018年01月15日 18:43, Wei Wang wrote:
->> On 01/15/2018 04:34 PM, Jason Wang wrote:
->>>
->>>
->>> On 2018年01月15日 15:59, Wei Wang wrote:
->>>> On 01/15/2018 02:56 PM, Jason Wang wrote:
->>>>>
->>>>>
->>>>> On 2018年01月12日 18:18, Stefan Hajnoczi wrote:
->>>>>>
->>>>>
->>>>> I just fail understand why we can't do software defined network or 
->>>>> storage with exist virtio device/drivers (or are there any 
->>>>> shortcomings that force us to invent new infrastructure).
->>>>>
->>>>
->>>> Existing virtio-net works with a host central vSwitch, and it has 
->>>> the following disadvantages:
->>>> 1) long code/data path;
->>>> 2) poor scalability; and
->>>> 3) host CPU sacrifice
->>>
->>> Please show me the numbers.
->>
->> Sure. For 64B packet transmission between two VMs: vhost-user reports 
->> ~6.8Mpps, and vhost-pci reports ~11Mpps, which is ~1.62x faster.
->>
->
-> This result is kind of incomplete. So still many questions left:
->
-> - What's the configuration of the vhost-user?
-> - What's the result of e.g 1500 byte?
-> - You said it improves scalability, at least I can't get this 
-> conclusion just from what you provide here
-> - You suspect long code/data path, but no latency numbers to prove it
->
+On Wed, 2018-01-17 at 10:26 +1100, Alexey Kardashevskiy wrote:
+> On 17/01/18 09:34, David Gibson wrote:
+> > On Tue, Jan 16, 2018 at 03:46:20PM +0100, Andrea Bolognani wrote:
+> > > On Wed, 2018-01-17 at 00:54 +1100, David Gibson wrote:
+> > > > > Correct me if I'm wrong, but it seems to me like there's no way
+> > > > > to figure out through QMP whether these new machine options can be
+> > > > > used for a given QEMU binary.
+> > > > 
+> > > > Uh, I don't think so.  These are machine options like any other (just
+> > > > constructed a bit differently).  So they'll appear in qemu -machine
+> > > > pseries,? and I believe that info can also be retrieved with QMP.
+> > > 
+> > > Yes, they will indeed show up in the output of -machine pseries,?
+> > > but there's AFAICT no way to retrieve them via QMP.
+> > 
+> > Really!?  I thought introspecting object properties was QMP's bread
+> > and butter.
+> 
+> On a guest started with '-S':
+> {"execute": "qom-list", "arguments": {"path": "/machine"}}
+> 
+> returns:
+> {   'return': [   {'name': 'graphics', 'type': 'bool'},
+[...]
+>                   {'name': 'cap-dfp', 'type': 'bool'},
+>                   {'name': 'cap-htm', 'type': 'bool'},
+>                   {'name': 'cap-vsx', 'type': 'bool'},
+>                   {'name': 'vfio-no-msix-emulation', 'type': 'bool'},
+>                   {'name': 'kvm-type', 'type': 'string'},
+>                   {'name': 'max-cpu-compat', 'type': 'string'},
+[...]
+>                   {'name': 'resize-hpt', 'type': 'string'}]}
+> 
+> but still requires a running qemu, yes.
 
-Had an offline meeting with Jason. The future discussion will be more 
-focused on the design.
+That's not a problem in itself; however, AFAICT the guest in
+question also needs to be started with -machine pseries in order
+for the above to work, which means it's not usable due to the
+scalability issues mentioned earlier in the thread. We run QEMU
+with -machine none, a single time, to probe for capabilities.
 
-Here is a conclusion about more results we collected for 64B packet 
-transmission, compared to ovs-dpdk (though we are comparing to ovs-dpdk 
-here, but vhost-pci isn't meant to replace ovs-dpdk. It's for inter-VM 
-communication, and packets going to the outside world will go from the 
-traditional backend like ovs-dpdk):
+I looked further and device-list-properties looks like it would
+do the trick; however it doesn't seem to work for machines:
 
-1) 2VM communication: over 1.6x higher throughput;
-2) 22% shorter latency;
-3) in the 5-VM chain communication tests, vhost-pci shows ~6.5x higher 
-throughput thanks to its better scalability
+  {"execute": "device-list-properties",
+   "arguments": {"typename": "spapr-2.11-machine"}}
+  {"error": {"class": "GenericError",
+             "desc": "Parameter 'typename' expects device"}}
 
-We'll provide 1500B test results later.
+It works fine for the likes of virtio-scsi-pci and even
+power9_v2.0-powerpc64-cpu, though. Any ideas? :)
 
-Best,
-Wei
+-- 
+Andrea Bolognani / Red Hat / Virtualization
