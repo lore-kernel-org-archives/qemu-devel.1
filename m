@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebnlW-0001h9-JX
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:28:31 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnm2-000228-5N
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebnlS-0000bt-LP
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:28:30 -0500
-References: <20171110224302.14424-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e6d13697-b7b5-5c8f-1a1f-61ac30ad8016@redhat.com>
-Date: Wed, 17 Jan 2018 14:28:13 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnlx-0000yT-9N
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:02 -0500
+Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:35146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnlw-0000xr-Sw
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:28:57 -0500
+Received: by mail-qk0-x234.google.com with SMTP id w1so25211121qka.2
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:28:56 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180116231824.27114-1-shaun.reitan@ndchost.com>
+	<20180117103148.GE19227@redhat.com>
+	<39294893-a458-9f40-dc9c-bcac14d8be5e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6fa6797b-c57f-5635-4c60-1a0714089638@amsat.org>
+Date: Wed, 17 Jan 2018 10:28:52 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171110224302.14424-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA"
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] blockdev: Mark BD-{remove,
- insert}-medium stable
+In-Reply-To: <39294893-a458-9f40-dc9c-bcac14d8be5e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Add ability to provide ifname when using
+ netdev bridge or tap helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +37,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Shaun Reitan <shaun.reitan@ndchost.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <e6d13697-b7b5-5c8f-1a1f-61ac30ad8016@redhat.com>
-Subject: Re: [PATCH for-2.12 0/4] blockdev: Mark BD-{remove,insert}-medium
- stable
-References: <20171110224302.14424-1-mreitz@redhat.com>
-In-Reply-To: <20171110224302.14424-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 01/17/2018 07:39 AM, Paolo Bonzini wrote:
+> On 17/01/2018 11:31, Daniel P. Berrange wrote:
+>>
+>> eg consider the user asks for a tap device called  eth1. To the
+>> sysadmin the user's tap device now looks like a physical NIC.
+>> This can be even worse if the host does physical NIC hotplug,
+>> or uses SRIOV. eg consider the host as eth0 -> eth7 for SRIOV
+>> NICs, and eth3 is given to a guest. Now a user uses the setuid
+>> helper to ask for a TAP called eth3. When the SRIOV device is
+>> later released by the guest it will end up called eth8, as the
+>> TAP device occupies eth3. In bad cases this could even cause
+>> the host mgmt layer to configure bogus addresses on the eth3
+>> TAP device instead of the SRIOV device.
+>>
+>> If we want to allow ifname to be set via the setuid helper, then IMHO,
+>> the config file for the helper *must* whitelist the various permitted
+>> naming patterns.
+> 
+> Indeed, a similar patch has been proposed several times, and always the
+> response was the same as Daniel's. :)
 
-On 2017-11-10 23:42, Max Reitz wrote:
-> Berto's "Test I/O limits with removable media" patch proves that
-> throttling survives a blockdev-remove-medium/blockdev-insert-medium pai=
-r
-> now, so let's mark them stable (because that was the reason they were
-> considered experimental, see commit
-> 6e0abc251dd4f8eba1f53656dfede12e5840e83b for more).
->=20
-> But before we do that, let's use the chance and drop the @device
-> parameter.
->=20
->=20
-> Based-on: <cover.1510339534.git.berto@igalia.com>
-> ("Fix throttling crashes in BlockBackend with no BlockDriverState",
->  because of the test case added there)
->=20
->=20
-> Max Reitz (4):
->   iotests: Make BD-{remove,insert}-medium use @id
->   tests/ahci: Switch tray and medium commands to @id
->   blockdev: Drop BD-{remove,insert}-medium's @device
->   blockdev: Mark BD-{remove,insert}-medium stable
->=20
->  qapi/block-core.json   |  42 ++++-------
->  blockdev.c             |  30 ++++++--
->  tests/ahci-test.c      |  16 ++---
->  tests/qemu-iotests/093 |   6 +-
->  tests/qemu-iotests/118 | 184 +++++++++++++++++++++++------------------=
---------
->  tests/qemu-iotests/139 |   2 +-
->  tests/qemu-iotests/155 |  60 ++++++++--------
->  7 files changed, 163 insertions(+), 177 deletions(-)
-
-Applied to my block branch.
-
-Max
-
-
---0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpfT20SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ABIUH/jVv/2ohy80ib9hH9HXoiHcPtnESUAwo
-G726UZ6YVUO2+54SvizKcvOHgzS22tQ2l+pZOfh2gPV5IkQfudlege+qtcKK8Zsn
-7cPHGKuz3RElkdc7+XaV3wmRxP8B7YWq/e67Q72AakE89ViNjqP0JsiJR642GRdE
-KHlBtvm9klVEF23S55QgwW7wsFva/uGc/Oa4dLJ0w02WWZ8WAbTbN+zttFwSTS8z
-ty5SqYshCscvS4z676rCGENF8mBprFNXyEVQhcqGRjnuWcAPpy2/AVKPAQLxVnZb
-Mr5MY52tJL0wy6rmasuSjGK5y8+py/30cBcHJ63DU172zKLIbaqHiUs=
-=7kOz
------END PGP SIGNATURE-----
-
---0Se7pm9DY6JGs4dK7nNpdd6qXqvCuNQOA--
+Can this be added to docs/netdev-helpers.rst and with a comment
+referencing this file in qemu-bridge-helper.c ?
