@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ebqM7-0005tn-OH
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:28 -0500
+	(envelope-from <marcel@redhat.com>) id 1ebqM8-0005um-SP
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ebqM4-0003H0-HT
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:27 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <99e8633c-828c-ccf5-334a-6d081d329878@redhat.com>
-References: <cover.1513342045.git.berto@igalia.com>
-	<192986ad741749064e855bc67916a11460911992.1513342045.git.berto@igalia.com>
-	<a634b25e-08d3-349e-7b71-6d25d7c7bc2c@redhat.com>
-	<w51fu741nuo.fsf@maestria.local.igalia.com>
-	<99e8633c-828c-ccf5-334a-6d081d329878@redhat.com>
-Date: Wed, 17 Jan 2018 17:13:45 +0100
-Message-ID: <w51d1281n0m.fsf@maestria.local.igalia.com>
+	(envelope-from <marcel@redhat.com>) id 1ebqM5-0003Hd-Lp
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:28 -0500
+References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
+	<20180116013709.13830-10-andrew.smirnov@gmail.com>
+	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
+	<b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
+	<CAFEAcA8Ei8vgOspvy9hBbwQya+gjDq3V8o2NbV8cxvCsw6kycQ@mail.gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <63726933-be7f-3dd7-9e14-fa02863cfb75@redhat.com>
+Date: Wed, 17 Jan 2018 18:12:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 16/32] qcow2: Update l2_allocate() to
- support L2 slices
+In-Reply-To: <CAFEAcA8Ei8vgOspvy9hBbwQya+gjDq3V8o2NbV8cxvCsw6kycQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
+ IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Wed 17 Jan 2018 05:06:04 PM CET, Eric Blake wrote:
->>>>      /* allocate a new entry in the l2 cache */
->>>>  
->>>> +    slice_size = s->l2_slice_size * sizeof(uint64_t);
->>>
->>> Would this read any better if the earlier patch named it
->>> s->l2_slice_entries?
->> 
->> I had doubts with this. Like you, when I see size I tend to think about
->> bytes. However both s->l1_size and s->l2_size indicate entries, and the
->> documentation of the qcow2 format even describes the header field like
->> this:
->> 
->>          36 - 39:   l1_size
->>                     Number of entries in the active L1 table
->
-> We're free to rename the field in the qcow2 format specification if it
-> makes things easier to understand.  If l1_entries reads better than
-> l1_size, maybe it's worth doing.
+On 17/01/2018 17:35, Peter Maydell wrote:
+> On 17 January 2018 at 15:23, Marcel Apfelbaum <marcel.apfelbaum@zoho.com> wrote:
+>>
+>> On 16/01/2018 16:34, Peter Maydell wrote:
+>>> On 16 January 2018 at 01:37, Andrey Smirnov <andrew.smirnov@gmail.com>
+>>> I'm not familiar enough with our PCI code to be able to review
+>>> this, I'm afraid. MST and Marcel are our PCI subsystem maintainers --
+>>> could one of you have a look at whether this seems to be a correct
+>>> implementation of a pcie host controller ?
+>>
+>>
+>> Sadly PCI Host bridges do not have a standard, each HW vendor
+>> can do pretty much what they want.
+>>
+>> That being said, if Andrey can point me to the PCI spec for the Designware
+>> PCI host bridge and what parts they implemented for it I can have a look,
+>> sure.
+> 
+> I'm not so worried about whether it's implementing the spec for
+> the hardware (I trust Andrey has done enough testing for that
+> side of things), but whether the code seems to be structured
+> the way we expect a QEMU pcie host controller to be structured,
+> is using the right APIs, and so on.
+> 
 
-In my opinion it reads much better. We mix both kinds of meanings in the
-BDRVQcow2State structure already, there's for example cluster_size
-(bytes), and refcount_table_size (entries). With the latter we actually
-have the exact same problem we're discussing here:
+Got it, I'll review in a week.
 
-    refcount_table_size2 = s->refcount_table_size * sizeof(uint64_t);
-    s->refcount_table = g_try_malloc(refcount_table_size2);
+Thanks,
+Marcel
 
-So yeah, we can change those variables but it won't be a small patch. I
-can do that if everyone thinks that it's a good idea.
-
-Berto
+> thanks
+> -- PMM
+> 
