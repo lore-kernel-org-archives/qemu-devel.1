@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqN6-0006st-NP
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:32 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqNE-00071C-Tn
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqN2-0003nA-Nt
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:28 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35801)
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqND-0003su-Qx
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:36 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:44253)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ebqN2-0003mf-E7
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:24 -0500
-Received: by mail-pg0-x244.google.com with SMTP id d6so11516175pgv.2
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:15:24 -0800 (PST)
+	id 1ebqND-0003sZ-JU
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:35 -0500
+Received: by mail-pf0-x242.google.com with SMTP id m26so11804371pfj.11
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:15:35 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 17 Jan 2018 08:14:26 -0800
-Message-Id: <20180117161435.28981-12-richard.henderson@linaro.org>
+Date: Wed, 17 Jan 2018 08:14:29 -0800
+Message-Id: <20180117161435.28981-15-richard.henderson@linaro.org>
 In-Reply-To: <20180117161435.28981-1-richard.henderson@linaro.org>
 References: <20180117161435.28981-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10.5 11/20] target/arm: Align vector registers
+Subject: [Qemu-devel] [PATCH v10.5 14/20] target/arm: Use vector
+ infrastructure for aa64 dup/movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +30,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/arm/translate-a64.c | 83 +++++++++++++++++++---------------------------
+ 1 file changed, 34 insertions(+), 49 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 96316700dd..3ff4dea6b8 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -492,7 +492,7 @@ typedef struct CPUARMState {
-          * the two execution states, and means we do not need to explicitly
-          * map these registers when changing states.
-          */
--        float64 regs[64];
-+        float64 regs[64] QEMU_ALIGNED(16);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 219cc1e19d..2495414603 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -5863,38 +5863,24 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
+  *
+  * size: encoded in imm5 (see ARM ARM LowestSetBit())
+  */
++
+ static void handle_simd_dupe(DisasContext *s, int is_q, int rd, int rn,
+                              int imm5)
+ {
+     int size = ctz32(imm5);
+-    int esize = 8 << size;
+-    int elements = (is_q ? 128 : 64) / esize;
+-    int index, i;
+-    TCGv_i64 tmp;
++    int index = imm5 >> (size + 1);
  
-         uint32_t xregs[16];
-         /* We store these fpcsr fields separately for convenience.  */
+     if (size > 3 || (size == 3 && !is_q)) {
+         unallocated_encoding(s);
+         return;
+     }
+-
+     if (!fp_access_check(s)) {
+         return;
+     }
+ 
+-    index = imm5 >> (size + 1);
+-
+-    tmp = tcg_temp_new_i64();
+-    read_vec_element(s, tmp, rn, index, size);
+-
+-    for (i = 0; i < elements; i++) {
+-        write_vec_element(s, tmp, rd, i, size);
+-    }
+-
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
+-
+-    tcg_temp_free_i64(tmp);
++    tcg_gen_gvec_dup_mem(size, vec_full_reg_offset(s, rd),
++                         vec_reg_offset(s, rn, index, size),
++                         is_q ? 16 : 8, vec_full_reg_size(s));
+ }
+ 
+ /* DUP (element, scalar)
+@@ -5943,9 +5929,7 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
+                              int imm5)
+ {
+     int size = ctz32(imm5);
+-    int esize = 8 << size;
+-    int elements = (is_q ? 128 : 64)/esize;
+-    int i = 0;
++    uint32_t dofs, oprsz, maxsz;
+ 
+     if (size > 3 || ((size == 3) && !is_q)) {
+         unallocated_encoding(s);
+@@ -5956,12 +5940,11 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
+         return;
+     }
+ 
+-    for (i = 0; i < elements; i++) {
+-        write_vec_element(s, cpu_reg(s, rn), rd, i, size);
+-    }
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
++    dofs = vec_full_reg_offset(s, rd);
++    oprsz = is_q ? 16 : 8;
++    maxsz = vec_full_reg_size(s);
++
++    tcg_gen_gvec_dup_i64(size, dofs, oprsz, maxsz, cpu_reg(s, rn));
+ }
+ 
+ /* INS (Element)
+@@ -6152,7 +6135,6 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+     bool is_neg = extract32(insn, 29, 1);
+     bool is_q = extract32(insn, 30, 1);
+     uint64_t imm = 0;
+-    TCGv_i64 tcg_rd, tcg_imm;
+     int i;
+ 
+     if (o2 != 0 || ((cmode == 0xf) && is_neg && !is_q)) {
+@@ -6234,32 +6216,35 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+         imm = ~imm;
+     }
+ 
+-    tcg_imm = tcg_const_i64(imm);
+-    tcg_rd = new_tmp_a64(s);
++    if (!((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9)) {
++        /* MOVI or MVNI, with MVNI negation handled above.  */
++        tcg_gen_gvec_dup64i(vec_full_reg_offset(s, rd), is_q ? 16 : 8,
++                            vec_full_reg_size(s), imm);
++    } else {
++        TCGv_i64 tcg_imm = tcg_const_i64(imm);
++        TCGv_i64 tcg_rd = new_tmp_a64(s);
+ 
+-    for (i = 0; i < 2; i++) {
+-        int foffs = i ? fp_reg_hi_offset(s, rd) : fp_reg_offset(s, rd, MO_64);
++        for (i = 0; i < 2; i++) {
++            int foffs = vec_reg_offset(s, rd, i, MO_64);
+ 
+-        if (i == 1 && !is_q) {
+-            /* non-quad ops clear high half of vector */
+-            tcg_gen_movi_i64(tcg_rd, 0);
+-        } else if ((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9) {
+-            tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
+-            if (is_neg) {
+-                /* AND (BIC) */
+-                tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
++            if (i == 1 && !is_q) {
++                /* non-quad ops clear high half of vector */
++                tcg_gen_movi_i64(tcg_rd, 0);
+             } else {
+-                /* ORR */
+-                tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
++                tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
++                if (is_neg) {
++                    /* AND (BIC) */
++                    tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
++                } else {
++                    /* ORR */
++                    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
++                }
+             }
+-        } else {
+-            /* MOVI */
+-            tcg_gen_mov_i64(tcg_rd, tcg_imm);
++            tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
+         }
+-        tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
+-    }
+ 
+-    tcg_temp_free_i64(tcg_imm);
++        tcg_temp_free_i64(tcg_imm);
++    }
+ }
+ 
+ /* AdvSIMD scalar copy
 -- 
 2.14.3
