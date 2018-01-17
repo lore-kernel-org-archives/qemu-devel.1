@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eboMB-0006NO-R6
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:06:28 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eboNW-0007Ic-Dy
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:07:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eboM4-0000vH-4Q
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:06:23 -0500
-Date: Wed, 17 Jan 2018 09:05:59 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180117140559.GA1477@localhost.localdomain>
-References: <20180117135015.15051-1-mreitz@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eboNR-0002Cg-Ly
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:07:46 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eboNR-0002CE-Ee
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:07:41 -0500
+Received: by mail-pf0-x244.google.com with SMTP id p1so11604226pfh.4
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 06:07:41 -0800 (PST)
+References: <20180116222212.1266-1-laurent@vivier.eu>
+	<20180116222212.1266-4-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <eca4c2b4-b400-8550-9373-8825efdb4dda@linaro.org>
+Date: Wed, 17 Jan 2018 06:07:36 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180117135015.15051-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: Make 200 run on tmpfs
+In-Reply-To: <20180116222212.1266-4-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] linux-user,
+ m68k: select CPU according to ELF header values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,41 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aaron Sierra <asierra@xes-inc.com>, YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On Wed, Jan 17, 2018 at 02:50:15PM +0100, Max Reitz wrote:
-> 200 currently fails on tmpfs because it sets cache=none.  However,
-> without that (and aio=native), the test still works now and it fails
-> before Jeff's series (on fc7dbc119e0852a70dc9fa68bb41a318e49e4cd6).  So
-> we can probably remove the aio=native safely, and replace cache=none by
-> cache=$CACHEMODE.
+On 01/16/2018 02:22 PM, Laurent Vivier wrote:
+> M680x0 doesn't support the same set of instructions
+> as ColdFire, so we can't use "any" CPU type to execute
+> m68020 instructions.
+> We select CPU type ("m68040" or "any" for ColdFire)
+> according to the ELF header. If we can't, we
+> use by default the value used until now: "any".
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-
-Tested-by, and:
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
-> v2: Use cache=$CACHEMODE instead of dropping it altogether [Stefan]
-> ---
->  tests/qemu-iotests/200 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-> index d8787ddb46..ddbdedc476 100755
-> --- a/tests/qemu-iotests/200
-> +++ b/tests/qemu-iotests/200
-> @@ -60,7 +60,7 @@ qemu_comm_method="qmp"
->  _launch_qemu -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 \
->               -object iothread,id=iothread0 \
->               -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 \
-> -             -drive file="${TEST_IMG}",media=disk,if=none,cache=none,id=drive_sysdisk,aio=native,format=$IMGFMT \
-> +             -drive file="${TEST_IMG}",media=disk,if=none,cache=$CACHEMODE,id=drive_sysdisk,format=$IMGFMT \
->               -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
->  h1=$QEMU_HANDLE
->  
-> -- 
-> 2.14.3
-> 
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
