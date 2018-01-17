@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebpuo-0005hD-7Y
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:46:16 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ebpuy-0005oQ-C2
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:46:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebpuk-0000TF-6w
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:46:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48122)
+	(envelope-from <imammedo@redhat.com>) id 1ebpuu-0000gr-1G
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:46:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ebpuj-0000Sj-Ub
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:46:10 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ebput-0000eG-Ro
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:46:19 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 17 Jan 2018 16:43:32 +0100
-Message-Id: <1516203816-19374-21-git-send-email-imammedo@redhat.com>
+Date: Wed, 17 Jan 2018 16:43:35 +0100
+Message-Id: <1516203816-19374-24-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
 References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 20/24] machine: drop MachineState::cpu_model
+Subject: [Qemu-devel] [PATCH 23/24] nios2: 10m50_devboard: replace cpu_model
+ with cpu_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +25,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
 
-The last user of it was machine type 'none', which used field
-to create CPU id user requested it on CLI with -cpu option.
-
-We could compare pointers of MachineState::cpu_type and
-MachineClass::default_cpu_type to check for the same condition,
-and drop cpu_model concept completly from machine/boards code
-So that no one would try to reuse obsolete field and only
-place to deal with cpu model would be vl.c and
-foo_cpu_class_by_name() callbacks.
+use cpu_create() instead of being removed cpu_generic_init()
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: Eduardo Habkost <ehabkost@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Chris Wulff <crwulff@gmail.com>
+CC: Marek Vasut <marex@denx.de>
 ---
- include/hw/boards.h    |  1 -
- hw/core/null-machine.c | 10 +++++++---
- vl.c                   |  8 +++++++-
- 3 files changed, 14 insertions(+), 5 deletions(-)
+ hw/nios2/10m50_devboard.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 156b16f..decd0ec 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -246,7 +246,6 @@ struct MachineState {
-     char *kernel_filename;
-     char *kernel_cmdline;
-     char *initrd_filename;
--    const char *cpu_model;
-     const char *cpu_type;
-     AccelState *accelerator;
-     CPUArchIdList *possible_cpus;
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index 864832d..c2e466c 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -23,10 +23,13 @@
- static void machine_none_init(MachineState *mch)
- {
-     CPUState *cpu = NULL;
-+    MachineClass *mc = MACHINE_GET_CLASS(mch);
+diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
+index e4007f6..42053b2 100644
+--- a/hw/nios2/10m50_devboard.c
++++ b/hw/nios2/10m50_devboard.c
+@@ -75,7 +75,7 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
+                                 phys_ram_alias);
  
--    /* Initialize CPU (if a model has been specified) */
--    if (mch->cpu_model) {
--        cpu = cpu_init(mch->cpu_model);
-+    /* Initialize CPU if cpu_type pointer is user provided
-+     * (i.e. != to pointer tot static default cpu type string)
-+     */
-+    if (mch->cpu_type != mc->default_cpu_type) {
-+        cpu = cpu_create(mch->cpu_type);
-         if (!cpu) {
-             error_report("Unable to initialize CPU");
-             exit(1);
-@@ -54,6 +57,7 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->init = machine_none_init;
-     mc->max_cpus = 1;
-     mc->default_ram_size = 0;
-+    mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
- }
+     /* Create CPU -- FIXME */
+-    cpu = NIOS2_CPU(cpu_generic_init(TYPE_NIOS2_CPU, "nios2"));
++    cpu = NIOS2_CPU(cpu_create(TYPE_NIOS2_CPU));
  
- DEFINE_MACHINE("none", machine_none_machine_init)
-diff --git a/vl.c b/vl.c
-index 2586f25..8aa0131 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4609,7 +4609,6 @@ int main(int argc, char **argv, char **envp)
-     current_machine->maxram_size = maxram_size;
-     current_machine->ram_slots = ram_slots;
-     current_machine->boot_order = boot_order;
--    current_machine->cpu_model = cpu_model;
- 
-     parse_numa_opts(current_machine);
- 
-@@ -4619,6 +4618,13 @@ int main(int argc, char **argv, char **envp)
-         if (cpu_model) {
-             current_machine->cpu_type =
-                 cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model);
-+
-+            /* machine 'none' depends on default cpu type pointer not being
-+             * equal to resolved type name pointer to fugure out if type was
-+             * user provided, make sure that if it becomes not true in future
-+             * it won't beark silently */
-+            g_assert(
-+                current_machine->cpu_type != machine_class->default_cpu_type);
-         }
-     }
- 
+     /* Register: CPU interrupt controller (PIC) */
+     cpu_irq = nios2_cpu_pic_init(cpu);
 -- 
 2.7.4
