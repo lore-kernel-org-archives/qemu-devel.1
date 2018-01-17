@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eblSp-0001OL-Th
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:01:07 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eblSw-0001Q7-E2
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:01:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eblSm-000347-3x
+	(envelope-from <alex.bennee@linaro.org>) id 1eblSq-00038F-Jp
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:01:10 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:44258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eblSq-00037F-Dh
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:01:04 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 17 Jan 2018 12:00:44 +0100
-Message-Id: <1516186851-23896-1-git-send-email-pbonzini@redhat.com>
+Received: by mail-wm0-x244.google.com with SMTP id t74so14411565wme.3
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 03:01:04 -0800 (PST)
+References: <20180115143500.22631-1-f4bug@amsat.org>
+	<20180115143500.22631-3-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180115143500.22631-3-f4bug@amsat.org>
+Date: Wed, 17 Jan 2018 11:01:01 +0000
+Message-ID: <876080oiky.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/7] Call check and invalidate_cache from
- coroutine context
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] docker: do not display deprecated
+ images in 'make docker' help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,62 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Check and invalidate_cache share some parts of the implementation
-with the regular I/O path.  This is sometimes complicated because the
-I/O path wants to use a CoMutex but that is not possible outside coroutine
-context.  By moving things to coroutine context, we can remove special
-cases.  In fact, invalidate_cache is already called from coroutine context
-because incoming migration is placed in a coroutine.
 
-While at it, I'm including two patches from Stefan to rename the
-bdrv_create callback to bdrv_co_create, because it is already called
-from coroutine context.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-qcow2 still has cache flushing in non-coroutine context, coming from
-qcow2_reopen_prepare->qcow2_update_options_prepare and
-qcow2_close->qcow2_inactivate.
+> the 'debian' base image is deprecated since 3e11974988d8
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Paolo
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Paolo Bonzini (5):
-  qcow2: make qcow2_do_open a coroutine_fn
-  qed: make bdrv_qed_do_open a coroutine_fn
-  block: convert bdrv_invalidate_cache callback to coroutine_fn
-  qcow2: introduce qcow2_write_caches and qcow2_flush_caches
-  block: convert bdrv_check callback to coroutine_fn
+> ---
+>  tests/docker/Makefile.include | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index ef95703cef..d5cf896966 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -4,7 +4,8 @@
+>
+>  DOCKER_SUFFIX :=3D .docker
+>  DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
+> -DOCKER_IMAGES :=3D $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_=
+DIR)/*.docker))))
+> +DOCKER_DEPRECATED_IMAGES :=3D debian
+> +DOCKER_IMAGES :=3D $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(not=
+dir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+>  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+>  # Use a global constant ccache directory to speed up repetitive builds
+>  DOCKER_CCACHE_DIR :=3D $$HOME/.cache/qemu-docker-ccache
+> @@ -63,7 +64,7 @@ docker-image-debian-win64-cross: docker-image-debian8-m=
+xe
+>  docker-image-travis: NOUSER=3D1
+>
+>  # Expand all the pre-requistes for each docker image and test combination
+> -$(foreach i,$(DOCKER_IMAGES), \
+> +$(foreach i,$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES), \
+>  	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
+>  		$(eval .PHONY: docker-$t@$i) \
+>  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
 
-Stefan Hajnoczi (2):
-  block: rename .bdrv_create() to .bdrv_co_create()
-  qcow2: make qcow2_co_create2() a coroutine_fn
 
- block.c                   |  88 ++++++++++++++++++++++++++++++----
- block/crypto.c            |   8 ++--
- block/file-posix.c        |  15 +++---
- block/file-win32.c        |   3 +-
- block/gluster.c           |  12 ++---
- block/iscsi.c             |  13 ++---
- block/nfs.c               |  11 +++--
- block/parallels.c         |  23 +++++----
- block/qcow.c              |   5 +-
- block/qcow2-refcount.c    |  28 +++++++++++
- block/qcow2.c             | 118 +++++++++++++++++++++++++++++++---------------
- block/qcow2.h             |   2 +
- block/qed-check.c         |   1 +
- block/qed-table.c         |  26 ++++------
- block/qed.c               |  72 +++++++++++++++++++++-------
- block/raw-format.c        |   5 +-
- block/rbd.c               |  12 +++--
- block/sheepdog.c          |  10 ++--
- block/ssh.c               |   5 +-
- block/vdi.c               |  11 +++--
- block/vhdx.c              |  12 +++--
- block/vmdk.c              |  12 +++--
- block/vpc.c               |   5 +-
- include/block/block_int.h |  11 +++--
- 24 files changed, 354 insertions(+), 154 deletions(-)
-
--- 
-1.8.3.1
+--
+Alex Benn=C3=A9e
