@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ebosN-0000Pn-5k
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:39:40 -0500
+	(envelope-from <clg@kaod.org>) id 1ebosj-0000fb-5o
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ebosJ-00050A-Qa
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:39:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33510)
+	(envelope-from <clg@kaod.org>) id 1ebosd-0005LX-06
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:40:01 -0500
+Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:54190)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ebosJ-0004zS-I9
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:39:35 -0500
-Date: Wed, 17 Jan 2018 14:39:11 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180117143911.GQ19227@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180117131821.18700-1-f4bug@amsat.org>
-	<20180117131821.18700-2-f4bug@amsat.org>
-	<20180117133201.GN19227@redhat.com>
-	<a38e57e4-b291-e7a1-3086-c2a1714f1b7f@amsat.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ebosc-0005K6-Lq
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:39:54 -0500
+Received: from player732.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id ED9C7182466
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 15:39:52 +0100 (CET)
+References: <20171209084338.29395-1-clg@kaod.org>
+	<20171209084338.29395-3-clg@kaod.org>
+	<20171220050947.GC5981@umbus.fritz.box>
+	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+	<1516187433.31850.189.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+Date: Wed, 17 Jan 2018 15:39:46 +0100
 MIME-Version: 1.0
+In-Reply-To: <1516187433.31850.189.camel@kernel.crashing.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a38e57e4-b291-e7a1-3086-c2a1714f1b7f@amsat.org>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] compiler: add
- QEMU_WARN_NONNULL_ARGS()
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +38,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>, Luiz Capitulino <lcapitulino@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On Wed, Jan 17, 2018 at 11:33:34AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 01/17/2018 10:32 AM, Daniel P. Berrange wrote:
-> > On Wed, Jan 17, 2018 at 10:18:19AM -0300, Philippe Mathieu-Daud=C3=A9=
- wrote:
-> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> >> ---
-> >>  include/qemu/compiler.h | 2 ++
-> >>  1 file changed, 2 insertions(+)
-> >>
-> >> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-> >> index 340e5fdc09..d9b2489391 100644
-> >> --- a/include/qemu/compiler.h
-> >> +++ b/include/qemu/compiler.h
-> >> @@ -26,6 +26,8 @@
-> >> =20
-> >>  #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
-> >> =20
-> >> +#define QEMU_WARN_NONNULL_ARGS(args...) __attribute__((nonnull(args=
-)))
-> >=20
-> > If we take this, it should come with a warning attached to it, becaus=
-e
-> > it has really nasty behaviour with GCC. Consider code like:
-> >=20
-> >   void foo(void *bar) __attribute__((nonnull(1)));
-> >=20
-> >   ...
-> >=20
-> >   void foo(void *bar) { if (!bar) return; }
-> >=20
-> > GCC may or may not warn you about passing NULL for the 'bar'
-> > parameter, but it will none the less assume nothing passes
-> > NULL, and thus remove the 'if (!bar)' conditional during
-> > optimization. IOW, adding nonnull annotations can actually
-> > make your code less robust :-(
+On 01/17/2018 12:10 PM, Benjamin Herrenschmidt wrote:
+> On Wed, 2018-01-17 at 10:18 +0100, C=C3=A9dric Le Goater wrote:
+>>>>> Also, have we decided how the process of switching between XICS and
+>>>>> XIVE will work vs. CAS ?=20
+>>>>
+>>>> That's how it is described in the architecture. The current choice i=
+s
+>>>> to create both XICS and XIVE objects and choose at CAS which one to
+>>>> use. It relies today on the capability of the pseries machine to=20
+>>>> allocate IRQ numbers for both interrupt controller backends. These
+>>>> patches have been merged in QEMU.
+>>>>
+>>>> A change of interrupt mode results in a reset. The device tree is=20
+>>>> populated accordingly and the ICPs are switched for the model in=20
+>>>> use.=20
+>>>
+>>> For KVM we need to only instanciate one of them though.
+>>
+>> Hmm,
+>>
+>> How would we handle a guest rebooting on a kernel without XIVE support=
+ ?=20
 >=20
-> TIL!
->=20
-> > After having a number of crashes in libvirt caused by gcc
-> > optimizing out checks for NULL, we now only define nonnull
-> > when running under static analysis (coverity) and not when
-> > compiling normally.
-> >=20
-> > https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dblob;f=3Dsrc/internal.h;=
-h=3D5895030415968d72200599e8a59bbf01ffc2d5a3;hb=3DHEAD#l162
->=20
-> Why do you use __attribute__(()) ? Isn't this enough:
+> It will do CAS again and we can change the devices.
 
-No idea offhand - Eric wrote this so perhaps he had a reason for that
-else branch style.
+So, we would destroy the previous QEMU ICS object and create a new one=20
+in the CAS hcall. That would probably work. There might be some issues=20
+in creating and destroying the ICS KVM device, but that can be studied=20
+without XIVE.
 
->=20
-> #if defined __clang_analyzer__ || defined __COVERITY__
-> #define QEMU_STATIC_ANALYSIS 1
-> +#define QEMU_WARN_NONNULL_ARGS(args...) __attribute__((nonnull(args)))
-> +#else
-> +#define QEMU_WARN_NONNULL_ARGS(args...)
-> #endif
->=20
-> > The 2 functions you've added nonnull attrs to look safe enough,
-> > but people might unwittingly use this elsewhere in QEMU in future
-> > not realizing the side-effect it has.
+It used to be considered ugly to create a QEMU device at reset time, so=20
+I wonder if this is still the case, because when the machine reaches CAS,=
+=20
+we really are beyond reset.  =20
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+If this is OK, then the next "issue" is to keep in sync the allocated=20
+IRQ numbers. The IRQ allocator is now merged at the machine level, so=20
+the synchronization is obvious to do when both backend QEMU objects=20
+are available. that's the path I took. If both QEMU objects are not=20
+available, then we need to scan the IRQ number space in the current=20
+interrupt mode and allocate the same IRQs in the newly negotiated mode.=20
+Probably OK. I don't see major problems with the current code.=20
+
+Migration is a problem. We will need both backend QEMU objects to be=20
+available anyhow if we want to migrate. So we are back to the current=20
+solution creating both QEMU objects but we can try to defer some of the=20
+KVM inits and create the KVM device on demand at CAS time.
+
+The next problem is the ICP object that currently needs the KVM device=20
+fd to connect the vcpus ... So, we will need to change that also.=20
+That is probably the biggest problem today. We need a way to disconnect=20
+the vpcu from the KVM device and see how we can defer the connection.
+I need to make sure this is possible, I can check that without XIVE
+I think.
+
+>> Are you suggesting to create the XICS or XIVE device in the CAS negoti=
+ation=20
+>> process ? So, the machine would not have any interrupt controller befo=
+re=20
+>> CAS. That seems really late to me. grub uses the console for instance.=
+=20
+>=20
+> We start with XICS by default.
+
+yes.
+
+>> I think it should prepare for both options, start in XIVE legacy mode,=
+=20
+>> which is XICS, then possibly switch to XIVE exploitation mode.
+>>
+>>>>> And how that will interact with KVM ?=20
+>>>>
+>>>> I expect we will do the same, which is to create two KVM devices to=20
+>>>> be able to handle both interrupt controller backends depending on th=
+e=20
+>>>> mode negotiated by the guest. =20
+>>>
+>>> That will be an ungodly mess, I'd rather we only instanciate the righ=
+t
+>>> one.
+>>
+>> It's rather transparent currently in the emulated version. There are t=
+wo=20
+>> sets of objects in QEMU, switching is done in CAS. KVM support should =
+not=20
+>> change anything in that area.=20
+>>
+>> I expect the 'xive-kvm' object to get/set states for migration, just l=
+ike=20
+>> for XICS and to setup the ESB+TIMA memory regions, which is new.=20
+>=20
+> But both XICS and XIVE are completely different kernel KVM devices that=
+ will
+> need to "hook" into the same set of internal hooks for things like inte=
+rrupts
+> being passed through, RTAS calls etc...=20
+>=20
+> How does KVM knows which one to "activate" ?
+
+Can't we add an extra IRQ type and use vcpu->arch.irq_type for that ?=20
+I haven't studied all the low level details though.
+
+> I don't think the kernel should have both.=20
+
+I hear that. From a QEMU perspective, it is much easier to put everything=
+=20
+in place for both interrupt modes and let the guest decide what it wants=20
+to use.=20
+
+If we choose not to, we will need to find solution to defer the KVM inits
+and to disconnect/reconnect the vcpus. For the latter, we could add a=20
+KVM_DISABLE_CAP ioctl or maybe better add a new capability like=20
+KVM_CAP_IRQ_XIVE to perform the switch.
+
+
+C.
