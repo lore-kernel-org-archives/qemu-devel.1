@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQJ-0007rD-5G
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQJ-0007rK-B5
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQF-0001GQ-3j
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQI-0001JC-3k
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:55 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jan 2018 13:25:08 +1100
-Message-Id: <20180117022525.31767-6-david@gibson.dropbear.id.au>
+Date: Wed, 17 Jan 2018 13:25:13 +1100
+Message-Id: <20180117022525.31767-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 References: <20180117022525.31767-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 05/22] target/ppc: Clean up probing of VMX,
- VSX and DFP availability on KVM
+Subject: [Qemu-devel] [PULL 10/22] ppc: Change Power9 compat table to
+ support at most 8 threads/core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +23,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-When constructing the "host" cpu class we modify whether the VMX and VSX
-vector extensions and DFP (Decimal Floating Point) are available
-based on whether KVM can support those instructions.  This can depend on
-policy in the host kernel as well as on the actual host cpu capabilities.
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-However, the way we probe for this is not very nice: we explicitly check
-the host's device tree.  That works in practice, but it's not really
-correct, since the device tree is a property of the host kernel's platform
-which we don't really know about.  We get away with it because the only
-modern POWER platforms happen to encode VMX, VSX and DFP availability in
-the device tree in the same way.
+Increases the max smt mode to 8 for Power9. That's because KVM supports
+smt emulation in this platform so QEMU should allow users to use it as
+well.
 
-Arguably we should have an explicit KVM capability for this, but we haven't
-needed one so far.  Barring specific KVM policies which don't yet exist,
-each of these instruction classes will be available in the guest if and
-only if they're available in the qemu userspace process.  We can determine
-that from the ELF AUX vector we're supplied with.
+Today if we try to pass -smp ...,threads=8, QEMU will silently truncate
+it to smt4 mode and may cause a crash if we try to perform a cpu
+hotplug.
 
-Once reworked like this, there are no more callers for kvmppc_get_vmx() and
-kvmppc_get_dfp() so remove them.
-
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+[dwg: Added an explanatory comment]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/kvm.c     | 27 ++++++---------------------
- target/ppc/kvm_ppc.h |  2 --
- 2 files changed, 6 insertions(+), 23 deletions(-)
+ target/ppc/compat.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 09fcb082d2..914be687e7 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2011,16 +2011,6 @@ uint64_t kvmppc_get_clockfreq(void)
-     return kvmppc_read_int_cpu_dt("clock-frequency");
- }
+diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+index ad8f93c064..276b5b52c2 100644
+--- a/target/ppc/compat.c
++++ b/target/ppc/compat.c
+@@ -73,7 +73,14 @@ static const CompatInfo compat_table[] = {
+         .pvr = CPU_POWERPC_LOGICAL_3_00,
+         .pcr = PCR_COMPAT_3_00,
+         .pcr_level = PCR_COMPAT_3_00,
+-        .max_threads = 4,
++        /*
++         * POWER9 hardware only supports 4 threads / core, but this
++         * limit is for guests.  We need to support 8 vthreads/vcore
++         * on POWER9 for POWER8 compatibility guests, and it's very
++         * confusing if half of the threads disappear from the guest
++         * if it announces it's POWER9 aware at CAS time.
++         */
++        .max_threads = 8,
+     },
+ };
  
--uint32_t kvmppc_get_vmx(void)
--{
--    return kvmppc_read_int_cpu_dt("ibm,vmx");
--}
--
--uint32_t kvmppc_get_dfp(void)
--{
--    return kvmppc_read_int_cpu_dt("ibm,dfp");
--}
--
- static int kvmppc_get_pvinfo(CPUPPCState *env, struct kvm_ppc_pvinfo *pvinfo)
-  {
-      PowerPCCPU *cpu = ppc_env_get_cpu(env);
-@@ -2404,23 +2394,18 @@ static void alter_insns(uint64_t *word, uint64_t flags, bool on)
- static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
- {
-     PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
--    uint32_t vmx = kvmppc_get_vmx();
--    uint32_t dfp = kvmppc_get_dfp();
-     uint32_t dcache_size = kvmppc_read_int_cpu_dt("d-cache-size");
-     uint32_t icache_size = kvmppc_read_int_cpu_dt("i-cache-size");
- 
-     /* Now fix up the class with information we can query from the host */
-     pcc->pvr = mfpvr();
- 
--    if (vmx != -1) {
--        /* Only override when we know what the host supports */
--        alter_insns(&pcc->insns_flags, PPC_ALTIVEC, vmx > 0);
--        alter_insns(&pcc->insns_flags2, PPC2_VSX, vmx > 1);
--    }
--    if (dfp != -1) {
--        /* Only override when we know what the host supports */
--        alter_insns(&pcc->insns_flags2, PPC2_DFP, dfp);
--    }
-+    alter_insns(&pcc->insns_flags, PPC_ALTIVEC,
-+                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_ALTIVEC);
-+    alter_insns(&pcc->insns_flags2, PPC2_VSX,
-+                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_VSX);
-+    alter_insns(&pcc->insns_flags2, PPC2_DFP,
-+                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_DFP);
- 
-     if (dcache_size != -1) {
-         pcc->l1_dcache_size = dcache_size;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index d6be38ecaf..ecb55493cc 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -15,8 +15,6 @@
- 
- uint32_t kvmppc_get_tbfreq(void);
- uint64_t kvmppc_get_clockfreq(void);
--uint32_t kvmppc_get_vmx(void);
--uint32_t kvmppc_get_dfp(void);
- bool kvmppc_get_host_model(char **buf);
- bool kvmppc_get_host_serial(char **buf);
- int kvmppc_get_hasidle(CPUPPCState *env);
 -- 
 2.14.3
