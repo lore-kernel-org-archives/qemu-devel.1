@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebndK-0005NQ-L4
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:20:08 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebne3-0005yS-LQ
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebndJ-0000vN-P4
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:20:02 -0500
-References: <20171110203759.14018-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <dedd720a-760d-f4f5-d4b0-4d3707cb0e32@redhat.com>
-Date: Wed, 17 Jan 2018 14:19:25 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebne2-0001zH-PU
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:20:47 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1516144891.git.alistair.francis@xilinx.com>
+	<d1049a00a3c00d8310584f7732492a2064a982ae.1516144891.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b366c117-c4be-50bc-0c34-3e61c6bebb72@amsat.org>
+Date: Wed, 17 Jan 2018 10:20:36 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171110203759.14018-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KcFmNlN6EZ0Wl06hUj1sMwWlP68BXSTSP"
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/1] qcow2: Repair unaligned
- preallocated zero clusters
+In-Reply-To: <d1049a00a3c00d8310584f7732492a2064a982ae.1516144891.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 1/9] microblaze: boot.c:
+ Don't try to find NULL pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+Cc: alistair23@gmail.com, qemu-arm@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KcFmNlN6EZ0Wl06hUj1sMwWlP68BXSTSP
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
-Message-ID: <dedd720a-760d-f4f5-d4b0-4d3707cb0e32@redhat.com>
-Subject: Re: [PATCH for-2.12 0/1] qcow2: Repair unaligned preallocated zero
- clusters
-References: <20171110203759.14018-1-mreitz@redhat.com>
-In-Reply-To: <20171110203759.14018-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Alistair,
 
-On 2017-11-10 21:37, Max Reitz wrote:
-> This is a follow-up to patch 2 of my "qcow2: Unaligned zero cluster in
-> handle_alloc()" series.  That patch adds a way to correctly deal with
-> such clusters, this patch here adds a way to repair them.
->=20
-> Naturally, this patch is therefore based on that series:
->=20
-> Based-on: <20171110203111.7666-1-mreitz@redhat.com>
->=20
->=20
-> Max Reitz (1):
->   qcow2: Repair unaligned preallocated zero clusters
->=20
->  block/qcow2-refcount.c     | 70 ++++++++++++++++++++++++++++++++++++++=
---------
->  tests/qemu-iotests/060     |  3 +-
->  tests/qemu-iotests/060.out |  9 ++++++
->  3 files changed, 69 insertions(+), 13 deletions(-)
+Maybe reworded "Don't try to find NULL file"
 
-Applied to my block branch.
+On 01/16/2018 08:22 PM, Alistair Francis wrote:
+> Previously if no device tree was passed to microblaze_load_kernel() then
+> qemu_find_file() would try to find a NULL pointer. To avoid this put a
+> check around qemu_find_file().
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
 
-Max
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-
---KcFmNlN6EZ0Wl06hUj1sMwWlP68BXSTSP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpfTV0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AMiYIAMKtAQL39vEnGq66gTrQY376GiQeXIcN
-2hVbNOY78cr8WpiGjkoAJyVKlUsxPRZGSOGJflBldlcjgj76iFOWPuq/FFlbGCXP
-8YDvjW8TXnAMctPa/Y86Fz0Z4//u4KjbVLWJIyej+/WdPCDKoPHY/zefs9jUSn+W
-Go4I3g62MKticTzHDiv7MM/DuHCDZfQsB4NcigdC+7tllk7YnA1Oyk7+q498OAsq
-1zsAoKHycKb3mc8wG2gxtoswcAW89KzV0mLYtqPKJIjk3662orbjpTmsK/1w3G6j
-LCJvbCRuzwZemdQN0LE678dh6NpupP/5tRv1BoJ9ym/G/pGTwDl6Cf4=
-=ih3w
------END PGP SIGNATURE-----
-
---KcFmNlN6EZ0Wl06hUj1sMwWlP68BXSTSP--
+> ---
+> 
+>  hw/microblaze/boot.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+> index 457a08a2fe..35bfeda7aa 100644
+> --- a/hw/microblaze/boot.c
+> +++ b/hw/microblaze/boot.c
+> @@ -124,7 +124,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
+>      kernel_cmdline = qemu_opt_get(machine_opts, "append");
+>      dtb_arg = qemu_opt_get(machine_opts, "dtb");
+>      /* default to pcbios dtb as passed by machine_init */
+> -    if (!dtb_arg) {
+> +    if (!dtb_arg && dtb_filename) {
+>          filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, dtb_filename);
+>      }
+> 
+> --
+> 2.14.1
