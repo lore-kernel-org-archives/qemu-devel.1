@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebujL-0000eb-IC
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:54:44 -0500
+	(envelope-from <david@redhat.com>) id 1eburB-0003cj-Ac
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 16:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebujH-0007Q8-Fw
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:54:43 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:43156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebujH-0007Pt-BM
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 15:54:39 -0500
-Received: by mail-qt0-x242.google.com with SMTP id s3so25016929qtb.10
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 12:54:39 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <bd66250ff262528199614f778a8323ced130a4db.1516221466.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dfa60856-7918-e78a-5610-a1a51cd4c581@amsat.org>
-Date: Wed, 17 Jan 2018 17:54:34 -0300
+	(envelope-from <david@redhat.com>) id 1ebur7-00037j-7H
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 16:02:49 -0500
+References: <20180117193757.73471-1-borntraeger@de.ibm.com>
+	<20180117193757.73471-2-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <54acb9d8-31a4-4582-d394-150ee49d4da6@redhat.com>
+Date: Wed, 17 Jan 2018 22:02:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <bd66250ff262528199614f778a8323ced130a4db.1516221466.git.alistair.francis@xilinx.com>
+In-Reply-To: <20180117193757.73471-2-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] linux-user: Fix webkitgtk hangs on
- 32-bit x86 target
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] header sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, rth@twiddle.net, richard.henderson@linaro.org
-Cc: peter.maydell@linaro.org, riku.voipio@iki.fi, alistair23@gmail.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-On 01/17/2018 05:39 PM, Alistair Francis wrote:
-> Since commit "linux-user: Tidy and enforce reserved_va initialization"
-> (18e80c55bb6ec17c05ec0ba717ec83933c2bfc07) the Yocto webkitgtk build
-> hangs when cross compiling for 32-bit x86 on a 64-bit x86 machine using
-> musl.
+On 17.01.2018 20:37, Christian Borntraeger wrote:
+> replace with proper header sync
 > 
-> To fix the issue reduce the MAX_RESERVED_VA macro to be a closer match
-> to what it was before the problematic commit.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
+>  linux-headers/asm-s390/kvm.h | 9 ++++-----
+>  linux-headers/linux/kvm.h    | 5 +++--
+>  2 files changed, 7 insertions(+), 7 deletions(-)
 > 
->  linux-user/main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+> index 32d372e..11def14 100644
+> --- a/linux-headers/asm-s390/kvm.h
+> +++ b/linux-headers/asm-s390/kvm.h
+> @@ -6,10 +6,6 @@
+>   *
+>   * Copyright IBM Corp. 2008
+>   *
+> - * This program is free software; you can redistribute it and/or modify
+> - * it under the terms of the GNU General Public License (version 2 only)
+> - * as published by the Free Software Foundation.
+> - *
+>   *    Author(s): Carsten Otte <cotte@de.ibm.com>
+>   *               Christian Borntraeger <borntraeger@de.ibm.com>
+>   */
+> @@ -228,6 +224,7 @@ struct kvm_guest_debug_arch {
+>  #define KVM_SYNC_RICCB  (1UL << 7)
+>  #define KVM_SYNC_FPRS   (1UL << 8)
+>  #define KVM_SYNC_GSCB   (1UL << 9)
+> +#define KVM_SYNC_BPBC   (1UL << 10)
+>  /* length and alignment of the sdnx as a power of two */
+>  #define SDNXC 8
+>  #define SDNXL (1UL << SDNXC)
+> @@ -251,7 +248,9 @@ struct kvm_sync_regs {
+>  	};
+>  	__u8  reserved[512];	/* for future vector expansion */
+>  	__u32 fpc;		/* valid on KVM_SYNC_VRS or KVM_SYNC_FPRS */
+> -	__u8 padding1[52];	/* riccb needs to be 64byte aligned */
+> +	__u8 bpbc : 1;		/* bp mode */
+> +	__u8 reserved2 : 7;
+> +	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
+>  	__u8 riccb[64];		/* runtime instrumentation controls block */
+>  	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
+>  	union {
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index ce6c2f1..b4503d8 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -630,9 +630,9 @@ struct kvm_s390_irq {
+>  
+>  struct kvm_s390_irq_state {
+>  	__u64 buf;
+> -	__u32 flags;
+> +	__u32 flags;        /* will stay unused for compatibility reasons */
+>  	__u32 len;
+> -	__u32 reserved[4];
+> +	__u32 reserved[4];  /* will stay unused for compatibility reasons */
+>  };
+>  
+>  /* for KVM_SET_GUEST_DEBUG */
+> @@ -932,6 +932,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_HYPERV_SYNIC2 148
+>  #define KVM_CAP_HYPERV_VP_INDEX 149
+>  #define KVM_CAP_S390_AIS_MIGRATION 150
+> +#define KVM_CAP_S390_BPB 151
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
 > 
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index 450eb3ce65..c7cc0a184e 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -77,7 +77,7 @@ do {                                                                    \
->        (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
->  /* There are a number of places where we assign reserved_va to a variable
->     of type abi_ulong and expect it to fit.  Avoid the last page.  */
 
-If this is only for MUSL shouldn't we think of smth like: ?
+Acked-by: David Hildenbrand <david@redhat.com>
 
-#if defined(__GLIBC__) || defined(__UCLIBC__)
+-- 
 
-> -#   define MAX_RESERVED_VA  (0xfffffffful & TARGET_PAGE_MASK)
+Thanks,
 
-#else /* __MUSL__ */
-
-> +#   define MAX_RESERVED_VA  (0x7ffffffful & TARGET_PAGE_MASK)
-
-#endif
-
->  #  else
->  #   define MAX_RESERVED_VA  (1ul << TARGET_VIRT_ADDR_SPACE_BITS)
->  #  endif
-> 
+David / dhildenb
