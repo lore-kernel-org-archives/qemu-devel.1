@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebnyu-0002Vb-TZ
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:42:22 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnzT-00030O-57
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:43:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebnyu-000585-6Z
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:42:20 -0500
-References: <20171123020832.8165-1-mreitz@redhat.com>
-	<20171123020832.8165-10-mreitz@redhat.com>
-	<cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
-	<11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <cf88fa6b-f9f6-d90b-c1b4-e14111f89aba@redhat.com>
-Date: Wed, 17 Jan 2018 14:41:57 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnzP-0005jk-82
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:42:55 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33740)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnzP-0005iE-4S
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:42:51 -0500
+Received: by mail-qk0-x243.google.com with SMTP id i141so25268508qke.0
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:42:51 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180112125000.27256-1-f4bug@amsat.org>
+	<20180112125000.27256-4-f4bug@amsat.org>
+	<329211f4-e244-2524-96ba-4dfa694c4daf@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a78a7be4-36c4-b043-0d0f-b3d8202498a0@amsat.org>
+Date: Wed, 17 Jan 2018 10:42:46 -0300
 MIME-Version: 1.0
-In-Reply-To: <11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="akk1Zoh3oAR1D7MQsgVcJaHRk2XdjHFeo"
-Subject: Re: [Qemu-devel] [PATCH 09/17] iotests: Disable some tests for
- compat=0.10
+In-Reply-To: <329211f4-e244-2524-96ba-4dfa694c4daf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/7] docker: add the Ubuntu Trusty base
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: Fam Zheng <fzheng@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---akk1Zoh3oAR1D7MQsgVcJaHRk2XdjHFeo
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <cf88fa6b-f9f6-d90b-c1b4-e14111f89aba@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/17] iotests: Disable some tests for
- compat=0.10
-References: <20171123020832.8165-1-mreitz@redhat.com>
- <20171123020832.8165-10-mreitz@redhat.com>
- <cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
- <11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
-In-Reply-To: <11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-12-09 17:53, Eric Blake wrote:
-> On 12/08/2017 07:46 PM, John Snow wrote:
+On 01/16/2018 11:12 PM, Fam Zheng wrote:
+> On 01/12/2018 08:49 PM, Philippe Mathieu-Daudé wrote:
+>> based on QEMU v2.10 ubuntu.docker (ca853f0c76e3 and 2346b12fc52d)
 >>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   tests/docker/dockerfiles/ubuntu14.04.docker | 17 +++++++++++++++++
+>>   1 file changed, 17 insertions(+)
+>>   create mode 100644 tests/docker/dockerfiles/ubuntu14.04.docker
 >>
->> On 11/22/2017 09:08 PM, Max Reitz wrote:
->>> Tests 080, 130, 137, and 176 simply do not work with compat=3D0.10 fo=
-r the
->>> reasons stated there.
->>>
->>> 177 is a bit more interesting:  Originally, it was actually very much=
+>> diff --git a/tests/docker/dockerfiles/ubuntu14.04.docker
+>> b/tests/docker/dockerfiles/ubuntu14.04.docker
+>> new file mode 100644
+>> index 0000000000..cd24e759a7
+>> --- /dev/null
+>> +++ b/tests/docker/dockerfiles/ubuntu14.04.docker
+>> @@ -0,0 +1,17 @@
+>> +FROM ubuntu:14.04
+>> +RUN apt-get update
+>> +ENV PACKAGES flex bison \
+>> +    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev
+>> libncursesw5-dev \
+>> +    libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
+>> +    libspice-protocol-dev libnss3-dev libfdt-dev \
+>> +    libgtk-3-dev libvte-2.90-dev libsdl1.2-dev libpng12-dev
+>> libpixman-1-dev \
+>> +    libvdeplug-dev liblzo2-dev libsnappy-dev libbz2-dev libxen-dev
+>> librdmacm-dev libibverbs-dev \
+>> +    libsasl2-dev libjpeg-turbo8-dev xfslibs-dev libcap-ng-dev
+>> libbrlapi-dev libcurl4-gnutls-dev \
+>> +    libbluetooth-dev librbd-dev libaio-dev glusterfs-common
+>> libnuma-dev libepoxy-dev libdrm-dev libgbm-dev \
+>> +    libjemalloc-dev libusbredirhost-dev libnfs-dev libcap-dev
+>> libattr1-dev \
+>> +    texinfo dpkg-dev \
+>> +    gettext git make ccache python-yaml gcc clang sparse
+>> +RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends
+>> install $PACKAGES
+>> +RUN dpkg -l $PACKAGES | sort > /packages.txt
+>> +ENV FEATURES clang pyyaml
+>> +ENV QEMU_CONFIGURE_OPTS --disable-opengl
+> 
+> Why is this option needed?
 
->>> intended to work with compat=3D0.10 (it even had a special case for t=
-hat).
->>> However, it now prints the test image's map twice, and short of just =
-not
->>> doing that, there is no solution I can imagine that is both simple an=
-d
->>> would leave compat=3D0.10 support intact.
->>>
->>
->> So we lost that support in
->> f0a9c18f9e7
->> and
->> 81c219ac6ce
->>
->> Eric, any input before we downscope your test?
->=20
-> Ouch, I broke my own test.
->=20
-> Maybe the best thing would be to split 177 into two tests: the original=
+Indeed I forgot to comment about this, I couldn't get it built in the
+Trusty image (remember, current 'ubuntu' contains 'Trusty' strings but
+'latest' points to Xenial).
 
-> test (as it was before f0a9c18) that works on both compats, and a new
-> test that works on just compat=3D1.1 images for the things added in lat=
-er
-> commits.
->=20
-> Since I'm the author for all commits (so far) to that file, I guess I
-> can sign up for that work...
-
-Did you make any progress? :-)
-
-Max
-
-
---akk1Zoh3oAR1D7MQsgVcJaHRk2XdjHFeo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpfUqUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AGKYH/AtXoRng/0v+qNxHHoSpZnV58eWayzgQ
-njpEckjKOAhWBfIouBW5VIzdRZSJux2EJ5FSiIjNU+91QbcDKOiOkKtKO5UR38+T
-LXctfPNAIlNI8xAs0oHUxG+VDlpXtJxdguAfkWj7LAiRRgucp7m+k7XrjfBrzadE
-au+InBc57SJMQq3YyA7Ay31hRoB3Q49Cl7vvZ1dlBEmhSRVZNbFCefrldEo++eQc
-ZGHP4FIW+n/jEoXOMcYAwQr9k2mdWq25KXZJn2YGxZnkw7PI6hBx5yT65Cjxs7W/
-NwpUSIfvsrrHNfQNxErnXf6ALpijtt56zl9DdcboCz4SdvA/relgArQ=
-=LzOJ
------END PGP SIGNATURE-----
-
---akk1Zoh3oAR1D7MQsgVcJaHRk2XdjHFeo--
+I assumed the stable release is interested of keeping Trusty builds.
