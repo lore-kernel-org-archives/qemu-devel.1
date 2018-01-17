@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebnmv-0002bb-Pi
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1ebnpL-0004H7-K7
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:32:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebnmu-0001ta-ND
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:29:57 -0500
-References: <20171129185102.29390-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <27daf5bc-00a1-ca51-a158-0d466569b095@redhat.com>
-Date: Wed, 17 Jan 2018 14:29:45 +0100
+	(envelope-from <berrange@redhat.com>) id 1ebnpH-0004Ca-H1
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:32:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ebnpH-0004Br-AA
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:32:23 -0500
+Date: Wed, 17 Jan 2018 13:32:01 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180117133201.GN19227@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20180117131821.18700-1-f4bug@amsat.org>
+	<20180117131821.18700-2-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20171129185102.29390-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr"
-Subject: Re: [Qemu-devel] [PATCH for-2.12] qemu-iotests: Fix locking issue
- in 102
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180117131821.18700-2-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] compiler: add
+ QEMU_WARN_NONNULL_ARGS()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>, Luiz Capitulino <lcapitulino@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <27daf5bc-00a1-ca51-a158-0d466569b095@redhat.com>
-Subject: Re: [PATCH for-2.12] qemu-iotests: Fix locking issue in 102
-References: <20171129185102.29390-1-mreitz@redhat.com>
-In-Reply-To: <20171129185102.29390-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-11-29 19:51, Max Reitz wrote:
-> 102 truncates a qcow2 file (the raw file) on purpose while a VM is
-> running.  However, image locking will usually prevent exactly this.
->=20
-> The fact that most people have not noticed until now (I suppose you may=
-
-> have seen sporadic failures, but not taken them too seriously, like me)=
-
-> further shows that this truncation is actually not really done
-> concurrently, but that the VM is still starting up by this point and ha=
-s
-> not yet opened the image.  Remedy this by waiting for the monitor shell=
-
-> to appear before the qemu-img invocation so we know the VM is up.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On Wed, Jan 17, 2018 at 10:18:19AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  tests/qemu-iotests/102     | 7 ++++++-
->  tests/qemu-iotests/102.out | 3 ++-
->  2 files changed, 8 insertions(+), 2 deletions(-)
+>  include/qemu/compiler.h | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> index 340e5fdc09..d9b2489391 100644
+> --- a/include/qemu/compiler.h
+> +++ b/include/qemu/compiler.h
+> @@ -26,6 +26,8 @@
+> =20
+>  #define QEMU_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+> =20
+> +#define QEMU_WARN_NONNULL_ARGS(args...) __attribute__((nonnull(args)))
 
-Applied to my block branch.
+If we take this, it should come with a warning attached to it, because
+it has really nasty behaviour with GCC. Consider code like:
 
-Max
+  void foo(void *bar) __attribute__((nonnull(1)));
 
+  ...
 
---u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  void foo(void *bar) { if (!bar) return; }
 
------BEGIN PGP SIGNATURE-----
+GCC may or may not warn you about passing NULL for the 'bar'
+parameter, but it will none the less assume nothing passes
+NULL, and thus remove the 'if (!bar)' conditional during
+optimization. IOW, adding nonnull annotations can actually
+make your code less robust :-(
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpfT8kSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A0qMIAJojMPhziYF3zQUEVq7AM3z6vvPODXhT
-1NT0qjKn/qv7j7NMt2oreR6NXrPY+w8lMHEZeOLOAEWt8jmCRtl7gjK7DrSxJCWu
-psVqs6QHKLKg8MGQTjckPgVfF2xDBVny3sagnaFgpP39zBlxWdUT2Ndx74co7TCy
-kAex5YutecjkoobAgXli6Y53WMOEiN3tfE9ZcKTeL28vhyn0KrDaXBQMLlBW/CXC
-hr5J0tog7nE8ZDW2xUkuv2N1VhaOoh4XNteabry0HXPZNwWaMwYqpWmd2KOlULRX
-raGBaGtnurFxTYjvXQo3xsxGYS2IN2OpcBcrpBkpRpsqJnZk9ycTeBE=
-=vY5D
------END PGP SIGNATURE-----
+After having a number of crashes in libvirt caused by gcc
+optimizing out checks for NULL, we now only define nonnull
+when running under static analysis (coverity) and not when
+compiling normally.
 
---u832DvdeqYffVzwWHpM3jtQ8gAyovIeGr--
+https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dblob;f=3Dsrc/internal.h;h=3D=
+5895030415968d72200599e8a59bbf01ffc2d5a3;hb=3DHEAD#l162
+
+The 2 functions you've added nonnull attrs to look safe enough,
+but people might unwittingly use this elsewhere in QEMU in future
+not realizing the side-effect it has.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
