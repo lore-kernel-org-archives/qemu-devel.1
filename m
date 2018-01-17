@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebrhs-00080J-Pw
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:02 -0500
+	(envelope-from <david@redhat.com>) id 1ebri4-0008B4-L0
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebrhp-0006iU-Js
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:00 -0500
+	(envelope-from <david@redhat.com>) id 1ebri1-0007BE-G6
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:12 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 17 Jan 2018 18:40:29 +0100
-Message-Id: <20180117174047.6382-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/18] s390x: flic rework,
- tcg flic support and STSI
+Date: Wed, 17 Jan 2018 18:40:30 +0100
+Message-Id: <20180117174047.6382-2-david@redhat.com>
+In-Reply-To: <20180117174047.6382-1-david@redhat.com>
+References: <20180117174047.6382-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/18] s390x/tcg: deliver multiple
+ interrupts in a row
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,83 +21,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-This patch series implements floating interrupt support for TCG and fixes
-STSI so we can remove warnings related to s390x SMP and MTTCG.
+We have to consider all deliverable interrupts.
 
-KVM code has to be touched in order to factor out the injection routines
-into the flic ("s390x/flic: factor out injection of floating interrupts").
-Basic testing didn't reveal any problems so far.
+We now have to take care of the special scenario, where we first
+inject an interrupt with a WAIT PSW, followed by a !WAIT PSW. (very
+unlikely but possible)
 
-With this series I am now able to run fedora 26/27 and Ubuntu 17.10+ with
-16 VCPUs (MTTCG) on a 8CPU host, doing a make -j16 in the guest. I got
-nasty stalls in the guest beforehand.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/excp_helper.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-Now also included: More flic related caching to avoid recurring
-conversions.
-
-Based on: https://github.com/cohuck/qemu.git s390x-next
-Available at: https://github.com/davidhildenbrand/qemu.git s390x-queue
-
-v1 -> v2:
-- Added due to discussions:
- - "s390x/flic: no need to call s390_io_interrupt() from flic"
- - "s390x/tcg: cache the qemu flic in a central function"
- - "s390x/kvm: cache the kvm flic in a central function"
- - "s390x/flic: cache the common flic class in a central function"
-- "s390x/flic: simplify flic initialization"
- -  no need to check for tcg_enabled()
-- "s390x/tcg: STSI overhaul"
- - rephrased the comment
-- "s390x/tcg: implement TEST PENDING INTERRUPTION"
- - renamed local variable
-- "s390x: fix size + content of STSI blocks"
- - added typedefs whiel touching it. Thomas, therefore not added your r-b.
-- Minor spelling errors fixed
-- Dropped a couple of unneeded OBJECT() conversion
-
-
-David Hildenbrand (18):
-  s390x/tcg: deliver multiple interrupts in a row
-  s390x/flic: simplify flic initialization
-  s390x/tcg: simplify lookup of flic
-  s390x/tcg: simplify machine check handling
-  s390x/flic: factor out injection of floating interrupts
-  s390x/flic: no need to call s390_io_interrupt() from flic
-  s390x/tcg: tolerate wrong wakeups due to floating interrupts
-  s390x/flic: make floating interrupts on TCG actually floating
-  s390x/tcg: implement TEST PENDING INTERRUPTION
-  s390x/flic: implement qemu_s390_clear_io_flic()
-  s390x/flic: optimize CPU wakeup for TCG
-  s390x: fix size + content of STSI blocks
-  s390x/tcg: STSI overhaul
-  s390x/tcg: remove SMP warning
-  configure: s390x supports mttcg now
-  s390x/tcg: cache the qemu flic in a central function
-  s390x/kvm: cache the kvm flic in a central function
-  s390x/flic: cache the common flic class in a central function
-
- configure                    |   1 +
- hw/intc/s390_flic.c          | 257 +++++++++++++++++++++++++++++++++++++++--
- hw/intc/s390_flic_kvm.c      |  84 +++++++++++---
- hw/s390x/css.c               |  10 +-
- hw/s390x/s390-virtio-ccw.c   |   4 -
- hw/s390x/virtio-ccw.c        |   4 +-
- include/hw/s390x/s390_flic.h |  57 ++++++++--
- target/s390x/cpu.c           |  10 --
- target/s390x/cpu.h           |  99 ++++++++--------
- target/s390x/excp_helper.c   | 147 +++++++++---------------
- target/s390x/helper.h        |   1 +
- target/s390x/insn-data.def   |   1 +
- target/s390x/internal.h      |   5 -
- target/s390x/interrupt.c     | 100 ++++------------
- target/s390x/kvm-stub.c      |  13 ---
- target/s390x/kvm.c           |  70 +-----------
- target/s390x/kvm_s390x.h     |  10 +-
- target/s390x/misc_helper.c   | 266 +++++++++++++++++++++++++++----------------
- target/s390x/translate.c     |   8 ++
- 19 files changed, 680 insertions(+), 467 deletions(-)
-
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index f4697a884d..d024ac5fef 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -433,10 +433,12 @@ void s390_cpu_do_interrupt(CPUState *cs)
+ {
+     S390CPU *cpu = S390_CPU(cs);
+     CPUS390XState *env = &cpu->env;
++    bool stopped = false;
+ 
+     qemu_log_mask(CPU_LOG_INT, "%s: %d at pc=%" PRIx64 "\n",
+                   __func__, cs->exception_index, env->psw.addr);
+ 
++try_deliver:
+     /* handle machine checks */
+     if (cs->exception_index == -1 && s390_cpu_has_mcck_int(cpu)) {
+         cs->exception_index = EXCP_MCHK;
+@@ -479,13 +481,14 @@ void s390_cpu_do_interrupt(CPUState *cs)
+         break;
+     case EXCP_STOP:
+         do_stop_interrupt(env);
++        stopped = true;
+         break;
+     }
+ 
+-    /* WAIT PSW during interrupt injection or STOP interrupt */
+-    if (cs->exception_index == EXCP_HLT) {
+-        /* don't trigger a cpu_loop_exit(), use an interrupt instead */
+-        cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
++    if (cs->exception_index != -1 && !stopped) {
++        /* check if there are more pending interrupts to deliver */
++        cs->exception_index = -1;
++        goto try_deliver;
+     }
+     cs->exception_index = -1;
+ 
+@@ -493,6 +496,15 @@ void s390_cpu_do_interrupt(CPUState *cs)
+     if (!env->pending_int) {
+         cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
+     }
++
++    /* WAIT PSW during interrupt injection or STOP interrupt */
++    if ((env->psw.mask & PSW_MASK_WAIT) || stopped) {
++        /* don't trigger a cpu_loop_exit(), use an interrupt instead */
++        cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
++    } else if (cs->halted) {
++        /* unhalt if we had a WAIT PSW somehwere in our injection chain */
++        s390_cpu_unhalt(cpu);
++    }
+ }
+ 
+ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 -- 
 2.14.3
