@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ebgOs-0002HF-CW
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 00:36:39 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebgx7-0002ZA-Nv
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:12:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ebgOn-000579-M2
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 00:36:38 -0500
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:42131)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1ebgOn-00056O-F6
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 00:36:33 -0500
-Received: by mail-wm0-f67.google.com with SMTP id b141so12732373wme.1
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 21:36:33 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ebgx4-00076D-J6
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:12:01 -0500
+References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516034665-27606-5-git-send-email-walling@linux.vnet.ibm.com>
+	<6e4c6445-0b78-1709-b724-e35daeefb1c1@redhat.com>
+	<e92dd0a3-422a-57a5-f0a4-c9fbb620a1c4@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <79634fce-eebe-4377-ef62-df8ef53b22d9@redhat.com>
+Date: Wed, 17 Jan 2018 07:11:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <a89ba2c9-0248-644e-2d95-83985780e422@linaro.org>
-References: <20180116033404.31532-1-richard.henderson@linaro.org>
-	<CAFEAcA_6KgcmRFa_AyyhpUb2EQKNBUsQQ9Wk_-guJXsoS-h-tw@mail.gmail.com>
-	<a89ba2c9-0248-644e-2d95-83985780e422@linaro.org>
-From: Fam Zheng <fzheng@redhat.com>
-Date: Wed, 17 Jan 2018 13:36:01 +0800
-Message-ID: <CAK1Eb9meLQ9k4ivb5HZ9K+svyAuy94e=f14xmTe1Di8b18Y_ww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 00/26] tcg: generic vector operations
+In-Reply-To: <e92dd0a3-422a-57a5-f0a4-c9fbb620a1c4@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 4/8] s390-ccw: interactive
+ boot menu for eckd dasd (menu setup)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, frankja@linux.vnet.ibm.com
 
-gcc-4.8.5-16.el7_4.1.ppc64le
+On 16.01.2018 20:37, Collin L. Walling wrote:
+> On 01/16/2018 01:23 PM, Thomas Huth wrote:
+>> On 15.01.2018 17:44, Collin L. Walling wrote:
+>>> Reads boot menu flag and timeout values from the iplb and
+>>> sets the respective fields for the menu.
+>>>
+>>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+>>> ---
+>> [...]
+>>> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+>>> index fe909d2..da29e6e 100644
+>>> --- a/pc-bios/s390-ccw/iplb.h
+>>> +++ b/pc-bios/s390-ccw/iplb.h
+>>> @@ -81,6 +81,9 @@ extern IplParameterBlock iplb
+>>> __attribute__((__aligned__(PAGE_SIZE)));
+>>> =C2=A0 #define S390_IPL_TYPE_CCW 0x02
+>>> =C2=A0 #define S390_IPL_TYPE_QEMU_SCSI 0xff
+>>> =C2=A0 +#define LOADPARM_PROMPT "PROMPT=C2=A0 "
+>>> +#define LOADPARM_EMPTY=C2=A0 "........"
+>> I've got a question: Is there a (public) specification document
+>> available somewhere for the loadparm field?
+>=20
+> Unfortunately there does not seems to be any kind of documentation
+> regarding loadparm for
+> KVM on IBM z.=C2=A0 Most of the information available on the IBM Knowle=
+dge
+> Center focuses on
+> z/VM, which isn't very helpful in this case :(
 
-On Tue, Jan 16, 2018 at 11:50 PM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 01/16/2018 03:59 AM, Peter Maydell wrote:
->> /var/tmp/patchew-tester-tmp-r7vd2rsz/src/accel/tcg/tcg-runtime-gvec.c:533:26:
->> internal compiler error: in emit_move_insn, at expr.c:3495
->
-> Bah.  I remember seeing this myself on the gcc 4.8.x that is the system
-> compiler on the gcc compile farm machines.  I forgot about it because I
-> immediately changed my path to select gcc 7.x.  ;-P
->
->> We need to either work around that or update the compiler in patchew's
->> setup or disable that build before we can merge this, or patchew will
->> start mailing complaints about every series that's sent to the list...
->
-> I can work around it in configure, but it might be worth updating the compiler
-> as well -- this bug has been fixed for years.
+Ok, too bad :-(
 
-This gcc is the CentOS 7 packaged version and an update (from
-gcc-4.8.5-16.el7.ppc64le
- to gcc-4.8.5-16.el7_4.1.ppc64le) doesn't fix it.
+> Are there any specific questions that I can help with?
 
-Fam
+I was just wondering whether there are pre-defined values for this
+field, e.g. is "PROMPT" something you came up with, or is this a value
+that has been documented in a specification somewhere? ... I'm just
+curious: If there is a list of pre-defined values somewhere, what are
+the other values that the s390-ccw bios does not support yet?
+
+ Thomas
