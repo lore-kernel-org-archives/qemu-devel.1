@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ebhYF-00055a-JQ
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:24 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ebhYJ-000595-6W
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ebhYE-0003tR-4b
+	(envelope-from <no-reply@patchew.org>) id 1ebhYG-0003ul-25
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:27 -0500
+Resent-Message-Id: <E1ebhYG-0003ul-25@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ebhYF-0003tt-Ou
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:23 -0500
-Received: from mga11.intel.com ([192.55.52.93]:59302)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ebhYD-0003no-Sj
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 01:50:22 -0500
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Wed, 17 Jan 2018 14:32:00 +0800
-Message-Id: <1516170720-4948-5-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1516170720-4948-1-git-send-email-wei.w.wang@intel.com>
-References: <1516170720-4948-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 4/4] virtio-balloon: Don't skip free pages
- if the poison val is non-zero
+In-Reply-To: <20180116142316.30486-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151616908700.575.7368076470257215397@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 16 Jan 2018 22:04:47 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] coroutine-lock: polymorphic CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-If the guest is using a non-zero poisoning, we don't skip the transfer
-of guest free pages.
-
-Todo: As a next step optimization, we can try
-1) skip the transfer of guest poisoned free pages;
-2) send the poison value to destination; and
-3) seek a way to poison the guest free pages before the guest starts to
-run on the destination.
-
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/virtio-balloon.c                      | 3 ++-
- include/hw/virtio/virtio-balloon.h              | 1 +
- include/standard-headers/linux/virtio_balloon.h | 2 ++
- 3 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index dcc8cb3..0cdc755 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -403,7 +403,7 @@ static void virtio_balloon_handle_free_pages(VirtIODevice *vdev, VirtQueue *vq)
-             ram_addr_t offset;
- 
-             if (atomic_read(&dev->free_page_report_status) ==
--                FREE_PAGE_REPORT_S_IN_PROGRESS) {
-+                FREE_PAGE_REPORT_S_IN_PROGRESS && !dev->poison_val) {
-                 block = qemu_ram_block_from_host(elem->in_sg[0].iov_base,
-                                                  false, &offset);
-                 size = elem->in_sg[0].iov_len;
-@@ -530,6 +530,7 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
-                         ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT),
-                         &error_abort);
-     }
-+    dev->poison_val = le32_to_cpu(config.poison_val);
-     trace_virtio_balloon_set_config(dev->actual, oldactual);
- }
- 
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 268f7d6..0bb80cd 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -43,6 +43,7 @@ typedef struct VirtIOBalloon {
-     uint32_t num_pages;
-     uint32_t actual;
-     uint32_t free_page_report_cmd_id;
-+    uint32_t poison_val;
-     uint64_t stats[VIRTIO_BALLOON_S_NR];
-     VirtQueueElement *stats_vq_elem;
-     size_t stats_vq_offset;
-diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-index 596df5d..f6f4ff3 100644
---- a/include/standard-headers/linux/virtio_balloon.h
-+++ b/include/standard-headers/linux/virtio_balloon.h
-@@ -47,6 +47,8 @@ struct virtio_balloon_config {
- 	uint32_t actual;
-         /* The free_page report command id, readonly by guest */
- 	uint32_t free_page_report_cmd_id;
-+	/* Stores PAGE_POISON if page poisoning with sanity check is in use */
-+	uint32_t poison_val;
- };
- 
- #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
--- 
-1.8.3.1
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLWJ1aWxkQG1pbi1nbGliIGJ1aWxkIHRlc3Qu
+IFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cu
+IElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNl
+IGl0CmxvY2FsbHkuCgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODAxMTYxNDIzMTYuMzA0
+ODYtMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIg
+MC80XSBjb3JvdXRpbmUtbG9jazogcG9seW1vcnBoaWMgQ29RdWV1ZQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0
+IGR0YwojIExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9X
+X0VOVj0xCmV4cG9ydCBKPTgKdGltZSBtYWtlIGRvY2tlci10ZXN0LWJ1aWxkQG1pbi1nbGliCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKY2ViODU3OWI3
+MSBjdXJsOiBjb252ZXJ0IHRvIENvUXVldWUKZGViOGYzNGI3NCBjb3JvdXRpbmUtbG9jazogbWFr
+ZSBxZW11X2NvX2VudGVyX25leHQgdGhyZWFkLXNhZmUKNWEzMGYzNmZiYSBjb3JvdXRpbmUtbG9j
+azogY29udmVydCBDb1F1ZXVlIHRvIHVzZSBRZW11TG9ja2FibGUKMjE1YjRlZjAzZCBsb2NrYWJs
+ZTogYWRkIFFlbXVMb2NrYWJsZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KU3VibW9kdWxlICdkdGMn
+IChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICdkdGMnCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLW0wM3Q5Y3df
+L3NyYy9kdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnZTU0Mzg4MDE1
+YWYxZmI0YmYwNGQwYmNhOTljYWJhMTA3NGQ5Y2M0MicKICBCVUlMRCAgIG1pbi1nbGliClRyYWNl
+YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
+ZXIucHkiLCBsaW5lIDQwNywgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKICBGaWxl
+ICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDQwNCwgaW4gbWFpbgogICAgcmV0dXJu
+IGFyZ3MuY21kb2JqLnJ1bihhcmdzLCBhcmd2KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tl
+ci5weSIsIGxpbmUgMjg3LCBpbiBydW4KICAgIGRrciA9IERvY2tlcigpCiAgRmlsZSAiLi90ZXN0
+cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSAxMzMsIGluIF9faW5pdF9fCiAgICBzZWxmLl9jb21t
+YW5kID0gX2d1ZXNzX2RvY2tlcl9jb21tYW5kKCkKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
+ZXIucHkiLCBsaW5lIDU4LCBpbiBfZ3Vlc3NfZG9ja2VyX2NvbW1hbmQKICAgIGNvbW1hbmRzX3R4
+dCkKRXhjZXB0aW9uOiBDYW5ub3QgZmluZCB3b3JraW5nIGRvY2tlciBjb21tYW5kLiBUcmllZDoK
+ICBkb2NrZXIKICBzdWRvIC1uIGRvY2tlcgptYWtlOiAqKiogW3Rlc3RzL2RvY2tlci9NYWtlZmls
+ZS5pbmNsdWRlOjM3OiBkb2NrZXItaW1hZ2UtbWluLWdsaWJdIEVycm9yIDEKCnJlYWwJMG0wLjY0
+OXMKdXNlcgkwbTAuMDQ5cwpzeXMJMG0wLjAyOXMKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
