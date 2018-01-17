@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebpuK-0005CB-OA
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:45:48 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ebpuQ-0005Jd-Mm
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:45:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebpuJ-0008IC-Td
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:45:44 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ebpuP-0008SD-TK
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:45:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53052)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ebpuP-0008Pa-Nz
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:45:49 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 17 Jan 2018 16:43:24 +0100
-Message-Id: <1516203816-19374-13-git-send-email-imammedo@redhat.com>
+Date: Wed, 17 Jan 2018 16:43:25 +0100
+Message-Id: <1516203816-19374-14-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
 References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/24] s390x: cpu: add TARGET_DEFAULT_CPU_TYPE
+Subject: [Qemu-devel] [PATCH 13/24] sh4: cpu: add TARGET_DEFAULT_CPU_TYPE
  macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,7 +25,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>
 
 it will be used for for 2 purposes, 1st is to
 provide to cpu name resolving class for machine 'none'
@@ -33,24 +37,22 @@ Use default value from linux-user for TARGET_DEFAULT_CPU_TYPE.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: Richard Henderson <rth@twiddle.net>
-CC: Alexander Graf <agraf@suse.de>
-CC: qemu-s390x@nongnu.org
+CC: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/s390x/cpu.h | 1 +
+ target/sh4/cpu.h | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 1a8b6b9..174624a 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -731,6 +731,7 @@ void s390_set_qemu_cpu_model(uint16_t type, uint8_t gen, uint8_t ec_ga,
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index a2c26e0..203d212 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -278,6 +278,7 @@ void cpu_load_tlb(CPUSH4State * env);
  
- #define S390_CPU_TYPE_SUFFIX "-" TYPE_S390_CPU
- #define S390_CPU_TYPE_NAME(name) (name S390_CPU_TYPE_SUFFIX)
-+#define TARGET_DEFAULT_CPU_TYPE S390_CPU_TYPE_NAME("qemu")
+ #define SUPERH_CPU_TYPE_SUFFIX "-" TYPE_SUPERH_CPU
+ #define SUPERH_CPU_TYPE_NAME(model) model SUPERH_CPU_TYPE_SUFFIX
++#define TARGET_DEFAULT_CPU_TYPE SUPERH_CPU_TYPE_NAME("sh7785")
  
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
+ #define cpu_signal_handler cpu_sh4_signal_handler
+ #define cpu_list sh4_cpu_list
 -- 
 2.7.4
