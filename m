@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ebjtq-0000v3-Qb
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:57 -0500
+	(envelope-from <ghammer@redhat.com>) id 1ebk16-0005fj-Jl
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:28:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ebjtn-0006vb-5p
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:50 -0500
-Received: from 7.mo179.mail-out.ovh.net ([46.105.61.94]:44205)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ebjtm-0006u3-Rn
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:20:47 -0500
-Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 35DB38FB11
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 10:20:45 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 17 Jan 2018 10:20:42 +0100
-Message-ID: <151618084250.20461.13884400486623011064.stgit@bahia.lan>
-In-Reply-To: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
-References: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
+	(envelope-from <ghammer@redhat.com>) id 1ebk13-0005SL-CP
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:28:20 -0500
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:43429)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ghammer@redhat.com>) id 1ebk13-0005Pj-3Q
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:28:17 -0500
+Received: by mail-lf0-f65.google.com with SMTP id o89so16899033lfg.10
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 01:28:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 3/3] spapr: fix device tree properties when
- using compatibility mode
+In-Reply-To: <4a649398-c643-33d2-f4ec-cd031b963e2f@ashroe.eu>
+References: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
+	<4a649398-c643-33d2-f4ec-cd031b963e2f@ashroe.eu>
+From: Gal Hammer <ghammer@redhat.com>
+Date: Wed, 17 Jan 2018 11:28:14 +0200
+Message-ID: <CAA2ifQy8pxOcxb_VbU-k+_6nDQ+pyMxB_j=pQGp_emUz7PK3cg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3 v2] virtio: improve virtio devices
+ initialization time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Kinsella, Ray" <mdr@ashroe.eu>
+Cc: qemu-devel@nongnu.org
 
-Commit 51f84465dd98 changed the compatility mode setting logic:
-- machine reset only sets compatibility mode for the boot CPU
-- compatibility mode is set for other CPUs when they are put online
-  by the guest with the "start-cpu" RTAS call
+Hi Ray,
 
-This causes a regression for machines started with max-compat-cpu:
-the device tree nodes related to secondary CPU cores contain wrong
-"cpu-version" and "ibm,pa-features" values, as shown below.
+On Tue, Jan 16, 2018 at 5:40 PM, Kinsella, Ray <mdr@ashroe.eu> wrote:
+> Hi Gal,
+>
+> Brilliant - will test this in the next day or two.
+> Hopefully this will help resolve the issues I reported last summer.
+>
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg05268.html
 
-Guest started on a POWER8 host with:
-     -smp cores=2 -machine pseries,max-cpu-compat=compat7
+Thanks for the compliment although a little over-tuned. ;-)
 
-# dtc -f -I fs -O dts /proc/device-tree | egrep 'cpu-version|pa-features'
-                        ibm,pa-features = [18 00 f6 3f c7 c0 80 f0 80 00
- 00 00 00 00 00 00 00 00 80 00 80 00 80 00 00 00];
-                        cpu-version = <0x4d0200>;
+I'm not sure my patch will help with your problem of multiple PCI
+devices (lots of devices). My patch improves the eventfd registration
+path while it seems that the source of your problem is either
+limitation enforced by the PCI specifications or by the QEMU's PCI
+emulation code.
 
-                               ^^^
-                        second CPU core
+> Ray K
 
-                        ibm,pa-features = <0x600f63f 0xc70080c0>;
-                        cpu-version = <0xf000003>;
+    Gal.
 
-                               ^^^
-                          boot CPU core
-
-The second core is advertised in raw POWER8 mode. This happens because
-CAS assumes all CPUs to have the same compatibility mode. Since the
-boot CPU already has the requested compatibility mode, the CAS code
-does not set it for the secondary one, and exposes the bogus device
-tree properties in in the CAS response to the guest.
-
-A similar situation is observed when hot-plugging a CPU core. The
-related device tree properties are generated and exposed to guest
-with the "ibm,configure-connector" RTAS before "start-cpu" is called.
-The CPU core is advertised to the guest in raw mode as well.
-
-It both cases, it boils down to the fact that "start-cpu" happens too
-late. This can be fixed globally by propagating the compatibility mode
-of the boot CPU to the other CPUs during reset.  For this to work, the
-compatibility mode of the boot CPU must be set before the machine code
-actually resets all CPUs.
-
-It is not needed to set the compatibility mode in "start-cpu" anymore,
-so the code is dropped.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c          |   18 +++++++++---------
- hw/ppc/spapr_cpu_core.c |    7 +++++++
- hw/ppc/spapr_rtas.c     |    9 ---------
- 3 files changed, 16 insertions(+), 18 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a2ff401f738a..a00bff823f95 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1484,6 +1484,15 @@ static void spapr_machine_reset(void)
-         spapr_setup_hpt_and_vrma(spapr);
-     }
- 
-+    /* if this reset wasn't generated by CAS, we should reset our
-+     * negotiated options and start from scratch */
-+    if (!spapr->cas_reboot) {
-+        spapr_ovec_cleanup(spapr->ov5_cas);
-+        spapr->ov5_cas = spapr_ovec_new();
-+
-+        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
-+    }
-+
-     qemu_devices_reset();
- 
-     /* DRC reset may cause a device to be unplugged. This will cause troubles
-@@ -1504,15 +1513,6 @@ static void spapr_machine_reset(void)
-     rtas_addr = rtas_limit - RTAS_MAX_SIZE;
-     fdt_addr = rtas_addr - FDT_MAX_SIZE;
- 
--    /* if this reset wasn't generated by CAS, we should reset our
--     * negotiated options and start from scratch */
--    if (!spapr->cas_reboot) {
--        spapr_ovec_cleanup(spapr->ov5_cas);
--        spapr->ov5_cas = spapr_ovec_new();
--
--        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
--    }
--
-     fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
- 
-     spapr_load_rtas(spapr, fdt, rtas_addr);
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 268be7784efb..f5e5ead5f4b0 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -44,6 +44,13 @@ void spapr_cpu_reset(void *opaque)
-     if (cs != first_cpu) {
-         env->spr[SPR_LPCR] &= ~pcc->lpcr_pm;
-     }
-+
-+    /* Set compatibility mode to match the boot CPU, which was either set
-+     * by the machine reset code or by CAS. This should never fail.
-+     */
-+    if (cs != first_cpu) {
-+        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort);
-+    }
- }
- 
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 2b89e1d448e4..4bb939d3d111 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -163,7 +163,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-         CPUState *cs = CPU(cpu);
-         CPUPPCState *env = &cpu->env;
-         PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
--        Error *local_err = NULL;
- 
-         if (!cs->halted) {
-             rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-@@ -175,14 +174,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-          * new cpu enters */
-         kvm_cpu_synchronize_state(cs);
- 
--        /* Set compatibility mode to match existing cpus */
--        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--            return;
--        }
--
-         env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
- 
-         /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
+>
+> On 14/01/2018 10:06, Gal Hammer wrote:
+>>
+>> A bug was reported about a very slow boot time and a 100% CPU usage of
+>> both Windows and Linux guests when running a VM with multiple
+>> virtio-serial devices (https://bugzilla.redhat.com/1528588).
+>>
+>> For example, running a VM with 25 virtio-serial devices, each one with
+>> max_ports=511, could have a boot time of around 30 minutes. With this
+>> patch (and another patch to kvm) the boot time is reduced to
+>> approximately 3 minutes.
+>>
+>> The patch wraps all the changes made to the Memory Regions during the
+>> eventfd registrations in a memory regions transaction. I had to add a
+>> cleanup callback function to the EventNotifier struct, so it will be
+>> possible to use a transaction in the shutdown code path as well.
+>>
+>> Gal Hammer (3):
+>>    qemu: add a cleanup callback function to EventNotifier
+>>    virtio: postpone the execution of event_notifier_cleanup function
+>>    virtio: improve virtio devices initialization time
+>>
+>>   accel/kvm/kvm-all.c           |  4 ++++
+>>   hw/virtio/virtio-bus.c        | 19 +++++++++++--------
+>>   hw/virtio/virtio.c            |  5 +++++
+>>   include/qemu/event_notifier.h |  1 +
+>>   util/event_notifier-posix.c   |  5 ++++-
+>>   util/event_notifier-win32.c   |  2 ++
+>>   6 files changed, 27 insertions(+), 9 deletions(-)
+>>
+>
