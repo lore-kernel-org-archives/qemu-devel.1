@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebpl2-0007o7-44
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:36:08 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ebpll-0008Dy-D4
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:36:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebpl1-0006th-6Y
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:36:08 -0500
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:34999)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ebplj-0007pg-VB
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:36:53 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:44978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ebpl1-0006sw-1G
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:36:07 -0500
-Received: by mail-oi0-x233.google.com with SMTP id b11so666980oif.2
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 07:36:06 -0800 (PST)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ebplj-0007op-Mo
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:36:51 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id t74so16143473wme.3
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 07:36:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-10-andrew.smirnov@gmail.com>
-	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
-	<b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 17 Jan 2018 15:35:45 +0000
-Message-ID: <CAFEAcA8Ei8vgOspvy9hBbwQya+gjDq3V8o2NbV8cxvCsw6kycQ@mail.gmail.com>
+In-Reply-To: <bacb3016-0470-a70d-881a-06a2b2555386@redhat.com>
+References: <20180117114430.19110-1-marcandre.lureau@redhat.com>
+	<a9bc4b35-23b3-515f-9ba1-71f41a95b9e7@redhat.com>
+	<bacb3016-0470-a70d-881a-06a2b2555386@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 17 Jan 2018 16:36:49 +0100
+Message-ID: <CAJ+F1CJZAsujv0X2D3-hzrsnzivA8TEa8MiWZbJ_HcWRVy-EXA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
- IP block
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] dump-guest-memory.py: fix python 2 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 17 January 2018 at 15:23, Marcel Apfelbaum <marcel.apfelbaum@zoho.com> wrote:
->
-> On 16/01/2018 16:34, Peter Maydell wrote:
->> On 16 January 2018 at 01:37, Andrey Smirnov <andrew.smirnov@gmail.com>
->> I'm not familiar enough with our PCI code to be able to review
->> this, I'm afraid. MST and Marcel are our PCI subsystem maintainers --
->> could one of you have a look at whether this seems to be a correct
->> implementation of a pcie host controller ?
->
->
-> Sadly PCI Host bridges do not have a standard, each HW vendor
-> can do pretty much what they want.
->
-> That being said, if Andrey can point me to the PCI spec for the Designware
-> PCI host bridge and what parts they implemented for it I can have a look,
-> sure.
+Hi
 
-I'm not so worried about whether it's implementing the spec for
-the hardware (I trust Andrey has done enough testing for that
-side of things), but whether the code seems to be structured
-the way we expect a QEMU pcie host controller to be structured,
-is using the right APIs, and so on.
+On Wed, Jan 17, 2018 at 3:59 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 01/17/2018 08:18 AM, Laszlo Ersek wrote:
+>> On 01/17/18 12:44, Marc-Andr=C3=A9 Lureau wrote:
+>>> Python GDB support may use Python 2 or 3.
+>>>
+>>> Inferior.read_memory() may return a buffer with Python 2 or a
+>>> memoryview with Python 3 (see also
+>>> https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
+>>>
+>>> The elf.add_vmcoreinfo_note() method expect a byte string, but Python 2
+>>> buffer doesn't provide the tobyes() method. Wrap the read_memory()
+>>> result to a memoryview, available in Python 2.7. (if the return object
+>>> is already a memoryview, this adds a useless identity view on top)
+>>
+>> OOP is awesome.
+>>
+>>>
+>>> Fixes a regression introduced with commit
+>>> d23bfa91b7789534d16ede6cb7d925bfac3f3c4c ("add vmcoreinfo").
+>>
+>> Do you want to CC stable? Commit d23bfa91b778 is part of v2.11.0.
+>
+> Configure says we still support python 2.6; does this still work there?
 
-thanks
--- PMM
+ memoryview is not available with python 2.6.
+
+Is the configure version check a configure-time check, or are we
+suppose to support that version for gdb scripts as well?
+
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
