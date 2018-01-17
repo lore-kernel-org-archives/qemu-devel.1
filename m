@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebqKF-00043p-Mv
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:12:32 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ebqKa-0004O2-HX
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:12:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ebqKE-0002e4-Ry
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:12:31 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:40457)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ebqKE-0002dk-Mq
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:12:30 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id x4so1626129otg.7
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:12:30 -0800 (PST)
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ebqKZ-0002nF-Bt
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:12:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
-References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 17 Jan 2018 16:12:09 +0000
-Message-ID: <CAFEAcA-8dwLpfrbV8+--L4Z9Um9xVsyUOfKjcz9-T1aTPkgrEg@mail.gmail.com>
+In-Reply-To: <b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
+References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
+	<20180116013709.13830-10-andrew.smirnov@gmail.com>
+	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
+	<b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Wed, 17 Jan 2018 08:12:48 -0800
+Message-ID: <CAHQ1cqFknfW0NmiD-3GFJRedgVE-9bacKhm-pYx0ycviRsmucQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/24] generalize parsing of cpu_model
- (part 4)
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
+ IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +26,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: marcel@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 17 January 2018 at 15:43, Igor Mammedov <imammedo@redhat.com> wrote:
-> Series is finishing work on generalizing cpu_model parsing
-> and limiting parts that deal with inconsistent cpu_model
-> naming to "-cpu" CLI option processing in vl.c/*-user.main.c
-> and FOO_cpu_class_by_name() callbacks.
+On Wed, Jan 17, 2018 at 7:23 AM, Marcel Apfelbaum
+<marcel.apfelbaum@zoho.com> wrote:
 >
-> It introduces TARGET_DEFAULT_CPU_TYPE which must be defined
-> by each target and is used setting default cpu type for
-> linux/bsd-user targets and as anchor point to pick cpu class
-> that provides target specific FOO_cpu_class_by_name()
-> callback for cpu_parse_cpu_model() in null-machine.c
-> which is compiled for all targets that have system
-> mode emulation.
+> Hi Peter,
+>
+>
+> On 16/01/2018 16:34, Peter Maydell wrote:
+>>
+>> On 16 January 2018 at 01:37, Andrey Smirnov <andrew.smirnov@gmail.com>
+>> wrote:
+>>>
+>>> Add code needed to get a functional PCI subsytem when using in
+>>> conjunction with upstream Linux guest (4.13+). Tested to work against
+>>> "e1000e" (network adapter, using MSI interrupts) as well as
+>>> "usb-ehci" (USB controller, using legacy PCI interrupts).
+>>>
+>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>> Cc: Jason Wang <jasowang@redhat.com>
+>>> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> Cc: qemu-devel@nongnu.org
+>>> Cc: qemu-arm@nongnu.org
+>>> Cc: yurovsky@gmail.com
+>>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>>> ---
+>>>   default-configs/arm-softmmu.mak  |   2 +
+>>>   hw/pci-host/Makefile.objs        |   2 +
+>>>   hw/pci-host/designware.c         | 618
+>>> +++++++++++++++++++++++++++++++++++++++
+>>>   include/hw/pci-host/designware.h |  93 ++++++
+>>>   include/hw/pci/pci_ids.h         |   2 +
+>>>   5 files changed, 717 insertions(+)
+>>>   create mode 100644 hw/pci-host/designware.c
+>>>   create mode 100644 include/hw/pci-host/designware.h
+>>
+>> I'm not familiar enough with our PCI code to be able to review
+>> this, I'm afraid. MST and Marcel are our PCI subsystem maintainers --
+>> could one of you have a look at whether this seems to be a correct
+>> implementation of a pcie host controller ?
+>
+>
+> Sadly PCI Host bridges do not have a standard, each HW vendor
+> can do pretty much what they want.
+>
+> That being said, if Andrey can point me to the PCI spec for the Designwar=
+e
+> PCI host bridge and what parts they implemented for it I can have a look,
+> sure.
+> (I will not be available for a week or so, but right after)
+>
 
-I like moving this from being an ifdef ladder into per-cpu
-code, but I don't think the definition belongs in target/$ARCH.
-It's part of the choice usermode makes about how to handle
-binaries it's loading, so it should go in linux-user/$ARCH/target_cpu.h.
-target/$ARCH should really be for things that are properties
-of the architecture.
+Just in case you still want this:
 
-thanks
--- PMM
+To the best of my knowledge, Synposys does not provide specification
+for their PCIe IP to general public and I am in no way affiliated with
+them, so I don't have any backchannels to get it any other way.
+
+The next best thing to an actual spec, that I found to be pretty
+useful, is PCIe chapter of i.MX6Q Reference Manual
+(https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf   page
+4049), which is what I used to implement the code in question.
+
+Last, and probably the most important, "source of truth" was actual
+Linux PCIe driver for i.MX/Designware which I used as a sort of
+inverse reference implementation.
+
+Thanks,
+Andrey Smirnov
