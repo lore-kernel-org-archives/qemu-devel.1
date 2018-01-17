@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebpEw-0001gY-I0
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:03:04 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ebpHD-000383-GM
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:05:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebpEs-0001ih-Gy
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:02:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ebpEs-0001fb-B7
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:02:54 -0500
-References: <20180117144756.31049-1-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <595f00e6-d5ad-b7c6-29be-7c6e135f9d12@redhat.com>
-Date: Wed, 17 Jan 2018 09:02:42 -0600
+	(envelope-from <no-reply@patchew.org>) id 1ebpH8-00082U-MM
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:05:19 -0500
+Resent-Message-Id: <E1ebpH8-00082U-MM@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ebpH8-00081Y-EK
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:05:14 -0500
+In-Reply-To: <20180117145029.28736-1-tournier.elie@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151620147216.575.7249351335768910793@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <20180117144756.31049-1-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="31Kd0WFcfCHKgf0AOEijXE3fxgkTYvUqe"
-Subject: Re: [Qemu-devel] [PULL 0/1] Dump patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 17 Jan 2018 07:04:33 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC 0/2] Use SDL to create an OpenGL ES context
+ for virglrenderer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: tournier.elie@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---31Kd0WFcfCHKgf0AOEijXE3fxgkTYvUqe
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-Message-ID: <595f00e6-d5ad-b7c6-29be-7c6e135f9d12@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/1] Dump patches
-References: <20180117144756.31049-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20180117144756.31049-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/17/2018 08:47 AM, Marc-Andr=C3=A9 Lureau wrote:
-> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7a=
-da7c:
->=20
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' int=
-o staging (2018-01-16 17:36:39 +0000)
->=20
-> are available in the Git repository at:
->=20
->   https://github.com/elmarco/qemu.git tags/dump-pull-request
->=20
-> for you to fetch changes up to 48fb74965a8d8f2916da30d9c5b9945df25142af=
-:
->=20
->   dump-guest-memory.py: fix python 2 support (2018-01-17 15:47:14 +0100=
-)
->=20
-
-The commit says it works with python 2.7, but we still require support
-for python 2.6.  Is this pull request premature?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---31Kd0WFcfCHKgf0AOEijXE3fxgkTYvUqe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpfZZIACgkQp6FrSiUn
-Q2rOIgf/emKuTY+YqqpQ5IT72NlOVpQ6y6CHwwZD314+0vc0JxJk5pT6r5mShpep
-q72+goHAE8BbsFJ31YBMPCWsdNuOoXfWYEP3QNNV+A0fGpgCvbTu+Qwd/ymNIAg/
-0yWoeFOR5rpzx1OGib51Hq8ceUHP8wLWHryTWlFeUPTUjEDz9oVvULlFKsOk/r8F
-uE+5LbESweWgMaqg7m5I80E32qBQGZ4UWv9np2W+0O9ew2w1HNgIXF6dfGtt/yWU
-sSfpQz3SXaG5kv9xIlLSGFIo2a0a+F3FrcU43VXiXBNduE+XxucKA3caI0Vnux2a
-vLE3dZndTvFDxQ1mqmQr3a5yQPJB4g==
-=0ER+
------END PGP SIGNATURE-----
-
---31Kd0WFcfCHKgf0AOEijXE3fxgkTYvUqe--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTE3MTQ1MDI5LjI4NzM2LTEtdG91cm5pZXIuZWxpZUBnbWFpbC5jb20K
+U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgMC8yXSBVc2UgU0RMIHRvIGNyZWF0ZSBhbiBPcGVu
+R0wgRVMgY29udGV4dCBmb3IgdmlyZ2xyZW5kZXJlci4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
+QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
+aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
+IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
+Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
+MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
+cWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwMTE3MTQ1MDI5LjI4
+NzM2LTEtdG91cm5pZXIuZWxpZUBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE4MDExNzE0NTAyOS4y
+ODczNi0xLXRvdXJuaWVyLmVsaWVAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKMGUxZDM2YWY4YSBzZGwyOiBnbGVzIG9wdGlvbiB3aWxsIGNyZWF0ZSBhIGdsZXMgY29u
+dGV4dApiNTUyYjdlODA3IHNkbDI6IEFkZCBnbGVzIG9wdGlvbnMKCj09PSBPVVRQVVQgQkVHSU4g
+PT09CkNoZWNraW5nIFBBVENIIDEvMjogc2RsMjogQWRkIGdsZXMgb3B0aW9ucy4uLgpDaGVja2lu
+ZyBQQVRDSCAyLzI6IHNkbDI6IGdsZXMgb3B0aW9uIHdpbGwgY3JlYXRlIGEgZ2xlcyBjb250ZXh0
+Li4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
+dGF0ZW1lbnQKIzQ1OiBGSUxFOiB1aS9zZGwyLWdsLmM6MTQ1OgorICAgIGlmIChzY29uLT5vcGVu
+Z2xfZXMpClsuLi5dCisgICAgZWxzZQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
+LCA2MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
+ZWxpc3RzLm9yZw==
