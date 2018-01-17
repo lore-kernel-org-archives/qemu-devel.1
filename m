@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXH-0006U4-15
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXH-0006Uu-Pz
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXD-0002AC-S7
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXE-0002Bj-KA
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52986)
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40200
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ebtXD-00028v-JR
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:07 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0HJYYtS033951
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:05 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fjc2n9v8u-1
+	id 1ebtXE-0002B2-Fa
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:08 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0HJYZQq051136
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:06 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fjcrvg4ks-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:04 -0500
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:05 -0500
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 17 Jan 2018 19:38:02 -0000
+	Wed, 17 Jan 2018 19:38:03 -0000
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 17 Jan 2018 20:37:54 +0100
-Message-Id: <20180117193757.73471-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] s390x/kvm: implement new
- hardware/firmware features
+Date: Wed, 17 Jan 2018 20:37:57 +0100
+In-Reply-To: <20180117193757.73471-1-borntraeger@de.ibm.com>
+References: <20180117193757.73471-1-borntraeger@de.ibm.com>
+Message-Id: <20180117193757.73471-4-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 3/3] s390x/kvm: provide stfle.81
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,32 +41,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-We want to provide more hw features to guests, namely the new bpb
-control as well as other transparent facilities that might be
-introduced by firmware updates (e.g. the stfle facility 81).
+stfle.81 (ppa15) is a transparent facility that can be passed to the
+guest without the need to implement hypervisor support. As this feature
+can be provided by firmware we add it to all full models.
 
-See the kernel discussion for the KVM side
-https://www.spinics.net/lists/kernel/msg2700551.html
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ target/s390x/cpu_features.c     | 1 +
+ target/s390x/cpu_features_def.h | 1 +
+ target/s390x/gen-features.c     | 1 +
+ 3 files changed, 3 insertions(+)
 
-v1->v2: - style and comment fixes
-	- drop transparent facility patch
-	- add patch to introduce facility 81
-
-Christian Borntraeger (3):
-  header sync
-  s390x/kvm: Handle bpb feature
-  s390x/kvm: provide stfle.81
-
- linux-headers/asm-s390/kvm.h    |  9 ++++-----
- linux-headers/linux/kvm.h       |  5 +++--
- target/s390x/cpu.c              |  1 +
- target/s390x/cpu.h              |  1 +
- target/s390x/cpu_features.c     |  2 ++
- target/s390x/cpu_features_def.h |  2 ++
- target/s390x/gen-features.c     |  2 ++
- target/s390x/kvm.c              | 14 ++++++++++++++
- target/s390x/machine.c          | 17 +++++++++++++++++
- 9 files changed, 46 insertions(+), 7 deletions(-)
-
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 5d1c210..1550ab0 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -89,6 +89,7 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("msa4-base", S390_FEAT_TYPE_STFL, 77, "Message-security-assist-extension-4 facility (excluding subfunctions)"),
+     FEAT_INIT("edat2", S390_FEAT_TYPE_STFL, 78, "Enhanced-DAT facility 2"),
+     FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point packed-conversion facility"),
++    FEAT_INIT("ppa15", S390_FEAT_TYPE_STFL, 81, "PPA15 is installed"),
+     FEAT_INIT("bpb", S390_FEAT_TYPE_STFL, 82, "Branch Prediction Blocking"),
+     FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
+     FEAT_INIT("iep", S390_FEAT_TYPE_STFL, 130, "Instruction-execution-protection facility"),
+diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+index 4487cfd..4d93087 100644
+--- a/target/s390x/cpu_features_def.h
++++ b/target/s390x/cpu_features_def.h
+@@ -80,6 +80,7 @@ typedef enum {
+     S390_FEAT_MSA_EXT_4,
+     S390_FEAT_EDAT_2,
+     S390_FEAT_DFP_PACKED_CONVERSION,
++    S390_FEAT_PPA15,
+     S390_FEAT_BPB,
+     S390_FEAT_VECTOR,
+     S390_FEAT_INSTRUCTION_EXEC_PROT,
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 95ee870..50bd3f4 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -357,6 +357,7 @@ static uint16_t full_GEN7_GA1[] = {
+     S390_FEAT_SIE_GPERE,
+     S390_FEAT_SIE_IB,
+     S390_FEAT_SIE_CEI,
++    S390_FEAT_PPA15,
+     S390_FEAT_BPB,
+ };
+ 
 -- 
 2.9.4
