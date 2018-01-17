@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQN-0007s0-8Z
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:01 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQP-0007vo-Pu
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQL-0001Mj-Dz
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQN-0001PT-MB
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:01 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jan 2018 13:25:21 +1100
-Message-Id: <20180117022525.31767-19-david@gibson.dropbear.id.au>
+Date: Wed, 17 Jan 2018 13:25:19 +1100
+Message-Id: <20180117022525.31767-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 References: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/22] ppc/pnv: introduce pnv*_is_power9()
- helpers
+Subject: [Qemu-devel] [PULL 16/22] ppc/pnv: use POWER9 DD2 processor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +27,42 @@ Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-These are useful when instantiating device models which are shared
-between the POWER8 and the POWER9 processor families.
+commit 1ed9c8af501f ("target/ppc: Add POWER9 DD2.0 model information")
+deprecated the POWER9 model v1.0.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_xscom.c   |  8 +++-----
- include/hw/ppc/pnv.h | 10 ++++++++++
- 2 files changed, 13 insertions(+), 5 deletions(-)
+ hw/ppc/pnv.c           | 2 +-
+ tests/pnv-xscom-test.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-index e51d634f40..99c40efecd 100644
---- a/hw/ppc/pnv_xscom.c
-+++ b/hw/ppc/pnv_xscom.c
-@@ -51,10 +51,9 @@ static void xscom_complete(CPUState *cs, uint64_t hmer=
-_bits)
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 9475e8479c..536162b274 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -759,7 +759,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+lass, void *data)
+     PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
 =20
- static uint32_t pnv_xscom_pcba(PnvChip *chip, uint64_t addr)
- {
--    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
--
-     addr &=3D (PNV_XSCOM_SIZE - 1);
--    if (pcc->chip_type =3D=3D PNV_CHIP_POWER9) {
-+
-+    if (pnv_chip_is_power9(chip)) {
-         return addr >> 3;
-     } else {
-         return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
-@@ -231,7 +230,6 @@ int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_o=
-ffset)
-     int xscom_offset;
-     ForeachPopulateArgs args;
-     char *name;
--    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-=20
-     name =3D g_strdup_printf("xscom@%" PRIx64, be64_to_cpu(reg[0]));
-     xscom_offset =3D fdt_add_subnode(fdt, root_offset, name);
-@@ -242,7 +240,7 @@ int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_o=
-ffset)
-     _FDT((fdt_setprop_cell(fdt, xscom_offset, "#size-cells", 1)));
-     _FDT((fdt_setprop(fdt, xscom_offset, "reg", reg, sizeof(reg))));
-=20
--    if (pcc->chip_type =3D=3D PNV_CHIP_POWER9) {
-+    if (pnv_chip_is_power9(chip)) {
-         _FDT((fdt_setprop(fdt, xscom_offset, "compatible", compat_p9,
-                           sizeof(compat_p9))));
-     } else {
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 61896f9fd7..f023f1ec99 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -138,6 +138,16 @@ typedef struct PnvMachineState {
-     Notifier     powerdown_notifier;
- } PnvMachineState;
-=20
-+static inline bool pnv_chip_is_power9(const PnvChip *chip)
-+{
-+    return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER9;
-+}
-+
-+static inline bool pnv_is_power9(PnvMachineState *pnv)
-+{
-+    return pnv_chip_is_power9(pnv->chips[0]);
-+}
-+
- #define PNV_FDT_ADDR          0x01000000
- #define PNV_TIMEBASE_FREQ     512000000ULL
-=20
+     k->chip_type =3D PNV_CHIP_POWER9;
+-    k->chip_cfam_id =3D 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
++    k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
+     k->cores_mask =3D POWER9_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p9;
+     k->xscom_base =3D 0x00603fc00000000ull;
+diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
+index 89fa6282d3..a1a119c091 100644
+--- a/tests/pnv-xscom-test.c
++++ b/tests/pnv-xscom-test.c
+@@ -48,7 +48,7 @@ static const PnvChip pnv_chips[] =3D {
+         .cpu_model  =3D "POWER9",
+         .xscom_base =3D 0x000603fc00000000ull,
+         .xscom_core_base =3D 0x0ull,
+-        .cfam_id    =3D 0x100d104980000000ull,
++        .cfam_id    =3D 0x220d104900008000ull,
+         .first_core =3D 0x20,
+     },
+ #endif
 --=20
 2.14.3
