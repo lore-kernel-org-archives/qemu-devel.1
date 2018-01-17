@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ebkhH-0006F9-6r
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:11:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebkly-0007vb-Fl
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:16:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ebkhD-000733-An
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:11:55 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180117090700.25811-1-stefanha@redhat.com>
-References: <20180117090700.25811-1-stefanha@redhat.com>
-Date: Wed, 17 Jan 2018 11:11:48 +0100
-Message-ID: <w51vag023rv.fsf@maestria.local.igalia.com>
+	(envelope-from <thuth@redhat.com>) id 1ebklu-0001iw-Ei
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:16:46 -0500
+References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516034665-27606-9-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2a0f0236-0095-6492-fce7-2bc2e23fd95b@redhat.com>
+Date: Wed, 17 Jan 2018 11:16:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: add
- block_set_io_throttle virtio-blk-pci QMP example
+In-Reply-To: <1516034665-27606-9-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 8/8] s390-ccw: interactive boot menu for
+ scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,25 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
 
-On Wed 17 Jan 2018 10:07:00 AM CET, Stefan Hajnoczi wrote:
-> The block_set_io_throttle command can look up BlockBackends by the
-> attached qdev device ID.  virtio-blk-pci is a special case because the
-> actual VirtIOBlock device is the "/virtio-backend" child of the PCI
-> adapter device.
->
-> Add a QMP schema example so clients will know how to use
-> block_set_io_throttle on the virtio-blk-pci device.
->
-> The alternative is to implement some sort of aliasing for qmp_get_blk()
-> but that is likely to cause confusion and could break future use cases.
-> Let's not go there.
->
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 15.01.2018 17:44, Collin L. Walling wrote:
+> Interactive boot menu for scsi. This follows the same procedure
+> as the interactive menu for eckd dasd. An example follows:
+> 
+>     s390x Enumerated Boot Menu.
+> 
+>     3 entries detected. Select from index 0 to 2.
+> 
+>     Please choose:
+> 
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> ---
+>  pc-bios/s390-ccw/bootmap.c |  9 ++++++---
+>  pc-bios/s390-ccw/main.c    |  3 +++
+>  pc-bios/s390-ccw/menu.c    | 14 ++++++++++++++
+>  pc-bios/s390-ccw/menu.h    |  1 +
+>  4 files changed, 24 insertions(+), 3 deletions(-)
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-
-Berto
+Reviewed-by: Thomas Huth <thuth@redhat.com>
