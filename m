@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebtU3-0004gj-4u
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:34:52 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXE-0006RN-E6
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebtTz-00069N-6R
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:34:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebtTy-00067V-U9
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:34:47 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB6577CB84
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 19:34:45 +0000 (UTC)
-Date: Wed, 17 Jan 2018 21:34:27 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180117213122-mutt-send-email-mst@kernel.org>
-References: <20180117164118.8510-1-berrange@redhat.com>
-	<20180117164118.8510-5-berrange@redhat.com>
-	<d2b317c1-4ba9-ee88-2f4f-43be23b382a8@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d2b317c1-4ba9-ee88-2f4f-43be23b382a8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 4/4] hw: convert virtio-input-hid device
- to keycodemapdb
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXB-00027o-9O
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55162
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ebtXB-00026y-4T
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:05 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0HJYYdV023307
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:04 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fjc9qs9xk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:03 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 17 Jan 2018 19:38:01 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 17 Jan 2018 20:37:55 +0100
+In-Reply-To: <20180117193757.73471-1-borntraeger@de.ibm.com>
+References: <20180117193757.73471-1-borntraeger@de.ibm.com>
+Message-Id: <20180117193757.73471-2-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] header sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,92 +38,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Wed, Jan 17, 2018 at 01:02:07PM -0600, Eric Blake wrote:
-> On 01/17/2018 10:41 AM, Daniel P. Berrange wrote:
-> > Replace the keymap_qcode table with automatically generated
-> > tables.
-> > 
-> > Missing entries in keymap_qcode now fixed:
-> > 
-> 
-> > 
-> > When a keycode is removed from the list of possible keycodes that host can
-> > send to the guest, it means that the guest OS will think it is possible
-> > to receive a key that in pratice can never be generated, which is harmless.
-> 
-> s/pratice/practice/
-> 
-> > 
-> > When a keycode is added to the list of possible keycodes that the host can
-> > send to the guest, it means that the guest OS can see an unexpected event.
-> > The Linux virtio_input.c driver code simply forwards this event to the
-> > input_event() method in the Linux input subsystem. This in turn calls
-> > input_handle_event(), which then calls input_get_disposition(). This method
-> > checks if the input event is present in the permitted keys bitmap, and if
-> > not returns INPUT_IGNORE_EVENT. Thus the unexpected event will get dropped,
-> > which is harmless.
-> > 
-> > If the guest OS reboots, or otherwise re-initializes the virt-input device,
-> > it will read the new keycode bitmap. No matter how many keys are defined,
-> > the config space has a fixed 128 byte bitmap. There is, however, a size
-> > field defiend which says how many bytes in the bitmap are used. So the guest
-> 
-> s/defiend/defined/
-> 
-> > OS reads the size of the bitmap, and then it reads the data from bitmap upto
-> 
-> s/upto/up to/
-> 
-> > the designated size. So if the guest OS re-initializes at precisely the time
-> > that QEMU is migrated across versions, in the worst case, it could conceivably
-> > read the old size field, but then get the newly updated bitmap.  If a key were
-> > added this is harmless, since it simply means it may not process the newly
-> > added key. If a key were removed, then it could be readnig a byte from the
-> 
-> s/readnig/reading/
-> 
-> > bitmap that was not initialized. Fortunately QEMU always memsets() the entire
-> 
-> maybe s/memsets()/memset()s/
-> 
-> > bitmap to 0, prior to setting keybits. Thus the guest OS will simply read
-> > zeros, which is again harmless.
-> > 
-> > Based on this analysis, it is believed that there is no need to preserve the
-> > virtio-input-hid keymaps across migration, as the host<->guest ABI change is
-> > harmless and self-resolving at time of guest reboot.
-> > 
-> > NB, this behaviour should perhaps be formalized in the virtio-input spec
-> > to declare how guest OS drivers should be written to be robust in their
-> > handling of the potentially changable key bitmaps.
-> 
-> Your analysis of the issues, as well as the advice to enhance the
-> virtio-input spec to document that a guest must not react negatively to
-> the change, both sound reasonable.
+replace with proper header sync
 
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ linux-headers/asm-s390/kvm.h | 9 ++++-----
+ linux-headers/linux/kvm.h    | 5 +++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-If anyone has the time to finalize the spec patch and send it to
-the virtio tc, that would be very welcome!
-IIRC the last revision was
-	[virtio-dev] [PATCH v2] Add virtio input device specification.
-
-
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  hw/input/virtio-input-hid.c | 136 +++-----------------------------------------
-> >  1 file changed, 9 insertions(+), 127 deletions(-)
-> 
-> Fun diffstat ratio!
-> 
-> I have not closely reviewed the series, so much as noticing the grammar
-> on the fly.
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 32d372e..11def14 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -6,10 +6,6 @@
+  *
+  * Copyright IBM Corp. 2008
+  *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License (version 2 only)
+- * as published by the Free Software Foundation.
+- *
+  *    Author(s): Carsten Otte <cotte@de.ibm.com>
+  *               Christian Borntraeger <borntraeger@de.ibm.com>
+  */
+@@ -228,6 +224,7 @@ struct kvm_guest_debug_arch {
+ #define KVM_SYNC_RICCB  (1UL << 7)
+ #define KVM_SYNC_FPRS   (1UL << 8)
+ #define KVM_SYNC_GSCB   (1UL << 9)
++#define KVM_SYNC_BPBC   (1UL << 10)
+ /* length and alignment of the sdnx as a power of two */
+ #define SDNXC 8
+ #define SDNXL (1UL << SDNXC)
+@@ -251,7 +248,9 @@ struct kvm_sync_regs {
+ 	};
+ 	__u8  reserved[512];	/* for future vector expansion */
+ 	__u32 fpc;		/* valid on KVM_SYNC_VRS or KVM_SYNC_FPRS */
+-	__u8 padding1[52];	/* riccb needs to be 64byte aligned */
++	__u8 bpbc : 1;		/* bp mode */
++	__u8 reserved2 : 7;
++	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
+ 	__u8 riccb[64];		/* runtime instrumentation controls block */
+ 	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
+ 	union {
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index ce6c2f1..b4503d8 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -630,9 +630,9 @@ struct kvm_s390_irq {
+ 
+ struct kvm_s390_irq_state {
+ 	__u64 buf;
+-	__u32 flags;
++	__u32 flags;        /* will stay unused for compatibility reasons */
+ 	__u32 len;
+-	__u32 reserved[4];
++	__u32 reserved[4];  /* will stay unused for compatibility reasons */
+ };
+ 
+ /* for KVM_SET_GUEST_DEBUG */
+@@ -932,6 +932,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_HYPERV_SYNIC2 148
+ #define KVM_CAP_HYPERV_VP_INDEX 149
+ #define KVM_CAP_S390_AIS_MIGRATION 150
++#define KVM_CAP_S390_BPB 151
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.9.4
