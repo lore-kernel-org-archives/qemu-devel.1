@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ebnu0-0007Nd-04
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:37:17 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnvP-0008Ik-3x
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:38:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ebntv-0000Dm-Vk
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:37:16 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-4-vsementsov@virtuozzo.com>
-	<74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
-	<7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-	<d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
-	<4e97de9a-bcdd-5e5d-275f-e6cac9473f0d@virtuozzo.com>
-Message-ID: <79e5851b-f35e-23ea-4842-cc3b1d1e30ee@virtuozzo.com>
-Date: Wed, 17 Jan 2018 16:36:50 +0300
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnvL-0001RH-6M
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:38:43 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:46483)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ebnvK-0001Qk-W2
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 08:38:39 -0500
+Received: by mail-qk0-x241.google.com with SMTP id l64so25145340qke.13
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 05:38:38 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180112125000.27256-1-f4bug@amsat.org>
+	<20180112125000.27256-3-f4bug@amsat.org>
+	<c90deebc-f06f-4d68-ed27-d210849eb5c0@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <22982079-8433-ae79-7cc0-bcf99fcae289@amsat.org>
+Date: Wed, 17 Jan 2018 10:38:34 -0300
 MIME-Version: 1.0
-In-Reply-To: <4e97de9a-bcdd-5e5d-275f-e6cac9473f0d@virtuozzo.com>
+In-Reply-To: <c90deebc-f06f-4d68-ed27-d210849eb5c0@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
+Subject: Re: [Qemu-devel] [PATCH 2/7] docker: do not display deprecated
+ images in 'make docker' help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: Fam Zheng <fzheng@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-15.01.2018 20:47, Vladimir Sementsov-Ogievskiy wrote:
-> 15.01.2018 18:09, Eric Blake wrote:
->> On 01/12/2018 03:47 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 09.01.2018 22:52, Eric Blake wrote:
->>>> On 12/07/2017 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Add command for export removing. It is needed for cases when we
->>>>> don't want to keep export after the operation on it was completed.
->>>>> The other example is temporary node, created with blockdev-add.
->>>>> If we want to delete it we should firstly remove corresponding
->>>>> NBD export.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy 
->>>>> <vsementsov@virtuozzo.com>
->>>>> ---
->>>> Do we want a third mode in the middle, where the server starts 
->>>> replying
->>>> to all existing clients with ESHUTDOWN errors for all new requests
->>>> rather than abruptly disconnecting (no new I/O, but no forced 
->>>> disconnect
->>>> and pending in-flight transactions can still complete gracefully)?
->>> looks interesting. what about the following naming?
->>>
->>> @mode: possible values:
->>>                hide - just hide server from new clients, maintain
->>> existing connections,
->>>                            remove after all clients disconnected
->>>                soft - like hide, but answer with ESHUTDOWN for all
->>> further requests from
->>>                            existing connections
->>>                hard - hard disconnect all clients and remove server
->>>                (default: soft)
->> Or even a fourth mode that causes an immediate error return without
->> state change if there are any connected clients, but otherwise removes
->> the server.
+On 01/16/2018 11:10 PM, Fam Zheng wrote:
+> On 01/12/2018 08:49 PM, Philippe Mathieu-Daudé wrote:
+>> the 'debian' base image is deprecated since 3e11974988d8
 >>
->>> new corresponding states of nbd export:
->>> hidden, shutting_down
->>>
->>> and we allow transitions:
->>>
->>> normal_execution -> hidden
->>> normal_execution -> shutting_down
->>> normal_execution -> exit
->>> hidden -> shutting_down
->>> hidden -> exit
->>> shutting_down -> exit
->> Seems reasonable.  Are you planning on tackling a respin of this series
->> incorporating that idea?
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   tests/docker/Makefile.include | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
 >>
->
-> yes, will do.
->
->
+>> diff --git a/tests/docker/Makefile.include
+>> b/tests/docker/Makefile.include
+>> index ef95703cef..f0cd26c2b6 100644
+>> --- a/tests/docker/Makefile.include
+>> +++ b/tests/docker/Makefile.include
+>> @@ -4,7 +4,8 @@
+>>     DOCKER_SUFFIX := .docker
+>>   DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
+>> -DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard
+>> $(DOCKER_FILES_DIR)/*.docker))))
+>> +DOCKER_DEPRECATED_IMAGES := debian
+>> +DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort
+>> $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+>>   DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+>>   # Use a global constant ccache directory to speed up repetitive builds
+>>   DOCKER_CCACHE_DIR := $$HOME/.cache/qemu-docker-ccache
+> 
+> While we are at it, could you please just spell out this list
+> explicitly, consistent to how we build obj-y variables?
 
-Discussed with Nikolay.
-For now we actually need only one mode: hard.
-In near future we _may be_ will need your proposed fourth mode (what 
-about "safe" name for it ?)
-
-I was going to implement all 4 modes, but now I doubt, isn't it too 
-hastily, to introduce 3 new modes to the
-interface, which we (personally) do not need. May be it is better to 
-start from one or two modes.
-
-Finally what do you think, Eric? Which modes do you need?
-
-ps: I've created hmp version for 2/6, it will be in v2.
-  also, I'm going to add query-nbd-server, which should list all exports
-
-also, about HMP: If I understand correctly, people use it because 
-writing qmp command by hand is not very comfortable.
-I have a script (for managing libvirt guest, but it can be adopted for 
-qemu or even used for qemu monitor), which allows
-me run qmp commands on vms as easy as:
-
-|qmp VMNAME query-block-jobs or qmp VMNAME nbd-server-remove name exp1 
-mode hard or even |
-
-|qmp VMNAME blockdev-add id disk driver qcow2 cache {writeback true 
-direct true} aio native discard unmap file {driver file filename 
-/tmp/somedisk} |||
-
--- 
-Best regards,
-Vladimir
+What I like with the current approach is one can have
+more/different/specific images to run the tests, without having to
+pollute upstream with plenty of more docker images (you just drop your
+Dockerfile in DOCKER_FILES_DIR and 'make docker-test' run them all).
