@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ebkAM-0000oh-Ty
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:55 -0500
+	(envelope-from <marcel@redhat.com>) id 1ebkQi-0006LA-Bq
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:54:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ebkAK-0004rw-B9
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:54 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41732)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ebkAK-0004rJ-52
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:52 -0500
-Received: by mail-wr0-x242.google.com with SMTP id o7so18147142wro.8
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 01:37:52 -0800 (PST)
-References: <20180115143500.22631-1-f4bug@amsat.org>
-	<20180115143500.22631-2-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180115143500.22631-2-f4bug@amsat.org>
-Date: Wed, 17 Jan 2018 09:37:49 +0000
-Message-ID: <878tcwomfm.fsf@linaro.org>
+	(envelope-from <marcel@redhat.com>) id 1ebkQf-0000CZ-8z
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:54:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:63736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ebkQf-0000C4-0U
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:54:45 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Wed, 17 Jan 2018 11:54:17 +0200
+Message-Id: <20180117095421.124787-1-marcel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] docker: sort images list displayed
- by 'make docker'
+Subject: [Qemu-devel] [PATCH V8 0/4] hw/pvrdma: PVRDMA device implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +24,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, marcel@redhat.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com, f4bug@amsat.org
+
+V7 -> V8:
+ - Addressed Michael S. Tsirkin comments:
+   - fail to init the pvrdma device if target page size is different
+     from the host size, or if the guest RAM is not backed by memory
+     and shared.
+   - Update documentation to include a note on huge memory regions
+     registration and remove not needed info.
+ - Removed "pci/shpc: Move function to generic header file" since it
+   appears in latest maintainer pull request
+ - Rebased on master
+
+V6 -> V7:
+ - Addressed Philippe Mathieu-Daud=C3=A9 comments
+   - modified pow2roundup32 signature
+   - added his RB tag (thanks)
+ - Addressed Corenlia Huck comments:
+   - Compiled the pvrdma for all archs and not only x86/arm (thanks)
+   - Fixed typo in documentation
+ - Rebased on latest master
+
+V5 -> V6:
+ - Found a ppc machine and solved ppc compilation issues
+ - Tried to fix the s390x issue (still looking of a machine)
+
+V4 -> V5:
+ - Fixed (at least tried to) compilation issues
+
+V3 -> V4:
+ - Fixed documentation (added more impl details)
+ - Fixed compilation errors discovered by patchew.
+ - Addressed Michael S. Tsirkin comments:
+   - Removed unnecessary typedefs and replace them with
+     macros in VMware header files, together with explanations.
+   - Moved more code from vmw specific to rdma generic code.
+   - Added page size limitations to the documentation.
+
+V2 -> V3:
+ - Addressed Michael S. Tsirkin and Philippe Mathieu-Daud=C3=A9 comments:
+   - Moved the device to hw/rdma
+ - Addressed Michael S. Tsirkin comments:
+   - Split the code into generic (hw/rdma) and VMWare
+     specific (hw/rdma/vmw)
+   - Added more details to documentation - VMware guest-host protocol.
+   - Remove mad processing
+   - limited the memory the Guest can pin.
+ - Addressed Philippe Mathieu-Daud=C3=A9 comment:
+   - s/roundup_pow_of_two/pow2roundup32 and move it to qemu/host-utils.h=20
+ - Added Shamit Rabinovici's review to documentation
+ - Rebased to latest master=20
+
+RFC -> V2:
+ - Full implementation of the pvrdma device
+ - Backend is an ibdevice interface, no need for the KDBR module
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+General description
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device=
+.
+It works with its Linux Kernel driver AS IS, no need for any special gues=
+t
+modifications.
 
-> we can now directly see different version sort consecutively.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+While it complies with the VMware device, it can also communicate with ba=
+re
+metal RDMA-enabled machines and does not require an RDMA HCA in the host,=
+ it
+can work with Soft-RoCE (rxe).
 
-I of course meant:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-
-> ---
->  tests/docker/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index de87341528..ef95703cef 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -4,7 +4,7 @@
->
->  DOCKER_SUFFIX :=3D .docker
->  DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
-> -DOCKER_IMAGES :=3D $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.=
-docker)))
-> +DOCKER_IMAGES :=3D $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_=
-DIR)/*.docker))))
->  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
->  # Use a global constant ccache directory to speed up repetitive builds
->  DOCKER_CCACHE_DIR :=3D $$HOME/.cache/qemu-docker-ccache
+It does not require the whole guest RAM to be pinned allowing memory
+over-commit and, even if not implemented yet, migration support will be
+possible with some HW assistance.
 
 
---
-Alex Benn=C3=A9e
+ Design
+ =3D=3D=3D=3D=3D=3D
+ - Follows the behavior of VMware's pvrdma device, however is not tightly
+   coupled with it and most of the code can be reused if we decide to
+   continue to a Virtio based RDMA device.
+
+ - It exposes 3 BARs:
+    BAR 0 - MSIX, utilize 3 vectors for command ring, async events and
+            completions
+    BAR 1 - Configuration of registers
+    BAR 2 - UAR, used to pass HW commands from driver.
+
+ - The device performs internal management of the RDMA
+   resources (PDs, CQs, QPs, ...), meaning the objects
+   are not directly coupled to a physical RDMA device resources.
+
+The pvrdma backend is an ibdevice interface that can be exposed
+either by a Soft-RoCE(rxe) device on machines with no RDMA device,
+or an HCA SRIOV function(VF/PF).
+Note that ibdevice interfaces can't be shared between pvrdma devices,
+each one requiring a separate instance (rxe or SRIOV VF).
+
+
+Tests and performance
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Tested with SoftRoCE backend (rxe)/Mellanox ConnectX3,
+and Mellanox ConnectX4 HCAs with:
+  - VMs in the same host
+  - VMs in different hosts=20
+  - VMs to bare metal.
+
+The best performance achieved with ConnectX HCAs and buffer size
+bigger than 1MB which was the line rate ~ 50Gb/s.
+The conclusion is that using the PVRDMA device there are no
+actual performance penalties compared to bare metal for big enough
+buffers (which is quite common when using RDMA), while allowing
+memory overcommit.
+
+Marcel Apfelbaum (3):
+  mem: add share parameter to memory-backend-ram
+  docs: add pvrdma device documentation.
+  MAINTAINERS: add entry for hw/rdma
+
+Yuval Shaia (1):
+  pvrdma: initial implementation
+
+ MAINTAINERS                   |   8 +
+ Makefile.objs                 |   2 +
+ backends/hostmem-file.c       |  25 +-
+ backends/hostmem-ram.c        |   4 +-
+ backends/hostmem.c            |  21 ++
+ configure                     |   9 +-
+ docs/pvrdma.txt               | 255 +++++++++++++
+ exec.c                        |  26 +-
+ hw/Makefile.objs              |   1 +
+ hw/rdma/Makefile.objs         |   6 +
+ hw/rdma/rdma_backend.c        | 815 ++++++++++++++++++++++++++++++++++++=
+++++++
+ hw/rdma/rdma_backend.h        |  92 +++++
+ hw/rdma/rdma_backend_defs.h   |  62 ++++
+ hw/rdma/rdma_rm.c             | 619 ++++++++++++++++++++++++++++++++
+ hw/rdma/rdma_rm.h             |  69 ++++
+ hw/rdma/rdma_rm_defs.h        | 106 ++++++
+ hw/rdma/rdma_utils.c          |  52 +++
+ hw/rdma/rdma_utils.h          |  43 +++
+ hw/rdma/trace-events          |   5 +
+ hw/rdma/vmw/pvrdma.h          | 122 +++++++
+ hw/rdma/vmw/pvrdma_cmd.c      | 679 +++++++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_api.h  | 602 +++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_ring.c | 139 +++++++
+ hw/rdma/vmw/pvrdma_dev_ring.h |  42 +++
+ hw/rdma/vmw/pvrdma_ib_verbs.h | 433 ++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_main.c     | 671 ++++++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.c   | 212 +++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.h   |  27 ++
+ hw/rdma/vmw/pvrdma_ring.h     | 134 +++++++
+ hw/rdma/vmw/trace-events      |   5 +
+ hw/rdma/vmw/vmw_pvrdma-abi.h  | 311 ++++++++++++++++
+ include/exec/memory.h         |  23 ++
+ include/exec/ram_addr.h       |   3 +-
+ include/hw/pci/pci_ids.h      |   3 +
+ include/qemu/osdep.h          |   2 +-
+ include/sysemu/hostmem.h      |   2 +-
+ include/sysemu/kvm.h          |   2 +-
+ memory.c                      |  16 +-
+ target/s390x/kvm.c            |   4 +-
+ util/oslib-posix.c            |   4 +-
+ util/oslib-win32.c            |   2 +-
+ 41 files changed, 5605 insertions(+), 53 deletions(-)
+ create mode 100644 docs/pvrdma.txt
+ create mode 100644 hw/rdma/Makefile.objs
+ create mode 100644 hw/rdma/rdma_backend.c
+ create mode 100644 hw/rdma/rdma_backend.h
+ create mode 100644 hw/rdma/rdma_backend_defs.h
+ create mode 100644 hw/rdma/rdma_rm.c
+ create mode 100644 hw/rdma/rdma_rm.h
+ create mode 100644 hw/rdma/rdma_rm_defs.h
+ create mode 100644 hw/rdma/rdma_utils.c
+ create mode 100644 hw/rdma/rdma_utils.h
+ create mode 100644 hw/rdma/trace-events
+ create mode 100644 hw/rdma/vmw/pvrdma.h
+ create mode 100644 hw/rdma/vmw/pvrdma_cmd.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_api.h
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ib_verbs.h
+ create mode 100644 hw/rdma/vmw/pvrdma_main.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ring.h
+ create mode 100644 hw/rdma/vmw/trace-events
+ create mode 100644 hw/rdma/vmw/vmw_pvrdma-abi.h
+
+--=20
+2.13.5
