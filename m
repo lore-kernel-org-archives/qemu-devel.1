@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebvkb-0007NP-Jv
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 17:00:11 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ebvwZ-0002xK-1y
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 17:12:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebvkX-0001qS-Od
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 17:00:05 -0500
-References: <20180117193757.73471-1-borntraeger@de.ibm.com>
-	<20180117193757.73471-4-borntraeger@de.ibm.com>
-	<e1579c11-9a30-7035-16f6-ad047108260c@redhat.com>
-	<7cc4f08f-2d40-1a1a-0e52-71cb310c3c0a@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7aa14ddf-769f-2c79-4ca4-fa4b0aa65347@redhat.com>
-Date: Wed, 17 Jan 2018 22:59:55 +0100
-MIME-Version: 1.0
-In-Reply-To: <7cc4f08f-2d40-1a1a-0e52-71cb310c3c0a@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/kvm: provide stfle.81
+	(envelope-from <jsnow@redhat.com>) id 1ebvwX-0003WW-SV
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 17:12:27 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Wed, 17 Jan 2018 17:12:10 -0500
+Message-Id: <20180117221210.28575-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] file-posix: specify expected filetypes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +17,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-On 17.01.2018 22:37, Christian Borntraeger wrote:
-> 
-> 
-> On 01/17/2018 10:13 PM, David Hildenbrand wrote:
->> On 17.01.2018 20:37, Christian Borntraeger wrote:
->>> stfle.81 (ppa15) is a transparent facility that can be passed to the
->>> guest without the need to implement hypervisor support. As this feature
->>> can be provided by firmware we add it to all full models.
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  target/s390x/cpu_features.c     | 1 +
->>>  target/s390x/cpu_features_def.h | 1 +
->>>  target/s390x/gen-features.c     | 1 +
->>>  3 files changed, 3 insertions(+)
->>>
->>> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
->>> index 5d1c210..1550ab0 100644
->>> --- a/target/s390x/cpu_features.c
->>> +++ b/target/s390x/cpu_features.c
->>> @@ -89,6 +89,7 @@ static const S390FeatDef s390_features[] = {
->>>      FEAT_INIT("msa4-base", S390_FEAT_TYPE_STFL, 77, "Message-security-assist-extension-4 facility (excluding subfunctions)"),
->>>      FEAT_INIT("edat2", S390_FEAT_TYPE_STFL, 78, "Enhanced-DAT facility 2"),
->>>      FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point packed-conversion facility"),
->>> +    FEAT_INIT("ppa15", S390_FEAT_TYPE_STFL, 81, "PPA15 is installed"),
->>>      FEAT_INIT("bpb", S390_FEAT_TYPE_STFL, 82, "Branch Prediction Blocking"),
->>>      FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
->>>      FEAT_INIT("iep", S390_FEAT_TYPE_STFL, 130, "Instruction-execution-protection facility"),
->>> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
->>> index 4487cfd..4d93087 100644
->>> --- a/target/s390x/cpu_features_def.h
->>> +++ b/target/s390x/cpu_features_def.h
->>> @@ -80,6 +80,7 @@ typedef enum {
->>>      S390_FEAT_MSA_EXT_4,
->>>      S390_FEAT_EDAT_2,
->>>      S390_FEAT_DFP_PACKED_CONVERSION,
->>> +    S390_FEAT_PPA15,
->>>      S390_FEAT_BPB,
->>>      S390_FEAT_VECTOR,
->>>      S390_FEAT_INSTRUCTION_EXEC_PROT,
->>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->>> index 95ee870..50bd3f4 100644
->>> --- a/target/s390x/gen-features.c
->>> +++ b/target/s390x/gen-features.c
->>> @@ -357,6 +357,7 @@ static uint16_t full_GEN7_GA1[] = {
->>>      S390_FEAT_SIE_GPERE,
->>>      S390_FEAT_SIE_IB,
->>>      S390_FEAT_SIE_CEI,
->>> +    S390_FEAT_PPA15,
->>>      S390_FEAT_BPB,
->>
-> 
->> Is the order in this list still correct?
-> 
-> Is the order in this array important as well? It seems to work fine. At least PPA15 is correctly
-> ordered vs BPB.
-> 
+Adjust each caller of raw_open_common to specify if they are expecting
+host and character devices or not. Tighten expectations of file types upon
+open in the common code and refuse types that are not expected.
 
-Purely style. (when introducing, I tried to keep features in the same
-order as defined in target/s390x/cpu_features_def.h )
+This has two effects:
 
-So feel free to keep the order (or I'll clean this up again one day).
+(1) Character and block devices are now considered deprecated for the
+    'file' driver, which expects only S_IFREG, and
+(2) no file-posix driver (file, host_cdrom, or host_device) can open
+    directories now.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I don't think there's a legitimate reason to open directories as if
+they were files. This prevents QEMU from opening and attempting to probe
+a directory inode, which can break in exciting ways. One of those ways
+is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
+size instead of EISDIR. This can coax QEMU into responding with a
+confusing "file too big" instead of "Hey, that's not a file".
 
+See: https://bugs.launchpad.net/qemu/+bug/1739304/
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+
+v3: Fixed bad semantics on multi-line break (Kevin)
+    Added deprecation warning (Eric, Kevin)
+    Removed superfluous whitespace change (Eric)
+
+ block/file-posix.c | 37 +++++++++++++++++++++++++++++--------
+ qemu-doc.texi      |  6 ++++++
+ 2 files changed, 35 insertions(+), 8 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 36ee89e940..61fac1d2a4 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -417,7 +417,8 @@ static QemuOptsList raw_runtime_opts = {
+ };
+ 
+ static int raw_open_common(BlockDriverState *bs, QDict *options,
+-                           int bdrv_flags, int open_flags, Error **errp)
++                           int bdrv_flags, int open_flags,
++                           bool device, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+     QemuOpts *opts;
+@@ -556,10 +557,30 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+         error_setg_errno(errp, errno, "Could not stat file");
+         goto fail;
+     }
+-    if (S_ISREG(st.st_mode)) {
+-        s->discard_zeroes = true;
+-        s->has_fallocate = true;
++
++    if (!device) {
++        if (S_ISBLK(st.st_mode)) {
++            warn_report("Opening a block device as file using 'file' "
++                        "driver is deprecated");
++        } else if (S_ISCHR(st.st_mode)) {
++            warn_report("Opening a character device as file using the 'file' "
++                        "driver is deprecated");
++        } else if (!S_ISREG(st.st_mode)) {
++            error_setg(errp, "A regular file was expected by the 'file' driver, "
++                       "but something else was given");
++            goto fail;
++        } else {
++            s->discard_zeroes = true;
++            s->has_fallocate = true;
++        }
++    } else {
++        if (!(S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
++            error_setg(errp, "host_device/host_cdrom driver expects either "
++                       "a character or block device");
++            goto fail;
++        }
+     }
++
+     if (S_ISBLK(st.st_mode)) {
+ #ifdef BLKDISCARDZEROES
+         unsigned int arg;
+@@ -611,7 +632,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     BDRVRawState *s = bs->opaque;
+ 
+     s->type = FTYPE_FILE;
+-    return raw_open_common(bs, options, flags, 0, errp);
++    return raw_open_common(bs, options, flags, 0, false, errp);
+ }
+ 
+ typedef enum {
+@@ -2575,7 +2596,7 @@ hdev_open_Mac_error:
+ 
+     s->type = FTYPE_FILE;
+ 
+-    ret = raw_open_common(bs, options, flags, 0, &local_err);
++    ret = raw_open_common(bs, options, flags, 0, true, &local_err);
+     if (ret < 0) {
+         error_propagate(errp, local_err);
+ #if defined(__APPLE__) && defined(__MACH__)
+@@ -2802,7 +2823,7 @@ static int cdrom_open(BlockDriverState *bs, QDict *options, int flags,
+     s->type = FTYPE_CD;
+ 
+     /* open will not fail even if no CD is inserted, so add O_NONBLOCK */
+-    return raw_open_common(bs, options, flags, O_NONBLOCK, errp);
++    return raw_open_common(bs, options, flags, O_NONBLOCK, true, errp);
+ }
+ 
+ static int cdrom_probe_device(const char *filename)
+@@ -2915,7 +2936,7 @@ static int cdrom_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     s->type = FTYPE_CD;
+ 
+-    ret = raw_open_common(bs, options, flags, 0, &local_err);
++    ret = raw_open_common(bs, options, flags, 0, true, &local_err);
+     if (ret) {
+         error_propagate(errp, local_err);
+         return ret;
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 3e9eb819a6..aaed699142 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2708,6 +2708,12 @@ that can be specified with the ``-device'' parameter.
+ The drive addr argument is replaced by the the addr argument
+ that can be specified with the ``-device'' parameter.
+ 
++@subsection -drive file=json:{...{'driver':'file'}} (since 2.12.0)
++
++The 'file' driver for drives is no longer appropriate for character or host
++devices and will only accept regular files (S_IFREG). The correct driver
++for these file types is 'host_cdrom' or 'host_device' as appropriate.
++
+ @subsection -net dump (since 2.10.0)
+ 
+ The ``--net dump'' argument is now replaced with the
 -- 
-
-Thanks,
-
-David / dhildenb
+2.14.3
