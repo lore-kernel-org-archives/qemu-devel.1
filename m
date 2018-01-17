@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@zoho.com>) id 1ebpZe-00023d-0B
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:24:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebpcL-0004BH-NT
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:27:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@zoho.com>) id 1ebpZY-0006Rm-2d
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:24:22 -0500
-Reply-To: marcel@redhat.com
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-10-andrew.smirnov@gmail.com>
-	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
-Message-ID: <b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
-Date: Wed, 17 Jan 2018 17:23:04 +0200
+	(envelope-from <eblake@redhat.com>) id 1ebpcK-0000Cg-L7
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:27:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47060)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ebpcK-0000BV-Bo
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:27:08 -0500
+References: <20180116231824.27114-1-shaun.reitan@ndchost.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5deda3ef-d5e4-c2a7-5556-4c46c26045ad@redhat.com>
+Date: Wed, 17 Jan 2018 09:26:55 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
- IP block
+In-Reply-To: <20180116231824.27114-1-shaun.reitan@ndchost.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2OXlecnFV3reS3czd9GPn72lR9FlG2r3D"
+Subject: Re: [Qemu-devel] [PATCH] Add ability to provide ifname when using
+ netdev bridge or tap helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Shaun Reitan <shaun.reitan@ndchost.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2OXlecnFV3reS3czd9GPn72lR9FlG2r3D
+From: Eric Blake <eblake@redhat.com>
+To: Shaun Reitan <shaun.reitan@ndchost.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <5deda3ef-d5e4-c2a7-5556-4c46c26045ad@redhat.com>
+Subject: Re: [PATCH] Add ability to provide ifname when using netdev bridge or
+ tap helper
+References: <20180116231824.27114-1-shaun.reitan@ndchost.com>
+In-Reply-To: <20180116231824.27114-1-shaun.reitan@ndchost.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/16/2018 05:18 PM, Shaun Reitan wrote:
+> This patch replaces the patch I sent yesturday. This one fixes
+> a bug in my original code as well as corrects a few styling
+> issues. Hopfully this one comes out correct!  Sorry for the
+> inconvienece.
+
+This paragraph belongs...
+
+> =20
+> When currently using -netdev bridge or -netdev tap with a helper
+> you are unable to set an ifname. This patch adds that ability so
+> that you can now specify an ifname.
+>=20
+> Signed-off-by: Shaun Reitan <shaun.reitan@ndchost.com>
+> ---
+
+=2E..here, after the --- separator.  It is useful for reviewers reading
+the list, but pointless in the git log a year from now.
+
+>  net/tap.c            | 33 ++++++++++++++++++++++++---------
+>  qapi/net.json        |  1 +
+>  qemu-bridge-helper.c | 11 +++++++++--
+>  qemu-options.hx      |  2 +-
+>  4 files changed, 35 insertions(+), 12 deletions(-)
+
+> +++ b/qapi/net.json
+> @@ -402,6 +402,7 @@
+>  { 'struct': 'NetdevBridgeOptions',
+>    'data': {
+>      '*br':     'str',
+> +    '*ifname': 'str',
+
+Missing documentation (including a '(since 2.12)' tag) of the new field.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Hi Peter,
+--2OXlecnFV3reS3czd9GPn72lR9FlG2r3D
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 16/01/2018 16:34, Peter Maydell wrote:
-> On 16 January 2018 at 01:37, Andrey Smirnov <andrew.smirnov@gmail.com> =
-wrote:
->> Add code needed to get a functional PCI subsytem when using in
->> conjunction with upstream Linux guest (4.13+). Tested to work against
->> "e1000e" (network adapter, using MSI interrupts) as well as
->> "usb-ehci" (USB controller, using legacy PCI interrupts).
->>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Cc: qemu-devel@nongnu.org
->> Cc: qemu-arm@nongnu.org
->> Cc: yurovsky@gmail.com
->> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->> ---
->>   default-configs/arm-softmmu.mak  |   2 +
->>   hw/pci-host/Makefile.objs        |   2 +
->>   hw/pci-host/designware.c         | 618 +++++++++++++++++++++++++++++=
-++++++++++
->>   include/hw/pci-host/designware.h |  93 ++++++
->>   include/hw/pci/pci_ids.h         |   2 +
->>   5 files changed, 717 insertions(+)
->>   create mode 100644 hw/pci-host/designware.c
->>   create mode 100644 include/hw/pci-host/designware.h
-> I'm not familiar enough with our PCI code to be able to review
-> this, I'm afraid. MST and Marcel are our PCI subsystem maintainers --
-> could one of you have a look at whether this seems to be a correct
-> implementation of a pcie host controller ?
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Sadly PCI Host bridges do not have a standard, each HW vendor
-can do pretty much what they want.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpfaz8ACgkQp6FrSiUn
+Q2oaVgf9EWLveAA2kjfnsjqSDGLVSVRFwYK7C6IsdkoWLEUKkO2C4cnDKKEKRBuA
+7sIJLDLv5PLv6SIG1Psc7SzhOknOmbpLQJQapGXbfe0LADGa/2jCde4gnF5rDMCB
+ULGKKIgpC6rV9B1nzLjtfO5nS6BPznK9eniy5RECHOhQZfQTo7k1KLTLLozLwKau
+dl7FS5V0sQJLCPdfG1ABni83vDbURHAAMnk2a62yzdlN71D4yQsMvyMX7A3cc7QJ
+rBllvG/lEe+rEFTAanlF7iB4rEY4mdgCH8+7+uqXhcqmMIkFupVpFUfDYbCHgHwn
+Q44zsik4wegPbYAyow1nOKAyzgO88w==
+=ovzJ
+-----END PGP SIGNATURE-----
 
-That being said, if Andrey can point me to the PCI spec for the Designwar=
-e
-PCI host bridge and what parts they implemented for it I can have a look,=
- sure.
-(I will not be available for a week or so, but right after)
-
-Thanks,
-Marcel
-> I did notice it seems to be missing device state save/load support.
->
-> thanks
-> -- PMM
->
+--2OXlecnFV3reS3czd9GPn72lR9FlG2r3D--
