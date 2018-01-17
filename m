@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ebkA3-0000fB-Ux
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:41 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ebkAM-0000oh-Ty
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ebkA1-0004dB-1r
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:35 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45249)
+	(envelope-from <alex.bennee@linaro.org>) id 1ebkAK-0004rw-B9
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:54 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41732)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ebkA0-0004cC-RT
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:33 -0500
-Received: by mail-wr0-x244.google.com with SMTP id 16so18141987wry.12
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 01:37:32 -0800 (PST)
+	id 1ebkAK-0004rJ-52
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 04:37:52 -0500
+Received: by mail-wr0-x242.google.com with SMTP id o7so18147142wro.8
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 01:37:52 -0800 (PST)
 References: <20180115143500.22631-1-f4bug@amsat.org>
 	<20180115143500.22631-2-f4bug@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 In-reply-to: <20180115143500.22631-2-f4bug@amsat.org>
-Date: Wed, 17 Jan 2018 09:37:30 +0000
-Message-ID: <87a7xcomg5.fsf@linaro.org>
+Date: Wed, 17 Jan 2018 09:37:49 +0000
+Message-ID: <878tcwomfm.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -41,7 +41,10 @@ Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+I of course meant:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 
 > ---
 >  tests/docker/Makefile.include | 2 +-
