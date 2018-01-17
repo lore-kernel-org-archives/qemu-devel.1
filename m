@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eblNI-0006HX-4m
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:55:24 -0500
+	(envelope-from <berrange@redhat.com>) id 1eblQp-0000Hi-ST
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eblNF-0004em-0A
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:55:20 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:42954)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eblNE-0004c0-Lw
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:55:16 -0500
-Received: by mail-wr0-x241.google.com with SMTP id e41so18030112wre.9
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 02:55:16 -0800 (PST)
-References: <20180115143500.22631-1-f4bug@amsat.org>
-	<20180115143500.22631-8-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180115143500.22631-8-f4bug@amsat.org>
-Date: Wed, 17 Jan 2018 10:55:13 +0000
-Message-ID: <877esgoium.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1eblQm-00007P-Kg
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:58:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37214)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eblQm-000068-AP
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 05:58:56 -0500
+Date: Wed, 17 Jan 2018 10:58:51 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180117105851.GG19227@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20180116231824.27114-1-shaun.reitan@ndchost.com>
+	<20180117103148.GE19227@redhat.com>
+	<05429a58-4013-c6ad-853c-73037086366d@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <05429a58-4013-c6ad-853c-73037086366d@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] docker: warn users to use newer
- fedora25/fedora27 base image
+Subject: Re: [Qemu-devel] [PATCH] Add ability to provide ifname when using
+ netdev bridge or tap helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: Shaun Reitan <shaun.reitan@ndchost.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
+On Wed, Jan 17, 2018 at 06:53:30PM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2018=E5=B9=B401=E6=9C=8817=E6=97=A5 18:31, Daniel P. Berrange wrote:
+> > On Tue, Jan 16, 2018 at 03:18:24PM -0800, Shaun Reitan wrote:
+> > > This patch replaces the patch I sent yesturday. This one fixes
+> > > a bug in my original code as well as corrects a few styling
+> > > issues. Hopfully this one comes out correct!  Sorry for the
+> > > inconvienece.
+> > > When currently using -netdev bridge or -netdev tap with a helper
+> > > you are unable to set an ifname. This patch adds that ability so
+> > > that you can now specify an ifname.
+> > I really don't think users should be allowed to override the
+> > ifname when using the setuid bridge helper. This allows an
+> > unprivileged users to create tap devices that may confuse the
+> > sysadmin, and/or network mgmt scripts.
+>=20
+> Ok, I drop it from my queue.
+>=20
+> >=20
+> > eg consider the user asks for a tap device called  eth1. To the
+> > sysadmin the user's tap device now looks like a physical NIC.
+> > This can be even worse if the host does physical NIC hotplug,
+> > or uses SRIOV. eg consider the host as eth0 -> eth7 for SRIOV
+> > NICs, and eth3 is given to a guest. Now a user uses the setuid
+> > helper to ask for a TAP called eth3. When the SRIOV device is
+> > later released by the guest it will end up called eth8, as the
+> > TAP device occupies eth3. In bad cases this could even cause
+> > the host mgmt layer to configure bogus addresses on the eth3
+> > TAP device instead of the SRIOV device.
+>=20
+> It looks to me that mgmt should not assume the type or location of devi=
+ce
+> just from its name. Ethtool should be used to do this.
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+Yes, a well written tool, or a prudent administrator should be careful
+and validate the devices they use, but most have assumptions they make
+which could easily be violated here.
 
-> deprecate the generic 'fedora' image, but stay backward incompatible
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > If we want to allow ifname to be set via the setuid helper, then IMHO=
+,
+> > the config file for the helper *must* whitelist the various permitted
+> > naming patterns.
+>=20
+> Good point but this only work for e.g default helper. Qemu allows 3rd h=
+elper
+> which can do anything they want.
 
-What clashed with this?
+If anyone writes a custom setuid helper, they are responsible for writing
+to in a way that doesn't open security holes, or expose the admin to
+intentionally misleading setup. IOW, that is somebody else's problem.
 
-> ---
->  tests/docker/Makefile.include            |  3 ++-
->  tests/docker/dockerfiles/fedora.docker   | 29 ++++++++++++--------------=
----
->  tests/docker/dockerfiles/fedora25.docker | 18 ++++++++++++++++++
->  3 files changed, 32 insertions(+), 18 deletions(-)
->  create mode 100644 tests/docker/dockerfiles/fedora25.docker
->
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index 1adea40499..950ef51d35 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -4,7 +4,7 @@
->
->  DOCKER_SUFFIX :=3D .docker
->  DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
-> -DOCKER_DEPRECATED_IMAGES :=3D debian ubuntu
-> +DOCKER_DEPRECATED_IMAGES :=3D debian fedora ubuntu
->  DOCKER_IMAGES :=3D $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(not=
-dir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
->  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
->  # Use a global constant ccache directory to speed up repetitive builds
-> @@ -61,6 +61,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
->  docker-image-debian-s390x-cross: docker-image-debian9
->  docker-image-debian-win32-cross: docker-image-debian8-mxe
->  docker-image-debian-win64-cross: docker-image-debian8-mxe
-> +docker-image-fedora: docker-image-fedora25
->  docker-image-ubuntu: docker-image-ubuntu16.04
->  docker-image-travis: NOUSER=3D1
->
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-> index 4b26c3aded..961534275f 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -1,18 +1,13 @@
-> -FROM fedora:latest
-> -ENV PACKAGES \
-> -    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostna=
-me \
-> -    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-> -    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-> -    nettle-devel \
-> -    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-con=
-fig \
-> -    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libt=
-asn1 \
-> -    mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
-> -    mingw32-bzip2 \
-> -    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-con=
-fig \
-> -    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libt=
-asn1 \
-> -    mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
-> -    mingw64-bzip2
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +#
-> +# This template is deprecated, it was previously based on Fedora 25 on Q=
-EMU 2.9.
-> +# Now than more recent releases are out, please use qemu:fedora25 as bas=
-e for
-> +# Fedora 25.
-> +#
-> +FROM qemu:fedora25
->
-> -RUN dnf install -y $PACKAGES
-> -RUN rpm -q $PACKAGES | sort > /packages.txt
-> -ENV FEATURES mingw clang pyyaml
-> +RUN for n in $(seq 8); do echo; done && \
-> +    echo "\n\t\tThis image is deprecated." && echo && \
-> +    echo "\tUse 'FROM qemu:fedora27' to use the Fedora 27 image" && \
-> +    echo "\tor 'FROM qemu:fedora25' to use the old Fedora 25." && \
-> +    for n in $(seq 8); do echo; done
-> diff --git a/tests/docker/dockerfiles/fedora25.docker b/tests/docker/dock=
-erfiles/fedora25.docker
-> new file mode 100644
-> index 0000000000..b53fe63b5c
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/fedora25.docker
-> @@ -0,0 +1,18 @@
-> +FROM fedora:25
-> +ENV PACKAGES \
-> +    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostna=
-me \
-> +    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-> +    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-> +    nettle-devel \
-> +    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-con=
-fig \
-> +    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libt=
-asn1 \
-> +    mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
-> +    mingw32-bzip2 \
-> +    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-con=
-fig \
-> +    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libt=
-asn1 \
-> +    mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
-> +    mingw64-bzip2
-> +
-> +RUN dnf install -y $PACKAGES
-> +RUN rpm -q $PACKAGES | sort > /packages.txt
-> +ENV FEATURES mingw clang pyyaml
-
-
---
-Alex Benn=C3=A9e
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
