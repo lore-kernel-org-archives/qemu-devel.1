@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ebmt6-0003Jg-Nk
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 07:32:34 -0500
+	(envelope-from <berto@igalia.com>) id 1ebnES-0003PB-7z
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 07:54:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ebmsv-0003KY-AA
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 07:32:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ebmsv-0003IF-4F
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 07:32:05 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1516170720-4948-2-git-send-email-wei.w.wang@intel.com> (Wei
-	Wang's message of "Wed, 17 Jan 2018 14:31:57 +0800")
-References: <1516170720-4948-1-git-send-email-wei.w.wang@intel.com>
-	<1516170720-4948-2-git-send-email-wei.w.wang@intel.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 17 Jan 2018 13:31:25 +0100
-Message-ID: <871sio4qg2.fsf@secure.laptop>
+	(envelope-from <berto@igalia.com>) id 1ebnEP-0000Y1-3v
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 07:54:20 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <82955b47-0b64-fccf-2173-711ad86d1a6f@redhat.com>
+References: <cover.1513342045.git.berto@igalia.com>
+	<97419f591a3aeb5c69c9b24a495f3e603cacb32f.1513342045.git.berto@igalia.com>
+	<82955b47-0b64-fccf-2173-711ad86d1a6f@redhat.com>
+Date: Wed, 17 Jan 2018 13:54:13 +0100
+Message-ID: <w51shb41w96.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 1/4] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+Subject: Re: [Qemu-devel] [PATCH v2 02/32] qcow2: Add table size field to
+ Qcow2Cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Wei Wang <wei.w.wang@intel.com> wrote:
-> The new feature enables the virtio-balloon device to receive the hint of
-> guest free pages from the free page vq, and clears the corresponding bits
-> of the free page from the dirty bitmap, so that those free pages are not
-> transferred by the migration thread.
+On Tue 16 Jan 2018 10:05:08 PM CET, Eric Blake wrote:
+>> @@ -331,7 +330,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
+>>      trace_qcow2_cache_get(qemu_coroutine_self(), c == s->l2_table_cache,
+>>                            offset, read_from_disk);
+>>  
+>> -    if (offset_into_cluster(s, offset)) {
+>> +    if (offset & (c->table_size - 1)) {
 >
-> Without this feature, to local live migrate an 8G idle guest takes
-> ~2286 ms. With this featrue, it takes ~260 ms, which redues the
-> migration time to ~11%.
->
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> Signed-off-by: Liang Li <liang.z.li@intel.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
+> Worth writing that as QEMU_IS_ALIGNED(offset, c->table_size) instead
+> of open-coding the bit-wise math?
 
-I hate to answer twice,but ...
+Oh, indeed, I very much prefer using macros/functions instead of dealing
+with bits directly. I'll change it for the next revision.
 
-
-> +static bool virtio_balloon_free_page_support(void *opaque)
-> +{
-> +    VirtIOBalloon *s = opaque;
-> +
-> +    if (!balloon_free_page_supported(s)) {
-> +        return false;
-> +    }
-> +
-> +    return true;
-
-return balloon_free_page_supported(s); ???
-
-
-> @@ -312,6 +399,7 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
->  
->      config.num_pages = cpu_to_le32(dev->num_pages);
->      config.actual = cpu_to_le32(dev->actual);
-> +    config.free_page_report_cmd_id = cpu_to_le32(dev->free_page_report_cmd_id);
->  
->      trace_virtio_balloon_get_config(config.num_pages, config.actual);
->      memcpy(config_data, &config, sizeof(struct virtio_balloon_config));
-> @@ -418,6 +506,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
->      .fields = (VMStateField[]) {
->          VMSTATE_UINT32(num_pages, VirtIOBalloon),
->          VMSTATE_UINT32(actual, VirtIOBalloon),
-> +        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
->          VMSTATE_END_OF_LIST()
-
-No new version, no subsection, and we add a new field?
-I think that is wrong.  We need to send that only for old versions.
-Look at how was handled for ....
-
-[PATCH v2] hpet: recover timer offset correctly
-
-v2 discussion explains why we want to handle that way for different
-machine types.
-
-v3 does it correctly.
-
-
-And I think that with this I have reviewed all the migration/vmstate
-bits, no?
-
-If something is missing, please ask.
-
-Later, Juan.
+Berto
