@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ebprk-0003UU-QE
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:43:05 -0500
+	(envelope-from <jcody@redhat.com>) id 1ebprx-0003bT-FS
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:43:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ebprf-0004XA-4h
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:43:04 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <b4f7c92c-4690-6b0e-1a24-e320d9a9dace@virtuozzo.com>
-References: <cover.1513342045.git.berto@igalia.com>
-	<192986ad741749064e855bc67916a11460911992.1513342045.git.berto@igalia.com>
-	<b4f7c92c-4690-6b0e-1a24-e320d9a9dace@virtuozzo.com>
-Date: Wed, 17 Jan 2018 16:42:56 +0100
-Message-ID: <w51inc01ofz.fsf@maestria.local.igalia.com>
+	(envelope-from <jcody@redhat.com>) id 1ebprw-0004pV-GU
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 10:43:17 -0500
+Date: Wed, 17 Jan 2018 10:43:02 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180117154302.GB1477@localhost.localdomain>
+References: <20180117135015.15051-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 16/32] qcow2: Update l2_allocate() to
- support L2 slices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180117135015.15051-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: Make 200 run on tmpfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Tue 16 Jan 2018 05:52:36 PM CET, Anton Nefedov wrote:
->> @@ -299,42 +300,50 @@ static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
->>   
-> [..]>
->> -    /* write the l2 table to the file */
->> -    BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_WRITE);
->> +        trace_qcow2_l2_allocate_write_l2(bs, l1_index);
->> +        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
->> +        ret = qcow2_cache_flush(bs, s->l2_table_cache);
->> +        if (ret < 0) {
->> +            goto fail;
->> +        }
->>   
->
-> Might be an overoptimization but do we really have to flush each slice
-> separately?
-> Otherwise a number of write ops will remain the same but at least we
-> would bdrv_flush() just once.
+On Wed, Jan 17, 2018 at 02:50:15PM +0100, Max Reitz wrote:
+> 200 currently fails on tmpfs because it sets cache=none.  However,
+> without that (and aio=native), the test still works now and it fails
+> before Jeff's series (on fc7dbc119e0852a70dc9fa68bb41a318e49e4cd6).  So
+> we can probably remove the aio=native safely, and replace cache=none by
+> cache=$CACHEMODE.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> v2: Use cache=$CACHEMODE instead of dropping it altogether [Stefan]
+> ---
+>  tests/qemu-iotests/200 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
+> index d8787ddb46..ddbdedc476 100755
+> --- a/tests/qemu-iotests/200
+> +++ b/tests/qemu-iotests/200
+> @@ -60,7 +60,7 @@ qemu_comm_method="qmp"
+>  _launch_qemu -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 \
+>               -object iothread,id=iothread0 \
+>               -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 \
+> -             -drive file="${TEST_IMG}",media=disk,if=none,cache=none,id=drive_sysdisk,aio=native,format=$IMGFMT \
+> +             -drive file="${TEST_IMG}",media=disk,if=none,cache=$CACHEMODE,id=drive_sysdisk,format=$IMGFMT \
+>               -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
+>  h1=$QEMU_HANDLE
+>  
+> -- 
+> 2.14.3
+> 
 
-You're completely right, I'll fix that.
+Thanks,
 
->>       } else {
->> +        uint64_t new_l2_offset;
->>           /* First allocate a new L2 table (and do COW if needed) */
->> -        ret = l2_allocate(bs, l1_index, &l2_table);
->> +        ret = l2_allocate(bs, l1_index);
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->> +
->> +        /* Get the offset of the newly-allocated l2 table */
->> +        new_l2_offset = s->l1_table[l1_index] & L1E_OFFSET_MASK;
->> +        assert(offset_into_cluster(s, new_l2_offset) == 0);
->> +        /* Load the l2 table in memory */
->> +        ret = l2_load(bs, offset, new_l2_offset, &l2_table);
->
-> Cosmetic: maybe this l2_load() better be merged with the copied L2 case?
-> e.g.
->
->    if (!(l1_table[l1_index] & COPIED))
->      l2_allocate();
->    l2_load();
+Applied to my block branch:
 
-I'm not sure about that, since there's also the qcow2_free_clusters()
-call afterwards, so the final code might be harder to follow.
+git://github.com/codyprime/qemu-kvm-jtc block
 
-Berto
+-Jeff
