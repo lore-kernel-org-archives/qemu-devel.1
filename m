@@ -1,28 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebqCA-0003gp-1d
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:04:15 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebqCK-0003oY-Qx
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:04:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebqC6-0007QO-2x
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:04:10 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-4-vsementsov@virtuozzo.com>
-	<74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
-	<7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-	<d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
-	<4e97de9a-bcdd-5e5d-275f-e6cac9473f0d@virtuozzo.com>
-	<79e5851b-f35e-23ea-4842-cc3b1d1e30ee@virtuozzo.com>
-	<1e2fd96e-5d07-3c52-33df-cf31490eb6ca@redhat.com>
-	<eccba06f-3a5f-7926-7fb5-ce56f01e94c7@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1298bc3d-c2bd-6fd5-5d3d-dabcae434874@redhat.com>
-Date: Wed, 17 Jan 2018 10:03:36 -0600
+	(envelope-from <borntraeger@de.ibm.com>) id 1ebqCE-0007Xi-Ts
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:04:20 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34318
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ebqCE-0007XZ-OF
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:04:14 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0HG1ISX072300
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 11:04:12 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fj9mtr63h-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 11:04:11 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 17 Jan 2018 16:04:10 -0000
+References: <20180117141849.65757-1-borntraeger@de.ibm.com>
+	<20180117141849.65757-3-borntraeger@de.ibm.com>
+	<20180117153727.2552d1a2.cohuck@redhat.com>
+	<94c656aa-4c1d-5297-8e3a-2816c3628290@redhat.com>
+	<34233d9f-2a81-3e81-8ea1-c8f11ccb29bc@de.ibm.com>
+	<66733c96-819a-c1ef-fada-42057324d224@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 17 Jan 2018 17:04:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <eccba06f-3a5f-7926-7fb5-ce56f01e94c7@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ug2MDbTfaIj2m2EUxwiYufa02fjBcSfwi"
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
+In-Reply-To: <66733c96-819a-c1ef-fada-42057324d224@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <2a6eb56a-5bde-6520-d282-269a176254e2@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/kvm: Handle bpb feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +47,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ug2MDbTfaIj2m2EUxwiYufa02fjBcSfwi
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
- mreitz@redhat.com, kwolf@redhat.com, den@openvz.org,
- Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
-Message-ID: <1298bc3d-c2bd-6fd5-5d3d-dabcae434874@redhat.com>
-Subject: Re: [PATCH v2 3/6] qapi: add nbd-server-remove
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
- <20171207155102.66622-4-vsementsov@virtuozzo.com>
- <74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
- <7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
- <d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
- <4e97de9a-bcdd-5e5d-275f-e6cac9473f0d@virtuozzo.com>
- <79e5851b-f35e-23ea-4842-cc3b1d1e30ee@virtuozzo.com>
- <1e2fd96e-5d07-3c52-33df-cf31490eb6ca@redhat.com>
- <eccba06f-3a5f-7926-7fb5-ce56f01e94c7@virtuozzo.com>
-In-Reply-To: <eccba06f-3a5f-7926-7fb5-ce56f01e94c7@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 01/17/2018 09:51 AM, Vladimir Sementsov-Ogievskiy wrote:
 
->>> I have a script (for managing libvirt guest, but it can be adopted fo=
-r
->>> qemu or even used for qemu monitor), which allows
->>> me run qmp commands on vms as easy as:
->>>
->>> |qmp VMNAME query-block-jobs or qmp VMNAME nbd-server-remove name exp=
-1
->>> mode hard or even |
->>>
->>> |qmp VMNAME blockdev-add id disk driver qcow2 cache {writeback true
->>> direct true} aio native discard unmap file {driver file filename
->>> /tmp/somedisk} |||
->> Yeah, there are various scripting solutions around QMP that can make i=
-t
->> easier; but HMP is often still an easy front-line interface for
->> experiments.
+On 01/17/2018 04:10 PM, David Hildenbrand wrote:
+> 
+>>> And exactly for this reason I tend to nack patch nr 3 (if that is of any
+>>> weight :) ).
 >>
->=20
-> isn't it because these solutions are not available directly in monitor,=
+>> I have communicated the mistake to asll relevant parties - it will not happen again
+>> (famous last words).
+> 
+> An I already saw it happen in the past. (I think I really have to dig
+> out that one feature to make a point :P ). Mistakes happen, but we don't
+> have to propagate them to customers if we can catch them early :)
+> 
+>>
+>>>
+>>> As soon as we enable bits for CPU models, we guarantee that migration
+>>> works. While introducing this change we already had one example where
+>>> this was not the case. Not good. (and remember having another such
+>>> exception)
+>>
+>> The point is migration continues to work. In fact I had a different version
+>> of this patch set that did it the other way around. Keep 82 a transparent
+>> and add a new cpu misc facility that takes care of the migration state.
+>>>
+>>> It is easier to patch a feature in than silently enabling *anything*
+>>> somebody thinks is transparent (but its not). Especially not for the
+>>> host model. The expanded host model is migration safe.
+>>
+>> I really do not care about -cpu host (host-passthrough) for migration safety, 
+>> because its not. And as you said: host-model (expanded) will work.
+>>
+> 
+> It will if the world would be perfect.
+> 
+> expand "-cpu host" -> -cpu z14-base,stfle_82=on
+> 
+> stfle_82 would now not be properly migrated. Yes, it might work somehow
+> right now. But it is not clean.
+> 
+>>>
+>>> And as we saw, in the unlikely event of such heavy changes, we need to
+>>> touch fw/linux/qemu either way.
+>>>
+>>> But there is more I dislike about the approach in patch 3:
+>>>
+>>> 1. feature names. We need aliases. Different QEMU versions on the same
+>>> hw might end up not understanding what a feature means. (old one: only
+>>> knows stfl_123, new one knows stfl_123 a.k.a crazy_feat)
+>>
+>> I plan to keep the old names. e.g. stfle131 is better than sea_esop2.
+> 
+> 
+> Oh god no. With vx, te, iep one at least has a rough idea what is happening.
+> 
+> -cpu z14-base,stfle123,stfle234,stfle323 ... :(
+> 
+> 
+> This all smells like a huge hack for a scenario that happened once. I
+> prefer to do it the clean way. Enable only what you checked works and
+> what you can actually give a name.
+> 
+> Especially we will lose the ability to know which bit was valid for
+> which hardware generation - which is key when working with IBC.
+> 
+> I am not sure if giving all that up is worth it.
+> 
 
-> when HMP is?
-
-QMP can be directly accessed in a monitor; it just requires more typing.
- If you are developing QMP commands, it may be easier to use
-=2E/scripts/qmp/qmp-shell (couple it with a readline wrapper, and you can=
-
-even get tab-completion and history across sessions).  There's also
-things like libvirt's 'virsh qmp-monitor-command' for shell-scripting
-access to arbitrary QMP commands, provided your guest is run by libvirt.
-
-> may be, we need third type of monitor HQMP which is QMP with simplified=
-
-> syntax? Or
-> allow qmp commands in simplified syntax directly in HMP?
-
-No, I don't think we need either thing.  Wrappers around existing
-monitors is better than bloating qemu proper with a third flavor of
-monitor.  And HMP is for humans, with no restrictions on back-compat
-changes, so if it doesn't do something you want for quick-and-dirty
-testing, you can either add a new HMP command, or just use QMP (or one
-of its wrappers, like qmp-shell) in the first place.  Ultimately, our
-long-term concern is only about the QMP interface; HMP is supposed to be
-convenient.  So if it starts costing too much time to port a QMP
-interface to HMP, then don't worry about it.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Ug2MDbTfaIj2m2EUxwiYufa02fjBcSfwi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpfc9gACgkQp6FrSiUn
-Q2qUDgf/Y+1dDbAAnDs993FsgyZVrH4vpUQayUklikqw7EGcRb5psnl9HKry2co2
-CGKC+ZM7kPW9aNbBy9+0Owlwcqok/lhx663YencZgLJ44KvaaZTYMwIPE3iyT/US
-BjeIDIXrb5lcfFFCOu8amKvPYqcCIq0Y+2tSxDEJ2hzq6/2qLpKJGZ343IKXhqmw
-1DtKgG21RKP1toQ4y6L6DM8NLr/AfAnk0/r6HB0P+rQ4uJ3OAOjWzevMctNSNoyR
-QUEODpE6Oy1B+4jVsVat55L7eW96JKURBdSFmklkQCMd2Qi6adogYqxmFTP9x+lW
-S8E9VuUT2n1fKg0lpCDvQYzHnqIBDw==
-=J8fT
------END PGP SIGNATURE-----
-
---Ug2MDbTfaIj2m2EUxwiYufa02fjBcSfwi--
+I will spin up a second patch that enables stfle81 and name it "ppa15".
+We can then discuss patch 3 on the slow path with enough time to think
+about this.
