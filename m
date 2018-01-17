@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ebqKa-0004O2-HX
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:12:53 -0500
+	(envelope-from <berto@igalia.com>) id 1ebqM7-0005tn-OH
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ebqKZ-0002nF-Bt
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:12:52 -0500
+	(envelope-from <berto@igalia.com>) id 1ebqM4-0003H0-HT
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:27 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <99e8633c-828c-ccf5-334a-6d081d329878@redhat.com>
+References: <cover.1513342045.git.berto@igalia.com>
+	<192986ad741749064e855bc67916a11460911992.1513342045.git.berto@igalia.com>
+	<a634b25e-08d3-349e-7b71-6d25d7c7bc2c@redhat.com>
+	<w51fu741nuo.fsf@maestria.local.igalia.com>
+	<99e8633c-828c-ccf5-334a-6d081d329878@redhat.com>
+Date: Wed, 17 Jan 2018 17:13:45 +0100
+Message-ID: <w51d1281n0m.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-10-andrew.smirnov@gmail.com>
-	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
-	<b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Wed, 17 Jan 2018 08:12:48 -0800
-Message-ID: <CAHQ1cqFknfW0NmiD-3GFJRedgVE-9bacKhm-pYx0ycviRsmucQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
- IP block
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 16/32] qcow2: Update l2_allocate() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcel@redhat.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Jan 17, 2018 at 7:23 AM, Marcel Apfelbaum
-<marcel.apfelbaum@zoho.com> wrote:
->
-> Hi Peter,
->
->
-> On 16/01/2018 16:34, Peter Maydell wrote:
->>
->> On 16 January 2018 at 01:37, Andrey Smirnov <andrew.smirnov@gmail.com>
->> wrote:
+On Wed 17 Jan 2018 05:06:04 PM CET, Eric Blake wrote:
+>>>>      /* allocate a new entry in the l2 cache */
+>>>>  
+>>>> +    slice_size = s->l2_slice_size * sizeof(uint64_t);
 >>>
->>> Add code needed to get a functional PCI subsytem when using in
->>> conjunction with upstream Linux guest (4.13+). Tested to work against
->>> "e1000e" (network adapter, using MSI interrupts) as well as
->>> "usb-ehci" (USB controller, using legacy PCI interrupts).
->>>
->>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>> Cc: Jason Wang <jasowang@redhat.com>
->>> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> Cc: qemu-devel@nongnu.org
->>> Cc: qemu-arm@nongnu.org
->>> Cc: yurovsky@gmail.com
->>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->>> ---
->>>   default-configs/arm-softmmu.mak  |   2 +
->>>   hw/pci-host/Makefile.objs        |   2 +
->>>   hw/pci-host/designware.c         | 618
->>> +++++++++++++++++++++++++++++++++++++++
->>>   include/hw/pci-host/designware.h |  93 ++++++
->>>   include/hw/pci/pci_ids.h         |   2 +
->>>   5 files changed, 717 insertions(+)
->>>   create mode 100644 hw/pci-host/designware.c
->>>   create mode 100644 include/hw/pci-host/designware.h
->>
->> I'm not familiar enough with our PCI code to be able to review
->> this, I'm afraid. MST and Marcel are our PCI subsystem maintainers --
->> could one of you have a look at whether this seems to be a correct
->> implementation of a pcie host controller ?
+>>> Would this read any better if the earlier patch named it
+>>> s->l2_slice_entries?
+>> 
+>> I had doubts with this. Like you, when I see size I tend to think about
+>> bytes. However both s->l1_size and s->l2_size indicate entries, and the
+>> documentation of the qcow2 format even describes the header field like
+>> this:
+>> 
+>>          36 - 39:   l1_size
+>>                     Number of entries in the active L1 table
 >
->
-> Sadly PCI Host bridges do not have a standard, each HW vendor
-> can do pretty much what they want.
->
-> That being said, if Andrey can point me to the PCI spec for the Designwar=
-e
-> PCI host bridge and what parts they implemented for it I can have a look,
-> sure.
-> (I will not be available for a week or so, but right after)
->
+> We're free to rename the field in the qcow2 format specification if it
+> makes things easier to understand.  If l1_entries reads better than
+> l1_size, maybe it's worth doing.
 
-Just in case you still want this:
+In my opinion it reads much better. We mix both kinds of meanings in the
+BDRVQcow2State structure already, there's for example cluster_size
+(bytes), and refcount_table_size (entries). With the latter we actually
+have the exact same problem we're discussing here:
 
-To the best of my knowledge, Synposys does not provide specification
-for their PCIe IP to general public and I am in no way affiliated with
-them, so I don't have any backchannels to get it any other way.
+    refcount_table_size2 = s->refcount_table_size * sizeof(uint64_t);
+    s->refcount_table = g_try_malloc(refcount_table_size2);
 
-The next best thing to an actual spec, that I found to be pretty
-useful, is PCIe chapter of i.MX6Q Reference Manual
-(https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf   page
-4049), which is what I used to implement the code in question.
+So yeah, we can change those variables but it won't be a small patch. I
+can do that if everyone thinks that it's a good idea.
 
-Last, and probably the most important, "source of truth" was actual
-Linux PCIe driver for i.MX/Designware which I used as a sort of
-inverse reference implementation.
-
-Thanks,
-Andrey Smirnov
+Berto
