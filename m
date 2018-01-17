@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebriO-0008Vl-Gl
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:33 -0500
+	(envelope-from <david@redhat.com>) id 1ebria-0000FO-Aq
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebriL-0007s7-BV
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:32 -0500
+	(envelope-from <david@redhat.com>) id 1ebriZ-000877-8e
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 12:41:44 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 17 Jan 2018 18:40:36 +0100
-Message-Id: <20180117174047.6382-8-david@redhat.com>
+Date: Wed, 17 Jan 2018 18:40:38 +0100
+Message-Id: <20180117174047.6382-10-david@redhat.com>
 In-Reply-To: <20180117174047.6382-1-david@redhat.com>
 References: <20180117174047.6382-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 07/18] s390x/tcg: tolerate wrong wakeups due
- to floating interrupts
+Subject: [Qemu-devel] [PATCH v2 09/18] s390x/tcg: implement TEST PENDING
+ INTERRUPTION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +23,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-This is a prparation for floating interrupt support and only applies to
-MTTCG, single threaded TCG works just fine. If a floating interrupt wakes
-up a VCPU and the CPU thinks it can run (clearing cs->halted), at
-the point where the interrupt would be delivered, already another VCPU
-might have picked up the interrupt, resulting in a wakeup without an
-interrupt (executing wrong code).
-
-It is wrong to let the VCPU continue to execute (the WAIT PSW). Instead,
-we have to put the VCPU back to sleep.
+Use s390_cpu_virt_mem_write() so we can actually revert what we did
+(re-inject the dequeued IO interrupt).
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/excp_helper.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  1 +
+ target/s390x/misc_helper.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   |  8 +++++++
+ 4 files changed, 64 insertions(+)
 
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index a18842ccbd..eeffb49f63 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -503,6 +503,11 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-             s390_cpu_do_interrupt(cs);
-             return true;
-         }
-+        if (env->psw.mask & PSW_MASK_WAIT) {
-+            /* Woken up because of a floating interrupt but it has already
-+             * been delivered. Go back to sleep. */
-+            cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
-+        }
-     }
-     return false;
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 26c1b07b44..a2090096cd 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -170,6 +170,7 @@ DEF_HELPER_4(schm, void, env, i64, i64, i64)
+ DEF_HELPER_3(ssch, void, env, i64, i64)
+ DEF_HELPER_2(stcrw, void, env, i64)
+ DEF_HELPER_3(stsch, void, env, i64, i64)
++DEF_HELPER_2(tpi, i32, env, i64)
+ DEF_HELPER_3(tsch, void, env, i64, i64)
+ DEF_HELPER_2(chsc, void, env, i64)
+ #endif
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 11ee43dcbc..c06c3884c0 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1063,6 +1063,7 @@
+     C(0xb233, SSCH,    S,     Z,   0, insn, 0, 0, ssch, 0)
+     C(0xb239, STCRW,   S,     Z,   0, insn, 0, 0, stcrw, 0)
+     C(0xb234, STSCH,   S,     Z,   0, insn, 0, 0, stsch, 0)
++    C(0xb236, TPI ,    S,     Z,   la2, 0, 0, 0, tpi, 0)
+     C(0xb235, TSCH,    S,     Z,   0, insn, 0, 0, tsch, 0)
+     /* ??? Not listed in PoO ninth edition, but there's a linux driver that
+        uses it: "A CHSC subchannel is usually present on LPAR only."  */
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 86da6aab7e..6ee7e8a64a 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -36,6 +36,7 @@
+ #include "hw/s390x/ebcdic.h"
+ #include "hw/s390x/s390-virtio-hcall.h"
+ #include "hw/s390x/sclp.h"
++#include "hw/s390x/s390_flic.h"
+ #endif
+ 
+ /* #define DEBUG_HELPER */
+@@ -429,6 +430,59 @@ void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+     qemu_mutex_unlock_iothread();
  }
+ 
++uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
++{
++    const uintptr_t ra = GETPC();
++    S390CPU *cpu = s390_env_get_cpu(env);
++    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
++    QEMUS390FlicIO *io = NULL;
++    LowCore *lowcore;
++
++    if (addr & 0x3) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
++    }
++
++    qemu_mutex_lock_iothread();
++    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
++    if (!io) {
++        qemu_mutex_unlock_iothread();
++        return 0;
++    }
++
++    if (addr) {
++        struct {
++            uint16_t id;
++            uint16_t nr;
++            uint32_t parm;
++        } intc = {
++            .id = cpu_to_be16(io->id),
++            .nr = cpu_to_be16(io->nr),
++            .parm = cpu_to_be32(io->parm),
++        };
++
++        if (s390_cpu_virt_mem_write(cpu, addr, 0, &intc, sizeof(intc))) {
++            /* writing failed, reinject and properly clean up */
++            s390_io_interrupt(io->id, io->nr, io->parm, io->word);
++            qemu_mutex_unlock_iothread();
++            g_free(io);
++            s390_cpu_virt_mem_handle_exc(cpu, ra);
++            return 0;
++        }
++    } else {
++        /* no protection applies */
++        lowcore = cpu_map_lowcore(env);
++        lowcore->subchannel_id = cpu_to_be16(io->id);
++        lowcore->subchannel_nr = cpu_to_be16(io->nr);
++        lowcore->io_int_parm = cpu_to_be32(io->parm);
++        lowcore->io_int_word = cpu_to_be32(io->word);
++        cpu_unmap_lowcore(lowcore);
++    }
++
++    g_free(io);
++    qemu_mutex_unlock_iothread();
++    return 1;
++}
++
+ void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+ {
+     S390CPU *cpu = s390_env_get_cpu(env);
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index df0b41606d..81abe40673 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4199,6 +4199,14 @@ static ExitStatus op_stcrw(DisasContext *s, DisasOps *o)
+     return NO_EXIT;
+ }
+ 
++static ExitStatus op_tpi(DisasContext *s, DisasOps *o)
++{
++    check_privileged(s);
++    gen_helper_tpi(cc_op, cpu_env, o->addr1);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_tsch(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
 -- 
 2.14.3
