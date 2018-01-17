@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1ebqOd-0008Lv-OC
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:17:04 -0500
+	(envelope-from <marcel@redhat.com>) id 1ebqPs-00011I-69
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:18:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1ebqOc-0004Xx-Pq
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:17:03 -0500
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:45754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1ebqOc-0004XO-GY
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:17:02 -0500
-Received: by mail-ot0-x22b.google.com with SMTP id r4so13458250oti.12
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:17:01 -0800 (PST)
+	(envelope-from <marcel@redhat.com>) id 1ebqPo-000587-0o
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:18:20 -0500
+References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
+	<20180116013709.13830-10-andrew.smirnov@gmail.com>
+	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
+	<b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
+	<CAHQ1cqFknfW0NmiD-3GFJRedgVE-9bacKhm-pYx0ycviRsmucQ@mail.gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <d060a7d9-b87e-df81-d601-f4cd538a0a88@redhat.com>
+Date: Wed, 17 Jan 2018 18:17:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <326660076.6160176.1515824585284.JavaMail.zimbra@redhat.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
-	<1511288389.1080.14.camel@redhat.com>
-	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
-	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
-	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
-	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-	<CAPcyv4j6nk1cJFuG4DDA9JoNJe2d3rSskdFSUPu4aWzWX+JQeQ@mail.gmail.com>
-	<326660076.6160176.1515824585284.JavaMail.zimbra@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Wed, 17 Jan 2018 08:17:00 -0800
-Message-ID: <CAPcyv4iCDGx11vHmxK=Q3aLdUBFef1QuvGE_Jh3DLm1pPkeeMw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+In-Reply-To: <CAHQ1cqFknfW0NmiD-3GFJRedgVE-9bacKhm-pYx0ycviRsmucQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
+ IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Fri, Jan 12, 2018 at 10:23 PM, Pankaj Gupta <pagupta@redhat.com> wrote:
->
-> Hello Dan,
->
->> Not a flag, but a new "Address Range Type GUID". See section "5.2.25.2
->> System Physical Address (SPA) Range Structure" in the ACPI 6.2A
->> specification. Since it is a GUID we could define a Linux specific
->> type for this case, but spec changes would allow non-Linux hypervisors
->> to advertise a standard interface to guests.
+On 17/01/2018 18:12, Andrey Smirnov wrote:
+> On Wed, Jan 17, 2018 at 7:23 AM, Marcel Apfelbaum
+> <marcel.apfelbaum@zoho.com> wrote:
 >>
+>> Hi Peter,
+>>
+>>
+>> On 16/01/2018 16:34, Peter Maydell wrote:
+>>>
+>>> On 16 January 2018 at 01:37, Andrey Smirnov <andrew.smirnov@gmail.com=
 >
-> I have added new SPA with a GUUID for this memory type and I could add
-> this new memory type in System memory map. I need help with the namespace
-> handling for this new type As mentioned in [1] discussion:
->
-> - Create a new namespace for this new memory type
-> - Teach libnvdimm how to handle this new namespace
->
-> I have some queries on this:
->
-> 1] How namespace handling of this new memory type would be?
+>>> wrote:
+>>>>
+>>>> Add code needed to get a functional PCI subsytem when using in
+>>>> conjunction with upstream Linux guest (4.13+). Tested to work agains=
+t
+>>>> "e1000e" (network adapter, using MSI interrupts) as well as
+>>>> "usb-ehci" (USB controller, using legacy PCI interrupts).
+>>>>
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>> Cc: Jason Wang <jasowang@redhat.com>
+>>>> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>> Cc: qemu-devel@nongnu.org
+>>>> Cc: qemu-arm@nongnu.org
+>>>> Cc: yurovsky@gmail.com
+>>>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>>>> ---
+>>>>    default-configs/arm-softmmu.mak  |   2 +
+>>>>    hw/pci-host/Makefile.objs        |   2 +
+>>>>    hw/pci-host/designware.c         | 618
+>>>> +++++++++++++++++++++++++++++++++++++++
+>>>>    include/hw/pci-host/designware.h |  93 ++++++
+>>>>    include/hw/pci/pci_ids.h         |   2 +
+>>>>    5 files changed, 717 insertions(+)
+>>>>    create mode 100644 hw/pci-host/designware.c
+>>>>    create mode 100644 include/hw/pci-host/designware.h
+>>>
+>>> I'm not familiar enough with our PCI code to be able to review
+>>> this, I'm afraid. MST and Marcel are our PCI subsystem maintainers --
+>>> could one of you have a look at whether this seems to be a correct
+>>> implementation of a pcie host controller ?
+>>
+>>
+>> Sadly PCI Host bridges do not have a standard, each HW vendor
+>> can do pretty much what they want.
+>>
+>> That being said, if Andrey can point me to the PCI spec for the Design=
+ware
+>> PCI host bridge and what parts they implemented for it I can have a lo=
+ok,
+>> sure.
+>> (I will not be available for a week or so, but right after)
+>>
+>=20
+> Just in case you still want this:
+>=20
+> To the best of my knowledge, Synposys does not provide specification
+> for their PCIe IP to general public and I am in no way affiliated with
+> them, so I don't have any backchannels to get it any other way.
+>=20
+> The next best thing to an actual spec, that I found to be pretty
+> useful, is PCIe chapter of i.MX6Q Reference Manual
+> (https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf   page
+> 4049), which is what I used to implement the code in question.
+>=20
 
-This would be a namespace that creates a pmem device, but does not allow DAX.
+Appreciated.
 
->
-> 2] There are existing namespace types:
->   ND_DEVICE_NAMESPACE_IO, ND_DEVICE_NAMESPACE_PMEM, ND_DEVICE_NAMESPACE_BLK
->
->   How libnvdimm will handle this new name-space type in conjuction with existing
->   memory type, region & namespaces?
+> Last, and probably the most important, "source of truth" was actual
+> Linux PCIe driver for i.MX/Designware which I used as a sort of
+> inverse reference implementation.
+>=20
 
-The type will be either ND_DEVICE_NAMESPACE_IO or
-ND_DEVICE_NAMESPACE_PMEM depending on whether you configure KVM to
-provide a virtual NVDIMM and label space. In other words the only
-difference between this range and a typical persistent memory range is
-that we will have a flag to disable DAX operation.
+We did the same for our PVRDMA device implementation :)
 
-See the usage of nvdimm_has_cache() in pmem_attach_disk() as an
-example of how to pass attributes about the "region" to the the pmem
-driver.
 
->
-> 3] For sending guest to host flush commands we still have to think about some
->    async way?
+Thanks,
+Marcel
 
-I thought we discussed this being a paravirtualized virtio command ring?
+> Thanks,
+> Andrey Smirnov
+>=20
