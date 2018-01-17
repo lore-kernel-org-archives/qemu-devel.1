@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQM-0007ro-Vk
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQM-0007rm-Vp
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQL-0001Mw-FC
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQK-0001Lx-MF
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:58 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jan 2018 13:25:23 +1100
-Message-Id: <20180117022525.31767-21-david@gibson.dropbear.id.au>
+Date: Wed, 17 Jan 2018 13:25:15 +1100
+Message-Id: <20180117022525.31767-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 References: <20180117022525.31767-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/22] ppc/pnv: change initrd address
+Subject: [Qemu-devel] [PULL 12/22] spapr: Allow some cases where we can't
+ set VSMT mode in the kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +21,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+At present if we require a vsmt mode that's not equal to the kernel's
+default, and the kernel doesn't let us change it (e.g. because it's an old
+kernel without support) then we always fail.
 
-When skiboot starts, it first clears the CPU structs for all possible
-CPUs on a system :
+But in fact we can cope with the kernel having a different vsmt as long as
+  a) it's >= the actual number of vthreads/vcore (so that guest threads
+     that are supposed to be on the same core act like it)
+  b) it's a submultiple of the requested vsmt mode (so that guest threads
+     spaced by the vsmt value will act like they're on different cores)
 
-	for (i =3D 0; i <=3D cpu_max_pir; i++)
-		memset(&cpu_stacks[i].cpu, 0, sizeof(struct cpu_thread));
+Allowing this case gives us a bit more freedom to adjust the vsmt behaviour
+without breaking existing cases.
 
-On POWER9, cpu_max_pir is quite big, 0x7fff, and the skiboot cpu_stacks
-array overlaps with the memory region in which QEMU maps the initramfs
-file. Move it upwards in memory to keep it safe.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Tested-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/pnv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ppc/spapr.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 80245f57f1..98ee3c607a 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -53,7 +53,7 @@
- #define FW_MAX_SIZE             0x00400000
-=20
- #define KERNEL_LOAD_ADDR        0x20000000
--#define INITRD_LOAD_ADDR        0x40000000
-+#define INITRD_LOAD_ADDR        0x60000000
-=20
- static const char *pnv_chip_core_typename(const PnvChip *o)
- {
---=20
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e35214bfc3..9e7088a192 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2314,17 +2314,29 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+     if (kvm_enabled() && (spapr->vsmt != kvm_smt)) {
+         ret = kvmppc_set_smt_threads(spapr->vsmt);
+         if (ret) {
++            /* Looks like KVM isn't able to change VSMT mode */
+             error_setg(&local_err,
+                        "Failed to set KVM's VSMT mode to %d (errno %d)",
+                        spapr->vsmt, ret);
+-            if (!vsmt_user) {
+-                error_append_hint(&local_err, "On PPC, a VM with %d threads/"
+-                             "core on a host with %d threads/core requires "
+-                             " the use of VSMT mode %d.\n",
+-                             smp_threads, kvm_smt, spapr->vsmt);
++            /* We can live with that if the default one is big enough
++             * for the number of threads, and a submultiple of the one
++             * we want.  In this case we'll waste some vcpu ids, but
++             * behaviour will be correct */
++            if ((kvm_smt >= smp_threads) && ((spapr->vsmt % kvm_smt) == 0)) {
++                warn_report_err(local_err);
++                local_err = NULL;
++                goto out;
++            } else {
++                if (!vsmt_user) {
++                    error_append_hint(&local_err,
++                                      "On PPC, a VM with %d threads/core"
++                                      " on a host with %d threads/core"
++                                      " requires the use of VSMT mode %d.\n",
++                                      smp_threads, kvm_smt, spapr->vsmt);
++                }
++                kvmppc_hint_smt_possible(&local_err);
++                goto out;
+             }
+-            kvmppc_hint_smt_possible(&local_err);
+-            goto out;
+         }
+     }
+     /* else TCG: nothing to do currently */
+-- 
 2.14.3
