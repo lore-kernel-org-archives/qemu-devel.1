@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXJ-0006Wc-Gt
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:14 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ebtfC-0003Dt-3V
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ebtXG-0002DY-9H
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45008
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ebtXG-0002Cx-2m
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:38:10 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0HJYp7S020696
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:07 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fjag46rhx-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:38:06 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 17 Jan 2018 19:38:04 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 17 Jan 2018 20:37:56 +0100
-In-Reply-To: <20180117193757.73471-1-borntraeger@de.ibm.com>
-References: <20180117193757.73471-1-borntraeger@de.ibm.com>
-Message-Id: <20180117193757.73471-3-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] s390x/kvm: Handle bpb feature
+	(envelope-from <mreitz@redhat.com>) id 1ebtfB-0008CR-4s
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 14:46:22 -0500
+References: <20180117165420.15946-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8893e453-81d0-f853-009a-7015c53faa34@redhat.com>
+Date: Wed, 17 Jan 2018 20:46:00 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180117165420.15946-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="zUKJMRi5THF4ml0pLKJQAKgqU4ZqQhllm"
+Subject: Re: [Qemu-devel] [PATCH 0/2] iotests compat=0.10 fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,158 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org
 
-We need to handle the bpb control on reset and migration. Normally
-stfle.82 is transparent (and the normal guest part works without
-hypervisor activity). To prevent any issues we require full
-host kernel support for this feature.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zUKJMRi5THF4ml0pLKJQAKgqU4ZqQhllm
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org
+Message-ID: <8893e453-81d0-f853-009a-7015c53faa34@redhat.com>
+Subject: Re: [PATCH 0/2] iotests compat=0.10 fixes
+References: <20180117165420.15946-1-eblake@redhat.com>
+In-Reply-To: <20180117165420.15946-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- target/s390x/cpu.c              |  1 +
- target/s390x/cpu.h              |  1 +
- target/s390x/cpu_features.c     |  1 +
- target/s390x/cpu_features_def.h |  1 +
- target/s390x/gen-features.c     |  1 +
- target/s390x/kvm.c              | 14 ++++++++++++++
- target/s390x/machine.c          | 17 +++++++++++++++++
- 7 files changed, 36 insertions(+)
+On 2018-01-17 17:54, Eric Blake wrote:
+> As requested here:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg03984.html
+>=20
+> Eric Blake (1):
+>   iotests: Split 177 into two parts for compat=3D0.10
+>=20
+> Max Reitz (1):
+>   iotests: Disable some tests for compat=3D0.10
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index ae3cee9..1577b2c 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -89,6 +89,7 @@ static void s390_cpu_reset(CPUState *s)
-     CPUS390XState *env = &cpu->env;
- 
-     env->pfault_token = -1UL;
-+    env->bpbc = 0;
-     scc->parent_reset(s);
-     cpu->env.sigp_order = 0;
-     s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 1a8b6b9..8514905 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -93,6 +93,7 @@ struct CPUS390XState {
- 
-     uint32_t fpc;          /* floating-point control register */
-     uint32_t cc_op;
-+    uint8_t bpbc;          /* branch prediction blocking */
- 
-     float_status fpu_status; /* passed to softfloat lib */
- 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 31a4676..5d1c210 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -89,6 +89,7 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("msa4-base", S390_FEAT_TYPE_STFL, 77, "Message-security-assist-extension-4 facility (excluding subfunctions)"),
-     FEAT_INIT("edat2", S390_FEAT_TYPE_STFL, 78, "Enhanced-DAT facility 2"),
-     FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point packed-conversion facility"),
-+    FEAT_INIT("bpb", S390_FEAT_TYPE_STFL, 82, "Branch Prediction Blocking"),
-     FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
-     FEAT_INIT("iep", S390_FEAT_TYPE_STFL, 130, "Instruction-execution-protection facility"),
-     FEAT_INIT("sea_esop2", S390_FEAT_TYPE_STFL, 131, "Side-effect-access facility and Enhanced-suppression-on-protection facility 2"),
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index 4b6d4e9..4487cfd 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -80,6 +80,7 @@ typedef enum {
-     S390_FEAT_MSA_EXT_4,
-     S390_FEAT_EDAT_2,
-     S390_FEAT_DFP_PACKED_CONVERSION,
-+    S390_FEAT_BPB,
-     S390_FEAT_VECTOR,
-     S390_FEAT_INSTRUCTION_EXEC_PROT,
-     S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index b24f6ad..95ee870 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -357,6 +357,7 @@ static uint16_t full_GEN7_GA1[] = {
-     S390_FEAT_SIE_GPERE,
-     S390_FEAT_SIE_IB,
-     S390_FEAT_SIE_CEI,
-+    S390_FEAT_BPB,
- };
- 
- static uint16_t full_GEN7_GA2[] = {
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 6a18a41..8736001 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -490,6 +490,11 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-         cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_GSCB;
-     }
- 
-+    if (can_sync_regs(cs, KVM_SYNC_BPBC)) {
-+        cs->kvm_run->s.regs.bpbc = env->bpbc;
-+        cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_BPBC;
-+    }
-+
-     /* Finally the prefix */
-     if (can_sync_regs(cs, KVM_SYNC_PREFIX)) {
-         cs->kvm_run->s.regs.prefix = env->psa;
-@@ -600,6 +605,10 @@ int kvm_arch_get_registers(CPUState *cs)
-         memcpy(env->gscb, cs->kvm_run->s.regs.gscb, 32);
-     }
- 
-+    if (can_sync_regs(cs, KVM_SYNC_BPBC)) {
-+        env->bpbc = cs->kvm_run->s.regs.bpbc;
-+    }
-+
-     /* pfault parameters */
-     if (can_sync_regs(cs, KVM_SYNC_PFAULT)) {
-         env->pfault_token = cs->kvm_run->s.regs.pft;
-@@ -2278,6 +2287,11 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         clear_bit(S390_FEAT_CMM_NT, model->features);
-     }
- 
-+    /* bpb needs kernel support for migration, VSIE and reset */
-+    if (!kvm_check_extension(kvm_state, KVM_CAP_S390_BPB)) {
-+        clear_bit(S390_FEAT_BPB, model->features);
-+    }
-+
-     /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
-     if (pci_available) {
-         set_bit(S390_FEAT_ZPCI, model->features);
-diff --git a/target/s390x/machine.c b/target/s390x/machine.c
-index b78f326..4aac456 100644
---- a/target/s390x/machine.c
-+++ b/target/s390x/machine.c
-@@ -194,6 +194,22 @@ const VMStateDescription vmstate_gscb = {
-         }
- };
- 
-+static bool bpbc_needed(void *opaque)
-+{
-+    return s390_has_feat(S390_FEAT_BPB);
-+}
-+
-+const VMStateDescription vmstate_bpbc = {
-+    .name = "cpu/bpbc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = bpbc_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(env.bpbc, S390CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- const VMStateDescription vmstate_s390_cpu = {
-     .name = "cpu",
-     .post_load = cpu_post_load,
-@@ -228,6 +244,7 @@ const VMStateDescription vmstate_s390_cpu = {
-         &vmstate_riccb,
-         &vmstate_exval,
-         &vmstate_gscb,
-+        &vmstate_bpbc,
-         NULL
-     },
- };
--- 
-2.9.4
+Thanks!  Applied to my block branch:
+
+https://github.com/XanClic/qemu/commits/block
+
+Max
+
+
+--zUKJMRi5THF4ml0pLKJQAKgqU4ZqQhllm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpfp/gSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A6fQH/iqxjerDQsSEfJ5Yejt/1HkLxvqIm1T8
+pZHhoXUvWgjtJ5FJ25h+D/ERzZxRGTHbePzrC4HI1ge/wJx51eiZLLMfOJA3/yVF
+MNb/Tm2yuTLsVBXizkgluFEFRUwB7y8axW86kG0UtCre5Ctr0Jhpd7/nj7TuUcM3
+wA2g13vsL77gMIVa9R+EBkrtSYQMaRgUbcDGoSen2JC/woMwcsiUodL4WkGjePh/
+ksN1JfEM6R41HYXLMbFmc6JGHaU9PiHZtNRA1gVg7RjVjSiZw3nLA0tg5Kc+Oc+l
+OYaK49fTO7xiBpn2Sh2T6c+h6gaVKf59qyPQ5b512GcjFvqf3mMO/fw=
+=nbjn
+-----END PGP SIGNATURE-----
+
+--zUKJMRi5THF4ml0pLKJQAKgqU4ZqQhllm--
