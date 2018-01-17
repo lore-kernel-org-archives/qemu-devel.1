@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQG-0007pK-BW
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:53 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQK-0007re-Ic
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQF-0001Ge-4M
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:52 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQI-0001JP-7t
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:56 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jan 2018 13:25:07 +1100
-Message-Id: <20180117022525.31767-5-david@gibson.dropbear.id.au>
+Date: Wed, 17 Jan 2018 13:25:09 +1100
+Message-Id: <20180117022525.31767-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 References: <20180117022525.31767-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/22] spapr: Validate capabilities on migration
+Subject: [Qemu-devel] [PULL 06/22] spapr: Handle VMX/VSX presence as an
+ spapr capability flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,217 +23,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Now that the "pseries" machine type implements optional capabilities (well,
-one so far) there's the possibility of having different capabilities
-available at either end of a migration.  Although arguably a user error,
-it would be nice to catch this situation and fail as gracefully as we can.
+We currently have some conditionals in the spapr device tree code to decide
+whether or not to advertise the availability of the VMX (aka Altivec) and
+VSX vector extensions to the guest, based on whether the guest cpu has
+those features.
 
-This adds code to migrate the capabilities flags.  These aren't pulled
-directly into the destination's configuration since what the user has
-specified on the destination command line should take precedence.  However,
-they are checked against the destination capabilities.
+This can lead to confusion and subtle failures on migration, since it makes
+a guest visible change based only on host capabilities.  We now have a
+better mechanism for this, in spapr capabilities flags, which explicitly
+depend on user options rather than host capabilities.
 
-If the source was using a capability which is absent on the destination,
-we fail the migration, since that could easily cause a guest crash or other
-bad behaviour.  If the source lacked a capability which is present on the
-destination we warn, but allow the migration to proceed.
+Rework the advertisement of VSX and VMX based on a new VSX capability.  We
+no longer bother with a conditional for VMX support, because every CPU
+that's ever been supported by the pseries machine type supports VMX.
+
+NOTE: Some userspace distributions (e.g. RHEL7.4) already rely on
+availability of VSX in libc, so using cap-vsx=off may lead to a fatal
+SIGILL in init.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         |  6 ++++
- hw/ppc/spapr_caps.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
- include/hw/ppc/spapr.h |  6 ++++
- 3 files changed, 105 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c         | 20 +++++++++++---------
+ hw/ppc/spapr_caps.c    | 25 +++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  3 +++
+ 3 files changed, 39 insertions(+), 9 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 73310bd3ee..3451d0806d 100644
+index 3451d0806d..eca9f11c91 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1589,6 +1589,11 @@ static int spapr_post_load(void *opaque, int version_id)
-     sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
-     int err = 0;
- 
-+    err = spapr_caps_post_migration(spapr);
-+    if (err) {
-+        return err;
-+    }
-+
-     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
-         CPUState *cs;
-         CPU_FOREACH(cs) {
-@@ -1755,6 +1760,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-         &vmstate_spapr_pending_events,
-+        &vmstate_spapr_caps,
-         NULL
+@@ -557,14 +557,16 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+                           segs, sizeof(segs))));
      }
- };
+ 
+-    /* Advertise VMX/VSX (vector extensions) if available
+-     *   0 / no property == no vector extensions
++    /* Advertise VSX (vector extensions) if available
+      *   1               == VMX / Altivec available
+-     *   2               == VSX available */
+-    if (env->insns_flags & PPC_ALTIVEC) {
+-        uint32_t vmx = (env->insns_flags2 & PPC2_VSX) ? 2 : 1;
+-
+-        _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", vmx)));
++     *   2               == VSX available
++     *
++     * Only CPUs for which we create core types in spapr_cpu_core.c
++     * are possible, and all of those have VMX */
++    if (spapr_has_cap(spapr, SPAPR_CAP_VSX)) {
++        _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", 2)));
++    } else {
++        _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", 1)));
+     }
+ 
+     /* Advertise DFP (Decimal Floating Point) if available
+@@ -3832,7 +3834,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      */
+     mc->numa_mem_align_shift = 28;
+ 
+-    smc->default_caps = spapr_caps(0);
++    smc->default_caps = spapr_caps(SPAPR_CAP_VSX);
+     spapr_caps_add_properties(smc, &error_abort);
+ }
+ 
+@@ -3914,7 +3916,7 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
+     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+ 
+     spapr_machine_2_12_class_options(mc);
+-    smc->default_caps = spapr_caps(SPAPR_CAP_HTM);
++    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+ }
+ 
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 3b35b91a5b..cad40fe49a 100644
+index cad40fe49a..7c855c67ad 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "sysemu/hw_accel.h"
-@@ -83,6 +84,93 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+@@ -57,6 +57,19 @@ static void cap_htm_allow(sPAPRMachineState *spapr, Error **errp)
+     }
+ }
+ 
++static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
++    CPUPPCState *env = &cpu->env;
++
++    /* Allowable CPUs in spapr_cpu_core.c should already have gotten
++     * rid of anything that doesn't do VMX */
++    g_assert(env->insns_flags & PPC_ALTIVEC);
++    if (!(env->insns_flags2 & PPC2_VSX)) {
++        error_setg(errp, "VSX support not available, try cap-vsx=off");
++    }
++}
++
+ static sPAPRCapabilityInfo capability_table[] = {
+     {
+         .name = "htm",
+@@ -65,6 +78,13 @@ static sPAPRCapabilityInfo capability_table[] = {
+         .allow = cap_htm_allow,
+         /* TODO: add cap_htm_disallow */
+     },
++    {
++        .name = "vsx",
++        .description = "Allow Vector Scalar Extensions (VSX)",
++        .flag = SPAPR_CAP_VSX,
++        .allow = cap_vsx_allow,
++        /* TODO: add cap_vsx_disallow */
++    },
+ };
+ 
+ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+@@ -81,6 +101,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+         caps.mask &= ~SPAPR_CAP_HTM;
+     }
+ 
++    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
++                          0, spapr->max_compat_pvr)) {
++        caps.mask &= ~SPAPR_CAP_VSX;
++    }
++
      return caps;
  }
  
-+static bool spapr_caps_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    return (spapr->forced_caps.mask != 0) || (spapr->forbidden_caps.mask != 0);
-+}
-+
-+/* This has to be called from the top-level spapr post_load, not the
-+ * caps specific one.  Otherwise it wouldn't be called when the source
-+ * caps are all defaults, which could still conflict with overridden
-+ * caps on the destination */
-+int spapr_caps_post_migration(sPAPRMachineState *spapr)
-+{
-+    uint64_t allcaps = 0;
-+    int i;
-+    bool ok = true;
-+    sPAPRCapabilities dstcaps = spapr->effective_caps;
-+    sPAPRCapabilities srccaps;
-+
-+    srccaps = default_caps_with_cpu(spapr, first_cpu);
-+    srccaps.mask |= spapr->mig_forced_caps.mask;
-+    srccaps.mask &= ~spapr->mig_forbidden_caps.mask;
-+
-+    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-+        sPAPRCapabilityInfo *info = &capability_table[i];
-+
-+        allcaps |= info->flag;
-+
-+        if ((srccaps.mask & info->flag) && !(dstcaps.mask & info->flag)) {
-+            error_report("cap-%s=on in incoming stream, but off in destination",
-+                         info->name);
-+            ok = false;
-+        }
-+
-+        if (!(srccaps.mask & info->flag) && (dstcaps.mask & info->flag)) {
-+            warn_report("cap-%s=off in incoming stream, but on in destination",
-+                         info->name);
-+        }
-+    }
-+
-+    if (spapr->mig_forced_caps.mask & ~allcaps) {
-+        error_report(
-+            "Unknown capabilities 0x%"PRIx64" enabled in incoming stream",
-+            spapr->mig_forced_caps.mask & ~allcaps);
-+        ok = false;
-+    }
-+    if (spapr->mig_forbidden_caps.mask & ~allcaps) {
-+        warn_report(
-+            "Unknown capabilities 0x%"PRIx64" disabled in incoming stream",
-+            spapr->mig_forbidden_caps.mask & ~allcaps);
-+    }
-+
-+    return ok ? 0 : -EINVAL;
-+}
-+
-+static int spapr_caps_pre_save(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_forced_caps = spapr->forced_caps;
-+    spapr->mig_forbidden_caps = spapr->forbidden_caps;
-+    return 0;
-+}
-+
-+static int spapr_caps_pre_load(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_forced_caps = spapr_caps(0);
-+    spapr->mig_forbidden_caps = spapr_caps(0);
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_spapr_caps = {
-+    .name = "spapr/caps",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_caps_needed,
-+    .pre_save = spapr_caps_pre_save,
-+    .pre_load = spapr_caps_pre_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(mig_forced_caps.mask, sPAPRMachineState),
-+        VMSTATE_UINT64(mig_forbidden_caps.mask, sPAPRMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- void spapr_caps_reset(sPAPRMachineState *spapr)
- {
-     Error *local_err = NULL;
-@@ -92,6 +180,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
-     /* First compute the actual set of caps we're running with.. */
-     caps = default_caps_with_cpu(spapr, first_cpu);
- 
-+    /* Remove unnecessary forced/forbidden bits (this will help us
-+     * with migration) */
-+    spapr->forced_caps.mask &= ~caps.mask;
-+    spapr->forbidden_caps.mask &= caps.mask;
-+
-     caps.mask |= spapr->forced_caps.mask;
-     caps.mask &= ~spapr->forbidden_caps.mask;
- 
-@@ -175,9 +268,6 @@ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
-         error_setg(errp, "Some sPAPR capabilities set both on and off");
-         return;
-     }
--
--    /* Check for any caps incompatible with other caps.  Nothing to do
--     * yet */
- }
- 
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index dc64f4ebcb..5c85f39c3b 100644
+index 5c85f39c3b..148a03d189 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -54,6 +54,8 @@ typedef enum {
-  * Capabilities
-  */
- 
-+/* These bits go in the migration stream, so they can't be reassigned */
-+
+@@ -59,6 +59,9 @@ typedef enum {
  /* Hardware Transactional Memory */
  #define SPAPR_CAP_HTM               0x0000000000000001ULL
  
-@@ -142,6 +144,7 @@ struct sPAPRMachineState {
-     const char *icp_type;
- 
-     sPAPRCapabilities forced_caps, forbidden_caps;
-+    sPAPRCapabilities mig_forced_caps, mig_forbidden_caps;
-     sPAPRCapabilities effective_caps;
- };
- 
-@@ -743,6 +746,8 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
- /*
-  * Handling of optional capabilities
-  */
-+extern const VMStateDescription vmstate_spapr_caps;
++/* Vector Scalar Extensions */
++#define SPAPR_CAP_VSX               0x0000000000000002ULL
 +
- static inline sPAPRCapabilities spapr_caps(uint64_t mask)
- {
-     sPAPRCapabilities caps = { mask };
-@@ -757,5 +762,6 @@ static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
- void spapr_caps_reset(sPAPRMachineState *spapr);
- void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
-+int spapr_caps_post_migration(sPAPRMachineState *spapr);
- 
- #endif /* HW_SPAPR_H */
+ typedef struct sPAPRCapabilities sPAPRCapabilities;
+ struct sPAPRCapabilities {
+     uint64_t mask;
 -- 
 2.14.3
