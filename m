@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ebm5T-0003zR-1m
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:40:59 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ebm95-0005zz-Pg
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:44:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ebm5O-00006K-UH
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:40:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52344)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ebm91-0002qX-Tq
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:44:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ebm5O-00005K-Nn
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:40:54 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1516170720-4948-2-git-send-email-wei.w.wang@intel.com> (Wei
-	Wang's message of "Wed, 17 Jan 2018 14:31:57 +0800")
-References: <1516170720-4948-1-git-send-email-wei.w.wang@intel.com>
-	<1516170720-4948-2-git-send-email-wei.w.wang@intel.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 17 Jan 2018 12:40:38 +0100
-Message-ID: <878tcw4ssp.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ebm91-0002py-OU
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 06:44:39 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E626DC04BD5A
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 11:44:38 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 17 Jan 2018 12:44:30 +0100
+Message-Id: <20180117114430.19110-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 1/4] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] dump-guest-memory.py: fix python 2 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-Wei Wang <wei.w.wang@intel.com> wrote:
-> The new feature enables the virtio-balloon device to receive the hint of
-> guest free pages from the free page vq, and clears the corresponding bits
-> of the free page from the dirty bitmap, so that those free pages are not
-> transferred by the migration thread.
->
-> Without this feature, to local live migrate an 8G idle guest takes
-> ~2286 ms. With this featrue, it takes ~260 ms, which redues the
-> migration time to ~11%.
->
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> Signed-off-by: Liang Li <liang.z.li@intel.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
+Python GDB support may use Python 2 or 3.
 
-I don't claim to understandthe full balloon driver
+Inferior.read_memory() may return a buffer with Python 2 or a
+memoryview with Python 3 (see also
+https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
 
+The elf.add_vmcoreinfo_note() method expect a byte string, but Python 2
+buffer doesn't provide the tobyes() method. Wrap the read_memory()
+result to a memoryview, available in Python 2.7. (if the return object
+is already a memoryview, this adds a useless identity view on top)
 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index cb1950f..d6f462c 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2186,6 +2186,16 @@ static int ram_init_all(RAMState **rsp)
->      return 0;
->  }
->  
-> +void skip_free_pages_from_dirty_bitmap(RAMBlock *block, ram_addr_t offset,
-> +                                       size_t len)
-> +{
-> +    long start = offset >> TARGET_PAGE_BITS,
-> +         nr = len >> TARGET_PAGE_BITS;
-> +
-> +    bitmap_clear(block->bmap, start, nr);
+Fixes a regression introduced with commit
+d23bfa91b7789534d16ede6cb7d925bfac3f3c4c ("add vmcoreinfo").
 
-But what assures us that all the nr pages are dirty?
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ scripts/dump-guest-memory.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-
-> +    ram_state->migration_dirty_pages -= nr;
-
-This should be
-ram_state->migration_dirty_pages -=
-     count_ones(block->bmap, start, nr);
-
-For a count_ones function, no?
-
-Furthermore, we have one "optimization" and this only works for the
-second stages onward:
-
-static inline
-unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
-                                          unsigned long start)
-{
-    unsigned long size = rb->used_length >> TARGET_PAGE_BITS;
-    unsigned long *bitmap = rb->bmap;
-    unsigned long next;
-
-    if (rs->ram_bulk_stage && start > 0) {
-        next = start + 1;
-    } else {
-        next = find_next_bit(bitmap, size, start);
-    }
-
-    return next;
-}
-
-So, for making this really work, we have more work to do.
-
-Actually, what I think we should do was to _ask_ the guest which pages
-are used at the beggining, instead of just setting all pages as dirty,
-but that requires kernel changes and lot of search of corner cases.
-
-Later, Juan.
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 09bec92b50..6f7e1a83b3 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -564,7 +564,9 @@ shape and this command should mostly work."""
+=20
+         vmcoreinfo =3D self.phys_memory_read(addr, size)
+         if vmcoreinfo:
+-            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
++            # Python 2.7 returns a buffer
++            vmciview =3D memoryview(vmcoreinfo)
++            self.elf.add_vmcoreinfo_note(vmciview.tobytes())
+=20
+     def invoke(self, args, from_tty):
+         """Handles command invocation from gdb."""
+--=20
+2.16.0.rc1.1.gef27df75a1
