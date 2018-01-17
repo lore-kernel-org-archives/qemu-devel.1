@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ebqM8-0005um-SP
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:29 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqMO-00068U-GZ
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ebqM5-0003Hd-Lp
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:28 -0500
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-10-andrew.smirnov@gmail.com>
-	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
-	<b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
-	<CAFEAcA8Ei8vgOspvy9hBbwQya+gjDq3V8o2NbV8cxvCsw6kycQ@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <63726933-be7f-3dd7-9e14-fa02863cfb75@redhat.com>
-Date: Wed, 17 Jan 2018 18:12:51 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Ei8vgOspvy9hBbwQya+gjDq3V8o2NbV8cxvCsw6kycQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
- IP block
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqMM-0003OU-T2
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:44 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:39179)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ebqMM-0003O7-LD
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:14:42 -0500
+Received: by mail-pg0-x242.google.com with SMTP id w17so5673101pgv.6
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:14:42 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 17 Jan 2018 08:14:16 -0800
+Message-Id: <20180117161435.28981-2-richard.henderson@linaro.org>
+In-Reply-To: <20180117161435.28981-1-richard.henderson@linaro.org>
+References: <20180117161435.28981-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v10.5 01/20] tcg: Allow multiple word entries
+ into the constant pool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +27,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 17/01/2018 17:35, Peter Maydell wrote:
-> On 17 January 2018 at 15:23, Marcel Apfelbaum <marcel.apfelbaum@zoho.com> wrote:
->>
->> On 16/01/2018 16:34, Peter Maydell wrote:
->>> On 16 January 2018 at 01:37, Andrey Smirnov <andrew.smirnov@gmail.com>
->>> I'm not familiar enough with our PCI code to be able to review
->>> this, I'm afraid. MST and Marcel are our PCI subsystem maintainers --
->>> could one of you have a look at whether this seems to be a correct
->>> implementation of a pcie host controller ?
->>
->>
->> Sadly PCI Host bridges do not have a standard, each HW vendor
->> can do pretty much what they want.
->>
->> That being said, if Andrey can point me to the PCI spec for the Designware
->> PCI host bridge and what parts they implemented for it I can have a look,
->> sure.
-> 
-> I'm not so worried about whether it's implementing the spec for
-> the hardware (I trust Andrey has done enough testing for that
-> side of things), but whether the code seems to be structured
-> the way we expect a QEMU pcie host controller to be structured,
-> is using the right APIs, and so on.
-> 
+This will be required for storing vector constants.
 
-Got it, I'll review in a week.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-pool.inc.c | 115 +++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 93 insertions(+), 22 deletions(-)
 
-Thanks,
-Marcel
-
-> thanks
-> -- PMM
-> 
+diff --git a/tcg/tcg-pool.inc.c b/tcg/tcg-pool.inc.c
+index 8a85131405..0f76e7bee3 100644
+--- a/tcg/tcg-pool.inc.c
++++ b/tcg/tcg-pool.inc.c
+@@ -22,39 +22,110 @@
+ 
+ typedef struct TCGLabelPoolData {
+     struct TCGLabelPoolData *next;
+-    tcg_target_ulong data;
+     tcg_insn_unit *label;
+-    intptr_t addend;
+-    int type;
++    int addend  : 32;
++    int rtype   : 16;
++    int nlong   : 16;
++    tcg_target_ulong data[];
+ } TCGLabelPoolData;
+ 
+ 
+-static void new_pool_label(TCGContext *s, tcg_target_ulong data, int type,
+-                           tcg_insn_unit *label, intptr_t addend)
++static TCGLabelPoolData *new_pool_alloc(TCGContext *s, int nlong, int rtype,
++                                        tcg_insn_unit *label, int addend)
+ {
+-    TCGLabelPoolData *n = tcg_malloc(sizeof(*n));
+-    TCGLabelPoolData *i, **pp;
++    TCGLabelPoolData *n = tcg_malloc(sizeof(TCGLabelPoolData)
++                                     + sizeof(tcg_target_ulong) * nlong);
+ 
+-    n->data = data;
+     n->label = label;
+-    n->type = type;
+     n->addend = addend;
++    n->rtype = rtype;
++    n->nlong = nlong;
++    return n;
++}
++
++static void new_pool_insert(TCGContext *s, TCGLabelPoolData *n)
++{
++    TCGLabelPoolData *i, **pp;
++    int nlong = n->nlong;
+ 
+     /* Insertion sort on the pool.  */
+-    for (pp = &s->pool_labels; (i = *pp) && i->data < data; pp = &i->next) {
+-        continue;
++    for (pp = &s->pool_labels; (i = *pp) != NULL; pp = &i->next) {
++        if (nlong > i->nlong) {
++            break;
++        }
++        if (nlong < i->nlong) {
++            continue;
++        }
++        if (memcmp(n->data, i->data, sizeof(tcg_target_ulong) * nlong) >= 0) {
++            break;
++        }
+     }
+     n->next = *pp;
+     *pp = n;
+ }
+ 
++/* The "usual" for generic integer code.  */
++static inline void new_pool_label(TCGContext *s, tcg_target_ulong d, int rtype,
++                                  tcg_insn_unit *label, int addend)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 1, rtype, label, addend);
++    n->data[0] = d;
++    new_pool_insert(s, n);
++}
++
++/* For v64 or v128, depending on the host.  */
++static inline void new_pool_l2(TCGContext *s, int rtype, tcg_insn_unit *label,
++                               int addend, tcg_target_ulong d0,
++                               tcg_target_ulong d1)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 2, rtype, label, addend);
++    n->data[0] = d0;
++    n->data[1] = d1;
++    new_pool_insert(s, n);
++}
++
++/* For v128 or v256, depending on the host.  */
++static inline void new_pool_l4(TCGContext *s, int rtype, tcg_insn_unit *label,
++                               int addend, tcg_target_ulong d0,
++                               tcg_target_ulong d1, tcg_target_ulong d2,
++                               tcg_target_ulong d3)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 4, rtype, label, addend);
++    n->data[0] = d0;
++    n->data[1] = d1;
++    n->data[2] = d2;
++    n->data[3] = d3;
++    new_pool_insert(s, n);
++}
++
++/* For v256, for 32-bit host.  */
++static inline void new_pool_l8(TCGContext *s, int rtype, tcg_insn_unit *label,
++                               int addend, tcg_target_ulong d0,
++                               tcg_target_ulong d1, tcg_target_ulong d2,
++                               tcg_target_ulong d3, tcg_target_ulong d4,
++                               tcg_target_ulong d5, tcg_target_ulong d6,
++                               tcg_target_ulong d7)
++{
++    TCGLabelPoolData *n = new_pool_alloc(s, 8, rtype, label, addend);
++    n->data[0] = d0;
++    n->data[1] = d1;
++    n->data[2] = d2;
++    n->data[3] = d3;
++    n->data[4] = d4;
++    n->data[5] = d5;
++    n->data[6] = d6;
++    n->data[7] = d7;
++    new_pool_insert(s, n);
++}
++
+ /* To be provided by cpu/tcg-target.inc.c.  */
+ static void tcg_out_nop_fill(tcg_insn_unit *p, int count);
+ 
+ static bool tcg_out_pool_finalize(TCGContext *s)
+ {
+     TCGLabelPoolData *p = s->pool_labels;
+-    tcg_target_ulong d, *a;
++    TCGLabelPoolData *l = NULL;
++    void *a;
+ 
+     if (p == NULL) {
+         return true;
+@@ -62,24 +133,24 @@ static bool tcg_out_pool_finalize(TCGContext *s)
+ 
+     /* ??? Round up to qemu_icache_linesize, but then do not round
+        again when allocating the next TranslationBlock structure.  */
+-    a = (void *)ROUND_UP((uintptr_t)s->code_ptr, sizeof(tcg_target_ulong));
++    a = (void *)ROUND_UP((uintptr_t)s->code_ptr,
++                         sizeof(tcg_target_ulong) * p->nlong);
+     tcg_out_nop_fill(s->code_ptr, (tcg_insn_unit *)a - s->code_ptr);
+     s->data_gen_ptr = a;
+ 
+-    /* Ensure the first comparison fails.  */
+-    d = p->data + 1;
+-
+     for (; p != NULL; p = p->next) {
+-        if (p->data != d) {
+-            d = p->data;
+-            if (unlikely((void *)a > s->code_gen_highwater)) {
++        size_t size = sizeof(tcg_target_ulong) * p->nlong;
++        if (!l || l->nlong != p->nlong || memcmp(l->data, p->data, size)) {
++            if (unlikely(a > s->code_gen_highwater)) {
+                 return false;
+             }
+-            *a++ = d;
++            memcpy(a, p->data, size);
++            a += size;
++            l = p;
+         }
+-        patch_reloc(p->label, p->type, (intptr_t)(a - 1), p->addend);
++        patch_reloc(p->label, p->rtype, (intptr_t)a - size, p->addend);
+     }
+ 
+-    s->code_ptr = (void *)a;
++    s->code_ptr = a;
+     return true;
+ }
+-- 
+2.14.3
