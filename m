@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebr0g-000230-Av
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:56:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebr1a-0002rB-FM
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:57:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebr0f-0003K2-7y
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:56:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebr1Z-0003y8-Ik
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:57:18 -0500
+References: <20171123020832.8165-1-mreitz@redhat.com>
+	<20171123020832.8165-10-mreitz@redhat.com>
+	<cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
+	<11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
+	<cf88fa6b-f9f6-d90b-c1b4-e14111f89aba@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 17 Jan 2018 10:54:20 -0600
-Message-Id: <20180117165420.15946-3-eblake@redhat.com>
-In-Reply-To: <20180117165420.15946-1-eblake@redhat.com>
-References: <20180117165420.15946-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Disable some tests for compat=0.10
+Message-ID: <dd57ecac-9e93-5f9a-fd37-7650c06905a6@redhat.com>
+Date: Wed, 17 Jan 2018 10:56:44 -0600
+MIME-Version: 1.0
+In-Reply-To: <cf88fa6b-f9f6-d90b-c1b4-e14111f89aba@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ZuEw0VIbXDVz5k6jn5XS1gRBV1OUrde2O"
+Subject: Re: [Qemu-devel] [PATCH 09/17] iotests: Disable some tests for
+ compat=0.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,79 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZuEw0VIbXDVz5k6jn5XS1gRBV1OUrde2O
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <dd57ecac-9e93-5f9a-fd37-7650c06905a6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/17] iotests: Disable some tests for
+ compat=0.10
+References: <20171123020832.8165-1-mreitz@redhat.com>
+ <20171123020832.8165-10-mreitz@redhat.com>
+ <cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
+ <11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
+ <cf88fa6b-f9f6-d90b-c1b4-e14111f89aba@redhat.com>
+In-Reply-To: <cf88fa6b-f9f6-d90b-c1b4-e14111f89aba@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Tests 080, 130, 137, and 176 simply do not work with compat=0.10 for the
-reasons stated there.
+On 01/17/2018 07:41 AM, Max Reitz wrote:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20171123020832.8165-10-mreitz@redhat.com>
-[eblake: fix 177 in a separate commit]
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/080 | 5 +++--
- tests/qemu-iotests/130 | 2 ++
- tests/qemu-iotests/137 | 2 ++
- tests/qemu-iotests/176 | 2 ++
- 4 files changed, 9 insertions(+), 2 deletions(-)
+>>> So we lost that support in
+>>> f0a9c18f9e7
+>>> and
+>>> 81c219ac6ce
+>>>
+>>> Eric, any input before we downscope your test?
+>>
+>> Ouch, I broke my own test.
+>>
+>> Maybe the best thing would be to split 177 into two tests: the origina=
+l
+>> test (as it was before f0a9c18) that works on both compats, and a new
+>> test that works on just compat=3D1.1 images for the things added in la=
+ter
+>> commits.
+>>
+>> Since I'm the author for all commits (so far) to that file, I guess I
+>> can sign up for that work...
+>=20
+> Did you make any progress? :-)
 
-diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 55044c700be..1c2bd85742a 100755
---- a/tests/qemu-iotests/080
-+++ b/tests/qemu-iotests/080
-@@ -41,8 +41,9 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
--# Internal snapshots are (currently) impossible with refcount_bits=1
--_unsupported_imgopts 'refcount_bits=1[^0-9]'
-+# - Internal snapshots are (currently) impossible with refcount_bits=1
-+# - This is generally a test for compat=1.1 images
-+_unsupported_imgopts 'refcount_bits=1[^0-9]' 'compat=0.10'
+Ah, thanks for the reminder.  Posted as
+<20180117165420.15946-1-eblake@redhat.com>
 
- header_size=104
-
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index e7e43de6d60..2c4b94da1bf 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -45,6 +45,8 @@ _supported_fmt qcow2
- _supported_proto generic
- _unsupported_proto vxhs
- _supported_os Linux
-+# We are going to use lazy-refcounts
-+_unsupported_imgopts 'compat=0.10'
-
- qemu_comm_method="monitor"
-
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index eb91e517d7d..5a01250005f 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -41,6 +41,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
-+# We are going to use lazy-refcounts
-+_unsupported_imgopts 'compat=0.10'
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
- _make_test_img 64M
-diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index b8dc17c5920..d38b3aeb919 100755
---- a/tests/qemu-iotests/176
-+++ b/tests/qemu-iotests/176
-@@ -48,6 +48,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
-+# Persistent dirty bitmaps require compat=1.1
-+_unsupported_imgopts 'compat=0.10'
+--ZuEw0VIbXDVz5k6jn5XS1gRBV1OUrde2O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
- function run_qemu()
- {
--- 
-2.14.3
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpfgEwACgkQp6FrSiUn
+Q2oxJAf/UXWKHznaGN9NiVrOZkrNZeQP5zPoscpnK/sQoWtIsuyygpo7uKw1U/EZ
+f89aqteFdgTqHABzqAK7nv/RiU2So0+TuK9IZA46wHKGqTjBoXvwxRyQ58sDJU00
+k7obU5rw5HHZJjWHHTsIXaUnUHf4n3YmHIssi4d9L5WYETXGGWHWN9bG+hxqLdro
+teV9mJu70kZ5xgR5X0y9WoDWLrB33HcjSAd+Y3JwHqoL1DLqy+Zo+sIRB9Rog1O7
+iSMzmDZty356OOk2r2vBORFao7V8RtCCUsJKwpaX+gEzGS4MvKKMiuQswFb9sgCJ
+C9p/nLNJSnf+QarzqyG0Yq0JWPC4mQ==
+=5DlN
+-----END PGP SIGNATURE-----
+
+--ZuEw0VIbXDVz5k6jn5XS1gRBV1OUrde2O--
