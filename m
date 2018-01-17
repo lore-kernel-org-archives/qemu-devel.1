@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebqD8-0004Zt-54
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:05:15 -0500
+	(envelope-from <david@redhat.com>) id 1ebqEF-0005mE-15
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:06:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebqD4-0000mg-16
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:05:10 -0500
-References: <cover.1513342045.git.berto@igalia.com>
-	<a000f7552f603b212c85ed76ac5ee4103f04d3a4.1513342045.git.berto@igalia.com>
-	<9a8ac19c-6d7c-dee7-174f-ffdee1a1a0d6@redhat.com>
-	<w51lggw1p0q.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6a17c7fc-d492-a406-8567-278477f733b6@redhat.com>
-Date: Wed, 17 Jan 2018 10:04:45 -0600
+	(envelope-from <david@redhat.com>) id 1ebqED-0005H1-Hh
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:06:19 -0500
+References: <20180117141849.65757-1-borntraeger@de.ibm.com>
+	<20180117141849.65757-3-borntraeger@de.ibm.com>
+	<20180117153727.2552d1a2.cohuck@redhat.com>
+	<94c656aa-4c1d-5297-8e3a-2816c3628290@redhat.com>
+	<34233d9f-2a81-3e81-8ea1-c8f11ccb29bc@de.ibm.com>
+	<66733c96-819a-c1ef-fada-42057324d224@redhat.com>
+	<2a6eb56a-5bde-6520-d282-269a176254e2@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <73d801c7-629b-0661-cacc-8b2bb61aade1@redhat.com>
+Date: Wed, 17 Jan 2018 17:06:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <w51lggw1p0q.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fKM13QgW71sDaMbPuCuM3zSjqyGXaXTni"
-Subject: Re: [Qemu-devel] [PATCH v2 13/32] qcow2: Add l2_slice_size field to
- BDRVQcow2State
+In-Reply-To: <2a6eb56a-5bde-6520-d282-269a176254e2@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/kvm: Handle bpb feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fKM13QgW71sDaMbPuCuM3zSjqyGXaXTni
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <6a17c7fc-d492-a406-8567-278477f733b6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 13/32] qcow2: Add l2_slice_size field to
- BDRVQcow2State
-References: <cover.1513342045.git.berto@igalia.com>
- <a000f7552f603b212c85ed76ac5ee4103f04d3a4.1513342045.git.berto@igalia.com>
- <9a8ac19c-6d7c-dee7-174f-ffdee1a1a0d6@redhat.com>
- <w51lggw1p0q.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51lggw1p0q.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/17/2018 09:30 AM, Alberto Garcia wrote:
-> On Tue 16 Jan 2018 11:06:21 PM CET, Eric Blake wrote:
->=20
->>>  typedef struct Qcow2ReopenState {
->>>      Qcow2Cache *l2_table_cache;
->>>      Qcow2Cache *refcount_block_cache;
->>> +    int l2_slice_size;
+On 17.01.2018 17:04, Christian Borntraeger wrote:
+> 
+> 
+> On 01/17/2018 04:10 PM, David Hildenbrand wrote:
 >>
->> Worth a comment?
->> /* Number of entries in a slice of the L2 table */
->=20
-> Yeah, why not? I'll add it.
+>>>> And exactly for this reason I tend to nack patch nr 3 (if that is of any
+>>>> weight :) ).
+>>>
+>>> I have communicated the mistake to asll relevant parties - it will not happen again
+>>> (famous last words).
+>>
+>> An I already saw it happen in the past. (I think I really have to dig
+>> out that one feature to make a point :P ). Mistakes happen, but we don't
+>> have to propagate them to customers if we can catch them early :)
+>>
+>>>
+>>>>
+>>>> As soon as we enable bits for CPU models, we guarantee that migration
+>>>> works. While introducing this change we already had one example where
+>>>> this was not the case. Not good. (and remember having another such
+>>>> exception)
+>>>
+>>> The point is migration continues to work. In fact I had a different version
+>>> of this patch set that did it the other way around. Keep 82 a transparent
+>>> and add a new cpu misc facility that takes care of the migration state.
+>>>>
+>>>> It is easier to patch a feature in than silently enabling *anything*
+>>>> somebody thinks is transparent (but its not). Especially not for the
+>>>> host model. The expanded host model is migration safe.
+>>>
+>>> I really do not care about -cpu host (host-passthrough) for migration safety, 
+>>> because its not. And as you said: host-model (expanded) will work.
+>>>
+>>
+>> It will if the world would be perfect.
+>>
+>> expand "-cpu host" -> -cpu z14-base,stfle_82=on
+>>
+>> stfle_82 would now not be properly migrated. Yes, it might work somehow
+>> right now. But it is not clean.
+>>
+>>>>
+>>>> And as we saw, in the unlikely event of such heavy changes, we need to
+>>>> touch fw/linux/qemu either way.
+>>>>
+>>>> But there is more I dislike about the approach in patch 3:
+>>>>
+>>>> 1. feature names. We need aliases. Different QEMU versions on the same
+>>>> hw might end up not understanding what a feature means. (old one: only
+>>>> knows stfl_123, new one knows stfl_123 a.k.a crazy_feat)
+>>>
+>>> I plan to keep the old names. e.g. stfle131 is better than sea_esop2.
+>>
+>>
+>> Oh god no. With vx, te, iep one at least has a rough idea what is happening.
+>>
+>> -cpu z14-base,stfle123,stfle234,stfle323 ... :(
+>>
+>>
+>> This all smells like a huge hack for a scenario that happened once. I
+>> prefer to do it the clean way. Enable only what you checked works and
+>> what you can actually give a name.
+>>
+>> Especially we will lose the ability to know which bit was valid for
+>> which hardware generation - which is key when working with IBC.
+>>
+>> I am not sure if giving all that up is worth it.
+>>
+> 
+> I will spin up a second patch that enables stfle81 and name it "ppa15".
+> We can then discuss patch 3 on the slow path with enough time to think
+> about this.
+> 
 
-Or see my comments in later patches, that perhaps this is better named
-l2_slice_entries.
+christian++ :)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- 
 
+Thanks,
 
---fKM13QgW71sDaMbPuCuM3zSjqyGXaXTni
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpfdB4ACgkQp6FrSiUn
-Q2pHGwgAn/Or63pW7Co4UTEt/G5+gEKxti8BElqjeUZysU0E1cAo3rl6f9bMppmC
-kH4fvF7+ujFo3U2Lsvp+sDizmiiM1wTmCOF1Tv0e+mis3WO6dxpl/IQ1OeqnZwGo
-5W8Z7T5xGCxsFfONQgZ86vxFTBylWOP3rasv9BhAjRYRJgWhc/fJ6rku1FrkcQc2
-lOABTGM3/9FiyBLNq5lV/Y2sifO1JjhUnxzivNUqTZ5hvJYBH655sJqmkCnK1N/R
-GflJY9smfxePPTZkRVXSp9y66Ffm1Z9Z5fU1qW0vn226tAXeVQaO8x0ro5DNAIAH
-OwjioLFVK/+2XK4wEZ48oV0lV+VJ0Q==
-=LF50
------END PGP SIGNATURE-----
-
---fKM13QgW71sDaMbPuCuM3zSjqyGXaXTni--
+David / dhildenb
