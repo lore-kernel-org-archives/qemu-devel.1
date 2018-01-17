@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebqpz-0000tD-Tp
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:45:25 -0500
+	(envelope-from <berrange@redhat.com>) id 1ebqs9-0002cB-Co
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:47:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebqpv-0000Pt-SG
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:45:19 -0500
-MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <CAHQ1cqFknfW0NmiD-3GFJRedgVE-9bacKhm-pYx0ycviRsmucQ@mail.gmail.com>
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-10-andrew.smirnov@gmail.com>
-	<CAFEAcA-hEgWp58nte89Vs6nZnp4wA6_f8-Vaovm2hiJe9SWwHQ@mail.gmail.com>
-	<b9661e65-5fb2-46b5-b082-6e768afff7bc@zoho.com>
-	<CAHQ1cqFknfW0NmiD-3GFJRedgVE-9bacKhm-pYx0ycviRsmucQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 17 Jan 2018 13:45:13 -0300
-Message-ID: <CAAdtpL65QPW9uW8ppnz1Lz0aaCtHokJqpdHXe48G-chz-T167A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 09/14] pci: Add support for Designware
- IP block
+	(envelope-from <berrange@redhat.com>) id 1ebqs5-0002S2-EL
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:47:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ebqs5-0002Rd-8G
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:47:29 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 529152FA0
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 16:47:28 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed, 17 Jan 2018 16:47:13 +0000
+Message-Id: <20180117164717.15855-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 0/4] Convert frontends to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hi Andrey,
+This is a followup to
 
-On Wed, Jan 17, 2018 at 1:12 PM, Andrey Smirnov
-<andrew.smirnov@gmail.com> wrote:
-> On Wed, Jan 17, 2018 at 7:23 AM, Marcel Apfelbaum
-> <marcel.apfelbaum@zoho.com> wrote:
->> That being said, if Andrey can point me to the PCI spec for the Designware
->> PCI host bridge and what parts they implemented for it I can have a look,
->> sure.
->> (I will not be available for a week or so, but right after)
->>
->
-> Just in case you still want this:
->
-> To the best of my knowledge, Synposys does not provide specification
-> for their PCIe IP to general public and I am in no way affiliated with
-> them, so I don't have any backchannels to get it any other way.
->
-> The next best thing to an actual spec, that I found to be pretty
-> useful, is PCIe chapter of i.MX6Q Reference Manual
-> (https://www.nxp.com/docs/en/reference-manual/IMX6DQRM.pdf   page
-> 4049), which is what I used to implement the code in question.
+  v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02047.html
+  v2: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02471.html
+  v3: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02517.html
+  v4: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02708.html
+  v5: https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg02950.html
+  v6: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg01988.html
 
-Please add a comment about it in your respin, such:
+This new series contains just the patches for converting the ui frontends
+for SDL1, SDL2, and GTK to use keycodemapdb.
 
-Based on "i.MX6 Applications Processor Reference Manual" (Document
-Number: IMX6DQRM Rev. 4)
+The particularly notable benefit is that this includes fixes such that SDL1
+and GTK2/3 can actually work when using a non-Linux host Xorg/X11 server.
+Previously it would display but key handling was complete garbage, making it
+unusable in practice.
 
-> Last, and probably the most important, "source of truth" was actual
-> Linux PCIe driver for i.MX/Designware which I used as a sort of
-> inverse reference implementation.
+Changed in v7:
 
-Same here:
+ - Fix syntax error in win32 hack
 
-Reversed from Linux v4.9 drivers/pci/host/pcie-designware.c
+Daniel P. Berrange (4):
+  ui: convert the SDL2 frontend to keycodemapdb
+  ui: convert GTK and SDL1 frontends to keycodemapdb
+  ui: add fix for GTK Pause key handling on Win32
+  ui: ignore hardware keycode 255 on win32
+
+ Makefile           |   8 ++
+ include/ui/input.h |  24 +++++
+ ui/Makefile.objs   |   5 +-
+ ui/gtk.c           | 220 ++++++++++++++++++++++++++-----------------
+ ui/input-keymap.c  |   8 ++
+ ui/sdl.c           | 105 +++++++--------------
+ ui/sdl2-input.c    |  16 +++-
+ ui/sdl2-keymap.h   | 267 -----------------------------------------------------
+ ui/trace-events    |   9 +-
+ ui/x_keymap.c      | 250 +++++++++++++++++++------------------------------
+ ui/x_keymap.h      |   8 +-
+ 11 files changed, 330 insertions(+), 590 deletions(-)
+ delete mode 100644 ui/sdl2-keymap.h
+
+-- 
+2.14.3
