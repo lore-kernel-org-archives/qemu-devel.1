@@ -1,35 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ebosj-0000fb-5o
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:40:05 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eboxO-00039w-IM
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:44:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ebosd-0005LX-06
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:40:01 -0500
-Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:54190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ebosc-0005K6-Lq
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:39:54 -0500
-Received: from player732.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id ED9C7182466
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 15:39:52 +0100 (CET)
-References: <20171209084338.29395-1-clg@kaod.org>
-	<20171209084338.29395-3-clg@kaod.org>
-	<20171220050947.GC5981@umbus.fritz.box>
-	<1513815126.2743.34.camel@kernel.crashing.org>
-	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
-	<1513896817.2743.63.camel@kernel.crashing.org>
-	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
-	<1516187433.31850.189.camel@kernel.crashing.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
-Date: Wed, 17 Jan 2018 15:39:46 +0100
+	(envelope-from <borntraeger@de.ibm.com>) id 1eboxL-00020u-BU
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:44:50 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49368
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eboxL-0001zs-6t
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:44:47 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0HEiESO035863
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 09:44:46 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fj7hq390f-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 09:44:45 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 17 Jan 2018 14:44:44 -0000
+References: <20180117141849.65757-1-borntraeger@de.ibm.com>
+	<20180117141849.65757-3-borntraeger@de.ibm.com>
+	<bd0d62c3-9243-931b-a539-b32b3fc19cf9@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 17 Jan 2018 15:44:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <1516187433.31850.189.camel@kernel.crashing.org>
+In-Reply-To: <bd0d62c3-9243-931b-a539-b32b3fc19cf9@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
- the XIVE interrupt controller
+Content-Transfer-Encoding: 7bit
+Message-Id: <2017497a-8b3c-2e06-b89b-e2b30c71d0d8@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/kvm: Handle bpb feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,122 +44,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
-
-On 01/17/2018 12:10 PM, Benjamin Herrenschmidt wrote:
-> On Wed, 2018-01-17 at 10:18 +0100, C=C3=A9dric Le Goater wrote:
->>>>> Also, have we decided how the process of switching between XICS and
->>>>> XIVE will work vs. CAS ?=20
->>>>
->>>> That's how it is described in the architecture. The current choice i=
-s
->>>> to create both XICS and XIVE objects and choose at CAS which one to
->>>> use. It relies today on the capability of the pseries machine to=20
->>>> allocate IRQ numbers for both interrupt controller backends. These
->>>> patches have been merged in QEMU.
->>>>
->>>> A change of interrupt mode results in a reset. The device tree is=20
->>>> populated accordingly and the ICPs are switched for the model in=20
->>>> use.=20
->>>
->>> For KVM we need to only instanciate one of them though.
->>
->> Hmm,
->>
->> How would we handle a guest rebooting on a kernel without XIVE support=
- ?=20
->=20
-> It will do CAS again and we can change the devices.
-
-So, we would destroy the previous QEMU ICS object and create a new one=20
-in the CAS hcall. That would probably work. There might be some issues=20
-in creating and destroying the ICS KVM device, but that can be studied=20
-without XIVE.
-
-It used to be considered ugly to create a QEMU device at reset time, so=20
-I wonder if this is still the case, because when the machine reaches CAS,=
-=20
-we really are beyond reset.  =20
-
-If this is OK, then the next "issue" is to keep in sync the allocated=20
-IRQ numbers. The IRQ allocator is now merged at the machine level, so=20
-the synchronization is obvious to do when both backend QEMU objects=20
-are available. that's the path I took. If both QEMU objects are not=20
-available, then we need to scan the IRQ number space in the current=20
-interrupt mode and allocate the same IRQs in the newly negotiated mode.=20
-Probably OK. I don't see major problems with the current code.=20
-
-Migration is a problem. We will need both backend QEMU objects to be=20
-available anyhow if we want to migrate. So we are back to the current=20
-solution creating both QEMU objects but we can try to defer some of the=20
-KVM inits and create the KVM device on demand at CAS time.
-
-The next problem is the ICP object that currently needs the KVM device=20
-fd to connect the vcpus ... So, we will need to change that also.=20
-That is probably the biggest problem today. We need a way to disconnect=20
-the vpcu from the KVM device and see how we can defer the connection.
-I need to make sure this is possible, I can check that without XIVE
-I think.
-
->> Are you suggesting to create the XICS or XIVE device in the CAS negoti=
-ation=20
->> process ? So, the machine would not have any interrupt controller befo=
-re=20
->> CAS. That seems really late to me. grub uses the console for instance.=
-=20
->=20
-> We start with XICS by default.
-
-yes.
-
->> I think it should prepare for both options, start in XIVE legacy mode,=
-=20
->> which is XICS, then possibly switch to XIVE exploitation mode.
->>
->>>>> And how that will interact with KVM ?=20
->>>>
->>>> I expect we will do the same, which is to create two KVM devices to=20
->>>> be able to handle both interrupt controller backends depending on th=
-e=20
->>>> mode negotiated by the guest. =20
->>>
->>> That will be an ungodly mess, I'd rather we only instanciate the righ=
-t
->>> one.
->>
->> It's rather transparent currently in the emulated version. There are t=
-wo=20
->> sets of objects in QEMU, switching is done in CAS. KVM support should =
-not=20
->> change anything in that area.=20
->>
->> I expect the 'xive-kvm' object to get/set states for migration, just l=
-ike=20
->> for XICS and to setup the ESB+TIMA memory regions, which is new.=20
->=20
-> But both XICS and XIVE are completely different kernel KVM devices that=
- will
-> need to "hook" into the same set of internal hooks for things like inte=
-rrupts
-> being passed through, RTAS calls etc...=20
->=20
-> How does KVM knows which one to "activate" ?
-
-Can't we add an extra IRQ type and use vcpu->arch.irq_type for that ?=20
-I haven't studied all the low level details though.
-
-> I don't think the kernel should have both.=20
-
-I hear that. From a QEMU perspective, it is much easier to put everything=
-=20
-in place for both interrupt modes and let the guest decide what it wants=20
-to use.=20
-
-If we choose not to, we will need to find solution to defer the KVM inits
-and to disconnect/reconnect the vcpus. For the latter, we could add a=20
-KVM_DISABLE_CAP ioctl or maybe better add a new capability like=20
-KVM_CAP_IRQ_XIVE to perform the switch.
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
 
-C.
+
+On 01/17/2018 03:30 PM, David Hildenbrand wrote:
+> On 17.01.2018 15:18, Christian Borntraeger wrote:
+>> We need to handle the bpb control on reset and migration. Normally
+>> stfle.82 is transparent (and the normal guest part works without
+>> hypervisor activity). To prevent any issues we require full
+>> host kernel support for this feature.
+> 
+> Actually it is not transparent because we need hypervisor support to get
+> VSIE running... or what am I missing? (or were you talking about bit 81?)
+
+When you pass along the bit as a transparent bit (just enable it if the host
+has it) it will work in nested guests. Its only that after reset or vsie you
+have a short period of time where you work in a stale state.
+Anyway we are aware that bit82 should have been a non-transparent bit, consider
+it a quirk in the architecture. Thats why I handle this feature not in patch 3.
