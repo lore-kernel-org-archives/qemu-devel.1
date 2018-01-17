@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ebbHW-00006u-Ge
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:08:43 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ebbe7-0007DX-JY
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:32:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ebbHV-0003ca-2Y
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:08:42 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ebbe6-0003Su-7k
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:32:03 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:45084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ebbe5-0003S1-Sr
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 19:32:02 -0500
+Received: by mail-lf0-x241.google.com with SMTP id y71so19659662lfd.12
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 16:32:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <8b247357a2e52d16d287db87b5d0957a@tribudubois.net>
-References: <20180110204327.22510-1-jcd@tribudubois.net>
-	<a2aa7ea7-ac15-d69e-82cd-dad6c89c61c7@adacore.com>
-	<548464fa8211307b397a5f50122abd3d@tribudubois.net>
-	<ea0e6a65-fd7b-e62b-8aa0-2531bbcbf49f@adacore.com>
-	<04ce75e9cdb6e001830c720196208e7f@tribudubois.net>
-	<44e1abb6-88e7-95a0-ff27-fed969eb3a9c@adacore.com>
-	<fb38cb0996586b500ef8b75877d16e7e@tribudubois.net>
-	<8b247357a2e52d16d287db87b5d0957a@tribudubois.net>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 16 Jan 2018 16:08:05 -0800
-Message-ID: <CAKmqyKMDvE4+MqwvEj2-KMFrLtJkKkUZ6A2eTyFUSqWeQJksjQ@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <CAFEAcA-4vkZEJDaNfPLavKK3=_JBfi9u1o=-0kGb0ui26SV3VA@mail.gmail.com>
+References: <cover.1515796549.git.alistair.francis@xilinx.com>
+	<9443d0cbb39ca4173d40b4116655c0309cc05983.1515796549.git.alistair.francis@xilinx.com>
+	<CAFEAcA-4vkZEJDaNfPLavKK3=_JBfi9u1o=-0kGb0ui26SV3VA@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 16 Jan 2018 16:31:29 -0800
+Message-ID: <CAKmqyKPwFm1-2gFzFr5yCXqG=nLbTqWt8_yhNdcU8N0H6WiB5g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] LEON3 IRQMP: Fix IRQ software ack
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] xlnx-zynqmp-rtc: Add basic time
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +32,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Christophe Dubois <jcd@tribudubois.net>
-Cc: Fabien Chouteau <chouteau@adacore.com>, KONRAD Frederic <frederic.konrad@adacore.com>, Qemu-devel <qemu-devel-bounces+jcd=tribudubois.net@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Mon, Jan 15, 2018 at 9:27 AM, Jean-Christophe Dubois
-<jcd@tribudubois.net> wrote:
-> Le 2018-01-15 14:45, Jean-Christophe Dubois a =C3=A9crit :
+On Mon, Jan 15, 2018 at 5:35 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 12 January 2018 at 22:37, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> Allow the guest to determine the time set from the QEMU command line.
 >>
->> Le 2018-01-15 12:09, Fabien Chouteau a =C3=A9crit :
->>>
->>> On 12/01/2018 15:10, Jean-Christophe Dubois wrote:
->>>>
->>>> Le 2018-01-12 11:55, Fabien Chouteau a =C3=A9crit :
->>>>>
->>>>> On 11/01/2018 13:35, Jean-Christophe Dubois wrote:
->>>>>>
->>>>>> Thanks Fabien,
->>>>>>
->>>>>> Now, as a side question, could you tell me which reference LEON3
->>>>>> platform is implemented by Qemu in leon3_generic?
->>>>>>
->>>>>
->>>>> I think it was the based on the FPGA version of Leon3 I was using at
->>>>> the
->>>>> time. The name leon3_generic comes from my will to make it a
->>>>> configurable board where users could define the number and the locati=
-on
->>>>> of the different peripherals, I never had time to work on this.
->>>>
->>>>
->>>> I see. I am not sure how to bring configurability to Qemu. There is th=
-e
->>>> possibility to describe the hw PTF with DTC/DTB or something similar. =
-I
->>>> think some people were working on it for the ARM Qemu platform (but I =
-am not
->>>> sure what happened to this initiative).
->>>>
->>>> Now in the meantime, would it make sense to move leon3_generic to a ts=
-im
->>>> compatible platform?
->>>>
->>>
->>> I don't think so, leon3_generic is compatible with a real hardware whic=
-h
->>> is also interesting for comparison.
+>> This includes adding a trace event to debug the new time.
 >>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>  - Convert DB_PRINT() macro to trace
 >>
->> What real hardware (gaisler reference platform) is it? Could you point
->> to the public reference manual for this hardware?
+>>  hw/timer/trace-events              |  3 +++
+>>  hw/timer/xlnx-zynqmp-rtc.c         | 23 +++++++++++++++++++++++
+>>  include/hw/timer/xlnx-zynqmp-rtc.h |  3 +++
+>>  3 files changed, 29 insertions(+)
 >>
->> Another possibility is to add a leon3_tsim platform into Qemu to
->> support the compatibility with the tsim emulator. But the difference
->> with leon3_generic would be minimal.
+>> diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+>> index 640722b5d1..e6e042fddb 100644
+>> --- a/hw/timer/trace-events
+>> +++ b/hw/timer/trace-events
+>> @@ -60,3 +60,6 @@ systick_write(uint64_t addr, uint32_t value, unsigned size) "systick write addr
+>>  cmsdk_apb_timer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+>>  cmsdk_apb_timer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+>>  cmsdk_apb_timer_reset(void) "CMSDK APB timer: reset"
+>> +
+>> +# hw/timer/xlnx-zynqmp-rtc.c
+>> +xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min, int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
+>> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
+>> index ead40fc42d..4adcc4701a 100644
+>> --- a/hw/timer/xlnx-zynqmp-rtc.c
+>> +++ b/hw/timer/xlnx-zynqmp-rtc.c
+>> @@ -29,6 +29,7 @@
+>>  #include "hw/register.h"
+>>  #include "qemu/bitops.h"
+>>  #include "qemu/log.h"
+>> +#include "hw/ptimer.h"
+>>  #include "hw/timer/xlnx-zynqmp-rtc.h"
 >>
->>>
->>>> This would allow to validate the same software on the 2 simulators
->>>> (obviously it would not be compatible with your specific FPGA version =
-for
->>>> now).
->>>>
->>>
->>> The Leon3 AMBA bus provides a way to discover the peripherals and their
->>> address, so any system should be capable of supporting different
->>> peripheral layouts.
->>>
->>> Here's an example of AMBA discovery code from a very old project of min=
-e
->>> (don't judge me on this :) :
->>> https://github.com/Fabien-Chouteau/kabitbol/blob/master/src/amba.c
->>>
->>> There was a couple of patches submitted some times ago to add Leon3 AMB=
-A
->>> support in QEMU, I think it's time to bring them back...
+>>  #ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
+>> @@ -47,6 +48,13 @@ static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
+>>      qemu_set_irq(s->irq_addr_error_int, pending);
+>>  }
 >>
->>
->> What you are talking about here is the possibility for the software
->> running inside Qemu to probe/discover the hardware. For such feature
->> Qemu should implement what is required for this AMBA discovery. But it
->> does not solve how you decide at run time at what addresses are the
->> various AMBA devices (how you decide to emulate a tsim platform or
->> another one).
->>
->> Note: For now I am not so much interested in the AMBA discovery as the
->> type of software platform I am thinking about is embedded where the
->> hardware is well known ahead of time. This discovery capability would
->> make sense for more generic OS like linux or such. We cannot require
->> all embedded OS to implement the AMBA discovery process.
+>> +static uint64_t current_time_postr(RegisterInfo *reg, uint64_t val64)
+>> +{
+>> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+>> +
+>> +    return mktime(&s->current_tm);
 >
->
-> For the configurability of Qemu, I was thinking of using something simila=
-r
-> to the Qemu provided by Xilinx (http://www.wiki.xilinx.com/QEMU). Basical=
-ly,
-> you provide a DTB file as a Qemu command line argument and Qemu will buil=
-d
-> the various devices (including addresses and interrupts) based on the
-> content of this file. Then when running an OS, it can provide the DTB fil=
-e
-> (for example to Linux) that match exactly the emulated platform.
->
-> This should allow to build "any" variation of the platform and to add
-> devices as you need them. This makes sense for Xilinx (their customer are
-> building custom platforms) and it would also make sense for LEON as the C=
-PU
-> core is usually integrated inside a custom SOC/FPGA.
+> No other timer device calls mktime(), so I suspect this is the wrong
+> approach. (You may want something involving the QEMU mktimegm() utility
+> function.)
 
-This is a cool solution and works pretty well for us, but it requires
-very complex code and is not easy to debug or maintain, just something
-to keep in mind.
+Ah, mktimegm() gives me the correct timezone, that does work better.
 
-We also have a lot of trouble working with Linux device trees. For our
-more complex ZynqMP SoC we have our own non-standard device trees as
-the Linux ones don't include enough information.
+>
+> Also, looking at mc146818rtc.c it has logic for tracking what the
+> guest thinks the RTC is, which might be at an offset from what the
+> host's idea of the RTC is. I don't see anything like that here, which
+> makes me think this patch is missing something.
+
+My testing shows that what I have works with the date function in the
+Xilinx kernel
+
+If I start QEMU with
+-rtc base=2017-10-17T16:01:21
+
+I can run this:
+root@xilinx-zcu102-2017_3:~# date
+Tue Oct 17 16:01:28 UTC 2017
+<Wait ~40 seconds>
+root@xilinx-zcu102-2017_3:~# date
+Tue Oct 17 16:02:18 UTC 2017
+
+The offset seems fine to me
+
+>
+>> +}
+>> +
+>>  static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
+>>  {
+>>      XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+>> @@ -103,11 +111,13 @@ static const RegisterAccessInfo rtc_regs_info[] = {
+>>      {   .name = "SET_TIME_WRITE",  .addr = A_SET_TIME_WRITE,
+>>      },{ .name = "SET_TIME_READ",  .addr = A_SET_TIME_READ,
+>>          .ro = 0xffffffff,
+>> +        .post_read = current_time_postr,
+>>      },{ .name = "CALIB_WRITE",  .addr = A_CALIB_WRITE,
+>>      },{ .name = "CALIB_READ",  .addr = A_CALIB_READ,
+>>          .ro = 0x1fffff,
+>>      },{ .name = "CURRENT_TIME",  .addr = A_CURRENT_TIME,
+>>          .ro = 0xffffffff,
+>> +        .post_read = current_time_postr,
+>>      },{ .name = "CURRENT_TICK",  .addr = A_CURRENT_TICK,
+>>          .ro = 0xffff,
+>>      },{ .name = "ALARM",  .addr = A_ALARM,
+>> @@ -147,6 +157,12 @@ static void rtc_reset(DeviceState *dev)
+>>          register_reset(&s->regs_info[i]);
+>>      }
+>>
+>> +    qemu_get_timedate(&s->current_tm, 0);
+>> +
+>> +    trace_xlnx_zynqmp_rtc_gettime(s->current_tm.tm_year, s->current_tm.tm_mon,
+>> +                                  s->current_tm.tm_mday, s->current_tm.tm_hour,
+>> +                                  s->current_tm.tm_min, s->current_tm.tm_sec);
+>> +
+>>      rtc_int_update_irq(s);
+>>      addr_error_int_update_irq(s);
+>>  }
+>> @@ -190,6 +206,13 @@ static const VMStateDescription vmstate_rtc = {
+>>      .minimum_version_id = 1,
+>>      .fields = (VMStateField[]) {
+>>          VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPRTC, XLNX_ZYNQMP_RTC_R_MAX),
+>> +        VMSTATE_INT32(current_tm.tm_sec, XlnxZynqMPRTC),
+>> +        VMSTATE_INT32(current_tm.tm_min, XlnxZynqMPRTC),
+>> +        VMSTATE_INT32(current_tm.tm_hour, XlnxZynqMPRTC),
+>> +        VMSTATE_INT32(current_tm.tm_wday, XlnxZynqMPRTC),
+>> +        VMSTATE_INT32(current_tm.tm_mday, XlnxZynqMPRTC),
+>> +        VMSTATE_INT32(current_tm.tm_mon, XlnxZynqMPRTC),
+>> +        VMSTATE_INT32(current_tm.tm_year, XlnxZynqMPRTC),
+>
+> Presumably the timer device has an internal representation of the
+> current time (in registers or something). I think it would make more
+> sense to have the migration state representation be whatever the
+> hardware does. (Compare eg mc146818rtc.c where we interpret a
+> struct tm into the various cmos_data[] fields, and then migration
+> works with those.)
+
+The problem with this is that it requires the overhead of
+saving/loading an internal state while at the moment we don't have to.
+Admittedly this falls apart if the guest wants to edit the RTC, at the
+moment that isn't supported.
+
+I'll repsin a new version with a tick_offset similar to pl031. Even if
+we don't support guest setting the RTC it puts us in a better position
+for the future.
 
 Alistair
 
 >
-> JC
+>>          VMSTATE_END_OF_LIST(),
+>>      }
+>>  };
+>> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
+>> index 87649836cc..daecb646f0 100644
+>> --- a/include/hw/timer/xlnx-zynqmp-rtc.h
+>> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
+>> @@ -25,6 +25,7 @@
+>>   */
+>>
+>>  #include "hw/register.h"
+>> +#include "trace.h"
 >
+> I think this include should be in the .c file.
+>
+>>
+>>  #define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
+>>
+>> @@ -79,6 +80,8 @@ typedef struct XlnxZynqMPRTC {
+>>      qemu_irq irq_rtc_int;
+>>      qemu_irq irq_addr_error_int;
+>>
+>> +    struct tm current_tm;
+>> +
+>>      uint32_t regs[XLNX_ZYNQMP_RTC_R_MAX];
+>>      RegisterInfo regs_info[XLNX_ZYNQMP_RTC_R_MAX];
+>>  } XlnxZynqMPRTC;
+>> --
+>> 2.14.1
+>
+> thanks
+> -- PMM
