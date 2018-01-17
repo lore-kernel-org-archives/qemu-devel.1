@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eboSa-0001Gq-Oi
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:13:02 -0500
+	(envelope-from <lersek@redhat.com>) id 1eboYE-0004WF-Al
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:18:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eboSZ-0006sR-Fg
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:13:00 -0500
-References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516107870-8110-9-git-send-email-anton.nefedov@virtuozzo.com>
-	<w51h8rlwzp8.fsf@maestria.local.igalia.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <11f70cde-3f73-ad03-3d67-1e2eee2a04e4@virtuozzo.com>
-Date: Wed, 17 Jan 2018 17:12:44 +0300
+	(envelope-from <lersek@redhat.com>) id 1eboY8-0003Mp-FO
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:18:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eboY8-0003Lk-8U
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 09:18:44 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 18A4E61D1F
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 14:18:43 +0000 (UTC)
+References: <20180117114430.19110-1-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a9bc4b35-23b3-515f-9ba1-71f41a95b9e7@redhat.com>
+Date: Wed, 17 Jan 2018 15:18:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <w51h8rlwzp8.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180117114430.19110-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 8/9] qcow2: skip writing zero buffers to
- empty COW areas
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] dump-guest-memory.py: fix python 2 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,117 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
+On 01/17/18 12:44, Marc-Andr=C3=A9 Lureau wrote:
+> Python GDB support may use Python 2 or 3.
+>=20
+> Inferior.read_memory() may return a buffer with Python 2 or a
+> memoryview with Python 3 (see also
+> https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
+>=20
+> The elf.add_vmcoreinfo_note() method expect a byte string, but Python 2
+> buffer doesn't provide the tobyes() method. Wrap the read_memory()
+> result to a memoryview, available in Python 2.7. (if the return object
+> is already a memoryview, this adds a useless identity view on top)
 
+OOP is awesome.
 
-On 16/1/2018 7:11 PM, Alberto Garcia wrote:
-> On Tue 16 Jan 2018 02:04:29 PM CET, Anton Nefedov wrote:
-> 
->> iotest 060:
->> write to the discarded cluster does not trigger COW anymore.
->> so, break on write_aio event instead, will work for the test
->> (but write won't fail anymore, so update reference output)
-> 
-> I'm wondering about this. The reason why the write doesn't fail anymore
-> is because after this patch we're breaking in write_aio as you say:
-> 
->         BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
->         trace_qcow2_writev_data(qemu_coroutine_self(),
->                                 cluster_offset + offset_in_cluster);
->         ret = bdrv_co_pwritev(bs->file,
->                               cluster_offset + offset_in_cluster,
->                               cur_bytes, &hd_qiov, 0);
-> 
-> When the image is marked as corrupted then bs->drv is set to NULL, but
-> bs->file->drv is still valid. So QEMU goes forward and writes into the
-> image.
-> 
-> Should we check bs->drv after BLKDBG_EVENT() or perhaps set
-> bs->file->bs->drv = NULL when an image is corrupted?
-> 
+>=20
+> Fixes a regression introduced with commit
+> d23bfa91b7789534d16ede6cb7d925bfac3f3c4c ("add vmcoreinfo").
 
-I don't know. On one hand we'll catch and cancel some of in-flight
-requests which is rather good.
-It feels though like the drv check that the test uses to get error on is
-mostly because the driver function is used directly.
+Do you want to CC stable? Commit d23bfa91b778 is part of v2.11.0.
 
->> +static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
->> +{
->> +    if (bs->encrypted) {
->> +        return false;
->> +    }
-> 
-> I found this a bit confusing because is_zero_cow() can be interpreted as
-> "the region we're going to copy only contains zeroes" or "we're only
-> going to write zeroes".
-> 
-> In the first case the bs->encrypted test does not belong there, because
-> that region may perfectly well contain only zeroes and bs->encrypted
-> tells us nothing about it.
-> 
-> In the second case the test is fine because bs->encrypted means that
-> we're definitely going to write something other than zeroes.
-> 
-> I think it's worth adding a comment clarifying this in order to avoid
-> confusion, or perhaps renaming the function to make it more explicit
-> (cow_writes_as_zeroes() or something like that).
-> 
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/dump-guest-memory.py | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
+y
+> index 09bec92b50..6f7e1a83b3 100644
+> --- a/scripts/dump-guest-memory.py
+> +++ b/scripts/dump-guest-memory.py
+> @@ -564,7 +564,9 @@ shape and this command should mostly work."""
+> =20
+>          vmcoreinfo =3D self.phys_memory_read(addr, size)
+>          if vmcoreinfo:
+> -            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
+> +            # Python 2.7 returns a buffer
+> +            vmciview =3D memoryview(vmcoreinfo)
+> +            self.elf.add_vmcoreinfo_note(vmciview.tobytes())
+> =20
+>      def invoke(self, args, from_tty):
+>          """Handles command invocation from gdb."""
+>=20
 
-Agree. I'd rather take bs->encrypted check out.
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
->> +static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
->> +{
->> +    BDRVQcow2State *s = bs->opaque;
->> +    QCowL2Meta *m;
->> +
->> +    for (m = l2meta; m != NULL; m = m->next) {
->> +        int ret;
->> +
->> +        if (!m->cow_start.nb_bytes && !m->cow_end.nb_bytes) {
->> +            continue;
->> +        }
->> +
->> +        if (!is_zero_cow(bs, m)) {
->> +            continue;
->> +        }
->> +
->> +        /* instead of writing zero COW buffers,
->> +           efficiently zero out the whole clusters */
->> +        ret = bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset,
->> +                                    m->nb_clusters * s->cluster_size,
->> +                                    BDRV_REQ_ALLOCATE);
->> +        if (ret < 0) {
->> +            continue;
->> +        }
-> 
-> Is it always fine to simply ignore the error and go on?
-> 
-
-Good point, probably error codes other than ENOTSUP and EAGAIN should be
-propagated.
-
->> --- a/tests/qemu-iotests/060
->> +++ b/tests/qemu-iotests/060
->> @@ -160,7 +160,7 @@ poke_file "$TEST_IMG" '131084' "\x00\x00" # 0x2000c
->>   # any unallocated cluster, leading to an attempt to overwrite the second L2
->>   # table. Finally, resume the COW write and see it fail (but not crash).
->>   echo "open -o file.driver=blkdebug $TEST_IMG
->> -break cow_read 0
->> +break write_aio 0
->>   aio_write 0k 1k
->>   wait_break 0
->>   write 64k 64k
-> 
-> Apart from what I wrote in the beginning of the e-mail, if you're
-> changing the semantics of this test you should also update the
-> comment. With your patch the COW no longer stops before doing the read,
-> and after being resumed it no longer crashes.
-> 
-
-In fact, the change makes the test quite useless.
-I will fix COW instead (i.e. use a real backing file).
-
-Also I think I missed to create a new blkdbg event, it looks those are
-generally put before bdrv_x(bs->file) calls.
+Laszlo
