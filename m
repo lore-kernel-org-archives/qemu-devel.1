@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQK-0007rY-1I
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQK-0007rf-In
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ebdQI-0001JI-5C
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ebdQI-0001Jm-FO
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 21:25:56 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 Jan 2018 13:25:10 +1100
-Message-Id: <20180117022525.31767-8-david@gibson.dropbear.id.au>
+Date: Wed, 17 Jan 2018 13:25:14 +1100
+Message-Id: <20180117022525.31767-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20180117022525.31767-1-david@gibson.dropbear.id.au>
 References: <20180117022525.31767-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/22] spapr: Handle Decimal Floating Point
- (DFP) as an optional capability
+Subject: [Qemu-devel] [PULL 11/22] target/ppc: Clarify compat mode
+ max_threads value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,115 +23,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Decimal Floating Point has been available on POWER7 and later (server)
-cpus.  However, it can be disabled on the hypervisor, meaning that it's
-not available to guests.
+We recently had some discussions that were sidetracked for a while, because
+nearly everyone misapprehended the purpose of the 'max_threads' field in
+the compatiblity modes table.  It's all about guest expectations, not host
+expectations or support (that's handled elsewhere).
 
-We currently handle this by conditionally advertising DFP support in the
-device tree depending on whether the guest CPU model supports it - which
-can also depend on what's allowed in the host for -cpu host.  That can lead
-to confusion on migration, since host properties are silently affecting
-guest visible properties.
-
-This patch handles it by treating it as an optional capability for the
-pseries machine type.
+In an attempt to avoid a repeat of that confusion, rename the field to
+'max_vthreads' and add an explanatory comment.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c         |  7 ++++---
- hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
- include/hw/ppc/spapr.h |  3 +++
- 3 files changed, 25 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c      |  4 ++--
+ target/ppc/compat.c | 25 +++++++++++++++++--------
+ target/ppc/cpu.h    |  2 +-
+ 3 files changed, 20 insertions(+), 11 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index eca9f11c91..d1acfe8858 100644
+index 3e528fe91e..e35214bfc3 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -572,7 +572,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     /* Advertise DFP (Decimal Floating Point) if available
-      *   0 / no property == no DFP
-      *   1               == DFP available */
--    if (env->insns_flags2 & PPC2_DFP) {
-+    if (spapr_has_cap(spapr, SPAPR_CAP_DFP)) {
-         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
-     }
+@@ -345,7 +345,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+         PowerPCCPU *cpu = POWERPC_CPU(cs);
+         DeviceClass *dc = DEVICE_GET_CLASS(cs);
+         int index = spapr_vcpu_id(cpu);
+-        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
++        int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
  
-@@ -3834,7 +3834,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      */
-     mc->numa_mem_align_shift = 28;
- 
--    smc->default_caps = spapr_caps(SPAPR_CAP_VSX);
-+    smc->default_caps = spapr_caps(SPAPR_CAP_VSX | SPAPR_CAP_DFP);
-     spapr_caps_add_properties(smc, &error_abort);
- }
- 
-@@ -3916,7 +3916,8 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
- 
-     spapr_machine_2_12_class_options(mc);
--    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX);
-+    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX
-+                                   | SPAPR_CAP_DFP);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
- }
- 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 7c855c67ad..9d070a306c 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -70,6 +70,16 @@ static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
-     }
- }
- 
-+static void cap_dfp_allow(sPAPRMachineState *spapr, Error **errp)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-+    CPUPPCState *env = &cpu->env;
+         if ((index % smt) != 0) {
+             continue;
+@@ -503,7 +503,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+     size_t page_sizes_prop_size;
+     uint32_t vcpus_per_socket = smp_threads * smp_cores;
+     uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
+-    int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
++    int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
+     sPAPRDRConnector *drc;
+     int drc_index;
+     uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
+diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+index 276b5b52c2..807c906f68 100644
+--- a/target/ppc/compat.c
++++ b/target/ppc/compat.c
+@@ -32,7 +32,16 @@ typedef struct {
+     uint32_t pvr;
+     uint64_t pcr;
+     uint64_t pcr_level;
+-    int max_threads;
 +
-+    if (!(env->insns_flags2 & PPC2_DFP)) {
-+        error_setg(errp, "DFP support not available, try cap-dfp=off");
-+    }
-+}
-+
- static sPAPRCapabilityInfo capability_table[] = {
-     {
-         .name = "htm",
-@@ -85,6 +95,13 @@ static sPAPRCapabilityInfo capability_table[] = {
-         .allow = cap_vsx_allow,
-         /* TODO: add cap_vsx_disallow */
++    /*
++     * Maximum allowed virtual threads per virtual core
++     *
++     * This is to stop older guests getting confused by seeing more
++     * threads than they think the cpu can support.  Usually it's
++     * equal to the number of threads supported on bare metal
++     * hardware, but not always (see POWER9).
++     */
++    int max_vthreads;
+ } CompatInfo;
+ 
+ static const CompatInfo compat_table[] = {
+@@ -45,28 +54,28 @@ static const CompatInfo compat_table[] = {
+         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
+                PCR_COMPAT_2_05 | PCR_TM_DIS | PCR_VSX_DIS,
+         .pcr_level = PCR_COMPAT_2_05,
+-        .max_threads = 2,
++        .max_vthreads = 2,
      },
-+    {
-+        .name = "dfp",
-+        .description = "Allow Decimal Floating Point (DFP)",
-+        .flag = SPAPR_CAP_DFP,
-+        .allow = cap_dfp_allow,
-+        /* TODO: add cap_dfp_disallow */
-+    },
+     { /* POWER7, ISA2.06 */
+         .name = "power7",
+         .pvr = CPU_POWERPC_LOGICAL_2_06,
+         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
+         .pcr_level = PCR_COMPAT_2_06,
+-        .max_threads = 4,
++        .max_vthreads = 4,
+     },
+     {
+         .name = "power7+",
+         .pvr = CPU_POWERPC_LOGICAL_2_06_PLUS,
+         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
+         .pcr_level = PCR_COMPAT_2_06,
+-        .max_threads = 4,
++        .max_vthreads = 4,
+     },
+     { /* POWER8, ISA2.07 */
+         .name = "power8",
+         .pvr = CPU_POWERPC_LOGICAL_2_07,
+         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
+         .pcr_level = PCR_COMPAT_2_07,
+-        .max_threads = 8,
++        .max_vthreads = 8,
+     },
+     { /* POWER9, ISA3.00 */
+         .name = "power9",
+@@ -80,7 +89,7 @@ static const CompatInfo compat_table[] = {
+          * confusing if half of the threads disappear from the guest
+          * if it announces it's POWER9 aware at CAS time.
+          */
+-        .max_threads = 8,
++        .max_vthreads = 8,
+     },
  };
  
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-@@ -104,6 +121,7 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-                           0, spapr->max_compat_pvr)) {
-         caps.mask &= ~SPAPR_CAP_VSX;
-+        caps.mask &= ~SPAPR_CAP_DFP;
+@@ -192,14 +201,14 @@ void ppc_set_compat_all(uint32_t compat_pvr, Error **errp)
+     }
+ }
+ 
+-int ppc_compat_max_threads(PowerPCCPU *cpu)
++int ppc_compat_max_vthreads(PowerPCCPU *cpu)
+ {
+     const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
+     int n_threads = CPU(cpu)->nr_threads;
+ 
+     if (cpu->compat_pvr) {
+         g_assert(compat);
+-        n_threads = MIN(n_threads, compat->max_threads);
++        n_threads = MIN(n_threads, compat->max_vthreads);
      }
  
-     return caps;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 148a03d189..26ac17e641 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -62,6 +62,9 @@ typedef enum {
- /* Vector Scalar Extensions */
- #define SPAPR_CAP_VSX               0x0000000000000002ULL
- 
-+/* Decimal Floating Point */
-+#define SPAPR_CAP_DFP               0x0000000000000004ULL
-+
- typedef struct sPAPRCapabilities sPAPRCapabilities;
- struct sPAPRCapabilities {
-     uint64_t mask;
+     return n_threads;
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index a5e49f23e9..dc6820c5eb 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1395,7 +1395,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
+ #if !defined(CONFIG_USER_ONLY)
+ void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
+ #endif
+-int ppc_compat_max_threads(PowerPCCPU *cpu);
++int ppc_compat_max_vthreads(PowerPCCPU *cpu);
+ void ppc_compat_add_property(Object *obj, const char *name,
+                              uint32_t *compat_pvr, const char *basedesc,
+                              Error **errp);
 -- 
 2.14.3
