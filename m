@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqN4-0006qP-5X
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:27 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqN8-0006ue-AH
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ebqN0-0003mJ-TT
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:26 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34716)
+	(envelope-from <richard.henderson@linaro.org>) id 1ebqN6-0003pA-HP
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:30 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:43829)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ebqN0-0003m0-L8
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:22 -0500
-Received: by mail-pg0-x241.google.com with SMTP id r19so5732683pgn.1
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:15:22 -0800 (PST)
+	id 1ebqN6-0003op-7e
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 11:15:28 -0500
+Received: by mail-pf0-x242.google.com with SMTP id y26so4225913pfi.10
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 08:15:28 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 17 Jan 2018 08:14:25 -0800
-Message-Id: <20180117161435.28981-11-richard.henderson@linaro.org>
+Date: Wed, 17 Jan 2018 08:14:27 -0800
+Message-Id: <20180117161435.28981-13-richard.henderson@linaro.org>
 In-Reply-To: <20180117161435.28981-1-richard.henderson@linaro.org>
 References: <20180117161435.28981-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v10.5 10/20] tcg/optimize: Handle vector
- opcodes during optimize
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v10.5 12/20] target/arm: Use vector
+ infrastructure for aa64 add/sub/logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,334 +33,287 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Trivial move and constant propagation.  Some identity and constant
-function folding, but nothing that requires knowledge of the size
-of the vector element.
-
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/optimize.c | 150 +++++++++++++++++++++++++++++----------------------------
- 1 file changed, 77 insertions(+), 73 deletions(-)
+ target/arm/translate-a64.c | 207 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 134 insertions(+), 73 deletions(-)
 
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index 2cbbeefd53..d4ea67e541 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -32,6 +32,11 @@
-         glue(glue(case INDEX_op_, x), _i32):    \
-         glue(glue(case INDEX_op_, x), _i64)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 70c1e08a36..b97bc9b83c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -21,6 +21,7 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
++#include "tcg-op-gvec.h"
+ #include "qemu/log.h"
+ #include "arm_ldst.h"
+ #include "translate.h"
+@@ -83,6 +84,10 @@ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
+ typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
+ typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
  
-+#define CASE_OP_32_64_VEC(x)                    \
-+        glue(glue(case INDEX_op_, x), _i32):    \
-+        glue(glue(case INDEX_op_, x), _i64):    \
-+        glue(glue(case INDEX_op_, x), _vec)
++/* Note that the gvec expanders operate on offsets + sizes.  */
++typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
++                        uint32_t, uint32_t, uint32_t);
 +
- struct tcg_temp_info {
-     bool is_const;
-     TCGTemp *prev_copy;
-@@ -108,40 +113,6 @@ static void init_arg_info(struct tcg_temp_info *infos,
-     init_ts_info(infos, temps_used, arg_temp(arg));
+ /* initialize TCG globals.  */
+ void a64_translate_init(void)
+ {
+@@ -535,6 +540,21 @@ static inline int vec_reg_offset(DisasContext *s, int regno,
+     return offs;
  }
  
--static int op_bits(TCGOpcode op)
--{
--    const TCGOpDef *def = &tcg_op_defs[op];
--    return def->flags & TCG_OPF_64BIT ? 64 : 32;
--}
--
--static TCGOpcode op_to_mov(TCGOpcode op)
--{
--    switch (op_bits(op)) {
--    case 32:
--        return INDEX_op_mov_i32;
--    case 64:
--        return INDEX_op_mov_i64;
--    default:
--        fprintf(stderr, "op_to_mov: unexpected return value of "
--                "function op_bits.\n");
--        tcg_abort();
--    }
--}
--
--static TCGOpcode op_to_movi(TCGOpcode op)
--{
--    switch (op_bits(op)) {
--    case 32:
--        return INDEX_op_movi_i32;
--    case 64:
--        return INDEX_op_movi_i64;
--    default:
--        fprintf(stderr, "op_to_movi: unexpected return value of "
--                "function op_bits.\n");
--        tcg_abort();
--    }
--}
--
- static TCGTemp *find_better_copy(TCGContext *s, TCGTemp *ts)
- {
-     TCGTemp *i;
-@@ -199,11 +170,23 @@ static bool args_are_copies(TCGArg arg1, TCGArg arg2)
- 
- static void tcg_opt_gen_movi(TCGContext *s, TCGOp *op, TCGArg dst, TCGArg val)
- {
--    TCGOpcode new_op = op_to_movi(op->opc);
-+    const TCGOpDef *def;
-+    TCGOpcode new_op;
-     tcg_target_ulong mask;
-     struct tcg_temp_info *di = arg_info(dst);
- 
-+    def = &tcg_op_defs[op->opc];
-+    if (def->flags & TCG_OPF_VECTOR) {
-+        new_op = INDEX_op_dupi_vec;
-+    } else if (def->flags & TCG_OPF_64BIT) {
-+        new_op = INDEX_op_movi_i64;
-+    } else {
-+        new_op = INDEX_op_movi_i32;
-+    }
-     op->opc = new_op;
-+    /* TCGOP_VECL and TCGOP_VECE remain unchanged.  */
-+    op->args[0] = dst;
-+    op->args[1] = val;
- 
-     reset_temp(dst);
-     di->is_const = true;
-@@ -214,15 +197,13 @@ static void tcg_opt_gen_movi(TCGContext *s, TCGOp *op, TCGArg dst, TCGArg val)
-         mask |= ~0xffffffffull;
++/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
++static inline int vec_full_reg_offset(DisasContext *s, int regno)
++{
++    assert_fp_access_checked(s);
++    return offsetof(CPUARMState, vfp.regs[regno * 2]);
++}
++
++/* Return the byte size of the "whole" vector register, VL / 8.  */
++static inline int vec_full_reg_size(DisasContext *s)
++{
++    /* FIXME SVE: We should put the composite ZCR_EL* value into tb->flags.
++       In the meantime this is just the AdvSIMD length of 128.  */
++    return 128 / 8;
++}
++
+ /* Return the offset into CPUARMState of a slice (from
+  * the least significant end) of FP register Qn (ie
+  * Dn, Sn, Hn or Bn).
+@@ -9065,85 +9085,125 @@ static void disas_simd_three_reg_diff(DisasContext *s, uint32_t insn)
      }
-     di->mask = mask;
--
--    op->args[0] = dst;
--    op->args[1] = val;
  }
  
- static void tcg_opt_gen_mov(TCGContext *s, TCGOp *op, TCGArg dst, TCGArg src)
++static void gen_bsl_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
++{
++    tcg_gen_xor_i64(rn, rn, rm);
++    tcg_gen_and_i64(rn, rn, rd);
++    tcg_gen_xor_i64(rd, rm, rn);
++}
++
++static void gen_bit_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
++{
++    tcg_gen_xor_i64(rn, rn, rd);
++    tcg_gen_and_i64(rn, rn, rm);
++    tcg_gen_xor_i64(rd, rd, rn);
++}
++
++static void gen_bif_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
++{
++    tcg_gen_xor_i64(rn, rn, rd);
++    tcg_gen_andc_i64(rn, rn, rm);
++    tcg_gen_xor_i64(rd, rd, rn);
++}
++
++static void gen_bsl_vec(unsigned vece, TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
++{
++    tcg_gen_xor_vec(vece, rn, rn, rm);
++    tcg_gen_and_vec(vece, rn, rn, rd);
++    tcg_gen_xor_vec(vece, rd, rm, rn);
++}
++
++static void gen_bit_vec(unsigned vece, TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
++{
++    tcg_gen_xor_vec(vece, rn, rn, rd);
++    tcg_gen_and_vec(vece, rn, rn, rm);
++    tcg_gen_xor_vec(vece, rd, rd, rn);
++}
++
++static void gen_bif_vec(unsigned vece, TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
++{
++    tcg_gen_xor_vec(vece, rn, rn, rd);
++    tcg_gen_andc_vec(vece, rn, rn, rm);
++    tcg_gen_xor_vec(vece, rd, rd, rn);
++}
++
+ /* Logic op (opcode == 3) subgroup of C3.6.16. */
+ static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
  {
-     TCGTemp *dst_ts = arg_temp(dst);
-     TCGTemp *src_ts = arg_temp(src);
-+    const TCGOpDef *def;
-     struct tcg_temp_info *di;
-     struct tcg_temp_info *si;
-     tcg_target_ulong mask;
-@@ -236,9 +217,16 @@ static void tcg_opt_gen_mov(TCGContext *s, TCGOp *op, TCGArg dst, TCGArg src)
-     reset_ts(dst_ts);
-     di = ts_info(dst_ts);
-     si = ts_info(src_ts);
--    new_op = op_to_mov(op->opc);
--
-+    def = &tcg_op_defs[op->opc];
-+    if (def->flags & TCG_OPF_VECTOR) {
-+        new_op = INDEX_op_mov_vec;
-+    } else if (def->flags & TCG_OPF_64BIT) {
-+        new_op = INDEX_op_mov_i64;
-+    } else {
-+        new_op = INDEX_op_mov_i32;
-+    }
-     op->opc = new_op;
-+    /* TCGOP_VECL and TCGOP_VECE remain unchanged.  */
-     op->args[0] = dst;
-     op->args[1] = src;
++    static const GVecGen3 bsl_op = {
++        .fni8 = gen_bsl_i64,
++        .fniv = gen_bsl_vec,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++        .load_dest = true
++    };
++    static const GVecGen3 bit_op = {
++        .fni8 = gen_bit_i64,
++        .fniv = gen_bit_vec,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++        .load_dest = true
++    };
++    static const GVecGen3 bif_op = {
++        .fni8 = gen_bif_i64,
++        .fniv = gen_bif_vec,
++        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++        .load_dest = true
++    };
++
+     int rd = extract32(insn, 0, 5);
+     int rn = extract32(insn, 5, 5);
+     int rm = extract32(insn, 16, 5);
+     int size = extract32(insn, 22, 2);
+     bool is_u = extract32(insn, 29, 1);
+     bool is_q = extract32(insn, 30, 1);
+-    TCGv_i64 tcg_op1, tcg_op2, tcg_res[2];
+-    int pass;
++    GVecGen3Fn *gvec_fn;
++    const GVecGen3 *gvec_op;
  
-@@ -417,8 +405,9 @@ static TCGArg do_constant_folding_2(TCGOpcode op, TCGArg x, TCGArg y)
- 
- static TCGArg do_constant_folding(TCGOpcode op, TCGArg x, TCGArg y)
- {
-+    const TCGOpDef *def = &tcg_op_defs[op];
-     TCGArg res = do_constant_folding_2(op, x, y);
--    if (op_bits(op) == 32) {
-+    if (!(def->flags & TCG_OPF_64BIT)) {
-         res = (int32_t)res;
+     if (!fp_access_check(s)) {
+         return;
      }
-     return res;
-@@ -508,13 +497,12 @@ static TCGArg do_constant_folding_cond(TCGOpcode op, TCGArg x,
-     tcg_target_ulong xv = arg_info(x)->val;
-     tcg_target_ulong yv = arg_info(y)->val;
-     if (arg_is_const(x) && arg_is_const(y)) {
--        switch (op_bits(op)) {
--        case 32:
--            return do_constant_folding_cond_32(xv, yv, c);
--        case 64:
-+        const TCGOpDef *def = &tcg_op_defs[op];
-+        tcg_debug_assert(!(def->flags & TCG_OPF_VECTOR));
-+        if (def->flags & TCG_OPF_64BIT) {
-             return do_constant_folding_cond_64(xv, yv, c);
--        default:
--            tcg_abort();
-+        } else {
-+            return do_constant_folding_cond_32(xv, yv, c);
-         }
-     } else if (args_are_copies(x, y)) {
-         return do_constant_folding_cond_eq(c);
-@@ -653,11 +641,11 @@ void tcg_optimize(TCGContext *s)
  
-         /* For commutative operations make constant second argument */
-         switch (opc) {
--        CASE_OP_32_64(add):
--        CASE_OP_32_64(mul):
--        CASE_OP_32_64(and):
--        CASE_OP_32_64(or):
--        CASE_OP_32_64(xor):
-+        CASE_OP_32_64_VEC(add):
-+        CASE_OP_32_64_VEC(mul):
-+        CASE_OP_32_64_VEC(and):
-+        CASE_OP_32_64_VEC(or):
-+        CASE_OP_32_64_VEC(xor):
-         CASE_OP_32_64(eqv):
-         CASE_OP_32_64(nand):
-         CASE_OP_32_64(nor):
-@@ -722,7 +710,7 @@ void tcg_optimize(TCGContext *s)
-                 continue;
+-    tcg_op1 = tcg_temp_new_i64();
+-    tcg_op2 = tcg_temp_new_i64();
+-    tcg_res[0] = tcg_temp_new_i64();
+-    tcg_res[1] = tcg_temp_new_i64();
+-
+-    for (pass = 0; pass < (is_q ? 2 : 1); pass++) {
+-        read_vec_element(s, tcg_op1, rn, pass, MO_64);
+-        read_vec_element(s, tcg_op2, rm, pass, MO_64);
+-
+-        if (!is_u) {
+-            switch (size) {
+-            case 0: /* AND */
+-                tcg_gen_and_i64(tcg_res[pass], tcg_op1, tcg_op2);
+-                break;
+-            case 1: /* BIC */
+-                tcg_gen_andc_i64(tcg_res[pass], tcg_op1, tcg_op2);
+-                break;
+-            case 2: /* ORR */
+-                tcg_gen_or_i64(tcg_res[pass], tcg_op1, tcg_op2);
+-                break;
+-            case 3: /* ORN */
+-                tcg_gen_orc_i64(tcg_res[pass], tcg_op1, tcg_op2);
+-                break;
+-            }
+-        } else {
+-            if (size != 0) {
+-                /* B* ops need res loaded to operate on */
+-                read_vec_element(s, tcg_res[pass], rd, pass, MO_64);
+-            }
+-
+-            switch (size) {
+-            case 0: /* EOR */
+-                tcg_gen_xor_i64(tcg_res[pass], tcg_op1, tcg_op2);
+-                break;
+-            case 1: /* BSL bitwise select */
+-                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_op2);
+-                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_res[pass]);
+-                tcg_gen_xor_i64(tcg_res[pass], tcg_op2, tcg_op1);
+-                break;
+-            case 2: /* BIT, bitwise insert if true */
+-                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
+-                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_op2);
+-                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
+-                break;
+-            case 3: /* BIF, bitwise insert if false */
+-                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
+-                tcg_gen_andc_i64(tcg_op1, tcg_op1, tcg_op2);
+-                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
+-                break;
+-            }
+-        }
+-    }
++    switch (size + 4 * is_u) {
++    case 0: /* AND */
++        gvec_fn = tcg_gen_gvec_and;
++        goto do_fn;
++    case 1: /* BIC */
++        gvec_fn = tcg_gen_gvec_andc;
++        goto do_fn;
++    case 2: /* ORR */
++        gvec_fn = tcg_gen_gvec_or;
++        goto do_fn;
++    case 3: /* ORN */
++        gvec_fn = tcg_gen_gvec_orc;
++        goto do_fn;
++    case 4: /* EOR */
++        gvec_fn = tcg_gen_gvec_xor;
++        goto do_fn;
++    do_fn:
++        gvec_fn(0, vec_full_reg_offset(s, rd),
++                vec_full_reg_offset(s, rn),
++                vec_full_reg_offset(s, rm),
++                is_q ? 16 : 8, vec_full_reg_size(s));
++        return;
++
++    case 5: /* BSL bitwise select */
++        gvec_op = &bsl_op;
++        goto do_op;
++    case 6: /* BIT, bitwise insert if true */
++        gvec_op = &bit_op;
++        goto do_op;
++    case 7: /* BIF, bitwise insert if false */
++        gvec_op = &bif_op;
++        goto do_op;
++    do_op:
++        tcg_gen_gvec_3(vec_full_reg_offset(s, rd),
++                       vec_full_reg_offset(s, rn),
++                       vec_full_reg_offset(s, rm),
++                       is_q ? 16 : 8, vec_full_reg_size(s), gvec_op);
++        return;
+ 
+-    write_vec_element(s, tcg_res[0], rd, 0, MO_64);
+-    if (!is_q) {
+-        tcg_gen_movi_i64(tcg_res[1], 0);
++    default:
++        g_assert_not_reached();
+     }
+-    write_vec_element(s, tcg_res[1], rd, 1, MO_64);
+-
+-    tcg_temp_free_i64(tcg_op1);
+-    tcg_temp_free_i64(tcg_op2);
+-    tcg_temp_free_i64(tcg_res[0]);
+-    tcg_temp_free_i64(tcg_res[1]);
+ }
+ 
+ /* Helper functions for 32 bit comparisons */
+@@ -9404,6 +9464,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+     int pass;
++    GVecGen3Fn *gvec_op;
+ 
+     switch (opcode) {
+     case 0x13: /* MUL, PMUL */
+@@ -9443,6 +9504,16 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
++    switch (opcode) {
++    case 0x10: /* ADD, SUB */
++        gvec_op = u ? tcg_gen_gvec_sub : tcg_gen_gvec_add;
++        gvec_op(size, vec_full_reg_offset(s, rd),
++                vec_full_reg_offset(s, rn),
++                vec_full_reg_offset(s, rm),
++                is_q ? 16 : 8, vec_full_reg_size(s));
++        return;
++    }
++
+     if (size == 3) {
+         assert(is_q);
+         for (pass = 0; pass < 2; pass++) {
+@@ -9615,16 +9686,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+                 genfn = fns[size][u];
+                 break;
              }
-             break;
--        CASE_OP_32_64(sub):
-+        CASE_OP_32_64_VEC(sub):
+-            case 0x10: /* ADD, SUB */
+-            {
+-                static NeonGenTwoOpFn * const fns[3][2] = {
+-                    { gen_helper_neon_add_u8, gen_helper_neon_sub_u8 },
+-                    { gen_helper_neon_add_u16, gen_helper_neon_sub_u16 },
+-                    { tcg_gen_add_i32, tcg_gen_sub_i32 },
+-                };
+-                genfn = fns[size][u];
+-                break;
+-            }
+             case 0x11: /* CMTST, CMEQ */
              {
-                 TCGOpcode neg_op;
-                 bool have_neg;
-@@ -734,9 +722,12 @@ void tcg_optimize(TCGContext *s)
-                 if (opc == INDEX_op_sub_i32) {
-                     neg_op = INDEX_op_neg_i32;
-                     have_neg = TCG_TARGET_HAS_neg_i32;
--                } else {
-+                } else if (opc == INDEX_op_sub_i64) {
-                     neg_op = INDEX_op_neg_i64;
-                     have_neg = TCG_TARGET_HAS_neg_i64;
-+                } else {
-+                    neg_op = INDEX_op_neg_vec;
-+                    have_neg = TCG_TARGET_HAS_neg_vec;
-                 }
-                 if (!have_neg) {
-                     break;
-@@ -750,7 +741,7 @@ void tcg_optimize(TCGContext *s)
-                 }
-             }
-             break;
--        CASE_OP_32_64(xor):
-+        CASE_OP_32_64_VEC(xor):
-         CASE_OP_32_64(nand):
-             if (!arg_is_const(op->args[1])
-                 && arg_is_const(op->args[2])
-@@ -767,7 +758,7 @@ void tcg_optimize(TCGContext *s)
-                 goto try_not;
-             }
-             break;
--        CASE_OP_32_64(andc):
-+        CASE_OP_32_64_VEC(andc):
-             if (!arg_is_const(op->args[2])
-                 && arg_is_const(op->args[1])
-                 && arg_info(op->args[1])->val == -1) {
-@@ -775,7 +766,7 @@ void tcg_optimize(TCGContext *s)
-                 goto try_not;
-             }
-             break;
--        CASE_OP_32_64(orc):
-+        CASE_OP_32_64_VEC(orc):
-         CASE_OP_32_64(eqv):
-             if (!arg_is_const(op->args[2])
-                 && arg_is_const(op->args[1])
-@@ -789,7 +780,10 @@ void tcg_optimize(TCGContext *s)
-                 TCGOpcode not_op;
-                 bool have_not;
- 
--                if (def->flags & TCG_OPF_64BIT) {
-+                if (def->flags & TCG_OPF_VECTOR) {
-+                    not_op = INDEX_op_not_vec;
-+                    have_not = TCG_TARGET_HAS_not_vec;
-+                } else if (def->flags & TCG_OPF_64BIT) {
-                     not_op = INDEX_op_not_i64;
-                     have_not = TCG_TARGET_HAS_not_i64;
-                 } else {
-@@ -810,16 +804,16 @@ void tcg_optimize(TCGContext *s)
- 
-         /* Simplify expression for "op r, a, const => mov r, a" cases */
-         switch (opc) {
--        CASE_OP_32_64(add):
--        CASE_OP_32_64(sub):
-+        CASE_OP_32_64_VEC(add):
-+        CASE_OP_32_64_VEC(sub):
-+        CASE_OP_32_64_VEC(or):
-+        CASE_OP_32_64_VEC(xor):
-+        CASE_OP_32_64_VEC(andc):
-         CASE_OP_32_64(shl):
-         CASE_OP_32_64(shr):
-         CASE_OP_32_64(sar):
-         CASE_OP_32_64(rotl):
-         CASE_OP_32_64(rotr):
--        CASE_OP_32_64(or):
--        CASE_OP_32_64(xor):
--        CASE_OP_32_64(andc):
-             if (!arg_is_const(op->args[1])
-                 && arg_is_const(op->args[2])
-                 && arg_info(op->args[2])->val == 0) {
-@@ -827,8 +821,8 @@ void tcg_optimize(TCGContext *s)
-                 continue;
-             }
-             break;
--        CASE_OP_32_64(and):
--        CASE_OP_32_64(orc):
-+        CASE_OP_32_64_VEC(and):
-+        CASE_OP_32_64_VEC(orc):
-         CASE_OP_32_64(eqv):
-             if (!arg_is_const(op->args[1])
-                 && arg_is_const(op->args[2])
-@@ -1042,8 +1036,8 @@ void tcg_optimize(TCGContext *s)
- 
-         /* Simplify expression for "op r, a, 0 => movi r, 0" cases */
-         switch (opc) {
--        CASE_OP_32_64(and):
--        CASE_OP_32_64(mul):
-+        CASE_OP_32_64_VEC(and):
-+        CASE_OP_32_64_VEC(mul):
-         CASE_OP_32_64(muluh):
-         CASE_OP_32_64(mulsh):
-             if (arg_is_const(op->args[2])
-@@ -1058,8 +1052,8 @@ void tcg_optimize(TCGContext *s)
- 
-         /* Simplify expression for "op r, a, a => mov r, a" cases */
-         switch (opc) {
--        CASE_OP_32_64(or):
--        CASE_OP_32_64(and):
-+        CASE_OP_32_64_VEC(or):
-+        CASE_OP_32_64_VEC(and):
-             if (args_are_copies(op->args[1], op->args[2])) {
-                 tcg_opt_gen_mov(s, op, op->args[0], op->args[1]);
-                 continue;
-@@ -1071,9 +1065,9 @@ void tcg_optimize(TCGContext *s)
- 
-         /* Simplify expression for "op r, a, a => movi r, 0" cases */
-         switch (opc) {
--        CASE_OP_32_64(andc):
--        CASE_OP_32_64(sub):
--        CASE_OP_32_64(xor):
-+        CASE_OP_32_64_VEC(andc):
-+        CASE_OP_32_64_VEC(sub):
-+        CASE_OP_32_64_VEC(xor):
-             if (args_are_copies(op->args[1], op->args[2])) {
-                 tcg_opt_gen_movi(s, op, op->args[0], 0);
-                 continue;
-@@ -1087,13 +1081,23 @@ void tcg_optimize(TCGContext *s)
-            folding.  Constants will be substituted to arguments by register
-            allocator where needed and possible.  Also detect copies. */
-         switch (opc) {
--        CASE_OP_32_64(mov):
-+        CASE_OP_32_64_VEC(mov):
-             tcg_opt_gen_mov(s, op, op->args[0], op->args[1]);
-             break;
-         CASE_OP_32_64(movi):
-+        case INDEX_op_dupi_vec:
-             tcg_opt_gen_movi(s, op, op->args[0], op->args[1]);
-             break;
- 
-+        case INDEX_op_dup_vec:
-+            if (arg_is_const(op->args[1])) {
-+                tmp = arg_info(op->args[1])->val;
-+                tmp = dup_const(TCGOP_VECE(op), tmp);
-+                tcg_opt_gen_movi(s, op, op->args[0], tmp);
-+                continue;
-+            }
-+            break;
-+
-         CASE_OP_32_64(not):
-         CASE_OP_32_64(neg):
-         CASE_OP_32_64(ext8s):
+                 static NeonGenTwoOpFn * const fns[3][2] = {
 -- 
 2.14.3
