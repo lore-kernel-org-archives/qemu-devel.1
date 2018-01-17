@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebv1v-0007XW-9l
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 16:13:56 -0500
+	(envelope-from <benh@kernel.crashing.org>) id 1ebvFs-0003Ry-8R
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 16:28:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ebv1u-0005Rw-C4
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 16:13:55 -0500
-References: <20180117193757.73471-1-borntraeger@de.ibm.com>
-	<20180117193757.73471-4-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <e1579c11-9a30-7035-16f6-ad047108260c@redhat.com>
-Date: Wed, 17 Jan 2018 22:13:49 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180117193757.73471-4-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/kvm: provide stfle.81
+	(envelope-from <benh@kernel.crashing.org>) id 1ebvFp-0005mV-2M
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 16:28:20 -0500
+Message-ID: <1516224472.31850.193.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Thu, 18 Jan 2018 08:27:52 +1100
+In-Reply-To: <2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+References: <20171209084338.29395-1-clg@kaod.org>
+	<20171209084338.29395-3-clg@kaod.org>
+	<20171220050947.GC5981@umbus.fritz.box>
+	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+	<1516187433.31850.189.camel@kernel.crashing.org>
+	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On 17.01.2018 20:37, Christian Borntraeger wrote:
-> stfle.81 (ppa15) is a transparent facility that can be passed to the
-> guest without the need to implement hypervisor support. As this feature
-> can be provided by firmware we add it to all full models.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/cpu_features.c     | 1 +
->  target/s390x/cpu_features_def.h | 1 +
->  target/s390x/gen-features.c     | 1 +
->  3 files changed, 3 insertions(+)
-> 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index 5d1c210..1550ab0 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -89,6 +89,7 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("msa4-base", S390_FEAT_TYPE_STFL, 77, "Message-security-assist-extension-4 facility (excluding subfunctions)"),
->      FEAT_INIT("edat2", S390_FEAT_TYPE_STFL, 78, "Enhanced-DAT facility 2"),
->      FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point packed-conversion facility"),
-> +    FEAT_INIT("ppa15", S390_FEAT_TYPE_STFL, 81, "PPA15 is installed"),
->      FEAT_INIT("bpb", S390_FEAT_TYPE_STFL, 82, "Branch Prediction Blocking"),
->      FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
->      FEAT_INIT("iep", S390_FEAT_TYPE_STFL, 130, "Instruction-execution-protection facility"),
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index 4487cfd..4d93087 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -80,6 +80,7 @@ typedef enum {
->      S390_FEAT_MSA_EXT_4,
->      S390_FEAT_EDAT_2,
->      S390_FEAT_DFP_PACKED_CONVERSION,
-> +    S390_FEAT_PPA15,
->      S390_FEAT_BPB,
->      S390_FEAT_VECTOR,
->      S390_FEAT_INSTRUCTION_EXEC_PROT,
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 95ee870..50bd3f4 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -357,6 +357,7 @@ static uint16_t full_GEN7_GA1[] = {
->      S390_FEAT_SIE_GPERE,
->      S390_FEAT_SIE_IB,
->      S390_FEAT_SIE_CEI,
-> +    S390_FEAT_PPA15,
->      S390_FEAT_BPB,
+On Wed, 2018-01-17 at 15:39 +0100, C=C3=A9dric Le Goater wrote:
+> Migration is a problem. We will need both backend QEMU objects to be=20
+> available anyhow if we want to migrate. So we are back to the current=20
+> solution creating both QEMU objects but we can try to defer some of the=
+=20
+> KVM inits and create the KVM device on demand at CAS time.
 
-Is the order in this list still correct?
+Do we have a way to migrate a piece of info from the machine *first*
+that indicate what type of XICS/XIVE to instanciate ?
 
-Apart from that, looks nice.
+> The next problem is the ICP object that currently needs the KVM device=20
+> fd to connect the vcpus ... So, we will need to change that also.=20
+> That is probably the biggest problem today. We need a way to disconnect=
+=20
+> the vpcu from the KVM device and see how we can defer the connection.
+> I need to make sure this is possible, I can check that without XIVE
 
->  };
->  
-> 
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+Ben.
