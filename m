@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecEsL-0003k9-Ig
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:25:23 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ecEuv-0004nZ-Mx
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:28:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecEsI-00079K-Cc
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:25:21 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:44253)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ecEuu-0000mp-S1
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:28:01 -0500
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:44083)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecEsI-000795-75
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:25:18 -0500
-Received: by mail-qt0-x244.google.com with SMTP id m59so32585682qte.11
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 10:25:18 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 18 Jan 2018 15:24:52 -0300
-Message-Id: <20180118182510.15630-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 00/17] SDHCI: clean v1/v2 Specs (part 2)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ecEuu-0000kz-Ke
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:28:00 -0500
+Received: by mail-lf0-x242.google.com with SMTP id w23so27848708lfd.11
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 10:28:00 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 18 Jan 2018 10:27:46 -0800
+Message-Id: <1516300066-18600-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa: disas/xtensa: fix coverity
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,147 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Krzysztof Kozlowski <krzk@kernel.org>
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Since v7:
-- use error_propagate()
+Coverity warnings CID 1385146, 1385148 1385149 and 1385150 point that
+xtensa_opcode_num_operands and xtensa_format_num_slots may return -1
+even when xtensa_opcode_decode and xtensa_format_decode succeed. In that
+case unsigned counters used to iterate through operands/slots will not
+do the right thing.
+Make counters and loop bounds signed to fix the warnings.
 
-Since v6:
-- rebased on upstream to use DEFINE_SDHCI_COMMON_PROPERTIES
-- included qtests back
-- add PCI qtests
-- series was getting big, splitting again; next one is "implement Spec v3"
-- following Alistair advice, new properties default to current
-  SDHC_CAPAB_REG_DEFAULT (probably 'default' for historical reason, being
-  the first capabilities set). This leads to weird properties imho, i.e.
-  defaulting 'max-frequency' to 52 MHz, the Exynos SoC has to set this
-  property to 0. 
-- addressed Alistair reviews
-- confirmed the Exynos4210 specs after chatting on IRC with Krzysztof
-  Kozlowski who kindly verified in the datasheet.
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ disas/xtensa.c            | 4 ++--
+ target/xtensa/translate.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Since v5:
-- addressed Alistair reviews
-- dropped "abstract generic-sdhci"
-- dropped Linux Device Tree names
-- split qtests in another series
-- change the bcm2835 minimum blocksize to 1KB (Andrew Baumann)
-- added Alistair R-b
-- based on Alistair work:
-  - add SD tunning sequence via Host Control 2 to use UHS-I cards
-  - add CMD/DAT[] fields in the Present State (used in next series
-    to switch card voltage)
-
-based on Alistair work:
-- add SD tunning sequence via Host Control 2 to use UHS-I cards
-- add CMD/DAT[] fields in the Present State (used in next series
-  to switch card voltage)
-
-Since v4 ("SDHCI: add qtests and fix few issues"):
-- spec_version default to v2 (current behaviour)
-- addressed Alistair review (no v1, tell user about valid version)
-
-Since v3:
-- no change, but split back in 2 series, 1st part is "SDHCI: housekeeping v5",
-
-Since v2:
-- more detailed 'capabilities', all boards converted to use these properties
-- since all qtests pass, removed the previous 'capareg' property
-- added Stefan/Alistair R-b
-- corrected 'access' LED behavior (Alistair's review)
-- more uses of the registerfields API
-- remove some dead code
-- cosmetix:
-  - added more comments
-  - renamed a pair of registers
-  - reordered few struct members
-
-Since v1:
-- addressed Alistair Francis review comments, added some R-b
-- only move register defines to "sd-internal.h"
-- fixed deposit64() arguments
-- dropped unuseful s->fifo_buffer = NULL
-- use a qemu_irq for the LED, restrict the logging to ON/OFF
-- fixed a trace format string error
-- included Andrey Smirnov ACMD12ERRSTS write patch
-- dropped few unuseful patches, and separate the Python polemical ones for later
-
->From the "SDHCI housekeeping" series:
-- 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
-- 2,3: we somehow beautiful the code, no logical changes,
-- 4-7: we refactor the common sysbus/pci qdev code,
-- 8-10: we add plenty of trace events which will result useful later,
-- 11: we finally expose a "dma-memory" property.
->From the "SDHCI: add a qtest and fix few issues" series:
-- 12,13: fix registers
-- 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
-- 15-20: HCI qtest
-
-Regards,
-
-Phil.
-
-$ git backport-diff with v7
-001/17:[down] 'use error_propagate(local_err) in realize()'
-002/17:[----] [--] 'sdhci: add qtest to check the SD capabilities register'
-003/17:[----] [--] 'sdhci: add check_capab_readonly() qtest'
-004/17:[----] [--] 'sdhci: add a check_capab_baseclock() qtest'
-005/17:[----] [--] 'sdhci: add a check_capab_sdma() qtest'
-006/17:[----] [--] 'sdhci: add qtest to check the SD Spec version'
-007/17:[0007] [FC] 'sdhci: add init_readonly_registers() to initialize the CAPAB register'
-008/17:[----] [--] 'sdhci: add a 'spec_version property' (default to v2)'
-009/17:[0006] [FC] 'sdhci: add basic Spec v1 capabilities'
-... no change ...
-
-$ git backport-diff with v6
-001/16:[down] 'sdhci: add qtest to check the SD capabilities register'
-002/16:[0008] [FC] 'sdhci: add check_capab_readonly() qtest'
-003/16:[0001] [FC] 'sdhci: add a check_capab_baseclock() qtest'
-004/16:[----] [-C] 'sdhci: add a check_capab_sdma() qtest'
-005/16:[0078] [FC] 'sdhci: add qtest to check the SD Spec version'
-006/16:[down] 'sdhci: add init_readonly_registers() to initialize the CAPAB register'
-007/16:[0010] [FC] 'sdhci: add a 'spec_version property' (default to v2)'
-008/16:[0049] [FC] 'sdhci: add basic Spec v1 capabilities'
-009/16:[0007] [FC] 'sdhci: add max-block-length capability (Spec v1)'
-010/16:[0013] [FC] 'sdhci: add clock capabilities (Spec v1)'
-011/16:[----] [--] 'sdhci: add BLOCK_SIZE_MASK for DMA'
-012/16:[----] [-C] 'sdhci: Fix 64-bit ADMA2'
-013/16:[0036] [FC] 'sdhci: add DMA and 64-bit capabilities (Spec v2)'
-014/16:[0010] [FC] 'hw/arm/xilinx_zynq: implement SDHCI Spec v2'
-015/16:[0014] [FC] 'hw/arm/exynos4210: implement SDHCI Spec v2'
-016/16:[down] 'sdhci: throw an error if capabilities are incorrectly configured'
-
-Philippe Mathieu-Daudé (16):
-  sdhci: use error_propagate(local_err) in realize()
-  sdhci: add qtest to check the SD capabilities register
-  sdhci: add check_capab_readonly() qtest
-  sdhci: add a check_capab_baseclock() qtest
-  sdhci: add a check_capab_sdma() qtest
-  sdhci: add qtest to check the SD Spec version
-  sdhci: add init_readonly_registers() to initialize the CAPAB register
-  sdhci: add a 'spec_version property' (default to v2)
-  sdhci: add basic Spec v1 capabilities
-  sdhci: add max-block-length capability (Spec v1)
-  sdhci: add clock capabilities (Spec v1)
-  sdhci: add BLOCK_SIZE_MASK for DMA
-  sdhci: add DMA and 64-bit capabilities (Spec v2)
-  hw/arm/xilinx_zynq: implement SDHCI Spec v2
-  hw/arm/exynos4210: implement SDHCI Spec v2
-  sdhci: throw an error if capabilities are incorrectly configured
-
-Sai Pavan Boddu (1):
-  sdhci: Fix 64-bit ADMA2
-
- include/hw/sd/sdhci.h  |  26 ++++++
- hw/sd/sdhci-internal.h |  43 +++++++---
- hw/arm/exynos4210.c    |  21 ++++-
- hw/arm/xilinx_zynq.c   |  70 ++++++++++------
- hw/sd/sdhci.c          | 223 ++++++++++++++++++++++++++++++++-----------------
- tests/sdhci-test.c     | 215 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include |   3 +
- 7 files changed, 488 insertions(+), 113 deletions(-)
- create mode 100644 tests/sdhci-test.c
-
+diff --git a/disas/xtensa.c b/disas/xtensa.c
+index 114326a4fc2e..5e3870b9ad23 100644
+--- a/disas/xtensa.c
++++ b/disas/xtensa.c
+@@ -37,7 +37,7 @@ int print_insn_xtensa(bfd_vma memaddr, struct disassemble_info *info)
+     bfd_byte *buffer = g_malloc(1);
+     int status = info->read_memory_func(memaddr, buffer, 1, info);
+     xtensa_format fmt;
+-    unsigned slot, slots;
++    int slot, slots;
+     unsigned len;
+ 
+     if (status) {
+@@ -79,7 +79,7 @@ int print_insn_xtensa(bfd_vma memaddr, struct disassemble_info *info)
+ 
+     for (slot = 0; slot < slots; ++slot) {
+         xtensa_opcode opc;
+-        unsigned opnd, vopnd, opnds;
++        int opnd, vopnd, opnds;
+ 
+         if (slot) {
+             info->fprintf_func(info->stream, "; ");
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 4bdfcd24d09b..3f439203acf3 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -942,7 +942,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+     unsigned char b[MAX_INSN_LENGTH] = {cpu_ldub_code(env, dc->pc)};
+     unsigned len = xtensa_op0_insn_len(dc, b[0]);
+     xtensa_format fmt;
+-    unsigned slot, slots;
++    int slot, slots;
+     unsigned i;
+ 
+     if (len == XTENSA_UNDEFINED) {
+@@ -969,7 +969,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+     slots = xtensa_format_num_slots(isa, fmt);
+     for (slot = 0; slot < slots; ++slot) {
+         xtensa_opcode opc;
+-        unsigned opnd, vopnd, opnds;
++        int opnd, vopnd, opnds;
+         uint32_t raw_arg[MAX_OPCODE_ARGS];
+         uint32_t arg[MAX_OPCODE_ARGS];
+         XtensaOpcodeOps *ops;
 -- 
-2.15.1
+2.1.4
