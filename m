@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1ecCXd-00053H-AE
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:55:50 -0500
+	(envelope-from <edgar@xilinx.com>) id 1ecCZc-0006at-B7
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:57:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1ecCXY-0004rc-9P
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:55:49 -0500
-Message-ID: <1516290939.3278.22.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 18 Jan 2018 16:55:39 +0100
-In-Reply-To: <20180118042713.GJ30352@umbus.fritz.box>
-References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
-	<1516110433.10494.5.camel@redhat.com>
-	<20180116135459.GN30352@umbus.fritz.box>
-	<1516113980.3278.1.camel@redhat.com>
-	<20180116223413.GQ30352@umbus.fritz.box>
-	<62449abf-fdd1-44f3-4a5c-0695e8607cea@ozlabs.ru>
-	<1516179297.3278.6.camel@redhat.com>
-	<20180118042713.GJ30352@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 0/6] target/ppc:
- Rework spapr_caps
+	(envelope-from <edgar@xilinx.com>) id 1ecCZb-00066Y-5w
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:57:52 -0500
+Date: Thu, 18 Jan 2018 22:57:28 +0700
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20180118155728.GK5516@toto>
+References: <cover.1516144891.git.alistair.francis@xilinx.com>
+	<63f5e8b2687502e1d6c53e190869e88d134f5f14.1516144891.git.alistair.francis@xilinx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <63f5e8b2687502e1d6c53e190869e88d134f5f14.1516144891.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v5 3/9] xlnx-zynqmp-pmu: Add the CPU and
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +24,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, edgar.iglesias@gmail.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
-On Thu, 2018-01-18 at 15:27 +1100, David Gibson wrote:
-> > I looked further and device-list-properties looks like it would
-> > do the trick; however it doesn't seem to work for machines:
-> > 
-> >   {"execute": "device-list-properties",
-> >    "arguments": {"typename": "spapr-2.11-machine"}}
-> >   {"error": {"class": "GenericError",
-> >              "desc": "Parameter 'typename' expects device"}}
-> > 
-> > It works fine for the likes of virtio-scsi-pci and even
-> > power9_v2.0-powerpc64-cpu, though. Any ideas? :)
+On Tue, Jan 16, 2018 at 03:22:26PM -0800, Alistair Francis wrote:
+> Connect the MicroBlaze CPU and the ROM and RAM memory regions.
 > 
-> I'm guessing it's because machines aren't descended from TYPE_DEVICE.
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
 > 
-> Dammit.  I really can't see a reasonable way of addressing this other
-> than improving qapi in general to have a way of reporting machine
-> class properties.  Adding something ad-hoc for just these properties
-> of this machine seems like madness.
+> V4:
+>  - Remove the ZCU102 name
+> V2:
+>  - Fix the pmu-cpu name
+>  - Use err and errp for CPU realise instead of error_fatal
 > 
-> Nor can I think of a place to put these that would be both sensible
-> and more discoverable with existing mechanisms.
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 70 +++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 68 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+> index ac0f78928a..c6a0b3b8a1 100644
+> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+> @@ -18,8 +18,11 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+> +#include "exec/address-spaces.h"
+>  #include "hw/boards.h"
+> +#include "hw/qdev-properties.h"
+>  #include "cpu.h"
+> +#include "boot.h"
+>  
+>  /* Define the PMU device */
+>  
+> @@ -27,21 +30,56 @@
+>  #define XLNX_ZYNQMP_PMU_SOC(obj) OBJECT_CHECK(XlnxZynqMPPMUSoCState, (obj), \
+>                                                TYPE_XLNX_ZYNQMP_PMU_SOC)
+>  
+> +#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
+> +#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
+> +#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
+> +
+>  typedef struct XlnxZynqMPPMUSoCState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+>  
+>      /*< public >*/
+> +    MicroBlazeCPU cpu;
+>  }  XlnxZynqMPPMUSoCState;
+>  
+>  static void xlnx_zynqmp_pmu_soc_init(Object *obj)
+>  {
+> +    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
+>  
+> +    object_initialize(&s->cpu, sizeof(s->cpu),
+> +                      TYPE_MICROBLAZE_CPU);
+> +    object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
+> +                              &error_abort);
+>  }
+>  
+>  static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
+>  {
+> -
+> +    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(dev);
+> +    Error *err = NULL;
+> +
+> +    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
+> +                             "base-vectors", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
+> +                             &error_abort);
+> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
+> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
+> +                             &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
+> +                             &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
+> +                             &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
+> +                             &error_abort);
+> +    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
+> +                            &error_abort);
+> +    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+>  }
+>  
+>  static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
+> @@ -70,7 +108,35 @@ type_init(xlnx_zynqmp_pmu_soc_register_types)
+>  
+>  static void xlnx_zynqmp_pmu_init(MachineState *machine)
+>  {
+> -
+> +    XlnxZynqMPPMUSoCState *pmu = g_new0(XlnxZynqMPPMUSoCState, 1);
+> +    MemoryRegion *address_space_mem = get_system_memory();
+> +    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
+> +
+> +    /* Create the ROM */
+> +    memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
+> +                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
+> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
+> +                                pmu_rom);
+> +
+> +    /* Create the RAM */
+> +    memory_region_init_ram(pmu_ram, NULL, "xlnx-zynqmp-pmu.ram",
+> +                           machine->ram_size, &error_fatal);
+> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
+> +                                pmu_ram);
+> +
+> +    /* Create the PMU device */
+> +    object_initialize(pmu, sizeof(XlnxZynqMPPMUSoCState), TYPE_XLNX_ZYNQMP_PMU_SOC);
+> +    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
+> +                              &error_abort);
+> +    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
+> +
+> +    /* Load the kernel */
+> +    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
+> +                           machine->ram_size,
+> +                           machine->kernel_filename,
 
-The relationship between QOM/QAPI/QMP is not very clear in my mind,
-as you might have guessed from my messages, so I don't think I can
-offer much useful input. But if the properties are registered using
-the same mechanism both for devices and machines, then maybe there
-should be a QMP command that can list them regardless of the parent
-type? object-list-properties or something like that.
+Hi Alistair,
 
-I also noticed that the (AFAIK s390-specific) "loadparm" property
-is detected by libvirt through the query-command-line-options QMP
-command. Not sure what kind of trickery they employ to obtain that
-result, though, and I'm not sure it's exactly an example of best
-practices since it shows up on x86 and aarch64 too ;)
+I think I forgot to mention this on the chat yesterday but I think
+this argument is incorrect. It should be the initrd filename, or
+NULL since it may not make sense to load an initrd for the PMU.
+Can you fix that up?
 
--- 
-Andrea Bolognani / Red Hat / Virtualization
+You can keep my R-b tag.
+
+Cheers,
+Edgar
+
+
+> +                           machine->dtb,
+> +                           NULL);
+>  }
+>  
+>  static void xlnx_zynqmp_pmu_machine_init(MachineClass *mc)
+> -- 
+> 2.14.1
+> 
