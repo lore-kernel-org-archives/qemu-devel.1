@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1ecCZc-0006at-B7
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:57:53 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ecCbR-0007iS-Ve
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:59:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1ecCZb-00066Y-5w
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:57:52 -0500
-Date: Thu, 18 Jan 2018 22:57:28 +0700
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180118155728.GK5516@toto>
-References: <cover.1516144891.git.alistair.francis@xilinx.com>
-	<63f5e8b2687502e1d6c53e190869e88d134f5f14.1516144891.git.alistair.francis@xilinx.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ecCbN-0007WI-3w
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:59:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecCbM-0007Vq-TZ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:59:41 -0500
+References: <20180118025245.13042-1-famz@redhat.com>
+	<d1dd1750-c487-be35-05eb-ffb12f18e805@redhat.com>
+	<a81a812f-065c-e8be-0d6d-92525a379a82@amsat.org>
+	<cf2b427d-a8a0-a124-16dd-598d4f7eea46@redhat.com>
+	<CAAdtpL4kR9qWjWHBuYYbZXv=FBoKXRgLE5tzaaC1nZyJZNHXNA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e7f2c735-d7b9-e05b-310f-c06f849b7660@redhat.com>
+Date: Thu, 18 Jan 2018 16:59:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <63f5e8b2687502e1d6c53e190869e88d134f5f14.1516144891.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v5 3/9] xlnx-zynqmp-pmu: Add the CPU and
- memory
+In-Reply-To: <CAAdtpL4kR9qWjWHBuYYbZXv=FBoKXRgLE5tzaaC1nZyJZNHXNA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] scsi-generic: Simplify error handling code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,150 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@gmail.com, alistair23@gmail.com, qemu-arm@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, Jan 16, 2018 at 03:22:26PM -0800, Alistair Francis wrote:
-> Connect the MicroBlaze CPU and the ROM and RAM memory regions.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
-> 
-> V4:
->  - Remove the ZCU102 name
-> V2:
->  - Fix the pmu-cpu name
->  - Use err and errp for CPU realise instead of error_fatal
-> 
->  hw/microblaze/xlnx-zynqmp-pmu.c | 70 +++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 68 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-> index ac0f78928a..c6a0b3b8a1 100644
-> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
-> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -18,8 +18,11 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
-> +#include "exec/address-spaces.h"
->  #include "hw/boards.h"
-> +#include "hw/qdev-properties.h"
->  #include "cpu.h"
-> +#include "boot.h"
->  
->  /* Define the PMU device */
->  
-> @@ -27,21 +30,56 @@
->  #define XLNX_ZYNQMP_PMU_SOC(obj) OBJECT_CHECK(XlnxZynqMPPMUSoCState, (obj), \
->                                                TYPE_XLNX_ZYNQMP_PMU_SOC)
->  
-> +#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
-> +#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
-> +#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
-> +
->  typedef struct XlnxZynqMPPMUSoCState {
->      /*< private >*/
->      DeviceState parent_obj;
->  
->      /*< public >*/
-> +    MicroBlazeCPU cpu;
->  }  XlnxZynqMPPMUSoCState;
->  
->  static void xlnx_zynqmp_pmu_soc_init(Object *obj)
->  {
-> +    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
->  
-> +    object_initialize(&s->cpu, sizeof(s->cpu),
-> +                      TYPE_MICROBLAZE_CPU);
-> +    object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
-> +                              &error_abort);
->  }
->  
->  static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
->  {
-> -
-> +    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(dev);
-> +    Error *err = NULL;
-> +
-> +    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
-> +                             "base-vectors", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
-> +                             &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
-> +                             &error_abort);
-> +    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
-> +                            &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
->  }
->  
->  static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
-> @@ -70,7 +108,35 @@ type_init(xlnx_zynqmp_pmu_soc_register_types)
->  
->  static void xlnx_zynqmp_pmu_init(MachineState *machine)
->  {
-> -
-> +    XlnxZynqMPPMUSoCState *pmu = g_new0(XlnxZynqMPPMUSoCState, 1);
-> +    MemoryRegion *address_space_mem = get_system_memory();
-> +    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
-> +
-> +    /* Create the ROM */
-> +    memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
-> +                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
-> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
-> +                                pmu_rom);
-> +
-> +    /* Create the RAM */
-> +    memory_region_init_ram(pmu_ram, NULL, "xlnx-zynqmp-pmu.ram",
-> +                           machine->ram_size, &error_fatal);
-> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
-> +                                pmu_ram);
-> +
-> +    /* Create the PMU device */
-> +    object_initialize(pmu, sizeof(XlnxZynqMPPMUSoCState), TYPE_XLNX_ZYNQMP_PMU_SOC);
-> +    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
-> +                              &error_abort);
-> +    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
-> +
-> +    /* Load the kernel */
-> +    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-> +                           machine->ram_size,
-> +                           machine->kernel_filename,
+On 18/01/2018 16:55, Philippe Mathieu-Daud=C3=A9 wrote:
+> On Thu, Jan 18, 2018 at 9:03 AM, Paolo Bonzini <pbonzini@redhat.com> wr=
+ote:
+>> On 18/01/2018 12:21, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> I'm not a fan of bool return types, in general (because "!" is often
+>>>> success while "< 0" is failure) and especially when there is an Erro=
+r**;
+>>>> I disagree with commit 9d3b155186.  But the function is not in an ar=
+ea I
+>>>> maintain so I'm queuing this, thanks.
+>>> Do you prefer "if (local_err)" and "if (errp && *errp)" ?
+>>
+>> The latter is wrong.  I do prefer
+>=20
+> Ok so my 253674981e24 missed that train too.
 
-Hi Alistair,
+Well, sdhci_common_realize cannot fail so you can just remove the
+Error** argument.
 
-I think I forgot to mention this on the chat yesterday but I think
-this argument is incorrect. It should be the initrd filename, or
-NULL since it may not make sense to load an initrd for the PMU.
-Can you fix that up?
-
-You can keep my R-b tag.
-
-Cheers,
-Edgar
-
-
-> +                           machine->dtb,
-> +                           NULL);
->  }
->  
->  static void xlnx_zynqmp_pmu_machine_init(MachineClass *mc)
-> -- 
-> 2.14.1
-> 
+Paolo
