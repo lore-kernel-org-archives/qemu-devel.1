@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH7N-00071T-GU
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:49:02 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH8K-0007su-BV
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH7K-0006wN-DO
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:49:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42732)
+	(envelope-from <mst@redhat.com>) id 1ecH8I-0007vB-D6
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:50:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH7K-0006w4-7K
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:48:58 -0500
-Date: Thu, 18 Jan 2018 22:48:56 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH8I-0007uZ-4J
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:49:58 -0500
+Date: Thu, 18 Jan 2018 22:49:51 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180118224758-mutt-send-email-mst@kernel.org>
-References: <1516121887-32738-1-git-send-email-mst@redhat.com>
-	<CAFEAcA-En6Pqo=bjOrDMfkNmnN5UR-7S=b45Vu6P34Ag4jdMEQ@mail.gmail.com>
+Message-ID: <20180118224941-mutt-send-email-mst@kernel.org>
+References: <cover.1516277913.git.arei.gonglei@huawei.com>
+	<97c7a886a8569b785d9fec7d4d6b7c182a6b8421.1516277913.git.arei.gonglei@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-En6Pqo=bjOrDMfkNmnN5UR-7S=b45Vu6P34Ag4jdMEQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v2 00/34] pc, pci, virtio: features, fixes,
- cleanups
+In-Reply-To: <97c7a886a8569b785d9fec7d4d6b7c182a6b8421.1516277913.git.arei.gonglei@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] cryptodev-vhost-user: depend on
+ CONFIG_VHOST_CRYPTO and CONFIG_VHOST_USER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
 
-On Thu, Jan 18, 2018 at 10:09:09AM +0000, Peter Maydell wrote:
-> On 16 January 2018 at 17:46, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > Changes from v1:
-> >     32 build fix
-> >     vhost-user-blk build fix
-> >     s390 qom fix
-> >     include mem slot limit fix
-> >
-> > The following changes since commit f521eeee3bd060b460c99e605472b7e03967db43:
-> >
-> >   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20180115' into staging (2018-01-15 13:17:47 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> >
-> > for you to fetch changes up to 1d9dc60062ae05375c080bbe2db5a5c3c4f495bc:
-> >
-> >   vhost: used_memslots refactoring (2018-01-16 18:52:03 +0200)
-> >
-> > ----------------------------------------------------------------
-> > pc, pci, virtio: features, fixes, cleanups
-> >
-> > A bunch of fixes, cleanus and new features all over the place.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On Thu, Jan 18, 2018 at 08:25:36PM +0800, Jay Zhou wrote:
+> From: Gonglei <arei.gonglei@huawei.com>
 > 
-> Hi -- this pullreq triggers a lot of alignment warnings for vhost
-> in the clang runtime sanitizer:
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
 
-I couldn't reproduce - sent v4 on an off chance it's gone there.
-Could you try that one pls?
+Pls squash with the previous patch.
+
+> ---
+>  backends/Makefile.objs     |  4 +++-
+>  backends/cryptodev-vhost.c | 57 +++++++++++++++++++++++++++++++++++++++++++---
+>  configure                  | 15 ++++++++++++
+>  vl.c                       |  2 ++
+>  4 files changed, 74 insertions(+), 4 deletions(-)
+> 
+> diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+> index 9e1fb76..ea4f630 100644
+> --- a/backends/Makefile.objs
+> +++ b/backends/Makefile.objs
+> @@ -10,5 +10,7 @@ common-obj-y += cryptodev.o
+>  common-obj-y += cryptodev-builtin.o
+>  
+>  ifeq ($(CONFIG_VIRTIO),y)
+> -common-obj-$(CONFIG_LINUX) += cryptodev-vhost.o cryptodev-vhost-user.o
+> +common-obj-$(CONFIG_LINUX) += cryptodev-vhost.o
+> +common-obj-$(call land,$(CONFIG_VHOST_CRYPTO),$(CONFIG_VHOST_USER)) += \
+> +    cryptodev-vhost-user.o
+>  endif
+> diff --git a/backends/cryptodev-vhost.c b/backends/cryptodev-vhost.c
+> index 830fb53..ad1f415 100644
+> --- a/backends/cryptodev-vhost.c
+> +++ b/backends/cryptodev-vhost.c
+> @@ -23,14 +23,18 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "hw/virtio/virtio-bus.h"
+> +#include "sysemu/cryptodev-vhost.h"
+> +
+> +#ifdef CONFIG_VHOST_CRYPTO
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qerror.h"
+>  #include "qemu/error-report.h"
+> -#include "sysemu/cryptodev-vhost.h"
+>  #include "hw/virtio/virtio-crypto.h"
+> -#include "hw/virtio/virtio-bus.h"
+> -#include "sysemu/cryptodev-vhost-user.h"
+>  
+> +#ifdef CONFIG_VHOST_USER
+> +#include "sysemu/cryptodev-vhost-user.h"
+> +#endif
+>  
+>  uint64_t
+>  cryptodev_vhost_get_max_queues(
+> @@ -123,9 +127,11 @@ cryptodev_get_vhost(CryptoDevBackendClient *cc,
+>      }
+>  
+>      switch (cc->type) {
+> +#ifdef CONFIG_VHOST_USER
+>      case CRYPTODEV_BACKEND_TYPE_VHOST_USER:
+>          vhost_crypto = cryptodev_vhost_user_get_vhost(cc, b, queue);
+>          break;
+> +#endif
+>      default:
+>          break;
+>      }
+> @@ -295,3 +301,48 @@ bool cryptodev_vhost_virtqueue_pending(VirtIODevice *dev,
+>  
+>      return vhost_virtqueue_pending(&vhost_crypto->dev, idx);
+>  }
+> +
+> +#else
+> +uint64_t
+> +cryptodev_vhost_get_max_queues(CryptoDevBackendVhost *crypto)
+> +{
+> +    return 0;
+> +}
+> +
+> +void cryptodev_vhost_cleanup(CryptoDevBackendVhost *crypto)
+> +{
+> +}
+> +
+> +struct CryptoDevBackendVhost *
+> +cryptodev_vhost_init(CryptoDevBackendVhostOptions *options)
+> +{
+> +    return NULL;
+> +}
+> +
+> +CryptoDevBackendVhost *
+> +cryptodev_get_vhost(CryptoDevBackendClient *cc, CryptoDevBackend *b,
+> +                    uint16_t queue)
+> +{
+> +    return NULL;
+> +}
+> +
+> +int cryptodev_vhost_start(VirtIODevice *dev, int total_queues)
+> +{
+> +    return -1;
+> +}
+> +
+> +void cryptodev_vhost_stop(VirtIODevice *dev, int total_queues)
+> +{
+> +}
+> +
+> +void cryptodev_vhost_virtqueue_mask(VirtIODevice *dev, int queue,
+> +                                    int idx, bool mask)
+> +{
+> +}
+> +
+> +bool cryptodev_vhost_virtqueue_pending(VirtIODevice *dev,
+> +                                       int queue, int idx)
+> +{
+> +    return false;
+> +}
+> +#endif
+> diff --git a/configure b/configure
+> index b272a03..e4cece3 100755
+> --- a/configure
+> +++ b/configure
+> @@ -332,6 +332,7 @@ xfs=""
+>  tcg="yes"
+>  
+>  vhost_net="no"
+> +vhost_crypto="no"
+>  vhost_scsi="no"
+>  vhost_vsock="no"
+>  vhost_user=""
+> @@ -801,6 +802,7 @@ Linux)
+>    linux_user="yes"
+>    kvm="yes"
+>    vhost_net="yes"
+> +  vhost_crypto="yes"
+>    vhost_scsi="yes"
+>    vhost_vsock="yes"
+>    QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+> @@ -1163,6 +1165,14 @@ for opt do
+>    ;;
+>    --enable-vhost-net) vhost_net="yes"
+>    ;;
+> +  --disable-vhost-crypto) vhost_crypto="no"
+> +  ;;
+> +  --enable-vhost-crypto)
+> +      vhost_crypto="yes"
+> +      if test "$mingw32" = "yes"; then
+> +          error_exit "vhost-crypto isn't available on win32"
+> +      fi
+> +  ;;
+>    --disable-vhost-scsi) vhost_scsi="no"
+>    ;;
+>    --enable-vhost-scsi) vhost_scsi="yes"
+> @@ -1555,6 +1565,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+>    cap-ng          libcap-ng support
+>    attr            attr and xattr support
+>    vhost-net       vhost-net acceleration support
+> +  vhost-crypto    vhost-crypto acceleration support
+>    spice           spice
+>    rbd             rados block device (rbd)
+>    libiscsi        iscsi support
+> @@ -5579,6 +5590,7 @@ echo "madvise           $madvise"
+>  echo "posix_madvise     $posix_madvise"
+>  echo "libcap-ng support $cap_ng"
+>  echo "vhost-net support $vhost_net"
+> +echo "vhost-crypto support $vhost_crypto"
+>  echo "vhost-scsi support $vhost_scsi"
+>  echo "vhost-vsock support $vhost_vsock"
+>  echo "vhost-user support $vhost_user"
+> @@ -6640,6 +6652,9 @@ if supported_kvm_target $target; then
+>              echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
+>          fi
+>      fi
+> +    if test "$vhost_crypto" = "yes"; then
+> +        echo "CONFIG_VHOST_CRYPTO=y" >> $config_target_mak
+> +    fi
+>  fi
+>  if supported_hax_target $target; then
+>      echo "CONFIG_HAX=y" >> $config_target_mak
+> diff --git a/vl.c b/vl.c
+> index 3e9d86f..9f9727d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2867,9 +2867,11 @@ static bool object_create_initial(const char *type)
+>          return false;
+>      }
+>  
+> +#if defined(CONFIG_VHOST_CRYPTO) && defined(CONFIG_VHOST_USER)
+>      if (g_str_equal(type, "cryptodev-vhost-user")) {
+>          return false;
+>      }
+> +#endif
+>  
+>      /*
+>       * return false for concrete netfilters since
+> -- 
+> 1.8.3.1
+> 
