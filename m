@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ecKqL-0001L0-GQ
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 19:47:42 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1ecLiH-0007dw-LS
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 20:43:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ecKqI-0005Ws-Ed
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 19:47:41 -0500
-Received: from mga01.intel.com ([192.55.52.88]:46755)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1ecKqI-0005W1-5x
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 19:47:38 -0500
-Date: Fri, 19 Jan 2018 08:47:28 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180119004728.ptmqdwdazens4dhv@hz-desktop>
-References: <20180118021000.27203-1-ehabkost@redhat.com>
-	<CAFEAcA_JX_eevQL3kM2Kvf_Z3+xTiDRkg6C-EknfMtj_-cRA1g@mail.gmail.com>
-	<20180118212023.GH5292@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180118212023.GH5292@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PULL 00/19] machine queue, 2018-01-18
+	(envelope-from <balaton@eik.bme.hu>) id 1ecLiE-0000ei-Hv
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 20:43:25 -0500
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Thu, 18 Jan 2018 19:01:19 +0100
+Message-Id: <20180119014313.445517456CD@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH] sm501: Add missing break to case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +17,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 01/18/18 19:20 -0200, Eduardo Habkost wrote:
-> On Thu, Jan 18, 2018 at 03:22:05PM +0000, Peter Maydell wrote:
-> > On 18 January 2018 at 02:09, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
-> > >
-> > >   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
-> > >
-> > > for you to fetch changes up to 901cc8d31f36ac82824ab68f656ab7050404100c:
-> > >
-> > >   fw_cfg: fix memory corruption when all fw_cfg slots are used (2018-01-17 23:04:37 -0200)
-> > >
-> > > ----------------------------------------------------------------
-> > > machine queue, 2018-01-18
-> > >
-> > > ----------------------------------------------------------------
-> > 
-> > Hi. I'm afraid this doesn't build on 32-bit hosts, due to a
-> > format string problem:
-> > 
-> > In file included from /home/peter.maydell/qemu/exec.c:20:0:
-> > /home/peter.maydell/qemu/exec.c: In function 'file_ram_alloc':
-> > /home/peter.maydell/qemu/include/qapi/error.h:162:25: error: format
-> > '%llx' expects argument of type 'long long unsigned int', but argument
-> > 7 has type 'size_t {aka unsigned int}' [-Werror=format=]
-> >                          (fmt), ## __VA_ARGS__)
-> >                          ^
-> > /home/peter.maydell/qemu/exec.c:1616:9: note: in expansion of macro 'error_setg'
-> >          error_setg(errp, "aligment 0x%" PRIx64
-> >          ^
-> 
-> Sorry for not catching this.  Fixup will be included on a new
-> pull request:
-> 
-> diff --git a/exec.c b/exec.c
-> index 00055559b8..7bba8ef4ab 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1613,8 +1613,8 @@ static void *file_ram_alloc(RAMBlock *block,
->  
->      block->page_size = qemu_fd_getpagesize(fd);
->      if (block->mr->align % block->page_size) {
-> -        error_setg(errp, "aligment 0x%" PRIx64
-> -                   " must be multiples of page size 0x%" PRIx64,
-> +        error_setg(errp, "alignment 0x%" PRIx64
-> +                   " must be multiples of page size 0x%zd",
-                                                       ^^^^^^ 0x%zx, or remove the prefix '0x'
+Noticed by Coverity, forgotten in 5690d9ece
 
->                     block->mr->align, block->page_size);
->          return NULL;
->      }
-> 
-> -- 
-> Eduardo
-> 
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/display/sm501.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 4f7dc59b2..134cbed 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -797,6 +797,7 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
+         break;
+     case SM501_COMMAND_LIST_STATUS:
+         ret = 0x00180002; /* FIFOs are empty, everything idle */
++        break;
+     case SM501_IRQ_MASK:
+         ret = s->irq_mask;
+         break;
+-- 
+2.7.6
