@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecHmt-00016t-2n
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:31:55 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecHt2-0003IO-Ox
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:38:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecHms-00021p-67
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:31:55 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1516300623.git.alistair.francis@xilinx.com>
-	<01de185b273b999f1a4df07cb0e4b2e8216689f0.1516300623.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9c36cbf6-3bbb-02ed-af88-ce1e8faaa491@amsat.org>
-Date: Thu, 18 Jan 2018 18:31:45 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1ecHsz-0007X7-KU
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:38:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:17527)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecHsz-0007Wc-Av
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:38:13 -0500
+Date: Thu, 18 Jan 2018 19:38:05 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180118213805.GI5292@localhost.localdomain>
+References: <20180118025245.13042-1-famz@redhat.com>
+	<d1dd1750-c487-be35-05eb-ffb12f18e805@redhat.com>
+	<a81a812f-065c-e8be-0d6d-92525a379a82@amsat.org>
+	<cf2b427d-a8a0-a124-16dd-598d4f7eea46@redhat.com>
+	<CAAdtpL4kR9qWjWHBuYYbZXv=FBoKXRgLE5tzaaC1nZyJZNHXNA@mail.gmail.com>
+	<59cde1ab-cf5f-b40a-4377-b33091b593a2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <01de185b273b999f1a4df07cb0e4b2e8216689f0.1516300623.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 6/9] xlnx-zynqmp-pmu: Connect the PMU
- interrupt controller
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <59cde1ab-cf5f-b40a-4377-b33091b593a2@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] scsi-generic: Simplify error handling code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +32,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair23@gmail.com, qemu-arm@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 01/18/2018 03:38 PM, Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On Thu, Jan 18, 2018 at 02:34:39PM -0600, Eric Blake wrote:
+> On 01/18/2018 09:55 AM, Philippe Mathieu-Daud=E9 wrote:
+> > On Thu, Jan 18, 2018 at 9:03 AM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+> >> On 18/01/2018 12:21, Philippe Mathieu-Daud=E9 wrote:
+> >>>> I'm not a fan of bool return types, in general (because "!" is oft=
+en
+> >>>> success while "< 0" is failure) and especially when there is an Er=
+ror**;
+> >>>> I disagree with commit 9d3b155186.  But the function is not in an =
+area I
+> >>>> maintain so I'm queuing this, thanks.
+> >>> Do you prefer "if (local_err)" and "if (errp && *errp)" ?
+> >>
+> >> The latter is wrong.  I do prefer
+> >=20
+> > Ok so my 253674981e24 missed that train too.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Oops.  I thought we had Coccinelle scripts to detect that
+pattern.
 
-> ---
-> 
->  hw/microblaze/xlnx-zynqmp-pmu.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-> index 145837b372..7312bfe23e 100644
-> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
-> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -24,6 +24,8 @@
->  #include "cpu.h"
->  #include "boot.h"
->  
-> +#include "hw/intc/xlnx-pmu-iomod-intc.h"
-> +
->  /* Define the PMU device */
->  
->  #define TYPE_XLNX_ZYNQMP_PMU_SOC "xlnx,zynqmp-pmu-soc"
-> @@ -34,14 +36,18 @@
->  #define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
->  #define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
->  
-> +#define XLNX_ZYNQMP_PMU_INTC_ADDR   0xFFD40000
-> +
->  typedef struct XlnxZynqMPPMUSoCState {
->      /*< private >*/
->      DeviceState parent_obj;
->  
->      /*< public >*/
->      MicroBlazeCPU cpu;
-> +    XlnxPMUIOIntc intc;
->  }  XlnxZynqMPPMUSoCState;
->  
-> +
->  static void xlnx_zynqmp_pmu_soc_init(Object *obj)
->  {
->      XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
-> @@ -50,6 +56,9 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
->                        TYPE_MICROBLAZE_CPU);
->      object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
->                                &error_abort);
-> +
-> +    object_initialize(&s->intc, sizeof(s->intc), TYPE_XLNX_PMU_IO_INTC);
-> +    qdev_set_parent_bus(DEVICE(&s->intc), sysbus_get_default());
->  }
->  
->  static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
-> @@ -80,6 +89,21 @@ static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
->          error_propagate(errp, err);
->          return;
->      }
-> +
-> +    object_property_set_uint(OBJECT(&s->intc), 0x10, "intc-intr-size",
-> +                             &error_abort);
-> +    object_property_set_uint(OBJECT(&s->intc), 0x0, "intc-level-edge",
-> +                             &error_abort);
-> +    object_property_set_uint(OBJECT(&s->intc), 0xffff, "intc-positive",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->intc), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->intc), 0, XLNX_ZYNQMP_PMU_INTC_ADDR);
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->intc), 0,
-> +                       qdev_get_gpio_in(DEVICE(&s->cpu), MB_CPU_IRQ));
->  }
->  
->  static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
-> 
+>=20
+> Markus has expressed as desire, as the error maintainer, to make errp
+> functions return a useful value for less boilerplate, and at one point
+> was even debating about Coccinelle scripts to make the conversion
+> easier.  Perhaps int with -1 is more reliable than bool for that useful
+> value, but this is definitely a topic of past discussion.
+>=20
+> By the way, if (local_err) is definitely preferable; 'if (errp &&
+> *errp)' means that your behavior is different depending on whether the
+> caller wanted to ignore the error, and not whether you wanted to handle
+> the error.
+>=20
+> >=20
+> >>
+> >>     if (local_err) {
+> >>         error_propagate(errp, local_err);
+> >>         return;
+> >>     }
+>=20
+> Yes, that's the right boilerplate if you don't have a return value witn=
+ess.
+>=20
+> >>
+> >> or maybe (but only if there is a meaning to a zero vs. positive retu=
+rn
+> >> value, or if errno is an important part of the returned Error *)
+> >>
+> >>     ret =3D f(..., errp);
+> >>     if (ret < 0) {
+> >>         return;
+> >>     }
+> >>
+> >>> I wondered once if a macro might improve this pattern but thought t=
+he
+> >>> code would get more obscure.
+> >>
+> >> Eduardo had a series to avoid error_propagate, where NULL was replac=
+ed
+> >> by a (non-NULL) IGNORED_ERRORS macro.  Then you could do:
+> >>
+> >>     f(..., errp);
+> >>     if (error_is_set(errp)) {
+> >>         return;
+> >>     }
+> >>
+> >> See here:
+> >> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03139.html
+> >=20
+> > This series never hit /master!
+> >=20
+> > Reading the thread I'm not sure what was the expected outcome.
+>=20
+> And since Markus may not answer this thread for a while, I'm still not
+> sure if there is any expected outcome.
+
+Quoting Markus on that discussion:
+
+"If we switch to returning success/failure (which also gets rid of the
+boilerplate), then the macros may still let us get rid of boilerplate
+more quickly, for some additional churn.  Worthwhile?  Depends on how
+long the return value change takes us."
+
+I guess the lack of activity switching the code to returning
+success/failure is enough evidence that the switch will take us
+forever?
+
+We can do some effort to document the preferred convention to
+return success/failure, but I don't think we will be able to
+convert the existing void/ret/bool functions to a single style
+(whatever it is) in a reasonable time.
+
+That said, IMO returning 0/-1 or true/false is always preferred
+to returning void, so there's no need to add more local_err
+boilerplate code.
+
+--=20
+Eduardo
