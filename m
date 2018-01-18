@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ecDMD-00050A-RG
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:48:06 -0500
+	(envelope-from <david@redhat.com>) id 1ecDNp-0005yM-E8
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:49:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ecDMA-00038i-QG
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:48:05 -0500
-Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:41115)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ecDMA-00038I-Jk
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:48:02 -0500
-Received: by mail-pf0-x22c.google.com with SMTP id j3so15044520pfh.8
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 08:48:02 -0800 (PST)
-References: <20180109122252.17670-1-alex.bennee@linaro.org>
-	<20180109122252.17670-12-alex.bennee@linaro.org>
-	<CAFEAcA-3nkmeJMHFqMeiwZtQycmieXdPiaCvKZsFuKY3MqtdCQ@mail.gmail.com>
-	<87r2qnnmlx.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <eb388d43-c72a-8bb2-ab90-732b53fe7fce@linaro.org>
-Date: Thu, 18 Jan 2018 08:47:57 -0800
+	(envelope-from <david@redhat.com>) id 1ecDNm-0004jT-BM
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:49:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ecDNm-0004ix-52
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:49:42 -0500
+References: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
+	<CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
+	<CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
+	<CAKmqyKP2cQGXSmPvaGt3AwDz6zewJ6HH=vVTSnk6GVAQAhW5uA@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <d332aaad-ce74-a304-a177-047c401b9306@redhat.com>
+Date: Thu, 18 Jan 2018 17:49:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <87r2qnnmlx.fsf@linaro.org>
+In-Reply-To: <CAKmqyKP2cQGXSmPvaGt3AwDz6zewJ6HH=vVTSnk6GVAQAhW5uA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/20] fpu/softfloat: re-factor add/sub
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Call for GSoC & Outreachy 2018 mentors & project
+ ideas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Alistair Francis <alistair23@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>
 
-On 01/18/2018 08:43 AM, Alex Bennée wrote:
->   /* Expand fields based on the size of exponent and fraction */
->   #define FRAC_PARAMS(E, F)                                            \
->       .exp_size       = E,                                             \
->       .frac_size      = F,                                             \
->       .frac_shift     = DECOMPOSED_BINARY_POINT - F,                   \
->       .frac_lsb       = 1ull << (DECOMPOSED_BINARY_POINT - F),         \
->       .frac_lsbm1     = 1ull << ((DECOMPOSED_BINARY_POINT - F) - 1),   \
->       .round_mask     = (1ull << (DECOMPOSED_BINARY_POINT - F)) - 1,   \
->       .roundeven_mask = (2ull << (DECOMPOSED_BINARY_POINT - F)) - 1
+On 12.01.2018 00:25, Alistair Francis wrote:
+> On Wed, Jan 10, 2018 at 4:52 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> On Tue, Jan 9, 2018 at 9:45 PM, Alistair Francis <alistair23@gmail.com> wrote:
+>>> Can anyone who has done this before chime in.
+>>>
+>>> What do you think about getting someone to cleanup and improve the GDB
+>>> support in QEMU? Would that be the right difficulty of task for a GSoC
+>>> project?
+
+Don't understand that sentence. We already support multiple CPUs
+(represented and switchable just like threads in GDB), no?
+
+An interesting thing to look at could be tracepoint support in GDB.
+
+>>
+>> There is not enough information to give feedback on whether this
+>> project idea is suitable.  What are the specific tasks you'd like the
+>> student to work on?
+>>
+>> In general, I'm sure there are well-defined 12-week project ideas
+>> around the GDB stub.  New features are easy to propose and are usually
+>> well-defined (e.g. implement these commands that are documented in the
+>> GDB protocol documentation).  Cleaning up code is less clear and it
+>> would depend on exactly what needs to be done.  Interns will not have
+>> a background in the QEMU codebase and may not be able to make
+>> judgements about how to structure things, so I would be more careful
+>> about refactoring/cleanup projects.
+>>
+>> Please see my talk about QEMU GSoC for guidelines on project ideas:
+>> https://www.youtube.com/watch?v=xNVCX7YMUL8&t=19m11s
+>> http://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
 > 
->   static const FloatFmt float16_params = {
->       .exp_bias       = 0x0f,
->       .exp_max        = 0x1f,
->       FRAC_PARAMS(5, 10)
->   };
+> That helps a lot, thanks for that.
+> 
+> So for a more concrete solution, how would adding support for multi
+> CPU support to the GDB server sound?
+> 
+> This would allow GDB debugging for the A53 and the R5 on the Xilinx
+> ZynqMP for example. This is something we have in the Xilinx tree, but
+> it is in no state to go upstream and really needs to be re-write to be
+> upstreamable and more generic.
+> 
+> Alistair
+> 
+>>
+>> Hope this helps,
+>> Stefan
 
-You can compute exp_bias and exp_max from E as well.
 
+-- 
 
-r~
+Thanks,
+
+David / dhildenb
