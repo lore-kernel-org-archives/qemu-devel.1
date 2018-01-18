@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ec602-0003Cb-Kj
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:56:44 -0500
+	(envelope-from <asegundo@redhat.com>) id 1ec6Ay-00083Z-Hn
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 04:08:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ec601-0005KL-6m
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:56:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ec600-0005Ii-VK
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:56:41 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0I8uQfF036347
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 03:56:36 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fjp47ep7f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 03:56:35 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 18 Jan 2018 08:56:33 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 18 Jan 2018 09:56:27 +0100
-In-Reply-To: <20180118085628.40798-1-borntraeger@de.ibm.com>
-References: <20180118085628.40798-1-borntraeger@de.ibm.com>
-Message-Id: <20180118085628.40798-3-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] s390x/kvm: Handle bpb feature
+	(envelope-from <asegundo@redhat.com>) id 1ec6Av-0005Fb-QX
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 04:08:00 -0500
+Received: from mail-it0-f47.google.com ([209.85.214.47]:38984)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1ec6Av-0005ED-Jx
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 04:07:57 -0500
+Received: by mail-it0-f47.google.com with SMTP id 68so12740266ite.4
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 01:07:54 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <b4b9f8f0-38f3-adc5-6dbb-13d5cc7cb41f@redhat.com>
+References: <7e30d2cc-6c42-15e9-78ef-1085e081a386@redhat.com>
+	<CAKmqyKOgFg09RAQQVfxHr2OfaNmYouhH=2nu+NT1uD87qZXzUg@mail.gmail.com>
+	<b4b9f8f0-38f3-adc5-6dbb-13d5cc7cb41f@redhat.com>
+From: Amador Pahim <apahim@redhat.com>
+Date: Thu, 18 Jan 2018 10:07:53 +0100
+Message-ID: <CALAZnb1PU2gFG7gsewNvqZJsPXS=qyzZsT63eMsEG+2BdqU0fA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Functional tests (AKA Avocado-based tests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,158 +29,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Jeff Nelson <jen@redhat.com>
 
-We need to handle the bpb control on reset and migration. Normally
-stfle.82 is transparent (and the normal guest part works without
-hypervisor activity). To prevent any issues we require full
-host kernel support for this feature.
+On Thu, Jan 18, 2018 at 1:47 AM, Cleber Rosa <crosa@redhat.com> wrote:
+>
+>
+> On 01/17/2018 06:41 PM, Alistair Francis wrote:
+>> On Wed, Jan 17, 2018 at 12:05 AM, Cleber Rosa <crosa@redhat.com> wrote:
+>>> TL;DR
+>>> =====
+>>>
+>>> This is about how QEMU developers can get started with functional
+>>> tests that are built on top of the Avocado libraries (and meant to be
+>>> run with the Avocado test runner).
+>>>
+>>> The past
+>>> ========
+>>>
+>>> The Avocado project[1] has been working, for quite some time now, on a
+>>> "set of tools and libraries" with the goal of making writing tests
+>>> easier.  It is supposed to be a framework agnostic to the exact
+>>> software that will be under test.
+>>>
+>>> But, at the same time, the Avocado project cannot deny its inheritance
+>>> and influences.  Those come from Autotest[2], which had "KVM Autotest"
+>>> as its largest and most developed "test".  This large Autotest test
+>>> (KVM Autotest) became virt-test[3] and later got integrated into
+>>> Avocado and became Avocado-VT[4] which is quite relevant here,
+>>> together with its QEMU test provider[5].
+>>>
+>>> Avocado-VT and the QEMU test provider attempt to provide coverage
+>>> across platform and QEMU versions, which increases its complexity.
+>>> Also, it's built on a legacy set of principles and tools that makes
+>>> some developers stir away from it.
+>>>
+>>> What's new?
+>>> ===========
+>>>
+>>> A few months ago, the Avocado developers returned to its
+>>> "virtualization origins", in an attempt to learn from the QEMU
+>>> project, and try to help with a way to have more functional tests in
+>>> the upstream QEMU repo.
+>>>
+>>> We believe it's possible to expand the test coverage for QEMU by
+>>> facilitating
+>>> the creation of more functional tests QEMU.  This is no different than how
+>>> other types of tests are already included in the tree itself.
+>>>
+>>> How
+>>> ===
+>>>
+>>> How we did it (so far)
+>>> ----------------------
+>>>
+>>> We're aware that there's a dilemma here: to be able to easily write
+>>> more powerful tests, a lot of the complexity has to be moved
+>>> elsewhere.  Here, it means moving complexity from the test itself to a
+>>> framework.  The QEMU source tree itself has proofs of this approach,
+>>> being the "scripts" and "tests/qemu-iotests" some of the examples.
+>>>
+>>> Avocado itself[1] provides a lot of the code that should help to
+>>> absorb some of the complexities in writing tests, but not exactly
+>>> everything that is needed for QEMU.  The approach we believe will have
+>>> the best balance is to reuse upstream Avocado libraries whenever they
+>>> are useful and generic enough, and on top of that, libraries that are
+>>> part of QEMU itself.
+>>>
+>>> How can you get started with it
+>>> -------------------------------
+>>>
+>>> First of all, get Avocado installed.  Besides the Avocado test runner
+>>> itself, this will give you the basic libraries on which the other part
+>>> of this work was built on.  We want that to be simple and painless, so
+>>> here's our best bet for a one-liner installation:
+>>>
+>>>   pip install --user avocado-framework
+>>> avocado-framework-plugin-varianter-yaml-to-mux aexpect
+>>>
+>>> That will install Avocado within the user's home directory.  If you
+>>> give up on it, it can be uninstalled with another simple one-liner:
+>>>
+>>>   pip uninstall -y avocado-framework
+>>> avocado-framework-plugin-varianter-yaml-to-mux aexpect
+>>>
+>>> Now, suppose you're working on a given feature, and want to try your
+>>> luck writing a test using this work.  To avoid having you fetching and
+>>> rebasing from our currently in development fork[6] and branch[7], you
+>>> can just
+>>> add one commit to your tree with:
+>>>
+>>>   curl
+>>> https://patch-diff.githubusercontent.com/raw/apahim/qemu/pull/17.patch |
+>>> git am -
+>>>
+>>> This will get a simple patch from a snapshot branch[8].  You can, of course,
+>>> do it "the git way", fetching from that repo[6] and using the
+>>> non-snapshotted branch.
+>>>
+>>> After that, we'd love for you to take a look at some of the existing
+>>> tests[9][10] and then attempt to create test for your own use case.
+>>> The basic README[11] file, and the Avocado documentation[12] are also
+>>> important resources not to be missed.
+>>>
+>>> What's next?
+>>> ============
+>>>
+>>> Initially, feedback is what we're looking for.  It would be greatly
+>>> appreciated to understand if/how this suits (or not) use cases out
+>>> there.
+>>>
+>>> After feedback, further refinements, and more tests are written, the
+>>> Avocado developers will follow up with an initial patch series for
+>>> upstream QEMU.  In such a proposal, we intend to have further
+>>> integration.  Ideally in way that "configure" can be given a
+>>> "--with-functional-[avocado-]tests" parameter of sorts, and a "make
+>>>  [functional-]check" would seamlessly include them.
+>>
+>> I have a few thoughts.
+>>
+>> We use pytest/pexpect internally to kick off QEMU runs and monitor the
+>> output (no interaction with the QEMU source tree) and I think it is
+>> extremely useful. So I am all for using Python to test things and this
+>> looks really well done!
+>>
+>
+> Thanks for checking it out, and for the positive words.  Now, sorry if
+> I'm missing some obvious information, but is this work of yours with
+> pytest/pexpect publicly available?  I'd like to also take a look at
+> that, because it does look similar to the Avocado + aexpect approach
+> taken here.
+>
+>> What I don't understand though is what this gives us compared to the
+>> existing QEMU test infrastructure? Besides being able to use Python
+>> and a better interface what are the main benefits? I think that is
+>> something worth documenting somewhere.
+>>
+>
+> We currently intend to *add* to the QEMU test infrastructure, not
+> replace it.
+>
+> The benefits we envision are, besides hopefully easier and more capable
+> interfaces, to simply have more upstream tests.  This means avoiding new
+> regressions and improving coverage.
+>
+>> Also, it looks like this will require images checked into git
+>> somewhere is that correct? Is there a good plan on how to handle that?
+>>
+>
+> It won't require images checked into git.  Right now, tests use the
+> vmimage library:
+>
+> http://avocado-framework.readthedocs.io/en/57.0/api/utils/avocado.utils.html#avocado.utils.vmimage.get
+>
+> Which downloads (and caches) images from external sources.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- target/s390x/cpu.c              |  1 +
- target/s390x/cpu.h              |  1 +
- target/s390x/cpu_features.c     |  1 +
- target/s390x/cpu_features_def.h |  1 +
- target/s390x/gen-features.c     |  1 +
- target/s390x/kvm.c              | 14 ++++++++++++++
- target/s390x/machine.c          | 17 +++++++++++++++++
- 7 files changed, 36 insertions(+)
+Expanding on that, the vmimage lib downloads and caches the so called
+"cloud images" from distros own repositories. Here's[1] some
+documentation with usage examples, including one example on how to add
+your own image provider.
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index ae3cee9..d2e6b9f 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -89,6 +89,7 @@ static void s390_cpu_reset(CPUState *s)
-     CPUS390XState *env = &cpu->env;
- 
-     env->pfault_token = -1UL;
-+    env->bpbc = false;
-     scc->parent_reset(s);
-     cpu->env.sigp_order = 0;
-     s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 1a8b6b9..c0ef85d 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -93,6 +93,7 @@ struct CPUS390XState {
- 
-     uint32_t fpc;          /* floating-point control register */
-     uint32_t cc_op;
-+    bool bpbc;             /* branch prediction blocking */
- 
-     float_status fpu_status; /* passed to softfloat lib */
- 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 31a4676..5d1c210 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -89,6 +89,7 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("msa4-base", S390_FEAT_TYPE_STFL, 77, "Message-security-assist-extension-4 facility (excluding subfunctions)"),
-     FEAT_INIT("edat2", S390_FEAT_TYPE_STFL, 78, "Enhanced-DAT facility 2"),
-     FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point packed-conversion facility"),
-+    FEAT_INIT("bpb", S390_FEAT_TYPE_STFL, 82, "Branch Prediction Blocking"),
-     FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
-     FEAT_INIT("iep", S390_FEAT_TYPE_STFL, 130, "Instruction-execution-protection facility"),
-     FEAT_INIT("sea_esop2", S390_FEAT_TYPE_STFL, 131, "Side-effect-access facility and Enhanced-suppression-on-protection facility 2"),
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index 4b6d4e9..4487cfd 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -80,6 +80,7 @@ typedef enum {
-     S390_FEAT_MSA_EXT_4,
-     S390_FEAT_EDAT_2,
-     S390_FEAT_DFP_PACKED_CONVERSION,
-+    S390_FEAT_BPB,
-     S390_FEAT_VECTOR,
-     S390_FEAT_INSTRUCTION_EXEC_PROT,
-     S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index b24f6ad..563aced 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -352,6 +352,7 @@ static uint16_t base_GEN14_GA1[] = {
-  * support these features yet.
-  */
- static uint16_t full_GEN7_GA1[] = {
-+    S390_FEAT_BPB,
-     S390_FEAT_SIE_F2,
-     S390_FEAT_SIE_SKEY,
-     S390_FEAT_SIE_GPERE,
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 6a18a41..8736001 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -490,6 +490,11 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-         cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_GSCB;
-     }
- 
-+    if (can_sync_regs(cs, KVM_SYNC_BPBC)) {
-+        cs->kvm_run->s.regs.bpbc = env->bpbc;
-+        cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_BPBC;
-+    }
-+
-     /* Finally the prefix */
-     if (can_sync_regs(cs, KVM_SYNC_PREFIX)) {
-         cs->kvm_run->s.regs.prefix = env->psa;
-@@ -600,6 +605,10 @@ int kvm_arch_get_registers(CPUState *cs)
-         memcpy(env->gscb, cs->kvm_run->s.regs.gscb, 32);
-     }
- 
-+    if (can_sync_regs(cs, KVM_SYNC_BPBC)) {
-+        env->bpbc = cs->kvm_run->s.regs.bpbc;
-+    }
-+
-     /* pfault parameters */
-     if (can_sync_regs(cs, KVM_SYNC_PFAULT)) {
-         env->pfault_token = cs->kvm_run->s.regs.pft;
-@@ -2278,6 +2287,11 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         clear_bit(S390_FEAT_CMM_NT, model->features);
-     }
- 
-+    /* bpb needs kernel support for migration, VSIE and reset */
-+    if (!kvm_check_extension(kvm_state, KVM_CAP_S390_BPB)) {
-+        clear_bit(S390_FEAT_BPB, model->features);
-+    }
-+
-     /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
-     if (pci_available) {
-         set_bit(S390_FEAT_ZPCI, model->features);
-diff --git a/target/s390x/machine.c b/target/s390x/machine.c
-index b78f326..84b4928 100644
---- a/target/s390x/machine.c
-+++ b/target/s390x/machine.c
-@@ -194,6 +194,22 @@ const VMStateDescription vmstate_gscb = {
-         }
- };
- 
-+static bool bpbc_needed(void *opaque)
-+{
-+    return s390_has_feat(S390_FEAT_BPB);
-+}
-+
-+const VMStateDescription vmstate_bpbc = {
-+    .name = "cpu/bpbc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = bpbc_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BOOL(env.bpbc, S390CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- const VMStateDescription vmstate_s390_cpu = {
-     .name = "cpu",
-     .post_load = cpu_post_load,
-@@ -228,6 +244,7 @@ const VMStateDescription vmstate_s390_cpu = {
-         &vmstate_riccb,
-         &vmstate_exval,
-         &vmstate_gscb,
-+        &vmstate_bpbc,
-         NULL
-     },
- };
--- 
-2.9.4
+Since those images usually come with no password, requiring cloudinit,
+we added to the avocado_qemu "add_image()" API the ability to set the
+default user and its password attaching a cloudinit cdrom to the VM,
+if you include the option "cloudinit=True". You can see an example
+here[2].
+
+In the example [2], there's no username/password options in the
+add_image() call, so the defaults (avocado/avocado) will be assumed.
+Btw, besides setting username/password as options in the add_image(),
+they can also come from parameters, so you don't have to hard code
+that information in in each test. See the "image_user"/"image_pass"
+parameters in the README[3] file.
+
+[1] - http://avocado-framework.readthedocs.io/en/57.0/utils/vmimage.html
+[2] - https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/test_nec-usb-xhci.py#L22-L23
+[3] - https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/README.rst
+
+--
+apahim
+
+>
+> Please let me know if you have more questions!
+> - Cleber.
+>
+>> Alistair
+>>
+>>>
+>>> Thanks!
+>>>
+>>> References
+>>> ==========
+>>>
+>>>  [1] http://avocado-framework.github.io/
+>>>  [2] http://autotest.github.io/
+>>>  [3] https://github.com/autotest/virt-test
+>>>  [4] https://github.com/avocado-framework/avocado-vt
+>>>  [5] https://github.com/autotest/tp-qemu
+>>>  [6] https://github.com/apahim/qemu
+>>>  [7] https://github.com/apahim/qemu/tree/avocado_qemu
+>>>  [8] https://github.com/apahim/qemu/tree/avocado_qemu_snapshot
+>>>  [9]
+>>> https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/test_info_memdev_host_nodes.py
+>>> [10]
+>>> https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/test_ovmf_with_240_vcpus.py
+>>> [11]
+>>> https://github.com/apahim/qemu/blob/avocado_qemu/tests/avocado/README.rst
+>>> [12] http://avocado-framework.readthedocs.io/
+>>>
+>>> --
+>>> Cleber Rosa
+>>> [ Sr Software Engineer - Virtualization Team - Red Hat ]
+>>> [ Avocado Test Framework - avocado-framework.github.io ]
+>>> [  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+>>>
+>
+> --
+> Cleber Rosa
+> [ Sr Software Engineer - Virtualization Team - Red Hat ]
+> [ Avocado Test Framework - avocado-framework.github.io ]
+> [  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
