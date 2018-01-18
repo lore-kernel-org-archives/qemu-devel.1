@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ecIDe-0005aU-0M
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:59:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1ecIRk-0001r0-5S
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 17:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ecIDZ-0002er-W6
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:59:34 -0500
-Date: Thu, 18 Jan 2018 14:59:20 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180118145920.2dd19c9a@w520.home>
-In-Reply-To: <51ac953b-da09-94ed-41a4-ae75ca045c5e@ozlabs.ru>
-References: <20171215062914.27927-1-aik@ozlabs.ru>
-	<3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
-	<20180105082916.480132af@t450s.home>
-	<51ac953b-da09-94ed-41a4-ae75ca045c5e@ozlabs.ru>
+	(envelope-from <eblake@redhat.com>) id 1ecIRi-000546-Oe
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 17:14:08 -0500
+References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
+	<20180118181123.37056-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1ea9362a-50ff-cea3-67fc-a658a2ff0b93@redhat.com>
+Date: Thu, 18 Jan 2018 16:13:56 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX
- BAR
+In-Reply-To: <20180118181123.37056-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5UIyFLRKw8NfxXEH30JRe6fkVnl2yVCAn"
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,297 +24,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Tue, 16 Jan 2018 16:17:58 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5UIyFLRKw8NfxXEH30JRe6fkVnl2yVCAn
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com,
+ kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <1ea9362a-50ff-cea3-67fc-a658a2ff0b93@redhat.com>
+Subject: Re: [PATCH v2 3/6] qapi: add nbd-server-remove
+References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
+ <20180118181123.37056-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20180118181123.37056-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 06/01/18 02:29, Alex Williamson wrote:
-> > On Fri, 5 Jan 2018 10:48:07 +0100
-> > Auger Eric <eric.auger@redhat.com> wrote:
-> >   
-> >> Hi Alexey,
-> >>
-> >> On 15/12/17 07:29, Alexey Kardashevskiy wrote:  
-> >>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
-> >>> which tells that a region with MSIX data can be mapped entirely, i.e.
-> >>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
-> >>>
-> >>> With this change, all BARs are mapped in a single chunk and MSIX vectors
-> >>> are emulated on top unless the machine requests not to by defining and
-> >>> enabling a new "vfio-no-msix-emulation" property. At the moment only
-> >>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
-> >>> enabling it as it does not define the "set" callback for the new property;
-> >>> the new property also does not appear in "-machine pseries,help".
-> >>>
-> >>> If the new capability is present, this puts MSIX IO memory region under
-> >>> mapped memory region. If the capability is not there, it falls back to
-> >>> the old behaviour with the sparse capability.
-> >>>
-> >>> In MSIX vectors section is not aligned to the page size, the KVM memory
-> >>> listener does not register it with the KVM as a memory slot and MSIX is
-> >>> emulated by QEMU as before.
-> >>>
-> >>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
-> >>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
-> >>>
-> >>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>> ---
-> >>>
-> >>> This is mtree and flatview BEFORE this patch:
-> >>>
-> >>> "info mtree":
-> >>> memory-region: pci@800000020000000.mmio
-> >>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-> >>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-> >>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-> >>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>
-> >>> "info mtree -f":
-> >>> FlatView #0
-> >>>  AS "memory", root: system
-> >>>  AS "cpu-memory", root: system
-> >>>  Root memory region: system
-> >>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>>   0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>   000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
-> >>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>
-> >>>
-> >>>
-> >>> This is AFTER this patch applied:
-> >>>
-> >>> "info mtree":
-> >>> memory-region: pci@800000020000000.mmio
-> >>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-> >>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
-> >>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-> >>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-> >>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>
-> >>>
-> >>> "info mtree -f":
-> >>> FlatView #2
-> >>>  AS "memory", root: system
-> >>>  AS "cpu-memory", root: system
-> >>>  Root memory region: system
-> >>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>>   0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>
-> >>>
-> >>>
-> >>> This is AFTER this patch applied AND spapr_get_msix_emulation() patched
-> >>> to enable emulation:
-> >>>
-> >>> "info mtree":
-> >>> memory-region: pci@800000020000000.mmio
-> >>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-> >>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-> >>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-> >>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>
-> >>> "info mtree -f":
-> >>> FlatView #1
-> >>>  AS "memory", root: system
-> >>>  AS "cpu-memory", root: system
-> >>>  Root memory region: system
-> >>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>>   0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>   000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
-> >>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>> ---
-> >>>  include/hw/vfio/vfio-common.h |  1 +
-> >>>  linux-headers/linux/vfio.h    |  5 +++++
-> >>>  hw/ppc/spapr.c                |  8 ++++++++
-> >>>  hw/vfio/common.c              | 15 +++++++++++++++
-> >>>  hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
-> >>>  5 files changed, 50 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> >>> index f3a2ac9..927d600 100644
-> >>> --- a/include/hw/vfio/vfio-common.h
-> >>> +++ b/include/hw/vfio/vfio-common.h
-> >>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
-> >>>                           struct vfio_region_info **info);
-> >>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-> >>>                               uint32_t subtype, struct vfio_region_info **info);
-> >>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
-> >>>  #endif
-> >>>  extern const MemoryListener vfio_prereg_listener;
-> >>>  
-> >>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> >>> index 4312e96..b45182e 100644
-> >>> --- a/linux-headers/linux/vfio.h
-> >>> +++ b/linux-headers/linux/vfio.h
-> >>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
-> >>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
-> >>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-> >>>  
-> >>> +/*
-> >>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
-> >>> + */
-> >>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
-> >>> +
-> >>>  /**
-> >>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-> >>>   *				    struct vfio_irq_info)
-> >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>> index 9de63f0..693394a 100644
-> >>> --- a/hw/ppc/spapr.c
-> >>> +++ b/hw/ppc/spapr.c
-> >>> @@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
-> >>>      spapr->use_hotplug_event_source = value;
-> >>>  }
-> >>>  
-> >>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
-> >>> +{
-> >>> +    return true;
-> >>> +}
-> >>> +
-> >>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
-> >>>  {
-> >>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-> >>> @@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
-> >>>      object_property_set_description(obj, "vsmt",
-> >>>                                      "Virtual SMT: KVM behaves as if this were"
-> >>>                                      " the host's SMT mode", &error_abort);
-> >>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
-> >>> +                             spapr_get_msix_emulation, NULL, NULL);
-> >>>  }
-> >>>  
-> >>>  static void spapr_machine_finalizefn(Object *obj)
-> >>> @@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
-> >>>  /*
-> >>>   * pseries-2.11
-> >>>   */
-> >>> +
-> >>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
-> >>>  {
-> >>>  }
-> >>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> >>> index 1fb8a8e..da5f182 100644
-> >>> --- a/hw/vfio/common.c
-> >>> +++ b/hw/vfio/common.c
-> >>> @@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-> >>>      return -ENODEV;
-> >>>  }
-> >>>  
-> >>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
-> >>> +{
-> >>> +    struct vfio_region_info *info = NULL;
-> >>> +    bool ret = false;
-> >>> +
-> >>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
-> >>> +        if (vfio_get_region_info_cap(info, cap_type)) {
-> >>> +            ret = true;
-> >>> +        }
-> >>> +        g_free(info);
-> >>> +    }
-> >>> +
-> >>> +    return ret;
-> >>> +}
-> >>> +
-> >>>  /*
-> >>>   * Interfaces for IBM EEH (Enhanced Error Handling)
-> >>>   */
-> >>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> >>> index c977ee3..27a3706 100644
-> >>> --- a/hw/vfio/pci.c
-> >>> +++ b/hw/vfio/pci.c
-> >>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
-> >>>      off_t start, end;
-> >>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
-> >>>  
-> >>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
-> >>> +                            vdev->msix->table_bar)) {
-> >>> +        return;
-> >>> +    }    
-> >>
-> >> I am testing this patch on ARM with a Mellanox CX-4 card. Single bar0 +
-> >> msix table at 0x2000, using 64kB pages.
-> >>
-> >> 0000000000000000-0000000001ffffff (prio 1, i/o): 0000:01:00.0 BAR 0
-> >>  0000000000000000-0000000001ffffff (prio 0, ramd): 0000:01:00.0 BAR 0
-> >> mmaps[0]
-> >>   0000000000002000-00000000000023ff (prio 0, i/o): msix-table
-> >>   0000000000003000-0000000000003007 (prio 0, i/o): msix-pba [disabled]
-> >>
-> >>
-> >> My kernel includes your "vfio-pci: Allow mapping MSIX BAR" so we bypass
-> >> vfio_pci_fixup_msix_region. But as the mmaps[0] is not fixed up the
-> >> vfio_listener_region_add_ram gets called on the first 8kB which cannot
-> >> be mapped with 64kB page, leading to a qemu abort.
-> >>
-> >> 29520@1515145231.232161:vfio_listener_region_add_ram region_add [ram]
-> >> 0x8000000000 - 0x8000001fff [0xffffa8820000]
-> >> qemu-system-aarch64: VFIO_MAP_DMA: -22
-> >> qemu-system-aarch64: vfio_dma_map(0x1e265f60, 0x8000000000, 0x2000,
-> >> 0xffffa8820000) = -22 (Invalid argument)
-> >> qemu: hardware error: vfio: DMA mapping failed, unable to continue
-> >>
-> >> In my case don't we still need the fixup logic?  
-> > 
-> > Ah, I didn't realize you had Alexey's QEMU patch when you asked about
-> > this.  I'd say no, the fixup shouldn't be needed, but apparently we
-> > can't remove it until we figure out this bug and who should be filtering
-> > out sub-page size listener events.  Thanks,  
-> 
-> 
-> This should do it:
-> 
-> @@ -303,11 +303,19 @@ static bool
-> vfio_listener_skipped_section(MemoryRegionSection *section)
->              * Sizing an enabled 64-bit BAR can cause spurious mappings to
->              * addresses in the upper part of the 64-bit address space.  These
->              * are never accessed by the CPU and beyond the address width of
->              * some IOMMU hardware.  TODO: VFIO should tell us the IOMMU width.
->              */
-> -           section->offset_within_address_space & (1ULL << 63);
-> +           section->offset_within_address_space & (1ULL << 63) ||
-> +           /*
-> +            * Non-system-page aligned RAM regions have no chance to be
-> +            * DMA mapped so skip them too.
-> +            */
-> +           (memory_region_is_ram(section->mr) &&
-> +            ((section->offset_within_region & qemu_real_host_page_mask) ||
-> +             (int128_getlo(section->size) & qemu_real_host_page_mask))
-> +           );
+On 01/18/2018 12:11 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Add command for export removing. It is needed for cases when we
+
+s/export removing/removing an export/
+
+> don't want to keep export after the operation on it was completed.
+> The other example is temporary node, created with blockdev-add.
+> If we want to delete it we should firstly remove corresponding
+> NBD export.
+>=20
+
+No HMP counterpart? I can give a quick shot at that, as a followup patch.=
+
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block.json     | 45 +++++++++++++++++++++++++++++++++++++++++++++=
+
+>  include/block/nbd.h |  1 +
+>  blockdev-nbd.c      | 24 ++++++++++++++++++++++++
+>  nbd/server.c        | 21 +++++++++++++++++++++
+>  4 files changed, 91 insertions(+)
+>=20
+> diff --git a/qapi/block.json b/qapi/block.json
+> index 353e3a45bd..ddf73932ce 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -228,6 +228,51 @@
+>    'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
+> =20
+>  ##
+> +# @NbdServerRemoveMode:
+> +#
+> +# Mode of NBD export removing.
+
+Mode for removing an NBD export.
+
+> +#
+> +# @safe: Remove export if there are no existing connections, fail othe=
+rwise.
+> +#
+> +# @hard: Drop all connections immediately and remove export.
+> +#
+> +# Postponed, not realized yet modes:
+
+Maybe:
+
+Potential additional modes to be added in the future:
+
+> +#
+> +# hide: Just hide export from new clients, leave existing connections =
+as is.
+> +#       Remove export after all clients are disconnected. nbd-server-r=
+emove
+> +#       with mode=3Dsoft or mode=3Dhard may be called after nbd-server=
+-remove
+> +#       with mode=3Dhide.
+
+mode=3Dsafe could also be called; I don't see that this last sentence add=
+s
+much.
+
+> +#
+> +# soft: Hide export from new clients, answer with ESHUTDOWN for all fu=
+rther
+> +#       requests from existing clients. Remove export after all client=
+s are
+> +#       disconnected. nbd-server-requests with mode=3Dhard may be call=
+ed after
+> +#       nbd-server-remove with mode=3Dsoft
+
+Again, the last sentence doesn't add mouch (I guess you're arguing that
+requesting a hide doesn't make much sense after a soft disconnect has
+already started; but I don't see any harm in permitting it as a no-op).
+
+> +#
+> +# Since: 2.12
+> +##
+> +{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
+> +
+> +##
+> +# @nbd-server-remove:
+> +#
+> +# Remove NBD export by name.
+> +#
+> +# @name: Export name.
+> +#
+> +# @mode: Mode of command operation. See @NbdServerRemoveMode descripti=
+on.
+> +#        Default is 'safe'.
+> +#
+> +# Returns: error if
+> +#            - the server is not running
+> +#            - export is not found
+> +#            - mode is 'safe' and there are existing connections
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'nbd-server-remove',
+> +  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
+
+Looks reasonable.
+
+
+> +++ b/nbd/server.c
+> @@ -1177,6 +1177,27 @@ void nbd_export_close(NBDExport *exp)
+>      nbd_export_put(exp);
 >  }
-> 
-> 
-> Do we VFIO DMA map on every RAM MR just because it is not necessary to have
-> more complicated logic to detect whether it is MMIO? Or there is something
-> bigger?
+> =20
+> +void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error=
+ **errp)
+> +{
+> +    NBDClient *client;
+> +    int nb_clients =3D 0;
+> +
+> +    if (mode =3D=3D NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->=
+clients)) {
+> +        nbd_export_close(exp);
+> +        return;
+> +    }
+> +
+> +    assert(mode =3D=3D NBD_SERVER_REMOVE_MODE_SAFE);
+> +
+> +    QTAILQ_FOREACH(client, &exp->clients, next) {
+> +        nb_clients++;
+> +    }
+> +
+> +    error_setg(errp, "NBD export '%s' has %d active connection%s. To f=
+orce "
+> +               "remove it (and hard disconnect clients) use mode=3D'ha=
+rd'",
+> +               exp->name, nb_clients, nb_clients =3D=3D 1 ? "" : "s");=
 
-Both, a) it's not clear how we determine a MR is MMIO vs RAM, thus the
-silly address hack above to try to exclude PCI BARs as they're being
-resized, and b) there is some value to enabling peer-to-peer mappings
-between devices.  Is there a better, more generic solution to a) now?
-If we know a MR is MMIO, then I think we can handle any associated
-mapping failure as non-fatal.  It's nice to enable p2p, but it's barely
-used and not clear that it works reliably (sometimes even on bare
-metal).  Nit, we don't yet have the IOVA range of the IOMMU exposed,
-thus the silly address hack, but we do have supported page sizes, so we
-should probably be referencing that rather than host page size.
- 
-> As for now, it is possible to have non-aligned RAM MR, the KVM's listener
-> just does not register it with the KVM if unaligned.
 
-For a sanity check, we don't support running a guest with a smaller
-page size than the host, right?  I assume that would be the only case
-where we would have a reasonable chance of the guest using a host
-sub-page as a DMA target, but that seems like just one of an infinite
-number of problems with such a setup.  Thanks,
+Playing games with English pluralization doesn't work too well in error
+messages, if we ever want to allow translations; does the number of
+active clients actually matter?  Also, error_setg() recommends against
+using '.' or more than one sentence.  Better might be:
 
-Alex
+error_setg(errp, "export '%s' still in use");
+error_append_hint(errp, "Use mode=3D'hard' to force client disconnect\n")=
+;
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--5UIyFLRKw8NfxXEH30JRe6fkVnl2yVCAn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlphHCQACgkQp6FrSiUn
+Q2olWwf/T+PY/BMbJJOxIIyh1FVPM23BzcOwxAGfXa+dL/Z+DEc6wBYBQqj5naWw
+C6rnhZJdrqbuArIYnSSaPUq1x1DHizi/UJ0uHSPuFwO31dMZ/CqMb0pibaYgxEFV
+ZzSSgYxcCJh44SV7kIkt9HN1TRXxMgl3Sd8+DQwzAs93ndFJMFxZcc6xCK2VmQgL
+uAZPl75WxcI+OXfLKVWkOMkbwY35xyFFcXGP1z9R+8cEk9BiDUH4xxTVYFKXkW5O
++e3UZ7Zjp/gu2d8TXlOLBRoxKWMiz0x1Br2v6wqJ/AnzmzC8rL8thEc0rehN9WIS
+M2Ahmsjh0cIIYiRE2YZPu7FLkDxB1w==
+=QK4F
+-----END PGP SIGNATURE-----
+
+--5UIyFLRKw8NfxXEH30JRe6fkVnl2yVCAn--
