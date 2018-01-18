@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH2z-00033R-D8
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:32 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH3D-0003DA-4N
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH2w-00036J-8J
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39238)
+	(envelope-from <mst@redhat.com>) id 1ecH3C-0003GG-0p
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47203)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH2v-00035A-T6
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:26 -0500
-Date: Thu, 18 Jan 2018 22:44:19 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH3B-0003Fc-NJ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:41 -0500
+Date: Thu, 18 Jan 2018 22:44:34 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516308132-10272-3-git-send-email-mst@redhat.com>
+Message-ID: <1516308132-10272-5-git-send-email-mst@redhat.com>
 References: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v4 02/29] vhost-user: add new vhost user
- messages to support virtio config space
+Subject: [Qemu-devel] [PULL v4 04/29] contrib/libvhost-user: enable virtio
+ config space messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,216 +29,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Changpeng Liu <changpeng.liu@intel.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Changpeng Liu <changpeng.liu@intel.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Changpeng Liu <changpeng.liu@intel.com>
 
-Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
-used for live migration of vhost user devices, also vhost user devices
-can benefit from the messages to get/set virtio config space from/to the
-I/O target. For the purpose to support virtio config space change,
-VHOST_USER_SLAVE_CONFIG_CHANGE_MSG message is added as the event notifier
-in case virtio config space change in the slave I/O target.
+Enable VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages in
+libvhost-user library, users can implement their own I/O target
+based on the library. This enable the virtio config space delivered
+between QEMU host device and the I/O target.
 
 Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/interop/vhost-user.txt       |  55 ++++++++++++++++++
- include/hw/virtio/vhost-backend.h |  12 ++++
- include/hw/virtio/vhost.h         |  15 +++++
- hw/virtio/vhost-user.c            | 118 ++++++++++++++++++++++++++++++++=
+ contrib/libvhost-user/libvhost-user.h | 33 +++++++++++++++++++++++++++
+ contrib/libvhost-user/libvhost-user.c | 42 +++++++++++++++++++++++++++++=
 ++++++
- hw/virtio/vhost.c                 |  32 +++++++++++
- 5 files changed, 232 insertions(+)
+ 2 files changed, 75 insertions(+)
 
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index d49444e..0875ef4 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -119,6 +119,19 @@ Depending on the request type, payload can be:
-     - 3: IOTLB invalidate
-     - 4: IOTLB access fail
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+index 2f5864b..f8a730b 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -30,6 +30,16 @@
 =20
-+ * Virtio device config space
-+   -----------------------------------
-+   | offset | size | flags | payload |
-+   -----------------------------------
-+
-+   Offset: a 32-bit offset of virtio device's configuration space
-+   Size: a 32-bit configuration space access size in bytes
-+   Flags: a 32-bit value:
-+    - 0: Vhost master messages used for writeable fields
-+    - 1: Vhost master messages used for live migration
-+   Payload: Size bytes array holding the contents of the virtio
-+       device's configuration space
-+
- In QEMU the vhost-user message is implemented with the following struct:
-=20
- typedef struct VhostUserMsg {
-@@ -132,6 +145,7 @@ typedef struct VhostUserMsg {
-         VhostUserMemory memory;
-         VhostUserLog log;
-         struct vhost_iotlb_msg iotlb;
-+        VhostUserConfig config;
-     };
- } QEMU_PACKED VhostUserMsg;
-=20
-@@ -623,6 +637,32 @@ Master message types
-       and expect this message once (per VQ) during device configuration
-       (ie. before the master starts the VQ).
-=20
-+ * VHOST_USER_GET_CONFIG
-+
-+      Id: 24
-+      Equivalent ioctl: N/A
-+      Master payload: virtio device config space
-+      Slave payload: virtio device config space
-+
-+      Submitted by the vhost-user master to fetch the contents of the vi=
-rtio
-+      device configuration space, vhost-user slave's payload size MUST m=
-atch
-+      master's request, vhost-user slave uses zero length of payload to
-+      indicate an error to vhost-user master. The vhost-user master may
-+      cache the contents to avoid repeated VHOST_USER_GET_CONFIG calls.
-+
-+* VHOST_USER_SET_CONFIG
-+
-+      Id: 25
-+      Equivalent ioctl: N/A
-+      Master payload: virtio device config space
-+      Slave payload: N/A
-+
-+      Submitted by the vhost-user master when the Guest changes the virt=
-io
-+      device configuration space and also can be used for live migration
-+      on the destination host. The vhost-user slave must check the flags
-+      field, and slaves MUST NOT accept SET_CONFIG for read-only
-+      configuration space fields unless the live migration bit is set.
-+
- Slave message types
- -------------------
-=20
-@@ -641,6 +681,21 @@ Slave message types
-       This request should be send only when VIRTIO_F_IOMMU_PLATFORM feat=
-ure
-       has been successfully negotiated.
-=20
-+* VHOST_USER_SLAVE_CONFIG_CHANGE_MSG
-+
-+     Id: 2
-+     Equivalent ioctl: N/A
-+     Slave payload: N/A
-+     Master payload: N/A
-+
-+     Vhost-user slave sends such messages to notify that the virtio devi=
-ce's
-+     configuration space has changed, for those host devices which can s=
-upport
-+     such feature, host driver can send VHOST_USER_GET_CONFIG message to=
- slave
-+     to get the latest content. If VHOST_USER_PROTOCOL_F_REPLY_ACK is
-+     negotiated, and slave set the VHOST_USER_NEED_REPLY flag, master mu=
-st
-+     respond with zero when operation is successfully completed, or non-=
-zero
-+     otherwise.
-+
- VHOST_USER_PROTOCOL_F_REPLY_ACK:
- -------------------------------
- The original vhost-user specification only demands replies for certain
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
-backend.h
-index a7a5f22..592254f 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -20,6 +20,11 @@ typedef enum VhostBackendType {
-     VHOST_BACKEND_TYPE_MAX =3D 3,
- } VhostBackendType;
+ #define VHOST_MEMORY_MAX_NREGIONS 8
 =20
 +typedef enum VhostSetConfigType {
 +    VHOST_SET_CONFIG_TYPE_MASTER =3D 0,
 +    VHOST_SET_CONFIG_TYPE_MIGRATION =3D 1,
 +} VhostSetConfigType;
 +
- struct vhost_dev;
- struct vhost_log;
- struct vhost_memory;
-@@ -84,6 +89,11 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vho=
-st_dev *dev,
-                                            int enabled);
- typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
-                                               struct vhost_iotlb_msg *im=
-sg);
-+typedef int (*vhost_set_config_op)(struct vhost_dev *dev, const uint8_t =
-*data,
-+                                   uint32_t offset, uint32_t size,
-+                                   uint32_t flags);
-+typedef int (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *confi=
-g,
-+                                   uint32_t config_len);
-=20
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-@@ -118,6 +128,8 @@ typedef struct VhostOps {
-     vhost_vsock_set_running_op vhost_vsock_set_running;
-     vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
-     vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-+    vhost_get_config_op vhost_get_config;
-+    vhost_set_config_op vhost_set_config;
- } VhostOps;
-=20
- extern const VhostOps user_ops;
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 467dc77..1dc2d73 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -46,6 +46,12 @@ struct vhost_iommu {
-     QLIST_ENTRY(vhost_iommu) iommu_next;
- };
-=20
-+typedef struct VhostDevConfigOps {
-+    /* Vhost device config space changed callback
-+     */
-+    int (*vhost_dev_config_notifier)(struct vhost_dev *dev);
-+} VhostDevConfigOps;
-+
- struct vhost_memory;
- struct vhost_dev {
-     VirtIODevice *vdev;
-@@ -76,6 +82,7 @@ struct vhost_dev {
-     QLIST_ENTRY(vhost_dev) entry;
-     QLIST_HEAD(, vhost_iommu) iommu_list;
-     IOMMUNotifier n;
-+    const VhostDevConfigOps *config_ops;
- };
-=20
- int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-@@ -106,4 +113,12 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
-                           struct vhost_vring_file *file);
-=20
- int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int wr=
-ite);
-+int vhost_dev_get_config(struct vhost_dev *dev, uint8_t *config,
-+                         uint32_t config_len);
-+int vhost_dev_set_config(struct vhost_dev *dev, const uint8_t *data,
-+                         uint32_t offset, uint32_t size, uint32_t flags)=
-;
-+/* notifier callback in case vhost device config space changed
-+ */
-+void vhost_dev_set_config_notifier(struct vhost_dev *dev,
-+                                   const VhostDevConfigOps *ops);
- #endif
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 093675e..8b94688 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -26,6 +26,11 @@
- #define VHOST_MEMORY_MAX_NREGIONS    8
- #define VHOST_USER_F_PROTOCOL_FEATURES 30
-=20
 +/*
 + * Maximum size of virtio device config space
 + */
@@ -247,7 +70,7 @@ index 093675e..8b94688 100644
  enum VhostUserProtocolFeature {
      VHOST_USER_PROTOCOL_F_MQ =3D 0,
      VHOST_USER_PROTOCOL_F_LOG_SHMFD =3D 1,
-@@ -65,12 +70,15 @@ typedef enum VhostUserRequest {
+@@ -69,6 +79,8 @@ typedef enum VhostUserRequest {
      VHOST_USER_SET_SLAVE_REQ_FD =3D 21,
      VHOST_USER_IOTLB_MSG =3D 22,
      VHOST_USER_SET_VRING_ENDIAN =3D 23,
@@ -256,14 +79,7 @@ index 093675e..8b94688 100644
      VHOST_USER_MAX
  } VhostUserRequest;
 =20
- typedef enum VhostUserSlaveRequest {
-     VHOST_USER_SLAVE_NONE =3D 0,
-     VHOST_USER_SLAVE_IOTLB_MSG =3D 1,
-+    VHOST_USER_SLAVE_CONFIG_CHANGE_MSG =3D 2,
-     VHOST_USER_SLAVE_MAX
- }  VhostUserSlaveRequest;
-=20
-@@ -92,6 +100,18 @@ typedef struct VhostUserLog {
+@@ -90,6 +102,18 @@ typedef struct VhostUserLog {
      uint64_t mmap_offset;
  } VhostUserLog;
 =20
@@ -279,192 +95,110 @@ index 093675e..8b94688 100644
 +                                   + sizeof(c.size) \
 +                                   + sizeof(c.flags))
 +
- typedef struct VhostUserMsg {
-     VhostUserRequest request;
-=20
-@@ -109,6 +129,7 @@ typedef struct VhostUserMsg {
+ #if defined(_WIN32)
+ # define VU_PACKED __attribute__((gcc_struct, packed))
+ #else
+@@ -112,6 +136,7 @@ typedef struct VhostUserMsg {
+         struct vhost_vring_addr addr;
          VhostUserMemory memory;
          VhostUserLog log;
-         struct vhost_iotlb_msg iotlb;
 +        VhostUserConfig config;
      } payload;
- } QEMU_PACKED VhostUserMsg;
 =20
-@@ -608,6 +629,21 @@ static int vhost_user_reset_device(struct vhost_dev =
-*dev)
-     return 0;
+     int fds[VHOST_MEMORY_MAX_NREGIONS];
+@@ -140,6 +165,10 @@ typedef int (*vu_process_msg_cb) (VuDev *dev, VhostU=
+serMsg *vmsg,
+                                   int *do_reply);
+ typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, bool star=
+ted);
+ typedef bool (*vu_queue_is_processed_in_order_cb) (VuDev *dev, int qidx)=
+;
++typedef int (*vu_get_config_cb) (VuDev *dev, uint8_t *config, uint32_t l=
+en);
++typedef int (*vu_set_config_cb) (VuDev *dev, const uint8_t *data,
++                                 uint32_t offset, uint32_t size,
++                                 uint32_t flags);
+=20
+ typedef struct VuDevIface {
+     /* called by VHOST_USER_GET_FEATURES to get the features bitmask */
+@@ -162,6 +191,10 @@ typedef struct VuDevIface {
+      * on unmanaged exit/crash.
+      */
+     vu_queue_is_processed_in_order_cb queue_is_processed_in_order;
++    /* get the config space of the device */
++    vu_get_config_cb get_config;
++    /* set the config space of the device */
++    vu_set_config_cb set_config;
+ } VuDevIface;
+=20
+ typedef void (*vu_queue_handler_cb) (VuDev *dev, int qidx);
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index f409bd3..27cc597 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -84,6 +84,8 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_SET_SLAVE_REQ_FD),
+         REQ(VHOST_USER_IOTLB_MSG),
+         REQ(VHOST_USER_SET_VRING_ENDIAN),
++        REQ(VHOST_USER_GET_CONFIG),
++        REQ(VHOST_USER_SET_CONFIG),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+@@ -798,6 +800,42 @@ vu_set_slave_req_fd(VuDev *dev, VhostUserMsg *vmsg)
  }
 =20
-+static int vhost_user_slave_handle_config_change(struct vhost_dev *dev)
+ static bool
++vu_get_config(VuDev *dev, VhostUserMsg *vmsg)
 +{
 +    int ret =3D -1;
 +
-+    if (!dev->config_ops) {
-+        return -1;
++    if (dev->iface->get_config) {
++        ret =3D dev->iface->get_config(dev, vmsg->payload.config.region,
++                                     vmsg->payload.config.size);
 +    }
 +
-+    if (dev->config_ops->vhost_dev_config_notifier) {
-+        ret =3D dev->config_ops->vhost_dev_config_notifier(dev);
++    if (ret) {
++        /* resize to zero to indicate an error to master */
++        vmsg->size =3D 0;
 +    }
 +
-+    return ret;
++    return true;
 +}
 +
- static void slave_read(void *opaque)
++static bool
++vu_set_config(VuDev *dev, VhostUserMsg *vmsg)
++{
++    int ret =3D -1;
++
++    if (dev->iface->set_config) {
++        ret =3D dev->iface->set_config(dev, vmsg->payload.config.region,
++                                     vmsg->payload.config.offset,
++                                     vmsg->payload.config.size,
++                                     vmsg->payload.config.flags);
++        if (ret) {
++            vu_panic(dev, "Set virtio configuration space failed");
++        }
++    }
++
++    return false;
++}
++
++static bool
+ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
  {
-     struct vhost_dev *dev =3D opaque;
-@@ -640,6 +676,9 @@ static void slave_read(void *opaque)
-     case VHOST_USER_SLAVE_IOTLB_MSG:
-         ret =3D vhost_backend_handle_iotlb_msg(dev, &msg.payload.iotlb);
+     int do_reply =3D 0;
+@@ -862,6 +900,10 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_set_vring_enable_exec(dev, vmsg);
+     case VHOST_USER_SET_SLAVE_REQ_FD:
+         return vu_set_slave_req_fd(dev, vmsg);
++    case VHOST_USER_GET_CONFIG:
++        return vu_get_config(dev, vmsg);
++    case VHOST_USER_SET_CONFIG:
++        return vu_set_config(dev, vmsg);
+     case VHOST_USER_NONE:
          break;
-+    case VHOST_USER_SLAVE_CONFIG_CHANGE_MSG :
-+        ret =3D vhost_user_slave_handle_config_change(dev);
-+        break;
      default:
-         error_report("Received unexpected msg type.");
-         ret =3D -EINVAL;
-@@ -922,6 +961,83 @@ static void vhost_user_set_iotlb_callback(struct vho=
-st_dev *dev, int enabled)
-     /* No-op as the receive channel is not dedicated to IOTLB messages. =
-*/
- }
-=20
-+static int vhost_user_get_config(struct vhost_dev *dev, uint8_t *config,
-+                                 uint32_t config_len)
-+{
-+    VhostUserMsg msg =3D {
-+        msg.request =3D VHOST_USER_GET_CONFIG,
-+        msg.flags =3D VHOST_USER_VERSION,
-+        msg.size =3D VHOST_USER_CONFIG_HDR_SIZE + config_len,
-+    };
-+
-+    if (config_len > VHOST_USER_MAX_CONFIG_SIZE) {
-+        return -1;
-+    }
-+
-+    msg.payload.config.offset =3D 0;
-+    msg.payload.config.size =3D config_len;
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -1;
-+    }
-+
-+    if (vhost_user_read(dev, &msg) < 0) {
-+        return -1;
-+    }
-+
-+    if (msg.request !=3D VHOST_USER_GET_CONFIG) {
-+        error_report("Received unexpected msg type. Expected %d received=
- %d",
-+                     VHOST_USER_GET_CONFIG, msg.request);
-+        return -1;
-+    }
-+
-+    if (msg.size !=3D VHOST_USER_CONFIG_HDR_SIZE + config_len) {
-+        error_report("Received bad msg size.");
-+        return -1;
-+    }
-+
-+    memcpy(config, msg.payload.config.region, config_len);
-+
-+    return 0;
-+}
-+
-+static int vhost_user_set_config(struct vhost_dev *dev, const uint8_t *d=
-ata,
-+                                 uint32_t offset, uint32_t size, uint32_=
-t flags)
-+{
-+    uint8_t *p;
-+    bool reply_supported =3D virtio_has_feature(dev->protocol_features,
-+                                              VHOST_USER_PROTOCOL_F_REPL=
-Y_ACK);
-+
-+    VhostUserMsg msg =3D {
-+        msg.request =3D VHOST_USER_SET_CONFIG,
-+        msg.flags =3D VHOST_USER_VERSION,
-+        msg.size =3D VHOST_USER_CONFIG_HDR_SIZE + size,
-+    };
-+
-+    if (reply_supported) {
-+        msg.flags |=3D VHOST_USER_NEED_REPLY_MASK;
-+    }
-+
-+    if (size > VHOST_USER_MAX_CONFIG_SIZE) {
-+        return -1;
-+    }
-+
-+    msg.payload.config.offset =3D offset,
-+    msg.payload.config.size =3D size,
-+    msg.payload.config.flags =3D flags,
-+    p =3D msg.payload.config.region;
-+    memcpy(p, data, size);
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -1;
-+    }
-+
-+    if (reply_supported) {
-+        return process_message_reply(dev, &msg);
-+    }
-+
-+    return 0;
-+}
-+
- const VhostOps user_ops =3D {
-         .backend_type =3D VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init =3D vhost_user_init,
-@@ -948,4 +1064,6 @@ const VhostOps user_ops =3D {
-         .vhost_net_set_mtu =3D vhost_user_net_set_mtu,
-         .vhost_set_iotlb_callback =3D vhost_user_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg =3D vhost_user_send_device_iotlb_ms=
-g,
-+        .vhost_get_config =3D vhost_user_get_config,
-+        .vhost_set_config =3D vhost_user_set_config,
- };
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index e4290ce..386aef8 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1505,6 +1505,38 @@ void vhost_ack_features(struct vhost_dev *hdev, co=
-nst int *feature_bits,
-     }
- }
-=20
-+int vhost_dev_get_config(struct vhost_dev *hdev, uint8_t *config,
-+                         uint32_t config_len)
-+{
-+    assert(hdev->vhost_ops);
-+
-+    if (hdev->vhost_ops->vhost_get_config) {
-+        return hdev->vhost_ops->vhost_get_config(hdev, config, config_le=
-n);
-+    }
-+
-+    return -1;
-+}
-+
-+int vhost_dev_set_config(struct vhost_dev *hdev, const uint8_t *data,
-+                         uint32_t offset, uint32_t size, uint32_t flags)
-+{
-+    assert(hdev->vhost_ops);
-+
-+    if (hdev->vhost_ops->vhost_set_config) {
-+        return hdev->vhost_ops->vhost_set_config(hdev, data, offset,
-+                                                 size, flags);
-+    }
-+
-+    return -1;
-+}
-+
-+void vhost_dev_set_config_notifier(struct vhost_dev *hdev,
-+                                   const VhostDevConfigOps *ops)
-+{
-+    assert(hdev->vhost_ops);
-+    hdev->config_ops =3D ops;
-+}
-+
- /* Host notifiers must be enabled at this point. */
- int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
- {
 --=20
 MST
