@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1ecHQd-0008Tn-AI
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:08:56 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecHT5-0002WD-M0
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:11:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1ecHQY-0003kj-Bl
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:08:55 -0500
-Message-ID: <1516309705.31850.227.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Fri, 19 Jan 2018 08:08:25 +1100
-In-Reply-To: <988ba765-5f0b-26eb-569a-2118eb533bf9@kaod.org>
-References: <20171209084338.29395-1-clg@kaod.org>
-	<20171209084338.29395-3-clg@kaod.org>
-	<20171220050947.GC5981@umbus.fritz.box>
-	<1513815126.2743.34.camel@kernel.crashing.org>
-	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
-	<1513896817.2743.63.camel@kernel.crashing.org>
-	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
-	<1516187433.31850.189.camel@kernel.crashing.org>
-	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
-	<1516224472.31850.193.camel@kernel.crashing.org>
-	<988ba765-5f0b-26eb-569a-2118eb533bf9@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
- the XIVE interrupt controller
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecHT4-0005X3-RT
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:11:27 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1516300623.git.alistair.francis@xilinx.com>
+	<3ddf66fa53e18ba941908bdba5e056e67ccf854b.1516300623.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <77046075-c43f-17b7-40cb-6ecc28d0b9c3@amsat.org>
+Date: Thu, 18 Jan 2018 18:11:17 -0300
+MIME-Version: 1.0
+In-Reply-To: <3ddf66fa53e18ba941908bdba5e056e67ccf854b.1516300623.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 1/9] microblaze: boot.c: Don't try to
+ find NULL pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+Cc: alistair23@gmail.com, qemu-arm@nongnu.org
 
-On Thu, 2018-01-18 at 14:27 +0100, C=C3=A9dric Le Goater wrote:
-> The source and the target machines should have the same realized=20
-> objects. I think this is the simplest solution to keep the migration=20
-> framework maintainable.=20
+On 01/18/2018 03:37 PM, Alistair Francis wrote:
+> Previously if no device tree was passed to microblaze_load_kernel() then
+> qemu_find_file() would try to find a NULL pointer. To avoid this put a
+> check around qemu_find_file().
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
 
-Yeah well, it all boils down to qemu migration being completely brain
-dead in relying on an external entity to create the same machine rather
-than carrying the configuration in the migration stream... ugh.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> I don't think it is a problem to call a xics_fini() routine to=20
-> destroy the XICS KVM device if a new interrupt mode was negotiated
-> in CAS. We would then call a xive_init() routing to create the new=20
-> XIVE KVM device.
->=20
-> When done, the question boils down to disconnect and reconnect the=20
-> vcpus to the KVM device. The QEMU CPU ->intc pointer should be=20
-> updated also but that's a QEMU level problem. Already done.
-
-The problem is more the in-kernel hooks.
-=20
-> In the QEMU "icp-kvm" object, the connection to the KVM device=20
-> is currently forced in the realize routine but we can add some=20
-> handlers to manage the link. Similar handlers would do the same=20
-> in the QEMU "nvt-kvm" object when XIVE is on.
->=20
->=20
-> If we think this is a possible way to address the problem, I can=20
-> check the above thinking on a XICS KVM machine and force the=20
-> init/fini sequence in the CAS negotiation process. I will need=20
-> a KVM ioctl to destroy a device and maybe a KVM VCPU ioctl to=20
-> disable a capability.=20
+> ---
+> 
+>  hw/microblaze/boot.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+> index 457a08a2fe..35bfeda7aa 100644
+> --- a/hw/microblaze/boot.c
+> +++ b/hw/microblaze/boot.c
+> @@ -124,7 +124,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
+>      kernel_cmdline = qemu_opt_get(machine_opts, "append");
+>      dtb_arg = qemu_opt_get(machine_opts, "dtb");
+>      /* default to pcbios dtb as passed by machine_init */
+> -    if (!dtb_arg) {
+> +    if (!dtb_arg && dtb_filename) {
+>          filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, dtb_filename);
+>      }
+>  
+> 
