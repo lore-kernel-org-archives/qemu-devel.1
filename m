@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJg-0004Mu-MG
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJg-0004Mh-Gj
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:49:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJf-0004Kj-KC
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJc-0004F3-0J
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:49:32 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 18 Jan 2018 20:49:07 +0300
-Message-Id: <1516297747-107232-10-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Thu, 18 Jan 2018 20:48:59 +0300
+Message-Id: <1516297747-107232-2-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 9/9] iotest 134: test cluster-misaligned
- encrypted write
+Subject: [Qemu-devel] [PATCH v7 1/9] mirror: inherit supported write/zero
+ flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +25,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-COW (even empty/zero) areas require encryption too
-
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- tests/qemu-iotests/134     |  9 +++++++++
- tests/qemu-iotests/134.out | 10 ++++++++++
- 2 files changed, 19 insertions(+)
+ block/mirror.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-index 9914415..6083ae4 100755
---- a/tests/qemu-iotests/134
-+++ b/tests/qemu-iotests/134
-@@ -59,6 +59,15 @@ echo "== reading whole image =="
- $QEMU_IO --object $SECRET -c "read 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
+diff --git a/block/mirror.c b/block/mirror.c
+index c9badc1..d18ec65 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1064,6 +1064,11 @@ static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
+     bdrv_refresh_filename(bs->backing->bs);
+     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
+             bs->backing->bs->filename);
++    bs->supported_write_flags = BDRV_REQ_FUA &
++        bs->backing->bs->supported_write_flags;
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        bs->backing->bs->supported_zero_flags;
+ }
  
- echo
-+echo "== rewriting cluster part =="
-+$QEMU_IO --object $SECRET -c "write -P 0xb 512 512" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern =="
-+$QEMU_IO --object $SECRET -c "read -P 0 0 512"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "read -P 0xb 512 512"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
- echo "== rewriting whole image =="
- $QEMU_IO --object $SECRET -c "write -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- 
-diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
-index 972be49..09d46f6 100644
---- a/tests/qemu-iotests/134.out
-+++ b/tests/qemu-iotests/134.out
-@@ -5,6 +5,16 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-+== rewriting cluster part ==
-+wrote 512/512 bytes at offset 512
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern ==
-+read 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 512
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
- == rewriting whole image ==
- wrote 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ static void bdrv_mirror_top_close(BlockDriverState *bs)
 -- 
 2.7.4
