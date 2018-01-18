@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ecA4t-0006nN-7o
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:18:01 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecABA-0000J5-UL
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:24:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ecA4o-00054J-4j
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:17:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:1151)
+	(envelope-from <ehabkost@redhat.com>) id 1ecAB6-0000rA-Rv
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:24:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ecA4n-00052u-Ry
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:17:54 -0500
-Date: Thu, 18 Jan 2018 14:17:49 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180118141749.072a4a05@redhat.com>
-In-Reply-To: <7b35a1bc-e7ce-4a8a-e71e-1ffaa6aff010@vivier.eu>
-References: <20180116222212.1266-1-laurent@vivier.eu>
-	<20180117164950.3c818541@redhat.com>
-	<7b35a1bc-e7ce-4a8a-e71e-1ffaa6aff010@vivier.eu>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecAB6-0000qO-Hw
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:24:24 -0500
+Date: Thu, 18 Jan 2018 11:24:15 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180118132415.GU627@localhost.localdomain>
+References: <82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
+	<97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
+	<20180115140455.GN6646@localhost.localdomain>
+	<20180115142518.GN1602429@orkuz.home>
+	<20180115143156.GO6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
+	<20180116115113.GA627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
+	<20180118024232.GT627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] linux-user: select CPU type
- according ELF header values
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +36,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, Philippe =?UTF-8?B?TWF0aGlldS1E?= =?UTF-8?B?YXVkw6k=?= <f4bug@amsat.org>, Aaron Sierra <asierra@xes-inc.com>
+To: "Kang, Luwei" <luwei.kang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
-On Wed, 17 Jan 2018 17:15:38 +0100
-Laurent Vivier <laurent@vivier.eu> wrote:
+On Thu, Jan 18, 2018 at 05:33:53AM +0000, Kang, Luwei wrote:
+> > > > > > > On Mon, Jan 15, 2018 at 12:04:55 -0200, Eduardo Habkost wrote:
+> > > > > > > > CCing libvirt developers.
+> > > > > > > ...
+> > > > > > > > This case is slightly more problematic, however: the new
+> > > > > > > > feature is actually migratable (under very controlled
+> > > > > > > > circumstances) because of patch 2/2, but it is not
+> > > > > > > > migration-safe[1].  This means libvirt shouldn't include it
+> > > > > > > > in "host-model" expansion (which uses the
+> > > > > > > > query-cpu-model-expansion QMP command) until we make the feature migration-safe.
+> > > > > > > >
+> > > > > > > > For QEMU, this means the feature shouldn't be returned by
+> > > > > > > > "query-cpu-model-expansion type=static model=max" (but it
+> > > > > > > > can be returned by "query-cpu-model-expansion type=full model=max").
+> > > > > > > >
+> > > > > > > > Jiri, it looks like libvirt uses type=full on
+> > > > > > > > query-cpu-model-expansion on x86.  It needs to use
+> > > > > > > > type=static[2], or it will have no way to find out if a
+> > > > > > > > feature is migration-safe or not.
+> > > > > > > ...
+> > > > > > > > [2] It looks like libvirt uses type=full because it wants to get
+> > > > > > > >     all QOM property aliases returned.  In this case, one
+> > > > > > > >     solution for libvirt is to use:
+> > > > > > > >
+> > > > > > > >     static_expansion = query_cpu_model_expansion(type=static, model)
+> > > > > > > >     all_props = query_cpu_model_expansion(type=full,
+> > > > > > > > static_expansion)
+> > > > > > >
+> > > > > > > This is exactly what libvirt is doing (with model = "host")
+> > > > > > > ever since query-cpu-model-expansion support was implemented for x86.
+> > > > > >
+> > > > > > Oh, now I see that the x86 code uses
+> > > > > > QEMU_MONITOR_CPU_MODEL_EXPANSION_STATIC_FULL and not just QEMU_MONITOR_CPU_MODEL_EXPANSION_FULL.
+> > > > Nice!
+> > > > > >
+> > > > >
+> > > > > So, I need to add Intel PT feature in "X86CPUDefinition
+> > > > > builtin_x86_defs[]" so that we can get this CPUID in specific CPU
+> > > > > model not only "-cpu host". Is that right?
+> > > >
+> > > > The problem is that you won't be able to add intel-pt to any CPU
+> > > > model unless the feature is made migration-safe (by not calling
+> > > > kvm_arch_get_supported_cpuid() from cpu_x86_cpuid()).
+> > >
+> > > Hi Eduardo,
+> > >     Have some question need you help clear. What is
+> > >     "migration-safe" feature mean? I find all the feature which
+> > >     included in CPU model (builtin_x86_defs[]) will make
+> > >     "xcc->migration_safe = true;" in
+> > >     x86_cpu_cpudef_class_init(). If create a Skylake guest on
+> > >     Skylake HW and live migrate this guest to another machine
+> > >     with old HW(e.g Haswell). Can we think the new feature or
+> > >     cpu model(Skylake guest) which only supported in Skylake HW
+> > >     is safe?
+> > 
+> > I mean matching the requirements so we can say the feature is migration-safe, that means exposing the same CPUID data to the
+> > guest on any host, if the machine-type + command-line is the same.  The data on CPUID[7] is OK (it changes according to the
+> > command-line options only), but the data exposed on CPUID[14h] on this patch is not migration-safe (it changes depending on the
+> > host it is running).
+> > 
+> 
+> Many thanks for your clarification.  I think I have understood.
+> But CPUID[14h] is depend on CPUID[7].EBX[bit25] and it would be
+> zero if CPUID[7].EBX[bit25] is not set. Or what you concerned
+> is make live migration on two different HW which all support
+> Intel PT virtualization but have different  CPUID[14h] result?
+> This may need to think about.
 
-> Le 17/01/2018 =C3=A0 16:49, Igor Mammedov a =C3=A9crit=C2=A0:
-> > On Tue, 16 Jan 2018 23:22:08 +0100
-> > Laurent Vivier <laurent@vivier.eu> wrote:
-> >  =20
-> >> This idea has been suggested to me before by Philippe
-> >> Mathieu-Daud=C3=A9, and recently YunQiang Su has proposed a
-> >> patch to manage the MIPS r6 case.
-> >>
-> >> Based on this, this series tries to clean-up the original
-> >> patch, and introduces the use for m68k architecture and
-> >> port the patch from YunQiang Su.
-> >>
-> >> v3: fix code indent problem reported by patchew
-> >>     remove useless "!=3D 0"
-> >>     check for EF_M68K_M68000
-> >>     add EF_M68K_* flags in elf.h
-> >>     set 680x0 default CPU to m68040
-> >>     change "#if ... #endif" structure for ppc
-> >> v2: move cpu_model selection to linux-user/*/target_elf.h
-> >>     provide eflags to cpu_get_model() instead of fd
-> >>     (and modify other patches accordingly) =20
-> > Sorry for not noticing it earlier, but could you please
-> > fix series to use cpu type names instead of cpu_model?
-> >=20
-> > I've just posted series that completes cpu_model refactoring
-> >   [PATCH 00/24] generalize parsing of cpu_model (part 4)
-> > which removes remnants of the code using cpu_model to
-> > instantiate CPUs, including reworking how default
-> > cpu type for *-user is picked up.
-> >=20
-> > After that cpu_model shouldn't be used anywhere in the code
-> > except of routines that process "-cpu" CLI and cpu types
-> > should be used directly.
-> >=20
-> > So you might not need 1/4 after that or it would have
-> > to be reworked and probably other patches where where
-> > cpu_model is used. =20
->=20
-> If I understand correctly, in linux-user/main.c we have to use
-> cpu_create() instead of cpu_init(), and provide the cpu_type instead of
-> the cpu_model?
-yes, that's what my series does.
+Yes.  If intel-pt is off, the results (CPUID[14h] all zeroes) are
+migration-safe.  Setting intel-pt=on makes the command-line not
+migration-safe.
 
-> In linux-user/main.c, How can I detect we want to use the default one
-> (we were relying on "cpu_model =3D=3D NULL" until now) to be able to comp=
-ute
-> the default one from the ELF header?
-maybe something along this lines would do the job:
+This is OK, in principle (e.g. the "pmu" option is not
+migration-safe and behaves the same way).  The only problem is
+that this patch would make query-cpu-model-expansion return
+intel-pt=on on type=static expansion.
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 4624cc9..c5d567f 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -43,6 +43,7 @@ static const char *filename;
- static const char *argv0;
- static int gdbstub_port;
- static envlist_t *envlist;
-+/* default type in case it's not possible to deduce from program */
- static const char *cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
- unsigned long mmap_min_addr;
- unsigned long guest_base;
-@@ -4250,6 +4251,12 @@ static int parse_args(int argc, char **argv)
-     }
-=20
-     filename =3D argv[optind];
-+    if (cpu_type is not set by user) {
-+        /* override default type if we can get it from executable */
-+        override_cpu_type =3D cpu_get_type(filename)
-+        if (override_cpu_type)
-+           cpu_type =3D override_cpu_type
-+    }
-     exec_path =3D argv[optind];
-=20
+Probably the easiest way to fix that is to specifically exclude
+intel-pt on x86_cpu_static_props().
+
+However, if there's a simple way to make it possible to migrate
+between hosts with different CPUID[14h] data, it would be even
+better.  With the current KVM intel-pt implementation, what
+happens if the CPUID[14h] data seen by the guest doesn't match
+exactly the CPUID[14h] leaves from the host?
+
+> 
 > Thanks,
-> Laurent
+> Luwei Kang
+> 
+> > 
+> > >
+> > > >
+> > > > What's missing here is to either: (a) make cpu_x86_cpuid() return
+> > > > host-independent data (it can be constant, or it can be configurable on the command-line); or (b) add a mechanism to skip intel-
+> > pt from "query-cpu-model-expansion type=static".
+> > >
+> > > ==> it can be constant:
+> > >     I think it shouldn't be constant because Intel PT virtualization can only supported in Ice Lake hardware now. Intel PT cpuid info
+> > would be mask off on old platform.
+> > > ==> or it can be configurable on the command-line:
+> > >     Because of I didn't add this feature in any CPU model. We only can enable this feature by "-cpu Skylake-Server,+intel-pt" at
+> > present.
+> > 
+> > Note that I'm talking about CPUID[14h], not CPUID[7].  The CPUID[7] bits are safe because they are set according to the CPU model
+> > + command-line options only.  The bits on CPUID[14h] change depending on the host and are not migration-safe.  CPUID[7].EBX[bit
+> > 25] is just the (already configurable) bit that enables the migration-unsafe code for CPUID[14h].
+> > 
+> > >
+> > > What about add a new cpu model name "Icelake" and add PT in this. Is that would be migration safe?
+> > 
+> > It won't, because of the CPUID[14h] code that makes it unsafe to migrate between hosts with different Intel-PT capabilities (i.e.
+> > different data on CPUID[14h]).
+> > 
+> > 
+> > >
+> > > Thanks,
+> > > Luwei Kang
+> > >
+> > > > Probably
+> > > > (a) is easier to implement, and it also makes the feature more useful (by making it migration-safe).
+> > > >
+> > > > >
+> > > > > Intel PT is first supported in Intel Core M and 5th generation
+> > > > > Intel Core processors that are based on the Intel
+> > > > > micro-architecture code name Broadwell but Intel PT use EPT is first supported in Ice Lake.
+> > > > > Intel PT virtualization depend on PT use EPT.  I will add Intel PT
+> > > > > to "Broadwell" CPU model and later to make sure a "Broadwell"
+> > > > > guest can use Intel PT if the host is Ice Lake.
+> > > >
+> > > > The "if the host is Ice Lake" part is problematic.  On
+> > > > migration-safe CPU models (all of them except "max" and "host"), the data seen on CPUID can't depend on the host at all.  It
+> > should depend only on the machine-type + command-line options.
+> > > >
+> > > > --
+> > > > Eduardo
+> > 
+> > --
+> > Eduardo
+> 
+
+-- 
+Eduardo
