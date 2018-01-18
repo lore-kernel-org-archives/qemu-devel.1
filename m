@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ec1Pk-0002GU-N7
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:02:58 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ec1Uk-0003v7-5F
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ec1Pj-0000vE-2Q
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:02:56 -0500
-Date: Thu, 18 Jan 2018 14:43:40 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ec1Ug-0003Xb-U9
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:08:06 -0500
+Date: Thu, 18 Jan 2018 15:07:54 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180118034340.GD30352@umbus.fritz.box>
+Message-ID: <20180118040754.GE30352@umbus.fritz.box>
 References: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
-	<151618083506.20461.14178623580944316317.stgit@bahia.lan>
+	<151618084250.20461.13884400486623011064.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7QsOHKuLbhbLTwLB"
+	protocol="application/pgp-signature"; boundary="z3ND3gJe4e1E4uwh"
 Content-Disposition: inline
-In-Reply-To: <151618083506.20461.14178623580944316317.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 2/3] spapr_cpu_core: don't reset CPUs
- during realization
+In-Reply-To: <151618084250.20461.13884400486623011064.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 3/3] spapr: fix device tree properties when
+ using compatibility mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +29,160 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---7QsOHKuLbhbLTwLB
+--z3ND3gJe4e1E4uwh
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 17, 2018 at 10:20:35AM +0100, Greg Kurz wrote:
-> When QEMU is started, all cold-plugged CPUs are reset twice: first
-> during initialization and then during machine reset. This is sub-
-> optimal.
+On Wed, Jan 17, 2018 at 10:20:42AM +0100, Greg Kurz wrote:
+> Commit 51f84465dd98 changed the compatility mode setting logic:
+> - machine reset only sets compatibility mode for the boot CPU
+> - compatibility mode is set for other CPUs when they are put online
+>   by the guest with the "start-cpu" RTAS call
 >=20
-> The first reset is only needed for hot-plugged CPUs because the CPU
-> hotplug code doesn't reset them. This patch adds the necessary code
-> to reset hot-plugged CPUs on the CPU core hotplug path, and removes
-> the now useless initial CPU reset.
+> This causes a regression for machines started with max-compat-cpu:
+> the device tree nodes related to secondary CPU cores contain wrong
+> "cpu-version" and "ibm,pa-features" values, as shown below.
 >=20
-> We just need to mark the newly created CPU as halted to prevent it
-> to run until it is put online later.
+> Guest started on a POWER8 host with:
+>      -smp cores=3D2 -machine pseries,max-cpu-compat=3Dcompat7
 >=20
-> Full CPU reset is now explicitely triggered from the machine code
-> only, either during system reset or during CPU hotplug.
+> # dtc -f -I fs -O dts /proc/device-tree | egrep 'cpu-version|pa-features'
+>                         ibm,pa-features =3D [18 00 f6 3f c7 c0 80 f0 80 00
+>  00 00 00 00 00 00 00 00 80 00 80 00 80 00 00 00];
+>                         cpu-version =3D <0x4d0200>;
+>=20
+>                                ^^^
+>                         second CPU core
+>=20
+>                         ibm,pa-features =3D <0x600f63f 0xc70080c0>;
+>                         cpu-version =3D <0xf000003>;
+>=20
+>                                ^^^
+>                           boot CPU core
+>=20
+> The second core is advertised in raw POWER8 mode. This happens because
+> CAS assumes all CPUs to have the same compatibility mode. Since the
+> boot CPU already has the requested compatibility mode, the CAS code
+> does not set it for the secondary one, and exposes the bogus device
+> tree properties in in the CAS response to the guest.
+>=20
+> A similar situation is observed when hot-plugging a CPU core. The
+> related device tree properties are generated and exposed to guest
+> with the "ibm,configure-connector" RTAS before "start-cpu" is called.
+> The CPU core is advertised to the guest in raw mode as well.
+>=20
+> It both cases, it boils down to the fact that "start-cpu" happens too
+> late. This can be fixed globally by propagating the compatibility mode
+> of the boot CPU to the other CPUs during reset.  For this to work, the
+> compatibility mode of the boot CPU must be set before the machine code
+> actually resets all CPUs.
+>=20
+> It is not needed to set the compatibility mode in "start-cpu" anymore,
+> so the code is dropped.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Hrm, this looks ok in outline, but makes me nervous in a couple of
-ways.
+Applied to ppc-for-2.12.
 
+I forgot that the RTAS call came after constructing the device tree
+fragment, and is therefore too late to set the compatibility mode.
 
 > ---
->  hw/ppc/spapr.c                  |    8 ++++++++
->  hw/ppc/spapr_cpu_core.c         |    8 ++++++--
->  include/hw/ppc/spapr_cpu_core.h |    2 ++
->  3 files changed, 16 insertions(+), 2 deletions(-)
+>  hw/ppc/spapr.c          |   18 +++++++++---------
+>  hw/ppc/spapr_cpu_core.c |    7 +++++++
+>  hw/ppc/spapr_rtas.c     |    9 ---------
+>  3 files changed, 16 insertions(+), 18 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index bca838fce638..a2ff401f738a 100644
+> index a2ff401f738a..a00bff823f95 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -3336,6 +3336,14 @@ static void spapr_core_plug(HotplugHandler *hotplu=
-g_dev, DeviceState *dev,
->          void *fdt;
->          int fdt_offset;
+> @@ -1484,6 +1484,15 @@ static void spapr_machine_reset(void)
+>          spapr_setup_hpt_and_vrma(spapr);
+>      }
 > =20
-> +        if (hotplugged) {
-
-First, I'm always wary of using the hotplugged parameter, because what
-qemu means by it often doesn't line up with what PAPR means by it.
-
-> +            int i;
+> +    /* if this reset wasn't generated by CAS, we should reset our
+> +     * negotiated options and start from scratch */
+> +    if (!spapr->cas_reboot) {
+> +        spapr_ovec_cleanup(spapr->ov5_cas);
+> +        spapr->ov5_cas =3D spapr_ovec_new();
 > +
-> +            for (i =3D 0; i < cc->nr_threads; i++) {
-> +                spapr_cpu_reset(core->threads[i]);
-> +            }
-> +        }
+> +        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
+l);
+> +    }
 > +
->          fdt =3D spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
+>      qemu_devices_reset();
 > =20
->          spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
+>      /* DRC reset may cause a device to be unplugged. This will cause tro=
+ubles
+> @@ -1504,15 +1513,6 @@ static void spapr_machine_reset(void)
+>      rtas_addr =3D rtas_limit - RTAS_MAX_SIZE;
+>      fdt_addr =3D rtas_addr - FDT_MAX_SIZE;
+> =20
+> -    /* if this reset wasn't generated by CAS, we should reset our
+> -     * negotiated options and start from scratch */
+> -    if (!spapr->cas_reboot) {
+> -        spapr_ovec_cleanup(spapr->ov5_cas);
+> -        spapr->ov5_cas =3D spapr_ovec_new();
+> -
+> -        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
+l);
+> -    }
+> -
+>      fdt =3D spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+> =20
+>      spapr_load_rtas(spapr, fdt, rtas_addr);
 > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index ac19b2e0b72c..268be7784efb 100644
+> index 268be7784efb..f5e5ead5f4b0 100644
 > --- a/hw/ppc/spapr_cpu_core.c
 > +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -22,7 +22,7 @@
->  #include "sysemu/hw_accel.h"
->  #include "qemu/error-report.h"
-> =20
-> -static void spapr_cpu_reset(void *opaque)
-> +void spapr_cpu_reset(void *opaque)
->  {
->      PowerPCCPU *cpu =3D opaque;
->      CPUState *cs =3D CPU(cpu);
-> @@ -63,7 +63,11 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, P=
-owerPCCPU *cpu,
->      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
-> =20
->      qemu_register_reset(spapr_cpu_reset, cpu);
-> -    spapr_cpu_reset(cpu);
+> @@ -44,6 +44,13 @@ void spapr_cpu_reset(void *opaque)
+>      if (cs !=3D first_cpu) {
+>          env->spr[SPR_LPCR] &=3D ~pcc->lpcr_pm;
+>      }
 > +
-> +    /* CPU must not execute anything until explicitely started otherwise=
- the
-> +     * guest will crash.
+> +    /* Set compatibility mode to match the boot CPU, which was either set
+> +     * by the machine reset code or by CAS. This should never fail.
 > +     */
-> +    CPU(cpu)->halted =3D 1;
-
-And poking specifics in a CPU that hasn't already been set to a known
-state by a reset also worries me.
-
+> +    if (cs !=3D first_cpu) {
+> +        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_a=
+bort);
+> +    }
 >  }
 > =20
->  /*
-> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
-ore.h
-> index 1129f344aa0c..763a2168461e 100644
-> --- a/include/hw/ppc/spapr_cpu_core.h
-> +++ b/include/hw/ppc/spapr_cpu_core.h
-> @@ -38,4 +38,6 @@ typedef struct sPAPRCPUCoreClass {
->  } sPAPRCPUCoreClass;
+>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 2b89e1d448e4..4bb939d3d111 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -163,7 +163,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMac=
+hineState *spapr,
+>          CPUState *cs =3D CPU(cpu);
+>          CPUPPCState *env =3D &cpu->env;
+>          PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> -        Error *local_err =3D NULL;
 > =20
->  const char *spapr_get_cpu_core_type(const char *cpu_type);
-> +void spapr_cpu_reset(void *opaque);
-> +
->  #endif
+>          if (!cs->halted) {
+>              rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> @@ -175,14 +174,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMa=
+chineState *spapr,
+>           * new cpu enters */
+>          kvm_cpu_synchronize_state(cs);
+> =20
+> -        /* Set compatibility mode to match existing cpus */
+> -        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &local_e=
+rr);
+> -        if (local_err) {
+> -            error_report_err(local_err);
+> -            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> -            return;
+> -        }
+> -
+>          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
+> =20
+>          /* Enable Power-saving mode Exit Cause exceptions for the new CP=
+U */
 >=20
 
 --=20
@@ -138,24 +191,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---7QsOHKuLbhbLTwLB
+--z3ND3gJe4e1E4uwh
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpgF+oACgkQbDjKyiDZ
-s5I0zQ//WVpm4eoMs45cWDag4pJZIUjx4N/j/KAgTy+uZhOXBYLzi2YlXEZw06+s
-kMjPNjeKaeIP3vc4R5oFXOYd4RBtsFBbWnZb6qRR63Qxo1aXdx5FUNK3bzaPg5zh
-oip640oOy++dexj+onmaQsSv6i/5ocSInKLl6TSL0vrFkML6g7LTzmrbRQ5h65Fj
-CNQXz3mJX0IOCjW2i/OiOVXZJPSrkt+iYl8IxcxobuEmHGLMu1jKYb0afdct4t+Y
-WtfHlIxQhinKI3mmpDYz9Sm6csiOJMkHxoykxDN2BKn+sQQKJFpVjYb2Yfvw8cD/
-9ugQXX2jZRwINHWli4gAgcR+iqKazXkIvXX4UqWiBJOpAfNlUXpYvHt29IXmb4mX
-+y5oQVfEsCoTin4xFrMAoa6MRHo9/Kq8gePy1Ebaxg7vNUMwwf0TpmeertltSCz4
-rwRmri40AIaiCLTuOyGQzpc81Rl4Y7p5e9o5d5vqKkun5k6+m8lA+nElge+VoxxZ
-TOFZfyjRbtIld4X40Ypg/pUKWzChbcXP+G9u9Qm98Q3j1uxldWtfrHS3+eEFyVaH
-OUJdrTX1pRhxuiqSSwoaMSugAiBRCxPSU9sn2fBF/NS/gMX3LIa+JeFr6XG8CmfQ
-gUava01CuVYEjn+fz7QJTm0KM2dMAb6RWrKozs5/HFA3B5mVbYo=
-=+jgE
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpgHZgACgkQbDjKyiDZ
+s5IQCxAAxA90H6z4W49XMaDfn8v5SlHC+OVFKjnutt73eheuGZbbebn8KNlCLW9b
+84RnnHVwksGWBXO34eX9RRL1lo+J9b6+wYJsrUPpvnr4rupe6EiQkVgCLdph5QaL
+twJP+e9MhFHeVfa2Nu2GlldorXC0sYNrlhJB7qcjJebPzDtgujvQ52pcsnZ2x0hW
+oAo9Gdyb/yKCj6pp5nzJ32KOginbFBknkACFO+FLWyqRGan5GqBZQ7HdKMrWO9xF
+bnTvYR6Wa5saRO3rCcwLIlRAUHd5+KXeV3dazOgZvAiGpy612VQR4eZmmGG7EUIN
+pGsgtCI4iZVweB2y8VnD/0GRZDUylGpZsvBSIsdnC8b3MQyO8CPY1eFEeHFw/no+
+1gb9CNkftSjQXv9AtytnvVdvbJ3l11QxXKu/o/68T261sg0jKJlv2TIfPpJk+AW/
+vU3xlS5UFrr4/uX4dtn+JUoQs74CiFLEhFYsT3nUnzv3I0sK0BFvNCOpLn7svE6C
+yVVgPhGO/fCc+tHkKGTksniTDVPyyl3xDLnHaWtAf7hAgQkzNyoXTT7qtrsdPYw7
+IeKpqUQ9f4b1+KugGbzGBkHO1HAx+0v2xn8BKYYCfpeHkWURnz1oK306d2VSWIkp
+EMrYUFnlKMi4dHiKcc2j5BsmkvHruWNoey0TZOMmnKYNOIhrP5o=
+=Kw/y
 -----END PGP SIGNATURE-----
 
---7QsOHKuLbhbLTwLB--
+--z3ND3gJe4e1E4uwh--
