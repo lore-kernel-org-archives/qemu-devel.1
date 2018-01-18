@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ecHv8-0004n1-Jk
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:40:27 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecHxk-0006Ub-Ki
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:43:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ecHv4-0008TW-CL
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:40:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ecHv3-0008Sx-OZ
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:40:22 -0500
-References: <20180118204058.5768-1-f4bug@amsat.org>
-	<20180118204058.5768-12-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b0f29164-f168-0df2-6a9d-399de14ff2c6@redhat.com>
-Date: Thu, 18 Jan 2018 15:40:18 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecHxj-0001aS-PE
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:43:08 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1516300623.git.alistair.francis@xilinx.com>
+	<f5426a36d6a0d997d5f6445201861445d8e857da.1516300623.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0f5a2011-7378-dcee-cf31-5bfb341b85f8@amsat.org>
+Date: Thu, 18 Jan 2018 18:42:56 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180118204058.5768-12-f4bug@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="T3uybE4GekAkE8WlXnJhezoO8EA6oVziY"
-Subject: Re: [Qemu-devel] [PATCH v7 11/14] sdhci: implement the Host Control
- 2 register for the tunning sequence
+In-Reply-To: <f5426a36d6a0d997d5f6445201861445d8e857da.1516300623.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 8/9] xlnx-zynqmp-pmu: Connect
+ the IPI device to the PMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-devel@nongnu.org, Sai Pavan Boddu <saipava@xilinx.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+Cc: alistair23@gmail.com, qemu-arm@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---T3uybE4GekAkE8WlXnJhezoO8EA6oVziY
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Alistair Francis <alistair.francis@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-devel@nongnu.org,
- Sai Pavan Boddu <saipava@xilinx.com>
-Message-ID: <b0f29164-f168-0df2-6a9d-399de14ff2c6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 11/14] sdhci: implement the Host Control 2
- register for the tunning sequence
-References: <20180118204058.5768-1-f4bug@amsat.org>
- <20180118204058.5768-12-f4bug@amsat.org>
-In-Reply-To: <20180118204058.5768-12-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 01/18/2018 03:38 PM, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+> V4:
+>  - Move the IPI to the machine instead of the SoC
+> 
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+> index 7312bfe23e..999a5657cf 100644
+> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+> @@ -24,6 +24,7 @@
+>  #include "cpu.h"
+>  #include "boot.h"
+>  
+> +#include "hw/intc/xlnx-zynqmp-ipi.h"
+>  #include "hw/intc/xlnx-pmu-iomod-intc.h"
+>  
+>  /* Define the PMU device */
+> @@ -38,6 +39,15 @@
+>  
+>  #define XLNX_ZYNQMP_PMU_INTC_ADDR   0xFFD40000
+>  
+> +#define XLNX_ZYNQMP_PMU_NUM_IPIS    4
+> +
+> +static const uint64_t ipi_addr[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
+> +    0xFF340000, 0xFF350000, 0xFF360000, 0xFF370000,
+> +};
+> +static const uint64_t ipi_irq[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
+> +    19, 20, 21, 22,
+> +};
+> +
+>  typedef struct XlnxZynqMPPMUSoCState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+> @@ -136,6 +146,9 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
+>      MemoryRegion *address_space_mem = get_system_memory();
+>      MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
+>      MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
+> +    XlnxZynqMPIPI *ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
 
-On 01/18/2018 02:40 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
->  from qemu/xilinx tag xilinx-v2015.2]
+Why use pointers and g_new() here?
 
-In the subject, did you mean s/tunning/tuning/?
+Isn't a plain array simpler?
 
+   XlnxZynqMPIPI ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
 
+(same apply to pmu_rom/ram)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Or maybe do you plan to start implementing MachineClass::exit()?
 
+(or go in this direction, which might make sens thinking about having a
+multiarch single binary).
 
---T3uybE4GekAkE8WlXnJhezoO8EA6oVziY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlphFEIACgkQp6FrSiUn
-Q2q69Qf/QQ7D/ubQuTNcp1tcEtT6RXduO14ysDWGATINIFWwv2VofD0MC/QpKA5w
-Y7YbvhJjO2NDqAeTxVLQxz+uqM7nJbP/2E8y8DvZ2mecnpmo4eZ93lXaxr/054mx
-9tBFvd+2bC+AQ0RFnyOxZADoOzYOvRF0nz+pyeHnfpJ44AVpRcooXjLRYOpDyCdn
-I9oHLPbZWGYa4y+9L73ArbjlmvlAIzjZIdwgVX8ms6PbNofGm5ao6TO7EFOr4LsH
-FtYcAKwG9Me/Iv4FmPyTgva37mSaBWdq5MYB70VpTcw17FRGiASHI/6SaxHuHRO8
-bDDP7D8FDjFhtIed8n4297LWI/e+KA==
-=D7za
------END PGP SIGNATURE-----
-
---T3uybE4GekAkE8WlXnJhezoO8EA6oVziY--
+> +    qemu_irq irq[32];
+> +    int i;
+>  
+>      /* Create the ROM */
+>      memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
+> @@ -155,6 +168,24 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
+>                                &error_abort);
+>      object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
+>  
+> +    for (i = 0; i < 32; i++) {
+> +        irq[i] = qdev_get_gpio_in(DEVICE(&pmu->intc), i);
+> +    }
+> +
+> +    /* Create and connect the IPI device */
+> +    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> +        ipi[i] = g_new0(XlnxZynqMPIPI, 1);
+> +        object_initialize(ipi[i], sizeof(XlnxZynqMPIPI), TYPE_XLNX_ZYNQMP_IPI);
+> +        qdev_set_parent_bus(DEVICE(ipi[i]), sysbus_get_default());
+> +    }
+> +
+> +    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> +        object_property_set_bool(OBJECT(ipi[i]), true, "realized",
+> +                                 &error_abort);
+> +        sysbus_mmio_map(SYS_BUS_DEVICE(ipi[i]), 0, ipi_addr[i]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(ipi[i]), 0, irq[ipi_irq[i]]);
+> +    }
+> +
+>      /* Load the kernel */
+>      microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
+>                             machine->ram_size,
+> 
