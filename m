@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ec2p6-0003T1-4y
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:33:14 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1ec2pv-0003wZ-4W
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:34:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ec2p2-0000OI-6r
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:33:12 -0500
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:36155)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ec2p1-0000Nu-UU
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:33:08 -0500
-Received: by mail-it0-x243.google.com with SMTP id p124so12125926ite.1
-	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 21:33:07 -0800 (PST)
-References: <20180118034732.10439-1-aik@ozlabs.ru>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <d36e66a5-8616-0cfe-033c-c2214cd1ba62@ozlabs.ru>
-Date: Thu, 18 Jan 2018 16:33:01 +1100
+	(envelope-from <luwei.kang@intel.com>) id 1ec2pr-0000sd-7F
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:34:03 -0500
+Received: from mga03.intel.com ([134.134.136.65]:57326)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1ec2pq-0000qy-LY
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:33:59 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Thu, 18 Jan 2018 05:33:53 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
+References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+	<20180112142252.GG6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
+	<97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
+	<20180115140455.GN6646@localhost.localdomain>
+	<20180115142518.GN1602429@orkuz.home>
+	<20180115143156.GO6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
+	<20180116115113.GA627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
+	<20180118024232.GT627@localhost.localdomain>
+In-Reply-To: <20180118024232.GT627@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20180118034732.10439-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] spapr_pci: Alias MMIO windows to PHB
- address space
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +39,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
-On 18/01/18 14:47, Alexey Kardashevskiy wrote:
-> At the moment the sPAPR PHB MMIO space does not have an address space
-> object as it does not really need one - guest accesses it via virtual
-> addresses (and we provide mappings to the CPU space), the device drivers
-> in QEMU access MMIO directly (as they own MRs). The only case when
-> a driver in QEMU might need an address space (AS) is DMA so we provide one
-> with only IOMMUs on it.
-> 
-> So PHB AS looks like:
-> address-space: pci@800000020000000
->   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.iommu-root
->     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000001
->       0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001
->     0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000000
->       0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000
->     0000040000000000-000004000000ffff (prio 0, i/o): msi
-> 
-> with no mention of any PCI device, and so does the flatview:
-> 
->  FlatView #2
->   AS "pci@800000020000000", root: pci@800000020000000.iommu-root
->   AS "nec-usb-xhci", root: bus master container
->   Root memory region: pci@800000020000000.iommu-root
->    0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000
-> 
-> This adds 2 more aliases (for MMIO32 and MMIO64 windows) on PHB AS so
-> whatever appears on the bus can be seen in "info mtree [-f]".
-> 
-> Here are the chunks from "diff" for a QEMU with an emulater XHCI adapter:
-> 
->  address-space: pci@800000020000000
->    0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.iommu-root
->      0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000001
->        0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001
->      0000000000000000-ffffffffffffffff (prio 0, i/o): tce-root-80000000
->        0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000
-> +    0000000080000000-00000000ffffffff (prio 0, i/o): alias pci@800000020000000.mmio32-alias-pci @pci@800000020000000.mmio3
-> +2-alias 0000000000000000-000000007fffffff
->      0000040000000000-000004000000ffff (prio 0, i/o): msi
-> +    0000210000000000-000021ffffffffff (prio 0, i/o): alias pci@800000020000000.mmio64-alias-pci @pci@800000020000000.mmio6
-> +4-alias 0000000000000000-000000ffffffffff
-> 
-> 
->  FlatView #2
->   AS "pci@800000020000000", root: pci@800000020000000.iommu-root
->   AS "nec-usb-xhci", root: bus master container
->   Root memory region: pci@800000020000000.iommu-root
->    0000000000000000-000000003fffffff (prio 0, i/o): tce-iommu-80000000
-> +  0000000080000000-000000008000003f (prio 0, i/o): capabilities
-> +  0000000080000040-000000008000043f (prio 0, i/o): operational
-> +  0000000080000440-000000008000044f (prio 0, i/o): usb3 port #1
-> +  0000000080000450-000000008000045f (prio 0, i/o): usb3 port #2
-> +  0000000080000460-000000008000046f (prio 0, i/o): usb3 port #3
-> +  0000000080000470-000000008000047f (prio 0, i/o): usb3 port #4
-> +  0000000080000480-000000008000048f (prio 0, i/o): usb2 port #1
-> +  0000000080000490-000000008000049f (prio 0, i/o): usb2 port #2
-> +  00000000800004a0-00000000800004af (prio 0, i/o): usb2 port #3
-> +  00000000800004b0-00000000800004bf (prio 0, i/o): usb2 port #4
-> +  0000000080001000-000000008000121f (prio 0, i/o): runtime
-> +  0000000080002000-000000008000281f (prio 0, i/o): doorbell
-> +  0000000080003000-00000000800030ff (prio 0, i/o): msix-table
-> +  0000000080003800-0000000080003807 (prio 0, i/o): msix-pba
->    0000040000000000-000004000000ffff (prio 0, i/o): msi
->    0800000000000000-080000007fffffff (prio 0, i/o): tce-iommu-80000001
-> 
-> The major point for this is to help debugging overlapped regions.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> Should not we do this in the common code really?
+> > > > > > On Mon, Jan 15, 2018 at 12:04:55 -0200, Eduardo Habkost wrote:
+> > > > > > > CCing libvirt developers.
+> > > > > > ...
+> > > > > > > This case is slightly more problematic, however: the new
+> > > > > > > feature is actually migratable (under very controlled
+> > > > > > > circumstances) because of patch 2/2, but it is not
+> > > > > > > migration-safe[1].  This means libvirt shouldn't include it
+> > > > > > > in "host-model" expansion (which uses the
+> > > > > > > query-cpu-model-expansion QMP command) until we make the feat=
+ure migration-safe.
+> > > > > > >
+> > > > > > > For QEMU, this means the feature shouldn't be returned by
+> > > > > > > "query-cpu-model-expansion type=3Dstatic model=3Dmax" (but it
+> > > > > > > can be returned by "query-cpu-model-expansion type=3Dfull mod=
+el=3Dmax").
+> > > > > > >
+> > > > > > > Jiri, it looks like libvirt uses type=3Dfull on
+> > > > > > > query-cpu-model-expansion on x86.  It needs to use
+> > > > > > > type=3Dstatic[2], or it will have no way to find out if a
+> > > > > > > feature is migration-safe or not.
+> > > > > > ...
+> > > > > > > [2] It looks like libvirt uses type=3Dfull because it wants t=
+o get
+> > > > > > >     all QOM property aliases returned.  In this case, one
+> > > > > > >     solution for libvirt is to use:
+> > > > > > >
+> > > > > > >     static_expansion =3D query_cpu_model_expansion(type=3Dsta=
+tic, model)
+> > > > > > >     all_props =3D query_cpu_model_expansion(type=3Dfull,
+> > > > > > > static_expansion)
+> > > > > >
+> > > > > > This is exactly what libvirt is doing (with model =3D "host")
+> > > > > > ever since query-cpu-model-expansion support was implemented fo=
+r x86.
+> > > > >
+> > > > > Oh, now I see that the x86 code uses
+> > > > > QEMU_MONITOR_CPU_MODEL_EXPANSION_STATIC_FULL and not just QEMU_MO=
+NITOR_CPU_MODEL_EXPANSION_FULL.
+> > > Nice!
+> > > > >
+> > > >
+> > > > So, I need to add Intel PT feature in "X86CPUDefinition
+> > > > builtin_x86_defs[]" so that we can get this CPUID in specific CPU
+> > > > model not only "-cpu host". Is that right?
+> > >
+> > > The problem is that you won't be able to add intel-pt to any CPU
+> > > model unless the feature is made migration-safe (by not calling
+> > > kvm_arch_get_supported_cpuid() from cpu_x86_cpuid()).
+> >
+> > Hi Eduardo,
+> >     Have some question need you help clear. What is
+> >     "migration-safe" feature mean? I find all the feature which
+> >     included in CPU model (builtin_x86_defs[]) will make
+> >     "xcc->migration_safe =3D true;" in
+> >     x86_cpu_cpudef_class_init(). If create a Skylake guest on
+> >     Skylake HW and live migrate this guest to another machine
+> >     with old HW(e.g Haswell). Can we think the new feature or
+> >     cpu model(Skylake guest) which only supported in Skylake HW
+> >     is safe?
+>=20
+> I mean matching the requirements so we can say the feature is migration-s=
+afe, that means exposing the same CPUID data to the
+> guest on any host, if the machine-type + command-line is the same.  The d=
+ata on CPUID[7] is OK (it changes according to the
+> command-line options only), but the data exposed on CPUID[14h] on this pa=
+tch is not migration-safe (it changes depending on the
+> host it is running).
+>=20
 
+Many thanks for your clarification.  I think I have understood. But CPUID[1=
+4h] is depend on CPUID[7].EBX[bit25] and it would be zero if CPUID[7].EBX[b=
+it25] is not set. Or what you concerned is make live migration on two diffe=
+rent HW which all support Intel PT virtualization but have different  CPUID=
+[14h] result? This may need to think about.
 
-By this I meant not literally map memory space from pci_register_root_bus()
-(as it is 64bit wide, subregions are the windows) but still do something to
-see devices on a PCI AS. Now PHB does not have an AS on my x86 setup.
+Thanks,
+Luwei Kang
 
-
-and ...
-
-
-
-> Does this look useful at all? I was quite confused when I realized that
-> I do not see an AS with DMA windows and MMIO while they co-exist
-> on a bus.
-> 
-> 
-> ---
->  include/hw/pci-host/spapr.h |  1 +
->  hw/ppc/spapr_pci.c          | 12 ++++++++++++
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> index 0fae4fc..4550192 100644
-> --- a/include/hw/pci-host/spapr.h
-> +++ b/include/hw/pci-host/spapr.h
-> @@ -57,6 +57,7 @@ struct sPAPRPHBState {
->      uint64_t mem64_win_pciaddr;
->      hwaddr io_win_addr, io_win_size;
->      MemoryRegion mem32window, mem64window, iowindow, msiwindow;
-> +    MemoryRegion mem32windowpci, mem64windowpci;
->  
->      uint32_t dma_liobn[SPAPR_PCI_DMA_MAX_WINDOWS];
->      hwaddr dma_win_addr, dma_win_size;
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 37f18b3..d142f74 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1642,6 +1642,18 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
->      address_space_init(&sphb->iommu_as, &sphb->iommu_root,
->                         sphb->dtbusname);
->  
-> +    /* Map memory space onto the PHB address space */
-> +    namebuf = g_strdup_printf("%s.mmio32-alias-pci", sphb->dtbusname);
-> +    memory_region_init_alias(&sphb->mem32windowpci, OBJECT(sphb), namebuf,
-> +                             &sphb->mem32window, 0, sphb->mem_win_size);
-> +    memory_region_add_subregion(&sphb->iommu_root, SPAPR_PCI_MEM_WIN_BUS_OFFSET,
-> +                                &sphb->mem32windowpci);
-> +    namebuf = g_strdup_printf("%s.mmio64-alias-pci", sphb->dtbusname);
-> +    memory_region_init_alias(&sphb->mem64windowpci, OBJECT(sphb), namebuf,
-> +                             &sphb->mem64window, 0, sphb->mem64_win_size);
-> +    memory_region_add_subregion(&sphb->iommu_root, sphb->mem64_win_pciaddr,
-> +                                &sphb->mem64windowpci);
-
-
-... I just noticed - this leaks @namebuf memory, I'll fix it in v2 if no
-other comment arrive.
-
-
-> +
->      /*
->       * As MSI/MSIX interrupts trigger by writing at MSI/MSIX vectors,
->       * we need to allocate some memory to catch those writes coming
-> 
-
-
--- 
-Alexey
+>=20
+> >
+> > >
+> > > What's missing here is to either: (a) make cpu_x86_cpuid() return
+> > > host-independent data (it can be constant, or it can be configurable =
+on the command-line); or (b) add a mechanism to skip intel-
+> pt from "query-cpu-model-expansion type=3Dstatic".
+> >
+> > =3D=3D> it can be constant:
+> >     I think it shouldn't be constant because Intel PT virtualization ca=
+n only supported in Ice Lake hardware now. Intel PT cpuid info
+> would be mask off on old platform.
+> > =3D=3D> or it can be configurable on the command-line:
+> >     Because of I didn't add this feature in any CPU model. We only can =
+enable this feature by "-cpu Skylake-Server,+intel-pt" at
+> present.
+>=20
+> Note that I'm talking about CPUID[14h], not CPUID[7].  The CPUID[7] bits =
+are safe because they are set according to the CPU model
+> + command-line options only.  The bits on CPUID[14h] change depending on =
+the host and are not migration-safe.  CPUID[7].EBX[bit
+> 25] is just the (already configurable) bit that enables the migration-uns=
+afe code for CPUID[14h].
+>=20
+> >
+> > What about add a new cpu model name "Icelake" and add PT in this. Is th=
+at would be migration safe?
+>=20
+> It won't, because of the CPUID[14h] code that makes it unsafe to migrate =
+between hosts with different Intel-PT capabilities (i.e.
+> different data on CPUID[14h]).
+>=20
+>=20
+> >
+> > Thanks,
+> > Luwei Kang
+> >
+> > > Probably
+> > > (a) is easier to implement, and it also makes the feature more useful=
+ (by making it migration-safe).
+> > >
+> > > >
+> > > > Intel PT is first supported in Intel Core M and 5th generation
+> > > > Intel Core processors that are based on the Intel
+> > > > micro-architecture code name Broadwell but Intel PT use EPT is firs=
+t supported in Ice Lake.
+> > > > Intel PT virtualization depend on PT use EPT.  I will add Intel PT
+> > > > to "Broadwell" CPU model and later to make sure a "Broadwell"
+> > > > guest can use Intel PT if the host is Ice Lake.
+> > >
+> > > The "if the host is Ice Lake" part is problematic.  On
+> > > migration-safe CPU models (all of them except "max" and "host"), the =
+data seen on CPUID can't depend on the host at all.  It
+> should depend only on the machine-type + command-line options.
+> > >
+> > > --
+> > > Eduardo
+>=20
+> --
+> Eduardo
