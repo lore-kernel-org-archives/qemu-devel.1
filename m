@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ecBV1-0006pG-JM
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:49:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ecBWe-00082q-2u
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ecBUy-0001OX-OE
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:49:03 -0500
-Date: Thu, 18 Jan 2018 15:48:05 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180118154805.3b174fb7.cohuck@redhat.com>
-In-Reply-To: <CAATJJ0+4djFATj5qYn5UR=OtK4w0qT2PcPySeMXXNT7PSaQhPg@mail.gmail.com>
-References: <20180118085628.40798-1-borntraeger@de.ibm.com>
-	<20180118125322.252929dc.cohuck@redhat.com>
-	<06e97f00-710a-c893-101f-0a1c6aaa5575@de.ibm.com>
-	<20180118141530.17faabd1.cohuck@redhat.com>
-	<CAATJJ0+4djFATj5qYn5UR=OtK4w0qT2PcPySeMXXNT7PSaQhPg@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ecBWd-0002fm-DD
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:50:44 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:41129)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ecBWd-0002fV-8P
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:50:43 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id n81so15845914oig.8
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 06:50:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] s390x/kvm: implement new
- hardware/firmware features
+In-Reply-To: <85686228-03dd-a7fc-1477-f27d09de5007@redhat.com>
+References: <20180112125854.18261-1-kraxel@redhat.com>
+	<20180112125854.18261-11-kraxel@redhat.com>
+	<CAFEAcA8UAbOvZuhxwjD2zAA7GBGucD8MAf5E0h05tb3NXKdGqw@mail.gmail.com>
+	<20180118133643.GP19695@redhat.com>
+	<b56b41f6-f048-00bf-d5fb-a1ed20ddeb09@redhat.com>
+	<20180118141256.GS19695@redhat.com>
+	<85686228-03dd-a7fc-1477-f27d09de5007@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Jan 2018 14:50:21 +0000
+Message-ID: <CAFEAcA9sFenca+n37VOjQ3tUJLV_Vt0A7iwNdj=WbOvrMP6Pbg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 10/14] ui: fix VNC client throttling when
+ audio capture is active
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 18 Jan 2018 14:31:50 +0100
-Christian Ehrhardt <christian.ehrhardt@canonical.com> wrote:
+On 18 January 2018 at 14:46, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 18/01/2018 15:12, Daniel P. Berrange wrote:
+>>> In addition to that, do we support a >= 2 GiB framebuffer at all? (Even
+>>> with unsigned ints, Coverity would rightly complain about a truncated
+>>> 32-bit multiplication being assigned to a 64-bit value).
+>> client_width/client_height are values that are initialized from the
+>> graphics card frontend config, and thus limited by amount of video
+>> RAM QEMU allows.   bytes_per_pixel is limited to 8/16/32.
+>>
+>> So I think we're safe from 2GB overflow in any normal case.
+>>
+>> That said, VGA RAM size is configurable, so I'm curious what would happen
+>> if someone configured an insanely large VGA RAM and asked for a big frame
+>> buffer in guest.
+>>
+>> VNC is protocol limited to uint16 for width/height size, and so is X11
+>> so I imagine some exploding behavour would follow :-)
+>
+> Indeed, and even 2^16 x 2^16 * 32bpp is already 34 bits.  So perhaps we
+> should limit VNC to 16384 pixels on each axis (maximum frame buffer size
+> 1 GiB).
 
-> On Thu, Jan 18, 2018 at 2:15 PM, Cornelia Huck <cohuck@redhat.com> wrote:
-> > On Thu, 18 Jan 2018 13:47:54 +0100
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >  
-> >> Have the x86 features been marked as stable? If the answer is yes,
-> >> shall we mark these patches for stable as well?  
-> >
-> > Doesn't look like it.
-> >
-> > TBH, I'm not quite sure whether this should go into stable as I'm a bit
-> > unclear what our use case for stable is. It seems to be mostly "don't
-> > let people run into known crashes" or something like that.  
-> 
-> I read the public statement [1] as "... non-x86 processors ...
-> backported to recent stable releases." or did the changes in
-> discussion here end up structurally so different that this doesn't
-> apply anymore?
-> 
-> [1]: https://www.qemu.org/2018/01/04/spectre/
+Google says you can already get graphics cards that can do 15360x8640,
+which is really quite close to that 16384 limit...
 
-OK, that would read as "do backport". (The x86 patches I saw didn't
-carry an explicit cc:stable.)
+thanks
+-- PMM
