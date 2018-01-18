@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ec9F4-00035r-5p
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:24:27 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ec9I0-0004EX-0E
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:27:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ec9F3-0000lL-CK
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:24:26 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:44266)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ec9F3-0000l0-6J
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:24:25 -0500
-Received: by mail-ot0-x243.google.com with SMTP id t20so10545477ote.11
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 04:24:25 -0800 (PST)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ec9Hv-0003kY-BE
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:27:28 -0500
+Received: from [45.249.212.35] (port=39975 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1ec9Hu-0003g1-VX
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:27:23 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Thu, 18 Jan 2018 20:25:35 +0800
+Message-ID: <f627f9669577793f6cc593c724770ab0b042474f.1516277913.git.arei.gonglei@huawei.com>
+In-Reply-To: <cover.1516277913.git.arei.gonglei@huawei.com>
+References: <cover.1516277913.git.arei.gonglei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1515520984-2873-1-git-send-email-jcmvbkbc@gmail.com>
-References: <1515520984-2873-1-git-send-email-jcmvbkbc@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jan 2018 12:24:03 +0000
-Message-ID: <CAFEAcA-TwVO+zkCDUNX5x7Wk0YwB4zcDDdiOii1HfZ2t5g66kg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4] target/xtensa: use libisa for
- instruction decoding
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 4/5] cryptodev-vhost-user: set the key length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
 
-On 9 January 2018 at 18:03, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> Replace manual opcode analysis with libisa-based code. This makes it
-> possible to support variable-encoding instructions of the core ISA, like
-> const16, and will allow to support advanced Xtensa features, like FLIX
-> and TIE.
->
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+From: Gonglei <arei.gonglei@huawei.com>
 
-Hi. Coverity (CID 1385146) complains about this bit of code:
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+---
+ backends/cryptodev-vhost-user.c       | 4 ++++
+ include/sysemu/cryptodev-vhost-user.h | 3 +++
+ 2 files changed, 7 insertions(+)
 
-> +        opnds = xtensa_opcode_num_operands(isa, opc);
-> +
-> +        for (opnd = vopnd = 0; opnd < opnds; ++opnd) {
-> +            if (xtensa_operand_is_visible(isa, opc, opnd)) {
-> +                uint32_t v;
-
-because xtensa_opcode_num_operands() can return -1
-(if the CHECK_OPCODE() fails), and then we will try to use
--1 as an upper bound for this loop and it will loop for a very
-long time.
-
-CID 1385148 is similar but for the outer loop where
-we do "slots = xtensa_format_num_slots()" and then use
-slots as a loop bound without checking whether we got back -1.
-
-thanks
--- PMM
+diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
+index 061c0e5..c7a9848 100644
+--- a/backends/cryptodev-vhost-user.c
++++ b/backends/cryptodev-vhost-user.c
+@@ -226,6 +226,10 @@ static void cryptodev_vhost_user_init(
+                          1u << VIRTIO_CRYPTO_SERVICE_MAC;
+     backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
+     backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
++
++    backend->conf.max_size = UINT64_MAX;
++    backend->conf.max_cipher_key_len = VHOST_USER_MAX_AUTH_KEY_LEN;
++    backend->conf.max_auth_key_len = VHOST_USER_MAX_AUTH_KEY_LEN;
+ }
+ 
+ static int64_t cryptodev_vhost_user_sym_create_session(
+diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/cryptodev-vhost-user.h
+index 937217b..6debf53 100644
+--- a/include/sysemu/cryptodev-vhost-user.h
++++ b/include/sysemu/cryptodev-vhost-user.h
+@@ -23,6 +23,9 @@
+ #ifndef CRYPTODEV_VHOST_USER_H
+ #define CRYPTODEV_VHOST_USER_H
+ 
++#define VHOST_USER_MAX_AUTH_KEY_LEN    512
++#define VHOST_USER_MAX_CIPHER_KEY_LEN  64
++
+ 
+ /**
+  * cryptodev_vhost_user_get_vhost:
+-- 
+1.8.3.1
