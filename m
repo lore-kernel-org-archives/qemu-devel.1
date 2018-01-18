@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ec8GG-0006Ux-3A
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:21:37 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1ec8J0-0008Bc-PO
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:24:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ec8GB-0003Se-5L
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:21:36 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45784)
+	(envelope-from <liq3ea@gmail.com>) id 1ec8Iz-000619-Dt
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:24:26 -0500
+Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:45249)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ec8GA-0003SK-Vf
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:21:31 -0500
-Received: by mail-qt0-x244.google.com with SMTP id x27so21225014qtm.12
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 03:21:30 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180118025245.13042-1-famz@redhat.com>
-	<d1dd1750-c487-be35-05eb-ffb12f18e805@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a81a812f-065c-e8be-0d6d-92525a379a82@amsat.org>
-Date: Thu, 18 Jan 2018 08:21:27 -0300
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1ec8Iz-00060U-7x
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:24:25 -0500
+Received: by mail-io0-x233.google.com with SMTP id p188so11706891ioe.12
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 03:24:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d1dd1750-c487-be35-05eb-ffb12f18e805@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] scsi-generic: Simplify error handling code
+In-Reply-To: <20180118104916.GF19695@redhat.com>
+References: <CAKXe6SJtWUFY8hN=dXzFCzztcsGkWbNx+1WZba05Rp3TqO_38w@mail.gmail.com>
+	<20180118104916.GF19695@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 18 Jan 2018 19:23:44 +0800
+Message-ID: <CAKXe6SJH7pOvTkKSqd9kaU5FsQySCKxGLmb+GJsDu1zzcvbJwQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Do I need update the microcode of virtual machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-On 01/18/2018 05:20 AM, Paolo Bonzini wrote:
-> On 18/01/2018 03:52, Fam Zheng wrote:
->> Coverity doesn't like the ignored return value introduced in
->> 9d3b155186c278 (hw/block: Fix the return type), and other callers are
->> converted already in ceff3e1f01.
->>
->> This one was added lately in d9bcd6f7f23a and missed the train. Do it
->> now.
->>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->> ---
->>  hw/scsi/scsi-generic.c | 9 +++------
->>  1 file changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
->> index ba70c0dc19..7414fe2d67 100644
->> --- a/hw/scsi/scsi-generic.c
->> +++ b/hw/scsi/scsi-generic.c
->> @@ -482,7 +482,6 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
->>      int rc;
->>      int sg_version;
->>      struct sg_scsi_id scsiid;
->> -    Error *local_err = NULL;
->>  
->>      if (!s->conf.blk) {
->>          error_setg(errp, "drive property not set");
->> @@ -516,11 +515,9 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
->>          error_setg(errp, "SG_GET_SCSI_ID ioctl failed");
->>          return;
->>      }
->> -    blkconf_apply_backend_options(&s->conf,
->> -                                  blk_is_read_only(s->conf.blk),
->> -                                  true, &local_err);
->> -    if (local_err) {
->> -        error_propagate(errp, local_err);
->> +    if (!blkconf_apply_backend_options(&s->conf,
->> +                                       blk_is_read_only(s->conf.blk),
->> +                                       true, errp)) {
->>          return;
->>      }
->>  
->>
-> 
-> I'm not a fan of bool return types, in general (because "!" is often
-> success while "< 0" is failure) and especially when there is an Error**;
-> I disagree with commit 9d3b155186.  But the function is not in an area I
-> maintain so I'm queuing this, thanks.
+2018-01-18 18:49 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
 
-Do you prefer "if (local_err)" and "if (errp && *errp)" ?
+> On Thu, Jan 18, 2018 at 06:38:57PM +0800, Li Qiang wrote:
+> > Hi Paolo, all,
+> >
+> > I have a question about the intel microcode update for spectre variant#2.
+> > From my understanding, there is no need to update the microcode of VMs
+> > because the kvm has expose the SPEC_CTL and PRED_CMD to the guest.
+> > Also, if we need to update the micorcode in guest, who is the vendor for
+> > this.
+> > From the hyper-v, I think I'm right.
+> > -->
+> > https://docs.microsoft.com/en-us/virtualization/hyper-v-on-
+> windows/CVE-2017-5715-and-hyper-v-vms
+> >
+> > But upon I update the centos guest, the host kvm/qemu has been updated.
+> > The IBPB_ENABLED and IBRS_ENABLED are both zero if I don't update the
+> > microcode in the guest.
+> > If I update the guest micorcode, the are both 1.
+> >
+> > So I want to know, if I should update the microcode in guest.
+> > If the answer is Yes, then what about the Windows guest, how to update
+> the
+> > microcode?
+>
+> Microcode updates are only applicable to the physical CPUs seen by the
+> host. There is no concept of microcde for virtual CPUs in the guest. The
+> guest merely sees whatever CPU feature the hypervisor has permitted it to
+> see. IOW, as described in that microsoft link, you need to
+>
+>  - Update microcode and/or firmware in host
+>  - Update host hypervisor software
+>  - Change hypervisor config for each guest to enable new CPU features
+>  - Update guest software (kernel)
+>  - Cold boot (ie fully shutoff, and then power on) the guest
+>
+>
+You are right. I have made a mistake, the test guest centos doesn't
+schedule to the host which I have updated the kvm/qemu.
+Thanks!
 
-I wondered once if a macro might improve this pattern but thought the
-code would get more obscure.
+Li Qiang
+
+
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
