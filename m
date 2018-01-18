@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
-	id 1ec8k8-0003J5-5t
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:52:29 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ec8l8-0003yZ-EW
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:53:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
-	id 1ec8k7-0008Oy-8N
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:52:28 -0500
-From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Date: Thu, 18 Jan 2018 14:51:58 +0300
-Message-Id: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
+	(envelope-from <cohuck@redhat.com>) id 1ec8l7-0000Rv-7W
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 06:53:30 -0500
+Date: Thu, 18 Jan 2018 12:53:22 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180118125322.252929dc.cohuck@redhat.com>
+In-Reply-To: <20180118085628.40798-1-borntraeger@de.ibm.com>
+References: <20180118085628.40798-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/1] nbd: implement bdrv_get_info callback
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] s390x/kvm: implement new
+ hardware/firmware features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Since mirror job supports efficient zero out target mechanism (see
-in mirror_dirty_init()), implement bdrv_get_info to make it work
-over NBD. Such improvement will allow using the largest chunk possible
-and will decrease the number of NBD_CMD_WRITE_ZEROES requests on the wire.
+On Thu, 18 Jan 2018 09:56:25 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
----
- block/nbd.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+> We want to provide more hw features to guests, namely the new bpb
+> control as well as other transparent facilities that might be
+> introduced by firmware updates (e.g. the stfle facility 81).
+> 
+> See the kernel discussion for the KVM side
+> https://www.spinics.net/lists/kernel/msg2700551.html
+> 
+> v2->v3: - use bool for bpbc
+> 	- sort cpu facilities
+> v1->v2: - style and comment fixes
+> 	- drop transparent facility patch
+> 	- add patch to introduce facility 81
+> 
+> Christian Borntraeger (3):
+>   header sync
+>   s390x/kvm: Handle bpb feature
+>   s390x/kvm: provide stfle.81
+> 
+>  linux-headers/asm-s390/kvm.h    |  9 ++++-----
+>  linux-headers/linux/kvm.h       |  5 +++--
+>  target/s390x/cpu.c              |  1 +
+>  target/s390x/cpu.h              |  1 +
+>  target/s390x/cpu_features.c     |  2 ++
+>  target/s390x/cpu_features_def.h |  2 ++
+>  target/s390x/gen-features.c     |  2 ++
+>  target/s390x/kvm.c              | 14 ++++++++++++++
+>  target/s390x/machine.c          | 17 +++++++++++++++++
+>  9 files changed, 46 insertions(+), 7 deletions(-)
+> 
 
-diff --git a/block/nbd.c b/block/nbd.c
-index 8b8ba56cdd..94220f6d14 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -566,6 +566,14 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
-     bs->full_open_options = opts;
- }
-
-+static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-+{
-+    if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP) {
-+        bdi->can_write_zeroes_with_unmap = true;
-+    }
-+    return 0;
-+}
-+
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -583,6 +591,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_get_info              = nbd_get_info,
- };
-
- static BlockDriver bdrv_nbd_tcp = {
-@@ -602,6 +611,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_get_info              = nbd_get_info,
- };
-
- static BlockDriver bdrv_nbd_unix = {
-@@ -621,6 +631,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_get_info              = nbd_get_info,
- };
-
- static void bdrv_nbd_init(void)
---
-2.11.0
+Thanks, I've queued this. Once the bpb code lands in Linux, I'll
+replace patch 1 with a proper header sync and push to s390-next.
