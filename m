@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ebzX1-0002Rw-2J
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:19 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ebzX1-0002SN-OE
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ebzX0-00040P-4d
+	(envelope-from <ehabkost@redhat.com>) id 1ebzX0-00040o-UD
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53264)
+Received: from mx1.redhat.com ([209.132.183.28]:32858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ebzWz-0003zj-ST
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ebzX0-00040J-Ld
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:18 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Jan 2018 00:01:57 -0200
-Message-Id: <20180118020157.25401-9-ehabkost@redhat.com>
+Date: Thu, 18 Jan 2018 00:01:55 -0200
+Message-Id: <20180118020157.25401-7-ehabkost@redhat.com>
 In-Reply-To: <20180118020157.25401-1-ehabkost@redhat.com>
 References: <20180118020157.25401-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] i386: Add EPYC-IBPB CPU model
+Subject: [Qemu-devel] [PULL 6/8] i386: Add FEAT_8000_0008_EBX CPUID feature
+ word
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +25,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-EPYC-IBPB is a copy of the EPYC CPU model with
-just CPUID_8000_0008_EBX_IBPB added.
+Add the new feature word and the "ibpb" feature flag.
 
-Cc: Jiri Denemark <jdenemar@redhat.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
+Based on a patch by Paolo Bonzini.
+
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180109154519.25634-7-ehabkost@redhat.com>
+Message-Id: <20180109154519.25634-5-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ target/i386/cpu.h |  3 +++
+ target/i386/cpu.c | 19 ++++++++++++++++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index d7bae242cd..30cc5628d2 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -472,6 +472,7 @@ typedef enum FeatureWord {
+     FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
+     FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
+     FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
++    FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */
+     FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */
+     FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */
+     FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
+@@ -669,6 +670,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+ 
++#define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
++
+ #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+ #define CPUID_XSAVE_XSAVEC     (1U << 1)
+ #define CPUID_XSAVE_XGETBV1    (1U << 2)
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 365458a6a0..a49d2221ad 100644
+index 7f815458a5..6fe14362cc 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1968,6 +1968,52 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x8000000A,
-         .model_id = "AMD EPYC Processor",
+@@ -483,6 +483,22 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .tcg_features = TCG_APM_FEATURES,
+         .unmigratable_flags = CPUID_APM_INVTSC,
      },
-+    {
-+        .name = "EPYC-IBPB",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_AMD,
-+        .family = 23,
-+        .model = 1,
-+        .stepping = 2,
-+        .features[FEAT_1_EDX] =
-+            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-+            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-+            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-+            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-+            CPUID_VME | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-+            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
-+            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-+            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
-+            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-+            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-+            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-+        .features[FEAT_8000_0008_EBX] =
-+            CPUID_8000_0008_EBX_IBPB,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-+            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-+            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-+            CPUID_7_0_EBX_SHA_NI,
-+        /* Missing: XSAVES (not supported by some Linux versions,
-+         * including v4.1 to v4.12).
-+         * KVM doesn't yet expose any XSAVES state save component.
-+         */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x8000000A,
-+        .model_id = "AMD EPYC Processor (with IBPB)",
++    [FEAT_8000_0008_EBX] = {
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            "ibpb", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid_eax = 0x80000008,
++        .cpuid_reg = R_EBX,
++        .tcg_features = 0,
++        .unmigratable_flags = 0,
 +    },
- };
- 
- typedef struct PropValue {
+     [FEAT_XSAVE] = {
+         .feat_names = {
+             "xsaveopt", "xsavec", "xgetbv1", "xsaves",
+@@ -3130,7 +3146,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         } else {
+             *eax = cpu->phys_bits;
+         }
+-        *ebx = 0;
++        *ebx = env->features[FEAT_8000_0008_EBX];
+         *ecx = 0;
+         *edx = 0;
+         if (cs->nr_cores * cs->nr_threads > 1) {
+@@ -3593,6 +3609,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
++        x86_cpu_adjust_feat_level(cpu, FEAT_8000_0008_EBX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+         x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
 -- 
 2.14.3
