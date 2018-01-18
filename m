@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecI5E-0001oe-ST
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:50:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1ecI5r-00025c-Pk
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:51:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecI59-0007A2-Tu
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:50:52 -0500
-Received: from mail-qt0-x22f.google.com ([2607:f8b0:400d:c0d::22f]:33533)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecI59-00079q-OO
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:50:47 -0500
-Received: by mail-qt0-x22f.google.com with SMTP id e2so34080920qti.0
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 13:50:47 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180118204058.5768-1-f4bug@amsat.org>
-	<20180118204058.5768-12-f4bug@amsat.org>
-	<b0f29164-f168-0df2-6a9d-399de14ff2c6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3c6a6247-5c49-0361-26d7-2d7263a51f8b@amsat.org>
-Date: Thu, 18 Jan 2018 18:50:39 -0300
+	(envelope-from <eblake@redhat.com>) id 1ecI5n-0007LH-JX
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:51:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55334)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ecI5n-0007Ks-AF
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:51:27 -0500
+References: <1516308132-10272-1-git-send-email-mst@redhat.com>
+	<1516308132-10272-10-git-send-email-mst@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <abe7704a-0288-6345-0f3d-3fb0474a538a@redhat.com>
+Date: Thu, 18 Jan 2018 15:51:17 -0600
 MIME-Version: 1.0
-In-Reply-To: <b0f29164-f168-0df2-6a9d-399de14ff2c6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
+In-Reply-To: <1516308132-10272-10-git-send-email-mst@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="7OI6jeuunn674a893VEGHOjx4XbJVrUhG"
-Subject: Re: [Qemu-devel] [PATCH v7 11/14] sdhci: implement the Host Control
- 2 register for the tunning sequence
+	boundary="nQiZLkrmjWbnlEoQz5MUIp9W1uD5Skit9"
+Subject: Re: [Qemu-devel] [PULL v4 09/29] pci/shpc: Move function to generic
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-devel@nongnu.org, Sai Pavan Boddu <saipava@xilinx.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Yuval Shaia <yuval.shaia@oracle.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7OI6jeuunn674a893VEGHOjx4XbJVrUhG
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Eric Blake <eblake@redhat.com>,
- Alistair Francis <alistair.francis@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-devel@nongnu.org,
- Sai Pavan Boddu <saipava@xilinx.com>
-Message-ID: <3c6a6247-5c49-0361-26d7-2d7263a51f8b@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v7 11/14] sdhci: implement the Host Control 2
- register for the tunning sequence
-References: <20180118204058.5768-1-f4bug@amsat.org>
- <20180118204058.5768-12-f4bug@amsat.org>
- <b0f29164-f168-0df2-6a9d-399de14ff2c6@redhat.com>
-In-Reply-To: <b0f29164-f168-0df2-6a9d-399de14ff2c6@redhat.com>
+--nQiZLkrmjWbnlEoQz5MUIp9W1uD5Skit9
+From: Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <abe7704a-0288-6345-0f3d-3fb0474a538a@redhat.com>
+Subject: Re: [Qemu-devel] [PULL v4 09/29] pci/shpc: Move function to generic
+ header file
+References: <1516308132-10272-1-git-send-email-mst@redhat.com>
+ <1516308132-10272-10-git-send-email-mst@redhat.com>
+In-Reply-To: <1516308132-10272-10-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 01/18/2018 06:40 PM, Eric Blake wrote:
-> On 01/18/2018 02:40 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
->>  from qemu/xilinx tag xilinx-v2015.2]
+On 01/18/2018 02:44 PM, Michael S. Tsirkin wrote:
+> From: Yuval Shaia <yuval.shaia@oracle.com>
 >=20
-> In the subject, did you mean s/tunning/tuning/?
+> This function should be declared in generic header file so we can
+> utilize it.
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/qemu/host-utils.h | 10 ++++++++++
+>  hw/pci/shpc.c             | 13 ++-----------
+>  2 files changed, 12 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
+> index 5ac621c..38da849 100644
+> --- a/include/qemu/host-utils.h
+> +++ b/include/qemu/host-utils.h
+> @@ -400,6 +400,16 @@ static inline uint64_t pow2ceil(uint64_t value)
+>      return 0x8000000000000000ull >> (n - 1);
+>  }
+> =20
+> +static inline uint32_t pow2roundup32(uint32_t x)
+> +{
+> +    x |=3D (x >> 1);
+> +    x |=3D (x >> 2);
+> +    x |=3D (x >> 4);
+> +    x |=3D (x >> 8);
+> +    x |=3D (x >> 16);
+> +    return x + 1;
+> +}
 
-I did the same mistake in the cover too :S
+How does this differ from pow2ceil(), other than the difference in type?
 
-Thanks to correct this,
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Phil.
 
-
---7OI6jeuunn674a893VEGHOjx4XbJVrUhG
+--nQiZLkrmjWbnlEoQz5MUIp9W1uD5Skit9
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlphFq8ACgkQ4+MsLN6t
-wN7FOA//TNJiHqXJLRLQL1QBCw4plFfqZA8KmyyezLdL/YWEsTcby5c3YmSUeAxd
-3Imrd2nsAAL9t2rVptUsNxEbihrHW3nBk3E3X1aErOygDx/6x0TduJQ42H0aa7qd
-QFIu0DKMpX8bdeXPodsKdN5M3Lz+wBC9StDii5vA7r32ql/9jCcs1kEOpAU5hK0R
-nzPM3MZBEOCh8D9ozoLGV6FSYbXU+dWgHBb0gCzFp2stywJtrUF+DjfdwkLfrDwS
-7YYb+5EY1UseHnBJQkj5vnR7Yg9+niUly1C6t79Xwmebel87K94EebFMqGh56Ch3
-7sgTuRN9x6b1ou6G6ge5nCf9Hv3xFaqzuTh73vmbqymvc9sH/4DM0+S/M1/CBSi6
-+5Z+PYA2yiuoeL/gG661INlZw2XN7gehZ0OruvBPwJvjzaCZyM99Mgxaz9T02rm5
-40smMQjlzCPfhEFHcrtItGtqIZoqbt+LxppNomnRtU1mPLjPeoHk0jzgMBb9PIav
-pSLAe3v1+RTN5+aokm+jDOuRQYMgdL9OxxTSFB41Za6ql2ruziVNzvVHNmMbUdTf
-dS4HxzZlQvzjNima6qeZLOxzJiSaV9mm/1CwNNTC1qF+v/cA27/+UNlbKzPtAKPM
-b+dX4DDPWltes0Zn3C3ZJBI+7hj3x52+fAAGv4uVu5m8qci4FaU=
-=lSEh
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlphFtUACgkQp6FrSiUn
+Q2r70Qf7BTcpVKoIDEas6rYi2VCZ7dr0QhAfKZAxV0b1p+ya3BJBWmTDWpKIt1YB
+uotGXa1Rd/x7rNwuO/gHWpOkOYf0IBteBNukjUfosRoJYtnz+rz84zcN9ckEmqHy
+zcm2wbw+8xdK6EBpaAcNCY2C1oSBVEdtaJXxd/8rK4IjkthSsZsFMAWmf/fS8K/j
+dogVlD6rEzzdaWNmMKDGa0fk/zdV4daWCXkqFpWY4XKmkjo6G+vu2mVky9doJeQN
+uIMxOYr7QvybUmW65xY2jHRndIwlt4+Gbw4RDRx5g229g+KLEXQpxGXo6ho8up9z
+DtrCPJYcMIVZ5S8K3YkurwjZFUmZFQ==
+=Gs0d
 -----END PGP SIGNATURE-----
 
---7OI6jeuunn674a893VEGHOjx4XbJVrUhG--
+--nQiZLkrmjWbnlEoQz5MUIp9W1uD5Skit9--
