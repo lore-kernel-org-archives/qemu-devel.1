@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1ebxLo-0005Vd-Qe
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eby51-00022o-GZ
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 19:29:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1ebxLl-0002Y6-MK
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:36 -0500
-Received: from mail-sn1nam02on0123.outbound.protection.outlook.com
-	([104.47.36.123]:52458
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1ebxLl-0002XK-4a
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 18:42:33 -0500
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Wed, 17 Jan 2018 23:41:13 +0000
-Message-ID: <CY4PR2101MB0866DEFFAF6DB80EBA4CFBF3B6E90@CY4PR2101MB0866.namprd21.prod.outlook.com>
-References: <1515788548-3570-1-git-send-email-juterry@microsoft.com>
-	<1728988755.33187824.1515790085358.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1728988755.33187824.1515790085358.JavaMail.zimbra@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1eby4z-0006Zl-8k
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 19:29:19 -0500
+Date: Thu, 18 Jan 2018 11:28:59 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180118002859.GA30352@umbus.fritz.box>
+References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
+	<1516203816-19374-23-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/4] Implements the Windows Hypervisor
- Platform accelerator
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="lYjFa3qL1bvncypl"
+Content-Disposition: inline
+In-Reply-To: <1516203816-19374-23-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 22/24] cpu: get rid of unused cpu_init()
+ defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +25,370 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, Stafford Horne <shorne@gmail.com>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-SGV5IFBhb2xvLA0KDQpUaGFua3MgZm9yIGFsbCB0aGUgZmVlZGJhY2suIEFmdGVyIHRhbGtpbmcg
-d2l0aCB2YXJpb3VzIG1lbWJlcnMgb2YgdGhlIHRlYW0gYXJvdW5kIHRoZXNlIHNjZW5hcmlvcyBJ
-IHRoaW5rIGl0cyBiZXN0IHdlIGFkZCB0aGUgbWlncmF0aW9uIGJsb2NrZXJzIGZvciBhbGwgb2Yg
-eW91ciBjb21tZW50cyB1bmZvcnR1bmF0ZWx5LiBUaGUgYW5zd2VycyB0byB5b3VyIHF1ZXN0aW9u
-IGFyZSBiZWxvdzoNCg0KMS4gRm9yIENQVUlELiBUaGUgQVBJIGhhcyBzdXBwb3J0IGZvciBhbiAi
-RVhURU5ERURfVk1fRVhJVFMiIG9mIHR5cGUgV0h2UnVuVnBFeGl0UmVhc29uWDY0Q3B1aWQgYWZ0
-ZXIgYSBjYWxsIHRvIFdIdlJ1blZpcnR1YWxQcm9jZXNzb3IuIFRoaXMgd2lsbCBvbmUgZGF5IGFs
-bG93IGZvciB0aGUgQ1BVSUQgaW5zdHJ1Y3Rpb24gdG8gYmUgcmVzb2x2ZWQgaG93ZXZlciBpdCBp
-cyBub3QgY3VycmVudGx5IGltcGxlbWVudGVkIGluIHRoZSBwbGF0Zm9ybS4gU28gZm9yIHJpZ2h0
-IG5vdyB3ZSB3aWxsIGhhdmUgdG8gYmxvY2sgb24gQ1BVSUQuDQoNCjIuIEZvciBkaXJ0eSBtZW1v
-cnkgdHJhY2tpbmcuIFdlIGN1cnJlbnRseSBkb27igJl0IGhhdmUgc3VwcG9ydCBpbiB0aGUgcGxh
-dGZvcm0gb3IgQVBJIGZvciB0aGlzLiBJIGhhdmUgYWRkZWQgdGhhdCB0byB0aGUgZmVhdHVyZSBi
-YWNrbG9nIGFuZCB3aWxsIHVwZGF0ZSBRRU1VIGFzIHRoYXQgZ2V0cyBpbXBsZW1lbnRlZCBpbiB0
-aGUgcGxhdGZvcm0uIEhvd2V2ZXIsIFZHQSBkb2VzIGluZGVlZCB3b3JrIHdpdGggdGhlIGN1cnJl
-bnQgaW1wbCBvZiBsb2dfc3luYy4NCg0KMy4gQWxzbywgZm9yIFhTQVZFL1JTVE9SIHdlIGFnYWlu
-IGRvbuKAmXQgaGF2ZSBwbGF0Zm9ybSBzdXBwb3J0IGZvciB0aGUgcmVxdWlyZWQgcmVnaXN0ZXJz
-LiBJIGhhdmUgYWRkZWQgdGhpcyB0byB0aGUgZmVhdHVyZSBwbGF0Zm9ybSBiYWNrbG9nIHRvIGdh
-aW4gYWNjZXNzIGZvciB0aGF0IGZ1bmN0aW9uYWxpdHkgYXMgd2VsbC4NCg0KNC4gVGhpcyB3aWxs
-IGJlIHN1cHBvcnRlZCBvbiBXaW5kb3dzIDEwIGhvc3RzIChJIGRvbuKAmXQgaGF2ZSB0aGUgaW5z
-aWRlciBidWlsZCBudW1iZXIgeWV0KSBhbmQgaXQgd2lsbCByZXF1aXJlIGFuIEludGVsIHByb2Nl
-c3NvciB3aXRoIFZULXggYW5kIFVucmVzdHJpY3RlZCBHdWVzdCBzdXBwb3J0LiBXaWxsIHVwZGF0
-ZSB0aGUgcWVtdS1kZXZlbCBsaXN0IG9uY2Ugd2UgaGF2ZSBhbiBpbnNpZGVyIGJ1aWxkIHRoYXQg
-aXMgcHVibGljIHRoYXQgaGFzIHRoZSBwbGF0Zm9ybSBiaXRzLg0KDQpTbywgaWYgeW91ciBvayB3
-aXRoIGl0IEkgd2lsbCBibG9jayBvbiBDUFVJRCwgTWVtb3J5IFRyYWNraW5nLCBhbmQgWFNBVkUv
-UlNUT1IgZnVuY3Rpb25hbGl0eSBhbmQgc2VuZCBvdXQgdGhlIHVwZGF0ZWQgUFIuDQoNCi1KdXN0
-aW4NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5p
-IFttYWlsdG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBKYW51YXJ5IDEy
-LCAyMDE4IDEyOjQ4IFBNDQo+IFRvOiBKdXN0aW4gVGVycnkgKFZNKSA8anV0ZXJyeUBtaWNyb3Nv
-ZnQuY29tPg0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnIHFlbXUtZGV2ZWwgPHFlbXUtZGV2
-ZWxAbm9uZ251Lm9yZz4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCAwLzRdIEltcGxlbWVudHMgdGhl
-IFdpbmRvd3MgSHlwZXJ2aXNvciBQbGF0Zm9ybQ0KPiBhY2NlbGVyYXRvcg0KPiANCj4gDQo+ID4g
-SGVsbG8gUUVNVSBDb21tdW5pdHkhDQo+ID4NCj4gPiBPdmVyIHRoZSBwYXN0IGZldyBtb250aHMg
-dGhlIEh5cGVyLVYgdGVhbSBhdCBNaWNyb3NvZnQgaGFzIGJlZW4NCj4gPiB3b3JraW5nIGhhcmQg
-b24gYSBuZXcgdXNlci1tb2RlIEFQSSBmb3Igb3VyIGh5cGVydmlzb3IgdGhhdCB3aWxsIGJlDQo+
-ID4gcmVsZWFzZWQgYXMgcGFydCBvZiB0aGUgdXBjb21pbmcgU0RLLiBUaGlzIG5ldyBBUEkgYWRk
-cyB1c2VyLW1vZGUNCj4gPiBjYXBhYmlsaXRpZXMgdG8gY3JlYXRlIGFuZCBtYW5hZ2UgcGFydGl0
-aW9ucyBhdCB0aGUgaHlwZXJ2aXNvciBsZXZlbCwNCj4gPiBjb25maWd1cmUgbWVtb3J5IG1hcHBp
-bmdzIGZvciB0aGUgcGFydGl0aW9uLCBhbmQgY3JlYXRlIGFuZCBjb250cm9sDQo+IGV4ZWN1dGlv
-biBvZiB2aXJ0dWFsIHByb2Nlc3NvcnMuDQo+ID4NCj4gPiBXaXRoIHRoaXMgbmV3IEFQSSB3ZSBh
-cmUgbm93IGFibGUgdG8gYnJpbmcgb3VyIGh5cGVydmlzb3IgdG8gdGhlIFFFTVUNCj4gPiBjb21t
-dW5pdHkhIFRoZSBmb2xsb3dpbmcgcGF0Y2hlcyBpbXBsZW1lbnQgdGhlIFdpbmRvd3MgSHlwZXJ2
-aXNvcg0KPiA+IFBsYXRmb3JtIGFjY2VsZXJhdG9yIChXSFBYKSBmb3IgUUVNVSBvbiBXaW5kb3dz
-IDEwIGhvc3RzLg0KPiA+DQo+ID4gV2hlbiBjb21waWxpbmcgUUVNVSBmb3IgeDg2XzY0IHBhc3Np
-bmcgdGhlIC0tZW5hYmxlLXdocHggZmxhZyB3aWxsDQo+ID4gY29tcGlsZSB0aGUgYWNjZWxlcmF0
-b3IgZm9yIHVzZS4gQXQgcnVudGltZSB1c2luZyB0aGUgJy1hY2NlbCB3aHB4Jw0KPiA+IHNob3Vs
-ZCBzZWUgYSBzaWduaWZpY2FudCBwZXJmb3JtYW5jZSBpbXByb3ZlbWVudCBvdmVyIGVtdWxhdGlv
-biwgbXVjaA0KPiA+IGxpa2Ugd2hlbiB1c2luZyAnaGF4JyBvbiBXaW5kb3dzLg0KPiA+DQo+ID4g
-T3ZlciB0aGUgbmV4dCBmZXcgZGF5cyB0aGUgcHJlLXJlbGVhc2UgdmVyc2lvbiBvZiB0aGUgZG9j
-dW1lbnRhdGlvbg0KPiA+IGZvciB0aGlzIG5ldyBBUEkgd2lsbCBiZSB2aXNpYmxlIGF0DQo+ID4N
-Cj4gaHR0cHM6Ly9uYTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0
-cHMlM0ElMkYlMkZkb2NzLg0KPiA+IG1pY3Jvc29mdC5jb20lMkZlbi0NCj4gdXMlMkZ2aXJ0dWFs
-aXphdGlvbiZkYXRhPTAyJTdDMDElN0NqdXRlcnJ5JTQwbWljcm9zb2Z0LmNvbSU3Q2U5NzljNQ0K
-PiAwYWI1NTQ0YWIyZGVjNzA4ZDU1OWZkYzg2ZiU3QzcyZjk4OGJmODZmMTQxYWY5MWFiMmQ3Y2Qw
-MTFkYjQ3JTdDMQ0KPiAlN0MwJTdDNjM2NTEzODY4ODg0OTg3NzcyJnNkYXRhPUUlMkJFNURYJTJG
-SnFzSzIlMkJaSlZXelEzcUZ5DQo+IEtnMFlMS3JnNkV0ekxrdm5KcWJVJTNEJnJlc2VydmVkPTAg
-dW5kZXIgdGhlICdXaW5kb3dzIEh5cGVydmlzb3INCj4gUGxhdGZvcm0nIHNlY3Rpb24uIEhlcmUg
-eW91IHdpbGwgc2VlIHRoZSByZXF1aXJlbWVudHMsIEFQSSwgYW5kIGV4YW1wbGVzLg0KPiANCj4g
-VGhhdCdzIGdyZWF0ISAgQWNjZWxlcmF0b3IgZ2Fsb3JlLiA6KQ0KPiANCj4gRnJvbSBhIHF1aWNr
-IHNraW0gdGhleSBwYXRjaGVzIHNlZW0gdG8gYmUgZ2VuZXJhbGx5IHByZXR0eSBnb29kISAgSSBo
-YXZlIGENCj4gZmV3IHF1aWNrIHF1ZXN0aW9uIG9uIGEgY291cGxlIGZlYXR1cmVzIHRoYXQgc2Vl
-bSB0byBiZSBtaXNzaW5nOg0KPiANCj4gLSBhbiBpbXBvcnRhbnQgbWlzc2luZyBmZWF0dXJlIGlz
-IHN1cHBvcnQgZm9yIENQVSBtb2RlbHMgKGUuZy4gIi1jcHUNCj4gSGFzd2VsbCIpLiAgQ29kZQ0K
-PiAgIGZvciB0aGF0IHdhcyBhZGRlZCByZWNlbnRseSBmb3IgSHlwZXJ2aXNvci5mcmFtZXdvcmsg
-YW5kIHlvdSBzaG91bGQgYmUNCj4gYWJsZSB0byBjb3B5DQo+ICAgc29tZSBvZiBpdCBhbmQgdGhl
-biBtb3JlIGZvciB5b3VyIENQVUlEIGludGVyY2VwdC4gIEhvd2V2ZXIsIHRoZSBxdWVzdGlvbg0K
-PiBJIGhhdmUgaXM6DQo+ICAgd2hhdCBpbnRlcmZhY2VzIGRvZXMgV0hQWCBzdXBwb3J0IHRvIHF1
-ZXJ5IHRoZSBoeXBlcnZpc29yJ3MgQ1BVSUQNCj4gY2FwYWJpbGl0aWVzPw0KPiANCj4gLSBpcyBk
-aXJ0eSBtZW1vcnkgc3VwcG9ydCBhdmFpbGFibGU/ICBUaGUgbG9nX3N5bmMgY2FsbGJhY2sgc2Vl
-bXMgYSBiaXQNCj4gaW5jb21wbGV0ZSA6KQ0KPiAgIElmIGl0J3Mgbm90LCBWR0Egb3V0cHV0IHBy
-b2JhYmx5IHdpbGwgbm90IHdvcmsuDQo+IA0KPiAtIEkgbWlnaHQgaGF2ZSBtaXNzZWQgdGhpcyBi
-ZWNhdXNlIHRoZSByZWxldmFudCBjb2RlIGlzIHF1aXRlIHJlcGV0aXRpdmUgLQ0KPiB3aGF0IGFi
-b3V0DQo+ICAgZ2V0L3NldCBvZiBYU0FWRSBhcmVhcz8gIElmIGVpdGhlciB0aGlzIG9yIGRpcnR5
-IG1lbW9yeSBpcyBub3QgcHJlc2VudCwgaXQncw0KPiBwcm9iYWJseQ0KPiAgIGJlc3QgdG8gYmxv
-Y2sgbWlncmF0aW9uIChncmVwIGZvciBtaWdyYXRpb25fYmxvY2tlcnMpLg0KPiANCj4gQWxzbywg
-d2hhdCB2ZXJzaW9ucyBvZiBXaW5kb3dzIHdpbGwgc3VwcG9ydCBXSFBYPw0KPiANCj4gVGhhbmtz
-LA0KPiANCj4gUGFvbG8NCj4gPiBUaGFuayB5b3UgZm9yIHlvdXIgZmVlZGJhY2suDQo+ID4NCj4g
-PiBKdXN0aW4gVGVycnkgKFZNKSAoNCk6DQo+ID4gICBBZGQgdGhlIFdpbmRvd3MgSHlwZXJ2aXNv
-ciBQbGF0Zm9ybSBhY2NlbGVyYXRvci4NCj4gPiAgIEFkZCB0aGUgV0hQWCB2Y3B1IEFQSQ0KPiA+
-ICAgSW50cm9kdWNlIHRoZSBXSFBYIGltcGwNCj4gPiAgIEFkZCB0aGUgV0hQWCBhY2NlbGVyYXRp
-b24gZW5saWdodGVubWVudHMNCj4gPg0KPiA+ICBhY2NlbC9zdHVicy9NYWtlZmlsZS5vYmpzIHwg
-ICAgOSArLQ0KPiA+ICBhY2NlbC9zdHVicy93aHB4LXN0dWIuYyAgIHwgICA0OCArKw0KPiA+ICBj
-b25maWd1cmUgICAgICAgICAgICAgICAgIHwgICA0OCArLQ0KPiA+ICBjcHVzLmMgICAgICAgICAg
-ICAgICAgICAgIHwgICA2NiArKy0NCj4gPiAgaW5jbHVkZS9zeXNlbXUvaHdfYWNjZWwuaCB8ICAg
-MTMgKw0KPiA+ICBpbmNsdWRlL3N5c2VtdS93aHB4LmggICAgIHwgICA0MCArKw0KPiA+ICBxZW11
-LW9wdGlvbnMuaHggICAgICAgICAgIHwgICAgOCArLQ0KPiA+ICB0YXJnZXQvaTM4Ni9NYWtlZmls
-ZS5vYmpzIHwgICAgMSArDQo+ID4gIHRhcmdldC9pMzg2L2hlbHBlci5jICAgICAgfCAgICAyICst
-DQo+ID4gIHRhcmdldC9pMzg2L3docHgtYWxsLmMgICAgfCAxMzk1DQo+ID4gICsrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+ICAxMCBmaWxlcyBjaGFuZ2Vk
-LCAxNjE5IGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKSAgY3JlYXRlIG1vZGUNCj4gPiAx
-MDA2NDQgYWNjZWwvc3R1YnMvd2hweC1zdHViLmMgIGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiA+IGlu
-Y2x1ZGUvc3lzZW11L3docHguaCAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRhcmdldC9pMzg2L3docHgt
-YWxsLmMNCj4gPg0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiA+DQo=
+
+--lYjFa3qL1bvncypl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jan 17, 2018 at 04:43:34PM +0100, Igor Mammedov wrote:
+> cpu_init(cpu_model) were replaced by cpu_create(cpu_type) so
+> no users are left, remove it.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+
+ppc part
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+> CC: Richard Henderson <rth@twiddle.net> (maintainer:Alpha)
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> CC: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: Michael Walle <michael@walle.cc>
+> CC: Laurent Vivier <laurent@vivier.eu>
+> CC: Aurelien Jarno <aurelien@aurel32.net>
+> CC: Yongbok Kim <yongbok.kim@mips.com>
+> CC: Anthony Green <green@moxielogic.com>
+> CC: Chris Wulff <crwulff@gmail.com>
+> CC: Marek Vasut <marex@denx.de>
+> CC: Stafford Horne <shorne@gmail.com>
+> CC: David Gibson <david@gibson.dropbear.id.au>
+> CC: Alexander Graf <agraf@suse.de>
+> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> CC: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> CC: Guan Xuetao <gxt@mprc.pku.edu.cn>
+> CC: Max Filippov <jcmvbkbc@gmail.com>
+> CC: qemu-arm@nongnu.org
+> CC: qemu-ppc@nongnu.org
+> CC: qemu-s390x@nongnu.org
+> ---
+>  target/alpha/cpu.h      | 2 --
+>  target/arm/cpu.h        | 2 --
+>  target/cris/cpu.h       | 2 --
+>  target/hppa/cpu.h       | 1 -
+>  target/i386/cpu.h       | 2 --
+>  target/lm32/cpu.h       | 2 --
+>  target/m68k/cpu.h       | 2 --
+>  target/microblaze/cpu.h | 1 -
+>  target/mips/cpu.h       | 2 --
+>  target/moxie/cpu.h      | 2 --
+>  target/nios2/cpu.h      | 1 -
+>  target/openrisc/cpu.h   | 2 --
+>  target/ppc/cpu.h        | 2 --
+>  target/s390x/cpu.h      | 2 --
+>  target/sh4/cpu.h        | 2 --
+>  target/sparc/cpu.h      | 4 ----
+>  target/tilegx/cpu.h     | 1 -
+>  target/tricore/cpu.h    | 2 --
+>  target/unicore32/cpu.h  | 2 --
+>  target/xtensa/cpu.h     | 2 --
+>  20 files changed, 38 deletions(-)
+>=20
+> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+> index c8dd560..1a1d9a0 100644
+> --- a/target/alpha/cpu.h
+> +++ b/target/alpha/cpu.h
+> @@ -468,8 +468,6 @@ enum {
+> =20
+>  void alpha_translate_init(void);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_ALPHA_CPU, cpu_model)
+> -
+>  #define ALPHA_CPU_TYPE_SUFFIX "-" TYPE_ALPHA_CPU
+>  #define ALPHA_CPU_TYPE_NAME(model) model ALPHA_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE ALPHA_CPU_TYPE_NAME("ev67")
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index c87bb76..3c1e1aa 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2167,8 +2167,6 @@ static inline bool arm_excp_unmasked(CPUState *cs, =
+unsigned int excp_idx,
+>      return unmasked || pstate_unmasked;
+>  }
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_ARM_CPU, cpu_model)
+> -
+>  #define ARM_CPU_TYPE_SUFFIX "-" TYPE_ARM_CPU
+>  #define ARM_CPU_TYPE_NAME(name) (name ARM_CPU_TYPE_SUFFIX)
+>  #define TARGET_DEFAULT_CPU_TYPE ARM_CPU_TYPE_NAME("any")
+> diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+> index 8feabb4..9845d89 100644
+> --- a/target/cris/cpu.h
+> +++ b/target/cris/cpu.h
+> @@ -267,8 +267,6 @@ enum {
+>  #define TARGET_PHYS_ADDR_SPACE_BITS 32
+>  #define TARGET_VIRT_ADDR_SPACE_BITS 32
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_CRIS_CPU, cpu_model)
+> -
+>  #define CRIS_CPU_TYPE_SUFFIX "-" TYPE_CRIS_CPU
+>  #define CRIS_CPU_TYPE_NAME(name) (name CRIS_CPU_TYPE_SUFFIX)
+>  #define TARGET_DEFAULT_CPU_TYPE CRIS_CPU_TYPE_NAME("crisv32")
+> diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+> index 04625f7..7a6074e 100644
+> --- a/target/hppa/cpu.h
+> +++ b/target/hppa/cpu.h
+> @@ -112,7 +112,6 @@ static inline int cpu_mmu_index(CPUHPPAState *env, bo=
+ol ifetch)
+> =20
+>  void hppa_translate_init(void);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_HPPA_CPU, cpu_model)
+>  #define TARGET_DEFAULT_CPU_TYPE TYPE_HPPA_CPU
+> =20
+>  void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index f64e5ed..0b4563b 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1557,8 +1557,6 @@ uint64_t cpu_get_tsc(CPUX86State *env);
+> =20
+>  #define PHYS_ADDR_MASK MAKE_64BIT_MASK(0, TCG_PHYS_ADDR_BITS)
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_X86_CPU, cpu_model)
+> -
+>  #define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
+>  #define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
+> =20
+> diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+> index 65f58f5..ec9efa7 100644
+> --- a/target/lm32/cpu.h
+> +++ b/target/lm32/cpu.h
+> @@ -255,8 +255,6 @@ void lm32_watchpoint_insert(CPULM32State *env, int in=
+dex, target_ulong address,
+>  void lm32_watchpoint_remove(CPULM32State *env, int index);
+>  bool lm32_cpu_do_semihosting(CPUState *cs);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_LM32_CPU, cpu_model)
+> -
+>  #define LM32_CPU_TYPE_SUFFIX "-" TYPE_LM32_CPU
+>  #define LM32_CPU_TYPE_NAME(model) model LM32_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE LM32_CPU_TYPE_NAME("lm32-basic")
+> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+> index 193e8f8..da4171c 100644
+> --- a/target/m68k/cpu.h
+> +++ b/target/m68k/cpu.h
+> @@ -401,8 +401,6 @@ void register_m68k_insns (CPUM68KState *env);
+>  #define TARGET_PHYS_ADDR_SPACE_BITS 32
+>  #define TARGET_VIRT_ADDR_SPACE_BITS 32
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
+> -
+>  #define M68K_CPU_TYPE_SUFFIX "-" TYPE_M68K_CPU
+>  #define M68K_CPU_TYPE_NAME(model) model M68K_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE M68K_CPU_TYPE_NAME("any")
+> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> index f244efa..3ad1016 100644
+> --- a/target/microblaze/cpu.h
+> +++ b/target/microblaze/cpu.h
+> @@ -343,7 +343,6 @@ int cpu_mb_signal_handler(int host_signum, void *pinf=
+o,
+>  #define TARGET_PHYS_ADDR_SPACE_BITS 32
+>  #define TARGET_VIRT_ADDR_SPACE_BITS 32
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_MICROBLAZE_CPU, cpu_mo=
+del)
+>  #define TARGET_DEFAULT_CPU_TYPE TYPE_MICROBLAZE_CPU
+> =20
+>  #define cpu_signal_handler cpu_mb_signal_handler
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index c5ee894..7c66ec0 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -739,8 +739,6 @@ enum {
+> =20
+>  int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_MIPS_CPU, cpu_model)
+> -
+>  #define MIPS_CPU_TYPE_SUFFIX "-" TYPE_MIPS_CPU
+>  #define MIPS_CPU_TYPE_NAME(model) model MIPS_CPU_TYPE_SUFFIX
+> =20
+> diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+> index 9fabb93..a3a1bba 100644
+> --- a/target/moxie/cpu.h
+> +++ b/target/moxie/cpu.h
+> @@ -120,8 +120,6 @@ void moxie_translate_init(void);
+>  int cpu_moxie_signal_handler(int host_signum, void *pinfo,
+>                               void *puc);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_MOXIE_CPU, cpu_model)
+> -
+>  #define MOXIE_CPU_TYPE_SUFFIX "-" TYPE_MOXIE_CPU
+>  #define MOXIE_CPU_TYPE_NAME(model) model MOXIE_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE MOXIE_CPU_TYPE_NAME("any")
+> diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+> index 2d03958..71a48b1 100644
+> --- a/target/nios2/cpu.h
+> +++ b/target/nios2/cpu.h
+> @@ -231,7 +231,6 @@ void nios2_check_interrupts(CPUNios2State *env);
+>  # define TARGET_VIRT_ADDR_SPACE_BITS 32
+>  #endif
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
+>  #define TARGET_DEFAULT_CPU_TYPE TYPE_NIOS2_CPU
+> =20
+>  #define cpu_gen_code cpu_nios2_gen_code
+> diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+> index 8d1a87e..f2d2abb 100644
+> --- a/target/openrisc/cpu.h
+> +++ b/target/openrisc/cpu.h
+> @@ -390,8 +390,6 @@ int cpu_openrisc_get_phys_data(OpenRISCCPU *cpu,
+>                                 int *prot, target_ulong address, int rw);
+>  #endif
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mode=
+l)
+> -
+>  #define OPENRISC_CPU_TYPE_SUFFIX "-" TYPE_OPENRISC_CPU
+>  #define OPENRISC_CPU_TYPE_NAME(model) model OPENRISC_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE OPENRISC_CPU_TYPE_NAME("or1200")
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 4af4aff..3dc0359 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1372,8 +1372,6 @@ static inline uint64_t ppc_dump_gpr(CPUPPCState *en=
+v, int gprn)
+>  int ppc_dcr_read (ppc_dcr_t *dcr_env, int dcrn, uint32_t *valp);
+>  int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, uint32_t val);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_POWERPC_CPU, cpu_model)
+> -
+>  #define POWERPC_CPU_TYPE_SUFFIX "-" TYPE_POWERPC_CPU
+>  #define POWERPC_CPU_TYPE_NAME(model) model POWERPC_CPU_TYPE_SUFFIX
+> =20
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 174624a..3e647df 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -727,8 +727,6 @@ void s390_set_qemu_cpu_model(uint16_t type, uint8_t g=
+en, uint8_t ec_ga,
+> =20
+> =20
+>  /* helper.c */
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
+> -
+>  #define S390_CPU_TYPE_SUFFIX "-" TYPE_S390_CPU
+>  #define S390_CPU_TYPE_NAME(name) (name S390_CPU_TYPE_SUFFIX)
+>  #define TARGET_DEFAULT_CPU_TYPE S390_CPU_TYPE_NAME("qemu")
+> diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+> index 203d212..ad58e24 100644
+> --- a/target/sh4/cpu.h
+> +++ b/target/sh4/cpu.h
+> @@ -274,8 +274,6 @@ int cpu_sh4_is_cached(CPUSH4State * env, target_ulong=
+ addr);
+> =20
+>  void cpu_load_tlb(CPUSH4State * env);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_SUPERH_CPU, cpu_model)
+> -
+>  #define SUPERH_CPU_TYPE_SUFFIX "-" TYPE_SUPERH_CPU
+>  #define SUPERH_CPU_TYPE_NAME(model) model SUPERH_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE SUPERH_CPU_TYPE_NAME("sh7785")
+> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+> index 02c55ad..54b3dc7 100644
+> --- a/target/sparc/cpu.h
+> +++ b/target/sparc/cpu.h
+> @@ -654,10 +654,6 @@ hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env,=
+ target_ulong addr,
+>  #endif
+>  int cpu_sparc_signal_handler(int host_signum, void *pinfo, void *puc);
+> =20
+> -#ifndef NO_CPU_IO_DEFS
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_SPARC_CPU, cpu_model)
+> -#endif
+> -
+>  #define SPARC_CPU_TYPE_SUFFIX "-" TYPE_SPARC_CPU
+>  #define SPARC_CPU_TYPE_NAME(model) model SPARC_CPU_TYPE_SUFFIX
+> =20
+> diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+> index 67de53e..6c89b05 100644
+> --- a/target/tilegx/cpu.h
+> +++ b/target/tilegx/cpu.h
+> @@ -164,7 +164,6 @@ static inline TileGXCPU *tilegx_env_get_cpu(CPUTLGSta=
+te *env)
+>  void tilegx_tcg_init(void);
+>  int cpu_tilegx_signal_handler(int host_signum, void *pinfo, void *puc);
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_TILEGX_CPU, cpu_model)
+>  #define TARGET_DEFAULT_CPU_TYPE TYPE_TILEGX_CPU
+> =20
+>  #define cpu_signal_handler cpu_tilegx_signal_handler
+> diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+> index 835d51a..8ed17e0 100644
+> --- a/target/tricore/cpu.h
+> +++ b/target/tricore/cpu.h
+> @@ -411,8 +411,6 @@ static inline void cpu_get_tb_cpu_state(CPUTriCoreSta=
+te *env, target_ulong *pc,
+>      *flags =3D 0;
+>  }
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_TRICORE_CPU, cpu_model)
+> -
+>  #define TRICORE_CPU_TYPE_SUFFIX "-" TYPE_TRICORE_CPU
+>  #define TRICORE_CPU_TYPE_NAME(model) model TRICORE_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE TRICORE_CPU_TYPE_NAME("tc1796")
+> diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+> index fd3fa81..91b673a 100644
+> --- a/target/unicore32/cpu.h
+> +++ b/target/unicore32/cpu.h
+> @@ -165,8 +165,6 @@ static inline int cpu_mmu_index(CPUUniCore32State *en=
+v, bool ifetch)
+> =20
+>  #include "exec/cpu-all.h"
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_UNICORE32_CPU, cpu_mod=
+el)
+> -
+>  #define UNICORE32_CPU_TYPE_SUFFIX "-" TYPE_UNICORE32_CPU
+>  #define UNICORE32_CPU_TYPE_NAME(model) model UNICORE32_CPU_TYPE_SUFFIX
+>  #define TARGET_DEFAULT_CPU_TYPE UNICORE32_CPU_TYPE_NAME("any")
+> diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+> index 537e151..c21acf9 100644
+> --- a/target/xtensa/cpu.h
+> +++ b/target/xtensa/cpu.h
+> @@ -508,8 +508,6 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, va=
+ddr addr,
+>  #endif
+>  #define TARGET_DEFAULT_CPU_TYPE XTENSA_CPU_TYPE_NAME(XTENSA_DEFAULT_CPU_=
+MODEL)
+> =20
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_XTENSA_CPU, cpu_model)
+> -
+>  void xtensa_translate_init(void);
+>  void xtensa_breakpoint_handler(CPUState *cs);
+>  void xtensa_finalize_config(XtensaConfig *config);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--lYjFa3qL1bvncypl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpf6kgACgkQbDjKyiDZ
+s5IPBBAArvszWgVC6U/PvklkccYOaid0gQRvsst6/gjL5PHfczV5QaI40B3YRVV7
+OPJQHJrdlt2JGuizbDFs60VEVGYU9fXt41hOSfOFnF5FlmTBuvSnFWwFn/alFLOo
+3AOnih6NH7hOPBc061NJDlGyDrSaUTRU7xAUQ51HdR8wLRsjgT0RlJhuSieiCTQd
+X4v2r0HR73md08suVQngfwl8Z92a4e0juWly0DJP76e8398deisz9l9m05hOWIpm
+4AWPFhzERyqc1u0nXMYdAEHRtojAV3aA8Lu6wq2OWdsEie5QTw4fCg/ZAK1owEfD
+pbFdc+TGoGDPnuDciAybKx7VHsg1Fpvg2rPm9TeYYclUrIcJMABvFy0MGpK8dJK7
+6z5viEmdowam7Rh2g4xUkR+XLHELS5Z5UbnroagvcVSmS0is7UtNVk9sz/wlH/2Q
+rd7Cv7/PptgeHx50YWymVLgMcoVAQAM+iUv7Xinkd4sSTbZPd1XRWo7t1fEZYMml
+2G0G7KHHCnx+PZgzDGnQtkGACRMB7lXjmp0Qxi9P5fAfTDQ++9CYCC/7m6tTvS7E
+UKnIMyFc5+Fm+cnhlYMxcM2AnQOLb2DdbQ7ZF4n7jGhaYch7UsZM6dtxgau8gVzK
+sDkUptvX6ne0jvPne+Pcu/B7ZKqZhZ547UXIETH+l4/mqr8P1q4=
+=er3+
+-----END PGP SIGNATURE-----
+
+--lYjFa3qL1bvncypl--
