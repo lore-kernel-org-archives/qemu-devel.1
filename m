@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ec5KP-00076G-VP
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:13:43 -0500
+	(envelope-from <clg@kaod.org>) id 1ec5KX-00078R-Dd
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:13:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ec5KO-00082q-O1
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:13:41 -0500
-References: <20180102052805.20498-1-aik@ozlabs.ru>
-	<f14c0782-0f25-8bd0-8536-323bfc5fcbe4@redhat.com>
-	<ad143758-227b-55fe-44a6-c62a48f74162@ozlabs.ru>
-	<20180116134614.1aae30b9@w520.home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2c870510-598c-b3e0-75bf-8e135b68d3bd@redhat.com>
-Date: Thu, 18 Jan 2018 09:13:34 +0100
+	(envelope-from <clg@kaod.org>) id 1ec5KS-00086b-F4
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:13:49 -0500
+Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:54882)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ec5KS-00085Y-51
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 03:13:44 -0500
+Received: from player732.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id DC8B71814ED
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 09:13:38 +0100 (CET)
+References: <20180116074157.16886-1-clg@kaod.org>
+	<20180116074157.16886-4-clg@kaod.org>
+	<20180118041507.GF30352@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <53a12175-0817-c39c-b54c-d7228a61fe76@kaod.org>
+Date: Thu, 18 Jan 2018 09:13:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180116134614.1aae30b9@w520.home>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180118041507.GF30352@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr/iommu: Enable in-kernel TCE
- acceleration via VFIO KVM device
+Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: add support for hypervisor
+ doorbells on book3s CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +33,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 16/01/2018 21:46, Alex Williamson wrote:
-> On Mon, 15 Jan 2018 15:12:07 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->=20
->> On 03/01/18 04:51, Paolo Bonzini wrote:
->>> On 02/01/2018 06:28, Alexey Kardashevskiy wrote: =20
->>>> This is my current queue of the in-kernel TCE acceleration
->>>> enablement.
->>>>
->>>> Changes since https://lists.gnu.org/archive/html/qemu-devel/2017-12/=
-msg01918.html :
->>>> * 3 patches instead of one, one per maintainership area;
->>>> * added memory_region_iommu_get_attr();
->>>> * removed set_attr() as there is no use for it now;
->>>> * folded the chunk in vfio_listener_region_add() under
->>>> VFIO_SPAPR_TCE_v2_IOMMU branch as the acceleration is only
->>>> enabled when DMA memory is preregistered and this is only supported
->>>> by the v2 IOMMU.
->>>>
->>>> This is based on sha1
->>>> ad59cde C=C3=A9dric Le Goater "target/ppc: more use of the PPC_*() m=
-acros".
->>>>
->>>> Please comment. Thanks.
->>>>
->>>>
->>>>
->>>> Alexey Kardashevskiy (3):
->>>>   memory/iommu: Add get_attr()
->>>>   vfio/spapr: Use iommu memory region's get_attr()
->>>>   spapr/iommu: Enable in-kernel TCE acceleration via VFIO KVM device
->>>>
->>>>  include/exec/memory.h | 22 ++++++++++++++++++++++
->>>>  target/ppc/kvm_ppc.h  |  6 ++++++
->>>>  hw/ppc/spapr_iommu.c  | 19 +++++++++++++++++++
->>>>  hw/vfio/common.c      | 26 ++++++++++++++++++++++++++
->>>>  memory.c              | 13 +++++++++++++
->>>>  target/ppc/kvm.c      |  7 ++++++-
->>>>  hw/vfio/trace-events  |  1 +
->>>>  7 files changed, 93 insertions(+), 1 deletion(-)
->>>> =20
->>>
->>> Alex, if this is okay for you, please pick it up yourself. =20
+On 01/18/2018 05:15 AM, David Gibson wrote:
+> On Tue, Jan 16, 2018 at 08:41:57AM +0100, C=E9dric Le Goater wrote:
+>> The hypervisor doorbells are used by skiboot and Linux on POWER9
+>> processors to wake up secondaries.
 >>
->> Alex, ping?
+>> This adds processor control support to the Server architecture by
+>> reusing the Embedded support. They are very similar, only the bits
+>> definition of the CPU identifier differ.
+>>
+>> Still to be done is message broadcast to all threads of the same
+>> processor.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  target/ppc/cpu.h            |  8 ++++++--
+>>  target/ppc/excp_helper.c    | 39 ++++++++++++++++++++++++++++++++----=
+---
+>>  target/ppc/helper.h         |  2 +-
+>>  target/ppc/translate.c      | 13 ++++++++++++-
+>>  target/ppc/translate_init.c |  2 +-
+>>  5 files changed, 52 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+>> index b8f4dfc1084a..603a38cae83f 100644
+>> --- a/target/ppc/cpu.h
+>> +++ b/target/ppc/cpu.h
+>> @@ -930,7 +930,7 @@ enum {
+>>  #define BOOKE206_MAX_TLBN      4
+>> =20
+>>  /********************************************************************=
+*********/
+>> -/* Embedded.Processor Control */
+>> +/* Server and Embedded Processor Control */
+>> =20
+>>  #define DBELL_TYPE_SHIFT               27
+>>  #define DBELL_TYPE_MASK                (0x1f << DBELL_TYPE_SHIFT)
+>> @@ -940,11 +940,15 @@ enum {
+>>  #define DBELL_TYPE_G_DBELL_CRIT        (0x03 << DBELL_TYPE_SHIFT)
+>>  #define DBELL_TYPE_G_DBELL_MC          (0x04 << DBELL_TYPE_SHIFT)
+>> =20
+>> -#define DBELL_BRDCAST                  (1 << 26)
+>> +#define DBELL_TYPE_DBELL_SERVER        (0x05 << DBELL_TYPE_SHIFT)
+>> +
+>> +#define DBELL_BRDCAST                  PPC_BIT(37)
+>>  #define DBELL_LPIDTAG_SHIFT            14
+>>  #define DBELL_LPIDTAG_MASK             (0xfff << DBELL_LPIDTAG_SHIFT)
+>>  #define DBELL_PIRTAG_MASK              0x3fff
+>> =20
+>> +#define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
+>> +
+>>  /********************************************************************=
+*********/
+>>  /* Segment page size information, used by recent hash MMUs
+>>   * The format of this structure mirrors kvm_ppc_smmu_info
+>> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+>> index 4e548a448747..0f32cab1ff57 100644
+>> --- a/target/ppc/excp_helper.c
+>> +++ b/target/ppc/excp_helper.c
+>> @@ -417,6 +417,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, i=
+nt excp_model, int excp)
+>>      case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage ex=
+ception */
+>>      case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception=
+        */
+>>      case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment ex=
+ception */
+>> +    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt    =
+        */
+>>      case POWERPC_EXCP_HV_EMU:
+>>          srr0 =3D SPR_HSRR0;
+>>          srr1 =3D SPR_HSRR1;
+>> @@ -846,6 +847,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>>              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
+>>              return;
+>>          }
+>> +        if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL))=
+ {
+>> +            env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDOORBE=
+LL);
+>> +            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR_HV)=
+;
+>> +            return;
+>> +        }
+>>          if (env->pending_interrupts & (1 << PPC_INTERRUPT_PERFM)) {
+>>              env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_PERFM);
+>>              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_PERFM);
+>> @@ -1088,8 +1094,8 @@ void helper_rfsvc(CPUPPCState *env)
+>>      do_rfi(env, env->lr, env->ctr & 0x0000FFFF);
+>>  }
+>> =20
+>> -/* Embedded.Processor Control */
+>> -static int dbell2irq(target_ulong rb)
+>> +/* Server and Embedded Processor Control */
+>> +static int dbell2irq(target_ulong rb, bool book3s)
+>>  {
+>>      int msg =3D rb & DBELL_TYPE_MASK;
+>>      int irq =3D -1;
+>> @@ -1109,12 +1115,21 @@ static int dbell2irq(target_ulong rb)
+>>          break;
+>>      }
+>> =20
+>> +    /* A Directed Hypervisor Doorbell message is sent only if the
+>> +     * message type is 5. All other types are reserved and the
+>> +     * instruction is a no-op */
 >=20
-> Yeah, I'll pick these up.  Paolo, do you want to throw an explicit Ack
-> for the first patch?  David, R-b/A-b?  Thanks,
->=20
-> Alex
->=20
+> I don't see that the logic here accomplishes that.  Other types will
+> return the same value as for embedded - that doesn't seem like it will
+> result in a no-op.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+yes ... I tried to reuse existing code. I will add a specific routine
+for book3s.
+
+>> +    if (book3s && msg =3D=3D DBELL_TYPE_DBELL_SERVER) {
+>> +        irq =3D PPC_INTERRUPT_HDOORBELL;
+>> +    }
+>> +
+>>      return irq;
+>>  }
+>> =20
+>>  void helper_msgclr(CPUPPCState *env, target_ulong rb)
+>>  {
+>> -    int irq =3D dbell2irq(rb);
+>> +    /* 64-bit server processors compliant with arch 2.x */
+>> +    bool book3s =3D (env->insns_flags & PPC_SEGMENT_64B);
+>=20
+> Keying off an otherwise unrelated instruction bit seems bogus to me.
+
+That is the option we took for rfi in commit 6ca038c292d9  "ppc: restrict=
+=20
+the use of the rfi instruction"
+
+May be we could introduce an helper for it ?
+
+>=20
+>> +    int irq =3D dbell2irq(rb, book3s);
+>> =20
+>>      if (irq < 0) {
+>>          return;
+>> @@ -1123,10 +1138,11 @@ void helper_msgclr(CPUPPCState *env, target_ul=
+ong rb)
+>>      env->pending_interrupts &=3D ~(1 << irq);
+>>  }
+>> =20
+>> -void helper_msgsnd(target_ulong rb)
+>> +void helper_msgsnd(CPUPPCState *env, target_ulong rb)
+>>  {
+>> -    int irq =3D dbell2irq(rb);
+>> -    int pir =3D rb & DBELL_PIRTAG_MASK;
+>> +    /* 64-bit server processors compliant with arch 2.x */
+>> +    bool book3s =3D (env->insns_flags & PPC_SEGMENT_64B);
+>> +    int irq =3D dbell2irq(rb, book3s);
+>>      CPUState *cs;
+>> =20
+>>      if (irq < 0) {
+>> @@ -1137,8 +1153,17 @@ void helper_msgsnd(target_ulong rb)
+>>      CPU_FOREACH(cs) {
+>>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>          CPUPPCState *cenv =3D &cpu->env;
+>> +        bool send;
+>> =20
+>> -        if ((rb & DBELL_BRDCAST) || (cenv->spr[SPR_BOOKE_PIR] =3D=3D =
+pir)) {
+>> +        /* TODO: broadcast message to all threads of the same  proces=
+sor */
+>> +        if (book3s) {
+>> +            int pir =3D rb & DBELL_PROCIDTAG_MASK;
+>> +            send =3D (cenv->spr_cb[SPR_PIR].default_value =3D=3D pir)=
+;
+>> +        } else {
+>> +            int pir =3D rb & DBELL_PROCIDTAG_MASK;
+>> +            send =3D (rb & DBELL_BRDCAST) || (cenv->spr[SPR_BOOKE_PIR=
+] =3D=3D pir);
+>> +        }
+>> +        if (send) {
+>>              cenv->pending_interrupts |=3D 1 << irq;
+>>              cpu_interrupt(cs, CPU_INTERRUPT_HARD);
+>>          }
+>=20
+> TBH, these functions are small enough and the booke vs. books
+> differences large enough that I think you'd be better off just having
+> separate implementations for the booke and books variants.  Those in
+> turn would have separate instruction bits.
+
+ok. I will and in that case we could introduce a specific dbell2irq()
+for each architecture possibly ?
+
+Thanks,
+
+C.=20
+
+>=20
+>> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+>> index bb6a94a8b390..3e98bd9eecb8 100644
+>> --- a/target/ppc/helper.h
+>> +++ b/target/ppc/helper.h
+>> @@ -677,7 +677,7 @@ DEF_HELPER_FLAGS_2(load_sr, TCG_CALL_NO_RWG, tl, e=
+nv, tl)
+>>  DEF_HELPER_FLAGS_3(store_sr, TCG_CALL_NO_RWG, void, env, tl, tl)
+>> =20
+>>  DEF_HELPER_FLAGS_1(602_mfrom, TCG_CALL_NO_RWG_SE, tl, tl)
+>> -DEF_HELPER_1(msgsnd, void, tl)
+>> +DEF_HELPER_2(msgsnd, void, env, tl)
+>>  DEF_HELPER_2(msgclr, void, env, tl)
+>>  #endif
+>> =20
+>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>> index bcd36d53537f..1ad7e0fd4efd 100644
+>> --- a/target/ppc/translate.c
+>> +++ b/target/ppc/translate.c
+>> @@ -6180,10 +6180,19 @@ static void gen_msgsnd(DisasContext *ctx)
+>>      GEN_PRIV;
+>>  #else
+>>      CHK_HV;
+>> -    gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
+>> +    gen_helper_msgsnd(cpu_env, cpu_gpr[rB(ctx->opcode)]);
+>>  #endif /* defined(CONFIG_USER_ONLY) */
+>>  }
+>> =20
+>> +static void gen_msgsync(DisasContext *ctx)
+>> +{
+>> +#if defined(CONFIG_USER_ONLY)
+>> +    GEN_PRIV;
+>> +#else
+>> +    CHK_HV;
+>> +#endif /* defined(CONFIG_USER_ONLY) */
+>> +    /* interpreted as no-op */
+>> +}
+>> =20
+>>  #if defined(TARGET_PPC64)
+>>  static void gen_maddld(DisasContext *ctx)
+>> @@ -6664,6 +6673,8 @@ GEN_HANDLER2_E(msgsnd, "msgsnd", 0x1F, 0x0E, 0x0=
+6, 0x03ff0001,
+>>                 PPC_NONE, PPC2_PRCNTL),
+>>  GEN_HANDLER2_E(msgclr, "msgclr", 0x1F, 0x0E, 0x07, 0x03ff0001,
+>>                 PPC_NONE, PPC2_PRCNTL),
+>> +GEN_HANDLER2_E(msgsync, "msgsync", 0x1F, 0x16, 0x1B, 0x00000000,
+>> +               PPC_NONE, PPC2_PRCNTL),
+>>  GEN_HANDLER(wrtee, 0x1F, 0x03, 0x04, 0x000FFC01, PPC_WRTEE),
+>>  GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
+>>  GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
+>> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+>> index 70ff15a51a6b..55c99c97e377 100644
+>> --- a/target/ppc/translate_init.c
+>> +++ b/target/ppc/translate_init.c
+>> @@ -8866,7 +8866,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *da=
+ta)
+>>                          PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
+>>                          PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
+>>                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 =
+|
+>> -                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300;
+>> +                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2=
+_PRCNTL;
+>>      pcc->msr_mask =3D (1ull << MSR_SF) |
+>>                      (1ull << MSR_TM) |
+>>                      (1ull << MSR_VR) |
+>=20
