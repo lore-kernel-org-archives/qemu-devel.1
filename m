@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ec1Uk-0003v7-5F
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:08:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ec1bk-0005yM-SW
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:15:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ec1Ug-0003Xb-U9
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:08:06 -0500
-Date: Thu, 18 Jan 2018 15:07:54 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ec1bh-0007iV-AY
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:15:20 -0500
+Date: Thu, 18 Jan 2018 15:15:07 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180118040754.GE30352@umbus.fritz.box>
-References: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
-	<151618084250.20461.13884400486623011064.stgit@bahia.lan>
+Message-ID: <20180118041507.GF30352@umbus.fritz.box>
+References: <20180116074157.16886-1-clg@kaod.org>
+	<20180116074157.16886-4-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="z3ND3gJe4e1E4uwh"
+	protocol="application/pgp-signature"; boundary="K/+MhuhYzqQJJ3Xj"
 Content-Disposition: inline
-In-Reply-To: <151618084250.20461.13884400486623011064.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 3/3] spapr: fix device tree properties when
- using compatibility mode
+In-Reply-To: <20180116074157.16886-4-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: add support for hypervisor
+ doorbells on book3s CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,165 +25,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---z3ND3gJe4e1E4uwh
-Content-Type: text/plain; charset=us-ascii
+--K/+MhuhYzqQJJ3Xj
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 17, 2018 at 10:20:42AM +0100, Greg Kurz wrote:
-> Commit 51f84465dd98 changed the compatility mode setting logic:
-> - machine reset only sets compatibility mode for the boot CPU
-> - compatibility mode is set for other CPUs when they are put online
->   by the guest with the "start-cpu" RTAS call
+On Tue, Jan 16, 2018 at 08:41:57AM +0100, C=E9dric Le Goater wrote:
+> The hypervisor doorbells are used by skiboot and Linux on POWER9
+> processors to wake up secondaries.
 >=20
-> This causes a regression for machines started with max-compat-cpu:
-> the device tree nodes related to secondary CPU cores contain wrong
-> "cpu-version" and "ibm,pa-features" values, as shown below.
+> This adds processor control support to the Server architecture by
+> reusing the Embedded support. They are very similar, only the bits
+> definition of the CPU identifier differ.
 >=20
-> Guest started on a POWER8 host with:
->      -smp cores=3D2 -machine pseries,max-cpu-compat=3Dcompat7
+> Still to be done is message broadcast to all threads of the same
+> processor.
 >=20
-> # dtc -f -I fs -O dts /proc/device-tree | egrep 'cpu-version|pa-features'
->                         ibm,pa-features =3D [18 00 f6 3f c7 c0 80 f0 80 00
->  00 00 00 00 00 00 00 00 80 00 80 00 80 00 00 00];
->                         cpu-version =3D <0x4d0200>;
->=20
->                                ^^^
->                         second CPU core
->=20
->                         ibm,pa-features =3D <0x600f63f 0xc70080c0>;
->                         cpu-version =3D <0xf000003>;
->=20
->                                ^^^
->                           boot CPU core
->=20
-> The second core is advertised in raw POWER8 mode. This happens because
-> CAS assumes all CPUs to have the same compatibility mode. Since the
-> boot CPU already has the requested compatibility mode, the CAS code
-> does not set it for the secondary one, and exposes the bogus device
-> tree properties in in the CAS response to the guest.
->=20
-> A similar situation is observed when hot-plugging a CPU core. The
-> related device tree properties are generated and exposed to guest
-> with the "ibm,configure-connector" RTAS before "start-cpu" is called.
-> The CPU core is advertised to the guest in raw mode as well.
->=20
-> It both cases, it boils down to the fact that "start-cpu" happens too
-> late. This can be fixed globally by propagating the compatibility mode
-> of the boot CPU to the other CPUs during reset.  For this to work, the
-> compatibility mode of the boot CPU must be set before the machine code
-> actually resets all CPUs.
->=20
-> It is not needed to set the compatibility mode in "start-cpu" anymore,
-> so the code is dropped.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Applied to ppc-for-2.12.
-
-I forgot that the RTAS call came after constructing the device tree
-fragment, and is therefore too late to set the compatibility mode.
-
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  hw/ppc/spapr.c          |   18 +++++++++---------
->  hw/ppc/spapr_cpu_core.c |    7 +++++++
->  hw/ppc/spapr_rtas.c     |    9 ---------
->  3 files changed, 16 insertions(+), 18 deletions(-)
+>  target/ppc/cpu.h            |  8 ++++++--
+>  target/ppc/excp_helper.c    | 39 ++++++++++++++++++++++++++++++++-------
+>  target/ppc/helper.h         |  2 +-
+>  target/ppc/translate.c      | 13 ++++++++++++-
+>  target/ppc/translate_init.c |  2 +-
+>  5 files changed, 52 insertions(+), 12 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index a2ff401f738a..a00bff823f95 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1484,6 +1484,15 @@ static void spapr_machine_reset(void)
->          spapr_setup_hpt_and_vrma(spapr);
->      }
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index b8f4dfc1084a..603a38cae83f 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -930,7 +930,7 @@ enum {
+>  #define BOOKE206_MAX_TLBN      4
 > =20
-> +    /* if this reset wasn't generated by CAS, we should reset our
-> +     * negotiated options and start from scratch */
-> +    if (!spapr->cas_reboot) {
-> +        spapr_ovec_cleanup(spapr->ov5_cas);
-> +        spapr->ov5_cas =3D spapr_ovec_new();
+>  /***********************************************************************=
+******/
+> -/* Embedded.Processor Control */
+> +/* Server and Embedded Processor Control */
+> =20
+>  #define DBELL_TYPE_SHIFT               27
+>  #define DBELL_TYPE_MASK                (0x1f << DBELL_TYPE_SHIFT)
+> @@ -940,11 +940,15 @@ enum {
+>  #define DBELL_TYPE_G_DBELL_CRIT        (0x03 << DBELL_TYPE_SHIFT)
+>  #define DBELL_TYPE_G_DBELL_MC          (0x04 << DBELL_TYPE_SHIFT)
+> =20
+> -#define DBELL_BRDCAST                  (1 << 26)
+> +#define DBELL_TYPE_DBELL_SERVER        (0x05 << DBELL_TYPE_SHIFT)
 > +
-> +        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
-l);
-> +    }
+> +#define DBELL_BRDCAST                  PPC_BIT(37)
+>  #define DBELL_LPIDTAG_SHIFT            14
+>  #define DBELL_LPIDTAG_MASK             (0xfff << DBELL_LPIDTAG_SHIFT)
+>  #define DBELL_PIRTAG_MASK              0x3fff
+> =20
+> +#define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
 > +
->      qemu_devices_reset();
-> =20
->      /* DRC reset may cause a device to be unplugged. This will cause tro=
-ubles
-> @@ -1504,15 +1513,6 @@ static void spapr_machine_reset(void)
->      rtas_addr =3D rtas_limit - RTAS_MAX_SIZE;
->      fdt_addr =3D rtas_addr - FDT_MAX_SIZE;
-> =20
-> -    /* if this reset wasn't generated by CAS, we should reset our
-> -     * negotiated options and start from scratch */
-> -    if (!spapr->cas_reboot) {
-> -        spapr_ovec_cleanup(spapr->ov5_cas);
-> -        spapr->ov5_cas =3D spapr_ovec_new();
-> -
-> -        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
-l);
-> -    }
-> -
->      fdt =3D spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
-> =20
->      spapr_load_rtas(spapr, fdt, rtas_addr);
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 268be7784efb..f5e5ead5f4b0 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -44,6 +44,13 @@ void spapr_cpu_reset(void *opaque)
->      if (cs !=3D first_cpu) {
->          env->spr[SPR_LPCR] &=3D ~pcc->lpcr_pm;
->      }
-> +
-> +    /* Set compatibility mode to match the boot CPU, which was either set
-> +     * by the machine reset code or by CAS. This should never fail.
-> +     */
-> +    if (cs !=3D first_cpu) {
-> +        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_a=
-bort);
-> +    }
+>  /***********************************************************************=
+******/
+>  /* Segment page size information, used by recent hash MMUs
+>   * The format of this structure mirrors kvm_ppc_smmu_info
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 4e548a448747..0f32cab1ff57 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -417,6 +417,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
+excp_model, int excp)
+>      case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage excep=
+tion */
+>      case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception   =
+     */
+>      case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
+tion */
+> +    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
+     */
+>      case POWERPC_EXCP_HV_EMU:
+>          srr0 =3D SPR_HSRR0;
+>          srr1 =3D SPR_HSRR1;
+> @@ -846,6 +847,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
+>              return;
+>          }
+> +        if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL)) {
+> +            env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDOORBELL);
+> +            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR_HV);
+> +            return;
+> +        }
+>          if (env->pending_interrupts & (1 << PPC_INTERRUPT_PERFM)) {
+>              env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_PERFM);
+>              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_PERFM);
+> @@ -1088,8 +1094,8 @@ void helper_rfsvc(CPUPPCState *env)
+>      do_rfi(env, env->lr, env->ctr & 0x0000FFFF);
 >  }
 > =20
->  static void spapr_cpu_destroy(PowerPCCPU *cpu)
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 2b89e1d448e4..4bb939d3d111 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -163,7 +163,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMac=
-hineState *spapr,
->          CPUState *cs =3D CPU(cpu);
->          CPUPPCState *env =3D &cpu->env;
->          PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> -        Error *local_err =3D NULL;
+> -/* Embedded.Processor Control */
+> -static int dbell2irq(target_ulong rb)
+> +/* Server and Embedded Processor Control */
+> +static int dbell2irq(target_ulong rb, bool book3s)
+>  {
+>      int msg =3D rb & DBELL_TYPE_MASK;
+>      int irq =3D -1;
+> @@ -1109,12 +1115,21 @@ static int dbell2irq(target_ulong rb)
+>          break;
+>      }
 > =20
->          if (!cs->halted) {
->              rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> @@ -175,14 +174,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMa=
-chineState *spapr,
->           * new cpu enters */
->          kvm_cpu_synchronize_state(cs);
+> +    /* A Directed Hypervisor Doorbell message is sent only if the
+> +     * message type is 5. All other types are reserved and the
+> +     * instruction is a no-op */
+
+I don't see that the logic here accomplishes that.  Other types will
+return the same value as for embedded - that doesn't seem like it will
+result in a no-op.
+
+> +    if (book3s && msg =3D=3D DBELL_TYPE_DBELL_SERVER) {
+> +        irq =3D PPC_INTERRUPT_HDOORBELL;
+> +    }
+> +
+>      return irq;
+>  }
 > =20
-> -        /* Set compatibility mode to match existing cpus */
-> -        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &local_e=
-rr);
-> -        if (local_err) {
-> -            error_report_err(local_err);
-> -            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> -            return;
-> -        }
-> -
->          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
+>  void helper_msgclr(CPUPPCState *env, target_ulong rb)
+>  {
+> -    int irq =3D dbell2irq(rb);
+> +    /* 64-bit server processors compliant with arch 2.x */
+> +    bool book3s =3D (env->insns_flags & PPC_SEGMENT_64B);
+
+Keying off an otherwise unrelated instruction bit seems bogus to me.
+
+> +    int irq =3D dbell2irq(rb, book3s);
 > =20
->          /* Enable Power-saving mode Exit Cause exceptions for the new CP=
-U */
->=20
+>      if (irq < 0) {
+>          return;
+> @@ -1123,10 +1138,11 @@ void helper_msgclr(CPUPPCState *env, target_ulong=
+ rb)
+>      env->pending_interrupts &=3D ~(1 << irq);
+>  }
+> =20
+> -void helper_msgsnd(target_ulong rb)
+> +void helper_msgsnd(CPUPPCState *env, target_ulong rb)
+>  {
+> -    int irq =3D dbell2irq(rb);
+> -    int pir =3D rb & DBELL_PIRTAG_MASK;
+> +    /* 64-bit server processors compliant with arch 2.x */
+> +    bool book3s =3D (env->insns_flags & PPC_SEGMENT_64B);
+> +    int irq =3D dbell2irq(rb, book3s);
+>      CPUState *cs;
+> =20
+>      if (irq < 0) {
+> @@ -1137,8 +1153,17 @@ void helper_msgsnd(target_ulong rb)
+>      CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>          CPUPPCState *cenv =3D &cpu->env;
+> +        bool send;
+> =20
+> -        if ((rb & DBELL_BRDCAST) || (cenv->spr[SPR_BOOKE_PIR] =3D=3D pir=
+)) {
+> +        /* TODO: broadcast message to all threads of the same  processor=
+ */
+> +        if (book3s) {
+> +            int pir =3D rb & DBELL_PROCIDTAG_MASK;
+> +            send =3D (cenv->spr_cb[SPR_PIR].default_value =3D=3D pir);
+> +        } else {
+> +            int pir =3D rb & DBELL_PROCIDTAG_MASK;
+> +            send =3D (rb & DBELL_BRDCAST) || (cenv->spr[SPR_BOOKE_PIR] =
+=3D=3D pir);
+> +        }
+> +        if (send) {
+>              cenv->pending_interrupts |=3D 1 << irq;
+>              cpu_interrupt(cs, CPU_INTERRUPT_HARD);
+>          }
+
+TBH, these functions are small enough and the booke vs. books
+differences large enough that I think you'd be better off just having
+separate implementations for the booke and books variants.  Those in
+turn would have separate instruction bits.
+
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index bb6a94a8b390..3e98bd9eecb8 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -677,7 +677,7 @@ DEF_HELPER_FLAGS_2(load_sr, TCG_CALL_NO_RWG, tl, env,=
+ tl)
+>  DEF_HELPER_FLAGS_3(store_sr, TCG_CALL_NO_RWG, void, env, tl, tl)
+> =20
+>  DEF_HELPER_FLAGS_1(602_mfrom, TCG_CALL_NO_RWG_SE, tl, tl)
+> -DEF_HELPER_1(msgsnd, void, tl)
+> +DEF_HELPER_2(msgsnd, void, env, tl)
+>  DEF_HELPER_2(msgclr, void, env, tl)
+>  #endif
+> =20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index bcd36d53537f..1ad7e0fd4efd 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -6180,10 +6180,19 @@ static void gen_msgsnd(DisasContext *ctx)
+>      GEN_PRIV;
+>  #else
+>      CHK_HV;
+> -    gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
+> +    gen_helper_msgsnd(cpu_env, cpu_gpr[rB(ctx->opcode)]);
+>  #endif /* defined(CONFIG_USER_ONLY) */
+>  }
+> =20
+> +static void gen_msgsync(DisasContext *ctx)
+> +{
+> +#if defined(CONFIG_USER_ONLY)
+> +    GEN_PRIV;
+> +#else
+> +    CHK_HV;
+> +#endif /* defined(CONFIG_USER_ONLY) */
+> +    /* interpreted as no-op */
+> +}
+> =20
+>  #if defined(TARGET_PPC64)
+>  static void gen_maddld(DisasContext *ctx)
+> @@ -6664,6 +6673,8 @@ GEN_HANDLER2_E(msgsnd, "msgsnd", 0x1F, 0x0E, 0x06, =
+0x03ff0001,
+>                 PPC_NONE, PPC2_PRCNTL),
+>  GEN_HANDLER2_E(msgclr, "msgclr", 0x1F, 0x0E, 0x07, 0x03ff0001,
+>                 PPC_NONE, PPC2_PRCNTL),
+> +GEN_HANDLER2_E(msgsync, "msgsync", 0x1F, 0x16, 0x1B, 0x00000000,
+> +               PPC_NONE, PPC2_PRCNTL),
+>  GEN_HANDLER(wrtee, 0x1F, 0x03, 0x04, 0x000FFC01, PPC_WRTEE),
+>  GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
+>  GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 70ff15a51a6b..55c99c97e377 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8866,7 +8866,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>                          PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
+>                          PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
+>                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
+> -                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300;
+> +                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_PR=
+CNTL;
+>      pcc->msr_mask =3D (1ull << MSR_SF) |
+>                      (1ull << MSR_TM) |
+>                      (1ull << MSR_VR) |
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -191,24 +271,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---z3ND3gJe4e1E4uwh
+--K/+MhuhYzqQJJ3Xj
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpgHZgACgkQbDjKyiDZ
-s5IQCxAAxA90H6z4W49XMaDfn8v5SlHC+OVFKjnutt73eheuGZbbebn8KNlCLW9b
-84RnnHVwksGWBXO34eX9RRL1lo+J9b6+wYJsrUPpvnr4rupe6EiQkVgCLdph5QaL
-twJP+e9MhFHeVfa2Nu2GlldorXC0sYNrlhJB7qcjJebPzDtgujvQ52pcsnZ2x0hW
-oAo9Gdyb/yKCj6pp5nzJ32KOginbFBknkACFO+FLWyqRGan5GqBZQ7HdKMrWO9xF
-bnTvYR6Wa5saRO3rCcwLIlRAUHd5+KXeV3dazOgZvAiGpy612VQR4eZmmGG7EUIN
-pGsgtCI4iZVweB2y8VnD/0GRZDUylGpZsvBSIsdnC8b3MQyO8CPY1eFEeHFw/no+
-1gb9CNkftSjQXv9AtytnvVdvbJ3l11QxXKu/o/68T261sg0jKJlv2TIfPpJk+AW/
-vU3xlS5UFrr4/uX4dtn+JUoQs74CiFLEhFYsT3nUnzv3I0sK0BFvNCOpLn7svE6C
-yVVgPhGO/fCc+tHkKGTksniTDVPyyl3xDLnHaWtAf7hAgQkzNyoXTT7qtrsdPYw7
-IeKpqUQ9f4b1+KugGbzGBkHO1HAx+0v2xn8BKYYCfpeHkWURnz1oK306d2VSWIkp
-EMrYUFnlKMi4dHiKcc2j5BsmkvHruWNoey0TZOMmnKYNOIhrP5o=
-=Kw/y
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpgH0sACgkQbDjKyiDZ
+s5JokA/8CFVLVZudc7jaj2ZmFjrKy6KHrITSifx0Q/jER//LsIVQMKWbdpgyrhJN
+BSIDnmQt8bCZy+sJKrBRbbzvfkGD2wEGqtWVn8OCexyfOhRK2ZbD2I1KNpfTwu7J
+u5dgC2ruaqsetQVvwe6hX0LGtvM+NpmerIOFUy0v40WvTF18/zz8Z3XMf7nQe3Bq
+KSKYWb4c6yhfhN4JxGnnsjUXnDKCXxdjkUo59nR5fTxuFz/6+++BWRV6Vtv/1cM4
+JEINj7IT2FIM+25FIQRvfgNeUnk8QKXH0nwfQVERDIojGpGP4ovur9pgJw8yEdgR
+cvsZMgen08PFfcORdGWxG8/9FlKbQYRRCAI7s4TE8asItPVVdsMPPR6XjfqkklW9
+yHMprASLdFW5YnqLJU8t3hnC3f+B2sw3GNQ0RuvonmH8twmj56j/Q0420xtfJDqQ
+7pVsO2d20NO0NGuWcmMu/zP2g/DDI+JBLBlYd60ePFzM2bNZtjomdmsjgBiY3QSx
+s7+SmbwwUSze/mUvk8tzbu7b48qdDqP3jSD8NnuRRAiqNSzNqOqu/6dX4YhrzuYS
++NooY73BOeKpGDjRdyKDQEgNfOTT+yDm5lsWA75+ta0uZM3cT94fsOXWZ5DODp/o
+jnavMiZzQ37Eztm13e+tV7S57iAK8qJC2GbH+R69JjPsP+WNBUc=
+=X19y
 -----END PGP SIGNATURE-----
 
---z3ND3gJe4e1E4uwh--
+--K/+MhuhYzqQJJ3Xj--
