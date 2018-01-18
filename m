@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ecCPp-0000eH-Bg
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:47:46 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ecCRE-0001ge-62
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:49:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ecCPm-000774-9I
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:47:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59154)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ecCPm-00076H-2X
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:47:42 -0500
-References: <20180118123219.19410-1-f4bug@amsat.org>
-	<20180118123219.19410-7-f4bug@amsat.org>
-	<16165fc9-6593-8ee9-1dd9-a28400876e66@amsat.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <2ee34e45-eeec-48e7-3f1f-a5e798a0fc4e@redhat.com>
-Date: Thu, 18 Jan 2018 17:47:34 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ecCRD-00080w-0B
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:49:12 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ecCRC-00080E-MY
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:49:10 -0500
+Received: by mail-wm0-x241.google.com with SMTP id v71so23895032wmv.2
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:49:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <16165fc9-6593-8ee9-1dd9-a28400876e66@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20180118143301.10864-1-klim.kireev@virtuozzo.com>
+References: <20180118143301.10864-1-klim.kireev@virtuozzo.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 18 Jan 2018 16:49:08 +0100
+Message-ID: <CAJ+F1CJk0iiy_iFv3zFkNkumbj2ee+OD=GDcuVLWb8xWUGSrjg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 06/16] sdhci: add
- init_readonly_registers() to initialize the CAPAB register
+Subject: Re: [Qemu-devel] [PATCH v2] chardev/char-socket: add POLLHUP handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +29,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>
+To: Klim Kireev <klim.kireev@virtuozzo.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, den@virtuozzo.com
 
-On 18/01/2018 17:44, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 01/18/2018 09:32 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>   hw/sd/sdhci.c | 17 ++++++++++++++---
->>   1 file changed, 14 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
->> index f9264d3be5..08b85558f1 100644
->> --- a/hw/sd/sdhci.c
->> +++ b/hw/sd/sdhci.c
->> @@ -1174,12 +1174,19 @@ static inline unsigned int sdhci_get_fifolen(S=
-DHCIState *s)
->>       }
->>   }
->>  =20
->> +static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp=
+Hi
+
+On Thu, Jan 18, 2018 at 3:33 PM, Klim Kireev <klim.kireev@virtuozzo.com> wr=
+ote:
+> The following behavior was observed for QEMU configured by libvirt
+> to use guest agent as usual for the guests without virtio-serial
+> driver (Windows or the guest remaining in BIOS stage).
+>
+> In QEMU on first connect to listen character device socket
+> the listen socket is removed from poll just after the accept().
+> virtio_serial_guest_ready() returns 0 and the descriptor
+> of the connected Unix socket is removed from poll and it will
+> not be present in poll() until the guest will initialize the driver
+> and change the state of the serial to "guest connected".
+>
+> In libvirt connect() to guest agent is performed on restart and
+> is run under VM state lock. Connect() is blocking and can
+> wait forever.
+> In this case libvirt can not perform ANY operation on that VM.
+>
+> The bug can be easily reproduced this way:
+>
+> Terminal 1:
+> qemu-system-x86_64 -m 512 -device pci-serial,chardev=3Dserial1 -chardev s=
+ocket,id=3Dserial1,path=3D/tmp/console.sock,server,nowait
+> (virtio-serial and isa-serial also fit)
+>
+> Terminal 2:
+> minicom -D unix\#/tmp/console.sock
+> (type something and press enter)
+> C-a x (to exit)
+>
+> Do 3 times:
+> minicom -D unix\#/tmp/console.sock
+> C-a x
+>
+> It needs 4 connections, because the first one is accepted by QEMU, then t=
+wo are queued by
+> the kernel, and the 4th blocks.
+>
+> The problem is that QEMU doesn't add a read watcher after succesful read
+> until the guest device wants to acquire recieved data, so
+> I propose to install a separate pullhup watcher regardless of
+> whether the device waits for data or not.
+>
+> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+> ---
+> Changelog:
+> v2: Remove timer as a redundant feature
+>
+>  chardev/char-socket.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 77cdf487eb..d3fe903ab6 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -42,6 +42,7 @@ typedef struct {
+>      QIOChannel *ioc; /* Client I/O channel */
+>      QIOChannelSocket *sioc; /* Client master channel */
+>      QIONetListener *listener;
+> +    guint hup_tag;
+>      QCryptoTLSCreds *tls_creds;
+>      int connected;
+>      int max_size;
+> @@ -352,6 +353,11 @@ static void tcp_chr_free_connection(Chardev *chr)
+>          s->read_msgfds_num =3D 0;
+>      }
+>
+> +    if (s->hup_tag !=3D 0) {
+> +        g_source_remove(s->hup_tag);
+> +        s->hup_tag =3D 0;
+> +    }
+> +
+>      tcp_set_msgfds(chr, NULL, 0);
+>      remove_fd_in_watch(chr);
+>      object_unref(OBJECT(s->sioc));
+> @@ -455,6 +461,19 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCo=
+ndition cond, void *opaque)
+>      return TRUE;
+>  }
+>
+> +static gboolean tcp_chr_hup(QIOChannel *channel,
+> +                               GIOCondition cond,
+> +                               void *opaque)
+> +{
+> +    Chardev *chr =3D CHARDEV(opaque);
+> +    SocketChardev *s =3D SOCKET_CHARDEV(chr);
+> +    tcp_chr_read(channel, cond, opaque);
+> +    if (s->connected !=3D 0) {
+
+tcp_chr_read() shouldn't be called unless frontend is ready to read.
+qemu_chr_be_can_write() is regularly updated with tcp_chr_read_poll()
+but this may create some race here (if it read all it could read
+previously for example)
+
+If frontend can't read, s->connected won't be updated, so you'll busy
+loop in the source callback, not good.
+
+I think it needs further rework of how s->connected is updated.
+
+Why call tcp_chr_read() if you received HUP event ? could it call
+tcp_chr_free_connection()?
+
+> +        tcp_chr_disconnect(chr);
+> +    }
+> +    return TRUE;
+
+please use G_SOURCE_CONTINUE/REMOVE (I know it's not being used
+widely, but we have define now, and it is much clearer)
+
+> +}
+> +
+>  static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+>  {
+>      SocketChardev *s =3D SOCKET_CHARDEV(chr);
+> @@ -528,6 +547,10 @@ static void tcp_chr_connect(void *opaque)
+>                                             tcp_chr_read,
+>                                             chr, chr->gcontext);
+>      }
+> +    if (s->hup_tag =3D=3D 0) {
+> +        s->hup_tag =3D qio_channel_add_watch(s->ioc, G_IO_HUP,
+> +                                           tcp_chr_hup, chr, NULL);
+> +    }
+>      qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+>  }
+>
+> @@ -546,7 +569,11 @@ static void tcp_chr_update_read_handler(Chardev *chr=
 )
->> +{
->> +    if (s->capareg =3D=3D UINT64_MAX) {
->> +        s->capareg =3D SDHC_CAPAB_REG_DEFAULT;
->> +    }
->> +}
->> +
->>   /* --- qdev common --- */
->>  =20
->>   #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
->> -    /* Capabilities registers provide information on supported featur=
-es
->> -     * of this specific host controller implementation */ \
->> -    DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEF=
-AULT), \
->> +    /* deprecated: Capabilities registers provide information on supp=
-orted
->> +     * features of this specific host controller implementation */ \
->> +    DEFINE_PROP_UINT64("capareg", _state, capareg, UINT64_MAX), \
->>       DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
->>  =20
->>   static void sdhci_initfn(SDHCIState *s)
->> @@ -1204,6 +1211,10 @@ static void sdhci_uninitfn(SDHCIState *s)
->>  =20
->>   static void sdhci_common_realize(SDHCIState *s, Error **errp)
->>   {
->> +    sdhci_init_readonly_registers(s, errp);
->> +    if (errp && *errp) {
+>                                             tcp_chr_read, chr,
+>                                             chr->gcontext);
+>      }
+> -}
+> +    if (s->hup_tag =3D=3D 0) {
+> +        s->hup_tag =3D qio_channel_add_watch(s->ioc, G_IO_HUP,
+> +                                           tcp_chr_hup, chr, NULL);
+> +    }
+> + }
+>
+>  typedef struct {
+>      Chardev *chr;
+> --
+> 2.14.3
+>
 >
 
-Hi Phillipe,
 
-> Paolo said this is wrong (as in bad pattern?).
->=20
-> I will respin probably using 'bool sdhci_init_readonly_registers()' ins=
-tead.
->=20
 
-I always use the explanations in include/qapi/error.h
-as guidelines.
-
-Thanks,
-Marcel
-
->> +        return;
->> +    }
->>       s->buf_maxsz =3D sdhci_get_fifolen(s);
->>       s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
->>  =20
->>
+--=20
+Marc-Andr=C3=A9 Lureau
