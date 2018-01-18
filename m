@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecEnf-0000mP-N4
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:20:32 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ecEnb-0000j8-2u
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:20:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecEnb-00033s-QW
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:20:31 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46583)
+	(envelope-from <alistair23@gmail.com>) id 1ecEnZ-000326-Sc
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:20:26 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:32981)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecEnb-00033I-LW
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:20:27 -0500
-Received: by mail-ot0-x244.google.com with SMTP id t35so14251498otd.13
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 10:20:27 -0800 (PST)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ecEnZ-000314-Aj
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:20:25 -0500
+Received: by mail-lf0-x244.google.com with SMTP id t139so13076188lff.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 10:20:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAMo8Bf+aczzS9ZKVML6b=Tua_ZNDuRHFxs9__tVcXKJ0g-UpPg@mail.gmail.com>
-References: <1515520984-2873-1-git-send-email-jcmvbkbc@gmail.com>
-	<CAFEAcA-TwVO+zkCDUNX5x7Wk0YwB4zcDDdiOii1HfZ2t5g66kg@mail.gmail.com>
-	<CAMo8Bf+aczzS9ZKVML6b=Tua_ZNDuRHFxs9__tVcXKJ0g-UpPg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jan 2018 18:20:06 +0000
-Message-ID: <CAFEAcA8Z7vsxzvqFZ2+W74d5q3+ofy2nP_ph7+X=mLUq_PFstQ@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <20180118123219.19410-17-f4bug@amsat.org>
+References: <20180118123219.19410-1-f4bug@amsat.org>
+	<20180118123219.19410-17-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 18 Jan 2018 10:19:53 -0800
+Message-ID: <CAKmqyKM-tEKmxoYdUr7iREp+J6kB8Gasq7WLAeF+30kz2n4oQg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4] target/xtensa: use libisa for
- instruction decoding
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 16/16] sdhci: throw an error if
+ capabilities are incorrectly configured
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin O'Connor <kevin@koconnor.net>, Marcel Apfelbaum <marcel@redhat.com>
 
-On 18 January 2018 at 18:07, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> On Thu, Jan 18, 2018 at 4:24 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Hi. Coverity (CID 1385146) complains about this bit of code:
->>
->>> +        opnds = xtensa_opcode_num_operands(isa, opc);
->>> +
->>> +        for (opnd = vopnd = 0; opnd < opnds; ++opnd) {
->>> +            if (xtensa_operand_is_visible(isa, opc, opnd)) {
->>> +                uint32_t v;
->>
->> because xtensa_opcode_num_operands() can return -1
->> (if the CHECK_OPCODE() fails), and then we will try to use
->> -1 as an upper bound for this loop and it will loop for a very
->> long time.
->>
->> CID 1385148 is similar but for the outer loop where
->> we do "slots = xtensa_format_num_slots()" and then use
->> slots as a loop bound without checking whether we got back -1.
+On Thu, Jan 18, 2018 at 4:32 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> now than the Exynos4210 uses the 'capareg-reserved' property,
+> we can safely report missing capabilities as error, since
+> capabilities will only get changed once new SDHCI models
+> are added.
 >
-> In both cases the check inside libisa should not fail, because
-> the caller just made sure that opcode or format is valid. But I
-> see, these checks are different. I guess the easiest fix for that
-> is to make opnd, opnds, slot and slots signed.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-If you definitely know you won't get back -1 then I think
-putting "assert(opnds != XTENSA_UNDEFINED);" etc will express
-the intention and should make coverity happy.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-thanks
--- PMM
+Alistair
+
+> ---
+>  hw/sd/sdhci.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 7799382e89..07a7ebcc1e 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -23,7 +23,6 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "qemu/error-report.h"
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+>  #include "sysemu/block-backend.h"
+> @@ -1208,7 +1207,8 @@ static void sdhci_init_readonly_registers(SDHCIStat=
+e *s, Error **errp)
+>      } else {
+>          capab =3D s->capareg & ~capab;
+>          if (capab) {
+> -            warn_report("SDHCI: missing capability mask: 0x%" PRIx64, ca=
+pab);
+> +            error_setg(errp, "missing capability mask: 0x%" PRIx64, capa=
+b);
+> +            return;
+>          }
+>      }
+>  }
+> --
+> 2.15.1
+>
+>
