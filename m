@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH5C-00055O-OE
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:47 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH59-00052D-Rz
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH5C-0004yZ-3I
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48390)
+	(envelope-from <mst@redhat.com>) id 1ecH56-0004tO-QE
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH5B-0004y1-UK
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:46 -0500
-Date: Thu, 18 Jan 2018 22:46:42 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH56-0004sC-J5
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:40 -0500
+Date: Thu, 18 Jan 2018 22:46:27 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516308132-10272-27-git-send-email-mst@redhat.com>
+Message-ID: <1516308132-10272-23-git-send-email-mst@redhat.com>
 References: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v4 26/29] tests: acpi: add comments to
- fetch_rsdt_referenced_tables/data->tables usage
+Subject: [Qemu-devel] [PULL v4 22/29] x86_iommu: check if machine has PCI bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +27,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mohammed Gamal <mgamal@redhat.com>, Peter Xu <peterx@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Mohammed Gamal <mgamal@redhat.com>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Starting qemu with
+qemu-system-x86_64 -S -M isapc -device {amd|intel}-iommu
+leads to a segfault. The code assume PCI bus is present and
+tries to access the bus structure without checking.
+
+Since Intel VT-d and AMDVI should only work with PCI, add a
+check for PCI bus and return error if not present.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/bios-tables-test.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/i386/x86-iommu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 1314ad8..b354aaa 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -257,6 +257,8 @@ static void fetch_rsdt_referenced_tables(test_data *data)
+diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+index 51de519..8a01a2d 100644
+--- a/hw/i386/x86-iommu.c
++++ b/hw/i386/x86-iommu.c
+@@ -88,7 +88,7 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
+         PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
+     QLIST_INIT(&x86_iommu->iec_notifiers);
  
-         addr = le32_to_cpu(data->rsdt_tables_addr[i + 1]); /* fadt is first */
-         fetch_table(&ssdt_table, addr);
-+
-+        /* Add table to ASL test tables list */
-         g_array_append_val(data->tables, ssdt_table);
-     }
- }
-@@ -427,6 +429,7 @@ try_again:
-     return exp_tables;
- }
- 
-+/* test the list of tables in @data->tables against reference tables */
- static void test_acpi_asl(test_data *data)
- {
-     int i;
+-    if (!pcms) {
++    if (!pcms || !pcms->bus) {
+         error_setg(errp, "Machine-type '%s' not supported by IOMMU",
+                    mc->name);
+         return;
 -- 
 MST
