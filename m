@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ecFCG-0002Ni-TS
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:58 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ecFCZ-0002eI-Bn
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:46:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ecFCC-00050W-0Y
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:56 -0500
-Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:34920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ecFCB-0004yf-N9
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:51 -0500
-Received: from player791.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id E86F3A5AE5
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 19:45:48 +0100 (CET)
-Date: Thu, 18 Jan 2018 19:45:45 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180118194545.76cdf1ac@bahia.lan>
-In-Reply-To: <20180118163930.2b5a8448@bahia.lan>
-References: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
-	<151618083506.20461.14178623580944316317.stgit@bahia.lan>
-	<20180118034340.GD30352@umbus.fritz.box>
-	<20180118163930.2b5a8448@bahia.lan>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1ecFCY-0005EH-EN
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:46:15 -0500
+Received: from mail-yw0-x22b.google.com ([2607:f8b0:4002:c05::22b]:32996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ecFCY-0005Dv-A9
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:46:14 -0500
+Received: by mail-yw0-x22b.google.com with SMTP id x24so11797976ywj.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 10:46:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/3] spapr_cpu_core: don't reset
- CPUs during realization
+In-Reply-To: <CAFEAcA8Z7vsxzvqFZ2+W74d5q3+ofy2nP_ph7+X=mLUq_PFstQ@mail.gmail.com>
+References: <1515520984-2873-1-git-send-email-jcmvbkbc@gmail.com>
+	<CAFEAcA-TwVO+zkCDUNX5x7Wk0YwB4zcDDdiOii1HfZ2t5g66kg@mail.gmail.com>
+	<CAMo8Bf+aczzS9ZKVML6b=Tua_ZNDuRHFxs9__tVcXKJ0g-UpPg@mail.gmail.com>
+	<CAFEAcA8Z7vsxzvqFZ2+W74d5q3+ofy2nP_ph7+X=mLUq_PFstQ@mail.gmail.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 18 Jan 2018 10:46:13 -0800
+Message-ID: <CAMo8BfK3nTRDtcfbQj3ngCj2V7GODniL0OVNtsS0anedfB9LHQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] target/xtensa: use libisa for
+ instruction decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,177 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
---Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 18, 2018 at 10:20 AM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 18 January 2018 at 18:07, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>> On Thu, Jan 18, 2018 at 4:24 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> Hi. Coverity (CID 1385146) complains about this bit of code:
+>>>
+>>>> +        opnds = xtensa_opcode_num_operands(isa, opc);
+>>>> +
+>>>> +        for (opnd = vopnd = 0; opnd < opnds; ++opnd) {
+>>>> +            if (xtensa_operand_is_visible(isa, opc, opnd)) {
+>>>> +                uint32_t v;
+>>>
+>>> because xtensa_opcode_num_operands() can return -1
+>>> (if the CHECK_OPCODE() fails), and then we will try to use
+>>> -1 as an upper bound for this loop and it will loop for a very
+>>> long time.
+>>>
+>>> CID 1385148 is similar but for the outer loop where
+>>> we do "slots = xtensa_format_num_slots()" and then use
+>>> slots as a loop bound without checking whether we got back -1.
+>>
+>> In both cases the check inside libisa should not fail, because
+>> the caller just made sure that opcode or format is valid. But I
+>> see, these checks are different. I guess the easiest fix for that
+>> is to make opnd, opnds, slot and slots signed.
+>
+> If you definitely know you won't get back -1 then I think
+> putting "assert(opnds != XTENSA_UNDEFINED);" etc will express
+> the intention and should make coverity happy.
 
-On Thu, 18 Jan 2018 16:39:30 +0100
-Greg Kurz <groug@kaod.org> wrote:
+I'd rather use data types that match these function return types.
 
-> On Thu, 18 Jan 2018 14:43:40 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Jan 17, 2018 at 10:20:35AM +0100, Greg Kurz wrote: =20
-> > > When QEMU is started, all cold-plugged CPUs are reset twice: first
-> > > during initialization and then during machine reset. This is sub-
-> > > optimal.
-> > >=20
-> > > The first reset is only needed for hot-plugged CPUs because the CPU
-> > > hotplug code doesn't reset them. This patch adds the necessary code
-> > > to reset hot-plugged CPUs on the CPU core hotplug path, and removes
-> > > the now useless initial CPU reset.
-> > >=20
-> > > We just need to mark the newly created CPU as halted to prevent it
-> > > to run until it is put online later.
-> > >=20
-> > > Full CPU reset is now explicitely triggered from the machine code
-> > > only, either during system reset or during CPU hotplug.
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>   =20
-> >=20
-> > Hrm, this looks ok in outline, but makes me nervous in a couple of
-> > ways.
-> >=20
-> >  =20
-> > > ---
-> > >  hw/ppc/spapr.c                  |    8 ++++++++
-> > >  hw/ppc/spapr_cpu_core.c         |    8 ++++++--
-> > >  include/hw/ppc/spapr_cpu_core.h |    2 ++
-> > >  3 files changed, 16 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index bca838fce638..a2ff401f738a 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -3336,6 +3336,14 @@ static void spapr_core_plug(HotplugHandler *ho=
-tplug_dev, DeviceState *dev,
-> > >          void *fdt;
-> > >          int fdt_offset;
-> > > =20
-> > > +        if (hotplugged) {   =20
-> >=20
-> > First, I'm always wary of using the hotplugged parameter, because what
-> > qemu means by it often doesn't line up with what PAPR means by it.
-> >  =20
->=20
-> Hmmm... you're right, hotplugged in QDEV simply means that the device
-> was not created during initial machine startup.
->=20
-> ie, any device added with QMP/HMP is always hotplugged.
->=20
-> To cope with the DRC state management, commit 94fd9cbaa3190 added the
-> fact that QEMU mustn't be waiting for an incoming migration as well.
->=20
-> ie, if QEMU is started with -incoming and CPUs are added before migration
-> starts, like libvirt does, this code wouldn't reset the CPUs...
->=20
-> I guess we should check qdev->hotplugged instead. Makes sense ?
->=20
-
-Actually, we could even just do this in spapr_cpu_init():
-
--    spapr_cpu_reset(cpu);
-+    if (DEVICE(cpu)->hotplugged) {
-+        spapr_cpu_reset(cpu);
-+    }
-
-
-> > > +            int i;
-> > > +
-> > > +            for (i =3D 0; i < cc->nr_threads; i++) {
-> > > +                spapr_cpu_reset(core->threads[i]);
-> > > +            }
-> > > +        }
-> > > +
-> > >          fdt =3D spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr=
-);
-> > > =20
-> > >          spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-> > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > > index ac19b2e0b72c..268be7784efb 100644
-> > > --- a/hw/ppc/spapr_cpu_core.c
-> > > +++ b/hw/ppc/spapr_cpu_core.c
-> > > @@ -22,7 +22,7 @@
-> > >  #include "sysemu/hw_accel.h"
-> > >  #include "qemu/error-report.h"
-> > > =20
-> > > -static void spapr_cpu_reset(void *opaque)
-> > > +void spapr_cpu_reset(void *opaque)
-> > >  {
-> > >      PowerPCCPU *cpu =3D opaque;
-> > >      CPUState *cs =3D CPU(cpu);
-> > > @@ -63,7 +63,11 @@ static void spapr_cpu_init(sPAPRMachineState *spap=
-r, PowerPCCPU *cpu,
-> > >      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
-> > > =20
-> > >      qemu_register_reset(spapr_cpu_reset, cpu);
-> > > -    spapr_cpu_reset(cpu);
-> > > +
-> > > +    /* CPU must not execute anything until explicitely started other=
-wise the
-> > > +     * guest will crash.
-> > > +     */
-> > > +    CPU(cpu)->halted =3D 1;   =20
-> >=20
-> > And poking specifics in a CPU that hasn't already been set to a known
-> > state by a reset also worries me.
-> >  =20
->=20
-> IIUC the halted flag doesn't really depend any CPU state. It is
-> only a way to prevent the CPU from executing, which is needed
-> if the CPU wasn't set to a known state.
->=20
-> FWIW I've seen other places where it is set before resetting the
-> CPU (eg, s390_cpu_initfn() or cpu_devinit() for Sun4m).
->=20
-> I was thinking of another solution: create a DeviceClass reset function
-> that would call spapr_cpu_reset() for all CPUs of a core, and register
-> it in spapr_cpu_core_class_init(). It would be called by QDEV during
-> realization of hot-plugged cores only. Unfortunately, this also happens
-> after the call to spapr_core_plug() (see device_set_realized()).
->=20
-> > >  }
-> > > =20
-> > >  /*
-> > > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_c=
-pu_core.h
-> > > index 1129f344aa0c..763a2168461e 100644
-> > > --- a/include/hw/ppc/spapr_cpu_core.h
-> > > +++ b/include/hw/ppc/spapr_cpu_core.h
-> > > @@ -38,4 +38,6 @@ typedef struct sPAPRCPUCoreClass {
-> > >  } sPAPRCPUCoreClass;
-> > > =20
-> > >  const char *spapr_get_cpu_core_type(const char *cpu_type);
-> > > +void spapr_cpu_reset(void *opaque);
-> > > +
-> > >  #endif
-> > >    =20
-> >  =20
->=20
-
-
---Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlpg61kACgkQcdTV5YIv
-c9bs0hAAsFivpCybeSye1ZJiaoW/bb+W3O4SBLJp0mZKMUuzAD/vL2LiHafY8h6X
-mlddUVKwwJci7vIQy8fvOvEmIysYtSu/L+CaE2g5jhdPn4UVnj0EUVOYL2bqChJE
-yylBEF7GbYfgg5CFQa2bYDDUZvf0p+QS/y5yoToaneeeE1tVMJUs3KwnZ6r6FUqe
-LFNw500EALXTTFzZg8JUy416U+kAbQM0KImqPqMmko2VHYa+XdOgyHHEV0/3a6Np
-uRYljdaN87J8yleAN+4pWPUB+Lm2Lp/IpN2ZrtlCrUVnS5976MzPH/zngcrZRx8f
-CiPMtTo9mrmAvfUQ9Q/oaF876CvB9djdHmr6Sm/EVI/7POThNUu1HCnsShfhcTs/
-079dJDxCPtmyvBVAMLiPK0ylDq3t17AiWcR/qP2033VhMlrvEImQO8LkZaG0DGUv
-c1jpMcZtR0B7ENQlv7bcvFUGH7Mw2Y0/CX9/Ve0PQsv+vHwy2LkyfCRpRgLyRtGy
-siTeCYw+cP8qlqLrNIOMk8RQbu2MRaWhhPn9vdjKfEQf047+DZmZ0Hlv9FqAfWXI
-S3NIrij70adkyhV1Y4bdU5AAa0zYsYMGuYAQgqhy7hz9QubCfFniie6lJml1FhI7
-t3VN+pttXIKw1hfMb3v75jymI87LTO54WHXrRcghzsX/p1n419c=
-=t5ak
------END PGP SIGNATURE-----
-
---Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C--
+-- 
+Thanks.
+-- Max
