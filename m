@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecGuj-00074W-Dr
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:35:58 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecGzo-0000Lv-Si
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecGui-0004Wo-Bv
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:35:57 -0500
-Date: Thu, 18 Jan 2018 18:35:47 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180118203546.GF5292@localhost.localdomain>
-References: <1516296842-136976-1-git-send-email-imammedo@redhat.com>
-	<1516296842-136976-3-git-send-email-imammedo@redhat.com>
-	<33aa0c19-59ec-7063-f638-884fe2249aee@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecGzl-0007Op-PB
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:12 -0500
+Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:46898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecGzl-0007Oh-IS
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:09 -0500
+Received: by mail-qt0-x22d.google.com with SMTP id o35so23490603qtj.13
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 12:41:09 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 18 Jan 2018 17:40:44 -0300
+Message-Id: <20180118204058.5768-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33aa0c19-59ec-7063-f638-884fe2249aee@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC v2 2/5] machine: prepare machine
- 'none' to gradually switch to cpu_create() API
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 00/14] SDHCI: add tunning sequence for UHS-I
+ cards (part 3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +32,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Thu, Jan 18, 2018 at 08:06:03PM +0100, Thomas Huth wrote:
-> On 18.01.2018 18:33, Igor Mammedov wrote:
-> > temporarily add #ifdef CPU_RESOLVING_TYPE in null-machine.c,
-> > so that each target could gradually switch to cpu_create() and
-> > not converted yet could continue to use cpu_init().
-> > 
-> > Once all targets are converted
-> >    temporary ifdefs, MachineState::cpu_model and cpu_init() API
-> > will be removed
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  hw/core/null-machine.c | 13 ++++++++++++-
-> >  vl.c                   |  8 +++++++-
-> >  2 files changed, 19 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> > index 864832d..3cc6a49 100644
-> > --- a/hw/core/null-machine.c
-> > +++ b/hw/core/null-machine.c
-> > @@ -23,10 +23,18 @@
-> >  static void machine_none_init(MachineState *mch)
-> >  {
-> >      CPUState *cpu = NULL;
-> > +#ifdef CPU_RESOLVING_TYPE
-> > +    MachineClass *mc = MACHINE_GET_CLASS(mch);
-> >  
-> > -    /* Initialize CPU (if a model has been specified) */
-> > +    /* Initialize CPU if cpu_type pointer is user provided
-> > +     * (i.e. != to pointer tot static default cpu type string)
-> 
-> s/tot/to/ ?
-> 
-> > +     */
-> > +    if (mch->cpu_type != mc->default_cpu_type) {
-> > +        cpu = cpu_create(mch->cpu_type);
-> > +#else
-> >      if (mch->cpu_model) {
-> >          cpu = cpu_init(mch->cpu_model);
-> > +#endif
-> >          if (!cpu) {
-> >              error_report("Unable to initialize CPU");
-> >              exit(1);
-> > @@ -54,6 +62,9 @@ static void machine_none_machine_init(MachineClass *mc)
-> >      mc->init = machine_none_init;
-> >      mc->max_cpus = 1;
-> >      mc->default_ram_size = 0;
-> > +#ifdef CPU_RESOLVING_TYPE
-> > +    mc->default_cpu_type = CPU_RESOLVING_TYPE;
-> > +#endif
+This series add minimum features required by Spec v3 to support UHS-I cards.
 
-As mentioned in a reply to a previous series, this is making
-mc->default_cpu_type lie about the default CPU type.  If vl.c is
-relying on default_cpu_type to parse the CPU data, I'd like to
-fix vl.c first instead of adding this hack.
+Since v6:
+- rebased on upstream
+- included spec v3 qtest back
 
-> >  }
-> >  
-> >  DEFINE_MACHINE("none", machine_none_machine_init)
-> > diff --git a/vl.c b/vl.c
-> > index 2586f25..8aa0131 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -4609,7 +4609,6 @@ int main(int argc, char **argv, char **envp)
-> >      current_machine->maxram_size = maxram_size;
-> >      current_machine->ram_slots = ram_slots;
-> >      current_machine->boot_order = boot_order;
-> > -    current_machine->cpu_model = cpu_model;
-> >  
-> >      parse_numa_opts(current_machine);
-> >  
-> > @@ -4619,6 +4618,13 @@ int main(int argc, char **argv, char **envp)
-> >          if (cpu_model) {
-> >              current_machine->cpu_type =
-> >                  cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model);
-> > +
-> > +            /* machine 'none' depends on default cpu type pointer not being
-> > +             * equal to resolved type name pointer to fugure out if type was
-> 
-> s/fugure/figure/
-> 
-> > +             * user provided, make sure that if it becomes not true in future
-> > +             * it won't beark silently */
-> 
-> s/beark/break/
-> 
-> > +            g_assert(
-> > +                current_machine->cpu_type != machine_class->default_cpu_type);
-> >          }
-> >      }
-> 
->  Thomas
-> 
-> 
+Since v5:
+- addressed Alistair reviews
+- dropped "abstract generic-sdhci"
+- dropped Linux Device Tree names
+- split qtests in another series
+- change the bcm2835 minimum blocksize to 1KB (Andrew Baumann)
+- added Alistair R-b
+- based on Alistair work:
+  - add SD tunning sequence via Host Control 2 to use UHS-I cards
+  - add CMD/DAT[] fields in the Present State (used in next series
+    to switch card voltage)
+
+based on Alistair work:
+- add SD tunning sequence via Host Control 2 to use UHS-I cards
+- add CMD/DAT[] fields in the Present State (used in next series
+  to switch card voltage)
+
+Since v4 ("SDHCI: add qtests and fix few issues"):
+- spec_version default to v2 (current behaviour)
+- addressed Alistair review (no v1, tell user about valid version)
+
+Since v3:
+- no change, but split back in 2 series, 1st part is "SDHCI: housekeeping v5",
+
+Since v2:
+- more detailed 'capabilities', all boards converted to use these properties
+- since all qtests pass, removed the previous 'capareg' property
+- added Stefan/Alistair R-b
+- corrected 'access' LED behavior (Alistair's review)
+- more uses of the registerfields API
+- remove some dead code
+- cosmetix:
+  - added more comments
+  - renamed a pair of registers
+  - reordered few struct members
+
+Since v1:
+- addressed Alistair Francis review comments, added some R-b
+- only move register defines to "sd-internal.h"
+- fixed deposit64() arguments
+- dropped unuseful s->fifo_buffer = NULL
+- use a qemu_irq for the LED, restrict the logging to ON/OFF
+- fixed a trace format string error
+- included Andrey Smirnov ACMD12ERRSTS write patch
+- dropped few unuseful patches, and separate the Python polemical ones for later
+
+>From the "SDHCI housekeeping" series:
+- 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
+- 2,3: we somehow beautiful the code, no logical changes,
+- 4-7: we refactor the common sysbus/pci qdev code,
+- 8-10: we add plenty of trace events which will result useful later,
+- 11: we finally expose a "dma-memory" property.
+>From the "SDHCI: add a qtest and fix few issues" series:
+- 12,13: fix registers
+- 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
+- 15-20: HCI qtest
+
+Regards,
+
+Phil.
+
+$ git backport-diff with v6
+001/14:[0015] [FC] 'sdhci: add v3 capabilities'
+002/14:[----] [-C] 'sdhci: rename the hostctl1 register'
+003/14:[----] [--] 'hw/arm/bcm2835_peripherals: implement SDHCI Spec v3'
+004/14:[----] [--] 'hw/arm/bcm2835_peripherals: change maximum block size to 1kB'
+005/14:[----] [--] 'hw/arm/fsl-imx6: implement SDHCI Spec v3'
+006/14:[0004] [FC] 'hw/arm/xilinx_zynqmp: implement SDHCI Spec v3'
+007/14:[down] 'sdhci: check Spec v3 capabilities qtest'
+008/14:[down] 'sdhci: add a check_capab_v3() qtest'
+009/14:[0018] [FC] 'sdhci: remove the deprecated 'capareg' property'
+010/14:[----] [--] 'sdhci: add Spec v4.2 register definitions'
+011/14:[----] [--] 'sdhci: implement the Host Control 2 register for the tunning sequence'
+012/14:[----] [--] 'sdbus: add trace events'
+013/14:[0002] [FC] 'sdhci: implement UHS-I voltage switch'
+014/14:[----] [--] 'sdhci: implement CMD/DAT[] fields in the Present State register'
+
+Based-on: 20180118183108.16009-17-f4bug@amsat.org
+
+Philippe Mathieu-Daudé (14):
+  sdhci: add v3 capabilities
+  sdhci: rename the hostctl1 register
+  hw/arm/bcm2835_peripherals: implement SDHCI Spec v3
+  hw/arm/bcm2835_peripherals: change maximum block size to 1kB
+  hw/arm/fsl-imx6: implement SDHCI Spec v3
+  hw/arm/xilinx_zynqmp: implement SDHCI Spec v3
+  sdhci: check Spec v3 capabilities qtest
+  sdhci: add a check_capab_v3() qtest
+  sdhci: remove the deprecated 'capareg' property
+  sdhci: add Spec v4.2 register definitions
+  sdhci: implement the Host Control 2 register for the tunning sequence
+  sdbus: add trace events
+  sdhci: implement UHS-I voltage switch
+  sdhci: implement CMD/DAT[] fields in the Present State register
+
+ include/hw/sd/sd.h           | 20 ++++++++++
+ include/hw/sd/sdhci.h        |  9 ++++-
+ hw/sd/sdhci-internal.h       | 31 +++++++++++++++
+ hw/arm/bcm2835_peripherals.c | 33 ++++++++++------
+ hw/arm/fsl-imx6.c            | 13 +++++++
+ hw/arm/xlnx-zynqmp.c         | 40 ++++++++++++++------
+ hw/sd/core.c                 | 61 +++++++++++++++++++++++++++++-
+ hw/sd/sd.c                   | 29 +++++++++++++++
+ hw/sd/sdhci.c                | 89 +++++++++++++++++++++++++++++++-------------
+ tests/sdhci-test.c           | 29 +++++++++++++++
+ hw/sd/trace-events           |  8 ++++
+ tests/Makefile.include       |  1 +
+ 12 files changed, 312 insertions(+), 51 deletions(-)
 
 -- 
-Eduardo
+2.15.1
