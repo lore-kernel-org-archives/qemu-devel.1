@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ecGDu-0004vB-2S
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:51:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1ecGDw-0004vn-EK
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:51:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ecGDq-0001r9-5Y
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:51:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ecGDp-0001qk-St
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:51:38 -0500
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
-	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
-	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
-	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-	<f1ca60cc-5506-a161-b473-f0de363b7e95@redhat.com>
-	<CAPcyv4j9b6ARvKcJkE25eNHatWACscMJTN_kCLSM6D+bfu_msA@mail.gmail.com>
-	<72839100-7fdf-693c-e9c2-348a5add8a56@redhat.com>
-	<1419599412.1747020.1516301689815.JavaMail.zimbra@redhat.com>
-	<CAPcyv4hso5FYCyxYBHRhHvsU+M_wrkQBwVKurK-i6BQYzQduPw@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7b0c4b68-2b37-b20c-b20d-7de35e50ad2a@redhat.com>
-Date: Thu, 18 Jan 2018 20:51:25 +0100
+	(envelope-from <eblake@redhat.com>) id 1ecGDv-0001ss-Eh
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:51:44 -0500
+References: <20180118103143.11780-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <11124de8-ece3-cad5-7e43-0b10ce5c097d@redhat.com>
+Date: Thu, 18 Jan 2018 13:51:36 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4hso5FYCyxYBHRhHvsU+M_wrkQBwVKurK-i6BQYzQduPw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+In-Reply-To: <20180118103143.11780-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QpXLe7yLppc898ayvJYG3H9Ac3ioU8ECN"
+Subject: Re: [Qemu-devel] [PATCH] block: implement the bdrv_reopen_prepare
+ helper for LUKS driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,59 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>, Pankaj Gupta <pagupta@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>, Rik van Riel <riel@surriel.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QpXLe7yLppc898ayvJYG3H9Ac3ioU8ECN
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <11124de8-ece3-cad5-7e43-0b10ce5c097d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: implement the bdrv_reopen_prepare
+ helper for LUKS driver
+References: <20180118103143.11780-1-berrange@redhat.com>
+In-Reply-To: <20180118103143.11780-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/18/2018 04:31 AM, Daniel P. Berrange wrote:
+> If the bdrv_reopen_prepare helper isn't provided, the qemu-img commit
+> command fails to re-open the base layer after committing changes into
+> it. Provide a no-op implementation for the LUKS driver, since there
+> is not any custom work that needs doing to re-open it.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+
+I'm hoping another block-layer expert chimes in, as I'm not quite sure
+what the full reopen rules are; but the idea makes sense to me.
+
+>=20
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 60ddf8623e..bb9a8f5376 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -382,6 +382,12 @@ static void block_crypto_close(BlockDriverState *b=
+s)
+>      qcrypto_block_free(crypto->block);
+>  }
+> =20
+> +static int block_crypto_reopen_prepare(BDRVReopenState *state,
+> +                                       BlockReopenQueue *queue, Error =
+**errp)
+> +{
+> +    /* nothing needs checking */
+
+Are we sure that even changes such as moving from read-only to
+read-write need no checking?
+
+> +    return 0;
+> +}
+> =20
+>  /*
+>   * 1 MB bounce buffer gives good performance / memory tradeoff
+> @@ -620,6 +626,7 @@ BlockDriver bdrv_crypto_luks =3D {
+>      .bdrv_truncate      =3D block_crypto_truncate,
+>      .create_opts        =3D &block_crypto_create_opts_luks,
+> =20
+> +    .bdrv_reopen_prepare =3D block_crypto_reopen_prepare,
+>      .bdrv_refresh_limits =3D block_crypto_refresh_limits,
+>      .bdrv_co_preadv     =3D block_crypto_co_preadv,
+>      .bdrv_co_pwritev    =3D block_crypto_co_pwritev,
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->> 1] Existing pmem driver & virtio for region discovery:
->>   -----------------------------------------------------
->>   Use existing pmem driver which is tightly coupled with concepts of namespaces, labels etc
->>   from ACPI region discovery and re-implement these concepts with virtio so that existing
->>   pmem driver can understand it. In addition to this, task of pmem driver to send flush command
->>   using virtio.
-> 
-> It's not tightly coupled. The whole point of libnvdimm is to be
-> agnostic to ACPI, e820 or any other range discovery. The only work to
-> do beyond identifying the address range is teaching libnvdimm to pass
-> along a flush control interface to the pmem driver.
-> 
->>
->> 2] Existing pmem driver & ACPI NFIT for region discovery:
->>   ----------------------------------------------------------------
->> - If we use NFIT ACPI, we need to teach existing ACPI driver to add this new memory
->>   type and teach existing pmem driver to handle this new memory type. Still we need
->>   an asynchronous(virtio) way to send flush commands. We need virtio device/driver
->>   or arbitrary key/value like pair just to send commands from guest to host using virtio.
->>
->> 3] New Virtio pmem driver & paravirt device:
->>  ----------------------------------------
->>   Third way is new virtio pmem driver with less work to support existing features of different protocols,
->>   and with asynchronous way of sending flush commands.
->>
->>   But this needs to duplicate some of the work which existing pmem driver does but as discussed
->>   previously we can separate common code from existing pmem driver and reuse it.
->>
->> Among these approaches I also prefer 3].
-> 
-> I disagree, the reason we went down this ACPI path was to limit the
-> needless duplication of most of the pmem driver.
-> 
+--QpXLe7yLppc898ayvJYG3H9Ac3ioU8ECN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I have way to little insight to make qualified statements to different
-approaches here. :)
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-All I am interesting in is making this as independent of architecture
-specific technologies (e.g. ACPI) as possible. We will want this e.g.
-for s390x too. Rather sooner than later. So trying to couple this
-(somehow) to ACPI just for the sake of less code to copy will not pay of
-in the long run.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpg+sgACgkQp6FrSiUn
+Q2odPwgAmG76IEF5Vwq98eTGOw+C2bP6Vub4kqfI7GrPfDbeBAg0laADJ79qVyK5
+HGf3uMYhw7Z/b20zpllwxLIyq6FfaRuVYcWXt6eDgZuEcduKsXTz5PCMAJIkE8r8
+DnLe6ynLxageVmIGA5QGqGTUOAwt6blziJPCT4zei7uJqeag60n2q8gsxGROi97l
+tncZajQQykdL2sInCyxOD3MVUBku5/p5YwL6wM20ApYp9nOiUrZcPiJSFcJIEMmf
+qohirIlBGoRuP4jcUPGLBLjSfT4FqFfoKkG02cEEIQ/5oqCRkqSzmCN81eROQzYa
+oIxMWpBmiVi9dkTWq7eRMDpmP8dHMQ==
+=O2NB
+-----END PGP SIGNATURE-----
 
-Better have a clean virtio interface / design right from the start.
-
-So I hope my words will be heard :)
-
--- 
-
-Thanks,
-
-David / dhildenb
+--QpXLe7yLppc898ayvJYG3H9Ac3ioU8ECN--
