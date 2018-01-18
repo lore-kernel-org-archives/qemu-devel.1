@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH3Q-0003RM-Il
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:57 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH3N-0003Pd-Sf
+	(envelope-from <mst@redhat.com>) id 1ecH3N-0003Oh-7u
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42066)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH3N-0003Od-MA
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mst@redhat.com>) id 1ecH3L-0003NL-7P
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:53 -0500
-Date: Thu, 18 Jan 2018 22:44:51 +0200
+Received: from mx1.redhat.com ([209.132.183.28]:39462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH3K-0003Lw-QU
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:51 -0500
+Date: Thu, 18 Jan 2018 22:44:40 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516308132-10272-8-git-send-email-mst@redhat.com>
+Message-ID: <1516308132-10272-6-git-send-email-mst@redhat.com>
 References: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v4 07/29] virtio: postpone the execution of
- event_notifier_cleanup function
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v4 05/29] contrib/vhost-user-blk: introduce a
+ vhost-user-blk sample application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +29,652 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gal Hammer <ghammer@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Changpeng Liu <changpeng.liu@intel.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Gal Hammer <ghammer@redhat.com>
+From: Changpeng Liu <changpeng.liu@intel.com>
 
-Use the EventNotifier's cleanup callback function to execute the
-event_notifier_cleanup function after kvm unregistered the eventfd.
+This commit introduces a vhost-user-blk backend device, it uses UNIX
+domain socket to communicate with QEMU. The vhost-user-blk sample
+application should be used with QEMU vhost-user-blk-pci device.
 
-This change supports running the virtio_bus_set_host_notifier
-function inside a memory region transaction. Otherwise, a closed
-fd is sent to kvm, which results in a failure.
+To use it, complie with:
+make vhost-user-blk
 
-Signed-off-by: Gal Hammer <ghammer@redhat.com>
+and start like this:
+vhost-user-blk -b /dev/sdb -s /path/vhost.socket
+
+Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- accel/kvm/kvm-all.c    |  4 ++++
- hw/virtio/virtio-bus.c | 19 +++++++++++--------
- 2 files changed, 15 insertions(+), 8 deletions(-)
+ Makefile                                |   3 +
+ contrib/vhost-user-blk/vhost-user-blk.c | 545 ++++++++++++++++++++++++++=
+++++++
+ .gitignore                              |   1 +
+ Makefile.objs                           |   1 +
+ contrib/vhost-user-blk/Makefile.objs    |   1 +
+ 5 files changed, 551 insertions(+)
+ create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
+ create mode 100644 contrib/vhost-user-blk/Makefile.objs
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f290f48..071f4f5 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -812,6 +812,10 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
-     if (r < 0) {
-         abort();
-     }
+diff --git a/Makefile b/Makefile
+index f26ef1b..d835bb9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -334,6 +334,7 @@ dummy :=3D $(call unnest-vars,, \
+                 ivshmem-server-obj-y \
+                 libvhost-user-obj-y \
+                 vhost-user-scsi-obj-y \
++                vhost-user-blk-obj-y \
+                 qga-vss-dll-obj-y \
+                 block-obj-y \
+                 block-obj-m \
+@@ -565,6 +566,8 @@ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(CO=
+MMON_LDADDS)
+ endif
+ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
+ 	$(call LINK, $^)
++vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
++	$(call LINK, $^)
+=20
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
+mak
+ 	$(call quiet-command,$(PYTHON) $< $@ \
+diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
+-blk/vhost-user-blk.c
+new file mode 100644
+index 0000000..67dac81
+--- /dev/null
++++ b/contrib/vhost-user-blk/vhost-user-blk.c
+@@ -0,0 +1,545 @@
++/*
++ * vhost-user-blk sample application
++ *
++ * Copyright (c) 2017 Intel Corporation. All rights reserved.
++ *
++ * Author:
++ *  Changpeng Liu <changpeng.liu@intel.com>
++ *
++ * This work is based on the "vhost-user-scsi" sample and "virtio-blk" d=
+river
++ * implementation by:
++ *  Felipe Franciosi <felipe@nutanix.com>
++ *  Anthony Liguori <aliguori@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 only.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+    if (e->cleanup) {
-+        e->cleanup(e);
-+    }
- }
- 
- static void kvm_io_ioeventfd_add(MemoryListener *listener,
-diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-index 3042232..8106346 100644
---- a/hw/virtio/virtio-bus.c
-+++ b/hw/virtio/virtio-bus.c
-@@ -256,6 +256,15 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus)
-     return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
- }
- 
-+static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
++#include "qemu/osdep.h"
++#include "standard-headers/linux/virtio_blk.h"
++#include "contrib/libvhost-user/libvhost-user-glib.h"
++#include "contrib/libvhost-user/libvhost-user.h"
++
++#include <glib.h>
++
++struct virtio_blk_inhdr {
++    unsigned char status;
++};
++
++/* vhost user block device */
++typedef struct VubDev {
++    VugDev parent;
++    int blk_fd;
++    struct virtio_blk_config blkcfg;
++    char *blk_name;
++    GMainLoop *loop;
++} VubDev;
++
++typedef struct VubReq {
++    VuVirtqElement *elem;
++    int64_t sector_num;
++    size_t size;
++    struct virtio_blk_inhdr *in;
++    struct virtio_blk_outhdr *out;
++    VubDev *vdev_blk;
++    struct VuVirtq *vq;
++} VubReq;
++
++/* refer util/iov.c */
++static size_t vub_iov_size(const struct iovec *iov,
++                              const unsigned int iov_cnt)
 +{
-+    /* Test and clear notifier after disabling event,
-+     * in case poll callback didn't have time to run.
-+     */
-+    virtio_queue_host_notifier_read(notifier);
-+    event_notifier_cleanup(notifier);
++    size_t len;
++    unsigned int i;
++
++    len =3D 0;
++    for (i =3D 0; i < iov_cnt; i++) {
++        len +=3D iov[i].iov_len;
++    }
++    return len;
 +}
 +
- /*
-  * This function switches ioeventfd on/off in the device.
-  * The caller must set or clear the handlers for the EventNotifier.
-@@ -283,19 +292,13 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, int n, bool assign)
-         r = k->ioeventfd_assign(proxy, notifier, n, true);
-         if (r < 0) {
-             error_report("%s: unable to assign ioeventfd: %d", __func__, r);
--            goto cleanup_event_notifier;
-+            virtio_bus_cleanup_event_notifier(notifier);
-         }
--        return 0;
-     } else {
-+        notifier->cleanup = virtio_bus_cleanup_event_notifier;
-         k->ioeventfd_assign(proxy, notifier, n, false);
-     }
- 
--cleanup_event_notifier:
--    /* Test and clear notifier after disabling event,
--     * in case poll callback didn't have time to run.
--     */
--    virtio_queue_host_notifier_read(notifier);
--    event_notifier_cleanup(notifier);
-     return r;
- }
- 
--- 
++static void vub_panic_cb(VuDev *vu_dev, const char *buf)
++{
++    VugDev *gdev;
++    VubDev *vdev_blk;
++
++    assert(vu_dev);
++
++    gdev =3D container_of(vu_dev, VugDev, parent);
++    vdev_blk =3D container_of(gdev, VubDev, parent);
++    if (buf) {
++        g_warning("vu_panic: %s", buf);
++    }
++
++    g_main_loop_quit(vdev_blk->loop);
++}
++
++static void vub_req_complete(VubReq *req)
++{
++    VugDev *gdev =3D &req->vdev_blk->parent;
++    VuDev *vu_dev =3D &gdev->parent;
++
++    /* IO size with 1 extra status byte */
++    vu_queue_push(vu_dev, req->vq, req->elem,
++                  req->size + 1);
++    vu_queue_notify(vu_dev, req->vq);
++
++    if (req->elem) {
++        free(req->elem);
++    }
++
++    g_free(req);
++}
++
++static int vub_open(const char *file_name, bool wce)
++{
++    int fd;
++    int flags =3D O_RDWR;
++
++    if (!wce) {
++        flags |=3D O_DIRECT;
++    }
++
++    fd =3D open(file_name, flags);
++    if (fd < 0) {
++        fprintf(stderr, "Cannot open file %s, %s\n", file_name,
++                strerror(errno));
++        return -1;
++    }
++
++    return fd;
++}
++
++static ssize_t
++vub_readv(VubReq *req, struct iovec *iov, uint32_t iovcnt)
++{
++    VubDev *vdev_blk =3D req->vdev_blk;
++    ssize_t rc;
++
++    if (!iovcnt) {
++        fprintf(stderr, "Invalid Read IOV count\n");
++        return -1;
++    }
++
++    req->size =3D vub_iov_size(iov, iovcnt);
++    rc =3D preadv(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512);
++    if (rc < 0) {
++        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n=
+",
++                vdev_blk->blk_name, req->sector_num, req->size,
++                strerror(errno));
++        return -1;
++    }
++
++    return rc;
++}
++
++static ssize_t
++vub_writev(VubReq *req, struct iovec *iov, uint32_t iovcnt)
++{
++    VubDev *vdev_blk =3D req->vdev_blk;
++    ssize_t rc;
++
++    if (!iovcnt) {
++        fprintf(stderr, "Invalid Write IOV count\n");
++        return -1;
++    }
++
++    req->size =3D vub_iov_size(iov, iovcnt);
++    rc =3D pwritev(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512)=
+;
++    if (rc < 0) {
++        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n=
+",
++                vdev_blk->blk_name, req->sector_num, req->size,
++                strerror(errno));
++        return -1;
++    }
++
++    return rc;
++}
++
++static void
++vub_flush(VubReq *req)
++{
++    VubDev *vdev_blk =3D req->vdev_blk;
++
++    fdatasync(vdev_blk->blk_fd);
++}
++
++static int vub_virtio_process_req(VubDev *vdev_blk,
++                                     VuVirtq *vq)
++{
++    VugDev *gdev =3D &vdev_blk->parent;
++    VuDev *vu_dev =3D &gdev->parent;
++    VuVirtqElement *elem;
++    uint32_t type;
++    unsigned in_num;
++    unsigned out_num;
++    VubReq *req;
++
++    elem =3D vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement) + sizeof(Vu=
+bReq));
++    if (!elem) {
++        return -1;
++    }
++
++    /* refer to hw/block/virtio_blk.c */
++    if (elem->out_num < 1 || elem->in_num < 1) {
++        fprintf(stderr, "virtio-blk request missing headers\n");
++        free(elem);
++        return -1;
++    }
++
++    req =3D g_new0(VubReq, 1);
++    req->vdev_blk =3D vdev_blk;
++    req->vq =3D vq;
++    req->elem =3D elem;
++
++    in_num =3D elem->in_num;
++    out_num =3D elem->out_num;
++
++    /* don't support VIRTIO_F_ANY_LAYOUT and virtio 1.0 only */
++    if (elem->out_sg[0].iov_len < sizeof(struct virtio_blk_outhdr)) {
++        fprintf(stderr, "Invalid outhdr size\n");
++        goto err;
++    }
++    req->out =3D (struct virtio_blk_outhdr *)elem->out_sg[0].iov_base;
++    out_num--;
++
++    if (elem->in_sg[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr=
+)) {
++        fprintf(stderr, "Invalid inhdr size\n");
++        goto err;
++    }
++    req->in =3D (struct virtio_blk_inhdr *)elem->in_sg[in_num - 1].iov_b=
+ase;
++    in_num--;
++
++    type =3D le32toh(req->out->type);
++    switch (type & ~(VIRTIO_BLK_T_OUT | VIRTIO_BLK_T_BARRIER)) {
++        case VIRTIO_BLK_T_IN: {
++            ssize_t ret =3D 0;
++            bool is_write =3D type & VIRTIO_BLK_T_OUT;
++            req->sector_num =3D le64toh(req->out->sector);
++            if (is_write) {
++                ret  =3D vub_writev(req, &elem->out_sg[1], out_num);
++            } else {
++                ret =3D vub_readv(req, &elem->in_sg[0], in_num);
++            }
++            if (ret >=3D 0) {
++                req->in->status =3D VIRTIO_BLK_S_OK;
++            } else {
++                req->in->status =3D VIRTIO_BLK_S_IOERR;
++            }
++            vub_req_complete(req);
++            break;
++        }
++        case VIRTIO_BLK_T_FLUSH: {
++            vub_flush(req);
++            req->in->status =3D VIRTIO_BLK_S_OK;
++            vub_req_complete(req);
++            break;
++        }
++        case VIRTIO_BLK_T_GET_ID: {
++            size_t size =3D MIN(vub_iov_size(&elem->in_sg[0], in_num),
++                              VIRTIO_BLK_ID_BYTES);
++            snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_bl=
+k");
++            req->in->status =3D VIRTIO_BLK_S_OK;
++            req->size =3D elem->in_sg[0].iov_len;
++            vub_req_complete(req);
++            break;
++        }
++        default: {
++            req->in->status =3D VIRTIO_BLK_S_UNSUPP;
++            vub_req_complete(req);
++            break;
++        }
++    }
++
++    return 0;
++
++err:
++    free(elem);
++    g_free(req);
++    return -1;
++}
++
++static void vub_process_vq(VuDev *vu_dev, int idx)
++{
++    VugDev *gdev;
++    VubDev *vdev_blk;
++    VuVirtq *vq;
++    int ret;
++
++    if ((idx < 0) || (idx >=3D VHOST_MAX_NR_VIRTQUEUE)) {
++        fprintf(stderr, "VQ Index out of range: %d\n", idx);
++        vub_panic_cb(vu_dev, NULL);
++        return;
++    }
++
++    gdev =3D container_of(vu_dev, VugDev, parent);
++    vdev_blk =3D container_of(gdev, VubDev, parent);
++    assert(vdev_blk);
++
++    vq =3D vu_get_queue(vu_dev, idx);
++    assert(vq);
++
++    while (1) {
++        ret =3D vub_virtio_process_req(vdev_blk, vq);
++        if (ret) {
++            break;
++        }
++    }
++}
++
++static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
++{
++    VuVirtq *vq;
++
++    assert(vu_dev);
++
++    vq =3D vu_get_queue(vu_dev, idx);
++    vu_set_queue_handler(vu_dev, vq, started ? vub_process_vq : NULL);
++}
++
++static uint64_t
++vub_get_features(VuDev *dev)
++{
++    return 1ull << VIRTIO_BLK_F_SIZE_MAX |
++           1ull << VIRTIO_BLK_F_SEG_MAX |
++           1ull << VIRTIO_BLK_F_TOPOLOGY |
++           1ull << VIRTIO_BLK_F_BLK_SIZE |
++           1ull << VIRTIO_BLK_F_FLUSH |
++           1ull << VIRTIO_BLK_F_CONFIG_WCE |
++           1ull << VIRTIO_F_VERSION_1 |
++           1ull << VHOST_USER_F_PROTOCOL_FEATURES;
++}
++
++static int
++vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
++{
++    VugDev *gdev;
++    VubDev *vdev_blk;
++
++    gdev =3D container_of(vu_dev, VugDev, parent);
++    vdev_blk =3D container_of(gdev, VubDev, parent);
++    memcpy(config, &vdev_blk->blkcfg, len);
++
++    return 0;
++}
++
++static int
++vub_set_config(VuDev *vu_dev, const uint8_t *data,
++               uint32_t offset, uint32_t size, uint32_t flags)
++{
++    VugDev *gdev;
++    VubDev *vdev_blk;
++    uint8_t wce;
++    int fd;
++
++    /* don't support live migration */
++    if (flags !=3D VHOST_SET_CONFIG_TYPE_MASTER) {
++        return -1;
++    }
++
++    gdev =3D container_of(vu_dev, VugDev, parent);
++    vdev_blk =3D container_of(gdev, VubDev, parent);
++
++    if (offset !=3D offsetof(struct virtio_blk_config, wce) ||
++        size !=3D 1) {
++        return -1;
++    }
++
++    wce =3D *data;
++    if (wce =3D=3D vdev_blk->blkcfg.wce) {
++        /* Do nothing as same with old configuration */
++        return 0;
++    }
++
++    vdev_blk->blkcfg.wce =3D wce;
++    fprintf(stdout, "Write Cache Policy Changed\n");
++    if (vdev_blk->blk_fd >=3D 0) {
++        close(vdev_blk->blk_fd);
++        vdev_blk->blk_fd =3D -1;
++    }
++
++    fd =3D vub_open(vdev_blk->blk_name, wce);
++    if (fd < 0) {
++        fprintf(stderr, "Error to open block device %s\n", vdev_blk->blk=
+_name);
++        vdev_blk->blk_fd =3D -1;
++        return -1;
++    }
++    vdev_blk->blk_fd =3D fd;
++
++    return 0;
++}
++
++static const VuDevIface vub_iface =3D {
++    .get_features =3D vub_get_features,
++    .queue_set_started =3D vub_queue_set_started,
++    .get_config =3D vub_get_config,
++    .set_config =3D vub_set_config,
++};
++
++static int unix_sock_new(char *unix_fn)
++{
++    int sock;
++    struct sockaddr_un un;
++    size_t len;
++
++    assert(unix_fn);
++
++    sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
++    if (sock <=3D 0) {
++        perror("socket");
++        return -1;
++    }
++
++    un.sun_family =3D AF_UNIX;
++    (void)snprintf(un.sun_path, sizeof(un.sun_path), "%s", unix_fn);
++    len =3D sizeof(un.sun_family) + strlen(un.sun_path);
++
++    (void)unlink(unix_fn);
++    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
++        perror("bind");
++        goto fail;
++    }
++
++    if (listen(sock, 1) < 0) {
++        perror("listen");
++        goto fail;
++    }
++
++    return sock;
++
++fail:
++    (void)close(sock);
++
++    return -1;
++}
++
++static void vub_free(struct VubDev *vdev_blk)
++{
++    if (!vdev_blk) {
++        return;
++    }
++
++    g_main_loop_unref(vdev_blk->loop);
++    if (vdev_blk->blk_fd >=3D 0) {
++        close(vdev_blk->blk_fd);
++    }
++    g_free(vdev_blk);
++}
++
++static uint32_t
++vub_get_blocksize(int fd)
++{
++    uint32_t blocksize =3D 512;
++
++#if defined(__linux__) && defined(BLKSSZGET)
++    if (ioctl(fd, BLKSSZGET, &blocksize) =3D=3D 0) {
++        return blocklen;
++    }
++#endif
++
++    return blocksize;
++}
++
++static void
++vub_initialize_config(int fd, struct virtio_blk_config *config)
++{
++    off64_t capacity;
++
++    capacity =3D lseek64(fd, 0, SEEK_END);
++    config->capacity =3D capacity >> 9;
++    config->blk_size =3D vub_get_blocksize(fd);
++    config->size_max =3D 65536;
++    config->seg_max =3D 128 - 2;
++    config->min_io_size =3D 1;
++    config->opt_io_size =3D 1;
++    config->num_queues =3D 1;
++}
++
++static VubDev *
++vub_new(char *blk_file)
++{
++    VubDev *vdev_blk;
++
++    vdev_blk =3D g_new0(VubDev, 1);
++    vdev_blk->loop =3D g_main_loop_new(NULL, FALSE);
++    vdev_blk->blk_fd =3D vub_open(blk_file, 0);
++    if (vdev_blk->blk_fd  < 0) {
++        fprintf(stderr, "Error to open block device %s\n", blk_file);
++        vub_free(vdev_blk);
++        return NULL;
++    }
++    vdev_blk->blkcfg.wce =3D 0;
++    vdev_blk->blk_name =3D blk_file;
++
++    /* fill virtio_blk_config with block parameters */
++    vub_initialize_config(vdev_blk->blk_fd, &vdev_blk->blkcfg);
++
++    return vdev_blk;
++}
++
++int main(int argc, char **argv)
++{
++    int opt;
++    char *unix_socket =3D NULL;
++    char *blk_file =3D NULL;
++    int lsock =3D -1, csock =3D -1;
++    VubDev *vdev_blk =3D NULL;
++
++    while ((opt =3D getopt(argc, argv, "b:s:h")) !=3D -1) {
++        switch (opt) {
++        case 'b':
++            blk_file =3D g_strdup(optarg);
++            break;
++        case 's':
++            unix_socket =3D g_strdup(optarg);
++            break;
++        case 'h':
++        default:
++            printf("Usage: %s [-b block device or file, -s UNIX domain s=
+ocket]"
++                   " | [ -h ]\n", argv[0]);
++            return 0;
++        }
++    }
++
++    if (!unix_socket || !blk_file) {
++        printf("Usage: %s [-b block device or file, -s UNIX domain socke=
+t] |"
++               " [ -h ]\n", argv[0]);
++        return -1;
++    }
++
++    lsock =3D unix_sock_new(unix_socket);
++    if (lsock < 0) {
++        goto err;
++    }
++
++    csock =3D accept(lsock, (void *)0, (void *)0);
++    if (csock < 0) {
++        fprintf(stderr, "Accept error %s\n", strerror(errno));
++        goto err;
++    }
++
++    vdev_blk =3D vub_new(blk_file);
++    if (!vdev_blk) {
++        goto err;
++    }
++
++    vug_init(&vdev_blk->parent, csock, vub_panic_cb, &vub_iface);
++
++    g_main_loop_run(vdev_blk->loop);
++
++    vug_deinit(&vdev_blk->parent);
++
++err:
++    vub_free(vdev_blk);
++    if (csock >=3D 0) {
++        close(csock);
++    }
++    if (lsock >=3D 0) {
++        close(lsock);
++    }
++    g_free(unix_socket);
++    g_free(blk_file);
++
++    return 0;
++}
+diff --git a/.gitignore b/.gitignore
+index 433f64f..704b222 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -54,6 +54,7 @@
+ /module_block.h
+ /scsi/qemu-pr-helper
+ /vhost-user-scsi
++/vhost-user-blk
+ /fsdev/virtfs-proxy-helper
+ *.tmp
+ *.[1-9]
+diff --git a/Makefile.objs b/Makefile.objs
+index c8b1bba..669d8d6 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -115,6 +115,7 @@ libvhost-user-obj-y =3D contrib/libvhost-user/
+ vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
+ vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
+ vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
++vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
+=20
+ ######################################################################
+ trace-events-subdirs =3D
+diff --git a/contrib/vhost-user-blk/Makefile.objs b/contrib/vhost-user-bl=
+k/Makefile.objs
+new file mode 100644
+index 0000000..72e2cdc
+--- /dev/null
++++ b/contrib/vhost-user-blk/Makefile.objs
+@@ -0,0 +1 @@
++vhost-user-blk-obj-y =3D vhost-user-blk.o
+--=20
 MST
