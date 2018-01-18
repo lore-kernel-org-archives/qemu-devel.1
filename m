@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJg-0004Mj-HX
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJg-0004Mk-Hn
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:49:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJd-0004HS-Es
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecEJe-0004Iv-AE
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:49:32 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 18 Jan 2018 20:49:02 +0300
-Message-Id: <1516297747-107232-5-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Thu, 18 Jan 2018 20:49:04 +0300
+Message-Id: <1516297747-107232-7-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 4/9] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Subject: [Qemu-devel] [PATCH v7 6/9] block: support BDRV_REQ_ALLOCATE in
+ passthrough drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,116 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-The idea is that ALLOCATE requests may overlap with other requests.
-Reuse the existing block layer infrastructure for serialising requests.
-Use the following approach:
-  - mark ALLOCATE serialising, so subsequent requests to the area wait
-  - ALLOCATE request itself must never wait if another request is in flight
-    already. Return EAGAIN, let the caller reconsider.
+Support the flag if the underlying BDS supports it
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/io.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ block/blkdebug.c   | 3 ++-
+ block/blkverify.c  | 2 +-
+ block/mirror.c     | 2 +-
+ block/raw-format.c | 3 ++-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index cf2f84c..4b0d34f 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -605,7 +605,8 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index e216699..7d5773d 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -400,7 +400,8 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->file->bs->supported_write_flags;
+-    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags;
+     ret = -EINVAL;
+ 
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 9ba65d0..b249636 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -145,7 +145,7 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
+         s->test_file->bs->supported_write_flags;
+ 
+     bs->supported_zero_flags =
+-        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags &
+         s->test_file->bs->supported_zero_flags;
+ 
+diff --git a/block/mirror.c b/block/mirror.c
+index d18ec65..eb41deb 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1067,7 +1067,7 @@ static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->backing->bs->supported_write_flags;
+     bs->supported_zero_flags =
+-        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->backing->bs->supported_zero_flags;
  }
  
--static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-+static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self,
-+                                                   bool nowait)
- {
-     BlockDriverState *bs = self->bs;
-     BdrvTrackedRequest *req;
-@@ -636,11 +637,14 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-                  * will wait for us as soon as it wakes up, then just go on
-                  * (instead of producing a deadlock in the former case). */
-                 if (!req->waiting_for) {
-+                    waited = true;
-+                    if (nowait) {
-+                        break;
-+                    }
-                     self->waiting_for = req;
-                     qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
-                     self->waiting_for = NULL;
-                     retry = true;
--                    waited = true;
-                     break;
-                 }
-             }
-@@ -1206,7 +1210,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-     }
+diff --git a/block/raw-format.c b/block/raw-format.c
+index ab552c0..b1deb93 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -416,7 +416,8 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->sg = bs->file->bs->sg;
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->file->bs->supported_write_flags;
+-    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags;
  
-     if (!(flags & BDRV_REQ_NO_SERIALISING)) {
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-     }
- 
-     if (flags & BDRV_REQ_COPY_ON_READ) {
-@@ -1504,7 +1508,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
-                                    align);
- 
--    waited = wait_serialising_requests(req);
-+    waited = wait_serialising_requests(req, flags & BDRV_REQ_ALLOCATE);
-+    if (waited && flags & BDRV_REQ_ALLOCATE) {
-+        return -EAGAIN;
-+    }
-     assert(!waited || !req->serialising);
-     assert(req->overlap_offset <= offset);
-     assert(offset + bytes <= req->overlap_offset + req->overlap_bytes);
-@@ -1608,7 +1615,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
- 
-         /* RMW the unaligned part before head. */
-         mark_request_serialising(req, align);
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
-         ret = bdrv_aligned_preadv(child, req, offset & ~(align - 1), align,
-                                   align, &local_qiov, 0);
-@@ -1628,6 +1635,10 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-         bytes -= zero_bytes;
-     }
- 
-+    if (flags & BDRV_REQ_ALLOCATE) {
-+        mark_request_serialising(req, align);
-+    }
-+
-     assert(!bytes || (offset & (align - 1)) == 0);
-     if (bytes >= align) {
-         /* Write the aligned part in the middle. */
-@@ -1646,7 +1657,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-         assert(align == tail_padding_bytes + bytes);
-         /* RMW the unaligned part after tail. */
-         mark_request_serialising(req, align);
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
-         ret = bdrv_aligned_preadv(child, req, offset, align,
-                                   align, &local_qiov, 0);
-@@ -1717,7 +1728,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         struct iovec head_iov;
- 
-         mark_request_serialising(&req, align);
--        wait_serialising_requests(&req);
-+        wait_serialising_requests(&req, false);
- 
-         head_buf = qemu_blockalign(bs, align);
-         head_iov = (struct iovec) {
-@@ -1758,7 +1769,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         bool waited;
- 
-         mark_request_serialising(&req, align);
--        waited = wait_serialising_requests(&req);
-+        waited = wait_serialising_requests(&req, false);
-         assert(!waited || !use_local_qiov);
- 
-         tail_buf = qemu_blockalign(bs, align);
+     if (bs->probed && !bdrv_is_read_only(bs)) {
 -- 
 2.7.4
