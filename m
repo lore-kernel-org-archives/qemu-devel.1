@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecCJr-00050R-0S
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:41:35 -0500
+	(envelope-from <berto@igalia.com>) id 1ecCLx-00069k-9y
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:43:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecCJq-00024H-A4
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:41:35 -0500
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:40550)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecCJq-00023x-52
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:41:34 -0500
-Received: by mail-ot0-x230.google.com with SMTP id x4so4783424otg.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:41:33 -0800 (PST)
+	(envelope-from <berto@igalia.com>) id 1ecCLu-0003tC-7u
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:43:45 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <fab2e9e4-50a0-1f21-9d06-969a90d0644a@redhat.com>
+References: <cover.1513342045.git.berto@igalia.com>
+	<192f0a4a1888e7e18cb7cec9fdbeadad5417b4ef.1513342045.git.berto@igalia.com>
+	<fab2e9e4-50a0-1f21-9d06-969a90d0644a@redhat.com>
+Date: Thu, 18 Jan 2018 16:43:39 +0100
+Message-ID: <w51zi5bp3ys.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1f5614b9-591c-a3f9-c6ce-15d615d13c03@amsat.org>
-References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA-8dwLpfrbV8+--L4Z9Um9xVsyUOfKjcz9-T1aTPkgrEg@mail.gmail.com>
-	<20180117201515.1a49fcbf@redhat.com>
-	<CAFEAcA9gXOOkv+-rTXcNyzgY9P8CR66Rrx-0GM2G0m0x+HbAmA@mail.gmail.com>
-	<20180118114330.53ad7ce7@redhat.com>
-	<CAFEAcA-My_vDd=_7g907MpO2WmVHOHKxsw2-E-vQwn=_SZadRQ@mail.gmail.com>
-	<20180118140605.028b7e33@redhat.com>
-	<CAFEAcA-oP7hCgjwqiCh4TKKpq-Jfho0JOAsSvWfc09iUouiUWg@mail.gmail.com>
-	<1f5614b9-591c-a3f9-c6ce-15d615d13c03@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jan 2018 15:41:12 +0000
-Message-ID: <CAFEAcA86cRiz4UgCnagEs8q=c_taa=enJ3ZxA4hN3hPYAMp=Kw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/24] generalize parsing of cpu_model
- (part 4)
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 24/32] qcow2: Update
+ qcow2_update_snapshot_refcount() to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,19 +24,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Michael Tokarev <mjt@tls.msk.ru>, Riku Voipio <riku.voipio@iki.fi>, Agustin Henze <tin@debian.org>, QEMU Developers <qemu-devel@nongnu.org>, Debian QEMU Team <pkg-qemu-devel@lists.alioth.debian.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 18 January 2018 at 15:31, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> I disagree on this, since userland binaries are compiled for a specific
-> arch/ABI/FPU.
-> Even without worrying about the FPU, it is unlikely the "any" cpu can
-> run indifferently ARMv6 and ARMv7 binaries.
+On Wed 17 Jan 2018 12:00:59 AM CET, Eric Blake wrote:
+>> -    l2_table = NULL;
+>> +    l2_slice = NULL;
+>>      l1_table = NULL;
+>>      l1_size2 = l1_size * sizeof(uint64_t);
+>>  
+>> +    slice_size = s->l2_slice_size * sizeof(uint64_t);
+>
+> Again, better naming on s->l2_slice_size in an earlier patch may make
+> this more readable, at a cost of slight rebase churn.
 
-In practice this works fine. Generally for userspace the Arm
-architecture retains backwards compatibility. (This is not the
-case for kernel mode, obviously.)
+Another approach would be to use _size2 to refer to size in bytes, after
+checking the code a bit that seems to be the convention in other places
+where we're dealing with both table lenghts and sizes in bytes.
 
-thanks
--- PMM
+> The diff looks hideous, but that's thanks to indentation changes.
+
+Right, that's why I suggested to use 'diff -w' in the cover letter to
+help see the changes better.
+
+Berto
