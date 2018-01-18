@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ecFyp-0002uh-Vn
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:36:09 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ecG1f-0004a4-Os
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:39:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ecFyl-0007if-2a
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:36:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53302)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1ecFyk-0007i5-Pa
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:36:02 -0500
-Date: Thu, 18 Jan 2018 14:36:01 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1386805697.1758284.1516304161333.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAPcyv4hso5FYCyxYBHRhHvsU+M_wrkQBwVKurK-i6BQYzQduPw@mail.gmail.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
-	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-	<f1ca60cc-5506-a161-b473-f0de363b7e95@redhat.com>
-	<CAPcyv4j9b6ARvKcJkE25eNHatWACscMJTN_kCLSM6D+bfu_msA@mail.gmail.com>
-	<72839100-7fdf-693c-e9c2-348a5add8a56@redhat.com>
-	<1419599412.1747020.1516301689815.JavaMail.zimbra@redhat.com>
-	<CAPcyv4hso5FYCyxYBHRhHvsU+M_wrkQBwVKurK-i6BQYzQduPw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+	(envelope-from <laurent@vivier.eu>) id 1ecG1a-0000vP-SM
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:39:03 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:64427)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecG1a-0000ue-IQ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:38:58 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu, 18 Jan 2018 20:38:39 +0100
+Message-Id: <20180118193846.24953-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v4 0/7] target/m68k: supervisor mode (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +21,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>, Rik van Riel <riel@surriel.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <huth@tuxfamily.org>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
+This series introduces the MC68040 MMU.
 
-> 
-> On Thu, Jan 18, 2018 at 10:54 AM, Pankaj Gupta <pagupta@redhat.com> wrote:
-> >
-> >>
-> >> >> I'd like to emphasize again, that I would prefer a virtio-pmem only
-> >> >> solution.
-> >> >>
-> >> >> There are architectures out there (e.g. s390x) that don't support
-> >> >> NVDIMMs - there is no HW interface to expose any such stuff.
-> >> >>
-> >> >> However, with virtio-pmem, we could make it work also on architectures
-> >> >> not having ACPI and friends.
-> >> >
-> >> > ACPI and virtio-only can share the same pmem driver. There are two
-> >> > parts to this, region discovery and setting up the pmem driver. For
-> >> > discovery you can either have an NFIT-bus defined range, or a new
-> >> > virtio-pmem-bus define it. As far as the pmem driver itself it's
-> >> > agnostic to how the range is discovered.
-> >> >
-> >>
-> >> And in addition to discovery + setup, we need the flush via virtio.
-> >>
-> >> > In other words, pmem consumes 'regions' from libnvdimm and the a bus
-> >> > provider like nfit, e820, or a new virtio-mechansim produce 'regions'.
-> >> >
-> >>
-> >> That sounds good to me. I would like to see how the ACPI discovery
-> >> variant connects to a virtio ring.
-> >>
-> >> The natural way for me would be:
-> >>
-> >> A virtio-X device supplies a memory region ("discovery") and also the
-> >> interface for flushes for this device. So one virtio-X corresponds to
-> >> one pmem device. No ACPI to be involved (also not on architectures that
-> >> have ACPI)
-> >
-> > I agree here if we discover regions with virtio-X we don't need to worry
-> > about
-> > NFIT ACPI. Actually, there are three ways to do it with pros and cons of
-> > these
-> > approaches:
-> >
-> > 1] Existing pmem driver & virtio for region discovery:
-> >   -----------------------------------------------------
-> >   Use existing pmem driver which is tightly coupled with concepts of
-> >   namespaces, labels etc
-> >   from ACPI region discovery and re-implement these concepts with virtio so
-> >   that existing
-> >   pmem driver can understand it. In addition to this, task of pmem driver
-> >   to send flush command
-> >   using virtio.
-> 
-> It's not tightly coupled. The whole point of libnvdimm is to be
-> agnostic to ACPI, e820 or any other range discovery. The only work to
-> do beyond identifying the address range is teaching libnvdimm to pass
-> along a flush control interface to the pmem driver.
+But first of all, we need to modify the prototype
+of tlb_fill() and handle_mmu_fault handler to pass
+the size of the access. MC68040 stores this value
+in the exception stack frame.
 
-o.k that means we can configure libnvdimm with virtio as well and use existing pmem
-driver. AFAICU it uses nvdimm bus? 
+Following patches add:
+- MMU page table and fault handlers,
+- Transparent Translation Registers
+- instruction "moves" to move data
+  between user and kernel space
+- instructions pflush/ptest, to flush TLB and
+  convert virtual address to physical address
+- "info tlb" HMP command
 
-Do we need other features which ACPI provides?
+I have tested it doesn't break QEMU linux-user mode
+emulation and coldfire softmmu machine.
 
-acpi_nfit_init
- nvdimm_bus_register
-  ...
-    acpi_nfit_register_region
-      acpi_region_create
-        nvdimm_pmem_region_create
-  
-Also, need to check how to pass virtio flush interface.
+With the help of these patches I'm able to start
+a debian etch-m68k, but the following patches
+are still missing in master:
+- m68k softfloat series
+- Quadra 800 machine emulation series
+  (VIA emulation, Nubus emulation,
+   ESCC control/data address bit selector,
+   video card emulation, ESP Pseudo-DMA,
+   SWIM floppy controller, Apple Sound Chip
+   emulation, and some big-endian fixes for
+   dp8393x)
 
-> 
-> >
-> > 2] Existing pmem driver & ACPI NFIT for region discovery:
-> >   ----------------------------------------------------------------
-> > - If we use NFIT ACPI, we need to teach existing ACPI driver to add this
-> > new memory
-> >   type and teach existing pmem driver to handle this new memory type. Still
-> >   we need
-> >   an asynchronous(virtio) way to send flush commands. We need virtio
-> >   device/driver
-> >   or arbitrary key/value like pair just to send commands from guest to host
-> >   using virtio.
-> >
-> > 3] New Virtio pmem driver & paravirt device:
-> >  ----------------------------------------
-> >   Third way is new virtio pmem driver with less work to support existing
-> >   features of different protocols,
-> >   and with asynchronous way of sending flush commands.
-> >
-> >   But this needs to duplicate some of the work which existing pmem driver
-> >   does but as discussed
-> >   previously we can separate common code from existing pmem driver and
-> >   reuse it.
-> >
-> > Among these approaches I also prefer 3].
-> 
-> I disagree, the reason we went down this ACPI path was to limit the
-> needless duplication of most of the pmem driver.
+v4: Add some defines and use them
+    fix parameter of M68K_UDT_VALID() and M68K_PDT_VALID()
+    align logical/physical on TARGET_PAGE_SIZE for tlb_set_page()
+    remove QEMU_SFC and QEMU_DFC
+    use directly tb->flags
 
-yes.
-> 
+v3: fix checkpatch.pl errors/warnings
+    s/smaller/smallest/
+
+v2: use "0" for the access size when we don't know
+    the size of the access
+    move mmu_fault to CPUM68KState
+    set TARGET_PAGE_BITS to 12 to avoid tlb_add_large_page() path
+    use -page_size to mask address instead of TARGET_PAGE_MASK
+    add ACCESS_DEBUG to not update page table USED/MODIFIED bits
+    on gdb access
+    rename ACCESS_INT to ACCESS_DATA
+    add index parameter to gen_load()/gen_store()
+    copy bit 2 of SFC and DFC to tb->flags to
+    inline memory access in moves decoder
+    change ACCESS_PTEST value because of new ACCESS_DEBUG
+
+Laurent Vivier (7):
+  accel/tcg: add size paremeter in tlb_fill()
+  target/m68k: add MC68040 MMU
+  target/m68k: add Transparent Translation
+  target/m68k: add index parameter to gen_load()/gen_store() and Co.
+  target/m68k: add moves
+  target/m68k: add pflush/ptest
+  target/m68k: add HMP command "info tlb"
+
+ accel/tcg/cputlb.c            |  13 +-
+ accel/tcg/softmmu_template.h  |  14 +-
+ accel/tcg/user-exec.c         |   2 +-
+ hmp-commands-info.hx          |   2 +-
+ include/exec/exec-all.h       |   6 +-
+ include/qom/cpu.h             |   2 +-
+ target/alpha/cpu.h            |   2 +-
+ target/alpha/helper.c         |   4 +-
+ target/alpha/mem_helper.c     |   6 +-
+ target/arm/cpu.c              |   4 +-
+ target/arm/op_helper.c        |   4 +-
+ target/cris/cpu.h             |   2 +-
+ target/cris/helper.c          |   4 +-
+ target/cris/op_helper.c       |   6 +-
+ target/hppa/cpu.h             |   3 +-
+ target/hppa/helper.c          |   2 +-
+ target/hppa/op_helper.c       |   2 +-
+ target/i386/cpu.h             |   2 +-
+ target/i386/excp_helper.c     |   4 +-
+ target/i386/mem_helper.c      |   6 +-
+ target/lm32/cpu.h             |   2 +-
+ target/lm32/helper.c          |   2 +-
+ target/lm32/op_helper.c       |   6 +-
+ target/m68k/cpu.c             |   4 +-
+ target/m68k/cpu.h             | 161 ++++++++++-
+ target/m68k/helper.c          | 606 +++++++++++++++++++++++++++++++++++++++++-
+ target/m68k/helper.h          |   2 +
+ target/m68k/monitor.c         |  22 ++
+ target/m68k/op_helper.c       | 101 ++++++-
+ target/m68k/translate.c       | 233 +++++++++++-----
+ target/microblaze/cpu.h       |   2 +-
+ target/microblaze/helper.c    |   4 +-
+ target/microblaze/op_helper.c |   6 +-
+ target/mips/helper.c          |   2 +-
+ target/mips/internal.h        |   2 +-
+ target/mips/op_helper.c       |  10 +-
+ target/moxie/cpu.h            |   2 +-
+ target/moxie/helper.c         |  10 +-
+ target/nios2/cpu.h            |   2 +-
+ target/nios2/helper.c         |   6 +-
+ target/nios2/mmu.c            |   6 +-
+ target/openrisc/cpu.h         |   2 +-
+ target/openrisc/mmu.c         |   8 +-
+ target/openrisc/mmu_helper.c  |   6 +-
+ target/ppc/cpu.h              |   2 +-
+ target/ppc/mmu_helper.c       |   4 +-
+ target/ppc/user_only_helper.c |   2 +-
+ target/s390x/excp_helper.c    |   4 +-
+ target/s390x/internal.h       |   2 +-
+ target/s390x/mem_helper.c     |   8 +-
+ target/sh4/cpu.h              |   2 +-
+ target/sh4/helper.c           |   4 +-
+ target/sh4/op_helper.c        |   6 +-
+ target/sparc/cpu.h            |   2 +-
+ target/sparc/ldst_helper.c    |   6 +-
+ target/sparc/mmu_helper.c     |   6 +-
+ target/tilegx/cpu.c           |   4 +-
+ target/tricore/op_helper.c    |   4 +-
+ target/unicore32/cpu.h        |   2 +-
+ target/unicore32/helper.c     |   2 +-
+ target/unicore32/op_helper.c  |   6 +-
+ target/unicore32/softmmu.c    |   2 +-
+ target/xtensa/op_helper.c     |   4 +-
+ 63 files changed, 1167 insertions(+), 202 deletions(-)
+
+-- 
+2.14.3
