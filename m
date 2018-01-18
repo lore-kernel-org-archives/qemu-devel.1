@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecJeW-0002lc-1b
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:31:25 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecJiD-0004ix-Pn
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:35:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecJeS-0000G2-Tx
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:31:24 -0500
-Date: Fri, 19 Jan 2018 10:28:29 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ecJiC-0002Cc-9I
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:35:13 -0500
+Date: Fri, 19 Jan 2018 10:33:22 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180118232829.GX30352@umbus.fritz.box>
-References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
-	<20180108055348.20444-2-david@gibson.dropbear.id.au>
-	<f1f754e4-adbf-0b18-e5f5-55d68e2edd89@redhat.com>
+Message-ID: <20180118233322.GZ30352@umbus.fritz.box>
+References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
+	<20180115063235.7518-7-sjitindarsingh@gmail.com>
+	<20180118052029.GR30352@umbus.fritz.box>
+	<0cdab21f-0f70-f705-9ae3-e95eea69f65e@ozlabs.ru>
+	<20180118055348.GU30352@umbus.fritz.box>
+	<3680b2ae-def7-9b00-81d8-eb66ec0bea4e@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1hAU+gb7eAuiw2fm"
+	protocol="application/pgp-signature"; boundary="oUI2l+Vq7ILP1REU"
 Content-Disposition: inline
-In-Reply-To: <f1f754e4-adbf-0b18-e5f5-55d68e2edd89@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 01/12] target-ppc: optimize cmp translation
+In-Reply-To: <3680b2ae-def7-9b00-81d8-eb66ec0bea4e@ozlabs.ru>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 6/6]
+ target/ppc/spapr: Add H-Call H_GET_CPU_CHARACTERISTICS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: peter.maydell@linaro.org, surajjs@au1.ibm.com, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---1hAU+gb7eAuiw2fm
+--oUI2l+Vq7ILP1REU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 18, 2018 at 05:36:40PM +0100, Paolo Bonzini wrote:
-> On 08/01/2018 06:53, David Gibson wrote:
-> > From: "pbonzini@redhat.com" <pbonzini@redhat.com>
+On Thu, Jan 18, 2018 at 07:11:41PM +1100, Alexey Kardashevskiy wrote:
+> On 18/01/18 16:53, David Gibson wrote:
+> > On Thu, Jan 18, 2018 at 04:44:28PM +1100, Alexey Kardashevskiy wrote:
+> >> On 18/01/18 16:20, David Gibson wrote:
+> >>> On Mon, Jan 15, 2018 at 05:32:35PM +1100, Suraj Jitindar Singh wrote:
+> >>>> The new H-Call H_GET_CPU_CHARACTERISTICS is used by the guest to que=
+ry
+> >>>> behaviours and available characteristics of the cpu.
+> >>>>
+> >>>> Implement the handler for this new H-Call which formulates its respo=
+nse
+> >>>> based on the setting of the spapr_caps cap-cfpc, cap-sbbc and cap-ib=
+s.
+> >>>>
+> >>>> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> >>>> ---
+> >>>>  hw/ppc/spapr_hcall.c   | 66 +++++++++++++++++++++++++++++++++++++++=
++++++++++++
+> >>>>  include/hw/ppc/spapr.h |  1 +
+> >>>>  2 files changed, 67 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> >>>> index 51eba52e86..a693d3b852 100644
+> >>>> --- a/hw/ppc/spapr_hcall.c
+> >>>> +++ b/hw/ppc/spapr_hcall.c
+> >>>> @@ -1654,6 +1654,69 @@ static target_ulong h_client_architecture_sup=
+port(PowerPCCPU *cpu,
+> >>>>      return H_SUCCESS;
+> >>>>  }
+> >>>> =20
+> >>>> +static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+> >>>> +                                              sPAPRMachineState *sp=
+apr,
+> >>>> +                                              target_ulong opcode,
+> >>>> +                                              target_ulong *args)
+> >>>> +{
+> >>>> +    uint64_t characteristics =3D H_CPU_CHAR_HON_BRANCH_HINTS &
+> >>>> +			       ~H_CPU_CHAR_THR_RECONF_TRIG;
+> >>>> +    uint64_t behaviour =3D H_CPU_BEHAV_FAVOUR_SECURITY;
+> >>>> +    uint8_t safe_cache =3D spapr_get_cap(spapr, SPAPR_CAP_CFPC);
+> >>>> +    uint8_t safe_bounds_check =3D spapr_get_cap(spapr, SPAPR_CAP_SB=
+BC);
+> >>>> +    uint8_t safe_indirect_branch =3D spapr_get_cap(spapr, SPAPR_CAP=
+_IBS);
+> >>>> +
+> >>>> +    switch (safe_cache) {
+> >>>> +    case SPAPR_CAP_WORKAROUND:
+> >>>> +        characteristics |=3D H_CPU_CHAR_L1D_FLUSH_ORI30;
+> >>>> +        characteristics |=3D H_CPU_CHAR_L1D_FLUSH_TRIG2;
+> >>>> +        characteristics |=3D H_CPU_CHAR_L1D_THREAD_PRIV;
+> >>>> +        behaviour |=3D H_CPU_BEHAV_L1D_FLUSH_PR;
+> >>>> +        break;
+> >>>> +    case SPAPR_CAP_FIXED:
+> >>>> +        break;
+> >>>> +    default: /* broken */
+> >>>> +        if (safe_cache !=3D SPAPR_CAP_BROKEN) {
+> >>>
+> >>> I think you just assert() for this.  The only way these could get a
+> >>> different value is if there's a bug elsewhere.
+> >>
+> >>
+> >> Why not return H_HARDWARE or other error?
 > >=20
-> > We know that only one bit (in addition to SO) is going to be set in
-> > the condition register, so do two movconds instead of three setconds,
-> > three shifts and two ORs.
-> >=20
-> > For ppc64-linux-user, the code size reduction is around 5% and the
-> > performance improvement slightly less than 10%.  For softmmu, the
-> > improvement is around 5%.
-> >=20
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  target/ppc/translate.c | 29 ++++++++++++-----------------
-> >  1 file changed, 12 insertions(+), 17 deletions(-)
-> >=20
-> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > index 4075fc8589..8a6bd329d0 100644
-> > --- a/target/ppc/translate.c
-> > +++ b/target/ppc/translate.c
-> > @@ -605,27 +605,22 @@ static opc_handler_t invalid_handler =3D {
-> >  static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
-> >  {
-> >      TCGv t0 =3D tcg_temp_new();
-> > -    TCGv_i32 t1 =3D tcg_temp_new_i32();
-> > -
-> > -    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
-> > -
-> > -    tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1=
-);
-> > -    tcg_gen_trunc_tl_i32(t1, t0);
-> > -    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
-> > -    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-> > +    TCGv t1 =3D tcg_temp_new();
-> > +    TCGv_i32 t =3D tcg_temp_new_i32();
-> > =20
-> > -    tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1=
-);
-> > -    tcg_gen_trunc_tl_i32(t1, t0);
-> > -    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
-> > -    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-> > +    tcg_gen_movi_tl(t0, CRF_EQ);
-> > +    tcg_gen_movi_tl(t1, CRF_LT);
-> > +    tcg_gen_movcond_tl((s ? TCG_COND_LT : TCG_COND_LTU), t0, arg0, arg=
-1, t1, t0);
-> > +    tcg_gen_movi_tl(t1, CRF_GT);
-> > +    tcg_gen_movcond_tl((s ? TCG_COND_GT : TCG_COND_GTU), t0, arg0, arg=
-1, t1, t0);
-> > =20
-> > -    tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
-> > -    tcg_gen_trunc_tl_i32(t1, t0);
-> > -    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
-> > -    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-> > +    tcg_gen_trunc_tl_i32(t, t0);
-> > +    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
-> > +    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t);
-> > =20
-> >      tcg_temp_free(t0);
-> > -    tcg_temp_free_i32(t1);
-> > +    tcg_temp_free(t1);
-> > +    tcg_temp_free_i32(t);
-> >  }
-> > =20
-> >  static inline void gen_op_cmpi(TCGv arg0, target_ulong arg1, int s, in=
-t crf)
-> >=20
+> > Because what's the guest supposed to do with it.=20
 >=20
-> David, can you queue this again now that the ARM backend has been
-> fixed?
+> "oops"
 
-Done, thanks.
+Thereby making what is definitely a qemu bug appear to be a guest
+problem.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -114,24 +114,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---1hAU+gb7eAuiw2fm
+--oUI2l+Vq7ILP1REU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphLZ0ACgkQbDjKyiDZ
-s5IphxAA5IeNggCHcv0oaLo2RGNJVN+nxfpghDo21DP6605pVSpfaafO0N12bOa+
-Se6B/eVZmhoaKcLSCgnFMPI8xzcSMbD3583NxzmhQAHGIUsJ8Stw+MkFvJvSrevO
-mGgRAVkonLPEFpjBUDI8A9D/Xa24ZZpdlRhSn0CXf4wKejolkgXEJ8gvzpZAIhxm
-NSeT9BI8zZY1MckhKmxkvYnn2dNWuqj2qu2OZWp7T43FVNJaZML11puLp1wqp/ZK
-vgfwGXeXHhzS2I/9JMP15A/awIu9/lKq+B5zBE1PzCXrlCs+4ocQYKzEuGMaEwEo
-bkBS2KutSeftijvZnjwD2znvPajIKg8tRQOLJtE2I39eStR8DZ54AjowMoQYCRAP
-Tt4rW+aQjLzuaxfp8GuAZhOngeDfgMlgF6fRy8TAy24cQZWEy0VvJ/apkkfRAmBl
-PT3cYr0YaQ/N01fv7cOTUqXNEhC3m57DLMaTJp38ZoXNRAZlgZf2lh4Pdy59ey2B
-GWdM8Pi7mopuSDSkuZjsqmt0ygO9Gylvei0yXKiokH959sj8tylaI0LKlZjg46+J
-OZ9iBEis94l3IY14C0JFs4C+RdNUOcnHWUQXsn7434izbcL8RDcTGRikwtmUqTE/
-QXaL7NNgd8oII2zSLl4SFhWP5ES2fZtCeI/e/hjyZvcEvjGa0WM=
-=eRVU
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphLsIACgkQbDjKyiDZ
+s5LdxxAAsEMShkcxak2PUiQKClLlQzgSKpt1SQjNLfiAznIipmja4seU0Bp1xLBe
+7w5M3NjrhLgjPXu/ETM9jGjFEPdKlBOyGXEQnGf434DVKAkeNFAVwe8qyI7e/stp
+1t1QboJyN47UmHlOh/3IOHVLsKMVwQMYyf/o/srw2vlIENCz+V04Jgr2JHOKkorV
+ZnJN1CBN7sh04BxCjuYKs4dvT9e0bKquXmt1XNHx510IszMeH9gnGJtNgssFOVR/
+rVz0Qp+n8ON3bdyLnS3d7n0+rNADUdxIMm+GfYcB+uPnHmawz1k2peIGh59gtyYj
+0vQHZP9QNstRvrUnqwYqgN5n6GnUwlJgw1ynqDm+3p5coicmm0AI5v4WixO+E0Ho
+I9vKuArKBGkS1/qPuSJzoXnetLXu7XAChexYRDUUFizgHf9lpQx2Hk2hVQ4pSfBw
+yiU2vxA9KPn8oHY1Y3/csvBu/z7cUlGh/ch71F+Xfnl3ssfZms+FE2aueSooRcMx
+bJKbXJ/AU0Exj2a63yUdBRNAyv+nTZ+T7vLDAv30B7VG1mEiuOlpcwypvFtPjdHc
+aMCiftsrPfk9gcvLQoCpSv9FyzZh1NaMZ/IWUG6p+IoeAvQQKpHfTN/EJTAYmDj1
+E+rfQxhMuHOolSzdAOfc2IMcvSkHj9SrCgZ6vX1MYPETjrxLIdQ=
+=xKlh
 -----END PGP SIGNATURE-----
 
---1hAU+gb7eAuiw2fm--
+--oUI2l+Vq7ILP1REU--
