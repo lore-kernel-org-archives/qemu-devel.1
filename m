@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecHT5-0002WD-M0
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:11:28 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecHbu-00020P-Ae
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:20:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecHT4-0005X3-RT
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:11:27 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1516300623.git.alistair.francis@xilinx.com>
-	<3ddf66fa53e18ba941908bdba5e056e67ccf854b.1516300623.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <77046075-c43f-17b7-40cb-6ecc28d0b9c3@amsat.org>
-Date: Thu, 18 Jan 2018 18:11:17 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1ecHbq-0004VX-Aa
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:20:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecHbq-0004V7-4Z
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:20:30 -0500
+Date: Thu, 18 Jan 2018 19:20:23 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180118212023.GH5292@localhost.localdomain>
+References: <20180118021000.27203-1-ehabkost@redhat.com>
+	<CAFEAcA_JX_eevQL3kM2Kvf_Z3+xTiDRkg6C-EknfMtj_-cRA1g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <3ddf66fa53e18ba941908bdba5e056e67ccf854b.1516300623.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 1/9] microblaze: boot.c: Don't try to
- find NULL pointer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_JX_eevQL3kM2Kvf_Z3+xTiDRkg6C-EknfMtj_-cRA1g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/19] machine queue, 2018-01-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair23@gmail.com, qemu-arm@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-On 01/18/2018 03:37 PM, Alistair Francis wrote:
-> Previously if no device tree was passed to microblaze_load_kernel() then
-> qemu_find_file() would try to find a NULL pointer. To avoid this put a
-> check around qemu_find_file().
+On Thu, Jan 18, 2018 at 03:22:05PM +0000, Peter Maydell wrote:
+> On 18 January 2018 at 02:09, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
+> >
+> >   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+> >
+> > for you to fetch changes up to 901cc8d31f36ac82824ab68f656ab7050404100c:
+> >
+> >   fw_cfg: fix memory corruption when all fw_cfg slots are used (2018-01-17 23:04:37 -0200)
+> >
+> > ----------------------------------------------------------------
+> > machine queue, 2018-01-18
+> >
+> > ----------------------------------------------------------------
 > 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Hi. I'm afraid this doesn't build on 32-bit hosts, due to a
+> format string problem:
+> 
+> In file included from /home/peter.maydell/qemu/exec.c:20:0:
+> /home/peter.maydell/qemu/exec.c: In function 'file_ram_alloc':
+> /home/peter.maydell/qemu/include/qapi/error.h:162:25: error: format
+> '%llx' expects argument of type 'long long unsigned int', but argument
+> 7 has type 'size_t {aka unsigned int}' [-Werror=format=]
+>                          (fmt), ## __VA_ARGS__)
+>                          ^
+> /home/peter.maydell/qemu/exec.c:1616:9: note: in expansion of macro 'error_setg'
+>          error_setg(errp, "aligment 0x%" PRIx64
+>          ^
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Sorry for not catching this.  Fixup will be included on a new
+pull request:
 
-> ---
-> 
->  hw/microblaze/boot.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
-> index 457a08a2fe..35bfeda7aa 100644
-> --- a/hw/microblaze/boot.c
-> +++ b/hw/microblaze/boot.c
-> @@ -124,7 +124,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
->      kernel_cmdline = qemu_opt_get(machine_opts, "append");
->      dtb_arg = qemu_opt_get(machine_opts, "dtb");
->      /* default to pcbios dtb as passed by machine_init */
-> -    if (!dtb_arg) {
-> +    if (!dtb_arg && dtb_filename) {
->          filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, dtb_filename);
->      }
->  
-> 
+diff --git a/exec.c b/exec.c
+index 00055559b8..7bba8ef4ab 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1613,8 +1613,8 @@ static void *file_ram_alloc(RAMBlock *block,
+ 
+     block->page_size = qemu_fd_getpagesize(fd);
+     if (block->mr->align % block->page_size) {
+-        error_setg(errp, "aligment 0x%" PRIx64
+-                   " must be multiples of page size 0x%" PRIx64,
++        error_setg(errp, "alignment 0x%" PRIx64
++                   " must be multiples of page size 0x%zd",
+                    block->mr->align, block->page_size);
+         return NULL;
+     }
+
+-- 
+Eduardo
