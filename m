@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1ec7kX-0001It-7s
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:48:50 -0500
+	(envelope-from <berrange@redhat.com>) id 1ec7l7-0001cV-0P
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:49:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1ec7kW-0005pc-4E
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:48:49 -0500
-Received: from mail-io0-x22d.google.com ([2607:f8b0:4001:c06::22d]:34312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1ec7kV-0005pH-Um
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:48:48 -0500
-Received: by mail-io0-x22d.google.com with SMTP id c17so24397164iod.1
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 02:48:47 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <824534a8-89ea-7b7a-40c9-1e4b5266e648@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1ec7l3-0006Fx-SL
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:49:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ec7l3-0006Ff-LY
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:49:21 -0500
+Date: Thu, 18 Jan 2018 10:49:16 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180118104916.GF19695@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <CAKXe6SJtWUFY8hN=dXzFCzztcsGkWbNx+1WZba05Rp3TqO_38w@mail.gmail.com>
-	<824534a8-89ea-7b7a-40c9-1e4b5266e648@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 18 Jan 2018 18:48:06 +0800
-Message-ID: <CAKXe6SJwebj1Jzkwn8nCCkXZbx3HzOEYT8RFfKoJsiDfwiuvdg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKXe6SJtWUFY8hN=dXzFCzztcsGkWbNx+1WZba05Rp3TqO_38w@mail.gmail.com>
 Subject: Re: [Qemu-devel] Do I need update the microcode of virtual machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,54 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-2018-01-18 18:43 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
+On Thu, Jan 18, 2018 at 06:38:57PM +0800, Li Qiang wrote:
+> Hi Paolo, all,
+> 
+> I have a question about the intel microcode update for spectre variant#2.
+> From my understanding, there is no need to update the microcode of VMs
+> because the kvm has expose the SPEC_CTL and PRED_CMD to the guest.
+> Also, if we need to update the micorcode in guest, who is the vendor for
+> this.
+> From the hyper-v, I think I'm right.
+> -->
+> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE-2017-5715-and-hyper-v-vms
+> 
+> But upon I update the centos guest, the host kvm/qemu has been updated.
+> The IBPB_ENABLED and IBRS_ENABLED are both zero if I don't update the
+> microcode in the guest.
+> If I update the guest micorcode, the are both 1.
+>
+> So I want to know, if I should update the microcode in guest.
+> If the answer is Yes, then what about the Windows guest, how to update the
+> microcode?
 
-> On 18/01/2018 11:38, Li Qiang wrote:
-> > Hi Paolo, all,
-> >
-> > I have a question about the intel microcode update for spectre variant#2.
-> > From my understanding, there is no need to update the microcode of VMs
-> > because the kvm has expose the SPEC_CTL and PRED_CMD to the guest.
-> > Also, if we need to update the micorcode in guest, who is the vendor for
-> > this.
->
-> The guest has no microcode of it's own, but you need to update the
-> microcode in the host.  You also need to update the kernel, QEMU and
-> libvirt if you are using it.
->
-> > From the hyper-v, I think I'm right.
-> > -->https://docs.microsoft.com/en-us/virtualization/hyper-v-
-> on-windows/CVE-2017-5715-and-hyper-v-vms
-> >
-> > But upon I update the centos guest, the host kvm/qemu has been updated.
-> > The IBPB_ENABLED and IBRS_ENABLED are both zero if I don't update the
-> > microcode in the guest. If I update the guest micorcode, the are both 1.
->
-> What do you mean by "update the guest microcode"?  Did you mean host?
->
+Microcode updates are only applicable to the physical CPUs seen by the
+host. There is no concept of microcde for virtual CPUs in the guest. The
+guest merely sees whatever CPU feature the hypervisor has permitted it to
+see. IOW, as described in that microsoft link, you need to
 
-No, here mean the guest. By overwrite guest's files in
-/lib/firmware/intel-ucode/ directory and "echo 1 >
-/sys/devices/system/cpu/microcode/reload" as Intel's instruction says.
-The host's kvm and qemu has been got updated before this.
+ - Update microcode and/or firmware in host
+ - Update host hypervisor software
+ - Change hypervisor config for each guest to enable new CPU features
+ - Update guest software (kernel)
+ - Cold boot (ie fully shutoff, and then power on) the guest
 
-Thanks,
-Li Qiang
-
-
->
-> Paolo
->
-> >
-> > So I want to know, if I should update the microcode in guest.
-> > If the answer is Yes, then what about the Windows guest, how to update
-> > the microcode?
-> >
-> >
-> > Thanks,
-> > Li Qiang
->
->
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
