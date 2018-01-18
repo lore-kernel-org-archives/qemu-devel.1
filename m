@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38268)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecEzQ-0007U5-62
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:32:43 -0500
+	id 1ecEzU-0007ZD-3o
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:32:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecEzP-0003bQ-1z
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:32:40 -0500
+	id 1ecEzT-0003cu-1D
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:32:43 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 18 Jan 2018 15:31:06 -0300
-Message-Id: <20180118183108.16009-15-f4bug@amsat.org>
+Date: Thu, 18 Jan 2018 15:31:07 -0300
+Message-Id: <20180118183108.16009-16-f4bug@amsat.org>
 In-Reply-To: <20180118183108.16009-1-f4bug@amsat.org>
 References: <20180118183108.16009-1-f4bug@amsat.org>
 In-Reply-To: <20180118182510.15630-1-f4bug@amsat.org>
@@ -19,7 +19,7 @@ References: <20180118182510.15630-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 15/17] hw/arm/xilinx_zynq: implement SDHCI
+Subject: [Qemu-devel] [PATCH v8 16/17] hw/arm/exynos4210: implement SDHCI
  Spec v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,118 +30,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:Xilinx Zynq" <qemu-arm@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "open list:Exynos" <qemu-arm@nongnu.org>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/arm/xilinx_zynq.c | 70 ++++++++++++++++++++++++++++++++++------------------
- tests/sdhci-test.c   |  4 +++
- 2 files changed, 50 insertions(+), 24 deletions(-)
+Krzysztof kindly checked those values with Manaul, the Samsung datasheet :)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 1836a4ed45..349787aacd 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -165,10 +165,8 @@ static void zynq_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
--    DeviceState *dev, *carddev;
-+    DeviceState *dev;
-     SysBusDevice *busdev;
--    DriveInfo *di;
--    BlockBackend *blk;
-     qemu_irq pic[64];
-     int n;
+ hw/arm/exynos4210.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index e8e1d81e62..e70e234f58 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -75,7 +75,6 @@
+ #define EXYNOS4210_INT_COMBINER_BASE_ADDR   0x10448000
  
-@@ -247,27 +245,51 @@ static void zynq_init(MachineState *machine)
-     gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
-     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
+ /* SD/MMC host controllers */
+-#define EXYNOS4210_SDHCI_CAPABILITIES       0x05E80080
+ #define EXYNOS4210_SDHCI_BASE_ADDR          0x12510000
+ #define EXYNOS4210_SDHCI_ADDR(n)            (EXYNOS4210_SDHCI_BASE_ADDR + \
+                                                 0x00010000 * (n))
+@@ -377,8 +376,26 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
+         BlockBackend *blk;
+         DriveInfo *di;
  
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
--
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
-+    for (n = 0; n < 2; n++) {
-+        int hci_irq = n ? 79 : 56;
-+        hwaddr hci_addr = n ? 0xE0101000 : 0xE0100000;
-+        DriveInfo *di;
-+        BlockBackend *blk;
-+        DeviceState *carddev;
-+
 +        /* Compatible with:
-+         * - SD Host Controller Specification Version 2.0 Part A2
++         * - SD Host Controller Specification Version 2.0
 +         * - SDIO Specification Version 2.0
-+         * - MMC Specification Version 3.31
-+         *
-+         * - SDMA (single operation DMA)
-+         * - ADMA1 (4 KB boundary limited DMA)
++         * - MMC Specification Version 4.3
++         * - SDMA
 +         * - ADMA2
 +         *
-+         * - up to seven functions in SD1, SD4, but does not support SPI mode
-+         * - SD high-speed (SDHS) card
-+         * - SD High Capacity (SDHC) card
-+         *
-+         * - Low-speed, 1 KHz to 400 KHz
-+         * - Full-speed, 1 MHz to 50 MHz (25 MB/sec)
++         * As this part of the Exynos4210 is not publically available,
++         * we used the "HS-MMC Controller S3C2416X RISC Microprocessor"
++         * public datasheet which is very similar (implementing
++         * MMC Specification Version 4.0 being the only difference noted)
 +         */
-+        dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
+         dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
+-        qdev_prop_set_uint32(dev, "capareg", EXYNOS4210_SDHCI_CAPABILITIES);
 +        qdev_prop_set_uint8(dev, "sd-spec-version", 2);
 +        qdev_prop_set_uint8(dev, "timeout-freq", 0);
 +        qdev_prop_set_uint8(dev, "max-frequency", 0);
-+        qdev_prop_set_bit(dev, "suspend", false);
++        qdev_prop_set_bit(dev, "suspend", true);
 +        qdev_prop_set_bit(dev, "sdma", true);
-+        qdev_prop_set_bit(dev, "adma1", true);
++        qdev_prop_set_bit(dev, "adma1", false);
 +        qdev_prop_set_bit(dev, "adma2", true);
-+        qdev_prop_set_bit(dev, "1v8", false);
-+        qdev_prop_set_bit(dev, "high-speed", true);
-+        qdev_prop_set_uint16(dev, "max-block-length", 1024);
-+        qdev_init_nofail(dev);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, hci_addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[hci_irq - IRQ_OFFSET]);
-+
-+        di = drive_get_next(IF_SD);
-+        blk = di ? blk_by_legacy_dinfo(di) : NULL;
-+        carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
-+        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(carddev), true, "realized",
-+                                 &error_fatal);
-+    }
+         qdev_init_nofail(dev);
  
-     dev = qdev_create(NULL, TYPE_ZYNQ_XADC);
-     qdev_init_nofail(dev);
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 37ada0e1c5..44ee5651c4 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -41,6 +41,10 @@ static const struct sdhci_t {
-     /* Exynos4210 */
-     { "arm",    "smdkc210",
-         {0x12510000, 2, 0, {1, 0x5e80080} } },
-+
-+    /* Zynq-7000 */
-+    { "arm",    "xilinx-zynq-a9",
-+        {0xe0100000, 2, 0, {1, 0x01790080} } },
- };
- 
- static struct {
+         busdev = SYS_BUS_DEVICE(dev);
 -- 
 2.15.1
