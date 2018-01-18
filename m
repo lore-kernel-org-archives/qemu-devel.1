@@ -1,18 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ecF9H-00080u-9K
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:42:52 -0500
+	(envelope-from <dan.j.williams@intel.com>) id 1ecFCE-0002N0-IJ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ecF9G-0003KB-Bq
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:42:51 -0500
-Sender: Alistair Francis <alistair23@gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 18 Jan 2018 10:38:23 -0800
-Message-Id: <188965748a7065402eb1089492669809108b0f0c.1516300623.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1516300623.git.alistair.francis@xilinx.com>
-References: <cover.1516300623.git.alistair.francis@xilinx.com>
-Subject: [Qemu-devel] [PATCH v6 9/9] xlnx-zynqmp: Connect the IPI device to
- the ZynqMP SoC
+	(envelope-from <dan.j.williams@intel.com>) id 1ecFCD-00051p-Jn
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:54 -0500
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:43390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1ecFCD-00051S-EK
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:53 -0500
+Received: by mail-ot0-x22e.google.com with SMTP id p36so12935666otd.10
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 10:45:53 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <72839100-7fdf-693c-e9c2-348a5add8a56@redhat.com>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
+	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
+	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
+	<1511288389.1080.14.camel@redhat.com>
+	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
+	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
+	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
+	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
+	<f1ca60cc-5506-a161-b473-f0de363b7e95@redhat.com>
+	<CAPcyv4j9b6ARvKcJkE25eNHatWACscMJTN_kCLSM6D+bfu_msA@mail.gmail.com>
+	<72839100-7fdf-693c-e9c2-348a5add8a56@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 18 Jan 2018 10:45:51 -0800
+Message-ID: <CAPcyv4iHvXJAiUiaBFPFc98+3BepR1+YeVOqH3imq4Zq2d+iAw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,75 +39,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
+On Thu, Jan 18, 2018 at 9:48 AM, David Hildenbrand <david@redhat.com> wrote:
+>>> I'd like to emphasize again, that I would prefer a virtio-pmem only
+>>> solution.
+>>>
+>>> There are architectures out there (e.g. s390x) that don't support
+>>> NVDIMMs - there is no HW interface to expose any such stuff.
+>>>
+>>> However, with virtio-pmem, we could make it work also on architectures
+>>> not having ACPI and friends.
+>>
+>> ACPI and virtio-only can share the same pmem driver. There are two
+>> parts to this, region discovery and setting up the pmem driver. For
+>> discovery you can either have an NFIT-bus defined range, or a new
+>> virtio-pmem-bus define it. As far as the pmem driver itself it's
+>> agnostic to how the range is discovered.
+>>
+>
+> And in addition to discovery + setup, we need the flush via virtio.
+>
+>> In other words, pmem consumes 'regions' from libnvdimm and the a bus
+>> provider like nfit, e820, or a new virtio-mechansim produce 'regions'.
+>>
+>
+> That sounds good to me. I would like to see how the ACPI discovery
+> variant connects to a virtio ring.
+>
+> The natural way for me would be:
+>
+> A virtio-X device supplies a memory region ("discovery") and also the
+> interface for flushes for this device. So one virtio-X corresponds to
+> one pmem device. No ACPI to be involved (also not on architectures that
+> have ACPI)
 
- include/hw/arm/xlnx-zynqmp.h |  2 ++
- hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
- 2 files changed, 16 insertions(+)
-
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 3e6fb9b7bd..0a2b037c6b 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -28,6 +28,7 @@
- #include "hw/ssi/xilinx_spips.h"
- #include "hw/dma/xlnx_dpdma.h"
- #include "hw/display/xlnx_dp.h"
-+#include "hw/intc/xlnx-zynqmp-ipi.h"
- 
- #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
- #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-@@ -90,6 +91,7 @@ typedef struct XlnxZynqMPState {
-     XlnxZynqMPQSPIPS qspi;
-     XlnxDPState dp;
-     XlnxDPDMAState dpdma;
-+    XlnxZynqMPIPI ipi;
- 
-     char *boot_cpu;
-     ARMCPU *boot_cpu_ptr;
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 325642058b..ca398c4159 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -50,6 +50,9 @@
- #define DPDMA_ADDR          0xfd4c0000
- #define DPDMA_IRQ           116
- 
-+#define IPI_ADDR            0xFF300000
-+#define IPI_IRQ             64
-+
- static const uint64_t gem_addr[XLNX_ZYNQMP_NUM_GEMS] = {
-     0xFF0B0000, 0xFF0C0000, 0xFF0D0000, 0xFF0E0000,
- };
-@@ -183,6 +186,9 @@ static void xlnx_zynqmp_init(Object *obj)
- 
-     object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
-     qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
-+
-+    object_initialize(&s->ipi, sizeof(s->ipi), TYPE_XLNX_ZYNQMP_IPI);
-+    qdev_set_parent_bus(DEVICE(&s->ipi), sysbus_get_default());
- }
- 
- static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-@@ -454,6 +460,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                              &error_abort);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dpdma), 0, DPDMA_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
-+
-+    object_property_set_bool(OBJECT(&s->ipi), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ipi), 0, IPI_ADDR);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->ipi), 0, gic_spi[IPI_IRQ]);
- }
- 
- static Property xlnx_zynqmp_props[] = {
--- 
-2.14.1
+Hmm, yes, it seems if ACPI is just going to be used as a trigger for
+"go find the virtio-X interface for this range" we could have started
+from a virtio device in the first place.
