@@ -1,33 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecABA-0000J5-UL
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:24:30 -0500
+	(envelope-from <clg@kaod.org>) id 1ecAE5-0001Pk-2h
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:27:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecAB6-0000rA-Rv
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:24:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46894)
+	(envelope-from <clg@kaod.org>) id 1ecAE1-0002GA-0L
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:27:29 -0500
+Received: from 12.mo3.mail-out.ovh.net ([188.165.41.191]:43751)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecAB6-0000qO-Hw
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:24:24 -0500
-Date: Thu, 18 Jan 2018 11:24:15 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180118132415.GU627@localhost.localdomain>
-References: <82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
-	<97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
-	<20180115140455.GN6646@localhost.localdomain>
-	<20180115142518.GN1602429@orkuz.home>
-	<20180115143156.GO6646@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
-	<20180116115113.GA627@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
-	<20180118024232.GT627@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ecAE0-00028d-Qg
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:27:24 -0500
+Received: from player158.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id C72211867C1
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 14:27:15 +0100 (CET)
+References: <20171209084338.29395-1-clg@kaod.org>
+	<20171209084338.29395-3-clg@kaod.org>
+	<20171220050947.GC5981@umbus.fritz.box>
+	<1513815126.2743.34.camel@kernel.crashing.org>
+	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+	<1516187433.31850.189.camel@kernel.crashing.org>
+	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+	<1516224472.31850.193.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <988ba765-5f0b-26eb-569a-2118eb533bf9@kaod.org>
+Date: Thu, 18 Jan 2018 14:27:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
- Trace feature support
+In-Reply-To: <1516224472.31850.193.camel@kernel.crashing.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,149 +40,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Kang, Luwei" <luwei.kang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On Thu, Jan 18, 2018 at 05:33:53AM +0000, Kang, Luwei wrote:
-> > > > > > > On Mon, Jan 15, 2018 at 12:04:55 -0200, Eduardo Habkost wrote:
-> > > > > > > > CCing libvirt developers.
-> > > > > > > ...
-> > > > > > > > This case is slightly more problematic, however: the new
-> > > > > > > > feature is actually migratable (under very controlled
-> > > > > > > > circumstances) because of patch 2/2, but it is not
-> > > > > > > > migration-safe[1].  This means libvirt shouldn't include it
-> > > > > > > > in "host-model" expansion (which uses the
-> > > > > > > > query-cpu-model-expansion QMP command) until we make the feature migration-safe.
-> > > > > > > >
-> > > > > > > > For QEMU, this means the feature shouldn't be returned by
-> > > > > > > > "query-cpu-model-expansion type=static model=max" (but it
-> > > > > > > > can be returned by "query-cpu-model-expansion type=full model=max").
-> > > > > > > >
-> > > > > > > > Jiri, it looks like libvirt uses type=full on
-> > > > > > > > query-cpu-model-expansion on x86.  It needs to use
-> > > > > > > > type=static[2], or it will have no way to find out if a
-> > > > > > > > feature is migration-safe or not.
-> > > > > > > ...
-> > > > > > > > [2] It looks like libvirt uses type=full because it wants to get
-> > > > > > > >     all QOM property aliases returned.  In this case, one
-> > > > > > > >     solution for libvirt is to use:
-> > > > > > > >
-> > > > > > > >     static_expansion = query_cpu_model_expansion(type=static, model)
-> > > > > > > >     all_props = query_cpu_model_expansion(type=full,
-> > > > > > > > static_expansion)
-> > > > > > >
-> > > > > > > This is exactly what libvirt is doing (with model = "host")
-> > > > > > > ever since query-cpu-model-expansion support was implemented for x86.
-> > > > > >
-> > > > > > Oh, now I see that the x86 code uses
-> > > > > > QEMU_MONITOR_CPU_MODEL_EXPANSION_STATIC_FULL and not just QEMU_MONITOR_CPU_MODEL_EXPANSION_FULL.
-> > > > Nice!
-> > > > > >
-> > > > >
-> > > > > So, I need to add Intel PT feature in "X86CPUDefinition
-> > > > > builtin_x86_defs[]" so that we can get this CPUID in specific CPU
-> > > > > model not only "-cpu host". Is that right?
-> > > >
-> > > > The problem is that you won't be able to add intel-pt to any CPU
-> > > > model unless the feature is made migration-safe (by not calling
-> > > > kvm_arch_get_supported_cpuid() from cpu_x86_cpuid()).
-> > >
-> > > Hi Eduardo,
-> > >     Have some question need you help clear. What is
-> > >     "migration-safe" feature mean? I find all the feature which
-> > >     included in CPU model (builtin_x86_defs[]) will make
-> > >     "xcc->migration_safe = true;" in
-> > >     x86_cpu_cpudef_class_init(). If create a Skylake guest on
-> > >     Skylake HW and live migrate this guest to another machine
-> > >     with old HW(e.g Haswell). Can we think the new feature or
-> > >     cpu model(Skylake guest) which only supported in Skylake HW
-> > >     is safe?
-> > 
-> > I mean matching the requirements so we can say the feature is migration-safe, that means exposing the same CPUID data to the
-> > guest on any host, if the machine-type + command-line is the same.  The data on CPUID[7] is OK (it changes according to the
-> > command-line options only), but the data exposed on CPUID[14h] on this patch is not migration-safe (it changes depending on the
-> > host it is running).
-> > 
-> 
-> Many thanks for your clarification.  I think I have understood.
-> But CPUID[14h] is depend on CPUID[7].EBX[bit25] and it would be
-> zero if CPUID[7].EBX[bit25] is not set. Or what you concerned
-> is make live migration on two different HW which all support
-> Intel PT virtualization but have different  CPUID[14h] result?
-> This may need to think about.
+On 01/17/2018 10:27 PM, Benjamin Herrenschmidt wrote:
+> On Wed, 2018-01-17 at 15:39 +0100, C=C3=A9dric Le Goater wrote:
+>> Migration is a problem. We will need both backend QEMU objects to be=20
+>> available anyhow if we want to migrate. So we are back to the current=20
+>> solution creating both QEMU objects but we can try to defer some of th=
+e=20
+>> KVM inits and create the KVM device on demand at CAS time.
+>=20
+> Do we have a way to migrate a piece of info from the machine *first*
+> that indicate what type of XICS/XIVE to instanciate ?
 
-Yes.  If intel-pt is off, the results (CPUID[14h] all zeroes) are
-migration-safe.  Setting intel-pt=on makes the command-line not
-migration-safe.
+The source and the target machines should have the same realized=20
+objects. I think this is the simplest solution to keep the migration=20
+framework maintainable.=20
 
-This is OK, in principle (e.g. the "pmu" option is not
-migration-safe and behaves the same way).  The only problem is
-that this patch would make query-cpu-model-expansion return
-intel-pt=on on type=static expansion.
 
-Probably the easiest way to fix that is to specifically exclude
-intel-pt on x86_cpu_static_props().
+I don't think it is a problem to call a xics_fini() routine to=20
+destroy the XICS KVM device if a new interrupt mode was negotiated
+in CAS. We would then call a xive_init() routing to create the new=20
+XIVE KVM device.
 
-However, if there's a simple way to make it possible to migrate
-between hosts with different CPUID[14h] data, it would be even
-better.  With the current KVM intel-pt implementation, what
-happens if the CPUID[14h] data seen by the guest doesn't match
-exactly the CPUID[14h] leaves from the host?
+When done, the question boils down to disconnect and reconnect the=20
+vcpus to the KVM device. The QEMU CPU ->intc pointer should be=20
+updated also but that's a QEMU level problem. Already done.
+=20
+In the QEMU "icp-kvm" object, the connection to the KVM device=20
+is currently forced in the realize routine but we can add some=20
+handlers to manage the link. Similar handlers would do the same=20
+in the QEMU "nvt-kvm" object when XIVE is on.
 
-> 
-> Thanks,
-> Luwei Kang
-> 
-> > 
-> > >
-> > > >
-> > > > What's missing here is to either: (a) make cpu_x86_cpuid() return
-> > > > host-independent data (it can be constant, or it can be configurable on the command-line); or (b) add a mechanism to skip intel-
-> > pt from "query-cpu-model-expansion type=static".
-> > >
-> > > ==> it can be constant:
-> > >     I think it shouldn't be constant because Intel PT virtualization can only supported in Ice Lake hardware now. Intel PT cpuid info
-> > would be mask off on old platform.
-> > > ==> or it can be configurable on the command-line:
-> > >     Because of I didn't add this feature in any CPU model. We only can enable this feature by "-cpu Skylake-Server,+intel-pt" at
-> > present.
-> > 
-> > Note that I'm talking about CPUID[14h], not CPUID[7].  The CPUID[7] bits are safe because they are set according to the CPU model
-> > + command-line options only.  The bits on CPUID[14h] change depending on the host and are not migration-safe.  CPUID[7].EBX[bit
-> > 25] is just the (already configurable) bit that enables the migration-unsafe code for CPUID[14h].
-> > 
-> > >
-> > > What about add a new cpu model name "Icelake" and add PT in this. Is that would be migration safe?
-> > 
-> > It won't, because of the CPUID[14h] code that makes it unsafe to migrate between hosts with different Intel-PT capabilities (i.e.
-> > different data on CPUID[14h]).
-> > 
-> > 
-> > >
-> > > Thanks,
-> > > Luwei Kang
-> > >
-> > > > Probably
-> > > > (a) is easier to implement, and it also makes the feature more useful (by making it migration-safe).
-> > > >
-> > > > >
-> > > > > Intel PT is first supported in Intel Core M and 5th generation
-> > > > > Intel Core processors that are based on the Intel
-> > > > > micro-architecture code name Broadwell but Intel PT use EPT is first supported in Ice Lake.
-> > > > > Intel PT virtualization depend on PT use EPT.  I will add Intel PT
-> > > > > to "Broadwell" CPU model and later to make sure a "Broadwell"
-> > > > > guest can use Intel PT if the host is Ice Lake.
-> > > >
-> > > > The "if the host is Ice Lake" part is problematic.  On
-> > > > migration-safe CPU models (all of them except "max" and "host"), the data seen on CPUID can't depend on the host at all.  It
-> > should depend only on the machine-type + command-line options.
-> > > >
-> > > > --
-> > > > Eduardo
-> > 
-> > --
-> > Eduardo
-> 
 
--- 
-Eduardo
+If we think this is a possible way to address the problem, I can=20
+check the above thinking on a XICS KVM machine and force the=20
+init/fini sequence in the CAS negotiation process. I will need=20
+a KVM ioctl to destroy a device and maybe a KVM VCPU ioctl to=20
+disable a capability.=20
+
+Cheers,
+
+C.=20
