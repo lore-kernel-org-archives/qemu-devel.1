@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ecCMN-0006TU-1k
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:44:11 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecCMq-0006q3-Hm
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ecCMJ-00049h-Vq
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:44:11 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37945)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecCMn-0004b8-Ey
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:44:40 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33491)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1ecCMJ-000489-Pu
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:44:07 -0500
-Received: by mail-pf0-x243.google.com with SMTP id k19so14892446pfj.5
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:44:07 -0800 (PST)
-From: Yongji Xie <elohimes@gmail.com>
-Date: Thu, 18 Jan 2018 23:41:56 +0800
-Message-Id: <1516290116-4366-1-git-send-email-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH] libvhost-user: Fix resource leak
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecCMn-0004ax-Aa
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:44:37 -0500
+Received: by mail-qt0-x243.google.com with SMTP id e2so31238611qti.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:44:37 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180118123219.19410-1-f4bug@amsat.org>
+	<20180118123219.19410-7-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <16165fc9-6593-8ee9-1dd9-a28400876e66@amsat.org>
+Date: Thu, 18 Jan 2018 12:44:32 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180118123219.19410-7-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 06/16] sdhci: add
+ init_readonly_registers() to initialize the CAPAB register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +36,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcandre.lureau@redhat.com
-Cc: dgilbert@redhat.com, maxime.coquelin@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-Free the mmaped memory when we need to mmap new memory
-space on vu_set_mem_table_exec() and vu_set_log_base_exec() to
-avoid memory leak.
+On 01/18/2018 09:32 AM, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/sd/sdhci.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index f9264d3be5..08b85558f1 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1174,12 +1174,19 @@ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+>      }
+>  }
+>  
+> +static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+> +{
+> +    if (s->capareg == UINT64_MAX) {
+> +        s->capareg = SDHC_CAPAB_REG_DEFAULT;
+> +    }
+> +}
+> +
+>  /* --- qdev common --- */
+>  
+>  #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
+> -    /* Capabilities registers provide information on supported features
+> -     * of this specific host controller implementation */ \
+> -    DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEFAULT), \
+> +    /* deprecated: Capabilities registers provide information on supported
+> +     * features of this specific host controller implementation */ \
+> +    DEFINE_PROP_UINT64("capareg", _state, capareg, UINT64_MAX), \
+>      DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
+>  
+>  static void sdhci_initfn(SDHCIState *s)
+> @@ -1204,6 +1211,10 @@ static void sdhci_uninitfn(SDHCIState *s)
+>  
+>  static void sdhci_common_realize(SDHCIState *s, Error **errp)
+>  {
+> +    sdhci_init_readonly_registers(s, errp);
+> +    if (errp && *errp) {
 
-Also close the corresponding fd after mmap() on
-vu_set_log_base_exec() to avoid fd leak.
+Paolo said this is wrong (as in bad pattern?).
 
-Signed-off-by: Yongji Xie <xieyongji@baidu.com>
----
- contrib/libvhost-user/libvhost-user.c |   14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+I will respin probably using 'bool sdhci_init_readonly_registers()' instead.
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index f409bd3..cadced7 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -405,6 +405,15 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
-     int i;
-     VhostUserMemory *memory = &vmsg->payload.memory;
-+
-+    for (i = 0; i < dev->nregions; i++) {
-+        VuDevRegion *r = &dev->regions[i];
-+        void *m = (void *) (uintptr_t) r->mmap_addr;
-+
-+        if (m) {
-+            munmap(m, r->size + r->mmap_offset);
-+        }
-+    }
-     dev->nregions = memory->nregions;
- 
-     DPRINT("Nregions: %d\n", memory->nregions);
-@@ -470,9 +479,14 @@ vu_set_log_base_exec(VuDev *dev, VhostUserMsg *vmsg)
- 
-     rc = mmap(0, log_mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd,
-               log_mmap_offset);
-+    close(fd);
-     if (rc == MAP_FAILED) {
-         perror("log mmap error");
-     }
-+
-+    if (dev->log_table) {
-+        munmap(dev->log_table, dev->log_size);
-+    }
-     dev->log_table = rc;
-     dev->log_size = log_mmap_size;
- 
--- 
-1.7.9.5
+> +        return;
+> +    }
+>      s->buf_maxsz = sdhci_get_fifolen(s);
+>      s->fifo_buffer = g_malloc0(s->buf_maxsz);
+>  
+> 
