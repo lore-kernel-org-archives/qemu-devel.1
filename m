@@ -1,25 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ecBdU-00028Z-0M
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:57:49 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecBf6-00032L-Iw
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:59:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ecBdP-0006ui-3f
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:57:48 -0500
-Received: from 13.mo3.mail-out.ovh.net ([188.165.33.202]:54687)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ecBdO-0006sV-Pg
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:57:43 -0500
-Received: from player158.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id D168318260C
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 15:57:40 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 18 Jan 2018 15:54:03 +0100
-Message-Id: <20180118145403.6527-1-clg@kaod.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecBf2-0008GV-Ew
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:59:28 -0500
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:41785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ecBf2-0008G5-Am
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:59:24 -0500
+Received: by mail-qt0-x230.google.com with SMTP id i1so14005635qtj.8
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 06:59:24 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-11-alex.bennee@linaro.org>
+	<1393deaf-c207-6055-1f7c-f7ae814cf2db@amsat.org>
+	<87shb3nwkc.fsf@linaro.org>
+	<CAAdtpL48633TDoSnhv1-iZ0QjWWQsuD1DxJTsniJg+AHbeiT_g@mail.gmail.com>
+	<CAFEAcA8bEPohja9fw-5_BUnfExX4KA_syce8dpdD=trShV=qAg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <782d052d-f390-1a55-8a73-120753aa1472@amsat.org>
+Date: Thu, 18 Jan 2018 11:59:19 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] target/ppc: add support for hypervisor
- doorbells on book3s CPUs
+In-Reply-To: <CAFEAcA8bEPohja9fw-5_BUnfExX4KA_syce8dpdD=trShV=qAg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/20] fpu/softfloat: define decompose
+ structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,230 +40,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Francisco Iglesias <frasse.iglesias@gmail.com>, Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Dutcher <andrew@andrewdutcher.com>, bharata@linux.vnet.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
 
-The hypervisor doorbells are used by skiboot and Linux on POWER9
-processors to wake up secondaries.
+On 01/18/2018 11:31 AM, Peter Maydell wrote:
+> On 18 January 2018 at 14:26, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Le 18 janv. 2018 10:09 AM, "Alex Bennée" <alex.bennee@linaro.org> a écrit :
+>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>>>> +typedef struct {
+>>>> +    uint64_t frac   : 64;
+>>>
+>>> I think this does not work on LLP64/IL32P64 model.
+>>>
+>>> Should we add a check in ./configure and refuse to build on IL32P64
+>>> model? This would be safer IMHO.
+>>>
+>>>> +    int exp         : 32;
+>>>> +    float_class cls : 8;
+>>>> +    int             : 23;
+>>>> +    bool sign       : 1;
+>>>
+>>> checking on "ISO/IEC 14882:1998" 9.6 Bit-fields:
+>>>
+>>> Alignment of bit-fields is implementation-defined. Bit-fields are packed
+>>> into some addressable allocation unit. [Note: bit-fields straddle
+>>> allocation units on some machines and not on others. Bit-fields are
+>>> assigned right-to-left on some machines, left-to-right on others. ]
+>>>
+>>> I'd still write it:
+>>>
+>>>       int             :23, sign :1;
+>>>
+>>>> +} decomposed_parts;
+>>
+>> I think rather than stuff it into bit fields we can just leave it up to
+>> the compiler?
+>>
+>>
+>> Yep, my only worry here is the IL32P64 model, if we care.
+> 
+> I don't think we care much about IL32P64, but the code should
+> still work there, right? It doesn't actually make any assumptions
+> about bitfield layout.
 
-This adds processor control support to the Server architecture by
-reusing the Embedded support. They are very similar, only the bits
-definition of the CPU identifier differ.
+My comment was for a previous line:
 
-Still to be done is message broadcast to all threads of the same
-processor.
+  uint64_t frac   : 64;
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+I don't have enough compiler knowledge to be sure how this bitfield is
+interpreted by the compiler. I understood the standard as bitfields are
+for 'unsigned', and for IL32 we have sizeof(unsigned) = 32, so I wonder
+how a :64 bitfield ends (bits >= 32 silently truncated?).
 
- Changes since v2:
+Richard do you have an idea?
 
- - introduced specific msgclr/snd helpers for book3s=20
-
- target/ppc/cpu.h            |  8 +++++--
- target/ppc/excp_helper.c    | 52 +++++++++++++++++++++++++++++++++++++++=
-++++++
- target/ppc/helper.h         |  2 ++
- target/ppc/translate.c      | 25 ++++++++++++++++++++--
- target/ppc/translate_init.c |  2 +-
- 5 files changed, 84 insertions(+), 5 deletions(-)
-
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index b8f4dfc1084a..603a38cae83f 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -930,7 +930,7 @@ enum {
- #define BOOKE206_MAX_TLBN      4
-=20
- /***********************************************************************=
-******/
--/* Embedded.Processor Control */
-+/* Server and Embedded Processor Control */
-=20
- #define DBELL_TYPE_SHIFT               27
- #define DBELL_TYPE_MASK                (0x1f << DBELL_TYPE_SHIFT)
-@@ -940,11 +940,15 @@ enum {
- #define DBELL_TYPE_G_DBELL_CRIT        (0x03 << DBELL_TYPE_SHIFT)
- #define DBELL_TYPE_G_DBELL_MC          (0x04 << DBELL_TYPE_SHIFT)
-=20
--#define DBELL_BRDCAST                  (1 << 26)
-+#define DBELL_TYPE_DBELL_SERVER        (0x05 << DBELL_TYPE_SHIFT)
-+
-+#define DBELL_BRDCAST                  PPC_BIT(37)
- #define DBELL_LPIDTAG_SHIFT            14
- #define DBELL_LPIDTAG_MASK             (0xfff << DBELL_LPIDTAG_SHIFT)
- #define DBELL_PIRTAG_MASK              0x3fff
-=20
-+#define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
-+
- /***********************************************************************=
-******/
- /* Segment page size information, used by recent hash MMUs
-  * The format of this structure mirrors kvm_ppc_smmu_info
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 4e548a448747..c092fbead036 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -417,6 +417,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-     case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage excep=
-tion */
-     case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception   =
-     */
-     case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
-tion */
-+    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
-     */
-     case POWERPC_EXCP_HV_EMU:
-         srr0 =3D SPR_HSRR0;
-         srr1 =3D SPR_HSRR1;
-@@ -846,6 +847,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
-             return;
-         }
-+        if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL)) {
-+            env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDOORBELL)=
-;
-+            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR_HV);
-+            return;
-+        }
-         if (env->pending_interrupts & (1 << PPC_INTERRUPT_PERFM)) {
-             env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_PERFM);
-             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_PERFM);
-@@ -1145,4 +1151,50 @@ void helper_msgsnd(target_ulong rb)
-     }
-     qemu_mutex_unlock_iothread();
- }
-+
-+/* Server Processor Control */
-+static int book3s_dbell2irq(target_ulong rb)
-+{
-+    int msg =3D rb & DBELL_TYPE_MASK;
-+
-+    /* A Directed Hypervisor Doorbell message is sent only if the
-+     * message type is 5. All other types are reserved and the
-+     * instruction is a no-op */
-+    return msg =3D=3D DBELL_TYPE_DBELL_SERVER ? PPC_INTERRUPT_HDOORBELL =
-: -1;
-+}
-+
-+void helper_book3s_msgclr(CPUPPCState *env, target_ulong rb)
-+{
-+    int irq =3D book3s_dbell2irq(rb);
-+
-+    if (irq < 0) {
-+        return;
-+    }
-+
-+    env->pending_interrupts &=3D ~(1 << irq);
-+}
-+
-+void helper_book3s_msgsnd(target_ulong rb)
-+{
-+    int irq =3D book3s_dbell2irq(rb);
-+    int pir =3D rb & DBELL_PROCIDTAG_MASK;
-+    CPUState *cs;
-+
-+    if (irq < 0) {
-+        return;
-+    }
-+
-+    qemu_mutex_lock_iothread();
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+        CPUPPCState *cenv =3D &cpu->env;
-+
-+        /* TODO: broadcast message to all threads of the same  processor=
- */
-+        if (cenv->spr_cb[SPR_PIR].default_value =3D=3D pir) {
-+            cenv->pending_interrupts |=3D 1 << irq;
-+            cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+        }
-+    }
-+    qemu_mutex_unlock_iothread();
-+}
- #endif
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index bb6a94a8b390..5b739179b8b5 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -679,6 +679,8 @@ DEF_HELPER_FLAGS_3(store_sr, TCG_CALL_NO_RWG, void, e=
-nv, tl, tl)
- DEF_HELPER_FLAGS_1(602_mfrom, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_1(msgsnd, void, tl)
- DEF_HELPER_2(msgclr, void, env, tl)
-+DEF_HELPER_1(book3s_msgsnd, void, tl)
-+DEF_HELPER_2(book3s_msgclr, void, env, tl)
- #endif
-=20
- DEF_HELPER_4(dlmzb, tl, env, tl, tl, i32)
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 396f422cf407..4325aa90a6fa 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6175,7 +6175,12 @@ static void gen_msgclr(DisasContext *ctx)
-     GEN_PRIV;
- #else
-     CHK_HV;
--    gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-+    /* 64-bit server processors compliant with arch 2.x */
-+    if (ctx->insns_flags & PPC_SEGMENT_64B) {
-+        gen_helper_book3s_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-+    } else {
-+        gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-+    }
- #endif /* defined(CONFIG_USER_ONLY) */
- }
-=20
-@@ -6185,10 +6190,24 @@ static void gen_msgsnd(DisasContext *ctx)
-     GEN_PRIV;
- #else
-     CHK_HV;
--    gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-+    /* 64-bit server processors compliant with arch 2.x */
-+    if (ctx->insns_flags & PPC_SEGMENT_64B) {
-+        gen_helper_book3s_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-+    } else {
-+        gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-+    }
- #endif /* defined(CONFIG_USER_ONLY) */
- }
-=20
-+static void gen_msgsync(DisasContext *ctx)
-+{
-+#if defined(CONFIG_USER_ONLY)
-+    GEN_PRIV;
-+#else
-+    CHK_HV;
-+#endif /* defined(CONFIG_USER_ONLY) */
-+    /* interpreted as no-op */
-+}
-=20
- #if defined(TARGET_PPC64)
- static void gen_maddld(DisasContext *ctx)
-@@ -6669,6 +6688,8 @@ GEN_HANDLER2_E(msgsnd, "msgsnd", 0x1F, 0x0E, 0x06, =
-0x03ff0001,
-                PPC_NONE, PPC2_PRCNTL),
- GEN_HANDLER2_E(msgclr, "msgclr", 0x1F, 0x0E, 0x07, 0x03ff0001,
-                PPC_NONE, PPC2_PRCNTL),
-+GEN_HANDLER2_E(msgsync, "msgsync", 0x1F, 0x16, 0x1B, 0x00000000,
-+               PPC_NONE, PPC2_PRCNTL),
- GEN_HANDLER(wrtee, 0x1F, 0x03, 0x04, 0x000FFC01, PPC_WRTEE),
- GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
- GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index ab70b3a25c1d..87a23f0f6265 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8866,7 +8866,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                         PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
-                         PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
--                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300;
-+                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_PR=
-CNTL;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
---=20
-2.13.6
+> 
+> I think I agree that we shouldn't use bitfields here if we don't
+> need to, though.
+> 
+> thanks
+> -- PMM
+> 
