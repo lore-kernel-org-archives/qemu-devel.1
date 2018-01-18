@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH42-00043z-GT
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:45:36 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH41-00043R-A6
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:45:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH40-0003up-Dv
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:45:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39976)
+	(envelope-from <mst@redhat.com>) id 1ecH3y-0003so-5f
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:45:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56022)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH40-0003tx-3l
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:45:32 -0500
-Date: Thu, 18 Jan 2018 22:45:29 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH3x-0003s1-OJ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:45:30 -0500
+Date: Thu, 18 Jan 2018 22:45:19 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516308132-10272-15-git-send-email-mst@redhat.com>
+Message-ID: <1516308132-10272-13-git-send-email-mst@redhat.com>
 References: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v4 14/29] ACPI/unit-test: Add a testcase for RAM
- allocation in numa node
+Subject: [Qemu-devel] [PULL v4 12/29] intel-iommu: Extend address width to
+ 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,218 +28,436 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Dou Liyang <douly.fnst@cn.fujitsu.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Prasad Singamsetty <prasad.singamsetty@oracle.com>, Prasad Singamsetty <prasad.singamsety@oracle.com>, Peter Xu <peterx@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
 
-As QEMU supports the memory-less node, it is possible that there is
-no RAM in the first numa node(also be called as node0). eg:
-  ... \
-  -m 128,slots=3,maxmem=1G \
-  -numa node -numa node,mem=128M \
+The current implementation of Intel IOMMU code only supports 39 bits
+iova address width. This patch provides a new parameter (x-aw-bits)
+for intel-iommu to extend its address width to 48 bits but keeping the
+default the same (39 bits). The reason for not changing the default
+is to avoid potential compatibility problems with live migration of
+intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
+parameter are 39 and 48.
 
-But, this makes it hard for QEMU to build a known-to-work ACPI SRAT
-table. Only fixing it is not enough.
+After enabling larger address width (48), we should be able to map
+larger iova addresses in the guest. For example, a QEMU guest that
+is configured with large memory ( >=1TB ). To check whether 48 bits
+aw is enabled, we can grep in the guest dmesg output with line:
+"DMAR: Host address width 48".
 
-Add a testcase for this situation to make sure the ACPI table is
-correct for guest.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Prasad Singamsetty <prasad.singamsety@oracle.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/bios-tables-test.c              |  24 ++++++++++++++++++++++++
- tests/acpi-test-data/pc/DSDT.numamem  | Bin 0 -> 5150 bytes
- tests/acpi-test-data/pc/SRAT.numamem  | Bin 0 -> 224 bytes
- tests/acpi-test-data/q35/DSDT.numamem | Bin 0 -> 7834 bytes
- tests/acpi-test-data/q35/SRAT.numamem | Bin 0 -> 224 bytes
- 5 files changed, 24 insertions(+)
- create mode 100644 tests/acpi-test-data/pc/DSDT.numamem
- create mode 100644 tests/acpi-test-data/pc/SRAT.numamem
- create mode 100644 tests/acpi-test-data/q35/DSDT.numamem
- create mode 100644 tests/acpi-test-data/q35/SRAT.numamem
+ hw/i386/intel_iommu_internal.h |   9 ++--
+ include/hw/i386/intel_iommu.h  |   1 +
+ hw/i386/acpi-build.c           |   3 +-
+ hw/i386/intel_iommu.c          | 101 ++++++++++++++++++++++++-----------------
+ 4 files changed, 65 insertions(+), 49 deletions(-)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index e28e0c9..def81fc 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -810,6 +810,28 @@ static void test_acpi_piix4_tcg_memhp(void)
-     free_test_data(&data);
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 77e4a98..d084099 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -131,7 +131,7 @@
+ #define VTD_TLB_DID(val)            (((val) >> 32) & VTD_DOMAIN_ID_MASK)
+ 
+ /* IVA_REG */
+-#define VTD_IVA_ADDR(val)       ((val) & ~0xfffULL & ((1ULL << VTD_MGAW) - 1))
++#define VTD_IVA_ADDR(val)       ((val) & ~0xfffULL)
+ #define VTD_IVA_AM(val)         ((val) & 0x3fULL)
+ 
+ /* GCMD_REG */
+@@ -197,7 +197,6 @@
+ #define VTD_DOMAIN_ID_SHIFT         16  /* 16-bit domain id for 64K domains */
+ #define VTD_DOMAIN_ID_MASK          ((1UL << VTD_DOMAIN_ID_SHIFT) - 1)
+ #define VTD_CAP_ND                  (((VTD_DOMAIN_ID_SHIFT - 4) / 2) & 7ULL)
+-#define VTD_MGAW                    39  /* Maximum Guest Address Width */
+ #define VTD_ADDRESS_SIZE(aw)        (1ULL << (aw))
+ #define VTD_CAP_MGAW(aw)            ((((aw) - 1) & 0x3fULL) << 16)
+ #define VTD_MAMV                    18ULL
+@@ -213,7 +212,6 @@
+ #define VTD_CAP_SAGAW_39bit         (0x2ULL << VTD_CAP_SAGAW_SHIFT)
+  /* 48-bit AGAW, 4-level page-table */
+ #define VTD_CAP_SAGAW_48bit         (0x4ULL << VTD_CAP_SAGAW_SHIFT)
+-#define VTD_CAP_SAGAW               VTD_CAP_SAGAW_39bit
+ 
+ /* IQT_REG */
+ #define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
+@@ -252,7 +250,7 @@
+ #define VTD_FRCD_SID_MASK       0xffffULL
+ #define VTD_FRCD_SID(val)       ((val) & VTD_FRCD_SID_MASK)
+ /* For the low 64-bit of 128-bit */
+-#define VTD_FRCD_FI(val)        ((val) & (((1ULL << VTD_MGAW) - 1) ^ 0xfffULL))
++#define VTD_FRCD_FI(val)        ((val) & ~0xfffULL)
+ 
+ /* DMA Remapping Fault Conditions */
+ typedef enum VTDFaultReason {
+@@ -360,8 +358,7 @@ typedef union VTDInvDesc VTDInvDesc;
+ #define VTD_INV_DESC_IOTLB_DOMAIN       (2ULL << 4)
+ #define VTD_INV_DESC_IOTLB_PAGE         (3ULL << 4)
+ #define VTD_INV_DESC_IOTLB_DID(val)     (((val) >> 16) & VTD_DOMAIN_ID_MASK)
+-#define VTD_INV_DESC_IOTLB_ADDR(val)    ((val) & ~0xfffULL & \
+-                                         ((1ULL << VTD_MGAW) - 1))
++#define VTD_INV_DESC_IOTLB_ADDR(val)    ((val) & ~0xfffULL)
+ #define VTD_INV_DESC_IOTLB_AM(val)      ((val) & 0x3fULL)
+ #define VTD_INV_DESC_IOTLB_RSVD_LO      0xffffffff0000ff00ULL
+ #define VTD_INV_DESC_IOTLB_RSVD_HI      0xf80ULL
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 372b06d..45ec891 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -304,6 +304,7 @@ struct IntelIOMMUState {
+     bool intr_eime;                 /* Extended interrupt mode enabled */
+     OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+     bool buggy_eim;                 /* Force buggy EIM unless eim=off */
++    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+ };
+ 
+ /* Find the VTD Address space associated with the given bus pointer,
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 18b939e..6f38fb9 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2473,6 +2473,7 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
+     AcpiDmarDeviceScope *scope = NULL;
+     /* Root complex IOAPIC use one path[0] only */
+     size_t ioapic_scope_size = sizeof(*scope) + sizeof(scope->path[0]);
++    IntelIOMMUState *intel_iommu = INTEL_IOMMU_DEVICE(iommu);
+ 
+     assert(iommu);
+     if (iommu->intr_supported) {
+@@ -2480,7 +2481,7 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
+     }
+ 
+     dmar = acpi_data_push(table_data, sizeof(*dmar));
+-    dmar->host_address_width = VTD_HOST_ADDRESS_WIDTH - 1;
++    dmar->host_address_width = intel_iommu->aw_bits - 1;
+     dmar->flags = dmar_flags;
+ 
+     /* DMAR Remapping Hardware Unit Definition structure */
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index fbcf43a..4e8642e 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -521,9 +521,9 @@ static inline dma_addr_t vtd_ce_get_slpt_base(VTDContextEntry *ce)
+     return ce->lo & VTD_CONTEXT_ENTRY_SLPTPTR;
  }
  
-+static void test_acpi_q35_tcg_numamem(void)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = MACHINE_Q35;
-+    data.variant = ".numamem";
-+    test_acpi_one(" -numa node -numa node,mem=128", &data);
-+    free_test_data(&data);
-+}
-+
-+static void test_acpi_piix4_tcg_numamem(void)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = MACHINE_PC;
-+    data.variant = ".numamem";
-+    test_acpi_one(" -numa node -numa node,mem=128", &data);
-+    free_test_data(&data);
-+}
-+
- int main(int argc, char *argv[])
+-static inline uint64_t vtd_get_slpte_addr(uint64_t slpte)
++static inline uint64_t vtd_get_slpte_addr(uint64_t slpte, uint8_t aw)
  {
-     const char *arch = qtest_get_arch();
-@@ -832,6 +854,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/cpuhp", test_acpi_q35_tcg_cphp);
-         qtest_add_func("acpi/piix4/memhp", test_acpi_piix4_tcg_memhp);
-         qtest_add_func("acpi/q35/memhp", test_acpi_q35_tcg_memhp);
-+        qtest_add_func("acpi/piix4/numamem", test_acpi_piix4_tcg_numamem);
-+        qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+-    return slpte & VTD_SL_PT_BASE_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
++    return slpte & VTD_SL_PT_BASE_ADDR_MASK(aw);
+ }
+ 
+ /* Whether the pte indicates the address of the page frame */
+@@ -608,20 +608,21 @@ static inline bool vtd_ce_type_check(X86IOMMUState *x86_iommu,
+     return true;
+ }
+ 
+-static inline uint64_t vtd_iova_limit(VTDContextEntry *ce)
++static inline uint64_t vtd_iova_limit(VTDContextEntry *ce, uint8_t aw)
+ {
+     uint32_t ce_agaw = vtd_ce_get_agaw(ce);
+-    return 1ULL << MIN(ce_agaw, VTD_MGAW);
++    return 1ULL << MIN(ce_agaw, aw);
+ }
+ 
+ /* Return true if IOVA passes range check, otherwise false. */
+-static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce)
++static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce,
++                                        uint8_t aw)
+ {
+     /*
+      * Check if @iova is above 2^X-1, where X is the minimum of MGAW
+      * in CAP_REG and AW in context-entry.
+      */
+-    return !(iova & ~(vtd_iova_limit(ce) - 1));
++    return !(iova & ~(vtd_iova_limit(ce, aw) - 1));
+ }
+ 
+ /*
+@@ -669,7 +670,7 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_num)
+  */
+ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+                              uint64_t *slptep, uint32_t *slpte_level,
+-                             bool *reads, bool *writes)
++                             bool *reads, bool *writes, uint8_t aw_bits)
+ {
+     dma_addr_t addr = vtd_ce_get_slpt_base(ce);
+     uint32_t level = vtd_ce_get_level(ce);
+@@ -677,7 +678,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+     uint64_t slpte;
+     uint64_t access_right_check;
+ 
+-    if (!vtd_iova_range_check(iova, ce)) {
++    if (!vtd_iova_range_check(iova, ce, aw_bits)) {
+         trace_vtd_err_dmar_iova_overflow(iova);
+         return -VTD_FR_ADDR_BEYOND_MGAW;
      }
-     ret = g_test_run();
-     boot_sector_cleanup(disk);
-diff --git a/tests/acpi-test-data/pc/DSDT.numamem b/tests/acpi-test-data/pc/DSDT.numamem
-new file mode 100644
-index 0000000000000000000000000000000000000000..224cfdd9e983e02dac5f4bf7e210eaa64cb0dc78
-GIT binary patch
-literal 5150
-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
-X)TZG7kLVu(w1s%rZLs0M;`09i9gxjE
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/acpi-test-data/pc/SRAT.numamem b/tests/acpi-test-data/pc/SRAT.numamem
-new file mode 100644
-index 0000000000000000000000000000000000000000..dbc595d9cb85d3fcb5a4243153f42bb431c9de8f
-GIT binary patch
-literal 224
-zcmWFzatwLEz`(%x#mV2<BUr&HBEUHqD8>jB1F=Cg2*ZH@DxXmUE`z~9*2k!U%mXRq
-Yf~!ZCL8t>-1O^}2VG2>z!9?-X08OU~0RR91
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/acpi-test-data/q35/DSDT.numamem b/tests/acpi-test-data/q35/DSDT.numamem
-new file mode 100644
-index 0000000000000000000000000000000000000000..8c9fa445b0119b6f67533cb968855b41fb9925d9
-GIT binary patch
-literal 7834
-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
-T7U*c>n%cO|8|hZC(G~v(I>Rw)
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/acpi-test-data/q35/SRAT.numamem b/tests/acpi-test-data/q35/SRAT.numamem
-new file mode 100644
-index 0000000000000000000000000000000000000000..dbc595d9cb85d3fcb5a4243153f42bb431c9de8f
-GIT binary patch
-literal 224
-zcmWFzatwLEz`(%x#mV2<BUr&HBEUHqD8>jB1F=Cg2*ZH@DxXmUE`z~9*2k!U%mXRq
-Yf~!ZCL8t>-1O^}2VG2>z!9?-X08OU~0RR91
-
-literal 0
-HcmV?d00001
-
+@@ -714,7 +715,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+             *slpte_level = level;
+             return 0;
+         }
+-        addr = vtd_get_slpte_addr(slpte);
++        addr = vtd_get_slpte_addr(slpte, aw_bits);
+         level--;
+     }
+ }
+@@ -732,11 +733,12 @@ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+  * @read: whether parent level has read permission
+  * @write: whether parent level has write permission
+  * @notify_unmap: whether we should notify invalid entries
++ * @aw: maximum address width
+  */
+ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+                                uint64_t end, vtd_page_walk_hook hook_fn,
+-                               void *private, uint32_t level,
+-                               bool read, bool write, bool notify_unmap)
++                               void *private, uint32_t level, bool read,
++                               bool write, bool notify_unmap, uint8_t aw)
+ {
+     bool read_cur, write_cur, entry_valid;
+     uint32_t offset;
+@@ -783,7 +785,7 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+             entry.target_as = &address_space_memory;
+             entry.iova = iova & subpage_mask;
+             /* NOTE: this is only meaningful if entry_valid == true */
+-            entry.translated_addr = vtd_get_slpte_addr(slpte);
++            entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+             entry.addr_mask = ~subpage_mask;
+             entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+             if (!entry_valid && !notify_unmap) {
+@@ -803,10 +805,10 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+                 trace_vtd_page_walk_skip_perm(iova, iova_next);
+                 goto next;
+             }
+-            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte), iova,
++            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
+                                       MIN(iova_next, end), hook_fn, private,
+                                       level - 1, read_cur, write_cur,
+-                                      notify_unmap);
++                                      notify_unmap, aw);
+             if (ret < 0) {
+                 return ret;
+             }
+@@ -827,25 +829,26 @@ next:
+  * @end: IOVA range end address (start <= addr < end)
+  * @hook_fn: the hook that to be called for each detected area
+  * @private: private data for the hook function
++ * @aw: maximum address width
+  */
+ static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
+                          vtd_page_walk_hook hook_fn, void *private,
+-                         bool notify_unmap)
++                         bool notify_unmap, uint8_t aw)
+ {
+     dma_addr_t addr = vtd_ce_get_slpt_base(ce);
+     uint32_t level = vtd_ce_get_level(ce);
+ 
+-    if (!vtd_iova_range_check(start, ce)) {
++    if (!vtd_iova_range_check(start, ce, aw)) {
+         return -VTD_FR_ADDR_BEYOND_MGAW;
+     }
+ 
+-    if (!vtd_iova_range_check(end, ce)) {
++    if (!vtd_iova_range_check(end, ce, aw)) {
+         /* Fix end so that it reaches the maximum */
+-        end = vtd_iova_limit(ce);
++        end = vtd_iova_limit(ce, aw);
+     }
+ 
+     return vtd_page_walk_level(addr, start, end, hook_fn, private,
+-                               level, true, true, notify_unmap);
++                               level, true, true, notify_unmap, aw);
+ }
+ 
+ /* Map a device to its corresponding domain (context-entry) */
+@@ -867,7 +870,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+         return -VTD_FR_ROOT_ENTRY_P;
+     }
+ 
+-    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(VTD_HOST_ADDRESS_WIDTH))) {
++    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(s->aw_bits))) {
+         trace_vtd_re_invalid(re.rsvd, re.val);
+         return -VTD_FR_ROOT_ENTRY_RSVD;
+     }
+@@ -884,7 +887,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+     }
+ 
+     if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
+-               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(VTD_HOST_ADDRESS_WIDTH))) {
++               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(s->aw_bits))) {
+         trace_vtd_ce_invalid(ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_RSVD;
+     }
+@@ -1166,7 +1169,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     }
+ 
+     ret_fr = vtd_iova_to_slpte(&ce, addr, is_write, &slpte, &level,
+-                               &reads, &writes);
++                               &reads, &writes, s->aw_bits);
+     if (ret_fr) {
+         ret_fr = -ret_fr;
+         if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
+@@ -1183,7 +1186,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+                      access_flags, level);
+ out:
+     entry->iova = addr & page_mask;
+-    entry->translated_addr = vtd_get_slpte_addr(slpte) & page_mask;
++    entry->translated_addr = vtd_get_slpte_addr(slpte, s->aw_bits) & page_mask;
+     entry->addr_mask = ~page_mask;
+     entry->perm = access_flags;
+     return true;
+@@ -1200,7 +1203,7 @@ static void vtd_root_table_setup(IntelIOMMUState *s)
+ {
+     s->root = vtd_get_quad_raw(s, DMAR_RTADDR_REG);
+     s->root_extended = s->root & VTD_RTADDR_RTT;
+-    s->root &= VTD_RTADDR_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
++    s->root &= VTD_RTADDR_ADDR_MASK(s->aw_bits);
+ 
+     trace_vtd_reg_dmar_root(s->root, s->root_extended);
+ }
+@@ -1216,7 +1219,7 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
+     uint64_t value = 0;
+     value = vtd_get_quad_raw(s, DMAR_IRTA_REG);
+     s->intr_size = 1UL << ((value & VTD_IRTA_SIZE_MASK) + 1);
+-    s->intr_root = value & VTD_IRTA_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
++    s->intr_root = value & VTD_IRTA_ADDR_MASK(s->aw_bits);
+     s->intr_eime = value & VTD_IRTA_EIME;
+ 
+     /* Notify global invalidation */
+@@ -1392,7 +1395,7 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+             vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
+                           vtd_page_invalidate_notify_hook,
+-                          (void *)&vtd_as->iommu, true);
++                          (void *)&vtd_as->iommu, true, s->aw_bits);
+         }
+     }
+ }
+@@ -1472,7 +1475,7 @@ static void vtd_handle_gcmd_qie(IntelIOMMUState *s, bool en)
+     trace_vtd_inv_qi_enable(en);
+ 
+     if (en) {
+-        s->iq = iqa_val & VTD_IQA_IQA_MASK(VTD_HOST_ADDRESS_WIDTH);
++        s->iq = iqa_val & VTD_IQA_IQA_MASK(s->aw_bits);
+         /* 2^(x+8) entries */
+         s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
+         s->qi_enabled = true;
+@@ -2403,6 +2406,8 @@ static Property vtd_properties[] = {
+     DEFINE_PROP_ON_OFF_AUTO("eim", IntelIOMMUState, intr_eim,
+                             ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
++    DEFINE_PROP_UINT8("x-aw-bits", IntelIOMMUState, aw_bits,
++                      VTD_HOST_ADDRESS_WIDTH),
+     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -2758,6 +2763,7 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+     hwaddr size;
+     hwaddr start = n->start;
+     hwaddr end = n->end;
++    IntelIOMMUState *s = as->iommu_state;
+ 
+     /*
+      * Note: all the codes in this function has a assumption that IOVA
+@@ -2765,12 +2771,12 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+      * VT-d spec), otherwise we need to consider overflow of 64 bits.
+      */
+ 
+-    if (end > VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH)) {
++    if (end > VTD_ADDRESS_SIZE(s->aw_bits)) {
+         /*
+          * Don't need to unmap regions that is bigger than the whole
+          * VT-d supported address space size
+          */
+-        end = VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH);
++        end = VTD_ADDRESS_SIZE(s->aw_bits);
+     }
+ 
+     assert(start <= end);
+@@ -2782,9 +2788,9 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+          * suite the minimum available mask.
+          */
+         int n = 64 - clz64(size);
+-        if (n > VTD_MGAW) {
++        if (n > s->aw_bits) {
+             /* should not happen, but in case it happens, limit it */
+-            n = VTD_MGAW;
++            n = s->aw_bits;
+         }
+         size = 1ULL << n;
+     }
+@@ -2844,7 +2850,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+                                   PCI_FUNC(vtd_as->devfn),
+                                   VTD_CONTEXT_ENTRY_DID(ce.hi),
+                                   ce.hi, ce.lo);
+-        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false);
++        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
++                      s->aw_bits);
+     } else {
+         trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
+                                     PCI_FUNC(vtd_as->devfn));
+@@ -2859,7 +2866,6 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+ static void vtd_init(IntelIOMMUState *s)
+ {
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+-    uint8_t aw_bits = VTD_HOST_ADDRESS_WIDTH;
+ 
+     memset(s->csr, 0, DMAR_REG_SIZE);
+     memset(s->wmask, 0, DMAR_REG_SIZE);
+@@ -2878,21 +2884,24 @@ static void vtd_init(IntelIOMMUState *s)
+     s->next_frcd_reg = 0;
+     s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+              VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+-             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(VTD_HOST_ADDRESS_WIDTH);
++             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
++    if (s->aw_bits == VTD_HOST_AW_48BIT) {
++        s->cap |= VTD_CAP_SAGAW_48bit;
++    }
+     s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+ 
+     /*
+      * Rsvd field masks for spte
+      */
+     vtd_paging_entry_rsvd_field[0] = ~0ULL;
+-    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(aw_bits);
+-    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(aw_bits);
+-    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(aw_bits);
+-    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(aw_bits);
+-    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(aw_bits);
+-    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(aw_bits);
+-    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(aw_bits);
+-    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(aw_bits);
++    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
+ 
+     if (x86_iommu->intr_supported) {
+         s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+@@ -3029,6 +3038,14 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+         }
+     }
+ 
++    /* Currently only address widths supported are 39 and 48 bits */
++    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
++        (s->aw_bits != VTD_HOST_AW_48BIT)) {
++        error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
++                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
++        return false;
++    }
++
+     return true;
+ }
+ 
 -- 
 MST
