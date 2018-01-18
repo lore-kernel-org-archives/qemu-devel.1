@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Y0-0001Et-Nu
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Y1-0001FP-AW
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Xz-0004XV-Ac
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:44:00 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Y0-0004YF-Cp
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:44:01 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Jan 2018 13:43:47 +0100
-Message-Id: <1516279431-30424-4-git-send-email-pbonzini@redhat.com>
+Date: Thu, 18 Jan 2018 13:43:48 +0100
+Message-Id: <1516279431-30424-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516279431-30424-1-git-send-email-pbonzini@redhat.com>
 References: <1516279431-30424-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/7] qcow2: make qcow2_do_open a coroutine_fn
+Subject: [Qemu-devel] [PATCH 4/7] qed: make bdrv_qed_do_open a coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +29,51 @@ loaded from a coroutine.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/qcow2.c | 46 +++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 41 insertions(+), 5 deletions(-)
+ block/qed.c | 40 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 37 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index fec065b..7c11516 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1087,8 +1087,9 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
-     return ret;
+diff --git a/block/qed.c b/block/qed.c
+index e0e08ce..3e1f4bc 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -381,8 +381,9 @@ static void bdrv_qed_init_state(BlockDriverState *bs)
+     qemu_co_queue_init(&s->allocating_write_reqs);
  }
  
--static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
--                         Error **errp)
-+/* Called with s->lock held.  */
-+static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-+                                      int flags, Error **errp)
+-static int bdrv_qed_do_open(BlockDriverState *bs, QDict *options, int flags,
+-                            Error **errp)
++/* Called with table_lock held.  */
++static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
++                                         int flags, Error **errp)
  {
-     BDRVQcow2State *s = bs->opaque;
-     unsigned int len, i;
-@@ -1467,8 +1468,6 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-         }
-     }
- 
--    /* Initialise locks */
--    qemu_co_mutex_init(&s->lock);
-     bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
- 
-     /* Repair image if dirty */
-@@ -1514,16 +1513,53 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+     BDRVQEDState *s = bs->opaque;
+     QEDHeader le_header;
+@@ -513,9 +514,35 @@ out:
      return ret;
  }
  
-+typedef struct QCow2OpenCo {
++typedef struct QEDOpenCo {
 +    BlockDriverState *bs;
 +    QDict *options;
 +    int flags;
 +    Error **errp;
 +    int ret;
-+} QCow2OpenCo;
++} QEDOpenCo;
 +
-+static void coroutine_fn qcow2_open_entry(void *opaque)
++static void coroutine_fn bdrv_qed_open_entry(void *opaque)
 +{
-+    QCow2OpenCo *qoc = opaque;
-+    BDRVQcow2State *s = qoc->bs->opaque;
++    QEDOpenCo *qoc = opaque;
++    BDRVQEDState *s = qoc->bs->opaque;
 +
-+    qemu_co_mutex_lock(&s->lock);
-+    qoc->ret = qcow2_do_open(qoc->bs, qoc->options, qoc->flags, qoc->errp);
-+    qemu_co_mutex_unlock(&s->lock);
++    qemu_co_mutex_lock(&s->table_lock);
++    qoc->ret = bdrv_qed_do_open(qoc->bs, qoc->options, qoc->flags, qoc->errp);
++    qemu_co_mutex_unlock(&s->table_lock);
 +}
 +
- static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
-                       Error **errp)
+ static int bdrv_qed_open(BlockDriverState *bs, QDict *options, int flags,
+                          Error **errp)
  {
-+    BDRVQcow2State *s = bs->opaque;
-+    QCow2OpenCo qoc = {
++    QEDOpenCo qoc = {
 +        .bs = bs,
 +        .options = options,
 +        .flags = flags,
@@ -94,23 +84,21 @@ index fec065b..7c11516 100644
      bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
                                 false, errp);
      if (!bs->file) {
-         return -EINVAL;
+@@ -523,7 +550,14 @@ static int bdrv_qed_open(BlockDriverState *bs, QDict *options, int flags,
      }
  
--    return qcow2_do_open(bs, options, flags, errp);
-+    /* Initialise locks */
-+    qemu_co_mutex_init(&s->lock);
-+
+     bdrv_qed_init_state(bs);
+-    return bdrv_qed_do_open(bs, options, flags, errp);
 +    if (qemu_in_coroutine()) {
-+        /* From bdrv_co_create.  */
-+        qcow2_open_entry(&qoc);
++        bdrv_qed_open_entry(&qoc);
 +    } else {
-+        qemu_coroutine_enter(qemu_coroutine_create(qcow2_open_entry, &qoc));
++        qemu_coroutine_enter(qemu_coroutine_create(bdrv_qed_open_entry, &qoc));
 +        BDRV_POLL_WHILE(bs, qoc.ret == -EINPROGRESS);
 +    }
++    BDRV_POLL_WHILE(bs, qoc.ret == -EINPROGRESS);
 +    return qoc.ret;
  }
  
- static void qcow2_refresh_limits(BlockDriverState *bs, Error **errp)
+ static void bdrv_qed_refresh_limits(BlockDriverState *bs, Error **errp)
 -- 
 1.8.3.1
