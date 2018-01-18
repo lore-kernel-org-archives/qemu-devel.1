@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ec9Mx-0008BL-89
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:32:36 -0500
+	id 1ec9N4-0008Is-V6
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:32:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ec9Mw-0006y7-81
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:32:35 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:37249)
+	id 1ec9N3-00074i-Cc
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:32:42 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36208)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ec9Mw-0006xu-45
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:32:34 -0500
-Received: by mail-qt0-x243.google.com with SMTP id d54so17649997qtd.4
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 04:32:34 -0800 (PST)
+	id 1ec9N3-00074L-90
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:32:41 -0500
+Received: by mail-qt0-x241.google.com with SMTP id z11so3864809qtm.3
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 04:32:41 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 18 Jan 2018 09:32:04 -0300
-Message-Id: <20180118123219.19410-3-f4bug@amsat.org>
+Date: Thu, 18 Jan 2018 09:32:06 -0300
+Message-Id: <20180118123219.19410-5-f4bug@amsat.org>
 In-Reply-To: <20180118123219.19410-1-f4bug@amsat.org>
 References: <20180118123219.19410-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 02/16] sdhci: add check_capab_readonly()
- qtest
+Subject: [Qemu-devel] [PATCH v7 04/16] sdhci: add a check_capab_sdma() qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,59 +39,44 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/sdhci-test.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ tests/sdhci-test.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 0db6b81545..645f61dc48 100644
+index bd5090162f..3f6377474c 100644
 --- a/tests/sdhci-test.c
 +++ b/tests/sdhci-test.c
-@@ -62,6 +62,17 @@ static uint64_t sdhci_readq(uintptr_t base, uint32_t reg_addr)
-     }
+@@ -15,6 +15,7 @@
+ 
+ #define SDHC_CAPAB                      0x40
+ FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
++FIELD(SDHC_CAPAB, SDMA,                     22, 1);
+ #define SDHC_HCVER                      0xFE
+ 
+ static const struct sdhci_t {
+@@ -108,6 +109,15 @@ static void check_capab_baseclock(uintptr_t addr, uint8_t expected_freq)
+     g_assert_cmpuint(capab_freq, ==, expected_freq);
  }
  
-+static void sdhci_writeq(uintptr_t base, uint32_t reg_addr, uint64_t value)
++static void check_capab_sdma(uintptr_t addr, bool supported)
 +{
-+    if (g.dev) {
-+        qpci_memwrite(g.dev, g.mem_bar, reg_addr, &value, sizeof(value));
-+    } else {
-+        QTestState *qtest = global_qtest;
++    uint64_t capab, capab_sdma;
 +
-+        qtest_writeq(qtest, base + reg_addr, value);
-+    }
-+}
-+
- static void check_capab_capareg(uintptr_t addr, uint64_t expected_capab)
- {
-     uint64_t capab;
-@@ -70,6 +81,20 @@ static void check_capab_capareg(uintptr_t addr, uint64_t expected_capab)
-     g_assert_cmphex(capab, ==, expected_capab);
- }
- 
-+static void check_capab_readonly(uintptr_t addr)
-+{
-+    const uint64_t vrand = 0x123456789abcdef;
-+    uint64_t capab0, capab1;
-+
-+    capab0 = sdhci_readq(addr, SDHC_CAPAB);
-+    g_assert_cmpuint(capab0, !=, vrand);
-+
-+    sdhci_writeq(addr, SDHC_CAPAB, vrand);
-+    capab1 = sdhci_readq(addr, SDHC_CAPAB);
-+    g_assert_cmpuint(capab1, !=, vrand);
-+    g_assert_cmpuint(capab1, ==, capab0);
++    capab = sdhci_readq(addr, SDHC_CAPAB);
++    capab_sdma = FIELD_EX64(capab, SDHC_CAPAB, SDMA);
++    g_assert_cmpuint(capab_sdma, ==, supported);
 +}
 +
  static void machine_start(const struct sdhci_t *test)
  {
      if (test->pci.vendor_id) {
-@@ -110,6 +135,7 @@ static void test_machine(const void *data)
-     machine_start(test);
+@@ -149,6 +159,7 @@ static void test_machine(const void *data)
  
      check_capab_capareg(test->sdhci.addr, test->sdhci.capab.reg);
-+    check_capab_readonly(test->sdhci.addr);
+     check_capab_readonly(test->sdhci.addr);
++    check_capab_sdma(test->sdhci.addr, test->sdhci.capab.sdma);
+     check_capab_baseclock(test->sdhci.addr, test->sdhci.baseclock);
  
      machine_stop();
- }
 -- 
 2.15.1
