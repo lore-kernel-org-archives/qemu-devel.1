@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44932)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecGzt-0000O7-Ft
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:18 -0500
+	id 1ecGzz-0000T2-9R
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecGzs-0007RP-Be
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:17 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:41763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecGzs-0007RD-7a
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:16 -0500
-Received: by mail-qt0-x244.google.com with SMTP id i1so16769430qtj.8
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 12:41:16 -0800 (PST)
+	id 1ecGzw-0007Sy-62
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:41:23 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 18 Jan 2018 17:40:46 -0300
-Message-Id: <20180118204058.5768-3-f4bug@amsat.org>
+Date: Thu, 18 Jan 2018 17:40:47 -0300
+Message-Id: <20180118204058.5768-4-f4bug@amsat.org>
 In-Reply-To: <20180118204058.5768-1-f4bug@amsat.org>
 References: <20180118204058.5768-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 02/14] sdhci: rename the hostctl1 register
+Subject: [Qemu-devel] [PATCH v7 03/14] hw/arm/bcm2835_peripherals: implement
+ SDHCI Spec v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,87 +28,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-
-As per the Spec v3.00
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- include/hw/sd/sdhci.h |  2 +-
- hw/sd/sdhci.c         | 12 ++++++------
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ hw/arm/bcm2835_peripherals.c | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index bf3bf243d7..98edcc1048 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -57,7 +57,7 @@ typedef struct SDHCIState {
-     uint16_t cmdreg;       /* Command Register */
-     uint32_t rspreg[4];    /* Response Registers 0-3 */
-     uint32_t prnsts;       /* Present State Register */
--    uint8_t  hostctl;      /* Host Control Register */
-+    uint8_t  hostctl1;     /* Host Control Register */
-     uint8_t  pwrcon;       /* Power control Register */
-     uint8_t  blkgap;       /* Block Gap Control Register */
-     uint8_t  wakcon;       /* WakeUp Control Register */
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 946dff0fac..ec7430c83c 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -598,7 +598,7 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
-     uint32_t adma1 = 0;
-     uint64_t adma2 = 0;
-     hwaddr entry_addr = (hwaddr)s->admasysaddr;
--    switch (SDHC_DMA_TYPE(s->hostctl)) {
-+    switch (SDHC_DMA_TYPE(s->hostctl1)) {
-     case SDHC_CTRL_ADMA2_32:
-         dma_memory_read(s->dma_as, entry_addr, (uint8_t *)&adma2,
-                         sizeof(adma2));
-@@ -787,7 +787,7 @@ static void sdhci_data_transfer(void *opaque)
-     SDHCIState *s = (SDHCIState *)opaque;
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 12e0dd11af..79d680cb1b 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -18,9 +18,6 @@
+ /* Peripheral base address on the VC (GPU) system bus */
+ #define BCM2835_VC_PERI_BASE 0x7e000000
  
-     if (s->trnmod & SDHC_TRNS_DMA) {
--        switch (SDHC_DMA_TYPE(s->hostctl)) {
-+        switch (SDHC_DMA_TYPE(s->hostctl1)) {
-         case SDHC_CTRL_SDMA:
-             if ((s->blkcnt == 1) || !(s->trnmod & SDHC_TRNS_MULTI)) {
-                 sdhci_sdma_transfer_single_block(s);
-@@ -896,7 +896,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
-         ret = s->prnsts;
-         break;
-     case SDHC_HOSTCTL:
--        ret = s->hostctl | (s->pwrcon << 8) | (s->blkgap << 16) |
-+        ret = s->hostctl1 | (s->pwrcon << 8) | (s->blkgap << 16) |
-               (s->wakcon << 24);
-         break;
-     case SDHC_CLKCON:
-@@ -1014,7 +1014,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-         MASKED_WRITE(s->sdmasysad, mask, value);
-         /* Writing to last byte of sdmasysad might trigger transfer */
-         if (!(mask & 0xFF000000) && TRANSFERRING_DATA(s->prnsts) && s->blkcnt &&
--                s->blksize && SDHC_DMA_TYPE(s->hostctl) == SDHC_CTRL_SDMA) {
-+                s->blksize && SDHC_DMA_TYPE(s->hostctl1) == SDHC_CTRL_SDMA) {
-             if (s->trnmod & SDHC_TRNS_MULTI) {
-                 sdhci_sdma_transfer_multi_blocks(s);
-             } else {
-@@ -1066,7 +1066,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-         if (!(mask & 0xFF0000)) {
-             sdhci_blkgap_write(s, value >> 16);
-         }
--        MASKED_WRITE(s->hostctl, mask, value);
-+        MASKED_WRITE(s->hostctl1, mask, value);
-         MASKED_WRITE(s->pwrcon, mask >> 8, value >> 8);
-         MASKED_WRITE(s->wakcon, mask >> 24, value >> 24);
-         if (!(s->prnsts & SDHC_CARD_PRESENT) || ((s->pwrcon >> 1) & 0x7) < 5 ||
-@@ -1322,7 +1322,7 @@ const VMStateDescription sdhci_vmstate = {
-         VMSTATE_UINT16(cmdreg, SDHCIState),
-         VMSTATE_UINT32_ARRAY(rspreg, SDHCIState, 4),
-         VMSTATE_UINT32(prnsts, SDHCIState),
--        VMSTATE_UINT8(hostctl, SDHCIState),
-+        VMSTATE_UINT8(hostctl1, SDHCIState),
-         VMSTATE_UINT8(pwrcon, SDHCIState),
-         VMSTATE_UINT8(blkgap, SDHCIState),
-         VMSTATE_UINT8(wakcon, SDHCIState),
+-/* Capabilities for SD controller: no DMA, high-speed, default clocks etc. */
+-#define BCM2835_SDHC_CAPAREG 0x52034b4
+-
+ static void bcm2835_peripherals_init(Object *obj)
+ {
+     BCM2835PeripheralState *s = BCM2835_PERIPHERALS(obj);
+@@ -254,14 +251,27 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(&s->peri_mr, RNG_OFFSET,
+                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0));
+ 
+-    /* Extended Mass Media Controller */
+-    object_property_set_int(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "capareg",
+-                            &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-
++    /* Extended Mass Media Controller
++     *
++     * Compatible with:
++     * - SD Host Controller Specification Version 3.0 Draft 1.0
++     * - SDIO Specification Version 3.0
++     * - MMC Specification Version 4.4
++     *
++     * - 32-bit access only
++     * - default clocks
++     * - no DMA
++     * - SD high-speed (SDHS) card
++     * - maximum block size: 1kB
++     *
++     * For the exact details please refer to the Arasan documentation:
++     *   SD3.0_Host_AHB_eMMC4.4_Usersguide_ver5.9_jan11_10.pdf   ¯\_(ツ)_/¯
++     */
++    object_property_set_uint(OBJECT(&s->sdhci), 3, "sd-spec-version", &err);
++    object_property_set_uint(OBJECT(&s->sdhci), 52, "timeout-freq", &err);
++    object_property_set_uint(OBJECT(&s->sdhci), 52, "max-frequency", &err);
++    object_property_set_bool(OBJECT(&s->sdhci), false, "adma1", &err);
++    object_property_set_bool(OBJECT(&s->sdhci), true, "1v8", &err);
+     object_property_set_bool(OBJECT(&s->sdhci), true, "pending-insert-quirk",
+                              &err);
+     if (err) {
 -- 
 2.15.1
