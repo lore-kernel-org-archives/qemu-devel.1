@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecJeU-0002lP-94
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:31:23 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecJeW-0002lc-1b
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecJeS-0000G8-Vx
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:31:22 -0500
-Date: Fri, 19 Jan 2018 10:30:56 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ecJeS-0000G2-Tx
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:31:24 -0500
+Date: Fri, 19 Jan 2018 10:28:29 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180118233056.GY30352@umbus.fritz.box>
-References: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
-	<151618083506.20461.14178623580944316317.stgit@bahia.lan>
-	<20180118034340.GD30352@umbus.fritz.box>
-	<20180118163930.2b5a8448@bahia.lan>
+Message-ID: <20180118232829.GX30352@umbus.fritz.box>
+References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+	<20180108055348.20444-2-david@gibson.dropbear.id.au>
+	<f1f754e4-adbf-0b18-e5f5-55d68e2edd89@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="e8znkWhb8vS+si4n"
+	protocol="application/pgp-signature"; boundary="1hAU+gb7eAuiw2fm"
 Content-Disposition: inline
-In-Reply-To: <20180118163930.2b5a8448@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 2/3] spapr_cpu_core: don't reset CPUs
- during realization
+In-Reply-To: <f1f754e4-adbf-0b18-e5f5-55d68e2edd89@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 01/12] target-ppc: optimize cmp translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,162 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, surajjs@au1.ibm.com, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org
 
 
---e8znkWhb8vS+si4n
+--1hAU+gb7eAuiw2fm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 18, 2018 at 04:39:30PM +0100, Greg Kurz wrote:
-> On Thu, 18 Jan 2018 14:43:40 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Jan 17, 2018 at 10:20:35AM +0100, Greg Kurz wrote:
-> > > When QEMU is started, all cold-plugged CPUs are reset twice: first
-> > > during initialization and then during machine reset. This is sub-
-> > > optimal.
-> > >=20
-> > > The first reset is only needed for hot-plugged CPUs because the CPU
-> > > hotplug code doesn't reset them. This patch adds the necessary code
-> > > to reset hot-plugged CPUs on the CPU core hotplug path, and removes
-> > > the now useless initial CPU reset.
-> > >=20
-> > > We just need to mark the newly created CPU as halted to prevent it
-> > > to run until it is put online later.
-> > >=20
-> > > Full CPU reset is now explicitely triggered from the machine code
-> > > only, either during system reset or during CPU hotplug.
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+On Thu, Jan 18, 2018 at 05:36:40PM +0100, Paolo Bonzini wrote:
+> On 08/01/2018 06:53, David Gibson wrote:
+> > From: "pbonzini@redhat.com" <pbonzini@redhat.com>
 > >=20
-> > Hrm, this looks ok in outline, but makes me nervous in a couple of
-> > ways.
+> > We know that only one bit (in addition to SO) is going to be set in
+> > the condition register, so do two movconds instead of three setconds,
+> > three shifts and two ORs.
 > >=20
+> > For ppc64-linux-user, the code size reduction is around 5% and the
+> > performance improvement slightly less than 10%.  For softmmu, the
+> > improvement is around 5%.
 > >=20
-> > > ---
-> > >  hw/ppc/spapr.c                  |    8 ++++++++
-> > >  hw/ppc/spapr_cpu_core.c         |    8 ++++++--
-> > >  include/hw/ppc/spapr_cpu_core.h |    2 ++
-> > >  3 files changed, 16 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index bca838fce638..a2ff401f738a 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -3336,6 +3336,14 @@ static void spapr_core_plug(HotplugHandler *ho=
-tplug_dev, DeviceState *dev,
-> > >          void *fdt;
-> > >          int fdt_offset;
-> > > =20
-> > > +        if (hotplugged) { =20
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  target/ppc/translate.c | 29 ++++++++++++-----------------
+> >  1 file changed, 12 insertions(+), 17 deletions(-)
 > >=20
-> > First, I'm always wary of using the hotplugged parameter, because what
-> > qemu means by it often doesn't line up with what PAPR means by it.
-> >=20
->=20
-> Hmmm... you're right, hotplugged in QDEV simply means that the device
-> was not created during initial machine startup.
->=20
-> ie, any device added with QMP/HMP is always hotplugged.
->=20
-> To cope with the DRC state management, commit 94fd9cbaa3190 added the
-> fact that QEMU mustn't be waiting for an incoming migration as well.
->=20
-> ie, if QEMU is started with -incoming and CPUs are added before migration
-> starts, like libvirt does, this code wouldn't reset the CPUs...
->=20
-> I guess we should check qdev->hotplugged instead. Makes sense ?
-
-Actually I don't think that dev->hotplugged is any better in terms of
-meaning what you want it to.
-
-> > > +            int i;
-> > > +
-> > > +            for (i =3D 0; i < cc->nr_threads; i++) {
-> > > +                spapr_cpu_reset(core->threads[i]);
-> > > +            }
-> > > +        }
-> > > +
-> > >          fdt =3D spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr=
+> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> > index 4075fc8589..8a6bd329d0 100644
+> > --- a/target/ppc/translate.c
+> > +++ b/target/ppc/translate.c
+> > @@ -605,27 +605,22 @@ static opc_handler_t invalid_handler =3D {
+> >  static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
+> >  {
+> >      TCGv t0 =3D tcg_temp_new();
+> > -    TCGv_i32 t1 =3D tcg_temp_new_i32();
+> > -
+> > -    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
+> > -
+> > -    tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1=
 );
-> > > =20
-> > >          spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-> > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > > index ac19b2e0b72c..268be7784efb 100644
-> > > --- a/hw/ppc/spapr_cpu_core.c
-> > > +++ b/hw/ppc/spapr_cpu_core.c
-> > > @@ -22,7 +22,7 @@
-> > >  #include "sysemu/hw_accel.h"
-> > >  #include "qemu/error-report.h"
-> > > =20
-> > > -static void spapr_cpu_reset(void *opaque)
-> > > +void spapr_cpu_reset(void *opaque)
-> > >  {
-> > >      PowerPCCPU *cpu =3D opaque;
-> > >      CPUState *cs =3D CPU(cpu);
-> > > @@ -63,7 +63,11 @@ static void spapr_cpu_init(sPAPRMachineState *spap=
-r, PowerPCCPU *cpu,
-> > >      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
-> > > =20
-> > >      qemu_register_reset(spapr_cpu_reset, cpu);
-> > > -    spapr_cpu_reset(cpu);
-> > > +
-> > > +    /* CPU must not execute anything until explicitely started other=
-wise the
-> > > +     * guest will crash.
-> > > +     */
-> > > +    CPU(cpu)->halted =3D 1; =20
-> >=20
-> > And poking specifics in a CPU that hasn't already been set to a known
-> > state by a reset also worries me.
-> >=20
->=20
-> IIUC the halted flag doesn't really depend any CPU state. It is
-> only a way to prevent the CPU from executing, which is needed
-> if the CPU wasn't set to a known state.
->=20
-> FWIW I've seen other places where it is set before resetting the
-> CPU (eg, s390_cpu_initfn() or cpu_devinit() for Sun4m).
-
-Its effects do, though - e.g. the recent patches to explicitly disable
-the decrementer on stopped vcpus, because halted alone wasn't enough
-to keep them quiescent.
-
-> I was thinking of another solution: create a DeviceClass reset function
-> that would call spapr_cpu_reset() for all CPUs of a core, and register
-> it in spapr_cpu_core_class_init(). It would be called by QDEV during
-> realization of hot-plugged cores only. Unfortunately, this also happens
-> after the call to spapr_core_plug() (see device_set_realized()).
-
-Well, feel free to come up with something.  AIUI there's no urgency
-about this, though - I'm not too worried by extraneous resets, as long
-as we have enough to be correct.
-
-
->=20
-> > >  }
-> > > =20
-> > >  /*
-> > > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_c=
-pu_core.h
-> > > index 1129f344aa0c..763a2168461e 100644
-> > > --- a/include/hw/ppc/spapr_cpu_core.h
-> > > +++ b/include/hw/ppc/spapr_cpu_core.h
-> > > @@ -38,4 +38,6 @@ typedef struct sPAPRCPUCoreClass {
-> > >  } sPAPRCPUCoreClass;
-> > > =20
-> > >  const char *spapr_get_cpu_core_type(const char *cpu_type);
-> > > +void spapr_cpu_reset(void *opaque);
-> > > +
-> > >  #endif
-> > >  =20
+> > -    tcg_gen_trunc_tl_i32(t1, t0);
+> > -    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
+> > -    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
+> > +    TCGv t1 =3D tcg_temp_new();
+> > +    TCGv_i32 t =3D tcg_temp_new_i32();
+> > =20
+> > -    tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1=
+);
+> > -    tcg_gen_trunc_tl_i32(t1, t0);
+> > -    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
+> > -    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
+> > +    tcg_gen_movi_tl(t0, CRF_EQ);
+> > +    tcg_gen_movi_tl(t1, CRF_LT);
+> > +    tcg_gen_movcond_tl((s ? TCG_COND_LT : TCG_COND_LTU), t0, arg0, arg=
+1, t1, t0);
+> > +    tcg_gen_movi_tl(t1, CRF_GT);
+> > +    tcg_gen_movcond_tl((s ? TCG_COND_GT : TCG_COND_GTU), t0, arg0, arg=
+1, t1, t0);
+> > =20
+> > -    tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
+> > -    tcg_gen_trunc_tl_i32(t1, t0);
+> > -    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
+> > -    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
+> > +    tcg_gen_trunc_tl_i32(t, t0);
+> > +    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
+> > +    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t);
+> > =20
+> >      tcg_temp_free(t0);
+> > -    tcg_temp_free_i32(t1);
+> > +    tcg_temp_free(t1);
+> > +    tcg_temp_free_i32(t);
+> >  }
+> > =20
+> >  static inline void gen_op_cmpi(TCGv arg0, target_ulong arg1, int s, in=
+t crf)
 > >=20
 >=20
+> David, can you queue this again now that the ARM backend has been
+> fixed?
 
-
+Done, thanks.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -190,24 +114,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---e8znkWhb8vS+si4n
+--1hAU+gb7eAuiw2fm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphLjAACgkQbDjKyiDZ
-s5LycA//b4GOe5IxMNq8qz+VCeXR5nK67C41Mt/blX9hRwl1WMsGa8fX1HIoOQL9
-gXWYSaZtulLG2eKrJVd86jiJfB7q0R6nlQ+XyDhVmE/+gEeV201Yap6tyDtkmVaF
-tpyy8aRQa4ZURxwslLQuabyBwrv3ndApvIt3EcKnAatQdNq9uhsWilrzbHd/tY/1
-orj5Ob28D473zuqwnBPDDgv/gvtX5BkdBvHpLjexCv0i3MbWwmB/A2qiVhjJp4UF
-YDKH6asiMD2uU/4noxYN0syuxB2wJYA3LjDEbOo1Cp8z0QQs47f6jeuoMP0EmSZ+
-cMNGQ5dG4zCNsGIKLiBnZDMRmlw0A0Fq9gRscoCBuUwV26xvUkYY7FZ+tKNDX2Tz
-C4pWHBInuB4tJHKI9X9aCfvrdSQ+S2ZnPiEBxJAXAHZkIh/O/UTCTw5xA1KKi0K3
-yDj0q56W2NqsTFKM9IeGOGPwLLQuwarKqks48xP4DVKgon3OnNXBOwe2nLEWvE/m
-yC5JKEvaxdblb9UCjHHXtK63/EIyVgC4cnHap90+/OnDjrKzNO00uuwoswhrLBEc
-fCAQ/gfazenf02l7at7gkw9DPOCeH5sJ5EU7pC8AowvS5RG1Lb233Z174pQ1wTQ7
-hKn7pzSS2B9DiTFb96Yf4EzrgMqohyq5FinNZxsMNgEaXj6wHLM=
-=WDKP
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphLZ0ACgkQbDjKyiDZ
+s5IphxAA5IeNggCHcv0oaLo2RGNJVN+nxfpghDo21DP6605pVSpfaafO0N12bOa+
+Se6B/eVZmhoaKcLSCgnFMPI8xzcSMbD3583NxzmhQAHGIUsJ8Stw+MkFvJvSrevO
+mGgRAVkonLPEFpjBUDI8A9D/Xa24ZZpdlRhSn0CXf4wKejolkgXEJ8gvzpZAIhxm
+NSeT9BI8zZY1MckhKmxkvYnn2dNWuqj2qu2OZWp7T43FVNJaZML11puLp1wqp/ZK
+vgfwGXeXHhzS2I/9JMP15A/awIu9/lKq+B5zBE1PzCXrlCs+4ocQYKzEuGMaEwEo
+bkBS2KutSeftijvZnjwD2znvPajIKg8tRQOLJtE2I39eStR8DZ54AjowMoQYCRAP
+Tt4rW+aQjLzuaxfp8GuAZhOngeDfgMlgF6fRy8TAy24cQZWEy0VvJ/apkkfRAmBl
+PT3cYr0YaQ/N01fv7cOTUqXNEhC3m57DLMaTJp38ZoXNRAZlgZf2lh4Pdy59ey2B
+GWdM8Pi7mopuSDSkuZjsqmt0ygO9Gylvei0yXKiokH959sj8tylaI0LKlZjg46+J
+OZ9iBEis94l3IY14C0JFs4C+RdNUOcnHWUQXsn7434izbcL8RDcTGRikwtmUqTE/
+QXaL7NNgd8oII2zSLl4SFhWP5ES2fZtCeI/e/hjyZvcEvjGa0WM=
+=eRVU
 -----END PGP SIGNATURE-----
 
---e8znkWhb8vS+si4n--
+--1hAU+gb7eAuiw2fm--
