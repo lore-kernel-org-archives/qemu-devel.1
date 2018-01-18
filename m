@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecDOE-0006HQ-6N
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:50:12 -0500
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1ecDQk-0008D6-21
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:52:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecDOD-00050A-Dt
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:50:10 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:37035)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecDOD-0004zy-8t
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:50:09 -0500
-Received: by mail-ot0-x243.google.com with SMTP id a24so20652467otd.4
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 08:50:09 -0800 (PST)
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1ecDQg-0006xn-UK
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:52:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
+	id 1ecDQg-0006x2-Lt
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 11:52:42 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0IGnT1R120423
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 11:52:37 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fjvgjstjy-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 11:52:37 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
+	Thu, 18 Jan 2018 16:52:34 -0000
+Date: Thu, 18 Jan 2018 17:52:29 +0100
+From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+In-Reply-To: <20180118172034.3dda2622.cohuck@redhat.com>
+References: <1516035122-7617-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<20180118172034.3dda2622.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180118022625.6462-1-eblake@redhat.com>
-References: <20180118022625.6462-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jan 2018 16:49:48 +0000
-Message-ID: <CAFEAcA-Eai2JWbe79xrrVCBLGdLASdaWBoSW5LKjMz5TkVJxrQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/6] NBD patches through 17 Jan
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20180118175229.42b27779@p-imbrenda.boeblingen.de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] s390x: fix storage attributes
+ migration for non-small guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +42,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 18 January 2018 at 02:26, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-01-17
->
-> for you to fetch changes up to 1d17922a28f5b9a8adcea3c93f49086e0a751e86:
->
->   nbd/server: structurize option reply sending (2018-01-17 20:14:12 -0600)
->
-> I'm still waiting for v3 of Vladimir's "0/6 nbd export qmp interface",
-> but it's been a week since my last pull, so it's worth flushing the queue.
->
-> ----------------------------------------------------------------
-> pull-nbd-2018-01-17
->
-> - Vladimir Sementsov-Ogievskiy/Eric Blake: 0/6 NBD server refactoring
->
-> ----------------------------------------------------------------
-> Eric Blake (4):
->       nbd/server: Hoist nbd_reject_length() earlier
->       nbd/server: Better error for NBD_OPT_EXPORT_NAME failure
->       nbd/server: Add va_list form of nbd_negotiate_send_rep_err()
->       nbd/server: Add helper functions for parsing option payload
->
-> Vladimir Sementsov-Ogievskiy (2):
->       nbd/server: refactor negotiation functions parameters
->       nbd/server: structurize option reply sending
+On Thu, 18 Jan 2018 17:20:34 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Applied, thanks.
+> On Mon, 15 Jan 2018 17:52:02 +0100
+> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
+> 
+> > Fix storage attribute migration so that it does not fail for guests
+> > with more than a few GB of RAM. Migration itself was successful, but
+> > storage attributes were not migrated completely.
+> > 
+> > This patch fixes the migration of all storage attributes, even when
+> > the guest have large amounts of memory.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> > Fixes: 903fd80b03243476 ("s390x/migration: Storage attributes
+> > device") ---
+> >  hw/s390x/s390-stattrib-kvm.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/s390x/s390-stattrib-kvm.c
+> > b/hw/s390x/s390-stattrib-kvm.c index 41770a7..480551c 100644
+> > --- a/hw/s390x/s390-stattrib-kvm.c
+> > +++ b/hw/s390x/s390-stattrib-kvm.c
+> > @@ -116,7 +116,7 @@ static void
+> > kvm_s390_stattrib_synchronize(S390StAttribState *sa) for (cx = 0;
+> > cx + len <= max; cx += len) { clog.start_gfn = cx;
+> >              clog.count = len;
+> > -            clog.values = (uint64_t)(sas->incoming_buffer + cx *
+> > len);  
+> 
+> Hm, doesn't that even imply that you reference an area beyond the
+> buffer, as the <= max check does not catch this?
 
--- PMM
+what do you mean?
+
+cx + len <= max catches the cases where you would write beyond the end
+of the buffer. if cx + len == max then we are filling the buffer to the
+last byte. and we will get out at the next iteration.
+
+> > +            clog.values = (uint64_t)(sas->incoming_buffer + cx);
+> >              r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS,
+> > &clog); if (r) {
+> >                  error_report("KVM_S390_SET_CMMA_BITS failed: %s",
+> > strerror(-r)); @@ -126,7 +126,7 @@ static void
+> > kvm_s390_stattrib_synchronize(S390StAttribState *sa) if (cx < max) {
+> >              clog.start_gfn = cx;
+> >              clog.count = max - cx;
+> > -            clog.values = (uint64_t)(sas->incoming_buffer + cx *
+> > len);
+
+and here we fill in the last pieces if there are any leftovers, which
+at this point are guaranteed to be smaller than len.
+
+> > +            clog.values = (uint64_t)(sas->incoming_buffer + cx);
+> >              r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS,
+> > &clog); if (r) {
+> >                  error_report("KVM_S390_SET_CMMA_BITS failed: %s",
+> > strerror(-r));  
+> 
