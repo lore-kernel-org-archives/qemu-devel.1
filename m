@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ecAND-0007oL-TL
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:36:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ecANN-0007wT-4s
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ecAN9-0007Vt-US
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:36:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ecAN9-0007VA-PC
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:36:51 -0500
-Date: Thu, 18 Jan 2018 13:36:43 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180118133643.GP19695@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180112125854.18261-1-kraxel@redhat.com>
-	<20180112125854.18261-11-kraxel@redhat.com>
-	<CAFEAcA8UAbOvZuhxwjD2zAA7GBGucD8MAf5E0h05tb3NXKdGqw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ecANJ-0007bd-DO
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:37:05 -0500
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:44290)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ecANJ-0007bF-94
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:37:01 -0500
+Received: by mail-ot0-x22d.google.com with SMTP id t20so10725596ote.11
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 05:37:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8UAbOvZuhxwjD2zAA7GBGucD8MAf5E0h05tb3NXKdGqw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 10/14] ui: fix VNC client throttling when
- audio capture is active
+In-Reply-To: <20180118143421.10499441@redhat.com>
+References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
+	<CAFEAcA-8dwLpfrbV8+--L4Z9Um9xVsyUOfKjcz9-T1aTPkgrEg@mail.gmail.com>
+	<20180117201515.1a49fcbf@redhat.com>
+	<CAFEAcA9gXOOkv+-rTXcNyzgY9P8CR66Rrx-0GM2G0m0x+HbAmA@mail.gmail.com>
+	<20180118114330.53ad7ce7@redhat.com>
+	<CAFEAcA-My_vDd=_7g907MpO2WmVHOHKxsw2-E-vQwn=_SZadRQ@mail.gmail.com>
+	<20180118140605.028b7e33@redhat.com>
+	<CAFEAcA-oP7hCgjwqiCh4TKKpq-Jfho0JOAsSvWfc09iUouiUWg@mail.gmail.com>
+	<20180118143421.10499441@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Jan 2018 13:36:40 +0000
+Message-ID: <CAFEAcA8K0Sx=rZ-GAZfZfmC2g7TQLGcwbXWOR76xBZKeHWsvig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/24] generalize parsing of cpu_model
+ (part 4)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +37,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-On Thu, Jan 18, 2018 at 01:29:35PM +0000, Peter Maydell wrote:
-> On 12 January 2018 at 12:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> >
-> > The VNC server must throttle data sent to the client to prevent the 'output'
-> > buffer size growing without bound, if the client stops reading data off the
-> > socket (either maliciously or due to stalled/slow network connection).
-> 
-> Hi. Coverity (CID 1385147) complains about a suspicious sign extension
-> in this patch:
-> 
-> > +/*
-> > + * Figure out how much pending data we should allow in the output
-> > + * buffer before we throttle incremental display updates, and/or
-> > + * drop audio samples.
-> > + *
-> > + * We allow for equiv of 1 full display's worth of FB updates,
-> > + * and 1 second of audio samples. If audio backlog was larger
-> > + * than that the client would already suffering awful audio
-> > + * glitches, so dropping samples is no worse really).
-> > + */
-> > +static void vnc_update_throttle_offset(VncState *vs)
-> > +{
-> > +    size_t offset =
-> > +        vs->client_width * vs->client_height * vs->client_pf.bytes_per_pixel;
-> 
-> because the multiply is done with the "int" type, and then may
-> be sign-extended when converted to the probably-64-bit unsigned
-> size_t, resulting in the high bits all being set if the
-> multiply ended up with a 1 in bit 31.
+On 18 January 2018 at 13:34, Igor Mammedov <imammedo@redhat.com> wrote:
+> and renaming
+>
+> TARGET_DEFAULT_CPU_TYPE to USERONLY_DEFAULT_CPU_TYPE
+>
+> but I'd still keep it within $ARCH/cpu.h so we won't
+> have to create a bunch of new linux-user/$ARCH/target_elf.h
+> files just for that and duplicate it to bsd-user/$ARCH/target_elf.h
 
-I guess we can usefully change client_width/client_height to be an unsigned
-int, since there's no valid scenario for them to be negative.
+We already have linux-user/$ARCH/target_cpu.h, which is exactly
+for this kind of define.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
