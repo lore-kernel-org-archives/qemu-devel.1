@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ecEex-0001WG-Ka
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:11:32 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecEex-0001WA-JG
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:11:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ecEeu-0004Mo-AJ
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecEeu-0004NP-Hv
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:11:31 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 18 Jan 2018 21:11:20 +0300
-Message-Id: <20180118181123.37056-4-vsementsov@virtuozzo.com>
+Date: Thu, 18 Jan 2018 21:11:23 +0300
+Message-Id: <20180118181123.37056-7-vsementsov@virtuozzo.com>
 In-Reply-To: <20180118181123.37056-1-vsementsov@virtuozzo.com>
 References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
+Subject: [Qemu-devel] [PATCH v2 6/6] iotest 201: new test for qmp
+ nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,154 +23,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Add command for export removing. It is needed for cases when we
-don't want to keep export after the operation on it was completed.
-The other example is temporary node, created with blockdev-add.
-If we want to delete it we should firstly remove corresponding
-NBD export.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block.json     | 45 +++++++++++++++++++++++++++++++++++++++++++++
- include/block/nbd.h |  1 +
- blockdev-nbd.c      | 24 ++++++++++++++++++++++++
- nbd/server.c        | 21 +++++++++++++++++++++
- 4 files changed, 91 insertions(+)
+ tests/qemu-iotests/201     | 159 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/201.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 165 insertions(+)
+ create mode 100644 tests/qemu-iotests/201
+ create mode 100644 tests/qemu-iotests/201.out
 
-diff --git a/qapi/block.json b/qapi/block.json
-index 353e3a45bd..ddf73932ce 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -228,6 +228,51 @@
-   'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
- 
- ##
-+# @NbdServerRemoveMode:
+diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
+new file mode 100644
+index 0000000000..1ac6d953c0
+--- /dev/null
++++ b/tests/qemu-iotests/201
+@@ -0,0 +1,159 @@
++#!/usr/bin/env python
 +#
-+# Mode of NBD export removing.
++# Tests for qmp command nbd-server-remove.
 +#
-+# @safe: Remove export if there are no existing connections, fail otherwise.
++# Copyright (c) 2017 Virtuozzo International GmbH
 +#
-+# @hard: Drop all connections immediately and remove export.
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
 +#
-+# Postponed, not realized yet modes:
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
 +#
-+# hide: Just hide export from new clients, leave existing connections as is.
-+#       Remove export after all clients are disconnected. nbd-server-remove
-+#       with mode=soft or mode=hard may be called after nbd-server-remove
-+#       with mode=hide.
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
-+# soft: Hide export from new clients, answer with ESHUTDOWN for all further
-+#       requests from existing clients. Remove export after all clients are
-+#       disconnected. nbd-server-requests with mode=hard may be called after
-+#       nbd-server-remove with mode=soft
-+#
-+# Since: 2.12
-+##
-+{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
 +
-+##
-+# @nbd-server-remove:
-+#
-+# Remove NBD export by name.
-+#
-+# @name: Export name.
-+#
-+# @mode: Mode of command operation. See @NbdServerRemoveMode description.
-+#        Default is 'safe'.
-+#
-+# Returns: error if
-+#            - the server is not running
-+#            - export is not found
-+#            - mode is 'safe' and there are existing connections
-+#
-+# Since: 2.12
-+##
-+{ 'command': 'nbd-server-remove',
-+  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
++import os
++import sys
++import iotests
++import time
++from iotests import qemu_img, qemu_io, filter_qemu_io, QemuIoInteractive
 +
-+##
- # @nbd-server-stop:
- #
- # Stop QEMU's embedded NBD server, and unregister all devices previously
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 978e443366..ee74ec391a 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -261,6 +261,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
-                           bool writethrough, BlockBackend *on_eject_blk,
-                           Error **errp);
- void nbd_export_close(NBDExport *exp);
-+void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
- void nbd_export_get(NBDExport *exp);
- void nbd_export_put(NBDExport *exp);
- 
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 104789e521..a9f79c6778 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -189,6 +189,30 @@ void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
-     nbd_export_put(exp);
- }
- 
-+void qmp_nbd_server_remove(const char *name,
-+                           bool has_mode, NbdServerRemoveMode mode,
-+                           Error **errp)
-+{
-+    NBDExport *exp;
++nbd_port = '10900'
++nbd_uri = 'nbd+tcp://localhost:' + nbd_port + '/exp'
++disk = os.path.join(iotests.test_dir, 'disk')
 +
-+    if (!nbd_server) {
-+        error_setg(errp, "NBD server not running");
-+        return;
-+    }
 +
-+    exp = nbd_export_find(name);
-+    if (exp == NULL) {
-+        error_setg(errp, "Export '%s' is not found", name);
-+        return;
-+    }
++class TestNbdServerRemove(iotests.QMPTestCase):
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
 +
-+    if (!has_mode) {
-+        mode = NBD_SERVER_REMOVE_MODE_SAFE;
-+    }
++        self.vm = iotests.VM().add_drive(disk)
++        self.vm.launch()
 +
-+    nbd_export_remove(exp, mode, errp);
-+}
++        address = {
++            'type': 'inet',
++            'data': {
++                'host': 'localhost',
++                'port': nbd_port
++            }
++        }
 +
- void qmp_nbd_server_stop(Error **errp)
- {
-     nbd_export_close_all();
-diff --git a/nbd/server.c b/nbd/server.c
-index 6cf2eeb2c1..fdb6be7016 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1177,6 +1177,27 @@ void nbd_export_close(NBDExport *exp)
-     nbd_export_put(exp);
- }
- 
-+void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
-+{
-+    NBDClient *client;
-+    int nb_clients = 0;
++        result = self.vm.qmp('nbd-server-start', addr=address)
++        self.assert_qmp(result, 'return', {})
++        result = self.vm.qmp('nbd-server-add', device='drive0', name='exp')
++        self.assert_qmp(result, 'return', {})
 +
-+    if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
-+        nbd_export_close(exp);
-+        return;
-+    }
++    def tearDown(self):
++        self.vm.shutdown()
++        os.remove(disk)
 +
-+    assert(mode == NBD_SERVER_REMOVE_MODE_SAFE);
++    def remove_export(self, name, mode=None):
++        if mode is None:
++            return self.vm.qmp('nbd-server-remove', name=name)
++        else:
++            return self.vm.qmp('nbd-server-remove', name=name, mode=mode)
 +
-+    QTAILQ_FOREACH(client, &exp->clients, next) {
-+        nb_clients++;
-+    }
++    def assertExportNotFound(self, name):
++        result = self.vm.qmp('nbd-server-remove', name=name)
++        self.assert_qmp(result, 'error/desc', "Export 'exp' is not found")
 +
-+    error_setg(errp, "NBD export '%s' has %d active connection%s. To force "
-+               "remove it (and hard disconnect clients) use mode='hard'",
-+               exp->name, nb_clients, nb_clients == 1 ? "" : "s");
-+}
++    def assertExistingClients(self, result):
++        self.assert_qmp(result, 'error/desc',
++                        "NBD export 'exp' has 1 active connection. To force "
++                        "remove it (and hard disconnect clients) use "
++                        "mode='hard'")
 +
- void nbd_export_get(NBDExport *exp)
- {
-     assert(exp->refcount > 0);
++    def assertReadOk(self, qemu_io_output):
++        self.assertEqual(
++                filter_qemu_io(qemu_io_output).strip(),
++                'read 512/512 bytes at offset 0\n' +
++                '512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)')
++
++    def assertReadFailed(self, qemu_io_output):
++        self.assertEqual(filter_qemu_io(qemu_io_output).strip(),
++                         'read failed: Input/output error')
++
++    def assertConnectFailed(self, qemu_io_output):
++        self.assertEqual(filter_qemu_io(qemu_io_output).strip(),
++                         "can't open device nbd+tcp://localhost:" + nbd_port +
++                         "/exp: Requested export not available\n"
++                         "server reported: export 'exp' not present")
++
++    def do_test_connect_after_remove(self, mode=None):
++        args = ('-r', '-f', 'raw', '-c', 'read 0 512', nbd_uri)
++        self.assertReadOk(qemu_io(*args))
++
++        result = self.remove_export('exp', mode)
++        self.assert_qmp(result, 'return', {})
++
++        self.assertExportNotFound('exp')
++        self.assertConnectFailed(qemu_io(*args))
++
++    def test_connect_after_remove_default(self):
++        self.do_test_connect_after_remove()
++
++    def test_connect_after_remove_safe(self):
++        self.do_test_connect_after_remove('safe')
++
++    def test_connect_after_remove_force(self):
++        self.do_test_connect_after_remove('hard')
++
++    def do_test_remove_during_connect_safe(self, mode=None):
++        qio = QemuIoInteractive('-r', '-f', 'raw', nbd_uri)
++        self.assertReadOk(qio.cmd('read 0 512'))
++
++        result = self.remove_export('exp', mode)
++        self.assertExistingClients(result)
++
++        self.assertReadOk(qio.cmd('read 0 512'))
++
++        qio.close()
++
++        result = self.remove_export('exp', mode)
++        self.assert_qmp(result, 'return', {})
++
++        self.assertExportNotFound('exp')
++
++    def test_remove_during_connect_default(self):
++        self.do_test_remove_during_connect_safe()
++
++    def test_remove_during_connect_safe(self):
++        self.do_test_remove_during_connect_safe('safe')
++
++    def test_remove_during_connect_hard(self):
++        qio = QemuIoInteractive('-r', '-f', 'raw', nbd_uri)
++        self.assertReadOk(qio.cmd('read 0 512'))
++
++        result = self.remove_export('exp', 'hard')
++        self.assert_qmp(result, 'return', {})
++
++        self.assertReadFailed(qio.cmd('read 0 512'))
++        self.assertExportNotFound('exp')
++
++        qio.close()
++
++    def test_remove_during_connect_safe_hard(self):
++        qio = QemuIoInteractive('-r', '-f', 'raw', nbd_uri)
++        self.assertReadOk(qio.cmd('read 0 512'))
++
++        result = self.remove_export('exp', 'safe')
++        self.assertExistingClients(result)
++
++        self.assertReadOk(qio.cmd('read 0 512'))
++
++        result = self.remove_export('exp', 'hard')
++        self.assert_qmp(result, 'return', {})
++
++        self.assertExportNotFound('exp')
++        self.assertReadFailed(qio.cmd('read 0 512'))
++        qio.close()
++
++
++if __name__ == '__main__':
++    iotests.main()
+diff --git a/tests/qemu-iotests/201.out b/tests/qemu-iotests/201.out
+new file mode 100644
+index 0000000000..2f7d3902f2
+--- /dev/null
++++ b/tests/qemu-iotests/201.out
+@@ -0,0 +1,5 @@
++.......
++----------------------------------------------------------------------
++Ran 7 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 93d96fb22f..f07d3e3df6 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -197,5 +197,6 @@
+ 197 rw auto quick
+ 198 rw auto
+ 200 rw auto
++201 rw auto quick
+ 202 rw auto quick
+ 203 rw auto
 -- 
 2.11.1
