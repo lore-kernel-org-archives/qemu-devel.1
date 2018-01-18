@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ebzWn-0002IP-73
+	(envelope-from <ehabkost@redhat.com>) id 1ebzWo-0002IU-HT
 	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ebzWl-0003kk-HS
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:2750)
+	(envelope-from <ehabkost@redhat.com>) id 1ebzWn-0003mF-9U
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ebzWl-0003kA-99
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:03 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ebzWn-0003lo-3r
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:02:05 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Jan 2018 00:01:50 -0200
-Message-Id: <20180118020157.25401-2-ehabkost@redhat.com>
+Date: Thu, 18 Jan 2018 00:01:51 -0200
+Message-Id: <20180118020157.25401-3-ehabkost@redhat.com>
 In-Reply-To: <20180118020157.25401-1-ehabkost@redhat.com>
 References: <20180118020157.25401-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 1/8] pc: add 2.12 machine types
+Subject: [Qemu-devel] [PULL 2/8] target/i386: add clflushopt to
+ "Skylake-Server" cpu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +29,49 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qe
 
 From: Haozhong Zhang <haozhong.zhang@intel.com>
 
+CPUID_7_0_EBX_CLFLUSHOPT is missed in current "Skylake-Server" cpu
+model. Add it to "Skylake-Server" cpu model on pc-i440fx-2.12 and
+pc-q35-2.12. Keep it disabled in "Skylake-Server" cpu model on older
+machine types.
+
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-Id: <20171219033730.12748-2-haozhong.zhang@intel.com>
+Message-Id: <20171219033730.12748-3-haozhong.zhang@intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/i386/pc.h |  3 +++
- hw/i386/pc_piix.c    | 15 ++++++++++++---
- hw/i386/pc_q35.c     | 13 +++++++++++--
- 3 files changed, 26 insertions(+), 5 deletions(-)
+ include/hw/i386/pc.h | 5 +++++
+ target/i386/cpu.c    | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 6f77eb0665..83d825e896 100644
+index 83d825e896..bb49165fe0 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -321,6 +321,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+@@ -323,6 +323,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
  
-+#define PC_COMPAT_2_11 \
-+    HW_COMPAT_2_11 \
-+
+ #define PC_COMPAT_2_11 \
+     HW_COMPAT_2_11 \
++    {\
++        .driver   = "Skylake-Server" "-" TYPE_X86_CPU,\
++        .property = "clflushopt",\
++        .value    = "off",\
++    },
+ 
  #define PC_COMPAT_2_10 \
      HW_COMPAT_2_10 \
-     {\
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 2febd0e136..a25619dfbf 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -426,21 +426,30 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     m->default_display = "std";
- }
- 
--static void pc_i440fx_2_11_machine_options(MachineClass *m)
-+static void pc_i440fx_2_12_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v2_12, "pc-i440fx-2.12", NULL,
-+                      pc_i440fx_2_12_machine_options);
-+
-+static void pc_i440fx_2_11_machine_options(MachineClass *m)
-+{
-+    pc_i440fx_2_12_machine_options(m);
-+    m->is_default = 0;
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_11);
-+}
-+
- DEFINE_I440FX_MACHINE(v2_11, "pc-i440fx-2.11", NULL,
-                       pc_i440fx_2_11_machine_options);
- 
- static void pc_i440fx_2_10_machine_options(MachineClass *m)
- {
-     pc_i440fx_2_11_machine_options(m);
--    m->is_default = 0;
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
-     m->auto_enable_numa_with_memhp = false;
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index d6060043ac..5c6c608fcb 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -303,19 +303,28 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
- 
--static void pc_q35_2_11_machine_options(MachineClass *m)
-+static void pc_q35_2_12_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
- }
- 
-+DEFINE_Q35_MACHINE(v2_12, "pc-q35-2.12", NULL,
-+                   pc_q35_2_12_machine_options);
-+
-+static void pc_q35_2_11_machine_options(MachineClass *m)
-+{
-+    pc_q35_2_12_machine_options(m);
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_11);
-+}
-+
- DEFINE_Q35_MACHINE(v2_11, "pc-q35-2.11", NULL,
-                    pc_q35_2_11_machine_options);
- 
- static void pc_q35_2_10_machine_options(MachineClass *m)
- {
-     pc_q35_2_11_machine_options(m);
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
-     m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
-     m->auto_enable_numa_with_memhp = false;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ad8196b166..4385853646 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1382,7 +1382,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+-            CPUID_7_0_EBX_AVX512VL,
++            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+         /* Missing: XSAVES (not supported by some Linux versions,
+          * including v4.1 to v4.12).
+          * KVM doesn't yet expose any XSAVES state save component,
 -- 
 2.14.3
