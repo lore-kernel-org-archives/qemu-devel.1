@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecCAh-0000qH-T7
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:32:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ecCCd-0001m3-TZ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:34:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecCAc-00041q-3z
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:32:07 -0500
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:32820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecCAb-000416-U5
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:32:02 -0500
-Received: by mail-qt0-x22c.google.com with SMTP id e2so31130071qti.0
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:32:01 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA-8dwLpfrbV8+--L4Z9Um9xVsyUOfKjcz9-T1aTPkgrEg@mail.gmail.com>
-	<20180117201515.1a49fcbf@redhat.com>
-	<CAFEAcA9gXOOkv+-rTXcNyzgY9P8CR66Rrx-0GM2G0m0x+HbAmA@mail.gmail.com>
-	<20180118114330.53ad7ce7@redhat.com>
-	<CAFEAcA-My_vDd=_7g907MpO2WmVHOHKxsw2-E-vQwn=_SZadRQ@mail.gmail.com>
-	<20180118140605.028b7e33@redhat.com>
-	<CAFEAcA-oP7hCgjwqiCh4TKKpq-Jfho0JOAsSvWfc09iUouiUWg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1f5614b9-591c-a3f9-c6ce-15d615d13c03@amsat.org>
-Date: Thu, 18 Jan 2018 12:31:53 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1ecCCb-0005sg-2y
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:34:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:8833)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecCCa-0005sF-Sy
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:34:05 -0500
+References: <20180112125854.18261-1-kraxel@redhat.com>
+	<20180112125854.18261-11-kraxel@redhat.com>
+	<CAFEAcA8UAbOvZuhxwjD2zAA7GBGucD8MAf5E0h05tb3NXKdGqw@mail.gmail.com>
+	<20180118133643.GP19695@redhat.com>
+	<b56b41f6-f048-00bf-d5fb-a1ed20ddeb09@redhat.com>
+	<20180118141256.GS19695@redhat.com>
+	<85686228-03dd-a7fc-1477-f27d09de5007@redhat.com>
+	<CAFEAcA9sFenca+n37VOjQ3tUJLV_Vt0A7iwNdj=WbOvrMP6Pbg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5eb947cb-6481-9081-0574-306858f985e0@redhat.com>
+Date: Thu, 18 Jan 2018 16:33:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-oP7hCgjwqiCh4TKKpq-Jfho0JOAsSvWfc09iUouiUWg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="55uQlmzhXezkZ1rPSUR1RVyTFY8qPyFk3"
-Subject: Re: [Qemu-devel] [PATCH 00/24] generalize parsing of cpu_model
- (part 4)
+In-Reply-To: <CAFEAcA9sFenca+n37VOjQ3tUJLV_Vt0A7iwNdj=WbOvrMP6Pbg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 10/14] ui: fix VNC client throttling when
+ audio capture is active
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,128 +35,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Michael Tokarev <mjt@tls.msk.ru>, Riku Voipio <riku.voipio@iki.fi>, Agustin Henze <tin@debian.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Debian QEMU Team <pkg-qemu-devel@lists.alioth.debian.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---55uQlmzhXezkZ1rPSUR1RVyTFY8qPyFk3
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Aurelien Jarno <aurelien@aurel32.net>, Michael Tokarev <mjt@tls.msk.ru>,
- Riku Voipio <riku.voipio@iki.fi>, Agustin Henze <tin@debian.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Debian QEMU Team <pkg-qemu-devel@lists.alioth.debian.org>
-Message-ID: <1f5614b9-591c-a3f9-c6ce-15d615d13c03@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 00/24] generalize parsing of cpu_model (part
- 4)
-References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
- <CAFEAcA-8dwLpfrbV8+--L4Z9Um9xVsyUOfKjcz9-T1aTPkgrEg@mail.gmail.com>
- <20180117201515.1a49fcbf@redhat.com>
- <CAFEAcA9gXOOkv+-rTXcNyzgY9P8CR66Rrx-0GM2G0m0x+HbAmA@mail.gmail.com>
- <20180118114330.53ad7ce7@redhat.com>
- <CAFEAcA-My_vDd=_7g907MpO2WmVHOHKxsw2-E-vQwn=_SZadRQ@mail.gmail.com>
- <20180118140605.028b7e33@redhat.com>
- <CAFEAcA-oP7hCgjwqiCh4TKKpq-Jfho0JOAsSvWfc09iUouiUWg@mail.gmail.com>
-In-Reply-To: <CAFEAcA-oP7hCgjwqiCh4TKKpq-Jfho0JOAsSvWfc09iUouiUWg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 18/01/2018 15:50, Peter Maydell wrote:
+> On 18 January 2018 at 14:46, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 18/01/2018 15:12, Daniel P. Berrange wrote:
+>>>> In addition to that, do we support a >= 2 GiB framebuffer at all? (Even
+>>>> with unsigned ints, Coverity would rightly complain about a truncated
+>>>> 32-bit multiplication being assigned to a 64-bit value).
+>>> client_width/client_height are values that are initialized from the
+>>> graphics card frontend config, and thus limited by amount of video
+>>> RAM QEMU allows.   bytes_per_pixel is limited to 8/16/32.
+>>>
+>>> So I think we're safe from 2GB overflow in any normal case.
+>>>
+>>> That said, VGA RAM size is configurable, so I'm curious what would happen
+>>> if someone configured an insanely large VGA RAM and asked for a big frame
+>>> buffer in guest.
+>>>
+>>> VNC is protocol limited to uint16 for width/height size, and so is X11
+>>> so I imagine some exploding behavour would follow :-)
+>>
+>> Indeed, and even 2^16 x 2^16 * 32bpp is already 34 bits.  So perhaps we
+>> should limit VNC to 16384 pixels on each axis (maximum frame buffer size
+>> 1 GiB).
+> 
+> Google says you can already get graphics cards that can do 15360x8640,
+> which is really quite close to that 16384 limit...
 
-(CC'ing linux-user maintainers)
+Then we can do 32767 * 16384 * 4, but I'm a bit afraid of off-by-ones.
 
-Hi Peter, Igor,
-
-On 01/18/2018 10:10 AM, Peter Maydell wrote:
-> On 18 January 2018 at 13:06, Igor Mammedov <imammedo@redhat.com> wrote:=
-
->> I've looked and such case is rather an exception,
->> I can fix it up in 2 ways:
->> 1st:
->>   target/arm/cpu.h
->>   +#if !defined(CONFIG_USER_ONLY)
->>   +#define TARGET_DEFAULT_CPU_TYPE TYPE_ARM_CPU
->>   +else
->>   +#define TARGET_DEFAULT_CPU_TYPE ARM_CPU_TYPE_NAME("any")
->>   +#endif
->=20
-> This is weird, because TYPE_ARM_CPU isn't really
-> a sensible thing to use for anything, so you've really set
-> it up as a "this is only of any use for null-machine.c",
-> in which case you should just do that in null-machine.c.
->=20
->> or 2nd is to compile in "any" type in system mode
->> (which most targets do), roughly it would amount to:
->>   target/arm/cpu.c
->>   @@ -1671,10 +1671,8 @@ static const ARMCPUInfo arm_cpus[] =3D {
->>      { .name =3D "pxa270-b1",   .initfn =3D pxa270b1_initfn },
->>      { .name =3D "pxa270-c0",   .initfn =3D pxa270c0_initfn },
->>      { .name =3D "pxa270-c5",   .initfn =3D pxa270c5_initfn },
->>   -#ifdef CONFIG_USER_ONLY
->>      { .name =3D "any",         .initfn =3D arm_any_initfn },
->>    #endif
->>   -#endif
->>      { .name =3D NULL }
->>    };
->=20
-> This is definitely wrong. We deliberately don't provide "any"
-> in system mode, because it's not a sensible thing for users
-> to try to use with board emulation. We disabled it some while
-> back to avoid users trying it by accident and getting confused.
->=20
-> In general, for Arm you really need to know which CPU you want
-> to use and why. So:
->  linux-user and bsd-user: should use "any"
-
-I disagree on this, since userland binaries are compiled for a specific
-arch/ABI/FPU.
-Even without worrying about the FPU, it is unlikely the "any" cpu can
-run indifferently ARMv6 and ARMv7 binaries.
-
-IMHO ARMv5 should default to arm946, ARMv6  arm1176 and ARMv7 to cortex-a=
-7.
-
-I think we should do the same for linux-user than system and remove the
-'any' cpu for ARM.
-
->  board models: should use whatever CPU that board is designed for
->  null-machine: if it genuinely doesn't care, then pick one at random
-
-Should work :)
-
-Maybe pick the latest/best implemented, hoping this has more features to
-cover?
-
-> But there is no single sensible "default CPU type" at an architecture
-> level, which is why you can't define a TARGET_DEFAULT_CPU_TYPE
-> in target/arm/cpu.h. Any code that thinks it wants that should
-> instead be defining it own default that makes sense for that
-> context.
->=20
-> thanks
-> -- PMM
->=20
-
-
---55uQlmzhXezkZ1rPSUR1RVyTFY8qPyFk3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlpgvekACgkQ4+MsLN6t
-wN4g3xAAva8yVJG6UJJbHu9tuRFdj8hqcfXWNyl9KETAwqzCs2n1AjJNB11IZqd8
-14mkxV+8nNcOn08+EG49+IOGdM8DaKJI3SvtZ9U2D5kfFztdhccqulZAntWHkv9x
-D6fxKPN56qrSypvlYXdcDAynzB+Sg90fqrDnV8wkJjqPkCFlEUWvksfnsZ4j61+p
-MbdaApSXeVZ6DDayVOD0LWba06I93Li5YItyr1pT8LLrOUsWipiSqtP6rbpkiexl
-TE+2E5+UuiLIUtR2wJR7I3d1G2OhhKXdI4nrgMMVVLUR+/uzzoPWJhutTt85uyHw
-PGAO4dEMspblIicpV3ZfNR897O0pGYudlssNeYVpf3IxCBS84yyKHPtDg5O1nDij
-fNPKkojkx81+5xMBiVviThFQjFsvS8yXEfbNpxQr4yuWRyOY5vCNUabwRmnCNV2o
-wiwPMOMD1IaqmBfLTHSuP5Sarl4nXgwYP5Lg2q7ZVgO1bPtJF2UB2OS64SfZHYzp
-bECnLtTUVq/o3QzqsIVt+l+PVYQXKJO5W6fXIYgDCDBePSAinpir2bSHMRKUep+s
-I3mJPm25v7DPqa6fFsRKtzjR609utErkKen+roFwcnaUIi+SsdTnYoF28k1wyHGN
-HssqlxEBnZJWN+kEzxT5vVbNKtHBlo9T6Vb6HVQ4e3Ub5semWY0=
-=cme3
------END PGP SIGNATURE-----
-
---55uQlmzhXezkZ1rPSUR1RVyTFY8qPyFk3--
+Paolo
