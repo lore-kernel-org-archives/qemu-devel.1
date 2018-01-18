@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH4T-0004Uj-VB
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:02 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH4c-0004bC-Rl
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH4Q-0004Em-Me
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50516)
+	(envelope-from <mst@redhat.com>) id 1ecH4Z-0004MN-P6
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH4Q-0004Dx-Cm
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:45:58 -0500
-Date: Thu, 18 Jan 2018 22:45:45 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH4Z-0004Lg-GS
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:07 -0500
+Date: Thu, 18 Jan 2018 22:45:57 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516308132-10272-18-git-send-email-mst@redhat.com>
+Message-ID: <1516308132-10272-19-git-send-email-mst@redhat.com>
 References: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v4 17/29] vhost-user-test: extract
- read-guest-mem test from main loop
+Subject: [Qemu-devel] [PULL v4 18/29] vhost-user-test: setup virtqueues in
+ all tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +29,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>
 
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This patch makes read-guest-test consistent with other tests,
-i.e. create the test server in the test function.
+Only the multiqueue test setups the virtqueues.
+This patch generalizes the setup of virtqueues for all tests.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/vhost-user-test.c | 41 +++++++++++++++++++++++------------------
- 1 file changed, 23 insertions(+), 18 deletions(-)
+ tests/vhost-user-test.c | 53 +++++++++++++++++++++++++++++++++++++++----=
+------
+ 1 file changed, 42 insertions(+), 11 deletions(-)
 
 diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 43c6528..df56724 100644
+index df56724..969e393 100644
 --- a/tests/vhost-user-test.c
 +++ b/tests/vhost-user-test.c
-@@ -617,6 +617,28 @@ GSourceFuncs test_migrate_source_funcs =3D {
-     .check =3D test_migrate_source_check,
- };
+@@ -55,6 +55,7 @@
+ /*********** FROM hw/virtio/vhost-user.c *******************************=
+******/
 =20
-+static void test_read_guest_mem(void)
-+{
-+    TestServer *server =3D NULL;
-+    char *qemu_cmd =3D NULL;
-+    QTestState *s =3D NULL;
+ #define VHOST_MEMORY_MAX_NREGIONS    8
++#define VHOST_MAX_VIRTQUEUES    0x100
+=20
+ #define VHOST_USER_F_PROTOCOL_FEATURES 30
+ #define VHOST_USER_PROTOCOL_F_MQ 0
+@@ -141,6 +142,8 @@ enum {
+=20
+ typedef struct TestServer {
+     QPCIBus *bus;
++    QVirtioPCIDevice *dev;
++    QVirtQueue *vq[VHOST_MAX_VIRTQUEUES];
+     gchar *socket_path;
+     gchar *mig_path;
+     gchar *chr_name;
+@@ -155,6 +158,7 @@ typedef struct TestServer {
+     bool test_fail;
+     int test_flags;
+     int queues;
++    QGuestAllocator *alloc;
+ } TestServer;
+=20
+ static const char *tmpfs;
+@@ -162,26 +166,43 @@ static const char *root;
+=20
+ static void init_virtio_dev(TestServer *s)
+ {
+-    QVirtioPCIDevice *dev;
+     uint32_t features;
++    int i;
+=20
+     s->bus =3D qpci_init_pc(NULL);
+     g_assert_nonnull(s->bus);
+=20
+-    dev =3D qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
+-    g_assert_nonnull(dev);
++    s->dev =3D qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
++    g_assert_nonnull(s->dev);
+=20
+-    qvirtio_pci_device_enable(dev);
+-    qvirtio_reset(&dev->vdev);
+-    qvirtio_set_acknowledge(&dev->vdev);
+-    qvirtio_set_driver(&dev->vdev);
++    qvirtio_pci_device_enable(s->dev);
++    qvirtio_reset(&s->dev->vdev);
++    qvirtio_set_acknowledge(&s->dev->vdev);
++    qvirtio_set_driver(&s->dev->vdev);
 +
-+    server =3D test_server_new("test");
-+    test_server_listen(server);
++    s->alloc =3D pc_alloc_init();
+=20
+-    features =3D qvirtio_get_features(&dev->vdev);
++    for (i =3D 0; i < s->queues * 2; i++) {
++        s->vq[i] =3D qvirtqueue_setup(&s->dev->vdev, s->alloc, i);
++    }
 +
-+    qemu_cmd =3D GET_QEMU_CMD(server);
-+
-+    s =3D qtest_start(qemu_cmd);
-+    g_free(qemu_cmd);
-+
-+    init_virtio_dev(server);
-+
-+    read_guest_mem(server);
-+
-+    qtest_quit(s);
-+    test_server_free(server);
++    features =3D qvirtio_get_features(&s->dev->vdev);
+     features =3D features & (1u << VIRTIO_NET_F_MAC);
+-    qvirtio_set_features(&dev->vdev, features);
++    qvirtio_set_features(&s->dev->vdev, features);
+=20
+-    qvirtio_set_driver_ok(&dev->vdev);
+-    qvirtio_pci_device_free(dev);
++    qvirtio_set_driver_ok(&s->dev->vdev);
 +}
 +
- static void test_migrate(void)
- {
-     TestServer *s =3D test_server_new("src");
-@@ -919,10 +941,7 @@ static void test_multiqueue(void)
++static void uninit_virtio_dev(TestServer *s)
++{
++    int i;
++
++    for (i =3D 0; i < s->queues * 2; i++) {
++        qvirtqueue_cleanup(s->dev->vdev.bus, s->vq[i], s->alloc);
++    }
++    pc_alloc_uninit(s->alloc);
++
++    qvirtio_pci_device_free(s->dev);
+ }
 =20
- int main(int argc, char **argv)
- {
--    QTestState *s =3D NULL;
--    TestServer *server =3D NULL;
-     const char *hugefs;
--    char *qemu_cmd =3D NULL;
-     int ret;
-     char template[] =3D "/tmp/vhost-test-XXXXXX";
-     GMainLoop *loop;
-@@ -947,20 +966,11 @@ int main(int argc, char **argv)
-         root =3D tmpfs;
-     }
+ static void wait_for_fds(TestServer *s)
+@@ -635,6 +656,8 @@ static void test_read_guest_mem(void)
 =20
--    server =3D test_server_new("test");
--    test_server_listen(server);
--
-     loop =3D g_main_loop_new(NULL, FALSE);
-     /* run the main loop thread so the chardev may operate */
-     thread =3D g_thread_new(NULL, thread_function, loop);
+     read_guest_mem(server);
 =20
--    qemu_cmd =3D GET_QEMU_CMD(server);
--
--    s =3D qtest_start(qemu_cmd);
--    g_free(qemu_cmd);
--    init_virtio_dev(server);
--
--    qtest_add_data_func("/vhost-user/read-guest-mem", server, read_guest=
-_mem);
-+    qtest_add_func("/vhost-user/read-guest-mem", test_read_guest_mem);
-     qtest_add_func("/vhost-user/migrate", test_migrate);
-     qtest_add_func("/vhost-user/multiqueue", test_multiqueue);
++    uninit_virtio_dev(server);
++
+     qtest_quit(s);
+     test_server_free(server);
+ }
+@@ -711,6 +734,8 @@ static void test_migrate(void)
 =20
-@@ -978,12 +988,7 @@ int main(int argc, char **argv)
+     read_guest_mem(dest);
 =20
-     ret =3D g_test_run();
++    uninit_virtio_dev(s);
++
+     g_source_destroy(source);
+     g_source_unref(source);
 =20
--    if (s) {
--        qtest_quit(s);
--    }
--
-     /* cleanup */
--    test_server_free(server);
+@@ -789,6 +814,8 @@ static void test_reconnect_subprocess(void)
+     wait_for_fds(s);
+     wait_for_rings_started(s, 2);
 =20
-     /* finish the helper thread and dispatch pending sources */
-     g_main_loop_quit(loop);
++    uninit_virtio_dev(s);
++
+     qtest_end();
+     test_server_free(s);
+     return;
+@@ -818,6 +845,8 @@ static void test_connect_fail_subprocess(void)
+     wait_for_fds(s);
+     wait_for_rings_started(s, 2);
+=20
++    uninit_virtio_dev(s);
++
+     qtest_end();
+     test_server_free(s);
+ }
+@@ -846,6 +875,8 @@ static void test_flags_mismatch_subprocess(void)
+     wait_for_fds(s);
+     wait_for_rings_started(s, 2);
+=20
++    uninit_virtio_dev(s);
++
+     qtest_end();
+     test_server_free(s);
+ }
 --=20
 MST
