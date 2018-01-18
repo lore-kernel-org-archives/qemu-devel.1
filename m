@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ec7dQ-00064X-Ma
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:41:29 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ec7fP-0006zr-QA
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:43:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ec7dN-0008Po-II
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:41:28 -0500
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:53112)
+	(envelope-from <pbonzini@redhat.com>) id 1ec7fM-0001rY-LQ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:43:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ec7dN-0008Fa-BS
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:41:25 -0500
-Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 0298917DEC5
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 11:41:14 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 18 Jan 2018 11:41:03 +0100
-Message-ID: <151627206353.4505.4602428849861610759.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ec7fM-0001qr-FD
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 05:43:28 -0500
+References: <CAKXe6SJtWUFY8hN=dXzFCzztcsGkWbNx+1WZba05Rp3TqO_38w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <824534a8-89ea-7b7a-40c9-1e4b5266e648@redhat.com>
+Date: Thu, 18 Jan 2018 11:43:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] readline: don't free completions in
- readline_free()
+In-Reply-To: <CAKXe6SJtWUFY8hN=dXzFCzztcsGkWbNx+1WZba05Rp3TqO_38w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Do I need update the microcode of virtual machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>
 
-Since commit e5dc1a6c6c43, QEMU aborts on exit if completion was used
-in the monitor:
+On 18/01/2018 11:38, Li Qiang wrote:
+> Hi Paolo, all,
+>=20
+> I have a question about the intel microcode update for spectre variant#=
+2.
+> From my understanding, there is no need to update the microcode of VMs
+> because the kvm has expose the SPEC_CTL and PRED_CMD to the guest.
+> Also, if we need to update the micorcode in guest, who is the vendor fo=
+r
+> this.
 
-*** Error in `obj/ppc64-softmmu/qemu-system-ppc64': double free or
- corruption (fasttop): 0x00000100331069d0 ***
+The guest has no microcode of it's own, but you need to update the
+microcode in the host.  You also need to update the kernel, QEMU and
+libvirt if you are using it.
 
-#0  0x00007ffff267eff0 in raise () from /lib64/libc.so.6
-#1  0x00007ffff268136c in abort () from /lib64/libc.so.6
-#2  0x00007ffff26c6b48 in __libc_message () from /lib64/libc.so.6
-#3  0x00007ffff26d69fc in free () from /lib64/libc.so.6
-#4  0x00007ffff28cb794 in g_free () from /lib64/libglib-2.0.so.0
-#5  0x00000000106230e4 in readline_free (rs=0x11223e60) at
- /home/greg/Work/qemu/qemu-spapr/util/readline.c:514
-#6  0x0000000010074cc4 in monitor_data_destroy (mon=0x1121c9f0) at
- /home/greg/Work/qemu/qemu-spapr/monitor.c:586
-#7  0x000000001007bcc8 in monitor_cleanup () at
- /home/greg/Work/qemu/qemu-spapr/monitor.c:4125
-#8  0x0000000010291274 in main (argc=<optimized out>,
- argv=<optimized out>, envp=<optimized out>) at
- /home/greg/Work/qemu/qemu-spapr/vl.c:4795
+> From the hyper-v, I think I'm right.
+> -->https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/C=
+VE-2017-5715-and-hyper-v-vms
+>=20
+> But upon I update the centos guest, the host kvm/qemu has been updated.
+> The IBPB_ENABLED and IBRS_ENABLED are both zero if I don't update the
+> microcode in the guest. If I update the guest micorcode, the are both 1=
+.
 
-Completion strings are not persistent accross completions (why would
-they?). They are allocated under readline_completion(), which already
-takes care of freeing them before returning.
+What do you mean by "update the guest microcode"?  Did you mean host?
 
-Maybe all completion related bits should be moved out of ReadLineState
-to a dedicated structure ?
+Paolo
 
-In the meantime, let's drop the offending lines from readline_free()
-to fix the crash.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- util/readline.c |    3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/util/readline.c b/util/readline.c
-index 24ec839854cf..ec91ee0fea6f 100644
---- a/util/readline.c
-+++ b/util/readline.c
-@@ -510,9 +510,6 @@ void readline_free(ReadLineState *rs)
-     for (i = 0; i < READLINE_MAX_CMDS; i++) {
-         g_free(rs->history[i]);
-     }
--    for (i = 0; i < READLINE_MAX_COMPLETIONS; i++) {
--        g_free(rs->completions[i]);
--    }
-     g_free(rs);
- }
- 
+>=20
+> So I want to know, if I should update the microcode in guest.=C2=A0
+> If the answer is Yes, then what about the Windows guest, how to update
+> the microcode?
+>=20
+>=20
+> Thanks,
+> Li Qiang
