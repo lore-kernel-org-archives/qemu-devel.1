@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH8K-0007su-BV
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:50:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1ecHQR-0008Je-Pj
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH8I-0007vB-D6
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:50:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH8I-0007uZ-4J
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:49:58 -0500
-Date: Thu, 18 Jan 2018 22:49:51 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180118224941-mutt-send-email-mst@kernel.org>
-References: <cover.1516277913.git.arei.gonglei@huawei.com>
-	<97c7a886a8569b785d9fec7d4d6b7c182a6b8421.1516277913.git.arei.gonglei@huawei.com>
+	(envelope-from <eblake@redhat.com>) id 1ecHQQ-0003eW-NT
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 16:08:43 -0500
+References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
+	<20180118181123.37056-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <35482a43-af44-9134-f112-30cf0cb135be@redhat.com>
+Date: Thu, 18 Jan 2018 15:08:36 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97c7a886a8569b785d9fec7d4d6b7c182a6b8421.1516277913.git.arei.gonglei@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] cryptodev-vhost-user: depend on
- CONFIG_VHOST_CRYPTO and CONFIG_VHOST_USER
+In-Reply-To: <20180118181123.37056-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="El0QqorFPRN1ACMZyi0RSIIP3TpiTXghI"
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] hmp: add name parameter to
+ nbd_server_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,200 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Thu, Jan 18, 2018 at 08:25:36PM +0800, Jay Zhou wrote:
-> From: Gonglei <arei.gonglei@huawei.com>
-> 
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--El0QqorFPRN1ACMZyi0RSIIP3TpiTXghI
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com,
+ kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <35482a43-af44-9134-f112-30cf0cb135be@redhat.com>
+Subject: Re: [PATCH v2 2/6] hmp: add name parameter to nbd_server_add
+References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
+ <20180118181123.37056-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20180118181123.37056-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Pls squash with the previous patch.
-
+On 01/18/2018 12:11 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Support name parameter for HMP too.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  backends/Makefile.objs     |  4 +++-
->  backends/cryptodev-vhost.c | 57 +++++++++++++++++++++++++++++++++++++++++++---
->  configure                  | 15 ++++++++++++
->  vl.c                       |  2 ++
->  4 files changed, 74 insertions(+), 4 deletions(-)
-> 
-> diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-> index 9e1fb76..ea4f630 100644
-> --- a/backends/Makefile.objs
-> +++ b/backends/Makefile.objs
-> @@ -10,5 +10,7 @@ common-obj-y += cryptodev.o
->  common-obj-y += cryptodev-builtin.o
->  
->  ifeq ($(CONFIG_VIRTIO),y)
-> -common-obj-$(CONFIG_LINUX) += cryptodev-vhost.o cryptodev-vhost-user.o
-> +common-obj-$(CONFIG_LINUX) += cryptodev-vhost.o
-> +common-obj-$(call land,$(CONFIG_VHOST_CRYPTO),$(CONFIG_VHOST_USER)) += \
-> +    cryptodev-vhost-user.o
->  endif
-> diff --git a/backends/cryptodev-vhost.c b/backends/cryptodev-vhost.c
-> index 830fb53..ad1f415 100644
-> --- a/backends/cryptodev-vhost.c
-> +++ b/backends/cryptodev-vhost.c
-> @@ -23,14 +23,18 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "hw/virtio/virtio-bus.h"
-> +#include "sysemu/cryptodev-vhost.h"
-> +
-> +#ifdef CONFIG_VHOST_CRYPTO
->  #include "qapi/error.h"
->  #include "qapi/qmp/qerror.h"
->  #include "qemu/error-report.h"
-> -#include "sysemu/cryptodev-vhost.h"
->  #include "hw/virtio/virtio-crypto.h"
-> -#include "hw/virtio/virtio-bus.h"
-> -#include "sysemu/cryptodev-vhost-user.h"
->  
-> +#ifdef CONFIG_VHOST_USER
-> +#include "sysemu/cryptodev-vhost-user.h"
-> +#endif
->  
->  uint64_t
->  cryptodev_vhost_get_max_queues(
-> @@ -123,9 +127,11 @@ cryptodev_get_vhost(CryptoDevBackendClient *cc,
->      }
->  
->      switch (cc->type) {
-> +#ifdef CONFIG_VHOST_USER
->      case CRYPTODEV_BACKEND_TYPE_VHOST_USER:
->          vhost_crypto = cryptodev_vhost_user_get_vhost(cc, b, queue);
->          break;
-> +#endif
->      default:
->          break;
->      }
-> @@ -295,3 +301,48 @@ bool cryptodev_vhost_virtqueue_pending(VirtIODevice *dev,
->  
->      return vhost_virtqueue_pending(&vhost_crypto->dev, idx);
->  }
-> +
-> +#else
-> +uint64_t
-> +cryptodev_vhost_get_max_queues(CryptoDevBackendVhost *crypto)
-> +{
-> +    return 0;
-> +}
-> +
-> +void cryptodev_vhost_cleanup(CryptoDevBackendVhost *crypto)
-> +{
-> +}
-> +
-> +struct CryptoDevBackendVhost *
-> +cryptodev_vhost_init(CryptoDevBackendVhostOptions *options)
-> +{
-> +    return NULL;
-> +}
-> +
-> +CryptoDevBackendVhost *
-> +cryptodev_get_vhost(CryptoDevBackendClient *cc, CryptoDevBackend *b,
-> +                    uint16_t queue)
-> +{
-> +    return NULL;
-> +}
-> +
-> +int cryptodev_vhost_start(VirtIODevice *dev, int total_queues)
-> +{
-> +    return -1;
-> +}
-> +
-> +void cryptodev_vhost_stop(VirtIODevice *dev, int total_queues)
-> +{
-> +}
-> +
-> +void cryptodev_vhost_virtqueue_mask(VirtIODevice *dev, int queue,
-> +                                    int idx, bool mask)
-> +{
-> +}
-> +
-> +bool cryptodev_vhost_virtqueue_pending(VirtIODevice *dev,
-> +                                       int queue, int idx)
-> +{
-> +    return false;
-> +}
-> +#endif
-> diff --git a/configure b/configure
-> index b272a03..e4cece3 100755
-> --- a/configure
-> +++ b/configure
-> @@ -332,6 +332,7 @@ xfs=""
->  tcg="yes"
->  
->  vhost_net="no"
-> +vhost_crypto="no"
->  vhost_scsi="no"
->  vhost_vsock="no"
->  vhost_user=""
-> @@ -801,6 +802,7 @@ Linux)
->    linux_user="yes"
->    kvm="yes"
->    vhost_net="yes"
-> +  vhost_crypto="yes"
->    vhost_scsi="yes"
->    vhost_vsock="yes"
->    QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
-> @@ -1163,6 +1165,14 @@ for opt do
->    ;;
->    --enable-vhost-net) vhost_net="yes"
->    ;;
-> +  --disable-vhost-crypto) vhost_crypto="no"
-> +  ;;
-> +  --enable-vhost-crypto)
-> +      vhost_crypto="yes"
-> +      if test "$mingw32" = "yes"; then
-> +          error_exit "vhost-crypto isn't available on win32"
-> +      fi
-> +  ;;
->    --disable-vhost-scsi) vhost_scsi="no"
->    ;;
->    --enable-vhost-scsi) vhost_scsi="yes"
-> @@ -1555,6 +1565,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->    cap-ng          libcap-ng support
->    attr            attr and xattr support
->    vhost-net       vhost-net acceleration support
-> +  vhost-crypto    vhost-crypto acceleration support
->    spice           spice
->    rbd             rados block device (rbd)
->    libiscsi        iscsi support
-> @@ -5579,6 +5590,7 @@ echo "madvise           $madvise"
->  echo "posix_madvise     $posix_madvise"
->  echo "libcap-ng support $cap_ng"
->  echo "vhost-net support $vhost_net"
-> +echo "vhost-crypto support $vhost_crypto"
->  echo "vhost-scsi support $vhost_scsi"
->  echo "vhost-vsock support $vhost_vsock"
->  echo "vhost-user support $vhost_user"
-> @@ -6640,6 +6652,9 @@ if supported_kvm_target $target; then
->              echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
->          fi
->      fi
-> +    if test "$vhost_crypto" = "yes"; then
-> +        echo "CONFIG_VHOST_CRYPTO=y" >> $config_target_mak
-> +    fi
->  fi
->  if supported_hax_target $target; then
->      echo "CONFIG_HAX=y" >> $config_target_mak
-> diff --git a/vl.c b/vl.c
-> index 3e9d86f..9f9727d 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2867,9 +2867,11 @@ static bool object_create_initial(const char *type)
->          return false;
->      }
->  
-> +#if defined(CONFIG_VHOST_CRYPTO) && defined(CONFIG_VHOST_USER)
->      if (g_str_equal(type, "cryptodev-vhost-user")) {
->          return false;
->      }
-> +#endif
->  
->      /*
->       * return false for concrete netfilters since
-> -- 
-> 1.8.3.1
-> 
+>  hmp.c           | 3 ++-
+>  hmp-commands.hx | 9 +++++----
+>  2 files changed, 7 insertions(+), 5 deletions(-)
+>=20
+
+> +++ b/hmp-commands.hx
+> @@ -1553,8 +1553,8 @@ ETEXI
+> =20
+>      {
+>          .name       =3D "nbd_server_add",
+> -        .args_type  =3D "writable:-w,device:B",
+> -        .params     =3D "nbd_server_add [-w] device",
+> +        .args_type  =3D "name:-n,writable:-w,device:B",
+> +        .params     =3D "nbd_server_add [-n] [-w] device",
+
+Doesn't quite look like my proposal:
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01639.html
+
+-        .args_type  =3D "writable:-w,device:B",
+-        .params     =3D "nbd_server_add [-w] device",
++        .args_type  =3D "writable:-w,device:B,name:s?",
++        .params     =3D "nbd_server_add [-w] device [name]",
+
+In fact, using -n is not quite right, because that's just a boolean flag
+rather than a string.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--El0QqorFPRN1ACMZyi0RSIIP3TpiTXghI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlphDNQACgkQp6FrSiUn
+Q2o+PQf/comG2aRAsofqTElwa3baISooph8lex4tq0uNlema2Bg6NKeO/Ex1KRBD
+Zq4Jz7e5w0uGfeH17JdbvAbYAWUSNHSPwuEQ/93fuI+n/5XsdGHDsOVEId1SvBzd
+wbn5D0/e5EhfNEXpJdtLGKNA6ki+Xv0Flj2UgG3xSjaD/K5P+sXEIop9fM74YX7h
+pHeTRVdttTyvgq04T/1o9KkVpGDmlqRZpNryDnccQkBjsHiTbzMGpKZrXJEd1q+E
+nec3iVCrrHj4sb+MgZkA+KLpghimKkYp6sUiFymPLE4S0PISo2aMX/FGTOwr9zEV
+CtigtKtTPpm0l1ZoLZyDRHavgAWzYw==
+=QU+u
+-----END PGP SIGNATURE-----
+
+--El0QqorFPRN1ACMZyi0RSIIP3TpiTXghI--
