@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Y6-0001Kl-IA
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Y8-0001Ms-Cp
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:44:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Y4-0004b1-MY
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:44:06 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ec9Y1-0004ZO-UK
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:44:08 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 18 Jan 2018 13:43:51 +0100
-Message-Id: <1516279431-30424-8-git-send-email-pbonzini@redhat.com>
+Date: Thu, 18 Jan 2018 13:43:49 +0100
+Message-Id: <1516279431-30424-6-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516279431-30424-1-git-send-email-pbonzini@redhat.com>
 References: <1516279431-30424-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 7/7] block: convert bdrv_check callback to
- coroutine_fn
+Subject: [Qemu-devel] [PATCH 5/7] block: convert bdrv_invalidate_cache
+ callback to coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,419 +24,251 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
+QED's bdrv_invalidate_cache implementation would like to reuse functions
+that acquire/release the metadata locks.  Call it from coroutine context
+to simplify the logic.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block.c                   | 43 ++++++++++++++++++++++++++++++++++++++++---
- block/parallels.c         | 17 +++++++++++------
- block/qcow2.c             | 23 +++++++++++++++++++----
- block/qed-check.c         |  1 +
- block/qed-table.c         | 26 +++++++++-----------------
- block/qed.c               | 13 +++++++++----
- block/vdi.c               |  6 +++---
- block/vhdx.c              |  7 ++++---
- block/vmdk.c              |  7 ++++---
- include/block/block_int.h |  5 +++--
- 10 files changed, 103 insertions(+), 45 deletions(-)
+ block.c                   | 41 +++++++++++++++++++++++++++++++++++++----
+ block/iscsi.c             |  6 +++---
+ block/nfs.c               |  6 +++---
+ block/qcow2.c             |  7 +++++--
+ block/qed.c               | 13 +++++--------
+ block/rbd.c               |  6 +++---
+ include/block/block_int.h |  3 ++-
+ 7 files changed, 58 insertions(+), 24 deletions(-)
 
 diff --git a/block.c b/block.c
-index 6ba7471..896031b 100644
+index cf33135..6ba7471 100644
 --- a/block.c
 +++ b/block.c
-@@ -3454,17 +3454,54 @@ static void bdrv_delete(BlockDriverState *bs)
-  * free of errors) or -errno when an internal error occurred. The results of the
-  * check are stored in res.
-  */
--int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix)
-+static int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-+                                      BdrvCheckResult *res, BdrvCheckMode fix)
+@@ -4214,7 +4214,8 @@ void bdrv_init_with_whitelist(void)
+     bdrv_init();
+ }
+ 
+-void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
++static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
++                                                  Error **errp)
  {
-     if (bs->drv == NULL) {
-         return -ENOMEDIUM;
-     }
--    if (bs->drv->bdrv_check == NULL) {
-+    if (bs->drv->bdrv_co_check == NULL) {
-         return -ENOTSUP;
+     BdrvChild *child, *parent;
+     uint64_t perm, shared_perm;
+@@ -4230,7 +4231,7 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
      }
  
-     memset(res, 0, sizeof(*res));
--    return bs->drv->bdrv_check(bs, res, fix);
-+    return bs->drv->bdrv_co_check(bs, res, fix);
-+}
-+
-+typedef struct CheckCo {
+     QLIST_FOREACH(child, &bs->children, next) {
+-        bdrv_invalidate_cache(child->bs, &local_err);
++        bdrv_co_invalidate_cache(child->bs, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+@@ -4260,8 +4261,8 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+     }
+     bdrv_set_perm(bs, perm, shared_perm);
+ 
+-    if (bs->drv->bdrv_invalidate_cache) {
+-        bs->drv->bdrv_invalidate_cache(bs, &local_err);
++    if (bs->drv->bdrv_co_invalidate_cache) {
++        bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
+         if (local_err) {
+             bs->open_flags |= BDRV_O_INACTIVE;
+             error_propagate(errp, local_err);
+@@ -4287,6 +4288,38 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+     }
+ }
+ 
++typedef struct InvalidateCacheCo {
 +    BlockDriverState *bs;
-+    BdrvCheckResult *res;
-+    BdrvCheckMode fix;
-+    int ret;
-+} CheckCo;
++    Error **errp;
++    bool done;
++} InvalidateCacheCo;
 +
-+static void bdrv_check_co_entry(void *opaque)
++static void coroutine_fn bdrv_invalidate_cache_co_entry(void *opaque)
 +{
-+    CheckCo *cco = opaque;
-+    cco->ret = bdrv_co_check(cco->bs, cco->res, cco->fix);
++    InvalidateCacheCo *ico = opaque;
++    bdrv_co_invalidate_cache(ico->bs, ico->errp);
++    ico->done = true;
 +}
 +
-+int bdrv_check(BlockDriverState *bs,
-+               BdrvCheckResult *res, BdrvCheckMode fix)
++void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
 +{
 +    Coroutine *co;
-+    CheckCo cco = {
++    InvalidateCacheCo ico = {
 +        .bs = bs,
-+        .res = res,
-+        .ret = -EINPROGRESS,
-+        .fix = fix,
++        .done = false,
++        .errp = errp
 +    };
 +
 +    if (qemu_in_coroutine()) {
 +        /* Fast-path if already in coroutine context */
-+        bdrv_check_co_entry(&cco);
++        bdrv_invalidate_cache_co_entry(&ico);
 +    } else {
-+        co = qemu_coroutine_create(bdrv_check_co_entry, &cco);
++        co = qemu_coroutine_create(bdrv_invalidate_cache_co_entry, &ico);
 +        qemu_coroutine_enter(co);
-+        BDRV_POLL_WHILE(bs, cco.ret == -EINPROGRESS);
++        BDRV_POLL_WHILE(bs, !ico.done);
 +    }
++}
 +
-+    return cco.ret;
- }
- 
- /*
-diff --git a/block/parallels.c b/block/parallels.c
-index 5f1497d..803b063 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -382,8 +382,9 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
- }
- 
- 
--static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
--                           BdrvCheckMode fix)
-+static int coroutine_fn parallels_co_check(BlockDriverState *bs,
-+                                           BdrvCheckResult *res,
-+                                           BdrvCheckMode fix)
+ void bdrv_invalidate_cache_all(Error **errp)
  {
-     BDRVParallelsState *s = bs->opaque;
-     int64_t size, prev_off, high_off;
-@@ -398,6 +399,7 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
-         return size;
-     }
- 
-+    qemu_co_mutex_lock(&s->lock);
-     if (s->header_unclean) {
-         fprintf(stderr, "%s image was not closed correctly\n",
-                 fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR");
-@@ -446,11 +448,12 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
-         prev_off = off;
-     }
- 
-+    ret = 0;
-     if (flush_bat) {
-         ret = bdrv_pwrite_sync(bs->file, 0, s->header, s->header_size);
-         if (ret < 0) {
-             res->check_errors++;
--            return ret;
-+            goto out;
-         }
-     }
- 
-@@ -469,13 +472,15 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
-             if (ret < 0) {
-                 error_report_err(local_err);
-                 res->check_errors++;
--                return ret;
-+                goto out;
-             }
-             res->leaks_fixed += count;
-         }
-     }
- 
--    return 0;
-+out:
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
- }
- 
- 
-@@ -802,7 +807,7 @@ static BlockDriver bdrv_parallels = {
-     .bdrv_co_writev = parallels_co_writev,
- 
-     .bdrv_co_create_opts = parallels_co_create_opts,
--    .bdrv_check     = parallels_check,
-+    .bdrv_co_check  = parallels_co_check,
-     .create_opts    = &parallels_create_opts,
- };
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4a10b55..8f9e37b 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -533,8 +533,9 @@ int qcow2_mark_consistent(BlockDriverState *bs)
+     BlockDriverState *bs;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 5f358f9..9b70899 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -2164,8 +2164,8 @@ static int iscsi_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
      return 0;
  }
  
--static int qcow2_check(BlockDriverState *bs, BdrvCheckResult *result,
--                       BdrvCheckMode fix)
-+static int coroutine_fn qcow2_co_check_locked(BlockDriverState *bs,
-+                                              BdrvCheckResult *result,
-+                                              BdrvCheckMode fix)
+-static void iscsi_invalidate_cache(BlockDriverState *bs,
+-                                   Error **errp)
++static void coroutine_fn iscsi_co_invalidate_cache(BlockDriverState *bs,
++                                                   Error **errp)
  {
-     int ret = qcow2_check_refcounts(bs, result, fix);
-     if (ret < 0) {
-@@ -551,6 +552,19 @@ static int qcow2_check(BlockDriverState *bs, BdrvCheckResult *result,
-     return ret;
+     IscsiLun *iscsilun = bs->opaque;
+     iscsi_allocmap_invalidate(iscsilun);
+@@ -2196,7 +2196,7 @@ static BlockDriver bdrv_iscsi = {
+     .create_opts            = &iscsi_create_opts,
+     .bdrv_reopen_prepare    = iscsi_reopen_prepare,
+     .bdrv_reopen_commit     = iscsi_reopen_commit,
+-    .bdrv_invalidate_cache  = iscsi_invalidate_cache,
++    .bdrv_co_invalidate_cache = iscsi_co_invalidate_cache,
+ 
+     .bdrv_getlength  = iscsi_getlength,
+     .bdrv_get_info   = iscsi_get_info,
+diff --git a/block/nfs.c b/block/nfs.c
+index 8029dc2..d7f9a6c 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -876,8 +876,8 @@ static void nfs_refresh_filename(BlockDriverState *bs, QDict *options)
  }
  
-+static int coroutine_fn qcow2_co_check(BlockDriverState *bs,
-+                                       BdrvCheckResult *result,
-+                                       BdrvCheckMode fix)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int ret;
-+
-+    qemu_co_mutex_lock(&s->lock);
-+    ret = qcow2_co_check_locked(bs, result, fix);
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
-+}
-+
- static int validate_table_offset(BlockDriverState *bs, uint64_t offset,
-                                  uint64_t entries, size_t entry_len)
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+-static void nfs_invalidate_cache(BlockDriverState *bs,
+-                                 Error **errp)
++static void coroutine_fn nfs_co_invalidate_cache(BlockDriverState *bs,
++                                                 Error **errp)
  {
-@@ -1475,7 +1489,8 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         (s->incompatible_features & QCOW2_INCOMPAT_DIRTY)) {
-         BdrvCheckResult result = {0};
+     NFSClient *client = bs->opaque;
+     nfs_pagecache_invalidate(client->context, client->fh);
+@@ -910,7 +910,7 @@ static BlockDriver bdrv_nfs = {
+     .bdrv_refresh_filename          = nfs_refresh_filename,
  
--        ret = qcow2_check(bs, &result, BDRV_FIX_ERRORS | BDRV_FIX_LEAKS);
-+        ret = qcow2_co_check_locked(bs, &result,
-+                                    BDRV_FIX_ERRORS | BDRV_FIX_LEAKS);
-         if (ret < 0 || result.check_errors) {
-             if (ret >= 0) {
-                 ret = -EIO;
-@@ -4381,7 +4396,7 @@ BlockDriver bdrv_qcow2 = {
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+-    .bdrv_invalidate_cache          = nfs_invalidate_cache,
++    .bdrv_co_invalidate_cache       = nfs_co_invalidate_cache,
+ #endif
+ };
+ 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7c11516..e886a44 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2109,7 +2109,8 @@ static void qcow2_close(BlockDriverState *bs)
+     qcow2_free_snapshots(bs);
+ }
+ 
+-static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
++static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
++                                                   Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     int flags = s->flags;
+@@ -2132,7 +2133,9 @@ static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
+     options = qdict_clone_shallow(bs->options);
+ 
+     flags &= ~BDRV_O_INACTIVE;
++    qemu_co_mutex_lock(&s->lock);
+     ret = qcow2_do_open(bs, options, flags, &local_err);
++    qemu_co_mutex_unlock(&s->lock);
+     QDECREF(options);
+     if (local_err) {
+         error_propagate(errp, local_err);
+@@ -4386,7 +4389,7 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_change_backing_file   = qcow2_change_backing_file,
+ 
+     .bdrv_refresh_limits        = qcow2_refresh_limits,
+-    .bdrv_invalidate_cache      = qcow2_invalidate_cache,
++    .bdrv_co_invalidate_cache   = qcow2_co_invalidate_cache,
      .bdrv_inactivate            = qcow2_inactivate,
  
      .create_opts         = &qcow2_create_opts,
--    .bdrv_check          = qcow2_check,
-+    .bdrv_co_check       = qcow2_co_check,
-     .bdrv_amend_options  = qcow2_amend_options,
- 
-     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
-diff --git a/block/qed-check.c b/block/qed-check.c
-index dcd4f03..0edac03 100644
---- a/block/qed-check.c
-+++ b/block/qed-check.c
-@@ -217,6 +217,7 @@ static void qed_check_mark_clean(BDRVQEDState *s, BdrvCheckResult *result)
-     qed_write_header_sync(s);
- }
- 
-+/* Called with table_lock held.  */
- int qed_check(BDRVQEDState *s, BdrvCheckResult *result, bool fix)
- {
-     QEDCheck check = {
-diff --git a/block/qed-table.c b/block/qed-table.c
-index eead8b0..7df5680 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -18,7 +18,7 @@
- #include "qed.h"
- #include "qemu/bswap.h"
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
- {
-     QEMUIOVector qiov;
-@@ -33,13 +33,9 @@ static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
- 
-     trace_qed_read_table(s, offset, table);
- 
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_unlock(&s->table_lock);
--    }
-+    qemu_co_mutex_unlock(&s->table_lock);
-     ret = bdrv_preadv(s->bs->file, offset, &qiov);
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_lock(&s->table_lock);
--    }
-+    qemu_co_mutex_lock(&s->table_lock);
-     if (ret < 0) {
-         goto out;
-     }
-@@ -67,7 +63,7 @@ out:
-  * @n:          Number of elements
-  * @flush:      Whether or not to sync to disk
-  *
-- * Called either from qed_check or with table_lock held.
-+ * Called with table_lock held.
-  */
- static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-                            unsigned int index, unsigned int n, bool flush)
-@@ -104,13 +100,9 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     /* Adjust for offset into table */
-     offset += start * sizeof(uint64_t);
- 
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_unlock(&s->table_lock);
--    }
-+    qemu_co_mutex_unlock(&s->table_lock);
-     ret = bdrv_pwritev(s->bs->file, offset, &qiov);
--    if (qemu_in_coroutine()) {
--        qemu_co_mutex_lock(&s->table_lock);
--    }
-+    qemu_co_mutex_lock(&s->table_lock);
-     trace_qed_write_table_cb(s, table, flush, ret);
-     if (ret < 0) {
-         goto out;
-@@ -134,7 +126,7 @@ int qed_read_l1_table_sync(BDRVQEDState *s)
-     return qed_read_table(s, s->header.l1_table_offset, s->l1_table);
- }
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- int qed_write_l1_table(BDRVQEDState *s, unsigned int index, unsigned int n)
- {
-     BLKDBG_EVENT(s->bs->file, BLKDBG_L1_UPDATE);
-@@ -148,7 +140,7 @@ int qed_write_l1_table_sync(BDRVQEDState *s, unsigned int index,
-     return qed_write_l1_table(s, index, n);
- }
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- int qed_read_l2_table(BDRVQEDState *s, QEDRequest *request, uint64_t offset)
- {
-     int ret;
-@@ -191,7 +183,7 @@ int qed_read_l2_table_sync(BDRVQEDState *s, QEDRequest *request, uint64_t offset
-     return qed_read_l2_table(s, request, offset);
- }
- 
--/* Called either from qed_check or with table_lock held.  */
-+/* Called with table_lock held.  */
- int qed_write_l2_table(BDRVQEDState *s, QEDRequest *request,
-                        unsigned int index, unsigned int n, bool flush)
- {
 diff --git a/block/qed.c b/block/qed.c
-index 5cf519c..77c9b10 100644
+index 3e1f4bc..5cf519c 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -1573,12 +1573,17 @@ static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
-     }
+@@ -1550,7 +1550,8 @@ static int bdrv_qed_change_backing_file(BlockDriverState *bs,
+     return ret;
  }
  
--static int bdrv_qed_check(BlockDriverState *bs, BdrvCheckResult *result,
--                          BdrvCheckMode fix)
-+static int bdrv_qed_co_check(BlockDriverState *bs, BdrvCheckResult *result,
-+                             BdrvCheckMode fix)
+-static void bdrv_qed_invalidate_cache(BlockDriverState *bs, Error **errp)
++static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
++                                                      Error **errp)
  {
      BDRVQEDState *s = bs->opaque;
-+    int ret;
+     Error *local_err = NULL;
+@@ -1559,13 +1560,9 @@ static void bdrv_qed_invalidate_cache(BlockDriverState *bs, Error **errp)
+     bdrv_qed_close(bs);
  
--    return qed_check(s, result, !!fix);
+     bdrv_qed_init_state(bs);
+-    if (qemu_in_coroutine()) {
+-        qemu_co_mutex_lock(&s->table_lock);
+-    }
 +    qemu_co_mutex_lock(&s->table_lock);
-+    ret = qed_check(s, result, !!fix);
+     ret = bdrv_qed_do_open(bs, NULL, bs->open_flags, &local_err);
+-    if (qemu_in_coroutine()) {
+-        qemu_co_mutex_unlock(&s->table_lock);
+-    }
 +    qemu_co_mutex_unlock(&s->table_lock);
-+
-+    return ret;
- }
- 
- static QemuOptsList qed_create_opts = {
-@@ -1638,7 +1643,7 @@ static BlockDriver bdrv_qed = {
+     if (local_err) {
+         error_propagate(errp, local_err);
+         error_prepend(errp, "Could not reopen qed layer: ");
+@@ -1640,7 +1637,7 @@ static BlockDriver bdrv_qed = {
+     .bdrv_get_info            = bdrv_qed_get_info,
      .bdrv_refresh_limits      = bdrv_qed_refresh_limits,
      .bdrv_change_backing_file = bdrv_qed_change_backing_file,
-     .bdrv_co_invalidate_cache = bdrv_qed_co_invalidate_cache,
--    .bdrv_check               = bdrv_qed_check,
-+    .bdrv_co_check            = bdrv_qed_co_check,
+-    .bdrv_invalidate_cache    = bdrv_qed_invalidate_cache,
++    .bdrv_co_invalidate_cache = bdrv_qed_co_invalidate_cache,
+     .bdrv_check               = bdrv_qed_check,
      .bdrv_detach_aio_context  = bdrv_qed_detach_aio_context,
      .bdrv_attach_aio_context  = bdrv_qed_attach_aio_context,
-     .bdrv_co_drain_begin      = bdrv_qed_co_drain_begin,
-diff --git a/block/vdi.c b/block/vdi.c
-index 01501d7..bb505ee 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -258,8 +258,8 @@ static void vdi_header_print(VdiHeader *header)
- }
+diff --git a/block/rbd.c b/block/rbd.c
+index 67ac2ee..9632355 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -1090,8 +1090,8 @@ static BlockAIOCB *qemu_rbd_aio_pdiscard(BlockDriverState *bs,
  #endif
  
--static int vdi_check(BlockDriverState *bs, BdrvCheckResult *res,
--                     BdrvCheckMode fix)
-+static int coroutine_fn vdi_co_check(BlockDriverState *bs, BdrvCheckResult *res,
-+                                     BdrvCheckMode fix)
+ #ifdef LIBRBD_SUPPORTS_INVALIDATE
+-static void qemu_rbd_invalidate_cache(BlockDriverState *bs,
+-                                      Error **errp)
++static void coroutine_fn qemu_rbd_co_invalidate_cache(BlockDriverState *bs,
++                                                      Error **errp)
  {
-     /* TODO: additional checks possible. */
-     BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
-@@ -908,7 +908,7 @@ static BlockDriver bdrv_vdi = {
-     .bdrv_get_info = vdi_get_info,
- 
-     .create_opts = &vdi_create_opts,
--    .bdrv_check = vdi_check,
-+    .bdrv_co_check = vdi_co_check,
+     BDRVRBDState *s = bs->opaque;
+     int r = rbd_invalidate_cache(s->image);
+@@ -1157,7 +1157,7 @@ static BlockDriver bdrv_rbd = {
+     .bdrv_snapshot_list     = qemu_rbd_snap_list,
+     .bdrv_snapshot_goto     = qemu_rbd_snap_rollback,
+ #ifdef LIBRBD_SUPPORTS_INVALIDATE
+-    .bdrv_invalidate_cache  = qemu_rbd_invalidate_cache,
++    .bdrv_co_invalidate_cache = qemu_rbd_co_invalidate_cache,
+ #endif
  };
  
- static void bdrv_vdi_init(void)
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 7fad8b2..14b33ed 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1944,8 +1944,9 @@ exit:
-  * r/w and any log has already been replayed, so there is nothing (currently)
-  * for us to do here
-  */
--static int vhdx_check(BlockDriverState *bs, BdrvCheckResult *result,
--                       BdrvCheckMode fix)
-+static int coroutine_fn vhdx_co_check(BlockDriverState *bs,
-+                                      BdrvCheckResult *result,
-+                                      BdrvCheckMode fix)
- {
-     BDRVVHDXState *s = bs->opaque;
- 
-@@ -2006,7 +2007,7 @@ static BlockDriver bdrv_vhdx = {
-     .bdrv_co_writev         = vhdx_co_writev,
-     .bdrv_co_create_opts    = vhdx_co_create_opts,
-     .bdrv_get_info          = vhdx_get_info,
--    .bdrv_check             = vhdx_check,
-+    .bdrv_co_check          = vhdx_co_check,
-     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
- 
-     .create_opts            = &vhdx_create_opts,
-diff --git a/block/vmdk.c b/block/vmdk.c
-index d4beb25..3614728 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2214,8 +2214,9 @@ static ImageInfo *vmdk_get_extent_info(VmdkExtent *extent)
-     return info;
- }
- 
--static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
--                      BdrvCheckMode fix)
-+static int coroutine_fn vmdk_co_check(BlockDriverState *bs,
-+                                      BdrvCheckResult *result,
-+                                      BdrvCheckMode fix)
- {
-     BDRVVmdkState *s = bs->opaque;
-     VmdkExtent *extent = NULL;
-@@ -2384,7 +2385,7 @@ static BlockDriver bdrv_vmdk = {
-     .instance_size                = sizeof(BDRVVmdkState),
-     .bdrv_probe                   = vmdk_probe,
-     .bdrv_open                    = vmdk_open,
--    .bdrv_check                   = vmdk_check,
-+    .bdrv_co_check                = vmdk_co_check,
-     .bdrv_reopen_prepare          = vmdk_reopen_prepare,
-     .bdrv_child_perm              = bdrv_format_default_perms,
-     .bdrv_co_preadv               = vmdk_co_preadv,
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 3481da1..3e4c93c 100644
+index 05f498f..3481da1 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -301,8 +301,9 @@ struct BlockDriver {
-      * Returns 0 for completed check, -errno for internal errors.
-      * The check results are stored in result.
+@@ -218,7 +218,8 @@ struct BlockDriver {
+     /*
+      * Invalidate any cached meta-data.
       */
--    int (*bdrv_check)(BlockDriverState *bs, BdrvCheckResult *result,
--        BdrvCheckMode fix);
-+    int coroutine_fn (*bdrv_co_check)(BlockDriverState *bs,
-+                                      BdrvCheckResult *result,
-+                                      BdrvCheckMode fix);
+-    void (*bdrv_invalidate_cache)(BlockDriverState *bs, Error **errp);
++    void coroutine_fn (*bdrv_co_invalidate_cache)(BlockDriverState *bs,
++                                                  Error **errp);
+     int (*bdrv_inactivate)(BlockDriverState *bs);
  
-     int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
-                               BlockDriverAmendStatusCB *status_cb,
+     /*
 -- 
 1.8.3.1
