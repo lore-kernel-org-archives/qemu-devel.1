@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebzuo-0005kH-GT
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:26:56 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ec0A5-0007Ou-D5
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:42:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebzun-0001Gk-56
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:26:54 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 17 Jan 2018 20:26:24 -0600
-Message-Id: <20180118022625.6462-6-eblake@redhat.com>
-In-Reply-To: <20180118022625.6462-1-eblake@redhat.com>
-References: <20180118022625.6462-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 5/6] nbd/server: Add helper functions for
- parsing option payload
+	(envelope-from <ehabkost@redhat.com>) id 1ec0A2-0004Zq-30
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:42:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ec0A1-0004ZQ-Q6
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:42:38 -0500
+Date: Thu, 18 Jan 2018 00:42:32 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180118024232.GT627@localhost.localdomain>
+References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+	<20180112142252.GG6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
+	<97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
+	<20180115140455.GN6646@localhost.localdomain>
+	<20180115142518.GN1602429@orkuz.home>
+	<20180115143156.GO6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
+	<20180116115113.GA627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,234 +36,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: "Kang, Luwei" <luwei.kang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
-Rather than making every callsite perform length sanity checks
-and error reporting, add the helper functions nbd_opt_read()
-and nbd_opt_drop() that use the length stored in the client
-struct; also add an assertion that optlen is 0 before any
-option (ie. any previous option was fully handled), complementing
-the assertion added in an earlier patch that optlen is 0 after
-all negotiation completes.
+On Wed, Jan 17, 2018 at 10:32:56AM +0000, Kang, Luwei wrote:
+> > > > > On Mon, Jan 15, 2018 at 12:04:55 -0200, Eduardo Habkost wrote:
+> > > > > > CCing libvirt developers.
+> > > > > ...
+> > > > > > This case is slightly more problematic, however: the new feature
+> > > > > > is actually migratable (under very controlled circumstances)
+> > > > > > because of patch 2/2, but it is not migration-safe[1].  This
+> > > > > > means libvirt shouldn't include it in "host-model" expansion
+> > > > > > (which uses the query-cpu-model-expansion QMP command) until we
+> > > > > > make the feature migration-safe.
+> > > > > >
+> > > > > > For QEMU, this means the feature shouldn't be returned by
+> > > > > > "query-cpu-model-expansion type=static model=max" (but it can be
+> > > > > > returned by "query-cpu-model-expansion type=full model=max").
+> > > > > >
+> > > > > > Jiri, it looks like libvirt uses type=full on
+> > > > > > query-cpu-model-expansion on x86.  It needs to use
+> > > > > > type=static[2], or it will have no way to find out if a feature
+> > > > > > is migration-safe or not.
+> > > > > ...
+> > > > > > [2] It looks like libvirt uses type=full because it wants to get
+> > > > > >     all QOM property aliases returned.  In this case, one
+> > > > > >     solution for libvirt is to use:
+> > > > > >
+> > > > > >     static_expansion = query_cpu_model_expansion(type=static, model)
+> > > > > >     all_props = query_cpu_model_expansion(type=full,
+> > > > > > static_expansion)
+> > > > >
+> > > > > This is exactly what libvirt is doing (with model = "host") ever
+> > > > > since query-cpu-model-expansion support was implemented for x86.
+> > > >
+> > > > Oh, now I see that the x86 code uses
+> > > > QEMU_MONITOR_CPU_MODEL_EXPANSION_STATIC_FULL and not just QEMU_MONITOR_CPU_MODEL_EXPANSION_FULL.
+> > Nice!
+> > > >
+> > >
+> > > So, I need to add Intel PT feature in "X86CPUDefinition
+> > > builtin_x86_defs[]" so that we can get this CPUID in specific CPU
+> > > model not only "-cpu host". Is that right?
+> > 
+> > The problem is that you won't be able to add intel-pt to any CPU model unless the feature is made migration-safe (by not calling
+> > kvm_arch_get_supported_cpuid() from cpu_x86_cpuid()).
+> 
+> Hi Eduardo,
+>     Have some question need you help clear. What is
+>     "migration-safe" feature mean? I find all the feature which
+>     included in CPU model (builtin_x86_defs[]) will make
+>     "xcc->migration_safe = true;" in
+>     x86_cpu_cpudef_class_init(). If create a Skylake guest on
+>     Skylake HW and live migrate this guest to another machine
+>     with old HW(e.g Haswell). Can we think the new feature or
+>     cpu model(Skylake guest) which only supported in Skylake HW
+>     is safe?
 
-Note that the call in nbd_negotiate_handle_export_name() does
-not use the new helper (in part because the server cannot
-reply to NBD_OPT_EXPORT_NAME - it either succeeds or the
-connection drops).
-
-Based on patches by Vladimir Sementsov-Ogievskiy.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20180110230825.18321-6-eblake@redhat.com>
----
- nbd/server.c | 122 ++++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 62 insertions(+), 60 deletions(-)
-
-diff --git a/nbd/server.c b/nbd/server.c
-index 04da1c2f1e1..78b08f58913 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -229,6 +229,40 @@ nbd_negotiate_send_rep_err(NBDClient *client, uint32_t type,
-     return ret;
- }
-
-+/* Drop remainder of the current option, and send a reply with the
-+ * given error type and message. Return -errno on read or write
-+ * failure; or 0 if connection is still live. */
-+static int GCC_FMT_ATTR(4, 5)
-+nbd_opt_drop(NBDClient *client, uint32_t type, Error **errp,
-+             const char *fmt, ...)
-+{
-+    int ret = nbd_drop(client->ioc, client->optlen, errp);
-+    va_list va;
-+
-+    client->optlen = 0;
-+    if (!ret) {
-+        va_start(va, fmt);
-+        ret = nbd_negotiate_send_rep_verr(client, type, errp, fmt, va);
-+        va_end(va);
-+    }
-+    return ret;
-+}
-+
-+/* Read size bytes from the unparsed payload of the current option.
-+ * Return -errno on I/O error, 0 if option was completely handled by
-+ * sending a reply about inconsistent lengths, or 1 on success. */
-+static int nbd_opt_read(NBDClient *client, void *buffer, size_t size,
-+                        Error **errp)
-+{
-+    if (size > client->optlen) {
-+        return nbd_opt_drop(client, NBD_REP_ERR_INVALID, errp,
-+                            "Inconsistent lengths in option %s",
-+                            nbd_opt_lookup(client->opt));
-+    }
-+    client->optlen -= size;
-+    return qio_channel_read_all(client->ioc, buffer, size, errp) < 0 ? -EIO : 1;
-+}
-+
- /* Send a single NBD_REP_SERVER reply to NBD_OPT_LIST, including payload.
-  * Return -errno on error, 0 on success. */
- static int nbd_negotiate_send_rep_list(NBDClient *client, NBDExport *exp,
-@@ -378,14 +412,11 @@ static int nbd_reject_length(NBDClient *client, bool fatal, Error **errp)
-     int ret;
-
-     assert(client->optlen);
--    if (nbd_drop(client->ioc, client->optlen, errp) < 0) {
--        return -EIO;
--    }
--    ret = nbd_negotiate_send_rep_err(client, NBD_REP_ERR_INVALID, errp,
--                                     "option '%s' should have zero length",
--                                     nbd_opt_lookup(client->opt));
-+    ret = nbd_opt_drop(client, NBD_REP_ERR_INVALID, errp,
-+                       "option '%s' has unexpected length",
-+                       nbd_opt_lookup(client->opt));
-     if (fatal && !ret) {
--        error_setg(errp, "option '%s' should have zero length",
-+        error_setg(errp, "option '%s' has unexpected length",
-                    nbd_opt_lookup(client->opt));
-         return -EINVAL;
-     }
-@@ -408,7 +439,6 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
-     bool blocksize = false;
-     uint32_t sizes[3];
-     char buf[sizeof(uint64_t) + sizeof(uint16_t)];
--    const char *msg;
-
-     /* Client sends:
-         4 bytes: L, name length (can be 0)
-@@ -416,48 +446,34 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
-         2 bytes: N, number of requests (can be 0)
-         N * 2 bytes: N requests
-     */
--    if (client->optlen < sizeof(namelen) + sizeof(requests)) {
--        msg = "overall request too short";
--        goto invalid;
--    }
--    if (nbd_read(client->ioc, &namelen, sizeof(namelen), errp) < 0) {
--        return -EIO;
-+    rc = nbd_opt_read(client, &namelen, sizeof(namelen), errp);
-+    if (rc <= 0) {
-+        return rc;
-     }
-     be32_to_cpus(&namelen);
--    client->optlen -= sizeof(namelen);
--    if (namelen > client->optlen - sizeof(requests) ||
--        (client->optlen - namelen) % 2)
--    {
--        msg = "name length is incorrect";
--        goto invalid;
--    }
-     if (namelen >= sizeof(name)) {
--        msg = "name too long for qemu";
--        goto invalid;
-+        return nbd_opt_drop(client, NBD_REP_ERR_INVALID, errp,
-+                            "name too long for qemu");
-     }
--    if (nbd_read(client->ioc, name, namelen, errp) < 0) {
--        return -EIO;
-+    rc = nbd_opt_read(client, name, namelen, errp);
-+    if (rc <= 0) {
-+        return rc;
-     }
-     name[namelen] = '\0';
--    client->optlen -= namelen;
-     trace_nbd_negotiate_handle_export_name_request(name);
-
--    if (nbd_read(client->ioc, &requests, sizeof(requests), errp) < 0) {
--        return -EIO;
-+    rc = nbd_opt_read(client, &requests, sizeof(requests), errp);
-+    if (rc <= 0) {
-+        return rc;
-     }
-     be16_to_cpus(&requests);
--    client->optlen -= sizeof(requests);
-     trace_nbd_negotiate_handle_info_requests(requests);
--    if (requests != client->optlen / sizeof(request)) {
--        msg = "incorrect number of  requests for overall length";
--        goto invalid;
--    }
-     while (requests--) {
--        if (nbd_read(client->ioc, &request, sizeof(request), errp) < 0) {
--            return -EIO;
-+        rc = nbd_opt_read(client, &request, sizeof(request), errp);
-+        if (rc <= 0) {
-+            return rc;
-         }
-         be16_to_cpus(&request);
--        client->optlen -= sizeof(request);
-         trace_nbd_negotiate_handle_info_request(request,
-                                                 nbd_info_lookup(request));
-         /* We care about NBD_INFO_NAME and NBD_INFO_BLOCK_SIZE;
-@@ -472,7 +488,9 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
-             break;
-         }
-     }
--    assert(client->optlen == 0);
-+    if (client->optlen) {
-+        return nbd_reject_length(client, false, errp);
-+    }
-
-     exp = nbd_export_find(name);
-     if (!exp) {
-@@ -560,13 +578,6 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
-         rc = 1;
-     }
-     return rc;
--
-- invalid:
--    if (nbd_drop(client->ioc, client->optlen, errp) < 0) {
--        return -EIO;
--    }
--    return nbd_negotiate_send_rep_err(client, NBD_REP_ERR_INVALID,
--                                      errp, "%s", msg);
- }
+I mean matching the requirements so we can say the feature is migration-safe,
+that means exposing the same CPUID data to the guest on any host, if the
+machine-type + command-line is the same.  The data on CPUID[7] is OK (it
+changes according to the command-line options only), but the data exposed on
+CPUID[14h] on this patch is not migration-safe (it changes depending on the
+host it is running).
 
 
-@@ -696,6 +707,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-             return -EINVAL;
-         }
-         length = be32_to_cpu(length);
-+        assert(!client->optlen);
-         client->optlen = length;
+> 
+> > 
+> > What's missing here is to either: (a) make cpu_x86_cpuid() return host-independent data (it can be constant, or it can be
+> > configurable on the command-line); or (b) add a mechanism to skip intel-pt from "query-cpu-model-expansion type=static".
+> 
+> ==> it can be constant:
+>     I think it shouldn't be constant because Intel PT virtualization can only supported in Ice Lake hardware now. Intel PT cpuid info would be mask off on old platform.
+> ==> or it can be configurable on the command-line:
+>     Because of I didn't add this feature in any CPU model. We only can enable this feature by "-cpu Skylake-Server,+intel-pt" at present.
 
-         if (length > NBD_MAX_BUFFER_SIZE) {
-@@ -736,14 +748,9 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                 return -EINVAL;
+Note that I'm talking about CPUID[14h], not CPUID[7].  The CPUID[7] bits are
+safe because they are set according to the CPU model + command-line options
+only.  The bits on CPUID[14h] change depending on the host and are not
+migration-safe.  CPUID[7].EBX[bit 25] is just the (already configurable) bit
+that enables the migration-unsafe code for CPUID[14h].
 
-             default:
--                if (nbd_drop(client->ioc, length, errp) < 0) {
--                    return -EIO;
--                }
--                ret = nbd_negotiate_send_rep_err(client,
--                                                 NBD_REP_ERR_TLS_REQD, errp,
--                                                 "Option 0x%" PRIx32
--                                                 "not permitted before TLS",
--                                                 option);
-+                ret = nbd_opt_drop(client, NBD_REP_ERR_TLS_REQD, errp,
-+                                   "Option 0x%" PRIx32
-+                                   "not permitted before TLS", option);
-                 /* Let the client keep trying, unless they asked to
-                  * quit. In this mode, we've already sent an error, so
-                  * we can't ack the abort.  */
-@@ -812,14 +819,9 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                 break;
+> 
+> What about add a new cpu model name "Icelake" and add PT in this. Is that would be migration safe?
 
-             default:
--                if (nbd_drop(client->ioc, length, errp) < 0) {
--                    return -EIO;
--                }
--                ret = nbd_negotiate_send_rep_err(client,
--                                                 NBD_REP_ERR_UNSUP, errp,
--                                                 "Unsupported option 0x%"
--                                                 PRIx32 " (%s)", option,
--                                                 nbd_opt_lookup(option));
-+                ret = nbd_opt_drop(client, NBD_REP_ERR_UNSUP, errp,
-+                                   "Unsupported option 0x%" PRIx32 " (%s)",
-+                                   option, nbd_opt_lookup(option));
-                 break;
-             }
-         } else {
+It won't, because of the CPUID[14h] code that makes it unsafe to migrate
+between hosts with different Intel-PT capabilities (i.e. different data on
+CPUID[14h]).
+
+
+> 
+> Thanks,
+> Luwei Kang
+> 
+> > Probably
+> > (a) is easier to implement, and it also makes the feature more useful (by making it migration-safe).
+> > 
+> > >
+> > > Intel PT is first supported in Intel Core M and 5th generation Intel
+> > > Core processors that are based on the Intel micro-architecture code
+> > > name Broadwell but Intel PT use EPT is first supported in Ice Lake.
+> > > Intel PT virtualization depend on PT use EPT.  I will add Intel PT to
+> > > "Broadwell" CPU model and later to make sure a "Broadwell" guest can
+> > > use Intel PT if the host is Ice Lake.
+> > 
+> > The "if the host is Ice Lake" part is problematic.  On migration-safe CPU models (all of them except "max" and "host"), the data seen
+> > on CPUID can't depend on the host at all.  It should depend only on the machine-type + command-line options.
+> > 
+> > --
+> > Eduardo
+
 -- 
-2.14.3
+Eduardo
