@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecIqo-0001ln-DQ
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 17:40:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1ecIu0-0003Sv-1Y
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 17:43:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecIql-0000Y7-BC
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 17:40:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecIql-0000Xt-3V
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 17:39:59 -0500
-Date: Thu, 18 Jan 2018 20:39:47 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180118223947.GK5292@localhost.localdomain>
-References: <20180118025245.13042-1-famz@redhat.com>
-	<d1dd1750-c487-be35-05eb-ffb12f18e805@redhat.com>
-	<a81a812f-065c-e8be-0d6d-92525a379a82@amsat.org>
-	<cf2b427d-a8a0-a124-16dd-598d4f7eea46@redhat.com>
-	<CAAdtpL4kR9qWjWHBuYYbZXv=FBoKXRgLE5tzaaC1nZyJZNHXNA@mail.gmail.com>
-	<59cde1ab-cf5f-b40a-4377-b33091b593a2@redhat.com>
-	<20180118213805.GI5292@localhost.localdomain>
-	<800158468.913862.1516313996908.JavaMail.zimbra@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ecItz-00039K-1h
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 17:43:20 -0500
+References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
+	<20180118181123.37056-7-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b78ed017-a01d-2e03-e998-e99c4d5c1f57@redhat.com>
+Date: Thu, 18 Jan 2018 16:43:10 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <800158468.913862.1516313996908.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] scsi-generic: Simplify error handling code
+In-Reply-To: <20180118181123.37056-7-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7eQg22hJLc73Tcbm0aNUFyHp8Y1ngmVbV"
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] iotest 201: new test for qmp
+ nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Thu, Jan 18, 2018 at 05:19:56PM -0500, Paolo Bonzini wrote:
-> 
-> ----- Eduardo Habkost <ehabkost@redhat.com> ha scritto:
-> > We can do some effort to document the preferred convention to
-> > return success/failure, but I don't think we will be able to
-> > convert the existing void/ret/bool functions to a single style
-> > (whatever it is) in a reasonable time.
-> > 
-> > That said, IMO returning 0/-1 or true/false is always preferred
-> > to returning void, so there's no need to add more local_err
-> > boilerplate code.
-> 
-> I strongly prefer having one way to say things, and having return value and Error*
-> (with no clear winner for return value) is a disadvantage. [...]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7eQg22hJLc73Tcbm0aNUFyHp8Y1ngmVbV
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com,
+ kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <b78ed017-a01d-2e03-e998-e99c4d5c1f57@redhat.com>
+Subject: Re: [PATCH v2 6/6] iotest 201: new test for qmp nbd-server-remove
+References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
+ <20180118181123.37056-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20180118181123.37056-7-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/18/2018 12:11 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/201     | 159 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/201.out |   5 ++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 165 insertions(+)
+>  create mode 100644 tests/qemu-iotests/201
+>  create mode 100644 tests/qemu-iotests/201.out
+>=20
+
+> +
+> +    def assertExistingClients(self, result):
+> +        self.assert_qmp(result, 'error/desc',
+> +                        "NBD export 'exp' has 1 active connection. To =
+force "
+> +                        "remove it (and hard disconnect clients) use "=
+
+> +                        "mode=3D'hard'")
+
+Needs tweaking if we massage the error message earlier in the series.
+
+I'm still worried that this test may fail spuriously due to a hard-coded
+port, but some testing is better than none, and if the CI engines don't
+immediately reject it, whoever first encounters it will be nice and let
+us know.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-I sympathize with this argument.
+--7eQg22hJLc73Tcbm0aNUFyHp8Y1ngmVbV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-...wait, now we're repeating the discussion from the previous
-thread:
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg461702.html
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlphIv4ACgkQp6FrSiUn
+Q2oO0QgAmWHDhN+lcnngfAk3NhSAIhHMHZSxiDRW2ek6cJrjJWW2eZkOpTc9S4M5
+J7paJKv76M1IyYX4Hd1RkLRCxhKqjTQhLA6jq4q9LYPGSvFh04uHbF8TnZuXWLXa
+Pgim20eVK5MN18Sa1ZK2k2NlmCwz0V5+hEN1t9HCi6DyHjPc3OCe6PFAm27GppAB
+ou3zB7cn9sbuKJuWddtFU4I9hp69zclVXntsTkFmrB4plbrvfZFMmdSo3uXs2OVd
+1za6aflOPAzYm+FRAOdqvjNW5tgRUje1veq8DTs+jg+3tU6c61xT2N7tb0jCHM5g
+k3d3PxciN4k2H2yxGhF6xiBFYEnqcQ==
+=anYr
+-----END PGP SIGNATURE-----
 
-
->                                                      [...] Your solution is
-> slightly more verbose in that it makes it harder to use && and ||, but I am not
-> even sure it is a disadvantage.  And the clear advantage that a full conversion
-> is mandatory and can be automated...
-
-Well, even if we don't decide about void vs non-void right now,
-we would still need something better to live with until a
-conversion to non-void is finished.  I think I should rebase and
-resubmit my ERR_IS_SET series.
-
--- 
-Eduardo
+--7eQg22hJLc73Tcbm0aNUFyHp8Y1ngmVbV--
