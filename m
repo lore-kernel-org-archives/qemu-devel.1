@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ec910-0004un-Fa
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:09:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ec91b-0005Vn-DX
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:10:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ec90z-0004Dk-Mj
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:09:54 -0500
-References: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1b55edad-f820-6898-1630-ccc76e6c4845@redhat.com>
-Date: Thu, 18 Jan 2018 13:09:42 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ec91a-0004X7-Fv
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:10:31 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:45279)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ec91a-0004Wj-BA
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:10:30 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id j129so15495711oib.12
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 04:10:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: implement bdrv_get_info callback
+In-Reply-To: <20180111045937.2119-7-david@gibson.dropbear.id.au>
+References: <20180111045937.2119-1-david@gibson.dropbear.id.au>
+	<20180111045937.2119-7-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Jan 2018 12:10:09 +0000
+Message-ID: <CAFEAcA--Gdhs+tTwGWw2S9PNuDOriaGCFKSAnLrEPciQGmL_=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 06/11] hw/ide: Emulate SiI3112 SATA
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, surajjs@au1.ibm.com, BALATON Zoltan <balaton@eik.bme.hu>
 
-On 18/01/2018 12:51, Edgar Kaziakhmedov wrote:
-> 
-> +static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-> +{
-> +    if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP) {
-> +        bdi->can_write_zeroes_with_unmap = true;
-> +    }
-> +    return 0;
-> +}
-> +
+On 11 January 2018 at 04:59, David Gibson <david@gibson.dropbear.id.au> wrote:
+> From: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> This is a common generic PCI SATA controller that is also used in PCs
+> but more importantly guests running on the Sam460ex board prefer this
+> card and have a driver for it (unlike for other SATA controllers
+> already emulated).
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Acked-by: John Snow <jsnow@redhat.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-Other drivers set the flag always, while NBD only sets it if the server
-knows the flag.
+> +    case 0x1c8:
+> +        val = d->regs[1].sien << 16;
+> +        break;
 
-I think NBD is more correct, so:
+There's a similar unintended-sign-extension issue here (CID 1385145);
+again, a cast should fix.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-However, it would be nice to remove can_write_zeroes_with_unmap from
-BlockDriverInfo, and make bdrv_can_write_zeroes_with_unmap just return
-!!(bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP).  Kevin, what do you
-think?
-
-Paolo
+thanks
+-- PMM
