@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecH0k-000199-5Z
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:42:11 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH2o-0002tk-83
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecH0i-00081J-RY
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:42:10 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:39377)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecH0i-00080x-Na
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:42:08 -0500
-Received: by mail-qt0-x244.google.com with SMTP id f4so12719141qtj.6
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 12:42:08 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 18 Jan 2018 17:40:58 -0300
-Message-Id: <20180118204058.5768-15-f4bug@amsat.org>
-In-Reply-To: <20180118204058.5768-1-f4bug@amsat.org>
-References: <20180118204058.5768-1-f4bug@amsat.org>
+	(envelope-from <mst@redhat.com>) id 1ecH2l-0002fz-4F
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:24755)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH2k-0002e2-RW
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:44:15 -0500
+Date: Thu, 18 Jan 2018 22:44:13 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 14/14] sdhci: implement CMD/DAT[] fields in
- the Present State register
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PULL v4 00/29] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,171 +25,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-[based on a patch from Alistair Francis <alistair.francis@xilinx.com>
- from qemu/xilinx tag xilinx-v2015.2]
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sd/sdhci-internal.h |  2 ++
- include/hw/sd/sd.h     |  4 ++++
- hw/sd/core.c           | 34 ++++++++++++++++++++++++++++++++++
- hw/sd/sd.c             | 16 ++++++++++++++++
- hw/sd/sdhci.c          |  4 ++++
- hw/sd/trace-events     |  2 ++
- 6 files changed, 62 insertions(+)
+changes since v3:
+- dropped vhost memory rework due to clang warnings
+- dropped vhost memslot rework due to merge conflicts
 
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index b82e847636..8bcca39310 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -82,6 +82,8 @@
- #define SDHC_CARD_PRESENT              0x00010000
- #define SDHC_CARD_DETECT               0x00040000
- #define SDHC_WRITE_PROTECT             0x00080000
-+FIELD(SDHC_PRNSTS, DAT_LVL,            20, 4);
-+FIELD(SDHC_PRNSTS, CMD_LVL,            24, 1);
- #define TRANSFERRING_DATA(x)           \
-     ((x) & (SDHC_DOING_READ | SDHC_DOING_WRITE))
- 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index f086679493..bf1eb0713c 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -103,6 +103,8 @@ typedef struct {
-     uint8_t (*read_data)(SDState *sd);
-     bool (*data_ready)(SDState *sd);
-     void (*set_voltage)(SDState *sd, uint16_t millivolts);
-+    uint8_t (*get_dat_lines)(SDState *sd);
-+    bool (*get_cmd_line)(SDState *sd);
-     void (*enable)(SDState *sd, bool enable);
-     bool (*get_inserted)(SDState *sd);
-     bool (*get_readonly)(SDState *sd);
-@@ -150,6 +152,8 @@ void sd_enable(SDState *sd, bool enable);
-  * an SDBus rather than directly with SDState)
-  */
- void sdbus_set_voltage(SDBus *sdbus, uint16_t millivolts);
-+uint8_t sdbus_get_dat_lines(SDBus *sdbus);
-+bool sdbus_get_cmd_line(SDBus *sdbus);
- int sdbus_do_command(SDBus *sd, SDRequest *req, uint8_t *response);
- void sdbus_write_data(SDBus *sd, uint8_t value);
- uint8_t sdbus_read_data(SDBus *sd);
-diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 6d198ea775..3c6eae6c88 100644
---- a/hw/sd/core.c
-+++ b/hw/sd/core.c
-@@ -41,6 +41,40 @@ static SDState *get_card(SDBus *sdbus)
-     return SD_CARD(kid->child);
- }
- 
-+uint8_t sdbus_get_dat_lines(SDBus *sdbus)
-+{
-+    SDState *slave = get_card(sdbus);
-+    uint8_t dat_lines = 0b1111; /* 4 bit bus width */
-+
-+    if (slave) {
-+        SDCardClass *sc = SD_CARD_GET_CLASS(slave);
-+
-+        if (sc->get_dat_lines) {
-+            dat_lines = sc->get_dat_lines(slave);
-+        }
-+    }
-+    trace_sdbus_get_dat_lines(sdbus_name(sdbus), dat_lines);
-+
-+    return dat_lines;
-+}
-+
-+bool sdbus_get_cmd_line(SDBus *sdbus)
-+{
-+    SDState *slave = get_card(sdbus);
-+    bool cmd_line = true;
-+
-+    if (slave) {
-+        SDCardClass *sc = SD_CARD_GET_CLASS(slave);
-+
-+        if (sc->get_cmd_line) {
-+            cmd_line = sc->get_cmd_line(slave);
-+        }
-+    }
-+    trace_sdbus_get_cmd_line(sdbus_name(sdbus), cmd_line);
-+
-+    return cmd_line;
-+}
-+
- void sdbus_set_voltage(SDBus *sdbus, uint16_t millivolts)
- {
-     SDState *card = get_card(sdbus);
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 609b2da14f..ab9be561d2 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -126,8 +126,20 @@ struct SDState {
-     BlockBackend *blk;
- 
-     bool enable;
-+    uint8_t dat_lines;
-+    bool cmd_line;
- };
- 
-+static uint8_t sd_get_dat_lines(SDState *sd)
-+{
-+    return sd->enable ? sd->dat_lines : 0;
-+}
-+
-+static bool sd_get_cmd_line(SDState *sd)
-+{
-+    return sd->enable ? sd->cmd_line : false;
-+}
-+
- static void sd_set_voltage(SDState *sd, uint16_t millivolts)
- {
-     switch (millivolts) {
-@@ -457,6 +469,8 @@ static void sd_reset(DeviceState *dev)
-     sd->blk_len = 0x200;
-     sd->pwd_len = 0;
-     sd->expecting_acmd = false;
-+    sd->dat_lines = 0xf;
-+    sd->cmd_line = true;
-     sd->multi_blk_cnt = 0;
- }
- 
-@@ -1938,6 +1952,8 @@ static void sd_class_init(ObjectClass *klass, void *data)
-     dc->bus_type = TYPE_SD_BUS;
- 
-     sc->set_voltage = sd_set_voltage;
-+    sc->get_dat_lines = sd_get_dat_lines;
-+    sc->get_cmd_line = sd_get_cmd_line;
-     sc->do_command = sd_do_command;
-     sc->write_data = sd_write_data;
-     sc->read_data = sd_read_data;
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 3846182371..01e608b6f8 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -910,6 +910,10 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
-         break;
-     case SDHC_PRNSTS:
-         ret = s->prnsts;
-+        ret = FIELD_DP32(ret, SDHC_PRNSTS, DAT_LVL,
-+                         sdbus_get_dat_lines(&s->sdbus));
-+        ret = FIELD_DP32(ret, SDHC_PRNSTS, CMD_LVL,
-+                         sdbus_get_cmd_line(&s->sdbus));
-         break;
-     case SDHC_HOSTCTL:
-         ret = s->hostctl1 | (s->pwrcon << 8) | (s->blkgap << 16) |
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index f874489980..82efd79bea 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -5,6 +5,8 @@ sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t crc) "@%s
- sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
- sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
- sdbus_set_voltage(const char *bus_name, uint16_t millivolts) "@%s %u (mV)"
-+sdbus_get_dat_lines(const char *bus_name, uint8_t dat_lines) "@%s dat_lines: %u"
-+sdbus_get_cmd_line(const char *bus_name, bool cmd_line) "@%s cmd_line: %u"
- 
- # hw/sd/sdhci.c
- sdhci_set_inserted(const char *level) "card state changed: %s"
--- 
-2.15.1
+
+The following changes since commit b4d6ed1c5ae519d3efb5297be3ef6625ca2a20f4:
+
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-17' into staging (2018-01-18 15:25:17 +0000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+
+for you to fetch changes up to f4bf56fb78ed0e9f60fa1ed656c14ff4c494da5a:
+
+  vhost: remove assertion to prevent crash (2018-01-18 21:52:39 +0200)
+
+----------------------------------------------------------------
+pc, pci, virtio: features, fixes, cleanups
+
+A bunch of fixes, cleanus and new features all over the place.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Changpeng Liu (4):
+      vhost-user: add new vhost user messages to support virtio config space
+      vhost-user-blk: introduce a new vhost-user-blk host device
+      contrib/libvhost-user: enable virtio config space messages
+      contrib/vhost-user-blk: introduce a vhost-user-blk sample application
+
+Dou Liyang (2):
+      ACPI/unit-test: Add a testcase for RAM allocation in numa node
+      hw/acpi-build: Make next_base easy to follow
+
+Gal Hammer (3):
+      qemu: add a cleanup callback function to EventNotifier
+      virtio: postpone the execution of event_notifier_cleanup function
+      virtio: improve virtio devices initialization time
+
+Igor Mammedov (4):
+      tests: acpi: move tested tables array allocation outside of test_acpi_dsdt_table()
+      tests: acpi: init table descriptor in test_dst_table()
+      tests: acpi: rename test_acpi_tables()/test_dst_table() to reflect its usage
+      tests: acpi: add comments to fetch_rsdt_referenced_tables/data->tables usage
+
+Jay Zhou (1):
+      vhost: remove assertion to prevent crash
+
+Marcel Apfelbaum (2):
+      MAINTAINERS: Add myself as maintainer to X86 machines
+      hw/pci-bridge: fix QEMU crash because of pcie-root-port
+
+Maxime Coquelin (6):
+      vhost-user: fix multiple queue specification
+      vhost-user-test: fix features mask
+      vhost-user-test: extract read-guest-mem test from main loop
+      vhost-user-test: setup virtqueues in all tests
+      vhost-user-test: make features mask an init_virtio_dev() argument
+      vhost-user-test: use init_virtio_dev in multiqueue test
+
+Michael S. Tsirkin (2):
+      vhost-user: factor out msg head and payload
+      vhost-user: fix misaligned access to payload
+
+Mohammed Gamal (2):
+      x86_iommu: Move machine check to x86_iommu_realize()
+      x86_iommu: check if machine has PCI bus
+
+Prasad Singamsetty (2):
+      intel-iommu: Redefine macros to enable supporting 48 bit address width
+      intel-iommu: Extend address width to 48 bits
+
+Yuval Shaia (1):
+      pci/shpc: Move function to generic header file
+
+ docs/interop/vhost-user.txt             |  59 +++-
+ Makefile                                |   3 +
+ default-configs/pci.mak                 |   1 +
+ default-configs/s390x-softmmu.mak       |   1 +
+ contrib/libvhost-user/libvhost-user.h   |  33 ++
+ hw/i386/intel_iommu_internal.h          |  43 ++-
+ hw/virtio/virtio-pci.h                  |  18 ++
+ include/hw/i386/intel_iommu.h           |   7 +-
+ include/hw/virtio/vhost-backend.h       |  12 +
+ include/hw/virtio/vhost-user-blk.h      |  41 +++
+ include/hw/virtio/vhost.h               |  15 +
+ include/qemu/event_notifier.h           |   1 +
+ include/qemu/host-utils.h               |  10 +
+ accel/kvm/kvm-all.c                     |   4 +
+ contrib/libvhost-user/libvhost-user.c   |  42 +++
+ contrib/vhost-user-blk/vhost-user-blk.c | 545 ++++++++++++++++++++++++++++++++
+ hw/block/vhost-user-blk.c               | 359 +++++++++++++++++++++
+ hw/i386/acpi-build.c                    |   5 +-
+ hw/i386/amd_iommu.c                     |  13 +-
+ hw/i386/intel_iommu.c                   | 136 ++++----
+ hw/i386/x86-iommu.c                     |  13 +
+ hw/pci-bridge/gen_pcie_root_port.c      |   7 +-
+ hw/pci/shpc.c                           |  13 +-
+ hw/virtio/vhost-user.c                  | 318 +++++++++++++------
+ hw/virtio/vhost.c                       |  32 ++
+ hw/virtio/virtio-bus.c                  |  19 +-
+ hw/virtio/virtio-pci.c                  |  55 ++++
+ hw/virtio/virtio.c                      |   5 +
+ tests/bios-tables-test.c                |  50 ++-
+ tests/vhost-user-test.c                 | 171 +++++-----
+ util/event_notifier-posix.c             |   5 +-
+ util/event_notifier-win32.c             |   2 +
+ .gitignore                              |   1 +
+ MAINTAINERS                             |   1 +
+ Makefile.objs                           |   1 +
+ contrib/vhost-user-blk/Makefile.objs    |   1 +
+ hw/block/Makefile.objs                  |   3 +
+ tests/acpi-test-data/pc/DSDT.numamem    | Bin 0 -> 5150 bytes
+ tests/acpi-test-data/pc/SRAT.numamem    | Bin 0 -> 224 bytes
+ tests/acpi-test-data/q35/DSDT.numamem   | Bin 0 -> 7834 bytes
+ tests/acpi-test-data/q35/SRAT.numamem   | Bin 0 -> 224 bytes
+ 41 files changed, 1739 insertions(+), 306 deletions(-)
+ create mode 100644 include/hw/virtio/vhost-user-blk.h
+ create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
+ create mode 100644 hw/block/vhost-user-blk.c
+ create mode 100644 contrib/vhost-user-blk/Makefile.objs
+ create mode 100644 tests/acpi-test-data/pc/DSDT.numamem
+ create mode 100644 tests/acpi-test-data/pc/SRAT.numamem
+ create mode 100644 tests/acpi-test-data/q35/DSDT.numamem
+ create mode 100644 tests/acpi-test-data/q35/SRAT.numamem
