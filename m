@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ecF9F-0007y8-2C
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:42:49 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ecF9H-00080u-9K
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:42:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ecF9C-0003Gj-6t
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:42:49 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ecF9G-0003KB-Bq
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:42:51 -0500
 Sender: Alistair Francis <alistair23@gmail.com>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 18 Jan 2018 10:38:18 -0800
-Message-Id: <f5426a36d6a0d997d5f6445201861445d8e857da.1516300623.git.alistair.francis@xilinx.com>
+Date: Thu, 18 Jan 2018 10:38:23 -0800
+Message-Id: <188965748a7065402eb1089492669809108b0f0c.1516300623.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1516300623.git.alistair.francis@xilinx.com>
 References: <cover.1516300623.git.alistair.francis@xilinx.com>
-Subject: [Qemu-devel] [PATCH v6 8/9] xlnx-zynqmp-pmu: Connect the IPI device
- to the PMU
+Subject: [Qemu-devel] [PATCH v6 9/9] xlnx-zynqmp: Connect the IPI device to
+ the ZynqMP SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +27,69 @@ Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
-V4:
- - Move the IPI to the machine instead of the SoC
 
- hw/microblaze/xlnx-zynqmp-pmu.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ include/hw/arm/xlnx-zynqmp.h |  2 ++
+ hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-index 7312bfe23e..999a5657cf 100644
---- a/hw/microblaze/xlnx-zynqmp-pmu.c
-+++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -24,6 +24,7 @@
- #include "cpu.h"
- #include "boot.h"
- 
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 3e6fb9b7bd..0a2b037c6b 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -28,6 +28,7 @@
+ #include "hw/ssi/xilinx_spips.h"
+ #include "hw/dma/xlnx_dpdma.h"
+ #include "hw/display/xlnx_dp.h"
 +#include "hw/intc/xlnx-zynqmp-ipi.h"
- #include "hw/intc/xlnx-pmu-iomod-intc.h"
  
- /* Define the PMU device */
-@@ -38,6 +39,15 @@
+ #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+ #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+@@ -90,6 +91,7 @@ typedef struct XlnxZynqMPState {
+     XlnxZynqMPQSPIPS qspi;
+     XlnxDPState dp;
+     XlnxDPDMAState dpdma;
++    XlnxZynqMPIPI ipi;
  
- #define XLNX_ZYNQMP_PMU_INTC_ADDR   0xFFD40000
+     char *boot_cpu;
+     ARMCPU *boot_cpu_ptr;
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 325642058b..ca398c4159 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -50,6 +50,9 @@
+ #define DPDMA_ADDR          0xfd4c0000
+ #define DPDMA_IRQ           116
  
-+#define XLNX_ZYNQMP_PMU_NUM_IPIS    4
++#define IPI_ADDR            0xFF300000
++#define IPI_IRQ             64
 +
-+static const uint64_t ipi_addr[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
-+    0xFF340000, 0xFF350000, 0xFF360000, 0xFF370000,
-+};
-+static const uint64_t ipi_irq[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
-+    19, 20, 21, 22,
-+};
+ static const uint64_t gem_addr[XLNX_ZYNQMP_NUM_GEMS] = {
+     0xFF0B0000, 0xFF0C0000, 0xFF0D0000, 0xFF0E0000,
+ };
+@@ -183,6 +186,9 @@ static void xlnx_zynqmp_init(Object *obj)
+ 
+     object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
+     qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
 +
- typedef struct XlnxZynqMPPMUSoCState {
-     /*< private >*/
-     DeviceState parent_obj;
-@@ -136,6 +146,9 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
-     MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
-+    XlnxZynqMPIPI *ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
-+    qemu_irq irq[32];
-+    int i;
++    object_initialize(&s->ipi, sizeof(s->ipi), TYPE_XLNX_ZYNQMP_IPI);
++    qdev_set_parent_bus(DEVICE(&s->ipi), sysbus_get_default());
+ }
  
-     /* Create the ROM */
-     memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
-@@ -155,6 +168,24 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
-                               &error_abort);
-     object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
- 
-+    for (i = 0; i < 32; i++) {
-+        irq[i] = qdev_get_gpio_in(DEVICE(&pmu->intc), i);
+ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+@@ -454,6 +460,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                              &error_abort);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dpdma), 0, DPDMA_ADDR);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
++
++    object_property_set_bool(OBJECT(&s->ipi), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
 +    }
-+
-+    /* Create and connect the IPI device */
-+    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
-+        ipi[i] = g_new0(XlnxZynqMPIPI, 1);
-+        object_initialize(ipi[i], sizeof(XlnxZynqMPIPI), TYPE_XLNX_ZYNQMP_IPI);
-+        qdev_set_parent_bus(DEVICE(ipi[i]), sysbus_get_default());
-+    }
-+
-+    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
-+        object_property_set_bool(OBJECT(ipi[i]), true, "realized",
-+                                 &error_abort);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(ipi[i]), 0, ipi_addr[i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(ipi[i]), 0, irq[ipi_irq[i]]);
-+    }
-+
-     /* Load the kernel */
-     microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-                            machine->ram_size,
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ipi), 0, IPI_ADDR);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->ipi), 0, gic_spi[IPI_IRQ]);
+ }
+ 
+ static Property xlnx_zynqmp_props[] = {
 -- 
 2.14.1
