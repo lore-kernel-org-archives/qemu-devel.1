@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1ecE8n-0006QG-Nc
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:38:18 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ecEAz-0008JA-F3
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1ecE8m-0001ub-PK
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:38:17 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:40078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1ecE8m-0001tL-JA
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:38:16 -0500
-Received: by mail-ot0-x242.google.com with SMTP id x4so5140984otg.7
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 09:38:15 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1ecEAy-0004cl-93
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 12:40:33 -0500
+Date: Thu, 18 Jan 2018 18:40:27 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180118184027.5ff55338.cohuck@redhat.com>
+In-Reply-To: <20180118183351.2a9c5506@p-imbrenda.boeblingen.de.ibm.com>
+References: <1516035122-7617-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<20180118172034.3dda2622.cohuck@redhat.com>
+	<20180118175229.42b27779@p-imbrenda.boeblingen.de.ibm.com>
+	<20180118180240.7d678384.cohuck@redhat.com>
+	<20180118182317.4ab785be@p-imbrenda.boeblingen.de.ibm.com>
+	<20180118182547.2e1b630b.cohuck@redhat.com>
+	<20180118183351.2a9c5506@p-imbrenda.boeblingen.de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <f1ca60cc-5506-a161-b473-f0de363b7e95@redhat.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
-	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
-	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
-	<1511288389.1080.14.camel@redhat.com>
-	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
-	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
-	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
-	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-	<f1ca60cc-5506-a161-b473-f0de363b7e95@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 18 Jan 2018 09:38:13 -0800
-Message-ID: <CAPcyv4j9b6ARvKcJkE25eNHatWACscMJTN_kCLSM6D+bfu_msA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] s390x: fix storage attributes
+ migration for non-small guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Thu, Jan 18, 2018 at 8:53 AM, David Hildenbrand <david@redhat.com> wrote:
-> On 24.11.2017 13:40, Pankaj Gupta wrote:
->>
->> Hello,
->>
->> Thank you all for all the useful suggestions.
->> I want to summarize the discussions so far in the
->> thread. Please see below:
->>
->>>>>
->>>>>> We can go with the "best" interface for what
->>>>>> could be a relatively slow flush (fsync on a
->>>>>> file on ssd/disk on the host), which requires
->>>>>> that the flushing task wait on completion
->>>>>> asynchronously.
->>>>>
->>>>>
->>>>> I'd like to clarify the interface of "wait on completion
->>>>> asynchronously" and KVM async page fault a bit more.
->>>>>
->>>>> Current design of async-page-fault only works on RAM rather
->>>>> than MMIO, i.e, if the page fault caused by accessing the
->>>>> device memory of a emulated device, it needs to go to
->>>>> userspace (QEMU) which emulates the operation in vCPU's
->>>>> thread.
->>>>>
->>>>> As i mentioned before the memory region used for vNVDIMM
->>>>> flush interface should be MMIO and consider its support
->>>>> on other hypervisors, so we do better push this async
->>>>> mechanism into the flush interface design itself rather
->>>>> than depends on kvm async-page-fault.
->>>>
->>>> I would expect this interface to be virtio-ring based to queue flush
->>>> requests asynchronously to the host.
->>>
->>> Could we reuse the virtio-blk device, only with a different device id?
->>
->> As per previous discussions, there were suggestions on main two parts of the project:
->>
->> 1] Expose vNVDIMM memory range to KVM guest.
->>
->>    - Add flag in ACPI NFIT table for this new memory type. Do we need NVDIMM spec
->>      changes for this?
->>
->>    - Guest should be able to add this memory in system memory map. Name of the added memory in
->>      '/proc/iomem' should be different(shared memory?) than persistent memory as it
->>      does not satisfy exact definition of persistent memory (requires an explicit flush).
->>
->>    - Guest should not allow 'device-dax' and other fancy features which are not
->>      virtualization friendly.
->>
->> 2] Flushing interface to persist guest changes.
->>
->>    - As per suggestion by ChristophH (CCed), we explored options other then virtio like MMIO etc.
->>      Looks like most of these options are not use-case friendly. As we want to do fsync on a
->>      file on ssd/disk on the host and we cannot make guest vCPU's wait for that time.
->>
->>    - Though adding new driver(virtio-pmem) looks like repeated work and not needed so we can
->>      go with the existing pmem driver and add flush specific to this new memory type.
->
-> I'd like to emphasize again, that I would prefer a virtio-pmem only
-> solution.
->
-> There are architectures out there (e.g. s390x) that don't support
-> NVDIMMs - there is no HW interface to expose any such stuff.
->
-> However, with virtio-pmem, we could make it work also on architectures
-> not having ACPI and friends.
+On Thu, 18 Jan 2018 18:33:51 +0100
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
 
-ACPI and virtio-only can share the same pmem driver. There are two
-parts to this, region discovery and setting up the pmem driver. For
-discovery you can either have an NFIT-bus defined range, or a new
-virtio-pmem-bus define it. As far as the pmem driver itself it's
-agnostic to how the range is discovered.
+> On Thu, 18 Jan 2018 18:25:47 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> ...
+> [snip]
+> 
+> > > > > > > diff --git a/hw/s390x/s390-stattrib-kvm.c
+> > > > > > > b/hw/s390x/s390-stattrib-kvm.c index 41770a7..480551c 100644
+> > > > > > > --- a/hw/s390x/s390-stattrib-kvm.c
+> > > > > > > +++ b/hw/s390x/s390-stattrib-kvm.c
+> > > > > > > @@ -116,7 +116,7 @@ static void
+> > > > > > > kvm_s390_stattrib_synchronize(S390StAttribState *sa) for
+> > > > > > > (cx = 0; cx + len <= max; cx += len) { clog.start_gfn = cx;
+> > > > > > >              clog.count = len;
+> > > > > > > -            clog.values = (uint64_t)(sas->incoming_buffer
+> > > > > > > + cx
+> > > > > > > * len);            
+> > > > > > 
+> > > > > > Hm, doesn't that even imply that you reference an area beyond
+> > > > > > the buffer, as the <= max check does not catch this?          
+> > > > > 
+> > > > > what do you mean?
+> > > > > 
+> > > > > cx + len <= max catches the cases where you would write beyond
+> > > > > the end of the buffer. if cx + len == max then we are filling
+> > > > > the buffer to the last byte. and we will get out at the next
+> > > > > iteration.        
+> > > > 
+> > > > Yes, but the problem is that your offset is too long, isn't it?
+> > > > (Where cx + len <= max, but you use an offset of cx * len which
+> > > > may be > max.)      
+> > > 
+> > > which is exactly why I'm removing that line. look at the very
+> > > beginning of the line, there is a -
+> > > 
+> > > the replacement line (the one that starts with a +) has only cx    
+> > 
+> > Err, yes :) I simply wanted to comment that this looks worse than "not
+> > migrated completely".  
+> 
+> yeah, that's true :) but the offset ended up big enough to always
+> get -EFAULT from the kernel and get ignored by qemu afterwards, which
+> then resulted in not all values being migrated.
 
-In other words, pmem consumes 'regions' from libnvdimm and the a bus
-provider like nfit, e820, or a new virtio-mechansim produce 'regions'.
+So the moral is: If you're wrong, be really wrong? :)
+
+> 
+> should I change the description to explain the issue in more detail?
+
+Just mentioning something like out-of-bounds due to wrong offset or so
+would be good.
