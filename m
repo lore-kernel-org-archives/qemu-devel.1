@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ec9c1-0004zW-JJ
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:48:12 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ec9cs-0005lp-4w
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ec9bx-0006oT-Lx
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:48:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ec9bx-0006o7-CX
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:48:05 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0ICkbDt082593
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:48:00 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fjtk3v2us-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:48:00 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 18 Jan 2018 12:47:57 -0000
-References: <20180118085628.40798-1-borntraeger@de.ibm.com>
-	<20180118125322.252929dc.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 18 Jan 2018 13:47:54 +0100
+	(envelope-from <cohuck@redhat.com>) id 1ec9co-0007BX-4c
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:49:02 -0500
+Date: Thu, 18 Jan 2018 13:48:49 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180118134849.54ff043f.cohuck@redhat.com>
+In-Reply-To: <ce17da50-7036-6fb6-07a6-0c1d1e5fa60f@redhat.com>
+References: <20180112125452.8569-1-david@redhat.com>
+	<ce17da50-7036-6fb6-07a6-0c1d1e5fa60f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180118125322.252929dc.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <06e97f00-710a-c893-101f-0a1c6aaa5575@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] s390x/kvm: implement new
- hardware/firmware features
+Subject: Re: [Qemu-devel] [PATCH] s390x/tcg: fixup TEST PROTECTION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,47 +23,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
+On Wed, 17 Jan 2018 16:37:37 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-
-On 01/18/2018 12:53 PM, Cornelia Huck wrote:
-> On Thu, 18 Jan 2018 09:56:25 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> On 12.01.2018 13:54, David Hildenbrand wrote:
+> > CC == 2 can only happen due to a protection exception, not if memory is
+> > not available (PGM_ADDRESSING). So all PGM_ADDRESSING exceptions have to
+> > be forwarded to the guest.
+> > 
+> > Since the initial definition of TEST PROTECTION, we now read globals
+> > (e.g. PSW mask), so we have to correctly mark the instruction
+> > (otherwise, e.g. booting fedora 27 fails).
+> > 
+> > Also, the architecture explicitly specifies which exceptions are
+> > forwarded to the guest, this makes the code a little nicer.
+> > 
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  target/s390x/cpu.h        |  2 ++
+> >  target/s390x/helper.h     |  2 +-
+> >  target/s390x/EM_helper.c | 41 +++++++++++++++++++----------------------
+> >  3 files changed, 22 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> > index 1a8b6b9ae9..915bccbc75 100644
+> > --- a/target/s390x/cpu.h
+> > +++ b/target/s390x/cpu.h
+> > @@ -759,6 +759,8 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+> >          s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, false)
+> >  #define s390_cpu_virt_mem_write(cpu, laddr, ar, dest, len)       \
+> >          s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, true)
+> > +#define s390_cpu_virt_mem_check_read(cpu, laddr, ar, len)   \
+> > +        s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, false)
+> >  #define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
+> >          s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
+> >  void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra);
+> > diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+> > index 26c1b07b44..59a1d9869b 100644
+> > --- a/target/s390x/helper.h
+> > +++ b/target/s390x/helper.h
+> > @@ -137,7 +137,7 @@ DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+> >  DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+> >  DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+> >  DEF_HELPER_FLAGS_2(testblock, TCG_CALL_NO_WG, i32, env, i64)
+> > -DEF_HELPER_FLAGS_3(tprot, TCG_CALL_NO_RWG, i32, env, i64, i64)
+> > +DEF_HELPER_FLAGS_3(tprot, TCG_CALL_NO_WG, i32, env, i64, i64)
+> >  DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
+> >  DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
+> >  DEF_HELPER_FLAGS_2(rrbe, TCG_CALL_NO_RWG, i32, env, i64)
+> > diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> > index 359e446c6f..c957febc6d 100644
+> > --- a/target/s390x/mem_helper.c
+> > +++ b/target/s390x/mem_helper.c
+> > @@ -1730,34 +1730,31 @@ uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t a1, uint64_t a2)
+> >          /* Fetching permitted; storing permitted */
+> >          return 0;
+> >      }
+> > +
+> > +    if (env->int_pgm_code == PGM_PROTECTION) {
+> > +        /* retry if reading is possible */
+> > +        cs->exception_index = 0;
+> > +        if (!s390_cpu_virt_mem_check_read(cpu, a1, 0, 1)) {
+> > +            /* Fetching permitted; storing not permitted */
+> > +            return 1;
+> > +        }
+> > +    }
+> > +
+> >      switch (env->int_pgm_code) {
+> >      case PGM_PROTECTION:
+> > -        /* Fetching permitted; storing not permitted */
+> > -        cs->exception_index = 0;
+> > -        return 1;
+> > -    case PGM_ADDRESSING:
+> >          /* Fetching not permitted; storing not permitted */
+> >          cs->exception_index = 0;
+> >          return 2;
+> > -    case PGM_ASCE_TYPE:
+> > -    case PGM_REG_FIRST_TRANS:
+> > -    case PGM_REG_SEC_TRANS:
+> > -    case PGM_REG_THIRD_TRANS:
+> > -    case PGM_SEGMENT_TRANS:
+> > -    case PGM_PAGE_TRANS:
+> > -    case PGM_ALET_SPEC:
+> > -    case PGM_ALEN_SPEC:
+> > -    case PGM_ALE_SEQ:
+> > -    case PGM_ASTE_VALID:
+> > -    case PGM_ASTE_SEQ:
+> > -    case PGM_EXT_AUTH:
+> > -        /* Translation not available */
+> > -        cs->exception_index = 0;
+> > -        return 3;
+> > +    case PGM_ADDRESSING:
+> > +    case PGM_TRANS_SPEC:
+> > +        /* exceptions forwarded to the guest */
+> > +        s390_cpu_virt_mem_handle_exc(cpu, GETPC());
+> > +        return 0;
+> >      }
+> > -    /* any other exception is forwarded to the guest */
+> > -    s390_cpu_virt_mem_handle_exc(cpu, GETPC());
+> > -    return 0;
+> > +
+> > +    /* Translation not available */
+> > +    cs->exception_index = 0;
+> > +    return 3;
+> >  }
+> >  
+> >  /* insert storage key extended */
+> >   
 > 
->> We want to provide more hw features to guests, namely the new bpb
->> control as well as other transparent facilities that might be
->> introduced by firmware updates (e.g. the stfle facility 81).
->>
->> See the kernel discussion for the KVM side
->> https://www.spinics.net/lists/kernel/msg2700551.html
->>
->> v2->v3: - use bool for bpbc
->> 	- sort cpu facilities
->> v1->v2: - style and comment fixes
->> 	- drop transparent facility patch
->> 	- add patch to introduce facility 81
->>
->> Christian Borntraeger (3):
->>   header sync
->>   s390x/kvm: Handle bpb feature
->>   s390x/kvm: provide stfle.81
->>
->>  linux-headers/asm-s390/kvm.h    |  9 ++++-----
->>  linux-headers/linux/kvm.h       |  5 +++--
->>  target/s390x/cpu.c              |  1 +
->>  target/s390x/cpu.h              |  1 +
->>  target/s390x/cpu_features.c     |  2 ++
->>  target/s390x/cpu_features_def.h |  2 ++
->>  target/s390x/gen-features.c     |  2 ++
->>  target/s390x/kvm.c              | 14 ++++++++++++++
->>  target/s390x/machine.c          | 17 +++++++++++++++++
->>  9 files changed, 46 insertions(+), 7 deletions(-)
->>
-> 
-> Thanks, I've queued this. Once the bpb code lands in Linux, I'll
-> replace patch 1 with a proper header sync and push to s390-next.
+> Ping, this is certainly better than the current (queued) state. Would
+> love to see some review. But if nobody volunteers to read the PoP, I
+> think my current use case (Linux and kvm-unit-tests) have to be
+> sufficient for now.
 
-Have the x86 features been marked as stable? If the answer is yes,
-shall we mark these patches for stable as well?
+I'm a bit low on review cycles, unfortunately.
+
+I guess I will just queue this for the next batch if nobody speaks up
+to the contrary.
