@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ec8vF-0000Mq-70
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:04:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ec8zC-0003MM-6i
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ec8vC-0000Xo-46
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:03:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32625)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ec8vB-0000XQ-S9
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:03:54 -0500
-References: <20180118025245.13042-1-famz@redhat.com>
-	<d1dd1750-c487-be35-05eb-ffb12f18e805@redhat.com>
-	<a81a812f-065c-e8be-0d6d-92525a379a82@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cf2b427d-a8a0-a124-16dd-598d4f7eea46@redhat.com>
-Date: Thu, 18 Jan 2018 13:03:43 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ec8zB-0003Xv-AO
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:08:02 -0500
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:33590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ec8zB-0003Xf-67
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 07:08:01 -0500
+Received: by mail-ot0-x22e.google.com with SMTP id x15so19863381ote.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 04:08:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a81a812f-065c-e8be-0d6d-92525a379a82@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scsi-generic: Simplify error handling code
+In-Reply-To: <20180111045937.2119-7-david@gibson.dropbear.id.au>
+References: <20180111045937.2119-1-david@gibson.dropbear.id.au>
+	<20180111045937.2119-7-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Jan 2018 12:07:40 +0000
+Message-ID: <CAFEAcA_tqP1Pu4B3x-Xgii_SkniNpCW+BxVdHnmhNtg1khDbWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 06/11] hw/ide: Emulate SiI3112 SATA
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, surajjs@au1.ibm.com, BALATON Zoltan <balaton@eik.bme.hu>
 
-On 18/01/2018 12:21, Philippe Mathieu-Daud=C3=A9 wrote:
->> I'm not a fan of bool return types, in general (because "!" is often
->> success while "< 0" is failure) and especially when there is an Error*=
-*;
->> I disagree with commit 9d3b155186.  But the function is not in an area=
- I
->> maintain so I'm queuing this, thanks.
-> Do you prefer "if (local_err)" and "if (errp && *errp)" ?
+On 11 January 2018 at 04:59, David Gibson <david@gibson.dropbear.id.au> wrote:
+> From: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> This is a common generic PCI SATA controller that is also used in PCs
+> but more importantly guests running on the Sam460ex board prefer this
+> card and have a driver for it (unlike for other SATA controllers
+> already emulated).
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Acked-by: John Snow <jsnow@redhat.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-The latter is wrong.  I do prefer
+> +    case 0x10:
+> +        val = d->i.bmdma[0].cmd;
+> +        val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
+> +        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
+> +        val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
+> +        val |= d->i.bmdma[0].status << 16;
+> +        val |= d->i.bmdma[1].status << 24;
+> +        break;
 
-    if (local_err) {
-        error_propagate(errp, local_err);
-        return;
-    }
+Hi. Coverity points out (CID 1385151) that the << 24 here will
+potentially inadvertently set the high 32 bits of val if the top
+bit in bmdma[1].status is 1. (This is because in x << 24 where
+x is uint8_t x gets promoted to signed int, and then when that
+signed int with a high bit set is converted to uint64_t for the
+logical or it's done by sign-extending.
 
-or maybe (but only if there is a meaning to a zero vs. positive return
-value, or if errno is an important part of the returned Error *)
+Adding a cast, like
+  val |= (uint32_t)d->i.bmdma[1].status << 24;
 
-    ret =3D f(..., errp);
-    if (ret < 0) {
-        return;
-    }
+should fix this.
 
-> I wondered once if a macro might improve this pattern but thought the
-> code would get more obscure.
-
-Eduardo had a series to avoid error_propagate, where NULL was replaced
-by a (non-NULL) IGNORED_ERRORS macro.  Then you could do:
-
-    f(..., errp);
-    if (error_is_set(errp)) {
-        return;
-    }
-
-See here:
-https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03139.html
-
-Paolo
+thanks
+-- PMM
