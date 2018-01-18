@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1ecFCE-0002N0-IJ
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:56 -0500
+	(envelope-from <groug@kaod.org>) id 1ecFCG-0002Ni-TS
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1ecFCD-00051p-Jn
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:54 -0500
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:43390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1ecFCD-00051S-EK
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:53 -0500
-Received: by mail-ot0-x22e.google.com with SMTP id p36so12935666otd.10
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 10:45:53 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1ecFCC-00050W-0Y
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:56 -0500
+Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:34920)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ecFCB-0004yf-N9
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 13:45:51 -0500
+Received: from player791.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id E86F3A5AE5
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 19:45:48 +0100 (CET)
+Date: Thu, 18 Jan 2018 19:45:45 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180118194545.76cdf1ac@bahia.lan>
+In-Reply-To: <20180118163930.2b5a8448@bahia.lan>
+References: <151618081462.20461.3393245354775542888.stgit@bahia.lan>
+	<151618083506.20461.14178623580944316317.stgit@bahia.lan>
+	<20180118034340.GD30352@umbus.fritz.box>
+	<20180118163930.2b5a8448@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <72839100-7fdf-693c-e9c2-348a5add8a56@redhat.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
-	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
-	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
-	<1511288389.1080.14.camel@redhat.com>
-	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
-	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
-	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
-	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-	<f1ca60cc-5506-a161-b473-f0de363b7e95@redhat.com>
-	<CAPcyv4j9b6ARvKcJkE25eNHatWACscMJTN_kCLSM6D+bfu_msA@mail.gmail.com>
-	<72839100-7fdf-693c-e9c2-348a5add8a56@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 18 Jan 2018 10:45:51 -0800
-Message-ID: <CAPcyv4iHvXJAiUiaBFPFc98+3BepR1+YeVOqH3imq4Zq2d+iAw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/3] spapr_cpu_core: don't reset
+ CPUs during realization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,42 +34,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Jan 18, 2018 at 9:48 AM, David Hildenbrand <david@redhat.com> wrote:
->>> I'd like to emphasize again, that I would prefer a virtio-pmem only
->>> solution.
->>>
->>> There are architectures out there (e.g. s390x) that don't support
->>> NVDIMMs - there is no HW interface to expose any such stuff.
->>>
->>> However, with virtio-pmem, we could make it work also on architectures
->>> not having ACPI and friends.
->>
->> ACPI and virtio-only can share the same pmem driver. There are two
->> parts to this, region discovery and setting up the pmem driver. For
->> discovery you can either have an NFIT-bus defined range, or a new
->> virtio-pmem-bus define it. As far as the pmem driver itself it's
->> agnostic to how the range is discovered.
->>
->
-> And in addition to discovery + setup, we need the flush via virtio.
->
->> In other words, pmem consumes 'regions' from libnvdimm and the a bus
->> provider like nfit, e820, or a new virtio-mechansim produce 'regions'.
->>
->
-> That sounds good to me. I would like to see how the ACPI discovery
-> variant connects to a virtio ring.
->
-> The natural way for me would be:
->
-> A virtio-X device supplies a memory region ("discovery") and also the
-> interface for flushes for this device. So one virtio-X corresponds to
-> one pmem device. No ACPI to be involved (also not on architectures that
-> have ACPI)
+--Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hmm, yes, it seems if ACPI is just going to be used as a trigger for
-"go find the virtio-X interface for this range" we could have started
-from a virtio device in the first place.
+On Thu, 18 Jan 2018 16:39:30 +0100
+Greg Kurz <groug@kaod.org> wrote:
+
+> On Thu, 18 Jan 2018 14:43:40 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Wed, Jan 17, 2018 at 10:20:35AM +0100, Greg Kurz wrote: =20
+> > > When QEMU is started, all cold-plugged CPUs are reset twice: first
+> > > during initialization and then during machine reset. This is sub-
+> > > optimal.
+> > >=20
+> > > The first reset is only needed for hot-plugged CPUs because the CPU
+> > > hotplug code doesn't reset them. This patch adds the necessary code
+> > > to reset hot-plugged CPUs on the CPU core hotplug path, and removes
+> > > the now useless initial CPU reset.
+> > >=20
+> > > We just need to mark the newly created CPU as halted to prevent it
+> > > to run until it is put online later.
+> > >=20
+> > > Full CPU reset is now explicitely triggered from the machine code
+> > > only, either during system reset or during CPU hotplug.
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>   =20
+> >=20
+> > Hrm, this looks ok in outline, but makes me nervous in a couple of
+> > ways.
+> >=20
+> >  =20
+> > > ---
+> > >  hw/ppc/spapr.c                  |    8 ++++++++
+> > >  hw/ppc/spapr_cpu_core.c         |    8 ++++++--
+> > >  include/hw/ppc/spapr_cpu_core.h |    2 ++
+> > >  3 files changed, 16 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index bca838fce638..a2ff401f738a 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -3336,6 +3336,14 @@ static void spapr_core_plug(HotplugHandler *ho=
+tplug_dev, DeviceState *dev,
+> > >          void *fdt;
+> > >          int fdt_offset;
+> > > =20
+> > > +        if (hotplugged) {   =20
+> >=20
+> > First, I'm always wary of using the hotplugged parameter, because what
+> > qemu means by it often doesn't line up with what PAPR means by it.
+> >  =20
+>=20
+> Hmmm... you're right, hotplugged in QDEV simply means that the device
+> was not created during initial machine startup.
+>=20
+> ie, any device added with QMP/HMP is always hotplugged.
+>=20
+> To cope with the DRC state management, commit 94fd9cbaa3190 added the
+> fact that QEMU mustn't be waiting for an incoming migration as well.
+>=20
+> ie, if QEMU is started with -incoming and CPUs are added before migration
+> starts, like libvirt does, this code wouldn't reset the CPUs...
+>=20
+> I guess we should check qdev->hotplugged instead. Makes sense ?
+>=20
+
+Actually, we could even just do this in spapr_cpu_init():
+
+-    spapr_cpu_reset(cpu);
++    if (DEVICE(cpu)->hotplugged) {
++        spapr_cpu_reset(cpu);
++    }
+
+
+> > > +            int i;
+> > > +
+> > > +            for (i =3D 0; i < cc->nr_threads; i++) {
+> > > +                spapr_cpu_reset(core->threads[i]);
+> > > +            }
+> > > +        }
+> > > +
+> > >          fdt =3D spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr=
+);
+> > > =20
+> > >          spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
+> > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > > index ac19b2e0b72c..268be7784efb 100644
+> > > --- a/hw/ppc/spapr_cpu_core.c
+> > > +++ b/hw/ppc/spapr_cpu_core.c
+> > > @@ -22,7 +22,7 @@
+> > >  #include "sysemu/hw_accel.h"
+> > >  #include "qemu/error-report.h"
+> > > =20
+> > > -static void spapr_cpu_reset(void *opaque)
+> > > +void spapr_cpu_reset(void *opaque)
+> > >  {
+> > >      PowerPCCPU *cpu =3D opaque;
+> > >      CPUState *cs =3D CPU(cpu);
+> > > @@ -63,7 +63,11 @@ static void spapr_cpu_init(sPAPRMachineState *spap=
+r, PowerPCCPU *cpu,
+> > >      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+> > > =20
+> > >      qemu_register_reset(spapr_cpu_reset, cpu);
+> > > -    spapr_cpu_reset(cpu);
+> > > +
+> > > +    /* CPU must not execute anything until explicitely started other=
+wise the
+> > > +     * guest will crash.
+> > > +     */
+> > > +    CPU(cpu)->halted =3D 1;   =20
+> >=20
+> > And poking specifics in a CPU that hasn't already been set to a known
+> > state by a reset also worries me.
+> >  =20
+>=20
+> IIUC the halted flag doesn't really depend any CPU state. It is
+> only a way to prevent the CPU from executing, which is needed
+> if the CPU wasn't set to a known state.
+>=20
+> FWIW I've seen other places where it is set before resetting the
+> CPU (eg, s390_cpu_initfn() or cpu_devinit() for Sun4m).
+>=20
+> I was thinking of another solution: create a DeviceClass reset function
+> that would call spapr_cpu_reset() for all CPUs of a core, and register
+> it in spapr_cpu_core_class_init(). It would be called by QDEV during
+> realization of hot-plugged cores only. Unfortunately, this also happens
+> after the call to spapr_core_plug() (see device_set_realized()).
+>=20
+> > >  }
+> > > =20
+> > >  /*
+> > > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_c=
+pu_core.h
+> > > index 1129f344aa0c..763a2168461e 100644
+> > > --- a/include/hw/ppc/spapr_cpu_core.h
+> > > +++ b/include/hw/ppc/spapr_cpu_core.h
+> > > @@ -38,4 +38,6 @@ typedef struct sPAPRCPUCoreClass {
+> > >  } sPAPRCPUCoreClass;
+> > > =20
+> > >  const char *spapr_get_cpu_core_type(const char *cpu_type);
+> > > +void spapr_cpu_reset(void *opaque);
+> > > +
+> > >  #endif
+> > >    =20
+> >  =20
+>=20
+
+
+--Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlpg61kACgkQcdTV5YIv
+c9bs0hAAsFivpCybeSye1ZJiaoW/bb+W3O4SBLJp0mZKMUuzAD/vL2LiHafY8h6X
+mlddUVKwwJci7vIQy8fvOvEmIysYtSu/L+CaE2g5jhdPn4UVnj0EUVOYL2bqChJE
+yylBEF7GbYfgg5CFQa2bYDDUZvf0p+QS/y5yoToaneeeE1tVMJUs3KwnZ6r6FUqe
+LFNw500EALXTTFzZg8JUy416U+kAbQM0KImqPqMmko2VHYa+XdOgyHHEV0/3a6Np
+uRYljdaN87J8yleAN+4pWPUB+Lm2Lp/IpN2ZrtlCrUVnS5976MzPH/zngcrZRx8f
+CiPMtTo9mrmAvfUQ9Q/oaF876CvB9djdHmr6Sm/EVI/7POThNUu1HCnsShfhcTs/
+079dJDxCPtmyvBVAMLiPK0ylDq3t17AiWcR/qP2033VhMlrvEImQO8LkZaG0DGUv
+c1jpMcZtR0B7ENQlv7bcvFUGH7Mw2Y0/CX9/Ve0PQsv+vHwy2LkyfCRpRgLyRtGy
+siTeCYw+cP8qlqLrNIOMk8RQbu2MRaWhhPn9vdjKfEQf047+DZmZ0Hlv9FqAfWXI
+S3NIrij70adkyhV1Y4bdU5AAa0zYsYMGuYAQgqhy7hz9QubCfFniie6lJml1FhI7
+t3VN+pttXIKw1hfMb3v75jymI87LTO54WHXrRcghzsX/p1n419c=
+=t5ak
+-----END PGP SIGNATURE-----
+
+--Sig_/oRwinbQ0Y4xUZ/3FZxlvo+C--
