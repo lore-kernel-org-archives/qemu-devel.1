@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH4x-0004tX-UD
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:33 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH59-00052K-TK
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH4u-0004gm-S4
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55690)
+	(envelope-from <mst@redhat.com>) id 1ecH58-0004vy-Mq
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH4u-0004gB-Is
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:28 -0500
-Date: Thu, 18 Jan 2018 22:46:16 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH58-0004v9-GV
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:42 -0500
+Date: Thu, 18 Jan 2018 22:46:40 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516308132-10272-22-git-send-email-mst@redhat.com>
+Message-ID: <1516308132-10272-25-git-send-email-mst@redhat.com>
 References: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v4 21/29] x86_iommu: Move machine check to
- x86_iommu_realize()
+Subject: [Qemu-devel] [PULL v4 24/29] tests: acpi: init table descriptor in
+ test_dst_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,107 +28,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mohammed Gamal <mgamal@redhat.com>, Peter Xu <peterx@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
 
-From: Mohammed Gamal <mgamal@redhat.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Instead of having the same error checks in vtd_realize()
-and amdvi_realize(), move that over to the generic
-x86_iommu_realize().
+remove code duplication and make sure that table descriptor
+passed in for initialization is in expected state.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/amd_iommu.c   | 13 ++-----------
- hw/i386/intel_iommu.c | 13 ++-----------
- hw/i386/x86-iommu.c   | 13 +++++++++++++
- 3 files changed, 17 insertions(+), 22 deletions(-)
+ tests/bios-tables-test.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index eeaf0e0..63d46ff 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1144,18 +1144,9 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-     AMDVIState *s = AMD_IOMMU_DEVICE(dev);
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
-     MachineState *ms = MACHINE(qdev_get_machine());
--    MachineClass *mc = MACHINE_GET_CLASS(ms);
--    PCMachineState *pcms =
--        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
--    PCIBus *bus;
--
--    if (!pcms) {
--        error_setg(err, "Machine-type '%s' not supported by amd-iommu",
--                   mc->name);
--        return;
--    }
-+    PCMachineState *pcms = PC_MACHINE(ms);
-+    PCIBus *bus = pcms->bus;
- 
--    bus = pcms->bus;
-     s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
-                                      amdvi_uint64_equal, g_free, g_free);
- 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 4e8642e..2e841cd 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3052,20 +3052,11 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
- static void vtd_realize(DeviceState *dev, Error **errp)
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index a2f64c8..4b357cd 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -214,6 +214,7 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
  {
-     MachineState *ms = MACHINE(qdev_get_machine());
--    MachineClass *mc = MACHINE_GET_CLASS(ms);
--    PCMachineState *pcms =
--        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
--    PCIBus *bus;
-+    PCMachineState *pcms = PC_MACHINE(ms);
-+    PCIBus *bus = pcms->bus;
-     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+     uint8_t checksum;
  
--    if (!pcms) {
--        error_setg(errp, "Machine-type '%s' not supported by intel-iommu",
--                   mc->name);
--        return;
--    }
++    memset(sdt_table, 0, sizeof(*sdt_table));
+     ACPI_READ_TABLE_HEADER(&sdt_table->header, addr);
+ 
+     sdt_table->aml_len = le32_to_cpu(sdt_table->header.length)
+@@ -233,8 +234,6 @@ static void test_acpi_dsdt_table(test_data *data)
+     AcpiSdtTable dsdt_table;
+     uint32_t addr = le32_to_cpu(data->fadt_table.dsdt);
+ 
+-    memset(&dsdt_table, 0, sizeof(dsdt_table));
 -
--    bus = pcms->bus;
-     x86_iommu->type = TYPE_INTEL;
+     test_dst_table(&dsdt_table, addr);
+     ACPI_ASSERT_CMP(dsdt_table.header.signature, "DSDT");
  
-     if (!vtd_decide_config(s, errp)) {
-diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-index 293caf8..51de519 100644
---- a/hw/i386/x86-iommu.c
-+++ b/hw/i386/x86-iommu.c
-@@ -21,6 +21,8 @@
- #include "hw/sysbus.h"
- #include "hw/boards.h"
- #include "hw/i386/x86-iommu.h"
-+#include "hw/i386/pc.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "trace.h"
+@@ -251,7 +250,6 @@ static void test_acpi_tables(test_data *data)
+         AcpiSdtTable ssdt_table;
+         uint32_t addr;
  
-@@ -80,7 +82,18 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
- {
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
-     X86IOMMUClass *x86_class = X86_IOMMU_GET_CLASS(dev);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    PCMachineState *pcms =
-+        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-     QLIST_INIT(&x86_iommu->iec_notifiers);
-+
-+    if (!pcms) {
-+        error_setg(errp, "Machine-type '%s' not supported by IOMMU",
-+                   mc->name);
-+        return;
-+    }
-+
-     if (x86_class->realize) {
-         x86_class->realize(dev, errp);
-     }
+-        memset(&ssdt_table, 0, sizeof(ssdt_table));
+         addr = le32_to_cpu(data->rsdt_tables_addr[i + 1]); /* fadt is first */
+         test_dst_table(&ssdt_table, addr);
+         g_array_append_val(data->tables, ssdt_table);
 -- 
 MST
