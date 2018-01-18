@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecGaG-0006lV-46
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:14:49 -0500
+	(envelope-from <mst@redhat.com>) id 1ecGcD-0007g2-Dq
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:16:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecGaB-0007rF-LT
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:14:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55470)
+	(envelope-from <mst@redhat.com>) id 1ecGc8-0000NO-JJ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:16:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecGaB-0007qp-FD
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:14:43 -0500
-Date: Thu, 18 Jan 2018 18:14:39 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180118201439.GD5292@localhost.localdomain>
-References: <20180118021000.27203-1-ehabkost@redhat.com>
-	<CAFEAcA_JX_eevQL3kM2Kvf_Z3+xTiDRkg6C-EknfMtj_-cRA1g@mail.gmail.com>
-	<3dc09f5a-241a-728f-2051-393010049f1d@amsat.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecGc8-0000Lx-9k
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:16:44 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E4EA81DF0
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 20:16:43 +0000 (UTC)
+Date: Thu, 18 Jan 2018 22:16:39 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180118221212-mutt-send-email-mst@kernel.org>
+References: <20180116180408.11279-1-dgilbert@redhat.com>
+	<20180118213321-mutt-send-email-mst@kernel.org>
+	<20180118195934.GD2660@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3dc09f5a-241a-728f-2051-393010049f1d@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/19] machine queue, 2018-01-18
+In-Reply-To: <20180118195934.GD2660@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v6 0/7] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +34,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com
 
-On Thu, Jan 18, 2018 at 12:36:19PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> On 01/18/2018 12:22 PM, Peter Maydell wrote:
-> > On 18 January 2018 at 02:09, Eduardo Habkost <ehabkost@redhat.com> wr=
-ote:
-> >> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42a=
-e7ada7c:
-> >>
-> >>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' =
-into staging (2018-01-16 17:36:39 +0000)
-> >>
-> >> are available in the Git repository at:
-> >>
-> >>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
-> >>
-> >> for you to fetch changes up to 901cc8d31f36ac82824ab68f656ab70504041=
-00c:
-> >>
-> >>   fw_cfg: fix memory corruption when all fw_cfg slots are used (2018=
--01-17 23:04:37 -0200)
-> >>
-> >> ----------------------------------------------------------------
-> >> machine queue, 2018-01-18
-> >>
-> >> ----------------------------------------------------------------
-> >=20
-> > Hi. I'm afraid this doesn't build on 32-bit hosts, due to a
-> > format string problem:
-> >=20
-> > In file included from /home/peter.maydell/qemu/exec.c:20:0:
-> > /home/peter.maydell/qemu/exec.c: In function 'file_ram_alloc':
-> > /home/peter.maydell/qemu/include/qapi/error.h:162:25: error: format
-> > '%llx' expects argument of type 'long long unsigned int', but argumen=
-t
-> > 7 has type 'size_t {aka unsigned int}' [-Werror=3Dformat=3D]
-> >                          (fmt), ## __VA_ARGS__)
-> >                          ^
-> > /home/peter.maydell/qemu/exec.c:1616:9: note: in expansion of macro '=
-error_setg'
-> >          error_setg(errp, "aligment 0x%" PRIx64
-> >          ^
->=20
-> Eduardo you can quickly check that running:
->=20
->   $ make docker-test-build@debian-win32-cross
->   (or use the debian-armel-cross image, but win32 is often weirder)
->=20
-> I hope one day compiler get smart enough to automatically fix those
-> mistakes :)
+On Thu, Jan 18, 2018 at 07:59:35PM +0000, Dr. David Alan Gilbert wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > On Tue, Jan 16, 2018 at 06:04:01PM +0000, Dr. David Alan Gilbert (git) wrote:
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > Hi,
+> > >   This patch set reworks the way the vhost code handles changes in
+> > > physical address space layout that came from a discussion with Igor.
+> > > 
+> > > Its intention is to simplify a lot of the update code,
+> > > and to make it easier for the postcopy+shared code to
+> > > do the hugepage alignments that are needed.
+> > > 
+> > > Instead of inserting/removing each section during the add/del
+> > > callbacks of the listener, we start afresh and build a list
+> > > from the add and nop callbacks, then at the end compare the list
+> > > we've built with the exisiting list.
+> > > 
+> > > v6
+> > >   Tidy ups from Igor
+> > >   The biggest change is moving the 'Move log_dirty check' to be
+> > >   the last patch in the set.
+> > > 
+> > > Dr. David Alan Gilbert (7):
+> > >   vhost: Build temporary section list and deref after commit
+> > >   vhost: Simplify ring verification checks
+> > >   vhost: Merge sections added to temporary list
+> > >   vhost: Regenerate region list from changed sections list
+> > >   vhost: Clean out old vhost_set_memory and friends
+> > >   vhost: Merge and delete unused callbacks
+> > >   vhost: Move log_dirty check
+> > > 
+> > >  hw/virtio/trace-events    |   6 +
+> > >  hw/virtio/vhost.c         | 497 ++++++++++++++++------------------------------
+> > >  include/hw/virtio/vhost.h |   5 +-
+> > >  3 files changed, 180 insertions(+), 328 deletions(-)
+> > 
+> > 
+> > Seems to trigger errors with clang runtime sanitizer:
+> > 
+> > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
+> > /usr/include/string.h:64:33: note: nonnull attribute specified here
+> 
+> 
+> How are you running that test?
 
-Reproduced using "make docker-test-build@debian-armel-cross".
+One Fedora:
+dnf install clang
 
---=20
-Eduardo
+'/scm/qemu-clang/../qemu/configure' '--cc=clang' '--cxx=clang++' '--extra-cflags=-fsanitize=undefined -ferror-limit=10000 -fno-sanitize=shift-base'
+make
+make check.
+
+> Can you add this printf and tell me what
+> it's seeing?
+> 
+>         /* Same size, lets check the contents */
+>         fprintf(stderr, "%s: %p %p %d\n", __func__, dev->mem_sections, old_sections, n_old_sections);
+>         changed = memcmp(dev->mem_sections, old_sections,
+>                          n_old_sections * sizeof(old_sections[0])) != 0;
+> 
+> I'm seeing a bunch of calls where both pointers are NULL, but
+> n_old_sections is 0, which feels legal to me.
+
+https://stackoverflow.com/questions/16362925/can-i-pass-a-null-pointer-to-memcmp
+
+says it's invalid.
+
+
+> I guess we could make it:
+>    changed = n_old_sections ? memcmp(....) : false;
+> just to shut clang up.
+> 
+> Dave
+> 
+> > 
+> > 
+> > > -- 
+> > > 2.14.3
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
