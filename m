@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ec3BE-0002jm-B4
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:56:05 -0500
+	(envelope-from <liliangleo@didichuxing.com>) id 1ecA0Y-0004p4-QE
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:13:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ec3BB-0008RU-8p
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:56:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ec3BB-0008R7-2I
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:56:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ec3B8-0007n4-SJ
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 05:55:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 17ED22E855B
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 05:55:58 +0000 (UTC)
+	(envelope-from <liliangleo@didichuxing.com>) id 1ecA0U-0001sS-J5
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:13:30 -0500
+Received: from mx1.didichuxing.com ([111.202.154.82]:4256
+	helo=BJEXMBX011.didichuxing.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liliangleo@didichuxing.com>)
+	id 1ecA0U-0001pP-7m
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 08:13:26 -0500
+Date: Thu, 18 Jan 2018 21:13:09 +0800
+From: Liang Li <liliangleo@didichuxing.com>
+Message-ID: <20180118131308.GA2181@liangdeMacBook-Pro.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jan 2018 05:38:17 -0000
-From: "Anthony A." <ubuntu@anthony-arnaud.fr>
-Reply-To: Bug 1449687 <1449687@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150428180718.24323.78355.malonedeb@wampee.canonical.com>
-Message-Id: <151625389730.11119.16143125537208460144.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1449687] Re: block migration of qcow2 VMs copies
- all empty space
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH resend] hbitmap: fix missing restore count when
+ finish deserialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Weiping Zhang <zhangweiping@didichuxing.com>
 
-I forgot to inform my test envrionement :
+The .count of HBitmap is forgot to set in function
+hbitmap_deserialize_finish, let's set it to the right value.
 
-Ubuntu Xenial
-qemu-kvm version 2.5
-libvirt-bin version 1.3.1
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Fam Zheng <famz@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Weiping Zhang <zhangweiping@didichuxing.com>
+Signed-off-by: Liang Li <liliangleo@didichuxing.com>
 
--- =
+---
+ util/hbitmap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1449687
-
-Title:
-  block migration of qcow2 VMs copies all empty space
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm running openstack 2012.1 'icehouse' which, ultimately, calls down
-  into qemu-system-x86 2.0.0+dfsg-2ubuntu1.10.
-
-  I primed the process by copying all necessary base images onto the
-  destination host.  Nonetheless, post-migration instances are much
-  larger than the original image; the copy duplicated all the empty
-  space that ought to have remained copy-on-write.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1449687/+subscriptions
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 289778a..58a2c93 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -630,6 +630,7 @@ void hbitmap_deserialize_finish(HBitmap *bitmap)
+     }
+ 
+     bitmap->levels[0][0] |= 1UL << (BITS_PER_LONG - 1);
++    bitmap->count = hb_count_between(bitmap, 0, bitmap->size - 1);
+ }
+ 
+ void hbitmap_free(HBitmap *hb)
+-- 
+1.8.3.1
