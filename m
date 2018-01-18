@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ebzfr-0001Gs-V2
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:11:28 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ebzg2-0001OX-BR
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:11:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ebzfq-00051r-Uz
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:11:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55386)
+	(envelope-from <ehabkost@redhat.com>) id 1ebzfz-00055W-Ds
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:11:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ebzfq-00051N-LF
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:11:26 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ebzfz-000556-52
+	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 21:11:35 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 18 Jan 2018 00:09:55 -0200
-Message-Id: <20180118021000.27203-15-ehabkost@redhat.com>
+Date: Thu, 18 Jan 2018 00:09:58 -0200
+Message-Id: <20180118021000.27203-18-ehabkost@redhat.com>
 In-Reply-To: <20180118021000.27203-1-ehabkost@redhat.com>
 References: <20180118021000.27203-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 14/19] scripts: Remove fixed entries from the
- device-crash-test
+Subject: [Qemu-devel] [PULL 17/19] nvdimm: add 'unarmed' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +24,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Haozhong Zhang <haozhong.zhang@intel.com>
 
-These are crashes / errors which have been fixed already in the past
-months. We can remove these from the device-crash-test script now.
+Currently the only vNVDIMM backend can guarantee the guest write
+persistence is device DAX on Linux, because no host-side kernel cache
+is involved in the guest access to it. The approach to detect whether
+the backend is device DAX needs to access sysfs, which may not work
+with SELinux.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1513613438-11017-1-git-send-email-thuth@redhat.com>
+Instead, we add the 'unarmed' option to device 'nvdimm', so that users
+or management utils, which have enough knowledge about the backend,
+can control the unarmed flag in guest ACPI NFIT via this option. The
+guest Linux NVDIMM driver, for example, will mark the corresponding
+vNVDIMM device read-only if the unarmed flag in guest NFIT is set.
+
+The default value of 'unarmed' option is 'off' in order to keep the
+backwards compatibility.
+
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-Id: <20171211072806.2812-4-haozhong.zhang@intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/device-crash-test | 8 --------
- 1 file changed, 8 deletions(-)
+ docs/nvdimm.txt         | 15 +++++++++++++++
+ include/hw/mem/nvdimm.h |  9 +++++++++
+ hw/acpi/nvdimm.c        |  7 +++++++
+ hw/mem/nvdimm.c         | 26 ++++++++++++++++++++++++++
+ 4 files changed, 57 insertions(+)
 
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index 827d8ec2af..7417177ebb 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -207,11 +207,9 @@ ERROR_WHITELIST = [
-     # Known crashes will generate error messages, but won't be fatal.
-     # Those entries must be removed once we fix the crashes.
-     {'exitcode':-6, 'log':r"Device 'serial0' is in use", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"spapr_rtas_register: Assertion .*rtas_table\[token\]\.name.* failed", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"qemu_net_client_setup: Assertion `!peer->peer' failed", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r'RAMBlock "[\w.-]+" already registered', 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"find_ram_offset: Assertion `size != 0' failed.", 'loglevel':logging.ERROR},
--    {'exitcode':-6, 'log':r"puv3_load_kernel: Assertion `kernel_filename != NULL' failed", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"add_cpreg_to_hashtable: code should not be reached", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"qemu_alloc_display: Assertion `surface->image != NULL' failed", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"Unexpected error in error_set_from_qdev_prop_error", 'loglevel':logging.ERROR},
-@@ -219,16 +217,10 @@ ERROR_WHITELIST = [
-     {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
--    {'exitcode':-11, 'device':'stm32f205-soc', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'xlnx,zynqmp', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'mips-cps', 'loglevel':logging.ERROR, 'expected':True},
-     {'exitcode':-11, 'device':'gus', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'a9mpcore_priv', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'a15mpcore_priv', 'loglevel':logging.ERROR, 'expected':True},
-     {'exitcode':-11, 'device':'isa-serial', 'loglevel':logging.ERROR, 'expected':True},
-     {'exitcode':-11, 'device':'sb16', 'loglevel':logging.ERROR, 'expected':True},
-     {'exitcode':-11, 'device':'cs4231a', 'loglevel':logging.ERROR, 'expected':True},
--    {'exitcode':-11, 'device':'arm-gicv3', 'loglevel':logging.ERROR, 'expected':True},
-     {'exitcode':-11, 'machine':'isapc', 'device':'.*-iommu', 'loglevel':logging.ERROR, 'expected':True},
+diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+index 21249dd062..e903d8bb09 100644
+--- a/docs/nvdimm.txt
++++ b/docs/nvdimm.txt
+@@ -138,3 +138,18 @@ backend of vNVDIMM:
  
-     # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
+  -object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=4G,align=2M
+  -device nvdimm,id=nvdimm1,memdev=mem1
++
++Guest Data Persistence
++----------------------
++
++Though QEMU supports multiple types of vNVDIMM backends on Linux,
++currently the only one that can guarantee the guest write persistence
++is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
++which all guest access do not involve any host-side kernel cache.
++
++When using other types of backends, it's suggested to set 'unarmed'
++option of '-device nvdimm' to 'on', which sets the unarmed flag of the
++guest NVDIMM region mapping structure.  This unarmed flag indicates
++guest software that this vNVDIMM device contains a region that cannot
++accept persistent writes. In result, for example, the guest Linux
++NVDIMM driver, marks such vNVDIMM device as read-only.
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 28e68ddf59..7fd87c4e1c 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -49,6 +49,7 @@
+                                                TYPE_NVDIMM)
+ 
+ #define NVDIMM_LABLE_SIZE_PROP "label-size"
++#define NVDIMM_UNARMED_PROP    "unarmed"
+ 
+ struct NVDIMMDevice {
+     /* private */
+@@ -74,6 +75,14 @@ struct NVDIMMDevice {
+      * guest via ACPI NFIT and _FIT method if NVDIMM hotplug is supported.
+      */
+     MemoryRegion nvdimm_mr;
++
++    /*
++     * The 'on' value results in the unarmed flag set in ACPI NFIT,
++     * which can be used to notify guest implicitly that the host
++     * backend (e.g., files on HDD, /dev/pmemX, etc.) cannot guarantee
++     * the guest write persistence.
++     */
++    bool unarmed;
+ };
+ typedef struct NVDIMMDevice NVDIMMDevice;
+ 
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index 6ceea196e7..59d6e4254c 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -138,6 +138,8 @@ struct NvdimmNfitMemDev {
+ } QEMU_PACKED;
+ typedef struct NvdimmNfitMemDev NvdimmNfitMemDev;
+ 
++#define ACPI_NFIT_MEM_NOT_ARMED     (1 << 3)
++
+ /*
+  * NVDIMM Control Region Structure
+  *
+@@ -284,6 +286,7 @@ static void
+ nvdimm_build_structure_memdev(GArray *structures, DeviceState *dev)
+ {
+     NvdimmNfitMemDev *nfit_memdev;
++    NVDIMMDevice *nvdimm = NVDIMM(OBJECT(dev));
+     uint64_t size = object_property_get_uint(OBJECT(dev), PC_DIMM_SIZE_PROP,
+                                              NULL);
+     int slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
+@@ -312,6 +315,10 @@ nvdimm_build_structure_memdev(GArray *structures, DeviceState *dev)
+ 
+     /* Only one interleave for PMEM. */
+     nfit_memdev->interleave_ways = cpu_to_le16(1);
++
++    if (nvdimm->unarmed) {
++        nfit_memdev->flags |= cpu_to_le16(ACPI_NFIT_MEM_NOT_ARMED);
++    }
+ }
+ 
+ /*
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 618c3d677b..61e677f92f 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
++#include "qapi-visit.h"
+ #include "hw/mem/nvdimm.h"
+ 
+ static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
+@@ -64,11 +65,36 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
++static bool nvdimm_get_unarmed(Object *obj, Error **errp)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(obj);
++
++    return nvdimm->unarmed;
++}
++
++static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(obj);
++    Error *local_err = NULL;
++
++    if (memory_region_size(&nvdimm->nvdimm_mr)) {
++        error_setg(&local_err, "cannot change property value");
++        goto out;
++    }
++
++    nvdimm->unarmed = value;
++
++ out:
++    error_propagate(errp, local_err);
++}
++
+ static void nvdimm_init(Object *obj)
+ {
+     object_property_add(obj, NVDIMM_LABLE_SIZE_PROP, "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
++    object_property_add_bool(obj, NVDIMM_UNARMED_PROP,
++                             nvdimm_get_unarmed, nvdimm_set_unarmed, NULL);
+ }
+ 
+ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
 -- 
 2.14.3
