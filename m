@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ec2JT-0000kg-Iu
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:00:32 -0500
+	(envelope-from <peterx@redhat.com>) id 1ec2dK-000514-IF
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:21:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ec2JQ-0006kO-H5
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:00:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54366)
+	(envelope-from <peterx@redhat.com>) id 1ec2dF-0005ax-Lk
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:21:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ec2JQ-0006iD-7r
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:00:28 -0500
-Date: Thu, 18 Jan 2018 13:00:22 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ec2dF-0005Zl-FS
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:20:57 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 56B9DC0587C9
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 05:20:56 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180118050022.GE16100@xz-mi>
-References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-	<1516112253-14480-9-git-send-email-pbonzini@redhat.com>
-	<CAJ+F1CL9Zno3VGjqavPBXz3p1e_iTSLvi6+PYG2nkUazVaFFVw@mail.gmail.com>
+Date: Thu, 18 Jan 2018 13:20:49 +0800
+Message-Id: <20180118052049.31119-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CL9Zno3VGjqavPBXz3p1e_iTSLvi6+PYG2nkUazVaFFVw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 08/51] chardev: introduce
- qemu_chr_timeout_add_ms()
+Subject: [Qemu-devel] [PATCH] chardev: fix incorrect unref of source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Wed, Jan 17, 2018 at 05:21:40PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Tue, Jan 16, 2018 at 3:16 PM, Paolo Bonzini <pbonzini@redhat.com> wr=
-ote:
-> > From: Peter Xu <peterx@redhat.com>
-> >
-> > It's a replacement of g_timeout_add[_seconds]() for chardevs.  Charde=
-vs
-> > now can have dedicated gcontext, we should always bind chardev tasks
-> > onto those gcontext rather than the default main context.  Since ther=
-e
-> > are quite a few of g_timeout_add[_seconds]() callers, a new function
-> > qemu_chr_timeout_add_ms() is introduced.
-> >
-> > One thing to mention is that, terminal3270 is still always running on
-> > main gcontext.  However let's convert that as well since it's still p=
-art
-> > of chardev codes and in case one day we'll miss that when we move it =
-out
-> > of main gcontext too.
-> >
-> > Also, convert all the timers from GSource tags into GSource pointers.
-> > Gsource tag IDs and g_source_remove()s can only work with default
-> > gcontext, while now these GSources can logically be attached to other
-> > contexts.  So let's use explicit g_source_destroy() plus another
-> > g_source_unref() to remove a timer.
-> >
-> > Note: when in the timer handler, we don't need the g_source_destroy()
-> > any more since that'll be done automatically if the timer handler
-> > returns false (and that's what all the current handlers do).
-> >
-> > Yet another note: in pty_chr_rearm_timer() we take special care for
-> > ms=3D1000.  This patch merged the two cases into one.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > Message-Id: <20180104141835.17987-4-peterx@redhat.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  chardev/char-pty.c     | 43 +++++++++++++++++++---------------------=
+glib reported error when pty chardev used:
+
+$ ./qemu-system-x86_64 -chardev pty,id=3Dfoo -device isa-serial,chardev=3D=
+foo
+qemu-system-x86_64: -chardev pty,id=3Dfoo: char device redirected to /dev=
+/pts/2 (label foo)
+(qemu-system-x86_64:27885): GLib-CRITICAL **: g_source_unref: assertion '=
+source !=3D NULL' failed
+(qemu-system-x86_64:27885): GLib-CRITICAL **: g_source_unref: assertion '=
+source !=3D NULL' failed
+
+This patch fixes that.
+
+Fixes: 2c716ba150 ("chardev: introduce qemu_chr_timeout_add_ms()")
+CC: Paolo Bonzini <pbonzini@redhat.com>
+Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
-> >  chardev/char-socket.c  | 28 ++++++++++++++++++----------
-> >  chardev/char.c         | 18 ++++++++++++++++++
-> >  hw/char/terminal3270.c | 28 ++++++++++++++++------------
-> >  include/chardev/char.h |  3 +++
-> >  5 files changed, 74 insertions(+), 46 deletions(-)
-> >
-> > diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-> > index 8248e36..89315e6 100644
-> > --- a/chardev/char-pty.c
-> > +++ b/chardev/char-pty.c
-> > @@ -42,7 +42,7 @@ typedef struct {
-> >
-> >      /* Protected by the Chardev chr_write_lock.  */
-> >      int connected;
-> > -    guint timer_tag;
-> > +    GSource *timer_src;
-> >      GSource *open_source;
-> >  } PtyChardev;
-> >
-> > @@ -57,7 +57,8 @@ static gboolean pty_chr_timer(gpointer opaque)
-> >      PtyChardev *s =3D PTY_CHARDEV(opaque);
-> >
-> >      qemu_mutex_lock(&chr->chr_write_lock);
-> > -    s->timer_tag =3D 0;
-> > +    s->timer_src =3D NULL;
-> > +    g_source_unref(s->open_source);
->=20
-> why that line ^ ? It adds criticals every second (for ex with -chardev
-> pty,id=3Dfoo -device isa-serial,chardev=3Dfoo).
+ chardev/char-pty.c | 38 +++++++++++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 17 deletions(-)
 
-My fault.  I must have had a wrong rebase somehow after switching to
-GSource pointers while kept the compiling happy.  I'll post a fix
-soon.  Sorry!
-
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index 89315e6807..68fd4e20c3 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -51,15 +51,32 @@ typedef struct {
+ static void pty_chr_update_read_handler_locked(Chardev *chr);
+ static void pty_chr_state(Chardev *chr, int connected);
+=20
++static void pty_chr_timer_cancel(PtyChardev *s)
++{
++    if (s->timer_src) {
++        g_source_destroy(s->timer_src);
++        g_source_unref(s->timer_src);
++        s->timer_src =3D NULL;
++    }
++}
++
++static void pty_chr_open_src_cancel(PtyChardev *s)
++{
++    if (s->open_source) {
++        g_source_destroy(s->open_source);
++        g_source_unref(s->open_source);
++        s->open_source =3D NULL;
++    }
++}
++
+ static gboolean pty_chr_timer(gpointer opaque)
+ {
+     struct Chardev *chr =3D CHARDEV(opaque);
+     PtyChardev *s =3D PTY_CHARDEV(opaque);
+=20
+     qemu_mutex_lock(&chr->chr_write_lock);
+-    s->timer_src =3D NULL;
+-    g_source_unref(s->open_source);
+-    s->open_source =3D NULL;
++    pty_chr_timer_cancel(s);
++    pty_chr_open_src_cancel(s);
+     if (!s->connected) {
+         /* Next poll ... */
+         pty_chr_update_read_handler_locked(chr);
+@@ -68,15 +85,6 @@ static gboolean pty_chr_timer(gpointer opaque)
+     return FALSE;
+ }
+=20
+-static void pty_chr_timer_cancel(PtyChardev *s)
+-{
+-    if (s->timer_src) {
+-        g_source_destroy(s->timer_src);
+-        g_source_unref(s->timer_src);
+-        s->timer_src =3D NULL;
+-    }
+-}
+-
+ /* Called with chr_write_lock held.  */
+ static void pty_chr_rearm_timer(Chardev *chr, int ms)
+ {
+@@ -195,11 +203,7 @@ static void pty_chr_state(Chardev *chr, int connecte=
+d)
+     PtyChardev *s =3D PTY_CHARDEV(chr);
+=20
+     if (!connected) {
+-        if (s->open_source) {
+-            g_source_destroy(s->open_source);
+-            g_source_unref(s->open_source);
+-            s->open_source =3D NULL;
+-        }
++        pty_chr_open_src_cancel(s);
+         remove_fd_in_watch(chr);
+         s->connected =3D 0;
+         /* (re-)connect poll interval for idle guests: once per second.
 --=20
-Peter Xu
+2.14.3
