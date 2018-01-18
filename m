@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH4m-0004jL-C9
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:21 -0500
+	(envelope-from <mst@redhat.com>) id 1ecH4x-0004tX-UD
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ecH4j-0004Rb-8Y
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43672)
+	(envelope-from <mst@redhat.com>) id 1ecH4u-0004gm-S4
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55690)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH4i-0004Ql-VL
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:17 -0500
-Date: Thu, 18 Jan 2018 22:46:13 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ecH4u-0004gB-Is
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:46:28 -0500
+Date: Thu, 18 Jan 2018 22:46:16 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516308132-10272-21-git-send-email-mst@redhat.com>
+Message-ID: <1516308132-10272-22-git-send-email-mst@redhat.com>
 References: <1516308132-10272-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v4 20/29] vhost-user-test: use init_virtio_dev
- in multiqueue test
+Subject: [Qemu-devel] [PULL v4 21/29] x86_iommu: Move machine check to
+ x86_iommu_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +28,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mohammed Gamal <mgamal@redhat.com>, Peter Xu <peterx@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>
 
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
+From: Mohammed Gamal <mgamal@redhat.com>
 
-Now that init_virtio_dev() has been generalized to all cases,
-use it in test_multiqueue() to avoid code duplication.
+Instead of having the same error checks in vtd_realize()
+and amdvi_realize(), move that over to the generic
+x86_iommu_realize().
 
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/vhost-user-test.c | 65 ++++++-------------------------------------=
-------
- 1 file changed, 8 insertions(+), 57 deletions(-)
+ hw/i386/amd_iommu.c   | 13 ++-----------
+ hw/i386/intel_iommu.c | 13 ++-----------
+ hw/i386/x86-iommu.c   | 13 +++++++++++++
+ 3 files changed, 17 insertions(+), 22 deletions(-)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 6a144e8..ec6ac9d 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -892,79 +892,30 @@ static void test_flags_mismatch(void)
-=20
- #endif
-=20
--static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
--{
--    QVirtioPCIDevice *dev;
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index eeaf0e0..63d46ff 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -1144,18 +1144,9 @@ static void amdvi_realize(DeviceState *dev, Error **err)
+     AMDVIState *s = AMD_IOMMU_DEVICE(dev);
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+     MachineState *ms = MACHINE(qdev_get_machine());
+-    MachineClass *mc = MACHINE_GET_CLASS(ms);
+-    PCMachineState *pcms =
+-        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
+-    PCIBus *bus;
 -
--    dev =3D qvirtio_pci_device_find(bus, VIRTIO_ID_NET);
--    g_assert(dev !=3D NULL);
--    g_assert_cmphex(dev->vdev.device_type, =3D=3D, VIRTIO_ID_NET);
--
--    qvirtio_pci_device_enable(dev);
--    qvirtio_reset(&dev->vdev);
--    qvirtio_set_acknowledge(&dev->vdev);
--    qvirtio_set_driver(&dev->vdev);
--
--    return dev;
--}
--
--static void driver_init(QVirtioDevice *dev)
--{
--    uint32_t features;
--
--    features =3D qvirtio_get_features(dev);
--    features =3D features & ~(QVIRTIO_F_BAD_FEATURE |
--                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
--                            (1u << VIRTIO_RING_F_EVENT_IDX));
--    qvirtio_set_features(dev, features);
--
--    qvirtio_set_driver_ok(dev);
--}
--
--#define PCI_SLOT                0x04
--
- static void test_multiqueue(void)
+-    if (!pcms) {
+-        error_setg(err, "Machine-type '%s' not supported by amd-iommu",
+-                   mc->name);
+-        return;
+-    }
++    PCMachineState *pcms = PC_MACHINE(ms);
++    PCIBus *bus = pcms->bus;
+ 
+-    bus = pcms->bus;
+     s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
+                                      amdvi_uint64_equal, g_free, g_free);
+ 
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 4e8642e..2e841cd 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3052,20 +3052,11 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+ static void vtd_realize(DeviceState *dev, Error **errp)
  {
--    const int queues =3D 2;
-     TestServer *s =3D test_server_new("mq");
--    QVirtioPCIDevice *dev;
--    QPCIBus *bus;
--    QVirtQueuePCI *vq[queues * 2];
--    QGuestAllocator *alloc;
-     char *cmd;
--    int i;
+     MachineState *ms = MACHINE(qdev_get_machine());
+-    MachineClass *mc = MACHINE_GET_CLASS(ms);
+-    PCMachineState *pcms =
+-        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
+-    PCIBus *bus;
++    PCMachineState *pcms = PC_MACHINE(ms);
++    PCIBus *bus = pcms->bus;
+     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+ 
+-    if (!pcms) {
+-        error_setg(errp, "Machine-type '%s' not supported by intel-iommu",
+-                   mc->name);
+-        return;
+-    }
 -
--    s->queues =3D queues;
-+    uint32_t features_mask =3D ~(QVIRTIO_F_BAD_FEATURE |
-+                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
-+                            (1u << VIRTIO_RING_F_EVENT_IDX));
-+    s->queues =3D 2;
-     test_server_listen(s);
-=20
-     cmd =3D g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",=
-queues=3D%d "
-                           "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,=
-vectors=3D%d",
-                           512, 512, root, s->chr_name,
-                           s->socket_path, "", s->chr_name,
--                          queues, queues * 2 + 2);
-+                          s->queues, s->queues * 2 + 2);
-     qtest_start(cmd);
-     g_free(cmd);
-=20
--    bus =3D qpci_init_pc(NULL);
--    dev =3D virtio_net_pci_init(bus, PCI_SLOT);
-+    init_virtio_dev(s, features_mask);
-=20
--    alloc =3D pc_alloc_init();
--    for (i =3D 0; i < queues * 2; i++) {
--        vq[i] =3D (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, alloc, i=
-);
--    }
-+    wait_for_rings_started(s, s->queues * 2);
-=20
--    driver_init(&dev->vdev);
--    wait_for_rings_started(s, queues * 2);
-+    uninit_virtio_dev(s);
-=20
--    /* End test */
--    for (i =3D 0; i < queues * 2; i++) {
--        qvirtqueue_cleanup(dev->vdev.bus, &vq[i]->vq, alloc);
--    }
--    pc_alloc_uninit(alloc);
--    qvirtio_pci_device_disable(dev);
--    g_free(dev->pdev);
--    g_free(dev);
--    qpci_free_pc(bus);
-     qtest_end();
-=20
-     test_server_free(s);
---=20
+-    bus = pcms->bus;
+     x86_iommu->type = TYPE_INTEL;
+ 
+     if (!vtd_decide_config(s, errp)) {
+diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+index 293caf8..51de519 100644
+--- a/hw/i386/x86-iommu.c
++++ b/hw/i386/x86-iommu.c
+@@ -21,6 +21,8 @@
+ #include "hw/sysbus.h"
+ #include "hw/boards.h"
+ #include "hw/i386/x86-iommu.h"
++#include "hw/i386/pc.h"
++#include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ 
+@@ -80,7 +82,18 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
+ {
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+     X86IOMMUClass *x86_class = X86_IOMMU_GET_CLASS(dev);
++    MachineState *ms = MACHINE(qdev_get_machine());
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    PCMachineState *pcms =
++        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
+     QLIST_INIT(&x86_iommu->iec_notifiers);
++
++    if (!pcms) {
++        error_setg(errp, "Machine-type '%s' not supported by IOMMU",
++                   mc->name);
++        return;
++    }
++
+     if (x86_class->realize) {
+         x86_class->realize(dev, errp);
+     }
+-- 
 MST
