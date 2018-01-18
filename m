@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecC1L-00059u-Kf
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:22:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1ecC8R-00088n-GU
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecC1K-0005lU-Pe
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:22:27 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:33508)
+	(envelope-from <bounces@canonical.com>) id 1ecC8O-00020o-On
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:29:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54882)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecC1K-0005ks-LG
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:22:26 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id x15so20381831ote.0
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 07:22:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ecC8O-0001zw-IE
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 10:29:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ecC8L-0001ya-Oe
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 15:29:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 142592E8555
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 15:29:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180118021000.27203-1-ehabkost@redhat.com>
-References: <20180118021000.27203-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jan 2018 15:22:05 +0000
-Message-ID: <CAFEAcA_JX_eevQL3kM2Kvf_Z3+xTiDRkg6C-EknfMtj_-cRA1g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/19] machine queue, 2018-01-18
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jan 2018 15:17:04 -0000
+From: Thomas Huth <1385934@bugs.launchpad.net>
+Reply-To: Bug 1385934 <1385934@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141026182810.4047.56419.malonedeb@soybean.canonical.com>
+Message-Id: <151628862466.10907.11061110593426292646.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1385934] Re: USB with passthrougth guest cannot
+ enumerate USB host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 18 January 2018 at 02:09, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
->
-> for you to fetch changes up to 901cc8d31f36ac82824ab68f656ab7050404100c:
->
->   fw_cfg: fix memory corruption when all fw_cfg slots are used (2018-01-17 23:04:37 -0200)
->
-> ----------------------------------------------------------------
-> machine queue, 2018-01-18
->
-> ----------------------------------------------------------------
-
-Hi. I'm afraid this doesn't build on 32-bit hosts, due to a
-format string problem:
-
-In file included from /home/peter.maydell/qemu/exec.c:20:0:
-/home/peter.maydell/qemu/exec.c: In function 'file_ram_alloc':
-/home/peter.maydell/qemu/include/qapi/error.h:162:25: error: format
-'%llx' expects argument of type 'long long unsigned int', but argument
-7 has type 'size_t {aka unsigned int}' [-Werror=format=]
-                         (fmt), ## __VA_ARGS__)
-                         ^
-/home/peter.maydell/qemu/exec.c:1616:9: note: in expansion of macro 'error_setg'
-         error_setg(errp, "aligment 0x%" PRIx64
-         ^
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
 
-thanks
--- PMM
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1385934
+
+Title:
+  USB with passthrougth guest cannot enumerate USB host
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Following the guide at http://www.linux-kvm.org/page/USB_Host_Device_Assi=
+gned_to_Guest
+  Qemu is launched with qemu-system-x86_64 /dev/vgstripe/kvm_wifi -enable-k=
+vm -m 512 -k fr -net nic -net tap,ifname=3Dtap1,script=3D/bin/ifup.script -=
+kernel /usr/src/linux_git/arch/x86_64/boot/bzImage -append root=3D/dev/sda =
+-usb -device usb-host,hostbus=3D1,hostaddr=3D6
+  The USB device does not show and USB stack seems not working
+  On the guest:
+  dmesg |grep -i usb
+  [    1.416966] hub 1-0:1.0: USB hub found
+  [    1.420431] usbcore: registered new interface driver usb-storage
+  [    1.445374] usbcore: registered new interface driver usbhid
+  [    1.446839] usbhid: USB HID core driver
+  [    1.863226] usb 1-1: new low-speed USB device number 2 using uhci_hcd
+  [    2.126173] usb 1-1: Invalid ep0 maxpacket: 64
+  [    2.373161] usb 1-1: new low-speed USB device number 3 using uhci_hcd
+  [    2.648112] usb 1-1: Invalid ep0 maxpacket: 64
+  [    2.892404] usb 1-1: new low-speed USB device number 4 using uhci_hcd
+  [    2.913001] usb 1-1: Invalid ep0 maxpacket: 64
+  [    3.161367] usb 1-1: new low-speed USB device number 5 using uhci_hcd
+  [    3.180070] usb 1-1: Invalid ep0 maxpacket: 64
+  [    3.181633] usb usb1-port1: unable to enumerate USB device
+  lsusb
+  Bus 001 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+
+  On the host:
+  lsusb
+  Bus 001 Device 006: ID 0457:0163 Silicon Integrated Systems Corp. SiS163U=
+ 802.11 Wireless LAN Adapter
+  qemu-system-x86_64 --version
+  QEMU emulator version 2.1.2, Copyright (c) 2003-2008 Fabrice Bellard
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1385934/+subscriptions
