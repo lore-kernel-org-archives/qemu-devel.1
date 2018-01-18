@@ -1,36 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1ec2pv-0003wZ-4W
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:34:04 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ec30A-0006f0-Jt
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:44:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1ec2pr-0000sd-7F
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:34:03 -0500
-Received: from mga03.intel.com ([134.134.136.65]:57326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1ec2pq-0000qy-LY
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:33:59 -0500
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Thu, 18 Jan 2018 05:33:53 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
-References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
-	<20180112142252.GG6646@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
-	<97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
-	<20180115140455.GN6646@localhost.localdomain>
-	<20180115142518.GN1602429@orkuz.home>
-	<20180115143156.GO6646@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
-	<20180116115113.GA627@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
-	<20180118024232.GT627@localhost.localdomain>
-In-Reply-To: <20180118024232.GT627@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <aik@ozlabs.ru>) id 1ec307-00023K-Er
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:44:38 -0500
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:34322)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ec307-00022Z-87
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:44:35 -0500
+Received: by mail-io0-x241.google.com with SMTP id c17so23553691iod.1
+	for <qemu-devel@nongnu.org>; Wed, 17 Jan 2018 21:44:35 -0800 (PST)
+References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
+	<20180115063235.7518-7-sjitindarsingh@gmail.com>
+	<20180118052029.GR30352@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <0cdab21f-0f70-f705-9ae3-e95eea69f65e@ozlabs.ru>
+Date: Thu, 18 Jan 2018 16:44:28 +1100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
- Trace feature support
+In-Reply-To: <20180118052029.GR30352@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="17bnbD61oBn53hL2OFCDzMSIIV66P9CZ8"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 6/6]
+ target/ppc/spapr: Add H-Call H_GET_CPU_CHARACTERISTICS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,144 +32,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-> > > > > > On Mon, Jan 15, 2018 at 12:04:55 -0200, Eduardo Habkost wrote:
-> > > > > > > CCing libvirt developers.
-> > > > > > ...
-> > > > > > > This case is slightly more problematic, however: the new
-> > > > > > > feature is actually migratable (under very controlled
-> > > > > > > circumstances) because of patch 2/2, but it is not
-> > > > > > > migration-safe[1].  This means libvirt shouldn't include it
-> > > > > > > in "host-model" expansion (which uses the
-> > > > > > > query-cpu-model-expansion QMP command) until we make the feat=
-ure migration-safe.
-> > > > > > >
-> > > > > > > For QEMU, this means the feature shouldn't be returned by
-> > > > > > > "query-cpu-model-expansion type=3Dstatic model=3Dmax" (but it
-> > > > > > > can be returned by "query-cpu-model-expansion type=3Dfull mod=
-el=3Dmax").
-> > > > > > >
-> > > > > > > Jiri, it looks like libvirt uses type=3Dfull on
-> > > > > > > query-cpu-model-expansion on x86.  It needs to use
-> > > > > > > type=3Dstatic[2], or it will have no way to find out if a
-> > > > > > > feature is migration-safe or not.
-> > > > > > ...
-> > > > > > > [2] It looks like libvirt uses type=3Dfull because it wants t=
-o get
-> > > > > > >     all QOM property aliases returned.  In this case, one
-> > > > > > >     solution for libvirt is to use:
-> > > > > > >
-> > > > > > >     static_expansion =3D query_cpu_model_expansion(type=3Dsta=
-tic, model)
-> > > > > > >     all_props =3D query_cpu_model_expansion(type=3Dfull,
-> > > > > > > static_expansion)
-> > > > > >
-> > > > > > This is exactly what libvirt is doing (with model =3D "host")
-> > > > > > ever since query-cpu-model-expansion support was implemented fo=
-r x86.
-> > > > >
-> > > > > Oh, now I see that the x86 code uses
-> > > > > QEMU_MONITOR_CPU_MODEL_EXPANSION_STATIC_FULL and not just QEMU_MO=
-NITOR_CPU_MODEL_EXPANSION_FULL.
-> > > Nice!
-> > > > >
-> > > >
-> > > > So, I need to add Intel PT feature in "X86CPUDefinition
-> > > > builtin_x86_defs[]" so that we can get this CPUID in specific CPU
-> > > > model not only "-cpu host". Is that right?
-> > >
-> > > The problem is that you won't be able to add intel-pt to any CPU
-> > > model unless the feature is made migration-safe (by not calling
-> > > kvm_arch_get_supported_cpuid() from cpu_x86_cpuid()).
-> >
-> > Hi Eduardo,
-> >     Have some question need you help clear. What is
-> >     "migration-safe" feature mean? I find all the feature which
-> >     included in CPU model (builtin_x86_defs[]) will make
-> >     "xcc->migration_safe =3D true;" in
-> >     x86_cpu_cpudef_class_init(). If create a Skylake guest on
-> >     Skylake HW and live migrate this guest to another machine
-> >     with old HW(e.g Haswell). Can we think the new feature or
-> >     cpu model(Skylake guest) which only supported in Skylake HW
-> >     is safe?
->=20
-> I mean matching the requirements so we can say the feature is migration-s=
-afe, that means exposing the same CPUID data to the
-> guest on any host, if the machine-type + command-line is the same.  The d=
-ata on CPUID[7] is OK (it changes according to the
-> command-line options only), but the data exposed on CPUID[14h] on this pa=
-tch is not migration-safe (it changes depending on the
-> host it is running).
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--17bnbD61oBn53hL2OFCDzMSIIV66P9CZ8
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <0cdab21f-0f70-f705-9ae3-e95eea69f65e@ozlabs.ru>
+Subject: Re: [Qemu-ppc] [QEMU-PPC] [PATCH V3 6/6] target/ppc/spapr: Add H-Call
+ H_GET_CPU_CHARACTERISTICS
+References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
+ <20180115063235.7518-7-sjitindarsingh@gmail.com>
+ <20180118052029.GR30352@umbus.fritz.box>
+In-Reply-To: <20180118052029.GR30352@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Many thanks for your clarification.  I think I have understood. But CPUID[1=
-4h] is depend on CPUID[7].EBX[bit25] and it would be zero if CPUID[7].EBX[b=
-it25] is not set. Or what you concerned is make live migration on two diffe=
-rent HW which all support Intel PT virtualization but have different  CPUID=
-[14h] result? This may need to think about.
+On 18/01/18 16:20, David Gibson wrote:
+> On Mon, Jan 15, 2018 at 05:32:35PM +1100, Suraj Jitindar Singh wrote:
+>> The new H-Call H_GET_CPU_CHARACTERISTICS is used by the guest to query=
 
-Thanks,
-Luwei Kang
+>> behaviours and available characteristics of the cpu.
+>>
+>> Implement the handler for this new H-Call which formulates its respons=
+e
+>> based on the setting of the spapr_caps cap-cfpc, cap-sbbc and cap-ibs.=
 
+>>
+>> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>> ---
+>>  hw/ppc/spapr_hcall.c   | 66 +++++++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  include/hw/ppc/spapr.h |  1 +
+>>  2 files changed, 67 insertions(+)
+>>
+>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+>> index 51eba52e86..a693d3b852 100644
+>> --- a/hw/ppc/spapr_hcall.c
+>> +++ b/hw/ppc/spapr_hcall.c
+>> @@ -1654,6 +1654,69 @@ static target_ulong h_client_architecture_suppo=
+rt(PowerPCCPU *cpu,
+>>      return H_SUCCESS;
+>>  }
+>> =20
+>> +static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+>> +                                              sPAPRMachineState *spap=
+r,
+>> +                                              target_ulong opcode,
+>> +                                              target_ulong *args)
+>> +{
+>> +    uint64_t characteristics =3D H_CPU_CHAR_HON_BRANCH_HINTS &
+>> +			       ~H_CPU_CHAR_THR_RECONF_TRIG;
+>> +    uint64_t behaviour =3D H_CPU_BEHAV_FAVOUR_SECURITY;
+>> +    uint8_t safe_cache =3D spapr_get_cap(spapr, SPAPR_CAP_CFPC);
+>> +    uint8_t safe_bounds_check =3D spapr_get_cap(spapr, SPAPR_CAP_SBBC=
+);
+>> +    uint8_t safe_indirect_branch =3D spapr_get_cap(spapr, SPAPR_CAP_I=
+BS);
+>> +
+>> +    switch (safe_cache) {
+>> +    case SPAPR_CAP_WORKAROUND:
+>> +        characteristics |=3D H_CPU_CHAR_L1D_FLUSH_ORI30;
+>> +        characteristics |=3D H_CPU_CHAR_L1D_FLUSH_TRIG2;
+>> +        characteristics |=3D H_CPU_CHAR_L1D_THREAD_PRIV;
+>> +        behaviour |=3D H_CPU_BEHAV_L1D_FLUSH_PR;
+>> +        break;
+>> +    case SPAPR_CAP_FIXED:
+>> +        break;
+>> +    default: /* broken */
+>> +        if (safe_cache !=3D SPAPR_CAP_BROKEN) {
 >=20
-> >
-> > >
-> > > What's missing here is to either: (a) make cpu_x86_cpuid() return
-> > > host-independent data (it can be constant, or it can be configurable =
-on the command-line); or (b) add a mechanism to skip intel-
-> pt from "query-cpu-model-expansion type=3Dstatic".
-> >
-> > =3D=3D> it can be constant:
-> >     I think it shouldn't be constant because Intel PT virtualization ca=
-n only supported in Ice Lake hardware now. Intel PT cpuid info
-> would be mask off on old platform.
-> > =3D=3D> or it can be configurable on the command-line:
-> >     Because of I didn't add this feature in any CPU model. We only can =
-enable this feature by "-cpu Skylake-Server,+intel-pt" at
-> present.
->=20
-> Note that I'm talking about CPUID[14h], not CPUID[7].  The CPUID[7] bits =
-are safe because they are set according to the CPU model
-> + command-line options only.  The bits on CPUID[14h] change depending on =
-the host and are not migration-safe.  CPUID[7].EBX[bit
-> 25] is just the (already configurable) bit that enables the migration-uns=
-afe code for CPUID[14h].
->=20
-> >
-> > What about add a new cpu model name "Icelake" and add PT in this. Is th=
-at would be migration safe?
->=20
-> It won't, because of the CPUID[14h] code that makes it unsafe to migrate =
-between hosts with different Intel-PT capabilities (i.e.
-> different data on CPUID[14h]).
->=20
->=20
-> >
-> > Thanks,
-> > Luwei Kang
-> >
-> > > Probably
-> > > (a) is easier to implement, and it also makes the feature more useful=
- (by making it migration-safe).
-> > >
-> > > >
-> > > > Intel PT is first supported in Intel Core M and 5th generation
-> > > > Intel Core processors that are based on the Intel
-> > > > micro-architecture code name Broadwell but Intel PT use EPT is firs=
-t supported in Ice Lake.
-> > > > Intel PT virtualization depend on PT use EPT.  I will add Intel PT
-> > > > to "Broadwell" CPU model and later to make sure a "Broadwell"
-> > > > guest can use Intel PT if the host is Ice Lake.
-> > >
-> > > The "if the host is Ice Lake" part is problematic.  On
-> > > migration-safe CPU models (all of them except "max" and "host"), the =
-data seen on CPUID can't depend on the host at all.  It
-> should depend only on the machine-type + command-line options.
-> > >
-> > > --
-> > > Eduardo
->=20
-> --
-> Eduardo
+> I think you just assert() for this.  The only way these could get a
+> different value is if there's a bug elsewhere.
+
+
+Why not return H_HARDWARE or other error?
+
+
+
+--=20
+Alexey
+
+
+--17bnbD61oBn53hL2OFCDzMSIIV66P9CZ8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlpgNDwOHGFpa0Bvemxh
+YnMucnUACgkQhhM92CvBILlzlRAAr4trxrFNvoq5/3aokZDnh0PreXbX83aGsas0
+x1WXjssFeMB+Qq8p2o5DeFn2PzbuNtNCIRXp/xgrPEeUgCJZlbGfuZUXaTxFNMwQ
+sCbUwm8Iz2FhPosjbV+4hcUnhEF5oPOJ1KiYwqykFffunHjhbjx0jfxbgxPZ2+SZ
+BUv5yejtOd7tv/bc0XhU3JfflEofJdP0nAHL3TR+Lb2UaI5zW0frhdd6kQgepVVh
+24K+Wpi+gjjGOYfhBR9WchXzaKtgjCkp8WY3cNXrg9ARyCM9IWk63EFs2CLj+ttm
+aG0serEY+RaNc2Y7UibVqyF+p+cFIB2Qek1hpbqzjLErk9e60+B46hW2O3ieEwX7
++1SZJfRNspo4akpR6XgZSx2DBUCNHYdqdZPlbsbGGn0qO86QSNcaJT0VAhMM52gP
+t19eJ7ko2xhsBGfxEQTS2FD/jreHx2cmc9AhZbO1e+TdscJ15G7wsThBJK8CvU+0
+EPTF1clGcTHrkzwHNWgXa5B0IlDVx3WRGE0UK/QjhSJ5KeH1cpHoK5TjJbKKit7x
+WeQG5b7qukvyyaaV9SxInmmJkLCJRCsjl6tOjkSdV+Pozn9OrhRXHnW8M+eBsxUK
+r2SFNKZJ6kQlV83kVMFeFuMIW/BtaDddtUk9KlqTwkWHjX6k31fb/0dIP41M+tNI
+nDnUv1Y=
+=Lj21
+-----END PGP SIGNATURE-----
+
+--17bnbD61oBn53hL2OFCDzMSIIV66P9CZ8--
