@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ecGLi-0000jO-3D
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:59:47 -0500
+	(envelope-from <dan.j.williams@intel.com>) id 1ecGXQ-0005VW-6U
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:11:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ecGLf-0006ci-2R
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:59:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45223)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ecGLe-0006cH-PQ
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 14:59:42 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 258902DA9B8
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 19:59:41 +0000 (UTC)
-Date: Thu, 18 Jan 2018 19:59:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180118195934.GD2660@work-vm>
-References: <20180116180408.11279-1-dgilbert@redhat.com>
-	<20180118213321-mutt-send-email-mst@kernel.org>
+	(envelope-from <dan.j.williams@intel.com>) id 1ecGXP-0005dN-6c
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:11:52 -0500
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:33738)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1ecGXP-0005Zn-0y
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 15:11:51 -0500
+Received: by mail-oi0-x230.google.com with SMTP id y141so16619045oia.0
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 12:11:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180118213321-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v6 0/7] Rework vhost memory region updates
+In-Reply-To: <7b0c4b68-2b37-b20c-b20d-7de35e50ad2a@redhat.com>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
+	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
+	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
+	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
+	<f1ca60cc-5506-a161-b473-f0de363b7e95@redhat.com>
+	<CAPcyv4j9b6ARvKcJkE25eNHatWACscMJTN_kCLSM6D+bfu_msA@mail.gmail.com>
+	<72839100-7fdf-693c-e9c2-348a5add8a56@redhat.com>
+	<1419599412.1747020.1516301689815.JavaMail.zimbra@redhat.com>
+	<CAPcyv4hso5FYCyxYBHRhHvsU+M_wrkQBwVKurK-i6BQYzQduPw@mail.gmail.com>
+	<7b0c4b68-2b37-b20c-b20d-7de35e50ad2a@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 18 Jan 2018 12:11:47 -0800
+Message-ID: <CAPcyv4g_x0Q6eT-SbX-gmy5yWwWrWHCc6vzw3u2SmYYuCMn7gA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +38,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>, Rik van Riel <riel@surriel.com>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Tue, Jan 16, 2018 at 06:04:01PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Hi,
-> >   This patch set reworks the way the vhost code handles changes in
-> > physical address space layout that came from a discussion with Igor.
-> > 
-> > Its intention is to simplify a lot of the update code,
-> > and to make it easier for the postcopy+shared code to
-> > do the hugepage alignments that are needed.
-> > 
-> > Instead of inserting/removing each section during the add/del
-> > callbacks of the listener, we start afresh and build a list
-> > from the add and nop callbacks, then at the end compare the list
-> > we've built with the exisiting list.
-> > 
-> > v6
-> >   Tidy ups from Igor
-> >   The biggest change is moving the 'Move log_dirty check' to be
-> >   the last patch in the set.
-> > 
-> > Dr. David Alan Gilbert (7):
-> >   vhost: Build temporary section list and deref after commit
-> >   vhost: Simplify ring verification checks
-> >   vhost: Merge sections added to temporary list
-> >   vhost: Regenerate region list from changed sections list
-> >   vhost: Clean out old vhost_set_memory and friends
-> >   vhost: Merge and delete unused callbacks
-> >   vhost: Move log_dirty check
-> > 
-> >  hw/virtio/trace-events    |   6 +
-> >  hw/virtio/vhost.c         | 497 ++++++++++++++++------------------------------
-> >  include/hw/virtio/vhost.h |   5 +-
-> >  3 files changed, 180 insertions(+), 328 deletions(-)
-> 
-> 
-> Seems to trigger errors with clang runtime sanitizer:
-> 
-> /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
-> /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
-> /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
-> /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
-> /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
-> /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
-> /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
-> /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> /usr/include/string.h:64:33: note: nonnull attribute specified here
+On Thu, Jan 18, 2018 at 11:51 AM, David Hildenbrand <david@redhat.com> wrote:
+>
+>>> 1] Existing pmem driver & virtio for region discovery:
+>>>   -----------------------------------------------------
+>>>   Use existing pmem driver which is tightly coupled with concepts of namespaces, labels etc
+>>>   from ACPI region discovery and re-implement these concepts with virtio so that existing
+>>>   pmem driver can understand it. In addition to this, task of pmem driver to send flush command
+>>>   using virtio.
+>>
+>> It's not tightly coupled. The whole point of libnvdimm is to be
+>> agnostic to ACPI, e820 or any other range discovery. The only work to
+>> do beyond identifying the address range is teaching libnvdimm to pass
+>> along a flush control interface to the pmem driver.
+>>
+>>>
+>>> 2] Existing pmem driver & ACPI NFIT for region discovery:
+>>>   ----------------------------------------------------------------
+>>> - If we use NFIT ACPI, we need to teach existing ACPI driver to add this new memory
+>>>   type and teach existing pmem driver to handle this new memory type. Still we need
+>>>   an asynchronous(virtio) way to send flush commands. We need virtio device/driver
+>>>   or arbitrary key/value like pair just to send commands from guest to host using virtio.
+>>>
+>>> 3] New Virtio pmem driver & paravirt device:
+>>>  ----------------------------------------
+>>>   Third way is new virtio pmem driver with less work to support existing features of different protocols,
+>>>   and with asynchronous way of sending flush commands.
+>>>
+>>>   But this needs to duplicate some of the work which existing pmem driver does but as discussed
+>>>   previously we can separate common code from existing pmem driver and reuse it.
+>>>
+>>> Among these approaches I also prefer 3].
+>>
+>> I disagree, the reason we went down this ACPI path was to limit the
+>> needless duplication of most of the pmem driver.
+>>
+>
+> I have way to little insight to make qualified statements to different
+> approaches here. :)
+>
+> All I am interesting in is making this as independent of architecture
+> specific technologies (e.g. ACPI) as possible. We will want this e.g.
+> for s390x too. Rather sooner than later. So trying to couple this
+> (somehow) to ACPI just for the sake of less code to copy will not pay of
+> in the long run.
+>
+> Better have a clean virtio interface / design right from the start.
+>
+> So I hope my words will be heard :)
 
-
-How are you running that test? Can you add this printf and tell me what
-it's seeing?
-
-        /* Same size, lets check the contents */
-        fprintf(stderr, "%s: %p %p %d\n", __func__, dev->mem_sections, old_sections, n_old_sections);
-        changed = memcmp(dev->mem_sections, old_sections,
-                         n_old_sections * sizeof(old_sections[0])) != 0;
-
-I'm seeing a bunch of calls where both pointers are NULL, but
-n_old_sections is 0, which feels legal to me.
-
-I guess we could make it:
-   changed = n_old_sections ? memcmp(....) : false;
-just to shut clang up.
-
-Dave
-
-> 
-> 
-> > -- 
-> > 2.14.3
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I think that's reasonable. Once we have the virtio based discovery I
+think the incremental changes to libnvdimm core and the pmem driver
+are small.
