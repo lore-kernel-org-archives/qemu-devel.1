@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecBEJ-0007OA-Q8
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:31:53 -0500
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecBFk-0008Bs-Ru
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:33:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecBEJ-0006zW-1p
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:31:47 -0500
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:36692)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecBEI-0006yk-Rg
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:31:46 -0500
-Received: by mail-ot0-x22f.google.com with SMTP id f100so7654338otf.3
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 06:31:46 -0800 (PST)
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecBFh-0008Lj-HE
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:33:16 -0500
+Received: from mail-he1eur01on0103.outbound.protection.outlook.com
+	([104.47.0.103]:36580
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <klim.kireev@virtuozzo.com>)
+	id 1ecBFg-0008Je-Cj
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:33:13 -0500
+From: Klim Kireev <klim.kireev@virtuozzo.com>
+Date: Thu, 18 Jan 2018 17:33:01 +0300
+Message-Id: <20180118143301.10864-1-klim.kireev@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL48633TDoSnhv1-iZ0QjWWQsuD1DxJTsniJg+AHbeiT_g@mail.gmail.com>
-References: <20180109122252.17670-1-alex.bennee@linaro.org>
-	<20180109122252.17670-11-alex.bennee@linaro.org>
-	<1393deaf-c207-6055-1f7c-f7ae814cf2db@amsat.org>
-	<87shb3nwkc.fsf@linaro.org>
-	<CAAdtpL48633TDoSnhv1-iZ0QjWWQsuD1DxJTsniJg+AHbeiT_g@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jan 2018 14:31:25 +0000
-Message-ID: <CAFEAcA8bEPohja9fw-5_BUnfExX4KA_syce8dpdD=trShV=qAg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/20] fpu/softfloat: define decompose
- structures
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] chardev/char-socket: add POLLHUP handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +26,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Francisco Iglesias <frasse.iglesias@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Dutcher <andrew@andrewdutcher.com>, bharata@linux.vnet.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@virtuozzo.com, marcandre.lureau@redhat.com
 
-On 18 January 2018 at 14:26, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->
->
-> Le 18 janv. 2018 10:09 AM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> a =
-=C3=A9crit :
->
->
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->>> +typedef struct {
->>> +    uint64_t frac   : 64;
->>
->> I think this does not work on LLP64/IL32P64 model.
->>
->> Should we add a check in ./configure and refuse to build on IL32P64
->> model? This would be safer IMHO.
->>
->>> +    int exp         : 32;
->>> +    float_class cls : 8;
->>> +    int             : 23;
->>> +    bool sign       : 1;
->>
->> checking on "ISO/IEC 14882:1998" 9.6 Bit-fields:
->>
->> Alignment of bit-fields is implementation-defined. Bit-fields are packed
->> into some addressable allocation unit. [Note: bit-fields straddle
->> allocation units on some machines and not on others. Bit-fields are
->> assigned right-to-left on some machines, left-to-right on others. ]
->>
->> I'd still write it:
->>
->>       int             :23, sign :1;
->>
->>> +} decomposed_parts;
->
-> I think rather than stuff it into bit fields we can just leave it up to
-> the compiler?
->
->
-> Yep, my only worry here is the IL32P64 model, if we care.
+The following behavior was observed for QEMU configured by libvirt
+to use guest agent as usual for the guests without virtio-serial
+driver (Windows or the guest remaining in BIOS stage).
 
-I don't think we care much about IL32P64, but the code should
-still work there, right? It doesn't actually make any assumptions
-about bitfield layout.
+In QEMU on first connect to listen character device socket
+the listen socket is removed from poll just after the accept().
+virtio_serial_guest_ready() returns 0 and the descriptor
+of the connected Unix socket is removed from poll and it will
+not be present in poll() until the guest will initialize the driver
+and change the state of the serial to "guest connected".
 
-I think I agree that we shouldn't use bitfields here if we don't
-need to, though.
+In libvirt connect() to guest agent is performed on restart and
+is run under VM state lock. Connect() is blocking and can
+wait forever.
+In this case libvirt can not perform ANY operation on that VM.
 
-thanks
--- PMM
+The bug can be easily reproduced this way:
+
+Terminal 1:
+qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
+(virtio-serial and isa-serial also fit)
+
+Terminal 2:
+minicom -D unix\#/tmp/console.sock
+(type something and press enter)
+C-a x (to exit)
+
+Do 3 times:
+minicom -D unix\#/tmp/console.sock
+C-a x
+
+It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
+the kernel, and the 4th blocks.
+
+The problem is that QEMU doesn't add a read watcher after succesful read
+until the guest device wants to acquire recieved data, so
+I propose to install a separate pullhup watcher regardless of
+whether the device waits for data or not.
+
+Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+---
+Changelog:
+v2: Remove timer as a redundant feature
+
+ chardev/char-socket.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 77cdf487eb..d3fe903ab6 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -42,6 +42,7 @@ typedef struct {
+     QIOChannel *ioc; /* Client I/O channel */
+     QIOChannelSocket *sioc; /* Client master channel */
+     QIONetListener *listener;
++    guint hup_tag;
+     QCryptoTLSCreds *tls_creds;
+     int connected;
+     int max_size;
+@@ -352,6 +353,11 @@ static void tcp_chr_free_connection(Chardev *chr)
+         s->read_msgfds_num = 0;
+     }
+ 
++    if (s->hup_tag != 0) {
++        g_source_remove(s->hup_tag);
++        s->hup_tag = 0;
++    }
++
+     tcp_set_msgfds(chr, NULL, 0);
+     remove_fd_in_watch(chr);
+     object_unref(OBJECT(s->sioc));
+@@ -455,6 +461,19 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
+     return TRUE;
+ }
+ 
++static gboolean tcp_chr_hup(QIOChannel *channel,
++                               GIOCondition cond,
++                               void *opaque)
++{
++    Chardev *chr = CHARDEV(opaque);
++    SocketChardev *s = SOCKET_CHARDEV(chr);
++    tcp_chr_read(channel, cond, opaque);
++    if (s->connected != 0) {
++        tcp_chr_disconnect(chr);
++    }
++    return TRUE;
++}
++
+ static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+ {
+     SocketChardev *s = SOCKET_CHARDEV(chr);
+@@ -528,6 +547,10 @@ static void tcp_chr_connect(void *opaque)
+                                            tcp_chr_read,
+                                            chr, chr->gcontext);
+     }
++    if (s->hup_tag == 0) {
++        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
++                                           tcp_chr_hup, chr, NULL);
++    }
+     qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+ }
+ 
+@@ -546,7 +569,11 @@ static void tcp_chr_update_read_handler(Chardev *chr)
+                                            tcp_chr_read, chr,
+                                            chr->gcontext);
+     }
+-}
++    if (s->hup_tag == 0) {
++        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
++                                           tcp_chr_hup, chr, NULL);
++    }
++ }
+ 
+ typedef struct {
+     Chardev *chr;
+-- 
+2.14.3
