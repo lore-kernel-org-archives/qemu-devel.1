@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecBFk-0008Bs-Ru
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:33:18 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecBKG-0001s1-6o
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecBFh-0008Lj-HE
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:33:16 -0500
-Received: from mail-he1eur01on0103.outbound.protection.outlook.com
-	([104.47.0.103]:36580
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <klim.kireev@virtuozzo.com>)
-	id 1ecBFg-0008Je-Cj
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:33:13 -0500
-From: Klim Kireev <klim.kireev@virtuozzo.com>
-Date: Thu, 18 Jan 2018 17:33:01 +0300
-Message-Id: <20180118143301.10864-1-klim.kireev@virtuozzo.com>
+	(envelope-from <ehabkost@redhat.com>) id 1ecBKC-0002IL-St
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:37:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecBKC-0002Hd-Iu
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 09:37:52 -0500
+Date: Thu, 18 Jan 2018 12:37:45 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180118143744.GY627@localhost.localdomain>
+References: <20180115140455.GN6646@localhost.localdomain>
+	<20180115142518.GN1602429@orkuz.home>
+	<20180115143156.GO6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
+	<20180116115113.GA627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
+	<20180118024232.GT627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
+	<20180118132415.GU627@localhost.localdomain>
+	<c67f0021-0ca0-413b-bb84-3ff54dd791de@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] chardev/char-socket: add POLLHUP handler
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c67f0021-0ca0-413b-bb84-3ff54dd791de@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@virtuozzo.com, marcandre.lureau@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Kang, Luwei" <luwei.kang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
-The following behavior was observed for QEMU configured by libvirt
-to use guest agent as usual for the guests without virtio-serial
-driver (Windows or the guest remaining in BIOS stage).
+On Thu, Jan 18, 2018 at 02:39:57PM +0100, Paolo Bonzini wrote:
+> On 18/01/2018 14:24, Eduardo Habkost wrote:
+> > However, if there's a simple way to make it possible to migrate
+> > between hosts with different CPUID[14h] data, it would be even
+> > better.  With the current KVM intel-pt implementation, what
+> > happens if the CPUID[14h] data seen by the guest doesn't match
+> > exactly the CPUID[14h] leaves from the host?
+> 
+> Some bits in there can be treated as CPU features (e.g. EBX bit 0 "CR3
+> filtering support").  Probably we should handle these in KVM right now.
+> KVM needs to compute a mask of valid 1 bits for IA32_RTIT_CTL based on
+> CPUID, and apply it when the MSR is written.
 
-In QEMU on first connect to listen character device socket
-the listen socket is removed from poll just after the accept().
-virtio_serial_guest_ready() returns 0 and the descriptor
-of the connected Unix socket is removed from poll and it will
-not be present in poll() until the guest will initialize the driver
-and change the state of the serial to "guest connected".
+Does this mean QEMU can't set CPUID values that won't match the
+host with the existing implementation, or this won't matter for
+well-behaved guests that don't try to set reserved bits on the
+MSRs?
 
-In libvirt connect() to guest agent is performed on restart and
-is run under VM state lock. Connect() is blocking and can
-wait forever.
-In this case libvirt can not perform ANY operation on that VM.
 
-The bug can be easily reproduced this way:
+>                                               It also needs to whitelist
+> bits like we do for other feature words.  These include:
+> 
+> - CPUID[EAX=14h,ECX=0].EBX
+> 
+> - CPUID[EAX=14h,ECX=0].ECX except bit 31
+> 
+> - CPUID[EAX=14h,ECX=1].EAX bits 16:31 (if CPUID[EAX=14h,ECX=0].EBX[3]=1)
+> 
+> - CPUID[EAX=14h,ECX=1].EBX (if CPUID[EAX=14h,ECX=0].EBX[1]=1)
 
-Terminal 1:
-qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
-(virtio-serial and isa-serial also fit)
+What do you mean by whitelist?
 
-Terminal 2:
-minicom -D unix\#/tmp/console.sock
-(type something and press enter)
-C-a x (to exit)
 
-Do 3 times:
-minicom -D unix\#/tmp/console.sock
-C-a x
+> 
+> Others, currently only CPUID[EAX=14h,ECX=0].ECX[31] must match, there is
+> no way to emulate the "wrong" value.
 
-It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
-the kernel, and the 4th blocks.
+In this case we could make it configurable but require the host
+and guest value to always match.
 
-The problem is that QEMU doesn't add a read watcher after succesful read
-until the guest device wants to acquire recieved data, so
-I propose to install a separate pullhup watcher regardless of
-whether the device waits for data or not.
+This might be an obstacle to enabling intel-pt by default
+(because it could make VMs not migratable to newer hosts), but
+may allow the feature to be configured in a predictable
+way.
 
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
----
-Changelog:
-v2: Remove timer as a redundant feature
 
- chardev/char-socket.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+> 
+> Others, currently only CPUID[EAX=14h,ECX=1].EAX[2:0] are numeric values,
+> and it's possible to emulate a lower value than the one in the processor.
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 77cdf487eb..d3fe903ab6 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -42,6 +42,7 @@ typedef struct {
-     QIOChannel *ioc; /* Client I/O channel */
-     QIOChannelSocket *sioc; /* Client master channel */
-     QIONetListener *listener;
-+    guint hup_tag;
-     QCryptoTLSCreds *tls_creds;
-     int connected;
-     int max_size;
-@@ -352,6 +353,11 @@ static void tcp_chr_free_connection(Chardev *chr)
-         s->read_msgfds_num = 0;
-     }
- 
-+    if (s->hup_tag != 0) {
-+        g_source_remove(s->hup_tag);
-+        s->hup_tag = 0;
-+    }
-+
-     tcp_set_msgfds(chr, NULL, 0);
-     remove_fd_in_watch(chr);
-     object_unref(OBJECT(s->sioc));
-@@ -455,6 +461,19 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
-     return TRUE;
- }
- 
-+static gboolean tcp_chr_hup(QIOChannel *channel,
-+                               GIOCondition cond,
-+                               void *opaque)
-+{
-+    Chardev *chr = CHARDEV(opaque);
-+    SocketChardev *s = SOCKET_CHARDEV(chr);
-+    tcp_chr_read(channel, cond, opaque);
-+    if (s->connected != 0) {
-+        tcp_chr_disconnect(chr);
-+    }
-+    return TRUE;
-+}
-+
- static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
- {
-     SocketChardev *s = SOCKET_CHARDEV(chr);
-@@ -528,6 +547,10 @@ static void tcp_chr_connect(void *opaque)
-                                            tcp_chr_read,
-                                            chr, chr->gcontext);
-     }
-+    if (s->hup_tag == 0) {
-+        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
-+                                           tcp_chr_hup, chr, NULL);
-+    }
-     qemu_chr_be_event(chr, CHR_EVENT_OPENED);
- }
- 
-@@ -546,7 +569,11 @@ static void tcp_chr_update_read_handler(Chardev *chr)
-                                            tcp_chr_read, chr,
-                                            chr->gcontext);
-     }
--}
-+    if (s->hup_tag == 0) {
-+        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
-+                                           tcp_chr_hup, chr, NULL);
-+    }
-+ }
- 
- typedef struct {
-     Chardev *chr;
+This could be handled by QEMU.  There's no requirement that all
+GET_SUPPORTED_CPUID values should be validated by simple bit
+masking.
+
+
+> 
+> CPUID[EAX=14h,ECX=0].EAX is the maximum subleaf.  It should be (barring
+> guest bugs) okay to always present leaf 1.
+> 
+> Paolo
+
 -- 
-2.14.3
+Eduardo
