@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ec1vO-0002ja-Sn
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:35:40 -0500
+	(envelope-from <peterx@redhat.com>) id 1ec2JT-0000kg-Iu
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:00:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ec1vN-0007WC-PS
-	for qemu-devel@nongnu.org; Wed, 17 Jan 2018 23:35:38 -0500
-Date: Thu, 18 Jan 2018 15:27:13 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180118042713.GJ30352@umbus.fritz.box>
-References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
-	<1516110433.10494.5.camel@redhat.com>
-	<20180116135459.GN30352@umbus.fritz.box>
-	<1516113980.3278.1.camel@redhat.com>
-	<20180116223413.GQ30352@umbus.fritz.box>
-	<62449abf-fdd1-44f3-4a5c-0695e8607cea@ozlabs.ru>
-	<1516179297.3278.6.camel@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1ec2JQ-0006kO-H5
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:00:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54366)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ec2JQ-0006iD-7r
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 00:00:28 -0500
+Date: Thu, 18 Jan 2018 13:00:22 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180118050022.GE16100@xz-mi>
+References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
+	<1516112253-14480-9-git-send-email-pbonzini@redhat.com>
+	<CAJ+F1CL9Zno3VGjqavPBXz3p1e_iTSLvi6+PYG2nkUazVaFFVw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3qYtBtpdm1/OJWPn"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1516179297.3278.6.camel@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 0/6] target/ppc:
- Rework spapr_caps
+In-Reply-To: <CAJ+F1CL9Zno3VGjqavPBXz3p1e_iTSLvi6+PYG2nkUazVaFFVw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 08/51] chardev: introduce
+ qemu_chr_timeout_add_ms()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-
---3qYtBtpdm1/OJWPn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 17, 2018 at 09:54:57AM +0100, Andrea Bolognani wrote:
-> On Wed, 2018-01-17 at 10:26 +1100, Alexey Kardashevskiy wrote:
-> > On 17/01/18 09:34, David Gibson wrote:
-> > > On Tue, Jan 16, 2018 at 03:46:20PM +0100, Andrea Bolognani wrote:
-> > > > On Wed, 2018-01-17 at 00:54 +1100, David Gibson wrote:
-> > > > > > Correct me if I'm wrong, but it seems to me like there's no way
-> > > > > > to figure out through QMP whether these new machine options can=
- be
-> > > > > > used for a given QEMU binary.
-> > > > >=20
-> > > > > Uh, I don't think so.  These are machine options like any other (=
-just
-> > > > > constructed a bit differently).  So they'll appear in qemu -machi=
-ne
-> > > > > pseries,? and I believe that info can also be retrieved with QMP.
-> > > >=20
-> > > > Yes, they will indeed show up in the output of -machine pseries,?
-> > > > but there's AFAICT no way to retrieve them via QMP.
-> > >=20
-> > > Really!?  I thought introspecting object properties was QMP's bread
-> > > and butter.
-> >=20
-> > On a guest started with '-S':
-> > {"execute": "qom-list", "arguments": {"path": "/machine"}}
-> >=20
-> > returns:
-> > {   'return': [   {'name': 'graphics', 'type': 'bool'},
-> [...]
-> >                   {'name': 'cap-dfp', 'type': 'bool'},
-> >                   {'name': 'cap-htm', 'type': 'bool'},
-> >                   {'name': 'cap-vsx', 'type': 'bool'},
-> >                   {'name': 'vfio-no-msix-emulation', 'type': 'bool'},
-> >                   {'name': 'kvm-type', 'type': 'string'},
-> >                   {'name': 'max-cpu-compat', 'type': 'string'},
-> [...]
-> >                   {'name': 'resize-hpt', 'type': 'string'}]}
-> >=20
-> > but still requires a running qemu, yes.
+On Wed, Jan 17, 2018 at 05:21:40PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
 >=20
-> That's not a problem in itself; however, AFAICT the guest in
-> question also needs to be started with -machine pseries in order
-> for the above to work, which means it's not usable due to the
-> scalability issues mentioned earlier in the thread. We run QEMU
-> with -machine none, a single time, to probe for capabilities.
+> On Tue, Jan 16, 2018 at 3:16 PM, Paolo Bonzini <pbonzini@redhat.com> wr=
+ote:
+> > From: Peter Xu <peterx@redhat.com>
+> >
+> > It's a replacement of g_timeout_add[_seconds]() for chardevs.  Charde=
+vs
+> > now can have dedicated gcontext, we should always bind chardev tasks
+> > onto those gcontext rather than the default main context.  Since ther=
+e
+> > are quite a few of g_timeout_add[_seconds]() callers, a new function
+> > qemu_chr_timeout_add_ms() is introduced.
+> >
+> > One thing to mention is that, terminal3270 is still always running on
+> > main gcontext.  However let's convert that as well since it's still p=
+art
+> > of chardev codes and in case one day we'll miss that when we move it =
+out
+> > of main gcontext too.
+> >
+> > Also, convert all the timers from GSource tags into GSource pointers.
+> > Gsource tag IDs and g_source_remove()s can only work with default
+> > gcontext, while now these GSources can logically be attached to other
+> > contexts.  So let's use explicit g_source_destroy() plus another
+> > g_source_unref() to remove a timer.
+> >
+> > Note: when in the timer handler, we don't need the g_source_destroy()
+> > any more since that'll be done automatically if the timer handler
+> > returns false (and that's what all the current handlers do).
+> >
+> > Yet another note: in pty_chr_rearm_timer() we take special care for
+> > ms=3D1000.  This patch merged the two cases into one.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > Message-Id: <20180104141835.17987-4-peterx@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  chardev/char-pty.c     | 43 +++++++++++++++++++---------------------=
+---
+> >  chardev/char-socket.c  | 28 ++++++++++++++++++----------
+> >  chardev/char.c         | 18 ++++++++++++++++++
+> >  hw/char/terminal3270.c | 28 ++++++++++++++++------------
+> >  include/chardev/char.h |  3 +++
+> >  5 files changed, 74 insertions(+), 46 deletions(-)
+> >
+> > diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+> > index 8248e36..89315e6 100644
+> > --- a/chardev/char-pty.c
+> > +++ b/chardev/char-pty.c
+> > @@ -42,7 +42,7 @@ typedef struct {
+> >
+> >      /* Protected by the Chardev chr_write_lock.  */
+> >      int connected;
+> > -    guint timer_tag;
+> > +    GSource *timer_src;
+> >      GSource *open_source;
+> >  } PtyChardev;
+> >
+> > @@ -57,7 +57,8 @@ static gboolean pty_chr_timer(gpointer opaque)
+> >      PtyChardev *s =3D PTY_CHARDEV(opaque);
+> >
+> >      qemu_mutex_lock(&chr->chr_write_lock);
+> > -    s->timer_tag =3D 0;
+> > +    s->timer_src =3D NULL;
+> > +    g_source_unref(s->open_source);
 >=20
-> I looked further and device-list-properties looks like it would
-> do the trick; however it doesn't seem to work for machines:
->=20
->   {"execute": "device-list-properties",
->    "arguments": {"typename": "spapr-2.11-machine"}}
->   {"error": {"class": "GenericError",
->              "desc": "Parameter 'typename' expects device"}}
->=20
-> It works fine for the likes of virtio-scsi-pci and even
-> power9_v2.0-powerpc64-cpu, though. Any ideas? :)
+> why that line ^ ? It adds criticals every second (for ex with -chardev
+> pty,id=3Dfoo -device isa-serial,chardev=3Dfoo).
 
-I'm guessing it's because machines aren't descended from TYPE_DEVICE.
-
-Dammit.  I really can't see a reasonable way of addressing this other
-than improving qapi in general to have a way of reporting machine
-class properties.  Adding something ad-hoc for just these properties
-of this machine seems like madness.
-
-Nor can I think of a place to put these that would be both sensible
-and more discoverable with existing mechanisms.
+My fault.  I must have had a wrong rebase somehow after switching to
+GSource pointers while kept the compiling happy.  I'll post a fix
+soon.  Sorry!
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---3qYtBtpdm1/OJWPn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpgIiEACgkQbDjKyiDZ
-s5Jj6g/+MC0LaZYqiCfhDE0VqSJ2SKHhqzC1Wu0mMQVgWRbJsk1Za4jcFxCFIRJz
-Q4s80KLivbey9LAzV9PrpCP3elEbGVMsJAl3O3tCeFMRH/BKYiU9zvzGDS94qHOn
-F8l87ukSCidmcmnE7ZVSBB3LVU+SfJ32CvK1ylzg9dqJm0Zfk/13C8wZD+bhxBnY
-KrLFVLoXHK/31olhSdjr7L7Wko1qIWQqAGf3or5yXZAsXKHU4vClaF6QH+60lnfW
-dg+9Lx+vhWel7oe66UMGCqUj5Zw4a164Qp8LWMIMlYDQG2woRze6GurTK5KFyDpe
-TpITEUrmFWNCgLr3CfQHnmOpVFpi0PTS+peSWIcGYbWhkr1IvVd30VQ9I3sr4r7p
-DKJoeuTKfWD/Rch/g9sbwwc4Ex6L0kdn4OVKm5YSBy3sCJVDYNsVCOKzcL+IXlnt
-I6HAwt3GkN1WQdA/TsgPmq53VyUX5vOnssaj19BsSgDHw2US367bBDwSVXjuB0Ra
-3T82AuSE+cO0IqKyHYxwxzH41TG9er2SYEKQa0Mh+JyE/XzBFiKJ/nEzEy59a8zl
-9cO202L+1RD/+nB5ao0XabZ4yFYQmDkshnQVt0mOwszvdHBJPKrzGOfEoUandhGP
-RFvu0dfqYseb6emaw46NJUYFHM5VQ5+wJA69LWtEdfrF6UVuRJU=
-=Ei/U
------END PGP SIGNATURE-----
-
---3qYtBtpdm1/OJWPn--
+Peter Xu
