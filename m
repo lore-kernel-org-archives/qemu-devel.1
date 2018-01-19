@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZez-0007lL-4p
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:03 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecZf4-0007oM-P7
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZex-0007wJ-Uj
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45104)
+	(envelope-from <ehabkost@redhat.com>) id 1ecZf3-0007zo-6L
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecZex-0007w1-Lu
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:55 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecZf2-0007zN-TO
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:01 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 19 Jan 2018 14:33:43 -0200
-Message-Id: <20180119163345.10649-18-ehabkost@redhat.com>
+Date: Fri, 19 Jan 2018 14:33:44 -0200
+Message-Id: <20180119163345.10649-19-ehabkost@redhat.com>
 In-Reply-To: <20180119163345.10649-1-ehabkost@redhat.com>
 References: <20180119163345.10649-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 17/19] nvdimm: add 'unarmed' option
+Subject: [Qemu-devel] [PULL v2 18/19] possible_cpus: add CPUArchId::type
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,167 +25,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-From: Haozhong Zhang <haozhong.zhang@intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Currently the only vNVDIMM backend can guarantee the guest write
-persistence is device DAX on Linux, because no host-side kernel cache
-is involved in the guest access to it. The approach to detect whether
-the backend is device DAX needs to access sysfs, which may not work
-with SELinux.
+Remove dependency of possible_cpus on 1st CPU instance,
+which decouples configuration data from CPU instances that
+are created using that data.
 
-Instead, we add the 'unarmed' option to device 'nvdimm', so that users
-or management utils, which have enough knowledge about the backend,
-can control the unarmed flag in guest ACPI NFIT via this option. The
-guest Linux NVDIMM driver, for example, will mark the corresponding
-vNVDIMM device read-only if the unarmed flag in guest NFIT is set.
+Also later it would be used for enabling early cpu to numa node
+configuration at runtime qmp_query_hotpluggable_cpus() should
+provide a list of available cpu slots at early stage,
+before machine_init() is called and the 1st cpu is created,
+so that mgmt might be able to call it and use output to set
+numa mapping.
 
-The default value of 'unarmed' option is 'off' in order to keep the
-backwards compatibility.
+Use MachineClass::possible_cpu_arch_ids() callback to set
+cpu type info, along with the rest of possible cpu properties,
+to let machine define which cpu type* will be used.
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-Id: <20171211072806.2812-4-haozhong.zhang@intel.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+* for SPAPR it will be a spapr core type and for ARM/s390x/x86
+  a respective descendant of CPUClass.
+
+Move parse_numa_opts() in vl.c after cpu_model is parsed into
+cpu_type so that possible_cpu_arch_ids() would know which
+cpu_type to use during layout initialization.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <1515597770-268979-1-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- docs/nvdimm.txt         | 15 +++++++++++++++
- include/hw/mem/nvdimm.h |  9 +++++++++
- hw/acpi/nvdimm.c        |  7 +++++++
- hw/mem/nvdimm.c         | 26 ++++++++++++++++++++++++++
- 4 files changed, 57 insertions(+)
+ include/hw/boards.h        |  2 ++
+ hw/arm/virt.c              |  3 ++-
+ hw/core/machine.c          | 12 ++++++------
+ hw/i386/pc.c               |  4 +++-
+ hw/ppc/spapr.c             | 13 ++++++++-----
+ hw/s390x/s390-virtio-ccw.c |  1 +
+ vl.c                       |  3 +--
+ 7 files changed, 23 insertions(+), 15 deletions(-)
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 21249dd062..e903d8bb09 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -138,3 +138,18 @@ backend of vNVDIMM:
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 041bc08971..efb0a9edfd 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -83,6 +83,7 @@ void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type);
+  * CPUArchId:
+  * @arch_id - architecture-dependent CPU ID of present or possible CPU
+  * @cpu - pointer to corresponding CPU object if it's present on NULL otherwise
++ * @type - QOM class name of possible @cpu object
+  * @props - CPU object properties, initialized by board
+  * #vcpus_count - number of threads provided by @cpu object
+  */
+@@ -91,6 +92,7 @@ typedef struct {
+     int64_t vcpus_count;
+     CpuInstanceProperties props;
+     Object *cpu;
++    const char *type;
+ } CPUArchId;
  
-  -object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=4G,align=2M
-  -device nvdimm,id=nvdimm1,memdev=mem1
-+
-+Guest Data Persistence
-+----------------------
-+
-+Though QEMU supports multiple types of vNVDIMM backends on Linux,
-+currently the only one that can guarantee the guest write persistence
-+is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
-+which all guest access do not involve any host-side kernel cache.
-+
-+When using other types of backends, it's suggested to set 'unarmed'
-+option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-+guest NVDIMM region mapping structure.  This unarmed flag indicates
-+guest software that this vNVDIMM device contains a region that cannot
-+accept persistent writes. In result, for example, the guest Linux
-+NVDIMM driver, marks such vNVDIMM device as read-only.
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index 28e68ddf59..7fd87c4e1c 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -49,6 +49,7 @@
-                                                TYPE_NVDIMM)
+ /**
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 4a6fdcc4f5..a4537af400 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1359,7 +1359,7 @@ static void machvirt_init(MachineState *machine)
+             break;
+         }
  
- #define NVDIMM_LABLE_SIZE_PROP "label-size"
-+#define NVDIMM_UNARMED_PROP    "unarmed"
+-        cpuobj = object_new(machine->cpu_type);
++        cpuobj = object_new(possible_cpus->cpus[n].type);
+         object_property_set_int(cpuobj, possible_cpus->cpus[n].arch_id,
+                                 "mp-affinity", NULL);
  
- struct NVDIMMDevice {
-     /* private */
-@@ -74,6 +75,14 @@ struct NVDIMMDevice {
-      * guest via ACPI NFIT and _FIT method if NVDIMM hotplug is supported.
-      */
-     MemoryRegion nvdimm_mr;
-+
-+    /*
-+     * The 'on' value results in the unarmed flag set in ACPI NFIT,
-+     * which can be used to notify guest implicitly that the host
-+     * backend (e.g., files on HDD, /dev/pmemX, etc.) cannot guarantee
-+     * the guest write persistence.
-+     */
-+    bool unarmed;
- };
- typedef struct NVDIMMDevice NVDIMMDevice;
- 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 6ceea196e7..59d6e4254c 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -138,6 +138,8 @@ struct NvdimmNfitMemDev {
- } QEMU_PACKED;
- typedef struct NvdimmNfitMemDev NvdimmNfitMemDev;
- 
-+#define ACPI_NFIT_MEM_NOT_ARMED     (1 << 3)
-+
- /*
-  * NVDIMM Control Region Structure
-  *
-@@ -284,6 +286,7 @@ static void
- nvdimm_build_structure_memdev(GArray *structures, DeviceState *dev)
+@@ -1575,6 +1575,7 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+                                   sizeof(CPUArchId) * max_cpus);
+     ms->possible_cpus->len = max_cpus;
+     for (n = 0; n < ms->possible_cpus->len; n++) {
++        ms->possible_cpus->cpus[n].type = ms->cpu_type;
+         ms->possible_cpus->cpus[n].arch_id =
+             virt_cpu_mp_affinity(vms, n);
+         ms->possible_cpus->cpus[n].props.has_thread_id = true;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 0320a8efa1..cdc1163dc6 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -377,18 +377,18 @@ static void machine_init_notify(Notifier *notifier, void *data)
+ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
  {
-     NvdimmNfitMemDev *nfit_memdev;
-+    NVDIMMDevice *nvdimm = NVDIMM(OBJECT(dev));
-     uint64_t size = object_property_get_uint(OBJECT(dev), PC_DIMM_SIZE_PROP,
-                                              NULL);
-     int slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
-@@ -312,6 +315,10 @@ nvdimm_build_structure_memdev(GArray *structures, DeviceState *dev)
- 
-     /* Only one interleave for PMEM. */
-     nfit_memdev->interleave_ways = cpu_to_le16(1);
+     int i;
+-    Object *cpu;
+     HotpluggableCPUList *head = NULL;
+-    const char *cpu_type;
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
 +
-+    if (nvdimm->unarmed) {
-+        nfit_memdev->flags |= cpu_to_le16(ACPI_NFIT_MEM_NOT_ARMED);
-+    }
++    /* force board to initialize possible_cpus if it hasn't been done yet */
++    mc->possible_cpu_arch_ids(machine);
+ 
+-    cpu = machine->possible_cpus->cpus[0].cpu;
+-    assert(cpu); /* Boot cpu is always present */
+-    cpu_type = object_get_typename(cpu);
+     for (i = 0; i < machine->possible_cpus->len; i++) {
++        Object *cpu;
+         HotpluggableCPUList *list_item = g_new0(typeof(*list_item), 1);
+         HotpluggableCPU *cpu_item = g_new0(typeof(*cpu_item), 1);
+ 
+-        cpu_item->type = g_strdup(cpu_type);
++        cpu_item->type = g_strdup(machine->possible_cpus->cpus[i].type);
+         cpu_item->vcpus_count = machine->possible_cpus->cpus[i].vcpus_count;
+         cpu_item->props = g_memdup(&machine->possible_cpus->cpus[i].props,
+                                    sizeof(*cpu_item->props));
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 55686bf5d8..ccc50baa85 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1148,7 +1148,8 @@ void pc_cpus_init(PCMachineState *pcms)
+     pcms->apic_id_limit = x86_cpu_apic_id_from_index(max_cpus - 1) + 1;
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < smp_cpus; i++) {
+-        pc_new_cpu(ms->cpu_type, possible_cpus->cpus[i].arch_id, &error_fatal);
++        pc_new_cpu(possible_cpus->cpus[i].type, possible_cpus->cpus[i].arch_id,
++                   &error_fatal);
+     }
  }
  
- /*
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index 618c3d677b..61e677f92f 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
-+#include "qapi-visit.h"
- #include "hw/mem/nvdimm.h"
+@@ -2307,6 +2308,7 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
+     for (i = 0; i < ms->possible_cpus->len; i++) {
+         X86CPUTopoInfo topo;
  
- static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
-@@ -64,11 +65,36 @@ out:
-     error_propagate(errp, local_err);
- }
++        ms->possible_cpus->cpus[i].type = ms->cpu_type;
+         ms->possible_cpus->cpus[i].vcpus_count = 1;
+         ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(i);
+         x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 278f9de1e7..a781dd22e7 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2226,11 +2226,6 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+     int boot_cores_nr = smp_cpus / smp_threads;
+     int i;
  
-+static bool nvdimm_get_unarmed(Object *obj, Error **errp)
-+{
-+    NVDIMMDevice *nvdimm = NVDIMM(obj);
-+
-+    return nvdimm->unarmed;
-+}
-+
-+static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
-+{
-+    NVDIMMDevice *nvdimm = NVDIMM(obj);
-+    Error *local_err = NULL;
-+
-+    if (memory_region_size(&nvdimm->nvdimm_mr)) {
-+        error_setg(&local_err, "cannot change property value");
-+        goto out;
-+    }
-+
-+    nvdimm->unarmed = value;
-+
-+ out:
-+    error_propagate(errp, local_err);
-+}
-+
- static void nvdimm_init(Object *obj)
+-    if (!type) {
+-        error_report("Unable to find sPAPR CPU Core definition");
+-        exit(1);
+-    }
+-
+     possible_cpus = mc->possible_cpu_arch_ids(machine);
+     if (mc->has_hotpluggable_cpus) {
+         if (smp_cpus % smp_threads) {
+@@ -3545,6 +3540,7 @@ static int64_t spapr_get_default_cpu_node_id(const MachineState *ms, int idx)
+ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
  {
-     object_property_add(obj, NVDIMM_LABLE_SIZE_PROP, "int",
-                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
-                         NULL, NULL);
-+    object_property_add_bool(obj, NVDIMM_UNARMED_PROP,
-+                             nvdimm_get_unarmed, nvdimm_set_unarmed, NULL);
- }
+     int i;
++    const char *core_type;
+     int spapr_max_cores = max_cpus / smp_threads;
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
  
- static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+@@ -3556,12 +3552,19 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
+         return machine->possible_cpus;
+     }
+ 
++    core_type = spapr_get_cpu_core_type(machine->cpu_type);
++    if (!core_type) {
++        error_report("Unable to find sPAPR CPU Core definition");
++        exit(1);
++    }
++
+     machine->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+                              sizeof(CPUArchId) * spapr_max_cores);
+     machine->possible_cpus->len = spapr_max_cores;
+     for (i = 0; i < machine->possible_cpus->len; i++) {
+         int core_id = i * smp_threads;
+ 
++        machine->possible_cpus->cpus[i].type = core_type;
+         machine->possible_cpus->cpus[i].vcpus_count = smp_threads;
+         machine->possible_cpus->cpus[i].arch_id = core_id;
+         machine->possible_cpus->cpus[i].props.has_core_id = true;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 35df7e19c5..3807dcb097 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -414,6 +414,7 @@ static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
+                                   sizeof(CPUArchId) * max_cpus);
+     ms->possible_cpus->len = max_cpus;
+     for (i = 0; i < ms->possible_cpus->len; i++) {
++        ms->possible_cpus->cpus[i].type = ms->cpu_type;
+         ms->possible_cpus->cpus[i].vcpus_count = 1;
+         ms->possible_cpus->cpus[i].arch_id = i;
+         ms->possible_cpus->cpus[i].props.has_core_id = true;
+diff --git a/vl.c b/vl.c
+index 2586f25952..e725ecbc08 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4611,8 +4611,6 @@ int main(int argc, char **argv, char **envp)
+     current_machine->boot_order = boot_order;
+     current_machine->cpu_model = cpu_model;
+ 
+-    parse_numa_opts(current_machine);
+-
+     /* parse features once if machine provides default cpu_type */
+     if (machine_class->default_cpu_type) {
+         current_machine->cpu_type = machine_class->default_cpu_type;
+@@ -4621,6 +4619,7 @@ int main(int argc, char **argv, char **envp)
+                 cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model);
+         }
+     }
++    parse_numa_opts(current_machine);
+ 
+     machine_run_board_init(current_machine);
+ 
 -- 
 2.14.3
