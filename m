@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecZJ6-0004q6-97
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:14:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ecZQH-0006uI-UN
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:21:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecZJ5-0005uh-8E
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:14:20 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:45433)
+	(envelope-from <peter.maydell@linaro.org>) id 1ecZQH-0004FV-1M
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:21:45 -0500
+Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:39844)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecZJ5-0005uW-2D
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:14:19 -0500
-Received: by mail-io0-x244.google.com with SMTP id p188so2655655ioe.12
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 08:14:19 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ecZQG-0004EL-SA
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:21:44 -0500
+Received: by mail-oi0-x229.google.com with SMTP id t8so1477022oie.6
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 08:21:44 -0800 (PST)
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <20180119143951.5810-1-f4bug@amsat.org>
-References: <20180119143951.5810-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 19 Jan 2018 13:14:17 -0300
-Message-ID: <CAAdtpL5=FU=+vTz_p5fQCDdmOTYO-QQ+p6DuLw3ds6wEAN46jQ@mail.gmail.com>
+In-Reply-To: <CAMxuvazc7W_CtOwZ7XqAjZaJpy_PSq=6Uf9bS7+siyoowPPX4w@mail.gmail.com>
+References: <20180117144756.31049-1-marcandre.lureau@redhat.com>
+	<595f00e6-d5ad-b7c6-29be-7c6e135f9d12@redhat.com>
+	<CAFEAcA_M7FazuMDpne5Fr=hQUmfp75BHqttYOWV+HJ9zinW6mA@mail.gmail.com>
+	<CAMxuvazG-y3XpE09oBRCJtB1OcNSbOP4heyGXYFHpLMbFj7VnA@mail.gmail.com>
+	<CAFEAcA-Z4PbC+Ze7uGriu-V+qJcLMVjEjeYJsrMbgemnHAu6bQ@mail.gmail.com>
+	<CAFEAcA9gv3LsbPkYpqsotZ-7Xigx1obkwMjGxF3ttnxDDK=+KA@mail.gmail.com>
+	<CAMxuvazc7W_CtOwZ7XqAjZaJpy_PSq=6Uf9bS7+siyoowPPX4w@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jan 2018 16:21:23 +0000
+Message-ID: <CAFEAcA8tuBBcdOJCnUSUVQbXqJ0RU9NA2rGMv_RBcCWKO2QQrA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] migration: do not use
- atomic__nocheck() functions directly
+Subject: Re: [Qemu-devel] [PULL 0/1] Dump patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,99 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Alexey Perevalov <a.perevalov@samsung.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Marc-Andre Lureau <mlureau@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jan 19, 2018 at 11:39 AM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> (incorrectly use in 3be98be4e9f)
+On 19 January 2018 at 16:08, Marc-Andre Lureau <mlureau@redhat.com> wrote:
+> Hi
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> currently on ppc32 the linking fails:
+> On Fri, Jan 19, 2018 at 4:29 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 19 January 2018 at 15:24, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> On 19 January 2018 at 14:35, Marc-Andre Lureau <mlureau@redhat.com> wrote:
+>>>> I have not found how to translate a python 'buffer' to a bytes string
+>>>> in 2.6.
+>>>
+>>> A local python expert suggests that "bytes(buffer)" should work.
+>>
+>> ...and that it ought to work if handed a memoryview too, so do we
+>> just want
+>>
+>>    self.elf.add_vmcoreinfo_note(bytes(vmcoreinfo))
+>>
+>
+> Yes, I tested on 2.6 and 3.6, it works. I'll send a new patch.
 
-Well armel and armhf hosts are also failing since 3be98be4e9f.
+Testing 2.7 as well would probably not be a bad plan. Apparently
+this works because:
+ * on python 3, bytes(memoryview) and memoryview.to_bytes() are the same
+ * gdb gives us a memoryview only if python 3
+ * so we don't have to handle the case of getting a memoryview and
+   being python 2 (in which case we would need to use memoryview.to_bytes()
+   as bytes() would do the wrong thing)
 
->
->   CC      migration/postcopy-ram.o
-> ...
->   LINK    microblaze-softmmu/qemu-system-microblaze
-> ../migration/postcopy-ram.o: In function `mark_postcopy_blocktime_end':
-> migration/postcopy-ram.c:717: undefined reference to `__atomic_fetch_add_=
-8'
-> migration/postcopy-ram.c:738: undefined reference to `__atomic_fetch_add_=
-8'
-> ../migration/postcopy-ram.o: In function `mark_postcopy_blocktime_begin':
-> migration/postcopy-ram.c:651: undefined reference to `__atomic_exchange_8=
-'
-> migration/postcopy-ram.c:652: undefined reference to `__atomic_exchange_8=
-'
-> migration/postcopy-ram.c:661: undefined reference to `__atomic_exchange_8=
-'
-> collect2: error: ld returned 1 exit status
-> Makefile:193: recipe for target 'qemu-system-microblaze' failed
-> make[1]: *** [qemu-system-microblaze] Error 1
->
-> with this patch the compilation fails:
->
->   CC      migration/postcopy-ram.o
-> In file included from include/qemu/osdep.h:36:0,
->                  from migration/postcopy-ram.c:19:
-> migration/postcopy-ram.c: In function 'mark_postcopy_blocktime_begin':
-> include/qemu/compiler.h:86:30: error: static assertion failed: "not expec=
-ting: sizeof(*&dc->last_begin) > ATOMIC_REG_SIZE"
->  #define QEMU_BUILD_BUG_ON(x) _Static_assert(!(x), "not expecting: " #x)
->                               ^
-> include/qemu/atomic.h:183:5: note: in expansion of macro 'QEMU_BUILD_BUG_=
-ON'
->      QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);      \
->      ^
-> migration/postcopy-ram.c:651:5: note: in expansion of macro 'atomic_xchg'
->      atomic_xchg(&dc->last_begin, now_ms);
->      ^
->
->  migration/postcopy-ram.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 7814da5b4b..6ecc1aa820 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -648,17 +648,17 @@ static void mark_postcopy_blocktime_begin(uintptr_t=
- addr, uint32_t ptid,
->          atomic_inc(&dc->smp_cpus_down);
->      }
->
-> -    atomic_xchg__nocheck(&dc->last_begin, now_ms);
-> -    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
-> -    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
-> +    atomic_xchg(&dc->last_begin, now_ms);
-> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], now_ms);
-> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
->
->      /* check it here, not at the begining of the function,
->       * due to, check could accur early than bitmap_set in
->       * qemu_ufd_copy_ioctl */
->      already_received =3D ramblock_recv_bitmap_test(rb, (void *)addr);
->      if (already_received) {
-> -        atomic_xchg__nocheck(&dc->vcpu_addr[cpu], 0);
-> -        atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], 0);
-> +        atomic_xchg(&dc->vcpu_addr[cpu], 0);
-> +        atomic_xchg(&dc->page_fault_vcpu_time[cpu], 0);
->          atomic_dec(&dc->smp_cpus_down);
->      }
->      trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_ti=
-me[cpu],
-> @@ -719,7 +719,7 @@ static void mark_postcopy_blocktime_end(uintptr_t add=
-r)
->              read_vcpu_time =3D=3D 0) {
->              continue;
->          }
-> -        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
-> +        atomic_xchg(&dc->vcpu_addr[i], 0);
->          vcpu_blocktime =3D now_ms - read_vcpu_time;
->          affected_cpu +=3D 1;
->          /* we need to know is that mark_postcopy_end was due to
-> --
-> 2.15.1
->
+thanks
+-- PMM
