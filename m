@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZep-0007a0-KF
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:51 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecZev-0007ht-Lx
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZen-0007lU-RM
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48026)
+	(envelope-from <ehabkost@redhat.com>) id 1ecZeu-0007v9-VT
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecZen-0007l7-IH
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:45 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecZeu-0007uz-QB
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:52 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 19 Jan 2018 14:33:41 -0200
-Message-Id: <20180119163345.10649-16-ehabkost@redhat.com>
+Date: Fri, 19 Jan 2018 14:33:42 -0200
+Message-Id: <20180119163345.10649-17-ehabkost@redhat.com>
 In-Reply-To: <20180119163345.10649-1-ehabkost@redhat.com>
 References: <20180119163345.10649-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 15/19] hostmem-file: add "align" option
+Subject: [Qemu-devel] [PULL v2 16/19] nvdimm: add a macro for property
+ "label-size"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,232 +29,42 @@ Cc: Marcel Apfelbaum <marcel@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.c
 
 From: Haozhong Zhang <haozhong.zhang@intel.com>
 
-When mmap(2) the backend files, QEMU uses the host page size
-(getpagesize(2)) by default as the alignment of mapping address.
-However, some backends may require alignments different than the page
-size. For example, mmap a device DAX (e.g., /dev/dax0.0) on Linux
-kernel 4.13 to an address, which is 4K-aligned but not 2M-aligned,
-fails with a kernel message like
-
-[617494.969768] dax dax0.0: qemu-system-x86: dax_mmap: fail, unaligned vma (0x7fa37c579000 - 0x7fa43c579000, 0x1fffff)
-
-Because there is no common approach to get such alignment requirement,
-we add the 'align' option to 'memory-backend-file', so that users or
-management utils, which have enough knowledge about the backend, can
-specify a proper alignment via this option.
-
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-Id: <20171211072806.2812-2-haozhong.zhang@intel.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-[ehabkost: fixed typo, fixed error_setg() format string]
+Message-Id: <20171211072806.2812-3-haozhong.zhang@intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- docs/nvdimm.txt         | 16 ++++++++++++++++
- include/exec/memory.h   |  3 +++
- backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- exec.c                  |  8 +++++++-
- memory.c                |  2 ++
- numa.c                  |  2 +-
- qemu-options.hx         |  9 ++++++++-
- 7 files changed, 77 insertions(+), 4 deletions(-)
+ include/hw/mem/nvdimm.h | 3 +++
+ hw/mem/nvdimm.c         | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 2d9f8c0e8c..21249dd062 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -122,3 +122,19 @@ Note:
-      M >= size of RAM devices +
-           size of statically plugged vNVDIMM devices +
-           size of hotplugged vNVDIMM devices
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 03e1ff9558..28e68ddf59 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -47,6 +47,9 @@
+ #define NVDIMM_CLASS(oc) OBJECT_CLASS_CHECK(NVDIMMClass, (oc), TYPE_NVDIMM)
+ #define NVDIMM_GET_CLASS(obj) OBJECT_GET_CLASS(NVDIMMClass, (obj), \
+                                                TYPE_NVDIMM)
 +
-+Alignment
-+---------
++#define NVDIMM_LABLE_SIZE_PROP "label-size"
 +
-+QEMU uses mmap(2) to maps vNVDIMM backends and aligns the mapping
-+address to the page size (getpagesize(2)) by default. However, some
-+types of backends may require an alignment different than the page
-+size. In that case, QEMU v2.12.0 and later provide 'align' option to
-+memory-backend-file to allow users to specify the proper alignment.
-+
-+For example, device dax require the 2 MB alignment, so we can use
-+following QEMU command line options to use it (/dev/dax0.0) as the
-+backend of vNVDIMM:
-+
-+ -object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=4G,align=2M
-+ -device nvdimm,id=nvdimm1,memdev=mem1
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index a4cabdf44c..07c5d6d597 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -465,6 +465,8 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
-  * @name: Region name, becomes part of RAMBlock name used in migration stream
-  *        must be unique within any device
-  * @size: size of the region.
-+ * @align: alignment of the region base address; if 0, the default alignment
-+ *         (getpagesize()) will be used.
-  * @share: %true if memory must be mmaped with the MAP_SHARED flag
-  * @path: the path in which to allocate the RAM.
-  * @errp: pointer to Error*, to store an error if it happens.
-@@ -476,6 +478,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-                                       struct Object *owner,
-                                       const char *name,
-                                       uint64_t size,
-+                                      uint64_t align,
-                                       bool share,
-                                       const char *path,
-                                       Error **errp);
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index e44c319915..e319ec1ad8 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -34,6 +34,7 @@ struct HostMemoryBackendFile {
-     bool share;
-     bool discard_data;
-     char *mem_path;
-+    uint64_t align;
- };
+ struct NVDIMMDevice {
+     /* private */
+     PCDIMMDevice parent_obj;
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 952fce5ec8..618c3d677b 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -66,7 +66,7 @@ out:
  
- static void
-@@ -58,7 +59,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-         path = object_get_canonical_path(OBJECT(backend));
-         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-                                  path,
--                                 backend->size, fb->share,
-+                                 backend->size, fb->align, fb->share,
-                                  fb->mem_path, errp);
-         g_free(path);
-     }
-@@ -115,6 +116,40 @@ static void file_memory_backend_set_discard_data(Object *o, bool value,
-     MEMORY_BACKEND_FILE(o)->discard_data = value;
- }
- 
-+static void file_memory_backend_get_align(Object *o, Visitor *v,
-+                                          const char *name, void *opaque,
-+                                          Error **errp)
-+{
-+    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
-+    uint64_t val = fb->align;
-+
-+    visit_type_size(v, name, &val, errp);
-+}
-+
-+static void file_memory_backend_set_align(Object *o, Visitor *v,
-+                                          const char *name, void *opaque,
-+                                          Error **errp)
-+{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-+    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
-+    Error *local_err = NULL;
-+    uint64_t val;
-+
-+    if (host_memory_backend_mr_inited(backend)) {
-+        error_setg(&local_err, "cannot change property value");
-+        goto out;
-+    }
-+
-+    visit_type_size(v, name, &val, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    fb->align = val;
-+
-+ out:
-+    error_propagate(errp, local_err);
-+}
-+
- static void file_backend_unparent(Object *obj)
+ static void nvdimm_init(Object *obj)
  {
-     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-@@ -145,6 +180,10 @@ file_backend_class_init(ObjectClass *oc, void *data)
-     object_class_property_add_str(oc, "mem-path",
-         get_mem_path, set_mem_path,
-         &error_abort);
-+    object_class_property_add(oc, "align", "int",
-+        file_memory_backend_get_align,
-+        file_memory_backend_set_align,
-+        NULL, NULL, &error_abort);
+-    object_property_add(obj, "label-size", "int",
++    object_property_add(obj, NVDIMM_LABLE_SIZE_PROP, "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
  }
- 
- static void file_backend_instance_finalize(Object *o)
-diff --git a/exec.c b/exec.c
-index d28fc0cd3d..629a508385 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1612,7 +1612,13 @@ static void *file_ram_alloc(RAMBlock *block,
-     void *area;
- 
-     block->page_size = qemu_fd_getpagesize(fd);
--    block->mr->align = block->page_size;
-+    if (block->mr->align % block->page_size) {
-+        error_setg(errp, "alignment 0x%" PRIx64
-+                   " must be multiples of page size 0x%zx",
-+                   block->mr->align, block->page_size);
-+        return NULL;
-+    }
-+    block->mr->align = MAX(block->page_size, block->mr->align);
- #if defined(__s390x__)
-     if (kvm_enabled()) {
-         block->mr->align = MAX(block->mr->align, QEMU_VMALLOC_ALIGN);
-diff --git a/memory.c b/memory.c
-index 4b41fb837b..449a1429b9 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1570,6 +1570,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-                                       struct Object *owner,
-                                       const char *name,
-                                       uint64_t size,
-+                                      uint64_t align,
-                                       bool share,
-                                       const char *path,
-                                       Error **errp)
-@@ -1578,6 +1579,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-     mr->ram = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
-+    mr->align = align;
-     mr->ram_block = qemu_ram_alloc_from_file(size, mr, share, path, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
- }
-diff --git a/numa.c b/numa.c
-index 7b9c33ad12..83675a03f3 100644
---- a/numa.c
-+++ b/numa.c
-@@ -456,7 +456,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
-     if (mem_path) {
- #ifdef __linux__
-         Error *err = NULL;
--        memory_region_init_ram_from_file(mr, owner, name, ram_size, false,
-+        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, false,
-                                          mem_path, &err);
-         if (err) {
-             error_report_err(err);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index b3e03c5464..5ff741a4af 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3974,7 +3974,7 @@ property must be set.  These objects are placed in the
- 
- @table @option
- 
--@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
-+@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
- 
- Creates a memory file backend object, which can be used to back
- the guest RAM with huge pages.
-@@ -4027,6 +4027,13 @@ restrict memory allocation to the given host node list
- interleave memory allocations across the given host node list
- @end table
- 
-+The @option{align} option specifies the base address alignment when
-+QEMU mmap(2) @option{mem-path}, and accepts common suffixes, eg
-+@option{2M}. Some backend store specified by @option{mem-path}
-+requires an alignment different than the default one used by QEMU, eg
-+the device DAX /dev/dax0.0 requires 2M alignment rather than 4K. In
-+such cases, users can specify the required alignment via this option.
-+
- @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
- 
- Creates a memory backend object, which can be used to back the guest RAM.
 -- 
 2.14.3
