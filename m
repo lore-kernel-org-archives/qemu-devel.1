@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecZbG-0004RM-Fm
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ecZbn-0004t5-5Y
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecZbC-000607-Di
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:06 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:63963)
+	(envelope-from <laurent@vivier.eu>) id 1ecZbj-0006Em-5e
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:39 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:52290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecZbC-0005ye-4S
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:02 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecZbi-0006ED-Qw
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:35 -0500
 References: <1513345976-22958-1-git-send-email-peter.maydell@linaro.org>
-	<1513345976-22958-2-git-send-email-peter.maydell@linaro.org>
+	<1513345976-22958-3-git-send-email-peter.maydell@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f927cc83-fb77-1230-e4f6-ceeb08315b68@vivier.eu>
-Date: Fri, 19 Jan 2018 17:32:50 +0100
+Message-ID: <721eacb9-f011-4b97-08c6-70004ea41bdd@vivier.eu>
+Date: Fri, 19 Jan 2018 17:33:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <1513345976-22958-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1513345976-22958-3-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: Fix length calculations in
- host_to_target_cmsg()
+Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: Don't use
+ CMSG_ALIGN(sizeof struct cmsghdr)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,121 +33,60 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Bruno Haible <bruno@clisp.org>, patches@linaro.org
 
 Le 15/12/2017 à 14:52, Peter Maydell a écrit :
-> The handling of length calculations in host_to_target_cmsg()
-> was rather confused:
->  * when checking for whether the target cmsg header fit in
->    the remaining buffer, we were using the host struct size,
->    not the target size
->  * we were setting tgt_len to "target payload + header length"
->    but then using it as if it were the target payload length alone
->  * in various message type cases we weren't handling the possibility
->    that host or target buffers were truncated
+> The Linux struct cmsghdr is already guaranteed to be sufficiently
+> aligned that CMSG_ALIGN(sizeof struct cmsghdr) is always equal
+> to sizeof struct cmsghdr. Stop doing the unnecessary alignment
+> arithmetic for host and target cmsghdr.
 > 
-> Fix these problems. The second one in particular is liable
-> to result in us overrunning the guest provided buffer,
-> since we will try to convert more data than is actually
-> present.
+> This follows kernel commit 1ff8cebf49ed9e9ca2 and brings our
+> TARGET_CMSG_* macros back into line with the kernel ones,
+> as well as making them easier to understand.
 > 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1701808
-> Reported-by: Bruno Haible  <bruno@clisp.org>
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  linux-user/syscall.c | 29 ++++++++++++++++++++++-------
->  1 file changed, 22 insertions(+), 7 deletions(-)
+>  linux-user/syscall_defs.h | 6 +++---
+>  linux-user/syscall.c      | 4 ++--
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 > 
+> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> index bec3680..a35c52a 100644
+> --- a/linux-user/syscall_defs.h
+> +++ b/linux-user/syscall_defs.h
+> @@ -303,9 +303,9 @@ struct target_cmsghdr {
+>                                 __target_cmsg_nxthdr(mhdr, cmsg, cmsg_start)
+>  #define TARGET_CMSG_ALIGN(len) (((len) + sizeof (abi_long) - 1) \
+>                                 & (size_t) ~(sizeof (abi_long) - 1))
+> -#define TARGET_CMSG_SPACE(len) (TARGET_CMSG_ALIGN (len) \
+> -                               + TARGET_CMSG_ALIGN (sizeof (struct target_cmsghdr)))
+> -#define TARGET_CMSG_LEN(len)   (TARGET_CMSG_ALIGN (sizeof (struct target_cmsghdr)) + (len))
+> +#define TARGET_CMSG_SPACE(len) (sizeof(struct target_cmsghdr) + \
+> +                                TARGET_CMSG_ALIGN(len))
+> +#define TARGET_CMSG_LEN(len) (sizeof(struct target_cmsghdr) + (len))
+>  
+>  static __inline__ struct target_cmsghdr *
+>  __target_cmsg_nxthdr(struct target_msghdr *__mhdr,
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 11c9116..a1b9772 100644
+> index a1b9772..39553c8 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -1782,7 +1782,7 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->           * to the guest via the CTRUNC bit), unlike truncation
->           * in target_to_host_cmsg, which is a QEMU bug.
->           */
-> -        if (msg_controllen < sizeof(struct cmsghdr)) {
-> +        if (msg_controllen < sizeof(struct target_cmsghdr)) {
->              target_msgh->msg_flags |= tswap32(MSG_CTRUNC);
->              break;
->          }
-> @@ -1794,8 +1794,6 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->          }
->          target_cmsg->cmsg_type = tswap32(cmsg->cmsg_type);
+> @@ -1692,7 +1692,7 @@ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+>          void *target_data = TARGET_CMSG_DATA(target_cmsg);
 >  
-> -        tgt_len = TARGET_CMSG_LEN(len);
-> -
->          /* Payload types which need a different size of payload on
->           * the target must adjust tgt_len here.
->           */
-> @@ -1809,12 +1807,13 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->                  break;
->              }
->          default:
-> +            tgt_len = len;
->              break;
->          }
+>          int len = tswapal(target_cmsg->cmsg_len)
+> -                  - TARGET_CMSG_ALIGN(sizeof (struct target_cmsghdr));
+> +            - sizeof(struct target_cmsghdr);
 >  
-> -        if (msg_controllen < tgt_len) {
-> +        if (msg_controllen < TARGET_CMSG_LEN(tgt_len)) {
->              target_msgh->msg_flags |= tswap32(MSG_CTRUNC);
-> -            tgt_len = msg_controllen;
-> +            tgt_len = msg_controllen - sizeof(struct target_cmsghdr);
->          }
+>          space += CMSG_SPACE(len);
+>          if (space > msgh->msg_controllen) {
+> @@ -1773,7 +1773,7 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
+>          void *data = CMSG_DATA(cmsg);
+>          void *target_data = TARGET_CMSG_DATA(target_cmsg);
 >  
->          /* We must now copy-and-convert len bytes of payload
-> @@ -1875,6 +1874,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->                  uint32_t *v = (uint32_t *)data;
->                  uint32_t *t_int = (uint32_t *)target_data;
+> -        int len = cmsg->cmsg_len - CMSG_ALIGN(sizeof (struct cmsghdr));
+> +        int len = cmsg->cmsg_len - sizeof(struct cmsghdr);
+>          int tgt_len, tgt_space;
 >  
-> +                if (len != sizeof(uint32_t) ||
-> +                    tgt_len != sizeof(uint32_t)) {
-> +                    goto unimplemented;
-> +                }
->                  __put_user(*v, t_int);
->                  break;
->              }
-> @@ -1888,6 +1891,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->                  struct errhdr_t *target_errh =
->                      (struct errhdr_t *)target_data;
->  
-> +                if (len != sizeof(struct errhdr_t) ||
-> +                    tgt_len != sizeof(struct errhdr_t)) {
-> +                    goto unimplemented;
-> +                }
->                  __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
->                  __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
->                  __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-> @@ -1911,6 +1918,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->                  uint32_t *v = (uint32_t *)data;
->                  uint32_t *t_int = (uint32_t *)target_data;
->  
-> +                if (len != sizeof(uint32_t) ||
-> +                    tgt_len != sizeof(uint32_t)) {
-> +                    goto unimplemented;
-> +                }
->                  __put_user(*v, t_int);
->                  break;
->              }
-> @@ -1924,6 +1935,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->                  struct errhdr6_t *target_errh =
->                      (struct errhdr6_t *)target_data;
->  
-> +                if (len != sizeof(struct errhdr6_t) ||
-> +                    tgt_len != sizeof(struct errhdr6_t)) {
-> +                    goto unimplemented;
-> +                }
->                  __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
->                  __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
->                  __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-> @@ -1950,8 +1965,8 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->              }
->          }
->  
-> -        target_cmsg->cmsg_len = tswapal(tgt_len);
-> -        tgt_space = TARGET_CMSG_SPACE(len);
-> +        target_cmsg->cmsg_len = tswapal(TARGET_CMSG_LEN(tgt_len));
-> +        tgt_space = TARGET_CMSG_SPACE(tgt_len);
->          if (msg_controllen < tgt_space) {
->              tgt_space = msg_controllen;
->          }
+>          /* We never copy a half-header but may copy half-data;
 > 
 
 Applied to my linux-user branch.
