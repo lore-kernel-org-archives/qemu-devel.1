@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTA9-0001j9-Nu
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTA9-0001iz-8s
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTA8-00005w-Nd
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTA6-0008Ul-62
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:41 -0500
-Received: from ozlabs.org ([103.22.144.67]:33343)
+Received: from ozlabs.org ([103.22.144.67]:60147)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTA8-0008Uy-Cd
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:40 -0500
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTA5-0008TT-8k
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:38 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 19 Jan 2018 20:40:06 +1100
-Message-Id: <20180119094015.28266-5-david@gibson.dropbear.id.au>
+Date: Fri, 19 Jan 2018 20:40:04 +1100
+Message-Id: <20180119094015.28266-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20180119094015.28266-1-david@gibson.dropbear.id.au>
 References: <20180119094015.28266-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/13] ppc: Deprecate qemu-system-ppcemb
+Subject: [Qemu-devel] [PULL 02/13] default-configs/ppc-softmmu: Restructure
+ the switches according to the machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +29,111 @@ Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu
 
 From: Thomas Huth <thuth@redhat.com>
 
-qemu-system-ppcemb has been once split of qemu-system-ppc to support
-CPU page sizes < 4096 for some of the embedded 4xx PowerPC CPUs.
-However, there was hardly any OS available in the wild that really
-used such small page sizes (Linux uses 4096 on PPC), so there is
-no known recent use case for this separate build anymore. It's
-rather cumbersome to maintain a separate set of config switches for
-this, and it's wasting compile and test time of all the developers
-who have to build all QEMU targets to verify that their changes did
-not break anything.
+Order the CONFIG switches in ppc-softmmu.mak according to the machine
+classes where they are used (embedded, Mac or PReP), so that it is
+easier for the users to disable a set of switches completely if they
+are not needed.
 
-Except for the small CPU page sizes, qemu-system-ppc can be used as
-a full replacement for qemu-system-ppcemb since it contains all the
-embedded 4xx PPC boards and CPUs, too. Thus let's start the deprecation
-process for qemu-system-ppcemb to see whether somebody still needs
-the small page sizes or whether we could finally remove this unloved
-separate build.
+Also add the missing CONFIG_IDE_SII3112 switch to the embedded section
+which was previously only added to ppcemb-softmmu.mak.
+
+And while we're at it, also remove the CONFIG_IDE_CMD646 switch since
+this controller does not seem to be used by any ppc machine in QEMU.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- qemu-doc.texi               | 6 ++++++
- target/ppc/translate_init.c | 5 +++++
- 2 files changed, 11 insertions(+)
+ default-configs/ppc-softmmu.mak | 59 ++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 27 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 3e9eb819a6..b13c6332fd 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2766,6 +2766,12 @@ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
- The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
- or ``ivshmem-doorbell`` device types.
- 
-+@subsection Page size support < 4k for embedded PowerPC CPUs (since 2.12.0)
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index bb225c6e46..3baed6a8fd 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -3,52 +3,57 @@
+ include pci.mak
+ include sound.mak
+ include usb.mak
 +
-+qemu-system-ppcemb will be removed. qemu-system-ppc (or qemu-system-ppc64)
-+should be used instead. That means that embedded 4xx PowerPC CPUs will not
-+support page sizes < 4096 any longer.
++# For embedded PPCs:
+ CONFIG_PPC4XX=y
+-CONFIG_ESCC=y
+ CONFIG_M48T59=y
+ CONFIG_SERIAL=y
+-CONFIG_PARALLEL=y
+-CONFIG_I8254=y
+-CONFIG_PCKBD=y
+-CONFIG_FDC=y
+ CONFIG_I8257=y
+-CONFIG_I82374=y
+ CONFIG_OPENPIC=y
+-CONFIG_PREP_PCI=y
+-CONFIG_I82378=y
+-CONFIG_PC87312=y
+-CONFIG_MACIO=y
+-CONFIG_SUNGEM=y
+-CONFIG_PCSPK=y
+-CONFIG_CS4231A=y
+-CONFIG_CUDA=y
+-CONFIG_ADB=y
+-CONFIG_MAC_NVRAM=y
+-CONFIG_MAC_DBDMA=y
+-CONFIG_HEATHROW_PIC=y
+-CONFIG_GRACKLE_PCI=y
+-CONFIG_UNIN_PCI=y
+-CONFIG_DEC_PCI=y
+ CONFIG_PPCE500_PCI=y
+-CONFIG_IDE_ISA=y
+-CONFIG_IDE_CMD646=y
+-CONFIG_IDE_MACIO=y
+-CONFIG_NE2000_ISA=y
+ CONFIG_PFLASH_CFI01=y
+ CONFIG_PFLASH_CFI02=y
+ CONFIG_PTIMER=y
+ CONFIG_I8259=y
+ CONFIG_XILINX=y
+ CONFIG_XILINX_ETHLITE=y
+-CONFIG_PREP=y
+-CONFIG_MAC=y
+ CONFIG_E500=y
+ CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ CONFIG_SM501=y
++CONFIG_IDE_SII3112=y
 +
- @section System emulator machines
- 
- @subsection Xilinx EP108 (since 2.11.0)
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 70ff15a51a..ab70b3a25c 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10634,6 +10634,11 @@ static void ppc_cpu_register_types(void)
- {
-     type_register_static(&ppc_cpu_type_info);
-     type_register_static(&ppc_vhyp_type_info);
++# For Macs
++CONFIG_MAC=y
++CONFIG_ESCC=y
++CONFIG_MACIO=y
++CONFIG_SUNGEM=y
++CONFIG_CUDA=y
++CONFIG_ADB=y
++CONFIG_MAC_NVRAM=y
++CONFIG_MAC_DBDMA=y
++CONFIG_HEATHROW_PIC=y
++CONFIG_GRACKLE_PCI=y
++CONFIG_UNIN_PCI=y
++CONFIG_DEC_PCI=y
++CONFIG_IDE_MACIO=y
 +
-+#ifdef TARGET_PPCEMB
-+    warn_report("qemu-system-ppcemb is deprecated, "
-+                "please use qemu-system-ppc instead.");
-+#endif
- }
- 
- type_init(ppc_cpu_register_types)
+ # For PReP
++CONFIG_PREP=y
++CONFIG_PREP_PCI=y
+ CONFIG_SERIAL_ISA=y
+ CONFIG_MC146818RTC=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_RS6000_MC=y
++CONFIG_PARALLEL=y
++CONFIG_I82374=y
++CONFIG_I82378=y
++CONFIG_I8254=y
++CONFIG_PCKBD=y
++CONFIG_FDC=y
++CONFIG_NE2000_ISA=y
++CONFIG_PC87312=y
++CONFIG_PCSPK=y
++CONFIG_IDE_ISA=y
++CONFIG_CS4231A=y
 -- 
 2.14.3
