@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSG1-0008Vd-Hs
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:42:42 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSG0-0004Er-NB
+	(envelope-from <peterx@redhat.com>) id 1ecSG0-0008V1-MW
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:42:41 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:53378)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSG0-0004EH-Ek
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <peterx@redhat.com>) id 1ecSFx-0004B6-KK
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:42:40 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Fri, 19 Jan 2018 11:42:42 +0300
-Message-ID: <20180119084242.7100.17598.stgit@pasha-VirtualBox>
-In-Reply-To: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
-References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v4 01/23] This patch adds a condition
- before overwriting exception_index fields.
+Received: from mx1.redhat.com ([209.132.183.28]:49936)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ecSFx-00043j-EE
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:42:37 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 19 Jan 2018 16:42:17 +0800
+Message-Id: <20180119084219.31187-1-peterx@redhat.com>
+Subject: [Qemu-devel] [RFC 0/2] memory/vfio: notify region_del() when
+ unregister listeners
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +23,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, peterx@redhat.com, Alex Williamson <alex.williamson@redhat.com>
 
-It is needed when exception_index is already set to some meaningful value.
+I encountered an event loss problem during unplugging vfio devices:
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- accel/tcg/cpu-exec.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+  https://bugzilla.redhat.com/show_bug.cgi?id=1531393
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 280200f..9cc6972 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -585,6 +585,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-         else {
-             if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
-                 replay_interrupt();
-+                cpu->exception_index = -1;
-                 *last_tb = NULL;
-             }
-             /* The target hook may have updated the 'cpu->interrupt_request';
-@@ -606,7 +607,9 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-     if (unlikely(atomic_read(&cpu->exit_request)
-         || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
-         atomic_set(&cpu->exit_request, 0);
--        cpu->exception_index = EXCP_INTERRUPT;
-+        if (cpu->exception_index == -1) {
-+            cpu->exception_index = EXCP_INTERRUPT;
-+        }
-         return true;
-     }
- 
+I thought it should be a simple VT-d issue but I was wrong.  The whole
+debugging leads me to these patches.
+
+Basically I think what we missed is that when unregistering memory
+listeners, we don't really call region_del() at all.  Instead we just
+remove ourselves from the listener list.  IMHO that's not enough.  A
+clean unregister should undo all possible changes that have done
+during region_add().  That's patch 1.
+
+Patch 2 fixes a vfio issue when patch 1 is applied.
+
+I'm marking this change as RFC since it touches the core of memory
+somehow, on which I am not 100% sure about.  E.g., I haven't tested
+all the listener users, so I'm not sure whether it may broke any use
+case.
+
+But what I'm sure is that it passes the docker tests on
+compiling/qtests, and it fixes the event loss that reported.
+
+Let's see whether I can get some feedback first.  Please review.
+
+Thanks.
+
+Peter Xu (2):
+  memory: do explicit cleanup when remove listeners
+  vfio: listener unregister before unset container
+
+ hw/vfio/common.c | 16 ++++++++++++----
+ memory.c         | 24 ++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 4 deletions(-)
+
+-- 
+2.14.3
