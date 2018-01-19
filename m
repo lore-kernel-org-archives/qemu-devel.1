@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1ecWzS-0003O6-Uu
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:45:56 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1ecWzm-0003X3-Ea
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1ecWzO-0002JL-Mh
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:45:54 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41980)
+	(envelope-from <zhangckid@gmail.com>) id 1ecWzh-0002bt-Gd
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:14 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:44423)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1ecWzO-0002Hz-GA
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:45:50 -0500
-Received: by mail-pg0-x242.google.com with SMTP id 136so1457878pgd.8
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 05:45:50 -0800 (PST)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1ecWzh-0002bZ-8Y
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:09 -0500
+Received: by mail-pf0-x243.google.com with SMTP id m26so1386297pfj.11
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 05:46:09 -0800 (PST)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Fri, 19 Jan 2018 21:44:29 +0800
-Message-Id: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V4 00/16] COLO: integrate colo frame with block
- replication and COLO proxy
+Date: Fri, 19 Jan 2018 21:44:30 +0800
+Message-Id: <1516369485-5374-2-git-send-email-zhangckid@gmail.com>
+In-Reply-To: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
+References: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V4 01/16] filter-rewriter: fix memory leak for
+ connection in connection_track_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +27,159 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Zhang Chen <zhangckid@gmail.com>
 
-From: Zhang Chen <chen.zhang@intel.com>
+After a net connection is closed, we didn't clear its releated resources
+in connection_track_table, which will lead to memory leak.
 
-Hi~
+Let't track the state of net connection, if it is closed, its related
+resources will be cleared up.
 
-COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
-filter-redirector,filter-rewriter) have been exist in qemu
-for long time, it's time to integrate these three parts to make COLO really works.
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+---
+ net/colo.h            |  4 +++
+ net/filter-rewriter.c | 69 +++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 66 insertions(+), 7 deletions(-)
 
-In this series, we have some optimizations for COLO frame, including separating the
-process of saving ram and device state, using an COLO_EXIT event to notify users that
-VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
-but since this series have just rebased on upstream which had merged a new series of migration,
-parts of pathes in this series deserve review again.
-
-We use notifier/callback method for COLO compare to notify COLO frame about
-net packets inconsistent event, and add a handle_event method for NetFilterClass to
-help COLO frame to notify filters and colo-compare about checkpoint/failover event, 
-it is flexible.
-
-For the neweset version, please refer to:
-https://github.com/zhangckid/qemu/tree/qemu-colo-18jan19
-
-Please review, thanks.
-
-V4:
- - Address Eric's comments in patch 10/16.
- - Rebase on upstream codes.
- - Fix mingw compile error in patch 02/16.
- - Fix some comments.
- - Fix conflect with the patch "migration: remove "enable_colo" var" in patch 06/16.
-
-V3:
- - Address community comments from V2.
- - Rebase on upstream codes.
- - Fix several bugs.
- - Splite shared disk part to indepentent patch set.
- - Optimize codes.
-
-
-Zhang Chen (8):
-  filter-rewriter: fix memory leak for connection in
-    connection_track_table
-  colo-compare: implement the process of checkpoint
-  colo-compare: use notifier to notify packets comparing result
-  COLO: integrate colo compare with colo frame
-  COLO: Add block replication into colo process
-  ram/COLO: Record the dirty pages that SVM received
-  filter: Add handle_event method for NetFilterClass
-  filter-rewriter: handle checkpoint and failover event
-
-zhanghailiang (8):
-  COLO: Remove colo_state migration struct
-  COLO: Load dirty pages into SVM's RAM cache firstly
-  COLO: Flush memory data from ram cache
-  qmp event: Add COLO_EXIT event to notify users while exited COLO
-  savevm: split the process of different stages for loadvm/savevm
-  COLO: flush host dirty ram from cache
-  COLO: notify net filters about checkpoint/failover event
-  COLO: quick failover process by kick COLO thread
-
- include/exec/ram_addr.h  |   1 +
- include/migration/colo.h |  11 ++-
- include/net/filter.h     |   5 ++
- migration/Makefile.objs  |   2 +-
- migration/colo-comm.c    |  76 -------------------
- migration/colo.c         | 188 ++++++++++++++++++++++++++++++++++++++++++++---
- migration/migration.c    |  38 +++++++++-
- migration/ram.c          | 181 ++++++++++++++++++++++++++++++++++++++++++++-
- migration/ram.h          |   4 +
- migration/savevm.c       |  54 ++++++++++++--
- migration/savevm.h       |   5 ++
- migration/trace-events   |   3 +
- net/colo-compare.c       | 108 +++++++++++++++++++++++++--
- net/colo-compare.h       |  24 ++++++
- net/colo.h               |   4 +
- net/filter-rewriter.c    | 109 +++++++++++++++++++++++++--
- net/filter.c             |  17 +++++
- net/net.c                |  28 +++++++
- qapi/migration.json      |  35 +++++++++
- vl.c                     |   2 -
- 20 files changed, 777 insertions(+), 118 deletions(-)
- delete mode 100644 migration/colo-comm.c
- create mode 100644 net/colo-compare.h
-
+diff --git a/net/colo.h b/net/colo.h
+index 0658e86..0193935 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -18,6 +18,7 @@
+ #include "slirp/slirp.h"
+ #include "qemu/jhash.h"
+ #include "qemu/timer.h"
++#include "slirp/tcp.h"
+ 
+ #define HASHTABLE_MAX_SIZE 16384
+ 
+@@ -71,6 +72,9 @@ typedef struct Connection {
+      * run once in independent tcp connection
+      */
+     int syn_flag;
++
++    int tcp_state; /* TCP FSM state */
++    tcp_seq fin_ack_seq; /* the seq of 'fin=1,ack=1' */
+ } Connection;
+ 
+ uint32_t connection_key_hash(const void *opaque);
+diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+index 2be388f..a58310a 100644
+--- a/net/filter-rewriter.c
++++ b/net/filter-rewriter.c
+@@ -62,9 +62,9 @@ static int is_tcp_packet(Packet *pkt)
+ }
+ 
+ /* handle tcp packet from primary guest */
+-static int handle_primary_tcp_pkt(NetFilterState *nf,
++static int handle_primary_tcp_pkt(RewriterState *rf,
+                                   Connection *conn,
+-                                  Packet *pkt)
++                                  Packet *pkt, ConnectionKey *key)
+ {
+     struct tcphdr *tcp_pkt;
+ 
+@@ -102,15 +102,44 @@ static int handle_primary_tcp_pkt(NetFilterState *nf,
+             net_checksum_calculate((uint8_t *)pkt->data + pkt->vnet_hdr_len,
+                                    pkt->size - pkt->vnet_hdr_len);
+         }
++        /*
++         * Case 1:
++         * The *server* side of this connect is VM, *client* tries to close
++         * the connection.
++         *
++         * We got 'ack=1' packets from client side, it acks 'fin=1, ack=1'
++         * packet from server side. From this point, we can ensure that there
++         * will be no packets in the connection, except that, some errors
++         * happen between the path of 'filter object' and vNIC, if this rare
++         * case really happen, we can still create a new connection,
++         * So it is safe to remove the connection from connection_track_table.
++         *
++         */
++        if ((conn->tcp_state == TCPS_LAST_ACK) &&
++            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
++            g_hash_table_remove(rf->connection_track_table, key);
++        }
++    }
++    /*
++     * Case 2:
++     * The *server* side of this connect is VM, *server* tries to close
++     * the connection.
++     *
++     * We got 'fin=1, ack=1' packet from client side, we need to
++     * record the seq of 'fin=1, ack=1' packet.
++     */
++    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
++        conn->fin_ack_seq = htonl(tcp_pkt->th_seq);
++        conn->tcp_state = TCPS_LAST_ACK;
+     }
+ 
+     return 0;
+ }
+ 
+ /* handle tcp packet from secondary guest */
+-static int handle_secondary_tcp_pkt(NetFilterState *nf,
++static int handle_secondary_tcp_pkt(RewriterState *rf,
+                                     Connection *conn,
+-                                    Packet *pkt)
++                                    Packet *pkt, ConnectionKey *key)
+ {
+     struct tcphdr *tcp_pkt;
+ 
+@@ -142,8 +171,34 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
+             net_checksum_calculate((uint8_t *)pkt->data + pkt->vnet_hdr_len,
+                                    pkt->size - pkt->vnet_hdr_len);
+         }
++        /*
++         * Case 2:
++         * The *server* side of this connect is VM, *server* tries to close
++         * the connection.
++         *
++         * We got 'ack=1' packets from server side, it acks 'fin=1, ack=1'
++         * packet from client side. Like Case 1, there should be no packets
++         * in the connection from now know, But the difference here is
++         * if the packet is lost, We will get the resent 'fin=1,ack=1' packet.
++         * TODO: Fix above case.
++         */
++        if ((conn->tcp_state == TCPS_LAST_ACK) &&
++            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
++            g_hash_table_remove(rf->connection_track_table, key);
++        }
++    }
++    /*
++     * Case 1:
++     * The *server* side of this connect is VM, *client* tries to close
++     * the connection.
++     *
++     * We got 'fin=1, ack=1' packet from server side, we need to
++     * record the seq of 'fin=1, ack=1' packet.
++     */
++    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
++        conn->fin_ack_seq = ntohl(tcp_pkt->th_seq);
++        conn->tcp_state = TCPS_LAST_ACK;
+     }
+-
+     return 0;
+ }
+ 
+@@ -193,7 +248,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
+ 
+         if (sender == nf->netdev) {
+             /* NET_FILTER_DIRECTION_TX */
+-            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
++            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
+                 qemu_net_queue_send(s->incoming_queue, sender, 0,
+                 (const uint8_t *)pkt->data, pkt->size, NULL);
+                 packet_destroy(pkt, NULL);
+@@ -206,7 +261,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
+             }
+         } else {
+             /* NET_FILTER_DIRECTION_RX */
+-            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
++            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
+                 qemu_net_queue_send(s->incoming_queue, sender, 0,
+                 (const uint8_t *)pkt->data, pkt->size, NULL);
+                 packet_destroy(pkt, NULL);
 -- 
 2.7.4
