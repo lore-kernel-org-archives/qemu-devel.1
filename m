@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ecW5g-0005OK-Fn
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:48:19 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ecW6m-00061N-At
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:49:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ecW5e-0002Wd-7K
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:48:16 -0500
-References: <20180118085316.27400-1-lvivier@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <445b8b3e-1394-8cdc-ae20-e14cac32c5fa@ilande.co.uk>
-Date: Fri, 19 Jan 2018 12:47:42 +0000
-MIME-Version: 1.0
-In-Reply-To: <20180118085316.27400-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/char: remove legacy interface
- escc_init()
+	(envelope-from <stefanha@redhat.com>) id 1ecW6i-0002o1-TD
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:49:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ecW6i-0002nk-Kr
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:49:20 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri, 19 Jan 2018 12:49:08 +0000
+Message-Id: <20180119124908.23637-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [RFC virtio-dev v2] vhost-user: add vhost-user device
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,683 +22,370 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: virtio-dev@lists.oasis-open.org
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Wei Wang <wei.w.wang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On 18/01/18 08:53, Laurent Vivier wrote:
-> Move necessary stuff in escc.h and update type names.
-> Remove slavio_serial_ms_kbd_init().
-> Fix code style problems reported by checkpatch.pl
-> Update mac_newworld, mac_oldworld and sun4m to use directly the
-> QDEV interface.
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->   hw/char/escc.c         | 208 ++++++++++++++-----------------------------------
->   hw/ppc/mac_newworld.c  |  19 ++++-
->   hw/ppc/mac_oldworld.c  |  19 ++++-
->   hw/sparc/sun4m.c       |  34 +++++++-
->   include/hw/char/escc.h |  54 +++++++++++--
->   5 files changed, 170 insertions(+), 164 deletions(-)
-> 
-> diff --git a/hw/char/escc.c b/hw/char/escc.c
-> index 3ab831a6a7..bb735cc0c8 100644
-> --- a/hw/char/escc.c
-> +++ b/hw/char/escc.c
-> @@ -26,10 +26,7 @@
->   #include "hw/hw.h"
->   #include "hw/sysbus.h"
->   #include "hw/char/escc.h"
-> -#include "chardev/char-fe.h"
-> -#include "chardev/char-serial.h"
->   #include "ui/console.h"
-> -#include "ui/input.h"
->   #include "trace.h"
->   
->   /*
-> @@ -64,53 +61,7 @@
->    *  2010-May-23  Artyom Tarasenko:  Reworked IUS logic
->    */
->   
-> -typedef enum {
-> -    chn_a, chn_b,
-> -} ChnID;
-> -
-> -#define CHN_C(s) ((s)->chn == chn_b? 'b' : 'a')
-> -
-> -typedef enum {
-> -    ser, kbd, mouse,
-> -} ChnType;
-> -
-> -#define SERIO_QUEUE_SIZE 256
-> -
-> -typedef struct {
-> -    uint8_t data[SERIO_QUEUE_SIZE];
-> -    int rptr, wptr, count;
-> -} SERIOQueue;
-> -
-> -#define SERIAL_REGS 16
-> -typedef struct ChannelState {
-> -    qemu_irq irq;
-> -    uint32_t rxint, txint, rxint_under_svc, txint_under_svc;
-> -    struct ChannelState *otherchn;
-> -    uint32_t reg;
-> -    uint8_t wregs[SERIAL_REGS], rregs[SERIAL_REGS];
-> -    SERIOQueue queue;
-> -    CharBackend chr;
-> -    int e0_mode, led_mode, caps_lock_mode, num_lock_mode;
-> -    int disabled;
-> -    int clock;
-> -    uint32_t vmstate_dummy;
-> -    ChnID chn; // this channel, A (base+4) or B (base+0)
-> -    ChnType type;
-> -    uint8_t rx, tx;
-> -    QemuInputHandlerState *hs;
-> -} ChannelState;
-> -
-> -#define ESCC(obj) OBJECT_CHECK(ESCCState, (obj), TYPE_ESCC)
-> -
-> -typedef struct ESCCState {
-> -    SysBusDevice parent_obj;
-> -
-> -    struct ChannelState chn[2];
-> -    uint32_t it_shift;
-> -    MemoryRegion mmio;
-> -    uint32_t disabled;
-> -    uint32_t frequency;
-> -} ESCCState;
-> +#define CHN_C(s) ((s)->chn == escc_chn_b ? 'b' : 'a')
->   
->   #define SERIAL_CTRL 0
->   #define SERIAL_DATA 1
-> @@ -214,44 +165,47 @@ typedef struct ESCCState {
->   #define R_MISC1I 14
->   #define R_EXTINT 15
->   
-> -static void handle_kbd_command(ChannelState *s, int val);
-> +static void handle_kbd_command(ESCCChannelState *s, int val);
->   static int serial_can_receive(void *opaque);
-> -static void serial_receive_byte(ChannelState *s, int ch);
-> +static void serial_receive_byte(ESCCChannelState *s, int ch);
->   
->   static void clear_queue(void *opaque)
->   {
-> -    ChannelState *s = opaque;
-> -    SERIOQueue *q = &s->queue;
-> +    ESCCChannelState *s = opaque;
-> +    ESCCSERIOQueue *q = &s->queue;
->       q->rptr = q->wptr = q->count = 0;
->   }
->   
->   static void put_queue(void *opaque, int b)
->   {
-> -    ChannelState *s = opaque;
-> -    SERIOQueue *q = &s->queue;
-> +    ESCCChannelState *s = opaque;
-> +    ESCCSERIOQueue *q = &s->queue;
->   
->       trace_escc_put_queue(CHN_C(s), b);
-> -    if (q->count >= SERIO_QUEUE_SIZE)
-> +    if (q->count >= ESCC_SERIO_QUEUE_SIZE) {
->           return;
-> +    }
->       q->data[q->wptr] = b;
-> -    if (++q->wptr == SERIO_QUEUE_SIZE)
-> +    if (++q->wptr == ESCC_SERIO_QUEUE_SIZE) {
->           q->wptr = 0;
-> +    }
->       q->count++;
->       serial_receive_byte(s, 0);
->   }
->   
->   static uint32_t get_queue(void *opaque)
->   {
-> -    ChannelState *s = opaque;
-> -    SERIOQueue *q = &s->queue;
-> +    ESCCChannelState *s = opaque;
-> +    ESCCSERIOQueue *q = &s->queue;
->       int val;
->   
->       if (q->count == 0) {
->           return 0;
->       } else {
->           val = q->data[q->rptr];
-> -        if (++q->rptr == SERIO_QUEUE_SIZE)
-> +        if (++q->rptr == ESCC_SERIO_QUEUE_SIZE) {
->               q->rptr = 0;
-> +        }
->           q->count--;
->       }
->       trace_escc_get_queue(CHN_C(s), val);
-> @@ -260,7 +214,7 @@ static uint32_t get_queue(void *opaque)
->       return val;
->   }
->   
-> -static int escc_update_irq_chn(ChannelState *s)
-> +static int escc_update_irq_chn(ESCCChannelState *s)
->   {
->       if ((((s->wregs[W_INTR] & INTR_TXINT) && (s->txint == 1)) ||
->            // tx ints enabled, pending
-> @@ -274,7 +228,7 @@ static int escc_update_irq_chn(ChannelState *s)
->       return 0;
->   }
->   
-> -static void escc_update_irq(ChannelState *s)
-> +static void escc_update_irq(ESCCChannelState *s)
->   {
->       int irq;
->   
-> @@ -285,12 +239,12 @@ static void escc_update_irq(ChannelState *s)
->       qemu_set_irq(s->irq, irq);
->   }
->   
-> -static void escc_reset_chn(ChannelState *s)
-> +static void escc_reset_chn(ESCCChannelState *s)
->   {
->       int i;
->   
->       s->reg = 0;
-> -    for (i = 0; i < SERIAL_REGS; i++) {
-> +    for (i = 0; i < ESCC_SERIAL_REGS; i++) {
->           s->rregs[i] = 0;
->           s->wregs[i] = 0;
->       }
-> @@ -322,13 +276,13 @@ static void escc_reset(DeviceState *d)
->       escc_reset_chn(&s->chn[1]);
->   }
->   
-> -static inline void set_rxint(ChannelState *s)
-> +static inline void set_rxint(ESCCChannelState *s)
->   {
->       s->rxint = 1;
-> -    /* XXX: missing daisy chainnig: chn_b rx should have a lower priority
-> +    /* XXX: missing daisy chainnig: escc_chn_b rx should have a lower priority
->          than chn_a rx/tx/special_condition service*/
->       s->rxint_under_svc = 1;
-> -    if (s->chn == chn_a) {
-> +    if (s->chn == escc_chn_a) {
->           s->rregs[R_INTR] |= INTR_RXINTA;
->           if (s->wregs[W_MINTR] & MINTR_STATUSHI)
->               s->otherchn->rregs[R_IVEC] = IVEC_HIRXINTA;
-> @@ -344,12 +298,12 @@ static inline void set_rxint(ChannelState *s)
->       escc_update_irq(s);
->   }
->   
-> -static inline void set_txint(ChannelState *s)
-> +static inline void set_txint(ESCCChannelState *s)
->   {
->       s->txint = 1;
->       if (!s->rxint_under_svc) {
->           s->txint_under_svc = 1;
-> -        if (s->chn == chn_a) {
-> +        if (s->chn == escc_chn_a) {
->               if (s->wregs[W_INTR] & INTR_TXINT) {
->                   s->rregs[R_INTR] |= INTR_TXINTA;
->               }
-> @@ -367,11 +321,11 @@ static inline void set_txint(ChannelState *s)
->       }
->   }
->   
-> -static inline void clr_rxint(ChannelState *s)
-> +static inline void clr_rxint(ESCCChannelState *s)
->   {
->       s->rxint = 0;
->       s->rxint_under_svc = 0;
-> -    if (s->chn == chn_a) {
-> +    if (s->chn == escc_chn_a) {
->           if (s->wregs[W_MINTR] & MINTR_STATUSHI)
->               s->otherchn->rregs[R_IVEC] = IVEC_HINOINT;
->           else
-> @@ -389,11 +343,11 @@ static inline void clr_rxint(ChannelState *s)
->       escc_update_irq(s);
->   }
->   
-> -static inline void clr_txint(ChannelState *s)
-> +static inline void clr_txint(ESCCChannelState *s)
->   {
->       s->txint = 0;
->       s->txint_under_svc = 0;
-> -    if (s->chn == chn_a) {
-> +    if (s->chn == escc_chn_a) {
->           if (s->wregs[W_MINTR] & MINTR_STATUSHI)
->               s->otherchn->rregs[R_IVEC] = IVEC_HINOINT;
->           else
-> @@ -412,12 +366,12 @@ static inline void clr_txint(ChannelState *s)
->       escc_update_irq(s);
->   }
->   
-> -static void escc_update_parameters(ChannelState *s)
-> +static void escc_update_parameters(ESCCChannelState *s)
->   {
->       int speed, parity, data_bits, stop_bits;
->       QEMUSerialSetParams ssp;
->   
-> -    if (!qemu_chr_fe_backend_connected(&s->chr) || s->type != ser)
-> +    if (!qemu_chr_fe_backend_connected(&s->chr) || s->type != escc_serial)
->           return;
->   
->       if (s->wregs[W_TXCTRL1] & TXCTRL1_PAREN) {
-> @@ -474,7 +428,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->                              uint64_t val, unsigned size)
->   {
->       ESCCState *serial = opaque;
-> -    ChannelState *s;
-> +    ESCCChannelState *s;
->       uint32_t saddr;
->       int newreg, channel;
->   
-> @@ -561,7 +515,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->                   /* XXX this blocks entire thread. Rewrite to use
->                    * qemu_chr_fe_write and background I/O callbacks */
->                   qemu_chr_fe_write_all(&s->chr, &s->tx, 1);
-> -            } else if (s->type == kbd && !s->disabled) {
-> +            } else if (s->type == escc_kbd && !s->disabled) {
->                   handle_kbd_command(s, val);
->               }
->           }
-> @@ -578,7 +532,7 @@ static uint64_t escc_mem_read(void *opaque, hwaddr addr,
->                                 unsigned size)
->   {
->       ESCCState *serial = opaque;
-> -    ChannelState *s;
-> +    ESCCChannelState *s;
->       uint32_t saddr;
->       uint32_t ret;
->       int channel;
-> @@ -595,10 +549,11 @@ static uint64_t escc_mem_read(void *opaque, hwaddr addr,
->       case SERIAL_DATA:
->           s->rregs[R_STATUS] &= ~STATUS_RXAV;
->           clr_rxint(s);
-> -        if (s->type == kbd || s->type == mouse)
-> +        if (s->type == escc_kbd || s->type == escc_mouse) {
->               ret = get_queue(s);
-> -        else
-> +        } else {
->               ret = s->rx;
-> +        }
->           trace_escc_mem_readb_data(CHN_C(s), ret);
->           qemu_chr_fe_accept_input(&s->chr);
->           return ret;
-> @@ -620,7 +575,7 @@ static const MemoryRegionOps escc_mem_ops = {
->   
->   static int serial_can_receive(void *opaque)
->   {
-> -    ChannelState *s = opaque;
-> +    ESCCChannelState *s = opaque;
->       int ret;
->   
->       if (((s->wregs[W_RXCTRL] & RXCTRL_RXEN) == 0) // Rx not enabled
-> @@ -632,7 +587,7 @@ static int serial_can_receive(void *opaque)
->       return ret;
->   }
->   
-> -static void serial_receive_byte(ChannelState *s, int ch)
-> +static void serial_receive_byte(ESCCChannelState *s, int ch)
->   {
->       trace_escc_serial_receive_byte(CHN_C(s), ch);
->       s->rregs[R_STATUS] |= STATUS_RXAV;
-> @@ -640,7 +595,7 @@ static void serial_receive_byte(ChannelState *s, int ch)
->       set_rxint(s);
->   }
->   
-> -static void serial_receive_break(ChannelState *s)
-> +static void serial_receive_break(ESCCChannelState *s)
->   {
->       s->rregs[R_STATUS] |= STATUS_BRK;
->       escc_update_irq(s);
-> @@ -648,13 +603,13 @@ static void serial_receive_break(ChannelState *s)
->   
->   static void serial_receive1(void *opaque, const uint8_t *buf, int size)
->   {
-> -    ChannelState *s = opaque;
-> +    ESCCChannelState *s = opaque;
->       serial_receive_byte(s, buf[0]);
->   }
->   
->   static void serial_event(void *opaque, int event)
->   {
-> -    ChannelState *s = opaque;
-> +    ESCCChannelState *s = opaque;
->       if (event == CHR_EVENT_BREAK)
->           serial_receive_break(s);
->   }
-> @@ -664,16 +619,16 @@ static const VMStateDescription vmstate_escc_chn = {
->       .version_id = 2,
->       .minimum_version_id = 1,
->       .fields = (VMStateField[]) {
-> -        VMSTATE_UINT32(vmstate_dummy, ChannelState),
-> -        VMSTATE_UINT32(reg, ChannelState),
-> -        VMSTATE_UINT32(rxint, ChannelState),
-> -        VMSTATE_UINT32(txint, ChannelState),
-> -        VMSTATE_UINT32(rxint_under_svc, ChannelState),
-> -        VMSTATE_UINT32(txint_under_svc, ChannelState),
-> -        VMSTATE_UINT8(rx, ChannelState),
-> -        VMSTATE_UINT8(tx, ChannelState),
-> -        VMSTATE_BUFFER(wregs, ChannelState),
-> -        VMSTATE_BUFFER(rregs, ChannelState),
-> +        VMSTATE_UINT32(vmstate_dummy, ESCCChannelState),
-> +        VMSTATE_UINT32(reg, ESCCChannelState),
-> +        VMSTATE_UINT32(rxint, ESCCChannelState),
-> +        VMSTATE_UINT32(txint, ESCCChannelState),
-> +        VMSTATE_UINT32(rxint_under_svc, ESCCChannelState),
-> +        VMSTATE_UINT32(txint_under_svc, ESCCChannelState),
-> +        VMSTATE_UINT8(rx, ESCCChannelState),
-> +        VMSTATE_UINT8(tx, ESCCChannelState),
-> +        VMSTATE_BUFFER(wregs, ESCCChannelState),
-> +        VMSTATE_BUFFER(rregs, ESCCChannelState),
->           VMSTATE_END_OF_LIST()
->       }
->   };
-> @@ -684,39 +639,11 @@ static const VMStateDescription vmstate_escc = {
->       .minimum_version_id = 1,
->       .fields = (VMStateField[]) {
->           VMSTATE_STRUCT_ARRAY(chn, ESCCState, 2, 2, vmstate_escc_chn,
-> -                             ChannelState),
-> +                             ESCCChannelState),
->           VMSTATE_END_OF_LIST()
->       }
->   };
->   
-> -MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
-> -              Chardev *chrA, Chardev *chrB,
-> -              int clock, int it_shift)
-> -{
-> -    DeviceState *dev;
-> -    SysBusDevice *s;
-> -    ESCCState *d;
-> -
-> -    dev = qdev_create(NULL, TYPE_ESCC);
-> -    qdev_prop_set_uint32(dev, "disabled", 0);
-> -    qdev_prop_set_uint32(dev, "frequency", clock);
-> -    qdev_prop_set_uint32(dev, "it_shift", it_shift);
-> -    qdev_prop_set_chr(dev, "chrB", chrB);
-> -    qdev_prop_set_chr(dev, "chrA", chrA);
-> -    qdev_prop_set_uint32(dev, "chnBtype", ser);
-> -    qdev_prop_set_uint32(dev, "chnAtype", ser);
-> -    qdev_init_nofail(dev);
-> -    s = SYS_BUS_DEVICE(dev);
-> -    sysbus_connect_irq(s, 0, irqB);
-> -    sysbus_connect_irq(s, 1, irqA);
-> -    if (base) {
-> -        sysbus_mmio_map(s, 0, base);
-> -    }
-> -
-> -    d = ESCC(s);
-> -    return &d->mmio;
-> -}
-> -
->   static const uint8_t qcode_to_keycode[Q_KEY_CODE__MAX] = {
->       [Q_KEY_CODE_SHIFT]         = 99,
->       [Q_KEY_CODE_SHIFT_R]       = 110,
-> @@ -841,7 +768,7 @@ static const uint8_t qcode_to_keycode[Q_KEY_CODE__MAX] = {
->   static void sunkbd_handle_event(DeviceState *dev, QemuConsole *src,
->                                   InputEvent *evt)
->   {
-> -    ChannelState *s = (ChannelState *)dev;
-> +    ESCCChannelState *s = (ESCCChannelState *)dev;
->       int qcode, keycode;
->       InputKeyEvent *key;
->   
-> @@ -893,7 +820,7 @@ static QemuInputHandler sunkbd_handler = {
->       .event = sunkbd_handle_event,
->   };
->   
-> -static void handle_kbd_command(ChannelState *s, int val)
-> +static void handle_kbd_command(ESCCChannelState *s, int val)
->   {
->       trace_escc_kbd_command(val);
->       if (s->led_mode) { // Ignore led byte
-> @@ -924,7 +851,7 @@ static void handle_kbd_command(ChannelState *s, int val)
->   static void sunmouse_event(void *opaque,
->                                  int dx, int dy, int dz, int buttons_state)
->   {
-> -    ChannelState *s = opaque;
-> +    ESCCChannelState *s = opaque;
->       int ch;
->   
->       trace_escc_sunmouse_event(dx, dy, buttons_state);
-> @@ -963,27 +890,6 @@ static void sunmouse_event(void *opaque,
->       put_queue(s, 0);
->   }
->   
-> -void slavio_serial_ms_kbd_init(hwaddr base, qemu_irq irq,
-> -                               int disabled, int clock, int it_shift)
-> -{
-> -    DeviceState *dev;
-> -    SysBusDevice *s;
-> -
-> -    dev = qdev_create(NULL, TYPE_ESCC);
-> -    qdev_prop_set_uint32(dev, "disabled", disabled);
-> -    qdev_prop_set_uint32(dev, "frequency", clock);
-> -    qdev_prop_set_uint32(dev, "it_shift", it_shift);
-> -    qdev_prop_set_chr(dev, "chrB", NULL);
-> -    qdev_prop_set_chr(dev, "chrA", NULL);
-> -    qdev_prop_set_uint32(dev, "chnBtype", mouse);
-> -    qdev_prop_set_uint32(dev, "chnAtype", kbd);
-> -    qdev_init_nofail(dev);
-> -    s = SYS_BUS_DEVICE(dev);
-> -    sysbus_connect_irq(s, 0, irq);
-> -    sysbus_connect_irq(s, 1, irq);
-> -    sysbus_mmio_map(s, 0, base);
-> -}
-> -
->   static void escc_init1(Object *obj)
->   {
->       ESCCState *s = ESCC(obj);
-> @@ -1020,11 +926,11 @@ static void escc_realize(DeviceState *dev, Error **errp)
->           }
->       }
->   
-> -    if (s->chn[0].type == mouse) {
-> +    if (s->chn[0].type == escc_mouse) {
->           qemu_add_mouse_event_handler(sunmouse_event, &s->chn[0], 0,
->                                        "QEMU Sun Mouse");
->       }
-> -    if (s->chn[1].type == kbd) {
-> +    if (s->chn[1].type == escc_kbd) {
->           s->chn[1].hs = qemu_input_handler_register((DeviceState *)(&s->chn[1]),
->                                                      &sunkbd_handler);
->       }
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 3fa7c429d5..de061ae76f 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -369,8 +369,23 @@ static void ppc_core99_init(MachineState *machine)
->       }
->   
->       /* init basic PC hardware */
-> -    escc_mem = escc_init(0, pic[0x25], pic[0x24],
-> -                         serial_hds[0], serial_hds[1], ESCC_CLOCK, 4);
-> +
-> +    dev = qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", 0);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 4);
-> +    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> +    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> +    qdev_init_nofail(dev);
-> +
-> +    s = SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, pic[0x24]);
-> +    sysbus_connect_irq(s, 1, pic[0x25]);
-> +
-> +    escc_mem = &ESCC(s)->mmio;
-> +
->       memory_region_init_alias(escc_bar, NULL, "escc-bar",
->                                escc_mem, 0, memory_region_size(escc_mem));
->   
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index 010ea36bf2..da0106b09d 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -104,6 +104,7 @@ static void ppc_heathrow_init(MachineState *machine)
->       DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->       void *fw_cfg;
->       uint64_t tbfreq;
-> +    SysBusDevice *s;
->   
->       linux_boot = (kernel_filename != NULL);
->   
-> @@ -264,8 +265,22 @@ static void ppc_heathrow_init(MachineState *machine)
->                                  get_system_io());
->       pci_vga_init(pci_bus);
->   
-> -    escc_mem = escc_init(0, pic[0x0f], pic[0x10], serial_hds[0],
-> -                               serial_hds[1], ESCC_CLOCK, 4);
-> +    dev = qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", 0);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 4);
-> +    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> +    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> +    qdev_init_nofail(dev);
-> +
-> +    s = SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, pic[0x10]);
-> +    sysbus_connect_irq(s, 1, pic[0x0f]);
-> +
-> +    escc_mem = &ESCC(s)->mmio;
-> +
->       memory_region_init_alias(escc_bar, NULL, "escc-bar",
->                                escc_mem, 0, memory_region_size(escc_mem));
->   
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index dd0038095b..0597127989 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -820,6 +820,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->       DriveInfo *fd[MAX_FD];
->       FWCfgState *fw_cfg;
->       unsigned int num_vsimms;
-> +    DeviceState *dev;
-> +    SysBusDevice *s;
->   
->       /* init CPUs */
->       for(i = 0; i < smp_cpus; i++) {
-> @@ -927,12 +929,36 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->   
->       slavio_timer_init_all(hwdef->counter_base, slavio_irq[19], slavio_cpu_irq, smp_cpus);
->   
-> -    slavio_serial_ms_kbd_init(hwdef->ms_kb_base, slavio_irq[14],
-> -                              !machine->enable_graphics, ESCC_CLOCK, 1);
-> +    dev = qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", !machine->enable_graphics);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 1);
-> +    qdev_prop_set_chr(dev, "chrB", NULL);
-> +    qdev_prop_set_chr(dev, "chrA", NULL);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_mouse);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_kbd);
-> +    qdev_init_nofail(dev);
-> +    s = SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, slavio_irq[14]);
-> +    sysbus_connect_irq(s, 1, slavio_irq[14]);
-> +    sysbus_mmio_map(s, 0, hwdef->ms_kb_base);
-> +
->       /* Slavio TTYA (base+4, Linux ttyS0) is the first QEMU serial device
->          Slavio TTYB (base+0, Linux ttyS1) is the second QEMU serial device */
+The vhost-user device backend facilitates vhost-user device emulation
+through vhost-user protocol exchanges and access to shared memory.
+Software-defined networking, storage, and other I/O appliances can
+provide services through this device.
 
-Minor nit: can you move this comment to just before qdev_create() for 
-the serial port above?
+For more information about virtio-vhost-user, see
+https://wiki.qemu.org/Features/VirtioVhostUser
 
-> -    escc_init(hwdef->serial_base, slavio_irq[15], slavio_irq[15],
-> -              serial_hds[0], serial_hds[1], ESCC_CLOCK, 1);
-> +    dev = qdev_create(NULL, TYPE_ESCC);
-> +    qdev_prop_set_uint32(dev, "disabled", 0);
-> +    qdev_prop_set_uint32(dev, "frequency", ESCC_CLOCK);
-> +    qdev_prop_set_uint32(dev, "it_shift", 1);
-> +    qdev_prop_set_chr(dev, "chrB", serial_hds[1]);
-> +    qdev_prop_set_chr(dev, "chrA", serial_hds[0]);
-> +    qdev_prop_set_uint32(dev, "chnBtype", escc_serial);
-> +    qdev_prop_set_uint32(dev, "chnAtype", escc_serial);
-> +    qdev_init_nofail(dev);
-> +
-> +    s = SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(s, 0, slavio_irq[15]);
-> +    sysbus_connect_irq(s, 1,  slavio_irq[15]);
-> +    sysbus_mmio_map(s, 0, hwdef->serial_base);
->   
->       if (hwdef->apc_base) {
->           apc_init(hwdef->apc_base, qemu_allocate_irq(cpu_halt_signal, NULL, 0));
-> diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
-> index 08ae122386..42aca83611 100644
-> --- a/include/hw/char/escc.h
-> +++ b/include/hw/char/escc.h
-> @@ -1,14 +1,58 @@
->   #ifndef HW_ESCC_H
->   #define HW_ESCC_H
->   
-> +#include "chardev/char-fe.h"
-> +#include "chardev/char-serial.h"
-> +#include "ui/input.h"
-> +
->   /* escc.c */
->   #define TYPE_ESCC "escc"
->   #define ESCC_SIZE 4
-> -MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
-> -              Chardev *chrA, Chardev *chrB,
-> -              int clock, int it_shift);
->   
-> -void slavio_serial_ms_kbd_init(hwaddr base, qemu_irq irq,
-> -                               int disabled, int clock, int it_shift);
-> +#define ESCC(obj) OBJECT_CHECK(ESCCState, (obj), TYPE_ESCC)
-> +
-> +typedef enum {
-> +    escc_chn_a, escc_chn_b,
-> +} ESCCChnID;
-> +
-> +typedef enum {
-> +    escc_serial, escc_kbd, escc_mouse,
-> +} ESCCChnType;
-> +
-> +#define ESCC_SERIO_QUEUE_SIZE 256
-> +
-> +typedef struct {
-> +    uint8_t data[ESCC_SERIO_QUEUE_SIZE];
-> +    int rptr, wptr, count;
-> +} ESCCSERIOQueue;
-> +
-> +#define ESCC_SERIAL_REGS 16
-> +typedef struct ESCCChannelState {
-> +    qemu_irq irq;
-> +    uint32_t rxint, txint, rxint_under_svc, txint_under_svc;
-> +    struct ESCCChannelState *otherchn;
-> +    uint32_t reg;
-> +    uint8_t wregs[ESCC_SERIAL_REGS], rregs[ESCC_SERIAL_REGS];
-> +    ESCCSERIOQueue queue;
-> +    CharBackend chr;
-> +    int e0_mode, led_mode, caps_lock_mode, num_lock_mode;
-> +    int disabled;
-> +    int clock;
-> +    uint32_t vmstate_dummy;
-> +    ESCCChnID chn; /* this channel, A (base+4) or B (base+0) */
-> +    ESCCChnType type;
-> +    uint8_t rx, tx;
-> +    QemuInputHandlerState *hs;
-> +} ESCCChannelState;
-> +
-> +typedef struct ESCCState {
-> +    SysBusDevice parent_obj;
-> +
-> +    struct ESCCChannelState chn[2];
-> +    uint32_t it_shift;
-> +    MemoryRegion mmio;
-> +    uint32_t disabled;
-> +    uint32_t frequency;
-> +} ESCCState;
->   
->   #endif
+This device is based on Wei Wang's vhost-pci work.  The virtio
+vhost-user device differs from vhost-pci because it is a single virtio
+device type that exposes the vhost-user protocol instead of a family of
+new virtio device types, one for each vhost-user device type.
 
-Other than the minor nit above, looks good to me - thanks for helping 
-remove another legacy API.
+This device supports vhost-user slave and vhost-user master
+reconnection.  It also contains a UUID so that vhost-user slave programs
+can identify a specific device among many without using bus addresses.
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+It is somewhat unconventional for a virtio device because it makes use
+of additional resources called doorbells, notifications, and shared
+memory.  A mapping of these resources to the virtio PCI transport is
+provided.  Other transports, such as CCW may not be able to support
+this device.
 
+Cc: Wei Wang <wei.w.wang@intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v2:
+ * Call the device a "vhost-user device backend" instead of a
+   "vhost-user slave"
+ * Use rxq/txq layout suggested by Wei Wang
 
-ATB,
+ content.tex      | 295 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ introduction.tex |   1 +
+ 2 files changed, 296 insertions(+)
 
-Mark.
+diff --git a/content.tex b/content.tex
+index c840588..d890151 100644
+--- a/content.tex
++++ b/content.tex
+@@ -3022,6 +3022,8 @@ Device ID  &  Virtio Device    \\
+ \hline
+ 22         &   pstore device \\
+ \hline
++24         &   vhost-user device backend \\
++\hline
+ \end{tabular}
+ 
+ Some of the devices above are unspecified by this document,
+@@ -5819,6 +5821,299 @@ descriptor for the \field{sense_len}, \field{residual},
+ \field{status_qualifier}, \field{status}, \field{response} and
+ \field{sense} fields.
+ 
++\section{Vhost-user Device Backend}\label{sec:Device Types / Vhost-user Device Backend}
++
++The vhost-user device backend facilitates vhost-user device emulation through
++vhost-user protocol exchanges and access to shared memory.  Software-defined
++networking, storage, and other I/O appliances can provide services through this
++device.
++
++This section relies on definitions from the \hyperref[intro:Vhost-user
++Protocol]{Vhost-user Protocol}.  Knowledge of the vhost-user protocol is a
++prerequisite for understanding this device.
++
++The \hyperref[intro:Vhost-user Protocol]{Vhost-user Protocol} was originally
++designed for processes on a single system communicating over UNIX domain
++sockets.  The virtio vhost-user device backend allows the vhost-user slave to
++communicate with the vhost-user master over the device instead of a UNIX domain
++socket.  This allows the slave and master to run on two separate systems such
++as a virtual machine and a hypervisor.
++
++The vhost-user slave program exchanges vhost-user protocol messages with the
++vhost-user master through this device.  How the device implementation
++communicates with the vhost-user master is beyond the scope of this
++specification.  One possible device implementation uses a UNIX domain socket to
++relay messages to a vhost-user master process running on the same host.
++
++Existing vhost-user slave programs that communicate over UNIX domain sockets
++can support the virtio vhost-user device backend without invasive changes
++because the pre-existing vhost-user wire protocol is used.
++
++\subsection{Device ID}\label{sec:Device Types / Vhost-user Device Backend / Device ID}
++  24
++
++\subsection{Virtqueues}\label{sec:Device Types / Vhost-user Device Backend / Virtqueues}
++
++\begin{description}
++\item[0] rxq (device-to-driver vhost-user protocol messages)
++\item[1] txq (driver-to-device vhost-user protocol messages)
++\end{description}
++
++\subsection{Feature bits}\label{sec:Device Types / Vhost-user Device Backend / Feature bits}
++
++No feature bits are defined at this time.
++
++\subsection{Device configuration layout}\label{sec:Device Types / Vhost-user Device Backend / Device configuration layout}
++
++  All fields of this configuration are always available.
++
++\begin{lstlisting}
++struct virtio_vhost_user_config {
++        le32 status;
++#define VIRTIO_VHOST_USER_STATUS_SLAVE_UP 0
++#define VIRTIO_VHOST_USER_STATUS_MASTER_UP 1
++        le32 max_vhost_queues;
++        u8 uuid[16];
++};
++\end{lstlisting}
++
++\begin{description}
++\item[\field{status}] contains the vhost-user operational status.  The default
++    value of this field is 0.
++
++    The driver sets VIRTIO_VHOST_USER_STATUS_SLAVE_UP to indicate readiness for
++    the vhost-user master to connect.  The vhost-user master cannot connect
++    unless the driver has set this bit first.
++
++    When the driver clears VIRTIO_VHOST_USER_SLAVE_UP while the vhost-user
++    master is connected, the vhost-user master is disconnected.
++
++    When the vhost-user master disconnects, both
++    VIRTIO_VHOST_USER_STATUS_SLAVE_UP and VIRTIO_VHOST_USER_STATUS_MASTER_UP
++    are cleared by the device.  Communication can be restarted by the driver
++    setting VIRTIO_VHOST_USER_STATUS_SLAVE_UP again.
++
++    A configuration change notification is sent when the device changes
++    this field unless a write to the field by the driver caused the change.
++
++\item[\field{max_vhost_queues}] is the maximum number of vhost-user queues
++    supported by this device.  This field is always greater than 0.
++
++\item[\field{uuid}] is the Universally Unique Identifier (UUID) for this
++    device.  If the device has no UUID then this field contains the nil
++    UUID (all zeroes).  The UUID allows vhost-user slave programs to identify a
++    specific vhost-user device backend among many without relying on bus
++    addresses.
++\end{description}
++
++\drivernormative{\subsubsection}{Device configuration layout}{Device Types / Vhost-user Device Backend / Device configuration layout}
++
++The driver MUST NOT write to device configuration fields other than
++\field{status}.
++
++The driver MUST NOT set undefined bits in the \field{status} configuration field.
++
++\devicenormative{\subsection}{Device Initialization}{Device Types / Vhost-user Device Backend / Device Initialization}
++
++The driver SHOULD check the \field{max_vhost_queues} configuration field to
++determine how many queues the vhost-user slave will be able to support.
++
++The driver SHOULD fetch the \field{uuid} configuration field to allow
++vhost-user slave programs to identify a specific device among many.
++
++The driver SHOULD place at least one buffer in rxq before setting the
++VIRTIO_VHOST_USER_SLAVE_UP bit in the \field{status} configuration field.
++
++The driver MUST handle rxq virtqueue notifications that occur before the
++configuration change notification.  It is possible that a vhost-user protocol
++message from the vhost-user master arrives before the driver has seen the
++configuration change notification for the VIRTIO_VHOST_USER_STATUS_MASTER_UP
++\field{status} change.
++
++\subsection{Device Operation}\label{sec:Device Types / Vhost-user Device Backend / Device Operation}
++
++Device operation consists of operating request queues and response queues.
++
++\subsubsection{Device Operation: Request Queues}\label{sec:Device Types / Vhost-user Device Backend / Device Operation / Device Operation: Request Queues}
++
++The driver receives vhost-user protocol messages from the vhost-user master on
++rxq.  The driver sends responses to the vhost-user master on txq.
++
++The driver sends slave-initiated requests on txq.  The driver receives
++responses from the vhost-user master on rxq.
++
++All virtqueues offer in-order guaranteed delivery semantics for vhost-user
++protocol messages.
++
++Each buffer is a vhost-user protocol message as defined by the
++\hyperref[intro:Vhost-user Protocol]{Vhost-user Protocol}.  In order to enable
++cross-endian communication, all message fields are little-endian instead of the
++native byte order normally used by the protocol.
++
++The appropriate size of rxq buffers is at least as large as the largest message
++defined by the \hyperref[intro:Vhost-user Protocol]{Vhost-user Protocol}
++standard version that the driver supports.  If the vhost-user master sends a
++message that is too large for an rxq buffer then DEVICE_NEEDS_RESET is set and
++the driver must reset the device.
++
++File descriptor passing is handled differently by the vhost-user device
++backend.  When a message is received that carries one or more file descriptors
++according to the vhost-user protocol, additional device resources become
++available to the driver.
++
++\subsection{Additional Device Resources over PCI}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI}
++
++The vhost-user device backend contains additional device resources beyond
++configuration space and virtqueues.  The nature of these resources is
++transport-specific and therefore only virtio transports that provide these
++resources support the vhost-user device backend.
++
++The following additional resources exist:
++\begin{description}
++  \item[Doorbells] The driver signals the vhost-user master through doorbells.  The signal does not carry any data, it is purely an event.
++  \item[Notifications] The vhost-user master signals the driver for events besides virtqueue activity and configuration changes by sending notifications.
++  \item[Shared memory] The vhost-user master gives access to memory that can be mapped by the driver.
++\end{description}
++
++\subsubsection{Doorbell Numbering}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Doorbell Numbering}
++
++Doorbells are laid out as follows:
++
++\begin{description}
++\item[0] Vring call for vhost-user queue 0
++\item[\ldots]
++\item[N] Vring err for vhost-user queue 0
++\item[\ldots]
++\item[2N] Log
++\end{description}
++
++\subsubsection{Notifications}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Notifications}
++
++Notifications are laid out as follows:
++
++\begin{description}
++\item[0] Vring kick for vhost-user queue 0
++\item[\ldots]
++\item[N-1] Vring kick for vhost-user queue N-1
++\end{description}
++
++\subsubsection{Shared Memory Layout}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Shared Memory Layout}
++
++Shared memory is laid out as follows:
++
++\begin{description}
++\item[0] Vhost memory region 0
++\item[SIZE0] Vhost memory region 1
++\item[\ldots]
++\item[SIZE0 + SIZE1 + \ldots] Log
++\end{description}
++
++The size of vhost memory region 0 is \field{SIZE0}, the size of vhost memory
++region 1 is \field{SIZE1}, and so on.
++
++\subsubsection{Availability of Additional Resources}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Availability of Additional Resources}
++
++The following vhost-user protocol messages convey access to additional device
++resources:
++
++\begin{description}
++\item[VHOST_USER_SET_MEM_TABLE] Contents of vhost memory regions are available to the driver in shared memory.  Region contents are laid out in the same order as the vhost memory region list.
++\item[VHOST_USER_SET_LOG_BASE] Contents of the log are available to the driver in shared memory.
++\item[VHOST_USER_SET_LOG_FD] The log doorbell is available to the driver.  Writes to the log doorbell before this message is received produce no effect.
++\item[VHOST_USER_SET_VRING_KICK] The vring kick notification for this queue is available to the driver.  The first notification may occur before the driver has processed this message.
++\item[VHOST_USER_SET_VRING_CALL] The vring call doorbell for this queue is available to the driver.  Writes to the vring call doorbell before this message is received produce no effect.
++\item[VHOST_USER_SET_VRING_ERR] The vring err doorbell for this queue is available to the driver.  Writes to the vring err doorbell before this message is received produce no effect.
++\item[VHOST_USER_SET_SLAVE_REQ_FD] The driver may send vhost-user protocol slave messages on txq.  Buffers put onto txq before this message is received are discarded by the device.
++\end{description}
++
++Additional resources are configured on the virtio PCI transport by the following \field{struct virtio_pci_cap.cfg_type} values:
++
++\begin{lstlisting}
++#define VIRTIO_PCI_CAP_DOORBELL_CFG 6
++#define VIRTIO_PCI_CAP_NOTIFICATION_CFG 7
++#define VIRTIO_PCI_CAP_SHARED_MEMORY_CFG 8
++\end{lstlisting}
++
++\subsubsection{Doorbell structure layout}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Doorbell capability}
++
++The doorbell location is found using the VIRTIO_PCI_CAP_DOORBELL_CFG
++capability.  This capability is immediately followed by an additional
++field, like so:
++
++\begin{lstlisting}
++struct virtio_pci_doorbell_cap {
++        struct virtio_pci_cap cap;
++        le32 doorbell_off_multiplier;
++};
++\end{lstlisting}
++
++The doorbell address within a BAR is calculated as follows:
++
++\begin{lstlisting}
++        cap.offset + doorbell_idx * doorbell_off_multiplier
++\end{lstlisting}
++
++The \field{cap.offset} and \field{doorbell_off_multiplier} are taken from the
++notification capability structure above, and the \field{doorbell_idx} is the
++doorbell number.
++
++\devicenormative{\paragraph}{Doorbell capability}{Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Doorbell capability}
++The device MUST present at least one doorbell capability.
++
++The \field{cap.offset} MUST be 2-byte aligned.  
++
++The device MUST either present \field{doorbell_off_multiplier} as an even power of 2,
++or present \field{doorbell_off_multiplier} as 0.
++
++The value \field{cap.length} presented by the device MUST be at least 2
++and MUST be large enough to support doorbell offsets for all supported
++doorbells in all possible configurations.
++
++The value \field{cap.length} presented by the device MUST satisfy:
++\begin{lstlisting}
++cap.length >= num_doorbells * doorbell_off_multiplier + 2
++\end{lstlisting}
++
++The number of doorbells is \field{num_doorbells} and is dependent on the
++device.
++
++\subsubsection{Notification structure layout}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Notification capability}
++
++The notification structure allows MSI-X vectors to be configured for
++notification interrupts.  If MSI-X is not available, bit 2 of the ISR status
++indicates that a notification occurred.
++
++The notification structure is found using the VIRTIO_PCI_CAP_DOORBELL_CFG
++capability.
++
++\begin{lstlisting}
++struct virtio_pci_notification_cfg {
++        le16 notification_select;              /* read-write */
++        le16 notification_msix_vector;         /* read-write */
++};
++\end{lstlisting}
++
++The driver indicates which notification is of interest by writing the
++\field{notification_select} field.  The driver then writes the MSI-X vector or
++\field{VIRTIO_MSI_NO_VECTOR} to \field{notification_msix_vector} to change the
++MSI-X vector for that notification.
++
++\subsubsection{Shared memory capability}\label{sec:Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Shared Memory capability}
++
++The shared memory location is found using the VIRTIO_PCI_CAP_SHARED_MEMORY_CFG
++capability.
++
++\devicenormative{\paragraph}{Shared Memory capability}{Device Types / Vhost-user Device Backend / Additional Device Resources over PCI / Shared Memory capability}
++The device MUST present exactly one shared memory capability.
++
++The device MUST locate shared memory in a Memory Space BAR.
++
++The device SHOULD locate shared memory in a Prefetchable BAR.
++
++The \field{cap.offset} MUST be 4096-byte aligned.
++
++The value \field{cap.length} presented by the device MUST be non-zero and 4096-byte aligned.
++
+ \chapter{Reserved Feature Bits}\label{sec:Reserved Feature Bits}
+ 
+ Currently these device-independent feature bits defined:
+diff --git a/introduction.tex b/introduction.tex
+index 979881e..0bf400d 100644
+--- a/introduction.tex
++++ b/introduction.tex
+@@ -60,6 +60,7 @@ Levels'', BCP 14, RFC 2119, March 1997. \newline\url{http://www.ietf.org/rfc/rfc
+ 	\phantomsection\label{intro:SCSI MMC}\textbf{[SCSI MMC]} &
+         SCSI Multimedia Commands,
+         \newline\url{http://www.t10.org/cgi-bin/ac.pl?t=f&f=mmc6r00.pdf}\\
++	\phantomsection\label{intro:Vhost-user Protocol}\textbf{[Vhost-user Protocol]} & Vhost-user Protocol, \newline\url{https://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/interop/vhost-user.txt;hb=HEAD}, and any future revisions\\
+ 
+ \end{longtable}
+ 
+-- 
+2.14.3
