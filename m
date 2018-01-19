@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1ecZln-0005a2-V8
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:44:00 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ecZp2-0008W9-QZ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:47:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1ecZlk-0003Vk-Oi
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:44:00 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:58542)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1ecZlk-0003UV-At
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:43:56 -0500
-MIME-version: 1.0
-Content-type: text/plain; charset="utf-8"; format="flowed"
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <f399b096-6e75-c04f-bb02-80e327de45c4@samsung.com>
-Date: Fri, 19 Jan 2018 19:43:44 +0300
-In-reply-to: <d746e2e8-3690-c27e-f816-9892b36d8a1c@amsat.org>
-Content-language: en-GB
-References: <20180115115309.23982-1-quintela@redhat.com>
-	<CAFEAcA-SxiJyKa84UwG8CESpkTXEM9AG5HqEgpPrzSFwrTPzYg@mail.gmail.com>
-	<CGME20180119162746epcas1p2143cef3a97b076ce3fbc0b79d7d347b7@epcas1p2.samsung.com>
-	<d746e2e8-3690-c27e-f816-9892b36d8a1c@amsat.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1ecZoz-00059V-OR
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:47:20 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38437)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ecZoz-00059I-H4
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:47:17 -0500
+Received: by mail-wm0-x241.google.com with SMTP id 141so4754928wme.3
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 08:47:17 -0800 (PST)
+References: <1516377391-25945-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1516377391-25945-7-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1516377391-25945-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 19 Jan 2018 16:47:14 +0000
+Message-ID: <87inbxokx9.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/27] Migration pull
+Subject: Re: [Qemu-devel] [PATCH 6/7] hw/mips_cpc: kick a VP when putting it
+ into Run state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Goran Ferenc <goran.ferenc@mips.com>, Miodrag Dinic <miodrag.dinic@mips.com>, Petar Jovanovic <petar.jovanovic@mips.com>
 
-On 01/19/2018 07:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 01/15/2018 01:14 PM, Peter Maydell wrote:
->> On 15 January 2018 at 11:52, Juan Quintela <quintela@redhat.com> wrote=
-:
->>> Hi
->>> - rebase on top of lastest
->>> - fix compilation on 32bit machines
->>> - add Peter Xu cleanups
->>>
->>> Please, apply.
->>>
->>> The following changes since commit fd06527b80c88c8dde1b35fdc692685b68=
-d2fd93:
->>>
->>>    Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibaul=
-t' into staging (2018-01-15 10:39:29 +0000)
->>>
->>> are available in the Git repository at:
->>>
->>>    git://github.com/juanquintela/qemu.git tags/migration/20180115
->>>
->>> for you to fetch changes up to 816306826a45f4d15352e32d157172af3a3589=
-9f:
->>>
->>>    migration: remove notify in fd_error (2018-01-15 12:48:13 +0100)
->>>
->>> ----------------------------------------------------------------
->>> migration/next for 20180115
->> Applied, thanks.
-> We have armel/armhf/powerpc hosts failing since this pull due to commit
-> 3be98be4e9f.
+
+Aleksandar Markovic <aleksandar.markovic@rt-rk.com> writes:
+
+> From: Miodrag Dinic <miodrag.dinic@mips.com>
 >
-> Those target are currently tested on Shippable CI, eventually adding an
-> IRC bot we could notice.
+> While testing mttcg VP0 could get gets stuck in a loop waiting
+> for other VPs to come up (which never actually happens). To fix this,
+> kick VPs while they are being powered up by Cluster Power Controller
+> in a async task which is triggered once the host thread is being
+> spawned.
 >
-> I know companies using QEMU system in embedded armel/armhf hosts, I
-> don't know about the ppc32 hosts.
-> This is however unlikely the migration features are used there.
+> Signed-off-by: Miodrag Dinic <miodrag.dinic@mips.com>
+> Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
+> Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+> ---
+>  hw/misc/mips_cpc.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
 >
-> If 64bit atomic op are required for migration (performance/security) bu=
-t
-> not on 32bit system, one way to fix it could be to have the migration
-> code being optional... so we can disable it on 32bit hosts.
+> diff --git a/hw/misc/mips_cpc.c b/hw/misc/mips_cpc.c
+> index 6d34574..105a109 100644
+> --- a/hw/misc/mips_cpc.c
+> +++ b/hw/misc/mips_cpc.c
+> @@ -30,6 +30,14 @@ static inline uint64_t cpc_vp_run_mask(MIPSCPCState *c=
+pc)
+>      return (1ULL << cpc->num_vp) - 1;
+>  }
 >
-> Regards,
->
-> Phil.
->
-Thank you Phil for report,
+> +static void mips_cpu_reset_async_work(CPUState *cs, run_on_cpu_data data)
+> +{
+> +    MIPSCPCState *cpc =3D (MIPSCPCState *) data.host_ptr;
 
-I have a release this week and it's not yet over.
+Is MIPSCPCState part of the CPUState or a shared structure? If it is a
+shared structure you may need to use safe work or have some form of
+locking to prevent races.
 
-As I remember, I tested build in QEMU's docker build system,
+> +
+> +    cpu_reset(cs);
+> +    cpc->vp_running |=3D 1ULL << cs->cpu_index;
+> +}
+> +
+>  static void cpc_run_vp(MIPSCPCState *cpc, uint64_t vp_run)
+>  {
+>      CPUState *cs =3D first_cpu;
+> @@ -37,8 +45,13 @@ static void cpc_run_vp(MIPSCPCState *cpc, uint64_t vp_=
+run)
+>      CPU_FOREACH(cs) {
+>          uint64_t i =3D 1ULL << cs->cpu_index;
+>          if (i & vp_run & ~cpc->vp_running) {
+> -            cpu_reset(cs);
+> -            cpc->vp_running |=3D i;
+> +            /*
+> +             * To avoid racing with a CPU we are just kicking off.
+> +             * We do the final bit of preparation for the work in
+> +             * the target CPUs context.
+> +             */
+> +            async_run_on_cpu(cs, mips_cpu_reset_async_work,
+> +                             RUN_ON_CPU_HOST_PTR(cpc));
+>          }
+>      }
+>  }
 
-but now I checked it on i386 Ubuntu, and yes linker says about unresolved
 
-atomic symbols. Next week, I'll have a time to investigate it deeper.
-
-
---=20
-Best regards,
-Alexey Perevalov
+--
+Alex Benn=C3=A9e
