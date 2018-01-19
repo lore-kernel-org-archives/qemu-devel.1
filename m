@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecWWD-0005uK-Vk
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:15:43 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ecWWQ-00066g-Ji
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:15:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecWW9-00084w-MY
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:15:41 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecWW9-00084q-Fy
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:15:37 -0500
-Received: by mail-qt0-x243.google.com with SMTP id u10so3669335qtg.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 05:15:37 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
-	<07099f0ebd7a206ee94eb555be35995e69ab31f5.1515960078.git.pisa@cmp.felk.cvut.cz>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5d7e9b67-02c4-e66f-6fda-de4235327ac1@amsat.org>
-Date: Fri, 19 Jan 2018 10:15:31 -0300
+	(envelope-from <eric.auger@redhat.com>) id 1ecWWN-0008BB-8G
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:15:54 -0500
+References: <20171215062914.27927-1-aik@ozlabs.ru>
+	<3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
+	<20180105082916.480132af@t450s.home>
+	<51ac953b-da09-94ed-41a4-ae75ca045c5e@ozlabs.ru>
+	<20180118145920.2dd19c9a@w520.home>
+	<c97a4741-dac0-5186-91e9-3dd0b1e4bf1e@ozlabs.ru>
+	<20180118202541.6b40f2a8@w520.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9160fdc1-320d-eaee-2d7c-c319e9fd5996@redhat.com>
+Date: Fri, 19 Jan 2018 14:15:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <07099f0ebd7a206ee94eb555be35995e69ab31f5.1515960078.git.pisa@cmp.felk.cvut.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20180118202541.6b40f2a8@w520.home>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 6/7] CAN bus PCM-3680I PCI (dual SJA1000
- channel) emulation added.
+Subject: Re: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,376 +29,356 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pisa@cmp.felk.cvut.cz, qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 01/14/2018 05:14 PM, pisa@cmp.felk.cvut.cz wrote:
-> From: Deniz Eren <deniz.eren@icloud.com>
+Hi,
+
+On 19/01/18 04:25, Alex Williamson wrote:
+> On Fri, 19 Jan 2018 13:41:41 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 > 
-> Signed-off-by: Deniz Eren <deniz.eren@icloud.com>
-> Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-> ---
->  hw/can/Makefile.objs     |   1 +
->  hw/can/can_pcm3680_pci.c | 336 +++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 337 insertions(+)
->  create mode 100644 hw/can/can_pcm3680_pci.c
+>> On 19/01/18 08:59, Alex Williamson wrote:
+>>> On Tue, 16 Jan 2018 16:17:58 +1100
+>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>   
+>>>> On 06/01/18 02:29, Alex Williamson wrote:  
+>>>>> On Fri, 5 Jan 2018 10:48:07 +0100
+>>>>> Auger Eric <eric.auger@redhat.com> wrote:
+>>>>>     
+>>>>>> Hi Alexey,
+>>>>>>
+>>>>>> On 15/12/17 07:29, Alexey Kardashevskiy wrote:    
+>>>>>>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+>>>>>>> which tells that a region with MSIX data can be mapped entirely, i.e.
+>>>>>>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+>>>>>>>
+>>>>>>> With this change, all BARs are mapped in a single chunk and MSIX vectors
+>>>>>>> are emulated on top unless the machine requests not to by defining and
+>>>>>>> enabling a new "vfio-no-msix-emulation" property. At the moment only
+>>>>>>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
+>>>>>>> enabling it as it does not define the "set" callback for the new property;
+>>>>>>> the new property also does not appear in "-machine pseries,help".
+>>>>>>>
+>>>>>>> If the new capability is present, this puts MSIX IO memory region under
+>>>>>>> mapped memory region. If the capability is not there, it falls back to
+>>>>>>> the old behaviour with the sparse capability.
+>>>>>>>
+>>>>>>> In MSIX vectors section is not aligned to the page size, the KVM memory
+>>>>>>> listener does not register it with the KVM as a memory slot and MSIX is
+>>>>>>> emulated by QEMU as before.
+>>>>>>>
+>>>>>>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+>>>>>>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
+>>>>>>>
+>>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>>>>> ---
+>>>>>>>
+>>>>>>> This is mtree and flatview BEFORE this patch:
+>>>>>>>
+>>>>>>> "info mtree":
+>>>>>>> memory-region: pci@800000020000000.mmio
+>>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+>>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+>>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>> "info mtree -f":
+>>>>>>> FlatView #0
+>>>>>>>  AS "memory", root: system
+>>>>>>>  AS "cpu-memory", root: system
+>>>>>>>  Root memory region: system
+>>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>>>>   0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>   000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
+>>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>> This is AFTER this patch applied:
+>>>>>>>
+>>>>>>> "info mtree":
+>>>>>>> memory-region: pci@800000020000000.mmio
+>>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
+>>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+>>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+>>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>>
+>>>>>>> "info mtree -f":
+>>>>>>> FlatView #2
+>>>>>>>  AS "memory", root: system
+>>>>>>>  AS "cpu-memory", root: system
+>>>>>>>  Root memory region: system
+>>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>>>>   0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>> This is AFTER this patch applied AND spapr_get_msix_emulation() patched
+>>>>>>> to enable emulation:
+>>>>>>>
+>>>>>>> "info mtree":
+>>>>>>> memory-region: pci@800000020000000.mmio
+>>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+>>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+>>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>> "info mtree -f":
+>>>>>>> FlatView #1
+>>>>>>>  AS "memory", root: system
+>>>>>>>  AS "cpu-memory", root: system
+>>>>>>>  Root memory region: system
+>>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>>>>   0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>   000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
+>>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>> ---
+>>>>>>>  include/hw/vfio/vfio-common.h |  1 +
+>>>>>>>  linux-headers/linux/vfio.h    |  5 +++++
+>>>>>>>  hw/ppc/spapr.c                |  8 ++++++++
+>>>>>>>  hw/vfio/common.c              | 15 +++++++++++++++
+>>>>>>>  hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
+>>>>>>>  5 files changed, 50 insertions(+), 2 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+>>>>>>> index f3a2ac9..927d600 100644
+>>>>>>> --- a/include/hw/vfio/vfio-common.h
+>>>>>>> +++ b/include/hw/vfio/vfio-common.h
+>>>>>>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+>>>>>>>                           struct vfio_region_info **info);
+>>>>>>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>>>>>>                               uint32_t subtype, struct vfio_region_info **info);
+>>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+>>>>>>>  #endif
+>>>>>>>  extern const MemoryListener vfio_prereg_listener;
+>>>>>>>  
+>>>>>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>>>>>>> index 4312e96..b45182e 100644
+>>>>>>> --- a/linux-headers/linux/vfio.h
+>>>>>>> +++ b/linux-headers/linux/vfio.h
+>>>>>>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+>>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>>>>>>>  
+>>>>>>> +/*
+>>>>>>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+>>>>>>> + */
+>>>>>>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+>>>>>>> +
+>>>>>>>  /**
+>>>>>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+>>>>>>>   *				    struct vfio_irq_info)
+>>>>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>>>>> index 9de63f0..693394a 100644
+>>>>>>> --- a/hw/ppc/spapr.c
+>>>>>>> +++ b/hw/ppc/spapr.c
+>>>>>>> @@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+>>>>>>>      spapr->use_hotplug_event_source = value;
+>>>>>>>  }
+>>>>>>>  
+>>>>>>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
+>>>>>>> +{
+>>>>>>> +    return true;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+>>>>>>>  {
+>>>>>>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+>>>>>>> @@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
+>>>>>>>      object_property_set_description(obj, "vsmt",
+>>>>>>>                                      "Virtual SMT: KVM behaves as if this were"
+>>>>>>>                                      " the host's SMT mode", &error_abort);
+>>>>>>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
+>>>>>>> +                             spapr_get_msix_emulation, NULL, NULL);
+>>>>>>>  }
+>>>>>>>  
+>>>>>>>  static void spapr_machine_finalizefn(Object *obj)
+>>>>>>> @@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
+>>>>>>>  /*
+>>>>>>>   * pseries-2.11
+>>>>>>>   */
+>>>>>>> +
+>>>>>>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
+>>>>>>>  {
+>>>>>>>  }
+>>>>>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>>>>>>> index 1fb8a8e..da5f182 100644
+>>>>>>> --- a/hw/vfio/common.c
+>>>>>>> +++ b/hw/vfio/common.c
+>>>>>>> @@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>>>>>>      return -ENODEV;
+>>>>>>>  }
+>>>>>>>  
+>>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
+>>>>>>> +{
+>>>>>>> +    struct vfio_region_info *info = NULL;
+>>>>>>> +    bool ret = false;
+>>>>>>> +
+>>>>>>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
+>>>>>>> +        if (vfio_get_region_info_cap(info, cap_type)) {
+>>>>>>> +            ret = true;
+>>>>>>> +        }
+>>>>>>> +        g_free(info);
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>> +    return ret;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>  /*
+>>>>>>>   * Interfaces for IBM EEH (Enhanced Error Handling)
+>>>>>>>   */
+>>>>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>>>>>> index c977ee3..27a3706 100644
+>>>>>>> --- a/hw/vfio/pci.c
+>>>>>>> +++ b/hw/vfio/pci.c
+>>>>>>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+>>>>>>>      off_t start, end;
+>>>>>>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+>>>>>>>  
+>>>>>>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
+>>>>>>> +                            vdev->msix->table_bar)) {
+>>>>>>> +        return;
+>>>>>>> +    }      
+>>>>>>
+>>>>>> I am testing this patch on ARM with a Mellanox CX-4 card. Single bar0 +
+>>>>>> msix table at 0x2000, using 64kB pages.
+>>>>>>
+>>>>>> 0000000000000000-0000000001ffffff (prio 1, i/o): 0000:01:00.0 BAR 0
+>>>>>>  0000000000000000-0000000001ffffff (prio 0, ramd): 0000:01:00.0 BAR 0
+>>>>>> mmaps[0]
+>>>>>>   0000000000002000-00000000000023ff (prio 0, i/o): msix-table
+>>>>>>   0000000000003000-0000000000003007 (prio 0, i/o): msix-pba [disabled]
+>>>>>>
+>>>>>>
+>>>>>> My kernel includes your "vfio-pci: Allow mapping MSIX BAR" so we bypass
+>>>>>> vfio_pci_fixup_msix_region. But as the mmaps[0] is not fixed up the
+>>>>>> vfio_listener_region_add_ram gets called on the first 8kB which cannot
+>>>>>> be mapped with 64kB page, leading to a qemu abort.
+>>>>>>
+>>>>>> 29520@1515145231.232161:vfio_listener_region_add_ram region_add [ram]
+>>>>>> 0x8000000000 - 0x8000001fff [0xffffa8820000]
+>>>>>> qemu-system-aarch64: VFIO_MAP_DMA: -22
+>>>>>> qemu-system-aarch64: vfio_dma_map(0x1e265f60, 0x8000000000, 0x2000,
+>>>>>> 0xffffa8820000) = -22 (Invalid argument)
+>>>>>> qemu: hardware error: vfio: DMA mapping failed, unable to continue
+>>>>>>
+>>>>>> In my case don't we still need the fixup logic?    
+>>>>>
+>>>>> Ah, I didn't realize you had Alexey's QEMU patch when you asked about
+>>>>> this.  I'd say no, the fixup shouldn't be needed, but apparently we
+>>>>> can't remove it until we figure out this bug and who should be filtering
+>>>>> out sub-page size listener events.  Thanks,    
+>>>>
+>>>>
+>>>> This should do it:
+>>>>
+>>>> @@ -303,11 +303,19 @@ static bool
+>>>> vfio_listener_skipped_section(MemoryRegionSection *section)
+>>>>              * Sizing an enabled 64-bit BAR can cause spurious mappings to
+>>>>              * addresses in the upper part of the 64-bit address space.  These
+>>>>              * are never accessed by the CPU and beyond the address width of
+>>>>              * some IOMMU hardware.  TODO: VFIO should tell us the IOMMU width.
+>>>>              */
+>>>> -           section->offset_within_address_space & (1ULL << 63);
+>>>> +           section->offset_within_address_space & (1ULL << 63) ||
+>>>> +           /*
+>>>> +            * Non-system-page aligned RAM regions have no chance to be
+>>>> +            * DMA mapped so skip them too.
+>>>> +            */
+>>>> +           (memory_region_is_ram(section->mr) &&
+>>>> +            ((section->offset_within_region & qemu_real_host_page_mask) ||
+>>>> +             (int128_getlo(section->size) & qemu_real_host_page_mask))
+>>>> +           );
+>>>>  }
+>>>>
+>>>>
+>>>> Do we VFIO DMA map on every RAM MR just because it is not necessary to have
+>>>> more complicated logic to detect whether it is MMIO? Or there is something
+>>>> bigger?  
+>>>
+>>> Both, a) it's not clear how we determine a MR is MMIO vs RAM, thus the
+>>> silly address hack above to try to exclude PCI BARs as they're being
+>>> resized, and b) there is some value to enabling peer-to-peer mappings
+>>> between devices.  Is there a better, more generic solution to a) now?  
+>>
+>> "now?" what? :)
 > 
-> diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
-> index c9d07b9b16..6a328f0c3a 100644
-> --- a/hw/can/Makefile.objs
-> +++ b/hw/can/Makefile.objs
-> @@ -9,4 +9,5 @@ common-obj-y += can_host_stub.o
->  endif
->  common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
->  common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
-> +common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
->  endif
-> diff --git a/hw/can/can_pcm3680_pci.c b/hw/can/can_pcm3680_pci.c
-> new file mode 100644
-> index 0000000000..e85b61849a
-> --- /dev/null
-> +++ b/hw/can/can_pcm3680_pci.c
-> @@ -0,0 +1,336 @@
-> +/*
-> + * PCM-3680i PCI CAN device (SJA1000 based) emulation
-> + *
-> + * Copyright (c) 2016 Deniz Eren (deniz.eren@icloud.com)
-> + *
-> + * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
-> + * Jin Yang and Pavel Pisa
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/event_notifier.h"
-> +#include "qemu/thread.h"
-> +#include "qemu/sockets.h"
-> +#include "qemu/error-report.h"
-> +#include "chardev/char.h"
-> +#include "hw/hw.h"
-> +#include "hw/pci/pci.h"
-> +#include "can/can_emu.h"
-> +
-> +#include "can_sja1000.h"
-> +
-> +#define TYPE_CAN_PCI_DEV "pcm3680_pci"
-> +
-> +#define PCM3680i_PCI_DEV(obj) \
-> +    OBJECT_CHECK(Pcm3680iPCIState, (obj), TYPE_CAN_PCI_DEV)
-> +
-> +/* the PCI device and vendor IDs */
-> +#ifndef PCM3680i_PCI_VENDOR_ID1
-> +#define PCM3680i_PCI_VENDOR_ID1     0x13fe
-> +#endif
-> +
-> +#ifndef PCM3680i_PCI_DEVICE_ID1
-> +#define PCM3680i_PCI_DEVICE_ID1     0xc002
-> +#endif
-> +
-> +#define PCM3680i_PCI_SJA_RANGE     0x200
-> +
-> +#define PCM3680i_PCI_BYTES_PER_SJA 0x20
-> +
-> +typedef struct Pcm3680iPCIState {
-> +    /*< private >*/
-> +    PCIDevice       dev;
-> +    /*< public >*/
-> +    MemoryRegion    sja_io[2];
-> +
-> +    CanSJA1000State sja_state[2];
-> +    qemu_irq        irq;
-> +
-> +    char            *model; /* The model that support, only SJA1000 now. */
-> +    char            *canbus[2];
-> +    char            *host[2];
-> +} Pcm3680iPCIState;
-> +
-> +static void pcm3680i_pci_irq_raise(void *opaque)
-> +{
-> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
-> +
-> +    qemu_irq_raise(d->irq);
-> +}
-> +
-> +static void pcm3680i_pci_irq_lower(void *opaque)
-> +{
-> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
-> +
-> +    qemu_irq_lower(d->irq);
-> +}
-> +
-> +static void
-> +pcm3680i_pci_reset(void *opaque)
-> +{
-> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
-> +    CanSJA1000State *s1 = &d->sja_state[0];
-> +    CanSJA1000State *s2 = &d->sja_state[1];
-> +
-> +    can_sja_hardware_reset(s1);
-> +    can_sja_hardware_reset(s2);
-> +}
-> +
-> +static uint64_t pcm3680i_pci_sja1_io_read(void *opaque, hwaddr addr,
-> +                                          unsigned size)
-> +{
-> +    Pcm3680iPCIState *d = opaque;
-> +    CanSJA1000State *s = &d->sja_state[0];
-> +
-> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
-> +        return 0;
-> +    }
-> +
-> +    return can_sja_mem_read(s, addr, size);
-> +}
-> +
-> +static void pcm3680i_pci_sja1_io_write(void *opaque, hwaddr addr,
-> +                                       uint64_t data, unsigned size)
-> +{
-> +    Pcm3680iPCIState *d = opaque;
-> +    CanSJA1000State *s = &d->sja_state[0];
-> +
-> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
-> +        return;
-> +    }
-> +
-> +    can_sja_mem_write(s, addr, data, size);
-> +}
-> +
-> +static uint64_t pcm3680i_pci_sja2_io_read(void *opaque, hwaddr addr,
-> +                                          unsigned size)
-> +{
-> +    Pcm3680iPCIState *d = opaque;
-> +    CanSJA1000State *s = &d->sja_state[1];
-> +
-> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
-> +        return 0;
-> +    }
-> +
-> +    return can_sja_mem_read(s, addr, size);
-> +}
-> +
-> +static void pcm3680i_pci_sja2_io_write(void *opaque, hwaddr addr, uint64_t data,
-> +                             unsigned size)
-> +{
-> +    Pcm3680iPCIState *d = opaque;
-> +    CanSJA1000State *s = &d->sja_state[1];
-> +
-> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
-> +        return;
-> +    }
-> +
-> +    can_sja_mem_write(s, addr, data, size);
-> +}
-> +
-> +static const MemoryRegionOps pcm3680i_pci_sja1_io_ops = {
-> +    .read = pcm3680i_pci_sja1_io_read,
-> +    .write = pcm3680i_pci_sja1_io_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 1,
-> +        .max_access_size = 1,
-> +    },
-> +};
-> +
-> +static const MemoryRegionOps pcm3680i_pci_sja2_io_ops = {
-> +    .read = pcm3680i_pci_sja2_io_read,
-> +    .write = pcm3680i_pci_sja2_io_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 1,
-> +        .max_access_size = 1,
-> +    },
-> +};
-> +
-> +static int pcm3680i_pci_init(PCIDevice *pci_dev)
-> +{
-> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
-> +    CanSJA1000State *s1 = &d->sja_state[0];
-> +    CanSJA1000State *s2 = &d->sja_state[1];
-> +    uint8_t *pci_conf;
-> +    CanBusState *can_bus1;
-> +    CanBusState *can_bus2;
-> +
-> +    if (d->model) {
-> +        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
-> +            error_report("Can't create CAN device, "
-> +                         "the model %s is not supported now.", d->model);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    can_bus1 = can_bus_find_by_name(d->canbus[0], true);
-> +    if (can_bus1 == NULL) {
-> +        error_report("Cannot create can find/allocate CAN bus #1");
-> +        exit(1);
-> +    }
-> +
-> +    can_bus2 = can_bus_find_by_name(d->canbus[1], true);
-> +    if (can_bus2 == NULL) {
-> +        error_report("Cannot create can find/allocate CAN bus #2");
-> +        exit(1);
-> +    }
-> +
-> +    if (d->host[0] != NULL) {
-> +        if (can_bus_connect_to_host_device(can_bus1, d->host[0]) < 0) {
-> +            error_report("Cannot connect CAN bus to host #1 device \"%s\"",
-> +                         d->host[0]);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    if (d->host[1] != NULL) {
-> +        if (can_bus_connect_to_host_device(can_bus2, d->host[1]) < 0) {
-> +            error_report("Cannot connect CAN bus to host #2 device \"%s\"",
-> +                         d->host[1]);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    pci_conf = pci_dev->config;
-> +    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
-> +
-> +    d->irq = pci_allocate_irq(&d->dev);
-> +
-> +    can_sja_init(s1, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
-> +    can_sja_init(s2, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
-> +
-> +    qemu_register_reset(pcm3680i_pci_reset, d);
-> +
-> +    if (can_sja_connect_to_bus(s1, can_bus1) < 0) {
-> +        error_report("can_sja_connect_to_bus failed");
-> +        exit(1);
-> +    }
-> +
-> +    if (can_sja_connect_to_bus(s2, can_bus2) < 0) {
-> +        error_report("can_sja_connect_to_bus failed");
-> +        exit(1);
-> +    }
-> +
-> +    memory_region_init_io(&d->sja_io[0], OBJECT(d), &pcm3680i_pci_sja1_io_ops,
-> +                          d, "pcm3680i_pci-sja1", PCM3680i_PCI_SJA_RANGE / 2);
-> +    memory_region_init_io(&d->sja_io[1], OBJECT(d), &pcm3680i_pci_sja2_io_ops,
-> +                          d, "pcm3680i_pci-sja2", PCM3680i_PCI_SJA_RANGE / 2);
-> +
-> +    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO,
-> +                                             &d->sja_io[0]);
-> +    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO,
-> +                                             &d->sja_io[1]);
-> +
-> +    return 0;
-> +}
-> +
-> +static void pcm3680i_pci_exit(PCIDevice *pci_dev)
-> +{
-> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
-> +    CanSJA1000State *s1 = &d->sja_state[0];
-> +    CanSJA1000State *s2 = &d->sja_state[1];
-> +
-> +    can_sja_disconnect(s1);
-> +    can_sja_disconnect(s2);
-> +
-> +    qemu_unregister_reset(pcm3680i_pci_reset, d);
-> +
-> +    /*
-> +     * region d->sja_io is destroyed by QOM now
-> +     */
-> +    /* memory_region_destroy(&d->sja_io[0]); */
-> +    /* memory_region_destroy(&d->sja_io[1]); */
-> +
-> +    can_sja_exit(s1);
-> +    can_sja_exit(s2);
-> +
-> +    qemu_free_irq(d->irq);
-> +}
-> +
-> +static const VMStateDescription vmstate_pcm3680i_pci = {
-> +    .name = "pcm3680i_pci",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .minimum_version_id_old = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_PCI_DEVICE(dev, Pcm3680iPCIState),
-> +        VMSTATE_STRUCT(sja_state[0], Pcm3680iPCIState, 0,
-> +                       vmstate_can_sja, CanSJA1000State),
-> +        VMSTATE_STRUCT(sja_state[1], Pcm3680iPCIState, 0,
-> +                       vmstate_can_sja, CanSJA1000State),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void qdev_pcm3680i_pci_reset(DeviceState *dev)
-> +{
-> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(dev);
-> +    pcm3680i_pci_reset(d);
-> +}
-> +
-> +static Property pcm3680i_pci_properties[] = {
-> +    DEFINE_PROP_STRING("canbus1",   Pcm3680iPCIState, canbus[0]),
-> +    DEFINE_PROP_STRING("canbus2",   Pcm3680iPCIState, canbus[1]),
-> +    DEFINE_PROP_STRING("host1",  Pcm3680iPCIState, host[0]),
-> +    DEFINE_PROP_STRING("host2",  Pcm3680iPCIState, host[1]),
-> +    DEFINE_PROP_STRING("model", Pcm3680iPCIState, model),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void pcm3680i_pci_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> +
-> +    k->init = pcm3680i_pci_init;
-> +    k->exit = pcm3680i_pci_exit;
-> +    k->vendor_id = PCM3680i_PCI_VENDOR_ID1;
-> +    k->device_id = PCM3680i_PCI_DEVICE_ID1;
-> +    k->revision = 0x00;
-> +    k->class_id = 0x000c09;
-> +    k->subsystem_vendor_id = PCM3680i_PCI_VENDOR_ID1;
-> +    k->subsystem_id = PCM3680i_PCI_DEVICE_ID1;
-> +    dc->desc = "Pcm3680i PCICANx";
-> +    dc->props = pcm3680i_pci_properties;
-> +    dc->vmsd = &vmstate_pcm3680i_pci;
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +    dc->reset = qdev_pcm3680i_pci_reset;
-> +}
-> +
-> +static const TypeInfo pcm3680i_pci_info = {
-> +    .name          = TYPE_CAN_PCI_DEV,
+> Now - adverb, at the present time or moment.  For example, vs in the
+> past.
+> 
+>>> If we know a MR is MMIO, then I think we can handle any associated
+>>> mapping failure as non-fatal.   
+>>
+>>
+>> mr->ram_device sound like an appropriate flag to check.
+> 
+> Yeah, I suppose we could, and that didn't exist when we added the
+> bit 63 hack.
+> 
+>>> It's nice to enable p2p, but it's barely
+>>> used and not clear that it works reliably (sometimes even on bare
+>>> metal).Nit, we don't yet have the IOVA range of the IOMMU exposed,
+>>> thus the silly address hack, but we do have supported page sizes, so we
+>>> should probably be referencing that rather than host page size.  
+>>
+>> Ah, correct,
+>> s/qemu_real_host_page_mask/memory_region_iommu_get_min_page_size()/
+> 
+> No, that would be the emulated iommu page size, which may or may not
+> (hopefully does) match the physical iommu page size.  The vfio iommu
+> page sizes are exposed via VFIO_IOMMU_GET_INFO, at least for type1.
+> 
+>>>> As for now, it is possible to have non-aligned RAM MR, the KVM's listener
+>>>> just does not register it with the KVM if unaligned.  
+>>>
+>>> For a sanity check, we don't support running a guest with a smaller
+>>> page size than the host, right?  
+>>
+>> We do, at least on POWER.
+>>
+>>> I assume that would be the only case
+>>> where we would have a reasonable chance of the guest using a host
+>>> sub-page as a DMA target, but that seems like just one of an infinite
+>>> number of problems with such a setup.  Thanks,  
+>>
+>> Like what? I am missing the point here. The most popular config on POWER
+>> today is 64k system page size in both host and guest and 4K IOMMU page size
+>> for 32bit DMA, seems alright, I also tried 4K guests, no problem there too.
+> 
+> The IOMMU supporting a smaller page size than the processor is the
+> thing I think I was missing here, but it makes sense that they could,
+> they're not necessarily linked.  Eric, will SMMU support 4K even while
+> the CPU runs at 64K?
 
-Clashing with "kvaser_pci"
+Yes that's my understanding. Also we introduced:
 
-> +    .parent        = TYPE_PCI_DEVICE,
+4644321 vfio/type1: handle case where IOMMU does not support PAGE_SIZE size
 
-Same comments here, this class should inherit from CanSJA1000Class.
+Thanks
 
-> +    .instance_size = sizeof(Pcm3680iPCIState),
-> +    .class_init    = pcm3680i_pci_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-> +        { },
-> +    },
-> +};
-> +
-> +static void pcm3680i_pci_register_types(void)
-> +{
-> +    type_register_static(&pcm3680i_pci_info);
-> +}
-> +
-> +type_init(pcm3680i_pci_register_types)
+Eric
+
+  The type1 backend has a number of PAGE_SIZE
+> assumptions in it and will not expose IOMMU page sizes less than
+> PAGE_SIZE.  Perhaps this is really the root of the problem, but it is
+> advertising vfio_iommu_type1_info.iova_pgsizes, which userspace should
+> honor.  So I think running (target page size) < (host page size) is
+> probably broken for type1, for instance the guest could have a 4K RAM
+> page as a DMA target that the 64K host couldn't map due to alignment,
+> therefore DMA with that page would fault.  Thanks,
+> 
+> Alex
 > 
