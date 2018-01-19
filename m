@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTAd-0002As-KH
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTAd-0002B7-TG
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000wL-S4
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000wn-Vb
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:41:11 -0500
-Received: from ozlabs.org ([103.22.144.67]:37503)
+Received: from ozlabs.org ([103.22.144.67]:55873)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000tO-GB
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000tL-K6
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:41:10 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 19 Jan 2018 20:40:11 +1100
-Message-Id: <20180119094015.28266-10-david@gibson.dropbear.id.au>
+Date: Fri, 19 Jan 2018 20:40:15 +1100
+Message-Id: <20180119094015.28266-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20180119094015.28266-1-david@gibson.dropbear.id.au>
 References: <20180119094015.28266-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 09/13] target-ppc: optimize cmp translation
+Subject: [Qemu-devel] [PULL 13/13] target/ppc/spapr_caps: Add macro to
+ generate spapr_caps migration vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +25,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, "pbonzini@redhat.com" <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: "pbonzini@redhat.com" <pbonzini@redhat.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-We know that only one bit (in addition to SO) is going to be set in
-the condition register, so do two movconds instead of three setconds,
-three shifts and two ORs.
+The vmstate description and the contained needed function for migration
+of spapr_caps is the same for each cap, with the name of the cap
+substituted. As such introduce a macro to allow for easier generation of
+these.
 
-For ppc64-linux-user, the code size reduction is around 5% and the
-performance improvement slightly less than 10%.  For softmmu, the
-improvement is around 5%.
+Convert the three existing spapr_caps (htm, vsx, and dfp) to use this
+macro.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
+ hw/ppc/spapr_caps.c | 78 +++++++++++++++++------------------------------------
+ 1 file changed, 24 insertions(+), 54 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 396f422cf4..bcd36d5353 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -605,27 +605,22 @@ static opc_handler_t invalid_handler = {
- static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
- {
-     TCGv t0 = tcg_temp_new();
--    TCGv_i32 t1 = tcg_temp_new_i32();
--
--    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
--
--    tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    TCGv t1 = tcg_temp_new();
-+    TCGv_i32 t = tcg_temp_new_i32();
- 
--    tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_movi_tl(t0, CRF_EQ);
-+    tcg_gen_movi_tl(t1, CRF_LT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_LT : TCG_COND_LTU), t0, arg0, arg1, t1, t0);
-+    tcg_gen_movi_tl(t1, CRF_GT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_GT : TCG_COND_GTU), t0, arg0, arg1, t1, t0);
- 
--    tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_trunc_tl_i32(t, t0);
-+    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
-+    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t);
- 
-     tcg_temp_free(t0);
--    tcg_temp_free_i32(t1);
-+    tcg_temp_free(t1);
-+    tcg_temp_free_i32(t);
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index d5c9ce774a..5d52969bd5 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -228,62 +228,32 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
+     return ok ? 0 : -EINVAL;
  }
  
- static inline void gen_op_cmpi(TCGv arg0, target_ulong arg1, int s, int crf)
+-static bool spapr_cap_htm_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_HTM] &&
+-           (spapr->eff.caps[SPAPR_CAP_HTM] != spapr->def.caps[SPAPR_CAP_HTM]);
+-}
+-
+-const VMStateDescription vmstate_spapr_cap_htm = {
+-    .name = "spapr/cap/htm",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_htm_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_HTM], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
+-
+-static bool spapr_cap_vsx_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_VSX] &&
+-           (spapr->eff.caps[SPAPR_CAP_VSX] != spapr->def.caps[SPAPR_CAP_VSX]);
++/* Used to generate the migration field and needed function for a spapr cap */
++#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
++static bool spapr_cap_##cap##_needed(void *opaque)      \
++{                                                       \
++    sPAPRMachineState *spapr = opaque;                  \
++                                                        \
++    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
++           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
++            spapr->def.caps[SPAPR_CAP_##ccap]);         \
++}                                                       \
++                                                        \
++const VMStateDescription vmstate_spapr_cap_##cap = {    \
++    .name = "spapr/cap/" #cap,                          \
++    .version_id = 1,                                    \
++    .minimum_version_id = 1,                            \
++    .needed = spapr_cap_##cap##_needed,                 \
++    .fields = (VMStateField[]) {                        \
++        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
++                      sPAPRMachineState),               \
++        VMSTATE_END_OF_LIST()                           \
++    },                                                  \
+ }
+ 
+-const VMStateDescription vmstate_spapr_cap_vsx = {
+-    .name = "spapr/cap/vsx",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_vsx_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_VSX], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
+-
+-static bool spapr_cap_dfp_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_DFP] &&
+-           (spapr->eff.caps[SPAPR_CAP_DFP] != spapr->def.caps[SPAPR_CAP_DFP]);
+-}
+-
+-const VMStateDescription vmstate_spapr_cap_dfp = {
+-    .name = "spapr/cap/dfp",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_dfp_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_DFP], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
++SPAPR_CAP_MIG_STATE(htm, HTM);
++SPAPR_CAP_MIG_STATE(vsx, VSX);
++SPAPR_CAP_MIG_STATE(dfp, DFP);
+ 
+ void spapr_caps_reset(sPAPRMachineState *spapr)
+ {
 -- 
 2.14.3
