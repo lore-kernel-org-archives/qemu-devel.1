@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecZfj-0008Mj-29
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:43 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ecY7W-0002pT-I2
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecZff-0008HQ-2T
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:43 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:52776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecZfe-0008Gz-Ot
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:38 -0500
-References: <20180112081435.21299-1-samuel.thibault@ens-lyon.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <dee366b8-8f14-cf9f-1ebc-9c493507d7d2@vivier.eu>
-Date: Fri, 19 Jan 2018 17:37:35 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180112081435.21299-1-samuel.thibault@ens-lyon.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv4] linux-user: Add getcpu() support
+	(envelope-from <luc.michel@greensocs.com>) id 1ecY7V-0003mn-Hw
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:58:18 -0500
+From: luc.michel@greensocs.com
+Date: Fri, 19 Jan 2018 15:57:56 +0100
+Message-Id: <20180119145756.7629-6-luc.michel@greensocs.com>
+In-Reply-To: <20180119145756.7629-1-luc.michel@greensocs.com>
+References: <20180119145756.7629-1-luc.michel@greensocs.com>
+Subject: [Qemu-devel] [PATCH 4/4] hw/intc/arm_gic: Fix the NS view of C_BPR
+ when C_CTRL.CBPR is 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +20,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
+Cc: Luc MICHEL <luc.michel@git.antfield.fr>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-Le 12/01/2018 à 09:14, Samuel Thibault a écrit :
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> 
-> ---
-> Difference between v1 and v2: handle failure of put_user_u32 with goto efault;
-> Difference between v2 and v3: handle failure of sys_getcpu system call
-> Difference between v3 and v4: use is_error
-> ---
->  linux-user/syscall.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 11c9116c4a..26403d7e5c 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
->  #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
->  _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
->            unsigned long *, user_mask_ptr);
-> +#define __NR_sys_getcpu __NR_getcpu
-> +_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
->  _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
->            void *, arg);
->  _syscall2(int, capget, struct __user_cap_header_struct *, header,
-> @@ -10403,6 +10405,23 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
->          }
->          break;
-> +    case TARGET_NR_getcpu:
-> +        {
-> +            unsigned cpu, node;
-> +            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-> +                                       arg2 ? &node : NULL,
-> +                                       NULL));
-> +            if (is_error(ret)) {
-> +                goto fail;
-> +            }
-> +            if (arg1 && put_user_u32(cpu, arg1)) {
-> +                goto efault;
-> +            }
-> +            if (arg2 && put_user_u32(node, arg2)) {
-> +                goto efault;
-> +            }
-> +        }
-> +        break;
->      case TARGET_NR_sched_setparam:
->          {
->              struct sched_param *target_schp;
-> 
+From: Luc MICHEL <luc.michel@git.antfield.fr>
 
-Applied to my linux-user branch.
+When C_CTRL.CBPR is 1, the Non-Secure view of C_BPR is altered:
+  - A Non-Secure read of C_BPR should return the BPR value plus 1,
+  saturated to 7,
+  - A Non-Secure write should be ignored.
 
-Thanks,
-Laurent
+Signed-off-by: Luc MICHEL <luc.michel@git.antfield.fr>
+---
+ hw/intc/arm_gic.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index d0a41a89ae..7418b7a082 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -1211,8 +1211,13 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+         break;
+     case 0x08: /* Binary Point */
+         if (s->security_extn && !attrs.secure) {
+-            /* BPR is banked. Non-secure copy stored in ABPR. */
+-            *data = s->abpr[cpu];
++            if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
++                /* NS view of BPR when CBPR is 1 */
++                *data = MIN(s->bpr[cpu] + 1, 7);
++            } else {
++                /* BPR is banked. Non-secure copy stored in ABPR. */
++                *data = s->abpr[cpu];
++            }
+         } else {
+             *data = s->bpr[cpu];
+         }
+@@ -1285,7 +1290,12 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+         break;
+     case 0x08: /* Binary Point */
+         if (s->security_extn && !attrs.secure) {
+-            s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
++            if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
++                /* WI when CTLR is 1 */
++                return MEMTX_OK;
++            } else {
++                s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
++            }
+         } else {
+             s->bpr[cpu] = MAX(value & 0x7, GIC_MIN_BPR);
+         }
+-- 
+2.16.0
