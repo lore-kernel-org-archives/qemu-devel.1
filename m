@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecPm0-0001Hw-U8
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 01:03:34 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ecPxX-0004po-Hp
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 01:15:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecPlx-0003qi-0Y
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 01:03:32 -0500
-Date: Fri, 19 Jan 2018 17:03:17 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180119060317.GB28299@umbus.fritz.box>
-References: <20171212051853.24583-1-aik@ozlabs.ru>
-	<20171211224650.71237179@w520.home>
-	<ca9cd686-ea2f-716e-b909-f6e22d1c704c@redhat.com>
-	<20171219070919.42d90b94@w520.home>
-	<87e241ad-4d65-1b51-aa22-a84f18de1cb6@redhat.com>
+	(envelope-from <aik@ozlabs.ru>) id 1ecPxR-0001tp-QJ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 01:15:27 -0500
+Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:42763)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ecPxR-0001tb-ID
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 01:15:21 -0500
+Received: by mail-io0-x230.google.com with SMTP id 25so1026069ioj.9
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 22:15:21 -0800 (PST)
+References: <20180119050906.18930-1-aik@ozlabs.ru>
+	<20180119051926.GI30352@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <6a3fac69-c1e5-36cf-4781-5bb82b890efa@ozlabs.ru>
+Date: Fri, 19 Jan 2018 17:15:15 +1100
 MIME-Version: 1.0
+In-Reply-To: <20180119051926.GI30352@umbus.fritz.box>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3lcZGd9BuhuYXNfi"
-Content-Disposition: inline
-In-Reply-To: <87e241ad-4d65-1b51-aa22-a84f18de1cb6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: spapr/iommu: Enable in-kernel
- TCE acceleration via VFIO KVM device
+	protocol="application/pgp-signature";
+	boundary="ToJr06rSEdJiSjdERk93ILxt348jt5km4"
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Andrea Bolognani <abologna@redhat.com>
 
-
---3lcZGd9BuhuYXNfi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ToJr06rSEdJiSjdERk93ILxt348jt5km4
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Andrea Bolognani <abologna@redhat.com>
+Message-ID: <6a3fac69-c1e5-36cf-4781-5bb82b890efa@ozlabs.ru>
+Subject: Re: [RFC PATCH qemu] qmp: Add qom-list-properties to list QOM object
+ properties
+References: <20180119050906.18930-1-aik@ozlabs.ru>
+ <20180119051926.GI30352@umbus.fritz.box>
+In-Reply-To: <20180119051926.GI30352@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 19, 2017 at 03:59:59PM +0100, Paolo Bonzini wrote:
-> On 19/12/2017 15:09, Alex Williamson wrote:
-> > On Tue, 19 Dec 2017 12:12:35 +0100
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >=20
-> >> On 12/12/2017 06:46, Alex Williamson wrote:
-> >>>> +enum IOMMUMemoryRegionAttr {
-> >>>> +    IOMMU_ATTR_KVM_FD =20
-> >>>
-> >>> You're generalizing the wrong thing here, this is specifically a
-> >>> SPAPR_TCE_FD, call it that. =20
-> >>
-> >> ... and you're not even implementing set_attr, so let's drop it.
-> >>
-> >> My suggestion is to add a function in hw/vfio:
-> >>
-> >>     int vfio_container_attach_kvm_spapr_tce(VFIOContainer *cont,
-> >>                                             int tablefd);
-> >>
-> >> and an IOMMUMemoryRegionClass member:
-> >>
-> >>     int (*set_vfio_container_attrs)(IOMMUMemoryRegion *iommu,
-> >>                                     VFIOContainer *cont)
-> >>
-> >> Then your implementation for the latter is as simple as this:
-> >>
-> >>     if (!kvm_enabled() || !kvmppc_has_cap_spapr_vfio()) {
-> >>         sPAPRTCETable *tcet =3D container_of(iommu, sPAPRTCETable, iom=
-mu);
-> >>         return vfio_container_attach_kvm_spapr_tce(cont, tcet->fd);
-> >>     }
-> >=20
-> > Ugh, exactly the sort of interface I've been trying to avoid, vfio
-> > specific callbacks on common data structures handing out vfio private
-> > data pointers,
+On 19/01/18 16:19, David Gibson wrote:
+> On Fri, Jan 19, 2018 at 04:09:06PM +1100, Alexey Kardashevskiy wrote:
+>> There is already 'device-list-properties' which does most of the job,
+>> however it does not handle everything returned by qom-list-types such
+>> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEV=
+ICE.
+>>
+>> This adds a new qom-list-properties command which prints properties
+>> of a specific class and its instance. It is pretty much a simplified c=
+opy
+>> of the device-list-properties handler.
+>>
+>> Since it creates an object instance, device properties should appear
+>> in the output as they are copied to QOM properties at the instance_ini=
+t
+>> hook.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 >=20
-> True, VFIOContainer* is private, but in those declarations it's also opaq=
-ue.
->=20
-> The VFIO container is the representation of the IOMMU, so it makes sense
-> to me to have a function to set it up according to QEMU's IOMMU object.
-> I don't think we will be introducing another object soon that is similar
-> to the VFIO container.
->=20
-> > requiring additional exported functions from vfio for
-> > each new user of it.  Why is this better?
->=20
-> I understand that you don't like having many exported functions, but you
-> are just pushing the problem on the memory.h side where you'd get many
-> attribute enums.
+> I think the existing qom-list interface does this already.
 
-It's more than just enums, doing it the other way around is putting
-fairly intimate knowledge of a specific guest IOMMU workings into the
-VFIO code.
+Nope, it does not. It takes path, not a type, so running with "-machine
+none" won't help.
 
-Fundamentally this *requires* linking vfio knowledge to guest iommu
-(kvm) knowledge, so some cross linkage we'd usually want to avoid is
-inevitable.  I don't see that there's a strong argument for whether we
-put the bit of vfio knowledge into the spapr viommu or the bit of
-spapr viommu knowledge into vfio.
+> This won't solve the libvirt problem we were discussing, because it
+> needs an existing instance of the object.  libvirt wants to know the
+> machine properties *without* instantiating an instance.
+
+My patch works with types, it creates an instance for a short time itself=
+,
+this is why it does not do a thing for "pseries" as it is not a type and
+prints properties for the "pseries-2.12-machine" type.
+
+
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Alexey
 
---3lcZGd9BuhuYXNfi
+
+--ToJr06rSEdJiSjdERk93ILxt348jt5km4
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphiiIACgkQbDjKyiDZ
-s5IBxw/9GYNrWHohQi0xpTTSab+t+WrmDo0jI4mQ9GIBZ0wgsh3vS4RUP9zUqvfw
-yaRhIEbQ0tUdiiAqMMrcA0zWA64U88FVxY2lvB7als8nkhKbqwtaicEioQrPTxW5
-F+z23bi/Pfx6Rh0MNbPRCwVga3fmTIruR+ku7dwUvoUsLaZe0/GojW3cRMizrZF7
-edz8t2WZ+JdhX2+QpMkFifE6LzwvUMoEFzPH2DRjU8rOEVWPqTIkFZQv0FLqSOXH
-V4sFhHR0HDsLdDHKxq6oy2sddiDggVqV2oQL9KyINcGqzJYjv5q5iyztlV5JGYvt
-rxmwR8UwjqAjqcYheysasA92MjSWtR5De7EAsVxN4j+eGgQXkYVAirlWYda1XkYm
-R3Iqb8mKLFmo+N1juEogw38R8TDAoBqoiqeYgNezK/IQaJJxnGHpxYnUN1lSL2fT
-Scq4vu35XB9ssCnKGJk9ywMgC8DQHX8HLL6J9uxtzypfEaX96fm7AIOe5qyJL0/S
-HOghyiiTxSu7tWsO3nhvoAdpsgN2cJrvCJj8gIbAF55I/rBMAtide86RVjUo8iCT
-uLXB5qqYhl9xhvbzW+xu8wGV/a1TepABdmHidssI8nBtKjaWqbnpnTOKaS68Ehf5
-eOI4U0B7prFtGmbF+t3F36aPGWKlC8xEnNvLokP+lfJw6lDOKHM=
-=EHTf
+iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlphjPMOHGFpa0Bvemxh
+YnMucnUACgkQhhM92CvBILmnCA/+KH7B4qDastN7MTFG5e0qZbdlnovaRm7TEGMP
+9lR5DauARZn7nSD+1I5xrXwyOghF5ksKXZdxwPfrcj+f+BUHV79QICYEEpSh/Dda
+QCv/UyspItcQpZE7zwCuz0DU0YWwqZ8mMQcx55JtFtVY+xXFTtqGujGSfFiy6CxN
+ELNIjQl2RtRoPzMELYDTQ5oGS/qFTlarKoNevW7A4R10n3P++vbf9aam+hjYX+al
+SmK0qbNfWjG1AyFWD1dsRTzVCeJXWKXjJJJdfaYzZejevAPpyxaM1TnISOphbwKE
+JfyAY9cGB0Jf8f8Kil/b56dRoWGdXmA4+ALK0d3rLDlsU8z71Hr+ZSYmbLQ15bgN
+Pa6sN5qB3XP1XpXZK05bZssrRSGil3gmBCEHIl8TbsDb7m97cSns+C/LseN29kzA
+KX6zQX+RCY0++LzYck2YnzE2A6gaYgTeYcoB3n0czo/vN9xY2Banu8y67BsGAR96
+W3BgxVfU1G4lx5reyACiBNiYvLWPRgyS9xmoEeO8hX0s77zOBrl8ZRC13s617Fso
+vOsZPsMeyYM1fvmQaEA1wrNcZ2w6xc89kTZUxAOdVuHBelLEO7qFoCmEfXW1YpL2
+UMmBpoyYE1lZ2+oruo14wj8ZSbakDQJtgq6tJdoyMjO1+LbqY+5WfWstfnLKx50D
+duik/1w=
+=w4Zq
 -----END PGP SIGNATURE-----
 
---3lcZGd9BuhuYXNfi--
+--ToJr06rSEdJiSjdERk93ILxt348jt5km4--
