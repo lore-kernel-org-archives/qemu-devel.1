@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdkd-0001Wl-8K
+	(envelope-from <jsnow@redhat.com>) id 1ecdkd-0001Wx-I8
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdkc-0005v9-CC
+	(envelope-from <jsnow@redhat.com>) id 1ecdkc-0005vM-Qo
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:03 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 19 Jan 2018 15:58:34 -0500
-Message-Id: <20180119205847.7141-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/13] blockjob: refactor mirror_throttle
+Date: Fri, 19 Jan 2018 15:58:36 -0500
+Message-Id: <20180119205847.7141-3-jsnow@redhat.com>
+In-Reply-To: <20180119205847.7141-1-jsnow@redhat.com>
+References: <20180119205847.7141-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 02/13] blockjob: consolidate SLICE_TIME
+ definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,68 +23,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-mirror_throttle attempts to make sure we yield every so often when we're
-doing operations that may not otherwise be as cooperative as we'd like.
+They're all the same. If it actually becomes important to configure it,
+it can become a job or driver property.
 
-This pattern is useful to other jobs like commit as well; if commit
-continuously decides not to copy data (and calculates delay_ns to be 0),
-we'll frequently and aggressively yield, only to be rescheduled immediately.
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+---
+ block/backup.c               | 1 -
+ block/commit.c               | 2 --
+ block/mirror.c               | 1 -
+ block/stream.c               | 2 --
+ include/block/blockjob_int.h | 2 ++
+ 5 files changed, 2 insertions(+), 6 deletions(-)
 
-This causes those "WARNING: I/O thread spun for 1000 iterations"
-warnings that everyone loves so much.
-
-Split out the mirror_throttle function to become a new internal
-BlockJob API function, block_job_throttle; then use it for all
-the other jobs in their runtime loops.
-
-I decided to use it in stream and backup as well, so that regardless of if the
-loop structure has the chance to be greedy or not (I did not audit this), the
-BlockJob has some kind of failsafe that will occasionally perform a 0ns sleep
-every SLICE_TIME.
-
-v2:
- - Fixed spacing consistency (Paolo)
- - Renamed last_yield_ns to last_enter_ns (Stefan)
- - Renamed block_job_throttle to block_job_relax (Stefan)
- - Removed external usages of block_job_pause_point and
-   block_job_sleep_ns (Paolo)
- - Further cut down block/backup code to use block_job_relax
-
-________________________________________________________________________________
-
-For convenience, this branch is available at:
-https://github.com/jnsnow/qemu.git branch block-job-yield
-https://github.com/jnsnow/qemu/tree/block-job-yield
-
-This version is tagged block-job-yield-v2:
-https://github.com/jnsnow/qemu/releases/tag/block-job-yield-v2
-
-John Snow (13):
-  blockjob: record time of last entrance
-  blockjob: consolidate SLICE_TIME definition
-  blockjob: create block_job_relax
-  blockjob: allow block_job_throttle to take delay_ns
-  block/commit: use block_job_relax
-  block/stream: use block_job_relax
-  block/backup: use block_job_relax
-  allow block_job_relax to return -ECANCELED
-  block/backup: remove yield_and_check
-  block/mirror: condense cancellation and relax calls
-  block/mirror: remove block_job_sleep_ns calls
-  blockjob: privatize block_job_sleep_ns
-  blockjob: remove block_job_pause_point from interface
-
- block/backup.c               | 27 ++++++-----------------
- block/commit.c               |  4 +---
- block/mirror.c               | 52 +++++++++++++++-----------------------------
- block/stream.c               |  4 +---
- block/trace-events           |  2 +-
- blockjob.c                   | 51 ++++++++++++++++++++++++++++++++++++-------
- include/block/blockjob.h     |  5 +++++
- include/block/blockjob_int.h | 37 +++++++++++++++----------------
- tests/test-bdrv-drain.c      |  2 +-
- tests/test-blockjob-txn.c    |  2 +-
- 10 files changed, 94 insertions(+), 92 deletions(-)
-
+diff --git a/block/backup.c b/block/backup.c
+index 4a16a37229..7b1cdd038a 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -27,7 +27,6 @@
+ #include "qemu/error-report.h"
+ 
+ #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
+-#define SLICE_TIME 100000000ULL /* ns */
+ 
+ typedef struct BackupBlockJob {
+     BlockJob common;
+diff --git a/block/commit.c b/block/commit.c
+index bb6c904704..898545b318 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -31,8 +31,6 @@ enum {
+     COMMIT_BUFFER_SIZE = 512 * 1024, /* in bytes */
+ };
+ 
+-#define SLICE_TIME 100000000ULL /* ns */
+-
+ typedef struct CommitBlockJob {
+     BlockJob common;
+     RateLimit limit;
+diff --git a/block/mirror.c b/block/mirror.c
+index 88f4e8964d..1fb5fc0cb8 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -22,7 +22,6 @@
+ #include "qemu/ratelimit.h"
+ #include "qemu/bitmap.h"
+ 
+-#define SLICE_TIME    100000000ULL /* ns */
+ #define MAX_IN_FLIGHT 16
+ #define MAX_IO_BYTES (1 << 20) /* 1 Mb */
+ #define DEFAULT_MIRROR_BUF_SIZE (MAX_IN_FLIGHT * MAX_IO_BYTES)
+diff --git a/block/stream.c b/block/stream.c
+index 499cdacdb0..e85af18c54 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -29,8 +29,6 @@ enum {
+     STREAM_BUFFER_SIZE = 512 * 1024, /* in bytes */
+ };
+ 
+-#define SLICE_TIME 100000000ULL /* ns */
+-
+ typedef struct StreamBlockJob {
+     BlockJob common;
+     RateLimit limit;
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index c9b23b0cc9..209fa1bb3e 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -29,6 +29,8 @@
+ #include "block/blockjob.h"
+ #include "block/block.h"
+ 
++#define SLICE_TIME 100000000ULL /* ns */
++
+ /**
+  * BlockJobDriver:
+  *
 -- 
 2.14.3
