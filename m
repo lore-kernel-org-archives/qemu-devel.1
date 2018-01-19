@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eccsz-00007J-4Q
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:03:38 -0500
+	(envelope-from <brak@gameservers.com>) id 1ecdGh-0006qK-TU
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eccsy-0006mx-8u
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:03:37 -0500
-Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:35452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eccsy-0006mO-2N
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:03:36 -0500
-Received: by mail-lf0-x236.google.com with SMTP id a204so3470009lfa.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 12:03:34 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri, 19 Jan 2018 12:03:12 -0800
-Message-Id: <1516392192-6491-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PULL 00/10] target/xtensa updates
+	(envelope-from <brak@gameservers.com>) id 1ecdGd-0005k8-W5
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:28:07 -0500
+Received: from mail2015.choopa.net ([208.167.225.251]:38121)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brak@gameservers.com>)
+	id 1ecdGd-0005jq-RQ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:28:03 -0500
+From: Brian Rak <brak@gameservers.com>
+Message-ID: <e9d36f5e-fc14-9c54-c519-7e1615959973@gameservers.com>
+Date: Fri, 19 Jan 2018 15:28:00 -0500
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] virtio_net occasionally stops sending packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel <qemu-devel@nongnu.org>, netdev@vger.kernel.org
 
-Hi Peter,
+We've been running into a fairly persistent issue where virtio_net=20
+adapters will suddenly stop sending packets when running under KVM.=C2=A0=
+=20
+This has persisted through several qemu versions, and a large number of=20
+guest kernel upgrades.
 
-please pull the following batch of updates for the target/xtensa.
+What we end up seeing is the guest continuing to receive packets, but=20
+refusing to transmit anything.
 
-The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75b9ff:
+If we leave ping running for a minute or two, it will eventually start=20
+printing "ping: sendmsg: No buffer space available" messages.=C2=A0 tcpdu=
+mp=20
+will show nothing being sent from the guest. `ip -s link` will show RX=20
+bytes/packets incrementing, but not TX. `tc -s qdisc show dev eth1`=20
+shows the 'dropped' counter incrementing with every new ping attempt.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180111' into staging (2018-01-11 14:34:41 +0000)
+I attempted to run 'dropwatch -l kas', which showed me a bunch of lines=20
+that looked like '4 drops at pfifo_fast_enqueue+85'.
 
-are available in the git repository at:
+So far, we haven't been able to consistently reproduce this.=C2=A0 We hav=
+e a=20
+few guests that will hit this issue roughly once every two weeks, but we=20
+haven't been able to reproduce it on demand.=C2=A0 This seems to happen w=
+ith=20
+guests that have more then one network adapter attached.=C2=A0 I do not t=
+hink=20
+we've seen it on guests that only have one NIC.
 
-  git://github.com/OSLL/qemu-xtensa.git tags/20180119-xtensa
+We've tried guest kernels as new as 4.14.13, and qemu versions as new as=20
+2.11.0.=C2=A0 This doesn't appear to be related to the physical network a=
+t=20
+all, we've seen this happen with a variety of network backends:
+* qemu 'multicast' networks
+* macvtap attached to a vxlan interface
+* bridged interface
 
-for you to fetch changes up to 8030ed759be52b2517356c3d0291c45cedc65fd9:
+We've tried disabling a variety of offloads (gso, tso4, tso6, ecn) from=20
+both the host and guest sides.=C2=A0 This didn't really have any effect.
 
-  target/xtensa: disas/xtensa: fix coverity warnings (2018-01-18 10:27:04 -0800)
+The only way to fix this once it breaks is to restart the guest OS.=C2=A0=
+=20
+`ifdown eth1; ifup eth1` doesn't seem to help.
 
-----------------------------------------------------------------
-target/xtensa updates:
+How can I determine if this is a qemu issue, or an issue with the=20
+virtio_net driver?=C2=A0 We have not tried this with other virtual nic ty=
+pes=20
+yet.=C2=A0 I'm not sure if that would provide any useful information or n=
+ot.=C2=A0=20
+We're still working on figuring out how to reproduce this, but I'm not=20
+terribly hopeful about coming up with a simple set of reproduction steps.
 
-- make mini-bootloader independent of the initial CPU state;
-- add noMMU XTFPGA variants;
-- add two noMMU cores: de212 and sample_controller;
-- fix issues reported by coverity against xtensa translator and disassembler.
-
-----------------------------------------------------------------
-Max Filippov (10):
-      hw/xtensa/xtfpga: rewrite mini bootloader
-      hw/xtensa/xtfpga: clean up function/structure names
-      target/xtensa: fix default sysrom/sysram addresses
-      hw/xtensa: extract xtensa_create_memory_regions
-      hw/xtensa/xtfpga: extract flash configuration
-      hw/xtensa/xtfpga: support noMMU cores
-      target/xtensa: add de212 core
-      target/xtensa: use different default CPU for MMU/noMMU
-      target/xtensa: add sample_controller core
-      target/xtensa: disas/xtensa: fix coverity warnings
-
- disas/xtensa.c                                     |     4 +-
- hw/xtensa/Makefile.objs                            |     1 +
- hw/xtensa/sim.c                                    |    38 +-
- hw/xtensa/xtensa_memory.c                          |    55 +
- hw/xtensa/xtensa_memory.h                          |    40 +
- hw/xtensa/xtfpga.c                                 |   414 +-
- target/xtensa/Makefile.objs                        |     2 +
- target/xtensa/core-de212.c                         |    53 +
- target/xtensa/core-de212/core-isa.h                |   622 +
- target/xtensa/core-de212/gdb-config.c              |   198 +
- target/xtensa/core-de212/xtensa-modules.c          | 14566 +++++++++++++++++++
- target/xtensa/core-sample_controller.c             |    53 +
- target/xtensa/core-sample_controller/core-isa.h    |   644 +
- target/xtensa/core-sample_controller/gdb-config.c  |   141 +
- .../xtensa/core-sample_controller/xtensa-modules.c | 11377 +++++++++++++++
- target/xtensa/cpu.h                                |     7 +-
- target/xtensa/overlay_tool.h                       |     8 +-
- target/xtensa/translate.c                          |     4 +-
- 18 files changed, 28081 insertions(+), 146 deletions(-)
- create mode 100644 hw/xtensa/xtensa_memory.c
- create mode 100644 hw/xtensa/xtensa_memory.h
- create mode 100644 target/xtensa/core-de212.c
- create mode 100644 target/xtensa/core-de212/core-isa.h
- create mode 100644 target/xtensa/core-de212/gdb-config.c
- create mode 100644 target/xtensa/core-de212/xtensa-modules.c
- create mode 100644 target/xtensa/core-sample_controller.c
- create mode 100644 target/xtensa/core-sample_controller/core-isa.h
- create mode 100644 target/xtensa/core-sample_controller/gdb-config.c
- create mode 100644 target/xtensa/core-sample_controller/xtensa-modules.c
-
--- 
-Thanks.
--- Max
+This was my post about it a few years ago:=20
+https://lists.nongnu.org/archive/html/qemu-devel/2015-01/msg03907.html
