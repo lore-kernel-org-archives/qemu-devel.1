@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eccBI-0000fO-PO
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:18:29 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eccGN-0002Co-P1
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:23:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eccBE-0000Ir-MI
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:18:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53586)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eccBE-0000IA-Fl
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:18:24 -0500
-References: <20180119162554.27270-1-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <0bf279e2-0f90-06ee-2779-1a3f67665ecf@redhat.com>
-Date: Fri, 19 Jan 2018 20:18:16 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eccGK-0003Qm-Bd
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:23:43 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eccGK-0003QV-67
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:23:40 -0500
+Received: by mail-qt0-x242.google.com with SMTP id u10so6478483qtg.2
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 11:23:40 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1516386853.git.alistair.francis@xilinx.com>
+	<9915a5663505d53a142c263b471142af29d2d7d8.1516386853.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1aa0e97b-d3f7-6d91-1b43-25ccac8ddae4@amsat.org>
+Date: Fri, 19 Jan 2018 16:22:51 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180119162554.27270-1-marcandre.lureau@redhat.com>
+In-Reply-To: <9915a5663505d53a142c263b471142af29d2d7d8.1516386853.git.alistair.francis@xilinx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix python 2
- support
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] xlnx-zynqmp-rtc: Initial commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +35,370 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, eblake@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 
-On 01/19/18 17:25, Marc-Andr=C3=A9 Lureau wrote:
-> Python GDB support may use Python 2 or 3.
->=20
-> Inferior.read_memory() may return a 'buffer' with Python 2 or a
-> 'memoryview' with Python 3 (see also
-> https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
->=20
-> The elf.add_vmcoreinfo_note() method expects a "bytes" object. Wrap
-> the returned memory with bytes(), which works with both 'memoryview'
-> and 'buffer'.
->=20
-> Fixes a regression introduced with commit
-> d23bfa91b7789534d16ede6cb7d925bfac3f3c4c ("add vmcoreinfo").
->=20
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Hi Alistair,
+
+On 01/19/2018 03:35 PM, Alistair Francis wrote:
+> Initial commit of the ZynqMP RTC device.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
->  scripts/dump-guest-memory.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
-y
-> index 09bec92b50..03fbf69f8a 100644
-> --- a/scripts/dump-guest-memory.py
-> +++ b/scripts/dump-guest-memory.py
-> @@ -564,7 +564,7 @@ shape and this command should mostly work."""
-> =20
->          vmcoreinfo =3D self.phys_memory_read(addr, size)
->          if vmcoreinfo:
-> -            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
-> +            self.elf.add_vmcoreinfo_note(bytes(vmcoreinfo))
-> =20
->      def invoke(self, args, from_tty):
->          """Handles command invocation from gdb."""
->=20
+> V2:
+>  - Delete unused realise function
+>  - Remove DB_PRINT()
+> 
+>  include/hw/timer/xlnx-zynqmp-rtc.h |  84 ++++++++++++++
+>  hw/timer/xlnx-zynqmp-rtc.c         | 218 +++++++++++++++++++++++++++++++++++++
+>  hw/timer/Makefile.objs             |   1 +
+>  3 files changed, 303 insertions(+)
+>  create mode 100644 include/hw/timer/xlnx-zynqmp-rtc.h
+>  create mode 100644 hw/timer/xlnx-zynqmp-rtc.c
+> 
+> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
+> new file mode 100644
+> index 0000000000..87649836cc
+> --- /dev/null
+> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
+> @@ -0,0 +1,84 @@
+> +/*
+> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
+> + *
+> + * Copyright (c) 2017 Xilinx Inc.
+> + *
+> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "hw/register.h"
+> +
+> +#define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
+> +
+> +#define XLNX_ZYNQMP_RTC(obj) \
+> +     OBJECT_CHECK(XlnxZynqMPRTC, (obj), TYPE_XLNX_ZYNQMP_RTC)
+> +
+> +REG32(SET_TIME_WRITE, 0x0)
+> +REG32(SET_TIME_READ, 0x4)
+> +REG32(CALIB_WRITE, 0x8)
+> +    FIELD(CALIB_WRITE, FRACTION_EN, 20, 1)
+> +    FIELD(CALIB_WRITE, FRACTION_DATA, 16, 4)
+> +    FIELD(CALIB_WRITE, MAX_TICK, 0, 16)
+> +REG32(CALIB_READ, 0xc)
+> +    FIELD(CALIB_READ, FRACTION_EN, 20, 1)
+> +    FIELD(CALIB_READ, FRACTION_DATA, 16, 4)
+> +    FIELD(CALIB_READ, MAX_TICK, 0, 16)
+> +REG32(CURRENT_TIME, 0x10)
+> +REG32(CURRENT_TICK, 0x14)
+> +    FIELD(CURRENT_TICK, VALUE, 0, 16)
+> +REG32(ALARM, 0x18)
+> +REG32(RTC_INT_STATUS, 0x20)
+> +    FIELD(RTC_INT_STATUS, ALARM, 1, 1)
+> +    FIELD(RTC_INT_STATUS, SECONDS, 0, 1)
+> +REG32(RTC_INT_MASK, 0x24)
+> +    FIELD(RTC_INT_MASK, ALARM, 1, 1)
+> +    FIELD(RTC_INT_MASK, SECONDS, 0, 1)
+> +REG32(RTC_INT_EN, 0x28)
+> +    FIELD(RTC_INT_EN, ALARM, 1, 1)
+> +    FIELD(RTC_INT_EN, SECONDS, 0, 1)
+> +REG32(RTC_INT_DIS, 0x2c)
+> +    FIELD(RTC_INT_DIS, ALARM, 1, 1)
+> +    FIELD(RTC_INT_DIS, SECONDS, 0, 1)
+> +REG32(ADDR_ERROR, 0x30)
+> +    FIELD(ADDR_ERROR, STATUS, 0, 1)
+> +REG32(ADDR_ERROR_INT_MASK, 0x34)
+> +    FIELD(ADDR_ERROR_INT_MASK, MASK, 0, 1)
+> +REG32(ADDR_ERROR_INT_EN, 0x38)
+> +    FIELD(ADDR_ERROR_INT_EN, MASK, 0, 1)
+> +REG32(ADDR_ERROR_INT_DIS, 0x3c)
+> +    FIELD(ADDR_ERROR_INT_DIS, MASK, 0, 1)
+> +REG32(CONTROL, 0x40)
+> +    FIELD(CONTROL, BATTERY_DISABLE, 31, 1)
+> +    FIELD(CONTROL, OSC_CNTRL, 24, 4)
+> +    FIELD(CONTROL, SLVERR_ENABLE, 0, 1)
+> +REG32(SAFETY_CHK, 0x50)
+> +
+> +#define XLNX_ZYNQMP_RTC_R_MAX (R_SAFETY_CHK + 1)
+> +
+> +typedef struct XlnxZynqMPRTC {
+> +    SysBusDevice parent_obj;
+> +    MemoryRegion iomem;
+> +    qemu_irq irq_rtc_int;
+> +    qemu_irq irq_addr_error_int;
+> +
+> +    uint32_t regs[XLNX_ZYNQMP_RTC_R_MAX];
+> +    RegisterInfo regs_info[XLNX_ZYNQMP_RTC_R_MAX];
+> +} XlnxZynqMPRTC;
+> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
+> new file mode 100644
+> index 0000000000..ead40fc42d
+> --- /dev/null
+> +++ b/hw/timer/xlnx-zynqmp-rtc.c
+> @@ -0,0 +1,218 @@
+> +/*
+> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
+> + *
+> + * Copyright (c) 2017 Xilinx Inc.
+> + *
+> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/register.h"
+> +#include "qemu/bitops.h"
+> +#include "qemu/log.h"
+> +#include "hw/timer/xlnx-zynqmp-rtc.h"
+> +
+> +#ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
+> +#define XLNX_ZYNQMP_RTC_ERR_DEBUG 0
+> +#endif
+> +
+> +static void rtc_int_update_irq(XlnxZynqMPRTC *s)
+> +{
+> +    bool pending = s->regs[R_RTC_INT_STATUS] & ~s->regs[R_RTC_INT_MASK];
+> +    qemu_set_irq(s->irq_rtc_int, pending);
+> +}
+> +
+> +static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
+> +{
+> +    bool pending = s->regs[R_ADDR_ERROR] & ~s->regs[R_ADDR_ERROR_INT_MASK];
+> +    qemu_set_irq(s->irq_addr_error_int, pending);
+> +}
+> +
+> +static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+> +    rtc_int_update_irq(s);
+> +}
+> +
+> +static uint64_t rtc_int_en_prew(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+> +    uint32_t val = val64;
 
-Ugh, can you please point me to the v1->v2 difference?
+Why is this intermediate variable necessary?
 
-Thanks
-Laszlo
+> +
+> +    s->regs[R_RTC_INT_MASK] &= ~val;
+> +    rtc_int_update_irq(s);
+> +    return 0;
+> +}
+> +
+> +static uint64_t rtc_int_dis_prew(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+> +    uint32_t val = val64;
+
+ditto,
+
+> +
+> +    s->regs[R_RTC_INT_MASK] |= val;
+> +    rtc_int_update_irq(s);
+> +    return 0;
+> +}
+> +
+> +static void addr_error_postw(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+> +    addr_error_int_update_irq(s);
+> +}
+> +
+> +static uint64_t addr_error_int_en_prew(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+> +    uint32_t val = val64;
+
+ditto,
+
+> +
+> +    s->regs[R_ADDR_ERROR_INT_MASK] &= ~val;
+> +    addr_error_int_update_irq(s);
+> +    return 0;
+> +}
+> +
+> +static uint64_t addr_error_int_dis_prew(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
+> +    uint32_t val = val64;
+
+ditto.
+
+I find this clearer to review:
+
+       s->regs[R_ADDR_ERROR_INT_MASK] |= (uint32_t)val64;
+
+Anyway:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +
+> +    s->regs[R_ADDR_ERROR_INT_MASK] |= val;
+> +    addr_error_int_update_irq(s);
+> +    return 0;
+> +}
+> +
+> +static const RegisterAccessInfo rtc_regs_info[] = {
+> +    {   .name = "SET_TIME_WRITE",  .addr = A_SET_TIME_WRITE,
+> +    },{ .name = "SET_TIME_READ",  .addr = A_SET_TIME_READ,
+> +        .ro = 0xffffffff,
+> +    },{ .name = "CALIB_WRITE",  .addr = A_CALIB_WRITE,
+> +    },{ .name = "CALIB_READ",  .addr = A_CALIB_READ,
+> +        .ro = 0x1fffff,
+> +    },{ .name = "CURRENT_TIME",  .addr = A_CURRENT_TIME,
+> +        .ro = 0xffffffff,
+> +    },{ .name = "CURRENT_TICK",  .addr = A_CURRENT_TICK,
+> +        .ro = 0xffff,
+> +    },{ .name = "ALARM",  .addr = A_ALARM,
+> +    },{ .name = "RTC_INT_STATUS",  .addr = A_RTC_INT_STATUS,
+> +        .w1c = 0x3,
+> +        .post_write = rtc_int_status_postw,
+> +    },{ .name = "RTC_INT_MASK",  .addr = A_RTC_INT_MASK,
+> +        .reset = 0x3,
+> +        .ro = 0x3,
+> +    },{ .name = "RTC_INT_EN",  .addr = A_RTC_INT_EN,
+> +        .pre_write = rtc_int_en_prew,
+> +    },{ .name = "RTC_INT_DIS",  .addr = A_RTC_INT_DIS,
+> +        .pre_write = rtc_int_dis_prew,
+> +    },{ .name = "ADDR_ERROR",  .addr = A_ADDR_ERROR,
+> +        .w1c = 0x1,
+> +        .post_write = addr_error_postw,
+> +    },{ .name = "ADDR_ERROR_INT_MASK",  .addr = A_ADDR_ERROR_INT_MASK,
+> +        .reset = 0x1,
+> +        .ro = 0x1,
+> +    },{ .name = "ADDR_ERROR_INT_EN",  .addr = A_ADDR_ERROR_INT_EN,
+> +        .pre_write = addr_error_int_en_prew,
+> +    },{ .name = "ADDR_ERROR_INT_DIS",  .addr = A_ADDR_ERROR_INT_DIS,
+> +        .pre_write = addr_error_int_dis_prew,
+> +    },{ .name = "CONTROL",  .addr = A_CONTROL,
+> +        .reset = 0x1000000,
+> +        .rsvd = 0x70fffffe,
+> +    },{ .name = "SAFETY_CHK",  .addr = A_SAFETY_CHK,
+> +    }
+> +};
+> +
+> +static void rtc_reset(DeviceState *dev)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(dev);
+> +    unsigned int i;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
+> +        register_reset(&s->regs_info[i]);
+> +    }
+> +
+> +    rtc_int_update_irq(s);
+> +    addr_error_int_update_irq(s);
+> +}
+> +
+> +static const MemoryRegionOps rtc_ops = {
+> +    .read = register_read_memory,
+> +    .write = register_write_memory,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +    },
+> +};
+> +
+> +static void rtc_init(Object *obj)
+> +{
+> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(obj);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +    RegisterInfoArray *reg_array;
+> +
+> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_RTC,
+> +                       XLNX_ZYNQMP_RTC_R_MAX * 4);
+> +    reg_array =
+> +        register_init_block32(DEVICE(obj), rtc_regs_info,
+> +                              ARRAY_SIZE(rtc_regs_info),
+> +                              s->regs_info, s->regs,
+> +                              &rtc_ops,
+> +                              XLNX_ZYNQMP_RTC_ERR_DEBUG,
+> +                              XLNX_ZYNQMP_RTC_R_MAX * 4);
+> +    memory_region_add_subregion(&s->iomem,
+> +                                0x0,
+> +                                &reg_array->mem);
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +    sysbus_init_irq(sbd, &s->irq_rtc_int);
+> +    sysbus_init_irq(sbd, &s->irq_addr_error_int);
+> +}
+> +
+> +static const VMStateDescription vmstate_rtc = {
+> +    .name = TYPE_XLNX_ZYNQMP_RTC,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPRTC, XLNX_ZYNQMP_RTC_R_MAX),
+> +        VMSTATE_END_OF_LIST(),
+> +    }
+> +};
+> +
+> +static void rtc_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->reset = rtc_reset;
+> +    dc->vmsd = &vmstate_rtc;
+> +}
+> +
+> +static const TypeInfo rtc_info = {
+> +    .name          = TYPE_XLNX_ZYNQMP_RTC,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(XlnxZynqMPRTC),
+> +    .class_init    = rtc_class_init,
+> +    .instance_init = rtc_init,
+> +};
+> +
+> +static void rtc_register_types(void)
+> +{
+> +    type_register_static(&rtc_info);
+> +}
+> +
+> +type_init(rtc_register_types)
+> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+> index 8c19eac3b6..8b27a4b7ef 100644
+> --- a/hw/timer/Makefile.objs
+> +++ b/hw/timer/Makefile.objs
+> @@ -21,6 +21,7 @@ common-obj-$(CONFIG_IMX) += imx_epit.o
+>  common-obj-$(CONFIG_IMX) += imx_gpt.o
+>  common-obj-$(CONFIG_LM32) += lm32_timer.o
+>  common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
+> +common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
+>  
+>  obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
+>  obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
+> 
