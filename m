@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ecPUM-0005Ni-7F
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:45:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecPm0-0001Hw-U8
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 01:03:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ecPUH-0008KA-ST
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:45:18 -0500
-Resent-Message-Id: <E1ecPUH-0008KA-ST@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ecPUH-0008Jw-Jh
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:45:13 -0500
-In-Reply-To: <20180119050005.29392-1-sjitindarsingh@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151633978111.593.12777283721425700216@5adcb62bf0d6>
+	(envelope-from <dgibson@ozlabs.org>) id 1ecPlx-0003qi-0Y
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 01:03:32 -0500
+Date: Fri, 19 Jan 2018 17:03:17 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180119060317.GB28299@umbus.fritz.box>
+References: <20171212051853.24583-1-aik@ozlabs.ru>
+	<20171211224650.71237179@w520.home>
+	<ca9cd686-ea2f-716e-b909-f6e22d1c704c@redhat.com>
+	<20171219070919.42d90b94@w520.home>
+	<87e241ad-4d65-1b51-aa22-a84f18de1cb6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 18 Jan 2018 21:29:42 -0800 (PST)
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V5 0/7] target/ppc: Rework
- spapr_caps
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3lcZGd9BuhuYXNfi"
+Content-Disposition: inline
+In-Reply-To: <87e241ad-4d65-1b51-aa22-a84f18de1cb6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: spapr/iommu: Enable in-kernel
+ TCE acceleration via VFIO KVM device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sjitindarsingh@gmail.com
-Cc: famz@redhat.com, qemu-ppc@nongnu.org, paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTE5MDUwMDA1LjI5MzkyLTEtc2ppdGluZGFyc2luZ2hAZ21haWwuY29t
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUUVNVS1QUENdIFtQQVRDSCBWNSAwLzddIHRhcmdldC9w
-cGM6IFJld29yayBzcGFwcl9jYXBzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkYzMxN2JjYmM1IHRhcmdldC9w
-cGMvc3BhcHI6IEFkZCBILUNhbGwgSF9HRVRfQ1BVX0NIQVJBQ1RFUklTVElDUwowOWMwZGJjYWI0
-IHRhcmdldC9wcGMvc3BhcHJfY2FwczogQWRkIG5ldyB0cmlzdGF0ZSBjYXAgc2FmZV9pbmRpcmVj
-dF9icmFuY2gKMTE0NWY3Njk2YSB0YXJnZXQvcHBjL3NwYXByX2NhcHM6IEFkZCBuZXcgdHJpc3Rh
-dGUgY2FwIHNhZmVfYm91bmRzX2NoZWNrCjM3YzM0NDU2MTkgdGFyZ2V0L3BwYy9zcGFwcl9jYXBz
-OiBBZGQgbmV3IHRyaXN0YXRlIGNhcCBzYWZlX2NhY2hlCjBhOGZmMTYwZGMgdGFyZ2V0L3BwYy9z
-cGFwcl9jYXBzOiBBZGQgc3VwcG9ydCBmb3IgdHJpc3RhdGUgc3BhcHJfY2FwYWJpbGl0aWVzCjhh
-ZWY3ODNiOWUgdGFyZ2V0L3BwYy9zcGFwcl9jYXBzOiBBZGQgbWFjcm8gdG8gZ2VuZXJhdGUgc3Bh
-cHJfY2FwcyBtaWdyYXRpb24gdm1zdGF0ZQowOWFkN2YyMDkzIHRhcmdldC9wcGMva3ZtOiBBZGQg
-Y2FwX3BwY19zYWZlX1tjYWNoZS9ib3VuZHNfY2hlY2svaW5kaXJlY3RfYnJhbmNoXQoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB0YXJnZXQvcHBjL2t2bTogQWRkIGNh
-cF9wcGNfc2FmZV9bY2FjaGUvYm91bmRzX2NoZWNrL2luZGlyZWN0X2JyYW5jaF0uLi4KQ2hlY2tp
-bmcgUEFUQ0ggMi83OiB0YXJnZXQvcHBjL3NwYXByX2NhcHM6IEFkZCBtYWNybyB0byBnZW5lcmF0
-ZSBzcGFwcl9jYXBzIG1pZ3JhdGlvbiB2bXN0YXRlLi4uCkNoZWNraW5nIFBBVENIIDMvNzogdGFy
-Z2V0L3BwYy9zcGFwcl9jYXBzOiBBZGQgc3VwcG9ydCBmb3IgdHJpc3RhdGUgc3BhcHJfY2FwYWJp
-bGl0aWVzLi4uCkNoZWNraW5nIFBBVENIIDQvNzogdGFyZ2V0L3BwYy9zcGFwcl9jYXBzOiBBZGQg
-bmV3IHRyaXN0YXRlIGNhcCBzYWZlX2NhY2hlLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojNzU6IEZJTEU6IGh3L3BwYy9zcGFwcl9jYXBzLmM6MTg4OgorICAgICAgICBlcnJvcl9z
-ZXRnKGVycnAsICJSZXF1ZXN0ZWQgc2FmZSBjYWNoZSBjYXBhYmlsaXR5IGxldmVsIG5vdCBzdXBw
-b3J0ZWQgYnkgdGNnLCB0cnkgYSBkaWZmZXJlbnQgdmFsdWUgZm9yIGNhcC1jZnBjIik7CgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzc3OiBGSUxFOiBody9wcGMvc3BhcHJfY2Fwcy5j
-OjE5MDoKKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiUmVxdWVzdGVkIHNhZmUgY2FjaGUgY2Fw
-YWJpbGl0eSBsZXZlbCBub3Qgc3VwcG9ydGVkIGJ5IGt2bSwgdHJ5IGEgZGlmZmVyZW50IHZhbHVl
-IGZvciBjYXAtY2ZwYyIpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5OCBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCA1Lzc6IHRhcmdldC9wcGMvc3BhcHJfY2FwczogQWRkIG5ldyB0cmlzdGF0ZSBjYXAgc2Fm
-ZV9ib3VuZHNfY2hlY2suLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NzogRklM
-RTogaHcvcHBjL3NwYXByX2NhcHMuYzoxOTk6CisgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlJl
-cXVlc3RlZCBzYWZlIGJvdW5kcyBjaGVjayBjYXBhYmlsaXR5IGxldmVsIG5vdCBzdXBwb3J0ZWQg
-YnkgdGNnLCB0cnkgYSBkaWZmZXJlbnQgdmFsdWUgZm9yIGNhcC1zYmJjIik7CgpFUlJPUjogbGlu
-ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ5OiBGSUxFOiBody9wcGMvc3BhcHJfY2Fwcy5jOjIwMToK
-KyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiUmVxdWVzdGVkIHNhZmUgYm91bmRzIGNoZWNrIGNh
-cGFiaWxpdHkgbGV2ZWwgbm90IHN1cHBvcnRlZCBieSBrdm0sIHRyeSBhIGRpZmZlcmVudCB2YWx1
-ZSBmb3IgY2FwLXNiYmMiKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2Mjog
-RklMRTogaHcvcHBjL3NwYXByX2NhcHMuYzoyNDY6CisgICAgICAgIC5kZXNjcmlwdGlvbiA9ICJT
-cGVjdWxhdGlvbiBCYXJyaWVyIEJvdW5kcyBDaGVja2luZyIgVkFMVUVfREVTQ19UUklTVEFURSwK
-CnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNzEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi83OiB0YXJnZXQv
-cHBjL3NwYXByX2NhcHM6IEFkZCBuZXcgdHJpc3RhdGUgY2FwIHNhZmVfaW5kaXJlY3RfYnJhbmNo
-Li4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDg6IEZJTEU6IGh3L3BwYy9zcGFw
-cl9jYXBzLmM6MjEwOgorICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJSZXF1ZXN0ZWQgc2FmZSBp
-bmRpcmVjdCBicmFuY2ggY2FwYWJpbGl0eSBsZXZlbCBub3Qgc3VwcG9ydGVkIGJ5IHRjZywgdHJ5
-IGEgZGlmZmVyZW50IHZhbHVlIGZvciBjYXAtaWJzIik7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzUwOiBGSUxFOiBody9wcGMvc3BhcHJfY2Fwcy5jOjIxMjoKKyAgICAgICAgZXJy
-b3Jfc2V0ZyhlcnJwLCAiUmVxdWVzdGVkIHNhZmUgaW5kaXJlY3QgYnJhbmNoIGNhcGFiaWxpdHkg
-bGV2ZWwgbm90IHN1cHBvcnRlZCBieSBrdm0sIHRyeSBhIGRpZmZlcmVudCB2YWx1ZSBmb3IgY2Fw
-LWlicyIpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA3MSBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3Lzc6
-IHRhcmdldC9wcGMvc3BhcHI6IEFkZCBILUNhbGwgSF9HRVRfQ1BVX0NIQVJBQ1RFUklTVElDUy4u
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
-ZWxpc3RzLm9yZw==
+
+--3lcZGd9BuhuYXNfi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Dec 19, 2017 at 03:59:59PM +0100, Paolo Bonzini wrote:
+> On 19/12/2017 15:09, Alex Williamson wrote:
+> > On Tue, 19 Dec 2017 12:12:35 +0100
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >=20
+> >> On 12/12/2017 06:46, Alex Williamson wrote:
+> >>>> +enum IOMMUMemoryRegionAttr {
+> >>>> +    IOMMU_ATTR_KVM_FD =20
+> >>>
+> >>> You're generalizing the wrong thing here, this is specifically a
+> >>> SPAPR_TCE_FD, call it that. =20
+> >>
+> >> ... and you're not even implementing set_attr, so let's drop it.
+> >>
+> >> My suggestion is to add a function in hw/vfio:
+> >>
+> >>     int vfio_container_attach_kvm_spapr_tce(VFIOContainer *cont,
+> >>                                             int tablefd);
+> >>
+> >> and an IOMMUMemoryRegionClass member:
+> >>
+> >>     int (*set_vfio_container_attrs)(IOMMUMemoryRegion *iommu,
+> >>                                     VFIOContainer *cont)
+> >>
+> >> Then your implementation for the latter is as simple as this:
+> >>
+> >>     if (!kvm_enabled() || !kvmppc_has_cap_spapr_vfio()) {
+> >>         sPAPRTCETable *tcet =3D container_of(iommu, sPAPRTCETable, iom=
+mu);
+> >>         return vfio_container_attach_kvm_spapr_tce(cont, tcet->fd);
+> >>     }
+> >=20
+> > Ugh, exactly the sort of interface I've been trying to avoid, vfio
+> > specific callbacks on common data structures handing out vfio private
+> > data pointers,
+>=20
+> True, VFIOContainer* is private, but in those declarations it's also opaq=
+ue.
+>=20
+> The VFIO container is the representation of the IOMMU, so it makes sense
+> to me to have a function to set it up according to QEMU's IOMMU object.
+> I don't think we will be introducing another object soon that is similar
+> to the VFIO container.
+>=20
+> > requiring additional exported functions from vfio for
+> > each new user of it.  Why is this better?
+>=20
+> I understand that you don't like having many exported functions, but you
+> are just pushing the problem on the memory.h side where you'd get many
+> attribute enums.
+
+It's more than just enums, doing it the other way around is putting
+fairly intimate knowledge of a specific guest IOMMU workings into the
+VFIO code.
+
+Fundamentally this *requires* linking vfio knowledge to guest iommu
+(kvm) knowledge, so some cross linkage we'd usually want to avoid is
+inevitable.  I don't see that there's a strong argument for whether we
+put the bit of vfio knowledge into the spapr viommu or the bit of
+spapr viommu knowledge into vfio.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--3lcZGd9BuhuYXNfi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphiiIACgkQbDjKyiDZ
+s5IBxw/9GYNrWHohQi0xpTTSab+t+WrmDo0jI4mQ9GIBZ0wgsh3vS4RUP9zUqvfw
+yaRhIEbQ0tUdiiAqMMrcA0zWA64U88FVxY2lvB7als8nkhKbqwtaicEioQrPTxW5
+F+z23bi/Pfx6Rh0MNbPRCwVga3fmTIruR+ku7dwUvoUsLaZe0/GojW3cRMizrZF7
+edz8t2WZ+JdhX2+QpMkFifE6LzwvUMoEFzPH2DRjU8rOEVWPqTIkFZQv0FLqSOXH
+V4sFhHR0HDsLdDHKxq6oy2sddiDggVqV2oQL9KyINcGqzJYjv5q5iyztlV5JGYvt
+rxmwR8UwjqAjqcYheysasA92MjSWtR5De7EAsVxN4j+eGgQXkYVAirlWYda1XkYm
+R3Iqb8mKLFmo+N1juEogw38R8TDAoBqoiqeYgNezK/IQaJJxnGHpxYnUN1lSL2fT
+Scq4vu35XB9ssCnKGJk9ywMgC8DQHX8HLL6J9uxtzypfEaX96fm7AIOe5qyJL0/S
+HOghyiiTxSu7tWsO3nhvoAdpsgN2cJrvCJj8gIbAF55I/rBMAtide86RVjUo8iCT
+uLXB5qqYhl9xhvbzW+xu8wGV/a1TepABdmHidssI8nBtKjaWqbnpnTOKaS68Ehf5
+eOI4U0B7prFtGmbF+t3F36aPGWKlC8xEnNvLokP+lfJw6lDOKHM=
+=EHTf
+-----END PGP SIGNATURE-----
+
+--3lcZGd9BuhuYXNfi--
