@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecWWc-0006EX-Le
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:16:07 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1ecWbG-0000Uh-7R
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:20:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecWWb-0008Er-CT
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:16:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecWWb-0008Ei-5o
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:16:05 -0500
-Date: Fri, 19 Jan 2018 11:15:58 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180119131558.GS5292@localhost.localdomain>
-References: <20180118021000.27203-1-ehabkost@redhat.com>
-	<CAFEAcA_JX_eevQL3kM2Kvf_Z3+xTiDRkg6C-EknfMtj_-cRA1g@mail.gmail.com>
-	<20180118212023.GH5292@localhost.localdomain>
-	<20180119004728.ptmqdwdazens4dhv@hz-desktop>
+	(envelope-from <dovgaluk@ispras.ru>) id 1ecWbC-000378-1z
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:20:54 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:58414)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1ecWbB-00036Y-PU
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:20:49 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
+	<20180119084417.7100.69568.stgit@pasha-VirtualBox>
+	<aca12788-c119-3046-ee8f-e7b3d4cc59bb@redhat.com>
+	<002a01d3911d$dc13ca80$943b5f80$@ru>
+	<8aa1900f-2663-43bd-dab5-001be0aede09@redhat.com>
+	<002b01d39120$8c88e880$a59ab980$@ru>
+	<f7c459df-c68f-3995-4183-45da91e688a3@redhat.com>
+	<002c01d39122$2de5d930$89b18b90$@ru>
+In-Reply-To: <002c01d39122$2de5d930$89b18b90$@ru>
+Date: Fri, 19 Jan 2018 16:20:52 +0300
+Message-ID: <002d01d39128$54aa1b70$fdfe5250$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180119004728.ptmqdwdazens4dhv@hz-desktop>
-Subject: Re: [Qemu-devel] [PULL 00/19] machine queue, 2018-01-18
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH v4 13/23] cpus: only take BQL for
+ sleeping threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
+To: 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-On Fri, Jan 19, 2018 at 08:47:28AM +0800, Haozhong Zhang wrote:
-> On 01/18/18 19:20 -0200, Eduardo Habkost wrote:
-> > On Thu, Jan 18, 2018 at 03:22:05PM +0000, Peter Maydell wrote:
-> > > On 18 January 2018 at 02:09, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > > The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
-> > > >
-> > > >   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
-> > > >
-> > > > are available in the Git repository at:
-> > > >
-> > > >   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
-> > > >
-> > > > for you to fetch changes up to 901cc8d31f36ac82824ab68f656ab7050404100c:
-> > > >
-> > > >   fw_cfg: fix memory corruption when all fw_cfg slots are used (2018-01-17 23:04:37 -0200)
-> > > >
-> > > > ----------------------------------------------------------------
-> > > > machine queue, 2018-01-18
-> > > >
-> > > > ----------------------------------------------------------------
-> > > 
-> > > Hi. I'm afraid this doesn't build on 32-bit hosts, due to a
-> > > format string problem:
-> > > 
-> > > In file included from /home/peter.maydell/qemu/exec.c:20:0:
-> > > /home/peter.maydell/qemu/exec.c: In function 'file_ram_alloc':
-> > > /home/peter.maydell/qemu/include/qapi/error.h:162:25: error: format
-> > > '%llx' expects argument of type 'long long unsigned int', but argument
-> > > 7 has type 'size_t {aka unsigned int}' [-Werror=format=]
-> > >                          (fmt), ## __VA_ARGS__)
-> > >                          ^
-> > > /home/peter.maydell/qemu/exec.c:1616:9: note: in expansion of macro 'error_setg'
-> > >          error_setg(errp, "aligment 0x%" PRIx64
-> > >          ^
-> > 
-> > Sorry for not catching this.  Fixup will be included on a new
-> > pull request:
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index 00055559b8..7bba8ef4ab 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -1613,8 +1613,8 @@ static void *file_ram_alloc(RAMBlock *block,
-> >  
-> >      block->page_size = qemu_fd_getpagesize(fd);
-> >      if (block->mr->align % block->page_size) {
-> > -        error_setg(errp, "aligment 0x%" PRIx64
-> > -                   " must be multiples of page size 0x%" PRIx64,
-> > +        error_setg(errp, "alignment 0x%" PRIx64
-> > +                   " must be multiples of page size 0x%zd",
->                                                        ^^^^^^ 0x%zx, or remove the prefix '0x'
+Pavel Dovgalyuk
 
-Oops.  Luckily the pull request wasn't submitted yet.
 
--- 
-Eduardo
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+> Sent: Friday, January 19, 2018 3:37 PM
+> To: 'Paolo Bonzini'; 'Pavel Dovgalyuk'; qemu-devel@nongnu.org
+> Cc: kwolf@redhat.com; peter.maydell@linaro.org; boost.lists@gmail.com; quintela@redhat.com;
+> jasowang@redhat.com; mst@redhat.com; zuban32s@gmail.com; maria.klimushenkova@ispras.ru;
+> kraxel@redhat.com; alex.bennee@linaro.org
+> Subject: RE: [RFC PATCH v4 13/23] cpus: only take BQL for sleeping threads
+> 
+> > From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> > Sent: Friday, January 19, 2018 3:26 PM
+> > To: Pavel Dovgalyuk; 'Pavel Dovgalyuk'; qemu-devel@nongnu.org
+> > Cc: kwolf@redhat.com; peter.maydell@linaro.org; boost.lists@gmail.com; quintela@redhat.com;
+> > jasowang@redhat.com; mst@redhat.com; zuban32s@gmail.com; maria.klimushenkova@ispras.ru;
+> > kraxel@redhat.com; alex.bennee@linaro.org
+> > Subject: Re: [RFC PATCH v4 13/23] cpus: only take BQL for sleeping threads
+> >
+> > On 19/01/2018 13:25, Pavel Dovgalyuk wrote:
+> > >>> It means, that I'll have to fix all the has_work function to avoid races,
+> > >>> because x86_cpu_has_work may have them?
+> > >> Why only x86_cpu_has_work?
+> > >>
+> > >> Even reading cs->interrupt_request outside the mutex is unsafe.
+> > > All the vcpu function that access interrupt controller or peripheral state may be unsafe?
+> > > How can it work safely then?
+> >
+> > They do it inside the big QEMU lock.
+> 
+> Right. Without these patches.
+
+Ah, I forgot about unlocking in tcg_cpu_exec.
+Now I see, that vcpu is taking the lock when trying to access the peripherals.
+
+Therefore, I have to fix all *_cpu_has_work, right?
+
+> They are within the replay lock. And BQL is not covering vcpu execution with these patches.
+> Therefore RR will be ok and regular execution may encounter races?
+> It means that I missed something in Alex ideas, because he prepared the initial patches.
+> 
+> > But here you're calling cpu_has_work (via all_cpu_threads_idle) outside the lock.
+> 
+> Yes, I see, but what we have to do?
+
+
+Pavel Dovgalyuk
