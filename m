@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZeB-00072V-NU
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:08 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ecZeN-0007Dl-Rv
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZe7-0007Pt-Ls
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:22671)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecZe7-0007PY-DI
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:03 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 19 Jan 2018 14:33:39 -0200
-Message-Id: <20180119163345.10649-14-ehabkost@redhat.com>
-In-Reply-To: <20180119163345.10649-1-ehabkost@redhat.com>
-References: <20180119163345.10649-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 13/19] qdev: Check for the availability of a
- hotplug controller before adding a device
+	(envelope-from <laurent@vivier.eu>) id 1ecZeJ-0007VO-SX
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:19 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:55296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecZeJ-0007Um-I1
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:36:15 -0500
+References: <20180109201643.1479-1-samuel.thibault@ens-lyon.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <54a74ee1-e5f5-906a-faa4-ff340ed546b9@vivier.eu>
+Date: Fri, 19 Jan 2018 17:36:04 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180109201643.1479-1-samuel.thibault@ens-lyon.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv2] linux-user: Fix sched_get/setaffinity
+ conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +28,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-From: Thomas Huth <thuth@redhat.com>
+Le 09/01/2018 à 21:16, Samuel Thibault a écrit :
+> sched_get/setaffinity linux-user syscalls were missing conversions for
+> little/big endian, which is hairy since longs may not be the same size
+> either.
+> 
+> For simplicity, this just introduces loops to convert bit by bit like is
+> done for select.
+> 
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> 
+> ---
+> Difference from v1: bitmask computation was separated out into
+> target_to_host_cpu_mask()/host_to_target_cpu_mask().
+> 
+>  linux-user/syscall.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 73 insertions(+), 8 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 11c9116c4a..cac07419aa 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7716,6 +7716,73 @@ static TargetFdTrans target_inotify_trans = {
+>  };
+>  #endif
+>  
+> +static int target_to_host_cpu_mask(unsigned long *host_mask,
+> +                                   size_t host_size,
+> +                                   abi_ulong target_addr,
+> +                                   size_t target_size)
+> +{
+> +    unsigned target_bits = sizeof(abi_ulong) * 8;
+> +    unsigned host_bits = sizeof(*host_mask) * 8;
+> +    abi_ulong *target_mask;
+> +    unsigned i, j;
+> +
+> +    assert(host_size >= target_size);
+> +
+> +    target_mask = lock_user(VERIFY_READ, target_addr, target_size, 1);
+> +    if (!target_mask) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    memset(host_mask, 0, host_size);
+> +
+> +    for (i = 0 ; i < target_size / sizeof(abi_ulong); i++) {
+> +        unsigned bit = i * target_bits;
+> +        abi_ulong val;
+> +
+> +        __get_user(val, &target_mask[i]);
+> +        for (j = 0; j < target_bits; j++, bit++) {
+> +            if (val & (1UL << j)) {
+> +                host_mask[bit / host_bits] |= 1UL << (bit % host_bits);
+> +            }
+> +        }
+> +    }
+> +
+> +    unlock_user(target_mask, target_addr, 0);
+> +    return 0;
+> +}
+> +
+> +static int host_to_target_cpu_mask(const unsigned long *host_mask,
+> +                                   size_t host_size,
+> +                                   abi_ulong target_addr,
+> +                                   size_t target_size)
+> +{
+> +    unsigned target_bits = sizeof(abi_ulong) * 8;
+> +    unsigned host_bits = sizeof(*host_mask) * 8;
+> +    abi_ulong *target_mask;
+> +    unsigned i, j;
+> +
+> +    assert(host_size >= target_size);
+> +
+> +    target_mask = lock_user(VERIFY_WRITE, target_addr, target_size, 0);
+> +    if (!target_mask) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +
+> +    for (i = 0 ; i < target_size / sizeof(abi_ulong); i++) {
+> +        unsigned bit = i * target_bits;
+> +        abi_ulong val = 0;
+> +
+> +        for (j = 0; j < target_bits; j++, bit++) {
+> +            if (host_mask[bit / host_bits] & (1UL << (bit % host_bits))) {
+> +                val |= 1UL << j;
+> +            }
+> +        }
+> +        __put_user(val, &target_mask[i]);
+> +    }
+> +
+> +    unlock_user(target_mask, target_addr, target_size);
+> +    return 0;
+> +}
+> +
+>  /* do_syscall() should always have a single exit point at the end so
+>     that actions, such as logging of syscall results, can be performed.
+>     All errnos that do_syscall() returns must be -TARGET_<errcode>. */
+> @@ -10353,6 +10420,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>              mask_size = (arg2 + (sizeof(*mask) - 1)) & ~(sizeof(*mask) - 1);
+>  
+>              mask = alloca(mask_size);
+> +            memset(mask, 0, mask_size);
+>              ret = get_errno(sys_sched_getaffinity(arg1, mask_size, mask));
+>  
+>              if (!is_error(ret)) {
+> @@ -10372,9 +10440,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>                      ret = arg2;
+>                  }
+>  
+> -                if (copy_to_user(arg3, mask, ret)) {
+> -                    goto efault;
+> -                }
+> +                ret = host_to_target_cpu_mask(mask, mask_size, arg3, arg2);
+>              }
+>          }
+>          break;
+> @@ -10392,13 +10458,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>                  break;
+>              }
+>              mask_size = (arg2 + (sizeof(*mask) - 1)) & ~(sizeof(*mask) - 1);
+> -
+>              mask = alloca(mask_size);
+> -            if (!lock_user_struct(VERIFY_READ, p, arg3, 1)) {
+> -                goto efault;
+> +
+> +            ret = target_to_host_cpu_mask(mask, mask_size, arg3, arg2);
+> +            if (ret) {
+> +                break;
+>              }
+> -            memcpy(mask, p, arg2);
+> -            unlock_user_struct(p, arg2, 0);
+>  
+>              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
+>          }
+> 
 
-The qdev_unplug() function contains a g_assert(hotplug_ctrl) statement,
-so QEMU crashes when the user tries to device_add + device_del a device
-that does not have a corresponding hotplug controller. This could be
-provoked for a couple of devices in the past (see commit 4c93950659487c7ad
-or 84ebd3e8c7d4fe955 for example), and can currently for example also be
-triggered like this:
+Applied to my linux-user branch.
 
-$ s390x-softmmu/qemu-system-s390x -M none -nographic
-QEMU 2.10.50 monitor - type 'help' for more information
-(qemu) device_add qemu-s390x-cpu,id=x
-(qemu) device_del x
-**
-ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
-Aborted (core dumped)
-
-So devices clearly need a hotplug controller when they should be usable
-with device_add.
-The code in qdev_device_add() already checks whether the bus has a proper
-hotplug controller, but for devices that do not have a corresponding bus,
-there is no appropriate check available yet. In that case we should check
-whether the machine itself provides a suitable hotplug controller and
-refuse to plug the device if none is available.
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1509617407-21191-3-git-send-email-thuth@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/hw/qdev-core.h |  1 +
- hw/core/qdev.c         | 28 ++++++++++++++++++++--------
- qdev-monitor.c         |  5 +++++
- 3 files changed, 26 insertions(+), 8 deletions(-)
-
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 0a71bf83f0..51473eee7b 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -286,6 +286,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
- void qdev_init_nofail(DeviceState *dev);
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version);
-+HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
- HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
- void qdev_unplug(DeviceState *dev, Error **errp);
- void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 11112951a5..f739753e3a 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -253,19 +253,31 @@ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-     dev->alias_required_for_version = required_for_version;
- }
- 
-+HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
-+{
-+    MachineState *machine;
-+    MachineClass *mc;
-+    Object *m_obj = qdev_get_machine();
-+
-+    if (object_dynamic_cast(m_obj, TYPE_MACHINE)) {
-+        machine = MACHINE(m_obj);
-+        mc = MACHINE_GET_CLASS(machine);
-+        if (mc->get_hotplug_handler) {
-+            return mc->get_hotplug_handler(machine, dev);
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
- HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
- {
--    HotplugHandler *hotplug_ctrl = NULL;
-+    HotplugHandler *hotplug_ctrl;
- 
-     if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-         hotplug_ctrl = dev->parent_bus->hotplug_handler;
--    } else if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
--        MachineState *machine = MACHINE(qdev_get_machine());
--        MachineClass *mc = MACHINE_GET_CLASS(machine);
--
--        if (mc->get_hotplug_handler) {
--            hotplug_ctrl = mc->get_hotplug_handler(machine, dev);
--        }
-+    } else {
-+        hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
-     }
-     return hotplug_ctrl;
- }
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 2abb80d7e4..c436616446 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -613,6 +613,11 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
- 
-     if (bus) {
-         qdev_set_parent_bus(dev, bus);
-+    } else if (qdev_hotplug && !qdev_get_machine_hotplug_handler(dev)) {
-+        /* No bus, no machine hotplug handler --> device is not hotpluggable */
-+        error_setg(&err, "Device '%s' can not be hotplugged on this machine",
-+                   driver);
-+        goto err_del_dev;
-     }
- 
-     qdev_set_id(dev, qemu_opts_id(opts));
--- 
-2.14.3
+Thanks,
+Laurent
