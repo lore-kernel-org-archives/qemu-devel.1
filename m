@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ecaTW-00024B-40
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:29:10 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecaTs-0002Kn-6S
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:29:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ecaTV-0000Ug-5n
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:29:10 -0500
-References: <20180119132856.3786-1-lvivier@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <9bac8781-0582-63ba-8e2e-0820e65cc69b@ilande.co.uk>
-Date: Fri, 19 Jan 2018 17:28:47 +0000
+	(envelope-from <ehabkost@redhat.com>) id 1ecaTo-0000h9-TQ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:29:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecaTo-0000go-L3
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:29:28 -0500
+Date: Fri, 19 Jan 2018 15:29:21 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180119172921.GD15832@localhost.localdomain>
+References: <20171114102246.22221-1-apahim@redhat.com>
+	<20171114102246.22221-4-apahim@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180119132856.3786-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/char: remove legacy interface
- escc_init()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171114102246.22221-4-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v11 3/8] qemu.py: refactor launch()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, crosa@redhat.com, muriloo@linux.vnet.ibm.com
 
-On 19/01/18 13:28, Laurent Vivier wrote:
-
-> Move necessary stuff in escc.h and update type names.
-> Remove slavio_serial_ms_kbd_init().
-> Fix code style problems reported by checkpatch.pl
-> Update mac_newworld, mac_oldworld and sun4m to use directly the
-> QDEV interface.
+On Tue, Nov 14, 2017 at 11:22:41AM +0100, Amador Pahim wrote:
+> This is just an refactor to separate the exception handler from the
+> actual launch procedure, improving the readability and making future
+> maintenances in this piece of code easier.
 > 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+The only thing preventing me from queueing it right now is the
+dependency on patch 2/8.
+
 > ---
-> v2: in sun4m, move comments about Slavio TTY close to
->      their qdev_prop_set_chr()
+>  scripts/qemu.py | 29 ++++++++++++++++++-----------
+>  1 file changed, 18 insertions(+), 11 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index d5b1cde044..28aa3712c7 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -202,20 +202,14 @@ class QEMUMachine(object):
+>              self._temp_dir = None
+>  
+>      def launch(self):
+> -        '''Launch the VM and establish a QMP connection'''
+> +        """
+> +        Launch the VM and make sure we cleanup and expose the
+> +        command line/output in case of exception
+> +        """
+>          self._iolog = None
+>          self._qemu_full_args = None
+> -        devnull = open(os.path.devnull, 'rb')
+>          try:
+> -            self._pre_launch()
+> -            self._qemu_full_args = (self._wrapper + [self._binary] +
+> -                                    self._base_args() + self._args)
+> -            self._popen = subprocess.Popen(self._qemu_full_args,
+> -                                           stdin=devnull,
+> -                                           stdout=self._qemu_log_file,
+> -                                           stderr=subprocess.STDOUT,
+> -                                           shell=False)
+> -            self._post_launch()
+> +            self._launch()
+>          except:
+>              if self.is_running():
+>                  self._popen.kill()
+> @@ -230,6 +224,19 @@ class QEMUMachine(object):
+>                  LOG.debug('Output: %r', self._iolog)
+>              raise
+>  
+> +    def _launch(self):
+> +        '''Launch the VM and establish a QMP connection'''
+> +        devnull = open(os.path.devnull, 'rb')
+> +        self._pre_launch()
+> +        self._qemu_full_args = (self._wrapper + [self._binary] +
+> +                                self._base_args() + self._args)
+> +        self._popen = subprocess.Popen(self._qemu_full_args,
+> +                                       stdin=devnull,
+> +                                       stdout=self._qemu_log_file,
+> +                                       stderr=subprocess.STDOUT,
+> +                                       shell=False)
+> +        self._post_launch()
+> +
+>      def wait(self):
+>          '''Wait for the VM to power off'''
+>          self._popen.wait()
+> -- 
+> 2.13.6
+> 
+> 
 
-Ah okay perhaps I didn't express myself particularly well: what I was 
-suggesting was moving the comment above both qdev_create()s rather than 
-in the middle e.g.
-
-   /* Slavio TTYA (base+4, Linux ttyS0) is the first QEMU serial device
-      Slavio TTYB (base+0, Linux ttyS1) is the second QEMU serial device
-    */
-    dev = qdev_create(NULL, TYPE_ESCC);
-    qdev_prop_set_uint32(dev, "disabled", !machine->enable_graphics);
-    ...
-    ...
-    sysbus_mmio_map(s, 0, hwdef->ms_kb_base);
-
-    dev = qdev_create(NULL, TYPE_ESCC);
-    qdev_prop_set_uint32(dev, "disabled", 0);
-    ...
-    ...
-    sysbus_mmio_map(s, 0, hwdef->serial_base);
-
-
-instead of v1 which does:
-
-
-    dev = qdev_create(NULL, TYPE_ESCC);
-    qdev_prop_set_uint32(dev, "disabled", !machine->enable_graphics);
-    ...
-    ...
-    sysbus_mmio_map(s, 0, hwdef->ms_kb_base);
-
-   /* Slavio TTYA (base+4, Linux ttyS0) is the first QEMU serial device
-      Slavio TTYB (base+0, Linux ttyS1) is the second QEMU serial device
-    */
-    dev = qdev_create(NULL, TYPE_ESCC);
-    qdev_prop_set_uint32(dev, "disabled", 0);
-    ...   ...
-    sysbus_mmio_map(s, 0, hwdef->serial_base);
-
-
-
-ATB,
-
-Mark.
+-- 
+Eduardo
