@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53469)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eccGN-0002Co-P1
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:23:45 -0500
+	id 1eccOO-0004ZR-5Q
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eccGK-0003Qm-Bd
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:23:43 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eccGK-0003QV-67
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:23:40 -0500
-Received: by mail-qt0-x242.google.com with SMTP id u10so6478483qtg.2
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 11:23:40 -0800 (PST)
+	id 1eccOK-0000Co-QS
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:32:00 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <cover.1516386853.git.alistair.francis@xilinx.com>
-	<9915a5663505d53a142c263b471142af29d2d7d8.1516386853.git.alistair.francis@xilinx.com>
+References: <cover.1516300623.git.alistair.francis@xilinx.com>
+	<406cec176afe5821bece00c94f1030948373d5c1.1516300623.git.alistair.francis@xilinx.com>
+	<b3c2a434-754a-7285-f79b-1d22e0dd3b0a@amsat.org>
+	<CAKmqyKPMQy15-+OLz_6iXc67Cp42QM_RP2t4Cceu-DcCK4ewZQ@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1aa0e97b-d3f7-6d91-1b43-25ccac8ddae4@amsat.org>
-Date: Fri, 19 Jan 2018 16:22:51 -0300
+Message-ID: <d4287aa1-8d6c-6410-f473-e511814577a5@amsat.org>
+Date: Fri, 19 Jan 2018 16:31:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <9915a5663505d53a142c263b471142af29d2d7d8.1516386853.git.alistair.francis@xilinx.com>
+In-Reply-To: <CAKmqyKPMQy15-+OLz_6iXc67Cp42QM_RP2t4Cceu-DcCK4ewZQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] xlnx-zynqmp-rtc: Initial commit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 5/9] xlnx-pmu-iomod-intc: Add
+ the PMU Interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,370 +31,710 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+To: Alistair Francis <alistair.francis@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edgar Iglesias <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
 
-Hi Alistair,
-
-On 01/19/2018 03:35 PM, Alistair Francis wrote:
-> Initial commit of the ZynqMP RTC device.
+On 01/19/2018 03:11 PM, Alistair Francis wrote:
+> On Thu, Jan 18, 2018 at 1:29 PM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> On 01/18/2018 03:38 PM, Alistair Francis wrote:
+>>> Add the PMU IO Module Interrupt controller device.
+>>>
+>>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>>> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>>> ---
+>>>
+>>>  default-configs/microblaze-softmmu.mak |   1 +
+>>>  include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
+>>>  hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
+>>
+>> Thanks for installing the git.orderfile :)
+>>
+>>>  hw/intc/Makefile.objs                  |   1 +
+>>>  4 files changed, 614 insertions(+)
+>>>  create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
+>>>  create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
+>>>
+>>> diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
+>>> index ce2630818a..7fca8e4c99 100644
+>>> --- a/default-configs/microblaze-softmmu.mak
+>>> +++ b/default-configs/microblaze-softmmu.mak
+>>> @@ -9,3 +9,4 @@ CONFIG_XILINX_SPI=y
+>>>  CONFIG_XILINX_ETHLITE=y
+>>>  CONFIG_SSI=y
+>>>  CONFIG_SSI_M25P80=y
+>>> +CONFIG_XLNX_ZYNQMP=y
+>>> diff --git a/include/hw/intc/xlnx-pmu-iomod-intc.h b/include/hw/intc/xlnx-pmu-iomod-intc.h
+>>> new file mode 100644
+>>> index 0000000000..3478d8cf6c
+>>> --- /dev/null
+>>> +++ b/include/hw/intc/xlnx-pmu-iomod-intc.h
+>>> @@ -0,0 +1,58 @@
+>>> +/*
+>>> + * QEMU model of Xilinx I/O Module Interrupt Controller
+>>> + *
+>>> + * Copyright (c) 2014 Xilinx Inc.
+>>> + *
+>>> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+>>> + * of this software and associated documentation files (the "Software"), to deal
+>>> + * in the Software without restriction, including without limitation the rights
+>>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+>>> + * copies of the Software, and to permit persons to whom the Software is
+>>> + * furnished to do so, subject to the following conditions:
+>>> + *
+>>> + * The above copyright notice and this permission notice shall be included in
+>>> + * all copies or substantial portions of the Software.
+>>> + *
+>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+>>> + * THE SOFTWARE.
+>>> + */
+>>> +
+>>> +#ifndef XLNX_PMU_IO_INTC_H
+>>> +#define XLNX_PMU_IO_INTC_H
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "hw/sysbus.h"
+>>> +#include "hw/register.h"
+>>> +
+>>> +#define TYPE_XLNX_PMU_IO_INTC "xlnx.pmu_io_intc"
+>>> +
+>>> +#define XLNX_PMU_IO_INTC(obj) \
+>>> +     OBJECT_CHECK(XlnxPMUIOIntc, (obj), TYPE_XLNX_PMU_IO_INTC)
+>>> +
+>>> +/* This is R_PIT3_CONTROL + 1 */
+>>> +#define XlnxPMUIOIntc_R_MAX (0x78 + 1)
+>>
+>> Good, I prefer this way, rather than having all the registers exposed in
+>> the header.
+>> Can you rename this with CAPS to stay consistent with the CODING_STYLE?
+>>
+>>> +
+>>> +typedef struct XlnxPMUIOIntc {
+>>> +    SysBusDevice parent_obj;
+>>> +    MemoryRegion iomem;
+>>> +
+>>> +    qemu_irq parent_irq;
+>>> +
+>>> +    struct {
+>>> +        uint32_t intr_size;
+>>> +        uint32_t level_edge;
+>>> +        uint32_t positive;
+>>> +    } cfg;
+>>> +
+>>> +    uint32_t irq_raw;
+>>> +
+>>> +    uint32_t regs[XlnxPMUIOIntc_R_MAX];
+>>> +    RegisterInfo regs_info[XlnxPMUIOIntc_R_MAX];
+>>> +} XlnxPMUIOIntc;
+>>> +
+>>> +#endif /* XLNX_PMU_IO_INTC_H */
+>>> diff --git a/hw/intc/xlnx-pmu-iomod-intc.c b/hw/intc/xlnx-pmu-iomod-intc.c
+>>> new file mode 100644
+>>> index 0000000000..1ce2f4fa6b
+>>> --- /dev/null
+>>> +++ b/hw/intc/xlnx-pmu-iomod-intc.c
+>>> @@ -0,0 +1,554 @@
+>>> +/*
+>>> + * QEMU model of Xilinx I/O Module Interrupt Controller
+>>> + *
+>>> + * Copyright (c) 2013 Xilinx Inc
+>>> + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>>> + * Written by Alistair Francis <alistair.francis@xilinx.com>
+>>> + *
+>>> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+>>> + * of this software and associated documentation files (the "Software"), to deal
+>>> + * in the Software without restriction, including without limitation the rights
+>>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+>>> + * copies of the Software, and to permit persons to whom the Software is
+>>> + * furnished to do so, subject to the following conditions:
+>>> + *
+>>> + * The above copyright notice and this permission notice shall be included in
+>>> + * all copies or substantial portions of the Software.
+>>> + *
+>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+>>> + * THE SOFTWARE.
+>>> + */
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "hw/sysbus.h"
+>>> +#include "hw/register.h"
+>>> +#include "qemu/bitops.h"
+>>> +#include "qemu/log.h"
+>>> +#include "hw/intc/xlnx-pmu-iomod-intc.h"
+>>> +
+>>> +#ifndef XLNX_PMU_IO_INTC_ERR_DEBUG
+>>> +#define XLNX_PMU_IO_INTC_ERR_DEBUG 0
+>>> +#endif
+>>> +
+>>> +#define DB_PRINT_L(lvl, fmt, args...) do {\
+>>> +    if (XLNX_PMU_IO_INTC_ERR_DEBUG >= lvl) {\
+>>> +        qemu_log(TYPE_XLNX_PMU_IO_INTC ": %s:" fmt, __func__, ## args);\
+>>> +    } \
+>>> +} while (0)
+>>> +
+>>> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>>> +
+>>> +REG32(IRQ_MODE, 0xc)
+>>> +REG32(GPO0, 0x10)
+>>> +    FIELD(GPO0, MAGIC_WORD_1, 24, 8)
+>>> +    FIELD(GPO0, MAGIC_WORD_2, 16, 8)
+>>> +    FIELD(GPO0, FT_INJECT_FAILURE, 13, 3)
+>>> +    FIELD(GPO0, DISABLE_RST_FTSM, 12, 1)
+>>> +    FIELD(GPO0, RST_FTSM, 11, 1)
+>>> +    FIELD(GPO0, CLR_FTSTS, 10, 1)
+>>> +    FIELD(GPO0, RST_ON_SLEEP, 9, 1)
+>>> +    FIELD(GPO0, DISABLE_TRACE_COMP, 8, 1)
+>>> +    FIELD(GPO0, PIT3_PRESCALE, 7, 1)
+>>> +    FIELD(GPO0, PIT2_PRESCALE, 5, 2)
+>>> +    FIELD(GPO0, PIT1_PRESCALE, 3, 2)
+>>> +    FIELD(GPO0, PIT0_PRESCALE, 1, 2)
+>>> +    FIELD(GPO0, DEBUG_REMAP, 0, 1)
+>>> +REG32(GPO1, 0x14)
+>>> +    FIELD(GPO1, MIO_5, 5, 1)
+>>> +    FIELD(GPO1, MIO_4, 4, 1)
+>>> +    FIELD(GPO1, MIO_3, 3, 1)
+>>> +    FIELD(GPO1, MIO_2, 2, 1)
+>>> +    FIELD(GPO1, MIO_1, 1, 1)
+>>> +    FIELD(GPO1, MIO_0, 0, 1)
+>>> +REG32(GPO2, 0x18)
+>>> +    FIELD(GPO2, DAP_RPU_WAKE_ACK, 9, 1)
+>>> +    FIELD(GPO2, DAP_FP_WAKE_ACK, 8, 1)
+>>> +    FIELD(GPO2, PS_STATUS, 7, 1)
+>>> +    FIELD(GPO2, PCAP_EN, 6, 1)
+>>> +REG32(GPO3, 0x1c)
+>>> +    FIELD(GPO3, PL_GPO_31, 31, 1)
+>>> +    FIELD(GPO3, PL_GPO_30, 30, 1)
+>>> +    FIELD(GPO3, PL_GPO_29, 29, 1)
+>>> +    FIELD(GPO3, PL_GPO_28, 28, 1)
+>>> +    FIELD(GPO3, PL_GPO_27, 27, 1)
+>>> +    FIELD(GPO3, PL_GPO_26, 26, 1)
+>>> +    FIELD(GPO3, PL_GPO_25, 25, 1)
+>>> +    FIELD(GPO3, PL_GPO_24, 24, 1)
+>>> +    FIELD(GPO3, PL_GPO_23, 23, 1)
+>>> +    FIELD(GPO3, PL_GPO_22, 22, 1)
+>>> +    FIELD(GPO3, PL_GPO_21, 21, 1)
+>>> +    FIELD(GPO3, PL_GPO_20, 20, 1)
+>>> +    FIELD(GPO3, PL_GPO_19, 19, 1)
+>>> +    FIELD(GPO3, PL_GPO_18, 18, 1)
+>>> +    FIELD(GPO3, PL_GPO_17, 17, 1)
+>>> +    FIELD(GPO3, PL_GPO_16, 16, 1)
+>>> +    FIELD(GPO3, PL_GPO_15, 15, 1)
+>>> +    FIELD(GPO3, PL_GPO_14, 14, 1)
+>>> +    FIELD(GPO3, PL_GPO_13, 13, 1)
+>>> +    FIELD(GPO3, PL_GPO_12, 12, 1)
+>>> +    FIELD(GPO3, PL_GPO_11, 11, 1)
+>>> +    FIELD(GPO3, PL_GPO_10, 10, 1)
+>>> +    FIELD(GPO3, PL_GPO_9, 9, 1)
+>>> +    FIELD(GPO3, PL_GPO_8, 8, 1)
+>>> +    FIELD(GPO3, PL_GPO_7, 7, 1)
+>>> +    FIELD(GPO3, PL_GPO_6, 6, 1)
+>>> +    FIELD(GPO3, PL_GPO_5, 5, 1)
+>>> +    FIELD(GPO3, PL_GPO_4, 4, 1)
+>>> +    FIELD(GPO3, PL_GPO_3, 3, 1)
+>>> +    FIELD(GPO3, PL_GPO_2, 2, 1)
+>>> +    FIELD(GPO3, PL_GPO_1, 1, 1)
+>>> +    FIELD(GPO3, PL_GPO_0, 0, 1)
+>>> +REG32(GPI0, 0x20)
+>>> +    FIELD(GPI0, RFT_ECC_FATAL_ERR, 31, 1)
+>>> +    FIELD(GPI0, RFT_VOTER_ERR, 30, 1)
+>>> +    FIELD(GPI0, RFT_COMPARE_ERR_23, 29, 1)
+>>> +    FIELD(GPI0, RFT_COMPARE_ERR_13, 28, 1)
+>>> +    FIELD(GPI0, RFT_COMPARE_ERR_12, 27, 1)
+>>> +    FIELD(GPI0, RFT_LS_MISMATCH_23_B, 26, 1)
+>>> +    FIELD(GPI0, RFT_LS_MISMATCH_13_B, 25, 1)
+>>> +    FIELD(GPI0, RFT_LS_MISMATCH_12_B, 24, 1)
+>>> +    FIELD(GPI0, RFT_MISMATCH_STATE, 23, 1)
+>>> +    FIELD(GPI0, RFT_MISMATCH_CPU, 22, 1)
+>>> +    FIELD(GPI0, RFT_SLEEP_RESET, 19, 1)
+>>> +    FIELD(GPI0, RFT_LS_MISMATCH_23_A, 18, 1)
+>>> +    FIELD(GPI0, RFT_LS_MISMATCH_13_A, 17, 1)
+>>> +    FIELD(GPI0, RFT_LS_MISMATCH_12_A, 16, 1)
+>>> +    FIELD(GPI0, NFT_ECC_FATAL_ERR, 15, 1)
+>>> +    FIELD(GPI0, NFT_VOTER_ERR, 14, 1)
+>>> +    FIELD(GPI0, NFT_COMPARE_ERR_23, 13, 1)
+>>> +    FIELD(GPI0, NFT_COMPARE_ERR_13, 12, 1)
+>>> +    FIELD(GPI0, NFT_COMPARE_ERR_12, 11, 1)
+>>> +    FIELD(GPI0, NFT_LS_MISMATCH_23_B, 10, 1)
+>>> +    FIELD(GPI0, NFT_LS_MISMATCH_13_B, 9, 1)
+>>> +    FIELD(GPI0, NFT_LS_MISMATCH_12_B, 8, 1)
+>>> +    FIELD(GPI0, NFT_MISMATCH_STATE, 7, 1)
+>>> +    FIELD(GPI0, NFT_MISMATCH_CPU, 6, 1)
+>>> +    FIELD(GPI0, NFT_SLEEP_RESET, 3, 1)
+>>> +    FIELD(GPI0, NFT_LS_MISMATCH_23_A, 2, 1)
+>>> +    FIELD(GPI0, NFT_LS_MISMATCH_13_A, 1, 1)
+>>> +    FIELD(GPI0, NFT_LS_MISMATCH_12_A, 0, 1)
+>>> +REG32(GPI1, 0x24)
+>>> +    FIELD(GPI1, APB_AIB_ERROR, 31, 1)
+>>> +    FIELD(GPI1, AXI_AIB_ERROR, 30, 1)
+>>> +    FIELD(GPI1, ERROR_2, 29, 1)
+>>> +    FIELD(GPI1, ERROR_1, 28, 1)
+>>> +    FIELD(GPI1, ACPU_3_DBG_PWRUP, 23, 1)
+>>> +    FIELD(GPI1, ACPU_2_DBG_PWRUP, 22, 1)
+>>> +    FIELD(GPI1, ACPU_1_DBG_PWRUP, 21, 1)
+>>> +    FIELD(GPI1, ACPU_0_DBG_PWRUP, 20, 1)
+>>> +    FIELD(GPI1, FPD_WAKE_GIC_PROXY, 16, 1)
+>>> +    FIELD(GPI1, MIO_WAKE_5, 15, 1)
+>>> +    FIELD(GPI1, MIO_WAKE_4, 14, 1)
+>>> +    FIELD(GPI1, MIO_WAKE_3, 13, 1)
+>>> +    FIELD(GPI1, MIO_WAKE_2, 12, 1)
+>>> +    FIELD(GPI1, MIO_WAKE_1, 11, 1)
+>>> +    FIELD(GPI1, MIO_WAKE_0, 10, 1)
+>>> +    FIELD(GPI1, DAP_RPU_WAKE, 9, 1)
+>>> +    FIELD(GPI1, DAP_FPD_WAKE, 8, 1)
+>>> +    FIELD(GPI1, USB_1_WAKE, 7, 1)
+>>> +    FIELD(GPI1, USB_0_WAKE, 6, 1)
+>>> +    FIELD(GPI1, R5_1_WAKE, 5, 1)
+>>> +    FIELD(GPI1, R5_0_WAKE, 4, 1)
+>>> +    FIELD(GPI1, ACPU_3_WAKE, 3, 1)
+>>> +    FIELD(GPI1, ACPU_2_WAKE, 2, 1)
+>>> +    FIELD(GPI1, ACPU_1_WAKE, 1, 1)
+>>> +    FIELD(GPI1, ACPU_0_WAKE, 0, 1)
+>>> +REG32(GPI2, 0x28)
+>>> +    FIELD(GPI2, VCC_INT_FP_DISCONNECT, 31, 1)
+>>> +    FIELD(GPI2, VCC_INT_DISCONNECT, 30, 1)
+>>> +    FIELD(GPI2, VCC_AUX_DISCONNECT, 29, 1)
+>>> +    FIELD(GPI2, DBG_ACPU3_RST_REQ, 23, 1)
+>>> +    FIELD(GPI2, DBG_ACPU2_RST_REQ, 22, 1)
+>>> +    FIELD(GPI2, DBG_ACPU1_RST_REQ, 21, 1)
+>>> +    FIELD(GPI2, DBG_ACPU0_RST_REQ, 20, 1)
+>>> +    FIELD(GPI2, CP_ACPU3_RST_REQ, 19, 1)
+>>> +    FIELD(GPI2, CP_ACPU2_RST_REQ, 18, 1)
+>>> +    FIELD(GPI2, CP_ACPU1_RST_REQ, 17, 1)
+>>> +    FIELD(GPI2, CP_ACPU0_RST_REQ, 16, 1)
+>>> +    FIELD(GPI2, DBG_RCPU1_RST_REQ, 9, 1)
+>>> +    FIELD(GPI2, DBG_RCPU0_RST_REQ, 8, 1)
+>>> +    FIELD(GPI2, R5_1_SLEEP, 5, 1)
+>>> +    FIELD(GPI2, R5_0_SLEEP, 4, 1)
+>>> +    FIELD(GPI2, ACPU_3_SLEEP, 3, 1)
+>>> +    FIELD(GPI2, ACPU_2_SLEEP, 2, 1)
+>>> +    FIELD(GPI2, ACPU_1_SLEEP, 1, 1)
+>>> +    FIELD(GPI2, ACPU_0_SLEEP, 0, 1)
+>>> +REG32(GPI3, 0x2c)
+>>> +    FIELD(GPI3, PL_GPI_31, 31, 1)
+>>> +    FIELD(GPI3, PL_GPI_30, 30, 1)
+>>> +    FIELD(GPI3, PL_GPI_29, 29, 1)
+>>> +    FIELD(GPI3, PL_GPI_28, 28, 1)
+>>> +    FIELD(GPI3, PL_GPI_27, 27, 1)
+>>> +    FIELD(GPI3, PL_GPI_26, 26, 1)
+>>> +    FIELD(GPI3, PL_GPI_25, 25, 1)
+>>> +    FIELD(GPI3, PL_GPI_24, 24, 1)
+>>> +    FIELD(GPI3, PL_GPI_23, 23, 1)
+>>> +    FIELD(GPI3, PL_GPI_22, 22, 1)
+>>> +    FIELD(GPI3, PL_GPI_21, 21, 1)
+>>> +    FIELD(GPI3, PL_GPI_20, 20, 1)
+>>> +    FIELD(GPI3, PL_GPI_19, 19, 1)
+>>> +    FIELD(GPI3, PL_GPI_18, 18, 1)
+>>> +    FIELD(GPI3, PL_GPI_17, 17, 1)
+>>> +    FIELD(GPI3, PL_GPI_16, 16, 1)
+>>> +    FIELD(GPI3, PL_GPI_15, 15, 1)
+>>> +    FIELD(GPI3, PL_GPI_14, 14, 1)
+>>> +    FIELD(GPI3, PL_GPI_13, 13, 1)
+>>> +    FIELD(GPI3, PL_GPI_12, 12, 1)
+>>> +    FIELD(GPI3, PL_GPI_11, 11, 1)
+>>> +    FIELD(GPI3, PL_GPI_10, 10, 1)
+>>> +    FIELD(GPI3, PL_GPI_9, 9, 1)
+>>> +    FIELD(GPI3, PL_GPI_8, 8, 1)
+>>> +    FIELD(GPI3, PL_GPI_7, 7, 1)
+>>> +    FIELD(GPI3, PL_GPI_6, 6, 1)
+>>> +    FIELD(GPI3, PL_GPI_5, 5, 1)
+>>> +    FIELD(GPI3, PL_GPI_4, 4, 1)
+>>> +    FIELD(GPI3, PL_GPI_3, 3, 1)
+>>> +    FIELD(GPI3, PL_GPI_2, 2, 1)
+>>> +    FIELD(GPI3, PL_GPI_1, 1, 1)
+>>> +    FIELD(GPI3, PL_GPI_0, 0, 1)
+>>> +REG32(IRQ_STATUS, 0x30)
+>>> +    FIELD(IRQ_STATUS, CSU_PMU_SEC_LOCK, 31, 1)
+>>> +    FIELD(IRQ_STATUS, INV_ADDR, 29, 1)
+>>> +    FIELD(IRQ_STATUS, PWR_DN_REQ, 28, 1)
+>>> +    FIELD(IRQ_STATUS, PWR_UP_REQ, 27, 1)
+>>> +    FIELD(IRQ_STATUS, SW_RST_REQ, 26, 1)
+>>> +    FIELD(IRQ_STATUS, HW_RST_REQ, 25, 1)
+>>> +    FIELD(IRQ_STATUS, ISO_REQ, 24, 1)
+>>> +    FIELD(IRQ_STATUS, FW_REQ, 23, 1)
+>>> +    FIELD(IRQ_STATUS, IPI3, 22, 1)
+>>> +    FIELD(IRQ_STATUS, IPI2, 21, 1)
+>>> +    FIELD(IRQ_STATUS, IPI1, 20, 1)
+>>> +    FIELD(IRQ_STATUS, IPI0, 19, 1)
+>>> +    FIELD(IRQ_STATUS, RTC_ALARM, 18, 1)
+>>> +    FIELD(IRQ_STATUS, RTC_EVERY_SECOND, 17, 1)
+>>> +    FIELD(IRQ_STATUS, CORRECTABLE_ECC, 16, 1)
+>>> +    FIELD(IRQ_STATUS, GPI3, 14, 1)
+>>> +    FIELD(IRQ_STATUS, GPI2, 13, 1)
+>>> +    FIELD(IRQ_STATUS, GPI1, 12, 1)
+>>> +    FIELD(IRQ_STATUS, GPI0, 11, 1)
+>>> +    FIELD(IRQ_STATUS, PIT3, 6, 1)
+>>> +    FIELD(IRQ_STATUS, PIT2, 5, 1)
+>>> +    FIELD(IRQ_STATUS, PIT1, 4, 1)
+>>> +    FIELD(IRQ_STATUS, PIT0, 3, 1)
+>>> +REG32(IRQ_PENDING, 0x34)
+>>> +    FIELD(IRQ_PENDING, CSU_PMU_SEC_LOCK, 31, 1)
+>>> +    FIELD(IRQ_PENDING, INV_ADDR, 29, 1)
+>>> +    FIELD(IRQ_PENDING, PWR_DN_REQ, 28, 1)
+>>> +    FIELD(IRQ_PENDING, PWR_UP_REQ, 27, 1)
+>>> +    FIELD(IRQ_PENDING, SW_RST_REQ, 26, 1)
+>>> +    FIELD(IRQ_PENDING, HW_RST_REQ, 25, 1)
+>>> +    FIELD(IRQ_PENDING, ISO_REQ, 24, 1)
+>>> +    FIELD(IRQ_PENDING, FW_REQ, 23, 1)
+>>> +    FIELD(IRQ_PENDING, IPI3, 22, 1)
+>>> +    FIELD(IRQ_PENDING, IPI2, 21, 1)
+>>> +    FIELD(IRQ_PENDING, IPI1, 20, 1)
+>>> +    FIELD(IRQ_PENDING, IPI0, 19, 1)
+>>> +    FIELD(IRQ_PENDING, RTC_ALARM, 18, 1)
+>>> +    FIELD(IRQ_PENDING, RTC_EVERY_SECOND, 17, 1)
+>>> +    FIELD(IRQ_PENDING, CORRECTABLE_ECC, 16, 1)
+>>> +    FIELD(IRQ_PENDING, GPI3, 14, 1)
+>>> +    FIELD(IRQ_PENDING, GPI2, 13, 1)
+>>> +    FIELD(IRQ_PENDING, GPI1, 12, 1)
+>>> +    FIELD(IRQ_PENDING, GPI0, 11, 1)
+>>> +    FIELD(IRQ_PENDING, PIT3, 6, 1)
+>>> +    FIELD(IRQ_PENDING, PIT2, 5, 1)
+>>> +    FIELD(IRQ_PENDING, PIT1, 4, 1)
+>>> +    FIELD(IRQ_PENDING, PIT0, 3, 1)
+>>> +REG32(IRQ_ENABLE, 0x38)
+>>> +    FIELD(IRQ_ENABLE, CSU_PMU_SEC_LOCK, 31, 1)
+>>> +    FIELD(IRQ_ENABLE, INV_ADDR, 29, 1)
+>>> +    FIELD(IRQ_ENABLE, PWR_DN_REQ, 28, 1)
+>>> +    FIELD(IRQ_ENABLE, PWR_UP_REQ, 27, 1)
+>>> +    FIELD(IRQ_ENABLE, SW_RST_REQ, 26, 1)
+>>> +    FIELD(IRQ_ENABLE, HW_RST_REQ, 25, 1)
+>>> +    FIELD(IRQ_ENABLE, ISO_REQ, 24, 1)
+>>> +    FIELD(IRQ_ENABLE, FW_REQ, 23, 1)
+>>> +    FIELD(IRQ_ENABLE, IPI3, 22, 1)
+>>> +    FIELD(IRQ_ENABLE, IPI2, 21, 1)
+>>> +    FIELD(IRQ_ENABLE, IPI1, 20, 1)
+>>> +    FIELD(IRQ_ENABLE, IPI0, 19, 1)
+>>> +    FIELD(IRQ_ENABLE, RTC_ALARM, 18, 1)
+>>> +    FIELD(IRQ_ENABLE, RTC_EVERY_SECOND, 17, 1)
+>>> +    FIELD(IRQ_ENABLE, CORRECTABLE_ECC, 16, 1)
+>>> +    FIELD(IRQ_ENABLE, GPI3, 14, 1)
+>>> +    FIELD(IRQ_ENABLE, GPI2, 13, 1)
+>>> +    FIELD(IRQ_ENABLE, GPI1, 12, 1)
+>>> +    FIELD(IRQ_ENABLE, GPI0, 11, 1)
+>>> +    FIELD(IRQ_ENABLE, PIT3, 6, 1)
+>>> +    FIELD(IRQ_ENABLE, PIT2, 5, 1)
+>>> +    FIELD(IRQ_ENABLE, PIT1, 4, 1)
+>>> +    FIELD(IRQ_ENABLE, PIT0, 3, 1)
+>>> +REG32(IRQ_ACK, 0x3c)
+>>> +    FIELD(IRQ_ACK, CSU_PMU_SEC_LOCK, 31, 1)
+>>> +    FIELD(IRQ_ACK, INV_ADDR, 29, 1)
+>>> +    FIELD(IRQ_ACK, PWR_DN_REQ, 28, 1)
+>>> +    FIELD(IRQ_ACK, PWR_UP_REQ, 27, 1)
+>>> +    FIELD(IRQ_ACK, SW_RST_REQ, 26, 1)
+>>> +    FIELD(IRQ_ACK, HW_RST_REQ, 25, 1)
+>>> +    FIELD(IRQ_ACK, ISO_REQ, 24, 1)
+>>> +    FIELD(IRQ_ACK, FW_REQ, 23, 1)
+>>> +    FIELD(IRQ_ACK, IPI3, 22, 1)
+>>> +    FIELD(IRQ_ACK, IPI2, 21, 1)
+>>> +    FIELD(IRQ_ACK, IPI1, 20, 1)
+>>> +    FIELD(IRQ_ACK, IPI0, 19, 1)
+>>> +    FIELD(IRQ_ACK, RTC_ALARM, 18, 1)
+>>> +    FIELD(IRQ_ACK, RTC_EVERY_SECOND, 17, 1)
+>>> +    FIELD(IRQ_ACK, CORRECTABLE_ECC, 16, 1)
+>>> +    FIELD(IRQ_ACK, GPI3, 14, 1)
+>>> +    FIELD(IRQ_ACK, GPI2, 13, 1)
+>>> +    FIELD(IRQ_ACK, GPI1, 12, 1)
+>>> +    FIELD(IRQ_ACK, GPI0, 11, 1)
+>>> +    FIELD(IRQ_ACK, PIT3, 6, 1)
+>>> +    FIELD(IRQ_ACK, PIT2, 5, 1)
+>>> +    FIELD(IRQ_ACK, PIT1, 4, 1)
+>>> +    FIELD(IRQ_ACK, PIT0, 3, 1)
+>>> +REG32(PIT0_PRELOAD, 0x40)
+>>> +REG32(PIT0_COUNTER, 0x44)
+>>> +REG32(PIT0_CONTROL, 0x48)
+>>> +    FIELD(PIT0_CONTROL, PRELOAD, 1, 1)
+>>> +    FIELD(PIT0_CONTROL, EN, 0, 1)
+>>> +REG32(PIT1_PRELOAD, 0x50)
+>>> +REG32(PIT1_COUNTER, 0x54)
+>>> +REG32(PIT1_CONTROL, 0x58)
+>>> +    FIELD(PIT1_CONTROL, PRELOAD, 1, 1)
+>>> +    FIELD(PIT1_CONTROL, EN, 0, 1)
+>>> +REG32(PIT2_PRELOAD, 0x60)
+>>> +REG32(PIT2_COUNTER, 0x64)
+>>> +REG32(PIT2_CONTROL, 0x68)
+>>> +    FIELD(PIT2_CONTROL, PRELOAD, 1, 1)
+>>> +    FIELD(PIT2_CONTROL, EN, 0, 1)
+>>> +REG32(PIT3_PRELOAD, 0x70)
+>>> +REG32(PIT3_COUNTER, 0x74)
+>>> +REG32(PIT3_CONTROL, 0x78)
+>>> +    FIELD(PIT3_CONTROL, PRELOAD, 1, 1)
+>>> +    FIELD(PIT3_CONTROL, EN, 0, 1)
+>>> +
+>>> +static void xlnx_pmu_io_irq_update(XlnxPMUIOIntc *s)
+>>> +{
+>>> +    bool irq_out;
+>>> +
+>>> +    s->regs[R_IRQ_PENDING] = s->regs[R_IRQ_STATUS] & s->regs[R_IRQ_ENABLE];
+>>> +    irq_out = !!s->regs[R_IRQ_PENDING];
+>>> +
+>>> +    DB_PRINT("Setting IRQ output = %d\n", irq_out);
+>>> +
+>>> +    qemu_set_irq(s->parent_irq, irq_out);
+>>> +}
+>>> +
+>>> +static void xlnx_pmu_io_irq_enable_postw(RegisterInfo *reg, uint64_t val64)
+>>> +{
+>>> +    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(reg->opaque);
+>>> +
+>>> +    xlnx_pmu_io_irq_update(s);
+>>> +}
+>>> +
+>>> +static void xlnx_pmu_io_irq_ack_postw(RegisterInfo *reg, uint64_t val64)
+>>> +{
+>>> +    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(reg->opaque);
+>>> +    uint32_t val = val64;
+>>> +
+>>> +    /* Only clear */
+>>> +    val &= s->regs[R_IRQ_STATUS];
+>>> +    s->regs[R_IRQ_STATUS] ^= val;
+>>> +
+>>> +    /* Active level triggered interrupts stay high.  */
+>>> +    s->regs[R_IRQ_STATUS] |= s->irq_raw & ~s->cfg.level_edge;
+>>> +
+>>> +    xlnx_pmu_io_irq_update(s);
+>>> +}
+>>> +
+>>> +static const RegisterAccessInfo xlnx_pmu_io_intc_regs_info[] = {
+>>> +    {   .name = "IRQ_MODE",  .addr = A_IRQ_MODE,
+>>> +        .rsvd = 0xffffffff,
+>>> +    },{ .name = "GPO0",  .addr = A_GPO0,
+>>> +    },{ .name = "GPO1",  .addr = A_GPO1,
+>>> +        .rsvd = 0xffffffc0,
+>>> +    },{ .name = "GPO2",  .addr = A_GPO2,
+>>> +        .rsvd = 0xfffffc3f,
+>>> +    },{ .name = "GPO3",  .addr = A_GPO3,
+>>> +    },{ .name = "GPI0",  .addr = A_GPI0,
+>>> +        .rsvd = 0x300030,
+>>> +        .ro = 0xffcfffcf,
+>>> +    },{ .name = "GPI1",  .addr = A_GPI1,
+>>> +        .rsvd = 0xf0e0000,
+>>> +        .ro = 0xf0f1ffff,
+>>> +    },{ .name = "GPI2",  .addr = A_GPI2,
+>>> +        .rsvd = 0x1f00fcc0,
+>>> +        .ro = 0xe0ff033f,
+>>> +    },{ .name = "GPI3",  .addr = A_GPI3,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "IRQ_STATUS",  .addr = A_IRQ_STATUS,
+>>> +        .rsvd = 0x40008787,
+>>> +        .ro = 0xbfff7878,
+>>> +    },{ .name = "IRQ_PENDING",  .addr = A_IRQ_PENDING,
+>>> +        .rsvd = 0x40008787,
+>>> +        .ro = 0xdfff7ff8,
+>>> +    },{ .name = "IRQ_ENABLE",  .addr = A_IRQ_ENABLE,
+>>> +        .rsvd = 0x40008787,
+>>> +        .ro = 0x7800,
+>>> +        .post_write = xlnx_pmu_io_irq_enable_postw,
+>>> +    },{ .name = "IRQ_ACK",  .addr = A_IRQ_ACK,
+>>> +        .rsvd = 0x40008787,
+>>> +        .post_write = xlnx_pmu_io_irq_ack_postw,
+>>> +    },{ .name = "PIT0_PRELOAD",  .addr = A_PIT0_PRELOAD,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT0_COUNTER",  .addr = A_PIT0_COUNTER,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT0_CONTROL",  .addr = A_PIT0_CONTROL,
+>>> +        .rsvd = 0xfffffffc,
+>>> +    },{ .name = "PIT1_PRELOAD",  .addr = A_PIT1_PRELOAD,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT1_COUNTER",  .addr = A_PIT1_COUNTER,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT1_CONTROL",  .addr = A_PIT1_CONTROL,
+>>> +        .rsvd = 0xfffffffc,
+>>> +    },{ .name = "PIT2_PRELOAD",  .addr = A_PIT2_PRELOAD,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT2_COUNTER",  .addr = A_PIT2_COUNTER,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT2_CONTROL",  .addr = A_PIT2_CONTROL,
+>>> +        .rsvd = 0xfffffffc,
+>>> +    },{ .name = "PIT3_PRELOAD",  .addr = A_PIT3_PRELOAD,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT3_COUNTER",  .addr = A_PIT3_COUNTER,
+>>> +        .ro = 0xffffffff,
+>>> +    },{ .name = "PIT3_CONTROL",  .addr = A_PIT3_CONTROL,
+>>> +        .rsvd = 0xfffffffc,
+>>> +    }
+>>> +};
+>>> +
+>>> +static void irq_handler(void *opaque, int irq, int level)
+>>> +{
+>>> +    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(opaque);
+>>> +    uint32_t mask = 1 << irq;
+>>> +    uint32_t prev = s->irq_raw;
+>>> +    uint32_t temp;
+>>> +
+>>> +    s->irq_raw &= ~mask;
+>>> +    s->irq_raw |= (!!level) << irq;
+>>> +
+>>> +    /* Turn active-low into active-high.  */
+>>> +    s->irq_raw ^= (~s->cfg.positive);
+>>> +    s->irq_raw &= mask;
+>>> +
+>>> +    if (s->cfg.level_edge & mask) {
+>>> +        /* Edge triggered.  */
+>>> +        temp = (prev ^ s->irq_raw) & s->irq_raw;
+>>> +    } else {
+>>> +        /* Level triggered.  */
+>>> +        temp = s->irq_raw;
+>>> +    }
+>>> +    s->regs[R_IRQ_STATUS] |= temp;
+>>> +
+>>> +    xlnx_pmu_io_irq_update(s);
+>>> +}
+>>> +
+>>> +static void xlnx_pmu_io_intc_reset(DeviceState *dev)
+>>> +{
+>>> +    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(dev);
+>>> +    unsigned int i;
+>>> +
+>>> +    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
+>>> +        register_reset(&s->regs_info[i]);
+>>> +    }
+>>> +
+>>> +    xlnx_pmu_io_irq_update(s);
+>>> +}
+>>> +
+>>> +static const MemoryRegionOps xlnx_pmu_io_intc_ops = {
+>>> +    .read = register_read_memory,
+>>> +    .write = register_write_memory,
+>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>> +    .valid = {
+>>> +        .min_access_size = 4,
+>>> +        .max_access_size = 4,
+>>> +    },
+>>> +};
+>>> +
+>>> +static Property xlnx_pmu_io_intc_properties[] = {
+>>> +    DEFINE_PROP_UINT32("intc-intr-size", XlnxPMUIOIntc, cfg.intr_size, 0),
+>>> +    DEFINE_PROP_UINT32("intc-level-edge", XlnxPMUIOIntc, cfg.level_edge, 0),
+>>> +    DEFINE_PROP_UINT32("intc-positive", XlnxPMUIOIntc, cfg.positive, 0),
+>>> +    DEFINE_PROP_END_OF_LIST(),
+>>> +};
+>>> +
+>>> +static void xlnx_pmu_io_intc_realize(DeviceState *dev, Error **errp)
+>>> +{
+>>> +    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(dev);
+>>> +
+>>> +    /* Internal interrupts are edge triggered?  */
+>>
+>> Is this an unresolved question?
+>>
+>>> +    s->cfg.level_edge <<= 16;
+>>> +    s->cfg.level_edge |= 0xffff;
+>>> +
+>>> +    /* Internal interrupts are postitive.  */
+>>
+>> positive
+>>
+>>> +    s->cfg.positive <<= 16;
+>>> +    s->cfg.positive |= 0xffff;
+>>> +
+>>> +    /* Max 16 external interrupts.  */
+>>> +    assert(s->cfg.intr_size <= 16);
+>>> +
+>>> +    qdev_init_gpio_in(dev, irq_handler, 16 + s->cfg.intr_size);
+>>> +}
+>>> +
+>>> +static void xlnx_pmu_io_intc_init(Object *obj)
+>>> +{
+>>> +    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(obj);
+>>> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>>> +    RegisterInfoArray *reg_array;
+>>> +
+>>> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_PMU_IO_INTC,
+>>> +                       XlnxPMUIOIntc_R_MAX * 4);
+>>> +    reg_array =
+>>> +        register_init_block32(DEVICE(obj), xlnx_pmu_io_intc_regs_info,
+>>> +                              ARRAY_SIZE(xlnx_pmu_io_intc_regs_info),
+>>> +                              s->regs_info, s->regs,
+>>> +                              &xlnx_pmu_io_intc_ops,
+>>> +                              XLNX_PMU_IO_INTC_ERR_DEBUG,
+>>> +                              XlnxPMUIOIntc_R_MAX * 4);
+>>> +    memory_region_add_subregion(&s->iomem,
+>>> +                                0x0,
+>>> +                                &reg_array->mem);
+>>> +    sysbus_init_mmio(sbd, &s->iomem);
+>>> +
+>>> +    sysbus_init_irq(sbd, &s->parent_irq);
+>>> +}
+>>> +
+>>> +static const VMStateDescription vmstate_xlnx_pmu_io_intc = {
+>>> +    .name = TYPE_XLNX_PMU_IO_INTC,
+>>> +    .version_id = 1,
+>>> +    .minimum_version_id = 1,
+>>> +    .fields = (VMStateField[]) {
+>>> +        VMSTATE_UINT32_ARRAY(regs, XlnxPMUIOIntc, XlnxPMUIOIntc_R_MAX),
+>>> +        VMSTATE_END_OF_LIST(),
+>>> +    }
+>>> +};
+>>> +
+>>> +static void xlnx_pmu_io_intc_class_init(ObjectClass *klass, void *data)
+>>> +{
+>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>> +
+>>> +    dc->reset = xlnx_pmu_io_intc_reset;
+>>> +    dc->realize = xlnx_pmu_io_intc_realize;
+>>> +    dc->vmsd = &vmstate_xlnx_pmu_io_intc;
+>>> +    dc->props = xlnx_pmu_io_intc_properties;
+>>> +}
+>>> +
+>>> +static const TypeInfo xlnx_pmu_io_intc_info = {
+>>> +    .name          = TYPE_XLNX_PMU_IO_INTC,
+>>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>>> +    .instance_size = sizeof(XlnxPMUIOIntc),
+>>> +    .class_init    = xlnx_pmu_io_intc_class_init,
+>>> +    .instance_init = xlnx_pmu_io_intc_init,
+>>> +};
+>>> +
+>>> +static void xlnx_pmu_io_intc_register_types(void)
+>>> +{
+>>> +    type_register_static(&xlnx_pmu_io_intc_info);
+>>> +}
+>>> +
+>>> +type_init(xlnx_pmu_io_intc_register_types)
+>>> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+>>> index ae358569a1..211655023e 100644
+>>> --- a/hw/intc/Makefile.objs
+>>> +++ b/hw/intc/Makefile.objs
+>>> @@ -3,6 +3,7 @@ common-obj-$(CONFIG_I8259) += i8259_common.o i8259.o
+>>>  common-obj-$(CONFIG_PL190) += pl190.o
+>>>  common-obj-$(CONFIG_PUV3) += puv3_intc.o
+>>>  common-obj-$(CONFIG_XILINX) += xilinx_intc.o
+>>> +common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-pmu-iomod-intc.o
+>>
+>> If you prefer to use CONFIG_XLNX_ZYNQMP_ARM for ARM, why not using
+>> CONFIG_XLNX_ZYNQMP_MB (or similar) here?
 > 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> V2:
->  - Delete unused realise function
->  - Remove DB_PRINT()
-> 
->  include/hw/timer/xlnx-zynqmp-rtc.h |  84 ++++++++++++++
->  hw/timer/xlnx-zynqmp-rtc.c         | 218 +++++++++++++++++++++++++++++++++++++
->  hw/timer/Makefile.objs             |   1 +
->  3 files changed, 303 insertions(+)
->  create mode 100644 include/hw/timer/xlnx-zynqmp-rtc.h
->  create mode 100644 hw/timer/xlnx-zynqmp-rtc.c
-> 
-> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
-> new file mode 100644
-> index 0000000000..87649836cc
-> --- /dev/null
-> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
-> @@ -0,0 +1,84 @@
-> +/*
-> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
-> + *
-> + * Copyright (c) 2017 Xilinx Inc.
-> + *
-> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "hw/register.h"
-> +
-> +#define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
-> +
-> +#define XLNX_ZYNQMP_RTC(obj) \
-> +     OBJECT_CHECK(XlnxZynqMPRTC, (obj), TYPE_XLNX_ZYNQMP_RTC)
-> +
-> +REG32(SET_TIME_WRITE, 0x0)
-> +REG32(SET_TIME_READ, 0x4)
-> +REG32(CALIB_WRITE, 0x8)
-> +    FIELD(CALIB_WRITE, FRACTION_EN, 20, 1)
-> +    FIELD(CALIB_WRITE, FRACTION_DATA, 16, 4)
-> +    FIELD(CALIB_WRITE, MAX_TICK, 0, 16)
-> +REG32(CALIB_READ, 0xc)
-> +    FIELD(CALIB_READ, FRACTION_EN, 20, 1)
-> +    FIELD(CALIB_READ, FRACTION_DATA, 16, 4)
-> +    FIELD(CALIB_READ, MAX_TICK, 0, 16)
-> +REG32(CURRENT_TIME, 0x10)
-> +REG32(CURRENT_TICK, 0x14)
-> +    FIELD(CURRENT_TICK, VALUE, 0, 16)
-> +REG32(ALARM, 0x18)
-> +REG32(RTC_INT_STATUS, 0x20)
-> +    FIELD(RTC_INT_STATUS, ALARM, 1, 1)
-> +    FIELD(RTC_INT_STATUS, SECONDS, 0, 1)
-> +REG32(RTC_INT_MASK, 0x24)
-> +    FIELD(RTC_INT_MASK, ALARM, 1, 1)
-> +    FIELD(RTC_INT_MASK, SECONDS, 0, 1)
-> +REG32(RTC_INT_EN, 0x28)
-> +    FIELD(RTC_INT_EN, ALARM, 1, 1)
-> +    FIELD(RTC_INT_EN, SECONDS, 0, 1)
-> +REG32(RTC_INT_DIS, 0x2c)
-> +    FIELD(RTC_INT_DIS, ALARM, 1, 1)
-> +    FIELD(RTC_INT_DIS, SECONDS, 0, 1)
-> +REG32(ADDR_ERROR, 0x30)
-> +    FIELD(ADDR_ERROR, STATUS, 0, 1)
-> +REG32(ADDR_ERROR_INT_MASK, 0x34)
-> +    FIELD(ADDR_ERROR_INT_MASK, MASK, 0, 1)
-> +REG32(ADDR_ERROR_INT_EN, 0x38)
-> +    FIELD(ADDR_ERROR_INT_EN, MASK, 0, 1)
-> +REG32(ADDR_ERROR_INT_DIS, 0x3c)
-> +    FIELD(ADDR_ERROR_INT_DIS, MASK, 0, 1)
-> +REG32(CONTROL, 0x40)
-> +    FIELD(CONTROL, BATTERY_DISABLE, 31, 1)
-> +    FIELD(CONTROL, OSC_CNTRL, 24, 4)
-> +    FIELD(CONTROL, SLVERR_ENABLE, 0, 1)
-> +REG32(SAFETY_CHK, 0x50)
-> +
-> +#define XLNX_ZYNQMP_RTC_R_MAX (R_SAFETY_CHK + 1)
-> +
-> +typedef struct XlnxZynqMPRTC {
-> +    SysBusDevice parent_obj;
-> +    MemoryRegion iomem;
-> +    qemu_irq irq_rtc_int;
-> +    qemu_irq irq_addr_error_int;
-> +
-> +    uint32_t regs[XLNX_ZYNQMP_RTC_R_MAX];
-> +    RegisterInfo regs_info[XLNX_ZYNQMP_RTC_R_MAX];
-> +} XlnxZynqMPRTC;
-> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
-> new file mode 100644
-> index 0000000000..ead40fc42d
-> --- /dev/null
-> +++ b/hw/timer/xlnx-zynqmp-rtc.c
-> @@ -0,0 +1,218 @@
-> +/*
-> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
-> + *
-> + * Copyright (c) 2017 Xilinx Inc.
-> + *
-> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/register.h"
-> +#include "qemu/bitops.h"
-> +#include "qemu/log.h"
-> +#include "hw/timer/xlnx-zynqmp-rtc.h"
-> +
-> +#ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
-> +#define XLNX_ZYNQMP_RTC_ERR_DEBUG 0
-> +#endif
-> +
-> +static void rtc_int_update_irq(XlnxZynqMPRTC *s)
-> +{
-> +    bool pending = s->regs[R_RTC_INT_STATUS] & ~s->regs[R_RTC_INT_MASK];
-> +    qemu_set_irq(s->irq_rtc_int, pending);
-> +}
-> +
-> +static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
-> +{
-> +    bool pending = s->regs[R_ADDR_ERROR] & ~s->regs[R_ADDR_ERROR_INT_MASK];
-> +    qemu_set_irq(s->irq_addr_error_int, pending);
-> +}
-> +
-> +static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-> +    rtc_int_update_irq(s);
-> +}
-> +
-> +static uint64_t rtc_int_en_prew(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-> +    uint32_t val = val64;
+> I have fixed all of your other comments.
 
-Why is this intermediate variable necessary?
-
-> +
-> +    s->regs[R_RTC_INT_MASK] &= ~val;
-> +    rtc_int_update_irq(s);
-> +    return 0;
-> +}
-> +
-> +static uint64_t rtc_int_dis_prew(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-> +    uint32_t val = val64;
-
-ditto,
-
-> +
-> +    s->regs[R_RTC_INT_MASK] |= val;
-> +    rtc_int_update_irq(s);
-> +    return 0;
-> +}
-> +
-> +static void addr_error_postw(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-> +    addr_error_int_update_irq(s);
-> +}
-> +
-> +static uint64_t addr_error_int_en_prew(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-> +    uint32_t val = val64;
-
-ditto,
-
-> +
-> +    s->regs[R_ADDR_ERROR_INT_MASK] &= ~val;
-> +    addr_error_int_update_irq(s);
-> +    return 0;
-> +}
-> +
-> +static uint64_t addr_error_int_dis_prew(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-> +    uint32_t val = val64;
-
-ditto.
-
-I find this clearer to review:
-
-       s->regs[R_ADDR_ERROR_INT_MASK] |= (uint32_t)val64;
-
-Anyway:
+Thanks!
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> +
-> +    s->regs[R_ADDR_ERROR_INT_MASK] |= val;
-> +    addr_error_int_update_irq(s);
-> +    return 0;
-> +}
-> +
-> +static const RegisterAccessInfo rtc_regs_info[] = {
-> +    {   .name = "SET_TIME_WRITE",  .addr = A_SET_TIME_WRITE,
-> +    },{ .name = "SET_TIME_READ",  .addr = A_SET_TIME_READ,
-> +        .ro = 0xffffffff,
-> +    },{ .name = "CALIB_WRITE",  .addr = A_CALIB_WRITE,
-> +    },{ .name = "CALIB_READ",  .addr = A_CALIB_READ,
-> +        .ro = 0x1fffff,
-> +    },{ .name = "CURRENT_TIME",  .addr = A_CURRENT_TIME,
-> +        .ro = 0xffffffff,
-> +    },{ .name = "CURRENT_TICK",  .addr = A_CURRENT_TICK,
-> +        .ro = 0xffff,
-> +    },{ .name = "ALARM",  .addr = A_ALARM,
-> +    },{ .name = "RTC_INT_STATUS",  .addr = A_RTC_INT_STATUS,
-> +        .w1c = 0x3,
-> +        .post_write = rtc_int_status_postw,
-> +    },{ .name = "RTC_INT_MASK",  .addr = A_RTC_INT_MASK,
-> +        .reset = 0x3,
-> +        .ro = 0x3,
-> +    },{ .name = "RTC_INT_EN",  .addr = A_RTC_INT_EN,
-> +        .pre_write = rtc_int_en_prew,
-> +    },{ .name = "RTC_INT_DIS",  .addr = A_RTC_INT_DIS,
-> +        .pre_write = rtc_int_dis_prew,
-> +    },{ .name = "ADDR_ERROR",  .addr = A_ADDR_ERROR,
-> +        .w1c = 0x1,
-> +        .post_write = addr_error_postw,
-> +    },{ .name = "ADDR_ERROR_INT_MASK",  .addr = A_ADDR_ERROR_INT_MASK,
-> +        .reset = 0x1,
-> +        .ro = 0x1,
-> +    },{ .name = "ADDR_ERROR_INT_EN",  .addr = A_ADDR_ERROR_INT_EN,
-> +        .pre_write = addr_error_int_en_prew,
-> +    },{ .name = "ADDR_ERROR_INT_DIS",  .addr = A_ADDR_ERROR_INT_DIS,
-> +        .pre_write = addr_error_int_dis_prew,
-> +    },{ .name = "CONTROL",  .addr = A_CONTROL,
-> +        .reset = 0x1000000,
-> +        .rsvd = 0x70fffffe,
-> +    },{ .name = "SAFETY_CHK",  .addr = A_SAFETY_CHK,
-> +    }
-> +};
-> +
-> +static void rtc_reset(DeviceState *dev)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(dev);
-> +    unsigned int i;
-> +
-> +    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
-> +        register_reset(&s->regs_info[i]);
-> +    }
-> +
-> +    rtc_int_update_irq(s);
-> +    addr_error_int_update_irq(s);
-> +}
-> +
-> +static const MemoryRegionOps rtc_ops = {
-> +    .read = register_read_memory,
-> +    .write = register_write_memory,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static void rtc_init(Object *obj)
-> +{
-> +    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(obj);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-> +    RegisterInfoArray *reg_array;
-> +
-> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_RTC,
-> +                       XLNX_ZYNQMP_RTC_R_MAX * 4);
-> +    reg_array =
-> +        register_init_block32(DEVICE(obj), rtc_regs_info,
-> +                              ARRAY_SIZE(rtc_regs_info),
-> +                              s->regs_info, s->regs,
-> +                              &rtc_ops,
-> +                              XLNX_ZYNQMP_RTC_ERR_DEBUG,
-> +                              XLNX_ZYNQMP_RTC_R_MAX * 4);
-> +    memory_region_add_subregion(&s->iomem,
-> +                                0x0,
-> +                                &reg_array->mem);
-> +    sysbus_init_mmio(sbd, &s->iomem);
-> +    sysbus_init_irq(sbd, &s->irq_rtc_int);
-> +    sysbus_init_irq(sbd, &s->irq_addr_error_int);
-> +}
-> +
-> +static const VMStateDescription vmstate_rtc = {
-> +    .name = TYPE_XLNX_ZYNQMP_RTC,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPRTC, XLNX_ZYNQMP_RTC_R_MAX),
-> +        VMSTATE_END_OF_LIST(),
-> +    }
-> +};
-> +
-> +static void rtc_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->reset = rtc_reset;
-> +    dc->vmsd = &vmstate_rtc;
-> +}
-> +
-> +static const TypeInfo rtc_info = {
-> +    .name          = TYPE_XLNX_ZYNQMP_RTC,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(XlnxZynqMPRTC),
-> +    .class_init    = rtc_class_init,
-> +    .instance_init = rtc_init,
-> +};
-> +
-> +static void rtc_register_types(void)
-> +{
-> +    type_register_static(&rtc_info);
-> +}
-> +
-> +type_init(rtc_register_types)
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 8c19eac3b6..8b27a4b7ef 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -21,6 +21,7 @@ common-obj-$(CONFIG_IMX) += imx_epit.o
->  common-obj-$(CONFIG_IMX) += imx_gpt.o
->  common-obj-$(CONFIG_LM32) += lm32_timer.o
->  common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
-> +common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
->  
->  obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
->  obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
 > 
+> Ideally we don't want to use CONFIG_XLNX_ZYNQMP_ARM but we have to in
+> order to avoid compilation issues (from memory the display port device
+> is always a problem). I'd rather not add another specific one unless
+> we have to.
+
+I wondered because now the qemu-system-aarch64 lists the
+'xlnx.pmu_io_intc' device as user-creatable.
+
+I am in favor of having a single QEMU running different archs, so that
+doesn't bother me.
+
+Once there we'll probably need a Device::valid_arch_bitmask field.
+
+> 
+> Alistair
+> 
+>>
+>>>  common-obj-$(CONFIG_ETRAXFS) += etraxfs_pic.o
+>>>  common-obj-$(CONFIG_IMX) += imx_avic.o
+>>>  common-obj-$(CONFIG_LM32) += lm32_pic.o
+>>>
