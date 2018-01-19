@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ecVDp-0007fZ-Uh
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:52:38 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ecVFZ-000053-EL
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:54:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ecVDl-0001db-Vp
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:52:37 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:46670)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ecVDl-0001dO-Ny
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:52:33 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
-	<20180119084409.7100.23132.stgit@pasha-VirtualBox>
-	<6abaddaf-96ee-d03c-0483-716f5317ed38@redhat.com>
-In-Reply-To: <6abaddaf-96ee-d03c-0483-716f5317ed38@redhat.com>
-Date: Fri, 19 Jan 2018 14:52:37 +0300
-Message-ID: <002901d3911c$0062e7b0$0128b710$@ru>
+	(envelope-from <cohuck@redhat.com>) id 1ecVFV-0002EQ-HA
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:54:25 -0500
+Date: Fri, 19 Jan 2018 12:54:16 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180119125416.25c1dd7c.cohuck@redhat.com>
+In-Reply-To: <1516297904-18188-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+References: <1516297904-18188-1-git-send-email-imbrenda@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v4 12/23] cpus: push BQL lock to
- qemu_*_wait_io_event
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x: fix storage attributes
+ migration for non-small guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +23,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 19/01/2018 09:44, Pavel Dovgalyuk wrote:
-> >  static void qemu_wait_io_event(CPUState *cpu)
-> >  {
-> > +    qemu_mutex_lock_iothread();
-> > +
-> >      while (cpu_thread_is_idle(cpu)) {
-> >          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-> >      }
+On Thu, 18 Jan 2018 18:51:44 +0100
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
+
+> Fix storage attribute migration so that it does not fail for guests
+> with more than a few GB of RAM.
+> With such guests, the index in the buffer would go out of bounds,
+> usually by large amounts, thus receiving -EFAULT from the kernel.
+> Migration itself would be successful, but storage attributes would then
+> not be migrated completely.
 > 
-> This function locks the iothread and never unlocks it.  Please test your
-> patches better.
+> This patch fixes the out of bounds access, and thus migration of all
+> storage attributes when the guest have large amounts of memory.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> Fixes: 903fd80b03243476 ("s390x/migration: Storage attributes device")
+> ---
+>  hw/s390x/s390-stattrib-kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Yes, there was kind of mess. Lock was inside the function and unlock outside,
-that's why it worked for me.
-
-Pavel Dovgalyuk
+Thanks, applied.
