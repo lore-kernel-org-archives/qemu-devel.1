@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ecU75-0000lz-7a
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:41:36 -0500
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecUD6-0005rY-3w
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:47:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ecU73-0004yv-HV
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:41:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ecU73-0004xz-8p
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:41:33 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71CC8780E9
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 10:41:32 +0000 (UTC)
-Date: Fri, 19 Jan 2018 10:41:26 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180119104125.GB2430@work-vm>
-References: <20180116180408.11279-1-dgilbert@redhat.com>
-	<20180118213321-mutt-send-email-mst@kernel.org>
-	<20180118195934.GD2660@work-vm>
-	<20180118221212-mutt-send-email-mst@kernel.org>
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecUD1-0008FH-9p
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:47:48 -0500
+Received: from mail-ve1eur01on0102.outbound.protection.outlook.com
+	([104.47.1.102]:4837
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <klim.kireev@virtuozzo.com>)
+	id 1ecUD0-0008EV-Mj
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:47:43 -0500
+From: Klim Kireev <klim.kireev@virtuozzo.com>
+Date: Fri, 19 Jan 2018 13:47:15 +0300
+Message-Id: <20180119104715.22184-1-klim.kireev@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180118221212-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v6 0/7] Rework vhost memory region updates
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3] chardev/char-socket: add POLLHUP handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +26,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Thu, Jan 18, 2018 at 07:59:35PM +0000, Dr. David Alan Gilbert wrote:
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > On Tue, Jan 16, 2018 at 06:04:01PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > 
-> > > > Hi,
-> > > >   This patch set reworks the way the vhost code handles changes in
-> > > > physical address space layout that came from a discussion with Igor.
-> > > > 
-> > > > Its intention is to simplify a lot of the update code,
-> > > > and to make it easier for the postcopy+shared code to
-> > > > do the hugepage alignments that are needed.
-> > > > 
-> > > > Instead of inserting/removing each section during the add/del
-> > > > callbacks of the listener, we start afresh and build a list
-> > > > from the add and nop callbacks, then at the end compare the list
-> > > > we've built with the exisiting list.
-> > > > 
-> > > > v6
-> > > >   Tidy ups from Igor
-> > > >   The biggest change is moving the 'Move log_dirty check' to be
-> > > >   the last patch in the set.
-> > > > 
-> > > > Dr. David Alan Gilbert (7):
-> > > >   vhost: Build temporary section list and deref after commit
-> > > >   vhost: Simplify ring verification checks
-> > > >   vhost: Merge sections added to temporary list
-> > > >   vhost: Regenerate region list from changed sections list
-> > > >   vhost: Clean out old vhost_set_memory and friends
-> > > >   vhost: Merge and delete unused callbacks
-> > > >   vhost: Move log_dirty check
-> > > > 
-> > > >  hw/virtio/trace-events    |   6 +
-> > > >  hw/virtio/vhost.c         | 497 ++++++++++++++++------------------------------
-> > > >  include/hw/virtio/vhost.h |   5 +-
-> > > >  3 files changed, 180 insertions(+), 328 deletions(-)
-> > > 
-> > > 
-> > > Seems to trigger errors with clang runtime sanitizer:
-> > > 
-> > > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > > /scm/qemu/hw/virtio/vhost.c:425:26: runtime error: null pointer passed as argument 1, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > > /scm/qemu/hw/virtio/vhost.c:425:45: runtime error: null pointer passed as argument 2, which is declared to never be null
-> > > /usr/include/string.h:64:33: note: nonnull attribute specified here
-> > 
-> > 
-> > How are you running that test?
-> 
-> One Fedora:
-> dnf install clang
-> 
-> '/scm/qemu-clang/../qemu/configure' '--cc=clang' '--cxx=clang++' '--extra-cflags=-fsanitize=undefined -ferror-limit=10000 -fno-sanitize=shift-base'
-> make
-> make check.
+The following behavior was observed for QEMU configured by libvirt
+to use guest agent as usual for the guests without virtio-serial
+driver (Windows or the guest remaining in BIOS stage).
 
-Thanks.
+In QEMU on first connect to listen character device socket
+the listen socket is removed from poll just after the accept().
+virtio_serial_guest_ready() returns 0 and the descriptor
+of the connected Unix socket is removed from poll and it will
+not be present in poll() until the guest will initialize the driver
+and change the state of the serial to "guest connected".
 
-> > Can you add this printf and tell me what
-> > it's seeing?
-> > 
-> >         /* Same size, lets check the contents */
-> >         fprintf(stderr, "%s: %p %p %d\n", __func__, dev->mem_sections, old_sections, n_old_sections);
-> >         changed = memcmp(dev->mem_sections, old_sections,
-> >                          n_old_sections * sizeof(old_sections[0])) != 0;
-> > 
-> > I'm seeing a bunch of calls where both pointers are NULL, but
-> > n_old_sections is 0, which feels legal to me.
-> 
-> https://stackoverflow.com/questions/16362925/can-i-pass-a-null-pointer-to-memcmp
-> 
-> says it's invalid.
+In libvirt connect() to guest agent is performed on restart and
+is run under VM state lock. Connect() is blocking and can
+wait forever.
+In this case libvirt can not perform ANY operation on that VM.
 
-Posted v7 with trivial fix for it.
-(It seems rather ungenerous of the standard to be fussy about that).
+The bug can be easily reproduced this way:
 
-Dave
+Terminal 1:
+qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
+(virtio-serial and isa-serial also fit)
 
-> > I guess we could make it:
-> >    changed = n_old_sections ? memcmp(....) : false;
-> > just to shut clang up.
-> > 
-> > Dave
-> > 
-> > > 
-> > > 
-> > > > -- 
-> > > > 2.14.3
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Terminal 2:
+minicom -D unix\#/tmp/console.sock
+(type something and press enter)
+C-a x (to exit)
+
+Do 3 times:
+minicom -D unix\#/tmp/console.sock
+C-a x
+
+It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
+the kernel, and the 4th blocks.
+
+The problem is that QEMU doesn't add a read watcher after succesful read
+until the guest device wants to acquire recieved data, so
+I propose to install a separate pullhup watcher regardless of
+whether the device waits for data or not.
+
+Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+---
+Changelog:
+v2: Remove timer as a redundant feature
+
+v3: Remove read call and return G_SOURCE_REMOVE
+
+ chardev/char-socket.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 77cdf487eb..83fa7b70f0 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -42,6 +42,7 @@ typedef struct {
+     QIOChannel *ioc; /* Client I/O channel */
+     QIOChannelSocket *sioc; /* Client master channel */
+     QIONetListener *listener;
++    guint hup_tag;
+     QCryptoTLSCreds *tls_creds;
+     int connected;
+     int max_size;
+@@ -352,6 +353,11 @@ static void tcp_chr_free_connection(Chardev *chr)
+         s->read_msgfds_num = 0;
+     }
+ 
++    if (s->hup_tag != 0) {
++        g_source_remove(s->hup_tag);
++        s->hup_tag = 0;
++    }
++
+     tcp_set_msgfds(chr, NULL, 0);
+     remove_fd_in_watch(chr);
+     object_unref(OBJECT(s->sioc));
+@@ -455,6 +461,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
+     return TRUE;
+ }
+ 
++static gboolean tcp_chr_hup(QIOChannel *channel,
++                               GIOCondition cond,
++                               void *opaque)
++{
++    Chardev *chr = CHARDEV(opaque);
++    tcp_chr_disconnect(chr);
++    return G_SOURCE_REMOVE;
++}
++
+ static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+ {
+     SocketChardev *s = SOCKET_CHARDEV(chr);
+@@ -528,6 +543,10 @@ static void tcp_chr_connect(void *opaque)
+                                            tcp_chr_read,
+                                            chr, chr->gcontext);
+     }
++    if (s->hup_tag == 0) {
++        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
++                                           tcp_chr_hup, chr, NULL);
++    }
+     qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+ }
+ 
+@@ -546,7 +565,11 @@ static void tcp_chr_update_read_handler(Chardev *chr)
+                                            tcp_chr_read, chr,
+                                            chr->gcontext);
+     }
+-}
++    if (s->hup_tag == 0) {
++        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
++                                           tcp_chr_hup, chr, NULL);
++    }
++ }
+ 
+ typedef struct {
+     Chardev *chr;
+-- 
+2.14.3
