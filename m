@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecYGM-0002HP-NK
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:07:27 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ecYGi-0002c4-Be
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:07:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecYGL-0005LU-Oz
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:07:26 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ecYGh-0005d5-Cx
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:07:48 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 19 Jan 2018 14:49:13 +0000
-Message-Id: <1516373355-305-21-git-send-email-eric.auger@redhat.com>
+Date: Fri, 19 Jan 2018 14:49:14 +0000
+Message-Id: <1516373355-305-22-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
 References: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 20/22] hw/vfio/common: Set the
- IOMMUMemoryRegion supported page sizes
+Subject: [Qemu-devel] [RFC v5 21/22] virtio-iommu: Implement
+ set_page_size_mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +23,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-We store the page_size_mask in the container and on
-vfio_listener_region_add(), the information is conveyed
-to the IOMMUMemoryRegion.
+We implement the set_page_size_mask callback to allow the
+virtio-iommu to be aware of any restrictions on the page size
+mask due to an underlying HW IOMMU.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/vfio/common.c              | 5 +++++
- include/hw/vfio/vfio-common.h | 1 +
- 2 files changed, 6 insertions(+)
+ hw/virtio/trace-events   |  1 +
+ hw/virtio/virtio-iommu.c | 16 ++++++++++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index b77be3a..35b83fe 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -480,6 +480,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
-     if (memory_region_is_iommu(section->mr)) {
-         VFIOGuestIOMMU *giommu;
-         IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
-+        IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index b6f1812..e514f86 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -49,3 +49,4 @@ virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid)
+ virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t addr, uint64_t size, uint32_t flags, size_t filled) "dev= %d, subtype=%d addr=0x%"PRIx64" size=0x%"PRIx64" flags=%d filled=0x%lx"
+ virtio_iommu_fill_none_property(uint32_t devid) "devid=%d"
+ virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
++virtio_iommu_set_page_size_mask(const char *iommu_mr, uint64_t mask) "mr=%s page_size_mask=0x%"PRIx64
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 9996ab8..f262f3f 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -831,6 +831,21 @@ unlock:
+     return entry;
+ }
  
-         trace_vfio_listener_region_add_iommu(iova, end);
-         /*
-@@ -500,6 +501,9 @@ static void vfio_listener_region_add(MemoryListener *listener,
-                             IOMMU_NOTIFIER_ALL,
-                             section->offset_within_region,
-                             int128_get64(llend));
-+        if (imrc->set_page_size_mask) {
-+            imrc->set_page_size_mask(iommu_mr, container->page_size_mask);
-+        }
-         QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
++static void virtio_iommu_set_page_size_mask(IOMMUMemoryRegion *mr,
++                                            uint64_t page_size_mask)
++{
++    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
++    VirtIOIOMMU *s = sdev->viommu;
++
++    s->config.page_size_mask &= page_size_mask;
++    if (!s->config.page_size_mask) {
++        error_setg(&error_fatal,
++                   "No compatible page size between guest and host iommus");
++    }
++
++    trace_virtio_iommu_set_page_size_mask(mr->parent_obj.name, page_size_mask);
++}
++
+ static void virtio_iommu_get_config(VirtIODevice *vdev, uint8_t *config_data)
+ {
+     VirtIOIOMMU *dev = VIRTIO_IOMMU(vdev);
+@@ -1021,6 +1036,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
+     IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
  
-         memory_region_register_iommu_notifier(section->mr, &giommu->n);
-@@ -1027,6 +1031,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-             /* Assume 4k IOVA page size */
-             info.iova_pgsizes = 4096;
-         }
-+        container->page_size_mask = info.iova_pgsizes;
-         vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
-     } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
-                ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9..221cc30 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -79,6 +79,7 @@ typedef struct VFIOContainer {
-     int fd; /* /dev/vfio/vfio, empowered by the attached groups */
-     MemoryListener listener;
-     MemoryListener prereg_listener;
-+    uint64_t page_size_mask; /* page sizes supported for this container */
-     unsigned iommu_type;
-     int error;
-     bool initialized;
+     imrc->translate = virtio_iommu_translate;
++    imrc->set_page_size_mask = virtio_iommu_set_page_size_mask;
+ }
+ 
+ static const TypeInfo virtio_iommu_info = {
 -- 
 1.9.1
