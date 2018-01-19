@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecWnG-0005bg-LP
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:33:19 -0500
+	(envelope-from <berrange@redhat.com>) id 1ecWsx-0007Zz-Sa
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:39:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecWnD-0000c0-GC
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:33:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54910)
+	(envelope-from <berrange@redhat.com>) id 1ecWrB-0003Cf-Iz
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:39:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecWnD-0000bW-9S
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:33:15 -0500
-References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
-	<20180119084417.7100.69568.stgit@pasha-VirtualBox>
-	<aca12788-c119-3046-ee8f-e7b3d4cc59bb@redhat.com>
-	<002a01d3911d$dc13ca80$943b5f80$@ru>
-	<8aa1900f-2663-43bd-dab5-001be0aede09@redhat.com>
-	<002b01d39120$8c88e880$a59ab980$@ru>
-	<f7c459df-c68f-3995-4183-45da91e688a3@redhat.com>
-	<002c01d39122$2de5d930$89b18b90$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <29712321-7255-6714-ca80-b94d208c1a40@redhat.com>
-Date: Fri, 19 Jan 2018 14:33:06 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ecWrB-0003C1-75
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:37:21 -0500
+Date: Fri, 19 Jan 2018 13:37:08 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180119133708.GM16798@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<425e38f28bba536cfb1ae389ffa963984990f306.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<65ff7759-2e09-fba6-e60e-41e8d89d0e7c@amsat.org>
+	<201801152229.53520.pisa@cmp.felk.cvut.cz>
+	<04fbdf17-6431-5d67-6681-3cc0f375b32a@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <002c01d39122$2de5d930$89b18b90$@ru>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <04fbdf17-6431-5d67-6681-3cc0f375b32a@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v4 13/23] cpus: only take BQL for
- sleeping threads
+Subject: Re: [Qemu-devel] [PATCH V4 2/7] CAN bus support to connect bust to
+ Linux host SocketCAN interface.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Pavel Pisa <pisa@cmp.felk.cvut.cz>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-On 19/01/2018 13:36, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> Sent: Friday, January 19, 2018 3:26 PM
->> To: Pavel Dovgalyuk; 'Pavel Dovgalyuk'; qemu-devel@nongnu.org
->> Cc: kwolf@redhat.com; peter.maydell@linaro.org; boost.lists@gmail.com;=
- quintela@redhat.com;
->> jasowang@redhat.com; mst@redhat.com; zuban32s@gmail.com; maria.klimush=
-enkova@ispras.ru;
->> kraxel@redhat.com; alex.bennee@linaro.org
->> Subject: Re: [RFC PATCH v4 13/23] cpus: only take BQL for sleeping thr=
-eads
->>
->> On 19/01/2018 13:25, Pavel Dovgalyuk wrote:
->>>>> It means, that I'll have to fix all the has_work function to avoid =
-races,
->>>>> because x86_cpu_has_work may have them?
->>>> Why only x86_cpu_has_work?
->>>>
->>>> Even reading cs->interrupt_request outside the mutex is unsafe.
->>> All the vcpu function that access interrupt controller or peripheral =
-state may be unsafe?
->>> How can it work safely then?
->>
->> They do it inside the big QEMU lock. =20
+On Mon, Jan 15, 2018 at 09:12:09PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> On 01/15/2018 06:29 PM, Pavel Pisa wrote:
+> >>> +    /* open socket */
+> >>> +    s =3D socket(PF_CAN, SOCK_RAW, CAN_RAW);
+> >>
+> >> I never used it, but I think QEMU uses his socket API: "qemu/sockets=
+.h"
+> >=20
+> > The SocketCAN host connection code is Linux specific,
+> > but I can switch to qemu_socket() if it is preferred.
+> > But address family has to be from Linux header file anyway.
 >=20
-> Right. Without these patches.
-> They are within the replay lock. And BQL is not covering vcpu execution=
- with these patches.
-> Therefore RR will be ok and regular execution may encounter races?
-> It means that I missed something in Alex ideas, because he prepared the=
- initial patches.
+> qemu_socket() sockets are heavily tested and already solve many things,
+> like async I/O and error handling.
 
-Yes.
+NB that's just the low level system call wrapper. All it really does is
+ensure O_CLOSEXEC is set for all sockets. It should defintely be used
+just for that reason alone though.=20
 
->> But here you're calling cpu_has_work (via all_cpu_threads_idle) outsid=
-e the lock.
->=20
-> Yes, I see, but what we have to do?
-
-I don't know.  But the idiom in these patches,
-
-	while(...) {
-		lock()
-		cond_wait()
-		unlock()
-	}
-
-is unsafe as well, so the issue is more than just cpu_has_work.
-
-Paolo
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
