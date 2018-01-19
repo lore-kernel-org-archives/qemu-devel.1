@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ecOhY-00028h-99
+	(envelope-from <richard.henderson@linaro.org>) id 1ecOhX-00027D-L7
 	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ecOhW-0008Te-Ap
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:52 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33532)
+	(envelope-from <richard.henderson@linaro.org>) id 1ecOhU-0008T5-Sz
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:51 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34382)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ecOhW-0008TI-2u
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:50 -0500
-Received: by mail-pf0-x243.google.com with SMTP id t5so537828pfi.0
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 20:54:49 -0800 (PST)
+	id 1ecOhU-0008ST-KM
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:48 -0500
+Received: by mail-pg0-x241.google.com with SMTP id r19so561719pgn.1
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 20:54:48 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 18 Jan 2018 20:54:25 -0800
-Message-Id: <20180119045438.28582-4-richard.henderson@linaro.org>
+Date: Thu, 18 Jan 2018 20:54:24 -0800
+Message-Id: <20180119045438.28582-3-richard.henderson@linaro.org>
 In-Reply-To: <20180119045438.28582-1-richard.henderson@linaro.org>
 References: <20180119045438.28582-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 03/16] target/arm: Use pointers in neon
- zip/uzp helpers
+Subject: [Qemu-devel] [PATCH v2 02/16] target/arm: Use pointers in crypto
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,406 +38,627 @@ directly access env->vfp.regs[].
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h      |  20 +++---
- target/arm/neon_helper.c | 162 +++++++++++++++++++++++++----------------------
- target/arm/translate.c   |  42 ++++++------
- 3 files changed, 120 insertions(+), 104 deletions(-)
+ target/arm/helper.h        |  18 ++---
+ target/arm/crypto_helper.c | 184 +++++++++++++++++----------------------------
+ target/arm/translate-a64.c |  75 ++++++++++--------
+ target/arm/translate.c     |  68 +++++++++--------
+ 4 files changed, 161 insertions(+), 184 deletions(-)
 
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 688380af6b..dbdc38fcb7 100644
+index 066729e8ad..688380af6b 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -511,16 +511,16 @@ DEF_HELPER_3(iwmmxt_muladdsl, i64, i64, i32, i32)
- DEF_HELPER_3(iwmmxt_muladdsw, i64, i64, i32, i32)
- DEF_HELPER_3(iwmmxt_muladdswl, i64, i64, i32, i32)
+@@ -522,17 +522,17 @@ DEF_HELPER_3(neon_qzip8, void, env, i32, i32)
+ DEF_HELPER_3(neon_qzip16, void, env, i32, i32)
+ DEF_HELPER_3(neon_qzip32, void, env, i32, i32)
  
--DEF_HELPER_3(neon_unzip8, void, env, i32, i32)
--DEF_HELPER_3(neon_unzip16, void, env, i32, i32)
--DEF_HELPER_3(neon_qunzip8, void, env, i32, i32)
--DEF_HELPER_3(neon_qunzip16, void, env, i32, i32)
--DEF_HELPER_3(neon_qunzip32, void, env, i32, i32)
--DEF_HELPER_3(neon_zip8, void, env, i32, i32)
--DEF_HELPER_3(neon_zip16, void, env, i32, i32)
--DEF_HELPER_3(neon_qzip8, void, env, i32, i32)
--DEF_HELPER_3(neon_qzip16, void, env, i32, i32)
--DEF_HELPER_3(neon_qzip32, void, env, i32, i32)
-+DEF_HELPER_FLAGS_2(neon_unzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_unzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_qunzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_qunzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_qunzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_zip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_zip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_qzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_qzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_2(neon_qzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
+-DEF_HELPER_4(crypto_aese, void, env, i32, i32, i32)
+-DEF_HELPER_4(crypto_aesmc, void, env, i32, i32, i32)
++DEF_HELPER_FLAGS_3(crypto_aese, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(crypto_aesmc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
  
- DEF_HELPER_FLAGS_3(crypto_aese, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(crypto_aesmc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
-index ebdf7c9b10..689491cad3 100644
---- a/target/arm/neon_helper.c
-+++ b/target/arm/neon_helper.c
-@@ -2027,12 +2027,12 @@ uint64_t HELPER(neon_acgt_f64)(uint64_t a, uint64_t b, void *fpstp)
+-DEF_HELPER_5(crypto_sha1_3reg, void, env, i32, i32, i32, i32)
+-DEF_HELPER_3(crypto_sha1h, void, env, i32, i32)
+-DEF_HELPER_3(crypto_sha1su1, void, env, i32, i32)
++DEF_HELPER_FLAGS_4(crypto_sha1_3reg, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_2(crypto_sha1h, TCG_CALL_NO_RWG, void, ptr, ptr)
++DEF_HELPER_FLAGS_2(crypto_sha1su1, TCG_CALL_NO_RWG, void, ptr, ptr)
  
- #define ELEM(V, N, SIZE) (((V) >> ((N) * (SIZE))) & ((1ull << (SIZE)) - 1))
+-DEF_HELPER_4(crypto_sha256h, void, env, i32, i32, i32)
+-DEF_HELPER_4(crypto_sha256h2, void, env, i32, i32, i32)
+-DEF_HELPER_3(crypto_sha256su0, void, env, i32, i32)
+-DEF_HELPER_4(crypto_sha256su1, void, env, i32, i32, i32)
++DEF_HELPER_FLAGS_3(crypto_sha256h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
++DEF_HELPER_FLAGS_3(crypto_sha256h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
++DEF_HELPER_FLAGS_2(crypto_sha256su0, TCG_CALL_NO_RWG, void, ptr, ptr)
++DEF_HELPER_FLAGS_3(crypto_sha256su1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
  
--void HELPER(neon_qunzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_qunzip8)(void *vd, void *vm)
+ DEF_HELPER_FLAGS_3(crc32, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_3(crc32c, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+diff --git a/target/arm/crypto_helper.c b/target/arm/crypto_helper.c
+index 3b6df3f41a..9ca0bdead7 100644
+--- a/target/arm/crypto_helper.c
++++ b/target/arm/crypto_helper.c
+@@ -30,20 +30,14 @@ union CRYPTO_STATE {
+ #define CR_ST_WORD(state, i)   (state.words[i])
+ #endif
+ 
+-void HELPER(crypto_aese)(CPUARMState *env, uint32_t rd, uint32_t rm,
+-                         uint32_t decrypt)
++void HELPER(crypto_aese)(void *vd, void *vm, uint32_t decrypt)
  {
--    uint64_t zm0 = float64_val(env->vfp.regs[rm]);
--    uint64_t zm1 = float64_val(env->vfp.regs[rm + 1]);
--    uint64_t zd0 = float64_val(env->vfp.regs[rd]);
--    uint64_t zd1 = float64_val(env->vfp.regs[rd + 1]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd0 = rd[0], zd1 = rd[1];
-+    uint64_t zm0 = rm[0], zm1 = rm[1];
-+
-     uint64_t d0 = ELEM(zd0, 0, 8) | (ELEM(zd0, 2, 8) << 8)
-         | (ELEM(zd0, 4, 8) << 16) | (ELEM(zd0, 6, 8) << 24)
-         | (ELEM(zd1, 0, 8) << 32) | (ELEM(zd1, 2, 8) << 40)
-@@ -2049,18 +2049,19 @@ void HELPER(neon_qunzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-         | (ELEM(zm0, 5, 8) << 16) | (ELEM(zm0, 7, 8) << 24)
-         | (ELEM(zm1, 1, 8) << 32) | (ELEM(zm1, 3, 8) << 40)
-         | (ELEM(zm1, 5, 8) << 48) | (ELEM(zm1, 7, 8) << 56);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rm + 1] = make_float64(m1);
--    env->vfp.regs[rd] = make_float64(d0);
--    env->vfp.regs[rd + 1] = make_float64(d1);
-+
-+    rm[0] = m0;
-+    rm[1] = m1;
-+    rd[0] = d0;
-+    rd[1] = d1;
+     static uint8_t const * const sbox[2] = { AES_sbox, AES_isbox };
+     static uint8_t const * const shift[2] = { AES_shifts, AES_ishifts };
+-
+-    union CRYPTO_STATE rk = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
+-    union CRYPTO_STATE st = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE rk = { .l = { rm[0], rm[1] } };
++    union CRYPTO_STATE st = { .l = { rd[0], rd[1] } };
+     int i;
+ 
+     assert(decrypt < 2);
+@@ -57,12 +51,11 @@ void HELPER(crypto_aese)(CPUARMState *env, uint32_t rd, uint32_t rm,
+         CR_ST_BYTE(st, i) = sbox[decrypt][CR_ST_BYTE(rk, shift[decrypt][i])];
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(st.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(st.l[1]);
++    rd[0] = st.l[0];
++    rd[1] = st.l[1];
  }
  
--void HELPER(neon_qunzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_qunzip16)(void *vd, void *vm)
+-void HELPER(crypto_aesmc)(CPUARMState *env, uint32_t rd, uint32_t rm,
+-                          uint32_t decrypt)
++void HELPER(crypto_aesmc)(void *vd, void *vm, uint32_t decrypt)
  {
--    uint64_t zm0 = float64_val(env->vfp.regs[rm]);
--    uint64_t zm1 = float64_val(env->vfp.regs[rm + 1]);
--    uint64_t zd0 = float64_val(env->vfp.regs[rd]);
--    uint64_t zd1 = float64_val(env->vfp.regs[rd + 1]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd0 = rd[0], zd1 = rd[1];
-+    uint64_t zm0 = rm[0], zm1 = rm[1];
+     static uint32_t const mc[][256] = { {
+         /* MixColumns lookup table */
+@@ -197,10 +190,10 @@ void HELPER(crypto_aesmc)(CPUARMState *env, uint32_t rd, uint32_t rm,
+         0x92b479a7, 0x99b970a9, 0x84ae6bbb, 0x8fa362b5,
+         0xbe805d9f, 0xb58d5491, 0xa89a4f83, 0xa397468d,
+     } };
+-    union CRYPTO_STATE st = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
 +
-     uint64_t d0 = ELEM(zd0, 0, 16) | (ELEM(zd0, 2, 16) << 16)
-         | (ELEM(zd1, 0, 16) << 32) | (ELEM(zd1, 2, 16) << 48);
-     uint64_t d1 = ELEM(zm0, 0, 16) | (ELEM(zm0, 2, 16) << 16)
-@@ -2069,32 +2070,35 @@ void HELPER(neon_qunzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-         | (ELEM(zd1, 1, 16) << 32) | (ELEM(zd1, 3, 16) << 48);
-     uint64_t m1 = ELEM(zm0, 1, 16) | (ELEM(zm0, 3, 16) << 16)
-         | (ELEM(zm1, 1, 16) << 32) | (ELEM(zm1, 3, 16) << 48);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rm + 1] = make_float64(m1);
--    env->vfp.regs[rd] = make_float64(d0);
--    env->vfp.regs[rd + 1] = make_float64(d1);
-+
-+    rm[0] = m0;
-+    rm[1] = m1;
-+    rd[0] = d0;
-+    rd[1] = d1;
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE st = { .l = { rm[0], rm[1] } };
+     int i;
+ 
+     assert(decrypt < 2);
+@@ -213,8 +206,8 @@ void HELPER(crypto_aesmc)(CPUARMState *env, uint32_t rd, uint32_t rm,
+             rol32(mc[decrypt][CR_ST_BYTE(st, i + 3)], 24);
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(st.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(st.l[1]);
++    rd[0] = st.l[0];
++    rd[1] = st.l[1];
  }
  
--void HELPER(neon_qunzip32)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_qunzip32)(void *vd, void *vm)
- {
--    uint64_t zm0 = float64_val(env->vfp.regs[rm]);
--    uint64_t zm1 = float64_val(env->vfp.regs[rm + 1]);
--    uint64_t zd0 = float64_val(env->vfp.regs[rd]);
--    uint64_t zd1 = float64_val(env->vfp.regs[rd + 1]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd0 = rd[0], zd1 = rd[1];
-+    uint64_t zm0 = rm[0], zm1 = rm[1];
-+
-     uint64_t d0 = ELEM(zd0, 0, 32) | (ELEM(zd1, 0, 32) << 32);
-     uint64_t d1 = ELEM(zm0, 0, 32) | (ELEM(zm1, 0, 32) << 32);
-     uint64_t m0 = ELEM(zd0, 1, 32) | (ELEM(zd1, 1, 32) << 32);
-     uint64_t m1 = ELEM(zm0, 1, 32) | (ELEM(zm1, 1, 32) << 32);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rm + 1] = make_float64(m1);
--    env->vfp.regs[rd] = make_float64(d0);
--    env->vfp.regs[rd + 1] = make_float64(d1);
-+
-+    rm[0] = m0;
-+    rm[1] = m1;
-+    rd[0] = d0;
-+    rd[1] = d1;
+ /*
+@@ -236,21 +229,14 @@ static uint32_t maj(uint32_t x, uint32_t y, uint32_t z)
+     return (x & y) | ((x | y) & z);
  }
  
--void HELPER(neon_unzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_unzip8)(void *vd, void *vm)
+-void HELPER(crypto_sha1_3reg)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                              uint32_t rm, uint32_t op)
++void HELPER(crypto_sha1_3reg)(void *vd, void *vn, void *vm, uint32_t op)
  {
--    uint64_t zm = float64_val(env->vfp.regs[rm]);
--    uint64_t zd = float64_val(env->vfp.regs[rd]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd = rd[0], zm = rm[0];
-+
-     uint64_t d0 = ELEM(zd, 0, 8) | (ELEM(zd, 2, 8) << 8)
-         | (ELEM(zd, 4, 8) << 16) | (ELEM(zd, 6, 8) << 24)
-         | (ELEM(zm, 0, 8) << 32) | (ELEM(zm, 2, 8) << 40)
-@@ -2103,28 +2107,31 @@ void HELPER(neon_unzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-         | (ELEM(zd, 5, 8) << 16) | (ELEM(zd, 7, 8) << 24)
-         | (ELEM(zm, 1, 8) << 32) | (ELEM(zm, 3, 8) << 40)
-         | (ELEM(zm, 5, 8) << 48) | (ELEM(zm, 7, 8) << 56);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rd] = make_float64(d0);
-+
-+    rm[0] = m0;
-+    rd[0] = d0;
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     if (op == 3) { /* sha1su0 */
+         d.l[0] ^= d.l[1] ^ m.l[0];
+@@ -284,42 +270,37 @@ void HELPER(crypto_sha1_3reg)(CPUARMState *env, uint32_t rd, uint32_t rn,
+             CR_ST_WORD(d, 0) = t;
+         }
+     }
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
  }
  
--void HELPER(neon_unzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_unzip16)(void *vd, void *vm)
+-void HELPER(crypto_sha1h)(CPUARMState *env, uint32_t rd, uint32_t rm)
++void HELPER(crypto_sha1h)(void *vd, void *vm)
  {
--    uint64_t zm = float64_val(env->vfp.regs[rm]);
--    uint64_t zd = float64_val(env->vfp.regs[rd]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd = rd[0], zm = rm[0];
-+
-     uint64_t d0 = ELEM(zd, 0, 16) | (ELEM(zd, 2, 16) << 16)
-         | (ELEM(zm, 0, 16) << 32) | (ELEM(zm, 2, 16) << 48);
-     uint64_t m0 = ELEM(zd, 1, 16) | (ELEM(zd, 3, 16) << 16)
-         | (ELEM(zm, 1, 16) << 32) | (ELEM(zm, 3, 16) << 48);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rd] = make_float64(d0);
-+
-+    rm[0] = m0;
-+    rd[0] = d0;
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(m, 0) = ror32(CR_ST_WORD(m, 0), 2);
+     CR_ST_WORD(m, 1) = CR_ST_WORD(m, 2) = CR_ST_WORD(m, 3) = 0;
+ 
+-    env->vfp.regs[rd] = make_float64(m.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(m.l[1]);
++    rd[0] = m.l[0];
++    rd[1] = m.l[1];
  }
  
--void HELPER(neon_qzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_qzip8)(void *vd, void *vm)
+-void HELPER(crypto_sha1su1)(CPUARMState *env, uint32_t rd, uint32_t rm)
++void HELPER(crypto_sha1su1)(void *vd, void *vm)
  {
--    uint64_t zm0 = float64_val(env->vfp.regs[rm]);
--    uint64_t zm1 = float64_val(env->vfp.regs[rm + 1]);
--    uint64_t zd0 = float64_val(env->vfp.regs[rd]);
--    uint64_t zd1 = float64_val(env->vfp.regs[rd + 1]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd0 = rd[0], zd1 = rd[1];
-+    uint64_t zm0 = rm[0], zm1 = rm[1];
-+
-     uint64_t d0 = ELEM(zd0, 0, 8) | (ELEM(zm0, 0, 8) << 8)
-         | (ELEM(zd0, 1, 8) << 16) | (ELEM(zm0, 1, 8) << 24)
-         | (ELEM(zd0, 2, 8) << 32) | (ELEM(zm0, 2, 8) << 40)
-@@ -2141,18 +2148,19 @@ void HELPER(neon_qzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-         | (ELEM(zd1, 5, 8) << 16) | (ELEM(zm1, 5, 8) << 24)
-         | (ELEM(zd1, 6, 8) << 32) | (ELEM(zm1, 6, 8) << 40)
-         | (ELEM(zd1, 7, 8) << 48) | (ELEM(zm1, 7, 8) << 56);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rm + 1] = make_float64(m1);
--    env->vfp.regs[rd] = make_float64(d0);
--    env->vfp.regs[rd + 1] = make_float64(d1);
-+
-+    rm[0] = m0;
-+    rm[1] = m1;
-+    rd[0] = d0;
-+    rd[1] = d1;
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(d, 0) = rol32(CR_ST_WORD(d, 0) ^ CR_ST_WORD(m, 1), 1);
+     CR_ST_WORD(d, 1) = rol32(CR_ST_WORD(d, 1) ^ CR_ST_WORD(m, 2), 1);
+     CR_ST_WORD(d, 2) = rol32(CR_ST_WORD(d, 2) ^ CR_ST_WORD(m, 3), 1);
+     CR_ST_WORD(d, 3) = rol32(CR_ST_WORD(d, 3) ^ CR_ST_WORD(d, 0), 1);
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
  }
  
--void HELPER(neon_qzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_qzip16)(void *vd, void *vm)
- {
--    uint64_t zm0 = float64_val(env->vfp.regs[rm]);
--    uint64_t zm1 = float64_val(env->vfp.regs[rm + 1]);
--    uint64_t zd0 = float64_val(env->vfp.regs[rd]);
--    uint64_t zd1 = float64_val(env->vfp.regs[rd + 1]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd0 = rd[0], zd1 = rd[1];
-+    uint64_t zm0 = rm[0], zm1 = rm[1];
-+
-     uint64_t d0 = ELEM(zd0, 0, 16) | (ELEM(zm0, 0, 16) << 16)
-         | (ELEM(zd0, 1, 16) << 32) | (ELEM(zm0, 1, 16) << 48);
-     uint64_t d1 = ELEM(zd0, 2, 16) | (ELEM(zm0, 2, 16) << 16)
-@@ -2161,32 +2169,35 @@ void HELPER(neon_qzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-         | (ELEM(zd1, 1, 16) << 32) | (ELEM(zm1, 1, 16) << 48);
-     uint64_t m1 = ELEM(zd1, 2, 16) | (ELEM(zm1, 2, 16) << 16)
-         | (ELEM(zd1, 3, 16) << 32) | (ELEM(zm1, 3, 16) << 48);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rm + 1] = make_float64(m1);
--    env->vfp.regs[rd] = make_float64(d0);
--    env->vfp.regs[rd + 1] = make_float64(d1);
-+
-+    rm[0] = m0;
-+    rm[1] = m1;
-+    rd[0] = d0;
-+    rd[1] = d1;
+ /*
+@@ -347,21 +328,14 @@ static uint32_t s1(uint32_t x)
+     return ror32(x, 17) ^ ror32(x, 19) ^ (x >> 10);
  }
  
--void HELPER(neon_qzip32)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_qzip32)(void *vd, void *vm)
+-void HELPER(crypto_sha256h)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                            uint32_t rm)
++void HELPER(crypto_sha256h)(void *vd, void *vn, void *vm)
  {
--    uint64_t zm0 = float64_val(env->vfp.regs[rm]);
--    uint64_t zm1 = float64_val(env->vfp.regs[rm + 1]);
--    uint64_t zd0 = float64_val(env->vfp.regs[rd]);
--    uint64_t zd1 = float64_val(env->vfp.regs[rd + 1]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd0 = rd[0], zd1 = rd[1];
-+    uint64_t zm0 = rm[0], zm1 = rm[1];
-+
-     uint64_t d0 = ELEM(zd0, 0, 32) | (ELEM(zm0, 0, 32) << 32);
-     uint64_t d1 = ELEM(zd0, 1, 32) | (ELEM(zm0, 1, 32) << 32);
-     uint64_t m0 = ELEM(zd1, 0, 32) | (ELEM(zm1, 0, 32) << 32);
-     uint64_t m1 = ELEM(zd1, 1, 32) | (ELEM(zm1, 1, 32) << 32);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rm + 1] = make_float64(m1);
--    env->vfp.regs[rd] = make_float64(d0);
--    env->vfp.regs[rd + 1] = make_float64(d1);
-+
-+    rm[0] = m0;
-+    rm[1] = m1;
-+    rd[0] = d0;
-+    rd[1] = d1;
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+     int i;
+ 
+     for (i = 0; i < 4; i++) {
+@@ -383,25 +357,18 @@ void HELPER(crypto_sha256h)(CPUARMState *env, uint32_t rd, uint32_t rn,
+         CR_ST_WORD(d, 0) = t;
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
  }
  
--void HELPER(neon_zip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_zip8)(void *vd, void *vm)
+-void HELPER(crypto_sha256h2)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                             uint32_t rm)
++void HELPER(crypto_sha256h2)(void *vd, void *vn, void *vm)
  {
--    uint64_t zm = float64_val(env->vfp.regs[rm]);
--    uint64_t zd = float64_val(env->vfp.regs[rd]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd = rd[0], zm = rm[0];
-+
-     uint64_t d0 = ELEM(zd, 0, 8) | (ELEM(zm, 0, 8) << 8)
-         | (ELEM(zd, 1, 8) << 16) | (ELEM(zm, 1, 8) << 24)
-         | (ELEM(zd, 2, 8) << 32) | (ELEM(zm, 2, 8) << 40)
-@@ -2195,20 +2206,23 @@ void HELPER(neon_zip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-         | (ELEM(zd, 5, 8) << 16) | (ELEM(zm, 5, 8) << 24)
-         | (ELEM(zd, 6, 8) << 32) | (ELEM(zm, 6, 8) << 40)
-         | (ELEM(zd, 7, 8) << 48) | (ELEM(zm, 7, 8) << 56);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rd] = make_float64(d0);
-+
-+    rm[0] = m0;
-+    rd[0] = d0;
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+     int i;
+ 
+     for (i = 0; i < 4; i++) {
+@@ -415,51 +382,40 @@ void HELPER(crypto_sha256h2)(CPUARMState *env, uint32_t rd, uint32_t rn,
+         CR_ST_WORD(d, 0) = CR_ST_WORD(n, 3 - i) + t;
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
  }
  
--void HELPER(neon_zip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-+void HELPER(neon_zip16)(void *vd, void *vm)
+-void HELPER(crypto_sha256su0)(CPUARMState *env, uint32_t rd, uint32_t rm)
++void HELPER(crypto_sha256su0)(void *vd, void *vm)
  {
--    uint64_t zm = float64_val(env->vfp.regs[rm]);
--    uint64_t zd = float64_val(env->vfp.regs[rd]);
-+    uint64_t *rd = vd, *rm = vm;
-+    uint64_t zd = rd[0], zm = rm[0];
-+
-     uint64_t d0 = ELEM(zd, 0, 16) | (ELEM(zm, 0, 16) << 16)
-         | (ELEM(zd, 1, 16) << 32) | (ELEM(zm, 1, 16) << 48);
-     uint64_t m0 = ELEM(zd, 2, 16) | (ELEM(zm, 2, 16) << 16)
-         | (ELEM(zd, 3, 16) << 32) | (ELEM(zm, 3, 16) << 48);
--    env->vfp.regs[rm] = make_float64(m0);
--    env->vfp.regs[rd] = make_float64(d0);
-+
-+    rm[0] = m0;
-+    rd[0] = d0;
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(d, 0) += s0(CR_ST_WORD(d, 1));
+     CR_ST_WORD(d, 1) += s0(CR_ST_WORD(d, 2));
+     CR_ST_WORD(d, 2) += s0(CR_ST_WORD(d, 3));
+     CR_ST_WORD(d, 3) += s0(CR_ST_WORD(m, 0));
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
  }
  
- /* Helper function for 64 bit polynomial multiply case:
+-void HELPER(crypto_sha256su1)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                              uint32_t rm)
++void HELPER(crypto_sha256su1)(void *vd, void *vn, void *vm)
+ {
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(d, 0) += s1(CR_ST_WORD(m, 2)) + CR_ST_WORD(n, 1);
+     CR_ST_WORD(d, 1) += s1(CR_ST_WORD(m, 3)) + CR_ST_WORD(n, 2);
+     CR_ST_WORD(d, 2) += s1(CR_ST_WORD(d, 0)) + CR_ST_WORD(n, 3);
+     CR_ST_WORD(d, 3) += s1(CR_ST_WORD(d, 1)) + CR_ST_WORD(m, 0);
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
+ }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 70c1e08a36..6d9b3af64c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -80,8 +80,9 @@ typedef void NeonGenWidenFn(TCGv_i64, TCGv_i32);
+ typedef void NeonGenTwoSingleOPFn(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_ptr);
+ typedef void NeonGenTwoDoubleOPFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_ptr);
+ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
+-typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
+-typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
++typedef void CryptoTwoOpFn(TCGv_ptr, TCGv_ptr);
++typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
++typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
+ 
+ /* initialize TCG globals.  */
+ void a64_translate_init(void)
+@@ -535,6 +536,21 @@ static inline int vec_reg_offset(DisasContext *s, int regno,
+     return offs;
+ }
+ 
++/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
++static inline int vec_full_reg_offset(DisasContext *s, int regno)
++{
++    assert_fp_access_checked(s);
++    return offsetof(CPUARMState, vfp.regs[regno * 2]);
++}
++
++/* Return a newly allocated pointer to the vector register.  */
++static TCGv_ptr vec_full_reg_ptr(DisasContext *s, int regno)
++{
++    TCGv_ptr ret = tcg_temp_new_ptr();
++    tcg_gen_addi_ptr(ret, cpu_env, vec_full_reg_offset(s, regno));
++    return ret;
++}
++
+ /* Return the offset into CPUARMState of a slice (from
+  * the least significant end) of FP register Qn (ie
+  * Dn, Sn, Hn or Bn).
+@@ -10949,8 +10965,9 @@ static void disas_crypto_aes(DisasContext *s, uint32_t insn)
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+     int decrypt;
+-    TCGv_i32 tcg_rd_regno, tcg_rn_regno, tcg_decrypt;
+-    CryptoThreeOpEnvFn *genfn;
++    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr;
++    TCGv_i32 tcg_decrypt;
++    CryptoThreeOpIntFn *genfn;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_V8_AES)
+         || size != 0) {
+@@ -10984,18 +11001,14 @@ static void disas_crypto_aes(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    /* Note that we convert the Vx register indexes into the
+-     * index within the vfp.regs[] array, so we can share the
+-     * helper with the AArch32 instructions.
+-     */
+-    tcg_rd_regno = tcg_const_i32(rd << 1);
+-    tcg_rn_regno = tcg_const_i32(rn << 1);
++    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
++    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
+     tcg_decrypt = tcg_const_i32(decrypt);
+ 
+-    genfn(cpu_env, tcg_rd_regno, tcg_rn_regno, tcg_decrypt);
++    genfn(tcg_rd_ptr, tcg_rn_ptr, tcg_decrypt);
+ 
+-    tcg_temp_free_i32(tcg_rd_regno);
+-    tcg_temp_free_i32(tcg_rn_regno);
++    tcg_temp_free_ptr(tcg_rd_ptr);
++    tcg_temp_free_ptr(tcg_rn_ptr);
+     tcg_temp_free_i32(tcg_decrypt);
+ }
+ 
+@@ -11012,8 +11025,8 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
+     int rm = extract32(insn, 16, 5);
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+-    CryptoThreeOpEnvFn *genfn;
+-    TCGv_i32 tcg_rd_regno, tcg_rn_regno, tcg_rm_regno;
++    CryptoThreeOpFn *genfn;
++    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr;
+     int feature = ARM_FEATURE_V8_SHA256;
+ 
+     if (size != 0) {
+@@ -11052,23 +11065,23 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    tcg_rd_regno = tcg_const_i32(rd << 1);
+-    tcg_rn_regno = tcg_const_i32(rn << 1);
+-    tcg_rm_regno = tcg_const_i32(rm << 1);
++    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
++    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
++    tcg_rm_ptr = vec_full_reg_ptr(s, rm);
+ 
+     if (genfn) {
+-        genfn(cpu_env, tcg_rd_regno, tcg_rn_regno, tcg_rm_regno);
++        genfn(tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr);
+     } else {
+         TCGv_i32 tcg_opcode = tcg_const_i32(opcode);
+ 
+-        gen_helper_crypto_sha1_3reg(cpu_env, tcg_rd_regno,
+-                                    tcg_rn_regno, tcg_rm_regno, tcg_opcode);
++        gen_helper_crypto_sha1_3reg(tcg_rd_ptr, tcg_rn_ptr,
++                                    tcg_rm_ptr, tcg_opcode);
+         tcg_temp_free_i32(tcg_opcode);
+     }
+ 
+-    tcg_temp_free_i32(tcg_rd_regno);
+-    tcg_temp_free_i32(tcg_rn_regno);
+-    tcg_temp_free_i32(tcg_rm_regno);
++    tcg_temp_free_ptr(tcg_rd_ptr);
++    tcg_temp_free_ptr(tcg_rn_ptr);
++    tcg_temp_free_ptr(tcg_rm_ptr);
+ }
+ 
+ /* Crypto two-reg SHA
+@@ -11083,9 +11096,9 @@ static void disas_crypto_two_reg_sha(DisasContext *s, uint32_t insn)
+     int opcode = extract32(insn, 12, 5);
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+-    CryptoTwoOpEnvFn *genfn;
++    CryptoTwoOpFn *genfn;
+     int feature;
+-    TCGv_i32 tcg_rd_regno, tcg_rn_regno;
++    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr;
+ 
+     if (size != 0) {
+         unallocated_encoding(s);
+@@ -11119,13 +11132,13 @@ static void disas_crypto_two_reg_sha(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    tcg_rd_regno = tcg_const_i32(rd << 1);
+-    tcg_rn_regno = tcg_const_i32(rn << 1);
++    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
++    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
+ 
+-    genfn(cpu_env, tcg_rd_regno, tcg_rn_regno);
++    genfn(tcg_rd_ptr, tcg_rn_ptr);
+ 
+-    tcg_temp_free_i32(tcg_rd_regno);
+-    tcg_temp_free_i32(tcg_rn_regno);
++    tcg_temp_free_ptr(tcg_rd_ptr);
++    tcg_temp_free_ptr(tcg_rn_ptr);
+ }
+ 
+ /* C3.6 Data processing - SIMD, inc Crypto
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 7b5db15861..6f02c56abb 100644
+index 781be1e219..7b5db15861 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -4687,22 +4687,23 @@ static inline TCGv_i32 neon_get_scalar(int size, int reg)
- 
- static int gen_neon_unzip(int rd, int rm, int size, int q)
- {
--    TCGv_i32 tmp, tmp2;
-+    TCGv_ptr pd, pm;
-+    
-     if (!q && size == 2) {
-         return 1;
-     }
--    tmp = tcg_const_i32(rd);
--    tmp2 = tcg_const_i32(rm);
-+    pd = vfp_reg_ptr(true, rd);
-+    pm = vfp_reg_ptr(true, rm);
-     if (q) {
-         switch (size) {
-         case 0:
--            gen_helper_neon_qunzip8(cpu_env, tmp, tmp2);
-+            gen_helper_neon_qunzip8(pd, pm);
-             break;
-         case 1:
--            gen_helper_neon_qunzip16(cpu_env, tmp, tmp2);
-+            gen_helper_neon_qunzip16(pd, pm);
-             break;
-         case 2:
--            gen_helper_neon_qunzip32(cpu_env, tmp, tmp2);
-+            gen_helper_neon_qunzip32(pd, pm);
-             break;
-         default:
-             abort();
-@@ -4710,38 +4711,39 @@ static int gen_neon_unzip(int rd, int rm, int size, int q)
-     } else {
-         switch (size) {
-         case 0:
--            gen_helper_neon_unzip8(cpu_env, tmp, tmp2);
-+            gen_helper_neon_unzip8(pd, pm);
-             break;
-         case 1:
--            gen_helper_neon_unzip16(cpu_env, tmp, tmp2);
-+            gen_helper_neon_unzip16(pd, pm);
-             break;
-         default:
-             abort();
-         }
-     }
--    tcg_temp_free_i32(tmp);
--    tcg_temp_free_i32(tmp2);
-+    tcg_temp_free_ptr(pd);
-+    tcg_temp_free_ptr(pm);
-     return 0;
+@@ -1559,6 +1559,13 @@ static inline void neon_store_reg64(TCGv_i64 var, int reg)
+     tcg_gen_st_i64(var, cpu_env, vfp_reg_offset(1, reg));
  }
  
- static int gen_neon_zip(int rd, int rm, int size, int q)
- {
--    TCGv_i32 tmp, tmp2;
-+    TCGv_ptr pd, pm;
++static TCGv_ptr vfp_reg_ptr(bool dp, int reg)
++{
++    TCGv_ptr ret = tcg_temp_new_ptr();
++    tcg_gen_addi_ptr(ret, cpu_env, vfp_reg_offset(dp, reg));
++    return ret;
++}
 +
-     if (!q && size == 2) {
-         return 1;
-     }
--    tmp = tcg_const_i32(rd);
--    tmp2 = tcg_const_i32(rm);
-+    pd = vfp_reg_ptr(true, rd);
-+    pm = vfp_reg_ptr(true, rm);
-     if (q) {
-         switch (size) {
-         case 0:
--            gen_helper_neon_qzip8(cpu_env, tmp, tmp2);
-+            gen_helper_neon_qzip8(pd, pm);
-             break;
-         case 1:
--            gen_helper_neon_qzip16(cpu_env, tmp, tmp2);
-+            gen_helper_neon_qzip16(pd, pm);
-             break;
-         case 2:
--            gen_helper_neon_qzip32(cpu_env, tmp, tmp2);
-+            gen_helper_neon_qzip32(pd, pm);
-             break;
-         default:
-             abort();
-@@ -4749,17 +4751,17 @@ static int gen_neon_zip(int rd, int rm, int size, int q)
-     } else {
-         switch (size) {
-         case 0:
--            gen_helper_neon_zip8(cpu_env, tmp, tmp2);
-+            gen_helper_neon_zip8(pd, pm);
-             break;
-         case 1:
--            gen_helper_neon_zip16(cpu_env, tmp, tmp2);
-+            gen_helper_neon_zip16(pd, pm);
-             break;
-         default:
-             abort();
-         }
-     }
--    tcg_temp_free_i32(tmp);
--    tcg_temp_free_i32(tmp2);
-+    tcg_temp_free_ptr(pd);
-+    tcg_temp_free_ptr(pm);
-     return 0;
- }
+ #define tcg_gen_ld_f32 tcg_gen_ld_i32
+ #define tcg_gen_ld_f64 tcg_gen_ld_i64
+ #define tcg_gen_st_f32 tcg_gen_st_i32
+@@ -5597,6 +5604,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+     int u;
+     uint32_t imm, mask;
+     TCGv_i32 tmp, tmp2, tmp3, tmp4, tmp5;
++    TCGv_ptr ptr1, ptr2, ptr3;
+     TCGv_i64 tmp64;
  
+     /* FIXME: this access check should not take precedence over UNDEF
+@@ -5643,34 +5651,34 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 if (!arm_dc_feature(s, ARM_FEATURE_V8_SHA1)) {
+                     return 1;
+                 }
+-                tmp = tcg_const_i32(rd);
+-                tmp2 = tcg_const_i32(rn);
+-                tmp3 = tcg_const_i32(rm);
++                ptr1 = vfp_reg_ptr(true, rd);
++                ptr2 = vfp_reg_ptr(true, rn);
++                ptr3 = vfp_reg_ptr(true, rm);
+                 tmp4 = tcg_const_i32(size);
+-                gen_helper_crypto_sha1_3reg(cpu_env, tmp, tmp2, tmp3, tmp4);
++                gen_helper_crypto_sha1_3reg(ptr1, ptr2, ptr3, tmp4);
+                 tcg_temp_free_i32(tmp4);
+             } else { /* SHA-256 */
+                 if (!arm_dc_feature(s, ARM_FEATURE_V8_SHA256) || size == 3) {
+                     return 1;
+                 }
+-                tmp = tcg_const_i32(rd);
+-                tmp2 = tcg_const_i32(rn);
+-                tmp3 = tcg_const_i32(rm);
++                ptr1 = vfp_reg_ptr(true, rd);
++                ptr2 = vfp_reg_ptr(true, rn);
++                ptr3 = vfp_reg_ptr(true, rm);
+                 switch (size) {
+                 case 0:
+-                    gen_helper_crypto_sha256h(cpu_env, tmp, tmp2, tmp3);
++                    gen_helper_crypto_sha256h(ptr1, ptr2, ptr3);
+                     break;
+                 case 1:
+-                    gen_helper_crypto_sha256h2(cpu_env, tmp, tmp2, tmp3);
++                    gen_helper_crypto_sha256h2(ptr1, ptr2, ptr3);
+                     break;
+                 case 2:
+-                    gen_helper_crypto_sha256su1(cpu_env, tmp, tmp2, tmp3);
++                    gen_helper_crypto_sha256su1(ptr1, ptr2, ptr3);
+                     break;
+                 }
+             }
+-            tcg_temp_free_i32(tmp);
+-            tcg_temp_free_i32(tmp2);
+-            tcg_temp_free_i32(tmp3);
++            tcg_temp_free_ptr(ptr1);
++            tcg_temp_free_ptr(ptr2);
++            tcg_temp_free_ptr(ptr3);
+             return 0;
+         }
+         if (size == 3 && op != NEON_3R_LOGIC) {
+@@ -7159,8 +7167,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         || ((rm | rd) & 1)) {
+                         return 1;
+                     }
+-                    tmp = tcg_const_i32(rd);
+-                    tmp2 = tcg_const_i32(rm);
++                    ptr1 = vfp_reg_ptr(true, rd);
++                    ptr2 = vfp_reg_ptr(true, rm);
+ 
+                      /* Bit 6 is the lowest opcode bit; it distinguishes between
+                       * encryption (AESE/AESMC) and decryption (AESD/AESIMC)
+@@ -7168,12 +7176,12 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     tmp3 = tcg_const_i32(extract32(insn, 6, 1));
+ 
+                     if (op == NEON_2RM_AESE) {
+-                        gen_helper_crypto_aese(cpu_env, tmp, tmp2, tmp3);
++                        gen_helper_crypto_aese(ptr1, ptr2, tmp3);
+                     } else {
+-                        gen_helper_crypto_aesmc(cpu_env, tmp, tmp2, tmp3);
++                        gen_helper_crypto_aesmc(ptr1, ptr2, tmp3);
+                     }
+-                    tcg_temp_free_i32(tmp);
+-                    tcg_temp_free_i32(tmp2);
++                    tcg_temp_free_ptr(ptr1);
++                    tcg_temp_free_ptr(ptr2);
+                     tcg_temp_free_i32(tmp3);
+                     break;
+                 case NEON_2RM_SHA1H:
+@@ -7181,13 +7189,13 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         || ((rm | rd) & 1)) {
+                         return 1;
+                     }
+-                    tmp = tcg_const_i32(rd);
+-                    tmp2 = tcg_const_i32(rm);
++                    ptr1 = vfp_reg_ptr(true, rd);
++                    ptr2 = vfp_reg_ptr(true, rm);
+ 
+-                    gen_helper_crypto_sha1h(cpu_env, tmp, tmp2);
++                    gen_helper_crypto_sha1h(ptr1, ptr2);
+ 
+-                    tcg_temp_free_i32(tmp);
+-                    tcg_temp_free_i32(tmp2);
++                    tcg_temp_free_ptr(ptr1);
++                    tcg_temp_free_ptr(ptr2);
+                     break;
+                 case NEON_2RM_SHA1SU1:
+                     if ((rm | rd) & 1) {
+@@ -7201,15 +7209,15 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     } else if (!arm_dc_feature(s, ARM_FEATURE_V8_SHA1)) {
+                         return 1;
+                     }
+-                    tmp = tcg_const_i32(rd);
+-                    tmp2 = tcg_const_i32(rm);
++                    ptr1 = vfp_reg_ptr(true, rd);
++                    ptr2 = vfp_reg_ptr(true, rm);
+                     if (q) {
+-                        gen_helper_crypto_sha256su0(cpu_env, tmp, tmp2);
++                        gen_helper_crypto_sha256su0(ptr1, ptr2);
+                     } else {
+-                        gen_helper_crypto_sha1su1(cpu_env, tmp, tmp2);
++                        gen_helper_crypto_sha1su1(ptr1, ptr2);
+                     }
+-                    tcg_temp_free_i32(tmp);
+-                    tcg_temp_free_i32(tmp2);
++                    tcg_temp_free_ptr(ptr1);
++                    tcg_temp_free_ptr(ptr2);
+                     break;
+                 default:
+                 elementwise:
 -- 
 2.14.3
