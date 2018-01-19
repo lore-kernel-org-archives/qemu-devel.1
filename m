@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecTwz-00044E-SH
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:31:11 -0500
+	(envelope-from <lvivier@redhat.com>) id 1ecTyw-0004zQ-Mk
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1ecTww-0002MF-7s
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:31:09 -0500
-From: klim <klim.kireev@virtuozzo.com>
-References: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
-Message-ID: <166e66d5-3d95-94d1-cba4-c637ecc0c94c@virtuozzo.com>
-Date: Fri, 19 Jan 2018 13:30:54 +0300
-MIME-Version: 1.0
-In-Reply-To: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/5 v3] preparation for Parallels Disk xml
- driver
+	(envelope-from <lvivier@redhat.com>) id 1ecTyt-00056y-Ir
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:33:10 -0500
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Fri, 19 Jan 2018 11:32:33 +0100
+Message-Id: <20180119103233.26075-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH] build: fix typo in error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +17,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, stefanha@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: "Daniel P . Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <lvivier@redhat.com>
 
-On 01/12/2018 12:01 PM, Klim Kireev wrote:
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ scripts/git-submodule.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-ping
-> Parallels Desktop and Parallels Cloud Server uses images glued with the
-> bundle description in XML format. This series contains very basic
-> description of this XML files and makes preparations for actual
-> implementation to be followed.
->
-> Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
->
-> Changelog:
->
-> v2:
-> PATCH 1/5: Fix some places noticed by Stefan Hajnoczi <stefanha@redhat.com>
-> PATCH 2/5: Rebase to upstream
-> PATCH 3/5: Fix includes
->
-> v3:
-> PATCH 1/5: Fix the place about GUID, add emails of the authors
->
+diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+index bc7224a27f..807ca0b4f8 100755
+--- a/scripts/git-submodule.sh
++++ b/scripts/git-submodule.sh
+@@ -28,7 +28,7 @@ error() {
+     echo
+     echo "and then manually update submodules prior to running make, with:"
+     echo
+-    echo " $ scripts/git-sbumodule.sh update $modules"
++    echo " $ scripts/git-submodule.sh update $modules"
+     echo
+     exit 1
+ }
+-- 
+2.14.3
