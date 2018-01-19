@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ecRMD-0007ZO-NV
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:45:02 -0500
+	(envelope-from <JBeulich@suse.com>) id 1ecRTU-0001Ba-Ug
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:52:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ecRMA-0006mD-FO
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:45:01 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:47688)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ecRMA-0006lv-6p
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:44:58 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-	<ecc919de-5193-a83c-0e29-4b8d9bc8d7d7@redhat.com>
-	<e0cbd675-7872-05c3-8c3e-214ef93e4552@redhat.com>
-	<002201d38b9d$f0a248d0$d1e6da70$@ru>
-	<357a23a7-2cac-a14d-f4b9-7f883b101ea7@redhat.com>
-	<001e01d390ef$ba73c890$2f5b59b0$@ru>
-	<50884d44-a368-6434-03d5-9aba86b2dcba@redhat.com>
-In-Reply-To: <50884d44-a368-6434-03d5-9aba86b2dcba@redhat.com>
-Date: Fri, 19 Jan 2018 10:45:01 +0300
-Message-ID: <002801d390f9$69f581b0$3de08510$@ru>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
+	(envelope-from <JBeulich@suse.com>) id 1ecRTR-0002no-Me
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:52:33 -0500
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:46007)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1ecRTR-0002n6-G2
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:52:29 -0500
+Message-Id: <5A61B1CB02000078001A0368@prv-mh.provo.novell.com>
+Date: Fri, 19 Jan 2018 00:52:27 -0700
+From: "Jan Beulich" <JBeulich@suse.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] allow to build with older sed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 19/01/2018 07:35, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >> On 12/01/2018 13:07, Pavel Dovgalyuk wrote:
-> >>>
-> >>> I can't build current version of qemu on Windows.
-> >>> For the first time this happened when capstone was included into the build.
-> >>
-> >> I've fixed it now.
-> >
-> > Is upstream version ok?
-> > I still cannot build it on Windows.
-> 
-> I only fixed the mutex tracing patches.  It builds for me with mingw.
+sed's -E option may not be supported by older distros. As there's no
+point using sed here at all, use just shell mechanisms to establish the
+variable values, starting from the stem instead of the full target.
 
-I've got some problems with capstone:
-make[1]: *** No rule to make target '/e/qemu-master/capstone/capstone.lib'.  Stop.
-make: *** [Makefile:415: subdir-capstone] Error 2
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
 
-Disabling it allows qemu to build.
-
-Pavel Dovgalyuk
+--- a/Makefile
++++ b/Makefile
+@@ -242,8 +242,7 @@ GENERATED_FILES +=3D $(KEYCODEMAP_FILES)
+=20
+ ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Ma=
+kefile.objs
+ 	$(call quiet-command,\
+-	    src=3D$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.=
+c$$,\1,") && \
+-	    dst=3D$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.=
+c$$,\2,") && \
++	    stem=3D$* && src=3D$${stem%-to-*} dst=3D$${stem#*-to-} && \
+ 	    test -e $(KEYCODEMAP_GEN) && \
+ 	    $(PYTHON) $(KEYCODEMAP_GEN) \
+ 	          --lang glib2 \
