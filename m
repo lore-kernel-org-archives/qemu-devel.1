@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ecdHm-0007Wm-4M
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:29:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1ecdK0-0000ZO-4d
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ecdHh-0006q1-Ln
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:29:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38174)
+	(envelope-from <eblake@redhat.com>) id 1ecdJx-0008KH-0n
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:31:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ecdHh-0006pP-D3
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:29:09 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ecdJw-0008J8-OL
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:31:28 -0500
 References: <20180119162554.27270-1-marcandre.lureau@redhat.com>
-	<0bf279e2-0f90-06ee-2779-1a3f67665ecf@redhat.com>
-	<86c60f49-bdf9-c3a5-7c0e-c05f6dd11db5@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8bb55134-b48c-94ab-40f7-91c64943905f@redhat.com>
-Date: Fri, 19 Jan 2018 21:29:00 +0100
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e103bfb4-af00-5a5c-cbba-4f808ccdf4af@redhat.com>
+Date: Fri, 19 Jan 2018 14:31:23 -0600
 MIME-Version: 1.0
-In-Reply-To: <86c60f49-bdf9-c3a5-7c0e-c05f6dd11db5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180119162554.27270-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Cl3vpFV2WrauaDVZ3RB7NwuI85D45aJBX"
 Subject: Re: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix python 2
  support
 List-Id: <qemu-devel.nongnu.org>
@@ -30,76 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, lersek@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 01/19/18 20:48, Eric Blake wrote:
-> On 01/19/2018 01:18 PM, Laszlo Ersek wrote:
->> On 01/19/18 17:25, Marc-Andr=C3=A9 Lureau wrote:
->>> Python GDB support may use Python 2 or 3.
->>>
->>> Inferior.read_memory() may return a 'buffer' with Python 2 or a
->>> 'memoryview' with Python 3 (see also
->>> https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
->>>
->>> The elf.add_vmcoreinfo_note() method expects a "bytes" object. Wrap
->>> the returned memory with bytes(), which works with both 'memoryview'
->>> and 'buffer'.
->>>
->=20
-> If I understand it, the issue stems from the fact that vmcoreinfo is a
-> bytes buffer under python2, but a memoryview under python3.  Let's
-> compare the patches:
->=20
-> The V1 patch:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg04010.html
->=20
->>
->>          if vmcoreinfo:
->> -            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
->> +            # Python 2.7 returns a buffer
->> +            vmciview =3D memoryview(vmcoreinfo)
->> +            self.elf.add_vmcoreinfo_note(vmciview.tobytes())
->=20
-> did an unconditional memoryview(vmcoreinfo) followed by a .tobytes()
-> call. Under python 2.7, vmcoreinfo is converted from a buffer to a
-> memoryview, then back to bytes; under python 3, memoryview(vmcoreinfo)
-> is a no-op (since it is already a memory view), then that is converted
-> to bytes; the double conversion was necessary because bytes.tobytes()
-> doesn't exist.  But python 2.6 doesn't have the memoryview conversion,
-> so we've excluded older python users.
->=20
-> Now looking at the V2 patch:
->=20
->=20
->>> @@ -564,7 +564,7 @@ shape and this command should mostly work."""
->>> =20
->>>          vmcoreinfo =3D self.phys_memory_read(addr, size)
->>>          if vmcoreinfo:
->>> -            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
->>> +            self.elf.add_vmcoreinfo_note(bytes(vmcoreinfo))
->=20
-> Under python2, and bytes(buffer) is still bytes; under python3,
-> vmcoreinfo is a memoryview but bytes(buffer) is equivalent to
-> buffer.to_bytes().  We've avoided the intermediate conversion through
-> memoryview, and thus work regardless of python version.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Cl3vpFV2WrauaDVZ3RB7NwuI85D45aJBX
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, lersek@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Message-ID: <e103bfb4-af00-5a5c-cbba-4f808ccdf4af@redhat.com>
+Subject: Re: [PATCH v2] dump-guest-memory.py: fix python 2 support
+References: <20180119162554.27270-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20180119162554.27270-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Heh, "semantics" :)
-
+On 01/19/2018 10:25 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Python GDB support may use Python 2 or 3.
 >=20
->> Ugh, can you please point me to the v1->v2 difference?
+> Inferior.read_memory() may return a 'buffer' with Python 2 or a
+> 'memoryview' with Python 3 (see also
+> https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
 >=20
-> Hope that helped (and hope I got it right, I'm learning as well from
-> this thread).
+> The elf.add_vmcoreinfo_note() method expects a "bytes" object. Wrap
+> the returned memory with bytes(), which works with both 'memoryview'
+> and 'buffer'.
 >=20
+> Fixes a regression introduced with commit
+> d23bfa91b7789534d16ede6cb7d925bfac3f3c4c ("add vmcoreinfo").
+>=20
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/dump-guest-memory.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-It sure helped a lot, thank you very much! In fact, you've done all the
-review work, so technically, "R-b: Laszlo" would be misappropriation.
-Can you give your R-b?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I'll manage an "I agree" statement:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Acked-by: Laszlo Ersek <lersek@redhat.com>
 
-Thanks!
-Laszlo
+--Cl3vpFV2WrauaDVZ3RB7NwuI85D45aJBX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpiVZsACgkQp6FrSiUn
+Q2q8/Qf7BqZpKj4tLyRH7p8YQLD2initpzkKufxZD83+4bDq5lKXKvaNHIGYm6O7
+Twctpy+CUP/buLXVhScIxs2M9pBM62969G0LCWkItjEueB/jXWb1BbJe6scmmSgm
++FUzr9xU+1SR5QaffYPPrqH+IRIFXuy/CQqxhXCRFGjekNqR4A2H7bguOt7Z6xA+
+ayM5NP5lpmHkVnmp4aAUhTAJl6qVAQ5c4my6L6Cbtsl0P73wsHI4cOeBGhE9VA/Z
+XYpGUUcPAPWsBg1dmbdJhhYf675qk/wnZG2OMnXecqH4YKIbiAFNj+3bmVROgnmz
+aw+ujEMWeQAGIAeePb6U17raaMFlPQ==
+=kcpv
+-----END PGP SIGNATURE-----
+
+--Cl3vpFV2WrauaDVZ3RB7NwuI85D45aJBX--
