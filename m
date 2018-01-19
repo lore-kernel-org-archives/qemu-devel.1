@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2f-0002yV-G9
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:23 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ecZ3b-0003ix-3E
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:58:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2d-0006Ay-AO
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:21 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:49756 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1ecZ2c-0005fS-W2
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:19 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 19 Jan 2018 16:56:24 +0100
-Message-Id: <1516377391-25945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 0/7] target-mips: support MTTCG feature
+	(envelope-from <alex.williamson@redhat.com>) id 1ecZ3X-0006xF-10
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:58:19 -0500
+Date: Fri, 19 Jan 2018 08:57:31 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180119085731.60dafe0d@w520.home>
+In-Reply-To: <cff09fdb-a378-5bc4-932a-805ad69fe6b6@ozlabs.ru>
+References: <20171215062914.27927-1-aik@ozlabs.ru>
+	<3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
+	<20180105082916.480132af@t450s.home>
+	<51ac953b-da09-94ed-41a4-ae75ca045c5e@ozlabs.ru>
+	<20180118145920.2dd19c9a@w520.home>
+	<cff09fdb-a378-5bc4-932a-805ad69fe6b6@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,224 +28,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Goran Ferenc <goran.ferenc@mips.com>, Miodrag Dinic <miodrag.dinic@mips.com>, Petar Jovanovic <petar.jovanovic@mips.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Aleksandar Markovic <aleksandar.markovic@mips.com>
+On Fri, 19 Jan 2018 19:55:49 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-This series introduces MTTCG feature for MIPS targets by adding all
-missing bits and pieces, and formally enabling corresponding QEMU
-builds to support such configurations.
+> On 19/01/18 08:59, Alex Williamson wrote:
+> > On Tue, 16 Jan 2018 16:17:58 +1100
+> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >   
+> >> On 06/01/18 02:29, Alex Williamson wrote:  
+> >>> On Fri, 5 Jan 2018 10:48:07 +0100
+> >>> Auger Eric <eric.auger@redhat.com> wrote:
+> >>>     
+> >>>> Hi Alexey,
+> >>>>
+> >>>> On 15/12/17 07:29, Alexey Kardashevskiy wrote:    
+> >>>>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+> >>>>> which tells that a region with MSIX data can be mapped entirely, i.e.
+> >>>>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+> >>>>>
+> >>>>> With this change, all BARs are mapped in a single chunk and MSIX vectors
+> >>>>> are emulated on top unless the machine requests not to by defining and
+> >>>>> enabling a new "vfio-no-msix-emulation" property. At the moment only
+> >>>>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
+> >>>>> enabling it as it does not define the "set" callback for the new property;
+> >>>>> the new property also does not appear in "-machine pseries,help".
+> >>>>>
+> >>>>> If the new capability is present, this puts MSIX IO memory region under
+> >>>>> mapped memory region. If the capability is not there, it falls back to
+> >>>>> the old behaviour with the sparse capability.
+> >>>>>
+> >>>>> In MSIX vectors section is not aligned to the page size, the KVM memory
+> >>>>> listener does not register it with the KVM as a memory slot and MSIX is
+> >>>>> emulated by QEMU as before.
+> >>>>>
+> >>>>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+> >>>>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
+> >>>>>
+> >>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>>>> ---
+> >>>>>
+> >>>>> This is mtree and flatview BEFORE this patch:
+> >>>>>
+> >>>>> "info mtree":
+> >>>>> memory-region: pci@800000020000000.mmio
+> >>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+> >>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >>>>>       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >>>>>       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+> >>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+> >>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> >>>>>
+> >>>>> "info mtree -f":
+> >>>>> FlatView #0
+> >>>>>  AS "memory", root: system
+> >>>>>  AS "cpu-memory", root: system
+> >>>>>  Root memory region: system
+> >>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >>>>>   0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >>>>>   000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
+> >>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> >>>>>
+> >>>>>
+> >>>>>
+> >>>>> This is AFTER this patch applied:
+> >>>>>
+> >>>>> "info mtree":
+> >>>>> memory-region: pci@800000020000000.mmio
+> >>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+> >>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
+> >>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+> >>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+> >>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> >>>>>
+> >>>>>
+> >>>>> "info mtree -f":
+> >>>>> FlatView #2
+> >>>>>  AS "memory", root: system
+> >>>>>  AS "cpu-memory", root: system
+> >>>>>  Root memory region: system
+> >>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >>>>>   0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> >>>>>
+> >>>>>
+> >>>>>
+> >>>>> This is AFTER this patch applied AND spapr_get_msix_emulation() patched
+> >>>>> to enable emulation:
+> >>>>>
+> >>>>> "info mtree":
+> >>>>> memory-region: pci@800000020000000.mmio
+> >>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+> >>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+> >>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+> >>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> >>>>>
+> >>>>> "info mtree -f":
+> >>>>> FlatView #1
+> >>>>>  AS "memory", root: system
+> >>>>>  AS "cpu-memory", root: system
+> >>>>>  Root memory region: system
+> >>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >>>>>   0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >>>>>   000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
+> >>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> >>>>> ---
+> >>>>>  include/hw/vfio/vfio-common.h |  1 +
+> >>>>>  linux-headers/linux/vfio.h    |  5 +++++
+> >>>>>  hw/ppc/spapr.c                |  8 ++++++++
+> >>>>>  hw/vfio/common.c              | 15 +++++++++++++++
+> >>>>>  hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
+> >>>>>  5 files changed, 50 insertions(+), 2 deletions(-)
+> >>>>>
+> >>>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> >>>>> index f3a2ac9..927d600 100644
+> >>>>> --- a/include/hw/vfio/vfio-common.h
+> >>>>> +++ b/include/hw/vfio/vfio-common.h
+> >>>>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+> >>>>>                           struct vfio_region_info **info);
+> >>>>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+> >>>>>                               uint32_t subtype, struct vfio_region_info **info);
+> >>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+> >>>>>  #endif
+> >>>>>  extern const MemoryListener vfio_prereg_listener;
+> >>>>>  
+> >>>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> >>>>> index 4312e96..b45182e 100644
+> >>>>> --- a/linux-headers/linux/vfio.h
+> >>>>> +++ b/linux-headers/linux/vfio.h
+> >>>>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+> >>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+> >>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+> >>>>>  
+> >>>>> +/*
+> >>>>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+> >>>>> + */
+> >>>>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+> >>>>> +
+> >>>>>  /**
+> >>>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+> >>>>>   *				    struct vfio_irq_info)
+> >>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>>>> index 9de63f0..693394a 100644
+> >>>>> --- a/hw/ppc/spapr.c
+> >>>>> +++ b/hw/ppc/spapr.c
+> >>>>> @@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+> >>>>>      spapr->use_hotplug_event_source = value;
+> >>>>>  }
+> >>>>>  
+> >>>>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
+> >>>>> +{
+> >>>>> +    return true;
+> >>>>> +}
+> >>>>> +
+> >>>>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+> >>>>>  {
+> >>>>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> >>>>> @@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
+> >>>>>      object_property_set_description(obj, "vsmt",
+> >>>>>                                      "Virtual SMT: KVM behaves as if this were"
+> >>>>>                                      " the host's SMT mode", &error_abort);
+> >>>>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
+> >>>>> +                             spapr_get_msix_emulation, NULL, NULL);
+> >>>>>  }
+> >>>>>  
+> >>>>>  static void spapr_machine_finalizefn(Object *obj)
+> >>>>> @@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
+> >>>>>  /*
+> >>>>>   * pseries-2.11
+> >>>>>   */
+> >>>>> +
+> >>>>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
+> >>>>>  {
+> >>>>>  }
+> >>>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> >>>>> index 1fb8a8e..da5f182 100644
+> >>>>> --- a/hw/vfio/common.c
+> >>>>> +++ b/hw/vfio/common.c
+> >>>>> @@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+> >>>>>      return -ENODEV;
+> >>>>>  }
+> >>>>>  
+> >>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
+> >>>>> +{
+> >>>>> +    struct vfio_region_info *info = NULL;
+> >>>>> +    bool ret = false;
+> >>>>> +
+> >>>>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
+> >>>>> +        if (vfio_get_region_info_cap(info, cap_type)) {
+> >>>>> +            ret = true;
+> >>>>> +        }
+> >>>>> +        g_free(info);
+> >>>>> +    }
+> >>>>> +
+> >>>>> +    return ret;
+> >>>>> +}
+> >>>>> +
+> >>>>>  /*
+> >>>>>   * Interfaces for IBM EEH (Enhanced Error Handling)
+> >>>>>   */
+> >>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> >>>>> index c977ee3..27a3706 100644
+> >>>>> --- a/hw/vfio/pci.c
+> >>>>> +++ b/hw/vfio/pci.c
+> >>>>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+> >>>>>      off_t start, end;
+> >>>>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+> >>>>>  
+> >>>>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
+> >>>>> +                            vdev->msix->table_bar)) {
+> >>>>> +        return;
+> >>>>> +    }      
+> >>>>
+> >>>> I am testing this patch on ARM with a Mellanox CX-4 card. Single bar0 +
+> >>>> msix table at 0x2000, using 64kB pages.
+> >>>>
+> >>>> 0000000000000000-0000000001ffffff (prio 1, i/o): 0000:01:00.0 BAR 0
+> >>>>  0000000000000000-0000000001ffffff (prio 0, ramd): 0000:01:00.0 BAR 0
+> >>>> mmaps[0]
+> >>>>   0000000000002000-00000000000023ff (prio 0, i/o): msix-table
+> >>>>   0000000000003000-0000000000003007 (prio 0, i/o): msix-pba [disabled]
+> >>>>
+> >>>>
+> >>>> My kernel includes your "vfio-pci: Allow mapping MSIX BAR" so we bypass
+> >>>> vfio_pci_fixup_msix_region. But as the mmaps[0] is not fixed up the
+> >>>> vfio_listener_region_add_ram gets called on the first 8kB which cannot
+> >>>> be mapped with 64kB page, leading to a qemu abort.
+> >>>>
+> >>>> 29520@1515145231.232161:vfio_listener_region_add_ram region_add [ram]
+> >>>> 0x8000000000 - 0x8000001fff [0xffffa8820000]
+> >>>> qemu-system-aarch64: VFIO_MAP_DMA: -22
+> >>>> qemu-system-aarch64: vfio_dma_map(0x1e265f60, 0x8000000000, 0x2000,
+> >>>> 0xffffa8820000) = -22 (Invalid argument)
+> >>>> qemu: hardware error: vfio: DMA mapping failed, unable to continue
+> >>>>
+> >>>> In my case don't we still need the fixup logic?    
+> >>>
+> >>> Ah, I didn't realize you had Alexey's QEMU patch when you asked about
+> >>> this.  I'd say no, the fixup shouldn't be needed, but apparently we
+> >>> can't remove it until we figure out this bug and who should be filtering
+> >>> out sub-page size listener events.  Thanks,    
+> >>
+> >>
+> >> This should do it:
+> >>
+> >> @@ -303,11 +303,19 @@ static bool
+> >> vfio_listener_skipped_section(MemoryRegionSection *section)
+> >>              * Sizing an enabled 64-bit BAR can cause spurious mappings to
+> >>              * addresses in the upper part of the 64-bit address space.  These
+> >>              * are never accessed by the CPU and beyond the address width of
+> >>              * some IOMMU hardware.  TODO: VFIO should tell us the IOMMU width.
+> >>              */
+> >> -           section->offset_within_address_space & (1ULL << 63);
+> >> +           section->offset_within_address_space & (1ULL << 63) ||
+> >> +           /*
+> >> +            * Non-system-page aligned RAM regions have no chance to be
+> >> +            * DMA mapped so skip them too.
+> >> +            */
+> >> +           (memory_region_is_ram(section->mr) &&
+> >> +            ((section->offset_within_region & qemu_real_host_page_mask) ||
+> >> +             (int128_getlo(section->size) & qemu_real_host_page_mask))
+> >> +           );
+> >>  }
+> >>
+> >>
+> >> Do we VFIO DMA map on every RAM MR just because it is not necessary to have
+> >> more complicated logic to detect whether it is MMIO? Or there is something
+> >> bigger?  
+> > 
+> > Both, a) it's not clear how we determine a MR is MMIO vs RAM, thus the
+> > silly address hack above to try to exclude PCI BARs as they're being
+> > resized, and b) there is some value to enabling peer-to-peer mappings
+> > between devices.  Is there a better, more generic solution to a) now?
+> > If we know a MR is MMIO, then I think we can handle any associated
+> > mapping failure as non-fatal.  It's nice to enable p2p, but it's barely
+> > used and not clear that it works reliably (sometimes even on bare
+> > metal).   
+> 
+> When P2P works in a guest, what does it look like exactly? Do the devices
+> talk via the IOMMU or directly? I'd assume the latter but then the guest
+> device driver needs to know physical MMIO addresses and it does not or
+> guest must program BARs exactly as the host did... Has anyone actually
+> reported this working?
 
-PATCH ORGANIZATION
-==================
+I've seen it work, NVIDIA has a peer to peer test in their cuda tests,
+see previous patches enabling GPUDirect.  The route is generally
+through the IOMMU, guests don't know host physical addresses.  I say
+generally though because ACS does have a Directed Translated P2P
+feature that would allow a more efficient path, but I've never seen
+anything that can take advantage of this.
+ 
+> I just tried exposing MMIO on a PCI AS ("[PATCH qemu] spapr_pci: Alias MMIO
+> windows to PHB address space") and ended up having
+> vfio_listener_region_add() called with RAM regions (which are mapped MMIO)
+> and sPAPR cannot handle it otherwise than creating a window per a memory
+> section and since we can have just two, this fails. Adding
+> memory_region_is_ram_device() to vfio_listener_skipped_section() solves my
+> particular problem but I wonder if I should rather enable this P2P on sPAPR?
 
-The organization of patches is as follows:
+Yeah, as mentioned it'd be nice to at least make ram_device (ie. MMIO)
+mappings non-fatal.  I think there's probably enough skepticism in
+drivers as to whether p2p works that this isn't as critical.  Of course
+making it work is even better.  Thanks,
 
-  - patches 1 and 2 deal with MIPS' LL/SC instruction emulation
-    improvements related to MTTCG. They are based on a previously
-    sent patch series by Leon Alrae (this is the last version, v3):
-    http://lists.gnu.org/archive/html/qemu-devel/2016-09/msg06870.html
-
-  - patches 3, 4, 5, and 6 deal with locking/synchronization issues
-    that surfaced while introducing MTTCG for MIPS. Similar sets of
-    patches have been already integrated for some other platforms
-    (arm, intel, ppc, sparc).
-
-  - patch 7 just enables QEMU build system to support MTTCG feature
-    for MIPS targets.
-
-PERFORMANCE TESTING
-===================
-
-Performance testing was performed using atomic_add-bench test program
-that tests LL/SC-related functionality in multithread environment. The
-observed performance gain was significant.
-
-For the sake of comparison, test case organization mimics the one from
-a previously sent patch set:
-
-target-arm: emulate aarch64's LL/SC using cmpxchg helpers
-https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg06653.html
-
------------------------------------------------------------------------
-
-          atomic_add-bench: 1000000 ops/thread, [0,1] range
-                                               
-throughput                                  M - MTTCG     N - no MTTCG
-
- 50 +---------+---------+---------+---------+---------+---------+----+
-    |                                                                |
-    |M                                                               |
- 40 +.                                                               +
-    |.                                                               |
-    |.                                                               |
- 30 +.                                                               +
-    |.                                                               |
-    |.                                                               |
- 20 +.                                                               +
-    | M                                                              |
-    | .                                                              |
- 10 +  .M...M.......M.......M.......M.......M.......M.......M.......M+
-    |N                                                               |
-    | N.N...N.......N.......N.......N.......N.......N.......N.......N|
-  0 +---------+---------+---------+---------+---------+---------+----+
-    0         10        20        30        40        50        60
-
-                            number of threads
-
------------------------------------------------------------------------
-
-          atomic_add-bench: 1000000 ops/thread, [0,2] range
-                                               
-throughput                                  M - MTTCG     N - no MTTCG
-
- 50 +---------+---------+---------+---------+---------+---------+----+
-    |                                                                |
-    |M                                                               |
- 40 +.                                                               +
-    |.                                                               |
-    |.                                                               |
- 30 + .                                                              +
-    | M                                                              |
-    | .                                                              |
- 20 +  .M...M.......M.......M.......M.......M.......M.......M.......M+
-    |                                                                |
-    |                                                                |
- 10 +                                                                +
-    |N                                                               |
-    | N.N...N.......N.......N.......N.......N.......N.......N.......N|
-  0 +---------+---------+---------+---------+---------+---------+----+
-    0         10        20        30        40        50        60
-
-                            number of threads
-
------------------------------------------------------------------------
-
-          atomic_add-bench: 1000000 ops/thread, [0,1] range
-                                               
-throughput                                  M - MTTCG     N - no MTTCG
-
-150 +---------+---------+---------+---------+---------+---------+----+
-    |                                                                |
-    |                                            ...M...        ....M|
-120 +                   ....M.......M........M...       ....M...     +
-    |           ....M...                                             |
-    |     ..M...                                                     |
- 90 +    .                                                           +
-    |  .M                                                            |
-    | .                                                              |
- 60 + M                                                              +
-    |.                                                               |
-    |M                                                               |
- 30 +                                                                +
-    |                                                                |
-    |NN.N...N.......N.......N.......N.......N.......N.......N.......N|
-  0 +---------+---------+---------+---------+---------+---------+----+
-    0         10        20        30        40        50        60
-
-                            number of threads
-
------------------------------------------------------------------------
-
-          atomic_add-bench: 1000000 ops/thread, [0,2] range
-                                               
-throughput                                  M - MTTCG     N - no MTTCG
-
-150 +---------+---------+---------+---------+---------+---------+----+
-    |                                            ...M.......M.......M|
-    |                           ....M...       ..                    |
-120 +           ....M.......M...        ....M..                      +
-    |     ..M...                                                     |
-    |   M.                                                           |
- 90 +  .                                                             +
-    | .                                                              |
-    | .                                                              |
- 60 + M                                                              +
-    |.                                                               |
-    |M                                                               |
- 30 +                                                                +
-    |                                                                |
-    |NN.N...N.......N.......N.......N.......N.......N.......N.......N|
-  0 +---------+---------+---------+---------+---------+---------+----+
-    0         10        20        30        40        50        60
-
-                            number of threads
-
------------------------------------------------------------------------
-
-Numerical data:
-
-Ops
-Range-->      1               2              128            1024
-
-# of     no              no              no              no
- thr.    MTTCG  MTTCG    MTTCG  MTTCG    MTTCG  MTTCG    MTTCG  MTTCG
-
-  1      4.95   42.61    4.94   42.27    4.89   42.24    4.85   41.81
-  2      1.23   18.41    1.29   25.71    1.33   57.41    1.36   60.34
-  4      0.46   11.99    0.48   19.69    0.53   78.98    0.50   95.39
-  8      0.18    9.59    0.18   19.11    0.19  104.66    0.20  112.66
- 16      0.11   11.19    0.12   19.12    0.12  108.29    0.13  121.90
- 24      0.10   10.18    0.09   19.14    0.11  115.53    0.10  127.40
- 32      0.11   11.15    0.12   19.36    0.09  120.60    0.10  131.60
- 40      0.08   10.47    0.11   20.88    0.12  124.59    0.10  124.74
- 48      0.12   11.78    0.13   20.09    0.11  129.24    0.11  137.19
- 56      0.14   12.40    0.13   22.13    0.15  124.16    0.15  138.52
- 64      0.14   11.08    0.20   21.08    0.18  131.28    0.19  144.84
-
------------------------------------------------------------------------
-
-Graphical representation:
-
- https://i.imgur.com/OtNLpVX.png
-
------------------------------------------------------------------------
-
-REGRESSION TESTING
-==================
-
-Regression testing was also performed. The main test bed for regression
-testing was LTP test suite executed on QEMU-emulated Debian mips64
-system.
-
-Some LTP tests (getrusage04, copy_file_range01) that used to fail for
-non-MTTCG systems, pass for MTTCG-enabled systems. Also, some LTP tests
-(nanosleep01, poll02, pselect01) intermittently fail on both non-MTTCG
-and MTTCG configurations, and therefore do not represent valid
-regressions.
-
-Emulation by itself did not appear to have any problems while executing
-LTP test suite.
-
-QEMU user mode MTTCG-enabled emulation was also tested to some extent.
-
-Aleksandar Markovic (2):
-  Revert "target/mips: hold BQL for timer interrupts"
-  target/mips: introduce MTTCG-enabled builds
-
-Goran Ferenc (1):
-  target/mips: hold BQL in mips_vpe_wake()
-
-Leon Alrae (2):
-  target/mips: compare virtual addresses in LL/SC sequence
-  target/mips: reimplement SC instruction and use cmpxchg
-
-Miodrag Dinic (2):
-  hw/mips_int: hold BQL for all interrupt requests
-  hw/mips_cpc: kick a VP when putting it into Run state
-
- configure               |   3 ++
- hw/mips/mips_int.c      |  12 +++++
- hw/misc/mips_cpc.c      |  17 ++++++-
- linux-user/main.c       |  58 ------------------------
- target/mips/cpu.h       |   9 ++--
- target/mips/helper.c    |   6 +--
- target/mips/helper.h    |   2 -
- target/mips/machine.c   |   7 +--
- target/mips/op_helper.c |  74 +++++++++---------------------
- target/mips/translate.c | 118 ++++++++++++++++--------------------------------
- 10 files changed, 100 insertions(+), 206 deletions(-)
-
--- 
-2.7.4
+Alex
