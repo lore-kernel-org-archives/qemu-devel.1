@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ecTSj-0006tc-Tm
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:59:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ecTg9-0003HQ-3z
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ecTSj-00076i-1D
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:59:54 -0500
-References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
-	<20180118181123.37056-3-vsementsov@virtuozzo.com>
-	<35482a43-af44-9134-f112-30cf0cb135be@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c8c3ffce-f765-d8ef-c1c4-e7f277dec0b1@virtuozzo.com>
-Date: Fri, 19 Jan 2018 12:59:38 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1ecTg8-00071h-C0
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:13:45 -0500
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:38093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ecTg8-00070f-63
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:13:44 -0500
+Received: by mail-oi0-x22e.google.com with SMTP id m65so783025oig.5
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 02:13:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <35482a43-af44-9134-f112-30cf0cb135be@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] hmp: add name parameter to
- nbd_server_add
+In-Reply-To: <20180118213022-mutt-send-email-mst@kernel.org>
+References: <1516121887-32738-1-git-send-email-mst@redhat.com>
+	<CAFEAcA-En6Pqo=bjOrDMfkNmnN5UR-7S=b45Vu6P34Ag4jdMEQ@mail.gmail.com>
+	<20180118213022-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jan 2018 10:13:22 +0000
+Message-ID: <CAFEAcA8tkOPWEPgk2GpM7HHqd7EMtnG2=h72jj4zMQQ01LNzJA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/34] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-19.01.2018 00:08, Eric Blake wrote:
-> On 01/18/2018 12:11 PM, Vladimir Sementsov-Ogievskiy wrote:
->> Support name parameter for HMP too.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   hmp.c           | 3 ++-
->>   hmp-commands.hx | 9 +++++----
->>   2 files changed, 7 insertions(+), 5 deletions(-)
->>
->> +++ b/hmp-commands.hx
->> @@ -1553,8 +1553,8 @@ ETEXI
->>   
->>       {
->>           .name       = "nbd_server_add",
->> -        .args_type  = "writable:-w,device:B",
->> -        .params     = "nbd_server_add [-w] device",
->> +        .args_type  = "name:-n,writable:-w,device:B",
->> +        .params     = "nbd_server_add [-n] [-w] device",
-> Doesn't quite look like my proposal:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01639.html
+On 18 January 2018 at 19:30, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Thu, Jan 18, 2018 at 10:09:09AM +0000, Peter Maydell wrote:
+>> Hi -- this pullreq triggers a lot of alignment warnings for vhost
+>> in the clang runtime sanitizer:
 >
-> -        .args_type  = "writable:-w,device:B",
-> -        .params     = "nbd_server_add [-w] device",
-> +        .args_type  = "writable:-w,device:B,name:s?",
-> +        .params     = "nbd_server_add [-w] device [name]",
->
-> In fact, using -n is not quite right, because that's just a boolean flag
-> rather than a string.
->
+> Are these build or make check errors?
 
-Strange, I don't have your letter. Let's use yours, of course.
+They're runtime, so they fire during make check.
 
--- 
-Best regards,
-Vladimir
+thanks
+-- PMM
