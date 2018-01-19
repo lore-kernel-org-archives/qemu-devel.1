@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdku-0001qM-MT
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:21 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ecdkv-0001rM-L9
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdkt-000636-NS
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:20 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ecdku-00063l-SQ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:21 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 19 Jan 2018 15:58:42 -0500
-Message-Id: <20180119205847.7141-9-jsnow@redhat.com>
+Date: Fri, 19 Jan 2018 15:58:43 -0500
+Message-Id: <20180119205847.7141-10-jsnow@redhat.com>
 In-Reply-To: <20180119205847.7141-1-jsnow@redhat.com>
 References: <20180119205847.7141-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/13] allow block_job_relax to return
- -ECANCELED
+Subject: [Qemu-devel] [PATCH v2 09/13] block/backup: remove yield_and_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,132 +22,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-This is just an optimization for callers who are likely going to
-want to check quite close to this call if the job was canceled or
-not anyway.
+This is a respin of the same functionality as mirror_throttle,
+so trash this and replace it with the generic version.
 
-Along the same lines, add the return to block_job_pause_point and
-block_job_sleep_ns, so we don't have to re-check it quite so
-excessively.
+yield_and_check returned true if canceled, false otherwise.
+block_job_relax returns -ECANCELED if canceled, 0 otherwise.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c                   | 28 +++++++++++++++++-----------
- include/block/blockjob_int.h |  8 +++++---
- 2 files changed, 22 insertions(+), 14 deletions(-)
+ block/backup.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 51c0eb5d9e..b5a0cda412 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -793,15 +793,15 @@ static void block_job_do_yield(BlockJob *job, uint64_t ns)
-     assert(job->busy);
+diff --git a/block/backup.c b/block/backup.c
+index b4204c0ee4..0624c3b322 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -334,29 +334,17 @@ static void backup_complete(BlockJob *job, void *opaque)
+     g_free(data);
  }
  
--void coroutine_fn block_job_pause_point(BlockJob *job)
-+int coroutine_fn block_job_pause_point(BlockJob *job)
+-static bool coroutine_fn yield_and_check(BackupBlockJob *job)
++static uint64_t get_delay_ns(BackupBlockJob *job)
  {
-     assert(job && block_job_started(job));
+     uint64_t delay_ns = 0;
  
--    if (!block_job_should_pause(job)) {
--        return;
+-    if (block_job_is_cancelled(&job->common)) {
+-        return true;
 -    }
-     if (block_job_is_cancelled(job)) {
--        return;
-+        return -ECANCELED;
-+    }
-+    if (!block_job_should_pause(job)) {
-+        return 0;
+-
+-    /* we need to yield so that bdrv_drain_all() returns.
+-     * (without, VM does not reboot)
+-     */
+     if (job->common.speed) {
+         delay_ns = ratelimit_calculate_delay(&job->limit,
+                                              job->bytes_read);
+         job->bytes_read = 0;
      }
  
-     if (job->driver->pause) {
-@@ -817,6 +817,8 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
-     if (job->driver->resume) {
-         job->driver->resume(job);
-     }
-+
-+    return 0;
+-    block_job_relax(&job->common, delay_ns);
+-    if (block_job_is_cancelled(&job->common)) {
+-        return true;
+-    }
+-
+-    return false;
++    return delay_ns;
  }
  
- void block_job_resume_all(void)
-@@ -874,20 +876,20 @@ bool block_job_is_cancelled(BlockJob *job)
-     return job->cancelled;
- }
+ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+@@ -369,7 +357,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
+     while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
+         do {
+-            if (yield_and_check(job)) {
++            if (block_job_relax(&job->common, get_delay_ns(job))) {
+                 return 0;
+             }
+             ret = backup_do_cow(job, cluster * job->cluster_size,
+@@ -465,7 +453,7 @@ static void coroutine_fn backup_run(void *opaque)
+             bool error_is_read;
+             int alloced = 0;
  
--void block_job_sleep_ns(BlockJob *job, int64_t ns)
-+int block_job_sleep_ns(BlockJob *job, int64_t ns)
- {
-     assert(job->busy);
+-            if (yield_and_check(job)) {
++            if (block_job_relax(&job->common, get_delay_ns(job))) {
+                 break;
+             }
  
-     /* Check cancellation *before* setting busy = false, too!  */
-     if (block_job_is_cancelled(job)) {
--        return;
-+        return -ECANCELED;
-     }
- 
-     if (!block_job_should_pause(job)) {
-         block_job_do_yield(job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
-     }
- 
--    block_job_pause_point(job);
-+    return block_job_pause_point(job);
- }
- 
- void block_job_yield(BlockJob *job)
-@@ -906,13 +908,17 @@ void block_job_yield(BlockJob *job)
-     block_job_pause_point(job);
- }
- 
--void block_job_relax(BlockJob *job, int64_t delay_ns)
-+int block_job_relax(BlockJob *job, int64_t delay_ns)
- {
-+    if (block_job_is_cancelled(job)) {
-+        return -ECANCELED;
-+    }
-+
-     if (delay_ns || (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - \
-                      job->last_enter_ns > SLICE_TIME)) {
--        block_job_sleep_ns(job, delay_ns);
-+        return block_job_sleep_ns(job, delay_ns);
-     } else {
--        block_job_pause_point(job);
-+        return block_job_pause_point(job);
-     }
- }
- 
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 5f1520fab7..1ceb47e1e6 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -147,7 +147,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-  * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
-  * interrupt the wait.
-  */
--void block_job_sleep_ns(BlockJob *job, int64_t ns);
-+int block_job_sleep_ns(BlockJob *job, int64_t ns);
- 
- /**
-  * block_job_yield:
-@@ -167,8 +167,10 @@ void block_job_yield(BlockJob *job);
-  * If delay_ns is 0, yield if it has been SLICE_TIME
-  * nanoseconds since the last yield. Otherwise, check
-  * if we need to yield for a pause event.
-+ *
-+ * returns ECANCELED if the job has been canceled.
-  */
--void block_job_relax(BlockJob *job, int64_t delay_ns);
-+int block_job_relax(BlockJob *job, int64_t delay_ns);
- 
- /**
-  * block_job_pause_all:
-@@ -217,7 +219,7 @@ bool block_job_is_cancelled(BlockJob *job);
-  * Pause now if block_job_pause() has been called.  Block jobs that perform
-  * lots of I/O must call this between requests so that the job can be paused.
-  */
--void coroutine_fn block_job_pause_point(BlockJob *job);
-+int coroutine_fn block_job_pause_point(BlockJob *job);
- 
- /**
-  * block_job_enter:
 -- 
 2.14.3
