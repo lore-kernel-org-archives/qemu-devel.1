@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZd6-000643-Jw
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:35:08 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecZdF-0006Ca-UT
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:35:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZd3-0006pd-33
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:35:00 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecZdB-0006tX-UV
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:35:09 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 19 Jan 2018 14:33:34 -0200
-Message-Id: <20180119163345.10649-9-ehabkost@redhat.com>
+Date: Fri, 19 Jan 2018 14:33:35 -0200
+Message-Id: <20180119163345.10649-10-ehabkost@redhat.com>
 In-Reply-To: <20180119163345.10649-1-ehabkost@redhat.com>
 References: <20180119163345.10649-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 08/19] ppc: e500: Allow only supported
- dynamic sysbus devices
+Subject: [Qemu-devel] [PULL v2 09/19] spapr: Allow only supported dynamic
+ sysbus devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,45 +21,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-platform_bus_create_devtree() already rejects all dynamic sysbus
-devices except TYPE_ETSEC_COMMON, so register it as the only
-allowed dynamic sysbus device for the ppce500 machine-type.
+TYPE_SPAPR_PCI_HOST_BRIDGE is the only dynamic sysbus device not
+rejected by ppc_spapr_reset(), so it can be the only entry on the
+allowed list.
 
-Cc: Alexander Graf <agraf@suse.de>
 Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>
 Cc: qemu-ppc@nongnu.org
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20171125151610.20547-4-ehabkost@redhat.com>
+Message-Id: <20171125151610.20547-5-ehabkost@redhat.com>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/ppc/e500plat.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/ppc/spapr.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-index 438118c29b..81d03e1038 100644
---- a/hw/ppc/e500plat.c
-+++ b/hw/ppc/e500plat.c
-@@ -12,6 +12,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "e500.h"
-+#include "hw/net/fsl_etsec/etsec.h"
- #include "hw/boards.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/kvm.h"
-@@ -64,8 +65,7 @@ static void e500plat_machine_init(MachineClass *mc)
-     mc->desc = "generic paravirt e500 platform";
-     mc->init = e500plat_init;
-     mc->max_cpus = 32;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 5847175fd9..278f9de1e7 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3843,8 +3843,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     mc->default_boot_order = "";
+     mc->default_ram_size = 512 * M_BYTE;
+     mc->kvm_type = spapr_kvm_type;
 -    /*TODO: allow only sysbus devices that really work with this machine */
 -    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_ETSEC_COMMON);
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
- }
- 
++    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SPAPR_PCI_HOST_BRIDGE);
+     mc->pci_allow_0_address = true;
+     mc->get_hotplug_handler = spapr_get_hotplug_handler;
+     hc->pre_plug = spapr_machine_device_pre_plug;
 -- 
 2.14.3
