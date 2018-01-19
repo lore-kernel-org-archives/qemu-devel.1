@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ecZfG-0007yF-Qy
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:16 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ecZfj-0008Mj-29
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ecZfC-00083T-PC
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:14 -0500
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:53588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ecZfC-0007zc-FS
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:10 -0500
-Received: from player698.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 58897B8DB6
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 17:37:00 +0100 (CET)
-Date: Fri, 19 Jan 2018 17:36:49 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180119173649.7db7fd47@bahia.lan>
-In-Reply-To: <05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
-References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
-	<20180112171416.6048ae9e@bahia.lan>
-	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
-	<20180119112733.4a9dd43f@bahia.lan>
-	<05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
+	(envelope-from <laurent@vivier.eu>) id 1ecZff-0008HQ-2T
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:43 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:52776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecZfe-0008Gz-Ot
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:37:38 -0500
+References: <20180112081435.21299-1-samuel.thibault@ens-lyon.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <dee366b8-8f14-cf9f-1ebc-9c493507d7d2@vivier.eu>
+Date: Fri, 19 Jan 2018 17:37:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
+In-Reply-To: <20180112081435.21299-1-samuel.thibault@ens-lyon.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv4] linux-user: Add getcpu() support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,179 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduard Shishkin <eduard.shishkin@huawei.com>
-Cc: Antonios Motakis <antonios.motakis@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Veaceslav Falico <veaceslav.falico@huawei.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei (CR)" <zhangwei555@huawei.com>, "Emilio G. Cota" <cota@braap.org>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-On Fri, 19 Jan 2018 16:52:44 +0100
-Eduard Shishkin <eduard.shishkin@huawei.com> wrote:
-
-> On 1/19/2018 11:27 AM, Greg Kurz wrote:
-> > On Mon, 15 Jan 2018 11:49:31 +0800
-> > Antonios Motakis <antonios.motakis@huawei.com> wrote:
-> >  
-> >> On 13-Jan-18 00:14, Greg Kurz wrote:  
-> >>> On Fri, 12 Jan 2018 19:32:10 +0800
-> >>> Antonios Motakis <antonios.motakis@huawei.com> wrote:
-> >>>  
-> >>>> Hello all,
-> >>>>  
-> >>>
-> >>> Hi Antonios,
-> >>>
-> >>> I see you have attached a patch to this email... this really isn't the preferred
-> >>> way to do things since it prevents to comment the patch (at least with my mail
-> >>> client). The appropriate way would have been to send the patch with a cover
-> >>> letter, using git-send-email for example.  
-> >>
-> >> I apologize for attaching the patch, I should have known better!
-> >>  
-> >
-> > np :)
-> >  
-> >>>  
-> >>>> We have found an issue in the 9p implementation of QEMU, with how qid paths are generated, which can cause qid path collisions and several issues caused by them. In our use case (running containers under VMs) these have proven to be critical.
-> >>>>  
-> >>>
-> >>> Ouch...
-> >>>  
-> >>>> In particular, stat_to_qid in hw/9pfs/9p.c generates a qid path using the inode number of the file as input. According to the 9p spec the path should be able to uniquely identify a file, distinct files should not share a path value.
-> >>>>
-> >>>> The current implementation that defines qid.path = inode nr works fine as long as there are not files from multiple partitions visible under the 9p share. In that case, distinct files from different devices are allowed to have the same inode number. So with multiple partitions, we have a very high probability of qid path collisions.
-> >>>>
-> >>>> How to demonstrate the issue:
-> >>>> 1) Prepare a problematic share:
-> >>>>  - mount one partition under share/p1/ with some files inside
-> >>>>  - mount another one *with identical contents* under share/p2/
-> >>>>  - confirm that both partitions have files with same inode nr, size, etc
-> >>>> 2) Demonstrate breakage:
-> >>>>  - start a VM with a virtio-9p pointing to the share
-> >>>>  - mount 9p share with FSCACHE on
-> >>>>  - keep open share/p1/file
-> >>>>  - open and write to share/p2/file
-> >>>>
-> >>>> What should happen is, the guest will consider share/p1/file and share/p2/file to be the same file, and since we are using the cache it will not reopen it. We intended to write to partition 2, but we just wrote to partition 1. This is just one example on how the guest may rely on qid paths being unique.
-> >>>>
-> >>>> In the use case of containers where we commonly have a few containers per VM, all based on similar images, these kind of qid path collisions are very common and they seem to cause all kinds of funny behavior (sometimes very subtle).
-> >>>>
-> >>>> To avoid this situation, the device id of a file needs to be also taken as input for generating a qid path. Unfortunately, the size of both inode nr + device id together would be 96 bits, while we have only 64 bits for the qid path, so we can't just append them and call it a day :(
-> >>>>
-> >>>> We have thought of a few approaches, but we would definitely like to hear what the upstream maintainers and community think:
-> >>>>
-> >>>> * Full fix: Change the 9p protocol
-> >>>>
-> >>>> We would need to support a longer qid path, based on a virtio feature flag. This would take reworking of host and guest parts of virtio-9p, so both QEMU and Linux for most users.
-> >>>>  
-> >>>
-> >>> I agree for a longer qid path, but we shouldn't tie it to a virtio flag since
-> >>> 9p is transport agnostic. And it happens to be used with a variety of transports.
-> >>> QEMU has both virtio-9p and a Xen backend for example.
-> >>>  
-> >>>> * Fallback and/or interim solutions
-> >>>>
-> >>>> A virtio feature flag may be refused by the guest, so we think we still need to make collisions less likely even with 64 bit paths. E.g.  
-> >>>
-> >>> In all cases, we would need a fallback solution to support current
-> >>> guest setups. Also there are several 9p server implementations out
-> >>> there (ganesha, diod, kvmtool) that are currently used with linux
-> >>> clients... it will take some time to get everyone in sync :-\
-> >>>  
-> >>>> 1. XOR the device id with inode nr to produce the qid path (we attach a proof of concept patch)  
-> >>>
-> >>> Hmm... this would still allow collisions. Not good for fallback.
-> >>>  
-> >>>> 2. 64 bit hash of device id and inode nr  
-> >>>
-> >>> Same here.
-> >>>  
-> >>>> 3. other ideas, such as allocating new qid paths and keep a look up table of some sorts (possibly too expensive)
-> >>>>  
-> >>>
-> >>> This would be acceptable for fallback.  
-> >>
-> >> Maybe we can use the QEMU hash table (https://github.com/qemu/qemu/blob/master/util/qht.c) but I wonder if it scales to millions of entries. Do you think it is appropriate in this case?
-> >>  
-> >
-> > I don't know QHT, hence Cc'ing Emilio for insights.
-> >  
-> >> I was thinking on how to implement something like this, without having to maintain millions of entries... One option we could consider is to split the bits into a directly-mapped part, and a lookup part. For example:
-> >>
-> >> Inode =
-> >> [ 10 first bits ] + [ 54 lowest bits ]
-> >>
-> >> A hash table maps [ inode 10 first bits ] + [ device id ] => [ 10 bit prefix ]
-> >> The prefix is uniquely allocated for each input.
-> >>
-> >> Qid path =
-> >> [ 10 bit prefix ] + [ inode 54 lowest bits ]
-> >>
-> >> Since inodes are not completely random, and we usually have a handful of device IDs, we get a much smaller number of entries to track in the hash table.
-> >>
-> >> So what this would give:
-> >> (1)	Would be faster and take less memory than mapping the full inode_nr,devi_id tuple to unique QID paths
-> >> (2)	Guaranteed not to run out of bits when inode numbers stay below the lowest 54 bits and we have less than 1024 devices.
-> >> (3)	When we get beyond this this limit, there is a chance we run out of bits to allocate new QID paths, but we can detect this and refuse to serve the offending files instead of allowing a collision.
-> >>
-> >> We could tweak the prefix size to match the scenarios that we consider more likely, but I think close to 10-16 bits sounds reasonable enough. What do you think?
-> >>  
-> >
-> > I think that should work. Please send a patchset :)  
+Le 12/01/2018 à 09:14, Samuel Thibault a écrit :
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 > 
-> Hi Greg,
+> ---
+> Difference between v1 and v2: handle failure of put_user_u32 with goto efault;
+> Difference between v2 and v3: handle failure of sys_getcpu system call
+> Difference between v3 and v4: use is_error
+> ---
+>  linux-user/syscall.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 > 
-> This is based on the assumption that high bits of inode numbers are
-> always zero, which is unacceptable from my standpoint. Inode numbers
-> allocator is a per-volume file system feature, so there may appear
-> allocators, which don't use simple increment and assign inode number
-> with non-zero high bits even for the first file of a volume.
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 11c9116c4a..26403d7e5c 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
+>  #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
+>  _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
+>            unsigned long *, user_mask_ptr);
+> +#define __NR_sys_getcpu __NR_getcpu
+> +_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
+>  _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
+>            void *, arg);
+>  _syscall2(int, capget, struct __user_cap_header_struct *, header,
+> @@ -10403,6 +10405,23 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
+>          }
+>          break;
+> +    case TARGET_NR_getcpu:
+> +        {
+> +            unsigned cpu, node;
+> +            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
+> +                                       arg2 ? &node : NULL,
+> +                                       NULL));
+> +            if (is_error(ret)) {
+> +                goto fail;
+> +            }
+> +            if (arg1 && put_user_u32(cpu, arg1)) {
+> +                goto efault;
+> +            }
+> +            if (arg2 && put_user_u32(node, arg2)) {
+> +                goto efault;
+> +            }
+> +        }
+> +        break;
+>      case TARGET_NR_sched_setparam:
+>          {
+>              struct sched_param *target_schp;
 > 
 
-I agree that inode numbers are random in theory, but this assumption
-is likely true for a vast majority of cases.
+Applied to my linux-user branch.
 
-> As I understand, the problem is that the guest doesn't have enough
-> information for proper files identification (in our case share/p1/file
-> and share/p2/file are wrongly identified as the same file). It seems
-> that we need to transmit device ID to the guest, and not in the high 
-> bits of the inode number.
-> 
-
-Yes this is what we should do in the long term, but this requires new spec
-and coordination between all stakeholders (not only QEMU and linux). This
-may take some time.
-
-What we want now is a fallback solution that can be merged in QEMU
-right away and works even with unmodified guests. Antonio's proposal
-is likely to work for most users, and it will allow to detect collisions
-and return an error to the guest in this case.
-
-> AFAIK Slava has patches for such transmission, I hope that he will send
-> it eventually.
-> 
-
-I'll gladly have a look.
-
-Cheers,
-
---
-Greg
-
-> Thanks,
-> Eduard.
-> 
-> >  
-> >>>  
-> >>>> With our proof of concept patch, the issues caused by qid path collisions go away, so it can be seen as an interim solution of sorts. However, the chance of collisions is not eliminated, we are just replacing the current strategy, which is almost guaranteed to cause collisions in certain use cases, with one that makes them more rare. We think that a virtio feature flag for longer qid paths is the only way to eliminate these issues completely.
-> >>>>
-> >>>> This is the extent that we were able to analyze the issue from our side, we would like to hear if there are some better ideas, or which approach would be more appropriate for upstream.
-> >>>>
-> >>>> Best regards,
-> >>>>  
-> >>>
-> >>> Cheers,
-> >>>
-> >>> --
-> >>> Greg
-> >>>  
-> >>  
-> >  
-> 
+Thanks,
+Laurent
