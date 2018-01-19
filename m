@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1ecX0C-0003s5-Fb
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:41 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1ecX0J-0003xh-Dc
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1ecX0B-0003Js-BF
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:40 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34461)
+	(envelope-from <zhangckid@gmail.com>) id 1ecX0F-0003La-2E
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:47 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:42798)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1ecX0B-0003Ja-61
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:39 -0500
-Received: by mail-pg0-x242.google.com with SMTP id r19so1478952pgn.1
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 05:46:39 -0800 (PST)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1ecX0E-0003LK-TC
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:46:42 -0500
+Received: by mail-pg0-x244.google.com with SMTP id q67so1458676pga.9
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 05:46:42 -0800 (PST)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Fri, 19 Jan 2018 21:44:38 +0800
-Message-Id: <1516369485-5374-10-git-send-email-zhangckid@gmail.com>
+Date: Fri, 19 Jan 2018 21:44:39 +0800
+Message-Id: <1516369485-5374-11-git-send-email-zhangckid@gmail.com>
 In-Reply-To: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
 References: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V4 09/16] COLO: Flush memory data from ram cache
+Subject: [Qemu-devel] [PATCH V4 10/16] qmp event: Add COLO_EXIT event to
+ notify users while exited COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +31,103 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huaw
 
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-During the time of VM's running, PVM may dirty some pages, we will transfer
-PVM's dirty pages to SVM and store them into SVM's RAM cache at next checkpoint
-time. So, the content of SVM's RAM cache will always be same with PVM's memory
-after checkpoint.
-
-Instead of flushing all content of PVM's RAM cache into SVM's MEMORY,
-we do this in a more efficient way:
-Only flush any page that dirtied by PVM since last checkpoint.
-In this way, we can ensure SVM's memory same with PVM's.
-
-Besides, we must ensure flush RAM cache before load device state.
+If some errors happen during VM's COLO FT stage, it's important to
+notify the users of this event. Together with 'x-colo-lost-heartbeat',
+Users can intervene in COLO's failover work immediately.
+If users don't want to get involved in COLO's failover verdict,
+it is still necessary to notify users that we exited COLO mode.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- migration/ram.c        | 39 +++++++++++++++++++++++++++++++++++++++
- migration/trace-events |  2 ++
- 2 files changed, 41 insertions(+)
+ migration/colo.c    | 19 +++++++++++++++++++
+ qapi/migration.json | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index d916da0..faee086 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2909,6 +2909,40 @@ static bool postcopy_is_running(void)
-     return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
- }
+diff --git a/migration/colo.c b/migration/colo.c
+index 8d2e3f8..790b122 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -516,6 +516,18 @@ out:
+         qemu_fclose(fb);
+     }
  
-+/*
-+ * Flush content of RAM cache into SVM's memory.
-+ * Only flush the pages that be dirtied by PVM or SVM or both.
-+ */
-+static void colo_flush_ram_cache(void)
-+{
-+    RAMBlock *block = NULL;
-+    void *dst_host;
-+    void *src_host;
-+    unsigned long offset = 0;
-+
-+    trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
-+    rcu_read_lock();
-+    block = QLIST_FIRST_RCU(&ram_list.blocks);
-+
-+    while (block) {
-+        offset = migration_bitmap_find_dirty(ram_state, block, offset);
-+        migration_bitmap_clear_dirty(ram_state, block, offset);
-+
-+        if (offset << TARGET_PAGE_BITS >= block->used_length) {
-+            offset = 0;
-+            block = QLIST_NEXT_RCU(block, next);
-+        } else {
-+            dst_host = block->host + (offset << TARGET_PAGE_BITS);
-+            src_host = block->colo_cache + (offset << TARGET_PAGE_BITS);
-+            memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
-+        }
++    /*
++     * There are only two reasons we can go here, some error happened.
++     * Or the user triggered failover.
++     */
++    if (failover_get_state() == FAILOVER_STATUS_NONE) {
++        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
++                                  COLO_EXIT_REASON_ERROR, NULL);
++    } else {
++        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
++                                  COLO_EXIT_REASON_REQUEST, NULL);
 +    }
 +
-+    rcu_read_unlock();
-+    trace_colo_flush_ram_cache_end();
-+    assert(ram_state->migration_dirty_pages == 0);
-+}
-+
- static int ram_load(QEMUFile *f, void *opaque, int version_id)
- {
-     int flags = 0, ret = 0, invalid_flags = 0;
-@@ -2921,6 +2955,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     bool postcopy_running = postcopy_is_running();
-     /* ADVISE is earlier, it shows the source has the postcopy capability on */
-     bool postcopy_advised = postcopy_is_advised();
-+    bool need_flush = false;
- 
-     seq_iter++;
- 
-@@ -3096,6 +3131,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     wait_for_decompress_done();
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
-+
-+    if (!ret  && migration_incoming_in_colo_state() && need_flush) {
-+        colo_flush_ram_cache();
+     /* Hope this not to be too long to wait here */
+     qemu_sem_wait(&s->colo_exit_sem);
+     qemu_sem_destroy(&s->colo_exit_sem);
+@@ -746,6 +758,13 @@ out:
+     if (local_err) {
+         error_report_err(local_err);
+     }
++    if (failover_get_state() == FAILOVER_STATUS_NONE) {
++        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
++                                  COLO_EXIT_REASON_ERROR, NULL);
++    } else {
++        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
++                                  COLO_EXIT_REASON_REQUEST, NULL);
 +    }
-     return ret;
- }
  
-diff --git a/migration/trace-events b/migration/trace-events
-index 59c7e3e..eb56cc6 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -78,6 +78,8 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
- ram_postcopy_send_discard_bitmap(void) ""
- ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
- ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-+colo_flush_ram_cache_begin(uint64_t dirty_pages) "dirty_pages %" PRIu64
-+colo_flush_ram_cache_end(void) ""
+     if (fb) {
+         qemu_fclose(fb);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 70e7b67..6fc95b7 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -869,6 +869,41 @@
+   'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
  
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
+ ##
++# @COLO_EXIT:
++#
++# Emitted when VM finishes COLO mode due to some errors happening or
++# at the request of users.
++#
++# @mode: which COLO mode the VM was in when it exited.
++#
++# @reason: describes the reason for the COLO exit.
++#
++# Since: 2.12
++#
++# Example:
++#
++# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
++#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
++#
++##
++{ 'event': 'COLO_EXIT',
++  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
++
++##
++# @COLOExitReason:
++#
++# The reason for a COLO exit
++#
++# @request: COLO exit is due to an external request
++#
++# @error: COLO exit is due to an internal error
++#
++# Since: 2.12
++##
++{ 'enum': 'COLOExitReason',
++  'data': [ 'request', 'error' ] }
++
++##
+ # @x-colo-lost-heartbeat:
+ #
+ # Tell qemu that heartbeat is lost, request it to do takeover procedures.
 -- 
 2.7.4
