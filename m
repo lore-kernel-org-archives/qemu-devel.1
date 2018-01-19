@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecY16-0005c1-6z
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:51:40 -0500
+	(envelope-from <voipio@kos.to>) id 1ecY1Q-0005tu-Lk
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:52:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecY15-0007fp-Il
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:51:40 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 19 Jan 2018 14:48:57 +0000
-Message-Id: <1516373355-305-5-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-References: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 04/22] update-linux-headers: Import
- virtio_iommu.h
+	(envelope-from <voipio@kos.to>) id 1ecY1M-0007uB-Nx
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:52:00 -0500
+Received: from jessie.kos.to ([212.47.231.226]:56608 helo=pilvi.kos.to)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1ecY1M-0007qM-HA
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:51:56 -0500
+Date: Fri, 19 Jan 2018 14:51:52 +0000
+From: Riku Voipio <riku.voipio@iki.fi>
+Message-ID: <20180119145152.GA28929@kos.to>
+References: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA90dgSX9kYC5TbPBV2UHgQjz3HWT3eyE4RUC6x9P=7_QQ@mail.gmail.com>
+	<21eaac25-23d4-7c03-b541-a93b79157e23@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <21eaac25-23d4-7c03-b541-a93b79157e23@vivier.eu>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: Fix race between threads
+ in page_unprotect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,29 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
-Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Update the script to update the virtio_iommu.h header.
+Hi Laurent,
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- scripts/update-linux-headers.sh | 3 +++
- 1 file changed, 3 insertions(+)
+On Mon, Jan 15, 2018 at 01:52:32PM +0100, Laurent Vivier wrote:
+> Le 15/01/2018 =C3=A0 13:48, Peter Maydell a =C3=A9crit=C2=A0:
+> > On 28 November 2017 at 14:35, Peter Maydell <peter.maydell@linaro.org=
+> wrote:
+> >> If multiple guest threads in user-mode emulation write to a
+> >> page which QEMU has marked read-only because of cached TCG
+> >> translations, the threads can race in page_unprotect:
+> >=20
+> >> Peter Maydell (2):
+> >>   linux-user: Propagate siginfo_t through to handle_cpu_signal()
+> >>   page_unprotect(): handle calls to pages that are PAGE_WRITE
+> >=20
+> > Ping! Linux-user maintainers, any chance this could get into
+> > a pull-request sometime soon? (I have another cleanup I'm
+> > thinking of that will touch the same code so I'd rather this
+> > went into master before I look at that.)
+> >=20
+> > (I have a bunch of other pending linux-user patchsets which
+> > I shan't bother to ping individually unless you want me to.)
+>=20
+> Riku,
+>=20
+> if you have no time to prepare a pull request, I can.
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-index 135a10d..e5af161 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -135,6 +135,9 @@ EOF
- cat <<EOF >$output/linux-headers/linux/virtio_config.h
- #include "standard-headers/linux/virtio_config.h"
- EOF
-+cat <<EOF >$output/linux-headers/linux/virtio_iommu.h
-+#include "standard-headers/linux/virtio_iommu.h"
-+EOF
- cat <<EOF >$output/linux-headers/linux/virtio_ring.h
- #include "standard-headers/linux/virtio_ring.h"
- EOF
--- 
-1.9.1
+Thanks, that would be great.
+
+Riku
