@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecbHd-00061P-6M
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:20:58 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1ecbJj-0007bg-1m
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecbHc-0007Du-ET
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:20:57 -0500
-References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
-	<20171220154945.88410-14-vsementsov@virtuozzo.com>
-	<20171228063330.GL9192@lemon>
-	<e7950241-1eee-a415-3e28-9468f1020d1b@virtuozzo.com>
-	<17c25946-8cce-21e8-d70f-856fb1924b8c@redhat.com>
-	<753ed688-ea9f-4070-b98f-ddbd35f49a32@virtuozzo.com>
-	<b2f0c083-d5b3-774b-e931-c7bbe6dc1eac@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <45b5c74c-a863-362d-93c6-4573e7c65b25@redhat.com>
-Date: Fri, 19 Jan 2018 13:20:36 -0500
-MIME-Version: 1.0
-In-Reply-To: <b2f0c083-d5b3-774b-e931-c7bbe6dc1eac@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 13/13] iotests: add dirty bitmap
- postcopy test
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1ecbJf-0008Dl-6D
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:23:07 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36025)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1ecbJe-0008DL-Uv
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:23:03 -0500
+Received: by mail-wm0-x241.google.com with SMTP id f3so5345517wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 10:23:02 -0800 (PST)
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 19 Jan 2018 18:22:44 +0000
+Message-Id: <20180119182248.10821-1-ard.biesheuvel@linaro.org>
+Subject: [Qemu-devel] [PATCH v4 0/4] target-arm: add SHA-3,
+ SM3 and SHA512 instruction support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, rth@twiddle.net, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
+Changes since v3:
+- don't bother with helpers for the SHA3 instructions: they are simple enough
+  to be emitted as TCG ops directly
+- rebase onto Richard's pending SVE work
 
+Changes since v2:
+- fix thinko in big-endian aware handling of 64-bit quantities: this is not
+  needed given that the NEON registers are represented as arrays of uint64_t
+  so they always appear in the correct order.
+- add support for SM3 instructions (Chinese SHA derivative)
 
-On 01/19/2018 01:08 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 18.01.2018 12:57, Vladimir Sementsov-Ogievskiy wrote:
->> 17.01.2018 21:30, John Snow wrote:
->>>
->>> On 12/28/2017 06:49 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Thank you for reviewing my code!
->>>>
->>> Time for the re-spin? There's pretty good pressure to get this into 2=
-.12
->>> and say the non-nbd workflow model is feature complete.
->>
->> Yes, you are right. Hope to do it today or tomorrow.
->>
->=20
-> I've rebased, applied comments from review, and even one some new fixes=
-,
-> but now I understand that it is too early for re-spin.
->=20
-> Now this series depends on
-> 1. [PATCH v2 0/3] fix bitmaps migration through shared storage
-> =C2=A0 - we need to decide, how to fix it. May be, we just do not need
-> bitmaps in inactive state, and should not load them in do_qcow2_open in
-> this case
-> =C2=A0 [I can ignore it, just dropping one test case from new iotest, a=
-nd fix
-> it later, but..
-> 2. [PATCH v2 0/6] qmp dirty bitmap API
-> =C2=A0- here autoload is dropped, and migration should be rebased on it=
-.
->=20
-> so, I'll re-spin migration after these two questions are resolved.
->=20
+Changes since v1:
+- update SHA512 patch to adhere more closely to the existing style, and to
+  the way the instruction encodings are classified in the ARM ARM (#1)
+- add patch implementing the new SHA3 instructions EOR3/RAX1/XAR/BCAX (#2)
+- enable support for these instructions in user mode emulation (#3)
 
-You got it, thanks.
+Ard Biesheuvel (4):
+  target/arm: implement SHA-512 instructions
+  target/arm: implement SHA-3 instructions
+  target/arm: implement SM3 instructions
+  target/arm: enable user-mode SHA-3, SM3 and SHA-512 instruction
+    support
+
+ linux-user/elfload.c       |  18 ++
+ target/arm/cpu.h           |   3 +
+ target/arm/cpu64.c         |   3 +
+ target/arm/crypto_helper.c | 192 +++++++++++-
+ target/arm/helper.h        |  10 +
+ target/arm/translate-a64.c | 317 ++++++++++++++++++++
+ 6 files changed, 542 insertions(+), 1 deletion(-)
+
+-- 
+2.11.0
