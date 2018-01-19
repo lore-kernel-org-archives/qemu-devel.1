@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2f-0002yd-IJ
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2f-0002yY-HI
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2d-0006AK-3w
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2c-00069b-Mm
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:21 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:49819 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:49948 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1ecZ2c-0005hp-Sy
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:19 -0500
+	id 1ecZ2c-000698-F8
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:18 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 19 Jan 2018 16:56:28 +0100
-Message-Id: <1516377391-25945-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 19 Jan 2018 16:56:30 +0100
+Message-Id: <1516377391-25945-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1516377391-25945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1516377391-25945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 4/7] hw/mips_int: hold BQL for all interrupt
- requests
+Subject: [Qemu-devel] [PATCH 6/7] hw/mips_cpc: kick a VP when putting it
+ into Run state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +30,53 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aur
 
 From: Miodrag Dinic <miodrag.dinic@mips.com>
 
-Make sure BQL is held for all interrupt requests.
-
-For MTTCG-enabled configurations, handling soft and hard interrupts
-between vCPUs must be properly locked. By acquiring BQL, make sure
-all paths triggering an IRQ are synchronized.
+While testing mttcg VP0 could get gets stuck in a loop waiting
+for other VPs to come up (which never actually happens). To fix this,
+kick VPs while they are being powered up by Cluster Power Controller
+in a async task which is triggered once the host thread is being
+spawned.
 
 Signed-off-by: Miodrag Dinic <miodrag.dinic@mips.com>
+Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
 Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
 ---
- hw/mips/mips_int.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ hw/misc/mips_cpc.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-index 48192d2..5ddeb15 100644
---- a/hw/mips/mips_int.c
-+++ b/hw/mips/mips_int.c
-@@ -21,6 +21,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
- #include "hw/hw.h"
- #include "hw/mips/cpudevs.h"
- #include "cpu.h"
-@@ -32,10 +33,17 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
-     MIPSCPU *cpu = opaque;
-     CPUMIPSState *env = &cpu->env;
-     CPUState *cs = CPU(cpu);
-+    bool locked = false;
- 
-     if (irq < 0 || irq > 7)
-         return;
- 
-+    /* Make sure locking works even if BQL is already held by the caller */
-+    if (!qemu_mutex_iothread_locked()) {
-+        locked = true;
-+        qemu_mutex_lock_iothread();
-+    }
-+
-     if (level) {
-         env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
- 
-@@ -56,6 +64,10 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
-     } else {
-         cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-     }
-+
-+    if (locked) {
-+        qemu_mutex_unlock_iothread();
-+    }
+diff --git a/hw/misc/mips_cpc.c b/hw/misc/mips_cpc.c
+index 6d34574..105a109 100644
+--- a/hw/misc/mips_cpc.c
++++ b/hw/misc/mips_cpc.c
+@@ -30,6 +30,14 @@ static inline uint64_t cpc_vp_run_mask(MIPSCPCState *cpc)
+     return (1ULL << cpc->num_vp) - 1;
  }
  
- void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
++static void mips_cpu_reset_async_work(CPUState *cs, run_on_cpu_data data)
++{
++    MIPSCPCState *cpc = (MIPSCPCState *) data.host_ptr;
++
++    cpu_reset(cs);
++    cpc->vp_running |= 1ULL << cs->cpu_index;
++}
++
+ static void cpc_run_vp(MIPSCPCState *cpc, uint64_t vp_run)
+ {
+     CPUState *cs = first_cpu;
+@@ -37,8 +45,13 @@ static void cpc_run_vp(MIPSCPCState *cpc, uint64_t vp_run)
+     CPU_FOREACH(cs) {
+         uint64_t i = 1ULL << cs->cpu_index;
+         if (i & vp_run & ~cpc->vp_running) {
+-            cpu_reset(cs);
+-            cpc->vp_running |= i;
++            /*
++             * To avoid racing with a CPU we are just kicking off.
++             * We do the final bit of preparation for the work in
++             * the target CPUs context.
++             */
++            async_run_on_cpu(cs, mips_cpu_reset_async_work,
++                             RUN_ON_CPU_HOST_PTR(cpc));
+         }
+     }
+ }
 -- 
 2.7.4
