@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecV2p-0004Hp-Rs
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:41:16 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ecV6Q-0005UI-Oy
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:44:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecV2k-0003Ex-Ub
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:41:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecV2k-0003EX-OH
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:41:10 -0500
-References: <20180119084219.31187-1-peterx@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b84e60fb-a527-204b-f355-b051e30d519f@redhat.com>
-Date: Fri, 19 Jan 2018 12:41:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180119084219.31187-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/2] memory/vfio: notify region_del() when
- unregister listeners
+	(envelope-from <laurent@vivier.eu>) id 1ecV6P-0005Xe-Ux
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:44:58 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri, 19 Jan 2018 12:44:44 +0100
+Message-Id: <20180119114444.7590-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] target/m68k: fix TCG variable double free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +17,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-On 19/01/2018 09:42, Peter Xu wrote:
-> I encountered an event loss problem during unplugging vfio devices:
->=20
->   https://bugzilla.redhat.com/show_bug.cgi?id=3D1531393
->=20
-> I thought it should be a simple VT-d issue but I was wrong.  The whole
-> debugging leads me to these patches.
->=20
-> Basically I think what we missed is that when unregistering memory
-> listeners, we don't really call region_del() at all.  Instead we just
-> remove ourselves from the listener list.  IMHO that's not enough.  A
-> clean unregister should undo all possible changes that have done
-> during region_add().  That's patch 1.
->=20
-> Patch 2 fixes a vfio issue when patch 1 is applied.
+t64 is also unconditionally freed after the switch () { ... }
 
-It makes sense, though of course patch 1 must come second for
-bisectability.  Of the other listeners, most do not implement
-region_del, but commit must be audited as well.  What matters is whether
-the listener is unregistered, and only few are:
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/translate.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-- kvm_arm_machine_init_done must unregister the listener after the
-QSLIST_FOREACH_SAFE loop.
-
-- Xen seems okay
-
-- vhost needs to remove the memory_region_unref loop after unregistering
-the listener - and this must be done at the same time as patch 1, not bef=
-ore
-
-- virtio seems okay
-
-Thanks,
-
-Paolo
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index f0e86a73d4..ea18df940a 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -969,7 +969,6 @@ static void gen_load_fp(DisasContext *s, int opsize, TCGv addr, TCGv_ptr fp)
+     case OS_DOUBLE:
+         tcg_gen_qemu_ld64(t64, addr, index);
+         gen_helper_extf64(cpu_env, fp, t64);
+-        tcg_temp_free_i64(t64);
+         break;
+     case OS_EXTENDED:
+         if (m68k_feature(s->env, M68K_FEATURE_CF_FPU)) {
+-- 
+2.14.3
