@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48064)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecbnb-0007g8-Q8
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:54:00 -0500
+	id 1ecbwm-0004fU-9F
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:03:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecbnW-0002L0-SK
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:53:59 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:42071)
+	id 1ecbwi-00085V-A2
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:03:28 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44076)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecbnW-0002Kl-MO
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 13:53:54 -0500
-Received: by mail-qt0-x244.google.com with SMTP id c2so6228430qtn.9
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 10:53:54 -0800 (PST)
+	id 1ecbwi-00085P-5V
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:03:24 -0500
+Received: by mail-qt0-x241.google.com with SMTP id l20so4970884qtj.11
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 11:03:24 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180116131555.14242-1-f4bug@amsat.org>
-	<20180116131555.14242-4-f4bug@amsat.org>
-	<20180119181827.GM15832@localhost.localdomain>
+	<20180116131555.14242-7-f4bug@amsat.org>
+	<20180119180302.GK15832@localhost.localdomain>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b76e275a-ef7e-f73e-0c8a-e165c707703a@amsat.org>
-Date: Fri, 19 Jan 2018 15:53:49 -0300
+Message-ID: <596f32f8-625b-497f-a52c-facb70404792@amsat.org>
+Date: Fri, 19 Jan 2018 16:03:19 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180119181827.GM15832@localhost.localdomain>
+In-Reply-To: <20180119180302.GK15832@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/i2c: convert I2CSlaveClass::init
- -> realize
+Subject: Re: [Qemu-devel] [PATCH 06/11] sysbus: add realize() and unrealize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,42 +37,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
 
-On 01/19/2018 03:18 PM, Eduardo Habkost wrote:
-> On Tue, Jan 16, 2018 at 10:15:47AM -0300, Philippe Mathieu-Daudé wrote:
+On 01/19/2018 03:03 PM, Eduardo Habkost wrote:
+> On Tue, Jan 16, 2018 at 10:15:50AM -0300, Philippe Mathieu-Daudé wrote:
 > [...]
->> -static int i2c_slave_qdev_init(DeviceState *dev)
->> +static void i2c_slave_realize(DeviceState *dev, Error **errp)
->>  {
->>      I2CSlave *s = I2C_SLAVE(dev);
->>      I2CSlaveClass *sc = I2C_SLAVE_GET_CLASS(s);
->>  
->> -    if (sc->init) {
->> -        return sc->init(s);
->> +    if (sc->realize) {
->> +        return sc->realize(s, errp);
->>      }
+>> +static void sysbus_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    SysBusDevice *sd = SYS_BUS_DEVICE(dev);
+>> +    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(sd);
+>> +
+>> +    if (sbc->realize) {
+>> +        sbc->realize(sd, errp);
+>> +    }
+>> +}
+>> +
+>> +static void sysbus_unrealize(DeviceState *dev, Error **errp)
+>> +{
+>> +    SysBusDevice *sd = SYS_BUS_DEVICE(dev);
+>> +    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(sd);
+>> +
+>> +    if (sbc->unrealize) {
+>> +        sbc->unrealize(sd, errp);
+>> +    }
+>> +}
 > 
-> Do you think i2c_slave_realize() will perform additional actions
-> in the future?  If not, why not let subclasses set
-> DeviceClass::realize directly?
+> Why not just let the subclasses set DeviceClass::realize and
+> DeviceClass::unrealize directly?
 
-Good idea, also with SMBusDeviceClass::realize.
+yes, clever :)
 
->> -
->> -    return 0;
->>  }
->>  
->>  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
->> @@ -301,7 +299,7 @@ DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
->>  static void i2c_slave_class_init(ObjectClass *klass, void *data)
+> 
+>> +
+>>  DeviceState *sysbus_create_varargs(const char *name,
+>>                                     hwaddr addr, ...)
+>>  {
+>> @@ -325,6 +346,8 @@ static void sysbus_device_class_init(ObjectClass *klass, void *data)
 >>  {
 >>      DeviceClass *k = DEVICE_CLASS(klass);
->> -    k->init = i2c_slave_qdev_init;
->> +    k->realize = i2c_slave_realize;
->>      set_bit(DEVICE_CATEGORY_MISC, k->categories);
->>      k->bus_type = TYPE_I2C_BUS;
->>      k->props = i2c_props;
-> [...]
+>>      k->init = sysbus_device_init;
+>> +    k->realize = sysbus_realize;
+>> +    k->unrealize = sysbus_unrealize;
+>>      k->bus_type = TYPE_SYSTEM_BUS;
+>>      /*
+>>       * device_add plugs devices into a suitable bus.  For "real" buses,
+>> -- 
+>> 2.15.1
+>>
+>>
 > 
