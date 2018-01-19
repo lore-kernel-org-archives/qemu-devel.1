@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ecQid-0000ZS-H3
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:04:09 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ecQta-0006QY-Md
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:15:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ecQiX-0007fd-0O
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:04:07 -0500
-Received: from [45.249.212.32] (port=44905 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ecQiW-0007aG-6l
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:04:00 -0500
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Fri, 19 Jan 2018 15:02:26 +0800
-Message-ID: <fb63b1cbda0fa8d1e64c03f038a7f73c6a36aa1f.1516329752.git.arei.gonglei@huawei.com>
-In-Reply-To: <cover.1516329752.git.arei.gonglei@huawei.com>
-References: <cover.1516329752.git.arei.gonglei@huawei.com>
+	(envelope-from <no-reply@patchew.org>) id 1ecQtX-00078L-Vk
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:15:26 -0500
+Resent-Message-Id: <E1ecQtX-00078L-Vk@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ecQtX-00077b-Ga
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 02:15:23 -0500
+In-Reply-To: <20180119045438.28582-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151633976489.593.9267216757733961562@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 3/4] cryptodev-vhost-user: add crypto
- session handler
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 18 Jan 2018 21:29:25 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] target/arm: Prepatory work for SVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,324 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-From: Gonglei <arei.gonglei@huawei.com>
-
-Introduce two vhost-user meassges: VHOST_USER_CREATE_CRYPTO_SESSION
-and VHOST_USER_CLOSE_CRYPTO_SESSION. At this point, the QEMU side
-support crypto operation in cryptodev host-user backend.
-
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
----
- backends/cryptodev-vhost-user.c   |  50 ++++++++++++++----
- docs/interop/vhost-user.txt       |  26 ++++++++++
- hw/virtio/vhost-user.c            | 104 ++++++++++++++++++++++++++++++++++++++
- include/hw/virtio/vhost-backend.h |   8 +++
- 4 files changed, 177 insertions(+), 11 deletions(-)
-
-diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
-index 0b1f049..061c0e5 100644
---- a/backends/cryptodev-vhost-user.c
-+++ b/backends/cryptodev-vhost-user.c
-@@ -233,7 +233,26 @@ static int64_t cryptodev_vhost_user_sym_create_session(
-            CryptoDevBackendSymSessionInfo *sess_info,
-            uint32_t queue_index, Error **errp)
- {
--    return 0;
-+    CryptoDevBackendClient *cc =
-+                   backend->conf.peers.ccs[queue_index];
-+    CryptoDevBackendVhost *vhost_crypto;
-+    uint64_t session_id = 0;
-+    int ret;
-+
-+    vhost_crypto = cryptodev_vhost_user_get_vhost(cc,
-+                                           backend, queue_index);
-+    if (vhost_crypto) {
-+        struct vhost_dev *dev = &(vhost_crypto->dev);
-+        ret = dev->vhost_ops->vhost_crypto_create_session(dev,
-+                                                       sess_info,
-+                                                        &session_id);
-+        if (ret < 0) {
-+            return -1;
-+        } else {
-+            return session_id;
-+        }
-+    }
-+    return -1;
- }
- 
- static int cryptodev_vhost_user_sym_close_session(
-@@ -241,15 +260,24 @@ static int cryptodev_vhost_user_sym_close_session(
-            uint64_t session_id,
-            uint32_t queue_index, Error **errp)
- {
--    return 0;
--}
--
--static int cryptodev_vhost_user_sym_operation(
--                 CryptoDevBackend *backend,
--                 CryptoDevBackendSymOpInfo *op_info,
--                 uint32_t queue_index, Error **errp)
--{
--    return VIRTIO_CRYPTO_OK;
-+    CryptoDevBackendClient *cc =
-+                  backend->conf.peers.ccs[queue_index];
-+    CryptoDevBackendVhost *vhost_crypto;
-+    int ret;
-+
-+    vhost_crypto = cryptodev_vhost_user_get_vhost(cc,
-+                                              backend, queue_index);
-+    if (vhost_crypto) {
-+        struct vhost_dev *dev = &(vhost_crypto->dev);
-+        ret = dev->vhost_ops->vhost_crypto_close_session(dev,
-+                                                       session_id);
-+        if (ret < 0) {
-+            return -1;
-+        } else {
-+            return 0;
-+        }
-+    }
-+    return -1;
- }
- 
- static void cryptodev_vhost_user_cleanup(
-@@ -328,7 +356,7 @@ cryptodev_vhost_user_class_init(ObjectClass *oc, void *data)
-     bc->cleanup = cryptodev_vhost_user_cleanup;
-     bc->create_session = cryptodev_vhost_user_sym_create_session;
-     bc->close_session = cryptodev_vhost_user_sym_close_session;
--    bc->do_sym_op = cryptodev_vhost_user_sym_operation;
-+    bc->do_sym_op = NULL;
- }
- 
- static const TypeInfo cryptodev_vhost_user_info = {
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index d49444e..a5a6f89 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -354,6 +354,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_MTU            4
- #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
- #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
-+#define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
- 
- Master message types
- --------------------
-@@ -623,6 +624,31 @@ Master message types
-       and expect this message once (per VQ) during device configuration
-       (ie. before the master starts the VQ).
- 
-+ * VHOST_USER_CREATE_CRYPTO_SESSION
-+
-+      Id: 23
-+      Equivalent ioctl: N/A
-+      Master payload: crypto session description
-+      Slave payload: crypto session description
-+
-+      Create a session for crypto operation. The server side must return the
-+      session id, 0 or positive for success, negative for failure.
-+      This request should be sent only when VHOST_USER_PROTOCOL_F_CRYPTO_SESSION
-+      feature has been successfully negotiated.
-+      It's a required feature for crypto devices.
-+
-+ * VHOST_USER_CLOSE_CRYPTO_SESSION
-+
-+      Id: 24
-+      Equivalent ioctl: N/A
-+      Master payload: u64
-+
-+      Close a session for crypto operation which was previously
-+      created by VHOST_USER_CREATE_CRYPTO_SESSION.
-+      This request should be sent only when VHOST_USER_PROTOCOL_F_CRYPTO_SESSION
-+      feature has been successfully negotiated.
-+      It's a required feature for crypto devices.
-+
- Slave message types
- -------------------
- 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 093675e..f779512 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -17,6 +17,7 @@
- #include "sysemu/kvm.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-+#include "sysemu/cryptodev.h"
- 
- #include <sys/ioctl.h>
- #include <sys/socket.h>
-@@ -34,6 +35,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
-     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
-+    VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
- 
-     VHOST_USER_PROTOCOL_F_MAX
- };
-@@ -65,6 +67,8 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_SLAVE_REQ_FD = 21,
-     VHOST_USER_IOTLB_MSG = 22,
-     VHOST_USER_SET_VRING_ENDIAN = 23,
-+    VHOST_USER_CREATE_CRYPTO_SESSION = 24,
-+    VHOST_USER_CLOSE_CRYPTO_SESSION = 25,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-@@ -92,6 +96,17 @@ typedef struct VhostUserLog {
-     uint64_t mmap_offset;
- } VhostUserLog;
- 
-+#define VHOST_CRYPTO_SYM_HMAC_MAX_KEY_LEN    512
-+#define VHOST_CRYPTO_SYM_CIPHER_MAX_KEY_LEN  64
-+
-+typedef struct VhostUserCryptoSession {
-+    /* session id for success, -1 on errors */
-+    int64_t session_id;
-+    CryptoDevBackendSymSessionInfo session_setup_data;
-+    uint8_t key[VHOST_CRYPTO_SYM_CIPHER_MAX_KEY_LEN];
-+    uint8_t auth_key[VHOST_CRYPTO_SYM_HMAC_MAX_KEY_LEN];
-+} VhostUserCryptoSession;
-+
- typedef struct VhostUserMsg {
-     VhostUserRequest request;
- 
-@@ -109,6 +124,7 @@ typedef struct VhostUserMsg {
-         VhostUserMemory memory;
-         VhostUserLog log;
-         struct vhost_iotlb_msg iotlb;
-+        VhostUserCryptoSession session;
-     } payload;
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -922,6 +938,92 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
-     /* No-op as the receive channel is not dedicated to IOTLB messages. */
- }
- 
-+static int vhost_user_crypto_create_session(struct vhost_dev *dev,
-+                              void *session_info,
-+                              uint64_t *session_id)
-+{
-+    bool crypto_session = virtio_has_feature(dev->protocol_features,
-+                                       VHOST_USER_PROTOCOL_F_CRYPTO_SESSION);
-+    CryptoDevBackendSymSessionInfo *sess_info = session_info;
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_CREATE_CRYPTO_SESSION,
-+        .flags = VHOST_USER_VERSION,
-+        .size = sizeof(msg.payload.session),
-+    };
-+
-+    assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
-+
-+    if (!crypto_session) {
-+        error_report("vhost-user trying to send unhandled ioctl");
-+        return -1;
-+    }
-+
-+    memcpy(&msg.payload.session.session_setup_data, sess_info,
-+              sizeof(CryptoDevBackendSymSessionInfo));
-+    if (sess_info->key_len) {
-+        memcpy(&msg.payload.session.key, sess_info->cipher_key,
-+               sess_info->key_len);
-+    }
-+    if (sess_info->auth_key_len > 0) {
-+        memcpy(&msg.payload.session.auth_key, sess_info->auth_key,
-+               sess_info->auth_key_len);
-+    }
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        error_report("vhost_user_write() return -1, create session failed");
-+        return -1;
-+    }
-+
-+    if (vhost_user_read(dev, &msg) < 0) {
-+        error_report("vhost_user_read() return -1, create session failed");
-+        return -1;
-+    }
-+
-+    if (msg.request != VHOST_USER_CREATE_CRYPTO_SESSION) {
-+        error_report("Received unexpected msg type. Expected %d received %d",
-+                     VHOST_USER_CREATE_CRYPTO_SESSION, msg.request);
-+        return -1;
-+    }
-+
-+    if (msg.size != sizeof(msg.payload.session)) {
-+        error_report("Received bad msg size.");
-+        return -1;
-+    }
-+
-+    if (msg.payload.session.session_id < 0) {
-+        error_report("Bad session id: %" PRId64 "",
-+                              msg.payload.session.session_id);
-+        return -1;
-+    }
-+    *session_id = msg.payload.session.session_id;
-+
-+    return 0;
-+}
-+
-+static int
-+vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id)
-+{
-+    bool crypto_session = virtio_has_feature(dev->protocol_features,
-+                                       VHOST_USER_PROTOCOL_F_CRYPTO_SESSION);
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_CLOSE_CRYPTO_SESSION,
-+        .flags = VHOST_USER_VERSION,
-+        .size = sizeof(msg.payload.u64),
-+    };
-+    msg.payload.u64 = session_id;
-+
-+    if (!crypto_session) {
-+        error_report("vhost-user trying to send unhandled ioctl");
-+        return -1;
-+    }
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        error_report("vhost_user_write() return -1, close session failed");
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_init,
-@@ -948,4 +1050,6 @@ const VhostOps user_ops = {
-         .vhost_net_set_mtu = vhost_user_net_set_mtu,
-         .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
-+        .vhost_crypto_create_session = vhost_user_crypto_create_session,
-+        .vhost_crypto_close_session = vhost_user_crypto_close_session,
- };
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index a7a5f22..21d9479 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -85,6 +85,12 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
- typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
-                                               struct vhost_iotlb_msg *imsg);
- 
-+typedef int (*vhost_crypto_create_session_op)(struct vhost_dev *dev,
-+                                      void *session_info,
-+                                      uint64_t *session_id);
-+typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
-+                                      uint64_t session_id);
-+
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-@@ -118,6 +124,8 @@ typedef struct VhostOps {
-     vhost_vsock_set_running_op vhost_vsock_set_running;
-     vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
-     vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-+    vhost_crypto_create_session_op vhost_crypto_create_session;
-+    vhost_crypto_close_session_op vhost_crypto_close_session;
- } VhostOps;
- 
- extern const VhostOps user_ops;
--- 
-1.8.3.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTE5MDQ1NDM4LjI4NTgyLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzE2XSB0YXJnZXQvYXJtOiBQ
+cmVwYXRvcnkgd29yayBmb3IgU1ZFCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
+dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDExOTA0NTQzOC4yODU4Mi0xLXJpY2hh
+cmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDExOTA0NTQzOC4yODU4Mi0x
+LXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAg
+cGF0Y2hldy8yMDE4MDExOTA1MDAwNS4yOTM5Mi0xLXNqaXRpbmRhcnNpbmdoQGdtYWlsLmNvbSAt
+PiBwYXRjaGV3LzIwMTgwMTE5MDUwMDA1LjI5MzkyLTEtc2ppdGluZGFyc2luZ2hAZ21haWwuY29t
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjMwOGIzZWI0MiB0YXJnZXQvYXJtOiBB
+ZGQgU1ZFIHN0YXRlIHRvIFRCLT5GTEFHUwpiYzBiZjNlYmFlIHRhcmdldC9hcm06IFNpbXBsaWZ5
+IGZwX2V4Y2VwdGlvbl9lbCBmb3IgdXNlci1vbmx5CjljZGFmNjBjMmYgdGFyZ2V0L2FybTogSG9p
+c3Qgc3RvcmUgdG8gZmxhZ3Mgb3V0cHV0IGluIGNwdV9nZXRfdGJfY3B1X3N0YXRlCjE1NDdiNzBj
+MWUgdGFyZ2V0L2FybTogTW92ZSBjcHVfZ2V0X3RiX2NwdV9zdGF0ZSBvdXQgb2YgbGluZQpiMDFi
+YjVjYTZiIHRhcmdldC9hcm06IEFkZCBaQ1JfRUx4CmE0MjY1OGQyNmEgdGFyZ2V0L2FybTogQWRk
+IFNWRSB0byBtaWdyYXRpb24gc3RhdGUKMDNhODBiNjhjMCB0YXJnZXQvYXJtOiBBZGQgQVJNX0ZF
+QVRVUkVfU1ZFCmEzOTZiMjYwMDkgdGFyZ2V0L2FybTogQWRkIHByZWRpY2F0ZSByZWdpc3RlcnMg
+Zm9yIFNWRQowY2NjZTliM2M5IHRhcmdldC9hcm06IEV4cGFuZCB2ZWN0b3IgcmVnaXN0ZXJzIGZv
+ciBTVkUKYWVhOTczOTYwOSB2bXN0YXRlOiBBZGQgVk1TVEFURV9VSU5UNjRfU1VCX0FSUkFZCjEx
+OWVhMzBkYzAgdGFyZ2V0L2FybTogQWRkIGFhezMyLCA2NH1fdmZwX3tkcmVnLCBxcmVnfSBoZWxw
+ZXJzCjJhY2Q3YzdjZWMgdGFyZ2V0L2FybTogQ2hhbmdlIHRoZSB0eXBlIG9mIHZmcC5yZWdzCmFl
+MmRhMDg0YTQgdGFyZ2V0L2FybTogVXNlIHBvaW50ZXJzIGluIG5lb24gdGJsIGhlbHBlcgphZjRi
+MTkwNWM0IHRhcmdldC9hcm06IFVzZSBwb2ludGVycyBpbiBuZW9uIHppcC91enAgaGVscGVycwo5
+MjI4YzZjMjAxIHRhcmdldC9hcm06IFVzZSBwb2ludGVycyBpbiBjcnlwdG8gaGVscGVycwoxNjRi
+ZjJjZDUzIHRhcmdldC9hcm06IE1hcmsgZGlzYXNfc2V0X2luc25fc3luZHJvbWUgaW5saW5lCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE2OiB0YXJnZXQvYXJtOiBNYXJr
+IGRpc2FzX3NldF9pbnNuX3N5bmRyb21lIGlubGluZS4uLgpDaGVja2luZyBQQVRDSCAyLzE2OiB0
+YXJnZXQvYXJtOiBVc2UgcG9pbnRlcnMgaW4gY3J5cHRvIGhlbHBlcnMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMy8xNjogdGFyZ2V0L2FybTogVXNlIHBvaW50ZXJzIGluIG5lb24gemlwL3V6cCBoZWxwZXJz
+Li4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzMTU6IEZJTEU6IHRhcmdldC9hcm0vdHJh
+bnNsYXRlLmM6NDY5MToKKyAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM3MyBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCA0LzE2OiB0YXJnZXQvYXJtOiBVc2UgcG9pbnRlcnMgaW4gbmVvbiB0YmwgaGVs
+cGVyLi4uCkNoZWNraW5nIFBBVENIIDUvMTY6IHRhcmdldC9hcm06IENoYW5nZSB0aGUgdHlwZSBv
+ZiB2ZnAucmVncy4uLgpDaGVja2luZyBQQVRDSCA2LzE2OiB0YXJnZXQvYXJtOiBBZGQgYWF7MzIs
+IDY0fV92ZnBfe2RyZWcsIHFyZWd9IGhlbHBlcnMuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM4MjogRklMRTogdGFyZ2V0L2FybS9hcmNoX2R1bXAu
+YzoxMDQ6CisgICAgICAgIG5vdGUudmZwLnZyZWdzWzIqaSArIDBdID0gY3B1X3RvX2R1bXA2NChz
+LCBxWzBdKTsKICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWly
+ZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojODM6IEZJTEU6IHRhcmdldC9hcm0vYXJjaF9k
+dW1wLmM6MTA1OgorICAgICAgICBub3RlLnZmcC52cmVnc1syKmkgKyAxXSA9IGNwdV90b19kdW1w
+NjQocywgcVsxXSk7CiAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMs
+IDAgd2FybmluZ3MsIDMyNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzE2OiB2bXN0YXRlOiBBZGQgVk1TVEFURV9V
+SU5UNjRfU1VCX0FSUkFZLi4uCkNoZWNraW5nIFBBVENIIDgvMTY6IHRhcmdldC9hcm06IEV4cGFu
+ZCB2ZWN0b3IgcmVnaXN0ZXJzIGZvciBTVkUuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNjogdGFyZ2V0
+L2FybTogQWRkIHByZWRpY2F0ZSByZWdpc3RlcnMgZm9yIFNWRS4uLgpDaGVja2luZyBQQVRDSCAx
+MC8xNjogdGFyZ2V0L2FybTogQWRkIEFSTV9GRUFUVVJFX1NWRS4uLgpDaGVja2luZyBQQVRDSCAx
+MS8xNjogdGFyZ2V0L2FybTogQWRkIFNWRSB0byBtaWdyYXRpb24gc3RhdGUuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTIvMTY6IHRhcmdldC9hcm06IEFkZCBaQ1JfRUx4Li4uCkNoZWNraW5nIFBBVENIIDEz
+LzE2OiB0YXJnZXQvYXJtOiBNb3ZlIGNwdV9nZXRfdGJfY3B1X3N0YXRlIG91dCBvZiBsaW5lLi4u
+CkNoZWNraW5nIFBBVENIIDE0LzE2OiB0YXJnZXQvYXJtOiBIb2lzdCBzdG9yZSB0byBmbGFncyBv
+dXRwdXQgaW4gY3B1X2dldF90Yl9jcHVfc3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTY6IHRh
+cmdldC9hcm06IFNpbXBsaWZ5IGZwX2V4Y2VwdGlvbl9lbCBmb3IgdXNlci1vbmx5Li4uCkNoZWNr
+aW5nIFBBVENIIDE2LzE2OiB0YXJnZXQvYXJtOiBBZGQgU1ZFIHN0YXRlIHRvIFRCLT5GTEFHUy4u
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
+ZWxpc3RzLm9yZw==
