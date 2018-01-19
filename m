@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ecdzX-00065J-4z
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 16:14:28 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1ece0M-0006gN-KV
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 16:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ecdzS-0006SS-Qp
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 16:14:27 -0500
-Resent-Message-Id: <E1ecdzS-0006SS-Qp@eggs.gnu.org>
-In-Reply-To: <20180119205847.7141-1-jsnow@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151639644839.599.15105151707304843341@5adcb62bf0d6>
+	(envelope-from <tcminyard@gmail.com>) id 1ece0J-0006uT-7R
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 16:15:18 -0500
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:38332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ece0J-0006uK-0f
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 16:15:15 -0500
+Received: by mail-oi0-x234.google.com with SMTP id m65so2049915oig.5
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 13:15:14 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+Reply-To: minyard@acm.org
+From: Corey Minyard <minyard@acm.org>
+References: <1516326941-11832-1-git-send-email-minyard@acm.org>
+	<20180119051309-mutt-send-email-mst@kernel.org>
+	<19605015-5d30-f91e-3344-32ae4555a7dd@acm.org>
+Message-ID: <3dc61d47-9315-0d59-912d-9952cbff970c@acm.org>
+Date: Fri, 19 Jan 2018 15:15:11 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 19 Jan 2018 13:14:09 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/13] blockjob: refactor mirror_throttle
+In-Reply-To: <19605015-5d30-f91e-3344-32ae4555a7dd@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH] Revert "smbus: do not immediately complete
+ commands"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +34,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Corey Minyard <cminyard@mvista.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTE5MjA1ODQ3LjcxNDEtMS1qc25vd0ByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTNdIGJsb2Nram9iOiByZWZhY3RvciBtaXJyb3Jf
-dGhyb3R0bGUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
-dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwMTE5MTYyNTU0LjI3MjcwLTEtbWFyY2FuZHJlLmx1cmVhdUBy
-ZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAxMTkxNjI1NTQuMjcyNzAtMS1tYXJjYW5kcmUubHVy
-ZWF1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDEx
-OTIwNTg0Ny43MTQxLTEtanNub3dAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMTE5MjA1ODQ3
-LjcxNDEtMS1qc25vd0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-OTY5ZGRkYzRmZCBibG9ja2pvYjogcmVtb3ZlIGJsb2NrX2pvYl9wYXVzZV9wb2ludCBmcm9tIGlu
-dGVyZmFjZQo3OTI1MzlhMDdlIGJsb2Nram9iOiBwcml2YXRpemUgYmxvY2tfam9iX3NsZWVwX25z
-CmVhNmY4ZjIzNTkgYmxvY2svbWlycm9yOiByZW1vdmUgYmxvY2tfam9iX3NsZWVwX25zIGNhbGxz
-CjdmMmVlNjBjOGIgYmxvY2svbWlycm9yOiBjb25kZW5zZSBjYW5jZWxsYXRpb24gYW5kIHJlbGF4
-IGNhbGxzCjlhMTZkNjc3OGUgYmxvY2svYmFja3VwOiByZW1vdmUgeWllbGRfYW5kX2NoZWNrCmJi
-ZmNmZTljODkgYWxsb3cgYmxvY2tfam9iX3JlbGF4IHRvIHJldHVybiAtRUNBTkNFTEVECmIxMzI0
-YjExMWMgYmxvY2svYmFja3VwOiB1c2UgYmxvY2tfam9iX3JlbGF4CmQyMDhkYjZmY2EgYmxvY2sv
-c3RyZWFtOiB1c2UgYmxvY2tfam9iX3JlbGF4Cjc4OGVjZTQzNmEgYmxvY2svY29tbWl0OiB1c2Ug
-YmxvY2tfam9iX3JlbGF4CjRlMjA5ZTdhZWQgYmxvY2tqb2I6IGFsbG93IGJsb2NrX2pvYl90aHJv
-dHRsZSB0byB0YWtlIGRlbGF5X25zCjc2Y2U0MjcxMGIgYmxvY2tqb2I6IGNyZWF0ZSBibG9ja19q
-b2JfcmVsYXgKOTc3MWU4NGFiOCBibG9ja2pvYjogY29uc29saWRhdGUgU0xJQ0VfVElNRSBkZWZp
-bml0aW9uCjJhMWVlYzY4YWMgYmxvY2tqb2I6IHJlY29yZCB0aW1lIG9mIGxhc3QgZW50cmFuY2UK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTM6IGJsb2Nram9iOiByZWNv
-cmQgdGltZSBvZiBsYXN0IGVudHJhbmNlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM1MjogRklMRTogYmxvY2svbWlycm9yLmM6ODAzOgorICAgICAgICBkZWx0YSA9IHFlbXVf
-Y2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfUkVBTFRJTUUpIC0gcy0+Y29tbW9uLmxhc3RfZW50ZXJf
-bnM7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDYzIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogYmxv
-Y2tqb2I6IGNvbnNvbGlkYXRlIFNMSUNFX1RJTUUgZGVmaW5pdGlvbi4uLgpDaGVja2luZyBQQVRD
-SCAzLzEzOiBibG9ja2pvYjogY3JlYXRlIGJsb2NrX2pvYl9yZWxheC4uLgpDaGVja2luZyBQQVRD
-SCA0LzEzOiBibG9ja2pvYjogYWxsb3cgYmxvY2tfam9iX3Rocm90dGxlIHRvIHRha2UgZGVsYXlf
-bnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMzogYmxvY2svY29tbWl0OiB1c2UgYmxvY2tfam9iX3Jl
-bGF4Li4uCkNoZWNraW5nIFBBVENIIDYvMTM6IGJsb2NrL3N0cmVhbTogdXNlIGJsb2NrX2pvYl9y
-ZWxheC4uLgpDaGVja2luZyBQQVRDSCA3LzEzOiBibG9jay9iYWNrdXA6IHVzZSBibG9ja19qb2Jf
-cmVsYXguLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMzogYWxsb3cgYmxvY2tfam9iX3JlbGF4IHRvIHJl
-dHVybiAtRUNBTkNFTEVELi4uCkNoZWNraW5nIFBBVENIIDkvMTM6IGJsb2NrL2JhY2t1cDogcmVt
-b3ZlIHlpZWxkX2FuZF9jaGVjay4uLgpDaGVja2luZyBQQVRDSCAxMC8xMzogYmxvY2svbWlycm9y
-OiBjb25kZW5zZSBjYW5jZWxsYXRpb24gYW5kIHJlbGF4IGNhbGxzLi4uCkNoZWNraW5nIFBBVENI
-IDExLzEzOiBibG9jay9taXJyb3I6IHJlbW92ZSBibG9ja19qb2Jfc2xlZXBfbnMgY2FsbHMuLi4K
-RVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIHN0YXRpY3MgdG8gMCBvciBOVUxMCiMzMDogRklMRTog
-YmxvY2svbWlycm9yLmM6NzY0OgorICAgICAgICBzdGF0aWMgdWludDY0X3QgZGVsYXlfbnMgPSAw
-OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8xMzogYmxv
-Y2tqb2I6IHByaXZhdGl6ZSBibG9ja19qb2Jfc2xlZXBfbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMv
-MTM6IGJsb2Nram9iOiByZW1vdmUgYmxvY2tfam9iX3BhdXNlX3BvaW50IGZyb20gaW50ZXJmYWNl
-Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
-cmVlbGlzdHMub3Jn
+On 01/19/2018 08:07 AM, Corey Minyard wrote:
+> On 01/18/2018 09:17 PM, Michael S. Tsirkin wrote:
+>> On Thu, Jan 18, 2018 at 07:55:41PM -0600, minyard@acm.org wrote:
+>>> From: Corey Minyard <cminyard@mvista.com>
+>>>
+>>> This reverts commit 880b1ffe6ec2f0ae25cc4175716227ad275e8b8a.
+>>>
+>>> The commit being reverted says:
+>>>
+>>>      PIIX4 errata says that "immediate polling of the Host Status 
+>>> Register BUSY
+>>>      bit may indicate that the SMBus is NOT busy."
+>>>      Due to this, some code does the following steps:
+>>>      (a) set parameters
+>>>      (b) start command
+>>>      (c) check for smbus busy bit set (to know that command started)
+>>>      (d) check for smbus busy bit not set (to know that command 
+>>> finished)
+>>>
+>>>      Let (c) happen, by immediately setting the busy bit, and really 
+>>> executing
+>>>      the command when status register has been read once.
+>>>
+>>>      This fixes a problem with AMIBIOS, which can now properly 
+>>> initialize the
+>>>      PIIX4.
+>>>
+>>> Emulating bad hardware so badly written software will work doesn't 
+>>> sound
+>>> like a good idea to me.  I have patches that add interrupt capability
+>>> to pm_smbus, but this change breaks that because the Linux driver
+>>> starts the transaction then waits for interrupts before reading the
+>>> status register.  That obviously won't work with these changes.
+>>>
+>>> The right way to fix this in AMIBIOS is to ignore the host busy bit
+>>> and use the other bits in the host status register to tell if the
+>>> transaction has completed.  Using host busy is racy, anyway, if you
+>>> get interrupted or something while processing, you may miss step (c)
+>>> in your algorithm and fail.
+>>>
+>>> Cc: Hervé Poussineau <hpoussin@reactos.org>
+>>> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>> Would it be possible to limit the change to when guest uses
+>> interrupts?
+>
+> I did think about that, but it seems rather frail.  What if another 
+> piece of software
+> does this but has the interrupt enable bit set?  And AMIBIOS is still 
+> broken doing
+> that algorithm on real hardware.  If you get a bus collision, for 
+> instance, that will
+> be almost instantaneous and the firmware is likely to miss it.
+>
+> The 82801 documentation is pretty clear that you should use the INTR 
+> and error
+> bits in the status register to know if a transaction is complete.
+>
+> If you really want to emulate real hardware, I guess the right way to 
+> do this
+> would be to add a delay between the start bit being set and the 
+> transaction
+> being done.  I'm not sure how timers work with vmstate, I'd have to 
+> look at
+> that.
+
+I realized that the timer is not going to be able to correctly work 
+around the
+AMIBIOS.  It would probably work most of the time, but if qemu got switched
+out, then switched back and the timer went off before the guest was allowed
+to run, then you would have the same issue.
+
+Also, looking at a more complete implementation of the pm_smbus device,
+using the host busy bit to know when to start the transaction won't work,
+that bit also does other things when doing byte at a time block transfers.
+So a separate bool is needed to know when to do this.
+
+-corey
+
+>
+> IMHO it's best to revert this change and fix AMIBIOS.  If that is
+> impossible, then adding the delay or doing the interrupt enable
+> thing you suggest (assuming AMIBIOS doesn't have interrupts
+> enabled), and fixing that assert would be best.  I can submit
+> a patch either way, depending on what you want.
+>
+> -corey
+>
+>>> ---
+>>>   hw/i2c/pm_smbus.c | 16 +---------------
+>>>   1 file changed, 1 insertion(+), 15 deletions(-)
+>>>
+>>> diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+>>> index 0d26e0f..a044dd1 100644
+>>> --- a/hw/i2c/pm_smbus.c
+>>> +++ b/hw/i2c/pm_smbus.c
+>>> @@ -62,9 +62,6 @@ static void smb_transaction(PMSMBus *s)
+>>>       I2CBus *bus = s->smbus;
+>>>       int ret;
+>>>   -    assert(s->smb_stat & STS_HOST_BUSY);
+>>> -    s->smb_stat &= ~STS_HOST_BUSY;
+>>> -
+>>>       SMBUS_DPRINTF("SMBus trans addr=0x%02x prot=0x%02x\n", addr, 
+>>> prot);
+>>>       /* Transaction isn't exec if STS_DEV_ERR bit set */
+>>>       if ((s->smb_stat & STS_DEV_ERR) != 0)  {
+>>> @@ -137,13 +134,6 @@ error:
+>>>     }
+>>>   -static void smb_transaction_start(PMSMBus *s)
+>>> -{
+>>> -    /* Do not execute immediately the command ; it will be
+>>> -     * executed when guest will read SMB_STAT register */
+>>> -    s->smb_stat |= STS_HOST_BUSY;
+>>> -}
+>>> -
+>>>   static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t 
+>>> val,
+>>>                                 unsigned width)
+>>>   {
+>>> @@ -159,7 +149,7 @@ static void smb_ioport_writeb(void *opaque, 
+>>> hwaddr addr, uint64_t val,
+>>>       case SMBHSTCNT:
+>>>           s->smb_ctl = val;
+>>>           if (val & 0x40)
+>>> -            smb_transaction_start(s);
+>>> +            smb_transaction(s);
+>>>           break;
+>>>       case SMBHSTCMD:
+>>>           s->smb_cmd = val;
+>>> @@ -191,10 +181,6 @@ static uint64_t smb_ioport_readb(void *opaque, 
+>>> hwaddr addr, unsigned width)
+>>>       switch(addr) {
+>>>       case SMBHSTSTS:
+>>>           val = s->smb_stat;
+>>> -        if (s->smb_stat & STS_HOST_BUSY) {
+>>> -            /* execute command now */
+>>> -            smb_transaction(s);
+>>> -        }
+>>>           break;
+>>>       case SMBHSTCNT:
+>>>           s->smb_index = 0;
+>>> -- 
+>>> 2.7.4
+>
+>
