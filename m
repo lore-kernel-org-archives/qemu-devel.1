@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecOFu-0003Pf-DX
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:26:24 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ecOLW-0004zi-Gd
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecOFs-0004JW-Nk
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:26:18 -0500
-Date: Fri, 19 Jan 2018 15:22:37 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180119042237.GF30352@umbus.fritz.box>
-References: <20180118145403.6527-1-clg@kaod.org>
+	(envelope-from <aik@ozlabs.ru>) id 1ecOLT-0006Uw-AJ
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:32:06 -0500
+Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:36493)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ecOLS-0006UO-Vi
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:32:03 -0500
+Received: by mail-pf0-x236.google.com with SMTP id 23so493377pfp.3
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 20:32:02 -0800 (PST)
+References: <20171215062914.27927-1-aik@ozlabs.ru>
+	<3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
+	<20180105082916.480132af@t450s.home>
+	<51ac953b-da09-94ed-41a4-ae75ca045c5e@ozlabs.ru>
+	<20180118145920.2dd19c9a@w520.home>
+	<c97a4741-dac0-5186-91e9-3dd0b1e4bf1e@ozlabs.ru>
+	<20180118202541.6b40f2a8@w520.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <16d43036-05a7-34f0-727a-9e770111c84d@ozlabs.ru>
+Date: Fri, 19 Jan 2018 15:31:56 +1100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hjFmXiTvfEJBEd4m"
-Content-Disposition: inline
-In-Reply-To: <20180118145403.6527-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: add support for hypervisor
- doorbells on book3s CPUs
+In-Reply-To: <20180118202541.6b40f2a8@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,265 +36,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+
+On 19/01/18 14:25, Alex Williamson wrote:
+> On Fri, 19 Jan 2018 13:41:41 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> On 19/01/18 08:59, Alex Williamson wrote:
+>>> On Tue, 16 Jan 2018 16:17:58 +1100
+>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>   
+>>>> On 06/01/18 02:29, Alex Williamson wrote:  
+>>>>> On Fri, 5 Jan 2018 10:48:07 +0100
+>>>>> Auger Eric <eric.auger@redhat.com> wrote:
+>>>>>     
+>>>>>> Hi Alexey,
+>>>>>>
+>>>>>> On 15/12/17 07:29, Alexey Kardashevskiy wrote:    
+>>>>>>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+>>>>>>> which tells that a region with MSIX data can be mapped entirely, i.e.
+>>>>>>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+>>>>>>>
+>>>>>>> With this change, all BARs are mapped in a single chunk and MSIX vectors
+>>>>>>> are emulated on top unless the machine requests not to by defining and
+>>>>>>> enabling a new "vfio-no-msix-emulation" property. At the moment only
+>>>>>>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
+>>>>>>> enabling it as it does not define the "set" callback for the new property;
+>>>>>>> the new property also does not appear in "-machine pseries,help".
+>>>>>>>
+>>>>>>> If the new capability is present, this puts MSIX IO memory region under
+>>>>>>> mapped memory region. If the capability is not there, it falls back to
+>>>>>>> the old behaviour with the sparse capability.
+>>>>>>>
+>>>>>>> In MSIX vectors section is not aligned to the page size, the KVM memory
+>>>>>>> listener does not register it with the KVM as a memory slot and MSIX is
+>>>>>>> emulated by QEMU as before.
+>>>>>>>
+>>>>>>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+>>>>>>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
+>>>>>>>
+>>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>>>>> ---
+>>>>>>>
+>>>>>>> This is mtree and flatview BEFORE this patch:
+>>>>>>>
+>>>>>>> "info mtree":
+>>>>>>> memory-region: pci@800000020000000.mmio
+>>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+>>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+>>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>> "info mtree -f":
+>>>>>>> FlatView #0
+>>>>>>>  AS "memory", root: system
+>>>>>>>  AS "cpu-memory", root: system
+>>>>>>>  Root memory region: system
+>>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>>>>   0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>   000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
+>>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>> This is AFTER this patch applied:
+>>>>>>>
+>>>>>>> "info mtree":
+>>>>>>> memory-region: pci@800000020000000.mmio
+>>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
+>>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+>>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+>>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>>
+>>>>>>> "info mtree -f":
+>>>>>>> FlatView #2
+>>>>>>>  AS "memory", root: system
+>>>>>>>  AS "cpu-memory", root: system
+>>>>>>>  Root memory region: system
+>>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>>>>   0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>> This is AFTER this patch applied AND spapr_get_msix_emulation() patched
+>>>>>>> to enable emulation:
+>>>>>>>
+>>>>>>> "info mtree":
+>>>>>>> memory-region: pci@800000020000000.mmio
+>>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+>>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+>>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+>>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>>
+>>>>>>> "info mtree -f":
+>>>>>>> FlatView #1
+>>>>>>>  AS "memory", root: system
+>>>>>>>  AS "cpu-memory", root: system
+>>>>>>>  Root memory region: system
+>>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>>>>   0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+>>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>>>>   000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
+>>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>>>> ---
+>>>>>>>  include/hw/vfio/vfio-common.h |  1 +
+>>>>>>>  linux-headers/linux/vfio.h    |  5 +++++
+>>>>>>>  hw/ppc/spapr.c                |  8 ++++++++
+>>>>>>>  hw/vfio/common.c              | 15 +++++++++++++++
+>>>>>>>  hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
+>>>>>>>  5 files changed, 50 insertions(+), 2 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+>>>>>>> index f3a2ac9..927d600 100644
+>>>>>>> --- a/include/hw/vfio/vfio-common.h
+>>>>>>> +++ b/include/hw/vfio/vfio-common.h
+>>>>>>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+>>>>>>>                           struct vfio_region_info **info);
+>>>>>>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>>>>>>                               uint32_t subtype, struct vfio_region_info **info);
+>>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+>>>>>>>  #endif
+>>>>>>>  extern const MemoryListener vfio_prereg_listener;
+>>>>>>>  
+>>>>>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>>>>>>> index 4312e96..b45182e 100644
+>>>>>>> --- a/linux-headers/linux/vfio.h
+>>>>>>> +++ b/linux-headers/linux/vfio.h
+>>>>>>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+>>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>>>>>>>  
+>>>>>>> +/*
+>>>>>>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+>>>>>>> + */
+>>>>>>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+>>>>>>> +
+>>>>>>>  /**
+>>>>>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+>>>>>>>   *				    struct vfio_irq_info)
+>>>>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>>>>> index 9de63f0..693394a 100644
+>>>>>>> --- a/hw/ppc/spapr.c
+>>>>>>> +++ b/hw/ppc/spapr.c
+>>>>>>> @@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+>>>>>>>      spapr->use_hotplug_event_source = value;
+>>>>>>>  }
+>>>>>>>  
+>>>>>>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
+>>>>>>> +{
+>>>>>>> +    return true;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+>>>>>>>  {
+>>>>>>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+>>>>>>> @@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
+>>>>>>>      object_property_set_description(obj, "vsmt",
+>>>>>>>                                      "Virtual SMT: KVM behaves as if this were"
+>>>>>>>                                      " the host's SMT mode", &error_abort);
+>>>>>>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
+>>>>>>> +                             spapr_get_msix_emulation, NULL, NULL);
+>>>>>>>  }
+>>>>>>>  
+>>>>>>>  static void spapr_machine_finalizefn(Object *obj)
+>>>>>>> @@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
+>>>>>>>  /*
+>>>>>>>   * pseries-2.11
+>>>>>>>   */
+>>>>>>> +
+>>>>>>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
+>>>>>>>  {
+>>>>>>>  }
+>>>>>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>>>>>>> index 1fb8a8e..da5f182 100644
+>>>>>>> --- a/hw/vfio/common.c
+>>>>>>> +++ b/hw/vfio/common.c
+>>>>>>> @@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>>>>>>      return -ENODEV;
+>>>>>>>  }
+>>>>>>>  
+>>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
+>>>>>>> +{
+>>>>>>> +    struct vfio_region_info *info = NULL;
+>>>>>>> +    bool ret = false;
+>>>>>>> +
+>>>>>>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
+>>>>>>> +        if (vfio_get_region_info_cap(info, cap_type)) {
+>>>>>>> +            ret = true;
+>>>>>>> +        }
+>>>>>>> +        g_free(info);
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>> +    return ret;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>  /*
+>>>>>>>   * Interfaces for IBM EEH (Enhanced Error Handling)
+>>>>>>>   */
+>>>>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>>>>>> index c977ee3..27a3706 100644
+>>>>>>> --- a/hw/vfio/pci.c
+>>>>>>> +++ b/hw/vfio/pci.c
+>>>>>>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+>>>>>>>      off_t start, end;
+>>>>>>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+>>>>>>>  
+>>>>>>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
+>>>>>>> +                            vdev->msix->table_bar)) {
+>>>>>>> +        return;
+>>>>>>> +    }      
+>>>>>>
+>>>>>> I am testing this patch on ARM with a Mellanox CX-4 card. Single bar0 +
+>>>>>> msix table at 0x2000, using 64kB pages.
+>>>>>>
+>>>>>> 0000000000000000-0000000001ffffff (prio 1, i/o): 0000:01:00.0 BAR 0
+>>>>>>  0000000000000000-0000000001ffffff (prio 0, ramd): 0000:01:00.0 BAR 0
+>>>>>> mmaps[0]
+>>>>>>   0000000000002000-00000000000023ff (prio 0, i/o): msix-table
+>>>>>>   0000000000003000-0000000000003007 (prio 0, i/o): msix-pba [disabled]
+>>>>>>
+>>>>>>
+>>>>>> My kernel includes your "vfio-pci: Allow mapping MSIX BAR" so we bypass
+>>>>>> vfio_pci_fixup_msix_region. But as the mmaps[0] is not fixed up the
+>>>>>> vfio_listener_region_add_ram gets called on the first 8kB which cannot
+>>>>>> be mapped with 64kB page, leading to a qemu abort.
+>>>>>>
+>>>>>> 29520@1515145231.232161:vfio_listener_region_add_ram region_add [ram]
+>>>>>> 0x8000000000 - 0x8000001fff [0xffffa8820000]
+>>>>>> qemu-system-aarch64: VFIO_MAP_DMA: -22
+>>>>>> qemu-system-aarch64: vfio_dma_map(0x1e265f60, 0x8000000000, 0x2000,
+>>>>>> 0xffffa8820000) = -22 (Invalid argument)
+>>>>>> qemu: hardware error: vfio: DMA mapping failed, unable to continue
+>>>>>>
+>>>>>> In my case don't we still need the fixup logic?    
+>>>>>
+>>>>> Ah, I didn't realize you had Alexey's QEMU patch when you asked about
+>>>>> this.  I'd say no, the fixup shouldn't be needed, but apparently we
+>>>>> can't remove it until we figure out this bug and who should be filtering
+>>>>> out sub-page size listener events.  Thanks,    
+>>>>
+>>>>
+>>>> This should do it:
+>>>>
+>>>> @@ -303,11 +303,19 @@ static bool
+>>>> vfio_listener_skipped_section(MemoryRegionSection *section)
+>>>>              * Sizing an enabled 64-bit BAR can cause spurious mappings to
+>>>>              * addresses in the upper part of the 64-bit address space.  These
+>>>>              * are never accessed by the CPU and beyond the address width of
+>>>>              * some IOMMU hardware.  TODO: VFIO should tell us the IOMMU width.
+>>>>              */
+>>>> -           section->offset_within_address_space & (1ULL << 63);
+>>>> +           section->offset_within_address_space & (1ULL << 63) ||
+>>>> +           /*
+>>>> +            * Non-system-page aligned RAM regions have no chance to be
+>>>> +            * DMA mapped so skip them too.
+>>>> +            */
+>>>> +           (memory_region_is_ram(section->mr) &&
+>>>> +            ((section->offset_within_region & qemu_real_host_page_mask) ||
+>>>> +             (int128_getlo(section->size) & qemu_real_host_page_mask))
+>>>> +           );
+>>>>  }
+>>>>
+>>>>
+>>>> Do we VFIO DMA map on every RAM MR just because it is not necessary to have
+>>>> more complicated logic to detect whether it is MMIO? Or there is something
+>>>> bigger?  
+>>>
+>>> Both, a) it's not clear how we determine a MR is MMIO vs RAM, thus the
+>>> silly address hack above to try to exclude PCI BARs as they're being
+>>> resized, and b) there is some value to enabling peer-to-peer mappings
+>>> between devices.  Is there a better, more generic solution to a) now?  
+>>
+>> "now?" what? :)
+> 
+> Now - adverb, at the present time or moment.  For example, vs in the
+> past.
+
+Ah, read incorrectly, I thought the sentence should have a) and b) and b)
+was missing by a mistake. A heatwave here today.
+
+> 
+>>> If we know a MR is MMIO, then I think we can handle any associated
+>>> mapping failure as non-fatal.   
+>>
+>>
+>> mr->ram_device sound like an appropriate flag to check.
+> 
+> Yeah, I suppose we could, and that didn't exist when we added the
+> bit 63 hack.
+
+Ok, I'll make a patch for this then.
 
 
---hjFmXiTvfEJBEd4m
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>>> It's nice to enable p2p, but it's barely
+>>> used and not clear that it works reliably (sometimes even on bare
+>>> metal).Nit, we don't yet have the IOVA range of the IOMMU exposed,
+>>> thus the silly address hack, but we do have supported page sizes, so we
+>>> should probably be referencing that rather than host page size.  
+>>
+>> Ah, correct,
+>> s/qemu_real_host_page_mask/memory_region_iommu_get_min_page_size()/
+> 
+> No, that would be the emulated iommu page size, which may or may not
+> (hopefully does) match the physical iommu page size.  The vfio iommu
+> page sizes are exposed via VFIO_IOMMU_GET_INFO, at least for type1.
 
-On Thu, Jan 18, 2018 at 03:54:03PM +0100, C=E9dric Le Goater wrote:
-> The hypervisor doorbells are used by skiboot and Linux on POWER9
-> processors to wake up secondaries.
->=20
-> This adds processor control support to the Server architecture by
-> reusing the Embedded support. They are very similar, only the bits
-> definition of the CPU identifier differ.
->=20
-> Still to be done is message broadcast to all threads of the same
-> processor.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+Correct.
 
-Applied to ppc-for-2.12, thanks.
 
-> ---
->=20
->  Changes since v2:
->=20
->  - introduced specific msgclr/snd helpers for book3s=20
->=20
->  target/ppc/cpu.h            |  8 +++++--
->  target/ppc/excp_helper.c    | 52 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  target/ppc/helper.h         |  2 ++
->  target/ppc/translate.c      | 25 ++++++++++++++++++++--
->  target/ppc/translate_init.c |  2 +-
->  5 files changed, 84 insertions(+), 5 deletions(-)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index b8f4dfc1084a..603a38cae83f 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -930,7 +930,7 @@ enum {
->  #define BOOKE206_MAX_TLBN      4
-> =20
->  /***********************************************************************=
-******/
-> -/* Embedded.Processor Control */
-> +/* Server and Embedded Processor Control */
-> =20
->  #define DBELL_TYPE_SHIFT               27
->  #define DBELL_TYPE_MASK                (0x1f << DBELL_TYPE_SHIFT)
-> @@ -940,11 +940,15 @@ enum {
->  #define DBELL_TYPE_G_DBELL_CRIT        (0x03 << DBELL_TYPE_SHIFT)
->  #define DBELL_TYPE_G_DBELL_MC          (0x04 << DBELL_TYPE_SHIFT)
-> =20
-> -#define DBELL_BRDCAST                  (1 << 26)
-> +#define DBELL_TYPE_DBELL_SERVER        (0x05 << DBELL_TYPE_SHIFT)
-> +
-> +#define DBELL_BRDCAST                  PPC_BIT(37)
->  #define DBELL_LPIDTAG_SHIFT            14
->  #define DBELL_LPIDTAG_MASK             (0xfff << DBELL_LPIDTAG_SHIFT)
->  #define DBELL_PIRTAG_MASK              0x3fff
-> =20
-> +#define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
-> +
->  /***********************************************************************=
-******/
->  /* Segment page size information, used by recent hash MMUs
->   * The format of this structure mirrors kvm_ppc_smmu_info
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 4e548a448747..c092fbead036 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -417,6 +417,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
->      case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage excep=
-tion */
->      case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception   =
-     */
->      case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
-tion */
-> +    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
-     */
->      case POWERPC_EXCP_HV_EMU:
->          srr0 =3D SPR_HSRR0;
->          srr1 =3D SPR_HSRR1;
-> @@ -846,6 +847,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
->              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
->              return;
->          }
-> +        if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL)) {
-> +            env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDOORBELL);
-> +            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR_HV);
-> +            return;
-> +        }
->          if (env->pending_interrupts & (1 << PPC_INTERRUPT_PERFM)) {
->              env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_PERFM);
->              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_PERFM);
-> @@ -1145,4 +1151,50 @@ void helper_msgsnd(target_ulong rb)
->      }
->      qemu_mutex_unlock_iothread();
->  }
-> +
-> +/* Server Processor Control */
-> +static int book3s_dbell2irq(target_ulong rb)
-> +{
-> +    int msg =3D rb & DBELL_TYPE_MASK;
-> +
-> +    /* A Directed Hypervisor Doorbell message is sent only if the
-> +     * message type is 5. All other types are reserved and the
-> +     * instruction is a no-op */
-> +    return msg =3D=3D DBELL_TYPE_DBELL_SERVER ? PPC_INTERRUPT_HDOORBELL =
-: -1;
-> +}
-> +
-> +void helper_book3s_msgclr(CPUPPCState *env, target_ulong rb)
-> +{
-> +    int irq =3D book3s_dbell2irq(rb);
-> +
-> +    if (irq < 0) {
-> +        return;
-> +    }
-> +
-> +    env->pending_interrupts &=3D ~(1 << irq);
-> +}
-> +
-> +void helper_book3s_msgsnd(target_ulong rb)
-> +{
-> +    int irq =3D book3s_dbell2irq(rb);
-> +    int pir =3D rb & DBELL_PROCIDTAG_MASK;
-> +    CPUState *cs;
-> +
-> +    if (irq < 0) {
-> +        return;
-> +    }
-> +
-> +    qemu_mutex_lock_iothread();
-> +    CPU_FOREACH(cs) {
-> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> +        CPUPPCState *cenv =3D &cpu->env;
-> +
-> +        /* TODO: broadcast message to all threads of the same  processor=
- */
-> +        if (cenv->spr_cb[SPR_PIR].default_value =3D=3D pir) {
-> +            cenv->pending_interrupts |=3D 1 << irq;
-> +            cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-> +        }
-> +    }
-> +    qemu_mutex_unlock_iothread();
-> +}
->  #endif
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index bb6a94a8b390..5b739179b8b5 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -679,6 +679,8 @@ DEF_HELPER_FLAGS_3(store_sr, TCG_CALL_NO_RWG, void, e=
-nv, tl, tl)
->  DEF_HELPER_FLAGS_1(602_mfrom, TCG_CALL_NO_RWG_SE, tl, tl)
->  DEF_HELPER_1(msgsnd, void, tl)
->  DEF_HELPER_2(msgclr, void, env, tl)
-> +DEF_HELPER_1(book3s_msgsnd, void, tl)
-> +DEF_HELPER_2(book3s_msgclr, void, env, tl)
->  #endif
-> =20
->  DEF_HELPER_4(dlmzb, tl, env, tl, tl, i32)
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 396f422cf407..4325aa90a6fa 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6175,7 +6175,12 @@ static void gen_msgclr(DisasContext *ctx)
->      GEN_PRIV;
->  #else
->      CHK_HV;
-> -    gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-> +    /* 64-bit server processors compliant with arch 2.x */
-> +    if (ctx->insns_flags & PPC_SEGMENT_64B) {
-> +        gen_helper_book3s_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-> +    } else {
-> +        gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-> +    }
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
-> =20
-> @@ -6185,10 +6190,24 @@ static void gen_msgsnd(DisasContext *ctx)
->      GEN_PRIV;
->  #else
->      CHK_HV;
-> -    gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-> +    /* 64-bit server processors compliant with arch 2.x */
-> +    if (ctx->insns_flags & PPC_SEGMENT_64B) {
-> +        gen_helper_book3s_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-> +    } else {
-> +        gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-> +    }
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
-> =20
-> +static void gen_msgsync(DisasContext *ctx)
-> +{
-> +#if defined(CONFIG_USER_ONLY)
-> +    GEN_PRIV;
-> +#else
-> +    CHK_HV;
-> +#endif /* defined(CONFIG_USER_ONLY) */
-> +    /* interpreted as no-op */
-> +}
-> =20
->  #if defined(TARGET_PPC64)
->  static void gen_maddld(DisasContext *ctx)
-> @@ -6669,6 +6688,8 @@ GEN_HANDLER2_E(msgsnd, "msgsnd", 0x1F, 0x0E, 0x06, =
-0x03ff0001,
->                 PPC_NONE, PPC2_PRCNTL),
->  GEN_HANDLER2_E(msgclr, "msgclr", 0x1F, 0x0E, 0x07, 0x03ff0001,
->                 PPC_NONE, PPC2_PRCNTL),
-> +GEN_HANDLER2_E(msgsync, "msgsync", 0x1F, 0x16, 0x1B, 0x00000000,
-> +               PPC_NONE, PPC2_PRCNTL),
->  GEN_HANDLER(wrtee, 0x1F, 0x03, 0x04, 0x000FFC01, PPC_WRTEE),
->  GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
->  GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index ab70b3a25c1d..87a23f0f6265 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8866,7 +8866,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->                          PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
->                          PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
->                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-> -                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300;
-> +                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_PR=
-CNTL;
->      pcc->msr_mask =3D (1ull << MSR_SF) |
->                      (1ull << MSR_TM) |
->                      (1ull << MSR_VR) |
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---hjFmXiTvfEJBEd4m
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphco0ACgkQbDjKyiDZ
-s5I04xAA19vEydImWVRQYFXKqGspj2fI53VFLwmJJYp295/Z33HGeRGeGAaT8AsW
-CMAGwhzgvRGTgoit7GJ8N3E3QK5DdZXngOwTKb4pGuzC1fnp0E6T2mAZ0WOVgkAl
-ZtTGVQs7doUnkfPMMDYzjsTM+dCq5Y3TrFOWuyrxD2q0gCfW0m6V7Fdx8xqBz/dR
-5QIQLkFu14+tw8nmx54UZTBBJkgthBavapK/QryzziCaZO/m9SXF07ObTVZYvD6A
-CfFNyZVWKyh/NeyQjS3bnA3NlZvRFsJtlTSGV3fO6BhLXOEdl7tt8Jvsf/0+Js/o
-8tFb/9qDTP87JxQPUZ1VjyTJSuszFschNO+zKUcwob+nTU3lZObjDHudgOkiU0zA
-HyYF31t4c/lAW+Jg/KmS64o19gUYyMw0sdfsoVgB8zxYBLbXMZFl8ilOwZFQ+bwN
-hAuLmnFQDQw+KzQkK12SSEZPaLpf1BoaOUkM4YkTvuHF1sUEswl2wsxPXmWy32+J
-OvPZOz00PWyCyEPYMut4+N/xqoJU5KxyhaGXWx8GL8BkjWPs5bxSO1WOMzh32PqR
-c41jRMXQ7OSaXrOP5XJftHPZ235z3VkKmgD9tB8seNi+SX5XyDVxy9U7ZjHyQHhf
-bj4wBQHNSaOnnzmu5fuWwLkOrqAJw0Hr2Z7N5eA5eyJzAz7vDVE=
-=xeZY
------END PGP SIGNATURE-----
-
---hjFmXiTvfEJBEd4m--
+-- 
+Alexey
