@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSHQ-0001Jc-Ff
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:44:09 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSHd-0001TP-D0
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:44:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSHP-0005Pn-BW
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:44:08 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:53694)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSHc-0005as-Jl
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:44:21 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:53734)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSHO-0005PM-UG
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:44:07 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSHc-0005ab-BV
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:44:20 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Fri, 19 Jan 2018 11:44:09 +0300
-Message-ID: <20180119084409.7100.23132.stgit@pasha-VirtualBox>
+Date: Fri, 19 Jan 2018 11:44:23 +0300
+Message-ID: <20180119084423.7100.17994.stgit@pasha-VirtualBox>
 In-Reply-To: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
 References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v4 12/23] cpus: push BQL lock to
- qemu_*_wait_io_event
+Subject: [Qemu-devel] [RFC PATCH v4 14/23] replay/replay.c: bump
+ REPLAY_VERSION again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,193 +32,43 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@
 
 From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-We only really need to grab the lock for initial setup (so we don't
-race with the thread-spawning thread). After that we can drop the lock
-for the whole main loop and only grab it for waiting for IO events.
-
-There is a slight wrinkle for the round-robin TCG thread as we also
-expire timers which needs to be done under BQL as they are in the
-main-loop.
-
-This is stage one of reducing the lock impact as we can drop the
-requirement of implicit BQL for async work and only grab the lock when
-we need to sleep on the cpu->halt_cond.
+This time commit 802f045a5f61b781df55e4492d896b4d20503ba7 broke the
+replay file format. Also add a comment about this to
+replay-internal.h.
 
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c   |    4 ----
- cpus.c                |   22 +++++++++++++++-------
- dtc                   |    2 +-
- target/i386/hax-all.c |    2 --
- 4 files changed, 16 insertions(+), 14 deletions(-)
+ replay/replay-internal.h |    2 +-
+ replay/replay.c          |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f290f48..8d1d2c4 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1857,9 +1857,7 @@ int kvm_cpu_exec(CPUState *cpu)
-         return EXCP_HLT;
-     }
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index be96d7e..8e4c701 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -12,7 +12,7 @@
+  *
+  */
 =20
--    qemu_mutex_unlock_iothread();
-     cpu_exec_start(cpu);
 -
-     do {
-         MemTxAttrs attrs;
++/* Any changes to order/number of events will need to bump REPLAY_VERSIO=
+N */
+ enum ReplayEvents {
+     /* for instruction event */
+     EVENT_INSTRUCTION,
+diff --git a/replay/replay.c b/replay/replay.c
+index ff58a5a..4f24498 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -22,7 +22,7 @@
 =20
-@@ -1989,8 +1987,6 @@ int kvm_cpu_exec(CPUState *cpu)
-     } while (ret =3D=3D 0);
+ /* Current version of the replay mechanism.
+    Increase it when file format changes. */
+-#define REPLAY_VERSION              0xe02006
++#define REPLAY_VERSION              0xe02007
+ /* Size of replay log header */
+ #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t)=
+)
 =20
-     cpu_exec_end(cpu);
--    qemu_mutex_lock_iothread();
--
-     if (ret < 0) {
-         cpu_dump_state(cpu, stderr, fprintf, CPU_DUMP_CODE);
-         vm_stop(RUN_STATE_INTERNAL_ERROR);
-diff --git a/cpus.c b/cpus.c
-index 7b6ce74..ca86d9f 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1150,10 +1150,14 @@ static void qemu_tcg_rr_wait_io_event(CPUState *c=
-pu)
-     start_tcg_kick_timer();
-=20
-     qemu_wait_io_event_common(cpu);
-+
-+    qemu_mutex_unlock_iothread();
- }
-=20
- static void qemu_wait_io_event(CPUState *cpu)
- {
-+    qemu_mutex_lock_iothread();
-+
-     while (cpu_thread_is_idle(cpu)) {
-         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-     }
-@@ -1190,6 +1194,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
-=20
-     /* signal CPU creation */
-     cpu->created =3D true;
-+    qemu_mutex_unlock_iothread();
-+
-     qemu_cond_signal(&qemu_cpu_cond);
-=20
-     do {
-@@ -1232,10 +1238,10 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
-=20
-     /* signal CPU creation */
-     cpu->created =3D true;
-+    qemu_mutex_unlock_iothread();
-     qemu_cond_signal(&qemu_cpu_cond);
-=20
-     while (1) {
--        qemu_mutex_unlock_iothread();
-         do {
-             int sig;
-             r =3D sigwait(&waitset, &sig);
-@@ -1246,6 +1252,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
-         }
-         qemu_mutex_lock_iothread();
-         qemu_wait_io_event(cpu);
-+        qemu_mutex_unlock_iothread();
-     }
-=20
-     return NULL;
-@@ -1334,11 +1341,9 @@ static int tcg_cpu_exec(CPUState *cpu)
- #ifdef CONFIG_PROFILER
-     ti =3D profile_getclock();
- #endif
--    qemu_mutex_unlock_iothread();
-     cpu_exec_start(cpu);
-     ret =3D cpu_exec(cpu);
-     cpu_exec_end(cpu);
--    qemu_mutex_lock_iothread();
- #ifdef CONFIG_PROFILER
-     tcg_time +=3D profile_getclock() - ti;
- #endif
-@@ -1398,6 +1403,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-             qemu_wait_io_event_common(cpu);
-         }
-     }
-+    qemu_mutex_unlock_iothread();
-=20
-     start_tcg_kick_timer();
-=20
-@@ -1407,6 +1413,8 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-     cpu->exit_request =3D 1;
-=20
-     while (1) {
-+        qemu_mutex_lock_iothread();
-+
-         /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
-         qemu_account_warp_timer();
-=20
-@@ -1415,6 +1423,8 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-          */
-         handle_icount_deadline();
-=20
-+        qemu_mutex_unlock_iothread();
-+
-         if (!cpu) {
-             cpu =3D first_cpu;
-         }
-@@ -1440,9 +1450,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-                     cpu_handle_guest_debug(cpu);
-                     break;
-                 } else if (r =3D=3D EXCP_ATOMIC) {
--                    qemu_mutex_unlock_iothread();
-                     cpu_exec_step_atomic(cpu);
--                    qemu_mutex_lock_iothread();
-                     break;
-                 }
-             } else if (cpu->stop) {
-@@ -1483,6 +1491,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
-     current_cpu =3D cpu;
-=20
-     hax_init_vcpu(cpu);
-+    qemu_mutex_unlock_iothread();
-     qemu_cond_signal(&qemu_cpu_cond);
-=20
-     while (1) {
-@@ -1569,6 +1578,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-     cpu->created =3D true;
-     cpu->can_do_io =3D 1;
-     current_cpu =3D cpu;
-+    qemu_mutex_unlock_iothread();
-     qemu_cond_signal(&qemu_cpu_cond);
-=20
-     /* process any pending work */
-@@ -1593,9 +1603,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                 g_assert(cpu->halted);
-                 break;
-             case EXCP_ATOMIC:
--                qemu_mutex_unlock_iothread();
-                 cpu_exec_step_atomic(cpu);
--                qemu_mutex_lock_iothread();
-             default:
-                 /* Ignore everything else? */
-                 break;
-diff --git a/dtc b/dtc
-index e543880..558cd81 160000
---- a/dtc
-+++ b/dtc
-@@ -1 +1 @@
--Subproject commit e54388015af1fb4bf04d0bca99caba1074d9cc42
-+Subproject commit 558cd81bdd432769b59bff01240c44f82cfb1a9d
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 934ec4a..54b1fc7 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -513,11 +513,9 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-=20
-         hax_vcpu_interrupt(env);
-=20
--        qemu_mutex_unlock_iothread();
-         cpu_exec_start(cpu);
-         hax_ret =3D hax_vcpu_run(vcpu);
-         cpu_exec_end(cpu);
--        qemu_mutex_lock_iothread();
-=20
-         /* Simply continue the vcpu_run if system call interrupted */
-         if (hax_ret =3D=3D -EINTR || hax_ret =3D=3D -EAGAIN) {
