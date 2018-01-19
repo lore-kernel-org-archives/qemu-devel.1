@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecUxd-0002TY-P3
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:35:54 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ecV2p-0004Hp-Rs
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:41:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecUxY-0000MO-Pq
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:35:53 -0500
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:34182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecUxY-0000Lz-Jz
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:35:48 -0500
-Received: by mail-wr0-f194.google.com with SMTP id 36so1308854wrh.1
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 03:35:48 -0800 (PST)
-References: <20170709170614.24967-1-peter.maydell@linaro.org>
-	<20170728125446.GE3983@localhost.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1ecV2k-0003Ex-Ub
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:41:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecV2k-0003EX-OH
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:41:10 -0500
+References: <20180119084219.31187-1-peterx@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3f6911ff-bc2e-d32d-6516-ec737ebf4703@redhat.com>
-Date: Fri, 19 Jan 2018 12:35:43 +0100
+Message-ID: <b84e60fb-a527-204b-f355-b051e30d519f@redhat.com>
+Date: Fri, 19 Jan 2018 12:41:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170728125446.GE3983@localhost.localdomain>
+In-Reply-To: <20180119084219.31187-1-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/vmdk: Report failures
- in vmdk_read_cid()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/2] memory/vfio: notify region_del() when
+ unregister listeners
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, patches@linaro.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>
 
-On 28/07/2017 14:54, Kevin Wolf wrote:
-> Am 09.07.2017 um 19:06 hat Peter Maydell geschrieben:
->> The function vmdk_read_cid() can fail if the read on the underlying
->> block device fails, or if there's a format error in the VMDK file.
->> However its API doesn't provide a mechanism to report these errors,
->> and in some cases we were returning a CID of 0 and in some cases a
->> CID of 0xffffffff, either of which might potentially be valid values.
->>
->> Change the function to return 0 on success or a negative errno, and
->> return the CID via a uint32_t* argument. Update the callsites to
->> handle and propagate the error appropriately.
->>
->> This fixes in passing a Coverity-spotted issue (CID 1350038) where
->> we weren't checking the return value from sscanf().
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> Fam, this is the commit that introduced the qemu-iotests 059 failure for
-> vmdk. I think what's happening is that we use an image produced by a
-> fuzzer, and with the additional checks introduced in this patch, we now
-> fail earlier and don't test the condition any more that we wanted to
-> test.
-> 
-> So do we need a new version of sample_images/afl9.vmdk.bz2 that has a
-> valid CID?
+On 19/01/2018 09:42, Peter Xu wrote:
+> I encountered an event loss problem during unplugging vfio devices:
+>=20
+>   https://bugzilla.redhat.com/show_bug.cgi?id=3D1531393
+>=20
+> I thought it should be a simple VT-d issue but I was wrong.  The whole
+> debugging leads me to these patches.
+>=20
+> Basically I think what we missed is that when unregistering memory
+> listeners, we don't really call region_del() at all.  Instead we just
+> remove ourselves from the listener list.  IMHO that's not enough.  A
+> clean unregister should undo all possible changes that have done
+> during region_add().  That's patch 1.
+>=20
+> Patch 2 fixes a vfio issue when patch 1 is applied.
 
-This has never been fixed, has it?  I still see the failure.
+It makes sense, though of course patch 1 must come second for
+bisectability.  Of the other listeners, most do not implement
+region_del, but commit must be audited as well.  What matters is whether
+the listener is unregistered, and only few are:
+
+- kvm_arm_machine_init_done must unregister the listener after the
+QSLIST_FOREACH_SAFE loop.
+
+- Xen seems okay
+
+- vhost needs to remove the memory_region_unref loop after unregistering
+the listener - and this must be done at the same time as patch 1, not bef=
+ore
+
+- virtio seems okay
+
+Thanks,
 
 Paolo
