@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecYbc-0003tO-2R
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:29:26 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2f-0002yd-IJ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecYba-00055q-TO
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:29:24 -0500
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:39263)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecYba-00055E-PE
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:29:22 -0500
-Received: by mail-ot0-x230.google.com with SMTP id d9so1693200oth.6
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 07:29:22 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Z4PbC+Ze7uGriu-V+qJcLMVjEjeYJsrMbgemnHAu6bQ@mail.gmail.com>
-References: <20180117144756.31049-1-marcandre.lureau@redhat.com>
-	<595f00e6-d5ad-b7c6-29be-7c6e135f9d12@redhat.com>
-	<CAFEAcA_M7FazuMDpne5Fr=hQUmfp75BHqttYOWV+HJ9zinW6mA@mail.gmail.com>
-	<CAMxuvazG-y3XpE09oBRCJtB1OcNSbOP4heyGXYFHpLMbFj7VnA@mail.gmail.com>
-	<CAFEAcA-Z4PbC+Ze7uGriu-V+qJcLMVjEjeYJsrMbgemnHAu6bQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Jan 2018 15:29:01 +0000
-Message-ID: <CAFEAcA9gv3LsbPkYpqsotZ-7Xigx1obkwMjGxF3ttnxDDK=+KA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Dump patches
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1ecZ2d-0006AK-3w
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:21 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:49819 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1ecZ2c-0005hp-Sy
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:57:19 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Fri, 19 Jan 2018 16:56:28 +0100
+Message-Id: <1516377391-25945-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1516377391-25945-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1516377391-25945-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH 4/7] hw/mips_int: hold BQL for all interrupt
+ requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Goran Ferenc <goran.ferenc@mips.com>, Miodrag Dinic <miodrag.dinic@mips.com>, Petar Jovanovic <petar.jovanovic@mips.com>
 
-On 19 January 2018 at 15:24, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 19 January 2018 at 14:35, Marc-Andre Lureau <mlureau@redhat.com> wrote:
->> I have not found how to translate a python 'buffer' to a bytes string
->> in 2.6.
->
-> A local python expert suggests that "bytes(buffer)" should work.
+From: Miodrag Dinic <miodrag.dinic@mips.com>
 
-...and that it ought to work if handed a memoryview too, so do we
-just want
+Make sure BQL is held for all interrupt requests.
 
-   self.elf.add_vmcoreinfo_note(bytes(vmcoreinfo))
+For MTTCG-enabled configurations, handling soft and hard interrupts
+between vCPUs must be properly locked. By acquiring BQL, make sure
+all paths triggering an IRQ are synchronized.
 
-?
+Signed-off-by: Miodrag Dinic <miodrag.dinic@mips.com>
+Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+---
+ hw/mips/mips_int.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-thanks
--- PMM
+diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+index 48192d2..5ddeb15 100644
+--- a/hw/mips/mips_int.c
++++ b/hw/mips/mips_int.c
+@@ -21,6 +21,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/main-loop.h"
+ #include "hw/hw.h"
+ #include "hw/mips/cpudevs.h"
+ #include "cpu.h"
+@@ -32,10 +33,17 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
+     MIPSCPU *cpu = opaque;
+     CPUMIPSState *env = &cpu->env;
+     CPUState *cs = CPU(cpu);
++    bool locked = false;
+ 
+     if (irq < 0 || irq > 7)
+         return;
+ 
++    /* Make sure locking works even if BQL is already held by the caller */
++    if (!qemu_mutex_iothread_locked()) {
++        locked = true;
++        qemu_mutex_lock_iothread();
++    }
++
+     if (level) {
+         env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
+ 
+@@ -56,6 +64,10 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
+     } else {
+         cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+     }
++
++    if (locked) {
++        qemu_mutex_unlock_iothread();
++    }
+ }
+ 
+ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
+-- 
+2.7.4
