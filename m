@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTA9-0001iy-8q
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:42 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTA9-0001j9-Nu
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTA6-0008UX-4i
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTA8-00005w-Nd
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:41 -0500
-Received: from ozlabs.org ([103.22.144.67]:52049)
+Received: from ozlabs.org ([103.22.144.67]:33343)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTA5-0008TX-9Y
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:38 -0500
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTA8-0008Uy-Cd
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:40 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 19 Jan 2018 20:40:02 +1100
-Message-Id: <20180119094015.28266-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/13] ppc-for-2.12 queue 20180119
+Date: Fri, 19 Jan 2018 20:40:06 +1100
+Message-Id: <20180119094015.28266-5-david@gibson.dropbear.id.au>
+In-Reply-To: <20180119094015.28266-1-david@gibson.dropbear.id.au>
+References: <20180119094015.28266-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 04/13] ppc: Deprecate qemu-system-ppcemb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +24,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit b4d6ed1c5ae519d3efb5297be3ef6625ca2a20=
-f4:
+From: Thomas Huth <thuth@redhat.com>
 
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-17' i=
-nto staging (2018-01-18 15:25:17 +0000)
+qemu-system-ppcemb has been once split of qemu-system-ppc to support
+CPU page sizes < 4096 for some of the embedded 4xx PowerPC CPUs.
+However, there was hardly any OS available in the wild that really
+used such small page sizes (Linux uses 4096 on PPC), so there is
+no known recent use case for this separate build anymore. It's
+rather cumbersome to maintain a separate set of config switches for
+this, and it's wasting compile and test time of all the developers
+who have to build all QEMU targets to verify that their changes did
+not break anything.
 
-are available in the Git repository at:
+Except for the small CPU page sizes, qemu-system-ppc can be used as
+a full replacement for qemu-system-ppcemb since it contains all the
+embedded 4xx PPC boards and CPUs, too. Thus let's start the deprecation
+process for qemu-system-ppcemb to see whether somebody still needs
+the small page sizes or whether we could finally remove this unloved
+separate build.
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180119
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ qemu-doc.texi               | 6 ++++++
+ target/ppc/translate_init.c | 5 +++++
+ 2 files changed, 11 insertions(+)
 
-for you to fetch changes up to 040cb0a2badf9e265cdbb78380048cd1624dd434:
-
-  target/ppc/spapr_caps: Add macro to generate spapr_caps migration vmsta=
-te (2018-01-19 16:06:26 +1100)
-
-----------------------------------------------------------------
-ppc patch queue 2018-01-19
-
-Quite soon after my previous pull request, but it's already
-accumulated a reasonable amount of stuff:
-  * Significant TCG speedup by optimizing cmp generation
-  * Fix a regression caused by recent change to set compat mode on
-    hotplugged cpus
-  * Cleanup of default configs
-  * Some implementation of msgsnd/msgrcv instructions for server chips
-
-----------------------------------------------------------------
-BALATON Zoltan (2):
-      sm501: Add missing break to case
-      sii3112: Add explicit type casts to avoid unintended sign extension
-
-C=C3=A9dric Le Goater (3):
-      target/ppc: fix doorbell and hypervisor doorbell definitions
-      target/ppc: msgsnd and msgclr instructions need hypervisor privileg=
-e
-      target/ppc: add support for hypervisor doorbells on book3s CPUs
-
-Greg Kurz (2):
-      spapr: drop duplicate variable in spapr_core_plug()
-      spapr: fix device tree properties when using compatibility mode
-
-Suraj Jitindar Singh (1):
-      target/ppc/spapr_caps: Add macro to generate spapr_caps migration v=
-mstate
-
-Thomas Huth (4):
-      default-configs/ppc64-softmmu: Include 32-bit configs instead of co=
-pying them
-      default-configs/ppc-softmmu: Restructure the switches according to =
-the machines
-      hw/ppc/Makefile: Add a way to disable the PPC4xx boards
-      ppc: Deprecate qemu-system-ppcemb
-
-pbonzini@redhat.com (1):
-      target-ppc: optimize cmp translation
-
- default-configs/ppc-softmmu.mak   | 59 +++++++++++++++--------------
- default-configs/ppc64-softmmu.mak | 61 ++++--------------------------
- hw/display/sm501.c                |  1 +
- hw/ide/sii3112.c                  | 10 ++---
- hw/ppc/Makefile.objs              |  4 +-
- hw/ppc/spapr.c                    | 22 +++++------
- hw/ppc/spapr_caps.c               | 78 ++++++++++++---------------------=
-------
- hw/ppc/spapr_cpu_core.c           |  7 ++++
- hw/ppc/spapr_rtas.c               |  9 -----
- qemu-doc.texi                     |  6 +++
- target/ppc/cpu.h                  | 16 +++++---
- target/ppc/excp_helper.c          | 52 ++++++++++++++++++++++++++
- target/ppc/helper.h               |  2 +
- target/ppc/translate.c            | 58 ++++++++++++++++++-----------
- target/ppc/translate_init.c       |  7 +++-
- 15 files changed, 202 insertions(+), 190 deletions(-)
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 3e9eb819a6..b13c6332fd 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2766,6 +2766,12 @@ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
+ The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
+ or ``ivshmem-doorbell`` device types.
+ 
++@subsection Page size support < 4k for embedded PowerPC CPUs (since 2.12.0)
++
++qemu-system-ppcemb will be removed. qemu-system-ppc (or qemu-system-ppc64)
++should be used instead. That means that embedded 4xx PowerPC CPUs will not
++support page sizes < 4096 any longer.
++
+ @section System emulator machines
+ 
+ @subsection Xilinx EP108 (since 2.11.0)
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 70ff15a51a..ab70b3a25c 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10634,6 +10634,11 @@ static void ppc_cpu_register_types(void)
+ {
+     type_register_static(&ppc_cpu_type_info);
+     type_register_static(&ppc_vhyp_type_info);
++
++#ifdef TARGET_PPCEMB
++    warn_report("qemu-system-ppcemb is deprecated, "
++                "please use qemu-system-ppc instead.");
++#endif
+ }
+ 
+ type_init(ppc_cpu_register_types)
+-- 
+2.14.3
