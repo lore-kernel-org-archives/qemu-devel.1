@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZd0-0005xj-JQ
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:34:55 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ecZd1-0005yk-J3
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:34:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ecZcz-0006oA-RQ
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:34:54 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 19 Jan 2018 14:33:33 -0200
-Message-Id: <20180119163345.10649-8-ehabkost@redhat.com>
-In-Reply-To: <20180119163345.10649-1-ehabkost@redhat.com>
-References: <20180119163345.10649-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL v2 07/19] hw/arm/virt: Allow only supported
- dynamic sysbus devices
+	(envelope-from <laurent@vivier.eu>) id 1ecZcx-0006mc-II
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:34:55 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:55828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecZcx-0006kr-8A
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:34:51 -0500
+References: <1515286904-86418-1-git-send-email-riemensberger@cadami.net>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a08c0959-bde1-cee7-ccd8-504cd768b6a6@vivier.eu>
+Date: Fri, 19 Jan 2018 17:34:37 +0100
+MIME-Version: 1.0
+In-Reply-To: <1515286904-86418-1-git-send-email-riemensberger@cadami.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user/mmap.c: Avoid choosing NULL
+ as start address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-arm@nongnu.org
+To: Maximilian Riemensberger <riemensberger@cadami.net>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
 
-Replace the TYPE_SYS_BUS_DEVICE entry in the allowed sysbus
-device list with the two device types that are really supported
-by the virt machine: vfio-amd-xgbe and vfio-calxeda-xgmac.
+Le 07/01/2018 à 02:01, Maximilian Riemensberger a écrit :
+> mmap() is required by the linux kernel ABI and POSIX to return a
+> non-NULL address when the implementation chooses a start address for the
+> mapping.
+> 
+> The current implementation of mmap_find_vma_reserved() can return NULL
+> as start address of a mapping which leads to subsequent crashes inside
+> the guests glibc, e.g. output of qemu-arm-static --strace executing a
+> test binary stx_test:
+> 
+>     1879 mmap2(NULL,8388608,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-1,0) = 0x00000000
+>     1879 write(2,0xf6fd39d0,79) stx_test: allocatestack.c:514: allocate_stack: Assertion `mem != NULL' failed.
+> 
+> This patch fixes mmap_find_vma_reserved() by skipping NULL as start
+> address while searching for a suitable mapping start address.
+> 
+> CC: Riku Voipio <riku.voipio@iki.fi>
+> CC: Laurent Vivier <laurent@vivier.eu>
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Maximilian Riemensberger <riemensberger@cadami.net>
+> ---
+> Changes since v1:
+>     - Applied feedback from Laurent Vivier
+> 
+>  linux-user/mmap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+> index 4888f53..0fbfd6d 100644
+> --- a/linux-user/mmap.c
+> +++ b/linux-user/mmap.c
+> @@ -234,7 +234,7 @@ static abi_ulong mmap_find_vma_reserved(abi_ulong start, abi_ulong size)
+>          if (prot) {
+>              end_addr = addr;
+>          }
+> -        if (addr + size == end_addr) {
+> +        if (addr && addr + size == end_addr) {
+>              break;
+>          }
+>          addr -= qemu_host_page_size;
+> 
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20171125151610.20547-3-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/arm/virt.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Applied to my linux-user branch.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 7549895fd2..4a6fdcc4f5 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -34,6 +34,8 @@
- #include "hw/arm/arm.h"
- #include "hw/arm/primecell.h"
- #include "hw/arm/virt.h"
-+#include "hw/vfio/vfio-calxeda-xgmac.h"
-+#include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/devices.h"
- #include "net/net.h"
- #include "sysemu/block-backend.h"
-@@ -1591,8 +1593,8 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-      * configuration of the particular instance.
-      */
-     mc->max_cpus = 255;
--    /*TODO: allow only sysbus devices that really work with this machine */
--    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-     mc->block_default_type = IF_VIRTIO;
-     mc->no_cdrom = 1;
-     mc->pci_allow_0_address = true;
--- 
-2.14.3
+Thanks,
+Laurent
