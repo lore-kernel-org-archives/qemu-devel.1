@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecJiD-0004iw-Om
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:35:14 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ecKEV-0005qH-Rg
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 19:08:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecJiC-0002Cj-CH
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 18:35:13 -0500
-Date: Fri, 19 Jan 2018 10:35:05 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180118233505.GA30352@umbus.fritz.box>
-References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
-	<20180115063235.7518-7-sjitindarsingh@gmail.com>
-	<20180118052029.GR30352@umbus.fritz.box>
-	<0cdab21f-0f70-f705-9ae3-e95eea69f65e@ozlabs.ru>
-	<20180118055348.GU30352@umbus.fritz.box>
-	<3680b2ae-def7-9b00-81d8-eb66ec0bea4e@ozlabs.ru>
-	<650522f0-9667-f6c5-1c45-b54619440b69@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1ecKEU-000653-RV
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 19:08:35 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:46368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ecKEU-00064M-Jc
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 19:08:34 -0500
+Received: by mail-lf0-x243.google.com with SMTP id q194so17408620lfe.13
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 16:08:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5LK7OEqpP/xdrAG9"
-Content-Disposition: inline
-In-Reply-To: <650522f0-9667-f6c5-1c45-b54619440b69@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 6/6]
- target/ppc/spapr: Add H-Call H_GET_CPU_CHARACTERISTICS
+Sender: alistair23@gmail.com
+In-Reply-To: <CAKmqyKPUWb7cKDjB+=ByK2fCNBYm-GELmET6yksQETU+neFU2w@mail.gmail.com>
+References: <bd66250ff262528199614f778a8323ced130a4db.1516221466.git.alistair.francis@xilinx.com>
+	<c5e23caa-770f-3b3d-14b8-33dba2c82c57@twiddle.net>
+	<CAKmqyKPUWb7cKDjB+=ByK2fCNBYm-GELmET6yksQETU+neFU2w@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 18 Jan 2018 16:08:02 -0800
+Message-ID: <CAKmqyKPbrubJUo0X2cxBYmUQh0G2WeJCu7BKxAFo1nU8rH4R4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] linux-user: Fix webkitgtk hangs on
+ 32-bit x86 target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, riku.voipio@iki.fi
 
+On Wed, Jan 17, 2018 at 9:46 PM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Wed, Jan 17, 2018 at 4:57 PM, Richard Henderson <rth@twiddle.net> wrote:
+>> On 01/17/2018 12:39 PM, Alistair Francis wrote:
+>>> Since commit "linux-user: Tidy and enforce reserved_va initialization"
+>>> (18e80c55bb6ec17c05ec0ba717ec83933c2bfc07) the Yocto webkitgtk build
+>>> hangs when cross compiling for 32-bit x86 on a 64-bit x86 machine using
+>>> musl.
+>>>
+>>> To fix the issue reduce the MAX_RESERVED_VA macro to be a closer match
+>>> to what it was before the problematic commit.
+>>>
+>>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>>> ---
+>>
+>> I don't like this at all.  You don't say why this hangs.
+>> What is the actual host, x86_64 or i686?
+>
+> The host is x86_64 and the guest is i686. I'm not sure why it hangs,
+> I'll dig through and get the actual command Yocto is running when it
+> hangs.
 
---5LK7OEqpP/xdrAG9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ok, this is not going to be straightforward at all.
 
-On Thu, Jan 18, 2018 at 02:30:27PM -0600, Eric Blake wrote:
-> On 01/18/2018 02:11 AM, Alexey Kardashevskiy wrote:
->=20
-> >>>> I think you just assert() for this.  The only way these could get a
-> >>>> different value is if there's a bug elsewhere.
-> >>>
-> >>>
-> >>> Why not return H_HARDWARE or other error?
-> >>
-> >> Because what's the guest supposed to do with it.=20
-> >=20
-> > "oops"
-> >=20
-> >> This is an internal
-> >> qemu problem, so it should be dealt with via an internal qemu
-> >> mechanism.
-> >=20
-> > Do we have assert() enabled in production? If not, then assert =3D=3D n=
-oop,
-> > error_report is just a noise.
->=20
-> See commit 262a69f4.  Yes, assert() is enabled in production, for
-> security reasons (aka it's easier to do that than to audit that
-> migration is still safe even with no-op asserts).
+The webkitgtk cmake command hangs when targeting i686 without this
+patch. Somewhere in the Yocto build flow this causing some change
+resulting in that hang. I don't know how to find out where the exact
+problem is though.
 
-TBH, assert()s usually aren't disabled in production.  That's the
-theory behind them, but in practice AFAICT, the debugging utility
-almost always outweighs the performance cost which is usually pretty
-small.
+It looks like only flipping the MSB to 0 fixes the issue, so maybe
+there is a signed/unsigned issue somewhere? I'll keep digging.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Alistair
 
---5LK7OEqpP/xdrAG9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphLykACgkQbDjKyiDZ
-s5KT9w//ZoAxVrlntxNtB8nT1XJs+s9RnizJ+ZkRb+/BfSyRoGgO07xV0cypCDLF
-gHVNOpEl4joBV3OXEilYEOxMZ9dT6twuO7QQvgEcMV+zBo2OJy3PNg7m5ttsZqpj
-Kq5tVk2C2B0BHxTs+X6IQiqmqFYWkLDJMt7AOS+bU0NwHhEq/XG52wNCoR66QQHR
-SfKbwg6U9G5zbKW2Vcm2GEmMxuaAmf469mXxfjzVi8/AUnT0G73WZs0rFsj9s8YO
-jedQCntqumcNz0ElS7Dhgfq2y+pGAATurtasZQA/zWgQlDLwUJ/hlMQslMJ7rCip
-8JQSQtP5HtEKsPoJnI7CPl5JWCfRu4ALDy9xM6D6eFIJZn/7eViGLqWGtnSRe3cU
-GH4QGO6Wh0pI/BoYgIu6Sr5Seoer9zcGB4DYxP40g12qrZ7iYmPJ+QRTETvqqVZc
-KFBDXp4YmLxAnnsN29sSBZzWGHFjq9C+XHdLVGKuOG4tWDb948X82eXNR4j9Zzd2
-B+8WrUM9yKXJwuhkSRmjrY65PrpTk6P8Wpaj9w2Nw7nS46qKVo2iMGJrzjR8hpay
-6m5r1Dorwz76TuhZZH57t/zLtmv2mUaksW5vLue9qDbuI5FEh23sxGZ7wfAQXYb7
-2xcEYp3Q7mYnDvODXGKGwbkmlnMT9L3lDPZanjYUnYfYn4UwjGs=
-=nk+o
------END PGP SIGNATURE-----
-
---5LK7OEqpP/xdrAG9--
+>
+> Alistair
+>
+>>
+>>
+>> r~
