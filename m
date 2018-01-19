@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7x-0006uj-EW
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7x-0006uG-47
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:50:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7w-0003B9-9c
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7v-0003Au-Qs
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:50:37 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Fri, 19 Jan 2018 15:50:07 +0300
-Message-Id: <1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Fri, 19 Jan 2018 15:50:06 +0300
+Message-Id: <1516366207-109842-8-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 8/8] qapi: query-blockstat: add driver
- specific file-posix stats
+Subject: [Qemu-devel] [PATCH v2 7/8] file-posix: account discard operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,189 +24,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@virtuozzo.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-A block driver can provide a callback to report driver-specific
-statistics.
-
-file-posix driver now reports discard statistics
+This will help to identify how many of the user-issued discard operations
+(accounted on a device level) have actually suceeded down on the host file
+(even though the numbers will not be exactly the same if non-raw format
+driver is used (e.g. qcow2 sending metadata discards)).
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json      | 37 +++++++++++++++++++++++++++++++++++++
- include/block/block.h     |  1 +
- include/block/block_int.h |  1 +
- block.c                   |  9 +++++++++
- block/file-posix.c        | 21 +++++++++++++++++++++
- block/qapi.c              |  5 +++++
- 6 files changed, 74 insertions(+)
+ block/file-posix.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3fa2d3a..0d9dc01 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -774,6 +774,40 @@
-            'timed_stats': ['BlockDeviceTimedStats'] } }
- 
- ##
-+# @BlockDriverStatsFile:
-+#
-+# File driver statistics
-+#
-+# @discard_nb_ok: The number of succeeded discard operations performed by
-+#                 the driver.
-+#
-+# @discard_nb_failed: The number of failed discard operations performed by
-+#                     the driver.
-+#
-+# @discard_bytes_ok: The number of bytes discarded by the driver.
-+#
-+# Since 2.12
-+##
-+{ 'struct': 'BlockDriverStatsFile',
-+  'data': {
-+      'discard_nb_ok': 'int',
-+      'discard_nb_failed': 'int',
-+      'discard_bytes_ok': 'int'
-+  } }
-+
-+##
-+# @BlockDriverStats:
-+#
-+# Statistics of a block driver (driver-specific)
-+#
-+# Since: 2.12
-+##
-+{ 'union': 'BlockDriverStats',
-+  'data': {
-+      'file': 'BlockDriverStatsFile'
-+  } }
-+
-+##
- # @BlockStats:
- #
- # Statistics of a virtual block device or a block backing device.
-@@ -785,6 +819,8 @@
- #
- # @stats:  A @BlockDeviceStats for the device.
- #
-+# @driver-stats: Optional driver-specific statistics. (Since 2.12)
-+#
- # @parent: This describes the file block device if it has one.
- #          Contains recursively the statistics of the underlying
- #          protocol (e.g. the host file for a qcow2 image). If there is
-@@ -798,6 +834,7 @@
- { 'struct': 'BlockStats',
-   'data': {'*device': 'str', '*node-name': 'str',
-            'stats': 'BlockDeviceStats',
-+           '*driver-stats': 'BlockDriverStats',
-            '*parent': 'BlockStats',
-            '*backing': 'BlockStats'} }
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index 9b12774..2f20697 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -473,6 +473,7 @@ const char *bdrv_get_device_or_node_name(const BlockDriverState *bs);
- int bdrv_get_flags(BlockDriverState *bs);
- int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi);
- ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs);
-+BlockDriverStats *bdrv_get_driver_stats(BlockDriverState *bs);
- void bdrv_round_to_clusters(BlockDriverState *bs,
-                             int64_t offset, int64_t bytes,
-                             int64_t *cluster_offset,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 29cafa4..6f56aeb 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -269,6 +269,7 @@ struct BlockDriver {
-                                   Error **errp);
-     int (*bdrv_get_info)(BlockDriverState *bs, BlockDriverInfo *bdi);
-     ImageInfoSpecific *(*bdrv_get_specific_info)(BlockDriverState *bs);
-+    BlockDriverStats *(*bdrv_get_stats)(BlockDriverState *bs);
- 
-     int coroutine_fn (*bdrv_save_vmstate)(BlockDriverState *bs,
-                                           QEMUIOVector *qiov,
-diff --git a/block.c b/block.c
-index a8da4f2..8c03587 100644
---- a/block.c
-+++ b/block.c
-@@ -4062,6 +4062,15 @@ ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs)
-     return NULL;
- }
- 
-+BlockDriverStats *bdrv_get_driver_stats(BlockDriverState *bs)
-+{
-+    BlockDriver *drv = bs->drv;
-+    if (!drv || !drv->bdrv_get_stats) {
-+        return NULL;
-+    }
-+    return drv->bdrv_get_stats(bs);
-+}
-+
- void bdrv_debug_event(BlockDriverState *bs, BlkdebugEvent event)
- {
-     if (!bs || !bs->drv || !bs->drv->bdrv_debug_event) {
 diff --git a/block/file-posix.c b/block/file-posix.c
-index 544ae58..3ab92e6 100644
+index 36ee89e..544ae58 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -2240,6 +2240,25 @@ static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-     return 0;
+@@ -158,6 +158,11 @@ typedef struct BDRVRawState {
+     bool page_cache_inconsistent:1;
+     bool has_fallocate;
+     bool needs_alignment;
++    struct {
++        int64_t discard_nb_ok;
++        int64_t discard_nb_failed;
++        int64_t discard_bytes_ok;
++    } stats;
+ 
+     PRManager *pr_mgr;
+ } BDRVRawState;
+@@ -1458,6 +1463,16 @@ static ssize_t handle_aiocb_discard(RawPosixAIOData *aiocb)
+     return ret;
  }
  
-+static BlockDriverStats *raw_get_stats(BlockDriverState *bs)
++static void raw_account_discard(BDRVRawState *s, uint64_t nbytes, int ret)
 +{
-+    BDRVRawState *s = bs->opaque;
-+    BlockDriverStats *stats = g_new(BlockDriverStats, 1);
-+
-+    *stats = (BlockDriverStats){
-+        .type  = BLOCK_DRIVER_STATS_KIND_FILE,
-+        .u.file.data = g_new(BlockDriverStatsFile, 1),
-+    };
-+
-+    *stats->u.file.data = (BlockDriverStatsFile){
-+        .discard_nb_ok = s->stats.discard_nb_ok,
-+        .discard_nb_failed = s->stats.discard_nb_failed,
-+        .discard_bytes_ok = s->stats.discard_bytes_ok,
-+    };
-+
-+    return stats;
++    if (ret) {
++        s->stats.discard_nb_failed++;
++    } else {
++        s->stats.discard_nb_ok++;
++        s->stats.discard_bytes_ok += nbytes;
++    }
 +}
 +
- static QemuOptsList raw_create_opts = {
-     .name = "raw-create-opts",
-     .head = QTAILQ_HEAD_INITIALIZER(raw_create_opts.head),
-@@ -2312,6 +2331,7 @@ BlockDriver bdrv_file = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
-+    .bdrv_get_stats  = raw_get_stats,
-     .bdrv_check_perm = raw_check_perm,
-     .bdrv_set_perm   = raw_set_perm,
-     .bdrv_abort_perm_update = raw_abort_perm_update,
-@@ -2790,6 +2810,7 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
-+    .bdrv_get_stats  = raw_get_stats,
-     .bdrv_check_perm = raw_check_perm,
-     .bdrv_set_perm   = raw_set_perm,
-     .bdrv_abort_perm_update = raw_abort_perm_update,
-diff --git a/block/qapi.c b/block/qapi.c
-index 6e110f2..4191e6c 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -489,6 +489,11 @@ static BlockStats *bdrv_query_bds_stats(BlockDriverState *bs,
- 
-     s->stats->wr_highest_offset = stat64_get(&bs->wr_highest_offset);
- 
-+    s->driver_stats = bdrv_get_driver_stats(bs);
-+    if (s->driver_stats) {
-+        s->has_driver_stats = true;
-+    }
-+
-     if (bs->file) {
-         s->has_parent = true;
-         s->parent = bdrv_query_bds_stats(bs->file->bs, blk_level);
+ static int aio_worker(void *arg)
+ {
+     RawPosixAIOData *aiocb = arg;
+@@ -1494,6 +1509,7 @@ static int aio_worker(void *arg)
+         break;
+     case QEMU_AIO_DISCARD:
+         ret = handle_aiocb_discard(aiocb);
++        raw_account_discard(aiocb->bs->opaque, aiocb->aio_nbytes, ret);
+         break;
+     case QEMU_AIO_WRITE_ZEROES:
+         ret = handle_aiocb_write_zeroes(aiocb);
+@@ -2654,8 +2670,9 @@ static coroutine_fn BlockAIOCB *hdev_aio_pdiscard(BlockDriverState *bs,
+     BlockCompletionFunc *cb, void *opaque)
+ {
+     BDRVRawState *s = bs->opaque;
+-
+-    if (fd_open(bs) < 0) {
++    int ret = fd_open(bs);
++    if (ret < 0) {
++        raw_account_discard(s, bytes, ret);
+         return NULL;
+     }
+     return paio_submit(bs, s->fd, offset, NULL, bytes,
 -- 
 2.7.4
