@@ -1,17 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecYF7-00015q-24
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:06:10 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ecYFC-0001Ca-Lg
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:06:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecYF5-00028n-SE
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:06:09 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 19 Jan 2018 14:49:10 +0000
-Message-Id: <1516373355-305-18-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-References: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 17/22] hw/arm/virt: Add virtio-iommu to the
- virt board
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ecYF9-0002FM-AV
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:06:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35916)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ecYF9-0002Dw-2T
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:06:11 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0JF2JCc072258
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 10:06:09 -0500
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fkhk5bw5w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 10:06:09 -0500
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 19 Jan 2018 08:06:08 -0700
+References: <20180119141105.29095-1-marcandre.lureau@redhat.com>
+	<151637257830.599.12053715954868331479@5adcb62bf0d6>
+	<CAMxuvawiLgNL9UGORr2chS7m6YqckB+UuSPh4Gk5iuzx_wGrtA@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 19 Jan 2018 10:06:05 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAMxuvawiLgNL9UGORr2chS7m6YqckB+UuSPh4Gk5iuzx_wGrtA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <702550e1-2432-beee-c031-9d46592aeacb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] tpm: CRB device and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,220 +42,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
-Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
+To: Marc-Andre Lureau <mlureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: marcandre <marcandre.lureau@redhat.com>, famz@redhat.com
 
-The specific virtio-mmio node is inconditionally added on
-machine init while the binding between this latter and the
-PCIe host bridge is done on machine init done notifier, only
-if -device virtio-iommu-device was added to the qemu command
-line.
+On 01/19/2018 09:56 AM, Marc-Andre Lureau wrote:
+> On Fri, Jan 19, 2018 at 3:36 PM,  <no-reply@patchew.org> wrote:
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c: In function 'tpm_crb_mmio_read':
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c:126:13: error: format '%lx' expects argument of type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long unsigned int}' [-Werror=format=]
+>>       DPRINTF("CRB read 0x%lx:%s len:%u\n",
+>>               ^
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c:48:20: note: in definition of macro 'DPRINTF'
+>>               printf(fmt, ## __VA_ARGS__);        \
+>>                      ^~~
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c: In function 'tpm_crb_mmio_write':
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c:146:13: error: format '%lx' expects argument of type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long unsigned int}' [-Werror=format=]
+>>       DPRINTF("CRB write 0x%lx:%s len:%u val:%lu\n",
+>>               ^
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c:48:20: note: in definition of macro 'DPRINTF'
+>>               printf(fmt, ## __VA_ARGS__);        \
+>>                      ^~~
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c:146:13: error: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'uint64_t {aka long long unsigned int}' [-Werror=format=]
+>>       DPRINTF("CRB write 0x%lx:%s len:%u val:%lu\n",
+>>               ^
+>> /tmp/qemu-test/src/hw/tpm/tpm_crb.c:48:20: note: in definition of macro 'DPRINTF'
+>>               printf(fmt, ## __VA_ARGS__);        \
+>>                      ^~~
+> This will fix it:
+> Stefan feel free to squash it if no further changes required
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Will do. Thanks.
 
----
-
-v4 -> v5:
-- VirtMachineClass no_iommu added in this patch
-- Use object_resolve_path_type
----
- hw/arm/virt.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++++----
- include/hw/arm/virt.h |  5 ++++
- 2 files changed, 82 insertions(+), 6 deletions(-)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 7844311..5584109 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -52,6 +52,7 @@
- #include "hw/arm/fdt.h"
- #include "hw/intc/arm_gic.h"
- #include "hw/intc/arm_gicv3_common.h"
-+#include "hw/virtio/virtio-iommu.h"
- #include "kvm_arm.h"
- #include "hw/smbios/smbios.h"
- #include "qapi/visitor.h"
-@@ -139,6 +140,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-+    [VIRT_IOMMU] =              { 0x09050000, 0x00000200 },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -159,6 +161,7 @@ static const int a15irqmap[] = {
-     [VIRT_SECURE_UART] = 8,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-+    [VIRT_IOMMU] = 74,
-     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
- };
- 
-@@ -999,6 +1002,69 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
-                            0x7           /* PCI irq */);
- }
- 
-+static void virtio_iommu_notifier(Notifier *notifier, void *data)
-+{
-+    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-+                                         virtio_iommu_done);
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+    struct arm_boot_info *info = &vms->bootinfo;
-+    bool ambiguous;
-+    Object *obj = object_resolve_path_type("", TYPE_VIRTIO_IOMMU, &ambiguous);
-+    int dtb_size;
-+    void *fdt = info->get_dtb(info, &dtb_size);
-+
-+    if (!obj) {
-+        return;
-+    }
-+
-+    if (vmc->no_iommu) {
-+        error_setg(&error_fatal, "this machine version does not support iommu");
-+    }
-+
-+    if (ambiguous) {
-+        error_setg(&error_fatal, "a single virtio-iommu device is supported!");
-+    }
-+
-+    object_property_set_bool(obj, false, "msi_bypass", &error_fatal);
-+
-+    qemu_fdt_setprop_cells(fdt, vms->pcie_host_nodename, "iommu-map",
-+                           0x0, vms->iommu_phandle, 0x0, 0x10000);
-+}
-+
-+static void create_virtio_iommu(VirtMachineState *vms, qemu_irq *pic)
-+{
-+    char *node;
-+    const char compat[] = "virtio,mmio";
-+    int irq =  vms->irqmap[VIRT_IOMMU];
-+    hwaddr base = vms->memmap[VIRT_IOMMU].base;
-+    hwaddr size = vms->memmap[VIRT_IOMMU].size;
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-+
-+    if (vmc->no_iommu) {
-+        return;
-+    }
-+
-+    vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
-+
-+    sysbus_create_simple("virtio-mmio", base, pic[irq]);
-+
-+    node = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
-+    qemu_fdt_add_subnode(vms->fdt, node);
-+    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg", 2, base, 2, size);
-+
-+    qemu_fdt_setprop_cells(vms->fdt, node, "interrupts",
-+            GIC_FDT_IRQ_TYPE_SPI, irq, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+
-+    qemu_fdt_setprop(vms->fdt, node, "dma-coherent", NULL, 0);
-+    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
-+    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
-+    g_free(node);
-+
-+    vms->virtio_iommu_done.notify = virtio_iommu_notifier;
-+    qemu_add_machine_init_done_notifier(&vms->virtio_iommu_done);
-+}
-+
- static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
- {
-     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
-@@ -1074,7 +1140,8 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-         }
-     }
- 
--    nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    vms->pcie_host_nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    nodename = vms->pcie_host_nodename;
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-     qemu_fdt_setprop_string(vms->fdt, nodename,
-                             "compatible", "pci-host-ecam-generic");
-@@ -1113,7 +1180,6 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
-     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
- 
--    g_free(nodename);
- }
- 
- static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
-@@ -1429,16 +1495,16 @@ static void machvirt_init(MachineState *machine)
- 
-     create_rtc(vms, pic);
- 
--    create_pcie(vms, pic);
--
--    create_gpio(vms, pic);
--
-     /* Create mmio transports, so the user can create virtio backends
-      * (which will be automatically plugged in to the transports). If
-      * no backend is created the transport will just sit harmlessly idle.
-      */
-     create_virtio_devices(vms, pic);
- 
-+    create_pcie(vms, pic);
-+
-+    create_gpio(vms, pic);
-+
-     vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
-     rom_set_fw(vms->fw_cfg);
- 
-@@ -1463,6 +1529,7 @@ static void machvirt_init(MachineState *machine)
-      * Notifiers are executed in registration reverse order.
-      */
-     create_platform_bus(vms, pic);
-+    create_virtio_iommu(vms, pic);
- }
- 
- static bool virt_get_secure(Object *obj, Error **errp)
-@@ -1702,8 +1769,12 @@ static void virt_2_11_instance_init(Object *obj)
- 
- static void virt_machine_2_11_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_2_12_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_11);
-+
-+    vmc->no_iommu = true;
- }
- DEFINE_VIRT_MACHINE(2, 11)
- 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 7e31e99..a13b895 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -59,6 +59,7 @@ enum {
-     VIRT_GIC_V2M,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
-+    VIRT_IOMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-     VIRT_RTC,
-@@ -84,12 +85,14 @@ typedef struct {
-     bool disallow_affinity_adjustment;
-     bool no_its;
-     bool no_pmu;
-+    bool no_iommu;
-     bool claim_edge_triggered_timers;
- } VirtMachineClass;
- 
- typedef struct {
-     MachineState parent;
-     Notifier machine_done;
-+    Notifier virtio_iommu_done;
-     FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-@@ -105,6 +108,8 @@ typedef struct {
-     uint32_t clock_phandle;
-     uint32_t gic_phandle;
-     uint32_t msi_phandle;
-+    uint32_t iommu_phandle;
-+    char *pcie_host_nodename;
-     int psci_conduit;
-     PCIBus *pci_bus;
- } VirtMachineState;
--- 
-1.9.1
+>
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -123,7 +123,7 @@ static uint64_t tpm_crb_mmio_read(void *opaque, hwaddr addr,
+>                                     unsigned size)
+>   {
+>       CRBState *s = CRB(opaque);
+> -    DPRINTF("CRB read 0x%lx:%s len:%u\n",
+> +    DPRINTF("CRB read 0x" TARGET_FMT_plx ":%s len:%u\n",
+>               addr, addr_desc(addr), size);
+>       void *regs = (void *)&s->regs + addr;
+>
+> @@ -143,7 +143,7 @@ static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
+>                                  uint64_t val, unsigned size)
+>   {
+>       CRBState *s = CRB(opaque);
+> -    DPRINTF("CRB write 0x%lx:%s len:%u val:%lu\n",
+> +    DPRINTF("CRB write 0x" TARGET_FMT_plx ":%s len:%u val:%" PRIu64 "\n",
+>               addr, addr_desc(addr), size, val);
+>
+>       switch (addr) {
+>
