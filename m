@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ecU5R-0007m6-Kd
+	(envelope-from <dgilbert@redhat.com>) id 1ecU5R-0007m7-Kh
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:39:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ecU5P-00036t-UX
+	(envelope-from <dgilbert@redhat.com>) id 1ecU5O-00033P-K1
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:39:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34276)
+Received: from mx1.redhat.com ([209.132.183.28]:37772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ecU5P-00035E-Nv
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:39:51 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ecU5O-00031z-EW
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:39:50 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E4B277EA8B
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 10:39:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 935AF780E9
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 10:39:49 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 19 Jan 2018 10:39:24 +0000
-Message-Id: <20180119103924.332-8-dgilbert@redhat.com>
+Date: Fri, 19 Jan 2018 10:39:23 +0000
+Message-Id: <20180119103924.332-7-dgilbert@redhat.com>
 In-Reply-To: <20180119103924.332-1-dgilbert@redhat.com>
 References: <20180119103924.332-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 7/7] vhost: Move log_dirty check
+Subject: [Qemu-devel] [PATCH v7 6/7] vhost: Merge and delete unused callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +34,73 @@ Cc: maxime.coquelin@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Move the log_dirty check into vhost_section.
+Now that the olf vhost_set_memory code is gone, the _nop and _add
+callbacks are identical and can be merged.  The _del callback is
+no longer needed.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/virtio/trace-events |  1 +
- hw/virtio/vhost.c      | 20 +++++++++++++-------
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ hw/virtio/vhost.c | 33 +++++----------------------------
+ 1 file changed, 5 insertions(+), 28 deletions(-)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 606e4fc949..742ff0f90b 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -4,6 +4,7 @@
- vhost_commit(bool started, bool changed) "Started: %d Changed: %d"
- vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
- vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
-+vhost_section(const char *name, int r) "%s:%d"
- 
- # hw/virtio/virtio.c
- virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 5819ac6de7..49625aade2 100644
+index b2a8dd189f..5819ac6de7 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -27,6 +27,7 @@
- #include "hw/virtio/virtio-access.h"
- #include "migration/blocker.h"
- #include "sysemu/dma.h"
-+#include "trace.h"
- 
- /* enabled until disconnected backend stabilizes */
- #define _VHOST_DEBUG 1
-@@ -373,8 +374,19 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
- 
- static bool vhost_section(MemoryRegionSection *section)
- {
--    return memory_region_is_ram(section->mr) &&
-+    bool result;
-+    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
-+                     ~(1 << DIRTY_MEMORY_MIGRATION);
-+    result = memory_region_is_ram(section->mr) &&
-         !memory_region_is_rom(section->mr);
-+
-+    /* Vhost doesn't handle any block which is doing dirty-tracking other
-+     * than migration; this typically fires on VGA areas.
-+     */
-+    result &= !log_dirty;
-+
-+    trace_vhost_section(section->mr->name, result);
-+    return result;
+@@ -554,8 +554,9 @@ static void vhost_region_add_section(struct vhost_dev *dev,
+     }
  }
  
- static void vhost_begin(MemoryListener *listener)
-@@ -504,12 +516,6 @@ static void vhost_region_add_section(struct vhost_dev *dev,
-     trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
-                                    mrs_host);
+-static void vhost_region_add(MemoryListener *listener,
+-                             MemoryRegionSection *section)
++/* Used for both add and nop callbacks */
++static void vhost_region_addnop(MemoryListener *listener,
++                                MemoryRegionSection *section)
+ {
+     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+                                          memory_listener);
+@@ -566,29 +567,6 @@ static void vhost_region_add(MemoryListener *listener,
+     vhost_region_add_section(dev, section);
+ }
  
--    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
--                        ~(1 << DIRTY_MEMORY_MIGRATION);
--    if (log_dirty) {
+-/* Called on regions that have not changed */
+-static void vhost_region_nop(MemoryListener *listener,
+-                             MemoryRegionSection *section)
+-{
+-    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+-                                         memory_listener);
+-
+-    if (!vhost_section(section)) {
 -        return;
 -    }
 -
-     if (dev->n_tmp_sections) {
-         /* Since we already have at least one section, lets see if
-          * this extends it; since we're scanning in order, we only
+-    vhost_region_add_section(dev, section);
+-}
+-
+-static void vhost_region_del(MemoryListener *listener,
+-                             MemoryRegionSection *section)
+-{
+-    if (!vhost_section(section)) {
+-        return;
+-    }
+-
+-}
+-
+ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+ {
+     struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
+@@ -1157,9 +1135,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+     hdev->memory_listener = (MemoryListener) {
+         .begin = vhost_begin,
+         .commit = vhost_commit,
+-        .region_add = vhost_region_add,
+-        .region_del = vhost_region_del,
+-        .region_nop = vhost_region_nop,
++        .region_add = vhost_region_addnop,
++        .region_nop = vhost_region_addnop,
+         .log_start = vhost_log_start,
+         .log_stop = vhost_log_stop,
+         .log_sync = vhost_log_sync,
 -- 
 2.14.3
