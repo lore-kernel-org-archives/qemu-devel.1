@@ -1,16 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecY6h-0001xd-B7
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:57:31 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ecY7E-0002X6-KU
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:58:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecY6g-0003OG-1p
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:57:27 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 19 Jan 2018 14:49:01 +0000
-Message-Id: <1516373355-305-9-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-References: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 08/22] virtio-iommu: Add the iommu regions
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ecY7A-0003dZ-Jz
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:58:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37444)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ecY7A-0003d6-Aw
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:57:56 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0JEtjmb042218
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 09:57:54 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fkf449yg5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 09:57:54 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 19 Jan 2018 07:57:53 -0700
+References: <20180119141105.29095-1-marcandre.lureau@redhat.com>
+	<20180119141105.29095-4-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 19 Jan 2018 09:57:49 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180119141105.29095-4-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <777c7ae5-7d41-004b-1337-6a7bdf9ba037@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] tpm: report backend request error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,213 +41,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
-Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-This patch initializes the iommu memory regions so that
-PCIe end point transactions get translated. The translation
-function is not yet implemented though.
+On 01/19/2018 09:11 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Use an Error** for request to let the caller handle error reporting.
+>
+> This will also allow to inform the frontend of a backend error.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
----
-v4 -> v5:
-- use PCI bus handle as a key
-- use get_primary_pci_bus() callback
-
-v3 -> v4:
-- add trace_virtio_iommu_init_iommu_mr
-
-v2 -> v3:
-- use IOMMUMemoryRegion
-- iommu mr name built with BDF
-- rename smmu_get_sid into virtio_iommu_get_sid and use PCI_BUILD_BDF
----
- hw/virtio/trace-events           |   2 +
- hw/virtio/virtio-iommu.c         | 102 +++++++++++++++++++++++++++++++++++++++
- include/hw/virtio/virtio-iommu.h |   2 +
- 3 files changed, 106 insertions(+)
-
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index f570699..1739db5 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -36,3 +36,5 @@ virtio_iommu_attach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
- virtio_iommu_detach(uint32_t ep_id) "endpoint=%d"
- virtio_iommu_map(uint32_t domain_id, uint64_t phys_addr, uint64_t virt_addr, uint64_t size, uint32_t flags) "domain=%d phys_addr=0x%"PRIx64" virt_addr=0x%"PRIx64" size=0x%"PRIx64" flags=%d"
- virtio_iommu_unmap(uint32_t domain_id, uint64_t virt_addr, uint64_t size) "domain=%d virt_addr=0x%"PRIx64" size=0x%"PRIx64
-+virtio_iommu_translate(const char *name, uint32_t rid, uint64_t iova, int flag) "mr=%s rid=%d addr=0x%"PRIx64" flag=%d"
-+virtio_iommu_init_iommu_mr(char *iommu_mr) "init %s"
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 247e6c8..5d335d1 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -23,6 +23,9 @@
- #include "hw/virtio/virtio.h"
- #include "sysemu/kvm.h"
- #include "qapi-event.h"
-+#include "qemu/error-report.h"
-+#include "hw/i386/pc.h"
-+#include "hw/arm/virt.h"
- #include "trace.h"
- 
- #include "standard-headers/linux/virtio_ids.h"
-@@ -35,6 +38,50 @@
- /* Max size */
- #define VIOMMU_DEFAULT_QUEUE_SIZE 256
- 
-+static inline uint16_t virtio_iommu_get_sid(IOMMUDevice *dev)
-+{
-+    return PCI_BUILD_BDF(pci_bus_num(dev->bus), dev->devfn);
-+}
-+
-+static AddressSpace *virtio_iommu_find_add_as(PCIBus *bus, void *opaque,
-+                                              int devfn)
-+{
-+    VirtIOIOMMU *s = opaque;
-+    IOMMUPciBus *sbus = g_hash_table_lookup(s->as_by_busptr, &bus);
-+    IOMMUDevice *sdev;
-+
-+    if (!sbus) {
-+        sbus = g_malloc0(sizeof(IOMMUPciBus) +
-+                         sizeof(IOMMUDevice *) * IOMMU_PCI_DEVFN_MAX);
-+        sbus->bus = bus;
-+        g_hash_table_insert(s->as_by_busptr, bus, sbus);
-+    }
-+
-+    sdev = sbus->pbdev[devfn];
-+    if (!sdev) {
-+        char *name = g_strdup_printf("%s-%d-%d",
-+                                     TYPE_VIRTIO_IOMMU_MEMORY_REGION,
-+                                     pci_bus_num(bus), devfn);
-+        sdev = sbus->pbdev[devfn] = g_malloc0(sizeof(IOMMUDevice));
-+
-+        sdev->viommu = s;
-+        sdev->bus = bus;
-+        sdev->devfn = devfn;
-+
-+        trace_virtio_iommu_init_iommu_mr(name);
-+
-+        memory_region_init_iommu(&sdev->iommu_mr, sizeof(sdev->iommu_mr),
-+                                 TYPE_VIRTIO_IOMMU_MEMORY_REGION,
-+                                 OBJECT(s), name,
-+                                 UINT64_MAX);
-+        address_space_init(&sdev->as,
-+                           MEMORY_REGION(&sdev->iommu_mr), TYPE_VIRTIO_IOMMU);
-+    }
-+
-+    return &sdev->as;
-+
-+}
-+
- static int virtio_iommu_attach(VirtIOIOMMU *s,
-                                struct virtio_iommu_req_attach *req)
- {
-@@ -215,6 +262,26 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
-     }
- }
- 
-+static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-+                                            IOMMUAccessFlags flag)
-+{
-+    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-+    uint32_t sid;
-+
-+    IOMMUTLBEntry entry = {
-+        .target_as = &address_space_memory,
-+        .iova = addr,
-+        .translated_addr = addr,
-+        .addr_mask = ~(hwaddr)0,
-+        .perm = IOMMU_NONE,
-+    };
-+
-+    sid = virtio_iommu_get_sid(sdev);
-+
-+    trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
-+    return entry;
-+}
-+
- static void virtio_iommu_get_config(VirtIODevice *vdev, uint8_t *config_data)
- {
-     VirtIOIOMMU *dev = VIRTIO_IOMMU(vdev);
-@@ -269,6 +336,17 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    PCIBus *pcibus;
-+
-+    if (!mc->get_primary_pci_bus) {
-+        goto err;
-+    }
-+    pcibus = mc->get_primary_pci_bus(ms);
-+    if (!pcibus) {
-+        goto err;
-+    }
- 
-     virtio_init(vdev, "virtio-iommu", VIRTIO_ID_IOMMU,
-                 sizeof(struct virtio_iommu_config));
-@@ -279,6 +357,14 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
- 
-     s->config.page_size_mask = TARGET_PAGE_MASK;
-     s->config.input_range.end = -1UL;
-+
-+    memset(s->as_by_bus_num, 0, sizeof(s->as_by_bus_num));
-+    s->as_by_busptr = g_hash_table_new(NULL, NULL);
-+
-+    pci_setup_iommu(pcibus, virtio_iommu_find_add_as, s);
-+    return;
-+err:
-+    error_setg(&error_fatal, "virtio-iommu: no pci bus identified");
- }
- 
- static void virtio_iommu_device_unrealize(DeviceState *dev, Error **errp)
-@@ -336,6 +422,14 @@ static void virtio_iommu_class_init(ObjectClass *klass, void *data)
-     vdc->vmsd = &vmstate_virtio_iommu_device;
- }
- 
-+static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
-+                                                  void *data)
-+{
-+    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
-+
-+    imrc->translate = virtio_iommu_translate;
-+}
-+
- static const TypeInfo virtio_iommu_info = {
-     .name = TYPE_VIRTIO_IOMMU,
-     .parent = TYPE_VIRTIO_DEVICE,
-@@ -344,9 +438,17 @@ static const TypeInfo virtio_iommu_info = {
-     .class_init = virtio_iommu_class_init,
- };
- 
-+static const TypeInfo virtio_iommu_memory_region_info = {
-+    .parent = TYPE_IOMMU_MEMORY_REGION,
-+    .name = TYPE_VIRTIO_IOMMU_MEMORY_REGION,
-+    .class_init = virtio_iommu_memory_region_class_init,
-+};
-+
-+
- static void virtio_register_types(void)
- {
-     type_register_static(&virtio_iommu_info);
-+    type_register_static(&virtio_iommu_memory_region_info);
- }
- 
- type_init(virtio_register_types)
-diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-index d7cf73b..0b6b3f2 100644
---- a/include/hw/virtio/virtio-iommu.h
-+++ b/include/hw/virtio/virtio-iommu.h
-@@ -28,6 +28,8 @@
- #define VIRTIO_IOMMU(obj) \
-         OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
- 
-+#define TYPE_VIRTIO_IOMMU_MEMORY_REGION "virtio-iommu-memory-region"
-+
- #define IOMMU_PCI_BUS_MAX      256
- #define IOMMU_PCI_DEVFN_MAX    256
- 
--- 
-1.9.1
+> ---
+>   include/sysemu/tpm.h         |  2 +-
+>   include/sysemu/tpm_backend.h |  3 ++-
+>   backends/tpm.c               |  9 +++++++--
+>   hw/tpm/tpm_emulator.c        | 21 ++++++---------------
+>   hw/tpm/tpm_passthrough.c     | 31 +++++++++++++++----------------
+>   hw/tpm/tpm_tis.c             |  3 ++-
+>   6 files changed, 33 insertions(+), 36 deletions(-)
+>
+> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+> index 852e02687c..ac04a9d4a2 100644
+> --- a/include/sysemu/tpm.h
+> +++ b/include/sysemu/tpm.h
+> @@ -41,7 +41,7 @@ typedef struct TPMIfClass {
+>       InterfaceClass parent_class;
+>  =20
+>       enum TpmModel model;
+> -    void (*request_completed)(TPMIf *obj);
+> +    void (*request_completed)(TPMIf *obj, int ret);
+>       enum TPMVersion (*get_version)(TPMIf *obj);
+>   } TPMIfClass;
+>  =20
+> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.=
+h
+> index a69593e0cd..7e166ef954 100644
+> --- a/include/sysemu/tpm_backend.h
+> +++ b/include/sysemu/tpm_backend.h
+> @@ -18,6 +18,7 @@
+>   #include "qapi-types.h"
+>   #include "qemu/option.h"
+>   #include "sysemu/tpm.h"
+> +#include "qapi/error.h"
+>  =20
+>   #define TYPE_TPM_BACKEND "tpm-backend"
+>   #define TPM_BACKEND(obj) \
+> @@ -84,7 +85,7 @@ struct TPMBackendClass {
+>  =20
+>       TpmTypeOptions *(*get_tpm_options)(TPMBackend *t);
+>  =20
+> -    void (*handle_request)(TPMBackend *s, TPMBackendCmd *cmd);
+> +    void (*handle_request)(TPMBackend *s, TPMBackendCmd *cmd, Error **=
+errp);
+>   };
+>  =20
+>   /**
+> diff --git a/backends/tpm.c b/backends/tpm.c
+> index 143807aa37..d617ba7c52 100644
+> --- a/backends/tpm.c
+> +++ b/backends/tpm.c
+> @@ -27,7 +27,7 @@ static void tpm_backend_request_completed(void *opaqu=
+e, int ret)
+>       TPMBackend *s =3D TPM_BACKEND(opaque);
+>       TPMIfClass *tic =3D TPM_IF_GET_CLASS(s->tpmif);
+>  =20
+> -    tic->request_completed(s->tpmif);
+> +    tic->request_completed(s->tpmif, ret);
+>  =20
+>       /* no need for atomic, as long the BQL is taken */
+>       s->cmd =3D NULL;
+> @@ -38,8 +38,13 @@ static int tpm_backend_worker_thread(gpointer data)
+>   {
+>       TPMBackend *s =3D TPM_BACKEND(data);
+>       TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+> +    Error *err =3D NULL;
+>  =20
+> -    k->handle_request(s, s->cmd);
+> +    k->handle_request(s, s->cmd, &err);
+> +    if (err) {
+> +        error_report_err(err);
+> +        return -1;
+> +    }
+>  =20
+>       return 0;
+>   }
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> index 35c78de5a9..52552af9f9 100644
+> --- a/hw/tpm/tpm_emulator.c
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -185,28 +185,19 @@ static int tpm_emulator_set_locality(TPMEmulator =
+*tpm_emu, uint8_t locty_number,
+>       return 0;
+>   }
+>  =20
+> -static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd =
+*cmd)
+> +static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd =
+*cmd,
+> +                                        Error **errp)
+>   {
+>       TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
+> -    Error *err =3D NULL;
+>  =20
+>       DPRINTF("processing TPM command");
+>  =20
+> -    if (tpm_emulator_set_locality(tpm_emu, cmd->locty, &err) < 0) {
+> -        goto error;
+> -    }
+> -
+> -    if (tpm_emulator_unix_tx_bufs(tpm_emu, cmd->in, cmd->in_len,
+> +    if (tpm_emulator_set_locality(tpm_emu, cmd->locty, errp) < 0 ||
+> +        tpm_emulator_unix_tx_bufs(tpm_emu, cmd->in, cmd->in_len,
+>                                     cmd->out, cmd->out_len,
+> -                                  &cmd->selftest_done, &err) < 0) {
+> -        goto error;
+> +                                  &cmd->selftest_done, errp) < 0) {
+> +        tpm_util_write_fatal_error_response(cmd->out, cmd->out_len);
+>       }
+> -
+> -    return;
+> -
+> -error:
+> -    tpm_util_write_fatal_error_response(cmd->out, cmd->out_len);
+> -    error_report_err(err);
+>   }
+>  =20
+>   static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index f2563ac668..37dce15801 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -80,10 +80,11 @@ static int tpm_passthrough_unix_read(int fd, uint8_=
+t *buf, uint32_t len)
+>       }
+>       return ret;
+>   }
+> -static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+> -                                        const uint8_t *in, uint32_t in=
+_len,
+> -                                        uint8_t *out, uint32_t out_len=
+,
+> -                                        bool *selftest_done)
+> +
+> +static void tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+> +                                         const uint8_t *in, uint32_t i=
+n_len,
+> +                                         uint8_t *out, uint32_t out_le=
+n,
+> +                                         bool *selftest_done, Error **=
+errp)
+>   {
+>       ssize_t ret;
+>       bool is_selftest;
+> @@ -99,9 +100,8 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruS=
+tate *tpm_pt,
+>       ret =3D qemu_write_full(tpm_pt->tpm_fd, in, in_len);
+>       if (ret !=3D in_len) {
+>           if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
+> -            error_report("tpm_passthrough: error while transmitting da=
+ta "
+> -                         "to TPM: %s (%i)",
+> -                         strerror(errno), errno);
+> +            error_setg_errno(errp, errno, "tpm_passthrough: error whil=
+e "
+> +                             "transmitting data to TPM");
+>           }
+>           goto err_exit;
+>       }
+> @@ -111,15 +111,14 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassth=
+ruState *tpm_pt,
+>       ret =3D tpm_passthrough_unix_read(tpm_pt->tpm_fd, out, out_len);
+>       if (ret < 0) {
+>           if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
+> -            error_report("tpm_passthrough: error while reading data fr=
+om "
+> -                         "TPM: %s (%i)",
+> -                         strerror(errno), errno);
+> +            error_setg_errno(errp, errno, "tpm_passthrough: error whil=
+e "
+> +                             "reading data from TPM");
+>           }
+>       } else if (ret < sizeof(struct tpm_resp_hdr) ||
+>                  be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D re=
+t) {
+>           ret =3D -1;
+> -        error_report("tpm_passthrough: received invalid response "
+> -                     "packet from TPM");
+> +        error_setg_errno(errp, errno, "tpm_passthrough: received inval=
+id "
+> +                     "response packet from TPM");
+>       }
+>  =20
+>       if (is_selftest && (ret >=3D sizeof(struct tpm_resp_hdr))) {
+> @@ -133,18 +132,18 @@ err_exit:
+>       }
+>  =20
+>       tpm_pt->tpm_executing =3D false;
+> -
+> -    return ret;
+>   }
+>  =20
+> -static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendC=
+md *cmd)
+> +static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendC=
+md *cmd,
+> +                                           Error **errp)
+>   {
+>       TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+>  =20
+>       DPRINTF("tpm_passthrough: processing command %p\n", cmd);
+>  =20
+>       tpm_passthrough_unix_tx_bufs(tpm_pt, cmd->in, cmd->in_len,
+> -                                 cmd->out, cmd->out_len, &cmd->selftes=
+t_done);
+> +                                 cmd->out, cmd->out_len, &cmd->selftes=
+t_done,
+> +                                 errp);
+>   }
+>  =20
+>   static void tpm_passthrough_reset(TPMBackend *tb)
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 8b5eb01a2c..08f41d2707 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -393,7 +393,7 @@ static void tpm_tis_prep_abort(TPMState *s, uint8_t=
+ locty, uint8_t newlocty)
+>   /*
+>    * Callback from the TPM to indicate that the response was received.
+>    */
+> -static void tpm_tis_request_completed(TPMIf *ti)
+> +static void tpm_tis_request_completed(TPMIf *ti, int ret)
+>   {
+>       TPMState *s =3D TPM(ti);
+>       uint8_t locty =3D s->cmd.locty;
+> @@ -405,6 +405,7 @@ static void tpm_tis_request_completed(TPMIf *ti)
+>           }
+>       }
+>  =20
+> +    /* FIXME: report error if ret !=3D 0 */
+>       tpm_tis_sts_set(&s->loc[locty],
+>                       TPM_TIS_STS_VALID | TPM_TIS_STS_DATA_AVAILABLE);
+>       s->loc[locty].state =3D TPM_TIS_STATE_COMPLETION;
