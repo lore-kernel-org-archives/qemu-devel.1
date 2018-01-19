@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ecXAe-0004Vf-G9
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:30 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecXAe-0004Vh-GF
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ecXAZ-0004NP-Jf
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecXAa-0004PS-Ic
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:28 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 19 Jan 2018 16:57:19 +0300
-Message-Id: <20180119135719.24745-6-vsementsov@virtuozzo.com>
+Date: Fri, 19 Jan 2018 16:57:18 +0300
+Message-Id: <20180119135719.24745-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20180119135719.24745-1-vsementsov@virtuozzo.com>
 References: <20180119135719.24745-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 5/5] iotest 201: new test for qmp
- nbd-server-remove
+Subject: [Qemu-devel] [PATCH v3 4/5] iotests: implement QemuIoInteractive
+ class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,198 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
+Implement QemuIoInteractive to test nbd-server-remove command when
+there are active connections.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/201     | 156 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/201.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 162 insertions(+)
- create mode 100644 tests/qemu-iotests/201
- create mode 100644 tests/qemu-iotests/201.out
+ tests/qemu-iotests/iotests.py | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
-new file mode 100644
-index 0000000000..10388920dc
---- /dev/null
-+++ b/tests/qemu-iotests/201
-@@ -0,0 +1,156 @@
-+#!/usr/bin/env python
-+#
-+# Tests for qmp command nbd-server-remove.
-+#
-+# Copyright (c) 2017 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 44477e9295..5a10b2d534 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -93,6 +93,44 @@ def qemu_io(*args):
+         sys.stderr.write('qemu-io received signal %i: %s\n' % (-exitcode, ' '.join(args)))
+     return subp.communicate()[0]
+ 
 +
-+import os
-+import sys
-+import iotests
-+import time
-+from iotests import qemu_img, qemu_io, filter_qemu_io, QemuIoInteractive
++class QemuIoInteractive:
++    def __init__(self, *args):
++        self.args = qemu_io_args + list(args)
++        self._p = subprocess.Popen(self.args, stdin=subprocess.PIPE,
++                                   stdout=subprocess.PIPE,
++                                   stderr=subprocess.STDOUT)
++        assert self._p.stdout.read(9) == 'qemu-io> '
 +
-+nbd_sock = 'nbd_sock'
-+nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
-+disk = os.path.join(iotests.test_dir, 'disk')
++    def close(self):
++        self._p.communicate('q\n')
 +
++    def _read_output(self):
++        pattern = 'qemu-io> '
++        n = len(pattern)
++        pos = 0
++        s = []
++        while pos != n:
++            c = self._p.stdout.read(1)
++            # check unexpected EOF
++            assert c != ''
++            s.append(c)
++            if c == pattern[pos]:
++                pos += 1
++            else:
++                pos = 0
 +
-+class TestNbdServerRemove(iotests.QMPTestCase):
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
++        return ''.join(s[:-n])
 +
-+        self.vm = iotests.VM().add_drive(disk)
-+        self.vm.launch()
-+
-+        address = {
-+            'type': 'unix',
-+            'data': {
-+                'path': nbd_sock
-+            }
-+        }
-+
-+        result = self.vm.qmp('nbd-server-start', addr=address)
-+        self.assert_qmp(result, 'return', {})
-+        result = self.vm.qmp('nbd-server-add', device='drive0', name='exp')
-+        self.assert_qmp(result, 'return', {})
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(nbd_sock)
-+        os.remove(disk)
-+
-+    def remove_export(self, name, mode=None):
-+        if mode is None:
-+            return self.vm.qmp('nbd-server-remove', name=name)
-+        else:
-+            return self.vm.qmp('nbd-server-remove', name=name, mode=mode)
-+
-+    def assertExportNotFound(self, name):
-+        result = self.vm.qmp('nbd-server-remove', name=name)
-+        self.assert_qmp(result, 'error/desc', "Export 'exp' is not found")
-+
-+    def assertExistingClients(self, result):
-+        self.assert_qmp(result, 'error/desc', "export 'exp' still in use")
-+
-+    def assertReadOk(self, qemu_io_output):
-+        self.assertEqual(
-+                filter_qemu_io(qemu_io_output).strip(),
-+                'read 512/512 bytes at offset 0\n' +
-+                '512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)')
-+
-+    def assertReadFailed(self, qemu_io_output):
-+        self.assertEqual(filter_qemu_io(qemu_io_output).strip(),
-+                         'read failed: Input/output error')
-+
-+    def assertConnectFailed(self, qemu_io_output):
-+        self.assertEqual(filter_qemu_io(qemu_io_output).strip(),
-+                         "can't open device " + nbd_uri +
-+                         ": Requested export not available\n"
-+                         "server reported: export 'exp' not present")
-+
-+    def do_test_connect_after_remove(self, mode=None):
-+        args = ('-r', '-f', 'raw', '-c', 'read 0 512', nbd_uri)
-+        self.assertReadOk(qemu_io(*args))
-+
-+        result = self.remove_export('exp', mode)
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.assertExportNotFound('exp')
-+        self.assertConnectFailed(qemu_io(*args))
-+
-+    def test_connect_after_remove_default(self):
-+        self.do_test_connect_after_remove()
-+
-+    def test_connect_after_remove_safe(self):
-+        self.do_test_connect_after_remove('safe')
-+
-+    def test_connect_after_remove_force(self):
-+        self.do_test_connect_after_remove('hard')
-+
-+    def do_test_remove_during_connect_safe(self, mode=None):
-+        qio = QemuIoInteractive('-r', '-f', 'raw', nbd_uri)
-+        self.assertReadOk(qio.cmd('read 0 512'))
-+
-+        result = self.remove_export('exp', mode)
-+        self.assertExistingClients(result)
-+
-+        self.assertReadOk(qio.cmd('read 0 512'))
-+
-+        qio.close()
-+
-+        result = self.remove_export('exp', mode)
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.assertExportNotFound('exp')
-+
-+    def test_remove_during_connect_default(self):
-+        self.do_test_remove_during_connect_safe()
-+
-+    def test_remove_during_connect_safe(self):
-+        self.do_test_remove_during_connect_safe('safe')
-+
-+    def test_remove_during_connect_hard(self):
-+        qio = QemuIoInteractive('-r', '-f', 'raw', nbd_uri)
-+        self.assertReadOk(qio.cmd('read 0 512'))
-+
-+        result = self.remove_export('exp', 'hard')
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.assertReadFailed(qio.cmd('read 0 512'))
-+        self.assertExportNotFound('exp')
-+
-+        qio.close()
-+
-+    def test_remove_during_connect_safe_hard(self):
-+        qio = QemuIoInteractive('-r', '-f', 'raw', nbd_uri)
-+        self.assertReadOk(qio.cmd('read 0 512'))
-+
-+        result = self.remove_export('exp', 'safe')
-+        self.assertExistingClients(result)
-+
-+        self.assertReadOk(qio.cmd('read 0 512'))
-+
-+        result = self.remove_export('exp', 'hard')
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.assertExportNotFound('exp')
-+        self.assertReadFailed(qio.cmd('read 0 512'))
-+        qio.close()
++    def cmd(self, cmd):
++        # quit command is in close(), '\n' is added automatically
++        assert '\n' not in cmd
++        cmd = cmd.strip()
++        assert cmd != 'q' and cmd != 'quit'
++        self._p.stdin.write(cmd + '\n')
++        return self._read_output()
 +
 +
-+if __name__ == '__main__':
-+    iotests.main()
-diff --git a/tests/qemu-iotests/201.out b/tests/qemu-iotests/201.out
-new file mode 100644
-index 0000000000..2f7d3902f2
---- /dev/null
-+++ b/tests/qemu-iotests/201.out
-@@ -0,0 +1,5 @@
-+.......
-+----------------------------------------------------------------------
-+Ran 7 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 93d96fb22f..f07d3e3df6 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -197,5 +197,6 @@
- 197 rw auto quick
- 198 rw auto
- 200 rw auto
-+201 rw auto quick
- 202 rw auto quick
- 203 rw auto
+ def qemu_nbd(*args):
+     '''Run qemu-nbd in daemon mode and return the parent's exit code'''
+     return subprocess.call(qemu_nbd_args + ['--fork'] + list(args))
 -- 
 2.11.1
