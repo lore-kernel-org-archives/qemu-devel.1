@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Eduard.Shishkin@huawei.com>) id 1ecYyr-000293-V8
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:53:27 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ecY7W-0002pE-9v
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Eduard.Shishkin@huawei.com>) id 1ecYyn-0003hc-0x
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:53:25 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2073 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Eduard.Shishkin@huawei.com>)
-	id 1ecYym-0003eO-DB
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:53:20 -0500
-References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
-	<20180112171416.6048ae9e@bahia.lan>
-	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
-	<20180119112733.4a9dd43f@bahia.lan>
-From: Eduard Shishkin <eduard.shishkin@huawei.com>
-Message-ID: <05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
-Date: Fri, 19 Jan 2018 16:52:44 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180119112733.4a9dd43f@bahia.lan>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
+	(envelope-from <luc.michel@greensocs.com>) id 1ecY7V-0003mf-Fq
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:58:18 -0500
+From: luc.michel@greensocs.com
+Date: Fri, 19 Jan 2018 15:57:55 +0100
+Message-Id: <20180119145756.7629-5-luc.michel@greensocs.com>
+In-Reply-To: <20180119145756.7629-1-luc.michel@greensocs.com>
+References: <20180119145756.7629-1-luc.michel@greensocs.com>
+Subject: [Qemu-devel] [PATCH 3/4] hw/intc/arm_gic: Fix group priority
+ computation for group 1 IRQs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,156 +20,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Veaceslav Falico <veaceslav.falico@huawei.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei
-	(CR)" <zhangwei555@huawei.com>, "Emilio G. Cota" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: Luc MICHEL <luc.michel@git.antfield.fr>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>
 
+From: Luc MICHEL <luc.michel@git.antfield.fr>
 
+When determining the group priority of a group 1 IRQ, if C_CTRL.CBPR is
+0, the non-secure BPR value is used. However, this value must be
+incremented by one so that it matches the secure world number of
+implemented priority bits (NS world has one less priority bit compared
+to the Secure world).
 
-On 1/19/2018 11:27 AM, Greg Kurz wrote:
-> On Mon, 15 Jan 2018 11:49:31 +0800
-> Antonios Motakis <antonios.motakis@huawei.com> wrote:
->
->> On 13-Jan-18 00:14, Greg Kurz wrote:
->>> On Fri, 12 Jan 2018 19:32:10 +0800
->>> Antonios Motakis <antonios.motakis@huawei.com> wrote:
->>>
->>>> Hello all,
->>>>
->>>
->>> Hi Antonios,
->>>
->>> I see you have attached a patch to this email... this really isn't the preferred
->>> way to do things since it prevents to comment the patch (at least with my mail
->>> client). The appropriate way would have been to send the patch with a cover
->>> letter, using git-send-email for example.
->>
->> I apologize for attaching the patch, I should have known better!
->>
->
-> np :)
->
->>>
->>>> We have found an issue in the 9p implementation of QEMU, with how qid paths are generated, which can cause qid path collisions and several issues caused by them. In our use case (running containers under VMs) these have proven to be critical.
->>>>
->>>
->>> Ouch...
->>>
->>>> In particular, stat_to_qid in hw/9pfs/9p.c generates a qid path using the inode number of the file as input. According to the 9p spec the path should be able to uniquely identify a file, distinct files should not share a path value.
->>>>
->>>> The current implementation that defines qid.path = inode nr works fine as long as there are not files from multiple partitions visible under the 9p share. In that case, distinct files from different devices are allowed to have the same inode number. So with multiple partitions, we have a very high probability of qid path collisions.
->>>>
->>>> How to demonstrate the issue:
->>>> 1) Prepare a problematic share:
->>>>  - mount one partition under share/p1/ with some files inside
->>>>  - mount another one *with identical contents* under share/p2/
->>>>  - confirm that both partitions have files with same inode nr, size, etc
->>>> 2) Demonstrate breakage:
->>>>  - start a VM with a virtio-9p pointing to the share
->>>>  - mount 9p share with FSCACHE on
->>>>  - keep open share/p1/file
->>>>  - open and write to share/p2/file
->>>>
->>>> What should happen is, the guest will consider share/p1/file and share/p2/file to be the same file, and since we are using the cache it will not reopen it. We intended to write to partition 2, but we just wrote to partition 1. This is just one example on how the guest may rely on qid paths being unique.
->>>>
->>>> In the use case of containers where we commonly have a few containers per VM, all based on similar images, these kind of qid path collisions are very common and they seem to cause all kinds of funny behavior (sometimes very subtle).
->>>>
->>>> To avoid this situation, the device id of a file needs to be also taken as input for generating a qid path. Unfortunately, the size of both inode nr + device id together would be 96 bits, while we have only 64 bits for the qid path, so we can't just append them and call it a day :(
->>>>
->>>> We have thought of a few approaches, but we would definitely like to hear what the upstream maintainers and community think:
->>>>
->>>> * Full fix: Change the 9p protocol
->>>>
->>>> We would need to support a longer qid path, based on a virtio feature flag. This would take reworking of host and guest parts of virtio-9p, so both QEMU and Linux for most users.
->>>>
->>>
->>> I agree for a longer qid path, but we shouldn't tie it to a virtio flag since
->>> 9p is transport agnostic. And it happens to be used with a variety of transports.
->>> QEMU has both virtio-9p and a Xen backend for example.
->>>
->>>> * Fallback and/or interim solutions
->>>>
->>>> A virtio feature flag may be refused by the guest, so we think we still need to make collisions less likely even with 64 bit paths. E.g.
->>>
->>> In all cases, we would need a fallback solution to support current
->>> guest setups. Also there are several 9p server implementations out
->>> there (ganesha, diod, kvmtool) that are currently used with linux
->>> clients... it will take some time to get everyone in sync :-\
->>>
->>>> 1. XOR the device id with inode nr to produce the qid path (we attach a proof of concept patch)
->>>
->>> Hmm... this would still allow collisions. Not good for fallback.
->>>
->>>> 2. 64 bit hash of device id and inode nr
->>>
->>> Same here.
->>>
->>>> 3. other ideas, such as allocating new qid paths and keep a look up table of some sorts (possibly too expensive)
->>>>
->>>
->>> This would be acceptable for fallback.
->>
->> Maybe we can use the QEMU hash table (https://github.com/qemu/qemu/blob/master/util/qht.c) but I wonder if it scales to millions of entries. Do you think it is appropriate in this case?
->>
->
-> I don't know QHT, hence Cc'ing Emilio for insights.
->
->> I was thinking on how to implement something like this, without having to maintain millions of entries... One option we could consider is to split the bits into a directly-mapped part, and a lookup part. For example:
->>
->> Inode =
->> [ 10 first bits ] + [ 54 lowest bits ]
->>
->> A hash table maps [ inode 10 first bits ] + [ device id ] => [ 10 bit prefix ]
->> The prefix is uniquely allocated for each input.
->>
->> Qid path =
->> [ 10 bit prefix ] + [ inode 54 lowest bits ]
->>
->> Since inodes are not completely random, and we usually have a handful of device IDs, we get a much smaller number of entries to track in the hash table.
->>
->> So what this would give:
->> (1)	Would be faster and take less memory than mapping the full inode_nr,devi_id tuple to unique QID paths
->> (2)	Guaranteed not to run out of bits when inode numbers stay below the lowest 54 bits and we have less than 1024 devices.
->> (3)	When we get beyond this this limit, there is a chance we run out of bits to allocate new QID paths, but we can detect this and refuse to serve the offending files instead of allowing a collision.
->>
->> We could tweak the prefix size to match the scenarios that we consider more likely, but I think close to 10-16 bits sounds reasonable enough. What do you think?
->>
->
-> I think that should work. Please send a patchset :)
+Signed-off-by: Luc MICHEL <luc.michel@git.antfield.fr>
+---
+ hw/intc/arm_gic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi Greg,
-
-This is based on the assumption that high bits of inode numbers are
-always zero, which is unacceptable from my standpoint. Inode numbers
-allocator is a per-volume file system feature, so there may appear
-allocators, which don't use simple increment and assign inode number
-with non-zero high bits even for the first file of a volume.
-
-As I understand, the problem is that the guest doesn't have enough
-information for proper files identification (in our case share/p1/file
-and share/p2/file are wrongly identified as the same file). It seems
-that we need to transmit device ID to the guest, and not in the high 
-bits of the inode number.
-
-AFAIK Slava has patches for such transmission, I hope that he will send
-it eventually.
-
-Thanks,
-Eduard.
-
->
->>>
->>>> With our proof of concept patch, the issues caused by qid path collisions go away, so it can be seen as an interim solution of sorts. However, the chance of collisions is not eliminated, we are just replacing the current strategy, which is almost guaranteed to cause collisions in certain use cases, with one that makes them more rare. We think that a virtio feature flag for longer qid paths is the only way to eliminate these issues completely.
->>>>
->>>> This is the extent that we were able to analyze the issue from our side, we would like to hear if there are some better ideas, or which approach would be more appropriate for upstream.
->>>>
->>>> Best regards,
->>>>
->>>
->>> Cheers,
->>>
->>> --
->>> Greg
->>>
->>
->
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 713de3084f..d0a41a89ae 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -256,7 +256,7 @@ static int gic_get_group_priority(GICState *s, int cpu, int irq)
+     if (gic_has_groups(s) &&
+         !(s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) &&
+         GIC_TEST_GROUP(irq, (1 << cpu))) {
+-        bpr = s->abpr[cpu];
++        bpr = s->abpr[cpu] - 1;
+     } else {
+         bpr = s->bpr[cpu];
+     }
+-- 
+2.16.0
