@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecZbn-0004t5-5Y
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:40 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecZc5-0005AR-Gs
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecZbj-0006Em-5e
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:39 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:52290)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecZbi-0006ED-Qw
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:35 -0500
-References: <1513345976-22958-1-git-send-email-peter.maydell@linaro.org>
-	<1513345976-22958-3-git-send-email-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <721eacb9-f011-4b97-08c6-70004ea41bdd@vivier.eu>
-Date: Fri, 19 Jan 2018 17:33:23 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1ecZc1-0006Mn-HQ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:5321)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecZc1-0006MQ-9F
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:33:53 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri, 19 Jan 2018 14:33:26 -0200
+Message-Id: <20180119163345.10649-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1513345976-22958-3-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: Don't use
- CMSG_ALIGN(sizeof struct cmsghdr)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 00/19] machine queue, 2018-01-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +25,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Bruno Haible <bruno@clisp.org>, patches@linaro.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 
-Le 15/12/2017 à 14:52, Peter Maydell a écrit :
-> The Linux struct cmsghdr is already guaranteed to be sufficiently
-> aligned that CMSG_ALIGN(sizeof struct cmsghdr) is always equal
-> to sizeof struct cmsghdr. Stop doing the unnecessary alignment
-> arithmetic for host and target cmsghdr.
-> 
-> This follows kernel commit 1ff8cebf49ed9e9ca2 and brings our
-> TARGET_CMSG_* macros back into line with the kernel ones,
-> as well as making them easier to understand.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  linux-user/syscall_defs.h | 6 +++---
->  linux-user/syscall.c      | 4 ++--
->  2 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index bec3680..a35c52a 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -303,9 +303,9 @@ struct target_cmsghdr {
->                                 __target_cmsg_nxthdr(mhdr, cmsg, cmsg_start)
->  #define TARGET_CMSG_ALIGN(len) (((len) + sizeof (abi_long) - 1) \
->                                 & (size_t) ~(sizeof (abi_long) - 1))
-> -#define TARGET_CMSG_SPACE(len) (TARGET_CMSG_ALIGN (len) \
-> -                               + TARGET_CMSG_ALIGN (sizeof (struct target_cmsghdr)))
-> -#define TARGET_CMSG_LEN(len)   (TARGET_CMSG_ALIGN (sizeof (struct target_cmsghdr)) + (len))
-> +#define TARGET_CMSG_SPACE(len) (sizeof(struct target_cmsghdr) + \
-> +                                TARGET_CMSG_ALIGN(len))
-> +#define TARGET_CMSG_LEN(len) (sizeof(struct target_cmsghdr) + (len))
->  
->  static __inline__ struct target_cmsghdr *
->  __target_cmsg_nxthdr(struct target_msghdr *__mhdr,
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index a1b9772..39553c8 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -1692,7 +1692,7 @@ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
->          void *target_data = TARGET_CMSG_DATA(target_cmsg);
->  
->          int len = tswapal(target_cmsg->cmsg_len)
-> -                  - TARGET_CMSG_ALIGN(sizeof (struct target_cmsghdr));
-> +            - sizeof(struct target_cmsghdr);
->  
->          space += CMSG_SPACE(len);
->          if (space > msgh->msg_controllen) {
-> @@ -1773,7 +1773,7 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
->          void *data = CMSG_DATA(cmsg);
->          void *target_data = TARGET_CMSG_DATA(target_cmsg);
->  
-> -        int len = cmsg->cmsg_len - CMSG_ALIGN(sizeof (struct cmsghdr));
-> +        int len = cmsg->cmsg_len - sizeof(struct cmsghdr);
->          int tgt_len, tgt_space;
->  
->          /* We never copy a half-header but may copy half-data;
-> 
+Changes from v1 (2018-01-18):
+* Fix build failure on 32-bit
 
-Applied to my linux-user branch.
+The following changes since commit 3e5bdc6573edf0585e4085e6a4e349b135abf3=
+b4:
 
-Thanks,
-Laurent
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2018-01-19 10:17:20 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+
+for you to fetch changes up to d6b6abc51dda79a97f2c7bd6652c1940c068f1ec:
+
+  fw_cfg: fix memory corruption when all fw_cfg slots are used (2018-01-1=
+9 11:18:51 -0200)
+
+----------------------------------------------------------------
+machine queue, 2018-01-19
+
+----------------------------------------------------------------
+
+Eduardo Habkost (6):
+  machine: Replace has_dynamic_sysbus with list of allowed devices
+  hw/arm/virt: Allow only supported dynamic sysbus devices
+  ppc: e500: Allow only supported dynamic sysbus devices
+  spapr: Allow only supported dynamic sysbus devices
+  xen: Add only xen-sysdev to dynamic sysbus device list
+  q35: Allow only supported dynamic sysbus devices
+
+Haozhong Zhang (3):
+  hostmem-file: add "align" option
+  nvdimm: add a macro for property "label-size"
+  nvdimm: add 'unarmed' option
+
+Igor Mammedov (2):
+  numa: fix missing '-numa cpu' in '-help' output
+  possible_cpus: add CPUArchId::type field
+
+Marc-Andr=C3=A9 Lureau (2):
+  memfd: split qemu_memfd_alloc()
+  memfd: remove needless include
+
+Marcel Apfelbaum (1):
+  fw_cfg: fix memory corruption when all fw_cfg slots are used
+
+Stefan Hajnoczi (2):
+  qemu-options: document missing memory-backend-file options
+  qemu-options: document memory-backend-ram
+
+Thomas Huth (3):
+  qdev_monitor: Simplify error handling in qdev_device_add()
+  qdev: Check for the availability of a hotplug controller before adding
+    a device
+  scripts: Remove fixed entries from the device-crash-test
+
+ docs/nvdimm.txt            | 31 ++++++++++++++++++++++
+ include/exec/memory.h      |  3 +++
+ include/hw/boards.h        |  7 ++++-
+ include/hw/mem/nvdimm.h    | 12 +++++++++
+ include/hw/qdev-core.h     |  1 +
+ include/qemu/memfd.h       |  1 +
+ backends/hostmem-file.c    | 41 +++++++++++++++++++++++++++-
+ exec.c                     |  8 +++++-
+ hw/acpi/nvdimm.c           |  7 +++++
+ hw/arm/virt.c              |  8 ++++--
+ hw/core/machine.c          | 55 ++++++++++++++++++++++++--------------
+ hw/core/qdev.c             | 28 ++++++++++++++------
+ hw/i386/pc.c               |  4 ++-
+ hw/i386/pc_q35.c           |  5 +++-
+ hw/mem/nvdimm.c            | 28 +++++++++++++++++++-
+ hw/nvram/fw_cfg.c          |  6 +++--
+ hw/ppc/e500plat.c          |  4 ++-
+ hw/ppc/spapr.c             | 15 ++++++-----
+ hw/s390x/s390-virtio-ccw.c |  1 +
+ hw/xen/xen_backend.c       |  2 +-
+ memory.c                   |  2 ++
+ numa.c                     |  2 +-
+ qdev-monitor.c             | 21 +++++++++------
+ util/memfd.c               | 63 ++++++++++++++++++++++++----------------=
+---
+ vl.c                       |  3 +--
+ qemu-options.hx            | 66 ++++++++++++++++++++++++++++++++++++++++=
+------
+ scripts/device-crash-test  |  8 ------
+ 27 files changed, 332 insertions(+), 100 deletions(-)
+
+--=20
+2.14.3
