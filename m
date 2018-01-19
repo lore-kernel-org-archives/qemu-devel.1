@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7s-0006pn-Ql
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7t-0006q7-4H
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:50:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7p-00037x-LN
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:50:32 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecW7s-000393-BE
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:50:33 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Fri, 19 Jan 2018 15:50:02 +0300
-Message-Id: <1516366207-109842-4-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Fri, 19 Jan 2018 15:50:04 +0300
+Message-Id: <1516366207-109842-6-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/8] ide: account UNMAP (TRIM) operations
+Subject: [Qemu-devel] [PATCH v2 5/8] scsi: move unmap error checking to the
+ complete callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +25,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@virtuozzo.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
----
- hw/ide/core.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+This will help to account the operation in the following commit.
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 5be72d4..6fdc936 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -443,6 +443,14 @@ static void ide_issue_trim_cb(void *opaque, int ret)
-     TrimAIOCB *iocb = opaque;
-     IDEState *s = iocb->s;
+The difference is that we don't call scsi_disk_req_check_error() before
+the 1st discard iteration anymore. That function also checks if
+the request is cancelled, however it shouldn't get canceled until it
+yields in blk_aio() functions anyway.
+Same approach is already used for emulate_write_same.
+
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ hw/scsi/scsi-disk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 7b8e0ed..693a754 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1627,9 +1627,6 @@ static void scsi_unmap_complete_noio(UnmapCBData *data, int ret)
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
  
-+    if (iocb->i >= 0) {
-+        if (ret >= 0) {
-+            block_acct_done(blk_get_stats(s->blk), &s->acct);
-+        } else {
-+            block_acct_failed(blk_get_stats(s->blk), &s->acct);
-+        }
+     assert(r->req.aiocb == NULL);
+-    if (scsi_disk_req_check_error(r, ret, false)) {
+-        goto done;
+-    }
+ 
+     if (data->count > 0) {
+         r->sector = ldq_be_p(&data->inbuf[0]);
+@@ -1665,7 +1662,12 @@ static void scsi_unmap_complete(void *opaque, int ret)
+     r->req.aiocb = NULL;
+ 
+     aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
+-    scsi_unmap_complete_noio(data, ret);
++    if (scsi_disk_req_check_error(r, ret, false)) {
++        scsi_req_unref(&r->req);
++        g_free(data);
++    } else {
++        scsi_unmap_complete_noio(data, ret);
 +    }
-+
-     if (ret >= 0) {
-         while (iocb->j < iocb->qiov->niov) {
-             int j = iocb->j;
-@@ -460,10 +468,15 @@ static void ide_issue_trim_cb(void *opaque, int ret)
-                 }
+     aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
+ }
  
-                 if (!ide_sect_range_ok(s, sector, count)) {
-+                    block_acct_invalid(blk_get_stats(s->blk),
-+                                       BLOCK_ACCT_UNMAP);
-                     iocb->is_invalid = true;
-                     goto done;
-                 }
- 
-+                block_acct_start(blk_get_stats(s->blk), &s->acct,
-+                                 count << BDRV_SECTOR_BITS, BLOCK_ACCT_UNMAP);
-+
-                 /* Got an entry! Submit and exit.  */
-                 iocb->aiocb = blk_aio_pdiscard(s->blk,
-                                                sector << BDRV_SECTOR_BITS,
 -- 
 2.7.4
