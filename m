@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecYBr-0006VA-9c
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:02:48 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ecYCN-0006xG-G5
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:03:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecYBq-00076q-9N
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:02:47 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ecYCM-0007dO-HV
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:03:19 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 19 Jan 2018 14:49:04 +0000
-Message-Id: <1516373355-305-12-git-send-email-eric.auger@redhat.com>
+Date: Fri, 19 Jan 2018 14:49:05 +0000
+Message-Id: <1516373355-305-13-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
 References: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 11/22] virtio-iommu: Implement map/unmap
+Subject: [Qemu-devel] [RFC v5 12/22] virtio-iommu: Implement translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,151 +22,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-This patch implements virtio_iommu_map/unmap.
+This patch implements the translate callback
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-v3 -> v4:
-- implement unmap semantics as specified in v0.4
+v4 -> v5:
+- check the device domain is not NULL
+- s/printf/error_report
+- set flags to IOMMU_NONE in case of all translation faults
 ---
- hw/virtio/trace-events   |  3 ++
- hw/virtio/virtio-iommu.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 92 insertions(+), 2 deletions(-)
+ hw/virtio/trace-events   |  1 +
+ hw/virtio/virtio-iommu.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 42 insertions(+), 1 deletion(-)
 
 diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 59c75da..3ce9b82 100644
+index 3ce9b82..873e4fc 100644
 --- a/hw/virtio/trace-events
 +++ b/hw/virtio/trace-events
-@@ -42,3 +42,6 @@ virtio_iommu_get_endpoint(uint32_t ep_id) "Alloc endpoint=%d"
- virtio_iommu_put_endpoint(uint32_t ep_id) "Free endpoint=%d"
- virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
-+virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap left [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
-+virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
-+virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
+@@ -45,3 +45,4 @@ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+ virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap left [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
+ virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
+ virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
++virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
 diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index b30d761..f530eca 100644
+index f530eca..c96aacc 100644
 --- a/hw/virtio/virtio-iommu.c
 +++ b/hw/virtio/virtio-iommu.c
-@@ -58,6 +58,13 @@ typedef struct viommu_interval {
-     uint64_t high;
- } viommu_interval;
- 
-+typedef struct viommu_mapping {
-+    uint64_t virt_addr;
-+    uint64_t phys_addr;
-+    uint64_t size;
-+    uint32_t flags;
-+} viommu_mapping;
-+
- static inline uint16_t virtio_iommu_get_sid(IOMMUDevice *dev)
+@@ -485,19 +485,59 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+                                             IOMMUAccessFlags flag)
  {
-     return PCI_BUILD_BDF(pci_bus_num(dev->bus), dev->devfn);
-@@ -253,10 +260,37 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
-     uint64_t virt_addr = le64_to_cpu(req->virt_addr);
-     uint64_t size = le64_to_cpu(req->size);
-     uint32_t flags = le32_to_cpu(req->flags);
-+    viommu_domain *domain;
-+    viommu_interval *interval;
-+    viommu_mapping *mapping;
-+
-+    interval = g_malloc0(sizeof(*interval));
-+
-+    interval->low = virt_addr;
-+    interval->high = virt_addr + size - 1;
-+
-+    domain = g_tree_lookup(s->domains, GUINT_TO_POINTER(domain_id));
-+    if (!domain) {
-+        return VIRTIO_IOMMU_S_NOENT;
-+    }
-+
-+    mapping = g_tree_lookup(domain->mappings, (gpointer)interval);
-+    if (mapping) {
-+        g_free(interval);
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
- 
-     trace_virtio_iommu_map(domain_id, phys_addr, virt_addr, size, flags);
- 
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    mapping = g_malloc0(sizeof(*mapping));
-+    mapping->virt_addr = virt_addr;
-+    mapping->phys_addr = phys_addr;
-+    mapping->size = size;
-+    mapping->flags = flags;
-+
-+    g_tree_insert(domain->mappings, interval, mapping);
-+
-+    return VIRTIO_IOMMU_S_OK;
- }
- 
- static int virtio_iommu_unmap(VirtIOIOMMU *s,
-@@ -265,10 +299,63 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-     uint32_t domain_id = le32_to_cpu(req->domain);
-     uint64_t virt_addr = le64_to_cpu(req->virt_addr);
-     uint64_t size = le64_to_cpu(req->size);
+     IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
++    VirtIOIOMMU *s = sdev->viommu;
+     uint32_t sid;
++    viommu_endpoint *ep;
 +    viommu_mapping *mapping;
 +    viommu_interval interval;
-+    viommu_domain *domain;
++
++    interval.low = addr;
++    interval.high = addr + 1;
  
-     trace_virtio_iommu_unmap(domain_id, virt_addr, size);
+     IOMMUTLBEntry entry = {
+         .target_as = &address_space_memory,
+         .iova = addr,
+         .translated_addr = addr,
+-        .addr_mask = ~(hwaddr)0,
++        .addr_mask = (1 << ctz32(s->config.page_size_mask)) - 1,
+         .perm = IOMMU_NONE,
+     };
  
--    return VIRTIO_IOMMU_S_UNSUPP;
-+    domain = g_tree_lookup(s->domains, GUINT_TO_POINTER(domain_id));
-+    if (!domain) {
-+        error_report("%s: no domain", __func__);
-+        return VIRTIO_IOMMU_S_NOENT;
-+    }
-+    interval.low = virt_addr;
-+    interval.high = virt_addr + size - 1;
+     sid = virtio_iommu_get_sid(sdev);
+ 
+     trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
++    qemu_mutex_lock(&s->mutex);
 +
-+    mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
-+
-+    while (mapping) {
-+        viommu_interval current;
-+        uint64_t low  = mapping->virt_addr;
-+        uint64_t high = mapping->virt_addr + mapping->size - 1;
-+
-+        current.low = low;
-+        current.high = high;
-+
-+        if (low == interval.low && size >= mapping->size) {
-+            g_tree_remove(domain->mappings, (gpointer)(&current));
-+            interval.low = high + 1;
-+            trace_virtio_iommu_unmap_left_interval(current.low, current.high,
-+                interval.low, interval.high);
-+        } else if (high == interval.high && size >= mapping->size) {
-+            trace_virtio_iommu_unmap_right_interval(current.low, current.high,
-+                interval.low, interval.high);
-+            g_tree_remove(domain->mappings, (gpointer)(&current));
-+            interval.high = low - 1;
-+        } else if (low > interval.low && high < interval.high) {
-+            trace_virtio_iommu_unmap_inc_interval(current.low, current.high);
-+            g_tree_remove(domain->mappings, (gpointer)(&current));
-+        } else {
-+            break;
-+        }
-+        if (interval.low >= interval.high) {
-+            return VIRTIO_IOMMU_S_OK;
-+        } else {
-+            mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
-+        }
++    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(sid));
++    if (!ep) {
++        error_report("%s sid=%d is not known!!", __func__, sid);
++        goto unlock;
 +    }
 +
-+    if (mapping) {
-+        error_report("****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
-+                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported",
-+                     __func__, interval.low, size,
-+                     mapping->virt_addr, mapping->size);
-+    } else {
-+        return VIRTIO_IOMMU_S_OK;
++    if (!ep->domain) {
++        error_report("%s %02x:%02x.%01x not attached to any domain", __func__,
++                     PCI_BUS_NUM(sid), PCI_SLOT(sid), PCI_FUNC(sid));
++        goto unlock;
 +    }
 +
-+    return VIRTIO_IOMMU_S_INVAL;
++    mapping = g_tree_lookup(ep->domain->mappings, (gpointer)(&interval));
++    if (!mapping) {
++        error_report("%s no mapping for 0x%"PRIx64" for sid=%d", __func__,
++                     addr, sid);
++        goto unlock;
++    }
++
++    if (((flag & IOMMU_RO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
++        ((flag & IOMMU_WO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
++        error_report("Permission error on 0x%"PRIx64"(%d): allowed=%d",
++                     addr, flag, mapping->flags);
++        goto unlock;
++    }
++    entry.translated_addr = addr - mapping->virt_addr + mapping->phys_addr;
++    entry.perm = flag;
++    trace_virtio_iommu_translate_out(addr, entry.translated_addr, sid);
++
++unlock:
++    qemu_mutex_unlock(&s->mutex);
+     return entry;
  }
  
- #define get_payload_size(req) (\
 -- 
 1.9.1
