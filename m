@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecZd5-00062N-BG
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:35:00 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecZd6-000643-Jw
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:35:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecZd4-0006qC-LE
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:34:59 -0500
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:42790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecZd4-0006py-F8
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:34:58 -0500
-Received: by mail-ot0-x232.google.com with SMTP id s3so1865302otc.9
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 08:34:58 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <d746e2e8-3690-c27e-f816-9892b36d8a1c@amsat.org>
-References: <20180115115309.23982-1-quintela@redhat.com>
-	<CAFEAcA-SxiJyKa84UwG8CESpkTXEM9AG5HqEgpPrzSFwrTPzYg@mail.gmail.com>
-	<d746e2e8-3690-c27e-f816-9892b36d8a1c@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Jan 2018 16:34:37 +0000
-Message-ID: <CAFEAcA9dYzqTQTseZQfa0bm+H8tjCdhjuJOSgCx-KB14jBWDUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/27] Migration pull
+	(envelope-from <ehabkost@redhat.com>) id 1ecZd3-0006pd-33
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:35:00 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri, 19 Jan 2018 14:33:34 -0200
+Message-Id: <20180119163345.10649-9-ehabkost@redhat.com>
+In-Reply-To: <20180119163345.10649-1-ehabkost@redhat.com>
+References: <20180119163345.10649-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL v2 08/19] ppc: e500: Allow only supported
+ dynamic sysbus devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +20,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
 
-On 19 January 2018 at 16:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> We have armel/armhf/powerpc hosts failing since this pull due to commit
-> 3be98be4e9f.
->
-> Those target are currently tested on Shippable CI, eventually adding an
-> IRC bot we could notice.
->
-> I know companies using QEMU system in embedded armel/armhf hosts, I
-> don't know about the ppc32 hosts.
-> This is however unlikely the migration features are used there.
+platform_bus_create_devtree() already rejects all dynamic sysbus
+devices except TYPE_ETSEC_COMMON, so register it as the only
+allowed dynamic sysbus device for the ppce500 machine-type.
 
-I have ppc64 and armhf in my test set, so clearly they don't all
-fail all the time. What are the failure symptoms ?
+Cc: Alexander Graf <agraf@suse.de>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20171125151610.20547-4-ehabkost@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/ppc/e500plat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-thanks
--- PMM
+diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
+index 438118c29b..81d03e1038 100644
+--- a/hw/ppc/e500plat.c
++++ b/hw/ppc/e500plat.c
+@@ -12,6 +12,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "e500.h"
++#include "hw/net/fsl_etsec/etsec.h"
+ #include "hw/boards.h"
+ #include "sysemu/device_tree.h"
+ #include "sysemu/kvm.h"
+@@ -64,8 +65,7 @@ static void e500plat_machine_init(MachineClass *mc)
+     mc->desc = "generic paravirt e500 platform";
+     mc->init = e500plat_init;
+     mc->max_cpus = 32;
+-    /*TODO: allow only sysbus devices that really work with this machine */
+-    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
++    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_ETSEC_COMMON);
+     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
+ }
+ 
+-- 
+2.14.3
