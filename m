@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdl6-00022w-VN
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:37 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ecdzX-00065J-4z
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 16:14:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdl5-000681-Uc
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:33 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Fri, 19 Jan 2018 15:58:47 -0500
-Message-Id: <20180119205847.7141-14-jsnow@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1ecdzS-0006SS-Qp
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 16:14:27 -0500
+Resent-Message-Id: <E1ecdzS-0006SS-Qp@eggs.gnu.org>
 In-Reply-To: <20180119205847.7141-1-jsnow@redhat.com>
-References: <20180119205847.7141-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 13/13] blockjob: remove
- block_job_pause_point from interface
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151639644839.599.15105151707304843341@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 19 Jan 2018 13:14:09 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] blockjob: refactor mirror_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,86 +23,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
+To: jsnow@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-Remove the last call in block/mirror, using relax instead.
-relax may do nothing if we are canceled, so allow iteration to return
-prematurely and allow mirror_run to handle the cancellation logic.
-
-This is a functional change to mirror that should have the effect of
-cancelled mirror jobs being able to respond to that request a little
-sooner instead of launching new requests.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/mirror.c               |  4 +++-
- blockjob.c                   | 10 +++++++++-
- include/block/blockjob_int.h |  9 ---------
- 3 files changed, 12 insertions(+), 11 deletions(-)
-
-diff --git a/block/mirror.c b/block/mirror.c
-index 192e03694f..8e6b5b25a9 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -345,7 +345,9 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-         mirror_wait_for_io(s);
-     }
- 
--    block_job_pause_point(&s->common);
-+    if (block_job_relax(&s->common, 0)) {
-+        return 0;
-+    }
- 
-     /* Find the number of consective dirty chunks following the first dirty
-      * one, and wait for in flight requests in them. */
-diff --git a/blockjob.c b/blockjob.c
-index 40167d6896..27c13fdd08 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -60,6 +60,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
- static void block_job_event_cancelled(BlockJob *job);
- static void block_job_event_completed(BlockJob *job, const char *msg);
- static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
-+static int coroutine_fn block_job_pause_point(BlockJob *job);
- 
- /* Transactional group of block jobs */
- struct BlockJobTxn {
-@@ -793,7 +794,14 @@ static void block_job_do_yield(BlockJob *job, uint64_t ns)
-     assert(job->busy);
- }
- 
--int coroutine_fn block_job_pause_point(BlockJob *job)
-+/**
-+ * block_job_pause_point:
-+ * @job: The job that is ready to pause.
-+ *
-+ * Pause now if block_job_pause() has been called.  Block jobs that perform
-+ * lots of I/O must call this between requests so that the job can be paused.
-+ */
-+static int coroutine_fn block_job_pause_point(BlockJob *job)
- {
-     assert(job && block_job_started(job));
- 
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index c4891a5a9b..57327cbc5a 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -201,15 +201,6 @@ void block_job_completed(BlockJob *job, int ret);
-  */
- bool block_job_is_cancelled(BlockJob *job);
- 
--/**
-- * block_job_pause_point:
-- * @job: The job that is ready to pause.
-- *
-- * Pause now if block_job_pause() has been called.  Block jobs that perform
-- * lots of I/O must call this between requests so that the job can be paused.
-- */
--int coroutine_fn block_job_pause_point(BlockJob *job);
--
- /**
-  * block_job_enter:
-  * @job: The job to enter.
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTE5MjA1ODQ3LjcxNDEtMS1qc25vd0ByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTNdIGJsb2Nram9iOiByZWZhY3RvciBtaXJyb3Jf
+dGhyb3R0bGUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
+ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
+QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
+ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
+ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
+dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAg
+ICAgICAgICBwYXRjaGV3LzIwMTgwMTE5MTYyNTU0LjI3MjcwLTEtbWFyY2FuZHJlLmx1cmVhdUBy
+ZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAxMTkxNjI1NTQuMjcyNzAtMS1tYXJjYW5kcmUubHVy
+ZWF1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDEx
+OTIwNTg0Ny43MTQxLTEtanNub3dAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwMTE5MjA1ODQ3
+LjcxNDEtMS1qc25vd0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+OTY5ZGRkYzRmZCBibG9ja2pvYjogcmVtb3ZlIGJsb2NrX2pvYl9wYXVzZV9wb2ludCBmcm9tIGlu
+dGVyZmFjZQo3OTI1MzlhMDdlIGJsb2Nram9iOiBwcml2YXRpemUgYmxvY2tfam9iX3NsZWVwX25z
+CmVhNmY4ZjIzNTkgYmxvY2svbWlycm9yOiByZW1vdmUgYmxvY2tfam9iX3NsZWVwX25zIGNhbGxz
+CjdmMmVlNjBjOGIgYmxvY2svbWlycm9yOiBjb25kZW5zZSBjYW5jZWxsYXRpb24gYW5kIHJlbGF4
+IGNhbGxzCjlhMTZkNjc3OGUgYmxvY2svYmFja3VwOiByZW1vdmUgeWllbGRfYW5kX2NoZWNrCmJi
+ZmNmZTljODkgYWxsb3cgYmxvY2tfam9iX3JlbGF4IHRvIHJldHVybiAtRUNBTkNFTEVECmIxMzI0
+YjExMWMgYmxvY2svYmFja3VwOiB1c2UgYmxvY2tfam9iX3JlbGF4CmQyMDhkYjZmY2EgYmxvY2sv
+c3RyZWFtOiB1c2UgYmxvY2tfam9iX3JlbGF4Cjc4OGVjZTQzNmEgYmxvY2svY29tbWl0OiB1c2Ug
+YmxvY2tfam9iX3JlbGF4CjRlMjA5ZTdhZWQgYmxvY2tqb2I6IGFsbG93IGJsb2NrX2pvYl90aHJv
+dHRsZSB0byB0YWtlIGRlbGF5X25zCjc2Y2U0MjcxMGIgYmxvY2tqb2I6IGNyZWF0ZSBibG9ja19q
+b2JfcmVsYXgKOTc3MWU4NGFiOCBibG9ja2pvYjogY29uc29saWRhdGUgU0xJQ0VfVElNRSBkZWZp
+bml0aW9uCjJhMWVlYzY4YWMgYmxvY2tqb2I6IHJlY29yZCB0aW1lIG9mIGxhc3QgZW50cmFuY2UK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTM6IGJsb2Nram9iOiByZWNv
+cmQgdGltZSBvZiBsYXN0IGVudHJhbmNlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiM1MjogRklMRTogYmxvY2svbWlycm9yLmM6ODAzOgorICAgICAgICBkZWx0YSA9IHFlbXVf
+Y2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfUkVBTFRJTUUpIC0gcy0+Y29tbW9uLmxhc3RfZW50ZXJf
+bnM7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDYzIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogYmxv
+Y2tqb2I6IGNvbnNvbGlkYXRlIFNMSUNFX1RJTUUgZGVmaW5pdGlvbi4uLgpDaGVja2luZyBQQVRD
+SCAzLzEzOiBibG9ja2pvYjogY3JlYXRlIGJsb2NrX2pvYl9yZWxheC4uLgpDaGVja2luZyBQQVRD
+SCA0LzEzOiBibG9ja2pvYjogYWxsb3cgYmxvY2tfam9iX3Rocm90dGxlIHRvIHRha2UgZGVsYXlf
+bnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMzogYmxvY2svY29tbWl0OiB1c2UgYmxvY2tfam9iX3Jl
+bGF4Li4uCkNoZWNraW5nIFBBVENIIDYvMTM6IGJsb2NrL3N0cmVhbTogdXNlIGJsb2NrX2pvYl9y
+ZWxheC4uLgpDaGVja2luZyBQQVRDSCA3LzEzOiBibG9jay9iYWNrdXA6IHVzZSBibG9ja19qb2Jf
+cmVsYXguLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMzogYWxsb3cgYmxvY2tfam9iX3JlbGF4IHRvIHJl
+dHVybiAtRUNBTkNFTEVELi4uCkNoZWNraW5nIFBBVENIIDkvMTM6IGJsb2NrL2JhY2t1cDogcmVt
+b3ZlIHlpZWxkX2FuZF9jaGVjay4uLgpDaGVja2luZyBQQVRDSCAxMC8xMzogYmxvY2svbWlycm9y
+OiBjb25kZW5zZSBjYW5jZWxsYXRpb24gYW5kIHJlbGF4IGNhbGxzLi4uCkNoZWNraW5nIFBBVENI
+IDExLzEzOiBibG9jay9taXJyb3I6IHJlbW92ZSBibG9ja19qb2Jfc2xlZXBfbnMgY2FsbHMuLi4K
+RVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIHN0YXRpY3MgdG8gMCBvciBOVUxMCiMzMDogRklMRTog
+YmxvY2svbWlycm9yLmM6NzY0OgorICAgICAgICBzdGF0aWMgdWludDY0X3QgZGVsYXlfbnMgPSAw
+OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
+dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8xMzogYmxv
+Y2tqb2I6IHByaXZhdGl6ZSBibG9ja19qb2Jfc2xlZXBfbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMv
+MTM6IGJsb2Nram9iOiByZW1vdmUgYmxvY2tfam9iX3BhdXNlX3BvaW50IGZyb20gaW50ZXJmYWNl
+Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
+cmVlbGlzdHMub3Jn
