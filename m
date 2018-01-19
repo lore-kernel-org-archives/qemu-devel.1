@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ecaLZ-0004ix-J4
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:20:58 -0500
+	(envelope-from <veaceslav.falico@huawei.com>) id 1ecaPU-0007M2-6F
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:25:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ecaLV-0003HO-Ia
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:20:57 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:39729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ecaLV-0003GS-7q
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:20:53 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id b21so4999726wme.4
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 09:20:53 -0800 (PST)
-Date: Fri, 19 Jan 2018 17:20:49 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180119172049.GA29973@stefanha-x1.localdomain>
-References: <20180110161438.GA28096@stefanha-x1.localdomain>
-	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
-	<20180111152345.GA7353@stefanha-x1.localdomain>
-	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
-	<20180112101807.GE7356@stefanha-x1.localdomain>
-	<a45c1da8-03e8-140f-725c-af0f31e3da62@redhat.com>
-	<20180115135620.GG13238@stefanha-x1.localdomain>
-	<9fad276a-d17b-6a45-6cd6-50899934b7a1@redhat.com>
-	<20180118105103.GC19831@stefanha-x1.localdomain>
-	<78448708-8d53-70ca-d079-424caabc3a35@redhat.com>
+	(envelope-from <veaceslav.falico@huawei.com>) id 1ecaPQ-0006ng-3M
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:25:00 -0500
+Received: from [45.249.212.32] (port=43329 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <veaceslav.falico@huawei.com>)
+	id 1ecaPP-0006lf-9I
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:24:56 -0500
+References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
+	<20180112171416.6048ae9e@bahia.lan>
+	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
+	<20180119112733.4a9dd43f@bahia.lan>
+	<05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
+From: Veaceslav Falico <veaceslav.falico@huawei.com>
+Message-ID: <899644b1-e401-8ed5-8a49-1f0e2dbf9b2b@huawei.com>
+Date: Fri, 19 Jan 2018 17:37:58 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
-Content-Disposition: inline
-In-Reply-To: <78448708-8d53-70ca-d079-424caabc3a35@redhat.com>
-Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
+In-Reply-To: <05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,106 +32,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, wei.w.wang@intel.com, qemu-devel@nongnu.org
+To: Eduard Shishkin <eduard.shishkin@huawei.com>, Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei (CR)" <zhangwei555@huawei.com>, "Emilio
+	G. Cota" <cota@braap.org>
 
-
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jan 18, 2018 at 07:51:49PM +0800, Jason Wang wrote:
+On 1/19/2018 4:52 PM, Eduard Shishkin wrote:
 >=20
 >=20
-> On 2018=E5=B9=B401=E6=9C=8818=E6=97=A5 18:51, Stefan Hajnoczi wrote:
-> > On Tue, Jan 16, 2018 at 01:41:37PM +0800, Jason Wang wrote:
-> > >=20
-> > > On 2018=E5=B9=B401=E6=9C=8815=E6=97=A5 21:56, Stefan Hajnoczi wrote:
-> > > > On Mon, Jan 15, 2018 at 02:56:31PM +0800, Jason Wang wrote:
-> > > > > On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 18:18, Stefan Hajnoczi wro=
-te:
-> > > > > > > And what's more important, according to the kvm 2016 slides o=
-f vhost-pci,
-> > > > > > > the motivation of vhost-pci is not building SDN but a chain o=
-f VNFs. So
-> > > > > > > bypassing the central vswitch through a private VM2VM path do=
-es make sense.
-> > > > > > > (Though whether or not vhost-pci is the best choice is still =
-questionable).
-> > > > > > This is probably my fault.  Maybe my networking terminology is =
-wrong.  I
-> > > > > > consider "virtual network functions" to be part of "software-de=
-fined
-> > > > > > networking" use cases.  I'm not implying there must be a centra=
-l virtual
-> > > > > > switch.
-> > > > > >=20
-> > > > > > To rephrase: vhost-pci enables exitless VM2VM communication.
-> > > > > The problem is, exitless is not what vhost-pci invents, it could =
-be achieved
-> > > > > now when both sides are doing busypolling.
-> > > > The only way I'm aware of is ivshmem.  But ivshmem lacks a family of
-> > > > standard device types that allows different implementations to
-> > > > interoperate.  We already have the virtio family of device types, s=
-o it
-> > > > makes sense to work on a virtio-based solution.
-> > > >=20
-> > > > Perhaps I've missed a different approach for exitless VM2VM
-> > > > communication.  Please explain how VM1 and VM2 can do exitless netw=
-ork
-> > > > communication today?
-> > > I'm not sure we're talking the same thing. For VM2VM, do you mean onl=
-y for
-> > > shared memory? I thought we can treat any backends that can transfer =
-data
-> > > directly between two VMs for a VM2VM solution. In this case, if virtq=
-ueue
-> > > notifications were disabled by all sides (e.g busy polling), there wi=
-ll be
-> > > no exits at all.
-> > >=20
-> > > And if you want a virtio version of shared memory, it's another kind =
-of
-> > > motivation at least from my point of view.
-> > I'm confused, we're probably not talking about the same thing.
-> >=20
-> > You said that exitless "could be achieved now when both sides are doing
-> > busypolling".  Can you post a QEMU command-line that does this?
+> On 1/19/2018 11:27 AM, Greg Kurz wrote:
+>> On Mon, 15 Jan 2018 11:49:31 +0800
+>> Antonios Motakis <antonios.motakis@huawei.com> wrote:
+>>
+>>> On 13-Jan-18 00:14, Greg Kurz wrote:
+>>>> On Fri, 12 Jan 2018 19:32:10 +0800
+>>>> Antonios Motakis <antonios.motakis@huawei.com> wrote:
+>>>>
+>>>>> Hello all,
+>>>>>
+>>>>
+>>>> Hi Antonios,
+>>>>
+>>>> I see you have attached a patch to this email... this really isn't t=
+he preferred
+>>>> way to do things since it prevents to comment the patch (at least wi=
+th my mail
+>>>> client). The appropriate way would have been to send the patch with =
+a cover
+>>>> letter, using git-send-email for example.
+>>>
+>>> I apologize for attaching the patch, I should have known better!
+>>>
+>>
+>> np :)
+>>
+>>>>
+>>>>> We have found an issue in the 9p implementation of QEMU, with how q=
+id paths are generated, which can cause qid path collisions and several i=
+ssues caused by them. In our use case (running containers under VMs) thes=
+e have proven to be critical.
+>>>>>
+>>>>
+>>>> Ouch...
+>>>>
+>>>>> In particular, stat_to_qid in hw/9pfs/9p.c generates a qid path usi=
+ng the inode number of the file as input. According to the 9p spec the pa=
+th should be able to uniquely identify a file, distinct files should not =
+share a path value.
+>>>>>
+>>>>> The current implementation that defines qid.path =3D inode nr works=
+ fine as long as there are not files from multiple partitions visible und=
+er the 9p share. In that case, distinct files from different devices are =
+allowed to have the same inode number. So with multiple partitions, we ha=
+ve a very high probability of qid path collisions.
+>>>>>
+>>>>> How to demonstrate the issue:
+>>>>> 1) Prepare a problematic share:
+>>>>> =A0- mount one partition under share/p1/ with some files inside
+>>>>> =A0- mount another one *with identical contents* under share/p2/
+>>>>> =A0- confirm that both partitions have files with same inode nr, si=
+ze, etc
+>>>>> 2) Demonstrate breakage:
+>>>>> =A0- start a VM with a virtio-9p pointing to the share
+>>>>> =A0- mount 9p share with FSCACHE on
+>>>>> =A0- keep open share/p1/file
+>>>>> =A0- open and write to share/p2/file
+>>>>>
+>>>>> What should happen is, the guest will consider share/p1/file and sh=
+are/p2/file to be the same file, and since we are using the cache it will=
+ not reopen it. We intended to write to partition 2, but we just wrote to=
+ partition 1. This is just one example on how the guest may rely on qid p=
+aths being unique.
+>>>>>
+>>>>> In the use case of containers where we commonly have a few containe=
+rs per VM, all based on similar images, these kind of qid path collisions=
+ are very common and they seem to cause all kinds of funny behavior (some=
+times very subtle).
+>>>>>
+>>>>> To avoid this situation, the device id of a file needs to be also t=
+aken as input for generating a qid path. Unfortunately, the size of both =
+inode nr + device id together would be 96 bits, while we have only 64 bit=
+s for the qid path, so we can't just append them and call it a day :(
+>>>>>
+>>>>> We have thought of a few approaches, but we would definitely like t=
+o hear what the upstream maintainers and community think:
+>>>>>
+>>>>> * Full fix: Change the 9p protocol
+>>>>>
+>>>>> We would need to support a longer qid path, based on a virtio featu=
+re flag. This would take reworking of host and guest parts of virtio-9p, =
+so both QEMU and Linux for most users.
+>>>>>
+>>>>
+>>>> I agree for a longer qid path, but we shouldn't tie it to a virtio f=
+lag since
+>>>> 9p is transport agnostic. And it happens to be used with a variety o=
+f transports.
+>>>> QEMU has both virtio-9p and a Xen backend for example.
+>>>>
+>>>>> * Fallback and/or interim solutions
+>>>>>
+>>>>> A virtio feature flag may be refused by the guest, so we think we s=
+till need to make collisions less likely even with 64 bit paths. E.g.
+>>>>
+>>>> In all cases, we would need a fallback solution to support current
+>>>> guest setups. Also there are several 9p server implementations out
+>>>> there (ganesha, diod, kvmtool) that are currently used with linux
+>>>> clients... it will take some time to get everyone in sync :-\
+>>>>
+>>>>> 1. XOR the device id with inode nr to produce the qid path (we atta=
+ch a proof of concept patch)
+>>>>
+>>>> Hmm... this would still allow collisions. Not good for fallback.
+>>>>
+>>>>> 2. 64 bit hash of device id and inode nr
+>>>>
+>>>> Same here.
+>>>>
+>>>>> 3. other ideas, such as allocating new qid paths and keep a look up=
+ table of some sorts (possibly too expensive)
+>>>>>
+>>>>
+>>>> This would be acceptable for fallback.
+>>>
+>>> Maybe we can use the QEMU hash table (https://github.com/qemu/qemu/bl=
+ob/master/util/qht.c) but I wonder if it scales to millions of entries. D=
+o you think it is appropriate in this case?
+>>>
+>>
+>> I don't know QHT, hence Cc'ing Emilio for insights.
+>>
+>>> I was thinking on how to implement something like this, without havin=
+g to maintain millions of entries... One option we could consider is to s=
+plit the bits into a directly-mapped part, and a lookup part. For example=
+:
+>>>
+>>> Inode =3D
+>>> [ 10 first bits ] + [ 54 lowest bits ]
+>>>
+>>> A hash table maps [ inode 10 first bits ] + [ device id ] =3D> [ 10 b=
+it prefix ]
+>>> The prefix is uniquely allocated for each input.
+>>>
+>>> Qid path =3D
+>>> [ 10 bit prefix ] + [ inode 54 lowest bits ]
+>>>
+>>> Since inodes are not completely random, and we usually have a handful=
+ of device IDs, we get a much smaller number of entries to track in the h=
+ash table.
+>>>
+>>> So what this would give:
+>>> (1)=A0=A0=A0 Would be faster and take less memory than mapping the fu=
+ll inode_nr,devi_id tuple to unique QID paths
+>>> (2)=A0=A0=A0 Guaranteed not to run out of bits when inode numbers sta=
+y below the lowest 54 bits and we have less than 1024 devices.
+>>> (3)=A0=A0=A0 When we get beyond this this limit, there is a chance we=
+ run out of bits to allocate new QID paths, but we can detect this and re=
+fuse to serve the offending files instead of allowing a collision.
+>>>
+>>> We could tweak the prefix size to match the scenarios that we conside=
+r more likely, but I think close to 10-16 bits sounds reasonable enough. =
+What do you think?
+>>>
+>>
+>> I think that should work. Please send a patchset :)
 >=20
-> If exitless means no virtqueue kick and interrupt. It does not require any
-> special command line, just start a testpmd in both guest and host.
+> Hi Greg,
 >=20
-> >=20
-> > In other words, what exactly are you proposing as an alternative to
-> > vhost-pci?
+> This is based on the assumption that high bits of inode numbers are
+> always zero, which is unacceptable from my standpoint. Inode numbers
+> allocator is a per-volume file system feature, so there may appear
+> allocators, which don't use simple increment and assign inode number
+> with non-zero high bits even for the first file of a volume.
 >=20
-> I don't propose any new idea. I just want to know what's the advantage of
-> vhost-pci over zerocopy. Both needs one time of copy, the difference is t=
-he
-> vhost-pci did it inside a guest but zerocopy did in on host.
+> As I understand, the problem is that the guest doesn't have enough
+> information for proper files identification (in our case share/p1/file
+> and share/p2/file are wrongly identified as the same file). It seems
+> that we need to transmit device ID to the guest, and not in the high bi=
+ts of the inode number.
+>=20
+> AFAIK Slava has patches for such transmission, I hope that he will send
+> it eventually.
 
-Exitless VM2VM communication is desirable if you cannot run software on
-the host or if both endpoints are already in VMs.  In that case running
-one thing in a VM and another on the host doesn't make sense.
+They're pretty trivial, however it'll require great effort and coordinati=
+on
+for all parties involved, as they break backwards compatibility (QID beco=
+mes
+bigger and, thus, breaks "Q" transmission).
 
-The obvious environment where this applies is in the cloud where
-everything is a VM.
+I'd like to raise another issue - it seems that st_dev and i_no aren't
+enough:
 
-Stefan
+mkdir -p /tmp/mounted
+touch /tmp/mounted/file
+mount -o bind /tmp/mounted t1
+mount -o bind /tmp/mounted t2
+stat t{1,2}/file  | grep Inode
+Device: 805h/2053d      Inode: 42729487    Links: 3
+Device: 805h/2053d      Inode: 42729487    Links: 3
 
---9amGYk9869ThD9tj
-Content-Type: application/pgp-signature; name="signature.asc"
+In that case, even with the patch applied, we'll still have the issue of
+colliding QIDs guest-side - so, for example, after umount t1, t2/file
+becomes unaccessible, as the inode points to t1...
 
------BEGIN PGP SIGNATURE-----
+I'm not sure how to fix this one. Ideas?
 
-iQEcBAEBAgAGBQJaYijxAAoJEJykq7OBq3PIfOYIALhUiErNyD/+2ppspWNVZP0F
-CCB6hjKN09MiTa69TV68UU/Nj+7GQgoT4xNcKufgHW2Y74+JYjJpeirfQGwn4vbv
-nwUaGqgzZnNnWUHjp/X/tGSW1f+IK1ksJa1xH96yTn3EaHDI9dTlrvxiTxkCUfmS
-TBTfbE+LvFGjdsUDPQY7k6Xlh3jWQXMXdFrd51TZWR6C6HfzHbiJ0fZNR35tP8Xt
-LaJL+peG9gT05+k+xol4juiKgB4tP1IMa56fvGcrHnVvJi9Vvm6ml2N1zPMf1tmp
-jxS5O/m2j0U+jbPSnx4/jiw/VqXGf2rp/Vs+rpiaKPB9FrQHe0fK7Zz1P8ip9Ig=
-=3T7d
------END PGP SIGNATURE-----
-
---9amGYk9869ThD9tj--
+>=20
+> Thanks,
+> Eduard.
+>=20
+>>
+>>>>
+>>>>> With our proof of concept patch, the issues caused by qid path coll=
+isions go away, so it can be seen as an interim solution of sorts. Howeve=
+r, the chance of collisions is not eliminated, we are just replacing the =
+current strategy, which is almost guaranteed to cause collisions in certa=
+in use cases, with one that makes them more rare. We think that a virtio =
+feature flag for longer qid paths is the only way to eliminate these issu=
+es completely.
+>>>>>
+>>>>> This is the extent that we were able to analyze the issue from our =
+side, we would like to hear if there are some better ideas, or which appr=
+oach would be more appropriate for upstream.
+>>>>>
+>>>>> Best regards,
+>>>>>
+>>>>
+>>>> Cheers,
+>>>>
+>>>> --=20
+>>>> Greg
+>>>>
+>>>
+>>
+>=20
+> .
+>=20
