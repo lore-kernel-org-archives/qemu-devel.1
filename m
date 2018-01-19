@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSGR-0000TK-Tx
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:43:08 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSGc-0000bE-Cc
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:43:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSGR-0004mR-71
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:43:07 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:53462)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSGX-0004sM-Gp
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:43:18 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:53486)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSGQ-0004lK-VJ
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:43:07 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSGX-0004re-9I
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:43:13 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Fri, 19 Jan 2018 11:43:06 +0300
-Message-ID: <20180119084306.7100.68648.stgit@pasha-VirtualBox>
+Date: Fri, 19 Jan 2018 11:43:16 +0300
+Message-ID: <20180119084316.7100.90579.stgit@pasha-VirtualBox>
 In-Reply-To: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
 References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v4 04/23] replay: disable default snapshot
- for record/replay
+Subject: [Qemu-devel] [RFC PATCH v4 05/23] replay: fix processing async
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +30,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-
-This patch disables setting '-snapshot' option on by default
-in record/replay mode. This is needed for creating vmstates in record
-and replay modes.
+Asynchronous events saved at checkpoints may invoke
+callbacks when processed. These callbacks may also generate/read
+new events (e.g. clock reads). Therefore event processing flag must be
+reset before callback invocation.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- vl.c |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ replay/replay-events.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 340d085..fdc7798 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3251,7 +3251,13 @@ int main(int argc, char **argv, char **envp)
-                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
-                 break;
-             case QEMU_OPTION_snapshot:
--                snapshot = 1;
-+                {
-+                    Error *blocker = NULL;
-+                    snapshot = 1;
-+                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
-+                               "-snapshot");
-+                    replay_add_blocker(blocker);
-+                }
-                 break;
-             case QEMU_OPTION_numa:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
+diff --git a/replay/replay-events.c b/replay/replay-events.c
+index 94a6dcc..768b505 100644
+--- a/replay/replay-events.c
++++ b/replay/replay-events.c
+@@ -295,13 +295,13 @@ void replay_read_events(int checkpoint)
+         if (!event) {
+             break;
+         }
++        replay_finish_event();
++        read_event_kind = -1;
+         replay_mutex_unlock();
+         replay_run_event(event);
+         replay_mutex_lock();
+ 
+         g_free(event);
+-        replay_finish_event();
+-        read_event_kind = -1;
+     }
+ }
+ 
