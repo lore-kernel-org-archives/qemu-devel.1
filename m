@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTA9-0001iw-7p
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTA9-0001ix-8r
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTA6-0008Ue-5J
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTA6-0008Uk-5z
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:41 -0500
-Received: from ozlabs.org ([103.22.144.67]:42069)
+Received: from ozlabs.org ([103.22.144.67]:55503)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTA5-0008TW-8t
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTA5-0008TV-8W
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:38 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 19 Jan 2018 20:40:08 +1100
-Message-Id: <20180119094015.28266-7-david@gibson.dropbear.id.au>
+Date: Fri, 19 Jan 2018 20:40:03 +1100
+Message-Id: <20180119094015.28266-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20180119094015.28266-1-david@gibson.dropbear.id.au>
 References: <20180119094015.28266-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/13] target/ppc: msgsnd and msgclr
- instructions need hypervisor privilege
+Subject: [Qemu-devel] [PULL 01/13] default-configs/ppc64-softmmu: Include
+ 32-bit configs instead of copying them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +25,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+qemu-softmmu-ppc64 is supposed to be a superset of qemu-softmmu-ppc.
+However, instead of simply including the 32-bit config file, we've
+duplicated all CONFIG_xxx settings there instead. This way, we've missed
+some CONFIG switches in ppc64-softmmu.mak which were only added to the
+32-bit config file (e.g. CONFIG_SUNGEM). Let's fix this problem by
+including the 32-bit config file into the 64-bit config file instead
+of duplicating all the CONFIG switches there.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ default-configs/ppc64-softmmu.mak | 61 +++++----------------------------------
+ 1 file changed, 8 insertions(+), 53 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 0ef21cce33..396f422cf4 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6174,7 +6174,7 @@ static void gen_msgclr(DisasContext *ctx)
- #if defined(CONFIG_USER_ONLY)
-     GEN_PRIV;
- #else
--    CHK_SV;
-+    CHK_HV;
-     gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
- #endif /* defined(CONFIG_USER_ONLY) */
- }
-@@ -6184,7 +6184,7 @@ static void gen_msgsnd(DisasContext *ctx)
- #if defined(CONFIG_USER_ONLY)
-     GEN_PRIV;
- #else
--    CHK_SV;
-+    CHK_HV;
-     gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
- #endif /* defined(CONFIG_USER_ONLY) */
- }
---=20
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index d1b3a6dd50..b94af6c7c6 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -1,64 +1,19 @@
+ # Default configuration for ppc64-softmmu
+ 
+-include pci.mak
+-include sound.mak
+-include usb.mak
+-CONFIG_PPC4XX=y
+-CONFIG_VIRTIO_VGA=y
+-CONFIG_ESCC=y
+-CONFIG_M48T59=y
++# Include all 32-bit boards
++include ppc-softmmu.mak
++
++# For PowerNV
++CONFIG_POWERNV=y
+ CONFIG_IPMI=y
+ CONFIG_IPMI_LOCAL=y
+ CONFIG_IPMI_EXTERN=y
+ CONFIG_ISA_IPMI_BT=y
+-CONFIG_SERIAL=y
+-CONFIG_PARALLEL=y
+-CONFIG_I8254=y
+-CONFIG_PCKBD=y
+-CONFIG_FDC=y
+-CONFIG_I8257=y
+-CONFIG_I82374=y
+-CONFIG_OPENPIC=y
+-CONFIG_PREP_PCI=y
+-CONFIG_I82378=y
+-CONFIG_PC87312=y
+-CONFIG_MACIO=y
+-CONFIG_PCSPK=y
+-CONFIG_CUDA=y
+-CONFIG_ADB=y
+-CONFIG_MAC_NVRAM=y
+-CONFIG_MAC_DBDMA=y
+-CONFIG_HEATHROW_PIC=y
+-CONFIG_GRACKLE_PCI=y
+-CONFIG_UNIN_PCI=y
+-CONFIG_DEC_PCI=y
+-CONFIG_PPCE500_PCI=y
+-CONFIG_IDE_ISA=y
+-CONFIG_IDE_CMD646=y
+-CONFIG_IDE_MACIO=y
+-CONFIG_NE2000_ISA=y
+-CONFIG_PFLASH_CFI01=y
+-CONFIG_PFLASH_CFI02=y
+-CONFIG_PTIMER=y
+-CONFIG_I8259=y
+-CONFIG_XILINX=y
+-CONFIG_XILINX_ETHLITE=y
+-CONFIG_PSERIES=y
+-CONFIG_POWERNV=y
+-CONFIG_PREP=y
+-CONFIG_MAC=y
+-CONFIG_E500=y
+-CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+-CONFIG_PLATFORM_BUS=y
+-CONFIG_ETSEC=y
+-CONFIG_SM501=y
++
+ # For pSeries
++CONFIG_PSERIES=y
++CONFIG_VIRTIO_VGA=y
+ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+ CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+-# For PReP
+-CONFIG_SERIAL_ISA=y
+-CONFIG_MC146818RTC=y
+-CONFIG_ISA_TESTDEV=y
+ CONFIG_MEM_HOTPLUG=y
+-CONFIG_RS6000_MC=y
+-- 
 2.14.3
