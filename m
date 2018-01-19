@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTAC-0001lm-UO
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTAD-0001ls-16
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTAC-0000GO-0k
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:44 -0500
-Received: from ozlabs.org ([103.22.144.67]:52811)
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTAB-0000Ee-HF
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:45 -0500
+Received: from ozlabs.org ([103.22.144.67]:43683)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTAA-00007a-Uq
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTAA-00007W-Tr
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:40:43 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 19 Jan 2018 20:40:13 +1100
-Message-Id: <20180119094015.28266-12-david@gibson.dropbear.id.au>
+Date: Fri, 19 Jan 2018 20:40:14 +1100
+Message-Id: <20180119094015.28266-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180119094015.28266-1-david@gibson.dropbear.id.au>
 References: <20180119094015.28266-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/13] sii3112: Add explicit type casts to avoid
- unintended sign extension
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 12/13] target/ppc: add support for hypervisor
+ doorbells on book3s CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +28,227 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu-ppc@nognu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Noticed by Coverity
+The hypervisor doorbells are used by skiboot and Linux on POWER9
+processors to wake up secondaries.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+This adds processor control support to the Server architecture by
+reusing the Embedded support. They are very similar, only the bits
+definition of the CPU identifier differ.
+
+Still to be done is message broadcast to all threads of the same
+processor.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ide/sii3112.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ target/ppc/cpu.h            |  8 +++++--
+ target/ppc/excp_helper.c    | 52 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ target/ppc/helper.h         |  2 ++
+ target/ppc/translate.c      | 25 ++++++++++++++++++++--
+ target/ppc/translate_init.c |  2 +-
+ 5 files changed, 84 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-index e2f5562bb7..17aa930e39 100644
---- a/hw/ide/sii3112.c
-+++ b/hw/ide/sii3112.c
-@@ -79,13 +79,13 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
-         val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
-         val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
-         val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
--        val |= d->i.bmdma[0].status << 16;
--        val |= d->i.bmdma[1].status << 24;
-+        val |= (uint32_t)d->i.bmdma[0].status << 16;
-+        val |= (uint32_t)d->i.bmdma[1].status << 24;
-         break;
-     case 0x18:
-         val = d->i.bmdma[1].cmd;
-         val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
--        val |= d->i.bmdma[1].status << 16;
-+        val |= (uint32_t)d->i.bmdma[1].status << 16;
-         break;
-     case 0x80 ... 0x87:
-         if (size == 1) {
-@@ -128,7 +128,7 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
-         val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
-         break;
-     case 0x148:
--        val = d->regs[0].sien << 16;
-+        val = (uint32_t)d->regs[0].sien << 16;
-         break;
-     case 0x180:
-         val = d->regs[1].scontrol;
-@@ -137,7 +137,7 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
-         val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
-         break;
-     case 0x1c8:
--        val = d->regs[1].sien << 16;
-+        val = (uint32_t)d->regs[1].sien << 16;
-         break;
-     default:
-         val = 0;
--- 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index b8f4dfc108..603a38cae8 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -930,7 +930,7 @@ enum {
+ #define BOOKE206_MAX_TLBN      4
+=20
+ /***********************************************************************=
+******/
+-/* Embedded.Processor Control */
++/* Server and Embedded Processor Control */
+=20
+ #define DBELL_TYPE_SHIFT               27
+ #define DBELL_TYPE_MASK                (0x1f << DBELL_TYPE_SHIFT)
+@@ -940,11 +940,15 @@ enum {
+ #define DBELL_TYPE_G_DBELL_CRIT        (0x03 << DBELL_TYPE_SHIFT)
+ #define DBELL_TYPE_G_DBELL_MC          (0x04 << DBELL_TYPE_SHIFT)
+=20
+-#define DBELL_BRDCAST                  (1 << 26)
++#define DBELL_TYPE_DBELL_SERVER        (0x05 << DBELL_TYPE_SHIFT)
++
++#define DBELL_BRDCAST                  PPC_BIT(37)
+ #define DBELL_LPIDTAG_SHIFT            14
+ #define DBELL_LPIDTAG_MASK             (0xfff << DBELL_LPIDTAG_SHIFT)
+ #define DBELL_PIRTAG_MASK              0x3fff
+=20
++#define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
++
+ /***********************************************************************=
+******/
+ /* Segment page size information, used by recent hash MMUs
+  * The format of this structure mirrors kvm_ppc_smmu_info
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 4e548a4487..c092fbead0 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -417,6 +417,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
+excp_model, int excp)
+     case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage excep=
+tion */
+     case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception   =
+     */
+     case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
+tion */
++    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
+     */
+     case POWERPC_EXCP_HV_EMU:
+         srr0 =3D SPR_HSRR0;
+         srr1 =3D SPR_HSRR1;
+@@ -846,6 +847,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
+             return;
+         }
++        if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL)) {
++            env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDOORBELL)=
+;
++            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR_HV);
++            return;
++        }
+         if (env->pending_interrupts & (1 << PPC_INTERRUPT_PERFM)) {
+             env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_PERFM);
+             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_PERFM);
+@@ -1145,4 +1151,50 @@ void helper_msgsnd(target_ulong rb)
+     }
+     qemu_mutex_unlock_iothread();
+ }
++
++/* Server Processor Control */
++static int book3s_dbell2irq(target_ulong rb)
++{
++    int msg =3D rb & DBELL_TYPE_MASK;
++
++    /* A Directed Hypervisor Doorbell message is sent only if the
++     * message type is 5. All other types are reserved and the
++     * instruction is a no-op */
++    return msg =3D=3D DBELL_TYPE_DBELL_SERVER ? PPC_INTERRUPT_HDOORBELL =
+: -1;
++}
++
++void helper_book3s_msgclr(CPUPPCState *env, target_ulong rb)
++{
++    int irq =3D book3s_dbell2irq(rb);
++
++    if (irq < 0) {
++        return;
++    }
++
++    env->pending_interrupts &=3D ~(1 << irq);
++}
++
++void helper_book3s_msgsnd(target_ulong rb)
++{
++    int irq =3D book3s_dbell2irq(rb);
++    int pir =3D rb & DBELL_PROCIDTAG_MASK;
++    CPUState *cs;
++
++    if (irq < 0) {
++        return;
++    }
++
++    qemu_mutex_lock_iothread();
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        CPUPPCState *cenv =3D &cpu->env;
++
++        /* TODO: broadcast message to all threads of the same  processor=
+ */
++        if (cenv->spr_cb[SPR_PIR].default_value =3D=3D pir) {
++            cenv->pending_interrupts |=3D 1 << irq;
++            cpu_interrupt(cs, CPU_INTERRUPT_HARD);
++        }
++    }
++    qemu_mutex_unlock_iothread();
++}
+ #endif
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index bb6a94a8b3..5b739179b8 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -679,6 +679,8 @@ DEF_HELPER_FLAGS_3(store_sr, TCG_CALL_NO_RWG, void, e=
+nv, tl, tl)
+ DEF_HELPER_FLAGS_1(602_mfrom, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_1(msgsnd, void, tl)
+ DEF_HELPER_2(msgclr, void, env, tl)
++DEF_HELPER_1(book3s_msgsnd, void, tl)
++DEF_HELPER_2(book3s_msgclr, void, env, tl)
+ #endif
+=20
+ DEF_HELPER_4(dlmzb, tl, env, tl, tl, i32)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index bcd36d5353..4132f67bb1 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6170,7 +6170,12 @@ static void gen_msgclr(DisasContext *ctx)
+     GEN_PRIV;
+ #else
+     CHK_HV;
+-    gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
++    /* 64-bit server processors compliant with arch 2.x */
++    if (ctx->insns_flags & PPC_SEGMENT_64B) {
++        gen_helper_book3s_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
++    } else {
++        gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
++    }
+ #endif /* defined(CONFIG_USER_ONLY) */
+ }
+=20
+@@ -6180,10 +6185,24 @@ static void gen_msgsnd(DisasContext *ctx)
+     GEN_PRIV;
+ #else
+     CHK_HV;
+-    gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
++    /* 64-bit server processors compliant with arch 2.x */
++    if (ctx->insns_flags & PPC_SEGMENT_64B) {
++        gen_helper_book3s_msgsnd(cpu_gpr[rB(ctx->opcode)]);
++    } else {
++        gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
++    }
+ #endif /* defined(CONFIG_USER_ONLY) */
+ }
+=20
++static void gen_msgsync(DisasContext *ctx)
++{
++#if defined(CONFIG_USER_ONLY)
++    GEN_PRIV;
++#else
++    CHK_HV;
++#endif /* defined(CONFIG_USER_ONLY) */
++    /* interpreted as no-op */
++}
+=20
+ #if defined(TARGET_PPC64)
+ static void gen_maddld(DisasContext *ctx)
+@@ -6664,6 +6683,8 @@ GEN_HANDLER2_E(msgsnd, "msgsnd", 0x1F, 0x0E, 0x06, =
+0x03ff0001,
+                PPC_NONE, PPC2_PRCNTL),
+ GEN_HANDLER2_E(msgclr, "msgclr", 0x1F, 0x0E, 0x07, 0x03ff0001,
+                PPC_NONE, PPC2_PRCNTL),
++GEN_HANDLER2_E(msgsync, "msgsync", 0x1F, 0x16, 0x1B, 0x00000000,
++               PPC_NONE, PPC2_PRCNTL),
+ GEN_HANDLER(wrtee, 0x1F, 0x03, 0x04, 0x000FFC01, PPC_WRTEE),
+ GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
+ GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index ab70b3a25c..87a23f0f62 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8866,7 +8866,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                         PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
+                         PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
+                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
+-                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300;
++                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_PR=
+CNTL;
+     pcc->msr_mask =3D (1ull << MSR_SF) |
+                     (1ull << MSR_TM) |
+                     (1ull << MSR_VR) |
+--=20
 2.14.3
