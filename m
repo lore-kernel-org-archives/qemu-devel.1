@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ecWmN-00056p-Ke
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:32:24 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ecWnG-0005bg-LP
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:33:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ecWmK-00008z-Fy
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:32:23 -0500
-Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:46104)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ecWmK-00007J-61
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:32:20 -0500
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-Date: Fri, 19 Jan 2018 14:28:05 +0100
-References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
-	<ba1a251965e9b9ee62d32e8580c7a041fb423c36.1515960078.git.pisa@cmp.felk.cvut.cz>
-	<ed771781-5985-0998-cec2-71bdeccd03d4@amsat.org>
-In-Reply-To: <ed771781-5985-0998-cec2-71bdeccd03d4@amsat.org>
+	(envelope-from <pbonzini@redhat.com>) id 1ecWnD-0000c0-GC
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:33:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54910)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecWnD-0000bW-9S
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:33:15 -0500
+References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
+	<20180119084417.7100.69568.stgit@pasha-VirtualBox>
+	<aca12788-c119-3046-ee8f-e7b3d4cc59bb@redhat.com>
+	<002a01d3911d$dc13ca80$943b5f80$@ru>
+	<8aa1900f-2663-43bd-dab5-001be0aede09@redhat.com>
+	<002b01d39120$8c88e880$a59ab980$@ru>
+	<f7c459df-c68f-3995-4183-45da91e688a3@redhat.com>
+	<002c01d39122$2de5d930$89b18b90$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <29712321-7255-6714-ca80-b94d208c1a40@redhat.com>
+Date: Fri, 19 Jan 2018 14:33:06 +0100
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
+In-Reply-To: <002c01d39122$2de5d930$89b18b90$@ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Message-Id: <201801191428.05659.pisa@cmp.felk.cvut.cz>
-Subject: Re: [Qemu-devel] [PATCH V4 1/7] CAN bus simple messages transport
- implementation for QEMU
+Subject: Re: [Qemu-devel] [RFC PATCH v4 13/23] cpus: only take BQL for
+ sleeping threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-Hello Philippe,
+On 19/01/2018 13:36, Pavel Dovgalyuk wrote:
+>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>> Sent: Friday, January 19, 2018 3:26 PM
+>> To: Pavel Dovgalyuk; 'Pavel Dovgalyuk'; qemu-devel@nongnu.org
+>> Cc: kwolf@redhat.com; peter.maydell@linaro.org; boost.lists@gmail.com;=
+ quintela@redhat.com;
+>> jasowang@redhat.com; mst@redhat.com; zuban32s@gmail.com; maria.klimush=
+enkova@ispras.ru;
+>> kraxel@redhat.com; alex.bennee@linaro.org
+>> Subject: Re: [RFC PATCH v4 13/23] cpus: only take BQL for sleeping thr=
+eads
+>>
+>> On 19/01/2018 13:25, Pavel Dovgalyuk wrote:
+>>>>> It means, that I'll have to fix all the has_work function to avoid =
+races,
+>>>>> because x86_cpu_has_work may have them?
+>>>> Why only x86_cpu_has_work?
+>>>>
+>>>> Even reading cs->interrupt_request outside the mutex is unsafe.
+>>> All the vcpu function that access interrupt controller or peripheral =
+state may be unsafe?
+>>> How can it work safely then?
+>>
+>> They do it inside the big QEMU lock. =20
+>=20
+> Right. Without these patches.
+> They are within the replay lock. And BQL is not covering vcpu execution=
+ with these patches.
+> Therefore RR will be ok and regular execution may encounter races?
+> It means that I missed something in Alex ideas, because he prepared the=
+ initial patches.
 
-On Friday 19 of January 2018 13:38:11 Philippe Mathieu-Daud=C3=A9 wrote:
-> On 01/14/2018 05:14 PM, pisa@cmp.felk.cvut.cz wrote:
-> > From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-> >
-> > +extern int (*can_bus_connect_to_host_variant)(CanBusState *bus,
-> > +                                              const char *name);
->
-> Isn't extern (*func) an anti-pattern?
-> One might be tempted to call it without checking it is non-NULL...
->
-> Please declare it as a function, and using a static pointer, i.e.:
->
-> typedef int (*can_bus_connect_to_host_variant_t)(CanBusState *bus,
->                                        const char *name);
->
->
-> static can_bus_connect_to_host_variant_t
-> can_bus_connect_to_host_variant_handler;
->
-> void
-> set_can_bus_connect_to_host_variant(can_bus_connect_to_host_variant_t
-> handler)
-> {
->     can_bus_connect_to_host_variant_handler =3D handler;
-> }
->
-> int can_bus_connect_to_host_variant(CanBusState *bus,
->                           const char *name)
-> {
->     if (!can_bus_connect_to_host_variant_handler) {
->         return ERROR;
->     }
->     return can_bus_connect_to_host_variant_handler(bus, name);
-> }
+Yes.
 
+>> But here you're calling cpu_has_work (via all_cpu_threads_idle) outsid=
+e the lock.
+>=20
+> Yes, I see, but what we have to do?
 
-Yes, that has been my initial idea but then I need
-some way how to setup variant from can_socketcan.c
-when it is linked in
+I don't know.  But the idiom in these patches,
 
-Something like
+	while(...) {
+		lock()
+		cond_wait()
+		unlock()
+	}
 
-static void __attribute__((constructor)) can_socketcan_setup_variant(void)
-{
+is unsafe as well, so the issue is more than just cpu_has_work.
 
-}
-
-or
-
-module_init()
-
-or
-
-in can_socketcan.c or have there some QOM object which
-type initialization setups pointer early before
-individual instances of kvaser_pci
-
-Thanks for suggestion in advance,
-
-Pavel
+Paolo
