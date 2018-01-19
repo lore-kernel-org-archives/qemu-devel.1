@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ecZl5-0004uJ-T6
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:43:16 -0500
+	(envelope-from <a.perevalov@samsung.com>) id 1ecZln-0005a2-V8
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:44:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ecZl1-000310-T2
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:43:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50204
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ecZl1-00030U-NS
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:43:11 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0JGeF7X113877
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 11:43:11 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fkkt59utk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 11:43:10 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 19 Jan 2018 09:43:10 -0700
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 19 Jan 2018 17:42:59 +0100
-Message-Id: <1516380179-12737-1-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 12/12] Fix configure for s390 qemu on alpine
+	(envelope-from <a.perevalov@samsung.com>) id 1ecZlk-0003Vk-Oi
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:44:00 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:58542)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1ecZlk-0003UV-At
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 11:43:56 -0500
+MIME-version: 1.0
+Content-type: text/plain; charset="utf-8"; format="flowed"
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <f399b096-6e75-c04f-bb02-80e327de45c4@samsung.com>
+Date: Fri, 19 Jan 2018 19:43:44 +0300
+In-reply-to: <d746e2e8-3690-c27e-f816-9892b36d8a1c@amsat.org>
+Content-language: en-GB
+References: <20180115115309.23982-1-quintela@redhat.com>
+	<CAFEAcA-SxiJyKa84UwG8CESpkTXEM9AG5HqEgpPrzSFwrTPzYg@mail.gmail.com>
+	<CGME20180119162746epcas1p2143cef3a97b076ce3fbc0b79d7d347b7@epcas1p2.samsung.com>
+	<d746e2e8-3690-c27e-f816-9892b36d8a1c@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/27] Migration pull
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alice Frosi <alice@linux.vnet.ibm.comx>Alice Frosi <alice@linux.vnet.ibm.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Alice Frosi <alice@linux.vnet.ibm.comx>
+On 01/19/2018 07:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 01/15/2018 01:14 PM, Peter Maydell wrote:
+>> On 15 January 2018 at 11:52, Juan Quintela <quintela@redhat.com> wrote=
+:
+>>> Hi
+>>> - rebase on top of lastest
+>>> - fix compilation on 32bit machines
+>>> - add Peter Xu cleanups
+>>>
+>>> Please, apply.
+>>>
+>>> The following changes since commit fd06527b80c88c8dde1b35fdc692685b68=
+d2fd93:
+>>>
+>>>    Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibaul=
+t' into staging (2018-01-15 10:39:29 +0000)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>    git://github.com/juanquintela/qemu.git tags/migration/20180115
+>>>
+>>> for you to fetch changes up to 816306826a45f4d15352e32d157172af3a3589=
+9f:
+>>>
+>>>    migration: remove notify in fd_error (2018-01-15 12:48:13 +0100)
+>>>
+>>> ----------------------------------------------------------------
+>>> migration/next for 20180115
+>> Applied, thanks.
+> We have armel/armhf/powerpc hosts failing since this pull due to commit
+> 3be98be4e9f.
+>
+> Those target are currently tested on Shippable CI, eventually adding an
+> IRC bot we could notice.
+>
+> I know companies using QEMU system in embedded armel/armhf hosts, I
+> don't know about the ppc32 hosts.
+> This is however unlikely the migration features are used there.
+>
+> If 64bit atomic op are required for migration (performance/security) bu=
+t
+> not on 32bit system, one way to fix it could be to have the migration
+> code being optional... so we can disable it on 32bit hosts.
+>
+> Regards,
+>
+> Phil.
+>
+Thank you Phil for report,
 
-In alpine docker image the qemu-system-s390x build is broken and
-it throws this error:
-qemu-system-s390x: Initialization of device s390-ipl failed: could not
-load bootloader 's390-ccw.img'
+I have a release this week and it's not yet over.
 
-The grep command of busybox uses regex. This fails on binary data
-(e.g. stops on every \0), so it does not identify the string 
-BiGeNdIaN in the test case big/little. Therefore, it assumes 
-that the architecture is little endian.
+As I remember, I tested build in QEMU's docker build system,
 
-This fix solves the grep problem by printing the content of
-TMPO with strings
+but now I checked it on i386 Ubuntu, and yes linker says about unresolved
 
-Signed-off-by: Alice Frosi <alice@linux.vnet.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-[some changes to patch description, add -a option to strings]
----
- configure | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+atomic symbols. Next week, I'll have a time to investigate it deeper.
 
-diff --git a/configure b/configure
-index 6d8c996..383b14e 100755
---- a/configure
-+++ b/configure
-@@ -1906,9 +1906,9 @@ int main(int argc, char *argv[]) {
- EOF
- 
- if compile_object ; then
--    if grep -q BiGeNdIaN $TMPO ; then
-+    if strings -a $TMPO | grep -q BiGeNdIaN ; then
-         bigendian="yes"
--    elif grep -q LiTtLeEnDiAn $TMPO ; then
-+    elif strings -a $TMPO | grep -q LiTtLeEnDiAn ; then
-         bigendian="no"
-     else
-         echo big/little test failed
--- 
-1.8.3.1
+
+--=20
+Best regards,
+Alexey Perevalov
