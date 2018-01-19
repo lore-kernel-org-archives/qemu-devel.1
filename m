@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecTnx-0006k3-Kp
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:21:50 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecToU-00072r-Ss
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:22:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ecTnu-000296-Jb
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:21:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecTnu-00027t-DG
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:21:46 -0500
-References: <20180119084219.31187-1-peterx@redhat.com>
-	<20180119084219.31187-2-peterx@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <88a39fec-67d6-5b60-ad70-2c14c4f2fffe@redhat.com>
-Date: Fri, 19 Jan 2018 11:21:36 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecToU-0003H4-3h
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 05:22:22 -0500
+References: <20180118181123.37056-1-vsementsov@virtuozzo.com>
+	<20180118181123.37056-7-vsementsov@virtuozzo.com>
+	<b78ed017-a01d-2e03-e998-e99c4d5c1f57@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9a3dbbf4-7e3a-f725-576f-9f368c4435e8@virtuozzo.com>
+Date: Fri, 19 Jan 2018 13:22:11 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180119084219.31187-2-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <b78ed017-a01d-2e03-e998-e99c4d5c1f57@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/2] memory: do explicit cleanup when remove
- listeners
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] iotest 201: new test for qmp
+ nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 19/01/2018 09:42, Peter Xu wrote:
-> +    FOR_EACH_FLAT_RANGE(fr, view) {
+19.01.2018 01:43, Eric Blake wrote:
+> On 01/18/2018 12:11 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   tests/qemu-iotests/201     | 159 +++++++++++++++++++++++++++++++++++++++++++++
+>>   tests/qemu-iotests/201.out |   5 ++
+>>   tests/qemu-iotests/group   |   1 +
+>>   3 files changed, 165 insertions(+)
+>>   create mode 100644 tests/qemu-iotests/201
+>>   create mode 100644 tests/qemu-iotests/201.out
+>>
+>> +
+>> +    def assertExistingClients(self, result):
+>> +        self.assert_qmp(result, 'error/desc',
+>> +                        "NBD export 'exp' has 1 active connection. To force "
+>> +                        "remove it (and hard disconnect clients) use "
+>> +                        "mode='hard'")
+> Needs tweaking if we massage the error message earlier in the series.
+>
+> I'm still worried that this test may fail spuriously due to a hard-coded
+> port, but some testing is better than none, and if the CI engines don't
+> immediately reject it, whoever first encounters it will be nice and let
+> us know.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
 
-listener->begin is missing before the loop.
+Looked through other tests, looks like same approach is only in 147, and 
+other iotests uses unix sockets for nbd-server-start. May be, it is 
+better to move to unix socket here.
+I'll resend today with unix-socket.
 
-Paolo
-
-> +        MemoryRegionSection section = section_from_flat_range(fr, view);
-> +
-> +        if (fr->dirty_log_mask && listener->log_stop) {
-> +            listener->log_stop(listener, &section, fr->dirty_log_mask, 0);
-> +        }
-> +        if (listener->region_del) {
-> +            listener->region_del(listener, &section);
-> +        }
-> +    }
-> +    if (listener->commit) {
-> +        listener->commit(listener);
-> +    }
-> +    flatview_unref(view);
+-- 
+Best regards,
+Vladimir
