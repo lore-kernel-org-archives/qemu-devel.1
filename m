@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecYSW-00050j-MB
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:20:01 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ecYVD-00071p-M8
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:22:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecYSV-0005if-Lh
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:20:00 -0500
-References: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <laurent@vivier.eu>) id 1ecYVA-00088N-Gv
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:22:47 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:59046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecYVA-00087J-6f
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 10:22:44 -0500
+References: <1512650481-1723-1-git-send-email-peter.maydell@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <677eb273-e768-b640-b8b9-85d624de0f05@vivier.eu>
-Date: Fri, 19 Jan 2018 16:19:44 +0100
+Message-ID: <424a3c6e-7396-a496-fec5-4d057c4c8ff2@vivier.eu>
+Date: Fri, 19 Jan 2018 16:22:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1512650481-1723-1-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix locking order in
- fork_start()
+Subject: Re: [Qemu-devel] [PATCH] linux-user: wrap fork() in a start/end
+ exclusive section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +29,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-stable@nongnu.org, patches@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, patches@linaro.org
 
-Le 04/12/2017 à 15:22, Peter Maydell a écrit :
-> Our locking order is that the tb lock should be taken
-> inside the mmap_lock, but fork_start() grabs locks the
-> other way around. This means that if a heavily multithreaded
-> guest process (such as Java) calls fork() it can deadlock,
-> with the thread that called fork() stuck in fork_start()
-> with the tb lock and waiting for the mmap lock, but some
-> other thread in tb_find() with the mmap lock and waiting
-> for the tb lock. The cpu_list_lock() should also always be
-> taken last, not first.
+Le 07/12/2017 à 13:41, Peter Maydell a écrit :
+> When we do a fork() in usermode emulation, we need to be in
+> a start/end exclusive section, so that we can ensure that no
+> other thread is in an RCU section. Otherwise you can get this
+> deadlock:
 > 
-> Fix this by making fork_start() grab the locks in the
-> right order. The order in which we drop locks doesn't
-> matter, so we leave fork_end() the way it is.
+> - fork thread: has mmap_lock, waits for rcu_sync_lock
+>   (because rcu_init_lock() is registered as a pthread_atfork() hook)
+> - RCU thread: has rcu_sync_lock, waits for rcu_read_(un)lock
+> - another CPU thread: in RCU critical section, waits for mmap_lock
+> 
+> This can show up if you have a heavily multithreaded guest program
+> that does a fork().
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-stable@nongnu.org
+> Reported-by: Stuart Monteith <stuart.monteith@linaro.org>
 > ---
->  linux-user/main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Based-on: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
+> (this applies on top of 'linux-user: Fix locking order in fork_start()')
+> 
+> I think this should fix the deadlock that Stuart reports, but I
+> can't reproduce it, so testing welcome.
+> 
+>  linux-user/main.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
 > diff --git a/linux-user/main.c b/linux-user/main.c
-> index 6286661..146ee3e 100644
+> index 146ee3e..ff116fe 100644
 > --- a/linux-user/main.c
 > +++ b/linux-user/main.c
-> @@ -128,9 +128,9 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+> @@ -128,6 +128,7 @@ int cpu_get_pic_interrupt(CPUX86State *env)
 >  /* Make sure everything is in a consistent state for calling fork().  */
 >  void fork_start(void)
 >  {
-> -    cpu_list_lock();
-> -    qemu_mutex_lock(&tb_ctx.tb_lock);
+> +    start_exclusive();
 >      mmap_fork_start();
-> +    qemu_mutex_lock(&tb_ctx.tb_lock);
-> +    cpu_list_lock();
+>      qemu_mutex_lock(&tb_ctx.tb_lock);
+>      cpu_list_lock();
+> @@ -148,9 +149,13 @@ void fork_end(int child)
+>          qemu_mutex_init(&tb_ctx.tb_lock);
+>          qemu_init_cpu_list();
+>          gdbserver_fork(thread_cpu);
+> +        /* qemu_init_cpu_list() takes care of reinitializing the
+> +         * exclusive state, so we don't need to end_exclusive() here.
+> +         */
+>      } else {
+>          qemu_mutex_unlock(&tb_ctx.tb_lock);
+>          cpu_list_unlock();
+> +        end_exclusive();
+>      }
 >  }
 >  
->  void fork_end(int child)
 > 
 
 Applied to my linux-user branch.
