@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTAd-0002B8-TI
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:41:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTAd-0002Af-De
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:41:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000w7-QB
+	(envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000ve-NL
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:41:11 -0500
-Received: from ozlabs.org ([103.22.144.67]:40061)
+Received: from ozlabs.org ([103.22.144.67]:47099)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000tK-Et
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecTAc-0000tG-CL
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 04:41:10 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 19 Jan 2018 20:40:10 +1100
-Message-Id: <20180119094015.28266-9-david@gibson.dropbear.id.au>
+Date: Fri, 19 Jan 2018 20:40:09 +1100
+Message-Id: <20180119094015.28266-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20180119094015.28266-1-david@gibson.dropbear.id.au>
 References: <20180119094015.28266-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/13] spapr: fix device tree properties when
- using compatibility mode
+Subject: [Qemu-devel] [PULL 07/13] spapr: drop duplicate variable in
+ spapr_core_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +29,33 @@ Cc: groug@kaod.org, surajjs@au1.ibm.com, lvivier@redhat.com, agraf@suse.de, qemu
 
 From: Greg Kurz <groug@kaod.org>
 
-Commit 51f84465dd98 changed the compatility mode setting logic:
-- machine reset only sets compatibility mode for the boot CPU
-- compatibility mode is set for other CPUs when they are put online
-  by the guest with the "start-cpu" RTAS call
+A variable is already defined at the begining of the function to
+hold a pointer to the CPU core object:
 
-This causes a regression for machines started with max-compat-cpu:
-the device tree nodes related to secondary CPU cores contain wrong
-"cpu-version" and "ibm,pa-features" values, as shown below.
+    sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
 
-Guest started on a POWER8 host with:
-     -smp cores=2 -machine pseries,max-cpu-compat=compat7
+No need to define it again in the pre-2.10 compatibility code snipplet.
 
-                        ibm,pa-features = [18 00 f6 3f c7 c0 80 f0 80 00
- 00 00 00 00 00 00 00 00 80 00 80 00 80 00 00 00];
-                        cpu-version = <0x4d0200>;
-
-                               ^^^
-                        second CPU core
-
-                        ibm,pa-features = <0x600f63f 0xc70080c0>;
-                        cpu-version = <0xf000003>;
-
-                               ^^^
-                          boot CPU core
-
-The second core is advertised in raw POWER8 mode. This happens because
-CAS assumes all CPUs to have the same compatibility mode. Since the
-boot CPU already has the requested compatibility mode, the CAS code
-does not set it for the secondary one, and exposes the bogus device
-tree properties in in the CAS response to the guest.
-
-A similar situation is observed when hot-plugging a CPU core. The
-related device tree properties are generated and exposed to guest
-with the "ibm,configure-connector" RTAS before "start-cpu" is called.
-The CPU core is advertised to the guest in raw mode as well.
-
-It both cases, it boils down to the fact that "start-cpu" happens too
-late. This can be fixed globally by propagating the compatibility mode
-of the boot CPU to the other CPUs during reset.  For this to work, the
-compatibility mode of the boot CPU must be set before the machine code
-actually resets all CPUs.
-
-It is not needed to set the compatibility mode in "start-cpu" anymore,
-so the code is dropped.
-
-Fixes: 51f84465dd98
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c          | 18 +++++++++---------
- hw/ppc/spapr_cpu_core.c |  7 +++++++
- hw/ppc/spapr_rtas.c     |  9 ---------
- 3 files changed, 16 insertions(+), 18 deletions(-)
+ hw/ppc/spapr.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bca838fce6..02e45dd010 100644
+index 499ab647d8..bca838fce6 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1484,6 +1484,15 @@ static void spapr_machine_reset(void)
-         spapr_setup_hpt_and_vrma(spapr);
+@@ -3362,9 +3362,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         int i;
+ 
+         for (i = 0; i < cc->nr_threads; i++) {
+-            sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
+-
+-            cs = CPU(sc->threads[i]);
++            cs = CPU(core->threads[i]);
+             pre_2_10_vmstate_unregister_dummy_icp(cs->cpu_index);
+         }
      }
- 
-+    /* if this reset wasn't generated by CAS, we should reset our
-+     * negotiated options and start from scratch */
-+    if (!spapr->cas_reboot) {
-+        spapr_ovec_cleanup(spapr->ov5_cas);
-+        spapr->ov5_cas = spapr_ovec_new();
-+
-+        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
-+    }
-+
-     qemu_devices_reset();
- 
-     /* DRC reset may cause a device to be unplugged. This will cause troubles
-@@ -1504,15 +1513,6 @@ static void spapr_machine_reset(void)
-     rtas_addr = rtas_limit - RTAS_MAX_SIZE;
-     fdt_addr = rtas_addr - FDT_MAX_SIZE;
- 
--    /* if this reset wasn't generated by CAS, we should reset our
--     * negotiated options and start from scratch */
--    if (!spapr->cas_reboot) {
--        spapr_ovec_cleanup(spapr->ov5_cas);
--        spapr->ov5_cas = spapr_ovec_new();
--
--        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
--    }
--
-     fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
- 
-     spapr_load_rtas(spapr, fdt, rtas_addr);
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index ac19b2e0b7..590d167b04 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -44,6 +44,13 @@ static void spapr_cpu_reset(void *opaque)
-     if (cs != first_cpu) {
-         env->spr[SPR_LPCR] &= ~pcc->lpcr_pm;
-     }
-+
-+    /* Set compatibility mode to match the boot CPU, which was either set
-+     * by the machine reset code or by CAS. This should never fail.
-+     */
-+    if (cs != first_cpu) {
-+        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort);
-+    }
- }
- 
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 2b89e1d448..4bb939d3d1 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -163,7 +163,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-         CPUState *cs = CPU(cpu);
-         CPUPPCState *env = &cpu->env;
-         PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
--        Error *local_err = NULL;
- 
-         if (!cs->halted) {
-             rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-@@ -175,14 +174,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-          * new cpu enters */
-         kvm_cpu_synchronize_state(cs);
- 
--        /* Set compatibility mode to match existing cpus */
--        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--            return;
--        }
--
-         env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
- 
-         /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
 -- 
 2.14.3
