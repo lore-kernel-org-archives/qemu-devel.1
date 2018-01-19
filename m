@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdl3-0001z7-GF
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:30 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ecdl6-00022w-VN
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdl2-00066g-G5
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:29 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ecdl5-000681-Uc
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:33 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 19 Jan 2018 15:58:45 -0500
-Message-Id: <20180119205847.7141-12-jsnow@redhat.com>
+Date: Fri, 19 Jan 2018 15:58:47 -0500
+Message-Id: <20180119205847.7141-14-jsnow@redhat.com>
 In-Reply-To: <20180119205847.7141-1-jsnow@redhat.com>
 References: <20180119205847.7141-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/13] block/mirror: remove
- block_job_sleep_ns calls
+Subject: [Qemu-devel] [PATCH v2 13/13] blockjob: remove
+ block_job_pause_point from interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +23,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-We're attempting to slacken the mirror loop in three different places,
-but we can combine these three attempts. Combine the early loop call to
-block_job_pause_point with the two late-loop calls to block_job_sleep_ns.
+Remove the last call in block/mirror, using relax instead.
+relax may do nothing if we are canceled, so allow iteration to return
+prematurely and allow mirror_run to handle the cancellation logic.
 
-When delay_ns is 0 and it has not been SLICE_TIME since the last yield,
-block_job_relax is merely a call to block_job_pause_point, so this should
-be equivalent with the exception that if we have managed to not yield at
-all in the last SLICE_TIME ns, we will now do so.
-
-I am not sure that condition was possible,
-so this loop should be equivalent.
+This is a functional change to mirror that should have the effect of
+cancelled mirror jobs being able to respond to that request a little
+sooner instead of launching new requests.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/mirror.c     | 22 +++++++++++-----------
- block/trace-events |  2 +-
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ block/mirror.c               |  4 +++-
+ blockjob.c                   | 10 +++++++++-
+ include/block/blockjob_int.h |  9 ---------
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index a0e0044de2..192e03694f 100644
+index 192e03694f..8e6b5b25a9 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -761,7 +761,7 @@ static void coroutine_fn mirror_run(void *opaque)
-     assert(!s->dbi);
-     s->dbi = bdrv_dirty_iter_new(s->dirty_bitmap);
-     for (;;) {
--        uint64_t delay_ns = 0;
-+        static uint64_t delay_ns = 0;
-         int64_t cnt, delta;
-         bool should_complete;
- 
-@@ -770,9 +770,16 @@ static void coroutine_fn mirror_run(void *opaque)
-             goto immediate_exit;
-         }
- 
--        block_job_pause_point(&s->common);
--
-         cnt = bdrv_get_dirty_count(s->dirty_bitmap);
-+
-+        trace_mirror_before_relax(s, cnt, s->synced, delay_ns);
-+        if (block_job_relax(&s->common, delay_ns)) {
-+            if (!s->synced) {
-+                goto immediate_exit;
-+            }
-+        }
-+        delay_ns = 0;
-+
-         /* s->common.offset contains the number of bytes already processed so
-          * far, cnt is the number of dirty bytes remaining and
-          * s->bytes_in_flight is the number of bytes currently being
-@@ -849,15 +856,8 @@ static void coroutine_fn mirror_run(void *opaque)
-         }
- 
-         ret = 0;
--        trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
--        if (!s->synced) {
--            block_job_sleep_ns(&s->common, delay_ns);
--            if (block_job_is_cancelled(&s->common)) {
--                break;
--            }
--        } else if (!should_complete) {
-+        if (s->synced && !should_complete) {
-             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
--            block_job_sleep_ns(&s->common, delay_ns);
-         }
+@@ -345,7 +345,9 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+         mirror_wait_for_io(s);
      }
  
-diff --git a/block/trace-events b/block/trace-events
-index 11c8d5f590..60f36f929a 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -27,7 +27,7 @@ mirror_start(void *bs, void *s, void *opaque) "bs %p s %p opaque %p"
- mirror_restart_iter(void *s, int64_t cnt) "s %p dirty count %"PRId64
- mirror_before_flush(void *s) "s %p"
- mirror_before_drain(void *s, int64_t cnt) "s %p dirty count %"PRId64
--mirror_before_sleep(void *s, int64_t cnt, int synced, uint64_t delay_ns) "s %p dirty count %"PRId64" synced %d delay %"PRIu64"ns"
-+mirror_before_relax(void *s, int64_t cnt, int synced, uint64_t delay_ns) "s %p dirty count %"PRId64" synced %d delay %"PRIu64"ns"
- mirror_one_iteration(void *s, int64_t offset, uint64_t bytes) "s %p offset %" PRId64 " bytes %" PRIu64
- mirror_iteration_done(void *s, int64_t offset, uint64_t bytes, int ret) "s %p offset %" PRId64 " bytes %" PRIu64 " ret %d"
- mirror_yield(void *s, int64_t cnt, int buf_free_count, int in_flight) "s %p dirty count %"PRId64" free buffers %d in_flight %d"
+-    block_job_pause_point(&s->common);
++    if (block_job_relax(&s->common, 0)) {
++        return 0;
++    }
+ 
+     /* Find the number of consective dirty chunks following the first dirty
+      * one, and wait for in flight requests in them. */
+diff --git a/blockjob.c b/blockjob.c
+index 40167d6896..27c13fdd08 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -60,6 +60,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
+ static void block_job_event_cancelled(BlockJob *job);
+ static void block_job_event_completed(BlockJob *job, const char *msg);
+ static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
++static int coroutine_fn block_job_pause_point(BlockJob *job);
+ 
+ /* Transactional group of block jobs */
+ struct BlockJobTxn {
+@@ -793,7 +794,14 @@ static void block_job_do_yield(BlockJob *job, uint64_t ns)
+     assert(job->busy);
+ }
+ 
+-int coroutine_fn block_job_pause_point(BlockJob *job)
++/**
++ * block_job_pause_point:
++ * @job: The job that is ready to pause.
++ *
++ * Pause now if block_job_pause() has been called.  Block jobs that perform
++ * lots of I/O must call this between requests so that the job can be paused.
++ */
++static int coroutine_fn block_job_pause_point(BlockJob *job)
+ {
+     assert(job && block_job_started(job));
+ 
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index c4891a5a9b..57327cbc5a 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -201,15 +201,6 @@ void block_job_completed(BlockJob *job, int ret);
+  */
+ bool block_job_is_cancelled(BlockJob *job);
+ 
+-/**
+- * block_job_pause_point:
+- * @job: The job that is ready to pause.
+- *
+- * Pause now if block_job_pause() has been called.  Block jobs that perform
+- * lots of I/O must call this between requests so that the job can be paused.
+- */
+-int coroutine_fn block_job_pause_point(BlockJob *job);
+-
+ /**
+  * block_job_enter:
+  * @job: The job to enter.
 -- 
 2.14.3
