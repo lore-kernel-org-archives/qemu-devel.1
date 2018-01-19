@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ecOmx-0007OQ-Do
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:00:28 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ecOmz-0007QH-C1
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:00:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ecOmv-0004oA-V5
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:00:27 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ecOmy-0004p0-31
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:00:29 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 19 Jan 2018 15:59:59 +1100
-Message-Id: <20180119050005.29392-2-sjitindarsingh@gmail.com>
+Date: Fri, 19 Jan 2018 16:00:00 +1100
+Message-Id: <20180119050005.29392-3-sjitindarsingh@gmail.com>
 In-Reply-To: <20180119050005.29392-1-sjitindarsingh@gmail.com>
 References: <20180119050005.29392-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V5 1/7] target/ppc/kvm: Add
- cap_ppc_safe_[cache/bounds_check/indirect_branch]
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V5 2/7] target/ppc/spapr_caps: Add
+ macro to generate spapr_caps migration vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,214 +23,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, paulus@ozlabs.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Add three new kvm capabilities used to represent the level of host support
-for three corresponding workarounds.
+The vmstate description and the contained needed function for migration
+of spapr_caps is the same for each cap, with the name of the cap
+substituted. As such introduce a macro to allow for easier generation of
+these.
 
-Host support for each of the capabilities is queried through the
-new ioctl KVM_PPC_GET_CPU_CHAR which returns four uint64 quantities. The
-first two, character and behaviour, represent the available
-characteristics of the cpu and the behaviour of the cpu respectively.
-The second two, c_mask and b_mask, represent the mask of known bits for
-the character and beheviour dwords respectively.
+Convert the three existing spapr_caps (htm, vsx, and dfp) to use this
+macro.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- include/hw/ppc/spapr.h          | 12 +++++++++
- linux-headers/asm-powerpc/kvm.h |  8 ++++++
- linux-headers/linux/kvm.h       |  3 +++
- target/ppc/kvm.c                | 58 +++++++++++++++++++++++++++++++++++++++++
- target/ppc/kvm_ppc.h            | 18 +++++++++++++
- 5 files changed, 99 insertions(+)
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 0f5628f22e..eded0ea57d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -295,6 +295,18 @@ struct sPAPRMachineState {
- #define H_DABRX_KERNEL     (1ULL<<(63-62))
- #define H_DABRX_USER       (1ULL<<(63-63))
- 
-+/* Values for KVM_PPC_GET_CPU_CHAR & H_GET_CPU_CHARACTERISTICS */
-+#define H_CPU_CHAR_SPEC_BAR_ORI31               PPC_BIT(0)
-+#define H_CPU_CHAR_BCCTRL_SERIALISED            PPC_BIT(1)
-+#define H_CPU_CHAR_L1D_FLUSH_ORI30              PPC_BIT(2)
-+#define H_CPU_CHAR_L1D_FLUSH_TRIG2              PPC_BIT(3)
-+#define H_CPU_CHAR_L1D_THREAD_PRIV              PPC_BIT(4)
-+#define H_CPU_CHAR_HON_BRANCH_HINTS             PPC_BIT(5)
-+#define H_CPU_CHAR_THR_RECONF_TRIG              PPC_BIT(6)
-+#define H_CPU_BEHAV_FAVOUR_SECURITY             PPC_BIT(0)
-+#define H_CPU_BEHAV_L1D_FLUSH_PR                PPC_BIT(1)
-+#define H_CPU_BEHAV_BNDS_CHK_SPEC_BAR           PPC_BIT(2)
-+
- /* Each control block has to be on a 4K boundary */
- #define H_CB_ALIGNMENT     4096
- 
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
-index 61d6049f4c..5d2cb26848 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -443,6 +443,14 @@ struct kvm_ppc_rmmu_info {
- 	__u32	ap_encodings[8];
- };
- 
-+/* For KVM_PPC_GET_CPU_CHAR */
-+struct kvm_ppc_cpu_char {
-+        __u64   character;      /* characteristics of the CPU */
-+        __u64   behaviour;      /* recommended software behaviour */
-+        __u64   c_mask;         /* valid bits in character */
-+        __u64   b_mask;         /* valid bits in behaviour */
-+};
-+
- /* Per-vcpu XICS interrupt controller state */
- #define KVM_REG_PPC_ICP_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x8c)
- 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index ce6c2f11f4..c35f1bd363 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -932,6 +932,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_HYPERV_SYNIC2 148
- #define KVM_CAP_HYPERV_VP_INDEX 149
- #define KVM_CAP_S390_AIS_MIGRATION 150
-+#define KVM_CAP_PPC_GET_CPU_CHAR 151
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1261,6 +1262,8 @@ struct kvm_s390_ucas_mapping {
- #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
- /* Available with KVM_CAP_PPC_RADIX_MMU */
- #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
-+/* Available with KVM_CAP_PPC_GET_CPU_CHAR */
-+#define KVM_PPC_GET_CPU_CHAR      _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 914be687e7..b16f731522 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -89,6 +89,9 @@ static int cap_mmu_radix;
- static int cap_mmu_hash_v3;
- static int cap_resize_hpt;
- static int cap_ppc_pvr_compat;
-+static int cap_ppc_safe_cache;
-+static int cap_ppc_safe_bounds_check;
-+static int cap_ppc_safe_indirect_branch;
- 
- static uint32_t debug_inst_opcode;
- 
-@@ -121,6 +124,7 @@ static bool kvmppc_is_pr(KVMState *ks)
+---
+
+V5:
+ - Patch added to series
+---
+ hw/ppc/spapr_caps.c | 78 +++++++++++++++++------------------------------------
+ 1 file changed, 24 insertions(+), 54 deletions(-)
+
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index d5c9ce774a..5d52969bd5 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -228,62 +228,32 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
+     return ok ? 0 : -EINVAL;
  }
  
- static int kvm_ppc_register_host_cpu_type(MachineState *ms);
-+static void kvmppc_get_cpu_characteristics(KVMState *s);
- 
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-@@ -147,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
-     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
-     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
-+    kvmppc_get_cpu_characteristics(s);
-     /*
-      * Note: setting it to false because there is not such capability
-      * in KVM at this moment.
-@@ -2456,6 +2461,59 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-     return cap_mmu_hash_v3;
+-static bool spapr_cap_htm_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_HTM] &&
+-           (spapr->eff.caps[SPAPR_CAP_HTM] != spapr->def.caps[SPAPR_CAP_HTM]);
+-}
+-
+-const VMStateDescription vmstate_spapr_cap_htm = {
+-    .name = "spapr/cap/htm",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_htm_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_HTM], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
+-
+-static bool spapr_cap_vsx_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_VSX] &&
+-           (spapr->eff.caps[SPAPR_CAP_VSX] != spapr->def.caps[SPAPR_CAP_VSX]);
++/* Used to generate the migration field and needed function for a spapr cap */
++#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
++static bool spapr_cap_##cap##_needed(void *opaque)      \
++{                                                       \
++    sPAPRMachineState *spapr = opaque;                  \
++                                                        \
++    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
++           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
++            spapr->def.caps[SPAPR_CAP_##ccap]);         \
++}                                                       \
++                                                        \
++const VMStateDescription vmstate_spapr_cap_##cap = {    \
++    .name = "spapr/cap/" #cap,                          \
++    .version_id = 1,                                    \
++    .minimum_version_id = 1,                            \
++    .needed = spapr_cap_##cap##_needed,                 \
++    .fields = (VMStateField[]) {                        \
++        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
++                      sPAPRMachineState),               \
++        VMSTATE_END_OF_LIST()                           \
++    },                                                  \
  }
  
-+static void kvmppc_get_cpu_characteristics(KVMState *s)
-+{
-+    struct kvm_ppc_cpu_char c;
-+    int ret;
-+
-+    /* Assume broken */
-+    cap_ppc_safe_cache = 0;
-+    cap_ppc_safe_bounds_check = 0;
-+    cap_ppc_safe_indirect_branch = 0;
-+
-+    ret = kvm_vm_check_extension(s, KVM_CAP_PPC_GET_CPU_CHAR);
-+    if (!ret) {
-+        return;
-+    }
-+    ret = kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &c);
-+    if (ret < 0) {
-+        return;
-+    }
-+    /* Parse and set cap_ppc_safe_cache */
-+    if (~c.behaviour & c.b_mask & H_CPU_BEHAV_L1D_FLUSH_PR) {
-+        cap_ppc_safe_cache = 2;
-+    } else if ((c.character & c.c_mask & H_CPU_CHAR_L1D_THREAD_PRIV) &&
-+               (c.character & c.c_mask & (H_CPU_CHAR_L1D_FLUSH_ORI30 |
-+                                          H_CPU_CHAR_L1D_FLUSH_TRIG2))) {
-+        cap_ppc_safe_cache = 1;
-+    }
-+    /* Parse and set cap_ppc_safe_bounds_check */
-+    if (~c.behaviour & c.b_mask & H_CPU_BEHAV_BNDS_CHK_SPEC_BAR) {
-+        cap_ppc_safe_bounds_check = 2;
-+    } else if (c.character & c.c_mask & H_CPU_CHAR_SPEC_BAR_ORI31) {
-+        cap_ppc_safe_bounds_check = 1;
-+    }
-+    /* Parse and set cap_ppc_safe_indirect_branch */
-+    if (c.character & H_CPU_CHAR_BCCTRL_SERIALISED) {
-+        cap_ppc_safe_indirect_branch = 2;
-+    }
-+}
-+
-+int kvmppc_get_cap_safe_cache(void)
-+{
-+    return cap_ppc_safe_cache;
-+}
-+
-+int kvmppc_get_cap_safe_bounds_check(void)
-+{
-+    return cap_ppc_safe_bounds_check;
-+}
-+
-+int kvmppc_get_cap_safe_indirect_branch(void)
-+{
-+    return cap_ppc_safe_indirect_branch;
-+}
-+
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
- {
-     uint32_t host_pvr = mfpvr();
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index ecb55493cc..39830baa77 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -59,6 +59,9 @@ bool kvmppc_has_cap_fixup_hcalls(void);
- bool kvmppc_has_cap_htm(void);
- bool kvmppc_has_cap_mmu_radix(void);
- bool kvmppc_has_cap_mmu_hash_v3(void);
-+int kvmppc_get_cap_safe_cache(void);
-+int kvmppc_get_cap_safe_bounds_check(void);
-+int kvmppc_get_cap_safe_indirect_branch(void);
- int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-@@ -290,6 +293,21 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
-     return false;
- }
+-const VMStateDescription vmstate_spapr_cap_vsx = {
+-    .name = "spapr/cap/vsx",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_vsx_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_VSX], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
+-
+-static bool spapr_cap_dfp_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_DFP] &&
+-           (spapr->eff.caps[SPAPR_CAP_DFP] != spapr->def.caps[SPAPR_CAP_DFP]);
+-}
+-
+-const VMStateDescription vmstate_spapr_cap_dfp = {
+-    .name = "spapr/cap/dfp",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_dfp_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_DFP], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
++SPAPR_CAP_MIG_STATE(htm, HTM);
++SPAPR_CAP_MIG_STATE(vsx, VSX);
++SPAPR_CAP_MIG_STATE(dfp, DFP);
  
-+static inline int kvmppc_get_cap_safe_cache(void)
-+{
-+    return 0;
-+}
-+
-+static inline int kvmppc_get_cap_safe_bounds_check(void)
-+{
-+    return 0;
-+}
-+
-+static inline int kvmppc_get_cap_safe_indirect_branch(void)
-+{
-+    return 0;
-+}
-+
- static inline int kvmppc_enable_hwrng(void)
+ void spapr_caps_reset(sPAPRMachineState *spapr)
  {
-     return -1;
 -- 
 2.13.6
