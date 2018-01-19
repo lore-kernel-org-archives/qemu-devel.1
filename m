@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecXAU-0004MC-6r
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:19 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecXAe-0004Vg-GB
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ecXAP-0004GB-9Z
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:18 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:55695)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ecXAO-0004F8-Vy
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:13 -0500
-References: <20180116222212.1266-1-laurent@vivier.eu>
-	<20180117164950.3c818541@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <41ae7321-c370-84ec-97ec-bd065cef2a61@vivier.eu>
-Date: Fri, 19 Jan 2018 14:56:53 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180117164950.3c818541@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] linux-user: select CPU type
- according ELF header values
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ecXAa-0004Ov-Bp
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:57:28 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 19 Jan 2018 16:57:17 +0300
+Message-Id: <20180119135719.24745-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20180119135719.24745-1-vsementsov@virtuozzo.com>
+References: <20180119135719.24745-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 3/5] iotest 147: add cases to test new @name
+ parameter of nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +20,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Aaron Sierra <asierra@xes-inc.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Le 17/01/2018 à 16:49, Igor Mammedov a écrit :
-> On Tue, 16 Jan 2018 23:22:08 +0100
-> Laurent Vivier <laurent@vivier.eu> wrote:
-> 
->> This idea has been suggested to me before by Philippe
->> Mathieu-Daudé, and recently YunQiang Su has proposed a
->> patch to manage the MIPS r6 case.
->>
->> Based on this, this series tries to clean-up the original
->> patch, and introduces the use for m68k architecture and
->> port the patch from YunQiang Su.
->>
->> v3: fix code indent problem reported by patchew
->>     remove useless "!= 0"
->>     check for EF_M68K_M68000
->>     add EF_M68K_* flags in elf.h
->>     set 680x0 default CPU to m68040
->>     change "#if ... #endif" structure for ppc
->> v2: move cpu_model selection to linux-user/*/target_elf.h
->>     provide eflags to cpu_get_model() instead of fd
->>     (and modify other patches accordingly)
-> Sorry for not noticing it earlier, but could you please
-> fix series to use cpu type names instead of cpu_model?
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ tests/qemu-iotests/147     | 68 +++++++++++++++++++++++++++++++++++++---------
+ tests/qemu-iotests/147.out |  4 +--
+ 2 files changed, 57 insertions(+), 15 deletions(-)
 
-As your series is not ready for inclusion, perhaps we can take my series
-first?
-
-I'll happily help you to adapt your series on top of this one if you need.
-
-Thanks,
-Laurent
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index 90f40ed245..d2081df84b 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -38,8 +38,8 @@ def flatten_sock_addr(crumpled_address):
+ 
+ 
+ class NBDBlockdevAddBase(iotests.QMPTestCase):
+-    def blockdev_add_options(self, address, export=None):
+-        options = { 'node-name': 'nbd-blockdev',
++    def blockdev_add_options(self, address, export, node_name):
++        options = { 'node-name': node_name,
+                     'driver': 'raw',
+                     'file': {
+                         'driver': 'nbd',
+@@ -50,23 +50,28 @@ class NBDBlockdevAddBase(iotests.QMPTestCase):
+             options['file']['export'] = export
+         return options
+ 
+-    def client_test(self, filename, address, export=None):
+-        bao = self.blockdev_add_options(address, export)
++    def client_test(self, filename, address, export=None,
++                    node_name='nbd-blockdev', delete=True):
++        bao = self.blockdev_add_options(address, export, node_name)
+         result = self.vm.qmp('blockdev-add', **bao)
+         self.assert_qmp(result, 'return', {})
+ 
++        found = False
+         result = self.vm.qmp('query-named-block-nodes')
+         for node in result['return']:
+-            if node['node-name'] == 'nbd-blockdev':
++            if node['node-name'] == node_name:
++                found = True
+                 if isinstance(filename, str):
+                     self.assert_qmp(node, 'image/filename', filename)
+                 else:
+                     self.assert_json_filename_equal(node['image']['filename'],
+                                                     filename)
+                 break
++        self.assertTrue(found)
+ 
+-        result = self.vm.qmp('blockdev-del', node_name='nbd-blockdev')
+-        self.assert_qmp(result, 'return', {})
++        if delete:
++            result = self.vm.qmp('blockdev-del', node_name=node_name)
++            self.assert_qmp(result, 'return', {})
+ 
+ 
+ class QemuNBD(NBDBlockdevAddBase):
+@@ -125,26 +130,63 @@ class BuiltinNBD(NBDBlockdevAddBase):
+         except OSError:
+             pass
+ 
+-    def _server_up(self, address):
++    def _server_up(self, address, export_name=None, export_name2=None):
+         result = self.server.qmp('nbd-server-start', addr=address)
+         self.assert_qmp(result, 'return', {})
+ 
+-        result = self.server.qmp('nbd-server-add', device='nbd-export')
++        if export_name is None:
++            result = self.server.qmp('nbd-server-add', device='nbd-export')
++        else:
++            result = self.server.qmp('nbd-server-add', device='nbd-export',
++                                     name=export_name)
+         self.assert_qmp(result, 'return', {})
+ 
++        if export_name2 is not None:
++            result = self.server.qmp('nbd-server-add', device='nbd-export',
++                                     name=export_name2)
++            self.assert_qmp(result, 'return', {})
++
++
+     def _server_down(self):
+         result = self.server.qmp('nbd-server-stop')
+         self.assert_qmp(result, 'return', {})
+ 
+-    def test_inet(self):
++    def do_test_inet(self, export_name=None):
+         address = { 'type': 'inet',
+                     'data': {
+                         'host': 'localhost',
+                         'port': str(NBD_PORT)
+                     } }
+-        self._server_up(address)
+-        self.client_test('nbd://localhost:%i/nbd-export' % NBD_PORT,
+-                         flatten_sock_addr(address), 'nbd-export')
++        self._server_up(address, export_name)
++        export_name = export_name or 'nbd-export'
++        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, export_name),
++                         flatten_sock_addr(address), export_name)
++        self._server_down()
++
++    def test_inet_default_export_name(self):
++        self.do_test_inet()
++
++    def test_inet_same_export_name(self):
++        self.do_test_inet('nbd-export')
++
++    def test_inet_different_export_name(self):
++        self.do_test_inet('shadow')
++
++    def test_inet_two_exports(self):
++        address = { 'type': 'inet',
++                    'data': {
++                        'host': 'localhost',
++                        'port': str(NBD_PORT)
++                    } }
++        self._server_up(address, 'exp1', 'exp2')
++        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp1'),
++                         flatten_sock_addr(address), 'exp1', 'node1', False)
++        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp2'),
++                         flatten_sock_addr(address), 'exp2', 'node2', False)
++        result = self.vm.qmp('blockdev-del', node_name='node1')
++        self.assert_qmp(result, 'return', {})
++        result = self.vm.qmp('blockdev-del', node_name='node2')
++        self.assert_qmp(result, 'return', {})
+         self._server_down()
+ 
+     def test_inet6(self):
+diff --git a/tests/qemu-iotests/147.out b/tests/qemu-iotests/147.out
+index 3f8a935a08..dae404e278 100644
+--- a/tests/qemu-iotests/147.out
++++ b/tests/qemu-iotests/147.out
+@@ -1,5 +1,5 @@
+-......
++.........
+ ----------------------------------------------------------------------
+-Ran 6 tests
++Ran 9 tests
+ 
+ OK
+-- 
+2.11.1
