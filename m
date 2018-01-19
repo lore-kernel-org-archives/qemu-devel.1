@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecY0O-00054E-5b
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:50:57 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ecY0o-0005ND-VY
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:51:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ecY0N-0006st-Ay
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:50:56 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ecY0o-0007Fb-8R
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:51:23 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 19 Jan 2018 14:48:55 +0000
-Message-Id: <1516373355-305-3-git-send-email-eric.auger@redhat.com>
+Date: Fri, 19 Jan 2018 14:48:56 +0000
+Message-Id: <1516373355-305-4-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
 References: <1516373355-305-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 02/22] hw/arm/virt: Implement
- get_primary_pci_bus
+Subject: [Qemu-devel] [RFC v5 03/22] pc: Implement get_primary_pci_bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +22,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com, linuc.decode@gmail.com
 
-get_primary_pci_bus() returns the root bus. We also
-add the PCIBus handle to VirtMachineState.
+Implement this get_primary_pci_bus() which returns the root
+bus.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/arm/virt.c         | 11 ++++++++++-
- include/hw/arm/virt.h |  1 +
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ hw/i386/pc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 543f9bd..7844311 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -999,7 +999,7 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
-                            0x7           /* PCI irq */);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 55686bf..00f4623 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2337,6 +2337,13 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+     }
  }
  
--static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-+static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
- {
-     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
-     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
-@@ -1062,6 +1062,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
- 
-     pci = PCI_HOST_BRIDGE(dev);
-     if (pci->bus) {
-+        vms->pci_bus = pci->bus;
-         for (i = 0; i < nb_nics; i++) {
-             NICInfo *nd = &nd_table[i];
- 
-@@ -1581,6 +1582,13 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
- 
-+static PCIBus *virt_get_primary_pci_bus(const MachineState *ms)
++static PCIBus *pc_machine_get_primary_pci_bus(const MachineState *ms)
 +{
-+    VirtMachineState *vms = VIRT_MACHINE(ms);
++    PCMachineState *pcms = PC_MACHINE(ms);
 +
-+    return vms->pci_bus;
++    return pcms->bus;
 +}
 +
- static void virt_machine_class_init(ObjectClass *oc, void *data)
+ static void pc_machine_class_init(ObjectClass *oc, void *data)
  {
      MachineClass *mc = MACHINE_CLASS(oc);
-@@ -1601,6 +1609,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-+    mc->get_primary_pci_bus = virt_get_primary_pci_bus;
- }
+@@ -2376,6 +2383,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug = pc_machine_device_unplug_cb;
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
++    mc->get_primary_pci_bus = pc_machine_get_primary_pci_bus;
  
- static const TypeInfo virt_machine_info = {
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 33b0ff3..7e31e99 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -106,6 +106,7 @@ typedef struct {
-     uint32_t gic_phandle;
-     uint32_t msi_phandle;
-     int psci_conduit;
-+    PCIBus *pci_bus;
- } VirtMachineState;
- 
- #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+     object_class_property_add(oc, PC_MACHINE_MEMHP_REGION_SIZE, "int",
+         pc_machine_get_hotplug_memory_region_size, NULL,
 -- 
 1.9.1
