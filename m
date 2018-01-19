@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecVww-0001tc-8s
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:39:15 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecVy5-0002pR-Dw
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:40:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ecVwv-0005YP-Jv
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:39:14 -0500
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:44962)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ecVwv-0005XQ-Ew
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:39:13 -0500
-Received: by mail-ot0-x232.google.com with SMTP id t20so1264714ote.11
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 04:39:13 -0800 (PST)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ecVy1-0006T0-6A
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:40:25 -0500
+Received: from mail-he1eur01on0717.outbound.protection.outlook.com
+	([2a01:111:f400:fe1e::717]:53696
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1ecVy0-0006RX-M9
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:40:21 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Fri, 19 Jan 2018 15:40:00 +0300
+Message-Id: <1516365600-105416-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1516308132-10272-1-git-send-email-mst@redhat.com>
-References: <1516308132-10272-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Jan 2018 12:38:52 +0000
-Message-ID: <CAFEAcA-0Vfu6-NXNTYnApcCsd7o24-FLKf=NWsnJY5nCLwAt6w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 00/29] pc, pci, virtio: features, fixes,
- cleanups
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] ide-test: test trim requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +26,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On 18 January 2018 at 20:44, Michael S. Tsirkin <mst@redhat.com> wrote:
-> changes since v3:
-> - dropped vhost memory rework due to clang warnings
-> - dropped vhost memslot rework due to merge conflicts
->
->
-> The following changes since commit b4d6ed1c5ae519d3efb5297be3ef6625ca2a20f4:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-17' into staging (2018-01-18 15:25:17 +0000)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to f4bf56fb78ed0e9f60fa1ed656c14ff4c494da5a:
->
->   vhost: remove assertion to prevent crash (2018-01-18 21:52:39 +0200)
->
-> ----------------------------------------------------------------
-> pc, pci, virtio: features, fixes, cleanups
->
-> A bunch of fixes, cleanus and new features all over the place.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+---
+ tests/ide-test.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-Applied this version, thanks.
-
--- PMM
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index aa9de06..259f39f 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -52,6 +52,7 @@
+ enum {
+     reg_data        = 0x0,
+     reg_feature     = 0x1,
++    reg_error       = 0x1,
+     reg_nsectors    = 0x2,
+     reg_lba_low     = 0x3,
+     reg_lba_middle  = 0x4,
+@@ -69,6 +70,11 @@ enum {
+     ERR     = 0x01,
+ };
+ 
++/* Error field */
++enum {
++    ABRT    = 0x04,
++};
++
+ enum {
+     DEV     = 0x10,
+     LBA     = 0x40,
+@@ -81,6 +87,7 @@ enum {
+ };
+ 
+ enum {
++    CMD_DSM         = 0x06,
+     CMD_READ_DMA    = 0xc8,
+     CMD_WRITE_DMA   = 0xca,
+     CMD_FLUSH_CACHE = 0xe7,
+@@ -179,6 +186,12 @@ typedef struct PrdtEntry {
+ #define assert_bit_set(data, mask) g_assert_cmphex((data) & (mask), ==, (mask))
+ #define assert_bit_clear(data, mask) g_assert_cmphex((data) & (mask), ==, 0)
+ 
++static uint64_t trim_range_le(uint64_t sector, uint64_t count)
++{
++    /* 2-byte range, 6-byte LBA */
++    return cpu_to_le64((count << 48) + sector);
++}
++
+ static int send_dma_request(int cmd, uint64_t sector, int nb_sectors,
+                             PrdtEntry *prdt, int prdt_entries,
+                             void(*post_exec)(QPCIDevice *dev, QPCIBar ide_bar,
+@@ -204,6 +217,7 @@ static int send_dma_request(int cmd, uint64_t sector, int nb_sectors,
+          * the SCSI command being sent in the packet, too. */
+         from_dev = true;
+         break;
++    case CMD_DSM:
+     case CMD_WRITE_DMA:
+         from_dev = false;
+         break;
+@@ -234,6 +248,10 @@ static int send_dma_request(int cmd, uint64_t sector, int nb_sectors,
+         /* Enables ATAPI DMA; otherwise PIO is attempted */
+         qpci_io_writeb(dev, ide_bar, reg_feature, 0x01);
+     } else {
++        if (cmd == CMD_DSM) {
++            /* trim bit */
++            qpci_io_writeb(dev, ide_bar, reg_feature, 0x01);
++        }
+         qpci_io_writeb(dev, ide_bar, reg_nsectors, nb_sectors);
+         qpci_io_writeb(dev, ide_bar, reg_lba_low,    sector & 0xff);
+         qpci_io_writeb(dev, ide_bar, reg_lba_middle, (sector >> 8) & 0xff);
+@@ -344,6 +362,58 @@ static void test_bmdma_simple_rw(void)
+     g_free(cmpbuf);
+ }
+ 
++static void test_bmdma_trim(void)
++{
++    QPCIDevice *dev;
++    QPCIBar bmdma_bar, ide_bar;
++    uint8_t status;
++    const uint64_t random_range[] = { trim_range_le(0, 2),
++                                      trim_range_le(6, 8),
++                                      trim_range_le(10, 1),
++                                    };
++    const uint64_t bad_range = trim_range_le(TEST_IMAGE_SIZE / 512 - 1, 2);
++    size_t len = 512;
++    uint8_t *buf;
++    uintptr_t guest_buf = guest_alloc(guest_malloc, len);
++
++    PrdtEntry prdt[] = {
++        {
++            .addr = cpu_to_le32(guest_buf),
++            .size = cpu_to_le32(len | PRDT_EOT),
++        },
++    };
++
++    dev = get_pci_device(&bmdma_bar, &ide_bar);
++
++    buf = g_malloc(len);
++
++    /* Normal request */
++    *((uint64_t *)buf) = random_range[0];
++    *((uint64_t *)buf + 1) = random_range[1];
++
++    memwrite(guest_buf, buf, 2 * sizeof(uint64_t));
++
++    status = send_dma_request(CMD_DSM, 0, 1, prdt,
++                              ARRAY_SIZE(prdt), NULL);
++    g_assert_cmphex(status, ==, BM_STS_INTR);
++    assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR);
++
++    /* Request contains invalid range */
++    *((uint64_t *)buf) = random_range[2];
++    *((uint64_t *)buf + 1) = bad_range;
++
++    memwrite(guest_buf, buf, 2 * sizeof(uint64_t));
++
++    status = send_dma_request(CMD_DSM, 0, 1, prdt,
++                              ARRAY_SIZE(prdt), NULL);
++    g_assert_cmphex(status, ==, BM_STS_INTR);
++    assert_bit_set(qpci_io_readb(dev, ide_bar, reg_status), ERR);
++    assert_bit_set(qpci_io_readb(dev, ide_bar, reg_error), ABRT);
++
++    free_pci_device(dev);
++    g_free(buf);
++}
++
+ static void test_bmdma_short_prdt(void)
+ {
+     QPCIDevice *dev;
+@@ -963,6 +1033,7 @@ int main(int argc, char **argv)
+ 
+     qtest_add_func("/ide/bmdma/setup", test_bmdma_setup);
+     qtest_add_func("/ide/bmdma/simple_rw", test_bmdma_simple_rw);
++    qtest_add_func("/ide/bmdma/trim", test_bmdma_trim);
+     qtest_add_func("/ide/bmdma/short_prdt", test_bmdma_short_prdt);
+     qtest_add_func("/ide/bmdma/one_sector_short_prdt",
+                    test_bmdma_one_sector_short_prdt);
+-- 
+2.7.4
