@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ecfhF-0004im-Ft
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 18:03:42 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ecg7X-00041q-0O
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 18:30:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ecfhE-0005kt-HX
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 18:03:41 -0500
-References: <20180119224735.12169-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
-Date: Fri, 19 Jan 2018 17:03:27 -0600
+	(envelope-from <jsnow@redhat.com>) id 1ecg7T-000827-OU
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 18:30:50 -0500
+References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8cb52056-e57c-ec72-60a1-adc41f21b9c3@redhat.com>
+Date: Fri, 19 Jan 2018 18:30:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180119224735.12169-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JUxs1XHKRbnw390AsGQIE632ohLwY4pv0"
-Subject: Re: [Qemu-devel] [PATCH v4] file-posix: specify expected filetypes
+In-Reply-To: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JUxs1XHKRbnw390AsGQIE632ohLwY4pv0
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
-Message-ID: <086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] file-posix: specify expected filetypes
-References: <20180119224735.12169-1-jsnow@redhat.com>
-In-Reply-To: <20180119224735.12169-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/19/2018 04:47 PM, John Snow wrote:
-> Adjust each caller of raw_open_common to specify if they are expecting
-> host and character devices or not. Tighten expectations of file types u=
-pon
-> open in the common code and refuse types that are not expected.
->=20
-> This has two effects:
->=20
-> (1) Character and block devices are now considered deprecated for the
->     'file' driver, which expects only S_IFREG, and
-> (2) no file-posix driver (file, host_cdrom, or host_device) can open
->     directories now.
->=20
-> I don't think there's a legitimate reason to open directories as if
-> they were files. This prevents QEMU from opening and attempting to prob=
-e
-> a directory inode, which can break in exciting ways. One of those ways
-> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
-> size instead of EISDIR. This can coax QEMU into responding with a
-> confusing "file too big" instead of "Hey, that's not a file".
->=20
-> See: https://bugs.launchpad.net/qemu/+bug/1739304/
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
 
---JUxs1XHKRbnw390AsGQIE632ohLwY4pv0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 01/16/2018 07:54 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all.
+> 
+> There are three qmp commands, needed to implement external backup API.
+> 
+> Using these three commands, client may do all needed bitmap management by
+> hand:
+> 
+> on backup start we need to do a transaction:
+>  {disable old bitmap, create new bitmap}
+> 
+> on backup success:
+>  drop old bitmap
+> 
+> on backup fail:
+>  enable old bitmap
+>  merge new bitmap to old bitmap
+>  drop new bitmap
+> 
+> v2: fix merge command deadlock
+>   add new patches: 1 and 6
+> 
+> Vladimir Sementsov-Ogievskiy (6):
+>   block: maintain persistent disabled bitmaps
+>   block/dirty-bitmap: add lock to bdrv_enable/disable_dirty_bitmap
+>   qapi: add block-dirty-bitmap-enable/disable
+>   qmp: transaction support for block-dirty-bitmap-enable/disable
+>   qapi: add block-dirty-bitmap-merge
+>   qapi: add disabled parameter to block-dirty-bitmap-add
+> 
+>  qapi/block-core.json         |  92 ++++++++++++++++++++++-
+>  qapi/transaction.json        |   4 +
+>  block/qcow2.h                |   2 +-
+>  include/block/dirty-bitmap.h |   3 +-
+>  block/dirty-bitmap.c         |  42 ++++++-----
+>  block/qcow2-bitmap.c         |  12 +--
+>  block/qcow2.c                |   2 +-
+>  blockdev.c                   | 169 +++++++++++++++++++++++++++++++++++++++++--
+>  8 files changed, 287 insertions(+), 39 deletions(-)
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpieUEACgkQp6FrSiUn
-Q2pPGAf/cqoeP6HxOpRFRL/fSx39wf+gTVDiP9z7fDiCgr472wTX3l0RDoYLFcTZ
-Y03JW61JXOQ6gWbaPyB3SspHHkg6r5ahaGzT5pMXDnFxMjWMKAwLCtz4hwZVh15e
-IyCUS/yuppi5xSGoXnxSb+JMqSILXVCPzd+iOhyWv0XzRuXJ/OMZyS4V7pUSEXxL
-ZgcCSAeICj9rCv/eiR/K6lMFVZS8wU/XOtMHdMjZrJFrQLc5vkL05ILk73f4Dpqr
-Kn3YZC6jc2XazcWVYQ476l6HOLOAdqVrdk4M9qTJ3LUkTZpCSPdlZZGDbEP8lEut
-NFzuGGGxlLTT1nbflyorfpG8E/LtwA==
-=tZaf
------END PGP SIGNATURE-----
+Fails to apply to master (b384cd95) on patch four and five. Only
+contextual problems, I've patched it up and I'll review that.
 
---JUxs1XHKRbnw390AsGQIE632ohLwY4pv0--
+(mirrored here if you want to check my rebase work:
+https://github.com/jnsnow/qemu/tree/vlad-review)
+
+Since I was full of such bad and stupid ideas last time, I'd like
+someone else to look over this one for design and I'll just review it
+for accuracy.
+
+--js
