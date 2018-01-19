@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecVg8-0002oR-1P
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:21:52 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1ecVjL-0004Pa-Se
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:25:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecVg3-0001ZG-Bj
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:21:52 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34341)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ecVg3-0001Z2-7X
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:21:47 -0500
-Received: by mail-qt0-x242.google.com with SMTP id 33so3311427qtv.1
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 04:21:47 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180117164118.8510-1-berrange@redhat.com>
-	<20180117164118.8510-4-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <33388738-2ac7-c926-9c41-b6284d7200c2@amsat.org>
-Date: Fri, 19 Jan 2018 09:21:43 -0300
+	(envelope-from <dovgaluk@ispras.ru>) id 1ecVjH-0004ft-3M
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:25:11 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:51350)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1ecVjG-0004eb-R1
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:25:07 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
+	<20180119084417.7100.69568.stgit@pasha-VirtualBox>
+	<aca12788-c119-3046-ee8f-e7b3d4cc59bb@redhat.com>
+	<002a01d3911d$dc13ca80$943b5f80$@ru>
+	<8aa1900f-2663-43bd-dab5-001be0aede09@redhat.com>
+In-Reply-To: <8aa1900f-2663-43bd-dab5-001be0aede09@redhat.com>
+Date: Fri, 19 Jan 2018 15:25:10 +0300
+Message-ID: <002b01d39120$8c88e880$a59ab980$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20180117164118.8510-4-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 3/4] ui: fix alphabetical ordering of
- keymaps
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH v4 13/23] cpus: only take BQL for
+ sleeping threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,83 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-On 01/17/2018 01:41 PM, Daniel P. Berrange wrote:
-> The qcode-to-linux keymaps was accidentally added in the wrong place
-> by
-> 
->   commit de80d78594b4c3767a12d8d42debcf12cbf85a5b
->   Author: Owen Smith <owen.smith@citrix.com>
->   Date:   Fri Nov 3 11:56:28 2017 +0000
-> 
->     ui: generate qcode to linux mappings
-> 
-> breaking the alphabetical ordering of keymaps
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  Makefile           | 2 +-
->  include/ui/input.h | 6 +++---
->  ui/input-keymap.c  | 2 +-
->  3 files changed, 5 insertions(+), 5 deletions(-)
+> -----Original Message-----
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> Sent: Friday, January 19, 2018 3:20 PM
+> To: Pavel Dovgalyuk; 'Pavel Dovgalyuk'; qemu-devel@nongnu.org
+> Cc: kwolf@redhat.com; peter.maydell@linaro.org; boost.lists@gmail.com; quintela@redhat.com;
+> jasowang@redhat.com; mst@redhat.com; zuban32s@gmail.com; maria.klimushenkova@ispras.ru;
+> kraxel@redhat.com; alex.bennee@linaro.org
+> Subject: Re: [RFC PATCH v4 13/23] cpus: only take BQL for sleeping threads
 > 
-> diff --git a/Makefile b/Makefile
-> index c62e96b6c7..e3f960905f 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -236,10 +236,10 @@ KEYCODEMAP_FILES = \
->  		 ui/input-keymap-qcode-to-atset1.c \
->  		 ui/input-keymap-qcode-to-atset2.c \
->  		 ui/input-keymap-qcode-to-atset3.c \
-> +		 ui/input-keymap-qcode-to-linux.c \
->  		 ui/input-keymap-qcode-to-qnum.c \
->  		 ui/input-keymap-qcode-to-sun.c \
->  		 ui/input-keymap-qnum-to-qcode.c \
-> -		 ui/input-keymap-qcode-to-linux.c \
->  		 $(NULL)
->  
->  GENERATED_FILES += $(KEYCODEMAP_FILES)
-> diff --git a/include/ui/input.h b/include/ui/input.h
-> index e6c9b483b0..bf3d0d1060 100644
-> --- a/include/ui/input.h
-> +++ b/include/ui/input.h
-> @@ -80,6 +80,9 @@ extern const guint16 qemu_input_map_qcode_to_atset2[];
->  extern const guint qemu_input_map_qcode_to_atset3_len;
->  extern const guint16 qemu_input_map_qcode_to_atset3[];
->  
-> +extern const guint qemu_input_map_qcode_to_linux_len;
-> +extern const guint16 qemu_input_map_qcode_to_linux[];
-> +
->  extern const guint qemu_input_map_qcode_to_qnum_len;
->  extern const guint16 qemu_input_map_qcode_to_qnum[];
->  
-> @@ -89,7 +92,4 @@ extern const guint16 qemu_input_map_qcode_to_sun[];
->  extern const guint qemu_input_map_qnum_to_qcode_len;
->  extern const guint16 qemu_input_map_qnum_to_qcode[];
->  
-> -extern const guint qemu_input_map_qcode_to_linux_len;
-> -extern const guint16 qemu_input_map_qcode_to_linux[];
-> -
->  #endif /* INPUT_H */
-> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-> index 32cc224e39..1f60caf314 100644
-> --- a/ui/input-keymap.c
-> +++ b/ui/input-keymap.c
-> @@ -9,10 +9,10 @@
->  #include "ui/input-keymap-qcode-to-atset1.c"
->  #include "ui/input-keymap-qcode-to-atset2.c"
->  #include "ui/input-keymap-qcode-to-atset3.c"
-> +#include "ui/input-keymap-qcode-to-linux.c"
->  #include "ui/input-keymap-qcode-to-qnum.c"
->  #include "ui/input-keymap-qcode-to-sun.c"
->  #include "ui/input-keymap-qnum-to-qcode.c"
-> -#include "ui/input-keymap-qcode-to-linux.c"
->  
->  int qemu_input_linux_to_qcode(unsigned int lnx)
->  {
+> On 19/01/2018 13:05, Pavel Dovgalyuk wrote:
+> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >> On 19/01/2018 09:44, Pavel Dovgalyuk wrote:
+> >>>      while (all_cpu_threads_idle()) {
+> >>> +        qemu_mutex_lock_iothread();
+> >>>          stop_tcg_kick_timer();
+> >>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+> >>> +        qemu_mutex_unlock_iothread();
+> >>>      }
+> >>
+> >> cpu_has_work cannot be called outside BQL yet.  You first need to access
+> >> cpu->interrupt_request with atomics.
+> >>
+> >> In general, testing the condition outside the mutex is a very dangerous
+> >> pattern (and I'm usually the one who enjoys dangerous patterns).
+> >
+> > It means, that I'll have to fix all the has_work function to avoid races,
+> > because x86_cpu_has_work may have them?
 > 
+> Why only x86_cpu_has_work?
+> 
+> Even reading cs->interrupt_request outside the mutex is unsafe.
+
+All the vcpu function that access interrupt controller or peripheral state may be unsafe?
+How can it work safely then?
+
+Pavel Dovgalyuk
