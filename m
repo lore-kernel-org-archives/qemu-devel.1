@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ecUYf-0003Zc-1i
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:10:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ecUxd-0002TY-P3
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:35:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ecUYa-0005nl-VZ
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:10:04 -0500
-Received: from mail-qt0-f196.google.com ([209.85.216.196]:45462)
+	(envelope-from <pbonzini@redhat.com>) id 1ecUxY-0000MO-Pq
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:35:53 -0500
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:34182)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ecUYa-0005mo-Qi
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:10:00 -0500
-Received: by mail-qt0-f196.google.com with SMTP id x27so2847707qtm.12
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 03:10:00 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecUxY-0000Lz-Jz
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 06:35:48 -0500
+Received: by mail-wr0-f194.google.com with SMTP id 36so1308854wrh.1
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 03:35:48 -0800 (PST)
+References: <20170709170614.24967-1-peter.maydell@linaro.org>
+	<20170728125446.GE3983@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3f6911ff-bc2e-d32d-6516-ec737ebf4703@redhat.com>
+Date: Fri, 19 Jan 2018 12:35:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180119104715.22184-1-klim.kireev@virtuozzo.com>
-References: <20180119104715.22184-1-klim.kireev@virtuozzo.com>
-From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Fri, 19 Jan 2018 12:09:59 +0100
-Message-ID: <CAMxuvayuz6aSX=dFzhHcwb=Eyk=7Ki1KRN3fQ7kR_d4h59HV6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] chardev/char-socket: add POLLHUP handler
+In-Reply-To: <20170728125446.GE3983@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/vmdk: Report failures
+ in vmdk_read_cid()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,137 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Klim Kireev <klim.kireev@virtuozzo.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>, marcandre <marcandre.lureau@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, patches@linaro.org
 
-Hi
+On 28/07/2017 14:54, Kevin Wolf wrote:
+> Am 09.07.2017 um 19:06 hat Peter Maydell geschrieben:
+>> The function vmdk_read_cid() can fail if the read on the underlying
+>> block device fails, or if there's a format error in the VMDK file.
+>> However its API doesn't provide a mechanism to report these errors,
+>> and in some cases we were returning a CID of 0 and in some cases a
+>> CID of 0xffffffff, either of which might potentially be valid values.
+>>
+>> Change the function to return 0 on success or a negative errno, and
+>> return the CID via a uint32_t* argument. Update the callsites to
+>> handle and propagate the error appropriately.
+>>
+>> This fixes in passing a Coverity-spotted issue (CID 1350038) where
+>> we weren't checking the return value from sscanf().
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> Fam, this is the commit that introduced the qemu-iotests 059 failure for
+> vmdk. I think what's happening is that we use an image produced by a
+> fuzzer, and with the additional checks introduced in this patch, we now
+> fail earlier and don't test the condition any more that we wanted to
+> test.
+> 
+> So do we need a new version of sample_images/afl9.vmdk.bz2 that has a
+> valid CID?
 
-On Fri, Jan 19, 2018 at 11:47 AM, Klim Kireev <klim.kireev@virtuozzo.com> wrote:
-> The following behavior was observed for QEMU configured by libvirt
-> to use guest agent as usual for the guests without virtio-serial
-> driver (Windows or the guest remaining in BIOS stage).
->
-> In QEMU on first connect to listen character device socket
-> the listen socket is removed from poll just after the accept().
-> virtio_serial_guest_ready() returns 0 and the descriptor
-> of the connected Unix socket is removed from poll and it will
-> not be present in poll() until the guest will initialize the driver
-> and change the state of the serial to "guest connected".
->
-> In libvirt connect() to guest agent is performed on restart and
-> is run under VM state lock. Connect() is blocking and can
-> wait forever.
-> In this case libvirt can not perform ANY operation on that VM.
->
-> The bug can be easily reproduced this way:
->
-> Terminal 1:
-> qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
-> (virtio-serial and isa-serial also fit)
->
-> Terminal 2:
-> minicom -D unix\#/tmp/console.sock
-> (type something and press enter)
-> C-a x (to exit)
->
-> Do 3 times:
-> minicom -D unix\#/tmp/console.sock
-> C-a x
->
-> It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
-> the kernel, and the 4th blocks.
->
-> The problem is that QEMU doesn't add a read watcher after succesful read
-> until the guest device wants to acquire recieved data, so
-> I propose to install a separate pullhup watcher regardless of
-> whether the device waits for data or not.
->
-> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-> ---
-> Changelog:
-> v2: Remove timer as a redundant feature
->
-> v3: Remove read call and return G_SOURCE_REMOVE
->
->  chardev/char-socket.c | 25 ++++++++++++++++++++++++-
->  1 file changed, 24 insertions(+), 1 deletion(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 77cdf487eb..83fa7b70f0 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -42,6 +42,7 @@ typedef struct {
->      QIOChannel *ioc; /* Client I/O channel */
->      QIOChannelSocket *sioc; /* Client master channel */
->      QIONetListener *listener;
-> +    guint hup_tag;
->      QCryptoTLSCreds *tls_creds;
->      int connected;
->      int max_size;
-> @@ -352,6 +353,11 @@ static void tcp_chr_free_connection(Chardev *chr)
->          s->read_msgfds_num = 0;
->      }
->
-> +    if (s->hup_tag != 0) {
-> +        g_source_remove(s->hup_tag);
-> +        s->hup_tag = 0;
-> +    }
-> +
->      tcp_set_msgfds(chr, NULL, 0);
->      remove_fd_in_watch(chr);
->      object_unref(OBJECT(s->sioc));
-> @@ -455,6 +461,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
->      return TRUE;
->  }
->
-> +static gboolean tcp_chr_hup(QIOChannel *channel,
-> +                               GIOCondition cond,
-> +                               void *opaque)
-> +{
-> +    Chardev *chr = CHARDEV(opaque);
-> +    tcp_chr_disconnect(chr);
-> +    return G_SOURCE_REMOVE;
+This has never been fixed, has it?  I still see the failure.
 
-The source is removed, it should clear s->hup_tag to 0
-
-> +}
-> +
->  static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
->  {
->      SocketChardev *s = SOCKET_CHARDEV(chr);
-> @@ -528,6 +543,10 @@ static void tcp_chr_connect(void *opaque)
->                                             tcp_chr_read,
->                                             chr, chr->gcontext);
->      }
-> +    if (s->hup_tag == 0) {
-> +        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
-> +                                           tcp_chr_hup, chr, NULL);
-
-Why not use chr->gcontext ?
-
-
-> +    }
->      qemu_chr_be_event(chr, CHR_EVENT_OPENED);
->  }
->
-> @@ -546,7 +565,11 @@ static void tcp_chr_update_read_handler(Chardev *chr)
->                                             tcp_chr_read, chr,
->                                             chr->gcontext);
->      }
-> -}
-> +    if (s->hup_tag == 0) {
-> +        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
-> +                                           tcp_chr_hup, chr, NULL);
-> +    }
-
-Why not set the handler on tcp_chr_connect() ?
-
-thanks
-
-> + }
->
->  typedef struct {
->      Chardev *chr;
-> --
-> 2.14.3
->
+Paolo
