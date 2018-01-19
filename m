@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eccgz-0004X0-Tq
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:51:14 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eccsz-00007J-4Q
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:03:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eccgw-0003Sd-Pw
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:51:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eccgw-0003RQ-Jc
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 14:51:10 -0500
-Date: Fri, 19 Jan 2018 21:51:07 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180119215042-mutt-send-email-mst@kernel.org>
-References: <cover.1515724314.git.jianjay.zhou@huawei.com>
-	<20180116064025-mutt-send-email-mst@kernel.org>
-	<B2D15215269B544CADD246097EACE7473AB45B31@DGGEMM505-MBS.china.huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B2D15215269B544CADD246097EACE7473AB45B31@DGGEMM505-MBS.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] vhost: two fixes and used_memslots
- refactoring
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eccsy-0006mx-8u
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:03:37 -0500
+Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:35452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eccsy-0006mO-2N
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:03:36 -0500
+Received: by mail-lf0-x236.google.com with SMTP id a204so3470009lfa.2
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 12:03:34 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Fri, 19 Jan 2018 12:03:12 -0800
+Message-Id: <1516392192-6491-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PULL 00/10] target/xtensa updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +23,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-On Tue, Jan 16, 2018 at 08:17:54AM +0000, Zhoujian (jay) wrote:
-> > -----Original Message-----
-> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > Sent: Tuesday, January 16, 2018 12:42 PM
-> > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
-> > Cc: qemu-devel@nongnu.org; imammedo@redhat.com; Huangweidong (C)
-> > <weidong.huang@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>; Gonglei
-> > (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler) <liuzhe13@huawei.com>
-> > Subject: Re: [PATCH v6 0/3] vhost: two fixes and used_memslots refactoring
-> > 
-> > On Fri, Jan 12, 2018 at 10:47:56AM +0800, Jay Zhou wrote:
-> > > Jay Zhou (3):
-> > >   vhost: remove assertion to prevent crash
-> > >   vhost: fix memslot limit check
-> > >   vhost: used_memslots refactoring
-> > 
-> > This looks good to me, but needs to be rebased on top of vhost mem slot
-> > management refactoring by dgilbert is merged. Pls post the rebase, and I'll
-> > merge.
-> 
-> Hi Michael,
-> I have tested but there're no conflicts, it is strange.
-> 
-> The patches I applied locally in sequence:
-> 
-> [PULL 21/33] vhost: Build temporary section list and deref after commit
-> [PULL 22/33] vhost: Move log_dirty check
-> [PULL 23/33] vhost: Simplify ring verification checks
-> [PULL 24/33] vhost: Merge sections added to temporary list
-> 
-> And then,
-> 
-> [PATCH v6 1/3] vhost: remove assertion to prevent crash
-> [PATCH v6 2/3] vhost: fix memslot limit check
-> [PATCH v6 3/3] vhost: used_memslots refactoring
-> 
-> Could you point out which patches from Dave(or others) are conflict with mine?
-> 
-> Regards,
-> Jay
+Hi Peter,
 
-So please simply rebase on top of master now.
+please pull the following batch of updates for the target/xtensa.
 
-Thanks!
+The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75b9ff:
 
-> > 
-> > Thanks!
-> > 
-> > 
-> > 
-> > >  hw/virtio/vhost-backend.c         | 15 +++++++-
-> > >  hw/virtio/vhost-user.c            | 74 +++++++++++++++++++++++++++--------
-> > ----
-> > >  hw/virtio/vhost.c                 | 30 +++++++++-------
-> > >  include/hw/virtio/vhost-backend.h |  6 ++--
-> > >  4 files changed, 86 insertions(+), 39 deletions(-)
-> > >
-> > > --
-> > > 1.8.3.1
-> > >
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180111' into staging (2018-01-11 14:34:41 +0000)
+
+are available in the git repository at:
+
+  git://github.com/OSLL/qemu-xtensa.git tags/20180119-xtensa
+
+for you to fetch changes up to 8030ed759be52b2517356c3d0291c45cedc65fd9:
+
+  target/xtensa: disas/xtensa: fix coverity warnings (2018-01-18 10:27:04 -0800)
+
+----------------------------------------------------------------
+target/xtensa updates:
+
+- make mini-bootloader independent of the initial CPU state;
+- add noMMU XTFPGA variants;
+- add two noMMU cores: de212 and sample_controller;
+- fix issues reported by coverity against xtensa translator and disassembler.
+
+----------------------------------------------------------------
+Max Filippov (10):
+      hw/xtensa/xtfpga: rewrite mini bootloader
+      hw/xtensa/xtfpga: clean up function/structure names
+      target/xtensa: fix default sysrom/sysram addresses
+      hw/xtensa: extract xtensa_create_memory_regions
+      hw/xtensa/xtfpga: extract flash configuration
+      hw/xtensa/xtfpga: support noMMU cores
+      target/xtensa: add de212 core
+      target/xtensa: use different default CPU for MMU/noMMU
+      target/xtensa: add sample_controller core
+      target/xtensa: disas/xtensa: fix coverity warnings
+
+ disas/xtensa.c                                     |     4 +-
+ hw/xtensa/Makefile.objs                            |     1 +
+ hw/xtensa/sim.c                                    |    38 +-
+ hw/xtensa/xtensa_memory.c                          |    55 +
+ hw/xtensa/xtensa_memory.h                          |    40 +
+ hw/xtensa/xtfpga.c                                 |   414 +-
+ target/xtensa/Makefile.objs                        |     2 +
+ target/xtensa/core-de212.c                         |    53 +
+ target/xtensa/core-de212/core-isa.h                |   622 +
+ target/xtensa/core-de212/gdb-config.c              |   198 +
+ target/xtensa/core-de212/xtensa-modules.c          | 14566 +++++++++++++++++++
+ target/xtensa/core-sample_controller.c             |    53 +
+ target/xtensa/core-sample_controller/core-isa.h    |   644 +
+ target/xtensa/core-sample_controller/gdb-config.c  |   141 +
+ .../xtensa/core-sample_controller/xtensa-modules.c | 11377 +++++++++++++++
+ target/xtensa/cpu.h                                |     7 +-
+ target/xtensa/overlay_tool.h                       |     8 +-
+ target/xtensa/translate.c                          |     4 +-
+ 18 files changed, 28081 insertions(+), 146 deletions(-)
+ create mode 100644 hw/xtensa/xtensa_memory.c
+ create mode 100644 hw/xtensa/xtensa_memory.h
+ create mode 100644 target/xtensa/core-de212.c
+ create mode 100644 target/xtensa/core-de212/core-isa.h
+ create mode 100644 target/xtensa/core-de212/gdb-config.c
+ create mode 100644 target/xtensa/core-de212/xtensa-modules.c
+ create mode 100644 target/xtensa/core-sample_controller.c
+ create mode 100644 target/xtensa/core-sample_controller/core-isa.h
+ create mode 100644 target/xtensa/core-sample_controller/gdb-config.c
+ create mode 100644 target/xtensa/core-sample_controller/xtensa-modules.c
+
+-- 
+Thanks.
+-- Max
