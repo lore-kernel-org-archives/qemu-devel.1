@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdkd-0001X7-Pt
+	(envelope-from <jsnow@redhat.com>) id 1ecdkd-0001X6-PA
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ecdkd-0005vh-4l
+	(envelope-from <jsnow@redhat.com>) id 1ecdkc-0005vU-VI
 	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 15:59:03 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 19 Jan 2018 15:58:37 -0500
-Message-Id: <20180119205847.7141-4-jsnow@redhat.com>
+Date: Fri, 19 Jan 2018 15:58:35 -0500
+Message-Id: <20180119205847.7141-2-jsnow@redhat.com>
 In-Reply-To: <20180119205847.7141-1-jsnow@redhat.com>
 References: <20180119205847.7141-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/13] blockjob: create block_job_relax
+Subject: [Qemu-devel] [PATCH v2 01/13] blockjob: record time of last entrance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,96 +22,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-This will replace mirror_throttle, for reuse in other jobs.
+The mirror job makes a semi-inaccurate record of the last time we yielded
+by recording the last time we left a "pause", but this doesn't always
+correlate to the time we actually last successfully ceded control.
+
+Record the time we last *exited* a yield centrally. In other words, record
+the time we began execution of this job to know how long we have been
+selfish for.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/mirror.c               | 15 ++-------------
- blockjob.c                   | 11 +++++++++++
- include/block/blockjob_int.h |  9 +++++++++
- 3 files changed, 22 insertions(+), 13 deletions(-)
+ block/mirror.c           | 8 ++------
+ blockjob.c               | 2 ++
+ include/block/blockjob.h | 5 +++++
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index 1fb5fc0cb8..36c681c7a1 100644
+index c9badc1203..88f4e8964d 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -590,17 +590,6 @@ static void mirror_exit(BlockJob *job, void *opaque)
-     bdrv_unref(src);
- }
+@@ -63,7 +63,6 @@ typedef struct MirrorBlockJob {
+     QSIMPLEQ_HEAD(, MirrorBuffer) buf_free;
+     int buf_free_count;
  
--static void mirror_throttle(MirrorBlockJob *s)
--{
--    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
--
--    if (now - s->common.last_enter_ns > SLICE_TIME) {
--        block_job_sleep_ns(&s->common, 0);
--    } else {
--        block_job_pause_point(&s->common);
--    }
--}
--
- static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+-    uint64_t last_pause_ns;
+     unsigned long *in_flight_bitmap;
+     int in_flight;
+     int64_t bytes_in_flight;
+@@ -596,8 +595,7 @@ static void mirror_throttle(MirrorBlockJob *s)
  {
-     int64_t offset;
-@@ -621,7 +610,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             int bytes = MIN(s->bdev_length - offset,
-                             QEMU_ALIGN_DOWN(INT_MAX, s->granularity));
+     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
  
--            mirror_throttle(s);
-+            block_job_relax(&s->common);
+-    if (now - s->last_pause_ns > SLICE_TIME) {
+-        s->last_pause_ns = now;
++    if (now - s->common.last_enter_ns > SLICE_TIME) {
+         block_job_sleep_ns(&s->common, 0);
+     } else {
+         block_job_pause_point(&s->common);
+@@ -769,7 +767,6 @@ static void coroutine_fn mirror_run(void *opaque)
  
-             if (block_job_is_cancelled(&s->common)) {
-                 s->initial_zeroing_ongoing = false;
-@@ -649,7 +638,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-         int bytes = MIN(s->bdev_length - offset,
-                         QEMU_ALIGN_DOWN(INT_MAX, s->granularity));
+     mirror_free_init(s);
  
--        mirror_throttle(s);
-+        block_job_relax(&s->common);
+-    s->last_pause_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+     if (!s->is_none_mode) {
+         ret = mirror_dirty_init(s);
+         if (ret < 0 || block_job_is_cancelled(&s->common)) {
+@@ -803,7 +800,7 @@ static void coroutine_fn mirror_run(void *opaque)
+          * We do so every SLICE_TIME nanoseconds, or when there is an error,
+          * or when the source is clean, whichever comes first.
+          */
+-        delta = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - s->last_pause_ns;
++        delta = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - s->common.last_enter_ns;
+         if (delta < SLICE_TIME &&
+             s->common.iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
+             if (s->in_flight >= MAX_IN_FLIGHT || s->buf_free_count == 0 ||
+@@ -878,7 +875,6 @@ static void coroutine_fn mirror_run(void *opaque)
+             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
+             block_job_sleep_ns(&s->common, delay_ns);
+         }
+-        s->last_pause_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+     }
  
-         if (block_job_is_cancelled(&s->common)) {
-             return 0;
+ immediate_exit:
 diff --git a/blockjob.c b/blockjob.c
-index 2a9ff66b95..6f2e709b51 100644
+index f5cea84e73..2a9ff66b95 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -906,6 +906,17 @@ void block_job_yield(BlockJob *job)
-     block_job_pause_point(job);
+@@ -321,6 +321,7 @@ void block_job_start(BlockJob *job)
+     job->pause_count--;
+     job->busy = true;
+     job->paused = false;
++    job->last_enter_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
  }
  
-+void block_job_relax(BlockJob *job)
-+{
-+    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+
-+    if (now - job->last_enter_ns > SLICE_TIME) {
-+        block_job_sleep_ns(job, 0);
-+    } else {
-+        block_job_pause_point(job);
-+    }
-+}
-+
- void block_job_iostatus_reset(BlockJob *job)
- {
-     if (job->iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 209fa1bb3e..553784d86f 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -157,6 +157,15 @@ void block_job_sleep_ns(BlockJob *job, int64_t ns);
-  */
- void block_job_yield(BlockJob *job);
+@@ -786,6 +787,7 @@ static void block_job_do_yield(BlockJob *job, uint64_t ns)
+     job->busy = false;
+     block_job_unlock();
+     qemu_coroutine_yield();
++    job->last_enter_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
  
-+/**
-+ * block_job_relax:
-+ * @job: The job that calls the function.
-+ *
-+ * Yield if it has been SLICE_TIME nanoseconds since the last yield.
-+ * Otherwise, check if we need to pause, and yield if so.
-+ */
-+void block_job_relax(BlockJob *job);
+     /* Set by block_job_enter before re-entering the coroutine.  */
+     assert(job->busy);
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 00403d9482..e965845c94 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -141,6 +141,11 @@ typedef struct BlockJob {
+      */
+     QEMUTimer sleep_timer;
+ 
++    /**
++     * Timestamp of the last yield
++     */
++    uint64_t last_enter_ns;
 +
- /**
-  * block_job_pause_all:
-  *
+     /** Non-NULL if this job is part of a transaction */
+     BlockJobTxn *txn;
+     QLIST_ENTRY(BlockJob) txn_list;
 -- 
 2.14.3
