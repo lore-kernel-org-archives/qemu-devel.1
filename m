@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecOe8-0000ie-3S
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:51:21 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ecOhT-00023W-Hl
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ecOe3-00070s-Vu
-	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:51:20 -0500
-Date: Fri, 19 Jan 2018 15:51:02 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180119045102.GG30352@umbus.fritz.box>
-References: <20180102052805.20498-1-aik@ozlabs.ru>
-	<f14c0782-0f25-8bd0-8536-323bfc5fcbe4@redhat.com>
-	<ad143758-227b-55fe-44a6-c62a48f74162@ozlabs.ru>
-	<20180116134614.1aae30b9@w520.home>
-	<2c870510-598c-b3e0-75bf-8e135b68d3bd@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1ecOhO-0008PV-OF
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:47 -0500
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:40321)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ecOhO-0008On-IN
+	for qemu-devel@nongnu.org; Thu, 18 Jan 2018 23:54:42 -0500
+Received: by mail-pg0-x22d.google.com with SMTP id g16so546999pgn.7
+	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 20:54:42 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 18 Jan 2018 20:54:22 -0800
+Message-Id: <20180119045438.28582-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1+kiJ7gFzGEgD6MU"
-Content-Disposition: inline
-In-Reply-To: <2c870510-598c-b3e0-75bf-8e135b68d3bd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr/iommu: Enable in-kernel TCE
- acceleration via VFIO KVM device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/16] target/arm: Prepatory work for SVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
+
+I believe that this addresses all of the comments Peter had with
+respect to v1.  I did go ahead and add the system registers, so that
+I could figure out how they're supposed to work.
+
+This has been rebased to master so that it has no dependencies.
 
 
---1+kiJ7gFzGEgD6MU
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+r~
 
-On Thu, Jan 18, 2018 at 09:13:34AM +0100, Paolo Bonzini wrote:
-> On 16/01/2018 21:46, Alex Williamson wrote:
-> > On Mon, 15 Jan 2018 15:12:07 +1100
-> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >=20
-> >> On 03/01/18 04:51, Paolo Bonzini wrote:
-> >>> On 02/01/2018 06:28, Alexey Kardashevskiy wrote: =20
-> >>>> This is my current queue of the in-kernel TCE acceleration
-> >>>> enablement.
-> >>>>
-> >>>> Changes since https://lists.gnu.org/archive/html/qemu-devel/2017-12/=
-msg01918.html :
-> >>>> * 3 patches instead of one, one per maintainership area;
-> >>>> * added memory_region_iommu_get_attr();
-> >>>> * removed set_attr() as there is no use for it now;
-> >>>> * folded the chunk in vfio_listener_region_add() under
-> >>>> VFIO_SPAPR_TCE_v2_IOMMU branch as the acceleration is only
-> >>>> enabled when DMA memory is preregistered and this is only supported
-> >>>> by the v2 IOMMU.
-> >>>>
-> >>>> This is based on sha1
-> >>>> ad59cde C=E9dric Le Goater "target/ppc: more use of the PPC_*() macr=
-os".
-> >>>>
-> >>>> Please comment. Thanks.
-> >>>>
-> >>>>
-> >>>>
-> >>>> Alexey Kardashevskiy (3):
-> >>>>   memory/iommu: Add get_attr()
-> >>>>   vfio/spapr: Use iommu memory region's get_attr()
-> >>>>   spapr/iommu: Enable in-kernel TCE acceleration via VFIO KVM device
-> >>>>
-> >>>>  include/exec/memory.h | 22 ++++++++++++++++++++++
-> >>>>  target/ppc/kvm_ppc.h  |  6 ++++++
-> >>>>  hw/ppc/spapr_iommu.c  | 19 +++++++++++++++++++
-> >>>>  hw/vfio/common.c      | 26 ++++++++++++++++++++++++++
-> >>>>  memory.c              | 13 +++++++++++++
-> >>>>  target/ppc/kvm.c      |  7 ++++++-
-> >>>>  hw/vfio/trace-events  |  1 +
-> >>>>  7 files changed, 93 insertions(+), 1 deletion(-)
-> >>>> =20
-> >>>
-> >>> Alex, if this is okay for you, please pick it up yourself. =20
-> >>
-> >> Alex, ping?
-> >=20
-> > Yeah, I'll pick these up.  Paolo, do you want to throw an explicit Ack
-> > for the first patch?  David, R-b/A-b?  Thanks,
-> >=20
-> > Alex
->=20
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I don't love the interface, I preferred some of the things Paolo
-suggested in the earlier thread.  Still, it's something Paolo and Alex
-seem to have agreed on, and it's not exposed to user or guest, so it's
-fixable later.  So,
+Richard Henderson (16):
+  target/arm: Mark disas_set_insn_syndrome inline
+  target/arm: Use pointers in crypto helpers
+  target/arm: Use pointers in neon zip/uzp helpers
+  target/arm: Use pointers in neon tbl helper
+  target/arm: Change the type of vfp.regs
+  target/arm: Add aa{32,64}_vfp_{dreg,qreg} helpers
+  vmstate: Add VMSTATE_UINT64_SUB_ARRAY
+  target/arm: Expand vector registers for SVE
+  target/arm: Add predicate registers for SVE
+  target/arm: Add ARM_FEATURE_SVE
+  target/arm: Add SVE to migration state
+  target/arm: Add ZCR_ELx
+  target/arm: Move cpu_get_tb_cpu_state out of line
+  target/arm: Hoist store to flags output in cpu_get_tb_cpu_state
+  target/arm: Simplify fp_exception_el for user-only
+  target/arm: Add SVE state to TB->FLAGS
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+ include/migration/vmstate.h |   9 +-
+ target/arm/cpu.h            | 227 +++++++++++++++-----------------------
+ target/arm/helper.h         |  46 ++++----
+ target/arm/translate.h      |   2 +-
+ linux-user/signal.c         |  22 ++--
+ target/arm/arch_dump.c      |   8 +-
+ target/arm/crypto_helper.c  | 184 ++++++++++++-------------------
+ target/arm/helper-a64.c     |   5 +-
+ target/arm/helper.c         | 263 ++++++++++++++++++++++++++++++++++++++++++--
+ target/arm/kvm32.c          |   4 +-
+ target/arm/kvm64.c          |  31 ++----
+ target/arm/machine.c        |  88 ++++++++++++++-
+ target/arm/neon_helper.c    | 162 ++++++++++++++-------------
+ target/arm/op_helper.c      |  17 ++-
+ target/arm/translate-a64.c  | 106 +++++++++---------
+ target/arm/translate.c      | 139 ++++++++++++-----------
+ 16 files changed, 781 insertions(+), 532 deletions(-)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---1+kiJ7gFzGEgD6MU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpheTMACgkQbDjKyiDZ
-s5IiIg//X0PQE18SVZvdqDozZHq2k2eQPJwDbraffJvr4Et6pNjV3lCL49ZacecG
-X+SqeFfhVHzhGbYa/KN0i5btB1RBTR04a7v2SJkIWFIiDjaEAzwJYBA8+EtLWekN
-ABj9dSqCX59UfxswAHzgE1V4Y4ITU/p6cwWonhG9HqXT51MFJtPQjlSzhv1r8OUj
-CMZBlLXXkJ3G2jq79sccuZHRRFdDBlLbGrvFrP6OevffBsvSDnehv+utNANChtCD
-ZKMwqa+muMIhVfKWlBbfIrLkFTyKub35HzQPV4TkBZKCslX6LwJzp6TdWc+8gMT0
-RBoz2YYHjutuoT+OYE1OSSRHSLvVtGh6/Mt3cyL01n4sAPNsC+rcb2gmkOSqp84w
-koaPxMzZrrfy2DF6HKJoRKDtngT9NIru7JZXyaJQal0KPVR4JyACbUSbEi3+lV/1
-oxyy9PimQfGswUgU9zmVOtFqw5zjXuidgQeK014feCNHJXG58RSPNh/tSPJaBq12
-MVY8q5OrfeQlLngm5m/oh6i39ngkTtMOnME64UW454Aq2lMTJIHmzkoLklrvM+/C
-osF5QAeHzuo144pVHuRS8EesCc6ZP250c+btoHNCIuvsHFXXAAQkgoS4xrJNU1hw
-EzS7+ZhAijeiO9Z7SypGrBrMvrS7yHxwZXW+66axK5RVfxbhX/k=
-=gOfK
------END PGP SIGNATURE-----
-
---1+kiJ7gFzGEgD6MU--
+-- 
+2.14.3
