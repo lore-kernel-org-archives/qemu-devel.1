@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ecOnF-0007fc-Iq
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:00:46 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ecOvx-00074w-3A
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ecOnE-0004ty-KT
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:00:45 -0500
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 19 Jan 2018 16:00:05 +1100
-Message-Id: <20180119050005.29392-8-sjitindarsingh@gmail.com>
-In-Reply-To: <20180119050005.29392-1-sjitindarsingh@gmail.com>
-References: <20180119050005.29392-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V5 7/7] target/ppc/spapr: Add H-Call
- H_GET_CPU_CHARACTERISTICS
+	(envelope-from <aik@ozlabs.ru>) id 1ecOvt-0000yE-1K
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:09:45 -0500
+Received: from ozlabs.ru ([107.173.13.209]:34660)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1ecOvs-0000xz-PC
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:09:40 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Fri, 19 Jan 2018 16:09:06 +1100
+Message-Id: <20180119050906.18930-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to list
+ QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,113 +22,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, paulus@ozlabs.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>, Andrea Bolognani <abologna@redhat.com>
 
-The new H-Call H_GET_CPU_CHARACTERISTICS is used by the guest to query
-behaviours and available characteristics of the cpu.
+There is already 'device-list-properties' which does most of the job,
+however it does not handle everything returned by qom-list-types such
+as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
 
-Implement the handler for this new H-Call which formulates its response
-based on the setting of the spapr_caps cap-cfpc, cap-sbbc and cap-ibs.
+This adds a new qom-list-properties command which prints properties
+of a specific class and its instance. It is pretty much a simplified copy
+of the device-list-properties handler.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Since it creates an object instance, device properties should appear
+in the output as they are copied to QOM properties at the instance_init
+hook.
 
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
 
-V4 -> V5:
- - Assert for invalid cap value
----
- hw/ppc/spapr_hcall.c   | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  1 +
- 2 files changed, 59 insertions(+)
+I am missing the point of make_device_property_info().
+qmp_device_list_properties() creates the instance which copies everything
+to QOM properties hashtable and commenting out the do{}while() in
+make_device_property_info() does not seem to change a thing, what case
+am I missing here?
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 51eba52e86..4d0e6eb0cf 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1654,6 +1654,60 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     return H_SUCCESS;
+
+---
+ qapi-schema.json | 29 +++++++++++++++++++++++++++++
+ qmp.c            | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 81 insertions(+)
+
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 5c06745..9d73501 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1455,6 +1455,35 @@
+   'returns': [ 'DevicePropertyInfo' ] }
+ 
+ ##
++# @QOMPropertyInfo:
++#
++# Information about object properties.
++#
++# @name: the name of the property
++# @type: the typename of the property
++# @description: if specified, the description of the property.
++#
++# Since: 2.12
++##
++{ 'struct': 'QOMPropertyInfo',
++  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
++
++##
++# @qom-list-properties:
++#
++# List properties associated with a QOM object.
++#
++# @typename: the type name of an object
++#
++# Returns: a list of QOMPropertyInfo describing object properties
++#
++# Since: 2.12
++##
++{ 'command': 'qom-list-properties',
++  'data': { 'typename': 'str'},
++  'returns': [ 'QOMPropertyInfo' ] }
++
++##
+ # @xen-set-global-dirty-log:
+ #
+ # Enable or disable the global dirty log mode.
+diff --git a/qmp.c b/qmp.c
+index 52cfd2d..20cb662 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -574,6 +574,58 @@ DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
+     return prop_list;
  }
  
-+static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-+                                              sPAPRMachineState *spapr,
-+                                              target_ulong opcode,
-+                                              target_ulong *args)
++QOMPropertyInfoList *qmp_qom_list_properties(const char *typename,
++                                             Error **errp)
 +{
-+    uint64_t characteristics = H_CPU_CHAR_HON_BRANCH_HINTS &
-+                               ~H_CPU_CHAR_THR_RECONF_TRIG;
-+    uint64_t behaviour = H_CPU_BEHAV_FAVOUR_SECURITY;
-+    uint8_t safe_cache = spapr_get_cap(spapr, SPAPR_CAP_CFPC);
-+    uint8_t safe_bounds_check = spapr_get_cap(spapr, SPAPR_CAP_SBBC);
-+    uint8_t safe_indirect_branch = spapr_get_cap(spapr, SPAPR_CAP_IBS);
++    ObjectClass *klass;
++    Object *obj;
++    ObjectProperty *prop;
++    ObjectPropertyIterator iter;
++    QOMPropertyInfoList *prop_list = NULL;
 +
-+    switch (safe_cache) {
-+    case SPAPR_CAP_WORKAROUND:
-+        characteristics |= H_CPU_CHAR_L1D_FLUSH_ORI30;
-+        characteristics |= H_CPU_CHAR_L1D_FLUSH_TRIG2;
-+        characteristics |= H_CPU_CHAR_L1D_THREAD_PRIV;
-+        behaviour |= H_CPU_BEHAV_L1D_FLUSH_PR;
-+        break;
-+    case SPAPR_CAP_FIXED:
-+        break;
-+    default: /* broken */
-+        assert(safe_cache == SPAPR_CAP_BROKEN);
-+        behaviour |= H_CPU_BEHAV_L1D_FLUSH_PR;
-+        break;
++    klass = object_class_by_name(typename);
++    if (klass == NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Class '%s' not found", typename);
++        return NULL;
 +    }
 +
-+    switch (safe_bounds_check) {
-+    case SPAPR_CAP_WORKAROUND:
-+        characteristics |= H_CPU_CHAR_SPEC_BAR_ORI31;
-+        behaviour |= H_CPU_BEHAV_BNDS_CHK_SPEC_BAR;
-+        break;
-+    case SPAPR_CAP_FIXED:
-+        break;
-+    default: /* broken */
-+        assert(safe_bounds_check == SPAPR_CAP_BROKEN);
-+        behaviour |= H_CPU_BEHAV_BNDS_CHK_SPEC_BAR;
-+        break;
++    klass = object_class_dynamic_cast(klass, TYPE_OBJECT);
++    if (klass == NULL) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_OBJECT);
++        return NULL;
 +    }
 +
-+    switch (safe_indirect_branch) {
-+    case SPAPR_CAP_FIXED:
-+        characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
-+    default: /* broken */
-+        assert(safe_indirect_branch == SPAPR_CAP_BROKEN);
-+        break;
++    if (object_class_is_abstract(klass)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename",
++                   "non-abstract class");
++        return NULL;
 +    }
 +
-+    args[0] = characteristics;
-+    args[1] = behaviour;
++    obj = object_new(typename);
 +
-+    return H_SUCCESS;
++    object_property_iter_init(&iter, obj);
++    while ((prop = object_property_iter_next(&iter))) {
++        QOMPropertyInfo *info;
++        QOMPropertyInfoList *entry;
++
++        info = g_malloc0(sizeof(*info));
++        info->name = g_strdup(prop->name);
++        info->type = g_strdup(prop->type);
++        info->has_description = !!prop->description;
++        info->description = g_strdup(prop->description);
++
++        entry = g_malloc0(sizeof(*entry));
++        entry->value = info;
++        entry->next = prop_list;
++        prop_list = entry;
++    }
++
++    object_unref(obj);
++
++    return prop_list;
 +}
 +
- static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
- static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
- 
-@@ -1733,6 +1787,10 @@ static void hypercall_register_types(void)
-     spapr_register_hypercall(H_INVALIDATE_PID, h_invalidate_pid);
-     spapr_register_hypercall(H_REGISTER_PROC_TBL, h_register_process_table);
- 
-+    /* hcall-get-cpu-characteristics */
-+    spapr_register_hypercall(H_GET_CPU_CHARACTERISTICS,
-+                             h_get_cpu_characteristics);
-+
-     /* "debugger" hcalls (also used by SLOF). Note: We do -not- differenciate
-      * here between the "CI" and the "CACHE" variants, they will use whatever
-      * mapping attributes qemu is using. When using KVM, the kernel will
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 549d7a4134..62c077ac20 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -404,6 +404,7 @@ struct sPAPRMachineState {
- #define H_GET_HCA_INFO          0x1B8
- #define H_GET_PERF_COUNT        0x1BC
- #define H_MANAGE_TRACE          0x1C0
-+#define H_GET_CPU_CHARACTERISTICS 0x1C8
- #define H_FREE_LOGICAL_LAN_BUFFER 0x1D4
- #define H_QUERY_INT_STATE       0x1E4
- #define H_POLL_PENDING          0x1D8
+ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+ {
+     return arch_query_cpu_definitions(errp);
 -- 
-2.13.6
+2.11.0
