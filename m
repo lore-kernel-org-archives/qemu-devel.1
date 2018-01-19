@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSIj-0002SZ-1N
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:45:30 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ecSL9-0004R1-Mo
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:48:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSIe-0006Oh-3j
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:45:29 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:53944)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ecSId-0006OP-KP
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:45:24 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Fri, 19 Jan 2018 11:45:26 +0300
-Message-ID: <20180119084526.7100.96359.stgit@pasha-VirtualBox>
-In-Reply-To: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
+	(envelope-from <pbonzini@redhat.com>) id 1ecSL9-0007nU-1s
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:47:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecSL8-0007m2-Rj
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 03:47:58 -0500
 References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
+	<20180119084242.7100.17598.stgit@pasha-VirtualBox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b4e29219-8fa3-464c-3f62-2efec1cdab5b@redhat.com>
+Date: Fri, 19 Jan 2018 09:47:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180119084242.7100.17598.stgit@pasha-VirtualBox>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v4 23/23] replay: save vmstate of the
- asynchronous events
+Subject: Re: [Qemu-devel] [RFC PATCH v4 01/23] This patch adds a condition
+ before overwriting exception_index fields.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,162 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-This patch fixes saving and loading the snapshots in the replay mode.
-It is required for the snapshots created in the moment when the header
-of the asynchronous event is read. This information was not saved in
-the snapshot. After loading the vmstate replay continued with the file offset
-passed the event header. The event header is lost in this case and replay
-hangs.
+On 19/01/2018 09:42, Pavel Dovgalyuk wrote:
+> It is needed when exception_index is already set to some meaningful value.
+> 
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- replay/replay-events.c   |   44 +++++++++++++++++++++-----------------------
- replay/replay-internal.h |    6 ++++++
- replay/replay-snapshot.c |    3 +++
- 3 files changed, 30 insertions(+), 23 deletions(-)
+Pavel, very frankly, this commit message is awful, and for two reasons.
 
-diff --git a/replay/replay-events.c b/replay/replay-events.c
-index 18d769f..29c6185 100644
---- a/replay/replay-events.c
-+++ b/replay/replay-events.c
-@@ -27,10 +27,6 @@ typedef struct Event {
- } Event;
- 
- static QTAILQ_HEAD(, Event) events_list = QTAILQ_HEAD_INITIALIZER(events_list);
--static unsigned int read_event_kind = -1;
--static uint64_t read_id = -1;
--static int read_checkpoint = -1;
--
- static bool events_enabled;
- 
- /* Functions */
-@@ -217,58 +213,60 @@ void replay_save_events(int checkpoint)
- static Event *replay_read_event(int checkpoint)
- {
-     Event *event;
--    if (read_event_kind == -1) {
--        read_checkpoint = replay_get_byte();
--        read_event_kind = replay_get_byte();
--        read_id = -1;
-+    if (replay_state.read_event_kind == -1) {
-+        replay_state.read_event_checkpoint = replay_get_byte();
-+        replay_state.read_event_kind = replay_get_byte();
-+        replay_state.read_event_id = -1;
-         replay_check_error();
-     }
- 
--    if (checkpoint != read_checkpoint) {
-+    if (checkpoint != replay_state.read_event_checkpoint) {
-         return NULL;
-     }
- 
-     /* Events that has not to be in the queue */
--    switch (read_event_kind) {
-+    switch (replay_state.read_event_kind) {
-     case REPLAY_ASYNC_EVENT_BH:
--        if (read_id == -1) {
--            read_id = replay_get_qword();
-+        if (replay_state.read_event_id == -1) {
-+            replay_state.read_event_id = replay_get_qword();
-         }
-         break;
-     case REPLAY_ASYNC_EVENT_INPUT:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = replay_read_input_event();
-         return event;
-     case REPLAY_ASYNC_EVENT_INPUT_SYNC:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = 0;
-         return event;
-     case REPLAY_ASYNC_EVENT_CHAR_READ:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = replay_event_char_read_load();
-         return event;
-     case REPLAY_ASYNC_EVENT_BLOCK:
--        if (read_id == -1) {
--            read_id = replay_get_qword();
-+        if (replay_state.read_event_id == -1) {
-+            replay_state.read_event_id = replay_get_qword();
-         }
-         break;
-     case REPLAY_ASYNC_EVENT_NET:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = replay_event_net_load();
-         return event;
-     default:
--        error_report("Unknown ID %d of replay event", read_event_kind);
-+        error_report("Unknown ID %d of replay event",
-+            replay_state.read_event_kind);
-         exit(1);
-         break;
-     }
- 
-     QTAILQ_FOREACH(event, &events_list, events) {
--        if (event->event_kind == read_event_kind
--            && (read_id == -1 || read_id == event->id)) {
-+        if (event->event_kind == replay_state.read_event_kind
-+            && (replay_state.read_event_id == -1
-+                || replay_state.read_event_id == event->id)) {
-             break;
-         }
-     }
-@@ -293,7 +291,7 @@ void replay_read_events(int checkpoint)
-             break;
-         }
-         replay_finish_event();
--        read_event_kind = -1;
-+        replay_state.read_event_kind = -1;
-         replay_run_event(event);
- 
-         g_free(event);
-@@ -302,7 +300,7 @@ void replay_read_events(int checkpoint)
- 
- void replay_init_events(void)
- {
--    read_event_kind = -1;
-+    replay_state.read_event_kind = -1;
- }
- 
- void replay_finish_events(void)
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index f5f8e96..bace4c2 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -80,6 +80,12 @@ typedef struct ReplayState {
-     uint64_t block_request_id;
-     /*! Prior value of the host clock */
-     uint64_t host_clock_last;
-+    /*! Asynchronous event type read from the log */
-+    int32_t read_event_kind;
-+    /*! Asynchronous event id read from the log */
-+    uint64_t read_event_id;
-+    /*! Asynchronous event checkpoint id read from the log */
-+    int32_t read_event_checkpoint;
- } ReplayState;
- extern ReplayState replay_state;
- 
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index e0b2204..2ab85cf 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -57,6 +57,9 @@ static const VMStateDescription vmstate_replay = {
-         VMSTATE_UINT64(file_offset, ReplayState),
-         VMSTATE_UINT64(block_request_id, ReplayState),
-         VMSTATE_UINT64(host_clock_last, ReplayState),
-+        VMSTATE_INT32(read_event_kind, ReplayState),
-+        VMSTATE_UINT64(read_event_id, ReplayState),
-+        VMSTATE_INT32(read_event_checkpoint, ReplayState),
-         VMSTATE_END_OF_LIST()
-     },
- };
+First, it should include the high level overview of the bug ("XYZ does
+not work") and the description of why XYZ does not work (what is the
+meaningful value?  who set it?)
+
+Second, it also resets cpu->exception_index to -1 in after calling
+cc->cpu_exec_interrupt.  Why is this correct?  Who was clearing it
+before?  Is that clearing still needed?  What does
+cc->cpu_exec_interrupt even have to do with cpu->exception_index, since
+exceptions are handled by cc->do_interrupt?
+
+And so on.
+
+Paolo
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  accel/tcg/cpu-exec.c |    5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 280200f..9cc6972 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -585,6 +585,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>          else {
+>              if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
+>                  replay_interrupt();
+> +                cpu->exception_index = -1;
+>                  *last_tb = NULL;
+>              }
+>              /* The target hook may have updated the 'cpu->interrupt_request';
+> @@ -606,7 +607,9 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>      if (unlikely(atomic_read(&cpu->exit_request)
+>          || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
+>          atomic_set(&cpu->exit_request, 0);
+> -        cpu->exception_index = EXCP_INTERRUPT;
+> +        if (cpu->exception_index == -1) {
+> +            cpu->exception_index = EXCP_INTERRUPT;
+> +        }
+>          return true;
+>      }
+>  
+> 
