@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <veaceslav.falico@huawei.com>) id 1ecaPU-0007M2-6F
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:25:02 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecaQy-0008Ty-AN
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:26:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <veaceslav.falico@huawei.com>) id 1ecaPQ-0006ng-3M
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:25:00 -0500
-Received: from [45.249.212.32] (port=43329 helo=huawei.com)
+	(envelope-from <ehabkost@redhat.com>) id 1ecaQu-0007Om-8G
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:26:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <veaceslav.falico@huawei.com>)
-	id 1ecaPP-0006lf-9I
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:24:56 -0500
-References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
-	<20180112171416.6048ae9e@bahia.lan>
-	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
-	<20180119112733.4a9dd43f@bahia.lan>
-	<05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
-From: Veaceslav Falico <veaceslav.falico@huawei.com>
-Message-ID: <899644b1-e401-8ed5-8a49-1f0e2dbf9b2b@huawei.com>
-Date: Fri, 19 Jan 2018 17:37:58 +0100
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecaQt-0007Nv-WE
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 12:26:28 -0500
+Date: Fri, 19 Jan 2018 15:26:20 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180119172620.GB15832@localhost.localdomain>
+References: <20171114102246.22221-1-apahim@redhat.com>
+	<20171114102246.22221-3-apahim@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171114102246.22221-3-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v11 2/8] qemu.py: better control of created
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,238 +28,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduard Shishkin <eduard.shishkin@huawei.com>, Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei (CR)" <zhangwei555@huawei.com>, "Emilio
-	G. Cota" <cota@braap.org>
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, crosa@redhat.com, muriloo@linux.vnet.ibm.com
 
-On 1/19/2018 4:52 PM, Eduard Shishkin wrote:
->=20
->=20
-> On 1/19/2018 11:27 AM, Greg Kurz wrote:
->> On Mon, 15 Jan 2018 11:49:31 +0800
->> Antonios Motakis <antonios.motakis@huawei.com> wrote:
->>
->>> On 13-Jan-18 00:14, Greg Kurz wrote:
->>>> On Fri, 12 Jan 2018 19:32:10 +0800
->>>> Antonios Motakis <antonios.motakis@huawei.com> wrote:
->>>>
->>>>> Hello all,
->>>>>
->>>>
->>>> Hi Antonios,
->>>>
->>>> I see you have attached a patch to this email... this really isn't t=
-he preferred
->>>> way to do things since it prevents to comment the patch (at least wi=
-th my mail
->>>> client). The appropriate way would have been to send the patch with =
-a cover
->>>> letter, using git-send-email for example.
->>>
->>> I apologize for attaching the patch, I should have known better!
->>>
->>
->> np :)
->>
->>>>
->>>>> We have found an issue in the 9p implementation of QEMU, with how q=
-id paths are generated, which can cause qid path collisions and several i=
-ssues caused by them. In our use case (running containers under VMs) thes=
-e have proven to be critical.
->>>>>
->>>>
->>>> Ouch...
->>>>
->>>>> In particular, stat_to_qid in hw/9pfs/9p.c generates a qid path usi=
-ng the inode number of the file as input. According to the 9p spec the pa=
-th should be able to uniquely identify a file, distinct files should not =
-share a path value.
->>>>>
->>>>> The current implementation that defines qid.path =3D inode nr works=
- fine as long as there are not files from multiple partitions visible und=
-er the 9p share. In that case, distinct files from different devices are =
-allowed to have the same inode number. So with multiple partitions, we ha=
-ve a very high probability of qid path collisions.
->>>>>
->>>>> How to demonstrate the issue:
->>>>> 1) Prepare a problematic share:
->>>>> =A0- mount one partition under share/p1/ with some files inside
->>>>> =A0- mount another one *with identical contents* under share/p2/
->>>>> =A0- confirm that both partitions have files with same inode nr, si=
-ze, etc
->>>>> 2) Demonstrate breakage:
->>>>> =A0- start a VM with a virtio-9p pointing to the share
->>>>> =A0- mount 9p share with FSCACHE on
->>>>> =A0- keep open share/p1/file
->>>>> =A0- open and write to share/p2/file
->>>>>
->>>>> What should happen is, the guest will consider share/p1/file and sh=
-are/p2/file to be the same file, and since we are using the cache it will=
- not reopen it. We intended to write to partition 2, but we just wrote to=
- partition 1. This is just one example on how the guest may rely on qid p=
-aths being unique.
->>>>>
->>>>> In the use case of containers where we commonly have a few containe=
-rs per VM, all based on similar images, these kind of qid path collisions=
- are very common and they seem to cause all kinds of funny behavior (some=
-times very subtle).
->>>>>
->>>>> To avoid this situation, the device id of a file needs to be also t=
-aken as input for generating a qid path. Unfortunately, the size of both =
-inode nr + device id together would be 96 bits, while we have only 64 bit=
-s for the qid path, so we can't just append them and call it a day :(
->>>>>
->>>>> We have thought of a few approaches, but we would definitely like t=
-o hear what the upstream maintainers and community think:
->>>>>
->>>>> * Full fix: Change the 9p protocol
->>>>>
->>>>> We would need to support a longer qid path, based on a virtio featu=
-re flag. This would take reworking of host and guest parts of virtio-9p, =
-so both QEMU and Linux for most users.
->>>>>
->>>>
->>>> I agree for a longer qid path, but we shouldn't tie it to a virtio f=
-lag since
->>>> 9p is transport agnostic. And it happens to be used with a variety o=
-f transports.
->>>> QEMU has both virtio-9p and a Xen backend for example.
->>>>
->>>>> * Fallback and/or interim solutions
->>>>>
->>>>> A virtio feature flag may be refused by the guest, so we think we s=
-till need to make collisions less likely even with 64 bit paths. E.g.
->>>>
->>>> In all cases, we would need a fallback solution to support current
->>>> guest setups. Also there are several 9p server implementations out
->>>> there (ganesha, diod, kvmtool) that are currently used with linux
->>>> clients... it will take some time to get everyone in sync :-\
->>>>
->>>>> 1. XOR the device id with inode nr to produce the qid path (we atta=
-ch a proof of concept patch)
->>>>
->>>> Hmm... this would still allow collisions. Not good for fallback.
->>>>
->>>>> 2. 64 bit hash of device id and inode nr
->>>>
->>>> Same here.
->>>>
->>>>> 3. other ideas, such as allocating new qid paths and keep a look up=
- table of some sorts (possibly too expensive)
->>>>>
->>>>
->>>> This would be acceptable for fallback.
->>>
->>> Maybe we can use the QEMU hash table (https://github.com/qemu/qemu/bl=
-ob/master/util/qht.c) but I wonder if it scales to millions of entries. D=
-o you think it is appropriate in this case?
->>>
->>
->> I don't know QHT, hence Cc'ing Emilio for insights.
->>
->>> I was thinking on how to implement something like this, without havin=
-g to maintain millions of entries... One option we could consider is to s=
-plit the bits into a directly-mapped part, and a lookup part. For example=
-:
->>>
->>> Inode =3D
->>> [ 10 first bits ] + [ 54 lowest bits ]
->>>
->>> A hash table maps [ inode 10 first bits ] + [ device id ] =3D> [ 10 b=
-it prefix ]
->>> The prefix is uniquely allocated for each input.
->>>
->>> Qid path =3D
->>> [ 10 bit prefix ] + [ inode 54 lowest bits ]
->>>
->>> Since inodes are not completely random, and we usually have a handful=
- of device IDs, we get a much smaller number of entries to track in the h=
-ash table.
->>>
->>> So what this would give:
->>> (1)=A0=A0=A0 Would be faster and take less memory than mapping the fu=
-ll inode_nr,devi_id tuple to unique QID paths
->>> (2)=A0=A0=A0 Guaranteed not to run out of bits when inode numbers sta=
-y below the lowest 54 bits and we have less than 1024 devices.
->>> (3)=A0=A0=A0 When we get beyond this this limit, there is a chance we=
- run out of bits to allocate new QID paths, but we can detect this and re=
-fuse to serve the offending files instead of allowing a collision.
->>>
->>> We could tweak the prefix size to match the scenarios that we conside=
-r more likely, but I think close to 10-16 bits sounds reasonable enough. =
-What do you think?
->>>
->>
->> I think that should work. Please send a patchset :)
->=20
-> Hi Greg,
->=20
-> This is based on the assumption that high bits of inode numbers are
-> always zero, which is unacceptable from my standpoint. Inode numbers
-> allocator is a per-volume file system feature, so there may appear
-> allocators, which don't use simple increment and assign inode number
-> with non-zero high bits even for the first file of a volume.
->=20
-> As I understand, the problem is that the guest doesn't have enough
-> information for proper files identification (in our case share/p1/file
-> and share/p2/file are wrongly identified as the same file). It seems
-> that we need to transmit device ID to the guest, and not in the high bi=
-ts of the inode number.
->=20
-> AFAIK Slava has patches for such transmission, I hope that he will send
-> it eventually.
+Hi Amador,
 
-They're pretty trivial, however it'll require great effort and coordinati=
-on
-for all parties involved, as they break backwards compatibility (QID beco=
-mes
-bigger and, thus, breaks "Q" transmission).
+First of all, sorry for reviewing this so late.
 
-I'd like to raise another issue - it seems that st_dev and i_no aren't
-enough:
+On Tue, Nov 14, 2017 at 11:22:40AM +0100, Amador Pahim wrote:
+> To launch a VM, we need to create basically two files: the monitor
+> socket (if it's a UNIX socket) and the qemu log file.
+> 
+> For the qemu log file, we currently just open the path, which will
+> create the file if it does not exist or overwrite the file if it does
+> exist.
+> 
+> For the monitor socket, if it already exists, we are currently removing
+> it, even if it's not created by us.
+> 
+> This patch moves to _pre_launch() the responsibility to create a
+> temporary directory to host the files so we can remove the whole
+> directory on _post_shutdown().
+> 
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 32 ++++++++++++++++++++++++--------
+>  1 file changed, 24 insertions(+), 8 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 65d9ad688c..d5b1cde044 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -17,6 +17,8 @@ import logging
+>  import os
+>  import subprocess
+>  import qmp.qmp
+> +import shutil
+> +import tempfile
+>  
+>  
+>  LOG = logging.getLogger(__name__)
+> @@ -72,10 +74,10 @@ class QEMUMachine(object):
+>              wrapper = []
+>          if name is None:
+>              name = "qemu-%d" % os.getpid()
+> -        if monitor_address is None:
+> -            monitor_address = os.path.join(test_dir, name + "-monitor.sock")
+> +        self._name = name
+>          self._monitor_address = monitor_address
+> -        self._qemu_log_path = os.path.join(test_dir, name + ".log")
+> +        self._qemu_log_path = None
+> +        self._qemu_log_file = None
+>          self._popen = None
+>          self._binary = binary
+>          self._args = list(args)     # Force copy args in case we modify them
+> @@ -85,6 +87,8 @@ class QEMUMachine(object):
+>          self._socket_scm_helper = socket_scm_helper
+>          self._qmp = None
+>          self._qemu_full_args = None
+> +        self._test_dir = test_dir
+> +        self._temp_dir = None
+>  
+>          # just in case logging wasn't configured by the main script:
+>          logging.basicConfig()
+> @@ -173,6 +177,13 @@ class QEMUMachine(object):
+>                  '-display', 'none', '-vga', 'none']
+>  
+>      def _pre_launch(self):
+> +        self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
+> +        if not isinstance(self._monitor_address, tuple):
+> +            self._monitor_address = os.path.join(self._temp_dir,
+> +                                                 self._name + "-monitor.sock")
 
-mkdir -p /tmp/mounted
-touch /tmp/mounted/file
-mount -o bind /tmp/mounted t1
-mount -o bind /tmp/mounted t2
-stat t{1,2}/file  | grep Inode
-Device: 805h/2053d      Inode: 42729487    Links: 3
-Device: 805h/2053d      Inode: 42729487    Links: 3
+Won't this break QEMUMachine(..., monitor_addres='/some/unix/path')?
 
-In that case, even with the patch applied, we'll still have the issue of
-colliding QIDs guest-side - so, for example, after umount t1, t2/file
-becomes unaccessible, as the inode points to t1...
+What about checking if self._monitor_address is None instead?
 
-I'm not sure how to fix this one. Ideas?
+The rest looks good to me.
 
->=20
-> Thanks,
-> Eduard.
->=20
->>
->>>>
->>>>> With our proof of concept patch, the issues caused by qid path coll=
-isions go away, so it can be seen as an interim solution of sorts. Howeve=
-r, the chance of collisions is not eliminated, we are just replacing the =
-current strategy, which is almost guaranteed to cause collisions in certa=
-in use cases, with one that makes them more rare. We think that a virtio =
-feature flag for longer qid paths is the only way to eliminate these issu=
-es completely.
->>>>>
->>>>> This is the extent that we were able to analyze the issue from our =
-side, we would like to hear if there are some better ideas, or which appr=
-oach would be more appropriate for upstream.
->>>>>
->>>>> Best regards,
->>>>>
->>>>
->>>> Cheers,
->>>>
->>>> --=20
->>>> Greg
->>>>
->>>
->>
->=20
-> .
->=20
+> +        self._qemu_log_path = os.path.join(self._temp_dir, self._name + ".log")
+> +        self._qemu_log_file = open(self._qemu_log_path, 'wb')
+> +
+>          self._qmp = qmp.qmp.QEMUMonitorProtocol(self._monitor_address,
+>                                                  server=True)
+>  
+> @@ -180,23 +191,28 @@ class QEMUMachine(object):
+>          self._qmp.accept()
+>  
+>      def _post_shutdown(self):
+> -        if not isinstance(self._monitor_address, tuple):
+> -            self._remove_if_exists(self._monitor_address)
+> -        self._remove_if_exists(self._qemu_log_path)
+> +        if self._qemu_log_file is not None:
+> +            self._qemu_log_file.close()
+> +            self._qemu_log_file = None
+> +
+> +        self._qemu_log_path = None
+> +
+> +        if self._temp_dir is not None:
+> +            shutil.rmtree(self._temp_dir)
+> +            self._temp_dir = None
+>  
+>      def launch(self):
+>          '''Launch the VM and establish a QMP connection'''
+>          self._iolog = None
+>          self._qemu_full_args = None
+>          devnull = open(os.path.devnull, 'rb')
+> -        qemulog = open(self._qemu_log_path, 'wb')
+>          try:
+>              self._pre_launch()
+>              self._qemu_full_args = (self._wrapper + [self._binary] +
+>                                      self._base_args() + self._args)
+>              self._popen = subprocess.Popen(self._qemu_full_args,
+>                                             stdin=devnull,
+> -                                           stdout=qemulog,
+> +                                           stdout=self._qemu_log_file,
+>                                             stderr=subprocess.STDOUT,
+>                                             shell=False)
+>              self._post_launch()
+> -- 
+> 2.13.6
+> 
+> 
+
+-- 
+Eduardo
