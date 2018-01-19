@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ecWtm-00088a-1D
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:40:04 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1ecWzS-0003O6-Uu
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ecWti-00051F-PF
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:40:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36168)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ecWti-00050K-By
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:39:58 -0500
-Date: Fri, 19 Jan 2018 14:39:49 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180119143949.7457412f@igors-macbook-pro.local>
-In-Reply-To: <20180119131430.GR5292@localhost.localdomain>
-References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
-	<1516203816-19374-21-git-send-email-imammedo@redhat.com>
-	<20180118014846.GM627@localhost.localdomain>
-	<20180118111035.3ab0a533@redhat.com>
-	<20180118191809.GB5292@localhost.localdomain>
-	<20180119111439.0feb4f5a@redhat.com>
-	<20180119131430.GR5292@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 20/24] machine: drop MachineState::cpu_model
+	(envelope-from <zhangckid@gmail.com>) id 1ecWzO-0002JL-Mh
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:45:54 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41980)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1ecWzO-0002Hz-GA
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 08:45:50 -0500
+Received: by mail-pg0-x242.google.com with SMTP id 136so1457878pgd.8
+	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 05:45:50 -0800 (PST)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Fri, 19 Jan 2018 21:44:29 +0800
+Message-Id: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V4 00/16] COLO: integrate colo frame with block
+ replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Zhang Chen <chen.zhang@intel.com>
 
-On Fri, 19 Jan 2018 11:14:30 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+From: Zhang Chen <chen.zhang@intel.com>
 
-> On Fri, Jan 19, 2018 at 11:14:39AM +0100, Igor Mammedov wrote:
-> > On Thu, 18 Jan 2018 17:18:09 -0200
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > 
-> > > On Thu, Jan 18, 2018 at 11:10:35AM +0100, Igor Mammedov wrote:
-> > > > On Wed, 17 Jan 2018 23:48:46 -0200
-> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > >   
-> > > > > On Wed, Jan 17, 2018 at 04:43:32PM +0100, Igor Mammedov wrote:  
-> > > > > > The last user of it was machine type 'none', which used field
-> > > > > > to create CPU id user requested it on CLI with -cpu option.
-> > [...]
-> > 
-> > > It looks like default_cpu_type is being overloaded for two
-> > > different roles: 1) specifying the default CPU type; 2) finding
-> > > the arch-specific class to be used to parse -cpu.
-> > > 
-> > > In the case of null-machine, these two roles conflict with each
-> > > other.  I believe we can find other solutions instead of this
-> > > hack that involves lying on MachineClass::default_cpu_type (and
-> > > then having to work around the lie on machine_none_init()).
-> > > 
-> > > I see multiple options: adding a new MachineClass field for that
-> > > (e.g.  resolving_cpu_type, which defaults to default_cpu_type if
-> > > NULL); moving the CPU parsing code to arch_init.c (so it could
-> > > use CPU_RESOLVING_TYPE or something similar); adding a optional
-> > > MachineClass::parse_cpu_model hook.  We could even try to get rid
-> > > of CPUClass::parse_features completely
-> > Adding hooks just for the sake on null-machine seems to be overkill,
-> > I'd go for arch_init.c but it won't work for linux-user, how about
-> > exec.c as following:
-> > 
-> > diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> > index 93bd546..0185589 100644
-> > --- a/include/qom/cpu.h
-> > +++ b/include/qom/cpu.h
-> > @@ -661,8 +661,7 @@ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
-> > [...]
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index d28fc0c..4543f06 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -817,6 +817,29 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-> >  #endif
-> >  }
-> >  
-> > +const char *parse_cpu_model(const char *cpu_model)
-> > +{
-> > +    ObjectClass *oc;
-> > +    CPUClass *cc;
-> > +    gchar **model_pieces;
-> > +    const char *cpu_type;
-> > +
-> > +    model_pieces = g_strsplit(cpu_model, ",", 2);
-> > +
-> > +    oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
-> > +    if (oc == NULL) {
-> > +        error_report("unable to find CPU model '%s'", model_pieces[0]);
-> > +        g_strfreev(model_pieces);
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +
-> > +    cpu_type = object_class_get_name(oc);
-> > +    cc = CPU_CLASS(oc);
-> > +    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
-> > +    g_strfreev(model_pieces);
-> > +    return cpu_type;
-> > +}
-> 
-> Sounds good to me.  Only two comments:
-> 
-> This looks like duplication of cpu_parse_cpu_model().  Should
-> this function body be replaced with:
->   cpu_parse_cpu_model(CPU_RESOLVING_TYPE, cpu_model)
-it's cpu_parse_cpu_model() which is moved to exec.c
-and first typename argument is replaced by inline CPU_RESOLVING_TYPE
+Hi~
+
+COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
+filter-redirector,filter-rewriter) have been exist in qemu
+for long time, it's time to integrate these three parts to make COLO really works.
+
+In this series, we have some optimizations for COLO frame, including separating the
+process of saving ram and device state, using an COLO_EXIT event to notify users that
+VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
+but since this series have just rebased on upstream which had merged a new series of migration,
+parts of pathes in this series deserve review again.
+
+We use notifier/callback method for COLO compare to notify COLO frame about
+net packets inconsistent event, and add a handle_event method for NetFilterClass to
+help COLO frame to notify filters and colo-compare about checkpoint/failover event, 
+it is flexible.
+
+For the neweset version, please refer to:
+https://github.com/zhangckid/qemu/tree/qemu-colo-18jan19
+
+Please review, thanks.
+
+V4:
+ - Address Eric's comments in patch 10/16.
+ - Rebase on upstream codes.
+ - Fix mingw compile error in patch 02/16.
+ - Fix some comments.
+ - Fix conflect with the patch "migration: remove "enable_colo" var" in patch 06/16.
+
+V3:
+ - Address community comments from V2.
+ - Rebase on upstream codes.
+ - Fix several bugs.
+ - Splite shared disk part to indepentent patch set.
+ - Optimize codes.
 
 
-> I would move this to arch_init.c, because that's where existing
-> target-dependent initialization code lives.
-arch_init.c doesn't fit linux-user, it has only sys emulation code
-while exec.c is used by both and still target depended so CPU_RESOLVING_TYPE
-could be used there
+Zhang Chen (8):
+  filter-rewriter: fix memory leak for connection in
+    connection_track_table
+  colo-compare: implement the process of checkpoint
+  colo-compare: use notifier to notify packets comparing result
+  COLO: integrate colo compare with colo frame
+  COLO: Add block replication into colo process
+  ram/COLO: Record the dirty pages that SVM received
+  filter: Add handle_event method for NetFilterClass
+  filter-rewriter: handle checkpoint and failover event
 
-> 
-> 
-> > [...]
-> 
+zhanghailiang (8):
+  COLO: Remove colo_state migration struct
+  COLO: Load dirty pages into SVM's RAM cache firstly
+  COLO: Flush memory data from ram cache
+  qmp event: Add COLO_EXIT event to notify users while exited COLO
+  savevm: split the process of different stages for loadvm/savevm
+  COLO: flush host dirty ram from cache
+  COLO: notify net filters about checkpoint/failover event
+  COLO: quick failover process by kick COLO thread
+
+ include/exec/ram_addr.h  |   1 +
+ include/migration/colo.h |  11 ++-
+ include/net/filter.h     |   5 ++
+ migration/Makefile.objs  |   2 +-
+ migration/colo-comm.c    |  76 -------------------
+ migration/colo.c         | 188 ++++++++++++++++++++++++++++++++++++++++++++---
+ migration/migration.c    |  38 +++++++++-
+ migration/ram.c          | 181 ++++++++++++++++++++++++++++++++++++++++++++-
+ migration/ram.h          |   4 +
+ migration/savevm.c       |  54 ++++++++++++--
+ migration/savevm.h       |   5 ++
+ migration/trace-events   |   3 +
+ net/colo-compare.c       | 108 +++++++++++++++++++++++++--
+ net/colo-compare.h       |  24 ++++++
+ net/colo.h               |   4 +
+ net/filter-rewriter.c    | 109 +++++++++++++++++++++++++--
+ net/filter.c             |  17 +++++
+ net/net.c                |  28 +++++++
+ qapi/migration.json      |  35 +++++++++
+ vl.c                     |   2 -
+ 20 files changed, 777 insertions(+), 118 deletions(-)
+ delete mode 100644 migration/colo-comm.c
+ create mode 100644 net/colo-compare.h
+
+-- 
+2.7.4
