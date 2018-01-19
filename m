@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ecXTz-0005Dx-6M
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:17:30 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ecXZx-0002E2-L3
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:23:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ecXTy-0004Aq-Cg
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:17:27 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45641)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1ecXTy-000498-6S
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:17:26 -0500
-Received: by mail-wr0-x241.google.com with SMTP id 16so1700345wry.12
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 06:17:26 -0800 (PST)
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Fri, 19 Jan 2018 14:17:07 +0000
-Message-Id: <20180119141707.11733-5-ard.biesheuvel@linaro.org>
-In-Reply-To: <20180119141707.11733-1-ard.biesheuvel@linaro.org>
-References: <20180119141707.11733-1-ard.biesheuvel@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 4/4] target/arm: enable user-mode SHA-3,
- SM3 and SHA-512 instruction support
+	(envelope-from <ehabkost@redhat.com>) id 1ecXZu-0003HL-FQ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:23:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ecXZu-0003Gd-5f
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 09:23:34 -0500
+Date: Fri, 19 Jan 2018 12:23:28 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180119142328.GT5292@localhost.localdomain>
+References: <1516203816-19374-1-git-send-email-imammedo@redhat.com>
+	<1516203816-19374-21-git-send-email-imammedo@redhat.com>
+	<20180118014846.GM627@localhost.localdomain>
+	<20180118111035.3ab0a533@redhat.com>
+	<20180118191809.GB5292@localhost.localdomain>
+	<20180119111439.0feb4f5a@redhat.com>
+	<20180119131430.GR5292@localhost.localdomain>
+	<20180119143949.7457412f@igors-macbook-pro.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180119143949.7457412f@igors-macbook-pro.local>
+Subject: Re: [Qemu-devel] [PATCH 20/24] machine: drop MachineState::cpu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +33,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Add support for the new ARMv8.2 SHA-3, SM3 and SHA-512 instructions to
-AArch64 user mode emulation.
+On Fri, Jan 19, 2018 at 02:39:49PM +0100, Igor Mammedov wrote:
+> On Fri, 19 Jan 2018 11:14:30 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Fri, Jan 19, 2018 at 11:14:39AM +0100, Igor Mammedov wrote:
+> > > On Thu, 18 Jan 2018 17:18:09 -0200
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > 
+> > > > On Thu, Jan 18, 2018 at 11:10:35AM +0100, Igor Mammedov wrote:
+> > > > > On Wed, 17 Jan 2018 23:48:46 -0200
+> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > >   
+> > > > > > On Wed, Jan 17, 2018 at 04:43:32PM +0100, Igor Mammedov wrote:  
+> > > > > > > The last user of it was machine type 'none', which used field
+> > > > > > > to create CPU id user requested it on CLI with -cpu option.
+> > > [...]
+> > > 
+> > > > It looks like default_cpu_type is being overloaded for two
+> > > > different roles: 1) specifying the default CPU type; 2) finding
+> > > > the arch-specific class to be used to parse -cpu.
+> > > > 
+> > > > In the case of null-machine, these two roles conflict with each
+> > > > other.  I believe we can find other solutions instead of this
+> > > > hack that involves lying on MachineClass::default_cpu_type (and
+> > > > then having to work around the lie on machine_none_init()).
+> > > > 
+> > > > I see multiple options: adding a new MachineClass field for that
+> > > > (e.g.  resolving_cpu_type, which defaults to default_cpu_type if
+> > > > NULL); moving the CPU parsing code to arch_init.c (so it could
+> > > > use CPU_RESOLVING_TYPE or something similar); adding a optional
+> > > > MachineClass::parse_cpu_model hook.  We could even try to get rid
+> > > > of CPUClass::parse_features completely
+> > > Adding hooks just for the sake on null-machine seems to be overkill,
+> > > I'd go for arch_init.c but it won't work for linux-user, how about
+> > > exec.c as following:
+> > > 
+> > > diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> > > index 93bd546..0185589 100644
+> > > --- a/include/qom/cpu.h
+> > > +++ b/include/qom/cpu.h
+> > > @@ -661,8 +661,7 @@ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
+> > > [...]
+> > > 
+> > > diff --git a/exec.c b/exec.c
+> > > index d28fc0c..4543f06 100644
+> > > --- a/exec.c
+> > > +++ b/exec.c
+> > > @@ -817,6 +817,29 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+> > >  #endif
+> > >  }
+> > >  
+> > > +const char *parse_cpu_model(const char *cpu_model)
+> > > +{
+> > > +    ObjectClass *oc;
+> > > +    CPUClass *cc;
+> > > +    gchar **model_pieces;
+> > > +    const char *cpu_type;
+> > > +
+> > > +    model_pieces = g_strsplit(cpu_model, ",", 2);
+> > > +
+> > > +    oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
+> > > +    if (oc == NULL) {
+> > > +        error_report("unable to find CPU model '%s'", model_pieces[0]);
+> > > +        g_strfreev(model_pieces);
+> > > +        exit(EXIT_FAILURE);
+> > > +    }
+> > > +
+> > > +    cpu_type = object_class_get_name(oc);
+> > > +    cc = CPU_CLASS(oc);
+> > > +    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
+> > > +    g_strfreev(model_pieces);
+> > > +    return cpu_type;
+> > > +}
+> > 
+> > Sounds good to me.  Only two comments:
+> > 
+> > This looks like duplication of cpu_parse_cpu_model().  Should
+> > this function body be replaced with:
+> >   cpu_parse_cpu_model(CPU_RESOLVING_TYPE, cpu_model)
+> it's cpu_parse_cpu_model() which is moved to exec.c
+> and first typename argument is replaced by inline CPU_RESOLVING_TYPE
+> 
+> 
+> > I would move this to arch_init.c, because that's where existing
+> > target-dependent initialization code lives.
+> arch_init.c doesn't fit linux-user, it has only sys emulation code
+> while exec.c is used by both and still target depended so CPU_RESOLVING_TYPE
+> could be used there
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- linux-user/elfload.c | 18 ++++++++++++++++++
- target/arm/cpu64.c   |  3 +++
- 2 files changed, 21 insertions(+)
+I don't really like adding more code to the mess that is exec.c,
+but this looks like the simplest solution.
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 20f3d8c2c373..5d5aa26d2710 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -512,6 +512,21 @@ enum {
-     ARM_HWCAP_A64_SHA1          = 1 << 5,
-     ARM_HWCAP_A64_SHA2          = 1 << 6,
-     ARM_HWCAP_A64_CRC32         = 1 << 7,
-+    ARM_HWCAP_A64_ATOMICS       = 1 << 8,
-+    ARM_HWCAP_A64_FPHP          = 1 << 9,
-+    ARM_HWCAP_A64_ASIMDHP       = 1 << 10,
-+    ARM_HWCAP_A64_CPUID         = 1 << 11,
-+    ARM_HWCAP_A64_ASIMDRDM      = 1 << 12,
-+    ARM_HWCAP_A64_JSCVT         = 1 << 13,
-+    ARM_HWCAP_A64_FCMA          = 1 << 14,
-+    ARM_HWCAP_A64_LRCPC         = 1 << 15,
-+    ARM_HWCAP_A64_DCPOP         = 1 << 16,
-+    ARM_HWCAP_A64_SHA3          = 1 << 17,
-+    ARM_HWCAP_A64_SM3           = 1 << 18,
-+    ARM_HWCAP_A64_SM4           = 1 << 19,
-+    ARM_HWCAP_A64_ASIMDDP       = 1 << 20,
-+    ARM_HWCAP_A64_SHA512        = 1 << 21,
-+    ARM_HWCAP_A64_SVE           = 1 << 22,
- };
- 
- #define ELF_HWCAP get_elf_hwcap()
-@@ -532,6 +547,9 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE(ARM_FEATURE_V8_SHA1, ARM_HWCAP_A64_SHA1);
-     GET_FEATURE(ARM_FEATURE_V8_SHA256, ARM_HWCAP_A64_SHA2);
-     GET_FEATURE(ARM_FEATURE_CRC, ARM_HWCAP_A64_CRC32);
-+    GET_FEATURE(ARM_FEATURE_V8_SHA3, ARM_HWCAP_A64_SHA3);
-+    GET_FEATURE(ARM_FEATURE_V8_SM3, ARM_HWCAP_A64_SM3);
-+    GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
- #undef GET_FEATURE
- 
-     return hwcaps;
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 670c07ab6ed4..56d50ba57194 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -224,6 +224,9 @@ static void aarch64_any_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-+    set_feature(&cpu->env, ARM_FEATURE_V8_SHA3);
-+    set_feature(&cpu->env, ARM_FEATURE_V8_SM3);
-+    set_feature(&cpu->env, ARM_FEATURE_V8_SHA512);
-     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-     set_feature(&cpu->env, ARM_FEATURE_CRC);
-     cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
 -- 
-2.11.0
+Eduardo
