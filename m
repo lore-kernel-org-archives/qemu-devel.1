@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ecP52-0005xV-8D
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:19:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ecP5S-0006IZ-4g
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ecP4z-0005o4-1h
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:19:08 -0500
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:39465)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ecP4y-0005ni-QP
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:19:04 -0500
-Received: by mail-it0-x244.google.com with SMTP id 68so774724ite.4
-	for <qemu-devel@nongnu.org>; Thu, 18 Jan 2018 21:19:04 -0800 (PST)
-References: <20180119050005.29392-1-sjitindarsingh@gmail.com>
-	<20180119050005.29392-3-sjitindarsingh@gmail.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <59acc32f-94e9-42b6-a8aa-4eddd504c8c8@ozlabs.ru>
-Date: Fri, 19 Jan 2018 16:18:58 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ecP5R-0005wo-5v
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:19:34 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:37005)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ecP5Q-0005wK-QJ
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 00:19:33 -0500
+Date: Fri, 19 Jan 2018 16:19:26 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180119051926.GI30352@umbus.fritz.box>
+References: <20180119050906.18930-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <20180119050005.29392-3-sjitindarsingh@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V5 2/7] target/ppc/spapr_caps:
- Add macro to generate spapr_caps migration vmstate
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="MKyq+TZLpK62LzFe"
+Content-Disposition: inline
+In-Reply-To: <20180119050906.18930-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org
-Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-
-On 19/01/18 16:00, Suraj Jitindar Singh wrote:
-> The vmstate description and the contained needed function for migration
-> of spapr_caps is the same for each cap, with the name of the cap
-> substituted. As such introduce a macro to allow for easier generation of
-> these.
-> 
-> Convert the three existing spapr_caps (htm, vsx, and dfp) to use this
-> macro.
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
-> ---
-> 
-> V5:
->  - Patch added to series
-> ---
->  hw/ppc/spapr_caps.c | 78 +++++++++++++++++------------------------------------
->  1 file changed, 24 insertions(+), 54 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index d5c9ce774a..5d52969bd5 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -228,62 +228,32 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
->      return ok ? 0 : -EINVAL;
->  }
->  
-> -static bool spapr_cap_htm_needed(void *opaque)
-> -{
-> -    sPAPRMachineState *spapr = opaque;
-> -
-> -    return spapr->cmd_line_caps[SPAPR_CAP_HTM] &&
-> -           (spapr->eff.caps[SPAPR_CAP_HTM] != spapr->def.caps[SPAPR_CAP_HTM]);
-> -}
-> -
-> -const VMStateDescription vmstate_spapr_cap_htm = {
-> -    .name = "spapr/cap/htm",
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> -    .needed = spapr_cap_htm_needed,
-> -    .fields = (VMStateField[]) {
-> -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_HTM], sPAPRMachineState),
-> -        VMSTATE_END_OF_LIST()
-> -    },
-> -};
-> -
-> -static bool spapr_cap_vsx_needed(void *opaque)
-> -{
-> -    sPAPRMachineState *spapr = opaque;
-> -
-> -    return spapr->cmd_line_caps[SPAPR_CAP_VSX] &&
-> -           (spapr->eff.caps[SPAPR_CAP_VSX] != spapr->def.caps[SPAPR_CAP_VSX]);
-> +/* Used to generate the migration field and needed function for a spapr cap */
-> +#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
-> +static bool spapr_cap_##cap##_needed(void *opaque)      \
-> +{                                                       \
-> +    sPAPRMachineState *spapr = opaque;                  \
-> +                                                        \
-> +    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
-> +           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
-> +            spapr->def.caps[SPAPR_CAP_##ccap]);         \
-> +}                                                       \
-> +                                                        \
-> +const VMStateDescription vmstate_spapr_cap_##cap = {    \
-> +    .name = "spapr/cap/" #cap,                          \
-> +    .version_id = 1,                                    \
-> +    .minimum_version_id = 1,                            \
-> +    .needed = spapr_cap_##cap##_needed,                 \
-> +    .fields = (VMStateField[]) {                        \
-> +        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
-> +                      sPAPRMachineState),               \
-> +        VMSTATE_END_OF_LIST()                           \
-> +    },                                                  \
->  }
->  
-> -const VMStateDescription vmstate_spapr_cap_vsx = {
-> -    .name = "spapr/cap/vsx",
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> -    .needed = spapr_cap_vsx_needed,
-> -    .fields = (VMStateField[]) {
-> -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_VSX], sPAPRMachineState),
-> -        VMSTATE_END_OF_LIST()
-> -    },
-> -};
-> -
-> -static bool spapr_cap_dfp_needed(void *opaque)
-> -{
-> -    sPAPRMachineState *spapr = opaque;
-> -
-> -    return spapr->cmd_line_caps[SPAPR_CAP_DFP] &&
-> -           (spapr->eff.caps[SPAPR_CAP_DFP] != spapr->def.caps[SPAPR_CAP_DFP]);
-> -}
-> -
-> -const VMStateDescription vmstate_spapr_cap_dfp = {
-> -    .name = "spapr/cap/dfp",
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> -    .needed = spapr_cap_dfp_needed,
-> -    .fields = (VMStateField[]) {
-> -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_DFP], sPAPRMachineState),
-> -        VMSTATE_END_OF_LIST()
-> -    },
-> -};
-> +SPAPR_CAP_MIG_STATE(htm, HTM);
-> +SPAPR_CAP_MIG_STATE(vsx, VSX);
-> +SPAPR_CAP_MIG_STATE(dfp, DFP);
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, Andrea Bolognani <abologna@redhat.com>
 
 
-A nit: I really dislike this kind of parameters which you cannot really
-cscope/ctags for because they are joined to some other things.
+--MKyq+TZLpK62LzFe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-"no matches found for cscope query g HTM of HTM" says vim's cscope when I
-search for "HTM".
+On Fri, Jan 19, 2018 at 04:09:06PM +1100, Alexey Kardashevskiy wrote:
+> There is already 'device-list-properties' which does most of the job,
+> however it does not handle everything returned by qom-list-types such
+> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+>=20
+> This adds a new qom-list-properties command which prints properties
+> of a specific class and its instance. It is pretty much a simplified copy
+> of the device-list-properties handler.
+>=20
+> Since it creates an object instance, device properties should appear
+> in the output as they are copied to QOM properties at the instance_init
+> hook.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
+I think the existing qom-list interface does this already.
 
->  
->  void spapr_caps_reset(sPAPRMachineState *spapr)
->  {
-> 
+This won't solve the libvirt problem we were discussing, because it
+needs an existing instance of the object.  libvirt wants to know the
+machine properties *without* instantiating an instance.
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
--- 
-Alexey
+--MKyq+TZLpK62LzFe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlphf9sACgkQbDjKyiDZ
+s5KIFA/+NPzN48sj/XY+MwkoQEaln/kwyZI0oZdJKF89J/nI30T6A7LtR1dW5pf6
+lvwLTcHIbbC1Neb9uQQLzvvH53OuhCSqF3wxzGEn4Hcs0j4UWlcN4TCyqWUtlzK3
+hOlvu4NvjMu9fwc9WtFzYa4jUgcj3cMDZD9HVeLLwevL13zhs/OU1Us7BnwAIJvO
+nVG81Q35ERGbYySm833wAoSDLxtRoITmuWqX79sl57Tq0o9CXQ3FTooLen/bFnzD
+LWhaTA1GQaG2vlCgPL1j+8rwjhH3ndSoN8lzdmW/yFHeAgAxA6EWIj/aJK8i9T/Q
+00ZB32mSSHQMwUpYazOuLFYDx/8a+wJRWdCBOroLmuoY9OBSLLgnMWZ5FbdXZI7k
+X9Vj+VOZqmNXb7X7RBgwKwldarqZPamm+iBg7T/LDsKNZyRUU6Bt6qFbA8Z1C5Ym
+MhS2yKKYmITBV9/fZ8aLvpLJkaVADj5fu+f+whwPP1MInnNm1zjKVpLhCxl9h5ly
+YqAb9smrz4N8Zh+rUJrOxpZhPGWcHOJlkXwKn/ytUou7o3DSPM+jTLWherv9dH9c
+CxSfoXT87UD/fU39ySiCzFOJQ0Xa/S7fC67yWdVMfv0ZWAth9Gt5bTim0MHQxXqD
+OiTIOsDSnOF5oR/JT23177ptklkcpNNmf9+62oiSnxrzNLYvr6g=
+=qSb7
+-----END PGP SIGNATURE-----
+
+--MKyq+TZLpK62LzFe--
