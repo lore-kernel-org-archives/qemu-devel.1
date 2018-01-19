@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ecVc5-0008Ow-VY
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:17:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ecVeQ-0001VZ-De
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:20:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ecVc1-0007qh-Ts
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:17:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ecVc1-0007qF-LR
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:17:37 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0JCEFvR078824
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 07:17:36 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fkf8vudxs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 07:17:35 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 19 Jan 2018 12:17:31 -0000
-References: <1516297904-18188-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 19 Jan 2018 13:17:29 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1ecVeL-0000OB-DP
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:20:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:28930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ecVeL-0000NW-7q
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 07:20:01 -0500
+References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
+	<20180119084417.7100.69568.stgit@pasha-VirtualBox>
+	<aca12788-c119-3046-ee8f-e7b3d4cc59bb@redhat.com>
+	<002a01d3911d$dc13ca80$943b5f80$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8aa1900f-2663-43bd-dab5-001be0aede09@redhat.com>
+Date: Fri, 19 Jan 2018 13:19:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <1516297904-18188-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+In-Reply-To: <002a01d3911d$dc13ca80$943b5f80$@ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <d6a912c2-3d19-8890-3caf-b3d9b4103c3c@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x: fix storage attributes
- migration for non-small guests
+Subject: Re: [Qemu-devel] [RFC PATCH v4 13/23] cpus: only take BQL for
+ sleeping threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,53 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, cohuck@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-
-
-On 01/18/2018 06:51 PM, Claudio Imbrenda wrote:
-> Fix storage attribute migration so that it does not fail for guests
-> with more than a few GB of RAM.
-> With such guests, the index in the buffer would go out of bounds,
-> usually by large amounts, thus receiving -EFAULT from the kernel.
-> Migration itself would be successful, but storage attributes would then
-> not be migrated completely.
+On 19/01/2018 13:05, Pavel Dovgalyuk wrote:
+>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>> On 19/01/2018 09:44, Pavel Dovgalyuk wrote:
+>>>      while (all_cpu_threads_idle()) {
+>>> +        qemu_mutex_lock_iothread();
+>>>          stop_tcg_kick_timer();
+>>>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+>>> +        qemu_mutex_unlock_iothread();
+>>>      }
+>>
+>> cpu_has_work cannot be called outside BQL yet.  You first need to access
+>> cpu->interrupt_request with atomics.
+>>
+>> In general, testing the condition outside the mutex is a very dangerous
+>> pattern (and I'm usually the one who enjoys dangerous patterns).
 > 
-> This patch fixes the out of bounds access, and thus migration of all
-> storage attributes when the guest have large amounts of memory.
+> It means, that I'll have to fix all the has_work function to avoid races,
+> because x86_cpu_has_work may have them?
+
+Why only x86_cpu_has_work?
+
+Even reading cs->interrupt_request outside the mutex is unsafe.
+
+Paolo
+
+> static bool x86_cpu_has_work(CPUState *cs)
+> {
+>     X86CPU *cpu = X86_CPU(cs);
+>     CPUX86State *env = &cpu->env;
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-> Fixes: 903fd80b03243476 ("s390x/migration: Storage attributes device")
-
-Cc: stable ?
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-> ---
->  hw/s390x/s390-stattrib-kvm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>     return ((cs->interrupt_request & (CPU_INTERRUPT_HARD |
+>                                       CPU_INTERRUPT_POLL)) &&
+>             (env->eflags & IF_MASK)) ||
+>            (cs->interrupt_request & (CPU_INTERRUPT_NMI |
+>                                      CPU_INTERRUPT_INIT |
+>                                      CPU_INTERRUPT_SIPI |
+>                                      CPU_INTERRUPT_MCE)) ||
+>            ((cs->interrupt_request & CPU_INTERRUPT_SMI) &&
+>             !(env->hflags & HF_SMM_MASK));
+> }
 > 
-> diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-> index 41770a7..480551c 100644
-> --- a/hw/s390x/s390-stattrib-kvm.c
-> +++ b/hw/s390x/s390-stattrib-kvm.c
-> @@ -116,7 +116,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttribState *sa)
->          for (cx = 0; cx + len <= max; cx += len) {
->              clog.start_gfn = cx;
->              clog.count = len;
-> -            clog.values = (uint64_t)(sas->incoming_buffer + cx * len);
-> +            clog.values = (uint64_t)(sas->incoming_buffer + cx);
->              r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS, &clog);
->              if (r) {
->                  error_report("KVM_S390_SET_CMMA_BITS failed: %s", strerror(-r));
-> @@ -126,7 +126,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttribState *sa)
->          if (cx < max) {
->              clog.start_gfn = cx;
->              clog.count = max - cx;
-> -            clog.values = (uint64_t)(sas->incoming_buffer + cx * len);
-> +            clog.values = (uint64_t)(sas->incoming_buffer + cx);
->              r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS, &clog);
->              if (r) {
->                  error_report("KVM_S390_SET_CMMA_BITS failed: %s", strerror(-r));
+> Pavel Dovgalyuk
 > 
