@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ecvJx-0004cS-9E
+	(envelope-from <mreitz@redhat.com>) id 1ecvJv-0004aO-5S
 	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ecvJw-0000E6-Dd
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:41 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ecvJr-0000C1-Ts
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:39 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 20 Jan 2018 16:44:12 +0100
-Message-Id: <20180120154412.9990-7-mreitz@redhat.com>
+Date: Sat, 20 Jan 2018 16:44:11 +0100
+Message-Id: <20180120154412.9990-6-mreitz@redhat.com>
 In-Reply-To: <20180120154412.9990-1-mreitz@redhat.com>
 References: <20180120154412.9990-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] block: Deprecate "backing": ""
+Subject: [Qemu-devel] [PATCH v2 5/6] block: Handle null backing link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,85 +22,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-We have a clear replacement, so let's deprecate it.
+Instead of converting all "backing": null instances into "backing": "",
+handle a null value directly in bdrv_open_inherit().
+
+This enables explicitly null backing links for json:{} filenames.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 4 ++--
- block.c              | 4 ++++
- qemu-doc.texi        | 7 +++++++
- qemu-options.hx      | 4 ++--
- 4 files changed, 15 insertions(+), 4 deletions(-)
+ block.c                    |  4 +++-
+ blockdev.c                 | 14 --------------
+ tests/qemu-iotests/089     | 20 ++++++++++++++++++++
+ tests/qemu-iotests/089.out |  8 ++++++++
+ 4 files changed, 31 insertions(+), 15 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 89ed2bc6a4..78de8eff63 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1090,7 +1090,7 @@
- # @overlay: reference to the existing block device that will become
- #           the overlay of @node, as part of creating the snapshot.
- #           It must not have a current backing file (this can be
--#           achieved by passing "backing": "" to blockdev-add).
-+#           achieved by passing "backing": null to blockdev-add).
- #
- # Since: 2.5
- ##
-@@ -1238,7 +1238,7 @@
- #                     "node-name": "node1534",
- #                     "file": { "driver": "file",
- #                               "filename": "hd1.qcow2" },
--#                     "backing": "" } }
-+#                     "backing": null } }
- #
- # <- { "return": {} }
- #
 diff --git a/block.c b/block.c
-index 32b7887651..5ac0aba638 100644
+index 909cf076b7..32b7887651 100644
 --- a/block.c
 +++ b/block.c
-@@ -2600,6 +2600,10 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-     if (qobject_to(qdict_get(options, "backing"), QNull) != NULL ||
-         (backing && *backing == '\0'))
-     {
-+        if (backing) {
-+            warn_report("Use of \"backing\": \"\" is deprecated; "
-+                        "use \"backing\": null instead");
-+        }
+@@ -2597,7 +2597,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+ 
+     /* See cautionary note on accessing @options above */
+     backing = qdict_get_try_str(options, "backing");
+-    if (backing && *backing == '\0') {
++    if (qobject_to(qdict_get(options, "backing"), QNull) != NULL ||
++        (backing && *backing == '\0'))
++    {
          flags |= BDRV_O_NO_BACKING;
          qdict_del(options, "backing");
      }
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 3e9eb819a6..d321908da8 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2773,6 +2773,13 @@ or ``ivshmem-doorbell`` device types.
- The ``xlnx-ep108'' machine has been replaced by the ``xlnx-zcu102'' machine.
- The ``xlnx-zcu102'' machine has the same features and capabilites in QEMU.
+diff --git a/blockdev.c b/blockdev.c
+index 2dce231c98..5aac920eae 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3969,7 +3969,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+     QObject *obj;
+     Visitor *v = qobject_output_visitor_new(&obj);
+     QDict *qdict;
+-    const QDictEntry *ent;
+     Error *local_err = NULL;
  
-+@section Block device options
+     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+@@ -3983,19 +3982,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+ 
+     qdict_flatten(qdict);
+ 
+-    /*
+-     * Rewrite "backing": null to "backing": ""
+-     * TODO Rewrite "" to null instead, and perhaps not even here
+-     */
+-    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
+-        char *dot = strrchr(ent->key, '.');
+-
+-        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
+-            && qobject_type(ent->value) == QTYPE_QNULL) {
+-            qdict_put(qdict, ent->key, qstring_new());
+-        }
+-    }
+-
+     if (!qdict_get_try_str(qdict, "node-name")) {
+         error_setg(errp, "'node-name' must be specified for the root node");
+         goto fail;
+diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
+index 0b059aba90..aa1ba4a98e 100755
+--- a/tests/qemu-iotests/089
++++ b/tests/qemu-iotests/089
+@@ -82,6 +82,26 @@ $QEMU_IO_PROG --cache $CACHEMODE \
+ $QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
+ 
+ 
++echo
++echo "=== Testing correct handling of 'backing':null ==="
++echo
 +
-+@subsection "backing": "" (since 2.12.0)
++_make_test_img -b "$TEST_IMG.base" $IMG_SIZE
 +
-+In order to prevent QEMU from automatically opening an image's backing
-+chain, use ``"backing": null'' instead.
++# This should read 42
++$QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
 +
- @node License
- @appendix License
++# This should read 0
++$QEMU_IO -c 'read -P 0 0 512' "json:{\
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'file',
++        'filename': '$TEST_IMG'
++    },
++    'backing': null
++}" | _filter_qemu_io
++
++
+ # Taken from test 071
+ echo
+ echo "=== Testing blkdebug ==="
+diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
+index 0bf5a13ec1..89e3e4340a 100644
+--- a/tests/qemu-iotests/089.out
++++ b/tests/qemu-iotests/089.out
+@@ -19,6 +19,14 @@ Pattern verification failed at offset 0, 512 bytes
+ read 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5ff741a4af..76e9a5b06b 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -743,8 +743,8 @@ Reference to or definition of the data source block driver node
++=== Testing correct handling of 'backing':null ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
+ === Testing blkdebug ===
  
- @item backing
- Reference to or definition of the backing file block device (default is taken
--from the image file). It is allowed to pass an empty string here in order to
--disable the default backing file.
-+from the image file). It is allowed to pass @code{null} here in order to disable
-+the default backing file.
- 
- @item lazy-refcounts
- Whether to enable the lazy refcounts feature (on/off; default is taken from the
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
 -- 
 2.14.3
