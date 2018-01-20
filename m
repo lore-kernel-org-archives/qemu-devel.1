@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eczN1-0005y6-Di
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 15:04:08 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eczN3-0005yE-7k
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 15:04:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eczMy-0003ju-Ax
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 15:04:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37268)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eczN2-0003py-0V
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 15:04:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47128)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eczMy-0003gc-4t
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 15:04:04 -0500
+	id 1eczN1-0003nD-R1
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 15:04:07 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sat, 20 Jan 2018 21:03:57 +0100
-Message-Id: <20180120200358.19991-1-marcandre.lureau@redhat.com>
+Date: Sat, 20 Jan 2018 21:03:58 +0100
+Message-Id: <20180120200358.19991-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180120200358.19991-1-marcandre.lureau@redhat.com>
+References: <20180120200358.19991-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/1] Dump patches
+Subject: [Qemu-devel] [PULL 1/1] dump-guest-memory.py: fix python 2 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +28,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc7=
-8f:
+Python GDB support may use Python 2 or 3.
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-01-19 16:35:25 +0000)
+Inferior.read_memory() may return a 'buffer' with Python 2 or a
+'memoryview' with Python 3 (see also
+https://sourceware.org/gdb/onlinedocs/gdb/Inferiors-In-Python.html)
 
-are available in the Git repository at:
+The elf.add_vmcoreinfo_note() method expects a "bytes" object. Wrap
+the returned memory with bytes(), which works with both 'memoryview'
+and 'buffer'.
 
-  https://github.com/elmarco/qemu.git tags/dump-pull-request
+Fixes a regression introduced with commit
+d23bfa91b7789534d16ede6cb7d925bfac3f3c4c ("add vmcoreinfo").
 
-for you to fetch changes up to 6f49ec4034e55dfb675a56a62c9579384f7fb8cc:
-
-  dump-guest-memory.py: fix python 2 support (2018-01-20 20:59:00 +0100)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Marc-Andr=C3=A9 Lureau (1):
-  dump-guest-memory.py: fix python 2 support
-
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
  scripts/dump-guest-memory.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 09bec92b50..03fbf69f8a 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -564,7 +564,7 @@ shape and this command should mostly work."""
+=20
+         vmcoreinfo =3D self.phys_memory_read(addr, size)
+         if vmcoreinfo:
+-            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
++            self.elf.add_vmcoreinfo_note(bytes(vmcoreinfo))
+=20
+     def invoke(self, args, from_tty):
+         """Handles command invocation from gdb."""
 --=20
 2.16.0.rc1.1.gef27df75a1
