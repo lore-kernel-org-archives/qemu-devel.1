@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ecged-0004tQ-Ot
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:05:07 -0500
+	(envelope-from <cota@braap.org>) id 1ecgem-000528-Pn
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:05:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ecgeZ-00028K-GI
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:05:03 -0500
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:46611)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ecgeZ-00026A-0k
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:04:59 -0500
-Received: by mail-pf0-x236.google.com with SMTP id y5so2526525pff.13
-	for <qemu-devel@nongnu.org>; Fri, 19 Jan 2018 16:04:58 -0800 (PST)
-References: <20171215062914.27927-1-aik@ozlabs.ru>
-	<3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
-	<20180105082916.480132af@t450s.home>
-	<51ac953b-da09-94ed-41a4-ae75ca045c5e@ozlabs.ru>
-	<20180118145920.2dd19c9a@w520.home>
-	<cff09fdb-a378-5bc4-932a-805ad69fe6b6@ozlabs.ru>
-	<20180119085731.60dafe0d@w520.home>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <0e9ea975-dcbf-f786-ab66-81f7d264d5d2@ozlabs.ru>
-Date: Sat, 20 Jan 2018 11:04:50 +1100
+	(envelope-from <cota@braap.org>) id 1ecgej-0002Lq-BX
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:05:12 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:39015)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1ecgei-0002Ig-Uy
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:05:09 -0500
+Date: Fri, 19 Jan 2018 19:05:06 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180120000506.GA3859@flamenco>
+References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
+	<20180112171416.6048ae9e@bahia.lan>
+	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
+	<20180119112733.4a9dd43f@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180119085731.60dafe0d@w520.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX
- BAR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180119112733.4a9dd43f@bahia.lan>
+Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,333 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Cc: Antonios Motakis <antonios.motakis@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Veaceslav Falico <veaceslav.falico@huawei.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, Eduard Shishkin <Eduard.Shishkin@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei (CR)" <zhangwei555@huawei.com>
 
-On 20/01/18 02:57, Alex Williamson wrote:
-> On Fri, 19 Jan 2018 19:55:49 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Fri, Jan 19, 2018 at 11:27:33 +0100, Greg Kurz wrote:
+> On Mon, 15 Jan 2018 11:49:31 +0800
+> Antonios Motakis <antonios.motakis@huawei.com> wrote:
+> > On 13-Jan-18 00:14, Greg Kurz wrote:
+> > > On Fri, 12 Jan 2018 19:32:10 +0800
+> > > Antonios Motakis <antonios.motakis@huawei.com> wrote:
+(snip)
+> > >> To avoid this situation, the device id of a file needs to be also taken as
+> > >> input for generating a qid path. Unfortunately, the size of both inode
+> > >> nr + device id together would be 96 bits, while we have only 64 bits
+> > >> for the qid path, so we can't just append them and call it a day :(
+(snip)
+> > >>
+> > >> We have thought of a few approaches, but we would definitely like to hear
+> > >> what the upstream maintainers and community think:
+(snip)
+> > >> * Fallback and/or interim solutions
+(snip)
+> > >> 3. other ideas, such as allocating new qid paths and keep a look up table of some sorts (possibly too expensive)
+> > >>  
+> > > 
+> > > This would be acceptable for fallback.  
+> > 
+> > Maybe we can use the QEMU hash table (https://github.com/qemu/qemu/blob/master/util/qht.c) but I wonder
+> > if it scales to millions of entries. Do you think it is appropriate in this case?
 > 
->> On 19/01/18 08:59, Alex Williamson wrote:
->>> On Tue, 16 Jan 2018 16:17:58 +1100
->>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>>   
->>>> On 06/01/18 02:29, Alex Williamson wrote:  
->>>>> On Fri, 5 Jan 2018 10:48:07 +0100
->>>>> Auger Eric <eric.auger@redhat.com> wrote:
->>>>>     
->>>>>> Hi Alexey,
->>>>>>
->>>>>> On 15/12/17 07:29, Alexey Kardashevskiy wrote:    
->>>>>>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
->>>>>>> which tells that a region with MSIX data can be mapped entirely, i.e.
->>>>>>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
->>>>>>>
->>>>>>> With this change, all BARs are mapped in a single chunk and MSIX vectors
->>>>>>> are emulated on top unless the machine requests not to by defining and
->>>>>>> enabling a new "vfio-no-msix-emulation" property. At the moment only
->>>>>>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
->>>>>>> enabling it as it does not define the "set" callback for the new property;
->>>>>>> the new property also does not appear in "-machine pseries,help".
->>>>>>>
->>>>>>> If the new capability is present, this puts MSIX IO memory region under
->>>>>>> mapped memory region. If the capability is not there, it falls back to
->>>>>>> the old behaviour with the sparse capability.
->>>>>>>
->>>>>>> In MSIX vectors section is not aligned to the page size, the KVM memory
->>>>>>> listener does not register it with the KVM as a memory slot and MSIX is
->>>>>>> emulated by QEMU as before.
->>>>>>>
->>>>>>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
->>>>>>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
->>>>>>>
->>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>>>>> ---
->>>>>>>
->>>>>>> This is mtree and flatview BEFORE this patch:
->>>>>>>
->>>>>>> "info mtree":
->>>>>>> memory-region: pci@800000020000000.mmio
->>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
->>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
->>>>>>>       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
->>>>>>>       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
->>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
->>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
->>>>>>>
->>>>>>> "info mtree -f":
->>>>>>> FlatView #0
->>>>>>>  AS "memory", root: system
->>>>>>>  AS "cpu-memory", root: system
->>>>>>>  Root memory region: system
->>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
->>>>>>>   0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
->>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
->>>>>>>   000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
->>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
->>>>>>>
->>>>>>>
->>>>>>>
->>>>>>> This is AFTER this patch applied:
->>>>>>>
->>>>>>> "info mtree":
->>>>>>> memory-region: pci@800000020000000.mmio
->>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
->>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
->>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
->>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
->>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
->>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
->>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
->>>>>>>
->>>>>>>
->>>>>>> "info mtree -f":
->>>>>>> FlatView #2
->>>>>>>  AS "memory", root: system
->>>>>>>  AS "cpu-memory", root: system
->>>>>>>  Root memory region: system
->>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
->>>>>>>   0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
->>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
->>>>>>>
->>>>>>>
->>>>>>>
->>>>>>> This is AFTER this patch applied AND spapr_get_msix_emulation() patched
->>>>>>> to enable emulation:
->>>>>>>
->>>>>>> "info mtree":
->>>>>>> memory-region: pci@800000020000000.mmio
->>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
->>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
->>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
->>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
->>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
->>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
->>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
->>>>>>>
->>>>>>> "info mtree -f":
->>>>>>> FlatView #1
->>>>>>>  AS "memory", root: system
->>>>>>>  AS "cpu-memory", root: system
->>>>>>>  Root memory region: system
->>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
->>>>>>>   0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
->>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
->>>>>>>   000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
->>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
->>>>>>> ---
->>>>>>>  include/hw/vfio/vfio-common.h |  1 +
->>>>>>>  linux-headers/linux/vfio.h    |  5 +++++
->>>>>>>  hw/ppc/spapr.c                |  8 ++++++++
->>>>>>>  hw/vfio/common.c              | 15 +++++++++++++++
->>>>>>>  hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
->>>>>>>  5 files changed, 50 insertions(+), 2 deletions(-)
->>>>>>>
->>>>>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->>>>>>> index f3a2ac9..927d600 100644
->>>>>>> --- a/include/hw/vfio/vfio-common.h
->>>>>>> +++ b/include/hw/vfio/vfio-common.h
->>>>>>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
->>>>>>>                           struct vfio_region_info **info);
->>>>>>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
->>>>>>>                               uint32_t subtype, struct vfio_region_info **info);
->>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
->>>>>>>  #endif
->>>>>>>  extern const MemoryListener vfio_prereg_listener;
->>>>>>>  
->>>>>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
->>>>>>> index 4312e96..b45182e 100644
->>>>>>> --- a/linux-headers/linux/vfio.h
->>>>>>> +++ b/linux-headers/linux/vfio.h
->>>>>>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
->>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
->>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
->>>>>>>  
->>>>>>> +/*
->>>>>>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
->>>>>>> + */
->>>>>>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
->>>>>>> +
->>>>>>>  /**
->>>>>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
->>>>>>>   *				    struct vfio_irq_info)
->>>>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>>>>> index 9de63f0..693394a 100644
->>>>>>> --- a/hw/ppc/spapr.c
->>>>>>> +++ b/hw/ppc/spapr.c
->>>>>>> @@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
->>>>>>>      spapr->use_hotplug_event_source = value;
->>>>>>>  }
->>>>>>>  
->>>>>>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
->>>>>>> +{
->>>>>>> +    return true;
->>>>>>> +}
->>>>>>> +
->>>>>>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
->>>>>>>  {
->>>>>>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
->>>>>>> @@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
->>>>>>>      object_property_set_description(obj, "vsmt",
->>>>>>>                                      "Virtual SMT: KVM behaves as if this were"
->>>>>>>                                      " the host's SMT mode", &error_abort);
->>>>>>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
->>>>>>> +                             spapr_get_msix_emulation, NULL, NULL);
->>>>>>>  }
->>>>>>>  
->>>>>>>  static void spapr_machine_finalizefn(Object *obj)
->>>>>>> @@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
->>>>>>>  /*
->>>>>>>   * pseries-2.11
->>>>>>>   */
->>>>>>> +
->>>>>>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
->>>>>>>  {
->>>>>>>  }
->>>>>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->>>>>>> index 1fb8a8e..da5f182 100644
->>>>>>> --- a/hw/vfio/common.c
->>>>>>> +++ b/hw/vfio/common.c
->>>>>>> @@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
->>>>>>>      return -ENODEV;
->>>>>>>  }
->>>>>>>  
->>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
->>>>>>> +{
->>>>>>> +    struct vfio_region_info *info = NULL;
->>>>>>> +    bool ret = false;
->>>>>>> +
->>>>>>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
->>>>>>> +        if (vfio_get_region_info_cap(info, cap_type)) {
->>>>>>> +            ret = true;
->>>>>>> +        }
->>>>>>> +        g_free(info);
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    return ret;
->>>>>>> +}
->>>>>>> +
->>>>>>>  /*
->>>>>>>   * Interfaces for IBM EEH (Enhanced Error Handling)
->>>>>>>   */
->>>>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->>>>>>> index c977ee3..27a3706 100644
->>>>>>> --- a/hw/vfio/pci.c
->>>>>>> +++ b/hw/vfio/pci.c
->>>>>>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
->>>>>>>      off_t start, end;
->>>>>>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
->>>>>>>  
->>>>>>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
->>>>>>> +                            vdev->msix->table_bar)) {
->>>>>>> +        return;
->>>>>>> +    }      
->>>>>>
->>>>>> I am testing this patch on ARM with a Mellanox CX-4 card. Single bar0 +
->>>>>> msix table at 0x2000, using 64kB pages.
->>>>>>
->>>>>> 0000000000000000-0000000001ffffff (prio 1, i/o): 0000:01:00.0 BAR 0
->>>>>>  0000000000000000-0000000001ffffff (prio 0, ramd): 0000:01:00.0 BAR 0
->>>>>> mmaps[0]
->>>>>>   0000000000002000-00000000000023ff (prio 0, i/o): msix-table
->>>>>>   0000000000003000-0000000000003007 (prio 0, i/o): msix-pba [disabled]
->>>>>>
->>>>>>
->>>>>> My kernel includes your "vfio-pci: Allow mapping MSIX BAR" so we bypass
->>>>>> vfio_pci_fixup_msix_region. But as the mmaps[0] is not fixed up the
->>>>>> vfio_listener_region_add_ram gets called on the first 8kB which cannot
->>>>>> be mapped with 64kB page, leading to a qemu abort.
->>>>>>
->>>>>> 29520@1515145231.232161:vfio_listener_region_add_ram region_add [ram]
->>>>>> 0x8000000000 - 0x8000001fff [0xffffa8820000]
->>>>>> qemu-system-aarch64: VFIO_MAP_DMA: -22
->>>>>> qemu-system-aarch64: vfio_dma_map(0x1e265f60, 0x8000000000, 0x2000,
->>>>>> 0xffffa8820000) = -22 (Invalid argument)
->>>>>> qemu: hardware error: vfio: DMA mapping failed, unable to continue
->>>>>>
->>>>>> In my case don't we still need the fixup logic?    
->>>>>
->>>>> Ah, I didn't realize you had Alexey's QEMU patch when you asked about
->>>>> this.  I'd say no, the fixup shouldn't be needed, but apparently we
->>>>> can't remove it until we figure out this bug and who should be filtering
->>>>> out sub-page size listener events.  Thanks,    
->>>>
->>>>
->>>> This should do it:
->>>>
->>>> @@ -303,11 +303,19 @@ static bool
->>>> vfio_listener_skipped_section(MemoryRegionSection *section)
->>>>              * Sizing an enabled 64-bit BAR can cause spurious mappings to
->>>>              * addresses in the upper part of the 64-bit address space.  These
->>>>              * are never accessed by the CPU and beyond the address width of
->>>>              * some IOMMU hardware.  TODO: VFIO should tell us the IOMMU width.
->>>>              */
->>>> -           section->offset_within_address_space & (1ULL << 63);
->>>> +           section->offset_within_address_space & (1ULL << 63) ||
->>>> +           /*
->>>> +            * Non-system-page aligned RAM regions have no chance to be
->>>> +            * DMA mapped so skip them too.
->>>> +            */
->>>> +           (memory_region_is_ram(section->mr) &&
->>>> +            ((section->offset_within_region & qemu_real_host_page_mask) ||
->>>> +             (int128_getlo(section->size) & qemu_real_host_page_mask))
->>>> +           );
->>>>  }
->>>>
->>>>
->>>> Do we VFIO DMA map on every RAM MR just because it is not necessary to have
->>>> more complicated logic to detect whether it is MMIO? Or there is something
->>>> bigger?  
->>>
->>> Both, a) it's not clear how we determine a MR is MMIO vs RAM, thus the
->>> silly address hack above to try to exclude PCI BARs as they're being
->>> resized, and b) there is some value to enabling peer-to-peer mappings
->>> between devices.  Is there a better, more generic solution to a) now?
->>> If we know a MR is MMIO, then I think we can handle any associated
->>> mapping failure as non-fatal.  It's nice to enable p2p, but it's barely
->>> used and not clear that it works reliably (sometimes even on bare
->>> metal).   
->>
->> When P2P works in a guest, what does it look like exactly? Do the devices
->> talk via the IOMMU or directly? I'd assume the latter but then the guest
->> device driver needs to know physical MMIO addresses and it does not or
->> guest must program BARs exactly as the host did... Has anyone actually
->> reported this working?
-> 
-> I've seen it work, NVIDIA has a peer to peer test in their cuda tests,
-> see previous patches enabling GPUDirect.  The route is generally
-> through the IOMMU, guests don't know host physical addresses.  I say
-> generally though because ACS does have a Directed Translated P2P
-> feature that would allow a more efficient path, but I've never seen
-> anything that can take advantage of this.
+> I don't know QHT, hence Cc'ing Emilio for insights.
 
-Ah, I see. I guess it still makes sense with IOMMU as it eliminates an
-extra memory copy.
+QHT stores a 32-bit hash per entry, so with perfect hashing one wouldn't
+see collisions (and the subsequent performance drop) below 2**32 entries.
+So yes, millions of entries are supported.
 
->  
->> I just tried exposing MMIO on a PCI AS ("[PATCH qemu] spapr_pci: Alias MMIO
->> windows to PHB address space") and ended up having
->> vfio_listener_region_add() called with RAM regions (which are mapped MMIO)
->> and sPAPR cannot handle it otherwise than creating a window per a memory
->> section and since we can have just two, this fails. Adding
->> memory_region_is_ram_device() to vfio_listener_skipped_section() solves my
->> particular problem but I wonder if I should rather enable this P2P on sPAPR?
-> 
-> Yeah, as mentioned it'd be nice to at least make ram_device (ie. MMIO)
-> mappings non-fatal.  I think there's probably enough skepticism in
-> drivers as to whether p2p works that this isn't as critical.  Of course
-> making it work is even better.  Thanks,
+Wrt memory overhead, each entry takes 12 bytes on 64-bit hosts
+and 8 bytes on 32-bit hosts (pointer + hash). However, we have to account
+for empty or partially filled buckets, as well as bucket overhead (header,
+tail and lock), so on 64-bit we can approximate the overhead to 32 bytes
+per entry. Given that inode sizes are >128 bytes, memory overhead
+[size(ht) / size(index)] would be at most 25%. (See below for some
+suggestions to lower this.)
 
-Well, to make P2P-via-IOMMU work on sPAPR (assuming that our IOMMU can
-actually redirect back to the bus which I am not sure about), these MMIOs
-need to me mapped via the huge DMA window by the guest and not by QEMU-VFIO
-so sPAPR will need another machine option ("no-mmio-dma-mmap"? implemented
-like "vfio-no-msix-emulation" proposed by this patch) to tell
-vfio_listener_region_add() not to vfio_dma_map on MMIO MRs,
-vfio_listener_region_del() will need adjustment too. Would that be
-considered as an option or there is a better interface?
+> > I was thinking on how to implement something like this, without having to maintain
+> > millions of entries... One option we could consider is to split the bits into a
+> > directly-mapped part, and a lookup part. For example:
+> > 
+> > Inode =
+> > [ 10 first bits ] + [ 54 lowest bits ]
+> > 
+> > A hash table maps [ inode 10 first bits ] + [ device id ] => [ 10 bit prefix ]
+> > The prefix is uniquely allocated for each input.
+> > 
+> > Qid path = 
+> > [ 10 bit prefix ] + [ inode 54 lowest bits ]
+> > 
+> > Since inodes are not completely random, and we usually have a handful of device IDs,
+> > we get a much smaller number of entries to track in the hash table.
+> > 
+> > So what this would give:
+> > (1)	Would be faster and take less memory than mapping the full inode_nr,devi_id
+> > tuple to unique QID paths
+> > (2)	Guaranteed not to run out of bits when inode numbers stay below the lowest
+> > 54 bits and we have less than 1024 devices.
+> > (3)	When we get beyond this this limit, there is a chance we run out of bits to
+> > allocate new QID paths, but we can detect this and refuse to serve the offending
+> > files instead of allowing a collision.
+> > 
+> > We could tweak the prefix size to match the scenarios that we consider more likely,
+> > but I think close to 10-16 bits sounds reasonable enough. What do you think?
 
+Assuming assumption (2) is very likely to be true, I'd suggest
+dropping the intermediate hash table altogether, and simply refuse
+to work with any files that do not meet (2).
 
+That said, the naive solution of having a large hash table with all entries
+in it might be worth a shot. With QHT and a good hash function
+like xxhash, you'd support parallel lookups and at worst it'd add
+an extra last-level cache miss per file operation (~300 cycles),
+which on average would be dwarfed by the corresponding I/O latency.
 
--- 
-Alexey
+This should be easy to implement and benchmark, so I think it is
+worth trying -- you might not need to fiddle with the protocol
+after all.
+
+BTW since hashing here would be very simple, we could have a variant
+of QHT where only pointers are kept in the buckets, thereby lowering
+memory overhead. We could also play with the resizing algorithm to
+make it less aggresive so that we end up with less (and fuller) buckets.
+
+Thanks,
+
+		E.
