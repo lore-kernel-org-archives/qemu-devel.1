@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1ecgue-0001wA-Mb
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:22:03 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ech3Q-0004No-AA
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1ecguA-0007ZT-0o
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:21:36 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:46782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jack.schwartz@oracle.com>)
-	id 1ecgu9-0007Uo-GC
-	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:21:05 -0500
-References: <1513877118-3149-1-git-send-email-jack.schwartz@oracle.com>
-	<20180115155413.GJ32271@localhost.localdomain>
-	<2f56a075-ba01-4329-b46c-33b3d40000cb@oracle.com>
-	<CAOMFOmXs17F4WnLZ_ThvYoNDO7R557vf3QNHSYq6RR_WvkL3uA@mail.gmail.com>
-From: Jack Schwartz <jack.schwartz@oracle.com>
-Message-ID: <ce8aad47-a63f-f5ba-2a56-7f3a18a44ab8@oracle.com>
-Date: Fri, 19 Jan 2018 16:18:07 -0800
+	(envelope-from <jsnow@redhat.com>) id 1ech2q-0004f9-5C
+	for qemu-devel@nongnu.org; Fri, 19 Jan 2018 19:30:40 -0500
+References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+	<20180116125427.18540-5-vsementsov@virtuozzo.com>
+	<6688fdd4-c820-89c7-3e39-84e9ccfb0bbf@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <f4db110c-6ccb-914a-5966-baa2611b62c4@redhat.com>
+Date: Fri, 19 Jan 2018 19:28:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAOMFOmXs17F4WnLZ_ThvYoNDO7R557vf3QNHSYq6RR_WvkL3uA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <6688fdd4-c820-89c7-3e39-84e9ccfb0bbf@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH QEMU v1 0/4] multiboot: bss_end_addr can be
- zero / cleanup
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] qmp: transaction support for
+ block-dirty-bitmap-enable/disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +26,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>, Kevin Wolf <kwolf@redhat.com>, berrange@redhat.com
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, daniel.kiper@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-Hi Anatol, Daniel and Kevin.
 
-On 01/19/18 10:36, Anatol Pomozov wrote:
-> Hello Jack
->
-> On Wed, Jan 17, 2018 at 12:06 PM, Jack Schwartz
-> <jack.schwartz@oracle.com> wrote:
->> Hi Kevin and Anatol.
->>
->> Kevin, thanks for your review.
->>
->> More inline below...
->>
->> On 01/15/18 07:54, Kevin Wolf wrote:
->>> Am 21.12.2017 um 18:25 hat Jack Schwartz geschrieben:
->>>> Properly account for the possibility of multiboot kernels with a zer=
-o
->>>> bss_end_addr.  The Multiboot Specification, section 3.1.3 allows for
->>>> kernels without a bss section, by allowing a zeroed bss_end_addr
->>>> multiboot
->>>> header field.
->>>>
->>>> Do some cleanup to multiboot.c as well:
->>>> - Remove some unused variables.
->>>> - Use more intuitive header names when displaying fields in messages.
->>>> - Change fprintf(stderr...) to error_report
->>> There are some conflicts with Anatol's (CCed) multiboot series:
->>> https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03003.htm=
-l
->>>
->>> None if these should be hard to resolve, but it would be good if you
->>> could agree with each other whose patch series should come first, and
->>> then the other one should be rebased on top of that.
->> Anatol,
->>
->> from my side, there are pros and cons to either patch set going in fir=
-st,
->> but advantages to either are pretty negligible.  Pro for you going fir=
-st: I
->> can use the constants you will define in header files.  Pro for me goi=
-ng
->> first: your merge should be about the same as if you went first (since=
- my
->> changes are small, more localized and affect only multiboot.c) and my =
-merge
->> will be easier.
->>
->> What are your thoughts?
-> Please move ahead with your patches. I'll rebase my changes on top of y=
-ours.
-OK.=C2=A0 I'm consulting with my company's legal department and waiting f=
-or=20
-their approvals for delivery of a test "kernel".=C2=A0 I'll get in touch =
-will=20
-everyone once I have an answer about that.=C2=A0 I anticipate about a wee=
-k=20
-before taking next steps to deliver.
 
-Kevin and Daniel, thanks for your inputs on this issue (different=20
-subthread), which I have forwarded to our legal department for review.
+On 01/17/2018 10:06 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 16.01.2018 15:54, Vladimir Sementsov-Ogievskiy wrote:
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>> =C2=A0 qapi/transaction.json |=C2=A0 4 +++
+>> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 79
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++
+>> =C2=A0 2 files changed, 83 insertions(+)
+>>
+>> diff --git a/qapi/transaction.json b/qapi/transaction.json
+>> index bd312792da..b643d848f8 100644
+>> --- a/qapi/transaction.json
+>> +++ b/qapi/transaction.json
+>> @@ -46,6 +46,8 @@
+>> =C2=A0 # - @abort: since 1.6
+>> =C2=A0 # - @block-dirty-bitmap-add: since 2.5
+>> =C2=A0 # - @block-dirty-bitmap-clear: since 2.5
+>> +# - @block-dirty-bitmap-enable: since 2.12
+>> +# - @block-dirty-bitmap-disable: since 2.12
+>> =C2=A0 # - @blockdev-backup: since 2.3
+>> =C2=A0 # - @blockdev-snapshot: since 2.5
+>> =C2=A0 # - @blockdev-snapshot-internal-sync: since 1.7
+>> @@ -59,6 +61,8 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'abort': 'Abort',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-a=
+dd': 'BlockDirtyBitmapAdd',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-c=
+lear': 'BlockDirtyBitmap',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-enable': 'Bl=
+ockDirtyBitmap',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-disable': 'B=
+lockDirtyBitmap',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blockdev-backup': 'B=
+lockdevBackup',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blockdev-snapshot': =
+'BlockdevSnapshot',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blockdev-snapshot-in=
+ternal-sync': 'BlockdevSnapshotInternal',
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 997a6f514c..d338363d78 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -1962,6 +1962,7 @@ typedef struct BlockDirtyBitmapState {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AioContext *aio_context;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HBitmap *backup;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool prepared;
+>> +=C2=A0=C2=A0=C2=A0 bool was_enabled;
+>> =C2=A0 } BlockDirtyBitmapState;
+>> =C2=A0 =C2=A0 static void block_dirty_bitmap_add_prepare(BlkActionStat=
+e *common,
+>> @@ -2069,6 +2070,74 @@ static void
+>> block_dirty_bitmap_clear_clean(BlkActionState *common)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 }
+>> =C2=A0 +static void block_dirty_bitmap_enable_prepare(BlkActionState *=
+common,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 BlockDirtyBitmap *action;
+>> +=C2=A0=C2=A0=C2=A0 BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDi=
+rtyBitmapState,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 common, common);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (action_check_completion_mode(common, errp) < 0=
+) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 action =3D common->action->u.block_dirty_bitmap_en=
+able.data;
+>> +=C2=A0=C2=A0=C2=A0 state->bitmap =3D block_dirty_bitmap_lookup(action=
+->node,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 action->name,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &state->bs,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 errp);
+>> +=C2=A0=C2=A0=C2=A0 if (!state->bitmap) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 state->was_enabled =3D bdrv_dirty_bitmap_enabled(s=
+tate->bitmap);
+>> +=C2=A0=C2=A0=C2=A0 bdrv_enable_dirty_bitmap(state->bitmap);
+>> +}
+>> +
+>> +static void block_dirty_bitmap_enable_abort(BlkActionState *common)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDi=
+rtyBitmapState,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 common, common);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (!state->was_enabled) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_disable_dirty_bitmap(=
+state->bitmap);
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +}
+>> +
+>> +static void block_dirty_bitmap_disable_prepare(BlkActionState *common=
+,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 BlockDirtyBitmap *action;
+>> +=C2=A0=C2=A0=C2=A0 BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDi=
+rtyBitmapState,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 common, common);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (action_check_completion_mode(common, errp) < 0=
+) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 action =3D common->action->u.block_dirty_bitmap_di=
+sable.data;
+>> +=C2=A0=C2=A0=C2=A0 state->bitmap =3D block_dirty_bitmap_lookup(action=
+->node,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 action->name,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &state->bs,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 errp);
+>> +=C2=A0=C2=A0=C2=A0 if (!state->bitmap) {
 
- =C2=A0=C2=A0=C2=A0 Thanks,
- =C2=A0=C2=A0=C2=A0 Jack
->
->>> Testing:
->>>     1) Ran the "make check" test suite.
->>>     2) Booted multiboot kernel with bss_end_addr=3D0.  (I rolled my o=
-wn
->>>        grub multiboot.elf test "kernel" by modifying source.)  Verifi=
-ed
->>>        with gdb that new code that reads addresses/offsets from multi=
-boot
->>>        header was accessed.
->>>     3) Booted multiboot kernel with non-zero bss_end_addr.
->>>     4) Uncommented DEBUG_MULTIBOOT in multiboot.c and verified messag=
-es
->>> worked.
->>>     5) Code has soaked in an internal repo for two months.
->>> Can you integrate your test kernel from 2) in tests/multiboot/ so we =
-can
->>> keep this as a regression test?
->> Kevin and alias,
->>
->> Before I proceed with adding my multiboot test file, I'll clarify here=
- that
->> I started with a version from the grub2 tree.  In that file I expanded=
- a
->> header file, also from the same tree.  Neither file had any license he=
-ader,
->> though the tree I got them from (Dated October 2017) contains the GNU =
-GPLv3
->> license file.
->>
->> I'll need to check with my company before I can say I can deliver this=
- file.
->> If I deliver it, I'll add a header stating the GPL license, that it ca=
-me
->> from grub2 and to check its repository for contributors.
->>>> Jack Schwartz (4):
->>>>     multiboot: bss_end_addr can be zero
->>>>     multiboot: Remove unused variables from multiboot.c
->>>>     multiboot: Use header names when displaying fields
->>>>     multiboot: fprintf(stderr...) -> error_report()
->>> Apart from the conflicts, the patches look good to me.
->>      Thanks,
->>      Jack
->>>
->>> Kevin
->>>
+&state->bs should be NULL if we're not going to use it. If we're going
+to use it, we should check the error condition here because it might fail=
+.
+
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 state->was_enabled =3D bdrv_dirty_bitmap_enabled(s=
+tate->bitmap);
+>> +=C2=A0=C2=A0=C2=A0 bdrv_disable_dirty_bitmap(state->bitmap);
+>=20
+> hm. actually, I just make it like _clear is made. But now I doubt,
+> why do we need disable here? we can disable in commit, and do not need
+> state->was_enabled..
+>=20
+
+You need to make sure that there is no way for bdrv_disable_dirty_bitmap
+to fail, so you need to add that frozen check in. Then you're alright,
+and you can move the actual disable portion to the commit, and get rid
+of the undo call.
+
+Or, we can even do this kind of trick to remove the redundant error
+checking:
+
+void qmp_block_dirty_bitmap_enable(const char *node, const char *name,
+                                   Error **errp)
+{
+    BlockDirtyBitmap data =3D {
+	.node =3D node,
+        .name =3D name
+    };
+    TransactionAction action =3D {
+        .type =3D TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_ENABLE,
+	.u.block_dirty_bitmap_enable.data =3D &data,
+    };
+    blockdev_do_action(&action, errp);
+}
+
+static void block_dirty_bitmap_enable_prepare(BlkActionState *common,
+                                              Error **errp)
+{
+    BlockDirtyBitmap *action;
+    BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDirtyBitmapState,
+                                             common, common);
+
+    if (action_check_completion_mode(common, errp) < 0) {
+	return;
+    }
+
+    action =3D common->action->u.block_dirty_bitmap_enable.data;
+    state->bitmap =3D block_dirty_bitmap_lookup(action->node,
+                                              action->name,
+                                              NULL,
+                                              errp);
+    if (!state->bitmap) {
+        return;
+    }
+
+    if (bdrv_dirty_bitmap_frozen(state->bitmap)) {
+        error_setg(errp, "Bitmap '%s' is currently frozen and cannot be
+                         " enabled", name);
+        return;
+    }
+}
+
+static void block_dirty_bitmap_enable_commit(BlkActionState *common,
+                                              Error **errp)
+{
+    ...blah...
+    bdrv_dirty_bitmap_enable(state->bitmap);
+}
+
+You can do the same for disable.
+
+> and for _clear, we not to clear bitmap in commit? and then, we do not n=
+eed
+> bdrv_undo_clear_dirty_bitmap at all?
+>=20
+
+Yeah, you can apply the same technique here too. You can consolidate the
+error checking in .prepare(), then recycle that error checking for the
+standalone QMP command.
+
+Then we can be assured we're not missing a safeguard in the transaction
+version, and it should be safe to move the action to the commit phase,
+because _enable, _disable, and _clear all cannot actually fail.
+
+Then you can get rid of the state->backup state, too, and the extra
+argument to bdrv_clear_dirty_bitmap.
+
+Nice!
+
+> or what do I miss? if nothing, I'll respin the series including _clear
+> refactoring.
+>=20
+
+Just pay heed to the error checking in .prepare(), and make sure the
+error checking is identical between the QMP and transactional versions.
+
+>> +}
+>> +
+>> +static void block_dirty_bitmap_disable_abort(BlkActionState *common)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 BlockDirtyBitmapState *state =3D DO_UPCAST(BlockDi=
+rtyBitmapState,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 common, common);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (state->was_enabled) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_enable_dirty_bitmap(s=
+tate->bitmap);
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +}
+>> +
+>> =C2=A0 static void abort_prepare(BlkActionState *common, Error **errp)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Transaction aborted u=
+sing Abort action");
+>> @@ -2130,6 +2199,16 @@ static const BlkActionOps actions[] =3D {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .commit =3D blo=
+ck_dirty_bitmap_clear_commit,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .abort =3D bloc=
+k_dirty_bitmap_clear_abort,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .clean =3D bloc=
+k_dirty_bitmap_clear_clean,
+>> +=C2=A0=C2=A0=C2=A0 },
+>> +=C2=A0=C2=A0=C2=A0 [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_ENABLE=
+] =3D {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_size =3D sizeof(=
+BlockDirtyBitmapState),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .prepare =3D block_dirty_b=
+itmap_enable_prepare,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .abort =3D block_dirty_bit=
+map_enable_abort,
+>> +=C2=A0=C2=A0=C2=A0 },
+>> +=C2=A0=C2=A0=C2=A0 [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_DISABL=
+E] =3D {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_size =3D sizeof(=
+BlockDirtyBitmapState),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .prepare =3D block_dirty_b=
+itmap_disable_prepare,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .abort =3D block_dirty_bit=
+map_disable_abort,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 };
+>> =C2=A0=20
+>=20
+>=20
+
+Thanks!
