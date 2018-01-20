@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ecvJn-0004Tr-8G
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:32 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ecvJp-0004VO-Fx
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ecvJm-0008Rj-6u
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:31 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ecvJo-00005a-FT
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:33 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 20 Jan 2018 16:44:09 +0100
-Message-Id: <20180120154412.9990-4-mreitz@redhat.com>
+Date: Sat, 20 Jan 2018 16:44:10 +0100
+Message-Id: <20180120154412.9990-5-mreitz@redhat.com>
 In-Reply-To: <20180120154412.9990-1-mreitz@redhat.com>
 References: <20180120154412.9990-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] qapi: Remove qobject_to_X() functions
+Subject: [Qemu-devel] [PATCH v2 4/6] qapi: Make more of qobject_to()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,191 +22,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-They are no longer needed now.
+This patch reworks some places which use either qobject_type() checks
+plus qobject_to(), where the latter alone is sufficient, or NULL checks
+plus qobject_type() checks where we can simply do a qobject_to() != NULL
+check.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qapi/qmp/qbool.h   |  1 -
- include/qapi/qmp/qdict.h   |  1 -
- include/qapi/qmp/qlist.h   |  1 -
- include/qapi/qmp/qnum.h    |  1 -
- include/qapi/qmp/qstring.h |  1 -
- qobject/qbool.c            | 11 -----------
- qobject/qdict.c            | 11 -----------
- qobject/qlist.c            | 11 -----------
- qobject/qnum.c             | 11 -----------
- qobject/qstring.c          | 11 -----------
- 10 files changed, 60 deletions(-)
+ qapi/qobject-input-visitor.c |  4 ++--
+ qobject/json-parser.c        | 13 +++++++------
+ qobject/qdict.c              | 20 +++++++++++---------
+ 3 files changed, 20 insertions(+), 17 deletions(-)
 
-diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
-index f77ea86c4e..63e2918041 100644
---- a/include/qapi/qmp/qbool.h
-+++ b/include/qapi/qmp/qbool.h
-@@ -23,7 +23,6 @@ typedef struct QBool {
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 45e6160b21..fa6b92d9f6 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -334,7 +334,7 @@ static GenericList *qobject_input_next_list(Visitor *v, GenericList *tail,
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
  
- QBool *qbool_from_bool(bool value);
- bool qbool_get_bool(const QBool *qb);
--QBool *qobject_to_qbool(const QObject *obj);
- bool qbool_is_equal(const QObject *x, const QObject *y);
- void qbool_destroy_obj(QObject *obj);
+-    assert(tos && tos->obj && qobject_type(tos->obj) == QTYPE_QLIST);
++    assert(tos && qobject_to(tos->obj, QList));
  
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index fc218e7be6..7dbe07dd85 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -42,7 +42,6 @@ void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
- void qdict_del(QDict *qdict, const char *key);
- int qdict_haskey(const QDict *qdict, const char *key);
- QObject *qdict_get(const QDict *qdict, const char *key);
--QDict *qobject_to_qdict(const QObject *obj);
- bool qdict_is_equal(const QObject *x, const QObject *y);
- void qdict_iter(const QDict *qdict,
-                 void (*iter)(const char *key, QObject *obj, void *opaque),
-diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
-index ec3fcc1a4c..979da8bc14 100644
---- a/include/qapi/qmp/qlist.h
-+++ b/include/qapi/qmp/qlist.h
-@@ -60,7 +60,6 @@ QObject *qlist_pop(QList *qlist);
- QObject *qlist_peek(QList *qlist);
- int qlist_empty(const QList *qlist);
- size_t qlist_size(const QList *qlist);
--QList *qobject_to_qlist(const QObject *obj);
- bool qlist_is_equal(const QObject *x, const QObject *y);
- void qlist_destroy_obj(QObject *obj);
+     if (!tos->entry) {
+         return NULL;
+@@ -348,7 +348,7 @@ static void qobject_input_check_list(Visitor *v, Error **errp)
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
  
-diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
-index c3d86794bb..56ca3c4658 100644
---- a/include/qapi/qmp/qnum.h
-+++ b/include/qapi/qmp/qnum.h
-@@ -68,7 +68,6 @@ double qnum_get_double(QNum *qn);
+-    assert(tos && tos->obj && qobject_type(tos->obj) == QTYPE_QLIST);
++    assert(tos && qobject_to(tos->obj, QList));
  
- char *qnum_to_string(QNum *qn);
- 
--QNum *qobject_to_qnum(const QObject *obj);
- bool qnum_is_equal(const QObject *x, const QObject *y);
- void qnum_destroy_obj(QObject *obj);
- 
-diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
-index 65c05a9be5..9293af9ac6 100644
---- a/include/qapi/qmp/qstring.h
-+++ b/include/qapi/qmp/qstring.h
-@@ -30,7 +30,6 @@ const char *qstring_get_str(const QString *qstring);
- void qstring_append_int(QString *qstring, int64_t value);
- void qstring_append(QString *qstring, const char *str);
- void qstring_append_chr(QString *qstring, int c);
--QString *qobject_to_qstring(const QObject *obj);
- bool qstring_is_equal(const QObject *x, const QObject *y);
- void qstring_destroy_obj(QObject *obj);
- 
-diff --git a/qobject/qbool.c b/qobject/qbool.c
-index 683d2b9b3f..91fc2ddcbb 100644
---- a/qobject/qbool.c
-+++ b/qobject/qbool.c
-@@ -40,17 +40,6 @@ bool qbool_get_bool(const QBool *qb)
-     return qb->value;
- }
- 
--/**
-- * qobject_to_qbool(): Convert a QObject into a QBool
-- */
--QBool *qobject_to_qbool(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QBOOL) {
--        return NULL;
--    }
--    return container_of(obj, QBool, base);
--}
--
- /**
-  * qbool_is_equal(): Test whether the two QBools are equal
+     if (tos->entry) {
+         error_setg(errp, "Only %u list elements expected in %s",
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 885039e94b..c4d1f0d8de 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -271,7 +271,8 @@ static void parser_context_free(JSONParserContext *ctxt)
   */
+ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
+ {
+-    QObject *key = NULL, *value;
++    QObject *value;
++    QString *key = NULL;
+     JSONToken *peek, *token;
+ 
+     peek = parser_context_peek_token(ctxt);
+@@ -280,8 +281,8 @@ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
+         goto out;
+     }
+ 
+-    key = parse_value(ctxt, ap);
+-    if (!key || qobject_type(key) != QTYPE_QSTRING) {
++    key = qobject_to(parse_value(ctxt, ap), QString);
++    if (!key) {
+         parse_error(ctxt, peek, "key is not a string in object");
+         goto out;
+     }
+@@ -303,14 +304,14 @@ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
+         goto out;
+     }
+ 
+-    qdict_put_obj(dict, qstring_get_str(qobject_to(key, QString)), value);
++    qdict_put_obj(dict, qstring_get_str(key), value);
+ 
+-    qobject_decref(key);
++    QDECREF(key);
+ 
+     return 0;
+ 
+ out:
+-    qobject_decref(key);
++    QDECREF(key);
+ 
+     return -1;
+ }
 diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 472d989a67..ca84455883 100644
+index ca84455883..3e97c2d3bc 100644
 --- a/qobject/qdict.c
 +++ b/qobject/qdict.c
-@@ -36,17 +36,6 @@ QDict *qdict_new(void)
-     return qdict;
- }
+@@ -861,18 +861,20 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
  
--/**
-- * qobject_to_qdict(): Convert a QObject into a QDict
-- */
--QDict *qobject_to_qdict(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QDICT) {
--        return NULL;
--    }
--    return container_of(obj, QDict, base);
--}
+         child = qdict_get(two_level, prefix);
+         if (suffix) {
+-            if (child) {
+-                if (qobject_type(child) != QTYPE_QDICT) {
++            QDict *child_dict = qobject_to(child, QDict);
++            if (!child_dict) {
++                if (child) {
+                     error_setg(errp, "Key %s prefix is already set as a scalar",
+                                prefix);
+                     goto error;
+                 }
+-            } else {
+-                child = QOBJECT(qdict_new());
+-                qdict_put_obj(two_level, prefix, child);
++
++                child_dict = qdict_new();
++                qdict_put_obj(two_level, prefix, QOBJECT(child_dict));
+             }
++
+             qobject_incref(ent->value);
+-            qdict_put_obj(qobject_to(child, QDict), suffix, ent->value);
++            qdict_put_obj(child_dict, suffix, ent->value);
+         } else {
+             if (child) {
+                 error_setg(errp, "Key %s prefix is already set as a dict",
+@@ -892,9 +894,9 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
+     multi_level = qdict_new();
+     for (ent = qdict_first(two_level); ent != NULL;
+          ent = qdict_next(two_level, ent)) {
 -
- /**
-  * tdb_hash(): based on the hash agorithm from gdbm, via tdb
-  * (from module-init-tools)
-diff --git a/qobject/qlist.c b/qobject/qlist.c
-index a8bd42e3de..b13a392fd5 100644
---- a/qobject/qlist.c
-+++ b/qobject/qlist.c
-@@ -128,17 +128,6 @@ size_t qlist_size(const QList *qlist)
-     return count;
- }
- 
--/**
-- * qobject_to_qlist(): Convert a QObject into a QList
-- */
--QList *qobject_to_qlist(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QLIST) {
--        return NULL;
--    }
--    return container_of(obj, QList, base);
--}
--
- /**
-  * qlist_is_equal(): Test whether the two QLists are equal
-  *
-diff --git a/qobject/qnum.c b/qobject/qnum.c
-index 18dcf27582..98893e06fb 100644
---- a/qobject/qnum.c
-+++ b/qobject/qnum.c
-@@ -201,17 +201,6 @@ char *qnum_to_string(QNum *qn)
-     return NULL;
- }
- 
--/**
-- * qobject_to_qnum(): Convert a QObject into a QNum
-- */
--QNum *qobject_to_qnum(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QNUM) {
--        return NULL;
--    }
--    return container_of(obj, QNum, base);
--}
--
- /**
-  * qnum_is_equal(): Test whether the two QNums are equal
-  *
-diff --git a/qobject/qstring.c b/qobject/qstring.c
-index ddfa8714dc..93b5f1814e 100644
---- a/qobject/qstring.c
-+++ b/qobject/qstring.c
-@@ -106,17 +106,6 @@ void qstring_append_chr(QString *qstring, int c)
-     qstring->string[qstring->length] = 0;
- }
- 
--/**
-- * qobject_to_qstring(): Convert a QObject to a QString
-- */
--QString *qobject_to_qstring(const QObject *obj)
--{
--    if (!obj || qobject_type(obj) != QTYPE_QSTRING) {
--        return NULL;
--    }
--    return container_of(obj, QString, base);
--}
--
- /**
-  * qstring_get_str(): Return a pointer to the stored string
-  *
+-        if (qobject_type(ent->value) == QTYPE_QDICT) {
+-            child = qdict_crumple(qobject_to(ent->value, QDict), errp);
++        QDict *dict = qobject_to(ent->value, QDict);
++        if (dict) {
++            child = qdict_crumple(dict, errp);
+             if (!child) {
+                 goto error;
+             }
 -- 
 2.14.3
