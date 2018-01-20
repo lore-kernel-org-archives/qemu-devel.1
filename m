@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ecvJf-0004N3-T5
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ecvJn-0004Tr-8G
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ecvJe-0008FY-R4
-	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:23 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ecvJm-0008Rj-6u
+	for qemu-devel@nongnu.org; Sat, 20 Jan 2018 10:44:31 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 20 Jan 2018 16:44:06 +0100
-Message-Id: <20180120154412.9990-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] block: Handle null backing link
+Date: Sat, 20 Jan 2018 16:44:09 +0100
+Message-Id: <20180120154412.9990-4-mreitz@redhat.com>
+In-Reply-To: <20180120154412.9990-1-mreitz@redhat.com>
+References: <20180120154412.9990-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 3/6] qapi: Remove qobject_to_X() functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +22,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-Currently, we try to rewrite every occurrence of "backing": null into
-"backing": "" in qmp_blockdev_add().  However, that breaks using the
-same "backing": null construction in json:{} file names (which do not go
-through qmp_blockdev_add()).  Currently, these then just behave as if
-the option has not been specified.
+They are no longer needed now.
 
-Since there is actually only one place where we evaluate the @backing
-option to find out whether not to use a backing file, we can instead
-just check for null there.  It doesn't matter that this changes the
-runtime state of the option from "" to null, because nobody really does
-anything with that runtime state anyway (except put it into qemu again,
-but qemu doesn't care whether it's "" or null).
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ include/qapi/qmp/qbool.h   |  1 -
+ include/qapi/qmp/qdict.h   |  1 -
+ include/qapi/qmp/qlist.h   |  1 -
+ include/qapi/qmp/qnum.h    |  1 -
+ include/qapi/qmp/qstring.h |  1 -
+ qobject/qbool.c            | 11 -----------
+ qobject/qdict.c            | 11 -----------
+ qobject/qlist.c            | 11 -----------
+ qobject/qnum.c             | 11 -----------
+ qobject/qstring.c          | 11 -----------
+ 10 files changed, 60 deletions(-)
 
-And in the future, it's much better if we get it to be null in that
-runtime state sooner than later -- see patch 6.
-
-
-v2: Add qobject_to() macro instead of qdict_is_null() (and then we can
-    do qobject_to(qdict_get(...), QNull) != NULL instead) [Markus]
-    - I'm not sure what I came up with is what Markus intended me to,
-      and if it is not, I'm inclined to go back to qdict_is_null() (or
-      qdict_entry_is_null(), as Berto has proposed);
-      or, alternatively, add a qobject_to_qnull() function and drop
-      patches 2 through 4.
-
-
-git-backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/6:[down] 'qapi: Add qobject_to()'
-002/6:[down] 'qapi: Replace qobject_to_X(o) by qobject_to(o, X)'
-003/6:[down] 'qapi: Remove qobject_to_X() functions'
-004/6:[down] 'qapi: Make more of qobject_to()'
-005/6:[0004] [FC] 'block: Handle null backing link'
-006/6:[----] [-C] 'block: Deprecate "backing": ""'
-
-
-Max Reitz (6):
-  qapi: Add qobject_to()
-  qapi: Replace qobject_to_X(o) by qobject_to(o, X)
-  qapi: Remove qobject_to_X() functions
-  qapi: Make more of qobject_to()
-  block: Handle null backing link
-  block: Deprecate "backing": ""
-
- qapi/block-core.json                |  4 +--
- include/qapi/qmp/qbool.h            |  1 -
- include/qapi/qmp/qdict.h            |  1 -
- include/qapi/qmp/qlist.h            |  1 -
- include/qapi/qmp/qnum.h             |  1 -
- include/qapi/qmp/qobject.h          | 32 ++++++++++++++++++
- include/qapi/qmp/qstring.h          |  1 -
- block.c                             | 10 ++++--
- block/qapi.c                        | 12 +++----
- block/rbd.c                         |  8 ++---
- blockdev.c                          | 21 +++---------
- hw/i386/acpi-build.c                | 14 ++++----
- monitor.c                           |  8 ++---
- qapi/qmp-dispatch.c                 |  2 +-
- qapi/qobject-input-visitor.c        | 24 +++++++-------
- qapi/qobject-output-visitor.c       |  4 +--
- qga/main.c                          |  2 +-
- qmp.c                               |  2 +-
- qobject/json-parser.c               | 13 ++++----
- qobject/qbool.c                     | 15 ++-------
- qobject/qdict.c                     | 65 ++++++++++++++++---------------------
- qobject/qjson.c                     | 10 +++---
- qobject/qlist.c                     | 17 ++--------
- qobject/qlit.c                      | 10 +++---
- qobject/qnum.c                      | 17 ++--------
- qobject/qstring.c                   | 17 ++--------
- qom/object.c                        |  8 ++---
- target/i386/cpu.c                   |  2 +-
- target/s390x/cpu_models.c           |  2 +-
- tests/check-qdict.c                 | 20 ++++++------
- tests/check-qjson.c                 | 41 +++++++++++------------
- tests/check-qlist.c                 |  4 +--
- tests/check-qlit.c                  |  2 +-
- tests/check-qnum.c                  |  4 +--
- tests/check-qobject.c               |  2 +-
- tests/check-qstring.c               |  2 +-
- tests/device-introspect-test.c      | 14 ++++----
- tests/libqtest.c                    |  6 ++--
- tests/numa-test.c                   |  8 ++---
- tests/qom-test.c                    |  4 +--
- tests/test-char.c                   |  2 +-
- tests/test-keyval.c                 |  8 ++---
- tests/test-qga.c                    | 19 ++++++-----
- tests/test-qmp-commands.c           | 12 +++----
- tests/test-qmp-event.c              | 16 ++++-----
- tests/test-qobject-input-visitor.c  | 10 +++---
- tests/test-qobject-output-visitor.c | 54 +++++++++++++++---------------
- tests/test-x86-cpuid-compat.c       | 17 +++++-----
- util/keyval.c                       |  4 +--
- util/qemu-config.c                  |  2 +-
- util/qemu-option.c                  |  6 ++--
- qemu-doc.texi                       |  7 ++++
- qemu-options.hx                     |  4 +--
- tests/qemu-iotests/089              | 20 ++++++++++++
- tests/qemu-iotests/089.out          |  8 +++++
- 55 files changed, 313 insertions(+), 307 deletions(-)
-
+diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
+index f77ea86c4e..63e2918041 100644
+--- a/include/qapi/qmp/qbool.h
++++ b/include/qapi/qmp/qbool.h
+@@ -23,7 +23,6 @@ typedef struct QBool {
+ 
+ QBool *qbool_from_bool(bool value);
+ bool qbool_get_bool(const QBool *qb);
+-QBool *qobject_to_qbool(const QObject *obj);
+ bool qbool_is_equal(const QObject *x, const QObject *y);
+ void qbool_destroy_obj(QObject *obj);
+ 
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index fc218e7be6..7dbe07dd85 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -42,7 +42,6 @@ void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
+ void qdict_del(QDict *qdict, const char *key);
+ int qdict_haskey(const QDict *qdict, const char *key);
+ QObject *qdict_get(const QDict *qdict, const char *key);
+-QDict *qobject_to_qdict(const QObject *obj);
+ bool qdict_is_equal(const QObject *x, const QObject *y);
+ void qdict_iter(const QDict *qdict,
+                 void (*iter)(const char *key, QObject *obj, void *opaque),
+diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+index ec3fcc1a4c..979da8bc14 100644
+--- a/include/qapi/qmp/qlist.h
++++ b/include/qapi/qmp/qlist.h
+@@ -60,7 +60,6 @@ QObject *qlist_pop(QList *qlist);
+ QObject *qlist_peek(QList *qlist);
+ int qlist_empty(const QList *qlist);
+ size_t qlist_size(const QList *qlist);
+-QList *qobject_to_qlist(const QObject *obj);
+ bool qlist_is_equal(const QObject *x, const QObject *y);
+ void qlist_destroy_obj(QObject *obj);
+ 
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index c3d86794bb..56ca3c4658 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -68,7 +68,6 @@ double qnum_get_double(QNum *qn);
+ 
+ char *qnum_to_string(QNum *qn);
+ 
+-QNum *qobject_to_qnum(const QObject *obj);
+ bool qnum_is_equal(const QObject *x, const QObject *y);
+ void qnum_destroy_obj(QObject *obj);
+ 
+diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+index 65c05a9be5..9293af9ac6 100644
+--- a/include/qapi/qmp/qstring.h
++++ b/include/qapi/qmp/qstring.h
+@@ -30,7 +30,6 @@ const char *qstring_get_str(const QString *qstring);
+ void qstring_append_int(QString *qstring, int64_t value);
+ void qstring_append(QString *qstring, const char *str);
+ void qstring_append_chr(QString *qstring, int c);
+-QString *qobject_to_qstring(const QObject *obj);
+ bool qstring_is_equal(const QObject *x, const QObject *y);
+ void qstring_destroy_obj(QObject *obj);
+ 
+diff --git a/qobject/qbool.c b/qobject/qbool.c
+index 683d2b9b3f..91fc2ddcbb 100644
+--- a/qobject/qbool.c
++++ b/qobject/qbool.c
+@@ -40,17 +40,6 @@ bool qbool_get_bool(const QBool *qb)
+     return qb->value;
+ }
+ 
+-/**
+- * qobject_to_qbool(): Convert a QObject into a QBool
+- */
+-QBool *qobject_to_qbool(const QObject *obj)
+-{
+-    if (!obj || qobject_type(obj) != QTYPE_QBOOL) {
+-        return NULL;
+-    }
+-    return container_of(obj, QBool, base);
+-}
+-
+ /**
+  * qbool_is_equal(): Test whether the two QBools are equal
+  */
+diff --git a/qobject/qdict.c b/qobject/qdict.c
+index 472d989a67..ca84455883 100644
+--- a/qobject/qdict.c
++++ b/qobject/qdict.c
+@@ -36,17 +36,6 @@ QDict *qdict_new(void)
+     return qdict;
+ }
+ 
+-/**
+- * qobject_to_qdict(): Convert a QObject into a QDict
+- */
+-QDict *qobject_to_qdict(const QObject *obj)
+-{
+-    if (!obj || qobject_type(obj) != QTYPE_QDICT) {
+-        return NULL;
+-    }
+-    return container_of(obj, QDict, base);
+-}
+-
+ /**
+  * tdb_hash(): based on the hash agorithm from gdbm, via tdb
+  * (from module-init-tools)
+diff --git a/qobject/qlist.c b/qobject/qlist.c
+index a8bd42e3de..b13a392fd5 100644
+--- a/qobject/qlist.c
++++ b/qobject/qlist.c
+@@ -128,17 +128,6 @@ size_t qlist_size(const QList *qlist)
+     return count;
+ }
+ 
+-/**
+- * qobject_to_qlist(): Convert a QObject into a QList
+- */
+-QList *qobject_to_qlist(const QObject *obj)
+-{
+-    if (!obj || qobject_type(obj) != QTYPE_QLIST) {
+-        return NULL;
+-    }
+-    return container_of(obj, QList, base);
+-}
+-
+ /**
+  * qlist_is_equal(): Test whether the two QLists are equal
+  *
+diff --git a/qobject/qnum.c b/qobject/qnum.c
+index 18dcf27582..98893e06fb 100644
+--- a/qobject/qnum.c
++++ b/qobject/qnum.c
+@@ -201,17 +201,6 @@ char *qnum_to_string(QNum *qn)
+     return NULL;
+ }
+ 
+-/**
+- * qobject_to_qnum(): Convert a QObject into a QNum
+- */
+-QNum *qobject_to_qnum(const QObject *obj)
+-{
+-    if (!obj || qobject_type(obj) != QTYPE_QNUM) {
+-        return NULL;
+-    }
+-    return container_of(obj, QNum, base);
+-}
+-
+ /**
+  * qnum_is_equal(): Test whether the two QNums are equal
+  *
+diff --git a/qobject/qstring.c b/qobject/qstring.c
+index ddfa8714dc..93b5f1814e 100644
+--- a/qobject/qstring.c
++++ b/qobject/qstring.c
+@@ -106,17 +106,6 @@ void qstring_append_chr(QString *qstring, int c)
+     qstring->string[qstring->length] = 0;
+ }
+ 
+-/**
+- * qobject_to_qstring(): Convert a QObject to a QString
+- */
+-QString *qobject_to_qstring(const QObject *obj)
+-{
+-    if (!obj || qobject_type(obj) != QTYPE_QSTRING) {
+-        return NULL;
+-    }
+-    return container_of(obj, QString, base);
+-}
+-
+ /**
+  * qstring_get_str(): Return a pointer to the stored string
+  *
 -- 
 2.14.3
