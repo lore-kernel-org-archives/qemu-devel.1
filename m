@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1edBtx-0007QI-05
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:26:58 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1edCAz-0003NB-8G
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:44:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1edBtt-0005ec-Sf
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:26:57 -0500
-Resent-Message-Id: <E1edBtt-0005ec-Sf@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21058)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1edBtt-0005bq-Ks
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:26:53 -0500
-In-Reply-To: <20180121091154.17426-1-mark.cave-ayland@ilande.co.uk>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151652678925.602.9160901868168473337@5adcb62bf0d6>
+	(envelope-from <dgibson@ozlabs.org>) id 1edCAw-0004hK-6l
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:44:33 -0500
+Date: Sun, 21 Jan 2018 20:44:19 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180121094419.GB28199@umbus>
+References: <20180119081511.24010-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 21 Jan 2018 01:26:29 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCHv2 00/10] sun4u: APB tidy-up/rename and
- tracepoint conversions
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="oC1+HKm2/end4ao3"
+Content-Disposition: inline
+In-Reply-To: <20180119081511.24010-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix PnvChip redefinition in
+ <hw/ppc/pnv_xscom.h>
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTIxMDkxMTU0LjE3NDI2LTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
-Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSHYyIDAwLzEwXSBzdW40dTogQVBCIHRp
-ZHktdXAvcmVuYW1lIGFuZCB0cmFjZXBvaW50IGNvbnZlcnNpb25zCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
-ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDEyMTA5
-MTE1NC4xNzQyNi0xLW1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrIC0+IHBhdGNoZXcvMjAx
-ODAxMjEwOTExNTQuMTc0MjYtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51awpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjBlYjUyYWVlZjMgc3BhcmM2NDogY29udmVydCBody9z
-cGFyYzY0L3NwYXJjNjQuYyBmcm9tIERQUklOVEYgbWFjcm9zIHRvIHRyYWNlIGV2ZW50cwozMmYx
-ZDhlMWI1IHNhYnJlOiBjb252ZXJ0IGZyb20gU0FCUkVfRFBSSU5URiBtYWNybyB0byB0cmFjZS1l
-dmVudHMKNjk1OGYxOGY1YSBhcGI6IHJlbmFtZSBhcGIuYyB0byBzYWJyZS5jCmZlM2UxYjMzNmMg
-c3VuNHU6IHJlbmFtZSBhcGIgdmFyaWFibGVzIGFuZCBjb25zdGFudHMKYTc1MGZmZjE4ZSBhcGI6
-IHJlbmFtZSBRT00gdHlwZSBmcm9tIFRZUEVfQVBCIHRvIFRZUEVfU0FCUkUKOTI4MDkxNmEwMSBh
-cGI6IFFPTWlmeSBzYWJyZSBQQ0kgaG9zdCBicmlkZ2UKNTE4MGQyMTRhOSBhcGI6IGNoYW5nZSBw
-Ym1fcGNpX2hvc3QgcHJlZml4IGZ1bmN0aW9ucyB0byB1c2Ugc2FicmVfcGNpIHByZWZpeAo3NDhj
-MmUyNTM2IGFwYjogcmVuYW1lIEFQQiBmdW5jdGlvbnMgdG8gdXNlIHNhYnJlIHByZWZpeAowNWIw
-OGM0ZjJmIHNpbWJhOiByZW5hbWUgUEJNUENJQnJpZGdlIGFuZCBRT00gdHlwZXMgdG8gcmVmbGVj
-dCBzaW1iYSBuYW1pbmcKZWE1YWZhNzUzYSBhcGI6IHNwbGl0IHNpbWJhIFBDSSBicmlkZ2UgaW50
-byBody9wY2ktYnJpZGdlL3NpbWJhLmMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBB
-VENIIDEvMTA6IGFwYjogc3BsaXQgc2ltYmEgUENJIGJyaWRnZSBpbnRvIGh3L3BjaS1icmlkZ2Uv
-c2ltYmEuYy4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBzaW1iYTogcmVuYW1lIFBCTVBDSUJyaWRn
-ZSBhbmQgUU9NIHR5cGVzIHRvIHJlZmxlY3Qgc2ltYmEgbmFtaW5nLi4uCkNoZWNraW5nIFBBVENI
-IDMvMTA6IGFwYjogcmVuYW1lIEFQQiBmdW5jdGlvbnMgdG8gdXNlIHNhYnJlIHByZWZpeC4uLgpD
-aGVja2luZyBQQVRDSCA0LzEwOiBhcGI6IGNoYW5nZSBwYm1fcGNpX2hvc3QgcHJlZml4IGZ1bmN0
-aW9ucyB0byB1c2Ugc2FicmVfcGNpIHByZWZpeC4uLgpDaGVja2luZyBQQVRDSCA1LzEwOiBhcGI6
-IFFPTWlmeSBzYWJyZSBQQ0kgaG9zdCBicmlkZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMDogYXBi
-OiByZW5hbWUgUU9NIHR5cGUgZnJvbSBUWVBFX0FQQiB0byBUWVBFX1NBQlJFLi4uCkNoZWNraW5n
-IFBBVENIIDcvMTA6IHN1bjR1OiByZW5hbWUgYXBiIHZhcmlhYmxlcyBhbmQgY29uc3RhbnRzLi4u
-CkNoZWNraW5nIFBBVENIIDgvMTA6IGFwYjogcmVuYW1lIGFwYi5jIHRvIHNhYnJlLmMuLi4KRVJS
-T1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM5MTogRklMRTogaHcvcGNpLWhvc3Qvc2Fi
-cmUuYzo0MToKKy8vI2RlZmluZSBERUJVR19TQUJSRQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
-bmdzLCAxODggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8xMDogc2FicmU6IGNvbnZlcnQgZnJvbSBTQUJSRV9EUFJJ
-TlRGIG1hY3JvIHRvIHRyYWNlLWV2ZW50cy4uLgpDaGVja2luZyBQQVRDSCAxMC8xMDogc3BhcmM2
-NDogY29udmVydCBody9zcGFyYzY0L3NwYXJjNjQuYyBmcm9tIERQUklOVEYgbWFjcm9zIHRvIHRy
-YWNlIGV2ZW50cy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+--oC1+HKm2/end4ao3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 19, 2018 at 09:15:11AM +0100, C=E9dric Le Goater wrote:
+> This redefinition generates warnings on some clang compilers and older
+> gcc4.4.
+>=20
+> ...include/hw/ppc/pnv_xscom.h:24:24: warning: redefinition of typedef 'Pn=
+vChip' is a C11
+>       feature [-Wtypedef-redefinition]
+> typedef struct PnvChip PnvChip;
+>                        ^
+> ...include/hw/ppc/pnv.h:65:3: note: previous definition is here
+> } PnvChip;
+>   ^
+> 1 warning generated.
+>   CC      ppc64-softmmu/hw/ppc/pnv_xscom.o
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied, thanks.
+
+> ---
+>  include/hw/ppc/pnv_xscom.h | 2 --
+>  1 file changed, 2 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+> index fb1bd5df095a..255b26a5aaf6 100644
+> --- a/include/hw/ppc/pnv_xscom.h
+> +++ b/include/hw/ppc/pnv_xscom.h
+> @@ -21,8 +21,6 @@
+> =20
+>  #include "qom/object.h"
+> =20
+> -typedef struct PnvChip PnvChip;
+> -
+>  typedef struct PnvXScomInterface {
+>      Object parent;
+>  } PnvXScomInterface;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--oC1+HKm2/end4ao3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpkYPMACgkQbDjKyiDZ
+s5LS9RAA1mJfuJZWVNDfFpx+zjrj6KSsr8QTMwhCK46jBvZ+OZ5GZ1JALyL9pIZG
+/tUFx85SlndvkbfAorla63brsJ1cT+FgSl9Xu3vZq0EsduNWXyPMMP7H0w/dpZt5
+VYxTCdLGYX5DSOGLaNmAFaxoA7xKzkE7nhmjQqNTg1hQSNWqQIfyK2EXxOaFlKrB
+sHb1T8CJB3G6/O420c0lCXUC9YtwXzuOeqG14hZvtlqzbUSq/7Z7cHHmetlkHK8s
+idXDwZZ1znflS6aVVD3i3HYDBOu3fyV8t8qh4HwkHZ2rutZbHUpkntJ7GHjoh3vI
+4Go79HlEScYPNyZIQWoUZ5ypQgs2sXooUVrPnwvxQzZGcTMxw7u39Q+U021Y8R6g
+IBxEfW5hsKbf1RJHqVUQ6Us3LtYVkabRiUm3gqoz23+Hs3aTkGKDaAJyC8DmO3vg
+U4kj+7701C0Unccj9BMn5yM/EXio1Mj3B8HDrofn8MkBHnaXwXBsmBEU3IoOZMWq
+mbc1Qajenq/atgki9IhsfKghWShXIZjnfm/L0mMuFslv+WcgtkdKVSNf/PF94UHp
+sfgNylySkCMYiT4EiyvkKyDNHYb1jZnECy2YCW1VGGStSa9OBZT7Xa3kBomrkpvP
+KzvYOCWxe4FmIEl+guHSGp3OqLXoHOr8KnQpIeNo5rhDxow/spA=
+=7Hyk
+-----END PGP SIGNATURE-----
+
+--oC1+HKm2/end4ao3--
