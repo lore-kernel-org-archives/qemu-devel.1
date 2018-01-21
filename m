@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gg-0000Yn-GM
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:11 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gh-0000Zk-7y
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Ge-0007Lz-Vp
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:10 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Ge-0007Ll-U8
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:11 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 21 Jan 2018 16:33:49 +1100
-Message-Id: <20180121053353.25970-9-david@gibson.dropbear.id.au>
+Date: Sun, 21 Jan 2018 16:33:51 +1100
+Message-Id: <20180121053353.25970-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20180121053353.25970-1-david@gibson.dropbear.id.au>
 References: <20180121053353.25970-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/12] target-ppc: optimize cmp translation
+Subject: [Qemu-devel] [PULL 10/12] sii3112: Add explicit type casts to avoid
+ unintended sign extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,67 +21,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, "pbonzini@redhat.com" <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: "pbonzini@redhat.com" <pbonzini@redhat.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-We know that only one bit (in addition to SO) is going to be set in
-the condition register, so do two movconds instead of three setconds,
-three shifts and two ORs.
+Noticed by Coverity
 
-For ppc64-linux-user, the code size reduction is around 5% and the
-performance improvement slightly less than 10%.  For softmmu, the
-improvement is around 5%.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
+ hw/ide/sii3112.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 396f422cf4..bcd36d5353 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -605,27 +605,22 @@ static opc_handler_t invalid_handler = {
- static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
- {
-     TCGv t0 = tcg_temp_new();
--    TCGv_i32 t1 = tcg_temp_new_i32();
--
--    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
--
--    tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    TCGv t1 = tcg_temp_new();
-+    TCGv_i32 t = tcg_temp_new_i32();
- 
--    tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_movi_tl(t0, CRF_EQ);
-+    tcg_gen_movi_tl(t1, CRF_LT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_LT : TCG_COND_LTU), t0, arg0, arg1, t1, t0);
-+    tcg_gen_movi_tl(t1, CRF_GT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_GT : TCG_COND_GTU), t0, arg0, arg1, t1, t0);
- 
--    tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_trunc_tl_i32(t, t0);
-+    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
-+    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t);
- 
-     tcg_temp_free(t0);
--    tcg_temp_free_i32(t1);
-+    tcg_temp_free(t1);
-+    tcg_temp_free_i32(t);
- }
- 
- static inline void gen_op_cmpi(TCGv arg0, target_ulong arg1, int s, int crf)
+diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+index e2f5562bb7..17aa930e39 100644
+--- a/hw/ide/sii3112.c
++++ b/hw/ide/sii3112.c
+@@ -79,13 +79,13 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
+         val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
+         val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
+         val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
+-        val |= d->i.bmdma[0].status << 16;
+-        val |= d->i.bmdma[1].status << 24;
++        val |= (uint32_t)d->i.bmdma[0].status << 16;
++        val |= (uint32_t)d->i.bmdma[1].status << 24;
+         break;
+     case 0x18:
+         val = d->i.bmdma[1].cmd;
+         val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
+-        val |= d->i.bmdma[1].status << 16;
++        val |= (uint32_t)d->i.bmdma[1].status << 16;
+         break;
+     case 0x80 ... 0x87:
+         if (size == 1) {
+@@ -128,7 +128,7 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
+         val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
+         break;
+     case 0x148:
+-        val = d->regs[0].sien << 16;
++        val = (uint32_t)d->regs[0].sien << 16;
+         break;
+     case 0x180:
+         val = d->regs[1].scontrol;
+@@ -137,7 +137,7 @@ static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
+         val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
+         break;
+     case 0x1c8:
+-        val = d->regs[1].sien << 16;
++        val = (uint32_t)d->regs[1].sien << 16;
+         break;
+     default:
+         val = 0;
 -- 
 2.14.3
