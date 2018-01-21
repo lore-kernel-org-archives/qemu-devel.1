@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gg-0000Yc-AS
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gg-0000Yo-Gs
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gc-0007I3-9z
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gf-0007MA-1r
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:10 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 21 Jan 2018 16:33:41 +1100
-Message-Id: <20180121053353.25970-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180121
+Date: Sun, 21 Jan 2018 16:33:53 +1100
+Message-Id: <20180121053353.25970-13-david@gibson.dropbear.id.au>
+In-Reply-To: <20180121053353.25970-1-david@gibson.dropbear.id.au>
+References: <20180121053353.25970-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 12/12] target/ppc/spapr_caps: Add macro to
+ generate spapr_caps migration vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,85 +21,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc7=
-8f:
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-01-19 16:35:25 +0000)
+The vmstate description and the contained needed function for migration
+of spapr_caps is the same for each cap, with the name of the cap
+substituted. As such introduce a macro to allow for easier generation of
+these.
 
-are available in the Git repository at:
+Convert the three existing spapr_caps (htm, vsx, and dfp) to use this
+macro.
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180121
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_caps.c | 78 +++++++++++++++++------------------------------------
+ 1 file changed, 24 insertions(+), 54 deletions(-)
 
-for you to fetch changes up to 1f63ebaa91f73f469c8f107dbd266cabdbea3a40:
-
-  target/ppc/spapr_caps: Add macro to generate spapr_caps migration vmsta=
-te (2018-01-20 17:15:05 +1100)
-
-Peter, since I'm on my way to linux.conf.au, this hasn't been through
-my full usual test regimen, just a quick sanity check.  I'm hoping
-this is ok, since the only changes since the superseded pull request
-(which did pass the full set of tests) is a clean rebase and removal
-of Thomas' patch deprecating ppcemb.
-
-----------------------------------------------------------------
-ppc patch queue 2018-01-21
-
-This request supersedes the one from 2018-01-19.  The only difference
-is that the patch deprecating ppcemb-softmmu, and thereby creating
-many annying warnings from make check has been removed.
-
-Highlights are:
-  * Significant TCG speedup by optimizing cmp generation
-  * Fix a regression caused by recent change to set compat mode on
-    hotplugged cpus
-  * Cleanup of default configs
-  * Some implementation of msgsnd/msgrcv instructions for server chips
-
-----------------------------------------------------------------
-BALATON Zoltan (2):
-      sm501: Add missing break to case
-      sii3112: Add explicit type casts to avoid unintended sign extension
-
-C=C3=A9dric Le Goater (3):
-      target/ppc: fix doorbell and hypervisor doorbell definitions
-      target/ppc: msgsnd and msgclr instructions need hypervisor privileg=
-e
-      target/ppc: add support for hypervisor doorbells on book3s CPUs
-
-Greg Kurz (2):
-      spapr: drop duplicate variable in spapr_core_plug()
-      spapr: fix device tree properties when using compatibility mode
-
-Suraj Jitindar Singh (1):
-      target/ppc/spapr_caps: Add macro to generate spapr_caps migration v=
-mstate
-
-Thomas Huth (3):
-      default-configs/ppc64-softmmu: Include 32-bit configs instead of co=
-pying them
-      default-configs/ppc-softmmu: Restructure the switches according to =
-the machines
-      hw/ppc/Makefile: Add a way to disable the PPC4xx boards
-
-pbonzini@redhat.com (1):
-      target-ppc: optimize cmp translation
-
- default-configs/ppc-softmmu.mak   | 59 +++++++++++++++--------------
- default-configs/ppc64-softmmu.mak | 61 ++++--------------------------
- hw/display/sm501.c                |  1 +
- hw/ide/sii3112.c                  | 10 ++---
- hw/ppc/Makefile.objs              |  4 +-
- hw/ppc/spapr.c                    | 22 +++++------
- hw/ppc/spapr_caps.c               | 78 ++++++++++++---------------------=
-------
- hw/ppc/spapr_cpu_core.c           |  7 ++++
- hw/ppc/spapr_rtas.c               |  9 -----
- target/ppc/cpu.h                  | 16 +++++---
- target/ppc/excp_helper.c          | 52 ++++++++++++++++++++++++++
- target/ppc/helper.h               |  2 +
- target/ppc/translate.c            | 58 ++++++++++++++++++-----------
- target/ppc/translate_init.c       |  2 +-
- 14 files changed, 191 insertions(+), 190 deletions(-)
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index d5c9ce774a..5d52969bd5 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -228,62 +228,32 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
+     return ok ? 0 : -EINVAL;
+ }
+ 
+-static bool spapr_cap_htm_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_HTM] &&
+-           (spapr->eff.caps[SPAPR_CAP_HTM] != spapr->def.caps[SPAPR_CAP_HTM]);
+-}
+-
+-const VMStateDescription vmstate_spapr_cap_htm = {
+-    .name = "spapr/cap/htm",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_htm_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_HTM], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
+-
+-static bool spapr_cap_vsx_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_VSX] &&
+-           (spapr->eff.caps[SPAPR_CAP_VSX] != spapr->def.caps[SPAPR_CAP_VSX]);
++/* Used to generate the migration field and needed function for a spapr cap */
++#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
++static bool spapr_cap_##cap##_needed(void *opaque)      \
++{                                                       \
++    sPAPRMachineState *spapr = opaque;                  \
++                                                        \
++    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
++           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
++            spapr->def.caps[SPAPR_CAP_##ccap]);         \
++}                                                       \
++                                                        \
++const VMStateDescription vmstate_spapr_cap_##cap = {    \
++    .name = "spapr/cap/" #cap,                          \
++    .version_id = 1,                                    \
++    .minimum_version_id = 1,                            \
++    .needed = spapr_cap_##cap##_needed,                 \
++    .fields = (VMStateField[]) {                        \
++        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
++                      sPAPRMachineState),               \
++        VMSTATE_END_OF_LIST()                           \
++    },                                                  \
+ }
+ 
+-const VMStateDescription vmstate_spapr_cap_vsx = {
+-    .name = "spapr/cap/vsx",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_vsx_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_VSX], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
+-
+-static bool spapr_cap_dfp_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return spapr->cmd_line_caps[SPAPR_CAP_DFP] &&
+-           (spapr->eff.caps[SPAPR_CAP_DFP] != spapr->def.caps[SPAPR_CAP_DFP]);
+-}
+-
+-const VMStateDescription vmstate_spapr_cap_dfp = {
+-    .name = "spapr/cap/dfp",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .needed = spapr_cap_dfp_needed,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8(mig.caps[SPAPR_CAP_DFP], sPAPRMachineState),
+-        VMSTATE_END_OF_LIST()
+-    },
+-};
++SPAPR_CAP_MIG_STATE(htm, HTM);
++SPAPR_CAP_MIG_STATE(vsx, VSX);
++SPAPR_CAP_MIG_STATE(dfp, DFP);
+ 
+ void spapr_caps_reset(sPAPRMachineState *spapr)
+ {
+-- 
+2.14.3
