@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBfw-0006HP-8X
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:33 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBi2-0007zq-2B
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:14:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBft-0003Dw-CW
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:26 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:48000
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBhy-0004mk-RW
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:14:38 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:48009
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1edBft-0003De-5V
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:25 -0500
+	id 1edBhy-0004m7-KW
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:14:34 -0500
+References: <20180115205848.26027-1-mark.cave-ayland@ilande.co.uk>
+	<CACXAS8CB1hNogfv-bg83HY+XAnqi2O3TJZVUOoRYqRS0Nx=DFA@mail.gmail.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 21 Jan 2018 09:11:53 +0000
-Message-Id: <20180121091154.17426-10-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180121091154.17426-1-mark.cave-ayland@ilande.co.uk>
-References: <20180121091154.17426-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <1a223e56-72c0-b9e6-7892-412de7bc4ad4@ilande.co.uk>
+Date: Sun, 21 Jan 2018 09:14:23 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCHv2 09/10] sabre: convert from SABRE_DPRINTF
- macro to trace-events
+In-Reply-To: <CACXAS8CB1hNogfv-bg83HY+XAnqi2O3TJZVUOoRYqRS0Nx=DFA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] sun4u: implement power device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,150 +30,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
-[for addition of trace-events to hw/pci-host]
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
----
- Makefile.objs            |  1 +
- hw/pci-host/sabre.c      | 32 ++++++++++----------------------
- hw/pci-host/trace-events | 11 +++++++++++
- 3 files changed, 22 insertions(+), 22 deletions(-)
- create mode 100644 hw/pci-host/trace-events
+On 20/01/18 20:10, Artyom Tarasenko wrote:
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 669d8d684d..323ef12384 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -150,6 +150,7 @@ trace-events-subdirs += hw/i386/xen
- trace-events-subdirs += hw/9pfs
- trace-events-subdirs += hw/ppc
- trace-events-subdirs += hw/pci
-+trace-events-subdirs += hw/pci-host
- trace-events-subdirs += hw/s390x
- trace-events-subdirs += hw/vfio
- trace-events-subdirs += hw/acpi
-diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-index 4054c17598..2268a41dd9 100644
---- a/hw/pci-host/sabre.c
-+++ b/hw/pci-host/sabre.c
-@@ -36,16 +36,7 @@
- #include "exec/address-spaces.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
--
--/* debug sabre */
--//#define DEBUG_SABRE
--
--#ifdef DEBUG_SABRE
--#define SABRE_DPRINTF(fmt, ...) \
--do { printf("sabre: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define SABRE_DPRINTF(fmt, ...)
--#endif
-+#include "trace.h"
- 
- /*
-  * Chipset docs:
-@@ -69,8 +60,7 @@ do { printf("sabre: " fmt , ## __VA_ARGS__); } while (0)
- 
- static inline void sabre_set_request(SabreState *s, unsigned int irq_num)
- {
--    SABRE_DPRINTF("%s: request irq %d\n", __func__, irq_num);
--
-+    trace_sabre_set_request(irq_num);
-     s->irq_request = irq_num;
-     qemu_set_irq(s->ivec_irqs[irq_num], 1);
- }
-@@ -108,7 +98,7 @@ static inline void sabre_check_irqs(SabreState *s)
- 
- static inline void sabre_clear_request(SabreState *s, unsigned int irq_num)
- {
--    SABRE_DPRINTF("%s: clear request irq %d\n", __func__, irq_num);
-+    trace_sabre_clear_request(irq_num);
-     qemu_set_irq(s->ivec_irqs[irq_num], 0);
-     s->irq_request = NO_IRQ_REQUEST;
- }
-@@ -125,8 +115,7 @@ static void sabre_config_write(void *opaque, hwaddr addr,
- {
-     SabreState *s = opaque;
- 
--    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__,
--                  addr, val);
-+    trace_sabre_config_write(addr, val);
- 
-     switch (addr & 0xffff) {
-     case 0x30 ... 0x4f: /* DMA error registers */
-@@ -250,7 +239,7 @@ static uint64_t sabre_config_read(void *opaque,
-         val = 0;
-         break;
-     }
--    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " -> %x\n", __func__, addr, val);
-+    trace_sabre_config_read(addr, val);
- 
-     return val;
- }
-@@ -267,8 +256,7 @@ static void sabre_pci_config_write(void *opaque, hwaddr addr,
-     SabreState *s = opaque;
-     PCIHostState *phb = PCI_HOST_BRIDGE(s);
- 
--    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__,
--                  addr, val);
-+    trace_sabre_pci_config_write(addr, val);
-     pci_data_write(phb->bus, addr, val, size);
- }
- 
-@@ -280,7 +268,7 @@ static uint64_t sabre_pci_config_read(void *opaque, hwaddr addr,
-     PCIHostState *phb = PCI_HOST_BRIDGE(s);
- 
-     ret = pci_data_read(phb->bus, addr, size);
--    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " -> %x\n", __func__, addr, ret);
-+    trace_sabre_pci_config_read(addr, ret);
-     return ret;
- }
- 
-@@ -318,7 +306,8 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
- {
-     SabreState *s = opaque;
- 
--    SABRE_DPRINTF("%s: set irq_in %d level %d\n", __func__, irq_num, level);
-+    trace_sabre_pci_set_irq(irq_num, level);
-+
-     /* PCI IRQ map onto the first 32 INO.  */
-     if (irq_num < 32) {
-         if (level) {
-@@ -332,8 +321,7 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
-     } else {
-         /* OBIO IRQ map onto the next 32 INO.  */
-         if (level) {
--            SABRE_DPRINTF("%s: set irq %d level %d\n", __func__, irq_num,
--                          level);
-+            trace_sabre_pci_set_obio_irq(irq_num, level);
-             s->pci_irq_in |= 1ULL << irq_num;
-             if ((s->irq_request == NO_IRQ_REQUEST)
-                 && (s->obio_irq_map[irq_num - 32] & PBM_PCI_IMR_ENABLED)) {
-diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-new file mode 100644
-index 0000000000..32dfc84692
---- /dev/null
-+++ b/hw/pci-host/trace-events
-@@ -0,0 +1,11 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# hw/pci-host/sabre.c
-+sabre_set_request(int irq_num) "request irq %d"
-+sabre_clear_request(int irq_num) "clear request irq %d"
-+sabre_config_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
-+sabre_config_read(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
-+sabre_pci_config_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
-+sabre_pci_config_read(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
-+sabre_pci_set_irq(int irq_num, int level) "set irq_in %d level %d"
-+sabre_pci_set_obio_irq(int irq_num, int level) "set irq %d level %d"
--- 
-2.11.0
+> Hi Mark,
+> 
+> 
+> On Mon, Jan 15, 2018 at 9:58 PM, Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+>> This inbuilt device contains a single 4-byte register, of which bit 24 is used
+>> to power down the machine on a real Ultra 5.
+>>
+>> The power device exists at offset 0x724000 on a real machine, but due to the
+>> current configuration of the BARs in QEMU it must be located lower in PCI IO
+>> space.
+>>
+>> For the moment we place the power device at offset 0x7240 as a reminder of its
+>> original location and raise the base PCI IO address from 0x4000 to 0x8000.
+> 
+> I think it's ok to have it there for now. The guests should get the
+> info from the device tree.
+
+Yes indeed. For reference you can see the corresponding OpenBIOS 
+patchset at 
+https://mail.coreboot.org/pipermail/openbios/2018-January/010160.html.
+
+
+ATB,
+
+Mark.
+
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> 
+>> ---
+>>   hw/sparc64/sun4u.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 63 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>> index ec45ec2801..26ab6e9a9c 100644
+>> --- a/hw/sparc64/sun4u.c
+>> +++ b/hw/sparc64/sun4u.c
+>> @@ -205,6 +205,59 @@ typedef struct ResetData {
+>>       uint64_t prom_addr;
+>>   } ResetData;
+>>
+>> +#define TYPE_SUN4U_POWER "power"
+>> +#define SUN4U_POWER(obj) OBJECT_CHECK(PowerDevice, (obj), TYPE_SUN4U_POWER)
+>> +
+>> +typedef struct PowerDevice {
+>> +    SysBusDevice parent_obj;
+>> +
+>> +    MemoryRegion power_mmio;
+>> +} PowerDevice;
+>> +
+>> +/* Power */
+>> +static void power_mem_write(void *opaque, hwaddr addr,
+>> +                            uint64_t val, unsigned size)
+>> +{
+>> +    /* According to a real Ultra 5, bit 24 controls the power */
+>> +    if (val & 0x1000000) {
+>> +        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+>> +    }
+>> +}
+>> +
+>> +static const MemoryRegionOps power_mem_ops = {
+>> +    .write = power_mem_write,
+>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>> +    .valid = {
+>> +        .min_access_size = 4,
+>> +        .max_access_size = 4,
+>> +    },
+>> +};
+>> +
+>> +static void power_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    PowerDevice *d = SUN4U_POWER(dev);
+>> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>> +
+>> +    memory_region_init_io(&d->power_mmio, OBJECT(dev), &power_mem_ops, d,
+>> +                          "power", sizeof(uint32_t));
+>> +
+>> +    sysbus_init_mmio(sbd, &d->power_mmio);
+>> +}
+>> +
+>> +static void power_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +
+>> +    dc->realize = power_realize;
+>> +}
+>> +
+>> +static const TypeInfo power_info = {
+>> +    .name          = TYPE_SUN4U_POWER,
+>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>> +    .instance_size = sizeof(PowerDevice),
+>> +    .class_init    = power_class_init,
+>> +};
+>> +
+>>   static void ebus_isa_irq_handler(void *opaque, int n, int level)
+>>   {
+>>       EbusState *s = EBUS(opaque);
+>> @@ -221,6 +274,7 @@ static void ebus_isa_irq_handler(void *opaque, int n, int level)
+>>   static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>>   {
+>>       EbusState *s = EBUS(pci_dev);
+>> +    SysBusDevice *sbd;
+>>       DeviceState *dev;
+>>       qemu_irq *isa_irq;
+>>       DriveInfo *fd[MAX_FD];
+>> @@ -270,6 +324,13 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>>       qdev_prop_set_uint32(dev, "dma", -1);
+>>       qdev_init_nofail(dev);
+>>
+>> +    /* Power */
+>> +    dev = qdev_create(NULL, TYPE_SUN4U_POWER);
+>> +    qdev_init_nofail(dev);
+>> +    sbd = SYS_BUS_DEVICE(dev);
+>> +    memory_region_add_subregion(pci_address_space_io(pci_dev), 0x7240,
+>> +                                sysbus_mmio_get_region(sbd, 0));
+>> +
+>>       /* PCI */
+>>       pci_dev->config[0x04] = 0x06; // command = bus master, pci mem
+>>       pci_dev->config[0x05] = 0x00;
+>> @@ -282,7 +343,7 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>>                                0, 0x1000000);
+>>       pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->bar0);
+>>       memory_region_init_alias(&s->bar1, OBJECT(s), "bar1", get_system_io(),
+>> -                             0, 0x4000);
+>> +                             0, 0x8000);
+>>       pci_register_bar(pci_dev, 1, PCI_BASE_ADDRESS_SPACE_IO, &s->bar1);
+>>   }
+>>
+>> @@ -693,6 +754,7 @@ static const TypeInfo sun4v_type = {
+>>
+>>   static void sun4u_register_types(void)
+>>   {
+>> +    type_register_static(&power_info);
+>>       type_register_static(&ebus_info);
+>>       type_register_static(&prom_info);
+>>       type_register_static(&ram_info);
+>> --
+>> 2.11.0
+>>
+> 
+> 
+> 
