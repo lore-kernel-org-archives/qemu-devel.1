@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gd-0000Xu-8u
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gd-0000Xx-9l
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gc-0007Hk-9D
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gc-0007Hz-9s
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:07 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 21 Jan 2018 16:33:44 +1100
-Message-Id: <20180121053353.25970-4-david@gibson.dropbear.id.au>
+Date: Sun, 21 Jan 2018 16:33:42 +1100
+Message-Id: <20180121053353.25970-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20180121053353.25970-1-david@gibson.dropbear.id.au>
 References: <20180121053353.25970-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 03/12] hw/ppc/Makefile: Add a way to disable the
- PPC4xx boards
+Subject: [Qemu-devel] [PULL 01/12] default-configs/ppc64-softmmu: Include
+ 32-bit configs instead of copying them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +25,96 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.c
 
 From: Thomas Huth <thuth@redhat.com>
 
-We've got the config switch CONFIG_PPC4XX, so we should use it
-in the Makefile accordingly and only include the PPC4xx boards
-if this switch has been enabled. (Note: Unfortunately, the files
-ppc4xx_devs.c and ppc405_uc.c still have to be included in the
-build anyway to fulfil some complicated linker dependencies ...
-so these are subject to a more thourough clean-up later)
+qemu-softmmu-ppc64 is supposed to be a superset of qemu-softmmu-ppc.
+However, instead of simply including the 32-bit config file, we've
+duplicated all CONFIG_xxx settings there instead. This way, we've missed
+some CONFIG switches in ppc64-softmmu.mak which were only added to the
+32-bit config file (e.g. CONFIG_SUNGEM). Let's fix this problem by
+including the 32-bit config file into the 64-bit config file instead
+of duplicating all the CONFIG switches there.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/Makefile.objs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ default-configs/ppc64-softmmu.mak | 61 +++++----------------------------------
+ 1 file changed, 8 insertions(+), 53 deletions(-)
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index 1faff853b7..ad1928c5d8 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -12,8 +12,8 @@ obj-y += spapr_pci_vfio.o
- endif
- obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
- # PowerPC 4xx boards
--obj-y += ppc405_boards.o ppc4xx_devs.o ppc405_uc.o ppc440_bamboo.o
--obj-y += ppc4xx_pci.o
-+obj-y += ppc4xx_devs.o ppc405_uc.o
-+obj-$(CONFIG_PPC4XX) += ppc4xx_pci.o ppc405_boards.o ppc440_bamboo.o
- # PReP
- obj-$(CONFIG_PREP) += prep.o
- obj-$(CONFIG_PREP) += prep_systemio.o
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index d1b3a6dd50..b94af6c7c6 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -1,64 +1,19 @@
+ # Default configuration for ppc64-softmmu
+ 
+-include pci.mak
+-include sound.mak
+-include usb.mak
+-CONFIG_PPC4XX=y
+-CONFIG_VIRTIO_VGA=y
+-CONFIG_ESCC=y
+-CONFIG_M48T59=y
++# Include all 32-bit boards
++include ppc-softmmu.mak
++
++# For PowerNV
++CONFIG_POWERNV=y
+ CONFIG_IPMI=y
+ CONFIG_IPMI_LOCAL=y
+ CONFIG_IPMI_EXTERN=y
+ CONFIG_ISA_IPMI_BT=y
+-CONFIG_SERIAL=y
+-CONFIG_PARALLEL=y
+-CONFIG_I8254=y
+-CONFIG_PCKBD=y
+-CONFIG_FDC=y
+-CONFIG_I8257=y
+-CONFIG_I82374=y
+-CONFIG_OPENPIC=y
+-CONFIG_PREP_PCI=y
+-CONFIG_I82378=y
+-CONFIG_PC87312=y
+-CONFIG_MACIO=y
+-CONFIG_PCSPK=y
+-CONFIG_CUDA=y
+-CONFIG_ADB=y
+-CONFIG_MAC_NVRAM=y
+-CONFIG_MAC_DBDMA=y
+-CONFIG_HEATHROW_PIC=y
+-CONFIG_GRACKLE_PCI=y
+-CONFIG_UNIN_PCI=y
+-CONFIG_DEC_PCI=y
+-CONFIG_PPCE500_PCI=y
+-CONFIG_IDE_ISA=y
+-CONFIG_IDE_CMD646=y
+-CONFIG_IDE_MACIO=y
+-CONFIG_NE2000_ISA=y
+-CONFIG_PFLASH_CFI01=y
+-CONFIG_PFLASH_CFI02=y
+-CONFIG_PTIMER=y
+-CONFIG_I8259=y
+-CONFIG_XILINX=y
+-CONFIG_XILINX_ETHLITE=y
+-CONFIG_PSERIES=y
+-CONFIG_POWERNV=y
+-CONFIG_PREP=y
+-CONFIG_MAC=y
+-CONFIG_E500=y
+-CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+-CONFIG_PLATFORM_BUS=y
+-CONFIG_ETSEC=y
+-CONFIG_SM501=y
++
+ # For pSeries
++CONFIG_PSERIES=y
++CONFIG_VIRTIO_VGA=y
+ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+ CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+-# For PReP
+-CONFIG_SERIAL_ISA=y
+-CONFIG_MC146818RTC=y
+-CONFIG_ISA_TESTDEV=y
+ CONFIG_MEM_HOTPLUG=y
+-CONFIG_RS6000_MC=y
 -- 
 2.14.3
