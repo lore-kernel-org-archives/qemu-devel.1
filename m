@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gg-0000Yo-Gs
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gg-0000Yv-LT
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gf-0007MA-1r
+	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gc-0007Hp-9s
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:10 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 21 Jan 2018 16:33:53 +1100
-Message-Id: <20180121053353.25970-13-david@gibson.dropbear.id.au>
+Date: Sun, 21 Jan 2018 16:33:45 +1100
+Message-Id: <20180121053353.25970-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20180121053353.25970-1-david@gibson.dropbear.id.au>
 References: <20180121053353.25970-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/12] target/ppc/spapr_caps: Add macro to
- generate spapr_caps migration vmstate
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 04/12] target/ppc: fix doorbell and hypervisor
+ doorbell definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,114 +24,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The vmstate description and the contained needed function for migration
-of spapr_caps is the same for each cap, with the name of the cap
-substituted. As such introduce a macro to allow for easier generation of
-these.
+commit f03a1af581b9 ("ppc: Fix POWER7 and POWER8 exception definitions")
+introduced definitions for the server doorbell exceptions by reusing
+the embedded definitions but this adds complexity in the powerpc_excp()
+routine. Let's introduce specific definitions for the Server doorbells
+exception.
 
-Convert the three existing spapr_caps (htm, vsx, and dfp) to use this
-macro.
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_caps.c | 78 +++++++++++++++++------------------------------------
- 1 file changed, 24 insertions(+), 54 deletions(-)
+ target/ppc/cpu.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index d5c9ce774a..5d52969bd5 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -228,62 +228,32 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
-     return ok ? 0 : -EINVAL;
- }
- 
--static bool spapr_cap_htm_needed(void *opaque)
--{
--    sPAPRMachineState *spapr = opaque;
--
--    return spapr->cmd_line_caps[SPAPR_CAP_HTM] &&
--           (spapr->eff.caps[SPAPR_CAP_HTM] != spapr->def.caps[SPAPR_CAP_HTM]);
--}
--
--const VMStateDescription vmstate_spapr_cap_htm = {
--    .name = "spapr/cap/htm",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .needed = spapr_cap_htm_needed,
--    .fields = (VMStateField[]) {
--        VMSTATE_UINT8(mig.caps[SPAPR_CAP_HTM], sPAPRMachineState),
--        VMSTATE_END_OF_LIST()
--    },
--};
--
--static bool spapr_cap_vsx_needed(void *opaque)
--{
--    sPAPRMachineState *spapr = opaque;
--
--    return spapr->cmd_line_caps[SPAPR_CAP_VSX] &&
--           (spapr->eff.caps[SPAPR_CAP_VSX] != spapr->def.caps[SPAPR_CAP_VSX]);
-+/* Used to generate the migration field and needed function for a spapr cap */
-+#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
-+static bool spapr_cap_##cap##_needed(void *opaque)      \
-+{                                                       \
-+    sPAPRMachineState *spapr = opaque;                  \
-+                                                        \
-+    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
-+           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
-+            spapr->def.caps[SPAPR_CAP_##ccap]);         \
-+}                                                       \
-+                                                        \
-+const VMStateDescription vmstate_spapr_cap_##cap = {    \
-+    .name = "spapr/cap/" #cap,                          \
-+    .version_id = 1,                                    \
-+    .minimum_version_id = 1,                            \
-+    .needed = spapr_cap_##cap##_needed,                 \
-+    .fields = (VMStateField[]) {                        \
-+        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
-+                      sPAPRMachineState),               \
-+        VMSTATE_END_OF_LIST()                           \
-+    },                                                  \
- }
- 
--const VMStateDescription vmstate_spapr_cap_vsx = {
--    .name = "spapr/cap/vsx",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .needed = spapr_cap_vsx_needed,
--    .fields = (VMStateField[]) {
--        VMSTATE_UINT8(mig.caps[SPAPR_CAP_VSX], sPAPRMachineState),
--        VMSTATE_END_OF_LIST()
--    },
--};
--
--static bool spapr_cap_dfp_needed(void *opaque)
--{
--    sPAPRMachineState *spapr = opaque;
--
--    return spapr->cmd_line_caps[SPAPR_CAP_DFP] &&
--           (spapr->eff.caps[SPAPR_CAP_DFP] != spapr->def.caps[SPAPR_CAP_DFP]);
--}
--
--const VMStateDescription vmstate_spapr_cap_dfp = {
--    .name = "spapr/cap/dfp",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .needed = spapr_cap_dfp_needed,
--    .fields = (VMStateField[]) {
--        VMSTATE_UINT8(mig.caps[SPAPR_CAP_DFP], sPAPRMachineState),
--        VMSTATE_END_OF_LIST()
--    },
--};
-+SPAPR_CAP_MIG_STATE(htm, HTM);
-+SPAPR_CAP_MIG_STATE(vsx, VSX);
-+SPAPR_CAP_MIG_STATE(dfp, DFP);
- 
- void spapr_caps_reset(sPAPRMachineState *spapr)
- {
--- 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 14aaa87fe8..b8f4dfc108 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -140,9 +140,6 @@ enum {
+     POWERPC_EXCP_HYPPRIV  =3D 41, /* Embedded hypervisor priv instructio=
+n      */
+     /* Vectors 42 to 63 are reserved                                    =
+     */
+     /* Exceptions defined in the PowerPC server specification           =
+     */
+-    /* Server doorbell variants */
+-#define POWERPC_EXCP_SDOOR      POWERPC_EXCP_GDOORI
+-#define POWERPC_EXCP_SDOOR_HV   POWERPC_EXCP_DOORI
+     POWERPC_EXCP_RESET    =3D 64, /* System reset exception             =
+       */
+     POWERPC_EXCP_DSEG     =3D 65, /* Data segment exception             =
+       */
+     POWERPC_EXCP_ISEG     =3D 66, /* Instruction segment exception      =
+       */
+@@ -189,8 +186,11 @@ enum {
+     POWERPC_EXCP_HV_EMU   =3D 96, /* HV emulation assistance            =
+       */
+     POWERPC_EXCP_HV_MAINT =3D 97, /* HMI                                =
+       */
+     POWERPC_EXCP_HV_FU    =3D 98, /* Hypervisor Facility unavailable    =
+       */
++    /* Server doorbell variants */
++    POWERPC_EXCP_SDOOR    =3D 99,
++    POWERPC_EXCP_SDOOR_HV =3D 100,
+     /* EOL                                                              =
+     */
+-    POWERPC_EXCP_NB       =3D 99,
++    POWERPC_EXCP_NB       =3D 101,
+     /* QEMU exceptions: used internally during code translation         =
+     */
+     POWERPC_EXCP_STOP         =3D 0x200, /* stop translation            =
+       */
+     POWERPC_EXCP_BRANCH       =3D 0x201, /* branch instruction          =
+       */
+--=20
 2.14.3
