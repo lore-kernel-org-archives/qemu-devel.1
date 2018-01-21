@@ -1,20 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gg-0000ZG-Ta
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:13 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ed8Se-0001id-9s
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:46:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ed8Gf-0007MT-5D
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:34:10 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Sun, 21 Jan 2018 16:33:52 +1100
-Message-Id: <20180121053353.25970-12-david@gibson.dropbear.id.au>
-In-Reply-To: <20180121053353.25970-1-david@gibson.dropbear.id.au>
-References: <20180121053353.25970-1-david@gibson.dropbear.id.au>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ed8SZ-0001MR-VZ
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:46:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48518)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ed8SZ-0001C6-Ir
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 00:46:27 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0L5iASu045076
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 00:46:24 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fmkfx251a-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 00:46:23 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Sun, 21 Jan 2018 00:46:22 -0500
+References: <20180119141105.29095-1-marcandre.lureau@redhat.com>
+	<20180119141105.29095-5-marcandre.lureau@redhat.com>
+	<f2ecf612-8538-f8d1-ffd8-f875aa453c42@amsat.org>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Sun, 21 Jan 2018 00:46:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <f2ecf612-8538-f8d1-ffd8-f875aa453c42@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <3c334ed0-3d9d-1ef5-27b7-aa587e5acd81@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/12] target/ppc: add support for hypervisor
- doorbells on book3s CPUs
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] tpm: add CRB device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,228 +42,660 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+On 01/20/2018 07:54 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 01/19/2018 11:11 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB)
+>> Interface as defined in TCG PC Client Platform TPM Profile (PTP)
+>> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03 v22.
+>>
+>> The PTP allows device implementation to switch between TIS and CRB
+>> model at run time, but given that CRB is a simpler device to
+>> implement, I chose to implement it as a different device.
+>>
+>> The device doesn't implement other locality than 0 for now (my laptop
+>> TPM doesn't either, so I assume this isn't so bad)
+>>
+>> The command/reply memory region is statically allocated after the CRB
+>> registers address TPM_CRB_ADDR_BASE + sizeof(struct crb_regs) (I
+>> wonder if the BIOS could or should allocate it instead, or what size
+>> to use, again this seems to fit well expectations)
+>>
+>> The PTP doesn't specify a particular bus to put the device. So I added
+>> it on the system bus directly, so it could hopefully be used easily on
+>> a different platform than x86. Currently, it fails to init on piix,
+>> because error_on_sysbus_device() check. The check may be changed in a
+>> near future, see discussion on the qemu-devel ML.
+>>
+>> Tested with some success with Linux upstream and Windows 10, seabios &
+>> modified ovmf. The device is recognized and correctly transmit
+>> command/response with passthrough & emu. However, we are missing PPI
+>> ACPI part atm.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> ---
+>>   qapi/tpm.json                      |   5 +-
+>>   include/hw/acpi/tpm.h              |  72 ++++++++
+>>   include/sysemu/tpm.h               |   3 +
+>>   hw/i386/acpi-build.c               |  34 +++-
+>>   hw/tpm/tpm_crb.c                   | 327 +++++++++++++++++++++++++++=
+++++++++++
+>>   default-configs/i386-softmmu.mak   |   1 +
+>>   default-configs/x86_64-softmmu.mak |   1 +
+>>   hw/tpm/Makefile.objs               |   1 +
+>>   8 files changed, 434 insertions(+), 10 deletions(-)
+>>   create mode 100644 hw/tpm/tpm_crb.c
+>>
+>> diff --git a/qapi/tpm.json b/qapi/tpm.json
+>> index 7093f268fb..d50deef5e9 100644
+>> --- a/qapi/tpm.json
+>> +++ b/qapi/tpm.json
+>> @@ -11,10 +11,11 @@
+>>   # An enumeration of TPM models
+>>   #
+>>   # @tpm-tis: TPM TIS model
+>> +# @tpm-crb: TPM CRB model (since 2.12)
+>>   #
+>>   # Since: 1.5
+>>   ##
+>> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
+>> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
+>>  =20
+>>   ##
+>>   # @query-tpm-models:
+>> @@ -28,7 +29,7 @@
+>>   # Example:
+>>   #
+>>   # -> { "execute": "query-tpm-models" }
+>> -# <- { "return": [ "tpm-tis" ] }
+>> +# <- { "return": [ "tpm-tis", "tpm-crb" ] }
+>>   #
+>>   ##
+>>   { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
+>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>> index 6d516c6a7f..b0048515fa 100644
+>> --- a/include/hw/acpi/tpm.h
+>> +++ b/include/hw/acpi/tpm.h
+>> @@ -16,11 +16,82 @@
+>>   #ifndef HW_ACPI_TPM_H
+>>   #define HW_ACPI_TPM_H
+>>  =20
+>> +#include "qemu/osdep.h"
+>> +
+>>   #define TPM_TIS_ADDR_BASE           0xFED40000
+>>   #define TPM_TIS_ADDR_SIZE           0x5000
+>>  =20
+>>   #define TPM_TIS_IRQ                 5
+>>  =20
+>> +struct crb_regs {
+>> +    union {
+>> +        uint32_t reg;
+>> +        struct {
+>> +            unsigned tpm_established:1;
+>> +            unsigned loc_assigned:1;
+>> +            unsigned active_locality:3;
+>> +            unsigned reserved:2;
+>> +            unsigned tpm_reg_valid_sts:1;
+>> +        } bits;
+> I suppose this is little-endian layout, so this won't work on big-endia=
+n
+> hosts.
+>
+> Can you add a qtest?
+>
+>> +    } loc_state;
+>> +    uint32_t reserved1;
+>> +    uint32_t loc_ctrl;
+>> +    union {
+>> +        uint32_t reg;
+>> +        struct {
+>> +            unsigned granted:1;
+>> +            unsigned been_seized:1;
+>> +        } bits;
+>
+> This is unclear where you expect those bits (right/left aligned).
+>
+> Can you add an unnamed field to be more explicit?
+>
+> i.e. without using struct if left alignment expected:
+>
+>             unsigned granted:1, been_seized:1, :30;
 
-The hypervisor doorbells are used by skiboot and Linux on POWER9
-processors to wake up secondaries.
 
-This adds processor control support to the Server architecture by
-reusing the Embedded support. They are very similar, only the bits
-definition of the CPU identifier differ.
+I got rid of all the bitfields and this patch here makes it work on a=20
+ppc64 big endian and also x86_64 host:
 
-Still to be done is message broadcast to all threads of the same
-processor.
+https://github.com/stefanberger/qemu-tpm/commit/28fc07f0d9314168986190eff=
+d6d72d9fd3972dd
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/cpu.h            |  8 +++++--
- target/ppc/excp_helper.c    | 52 +++++++++++++++++++++++++++++++++++++++=
-++++++
- target/ppc/helper.h         |  2 ++
- target/ppc/translate.c      | 25 ++++++++++++++++++++--
- target/ppc/translate_init.c |  2 +-
- 5 files changed, 84 insertions(+), 5 deletions(-)
+Regards,
+     Stefan
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index b8f4dfc108..603a38cae8 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -930,7 +930,7 @@ enum {
- #define BOOKE206_MAX_TLBN      4
-=20
- /***********************************************************************=
-******/
--/* Embedded.Processor Control */
-+/* Server and Embedded Processor Control */
-=20
- #define DBELL_TYPE_SHIFT               27
- #define DBELL_TYPE_MASK                (0x1f << DBELL_TYPE_SHIFT)
-@@ -940,11 +940,15 @@ enum {
- #define DBELL_TYPE_G_DBELL_CRIT        (0x03 << DBELL_TYPE_SHIFT)
- #define DBELL_TYPE_G_DBELL_MC          (0x04 << DBELL_TYPE_SHIFT)
-=20
--#define DBELL_BRDCAST                  (1 << 26)
-+#define DBELL_TYPE_DBELL_SERVER        (0x05 << DBELL_TYPE_SHIFT)
-+
-+#define DBELL_BRDCAST                  PPC_BIT(37)
- #define DBELL_LPIDTAG_SHIFT            14
- #define DBELL_LPIDTAG_MASK             (0xfff << DBELL_LPIDTAG_SHIFT)
- #define DBELL_PIRTAG_MASK              0x3fff
-=20
-+#define DBELL_PROCIDTAG_MASK           PPC_BITMASK(44, 63)
-+
- /***********************************************************************=
-******/
- /* Segment page size information, used by recent hash MMUs
-  * The format of this structure mirrors kvm_ppc_smmu_info
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 4e548a4487..c092fbead0 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -417,6 +417,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-     case POWERPC_EXCP_HISI:      /* Hypervisor instruction storage excep=
-tion */
-     case POWERPC_EXCP_HDSEG:     /* Hypervisor data segment exception   =
-     */
-     case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
-tion */
-+    case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
-     */
-     case POWERPC_EXCP_HV_EMU:
-         srr0 =3D SPR_HSRR0;
-         srr1 =3D SPR_HSRR1;
-@@ -846,6 +847,11 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_DOORI);
-             return;
-         }
-+        if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDOORBELL)) {
-+            env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDOORBELL)=
+
+>
+>> +    } loc_sts;
+>> +    uint8_t reserved2[32];
+>> +    union {
+>> +        uint64_t reg;
+>> +        struct {
+>> +            unsigned type:4;
+>> +            unsigned version:4;
+>> +            unsigned cap_locality:1;
+>> +            unsigned cap_crb_idle_bypass:1;
+>> +            unsigned reserved1:1;
+>> +            unsigned cap_data_xfer_size_support:2;
+>> +            unsigned cap_fifo:1;
+>> +            unsigned cap_crb:1;
+>> +            unsigned cap_if_res:2;
+>> +            unsigned if_selector:2;
+>> +            unsigned if_selector_lock:1;
+>> +            unsigned reserved2:4;
+>> +            unsigned rid:8;
+>> +            unsigned vid:16;
+>> +            unsigned did:16;
+>> +        } bits;
+>> +    } intf_id;
+>> +    uint64_t ctrl_ext;
+>> +
+>> +    uint32_t ctrl_req;
+>> +    union {
+>> +        uint32_t reg;
+>> +        struct {
+>> +            unsigned tpm_sts:1;
+>> +            unsigned tpm_idle:1;
+>> +            unsigned reserved:30;
+> Oh here you use 'reserved' to left align.
+>
+>> +        } bits;
+>> +    } ctrl_sts;
+>> +    uint32_t ctrl_cancel;
+>> +    uint32_t ctrl_start;
+>> +    uint32_t ctrl_int_enable;
+>> +    uint32_t ctrl_int_sts;
+>> +    uint32_t ctrl_cmd_size;
+>> +    uint32_t ctrl_cmd_pa_low;
+>> +    uint32_t ctrl_cmd_pa_high;
+>> +    uint32_t ctrl_rsp_size;
+>> +    uint64_t ctrl_rsp_pa;
+>> +    uint8_t reserved3[0x10];
+>> +} QEMU_PACKED;
+>> +
+>> +#define TPM_CRB_ADDR_BASE           0xFED40000
+>> +#define TPM_CRB_ADDR_SIZE           0x1000
+>> +#define TPM_CRB_ADDR_CTRL \
+>> +    (TPM_CRB_ADDR_BASE + offsetof(struct crb_regs, ctrl_req))
+>> +
+>>   #define TPM_LOG_AREA_MINIMUM_SIZE   (64 * 1024)
+>>  =20
+>>   #define TPM_TCPA_ACPI_CLASS_CLIENT  0
+>> @@ -30,5 +101,6 @@
+>>   #define TPM2_ACPI_CLASS_SERVER      1
+>>  =20
+>>   #define TPM2_START_METHOD_MMIO      6
+>> +#define TPM2_START_METHOD_CRB       7
+>>  =20
+>>   #endif /* HW_ACPI_TPM_H */
+>> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+>> index ac04a9d4a2..233b1a3fc3 100644
+>> --- a/include/sysemu/tpm.h
+>> +++ b/include/sysemu/tpm.h
+>> @@ -46,9 +46,12 @@ typedef struct TPMIfClass {
+>>   } TPMIfClass;
+>>  =20
+>>   #define TYPE_TPM_TIS                "tpm-tis"
+>> +#define TYPE_TPM_CRB                "tpm-crb"
+>>  =20
+>>   #define TPM_IS_TIS(chr)                             \
+>>       object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
+>> +#define TPM_IS_CRB(chr)                             \
+>> +    object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
+>>  =20
+>>   /* returns NULL unless there is exactly one TPM device */
+>>   static inline TPMIf *tpm_find(void)
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index dc4b2b9ffe..ed78c4ed9f 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2224,6 +2224,22 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
+er,
+>>               aml_append(sb_scope, scope);
+>>           }
+>>       }
+>> +
+>> +    if (TPM_IS_CRB(tpm_find())) {
+>> +        dev =3D aml_device("TPM");
+>> +        aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101"))=
+);
+>> +        crs =3D aml_resource_template();
+>> +        aml_append(crs, aml_memory32_fixed(TPM_CRB_ADDR_BASE,
+>> +                                           TPM_CRB_ADDR_SIZE, AML_REA=
+D_WRITE));
+>> +        aml_append(dev, aml_name_decl("_CRS", crs));
+>> +
+>> +        method =3D aml_method("_STA", 0, AML_NOTSERIALIZED);
+>> +        aml_append(method, aml_return(aml_int(0x0f)));
+>> +        aml_append(dev, method);
+>> +
+>> +        aml_append(sb_scope, dev);
+>> +    }
+>> +
+>>       aml_append(dsdt, sb_scope);
+>>  =20
+>>       /* copy AML table into ACPI tables blob and patch header there *=
+/
+>> @@ -2285,18 +2301,20 @@ build_tpm2(GArray *table_data, BIOSLinker *lin=
+ker, GArray *tcpalog)
+>>       if (TPM_IS_TIS(tpm_find())) {
+>>           tpm2_ptr->control_area_address =3D cpu_to_le64(0);
+>>           tpm2_ptr->start_method =3D cpu_to_le32(TPM2_START_METHOD_MMI=
+O);
+>> -
+>> -        tpm2_ptr->log_area_minimum_length =3D
+>> -            cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
+>> -
+>> -        /* log area start address to be filled by Guest linker */
+>> -        bios_linker_loader_add_pointer(linker,
+>> -            ACPI_BUILD_TABLE_FILE, log_addr_offset, log_addr_size,
+>> -            ACPI_BUILD_TPMLOG_FILE, 0);
+>> +    } else if (TPM_IS_CRB(tpm_find())) {
+>> +        tpm2_ptr->control_area_address =3D cpu_to_le64(TPM_CRB_ADDR_C=
+TRL);
+>> +        tpm2_ptr->start_method =3D cpu_to_le32(TPM2_START_METHOD_CRB)=
 ;
-+            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_SDOOR_HV);
-+            return;
-+        }
-         if (env->pending_interrupts & (1 << PPC_INTERRUPT_PERFM)) {
-             env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_PERFM);
-             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_PERFM);
-@@ -1145,4 +1151,50 @@ void helper_msgsnd(target_ulong rb)
-     }
-     qemu_mutex_unlock_iothread();
- }
-+
-+/* Server Processor Control */
-+static int book3s_dbell2irq(target_ulong rb)
-+{
-+    int msg =3D rb & DBELL_TYPE_MASK;
-+
-+    /* A Directed Hypervisor Doorbell message is sent only if the
-+     * message type is 5. All other types are reserved and the
-+     * instruction is a no-op */
-+    return msg =3D=3D DBELL_TYPE_DBELL_SERVER ? PPC_INTERRUPT_HDOORBELL =
-: -1;
-+}
-+
-+void helper_book3s_msgclr(CPUPPCState *env, target_ulong rb)
-+{
-+    int irq =3D book3s_dbell2irq(rb);
-+
-+    if (irq < 0) {
-+        return;
-+    }
-+
-+    env->pending_interrupts &=3D ~(1 << irq);
-+}
-+
-+void helper_book3s_msgsnd(target_ulong rb)
-+{
-+    int irq =3D book3s_dbell2irq(rb);
-+    int pir =3D rb & DBELL_PROCIDTAG_MASK;
-+    CPUState *cs;
-+
-+    if (irq < 0) {
-+        return;
-+    }
-+
-+    qemu_mutex_lock_iothread();
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+        CPUPPCState *cenv =3D &cpu->env;
-+
-+        /* TODO: broadcast message to all threads of the same  processor=
- */
-+        if (cenv->spr_cb[SPR_PIR].default_value =3D=3D pir) {
-+            cenv->pending_interrupts |=3D 1 << irq;
-+            cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+        }
-+    }
-+    qemu_mutex_unlock_iothread();
-+}
- #endif
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index bb6a94a8b3..5b739179b8 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -679,6 +679,8 @@ DEF_HELPER_FLAGS_3(store_sr, TCG_CALL_NO_RWG, void, e=
-nv, tl, tl)
- DEF_HELPER_FLAGS_1(602_mfrom, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_1(msgsnd, void, tl)
- DEF_HELPER_2(msgclr, void, env, tl)
-+DEF_HELPER_1(book3s_msgsnd, void, tl)
-+DEF_HELPER_2(book3s_msgclr, void, env, tl)
- #endif
-=20
- DEF_HELPER_4(dlmzb, tl, env, tl, tl, i32)
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index bcd36d5353..4132f67bb1 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6170,7 +6170,12 @@ static void gen_msgclr(DisasContext *ctx)
-     GEN_PRIV;
- #else
-     CHK_HV;
--    gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-+    /* 64-bit server processors compliant with arch 2.x */
-+    if (ctx->insns_flags & PPC_SEGMENT_64B) {
-+        gen_helper_book3s_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-+    } else {
-+        gen_helper_msgclr(cpu_env, cpu_gpr[rB(ctx->opcode)]);
-+    }
- #endif /* defined(CONFIG_USER_ONLY) */
- }
-=20
-@@ -6180,10 +6185,24 @@ static void gen_msgsnd(DisasContext *ctx)
-     GEN_PRIV;
- #else
-     CHK_HV;
--    gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-+    /* 64-bit server processors compliant with arch 2.x */
-+    if (ctx->insns_flags & PPC_SEGMENT_64B) {
-+        gen_helper_book3s_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-+    } else {
-+        gen_helper_msgsnd(cpu_gpr[rB(ctx->opcode)]);
-+    }
- #endif /* defined(CONFIG_USER_ONLY) */
- }
-=20
-+static void gen_msgsync(DisasContext *ctx)
-+{
-+#if defined(CONFIG_USER_ONLY)
-+    GEN_PRIV;
-+#else
-+    CHK_HV;
-+#endif /* defined(CONFIG_USER_ONLY) */
-+    /* interpreted as no-op */
-+}
-=20
- #if defined(TARGET_PPC64)
- static void gen_maddld(DisasContext *ctx)
-@@ -6664,6 +6683,8 @@ GEN_HANDLER2_E(msgsnd, "msgsnd", 0x1F, 0x0E, 0x06, =
-0x03ff0001,
-                PPC_NONE, PPC2_PRCNTL),
- GEN_HANDLER2_E(msgclr, "msgclr", 0x1F, 0x0E, 0x07, 0x03ff0001,
-                PPC_NONE, PPC2_PRCNTL),
-+GEN_HANDLER2_E(msgsync, "msgsync", 0x1F, 0x16, 0x1B, 0x00000000,
-+               PPC_NONE, PPC2_PRCNTL),
- GEN_HANDLER(wrtee, 0x1F, 0x03, 0x04, 0x000FFC01, PPC_WRTEE),
- GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
- GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 70ff15a51a..55c99c97e3 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8866,7 +8866,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                         PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
-                         PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
--                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300;
-+                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_PR=
-CNTL;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
---=20
-2.14.3
+>>       } else {
+>>           g_warn_if_reached();
+>>       }
+>>  =20
+>> +    tpm2_ptr->log_area_minimum_length =3D
+>> +        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
+>> +
+>> +    /* log area start address to be filled by Guest linker */
+>> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+>> +                                   log_addr_offset, log_addr_size,
+>> +                                   ACPI_BUILD_TPMLOG_FILE, 0);
+>>       build_header(linker, table_data,
+>>                    (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NUL=
+L, NULL);
+>>   }
+>> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+>> new file mode 100644
+>> index 0000000000..908ca18d92
+>> --- /dev/null
+>> +++ b/hw/tpm/tpm_crb.c
+>> @@ -0,0 +1,327 @@
+>> +/*
+>> + * tpm_crb.c - QEMU's TPM CRB interface emulator
+>> + *
+>> + * Copyright (c) 2017 Red Hat, Inc.
+>> + *
+>> + * Authors:
+>> + *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or=
+ later.
+>> + * See the COPYING file in the top-level directory.
+>> + *
+>> + * tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB) Inte=
+rface
+>> + * as defined in TCG PC Client Platform TPM Profile (PTP) Specificati=
+on
+>> + * Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03 v22
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +
+>> +#include "qemu-common.h"
+>> +#include "qapi/error.h"
+>> +#include "hw/sysbus.h"
+>> +#include "exec/address-spaces.h"
+>> +
+>> +#include "hw/pci/pci_ids.h"
+>> +#include "hw/acpi/tpm.h"
+>> +#include "sysemu/tpm_backend.h"
+>> +#include "tpm_int.h"
+>> +#include "tpm_util.h"
+>> +
+>> +typedef struct CRBState {
+>> +    SysBusDevice parent_obj;
+>> +
+>> +    TPMBackend *tpmbe;
+>> +    TPMBackendCmd cmd;
+>> +    struct crb_regs regs;
+>> +    MemoryRegion mmio;
+>> +    MemoryRegion cmdmem;
+>> +
+>> +    size_t be_buffer_size;
+>> +} CRBState;
+>> +
+>> +#define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+>> +
+>> +#define DEBUG_CRB 0
+>> +
+>> +#define DPRINTF(fmt, ...) do {                  \
+>> +        if (DEBUG_CRB) {                        \
+>> +            printf(fmt, ## __VA_ARGS__);        \
+>> +        }                                       \
+>> +    } while (0)
+>> +
+>> +#define CRB_ADDR_LOC_STATE offsetof(struct crb_regs, loc_state)
+>> +#define CRB_ADDR_LOC_CTRL offsetof(struct crb_regs, loc_ctrl)
+>> +#define CRB_ADDR_CTRL_REQ offsetof(struct crb_regs, ctrl_req)
+>> +#define CRB_ADDR_CTRL_CANCEL offsetof(struct crb_regs, ctrl_cancel)
+>> +#define CRB_ADDR_CTRL_START offsetof(struct crb_regs, ctrl_start)
+>> +
+>> +#define CRB_INTF_TYPE_CRB_ACTIVE 0b1
+>> +#define CRB_INTF_VERSION_CRB 0b1
+>> +#define CRB_INTF_CAP_LOCALITY_0_ONLY 0b0
+>> +#define CRB_INTF_CAP_IDLE_FAST 0b0
+>> +#define CRB_INTF_CAP_XFER_SIZE_64 0b11
+>> +#define CRB_INTF_CAP_FIFO_NOT_SUPPORTED 0b0
+>> +#define CRB_INTF_CAP_CRB_SUPPORTED 0b1
+>> +#define CRB_INTF_IF_SELECTOR_CRB 0b1
+>> +#define CRB_INTF_IF_SELECTOR_UNLOCKED 0b0
+>> +
+>> +#define CRB_CTRL_CMD_SIZE (TPM_CRB_ADDR_SIZE - sizeof(struct crb_regs=
+))
+>> +
+>> +enum crb_loc_ctrl {
+>> +    CRB_LOC_CTRL_REQUEST_ACCESS =3D BIT(0),
+>> +    CRB_LOC_CTRL_RELINQUISH =3D BIT(1),
+>> +    CRB_LOC_CTRL_SEIZE =3D BIT(2),
+>> +    CRB_LOC_CTRL_RESET_ESTABLISHMENT_BIT =3D BIT(3),
+>> +};
+>> +
+>> +enum crb_ctrl_req {
+>> +    CRB_CTRL_REQ_CMD_READY =3D BIT(0),
+>> +    CRB_CTRL_REQ_GO_IDLE =3D BIT(1),
+>> +};
+>> +
+>> +enum crb_start {
+>> +    CRB_START_INVOKE =3D BIT(0),
+>> +};
+>> +
+>> +enum crb_cancel {
+>> +    CRB_CANCEL_INVOKE =3D BIT(0),
+>> +};
+>> +
+>> +static const char *addr_desc(unsigned off)
+>> +{
+>> +    struct crb_regs crb;
+>> +
+>> +    switch (off) {
+>> +#define CASE(field)                                                 \
+>> +    case offsetof(struct crb_regs, field) ...                       \
+>> +        offsetof(struct crb_regs, field) + sizeof(crb.field) - 1:   \
+>> +        return G_STRINGIFY(field);
+>> +        CASE(loc_state);
+>> +        CASE(reserved1);
+>> +        CASE(loc_ctrl);
+>> +        CASE(loc_sts);
+>> +        CASE(reserved2);
+>> +        CASE(intf_id);
+>> +        CASE(ctrl_ext);
+>> +        CASE(ctrl_req);
+>> +        CASE(ctrl_sts);
+>> +        CASE(ctrl_cancel);
+>> +        CASE(ctrl_start);
+>> +        CASE(ctrl_int_enable);
+>> +        CASE(ctrl_int_sts);
+>> +        CASE(ctrl_cmd_size);
+>> +        CASE(ctrl_cmd_pa_low);
+>> +        CASE(ctrl_cmd_pa_high);
+>> +        CASE(ctrl_rsp_size);
+>> +        CASE(ctrl_rsp_pa);
+>> +#undef CASE
+>> +    }
+>> +    return NULL;
+>> +}
+>> +
+>> +static uint64_t tpm_crb_mmio_read(void *opaque, hwaddr addr,
+>> +                                  unsigned size)
+>> +{
+>> +    CRBState *s =3D CRB(opaque);
+>> +    DPRINTF("CRB read 0x%lx:%s len:%u\n",
+>> +            addr, addr_desc(addr), size);
+>> +    void *regs =3D (void *)&s->regs + addr;
+>> +
+>> +    switch (size) {
+>> +    case 1:
+>> +        return *(uint8_t *)regs;
+>> +    case 2:
+>> +        return *(uint16_t *)regs;
+>> +    case 4:
+>> +        return *(uint32_t *)regs;
+>> +    default:
+>> +        g_return_val_if_reached(-1);
+>> +    }
+>> +}
+>> +
+>> +static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
+>> +                               uint64_t val, unsigned size)
+>> +{
+>> +    CRBState *s =3D CRB(opaque);
+>> +    DPRINTF("CRB write 0x%lx:%s len:%u val:%lu\n",
+>> +            addr, addr_desc(addr), size, val);
+>> +
+>> +    switch (addr) {
+>> +    case CRB_ADDR_CTRL_REQ:
+>> +        switch (val) {
+>> +        case CRB_CTRL_REQ_CMD_READY:
+>> +            s->regs.ctrl_sts.bits.tpm_idle =3D 0;
+>> +            break;
+>> +        case CRB_CTRL_REQ_GO_IDLE:
+>> +            s->regs.ctrl_sts.bits.tpm_idle =3D 1;
+>> +            break;
+>> +        }
+>> +        break;
+>> +    case CRB_ADDR_CTRL_CANCEL:
+>> +        if (val =3D=3D CRB_CANCEL_INVOKE && s->regs.ctrl_start & CRB_=
+START_INVOKE) {
+>> +            tpm_backend_cancel_cmd(s->tpmbe);
+>> +        }
+>> +        break;
+>> +    case CRB_ADDR_CTRL_START:
+>> +        if (val =3D=3D CRB_START_INVOKE &&
+>> +            !(s->regs.ctrl_start & CRB_START_INVOKE)) {
+>> +            void *mem =3D memory_region_get_ram_ptr(&s->cmdmem);
+>> +
+>> +            s->regs.ctrl_start |=3D CRB_START_INVOKE;
+>> +            s->cmd =3D (TPMBackendCmd) {
+>> +                .in =3D mem,
+>> +                .in_len =3D MIN(tpm_cmd_get_size(mem), s->be_buffer_s=
+ize),
+>> +                .out =3D mem,
+>> +                .out_len =3D s->be_buffer_size,
+>> +            };
+>> +
+>> +            tpm_backend_deliver_request(s->tpmbe, &s->cmd);
+>> +        }
+>> +        break;
+>> +    case CRB_ADDR_LOC_CTRL:
+>> +        switch (val) {
+>> +        case CRB_LOC_CTRL_RESET_ESTABLISHMENT_BIT:
+>> +            /* not loc 3 or 4 */
+>> +            break;
+>> +        case CRB_LOC_CTRL_RELINQUISH:
+>> +            break;
+>> +        case CRB_LOC_CTRL_REQUEST_ACCESS:
+>> +            s->regs.loc_sts.bits.granted =3D 1;
+>> +            s->regs.loc_sts.bits.been_seized =3D 0;
+>> +            s->regs.loc_state.bits.loc_assigned =3D 1;
+>> +            s->regs.loc_state.bits.tpm_reg_valid_sts =3D 1;
+>> +            break;
+>> +        }
+>> +        break;
+>> +    }
+>> +}
+>> +
+>> +static const MemoryRegionOps tpm_crb_memory_ops =3D {
+>> +    .read =3D tpm_crb_mmio_read,
+>> +    .write =3D tpm_crb_mmio_write,
+>> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
+>> +    .valid =3D {
+>> +        .min_access_size =3D 1,
+>> +        .max_access_size =3D 4,
+>> +    },
+>> +};
+>> +
+>> +static void tpm_crb_reset(DeviceState *dev)
+>> +{
+>> +    CRBState *s =3D CRB(dev);
+>> +
+>> +    tpm_backend_reset(s->tpmbe);
+>> +
+>> +    s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->tpmbe),
+>> +                            CRB_CTRL_CMD_SIZE);
+>> +
+>> +    s->regs =3D (struct crb_regs) {
+>> +        .intf_id.bits =3D {
+>> +            .type =3D CRB_INTF_TYPE_CRB_ACTIVE,
+>> +            .version =3D CRB_INTF_VERSION_CRB,
+>> +            .cap_locality =3D CRB_INTF_CAP_LOCALITY_0_ONLY,
+>> +            .cap_crb_idle_bypass =3D CRB_INTF_CAP_IDLE_FAST,
+>> +            .cap_data_xfer_size_support =3D CRB_INTF_CAP_XFER_SIZE_64=
+,
+>> +            .cap_fifo =3D CRB_INTF_CAP_FIFO_NOT_SUPPORTED,
+>> +            .cap_crb =3D CRB_INTF_CAP_CRB_SUPPORTED,
+>> +            .cap_if_res =3D 0b0,
+>> +            .if_selector =3D CRB_INTF_IF_SELECTOR_CRB,
+>> +            .if_selector_lock =3D CRB_INTF_IF_SELECTOR_UNLOCKED,
+>> +            .rid =3D 0b0001,
+>> +            .vid =3D PCI_VENDOR_ID_IBM,
+>> +            .did =3D 0b0001,
+>> +        },
+>> +        .ctrl_cmd_size =3D CRB_CTRL_CMD_SIZE,
+>> +        .ctrl_cmd_pa_low =3D TPM_CRB_ADDR_BASE + sizeof(struct crb_re=
+gs),
+>> +        .ctrl_rsp_size =3D CRB_CTRL_CMD_SIZE,
+>> +        .ctrl_rsp_pa =3D TPM_CRB_ADDR_BASE + sizeof(struct crb_regs),
+>> +    };
+>> +
+>> +    tpm_backend_startup_tpm(s->tpmbe, s->be_buffer_size);
+>> +}
+>> +
+>> +static void tpm_crb_request_completed(TPMIf *ti, int ret)
+>> +{
+>> +    CRBState *s =3D CRB(ti);
+>> +
+>> +    s->regs.ctrl_start &=3D ~CRB_START_INVOKE;
+>> +    if (ret !=3D 0) {
+>> +        s->regs.ctrl_sts.bits.tpm_sts =3D 1; /* fatal error */
+>> +    }
+>> +}
+>> +
+>> +static enum TPMVersion tpm_crb_get_version(TPMIf *ti)
+>> +{
+>> +    CRBState *s =3D CRB(ti);
+>> +
+>> +    return tpm_backend_get_tpm_version(s->tpmbe);
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_tpm_crb =3D {
+>> +    .name =3D "tpm-crb",
+>> +    .unmigratable =3D 1,
+>> +};
+>> +
+>> +static Property tpm_crb_properties[] =3D {
+>> +    DEFINE_PROP_TPMBE("tpmdev", CRBState, tpmbe),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>> +static void tpm_crb_realizefn(DeviceState *dev, Error **errp)
+>> +{
+>> +    CRBState *s =3D CRB(dev);
+>> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+>> +
+>> +    if (!tpm_find()) {
+>> +        error_setg(errp, "at most one TPM device is permitted");
+>> +        return;
+>> +    }
+>> +    if (!s->tpmbe) {
+>> +        error_setg(errp, "'tpmdev' property is required");
+>> +        return;
+>> +    }
+>> +
+>> +    memory_region_init_io(&s->mmio, OBJECT(s), &tpm_crb_memory_ops, s=
+,
+>> +        "tpm-crb-mmio", sizeof(struct crb_regs));
+>> +    memory_region_init_ram(&s->cmdmem, OBJECT(s),
+>> +        "tpm-crb-cmd", CRB_CTRL_CMD_SIZE, errp);
+>> +
+>> +    sysbus_init_mmio(sbd, &s->mmio);
+>> +    sysbus_mmio_map(sbd, 0, TPM_CRB_ADDR_BASE);
+>> +    /* allocate ram in bios instead? */
+>> +    memory_region_add_subregion(get_system_memory(),
+>> +        TPM_CRB_ADDR_BASE + sizeof(struct crb_regs), &s->cmdmem);
+>> +}
+>> +
+>> +static void tpm_crb_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> +    TPMIfClass *tc =3D TPM_IF_CLASS(klass);
+>> +
+>> +    dc->realize =3D tpm_crb_realizefn;
+>> +    dc->props =3D tpm_crb_properties;
+>> +    dc->reset =3D tpm_crb_reset;
+>> +    dc->vmsd  =3D &vmstate_tpm_crb;
+>> +    dc->user_creatable =3D true;
+>> +    tc->model =3D TPM_MODEL_TPM_CRB;
+>> +    tc->get_version =3D tpm_crb_get_version;
+>> +    tc->request_completed =3D tpm_crb_request_completed;
+>> +}
+>> +
+>> +static const TypeInfo tpm_crb_info =3D {
+>> +    .name =3D TYPE_TPM_CRB,
+>> +    .parent =3D TYPE_SYS_BUS_DEVICE,
+>> +    .instance_size =3D sizeof(CRBState),
+>> +    .class_init  =3D tpm_crb_class_init,
+>> +    .interfaces =3D (InterfaceInfo[]) {
+>> +        { TYPE_TPM_IF },
+>> +        { }
+>> +    }
+>> +};
+>> +
+>> +static void tpm_crb_register(void)
+>> +{
+>> +    type_register_static(&tpm_crb_info);
+>> +}
+>> +
+>> +type_init(tpm_crb_register)
+>> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-s=
+oftmmu.mak
+>> index 95ac4b464a..ac27700e79 100644
+>> --- a/default-configs/i386-softmmu.mak
+>> +++ b/default-configs/i386-softmmu.mak
+>> @@ -37,6 +37,7 @@ CONFIG_APPLESMC=3Dy
+>>   CONFIG_I8259=3Dy
+>>   CONFIG_PFLASH_CFI01=3Dy
+>>   CONFIG_TPM_TIS=3D$(CONFIG_TPM)
+>> +CONFIG_TPM_CRB=3D$(CONFIG_TPM)
+>>   CONFIG_MC146818RTC=3Dy
+>>   CONFIG_PCI_PIIX=3Dy
+>>   CONFIG_WDT_IB700=3Dy
+>> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_=
+64-softmmu.mak
+>> index 0221236825..b2104ade19 100644
+>> --- a/default-configs/x86_64-softmmu.mak
+>> +++ b/default-configs/x86_64-softmmu.mak
+>> @@ -37,6 +37,7 @@ CONFIG_APPLESMC=3Dy
+>>   CONFIG_I8259=3Dy
+>>   CONFIG_PFLASH_CFI01=3Dy
+>>   CONFIG_TPM_TIS=3D$(CONFIG_TPM)
+>> +CONFIG_TPM_CRB=3D$(CONFIG_TPM)
+>>   CONFIG_MC146818RTC=3Dy
+>>   CONFIG_PCI_PIIX=3Dy
+>>   CONFIG_WDT_IB700=3Dy
+>> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+>> index 7a93b24636..1dc9f8bf2c 100644
+>> --- a/hw/tpm/Makefile.objs
+>> +++ b/hw/tpm/Makefile.objs
+>> @@ -1,4 +1,5 @@
+>>   common-obj-y +=3D tpm_util.o
+>>   common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+>> +common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+>>   common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
+>>   common-obj-$(CONFIG_TPM_EMULATOR) +=3D tpm_emulator.o
+>>
