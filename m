@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1edFAM-0005Sl-Rz
+	(envelope-from <jianjay.zhou@huawei.com>) id 1edFAM-0005Sk-Rb
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 07:56:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1edFAI-0000sc-Vm
+	(envelope-from <jianjay.zhou@huawei.com>) id 1edFAJ-0000si-1s
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 07:56:06 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2077 helo=huawei.com)
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2075 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1edFAI-0000rb-KT
+	id 1edFAI-0000rT-M4
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 07:56:02 -0500
 From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Sun, 21 Jan 2018 20:54:50 +0800
-Message-ID: <c0bb426f73000d6c6692cd655e49beac678f3455.1516538887.git.arei.gonglei@huawei.com>
-In-Reply-To: <cover.1516538887.git.arei.gonglei@huawei.com>
-References: <cover.1516538887.git.arei.gonglei@huawei.com>
+Date: Sun, 21 Jan 2018 20:54:46 +0800
+Message-ID: <cover.1516538887.git.arei.gonglei@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 4/4] cryptodev-vhost-user: set the key length
+Subject: [Qemu-devel] [PATCH v6 0/4] cryptodev: add vhost support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +29,64 @@ Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redh
 
 From: Gonglei <arei.gonglei@huawei.com>
 
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- backends/cryptodev-vhost-user.c       | 4 ++++
- include/sysemu/cryptodev-vhost-user.h | 3 +++
- 2 files changed, 7 insertions(+)
+I posted the RFC verion a few months ago for DPDK
+vhost-crypto implmention, and now it's time to send
+the formal version. Because we need an user space scheme
+for better performance.
 
-diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
-index 7bd0929..11b834b 100644
---- a/backends/cryptodev-vhost-user.c
-+++ b/backends/cryptodev-vhost-user.c
-@@ -226,6 +226,10 @@ static void cryptodev_vhost_user_init(
-                          1u << VIRTIO_CRYPTO_SERVICE_MAC;
-     backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
-     backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
-+
-+    backend->conf.max_size = UINT64_MAX;
-+    backend->conf.max_cipher_key_len = VHOST_USER_MAX_AUTH_KEY_LEN;
-+    backend->conf.max_auth_key_len = VHOST_USER_MAX_AUTH_KEY_LEN;
- }
- 
- static int64_t cryptodev_vhost_user_sym_create_session(
-diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/cryptodev-vhost-user.h
-index 937217b..6debf53 100644
---- a/include/sysemu/cryptodev-vhost-user.h
-+++ b/include/sysemu/cryptodev-vhost-user.h
-@@ -23,6 +23,9 @@
- #ifndef CRYPTODEV_VHOST_USER_H
- #define CRYPTODEV_VHOST_USER_H
- 
-+#define VHOST_USER_MAX_AUTH_KEY_LEN    512
-+#define VHOST_USER_MAX_CIPHER_KEY_LEN  64
-+
- 
- /**
-  * cryptodev_vhost_user_get_vhost:
--- 
+The vhost user crypto server side patches had been
+sent to DPDK community, pls see
+
+[RFC PATCH 0/6] lib/librte_vhost: introduce new vhost_user crypto backend
+support
+http://dpdk.org/ml/archives/dev/2017-November/081048.html
+
+You also can get virtio-crypto polling mode driver from:
+
+[PATCH] virtio: add new driver for crypto devices
+http://dpdk.org/ml/archives/dev/2017-November/081985.html
+
+v5 -> v6:
+  Fix compile error about backends/cryptodev-vhost-user.o and rebase on
+  the master
+v4 -> v5:
+  squash [PATCH v4 5/5] into previous patches [Michael]
+v3 -> v4:
+  "[PATCH v4 5/5] cryptodev-vhost-user: depend on CONFIG_VHOST_CRYPTO
+  and CONFIG_VHOST_USER" newly added to fix compilation dependency [Michael]
+v2 -> v3:
+  New added vhost user messages should be sent only when feature
+  has been successfully negotiated [Michael]
+v1 -> v2:
+  Fix compile error on mingw32
+
+Gonglei (4):
+  cryptodev: add vhost-user as a new cryptodev backend
+  cryptodev: add vhost support
+  cryptodev-vhost-user: add crypto session handler
+  cryptodev-vhost-user: set the key length
+
+ backends/Makefile.objs                |   6 +
+ backends/cryptodev-builtin.c          |   1 +
+ backends/cryptodev-vhost-user.c       | 379 ++++++++++++++++++++++++++++++++++
+ backends/cryptodev-vhost.c            | 347 +++++++++++++++++++++++++++++++
+ configure                             |  15 ++
+ docs/interop/vhost-user.txt           |  26 +++
+ hw/virtio/Makefile.objs               |   2 +-
+ hw/virtio/vhost-user.c                | 104 ++++++++++
+ hw/virtio/virtio-crypto.c             |  70 +++++++
+ include/hw/virtio/vhost-backend.h     |   8 +
+ include/hw/virtio/virtio-crypto.h     |   1 +
+ include/sysemu/cryptodev-vhost-user.h |  47 +++++
+ include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
+ include/sysemu/cryptodev.h            |   8 +
+ qemu-options.hx                       |  21 ++
+ vl.c                                  |   6 +
+ 16 files changed, 1194 insertions(+), 1 deletion(-)
+ create mode 100644 backends/cryptodev-vhost-user.c
+ create mode 100644 backends/cryptodev-vhost.c
+ create mode 100644 include/sysemu/cryptodev-vhost-user.h
+ create mode 100644 include/sysemu/cryptodev-vhost.h
+
+--
 1.8.3.1
