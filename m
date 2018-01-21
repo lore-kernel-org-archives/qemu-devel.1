@@ -1,14 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edNcu-0008Kp-F0
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 16:58:09 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1edNg0-00019w-CK
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 17:01:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edNco-00062a-K2
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 16:58:05 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Sun, 21 Jan 2018 22:57:58 +0100
-Message-Id: <1516571878-13321-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] ppc: Deprecate qemu-system-ppcemb
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1edNfx-00006e-AM
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 17:01:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1edNfx-00005l-1V
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 17:01:17 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0LLxIMn089725
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 17:01:15 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fmkpjxyfp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 17:01:15 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Sun, 21 Jan 2018 15:01:14 -0700
+References: <20180119141105.29095-1-marcandre.lureau@redhat.com>
+	<20180119141105.29095-5-marcandre.lureau@redhat.com>
+	<f2ecf612-8538-f8d1-ffd8-f875aa453c42@amsat.org>
+	<3c334ed0-3d9d-1ef5-27b7-aa587e5acd81@linux.vnet.ibm.com>
+	<CAMxuvaxyBmEEnk_dtFR4qbk_-95ROnR6o-3gR7U=HNJAhV5DdA@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Sun, 21 Jan 2018 17:01:08 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAMxuvaxyBmEEnk_dtFR4qbk_-95ROnR6o-3gR7U=HNJAhV5DdA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <6cb2b88f-0c8b-4bab-c8fc-018dd0cbc662@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] tpm: add CRB device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,146 +44,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <dgibson@redhat.com>, qemu-ppc@nongnu.org
+To: Marc-Andre Lureau <mlureau@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-qemu-system-ppcemb has been once split of qemu-system-ppc to support
-CPU page sizes < 4096 for some of the embedded 4xx PowerPC CPUs.
-However, there was hardly any OS available in the wild that really
-used such small page sizes (Linux uses 4096 on PPC), so there is
-no known recent use case for this separate build anymore. It's
-rather cumbersome to maintain a separate set of config switches for
-this, and it's wasting compile and test time of all the developers
-who have to build all QEMU targets to verify that their changes did
-not break anything.
+On 01/21/2018 02:24 PM, Marc-Andre Lureau wrote:
+> Hi
+>
+> On Sun, Jan 21, 2018 at 6:46 AM, Stefan Berger
+> <stefanb@linux.vnet.ibm.com> wrote:
+>> On 01/20/2018 07:54 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 01/19/2018 11:11 AM, Marc-Andr=C3=A9 Lureau wrote:
+>>>> tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB)
+>>>> Interface as defined in TCG PC Client Platform TPM Profile (PTP)
+>>>> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03 v=
+22.
+>>>>
+>>>> The PTP allows device implementation to switch between TIS and CRB
+>>>> model at run time, but given that CRB is a simpler device to
+>>>> implement, I chose to implement it as a different device.
+>>>>
+>>>> The device doesn't implement other locality than 0 for now (my lapto=
+p
+>>>> TPM doesn't either, so I assume this isn't so bad)
+>>>>
+>>>> The command/reply memory region is statically allocated after the CR=
+B
+>>>> registers address TPM_CRB_ADDR_BASE + sizeof(struct crb_regs) (I
+>>>> wonder if the BIOS could or should allocate it instead, or what size
+>>>> to use, again this seems to fit well expectations)
+>>>>
+>>>> The PTP doesn't specify a particular bus to put the device. So I add=
+ed
+>>>> it on the system bus directly, so it could hopefully be used easily =
+on
+>>>> a different platform than x86. Currently, it fails to init on piix,
+>>>> because error_on_sysbus_device() check. The check may be changed in =
+a
+>>>> near future, see discussion on the qemu-devel ML.
+>>>>
+>>>> Tested with some success with Linux upstream and Windows 10, seabios=
+ &
+>>>> modified ovmf. The device is recognized and correctly transmit
+>>>> command/response with passthrough & emu. However, we are missing PPI
+>>>> ACPI part atm.
+>>>>
+>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>>> ---
+>>>>    qapi/tpm.json                      |   5 +-
+>>>>    include/hw/acpi/tpm.h              |  72 ++++++++
+>>>>    include/sysemu/tpm.h               |   3 +
+>>>>    hw/i386/acpi-build.c               |  34 +++-
+>>>>    hw/tpm/tpm_crb.c                   | 327
+>>>> +++++++++++++++++++++++++++++++++++++
+>>>>    default-configs/i386-softmmu.mak   |   1 +
+>>>>    default-configs/x86_64-softmmu.mak |   1 +
+>>>>    hw/tpm/Makefile.objs               |   1 +
+>>>>    8 files changed, 434 insertions(+), 10 deletions(-)
+>>>>    create mode 100644 hw/tpm/tpm_crb.c
+>>>>
+>>>> diff --git a/qapi/tpm.json b/qapi/tpm.json
+>>>> index 7093f268fb..d50deef5e9 100644
+>>>> --- a/qapi/tpm.json
+>>>> +++ b/qapi/tpm.json
+>>>> @@ -11,10 +11,11 @@
+>>>>    # An enumeration of TPM models
+>>>>    #
+>>>>    # @tpm-tis: TPM TIS model
+>>>> +# @tpm-crb: TPM CRB model (since 2.12)
+>>>>    #
+>>>>    # Since: 1.5
+>>>>    ##
+>>>> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
+>>>> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
+>>>>      ##
+>>>>    # @query-tpm-models:
+>>>> @@ -28,7 +29,7 @@
+>>>>    # Example:
+>>>>    #
+>>>>    # -> { "execute": "query-tpm-models" }
+>>>> -# <- { "return": [ "tpm-tis" ] }
+>>>> +# <- { "return": [ "tpm-tis", "tpm-crb" ] }
+>>>>    #
+>>>>    ##
+>>>>    { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
+>>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>>>> index 6d516c6a7f..b0048515fa 100644
+>>>> --- a/include/hw/acpi/tpm.h
+>>>> +++ b/include/hw/acpi/tpm.h
+>>>> @@ -16,11 +16,82 @@
+>>>>    #ifndef HW_ACPI_TPM_H
+>>>>    #define HW_ACPI_TPM_H
+>>>>    +#include "qemu/osdep.h"
+>>>> +
+>>>>    #define TPM_TIS_ADDR_BASE           0xFED40000
+>>>>    #define TPM_TIS_ADDR_SIZE           0x5000
+>>>>      #define TPM_TIS_IRQ                 5
+>>>>    +struct crb_regs {
+>>>> +    union {
+>>>> +        uint32_t reg;
+>>>> +        struct {
+>>>> +            unsigned tpm_established:1;
+>>>> +            unsigned loc_assigned:1;
+>>>> +            unsigned active_locality:3;
+>>>> +            unsigned reserved:2;
+>>>> +            unsigned tpm_reg_valid_sts:1;
+>>>> +        } bits;
+>>> I suppose this is little-endian layout, so this won't work on big-end=
+ian
+>>> hosts.
+>>>
+>>> Can you add a qtest?
+>>>
+>>>> +    } loc_state;
+>>>> +    uint32_t reserved1;
+>>>> +    uint32_t loc_ctrl;
+>>>> +    union {
+>>>> +        uint32_t reg;
+>>>> +        struct {
+>>>> +            unsigned granted:1;
+>>>> +            unsigned been_seized:1;
+>>>> +        } bits;
+>>>
+>>> This is unclear where you expect those bits (right/left aligned).
+>>>
+>>> Can you add an unnamed field to be more explicit?
+>>>
+>>> i.e. without using struct if left alignment expected:
+>>>
+>>>              unsigned granted:1, been_seized:1, :30;
+>>
+>>
+>> I got rid of all the bitfields and this patch here makes it work on a =
+ppc64
+>> big endian and also x86_64 host:
+>>
+>> https://github.com/stefanberger/qemu-tpm/commit/28fc07f0d9314168986190=
+effd6d72d9fd3972dd
+>>
+> Thank you Stefan! I am all for squashing this fix to the patch. You
+> should then add your signed-off to the commit.
 
-Except for the small CPU page sizes, qemu-system-ppc can be used as
-a full replacement for qemu-system-ppcemb since it contains all the
-embedded 4xx PPC boards and CPUs, too. Thus let's start the deprecation
-process for qemu-system-ppcemb to see whether somebody still needs
-the small page sizes or whether we could finally remove this unloved
-separate build.
+I'll do that.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v3: Use qtest_enabled() and emit the deprecation message in the
-     machine init functions (I unfortunately haven't found a better
-     common spot for all 4xx machines where qtest_enabled() works).
+The TIS is an ISA Device and the CRB is similar. Considering the=20
+complications with the sysbus devices where one has to explicitly allow=20
+it for a certain machine type, I would advocate to convert the CRB to an=20
+ISA device. A patch that does that is this one:
 
- hw/ppc/ppc405_boards.c | 14 ++++++++++++++
- hw/ppc/ppc440_bamboo.c |  9 +++++++++
- hw/ppc/virtex_ml507.c  |  8 ++++++++
- qemu-doc.texi          |  6 ++++++
- 4 files changed, 37 insertions(+)
+https://github.com/stefanberger/qemu-tpm/commit/08c61bd666f82084c42621f42=
+85bcac08fb4f713
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index e92db2c..6f7f2ee 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -202,6 +202,13 @@ static void ref405ep_init(MachineState *machine)
-     DriveInfo *dinfo;
-     MemoryRegion *sysmem = get_system_memory();
- 
-+#ifdef TARGET_PPCEMB
-+    if (!qtest_enabled()) {
-+        warn_report("qemu-system-ppcemb is deprecated, "
-+                    "please use qemu-system-ppc instead.");
-+    }
-+#endif
-+
-     /* XXX: fix this */
-     memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.ram",
-                                          0x08000000);
-@@ -497,6 +504,13 @@ static void taihu_405ep_init(MachineState *machine)
-     int fl_idx, fl_sectors;
-     DriveInfo *dinfo;
- 
-+#ifdef TARGET_PPCEMB
-+    if (!qtest_enabled()) {
-+        warn_report("qemu-system-ppcemb is deprecated, "
-+                    "please use qemu-system-ppc instead.");
-+    }
-+#endif
-+
-     /* RAM is soldered to the board so the size cannot be changed */
-     ram_size = 0x08000000;
-     memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index 693c215..a299206 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -13,6 +13,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-+#include "qemu/error-report.h"
- #include "net/net.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
-@@ -27,6 +28,7 @@
- #include "hw/ppc/ppc.h"
- #include "ppc405.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
- #include "hw/sysbus.h"
- 
- #define BINARY_DEVICE_TREE_FILE "bamboo.dtb"
-@@ -191,6 +193,13 @@ static void bamboo_init(MachineState *machine)
-         exit(1);
-     }
- 
-+#ifdef TARGET_PPCEMB
-+    if (!qtest_enabled()) {
-+        warn_report("qemu-system-ppcemb is deprecated, "
-+                    "please use qemu-system-ppc instead.");
-+    }
-+#endif
-+
-     qemu_register_reset(main_cpu_reset, cpu);
-     ppc_booke_timers_init(cpu, 400000000, 0);
-     ppc_dcr_init(env, NULL, NULL);
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index 5ac4f76..9fe7655 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -29,6 +29,7 @@
- #include "hw/char/serial.h"
- #include "hw/block/flash.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
- #include "hw/devices.h"
- #include "hw/boards.h"
- #include "sysemu/device_tree.h"
-@@ -210,6 +211,13 @@ static void virtex_init(MachineState *machine)
-     int kernel_size;
-     int i;
- 
-+#ifdef TARGET_PPCEMB
-+    if (!qtest_enabled()) {
-+        warn_report("qemu-system-ppcemb is deprecated, "
-+                    "please use qemu-system-ppc instead.");
-+    }
-+#endif
-+
-     /* init CPUs */
-     cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_type, 400000000);
-     env = &cpu->env;
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 3e9eb81..b13c633 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2766,6 +2766,12 @@ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
- The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
- or ``ivshmem-doorbell`` device types.
- 
-+@subsection Page size support < 4k for embedded PowerPC CPUs (since 2.12.0)
-+
-+qemu-system-ppcemb will be removed. qemu-system-ppc (or qemu-system-ppc64)
-+should be used instead. That means that embedded 4xx PowerPC CPUs will not
-+support page sizes < 4096 any longer.
-+
- @section System emulator machines
- 
- @subsection Xilinx EP108 (since 2.11.0)
--- 
-1.8.3.1
+     Stefan
