@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBfq-0006Ei-1M
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBfq-0006F5-TQ
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBfn-000389-NY
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1edBfp-0003A2-AC
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:22 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:47991
+Received: from chuckie.co.uk ([82.165.15.123]:47994
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1edBfn-00036d-DD
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:19 -0500
+	id 1edBfp-000399-4J
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 04:12:21 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 21 Jan 2018 09:11:50 +0000
-Message-Id: <20180121091154.17426-7-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 21 Jan 2018 09:11:51 +0000
+Message-Id: <20180121091154.17426-8-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180121091154.17426-1-mark.cave-ayland@ilande.co.uk>
 References: <20180121091154.17426-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCHv2 06/10] apb: rename QOM type from TYPE_APB to
- TYPE_SABRE
+Subject: [Qemu-devel] [PATCHv2 07/10] sun4u: rename apb variables and
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,194 +32,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Similarly rename the corresponding APBState typedef to SabreState.
+In order to reflect the previous change of TYPE_APB to TYPE_SABRE, update
+the corresponding variable names to keep the terminology consistent.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
 ---
- hw/pci-host/apb.c         | 30 +++++++++++++++---------------
- hw/sparc64/sun4u.c        |  6 +++---
- include/hw/pci-host/apb.h | 10 +++++-----
- 3 files changed, 23 insertions(+), 23 deletions(-)
+ hw/sparc64/sun4u.c | 41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
 
-diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index 36c6251816..f6c5dbd469 100644
---- a/hw/pci-host/apb.c
-+++ b/hw/pci-host/apb.c
-@@ -70,7 +70,7 @@ do { printf("APB: " fmt , ## __VA_ARGS__); } while (0)
- 
- #define NO_IRQ_REQUEST (MAX_IVEC + 1)
- 
--static inline void sabre_set_request(APBState *s, unsigned int irq_num)
-+static inline void sabre_set_request(SabreState *s, unsigned int irq_num)
- {
-     APB_DPRINTF("%s: request irq %d\n", __func__, irq_num);
- 
-@@ -78,7 +78,7 @@ static inline void sabre_set_request(APBState *s, unsigned int irq_num)
-     qemu_set_irq(s->ivec_irqs[irq_num], 1);
- }
- 
--static inline void sabre_check_irqs(APBState *s)
-+static inline void sabre_check_irqs(SabreState *s)
- {
-     unsigned int i;
- 
-@@ -109,7 +109,7 @@ static inline void sabre_check_irqs(APBState *s)
-     }
- }
- 
--static inline void sabre_clear_request(APBState *s, unsigned int irq_num)
-+static inline void sabre_clear_request(SabreState *s, unsigned int irq_num)
- {
-     APB_DPRINTF("%s: clear request irq %d\n", __func__, irq_num);
-     qemu_set_irq(s->ivec_irqs[irq_num], 0);
-@@ -126,7 +126,7 @@ static AddressSpace *sabre_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
- static void sabre_config_write(void *opaque, hwaddr addr,
-                                uint64_t val, unsigned size)
- {
--    APBState *s = opaque;
-+    SabreState *s = opaque;
- 
-     APB_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__, addr, val);
- 
-@@ -204,7 +204,7 @@ static void sabre_config_write(void *opaque, hwaddr addr,
- static uint64_t sabre_config_read(void *opaque,
-                                   hwaddr addr, unsigned size)
- {
--    APBState *s = opaque;
-+    SabreState *s = opaque;
-     uint32_t val;
- 
-     switch (addr & 0xffff) {
-@@ -266,7 +266,7 @@ static const MemoryRegionOps sabre_config_ops = {
- static void sabre_pci_config_write(void *opaque, hwaddr addr,
-                                    uint64_t val, unsigned size)
- {
--    APBState *s = opaque;
-+    SabreState *s = opaque;
-     PCIHostState *phb = PCI_HOST_BRIDGE(s);
- 
-     APB_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__, addr, val);
-@@ -277,7 +277,7 @@ static uint64_t sabre_pci_config_read(void *opaque, hwaddr addr,
-                                       unsigned size)
- {
-     uint32_t ret;
--    APBState *s = opaque;
-+    SabreState *s = opaque;
-     PCIHostState *phb = PCI_HOST_BRIDGE(s);
- 
-     ret = pci_data_read(phb->bus, addr, size);
-@@ -317,7 +317,7 @@ static int pci_simbaB_map_irq(PCIDevice *pci_dev, int irq_num)
- 
- static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
- {
--    APBState *s = opaque;
-+    SabreState *s = opaque;
- 
-     APB_DPRINTF("%s: set irq_in %d level %d\n", __func__, irq_num, level);
-     /* PCI IRQ map onto the first 32 INO.  */
-@@ -347,7 +347,7 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
- 
- static void sabre_reset(DeviceState *d)
- {
--    APBState *s = APB_DEVICE(d);
-+    SabreState *s = SABRE_DEVICE(d);
-     PCIDevice *pci_dev;
-     unsigned int i;
-     uint16_t cmd;
-@@ -385,7 +385,7 @@ static const MemoryRegionOps pci_config_ops = {
- 
- static void sabre_realize(DeviceState *dev, Error **errp)
- {
--    APBState *s = APB_DEVICE(dev);
-+    SabreState *s = SABRE_DEVICE(dev);
-     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(s);
-     PCIDevice *pci_dev;
-@@ -430,7 +430,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
- 
- static void sabre_init(Object *obj)
- {
--    APBState *s = APB_DEVICE(obj);
-+    SabreState *s = SABRE_DEVICE(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     unsigned int i;
- 
-@@ -509,8 +509,8 @@ static const TypeInfo sabre_pci_info = {
- };
- 
- static Property sabre_properties[] = {
--    DEFINE_PROP_UINT64("special-base", APBState, special_base, 0),
--    DEFINE_PROP_UINT64("mem-base", APBState, mem_base, 0),
-+    DEFINE_PROP_UINT64("special-base", SabreState, special_base, 0),
-+    DEFINE_PROP_UINT64("mem-base", SabreState, mem_base, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -525,9 +525,9 @@ static void sabre_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo sabre_info = {
--    .name          = TYPE_APB,
-+    .name          = TYPE_SABRE,
-     .parent        = TYPE_PCI_HOST_BRIDGE,
--    .instance_size = sizeof(APBState),
-+    .instance_size = sizeof(SabreState),
-     .instance_init = sabre_init,
-     .class_init    = sabre_class_init,
- };
 diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index ec45ec2801..b8f685847a 100644
+index b8f685847a..fb18afaaa6 100644
 --- a/hw/sparc64/sun4u.c
 +++ b/hw/sparc64/sun4u.c
+@@ -55,9 +55,9 @@
+ #define CMDLINE_ADDR         0x003ff000
+ #define PROM_SIZE_MAX        (4 * 1024 * 1024)
+ #define PROM_VADDR           0x000ffd00000ULL
+-#define APB_SPECIAL_BASE     0x1fe00000000ULL
+-#define APB_MEM_BASE         0x1ff00000000ULL
+-#define APB_PCI_IO_BASE      (APB_SPECIAL_BASE + 0x02000000ULL)
++#define PBM_SPECIAL_BASE     0x1fe00000000ULL
++#define PBM_MEM_BASE         0x1ff00000000ULL
++#define PBM_PCI_IO_BASE      (PBM_SPECIAL_BASE + 0x02000000ULL)
+ #define PROM_FILENAME        "openbios-sparc64"
+ #define NVRAM_SIZE           0x2000
+ #define MAX_IDE_BUS          2
 @@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
      Nvram *nvram;
      unsigned int i;
      uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
--    APBState *apb;
-+    SabreState *apb;
+-    SabreState *apb;
++    SabreState *sabre;
      PCIBus *pci_bus, *pci_busA, *pci_busB;
      PCIDevice *ebus, *pci_dev;
      SysBusDevice *s;
-@@ -488,8 +488,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
- 
+@@ -489,23 +489,24 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
      prom_init(hwdef->prom_addr, bios_name);
  
--    /* Init APB (PCI host bridge) */
--    apb = APB_DEVICE(qdev_create(NULL, TYPE_APB));
-+    /* Init sabre (PCI host bridge) */
-+    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
-     qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
-     qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
-     object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
-diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
-index 470863639a..2552f3c984 100644
---- a/include/hw/pci-host/apb.h
-+++ b/include/hw/pci-host/apb.h
-@@ -22,7 +22,7 @@ typedef struct SabrePCIState {
- #define SABRE_PCI_DEVICE(obj) \
-     OBJECT_CHECK(SabrePCIState, (obj), TYPE_SABRE_PCI_DEVICE)
+     /* Init sabre (PCI host bridge) */
+-    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
+-    qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
+-    qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
+-    object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
+-    qdev_init_nofail(DEVICE(apb));
++    sabre = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
++    qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
++    qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
++    object_property_set_link(OBJECT(sabre), OBJECT(iommu), "iommu",
++                             &error_abort);
++    qdev_init_nofail(DEVICE(sabre));
  
--typedef struct APBState {
-+typedef struct SabreState {
-     PCIHostState parent_obj;
+     /* Wire up PCI interrupts to CPU */
+     for (i = 0; i < IVEC_MAX; i++) {
+-        qdev_connect_gpio_out_named(DEVICE(apb), "ivec-irq", i,
++        qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
+             qdev_get_gpio_in_named(DEVICE(cpu), "ivec-irq", i));
+     }
  
-     hwaddr special_base;
-@@ -43,10 +43,10 @@ typedef struct APBState {
-     unsigned int irq_request;
-     uint32_t reset_control;
-     unsigned int nr_resets;
--} APBState;
-+} SabreState;
+-    pci_bus = PCI_HOST_BRIDGE(apb)->bus;
+-    pci_busA = pci_bridge_get_sec_bus(apb->bridgeA);
+-    pci_busB = pci_bridge_get_sec_bus(apb->bridgeB);
++    pci_bus = PCI_HOST_BRIDGE(sabre)->bus;
++    pci_busA = pci_bridge_get_sec_bus(sabre->bridgeA);
++    pci_busB = pci_bridge_get_sec_bus(sabre->bridgeB);
  
--#define TYPE_APB "apb"
--#define APB_DEVICE(obj) \
--    OBJECT_CHECK(APBState, (obj), TYPE_APB)
-+#define TYPE_SABRE "sabre"
-+#define SABRE_DEVICE(obj) \
-+    OBJECT_CHECK(SabreState, (obj), TYPE_SABRE)
+-    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
++    /* Only in-built Simba APBs can exist on the root bus, slot 0 on busA is
+        reserved (leaving no slots free after on-board devices) however slots
+        0-3 are free on busB */
+     pci_bus->slot_reserved_mask = 0xfffffffc;
+@@ -517,17 +518,17 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+                          hwdef->console_serial_base);
+     qdev_init_nofail(DEVICE(ebus));
  
- #endif
+-    /* Wire up "well-known" ISA IRQs to APB legacy obio IRQs */
++    /* Wire up "well-known" ISA IRQs to PBM legacy obio IRQs */
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_LPT_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_LPT_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 6,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_FDD_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_FDD_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 1,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_KBD_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_KBD_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_MSE_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_MSE_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 4,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_SER_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_SER_IRQ));
+ 
+     pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
+ 
 -- 
 2.11.0
