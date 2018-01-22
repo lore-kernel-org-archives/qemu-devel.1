@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1eddcT-0003fu-RZ
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:02:51 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eddhO-0006jm-S4
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:07:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1eddcO-00019b-4L
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:02:45 -0500
-Received: from mail-bn3nam01on0129.outbound.protection.outlook.com
-	([104.47.33.129]:45030
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1eddcN-000194-Ux
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:02:40 -0500
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Mon, 22 Jan 2018 15:02:38 +0000
-Message-ID: <CY4PR2101MB086616FBE1DFBC5CDD43026AB6EC0@CY4PR2101MB0866.namprd21.prod.outlook.com>
-References: <1515788548-3570-1-git-send-email-juterry@microsoft.com>
-	<1728988755.33187824.1515790085358.JavaMail.zimbra@redhat.com>
-	<CY4PR2101MB0866DEFFAF6DB80EBA4CFBF3B6E90@CY4PR2101MB0866.namprd21.prod.outlook.com>
-	<27541c43-e2a7-923b-afae-15336997e4ef@redhat.com>
-In-Reply-To: <27541c43-e2a7-923b-afae-15336997e4ef@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1eddhK-0005TZ-9r
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:07:50 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46159)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eddhK-0005Sw-09
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:07:46 -0500
+Received: by mail-wr0-x244.google.com with SMTP id g21so9009242wrb.13
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 07:07:45 -0800 (PST)
+References: <20180119045438.28582-1-richard.henderson@linaro.org>
+	<20180119045438.28582-14-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180119045438.28582-14-richard.henderson@linaro.org>
+Date: Mon, 22 Jan 2018 15:07:43 +0000
+Message-ID: <87po62j5j4.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/4] Implements the Windows Hypervisor
- Platform accelerator
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] target/arm: Move
+ cpu_get_tb_cpu_state out of line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +31,319 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-UGVyZmVjdC4gVGhhbmtzIFBhb2xvLiBXaWxsIHN1Ym1pdCB0aGUgUGF0Y2ggVjIgd2l0aCB5b3Vy
-IHJlcXVlc3RlZCBjaGFuZ2VzIHRvZGF5Lg0KDQpKdXN0aW4NCg0KPiAtLS0tLU9yaWdpbmFsIE1l
-c3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWlsdG86cGJvbnppbmlAcmVkaGF0
-LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEphbnVhcnkgMTgsIDIwMTggMTI6MTYgQU0NCj4gVG86
-IEp1c3RpbiBUZXJyeSAoVk0pIDxqdXRlcnJ5QG1pY3Jvc29mdC5jb20+DQo+IENjOiBxZW11LWRl
-dmVsQG5vbmdudS5vcmcgcWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0KPiBTdWJq
-ZWN0OiBSZTogW1BBVENIIDAvNF0gSW1wbGVtZW50cyB0aGUgV2luZG93cyBIeXBlcnZpc29yIFBs
-YXRmb3JtDQo+IGFjY2VsZXJhdG9yDQo+IA0KPiBPbiAxOC8wMS8yMDE4IDAwOjQxLCBKdXN0aW4g
-VGVycnkgKFZNKSB3cm90ZToNCj4gPg0KPiA+IFRoYW5rcyBmb3IgYWxsIHRoZSBmZWVkYmFjay4g
-QWZ0ZXIgdGFsa2luZyB3aXRoIHZhcmlvdXMgbWVtYmVycyBvZiB0aGUNCj4gPiB0ZWFtIGFyb3Vu
-ZCB0aGVzZSBzY2VuYXJpb3MgSSB0aGluayBpdHMgYmVzdCB3ZSBhZGQgdGhlIG1pZ3JhdGlvbg0K
-PiA+IGJsb2NrZXJzIGZvciBhbGwgb2YgeW91ciBjb21tZW50cyB1bmZvcnR1bmF0ZWx5LiBUaGUg
-YW5zd2VycyB0byB5b3VyDQo+ID4gcXVlc3Rpb24gYXJlIGJlbG93Og0KPiA+DQo+ID4gMS4gRm9y
-IENQVUlELiBUaGUgQVBJIGhhcyBzdXBwb3J0IGZvciBhbiAiRVhURU5ERURfVk1fRVhJVFMiIG9m
-IHR5cGUNCj4gPiBXSHZSdW5WcEV4aXRSZWFzb25YNjRDcHVpZCBhZnRlciBhIGNhbGwgdG8gV0h2
-UnVuVmlydHVhbFByb2Nlc3Nvci4NCj4gPiBUaGlzIHdpbGwgb25lIGRheSBhbGxvdyBmb3IgdGhl
-IENQVUlEIGluc3RydWN0aW9uIHRvIGJlIHJlc29sdmVkDQo+ID4gaG93ZXZlciBpdCBpcyBub3Qg
-Y3VycmVudGx5IGltcGxlbWVudGVkIGluIHRoZSBwbGF0Zm9ybS4gU28gZm9yIHJpZ2h0DQo+ID4g
-bm93IHdlIHdpbGwgaGF2ZSB0byBibG9jayBvbiBDUFVJRC4NCj4gPg0KPiA+IDIuIEZvciBkaXJ0
-eSBtZW1vcnkgdHJhY2tpbmcuIFdlIGN1cnJlbnRseSBkb27igJl0IGhhdmUgc3VwcG9ydCBpbiB0
-aGUNCj4gPiBwbGF0Zm9ybSBvciBBUEkgZm9yIHRoaXMuIEkgaGF2ZSBhZGRlZCB0aGF0IHRvIHRo
-ZSBmZWF0dXJlIGJhY2tsb2cgYW5kDQo+ID4gd2lsbCB1cGRhdGUgUUVNVSBhcyB0aGF0IGdldHMg
-aW1wbGVtZW50ZWQgaW4gdGhlIHBsYXRmb3JtLg0KPiA+IEhvd2V2ZXIsIFZHQSBkb2VzIGluZGVl
-ZCB3b3JrIHdpdGggdGhlIGN1cnJlbnQgaW1wbCBvZiBsb2dfc3luYy4NCj4gPg0KPiA+IDMuIEFs
-c28sIGZvciBYU0FWRS9SU1RPUiB3ZSBhZ2FpbiBkb27igJl0IGhhdmUgcGxhdGZvcm0gc3VwcG9y
-dCBmb3IgdGhlDQo+ID4gcmVxdWlyZWQgcmVnaXN0ZXJzLiBJIGhhdmUgYWRkZWQgdGhpcyB0byB0
-aGUgZmVhdHVyZSBwbGF0Zm9ybSBiYWNrbG9nDQo+ID4gdG8gZ2FpbiBhY2Nlc3MgZm9yIHRoYXQg
-ZnVuY3Rpb25hbGl0eSBhcyB3ZWxsLg0KPiA+DQo+ID4gNC4gVGhpcyB3aWxsIGJlIHN1cHBvcnRl
-ZCBvbiBXaW5kb3dzIDEwIGhvc3RzIChJIGRvbuKAmXQgaGF2ZSB0aGUNCj4gPiBpbnNpZGVyIGJ1
-aWxkIG51bWJlciB5ZXQpIGFuZCBpdCB3aWxsIHJlcXVpcmUgYW4gSW50ZWwgcHJvY2Vzc29yIHdp
-dGgNCj4gPiBWVC14IGFuZCBVbnJlc3RyaWN0ZWQgR3Vlc3Qgc3VwcG9ydC4gV2lsbCB1cGRhdGUg
-dGhlIHFlbXUtZGV2ZWwgbGlzdA0KPiA+IG9uY2Ugd2UgaGF2ZSBhbiBpbnNpZGVyIGJ1aWxkIHRo
-YXQgaXMgcHVibGljIHRoYXQgaGFzIHRoZSBwbGF0Zm9ybQ0KPiA+IGJpdHMuDQo+ID4NCj4gPiBT
-bywgaWYgeW91ciBvayB3aXRoIGl0IEkgd2lsbCBibG9jayBvbiBDUFVJRCwgTWVtb3J5IFRyYWNr
-aW5nLCBhbmQNCj4gPiBYU0FWRS9SU1RPUiBmdW5jdGlvbmFsaXR5IGFuZCBzZW5kIG91dCB0aGUg
-dXBkYXRlZCBQUi4NCj4gDQo+IFllcywgdGhhbmtzLiAgT2YgY291cnNlIGp1c3Qgb25lIG1pZ3Jh
-dGlvbiBibG9ja2VyIGlzIGVub3VnaC4gIEFkZCBhIGNvbW1lbnQNCj4gbGlrZSB0aGUgYWJvdmUg
-MS0zIGJ1bGxldCBwb2ludHMgYWJvdmUgaXQuDQo+IA0KPiBUaGFua3MsDQo+IA0KPiBQYW9sbw0K
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h    | 127 +---------------------------------------------=
+------
+>  target/arm/helper.c | 126
+> +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 128 insertions(+), 125 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index c8e8155b6e..2de1afb53a 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2703,71 +2703,6 @@ static inline bool bswap_code(bool sctlr_b)
+>  #endif
+>  }
+>
+> -/* Return the exception level to which FP-disabled exceptions should
+> - * be taken, or 0 if FP is enabled.
+> - */
+> -static inline int fp_exception_el(CPUARMState *env)
+> -{
+> -    int fpen;
+> -    int cur_el =3D arm_current_el(env);
+> -
+> -    /* CPACR and the CPTR registers don't exist before v6, so FP is
+> -     * always accessible
+> -     */
+> -    if (!arm_feature(env, ARM_FEATURE_V6)) {
+> -        return 0;
+> -    }
+> -
+> -    /* The CPACR controls traps to EL1, or PL1 if we're 32 bit:
+> -     * 0, 2 : trap EL0 and EL1/PL1 accesses
+> -     * 1    : trap only EL0 accesses
+> -     * 3    : trap no accesses
+> -     */
+> -    fpen =3D extract32(env->cp15.cpacr_el1, 20, 2);
+> -    switch (fpen) {
+> -    case 0:
+> -    case 2:
+> -        if (cur_el =3D=3D 0 || cur_el =3D=3D 1) {
+> -            /* Trap to PL1, which might be EL1 or EL3 */
+> -            if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
+> -                return 3;
+> -            }
+> -            return 1;
+> -        }
+> -        if (cur_el =3D=3D 3 && !is_a64(env)) {
+> -            /* Secure PL1 running at EL3 */
+> -            return 3;
+> -        }
+> -        break;
+> -    case 1:
+> -        if (cur_el =3D=3D 0) {
+> -            return 1;
+> -        }
+> -        break;
+> -    case 3:
+> -        break;
+> -    }
+> -
+> -    /* For the CPTR registers we don't need to guard with an ARM_FEATURE
+> -     * check because zero bits in the registers mean "don't trap".
+> -     */
+> -
+> -    /* CPTR_EL2 : present in v7VE or v8 */
+> -    if (cur_el <=3D 2 && extract32(env->cp15.cptr_el[2], 10, 1)
+> -        && !arm_is_secure_below_el3(env)) {
+> -        /* Trap FP ops at EL2, NS-EL1 or NS-EL0 to EL2 */
+> -        return 2;
+> -    }
+> -
+> -    /* CPTR_EL3 : present in v8 */
+> -    if (extract32(env->cp15.cptr_el[3], 10, 1)) {
+> -        /* Trap all FP ops to EL3 */
+> -        return 3;
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+>  #ifdef CONFIG_USER_ONLY
+>  static inline bool arm_cpu_bswap_data(CPUARMState *env)
+>  {
+> @@ -2814,66 +2749,8 @@ static inline uint32_t arm_regime_tbi1(CPUARMState=
+ *env, ARMMMUIdx mmu_idx)
+>  }
+>  #endif
+>
+> -static inline void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *=
+pc,
+> -                                        target_ulong *cs_base, uint32_t =
+*flags)
+> -{
+> -    ARMMMUIdx mmu_idx =3D core_to_arm_mmu_idx(env, cpu_mmu_index(env, fa=
+lse));
+> -    if (is_a64(env)) {
+> -        *pc =3D env->pc;
+> -        *flags =3D ARM_TBFLAG_AARCH64_STATE_MASK;
+> -        /* Get control bits for tagged addresses */
+> -        *flags |=3D (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SH=
+IFT);
+> -        *flags |=3D (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SH=
+IFT);
+> -    } else {
+> -        *pc =3D env->regs[15];
+> -        *flags =3D (env->thumb << ARM_TBFLAG_THUMB_SHIFT)
+> -            | (env->vfp.vec_len << ARM_TBFLAG_VECLEN_SHIFT)
+> -            | (env->vfp.vec_stride << ARM_TBFLAG_VECSTRIDE_SHIFT)
+> -            | (env->condexec_bits << ARM_TBFLAG_CONDEXEC_SHIFT)
+> -            | (arm_sctlr_b(env) << ARM_TBFLAG_SCTLR_B_SHIFT);
+> -        if (!(access_secure_reg(env))) {
+> -            *flags |=3D ARM_TBFLAG_NS_MASK;
+> -        }
+> -        if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
+> -            || arm_el_is_aa64(env, 1)) {
+> -            *flags |=3D ARM_TBFLAG_VFPEN_MASK;
+> -        }
+> -        *flags |=3D (extract32(env->cp15.c15_cpar, 0, 2)
+> -                   << ARM_TBFLAG_XSCALE_CPAR_SHIFT);
+> -    }
+> -
+> -    *flags |=3D (arm_to_core_mmu_idx(mmu_idx) << ARM_TBFLAG_MMUIDX_SHIFT=
+);
+> -
+> -    /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
+> -     * states defined in the ARM ARM for software singlestep:
+> -     *  SS_ACTIVE   PSTATE.SS   State
+> -     *     0            x       Inactive (the TB flag for SS is always 0)
+> -     *     1            0       Active-pending
+> -     *     1            1       Active-not-pending
+> -     */
+> -    if (arm_singlestep_active(env)) {
+> -        *flags |=3D ARM_TBFLAG_SS_ACTIVE_MASK;
+> -        if (is_a64(env)) {
+> -            if (env->pstate & PSTATE_SS) {
+> -                *flags |=3D ARM_TBFLAG_PSTATE_SS_MASK;
+> -            }
+> -        } else {
+> -            if (env->uncached_cpsr & PSTATE_SS) {
+> -                *flags |=3D ARM_TBFLAG_PSTATE_SS_MASK;
+> -            }
+> -        }
+> -    }
+> -    if (arm_cpu_data_is_big_endian(env)) {
+> -        *flags |=3D ARM_TBFLAG_BE_DATA_MASK;
+> -    }
+> -    *flags |=3D fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
+> -
+> -    if (arm_v7m_is_handler_mode(env)) {
+> -        *flags |=3D ARM_TBFLAG_HANDLER_MASK;
+> -    }
+> -
+> -    *cs_base =3D 0;
+> -}
+> +void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+> +                          target_ulong *cs_base, uint32_t *flags);
+>
+>  enum {
+>      QEMU_PSCI_CONDUIT_DISABLED =3D 0,
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 984a4b1306..9e673bb672 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -11701,3 +11701,129 @@ uint32_t HELPER(crc32c)(uint32_t acc, uint32_t =
+val, uint32_t bytes)
+>      /* Linux crc32c converts the output to one's complement.  */
+>      return crc32c(acc, buf, bytes) ^ 0xffffffff;
+>  }
+> +
+> +/* Return the exception level to which FP-disabled exceptions should
+> + * be taken, or 0 if FP is enabled.
+> + */
+> +static inline int fp_exception_el(CPUARMState *env)
+
+You can drop the inline here. The compiler knows what to do and we are
+no longer in a header.
+
+> +{
+> +    int fpen;
+> +    int cur_el =3D arm_current_el(env);
+> +
+> +    /* CPACR and the CPTR registers don't exist before v6, so FP is
+> +     * always accessible
+> +     */
+> +    if (!arm_feature(env, ARM_FEATURE_V6)) {
+> +        return 0;
+> +    }
+> +
+> +    /* The CPACR controls traps to EL1, or PL1 if we're 32 bit:
+> +     * 0, 2 : trap EL0 and EL1/PL1 accesses
+> +     * 1    : trap only EL0 accesses
+> +     * 3    : trap no accesses
+> +     */
+> +    fpen =3D extract32(env->cp15.cpacr_el1, 20, 2);
+> +    switch (fpen) {
+> +    case 0:
+> +    case 2:
+> +        if (cur_el =3D=3D 0 || cur_el =3D=3D 1) {
+> +            /* Trap to PL1, which might be EL1 or EL3 */
+> +            if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
+> +                return 3;
+> +            }
+> +            return 1;
+> +        }
+> +        if (cur_el =3D=3D 3 && !is_a64(env)) {
+> +            /* Secure PL1 running at EL3 */
+> +            return 3;
+> +        }
+> +        break;
+> +    case 1:
+> +        if (cur_el =3D=3D 0) {
+> +            return 1;
+> +        }
+> +        break;
+> +    case 3:
+> +        break;
+> +    }
+> +
+> +    /* For the CPTR registers we don't need to guard with an ARM_FEATURE
+> +     * check because zero bits in the registers mean "don't trap".
+> +     */
+> +
+> +    /* CPTR_EL2 : present in v7VE or v8 */
+> +    if (cur_el <=3D 2 && extract32(env->cp15.cptr_el[2], 10, 1)
+> +        && !arm_is_secure_below_el3(env)) {
+> +        /* Trap FP ops at EL2, NS-EL1 or NS-EL0 to EL2 */
+> +        return 2;
+> +    }
+> +
+> +    /* CPTR_EL3 : present in v8 */
+> +    if (extract32(env->cp15.cptr_el[3], 10, 1)) {
+> +        /* Trap all FP ops to EL3 */
+> +        return 3;
+> +    }
+> +
+> +    return 0;
+> +}
+
+I'm not sure helper.c is the best place for this. Maybe cpu.c?
+
+> +
+> +void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+> +                          target_ulong *cs_base, uint32_t *flags)
+> +{
+> +    ARMMMUIdx mmu_idx =3D core_to_arm_mmu_idx(env, cpu_mmu_index(env, fa=
+lse));
+> +    if (is_a64(env)) {
+> +        *pc =3D env->pc;
+> +        *flags =3D ARM_TBFLAG_AARCH64_STATE_MASK;
+> +        /* Get control bits for tagged addresses */
+> +        *flags |=3D (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SH=
+IFT);
+> +        *flags |=3D (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SH=
+IFT);
+> +    } else {
+> +        *pc =3D env->regs[15];
+> +        *flags =3D (env->thumb << ARM_TBFLAG_THUMB_SHIFT)
+> +            | (env->vfp.vec_len << ARM_TBFLAG_VECLEN_SHIFT)
+> +            | (env->vfp.vec_stride << ARM_TBFLAG_VECSTRIDE_SHIFT)
+> +            | (env->condexec_bits << ARM_TBFLAG_CONDEXEC_SHIFT)
+> +            | (arm_sctlr_b(env) << ARM_TBFLAG_SCTLR_B_SHIFT);
+> +        if (!(access_secure_reg(env))) {
+> +            *flags |=3D ARM_TBFLAG_NS_MASK;
+> +        }
+> +        if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
+> +            || arm_el_is_aa64(env, 1)) {
+> +            *flags |=3D ARM_TBFLAG_VFPEN_MASK;
+> +        }
+> +        *flags |=3D (extract32(env->cp15.c15_cpar, 0, 2)
+> +                   << ARM_TBFLAG_XSCALE_CPAR_SHIFT);
+> +    }
+> +
+> +    *flags |=3D (arm_to_core_mmu_idx(mmu_idx) << ARM_TBFLAG_MMUIDX_SHIFT=
+);
+> +
+> +    /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
+> +     * states defined in the ARM ARM for software singlestep:
+> +     *  SS_ACTIVE   PSTATE.SS   State
+> +     *     0            x       Inactive (the TB flag for SS is always 0)
+> +     *     1            0       Active-pending
+> +     *     1            1       Active-not-pending
+> +     */
+> +    if (arm_singlestep_active(env)) {
+> +        *flags |=3D ARM_TBFLAG_SS_ACTIVE_MASK;
+> +        if (is_a64(env)) {
+> +            if (env->pstate & PSTATE_SS) {
+> +                *flags |=3D ARM_TBFLAG_PSTATE_SS_MASK;
+> +            }
+> +        } else {
+> +            if (env->uncached_cpsr & PSTATE_SS) {
+> +                *flags |=3D ARM_TBFLAG_PSTATE_SS_MASK;
+> +            }
+> +        }
+> +    }
+> +    if (arm_cpu_data_is_big_endian(env)) {
+> +        *flags |=3D ARM_TBFLAG_BE_DATA_MASK;
+> +    }
+> +    *flags |=3D fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
+> +
+> +    if (arm_v7m_is_handler_mode(env)) {
+> +        *flags |=3D ARM_TBFLAG_HANDLER_MASK;
+> +    }
+> +
+> +    *cs_base =3D 0;
+> +}
+
+
+--
+Alex Benn=C3=A9e
