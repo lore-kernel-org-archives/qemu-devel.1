@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edhb3-0005c2-9G
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:17:34 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1edhgW-0007SV-OS
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edhb2-0004ID-CR
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:17:33 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1edhb2-0004Hf-83
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:17:32 -0500
-Received: by mail-ot0-x244.google.com with SMTP id d9so8477297oth.6
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 11:17:32 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1edhgS-000884-Gv
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:23:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56166)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1edhgS-00087q-6l
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:23:08 -0500
+Date: Mon, 22 Jan 2018 17:22:59 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180122192259.GC31237@localhost.localdomain>
+References: <20180119141105.29095-5-marcandre.lureau@redhat.com>
+	<f2ecf612-8538-f8d1-ffd8-f875aa453c42@amsat.org>
+	<3c334ed0-3d9d-1ef5-27b7-aa587e5acd81@linux.vnet.ibm.com>
+	<CAMxuvaxyBmEEnk_dtFR4qbk_-95ROnR6o-3gR7U=HNJAhV5DdA@mail.gmail.com>
+	<6cb2b88f-0c8b-4bab-c8fc-018dd0cbc662@linux.vnet.ibm.com>
+	<CAMxuvazYZZwzSBPvbmKLPv_YG2uYPkPA1meiYoMkizegEozC_g@mail.gmail.com>
+	<20180122172546.GI5292@localhost.localdomain>
+	<CAJ+F1CKrkirvv=5=M1OSQXg5RwRgNYZ+r7BzHW7Pd1W-utEGaw@mail.gmail.com>
+	<20180122174715.GM5292@localhost.localdomain>
+	<CAJ+F1CJWX6+1Q9+80E4c85uGq8fFOuPaEek2pnfuKO2p093Rsw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180117161435.28981-4-richard.henderson@linaro.org>
-References: <20180117161435.28981-1-richard.henderson@linaro.org>
-	<20180117161435.28981-4-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 19:17:11 +0000
-Message-ID: <CAFEAcA_Xy=3Twb_J1VrcT4QnKK=PVbVc_YGBd58ADX7z2YkkaA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v10.5 03/20] tcg: Standardize integral
- arguments to expanders
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJWX6+1Q9+80E4c85uGq8fFOuPaEek2pnfuKO2p093Rsw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] tpm: add CRB device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +36,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 17 January 2018 at 16:14, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Some functions use intN_t arguments, some use uintN_t, some just
-> used "unsigned".  To aid putting function pointers in tables, we
-> need consistency.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/tcg-op.h | 16 ++++++++--------
->  tcg/tcg-op.c | 42 +++++++++++++++++++++---------------------
->  2 files changed, 29 insertions(+), 29 deletions(-)
->
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index 9b0560e4d3..df2eabaa67 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -269,12 +269,12 @@ void tcg_gen_mb(TCGBar);
->  void tcg_gen_addi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
->  void tcg_gen_subfi_i32(TCGv_i32 ret, int32_t arg1, TCGv_i32 arg2);
->  void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
-> -void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2);
-> +void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
->  void tcg_gen_ori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
->  void tcg_gen_xori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
-> -void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
-> -void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
-> -void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
-> +void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
-> +void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
-> +void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
->  void tcg_gen_muli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
->  void tcg_gen_div_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_rem_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
-> @@ -458,12 +458,12 @@ static inline void tcg_gen_not_i32(TCGv_i32 ret, TCGv_i32 arg)
->  void tcg_gen_addi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
->  void tcg_gen_subfi_i64(TCGv_i64 ret, int64_t arg1, TCGv_i64 arg2);
->  void tcg_gen_subi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
-> -void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2);
-> +void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+On Mon, Jan 22, 2018 at 07:15:01PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Mon, Jan 22, 2018 at 6:47 PM, Eduardo Habkost <ehabkost@redhat.com> =
+wrote:
+> > On Mon, Jan 22, 2018 at 06:32:37PM +0100, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> >> Hi
+> >>
+> >> On Mon, Jan 22, 2018 at 6:25 PM, Eduardo Habkost <ehabkost@redhat.co=
+m> wrote:
+> >> > On Mon, Jan 22, 2018 at 04:08:30PM +0100, Marc-Andre Lureau wrote:
+> >> >> Hi
+> >> >>
+> >> >> On Sun, Jan 21, 2018 at 11:01 PM, Stefan Berger
+> >> >> <stefanb@linux.vnet.ibm.com> wrote:
+> >> >> > On 01/21/2018 02:24 PM, Marc-Andre Lureau wrote:
+> >> >> >>
+> >> >> >> Hi
+> >> >> >>
+> >> >> >> On Sun, Jan 21, 2018 at 6:46 AM, Stefan Berger
+> >> >> >> <stefanb@linux.vnet.ibm.com> wrote:
+> >> >> >>>
+> >> >> >>> On 01/20/2018 07:54 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> >> >> >>>>
+> >> >> >>>> On 01/19/2018 11:11 AM, Marc-Andr=C3=A9 Lureau wrote:
+> >> >> >>>>>
+> >> >> >>>>> tpm_crb is a device for TPM 2.0 Command Response Buffer (CR=
+B)
+> >> >> >>>>> Interface as defined in TCG PC Client Platform TPM Profile =
+(PTP)
+> >> >> >>>>> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revisio=
+n 01.03 v22.
+> >> >> >>>>>
+> >> >> >>>>> The PTP allows device implementation to switch between TIS =
+and CRB
+> >> >> >>>>> model at run time, but given that CRB is a simpler device t=
+o
+> >> >> >>>>> implement, I chose to implement it as a different device.
+> >> >> >>>>>
+> >> >> >>>>> The device doesn't implement other locality than 0 for now =
+(my laptop
+> >> >> >>>>> TPM doesn't either, so I assume this isn't so bad)
+> >> >> >>>>>
+> >> >> >>>>> The command/reply memory region is statically allocated aft=
+er the CRB
+> >> >> >>>>> registers address TPM_CRB_ADDR_BASE + sizeof(struct crb_reg=
+s) (I
+> >> >> >>>>> wonder if the BIOS could or should allocate it instead, or =
+what size
+> >> >> >>>>> to use, again this seems to fit well expectations)
+> >> >> >>>>>
+> >> >> >>>>> The PTP doesn't specify a particular bus to put the device.=
+ So I added
+> >> >> >>>>> it on the system bus directly, so it could hopefully be use=
+d easily on
+> >> >> >>>>> a different platform than x86. Currently, it fails to init =
+on piix,
+> >> >> >>>>> because error_on_sysbus_device() check. The check may be ch=
+anged in a
+> >> >> >>>>> near future, see discussion on the qemu-devel ML.
+> >> >> >>>>>
+> >> >> >>>>> Tested with some success with Linux upstream and Windows 10=
+, seabios &
+> >> >> >>>>> modified ovmf. The device is recognized and correctly trans=
+mit
+> >> >> >>>>> command/response with passthrough & emu. However, we are mi=
+ssing PPI
+> >> >> >>>>> ACPI part atm.
+> >> >> >>>>>
+> >> >> >>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@red=
+hat.com>
+> >> >> >>>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> >> >> >>>>> ---
+> >> >> >>>>>    qapi/tpm.json                      |   5 +-
+> >> >> >>>>>    include/hw/acpi/tpm.h              |  72 ++++++++
+> >> >> >>>>>    include/sysemu/tpm.h               |   3 +
+> >> >> >>>>>    hw/i386/acpi-build.c               |  34 +++-
+> >> >> >>>>>    hw/tpm/tpm_crb.c                   | 327
+> >> >> >>>>> +++++++++++++++++++++++++++++++++++++
+> >> >> >>>>>    default-configs/i386-softmmu.mak   |   1 +
+> >> >> >>>>>    default-configs/x86_64-softmmu.mak |   1 +
+> >> >> >>>>>    hw/tpm/Makefile.objs               |   1 +
+> >> >> >>>>>    8 files changed, 434 insertions(+), 10 deletions(-)
+> >> >> >>>>>    create mode 100644 hw/tpm/tpm_crb.c
+> >> >> >>>>>
+> >> >> >>>>> diff --git a/qapi/tpm.json b/qapi/tpm.json
+> >> >> >>>>> index 7093f268fb..d50deef5e9 100644
+> >> >> >>>>> --- a/qapi/tpm.json
+> >> >> >>>>> +++ b/qapi/tpm.json
+> >> >> >>>>> @@ -11,10 +11,11 @@
+> >> >> >>>>>    # An enumeration of TPM models
+> >> >> >>>>>    #
+> >> >> >>>>>    # @tpm-tis: TPM TIS model
+> >> >> >>>>> +# @tpm-crb: TPM CRB model (since 2.12)
+> >> >> >>>>>    #
+> >> >> >>>>>    # Since: 1.5
+> >> >> >>>>>    ##
+> >> >> >>>>> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
+> >> >> >>>>> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
+> >> >> >>>>>      ##
+> >> >> >>>>>    # @query-tpm-models:
+> >> >> >>>>> @@ -28,7 +29,7 @@
+> >> >> >>>>>    # Example:
+> >> >> >>>>>    #
+> >> >> >>>>>    # -> { "execute": "query-tpm-models" }
+> >> >> >>>>> -# <- { "return": [ "tpm-tis" ] }
+> >> >> >>>>> +# <- { "return": [ "tpm-tis", "tpm-crb" ] }
+> >> >> >>>>>    #
+> >> >> >>>>>    ##
+> >> >> >>>>>    { 'command': 'query-tpm-models', 'returns': ['TpmModel']=
+ }
+> >> >> >>>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> >> >> >>>>> index 6d516c6a7f..b0048515fa 100644
+> >> >> >>>>> --- a/include/hw/acpi/tpm.h
+> >> >> >>>>> +++ b/include/hw/acpi/tpm.h
+> >> >> >>>>> @@ -16,11 +16,82 @@
+> >> >> >>>>>    #ifndef HW_ACPI_TPM_H
+> >> >> >>>>>    #define HW_ACPI_TPM_H
+> >> >> >>>>>    +#include "qemu/osdep.h"
+> >> >> >>>>> +
+> >> >> >>>>>    #define TPM_TIS_ADDR_BASE           0xFED40000
+> >> >> >>>>>    #define TPM_TIS_ADDR_SIZE           0x5000
+> >> >> >>>>>      #define TPM_TIS_IRQ                 5
+> >> >> >>>>>    +struct crb_regs {
+> >> >> >>>>> +    union {
+> >> >> >>>>> +        uint32_t reg;
+> >> >> >>>>> +        struct {
+> >> >> >>>>> +            unsigned tpm_established:1;
+> >> >> >>>>> +            unsigned loc_assigned:1;
+> >> >> >>>>> +            unsigned active_locality:3;
+> >> >> >>>>> +            unsigned reserved:2;
+> >> >> >>>>> +            unsigned tpm_reg_valid_sts:1;
+> >> >> >>>>> +        } bits;
+> >> >> >>>>
+> >> >> >>>> I suppose this is little-endian layout, so this won't work o=
+n big-endian
+> >> >> >>>> hosts.
+> >> >> >>>>
+> >> >> >>>> Can you add a qtest?
+> >> >> >>>>
+> >> >> >>>>> +    } loc_state;
+> >> >> >>>>> +    uint32_t reserved1;
+> >> >> >>>>> +    uint32_t loc_ctrl;
+> >> >> >>>>> +    union {
+> >> >> >>>>> +        uint32_t reg;
+> >> >> >>>>> +        struct {
+> >> >> >>>>> +            unsigned granted:1;
+> >> >> >>>>> +            unsigned been_seized:1;
+> >> >> >>>>> +        } bits;
+> >> >> >>>>
+> >> >> >>>>
+> >> >> >>>> This is unclear where you expect those bits (right/left alig=
+ned).
+> >> >> >>>>
+> >> >> >>>> Can you add an unnamed field to be more explicit?
+> >> >> >>>>
+> >> >> >>>> i.e. without using struct if left alignment expected:
+> >> >> >>>>
+> >> >> >>>>              unsigned granted:1, been_seized:1, :30;
+> >> >> >>>
+> >> >> >>>
+> >> >> >>>
+> >> >> >>> I got rid of all the bitfields and this patch here makes it w=
+ork on a
+> >> >> >>> ppc64
+> >> >> >>> big endian and also x86_64 host:
+> >> >> >>>
+> >> >> >>>
+> >> >> >>> https://github.com/stefanberger/qemu-tpm/commit/28fc07f0d9314=
+168986190effd6d72d9fd3972dd
+> >> >> >>>
+> >> >> >> Thank you Stefan! I am all for squashing this fix to the patch=
+. You
+> >> >> >> should then add your signed-off to the commit.
+> >> >> >
+> >> >> >
+> >> >> > I'll do that.
+> >> >> >
+> >> >> > The TIS is an ISA Device and the CRB is similar. Considering th=
+e
+> >> >>
+> >> >> How much similarity is there between TIS and CRB is there? The tw=
+o
+> >> >> devices look quite different to me, CRB is way simpler it seems. =
+Or is
+> >> >> the CRB implementation just lacking many bells and whistles that =
+TIS
+> >> >> has? Should we consider merging CRB in TIS?
+> >> >>
+> >> >> > complications with the sysbus devices where one has to explicit=
+ly allow it
+> >> >> > for a certain machine type, I would advocate to convert the CRB=
+ to an ISA
+> >> >> > device. A patch that does that is this one:
+> >> >>
+> >> >> If it's only for that reason (an explicit enable), I would rather=
+ keep
+> >> >> it on the system bus. Or should it be on an LPC bus?
+> >> >>
+> >> >> Eduardo, what do you think?
+> >> >
+> >> > Everything about sysbus is exceptional and confusing, so I would
+> >> > prefer to avoid using sysbus every time we have an alternative.
+> >> > If tpm-tis is already an ISA device, what are the reasons to not
+> >> > use ISA for tpm-crb too?
+> >>
+> >> I was hoping this would make the device more portable (especially on
+> >> arm) and avoid using legacy bus or resources.
+> >>
+> >> Putting it on ISA doesn't reflect better what a real hardware is lik=
+e,
+> >> or does it?
+> >
+> > I don't know what the hardware interface for those devices look
+> > like, the documentation I found for TPM-CRB seem to be purely for
+> > the software interface.
+> >
+>=20
+> It has a MMIO region at 0xFED4_xxxx, and it can be on LPC or SPI bus
+> as far as I understand (8.2.2):
+>=20
+> https://trustedcomputinggroup.org/wp-content/uploads/TCG_PC_Client_Plat=
+form_TPM_Profile_PTP_Specification_Family_2.0_Revision_1.3v22.pdf
 
-Does changing these types from unsigned to signed definitely
-not result in any possible change in behaviour of frontend
-code if there's now an unintended sign extension ? I thought
-maybe there was, but now I think I was confused and this is safe...
+Thanks.  It looks like the actual hardware interface doesn't
+matter for QEMU and for guest software, though?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+>=20
+> > Is there a reason to make it a sysbus device instead of a
+> > bus-less device, then?
+>=20
+> The calls to
+>     sysbus_init_mmio(sbd, &s->mmio);
+>     sysbus_mmio_map(sbd, 0, TPM_CRB_ADDR_BASE);
+>=20
+> Could perhaps be replaced by lower-level memory_region calls?
+>=20
+> I'll give it a try
+
+If the code ends up uglier, then this sounds like a good reason
+to use sysbus, at least until we make the sysbus I/O APIs
+available to the rest of devices.  I would document this in a
+comment above the ".parent =3D TYPE_SYSBUS_DEVICE" line, though.
+
+--=20
+Eduardo
