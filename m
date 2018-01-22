@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55511)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ediRW-0007NE-Ks
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:11:47 -0500
+	id 1ediT6-0008ED-Bs
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:13:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ediRV-0002h9-H5
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:11:46 -0500
+	id 1ediT5-0003C2-8u
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:13:24 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <cover.1516650109.git.alistair.francis@xilinx.com>
-	<c7577f92c251176a04ba82a56fc088cd3609800f.1516650109.git.alistair.francis@xilinx.com>
+	<7b176d7bc8271aebdaacb4635f7f31d8fc41c078.1516650109.git.alistair.francis@xilinx.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9a6c3bdc-79bb-c119-61b2-fd4dd9fe8221@amsat.org>
-Date: Mon, 22 Jan 2018 17:11:37 -0300
+Message-ID: <754d7340-287e-2068-4ece-b13e6da6d4f8@amsat.org>
+Date: Mon, 22 Jan 2018 17:13:17 -0300
 MIME-Version: 1.0
-In-Reply-To: <c7577f92c251176a04ba82a56fc088cd3609800f.1516650109.git.alistair.francis@xilinx.com>
+In-Reply-To: <7b176d7bc8271aebdaacb4635f7f31d8fc41c078.1516650109.git.alistair.francis@xilinx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 4/9] aarch64-softmmu.mak: Use an ARM
- specific config
+Subject: Re: [Qemu-devel] [PATCH v7 9/9] xlnx-zynqmp: Connect the IPI device
+ to the ZynqMP SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +33,74 @@ To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar
 Cc: alistair23@gmail.com, qemu-arm@nongnu.org
 
 On 01/22/2018 04:43 PM, Alistair Francis wrote:
-> In preperation for having an ARM and MicroBlaze ZynqMP machine let's
-> split out the current ARM specific config options.
-> 
 > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Acked-by: Peter Maydell <peter.maydell@linaro.org>
 > Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
 > 
->  default-configs/aarch64-softmmu.mak | 1 +
->  hw/arm/Makefile.objs                | 2 +-
->  hw/display/Makefile.objs            | 2 +-
->  hw/dma/Makefile.objs                | 1 +
->  4 files changed, 4 insertions(+), 2 deletions(-)
+>  include/hw/arm/xlnx-zynqmp.h |  2 ++
+>  hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
+>  2 files changed, 16 insertions(+)
 > 
-> diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
-> index 24494832cf..9ddccf855e 100644
-> --- a/default-configs/aarch64-softmmu.mak
-> +++ b/default-configs/aarch64-softmmu.mak
-> @@ -7,3 +7,4 @@ CONFIG_AUX=y
->  CONFIG_DDC=y
->  CONFIG_DPCD=y
->  CONFIG_XLNX_ZYNQMP=y
-> +CONFIG_XLNX_ZYNQMP_ARM=y
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index 2794e086d6..1c896bafb4 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -13,7 +13,7 @@ obj-y += omap1.o omap2.o strongarm.o
->  obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
->  obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
->  obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
-> -obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp.o xlnx-zcu102.o
-> +obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
->  obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
->  obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
->  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
-> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-> index 551c050a6a..d3a4cb396e 100644
-> --- a/hw/display/Makefile.objs
-> +++ b/hw/display/Makefile.objs
-> @@ -40,4 +40,4 @@ virtio-gpu.o-libs += $(VIRGL_LIBS)
->  virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
->  virtio-gpu-3d.o-libs += $(VIRGL_LIBS)
->  obj-$(CONFIG_DPCD) += dpcd.o
-> -obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dp.o
-> +obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dp.o
-> diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-> index 0b3a009b87..c2afecbf73 100644
-> --- a/hw/dma/Makefile.objs
-> +++ b/hw/dma/Makefile.objs
-> @@ -9,6 +9,7 @@ common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
->  common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
->  common-obj-$(CONFIG_STP2000) += sparc32_dma.o
->  obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
-> +obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
+> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+> index 3e6fb9b7bd..0a2b037c6b 100644
+> --- a/include/hw/arm/xlnx-zynqmp.h
+> +++ b/include/hw/arm/xlnx-zynqmp.h
+> @@ -28,6 +28,7 @@
+>  #include "hw/ssi/xilinx_spips.h"
+>  #include "hw/dma/xlnx_dpdma.h"
+>  #include "hw/display/xlnx_dp.h"
+> +#include "hw/intc/xlnx-zynqmp-ipi.h"
 >  
->  obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
->  obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
+>  #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+>  #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+> @@ -90,6 +91,7 @@ typedef struct XlnxZynqMPState {
+>      XlnxZynqMPQSPIPS qspi;
+>      XlnxDPState dp;
+>      XlnxDPDMAState dpdma;
+> +    XlnxZynqMPIPI ipi;
+>  
+>      char *boot_cpu;
+>      ARMCPU *boot_cpu_ptr;
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 325642058b..ca398c4159 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -50,6 +50,9 @@
+>  #define DPDMA_ADDR          0xfd4c0000
+>  #define DPDMA_IRQ           116
+>  
+> +#define IPI_ADDR            0xFF300000
+> +#define IPI_IRQ             64
+> +
+>  static const uint64_t gem_addr[XLNX_ZYNQMP_NUM_GEMS] = {
+>      0xFF0B0000, 0xFF0C0000, 0xFF0D0000, 0xFF0E0000,
+>  };
+> @@ -183,6 +186,9 @@ static void xlnx_zynqmp_init(Object *obj)
+>  
+>      object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
+>      qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
+> +
+> +    object_initialize(&s->ipi, sizeof(s->ipi), TYPE_XLNX_ZYNQMP_IPI);
+> +    qdev_set_parent_bus(DEVICE(&s->ipi), sysbus_get_default());
+>  }
+>  
+>  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+> @@ -454,6 +460,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>                               &error_abort);
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->dpdma), 0, DPDMA_ADDR);
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
+> +
+> +    object_property_set_bool(OBJECT(&s->ipi), true, "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ipi), 0, IPI_ADDR);
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->ipi), 0, gic_spi[IPI_IRQ]);
+>  }
+>  
+>  static Property xlnx_zynqmp_props[] = {
 > 
