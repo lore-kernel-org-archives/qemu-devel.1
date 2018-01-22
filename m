@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1edken-0004KG-Cy
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:33:38 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1edkul-0000ro-5n
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:50:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1edkem-0002LD-Ch
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:33:37 -0500
-References: <20180119135719.24745-1-vsementsov@virtuozzo.com>
-	<20180119135719.24745-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <736cc213-5f7a-f2b0-6b9e-37b26bd824fc@redhat.com>
-Date: Mon, 22 Jan 2018 16:33:26 -0600
+	(envelope-from <marcandre.lureau@gmail.com>) id 1edkuk-0003K5-DY
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:50:07 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:43214)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1edkuk-0003Jo-71
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:50:06 -0500
+Received: by mail-wm0-x244.google.com with SMTP id g1so19249463wmg.2
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 14:50:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180119135719.24745-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1GBP65SD4IPsPU2g9CeM9xJYXL9wILfH9"
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: add nbd-server-remove
+In-Reply-To: <1516656818-31834-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1516656818-31834-1-git-send-email-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 22 Jan 2018 23:50:04 +0100
+Message-ID: <CAJ+F1C+YEPQqLTM7Q375USd9bEkCJBRoQyi+2R0Kz0zBPOpXbg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tpm: Set the flags of the CMD_INIT command
+ to 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1GBP65SD4IPsPU2g9CeM9xJYXL9wILfH9
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com,
- kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <736cc213-5f7a-f2b0-6b9e-37b26bd824fc@redhat.com>
-Subject: Re: [PATCH v3 2/5] qapi: add nbd-server-remove
-References: <20180119135719.24745-1-vsementsov@virtuozzo.com>
- <20180119135719.24745-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20180119135719.24745-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jan 22, 2018 at 10:33 PM, Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+> The flags of the CMD_INIT control channel command were not
+> initialized properly. Fix this and set to 0.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 01/19/2018 07:57 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add command for removing an export. It is needed for cases when we
-> don't want to keep export after the operation on it was completed.
-> The other example is temporary node, created with blockdev-add.
-> If we want to delete it we should firstly remove corresponding
-> NBD export.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
 > ---
-
-> +++ b/nbd/server.c
-> @@ -1177,6 +1177,26 @@ void nbd_export_close(NBDExport *exp)
->      nbd_export_put(exp);
->  }
-> =20
-> +void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error=
- **errp)
-> +{
-> +    NBDClient *client;
-> +    int nb_clients =3D 0;
-> +
-> +    if (mode =3D=3D NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->=
-clients)) {
-> +        nbd_export_close(exp);
-> +        return;
-> +    }
-> +
-> +    assert(mode =3D=3D NBD_SERVER_REMOVE_MODE_SAFE);
-> +
-> +    QTAILQ_FOREACH(client, &exp->clients, next) {
-> +        nb_clients++;
-> +    }
-> +
-
-Now that the error message is not using nb_clients, we can simplify the
-code to quit computing it.
-
-> +    error_setg(errp, "export '%s' still in use", exp->name);
-> +    error_append_hint(errp, "Use mode=3D'hard' to force client disconn=
-ect\n");
-> +}
-> +
->  void nbd_export_get(NBDExport *exp)
+>  hw/tpm/tpm_emulator.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> index 35c78de..532d3e3 100644
+> --- a/hw/tpm/tpm_emulator.c
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -320,7 +320,9 @@ static int tpm_emulator_set_buffer_size(TPMBackend *t=
+b,
+>  static int tpm_emulator_startup_tpm(TPMBackend *tb, size_t buffersize)
 >  {
->      assert(exp->refcount > 0);
->=20
+>      TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
+> -    ptm_init init;
+> +    ptm_init init =3D {
+> +        .u.req.init_flags =3D 0,
+> +    };
+>      ptm_res res;
+>
+>      if (buffersize !=3D 0 &&
+> --
+> 2.5.5
+>
+>
 
-I'll make that change as part of adding it to my NBD queue.
-Reviewed-by: Eric Blake <eblake@redhat.com>
+
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---1GBP65SD4IPsPU2g9CeM9xJYXL9wILfH9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpmZrYACgkQp6FrSiUn
-Q2pLYgf/cMD7T7dMuD8PPr8gAEp0m9fdOhXpv7WIAUt69FCQTk+d0tmipv/9UNXC
-Z6yVNbpD96EmT3ripJmam9mblMmBaTTDV680BfQwPJZONuXEkiYkEF01v2uyeMef
-XURsOW3IIVsAz1jh27sujzhSr3ho2jgUsRafWbwxaXDgIRSgqgu8XkgqXjmOtVBs
-EA3Z4ncCNbQl2qSaZj4/vylz5zOHdYWoZ8jLvjkdwN5lVHlLIh3Z6b0L+n02YO0M
-aDpTnGUS/SwaHUdzvXW+5ZCR8Idux1LeWuTqvqiTVv4hDadQecLJanmUksp7EKal
-zr7vjmHsdUnFyCQe2KqFJ4Taar7dEQ==
-=/G4p
------END PGP SIGNATURE-----
-
---1GBP65SD4IPsPU2g9CeM9xJYXL9wILfH9--
+Marc-Andr=C3=A9 Lureau
