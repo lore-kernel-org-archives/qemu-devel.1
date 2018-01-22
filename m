@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFu-0002kf-VB
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:15 -0500
+	(envelope-from <thuth@redhat.com>) id 1edaFu-0002ke-UL
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFu-0007Ft-2r
+	(envelope-from <thuth@redhat.com>) id 1edaFr-0007ER-BQ
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:18292)
+Received: from mx1.redhat.com ([209.132.183.28]:55014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFt-0007FL-Pw
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:13 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFr-0007E2-2i
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:11 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 22 Jan 2018 12:27:00 +0100
-Message-Id: <1516620426-18530-4-git-send-email-thuth@redhat.com>
+Date: Mon, 22 Jan 2018 12:26:58 +0100
+Message-Id: <1516620426-18530-2-git-send-email-thuth@redhat.com>
 In-Reply-To: <1516620426-18530-1-git-send-email-thuth@redhat.com>
 References: <1516620426-18530-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 3/9] tests/cpu-plug-test: Check CPU hot-plugging
- on ppc64, too
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/9] tests: Rename pc-cpu-test.c to
+ cpu-plug-test.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +30,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: Alistair Francis <alistair.francis@xilinx.com>
 
-Hot plugging on ppc64 is possible via "device_add", too. Unlike x86,
-we must not specify a 'socket-id' and 'thread-id' here, so this needs
-to be done with a separate function that just specifies the 'core-id'
-during the "device_add".
+The test will be extended to work on other architectures, too, so let's
+use a more generic name for the file and the functions in here first.
 
-Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
-Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include |  1 +
- tests/cpu-plug-test.c  | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+)
+ tests/Makefile.include                   |  4 ++--
+ tests/{pc-cpu-test.c =3D> cpu-plug-test.c} | 24 ++++++++++++------------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+ rename tests/{pc-cpu-test.c =3D> cpu-plug-test.c} (87%)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 669f7f6..092ad5f 100644
+index 8883274..669f7f6 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -340,6 +340,7 @@ check-qtest-ppc64-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
- check-qtest-ppc64-y += tests/numa-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
-+check-qtest-ppc64-y += tests/cpu-plug-test$(EXESUF)
- 
- check-qtest-sh4-y = tests/endianness-test$(EXESUF)
- 
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index 1e622cb..a306340 100644
---- a/tests/cpu-plug-test.c
+@@ -278,7 +278,7 @@ gcov-files-i386-y +=3D hw/usb/dev-hid.c
+ gcov-files-i386-y +=3D hw/usb/dev-storage.c
+ check-qtest-i386-y +=3D tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-i386-y +=3D hw/usb/hcd-xhci.c
+-check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
++check-qtest-i386-y +=3D tests/cpu-plug-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
+ gcov-files-i386-y +=3D hw/pci-host/q35.c
+@@ -795,7 +795,7 @@ tests/usb-hcd-ohci-test$(EXESUF): tests/usb-hcd-ohci-=
+test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb=
+-obj-y)
+ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb=
+-obj-y)
+ tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb=
+-obj-y)
+-tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
++tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
+ tests/migration-test$(EXESUF): tests/migration-test.o
+ tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-=
+y) \
+ 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-=
+y) \
+diff --git a/tests/pc-cpu-test.c b/tests/cpu-plug-test.c
+similarity index 87%
+rename from tests/pc-cpu-test.c
+rename to tests/cpu-plug-test.c
+index 11d3e81..4579119 100644
+--- a/tests/pc-cpu-test.c
 +++ b/tests/cpu-plug-test.c
-@@ -100,6 +100,28 @@ static void test_plug_with_device_add_x86(gconstpointer data)
+@@ -1,5 +1,5 @@
+ /*
+- * QTest testcase for PC CPUs
++ * QTest testcase for CPU plugging
+  *
+  * Copyright (c) 2015 SUSE Linux GmbH
+  *
+@@ -13,7 +13,7 @@
+ #include "libqtest.h"
+ #include "qapi/qmp/types.h"
+=20
+-struct PCTestData {
++struct PlugTestData {
+     char *machine;
+     const char *cpu_model;
+     unsigned sockets;
+@@ -21,11 +21,11 @@ struct PCTestData {
+     unsigned threads;
+     unsigned maxcpus;
+ };
+-typedef struct PCTestData PCTestData;
++typedef struct PlugTestData PlugTestData;
+=20
+-static void test_pc_with_cpu_add(gconstpointer data)
++static void test_plug_with_cpu_add(gconstpointer data)
+ {
+-    const PCTestData *s =3D data;
++    const PlugTestData *s =3D data;
+     char *args;
+     QDict *response;
+     unsigned int i;
+@@ -48,9 +48,9 @@ static void test_pc_with_cpu_add(gconstpointer data)
      g_free(args);
  }
- 
-+static void test_plug_with_device_add_coreid(gconstpointer data)
-+{
-+    const PlugTestData *td = data;
-+    char *args;
-+    unsigned int c;
-+
-+    args = g_strdup_printf("-machine %s -cpu %s "
-+                           "-smp 1,sockets=%u,cores=%u,threads=%u,maxcpus=%u",
-+                           td->machine, td->cpu_model,
-+                           td->sockets, td->cores, td->threads, td->maxcpus);
-+    qtest_start(args);
-+
-+    for (c = td->cores; c < td->maxcpus / td->sockets / td->threads; c++) {
-+        char *id = g_strdup_printf("id-%i", c);
-+        qtest_qmp_device_add(td->device_model, id, "'core-id':'%i'", c);
-+        g_free(id);
-+    }
-+
-+    qtest_end();
-+    g_free(args);
-+}
-+
+=20
+-static void test_pc_without_cpu_add(gconstpointer data)
++static void test_plug_without_cpu_add(gconstpointer data)
+ {
+-    const PCTestData *s =3D data;
++    const PlugTestData *s =3D data;
+     char *args;
+     QDict *response;
+=20
+@@ -73,7 +73,7 @@ static void test_pc_without_cpu_add(gconstpointer data)
+=20
  static void test_data_free(gpointer data)
  {
-     PlugTestData *pc = data;
-@@ -164,6 +186,32 @@ static void add_pc_test_case(const char *mname)
-     }
- }
- 
-+static void add_pseries_test_case(const char *mname)
-+{
-+    char *path;
-+    PlugTestData *data;
-+
-+    if (!g_str_has_prefix(mname, "pseries-") ||
-+        (g_str_has_prefix(mname, "pseries-2.") && atoi(&mname[10]) < 7)) {
-+        return;
-+    }
-+    data = g_new(PlugTestData, 1);
-+    data->machine = g_strdup(mname);
-+    data->cpu_model = "power8_v2.0";
-+    data->device_model = g_strdup("power8_v2.0-spapr-cpu-core");
-+    data->sockets = 2;
-+    data->cores = 3;
-+    data->threads = 1;
-+    data->maxcpus = data->sockets * data->cores * data->threads * 2;
-+
-+    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
-+                           mname, data->sockets, data->cores,
-+                           data->threads, data->maxcpus);
-+    qtest_add_data_func_full(path, data, test_plug_with_device_add_coreid,
-+                             test_data_free);
-+    g_free(path);
-+}
-+
- int main(int argc, char **argv)
+-    PCTestData *pc =3D data;
++    PlugTestData *pc =3D data;
+=20
+     g_free(pc->machine);
+     g_free(pc);
+@@ -82,12 +82,12 @@ static void test_data_free(gpointer data)
+ static void add_pc_test_case(const char *mname)
  {
-     const char *arch = qtest_get_arch();
-@@ -172,6 +220,8 @@ int main(int argc, char **argv)
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-         qtest_cb_for_every_machine(add_pc_test_case);
-+    } else if (g_str_equal(arch, "ppc64")) {
-+        qtest_cb_for_every_machine(add_pseries_test_case);
+     char *path;
+-    PCTestData *data;
++    PlugTestData *data;
+=20
+     if (!g_str_has_prefix(mname, "pc-")) {
+         return;
      }
- 
-     return g_test_run();
--- 
+-    data =3D g_new(PCTestData, 1);
++    data =3D g_new(PlugTestData, 1);
+     data->machine =3D g_strdup(mname);
+     data->cpu_model =3D "Haswell"; /* 1.3+ theoretically */
+     data->sockets =3D 1;
+@@ -108,14 +108,14 @@ static void add_pc_test_case(const char *mname)
+         path =3D g_strdup_printf("cpu/%s/init/%ux%ux%u&maxcpus=3D%u",
+                                mname, data->sockets, data->cores,
+                                data->threads, data->maxcpus);
+-        qtest_add_data_func_full(path, data, test_pc_without_cpu_add,
++        qtest_add_data_func_full(path, data, test_plug_without_cpu_add,
+                                  test_data_free);
+         g_free(path);
+     } else {
+         path =3D g_strdup_printf("cpu/%s/add/%ux%ux%u&maxcpus=3D%u",
+                                mname, data->sockets, data->cores,
+                                data->threads, data->maxcpus);
+-        qtest_add_data_func_full(path, data, test_pc_with_cpu_add,
++        qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
+                                  test_data_free);
+         g_free(path);
+     }
+--=20
 1.8.3.1
