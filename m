@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1edVtO-0003Xs-MV
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:47:43 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1edW4j-0006pE-Uu
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:59:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1edVtJ-0004ud-R7
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:47:42 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:36106)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1edVtJ-0004tY-J4
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:47:37 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180119084235.7100.98318.stgit@pasha-VirtualBox>
-	<20180119084417.7100.69568.stgit@pasha-VirtualBox>
-	<aca12788-c119-3046-ee8f-e7b3d4cc59bb@redhat.com>
-	<002a01d3911d$dc13ca80$943b5f80$@ru>
-	<8aa1900f-2663-43bd-dab5-001be0aede09@redhat.com>
-	<002b01d39120$8c88e880$a59ab980$@ru>
-	<f7c459df-c68f-3995-4183-45da91e688a3@redhat.com>
-	<002c01d39122$2de5d930$89b18b90$@ru>
-	<29712321-7255-6714-ca80-b94d208c1a40@redhat.com>
-In-Reply-To: <29712321-7255-6714-ca80-b94d208c1a40@redhat.com>
-Date: Mon, 22 Jan 2018 09:47:33 +0300
-Message-ID: <000c01d3934c$e19e6c90$a4db45b0$@ru>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1edW4f-0001rs-Ac
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:59:26 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2249 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1edW4e-0001lw-VZ
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:59:21 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Mon, 22 Jan 2018 14:57:49 +0800
+Message-ID: <e683b6d0e479bf2950d7b0f89136ba1d3d31e1e1.1516527761.git.jianjay.zhou@huawei.com>
+In-Reply-To: <cover.1516527761.git.jianjay.zhou@huawei.com>
+References: <cover.1516527761.git.jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v4 13/23] cpus: only take BQL for
- sleeping threads
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 1/2] vhost: fix memslot limit check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, jianjay.zhou@huawei.com, liuzhe13@huawei.com
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 19/01/2018 13:36, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >> On 19/01/2018 13:25, Pavel Dovgalyuk wrote:
-> >>>>> It means, that I'll have to fix all the has_work function to avoid races,
-> >>>>> because x86_cpu_has_work may have them?
-> >>>> Why only x86_cpu_has_work?
-> >>>>
-> >>>> Even reading cs->interrupt_request outside the mutex is unsafe.
-> >>> All the vcpu function that access interrupt controller or peripheral state may be unsafe?
-> >>> How can it work safely then?
-> >>
-> >> They do it inside the big QEMU lock.
-> >
-> > Right. Without these patches.
-> > They are within the replay lock. And BQL is not covering vcpu execution with these patches.
-> > Therefore RR will be ok and regular execution may encounter races?
-> > It means that I missed something in Alex ideas, because he prepared the initial patches.
-> 
-> Yes.
-> 
-> >> But here you're calling cpu_has_work (via all_cpu_threads_idle) outside the lock.
-> >
-> > Yes, I see, but what we have to do?
-> 
-> I don't know.  But the idiom in these patches,
-> 
-> 	while(...) {
-> 		lock()
-> 		cond_wait()
-> 		unlock()
-> 	}
-> 
-> is unsafe as well, so the issue is more than just cpu_has_work.
+Since used_memslots will be updated to the actual value after
+registering memory listener for the first time, move the
+memslots limit checking to the right place.
 
-Maybe it's better to omit this patch?
-It seems that replay and regular execution are ok without it.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+---
+ hw/virtio/vhost.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-Pavel Dovgalyuk
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 386aef8..1ac512e 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1251,13 +1251,6 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+         goto fail;
+     }
+ 
+-    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+-        error_report("vhost backend memory slots limit is less"
+-                " than current number of present memory slots");
+-        r = -1;
+-        goto fail;
+-    }
+-
+     r = hdev->vhost_ops->vhost_set_owner(hdev);
+     if (r < 0) {
+         VHOST_OPS_DEBUG("vhost_set_owner failed");
+@@ -1339,6 +1332,18 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+     hdev->memory_changed = false;
+     memory_listener_register(&hdev->memory_listener, &address_space_memory);
+     QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
++
++    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
++        error_report("vhost backend memory slots limit is less"
++                " than current number of present memory slots");
++        r = -1;
++        if (busyloop_timeout) {
++            goto fail_busyloop;
++        } else {
++            goto fail;
++        }
++    }
++
+     return 0;
+ 
+ fail_busyloop:
+-- 
+1.8.3.1
