@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edWZN-0000Ks-NG
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:31:06 -0500
+	(envelope-from <peterx@redhat.com>) id 1edWlO-0004ZQ-Mq
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:43:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edWZK-00081Y-IF
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:31:05 -0500
-From: Thomas Huth <thuth@redhat.com>
-References: <1513700253-10045-1-git-send-email-thuth@redhat.com>
-Message-ID: <0314bfe1-fa6d-cdd6-fd35-3d718249d59f@redhat.com>
-Date: Mon, 22 Jan 2018 08:30:48 +0100
+	(envelope-from <peterx@redhat.com>) id 1edWlJ-0006bq-O0
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:43:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1edWlJ-0006bX-HA
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:43:25 -0500
+Date: Mon, 22 Jan 2018 15:43:13 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180122074313.GC29532@xz-mi>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-15-peterx@redhat.com>
+	<30db45d4-66fa-167f-4f32-22ed47a3bfd2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1513700253-10045-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] monitor: Remove legacy "-mon default=on"
- parameter
+Content-Disposition: inline
+In-Reply-To: <30db45d4-66fa-167f-4f32-22ed47a3bfd2@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v6 14/27] monitor: let suspend_cnt be thread
+ safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 19.12.2017 17:17, Thomas Huth wrote:
-> The "default" parameter of the "-mon" option is useless since
-> QEMU v2.4.0, and marked as deprecated since QEMU v2.8.0. That
-> should have been long enough to let people update their scripts,
-> so time to remove it now.
+On Fri, Jan 12, 2018 at 03:48:10PM -0600, Eric Blake wrote:
+> On 12/19/2017 02:45 AM, Peter Xu wrote:
+> > Monitor code now can be run in more than one thread.  Let it be thread
+> > safe when accessing suspend_cnt counter.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  monitor.c | 13 +++++++------
+> >  1 file changed, 7 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/monitor.c b/monitor.c
+> > index cf1e5d881c..844508d134 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -3862,7 +3862,7 @@ static int monitor_can_read(void *opaque)
+> >  {
+> >      Monitor *mon = opaque;
+> >  
+> > -    return (mon->suspend_cnt == 0) ? 1 : 0;
+> > +    return (atomic_mb_read(&mon->suspend_cnt) == 0) ? 1 : 0;
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  monitor.c     | 3 ---
->  qemu-doc.texi | 9 ---------
->  vl.c          | 4 ----
->  3 files changed, 16 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index e36fb53..e53c6e1 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4141,9 +4141,6 @@ QemuOptsList qemu_mon_opts = {
->              .name = "chardev",
->              .type = QEMU_OPT_STRING,
->          },{
-> -            .name = "default",  /* deprecated */
-> -            .type = QEMU_OPT_BOOL,
-> -        },{
->              .name = "pretty",
->              .type = QEMU_OPT_BOOL,
->          },
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index d9861b3..6913b32 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2401,15 +2401,6 @@ setting ``-machine kernel_irqchip=off''.
->  The ``-no-kvm'' argument is now a synonym for setting
->  ``-machine accel=tcg''.
->  
-> -@subsection -mon default=on (since 2.4.0)
-> -
-> -The ``default'' option to the ``-mon'' argument is
-> -now ignored. When multiple monitors were enabled, it
-> -indicated which monitor would receive log messages
-> -from the various subsystems. This feature is no longer
-> -required as messages are now only sent to the monitor
-> -in response to explicitly monitor commands.
-> -
->  @subsection -vnc tls (since 2.5.0)
->  
->  The ``-vnc tls'' argument is now a synonym for setting
-> diff --git a/vl.c b/vl.c
-> index 2644400..4e7a7e4 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2438,10 +2438,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
->      if (qemu_opt_get_bool(opts, "pretty", 0))
->          flags |= MONITOR_USE_PRETTY;
->  
-> -    if (qemu_opt_get_bool(opts, "default", 0)) {
-> -        error_report("option 'default' does nothing and is deprecated");
-> -    }
-> -
->      chardev = qemu_opt_get(opts, "chardev");
->      chr = qemu_chr_find(chardev);
->      if (chr == NULL) {
-> 
+> Worth a comment at the declaration of suspend_cnt that it must be
+> accessed atomically?
 
-Ping?
+Sure.
 
- Thomas
+> 
+> I find anything that does '(boolexpr) ? 1 : 0' to be a pointless waste
+> of typing.  It is semantically equivalent and shorter to write either of:
+> 
+> return atomic_mb_read(&mon->suspend_cnt) == 0;
+> return !atomic_mb_read(&mon->suspend_cnt);
+
+Sure, will use the latter.
+
+> 
+> At any rate, I checked that all uses of suspend_cnt were converted over
+> to atomic API, so this looks correct, whether or not you add my tweaks.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks for reviewing.
+
+-- 
+Peter Xu
