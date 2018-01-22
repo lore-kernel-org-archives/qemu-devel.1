@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ediq3-0007EY-Np
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:37:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1edisL-0008Hf-Cw
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:39:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ediq2-0007ha-Ra
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:37:07 -0500
-References: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
-	<20180112090122.1702-2-klim.kireev@virtuozzo.com>
-	<a562774e-a8d8-d864-c639-6edb6f58df4a@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1edisK-0000ij-Bi
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:39:29 -0500
+References: <cover.1513342045.git.berto@igalia.com>
+	<9848848136be0af6e4c2c7a51effd88fbd8e6126.1513342045.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <1b387283-6203-ebae-0631-2f6f6ff2fe0a@redhat.com>
-Date: Mon, 22 Jan 2018 14:36:55 -0600
+Message-ID: <7b8c87e6-04eb-840b-de82-7072b805b1c2@redhat.com>
+Date: Mon, 22 Jan 2018 14:39:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <a562774e-a8d8-d864-c639-6edb6f58df4a@redhat.com>
+In-Reply-To: <9848848136be0af6e4c2c7a51effd88fbd8e6126.1513342045.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Ci8J3dzrqyUN65Hz8Hrv6vfEVwT1qXs29"
-Subject: Re: [Qemu-devel] [PATCH 1/5] docs/interop/prl-xml: description of
- Parallels Disk format
+	boundary="psayIZYGbKSSURUnhWtf4hGscFDAqygDp"
+Subject: Re: [Qemu-devel] [PATCH v2 30/32] qcow2: Rename l2_table in
+ count_cow_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Klim Kireev <klim.kireev@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, qemu-block@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ci8J3dzrqyUN65Hz8Hrv6vfEVwT1qXs29
+--psayIZYGbKSSURUnhWtf4hGscFDAqygDp
 From: Eric Blake <eblake@redhat.com>
-To: Klim Kireev <klim.kireev@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, qemu-block@nongnu.org,
- stefanha@redhat.com, mreitz@redhat.com
-Message-ID: <1b387283-6203-ebae-0631-2f6f6ff2fe0a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] docs/interop/prl-xml: description of
- Parallels Disk format
-References: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
- <20180112090122.1702-2-klim.kireev@virtuozzo.com>
- <a562774e-a8d8-d864-c639-6edb6f58df4a@redhat.com>
-In-Reply-To: <a562774e-a8d8-d864-c639-6edb6f58df4a@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <7b8c87e6-04eb-840b-de82-7072b805b1c2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 30/32] qcow2: Rename l2_table in
+ count_cow_clusters()
+References: <cover.1513342045.git.berto@igalia.com>
+ <9848848136be0af6e4c2c7a51effd88fbd8e6126.1513342045.git.berto@igalia.com>
+In-Reply-To: <9848848136be0af6e4c2c7a51effd88fbd8e6126.1513342045.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 01/22/2018 02:32 PM, Eric Blake wrote:
-> On 01/12/2018 03:01 AM, Klim Kireev wrote:
->> This patch adds main information about Parallels Disk
->> format, which consists of DiskDescriptor.xml and other files.
->>
->> Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
->> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
-
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> CC: Stefan Hajnoczi <stefanha@redhat.com>
->> ---
->>  docs/interop/prl-xml.txt | 158 ++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  1 file changed, 158 insertions(+)
->>  create mode 100644 docs/interop/prl-xml.txt
->>
->> diff --git a/docs/interop/prl-xml.txt b/docs/interop/prl-xml.txt
->> new file mode 100644
->> index 0000000000..7031f8752c
->> --- /dev/null
->> +++ b/docs/interop/prl-xml.txt
->> @@ -0,0 +1,158 @@
->> +=3D License =3D
->> +
->> +Copyright (c) 2015-2017, Virtuozzo, Inc.
+On 12/15/2017 06:53 AM, Alberto Garcia wrote:
+> This function doesn't need any changes to support L2 slices, but since
+> it's now dealing with slices intead of full tables, the l2_table
+> variable is renamed for clarity.
 >=20
-> Want to claim 2018 as well?
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
 
-Oh, and I see that the pull request has already been sent, so these
-cleanups can be a followup patch.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -83,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---Ci8J3dzrqyUN65Hz8Hrv6vfEVwT1qXs29
+--psayIZYGbKSSURUnhWtf4hGscFDAqygDp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -92,14 +71,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpmS2cACgkQp6FrSiUn
-Q2q7Awf/bFQF/z4itVqW8zQ4pwfct9UO167xu1lVkQFEgpTjItRS43UGxZW3fMO0
-8ZDutRIE7YMwNj3MuEfHML/WkEU6MI6y+a9P3KcNFunPPnxpxgRo6tzVT60FsgnA
-dskgcxIdvjyqYBtAlNaYB55KdGWjydGoeCDmqQbDZupnxDkL2TMvjOAlXburBkXR
-9Ka0Y+uUSzjC9RjG8QhdzQLEyaO9By2ANJuSKdXa6/nqtPqaNVrQw1FMVh6FBv48
-K5Ckjlkfdc49JNwN71Q4UByXb1hBub3fzsUAisKVOsBh1WTshSMq5M3hRHMagGDp
-KHS6zOLl8oK9Irj7+jl0v/m5tNWPNw==
-=cmcF
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpmS/YACgkQp6FrSiUn
+Q2rpvwf7BG9rBLiyLsXzdssCIKemTg3wl2LnAC5gu1GUk0fq7SUSstzQYbCOvaW0
+gxrkYHByutB1m5IsY5pHcUfo0ROORxq/EEuSv17KcflnPHA2dv0RIIgnClcDfezn
+YQ+raYOuEKYeHxVsCmxQfVqQ1bfztKxjkOCU57CcJfJSqUUyygbF1wAJU0QZtML/
+OWUnluhsdlq3lb+oaJ6bUpWshhunQ7P5OP1BuG+LOXZArScWKMOnSL4mEPwegCsj
+8WWDeziSaLZnICFtBZDD8tGhve7fR5I38oGuT50bDUjLUw42qn4M7sb9miQwsy66
+JQiWl5RXsdXmUW0FheLapKD7417hVQ==
+=ViWG
 -----END PGP SIGNATURE-----
 
---Ci8J3dzrqyUN65Hz8Hrv6vfEVwT1qXs29--
+--psayIZYGbKSSURUnhWtf4hGscFDAqygDp--
