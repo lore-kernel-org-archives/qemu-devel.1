@@ -1,15 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eddMC-00050k-2X
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:45:57 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eddUQ-0007RA-3j
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:54:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eddM9-0007so-Ga
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:45:56 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 22 Jan 2018 17:45:49 +0300
-Message-Id: <20180122144549.25318-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [RFC] block-backend: fix double inc/dec inflight
- requests number
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eddUP-0004Tc-1y
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:54:26 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_epX=BOj5sxNVB2z-k3wQ+RRAry=OQi2b=i0d9pJaSeA@mail.gmail.com>
+References: <20180113113445.2705-1-jcd@tribudubois.net>
+	<CAFEAcA_epX=BOj5sxNVB2z-k3wQ+RRAry=OQi2b=i0d9pJaSeA@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 22 Jan 2018 06:54:23 -0800
+Message-ID: <CAHQ1cqHXHxSH4LxSu0Jjug5hy1FhMYF-O2FtYbjpnm68VjTDpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] i.MX: Fix FEC/ENET receive funtions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,68 +22,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, fyleo45@gmail.com, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>
 
-blk_co_preadv and blk_co_pwritev calls bdrv_inc_in_flight and
-bdrv_dec_in_flight. But they calls correspondingly bdrv_co_preadv
-and bdrv_co_pwritev, which inc/dec in-flight count by themselves.
-Counting in-flight requests in blk_ layer is redundant, drop it.
+On Mon, Jan 22, 2018 at 3:48 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 13 January 2018 at 11:34, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
+>> The actual imx_eth_enable_rx() function is buggy.
+>>
+>> It updates s->regs[ENET_RDAR] after calling qemu_flush_queued_packets().
+>>
+>> qemu_flush_queued_packets() is going to call imx_XXX_receive() which itself
+>> is going to call imx_eth_enable_rx().
+>>
+>> By updating s->regs[ENET_RDAR] after calling qemu_flush_queued_packets()
+>> we end up updating the register with an outdated value which might
+>> lead to disabling the receive function in the i.MX FEC/ENET device.
+>>
+>> This patch change the place where the register update is done so that the
+>> register value stays up to date and the receive function can keep
+>> running.
+>>
+>> Reported-by: Fyleo <fyleo45@gmail.com>
+>> Tested-by: Fyleo  <fyleo45@gmail.com>
+>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>> ---
+>
+> Andrey, do you have an opinion on this patch, since you've been
+> looking at i.MX code recently?
+>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+The rationale makes sense to me and patch looks like a good cleanup in
+general, so FWIW:
 
-Hi all!
+Reviewed-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 
-Is it a bug or a feature? Why do we call inc/dec twice for read/write?
-We don't do this for flush and discard..
+I also gave it a spin against my i.MX7 changes with doing basic things
+like ping and scp of 1GB file, so I can give my:
 
-(patch is called RFC, but it may be applied as is, if it is OK)
+Tested-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 
- block/block-backend.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+for that.
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index baef8e7abc..8219f59d93 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1094,17 +1094,13 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
-         return ret;
-     }
- 
--    bdrv_inc_in_flight(bs);
--
-     /* throttling disk I/O */
-     if (blk->public.throttle_group_member.throttle_state) {
-         throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
-                 bytes, false);
-     }
- 
--    ret = bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
--    bdrv_dec_in_flight(bs);
--    return ret;
-+    return bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
- }
- 
- int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-@@ -1121,7 +1117,6 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-         return ret;
-     }
- 
--    bdrv_inc_in_flight(bs);
-     /* throttling disk I/O */
-     if (blk->public.throttle_group_member.throttle_state) {
-         throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
-@@ -1132,9 +1127,7 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-         flags |= BDRV_REQ_FUA;
-     }
- 
--    ret = bdrv_co_pwritev(blk->root, offset, bytes, qiov, flags);
--    bdrv_dec_in_flight(bs);
--    return ret;
-+    return bdrv_co_pwritev(blk->root, offset, bytes, qiov, flags);
- }
- 
- typedef struct BlkRwCo {
--- 
-2.11.1
+Thanks,
+Andrey Smirnov
+
+
+>> Change since v1:
+>> 1. Rebase the patch on the updated master branch
+>>
+>>  hw/net/imx_fec.c | 8 ++------
+>>  1 file changed, 2 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+>> index 4fb48f62ba..9506f9b69f 100644
+>> --- a/hw/net/imx_fec.c
+>> +++ b/hw/net/imx_fec.c
+>> @@ -595,19 +595,16 @@ static void imx_eth_do_tx(IMXFECState *s, uint32_t index)
+>>  static void imx_eth_enable_rx(IMXFECState *s, bool flush)
+>>  {
+>>      IMXFECBufDesc bd;
+>> -    bool rx_ring_full;
+>>
+>>      imx_fec_read_bd(&bd, s->rx_descriptor);
+>>
+>> -    rx_ring_full = !(bd.flags & ENET_BD_E);
+>> +    s->regs[ENET_RDAR] = (bd.flags & ENET_BD_E) ? ENET_RDAR_RDAR : 0;
+>>
+>> -    if (rx_ring_full) {
+>> +    if (!s->regs[ENET_RDAR]) {
+>>          FEC_PRINTF("RX buffer full\n");
+>>      } else if (flush) {
+>>          qemu_flush_queued_packets(qemu_get_queue(s->nic));
+>>      }
+>> -
+>> -    s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
+>>  }
+>>
+>>  static void imx_eth_reset(DeviceState *d)
+>> @@ -866,7 +863,6 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+>>      case ENET_RDAR:
+>>          if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
+>>              if (!s->regs[index]) {
+>> -                s->regs[index] = ENET_RDAR_RDAR;
+>>                  imx_eth_enable_rx(s, true);
+>>              }
+>>          } else {
+>> --
+>> 2.14.1
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> thanks
+> -- PMM
