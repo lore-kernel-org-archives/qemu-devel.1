@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ediNg-0005n8-0Z
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:07:48 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ediRW-0007NE-Ks
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:11:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ediNe-00008t-Qi
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:07:47 -0500
-Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:39418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ediNe-00008E-JA
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:07:46 -0500
-Received: by mail-lf0-x22a.google.com with SMTP id m8so12141104lfc.6
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 12:07:46 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 22 Jan 2018 12:07:29 -0800
-Message-Id: <1516651649-28514-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PULL v2 00/10] target/xtensa updates
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ediRV-0002h9-H5
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:11:46 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1516650109.git.alistair.francis@xilinx.com>
+	<c7577f92c251176a04ba82a56fc088cd3609800f.1516650109.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9a6c3bdc-79bb-c119-61b2-fd4dd9fe8221@amsat.org>
+Date: Mon, 22 Jan 2018 17:11:37 -0300
+MIME-Version: 1.0
+In-Reply-To: <c7577f92c251176a04ba82a56fc088cd3609800f.1516650109.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 4/9] aarch64-softmmu.mak: Use an ARM
+ specific config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+Cc: alistair23@gmail.com, qemu-arm@nongnu.org
 
-Hi Peter,
+On 01/22/2018 04:43 PM, Alistair Francis wrote:
+> In preperation for having an ARM and MicroBlaze ZynqMP machine let's
+> split out the current ARM specific config options.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Acked-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-please pull the following batch of updates for the target/xtensa.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Changes v1->v2:
-- use fsf core for both MMU and noMMU in qemu-system-xtensaeb.
-
-The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75b9ff:
-
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180111' into staging (2018-01-11 14:34:41 +0000)
-
-are available in the git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20180122-xtensa
-
-for you to fetch changes up to 847a6473206607bc6c84f6c537a0fe603ff7aaa6:
-
-  target/xtensa: disas/xtensa: fix coverity warnings (2018-01-22 11:54:58 -0800)
-
-----------------------------------------------------------------
-target/xtensa updates:
-
-- make mini-bootloader independent of the initial CPU state;
-- add noMMU XTFPGA variants;
-- add two noMMU cores: de212 and sample_controller;
-- fix issues reported by coverity against xtensa translator and disassembler.
-
-----------------------------------------------------------------
-Max Filippov (10):
-      hw/xtensa/xtfpga: rewrite mini bootloader
-      hw/xtensa/xtfpga: clean up function/structure names
-      target/xtensa: fix default sysrom/sysram addresses
-      hw/xtensa: extract xtensa_create_memory_regions
-      hw/xtensa/xtfpga: extract flash configuration
-      hw/xtensa/xtfpga: support noMMU cores
-      target/xtensa: add de212 core
-      target/xtensa: allow different default CPU for MMU/noMMU
-      target/xtensa: add sample_controller core
-      target/xtensa: disas/xtensa: fix coverity warnings
-
- disas/xtensa.c                                     |     4 +-
- hw/xtensa/Makefile.objs                            |     1 +
- hw/xtensa/sim.c                                    |    38 +-
- hw/xtensa/xtensa_memory.c                          |    55 +
- hw/xtensa/xtensa_memory.h                          |    40 +
- hw/xtensa/xtfpga.c                                 |   414 +-
- target/xtensa/Makefile.objs                        |     2 +
- target/xtensa/core-de212.c                         |    53 +
- target/xtensa/core-de212/core-isa.h                |   622 +
- target/xtensa/core-de212/gdb-config.c              |   198 +
- target/xtensa/core-de212/xtensa-modules.c          | 14566 +++++++++++++++++++
- target/xtensa/core-sample_controller.c             |    53 +
- target/xtensa/core-sample_controller/core-isa.h    |   644 +
- target/xtensa/core-sample_controller/gdb-config.c  |   141 +
- .../xtensa/core-sample_controller/xtensa-modules.c | 11377 +++++++++++++++
- target/xtensa/cpu.h                                |     7 +-
- target/xtensa/overlay_tool.h                       |     8 +-
- target/xtensa/translate.c                          |     4 +-
- 18 files changed, 28081 insertions(+), 146 deletions(-)
- create mode 100644 hw/xtensa/xtensa_memory.c
- create mode 100644 hw/xtensa/xtensa_memory.h
- create mode 100644 target/xtensa/core-de212.c
- create mode 100644 target/xtensa/core-de212/core-isa.h
- create mode 100644 target/xtensa/core-de212/gdb-config.c
- create mode 100644 target/xtensa/core-de212/xtensa-modules.c
- create mode 100644 target/xtensa/core-sample_controller.c
- create mode 100644 target/xtensa/core-sample_controller/core-isa.h
- create mode 100644 target/xtensa/core-sample_controller/gdb-config.c
- create mode 100644 target/xtensa/core-sample_controller/xtensa-modules.c
-
--- 
-Thanks.
--- Max
+> ---
+> 
+>  default-configs/aarch64-softmmu.mak | 1 +
+>  hw/arm/Makefile.objs                | 2 +-
+>  hw/display/Makefile.objs            | 2 +-
+>  hw/dma/Makefile.objs                | 1 +
+>  4 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
+> index 24494832cf..9ddccf855e 100644
+> --- a/default-configs/aarch64-softmmu.mak
+> +++ b/default-configs/aarch64-softmmu.mak
+> @@ -7,3 +7,4 @@ CONFIG_AUX=y
+>  CONFIG_DDC=y
+>  CONFIG_DPCD=y
+>  CONFIG_XLNX_ZYNQMP=y
+> +CONFIG_XLNX_ZYNQMP_ARM=y
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index 2794e086d6..1c896bafb4 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -13,7 +13,7 @@ obj-y += omap1.o omap2.o strongarm.o
+>  obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
+>  obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
+>  obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
+> -obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp.o xlnx-zcu102.o
+> +obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
+>  obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
+>  obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+>  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+> index 551c050a6a..d3a4cb396e 100644
+> --- a/hw/display/Makefile.objs
+> +++ b/hw/display/Makefile.objs
+> @@ -40,4 +40,4 @@ virtio-gpu.o-libs += $(VIRGL_LIBS)
+>  virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
+>  virtio-gpu-3d.o-libs += $(VIRGL_LIBS)
+>  obj-$(CONFIG_DPCD) += dpcd.o
+> -obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dp.o
+> +obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dp.o
+> diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
+> index 0b3a009b87..c2afecbf73 100644
+> --- a/hw/dma/Makefile.objs
+> +++ b/hw/dma/Makefile.objs
+> @@ -9,6 +9,7 @@ common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
+>  common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
+>  common-obj-$(CONFIG_STP2000) += sparc32_dma.o
+>  obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
+> +obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
+>  
+>  obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
+>  obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
+> 
