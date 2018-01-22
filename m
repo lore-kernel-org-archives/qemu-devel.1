@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1edVCV-0000bQ-Ou
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1edVU1-0006Q0-Au
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:21:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1edVCU-0004c4-Lg
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39226)
+	(envelope-from <thuth@redhat.com>) id 1edVTx-0006hx-Sb
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:21:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33592)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1edVCU-0004bf-DF
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:22 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Mon, 22 Jan 2018 14:02:44 +0800
-Message-Id: <20180122060244.29368-5-peterx@redhat.com>
-In-Reply-To: <20180122060244.29368-1-peterx@redhat.com>
-References: <20180122060244.29368-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] memory: do explicit cleanup when remove
- listeners
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edVTx-0006h1-Mm
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:21:25 -0500
+References: <20171108022828.7242-1-f4bug@amsat.org>
+	<20171108022828.7242-2-f4bug@amsat.org>
+	<20171108202924.GV3111@localhost.localdomain>
+	<915da050-14bd-50ad-9a0d-5ad81fd34073@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <46d3f7c5-df3b-b650-e0a2-ea786a0400c4@redhat.com>
+Date: Mon, 22 Jan 2018 07:21:18 +0100
+MIME-Version: 1.0
+In-Reply-To: <915da050-14bd-50ad-9a0d-5ad81fd34073@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 1/6] machine: add a deprecated_reason
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, peterx@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-When unregister memory listeners, we should call, e.g.,
-region_del() (and possibly other undo operations) on every existing
-memory region sections there, otherwise we may leak resources that are
-held during the region_add(). This patch undo the stuff for the
-listeners, which emulates the case when the address space is set from
-current to an empty state.
+On 22.01.2018 03:10, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+>> This series introduces 5 different flavors of deprecation
+>> messages:
+>>
+>> * "Too old"
+>> * "Unmaintained"
+>> * "The ZCU102 machine has the same features supported"
+>> * "Use the \"pc\" machine instead"
+>> * "Obsoleted by the \"40p\" machine"
+>>
+>> Can we clearly document guidelines and examples for values of
+>> this field, to help ensure consistency?
+>>
+>> Examples of questions that could be answered in the field
+>> documentation:
+>>
+>> * Should the message start with an uppercase letter?
+>> * Should it really explain _why_ it was deprecated, or is a
+>>   simple "please use xlnx-zcu102 instead" good enough?
+>> * Which of the following is preferred:
+>>   * "obsoleted by the \"pc\" machine"
+>>   * "obsoleted by \"pc\""
+>>   * "use \"pc\" instead"
+>>   * "too old, use \"pc\" instead"
+>>   * "too old; use \"pc\" instead"
+>>   * <something else?>
+>=20
+> Do you have any preference regarding Eduardo's suggestions?
+>=20
+> I see this pattern:
+>=20
+> - obsoleted by newer
+>   -> hint about replacement
+> - too old, unmaintained (maybe suggest use an older version?)
+>   -> hint when removal is scheduled
 
-I found this problem when debugging a refcount leak issue that leads to
-a device unplug event lost (please see the "Bug:" line below).  In that
-case, the leakage of resource is the PCI BAR memory region refcount.
-And since memory regions are not keeping their own refcount but onto
-their owners, so the vfio-pci device's (who is the owner of the PCI BAR
-memory regions) refcount is leaked, and event missing.
+I don't mind the exact wording, as long as there is an indication for
+the user what to do next (if possible).
 
-We had encountered similar issues before and fixed in other
-way (ee4c112846, "vhost: Release memory references on cleanup"). This
-patch can be seen as a more high-level fix of similar problems that are
-caused by the resource leaks from memory listeners. So now we can remove
-the explicit unref of memory regions since that'll be done altogether
-during unregistering of listeners now.
+> These are also valid for Devices.
+>=20
+> Now if we want a consistent guideline, I suggest we clearly document th=
+e
+> deprecated machines/devices in qemu-doc.texi and extract this
+> information at build time, like trace.h.
 
-Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1531393
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/virtio/vhost.c |  4 ----
- memory.c          | 27 +++++++++++++++++++++++++++
- 2 files changed, 27 insertions(+), 4 deletions(-)
+While it's a must of course to document deprecations in the qemu-doc,
+automatic extraction already sounds like over-engineering to me. I don't
+think that we are going to have as much deprecation entries as trace
+points, so would an additional automatic mechanism really help a lot here=
+?
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 19a7a3cb37..54480ffd85 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1368,10 +1368,6 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
-     if (hdev->mem) {
-         /* those are only safe after successful init */
-         memory_listener_unregister(&hdev->memory_listener);
--        for (i = 0; i < hdev->n_mem_sections; ++i) {
--            MemoryRegionSection *section = &hdev->mem_sections[i];
--            memory_region_unref(section->mr);
--        }
-         QLIST_REMOVE(hdev, entry);
-     }
-     if (hdev->migration_blocker) {
-diff --git a/memory.c b/memory.c
-index 4b41fb837b..9ad98b701b 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2609,6 +2609,32 @@ static void listener_add_address_space(MemoryListener *listener,
-     flatview_unref(view);
- }
- 
-+static void listener_del_address_space(MemoryListener *listener,
-+                                       AddressSpace *as)
-+{
-+    FlatView *view;
-+    FlatRange *fr;
-+
-+    if (listener->begin) {
-+        listener->begin(listener);
-+    }
-+    view = address_space_get_flatview(as);
-+    FOR_EACH_FLAT_RANGE(fr, view) {
-+        MemoryRegionSection section = section_from_flat_range(fr, view);
-+
-+        if (fr->dirty_log_mask && listener->log_stop) {
-+            listener->log_stop(listener, &section, fr->dirty_log_mask, 0);
-+        }
-+        if (listener->region_del) {
-+            listener->region_del(listener, &section);
-+        }
-+    }
-+    if (listener->commit) {
-+        listener->commit(listener);
-+    }
-+    flatview_unref(view);
-+}
-+
- void memory_listener_register(MemoryListener *listener, AddressSpace *as)
- {
-     MemoryListener *other = NULL;
-@@ -2649,6 +2675,7 @@ void memory_listener_unregister(MemoryListener *listener)
-         return;
-     }
- 
-+    listener_del_address_space(listener, listener->address_space);
-     QTAILQ_REMOVE(&memory_listeners, listener, link);
-     QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
-     listener->address_space = NULL;
--- 
-2.14.3
+ Thomas
