@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFu-0002ke-UL
+	(envelope-from <thuth@redhat.com>) id 1edaFu-0002kZ-Dg
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFr-0007ER-BQ
+	(envelope-from <thuth@redhat.com>) id 1edaFp-0007Dr-U1
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55014)
+Received: from mx1.redhat.com ([209.132.183.28]:38056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFr-0007E2-2i
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:11 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFp-0007DY-L9
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:09 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 22 Jan 2018 12:26:58 +0100
-Message-Id: <1516620426-18530-2-git-send-email-thuth@redhat.com>
-In-Reply-To: <1516620426-18530-1-git-send-email-thuth@redhat.com>
-References: <1516620426-18530-1-git-send-email-thuth@redhat.com>
+Date: Mon, 22 Jan 2018 12:26:57 +0100
+Message-Id: <1516620426-18530-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/9] tests: Rename pc-cpu-test.c to
- cpu-plug-test.c
+Subject: [Qemu-devel] [PULL 0/9] CPU hotplug test,
+ __FUNCTION__ and some fprintf patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +28,198 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: Alistair Francis <alistair.francis@xilinx.com>
 
-The test will be extended to work on other architectures, too, so let's
-use a more generic name for the file and the functions in here first.
+The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc7=
+8f:
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include                   |  4 ++--
- tests/{pc-cpu-test.c =3D> cpu-plug-test.c} | 24 ++++++++++++------------
- 2 files changed, 14 insertions(+), 14 deletions(-)
- rename tests/{pc-cpu-test.c =3D> cpu-plug-test.c} (87%)
+  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
+equest' into staging (2018-01-19 16:35:25 +0000)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8883274..669f7f6 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -278,7 +278,7 @@ gcov-files-i386-y +=3D hw/usb/dev-hid.c
- gcov-files-i386-y +=3D hw/usb/dev-storage.c
- check-qtest-i386-y +=3D tests/usb-hcd-xhci-test$(EXESUF)
- gcov-files-i386-y +=3D hw/usb/hcd-xhci.c
--check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
-+check-qtest-i386-y +=3D tests/cpu-plug-test$(EXESUF)
- check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
- check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
- gcov-files-i386-y +=3D hw/pci-host/q35.c
-@@ -795,7 +795,7 @@ tests/usb-hcd-ohci-test$(EXESUF): tests/usb-hcd-ohci-=
-test.o $(libqos-usb-obj-y)
- tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb=
--obj-y)
- tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb=
--obj-y)
- tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb=
--obj-y)
--tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
-+tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
- tests/migration-test$(EXESUF): tests/migration-test.o
- tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-=
-y) \
- 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-=
-y) \
-diff --git a/tests/pc-cpu-test.c b/tests/cpu-plug-test.c
-similarity index 87%
-rename from tests/pc-cpu-test.c
-rename to tests/cpu-plug-test.c
-index 11d3e81..4579119 100644
---- a/tests/pc-cpu-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -1,5 +1,5 @@
- /*
-- * QTest testcase for PC CPUs
-+ * QTest testcase for CPU plugging
-  *
-  * Copyright (c) 2015 SUSE Linux GmbH
-  *
-@@ -13,7 +13,7 @@
- #include "libqtest.h"
- #include "qapi/qmp/types.h"
-=20
--struct PCTestData {
-+struct PlugTestData {
-     char *machine;
-     const char *cpu_model;
-     unsigned sockets;
-@@ -21,11 +21,11 @@ struct PCTestData {
-     unsigned threads;
-     unsigned maxcpus;
- };
--typedef struct PCTestData PCTestData;
-+typedef struct PlugTestData PlugTestData;
-=20
--static void test_pc_with_cpu_add(gconstpointer data)
-+static void test_plug_with_cpu_add(gconstpointer data)
- {
--    const PCTestData *s =3D data;
-+    const PlugTestData *s =3D data;
-     char *args;
-     QDict *response;
-     unsigned int i;
-@@ -48,9 +48,9 @@ static void test_pc_with_cpu_add(gconstpointer data)
-     g_free(args);
- }
-=20
--static void test_pc_without_cpu_add(gconstpointer data)
-+static void test_plug_without_cpu_add(gconstpointer data)
- {
--    const PCTestData *s =3D data;
-+    const PlugTestData *s =3D data;
-     char *args;
-     QDict *response;
-=20
-@@ -73,7 +73,7 @@ static void test_pc_without_cpu_add(gconstpointer data)
-=20
- static void test_data_free(gpointer data)
- {
--    PCTestData *pc =3D data;
-+    PlugTestData *pc =3D data;
-=20
-     g_free(pc->machine);
-     g_free(pc);
-@@ -82,12 +82,12 @@ static void test_data_free(gpointer data)
- static void add_pc_test_case(const char *mname)
- {
-     char *path;
--    PCTestData *data;
-+    PlugTestData *data;
-=20
-     if (!g_str_has_prefix(mname, "pc-")) {
-         return;
-     }
--    data =3D g_new(PCTestData, 1);
-+    data =3D g_new(PlugTestData, 1);
-     data->machine =3D g_strdup(mname);
-     data->cpu_model =3D "Haswell"; /* 1.3+ theoretically */
-     data->sockets =3D 1;
-@@ -108,14 +108,14 @@ static void add_pc_test_case(const char *mname)
-         path =3D g_strdup_printf("cpu/%s/init/%ux%ux%u&maxcpus=3D%u",
-                                mname, data->sockets, data->cores,
-                                data->threads, data->maxcpus);
--        qtest_add_data_func_full(path, data, test_pc_without_cpu_add,
-+        qtest_add_data_func_full(path, data, test_plug_without_cpu_add,
-                                  test_data_free);
-         g_free(path);
-     } else {
-         path =3D g_strdup_printf("cpu/%s/add/%ux%ux%u&maxcpus=3D%u",
-                                mname, data->sockets, data->cores,
-                                data->threads, data->maxcpus);
--        qtest_add_data_func_full(path, data, test_pc_with_cpu_add,
-+        qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
-                                  test_data_free);
-         g_free(path);
-     }
+are available in the git repository at:
+
+  https://github.com/huth/qemu.git tags/pull-request-2018-01-22
+
+for you to fetch changes up to 1081ed2c4b71b5fe8bd31f6de8cdaa630c8acfd3:
+
+  hw/isa: Replace fprintf(stderr, "*\n" with error_report() (2018-01-22 0=
+9:51:00 +0100)
+
+----------------------------------------------------------------
+Pull request for various patches that have been reviewed and
+laying on the mailing list for a while, but where apparently
+no maintainer currently feels responsible for picking up.
+----------------------------------------------------------------
+Alistair Francis (5):
+      Replace all occurances of __FUNCTION__ with __func__
+      Fixes after renaming __FUNCTION__ to __func__
+      hw/bt: Replace fprintf(stderr, "*\n" with error_report()
+      hw/ipmi: Replace fprintf(stderr, "*\n" with error_report()
+      hw/isa: Replace fprintf(stderr, "*\n" with error_report()
+
+Thomas Huth (4):
+      tests: Rename pc-cpu-test.c to cpu-plug-test.c
+      tests/cpu-plug-test: Check the CPU hot-plugging with device_add, to=
+o
+      tests/cpu-plug-test: Check CPU hot-plugging on ppc64, too
+      tests/cpu-plug-test: Test CPU hot-plugging on s390x
+
+ hw/arm/nseries.c           |   2 +-
+ hw/arm/omap1.c             |  46 ++++----
+ hw/arm/omap2.c             |  12 +-
+ hw/arm/palm.c              |  14 +--
+ hw/arm/pxa2xx.c            |  46 ++++----
+ hw/arm/pxa2xx_gpio.c       |   6 +-
+ hw/arm/pxa2xx_pic.c        |   4 +-
+ hw/arm/tosa.c              |  10 +-
+ hw/audio/hda-codec.c       |  10 +-
+ hw/audio/intel-hda.c       |  28 ++---
+ hw/audio/wm8750.c          |   4 +-
+ hw/block/nand.c            |   4 +-
+ hw/block/onenand.c         |   8 +-
+ hw/bt/core.c               |  15 ++-
+ hw/bt/hci-csr.c            |  21 ++--
+ hw/bt/hci.c                |  46 ++++----
+ hw/bt/hid.c                |   4 +-
+ hw/bt/l2cap.c              |  49 +++++----
+ hw/bt/sdp.c                |  11 +-
+ hw/display/blizzard.c      |  18 +--
+ hw/display/omap_dss.c      |   6 +-
+ hw/display/pxa2xx_lcd.c    |  14 +--
+ hw/display/qxl-render.c    |   6 +-
+ hw/display/qxl.h           |   2 +-
+ hw/display/tc6393xb.c      |   2 +-
+ hw/display/xenfb.c         |   2 +-
+ hw/dma/omap_dma.c          |  26 ++---
+ hw/dma/pxa2xx_dma.c        |  14 +--
+ hw/gpio/max7310.c          |   8 +-
+ hw/gpio/omap_gpio.c        |   2 +-
+ hw/i2c/omap_i2c.c          |   6 +-
+ hw/ide/ahci.c              |   2 +-
+ hw/ide/microdrive.c        |   4 +-
+ hw/input/lm832x.c          |   6 +-
+ hw/input/pxa2xx_keypad.c   |   6 +-
+ hw/input/tsc2005.c         |   8 +-
+ hw/input/tsc210x.c         |   4 +-
+ hw/intc/omap_intc.c        |   2 +-
+ hw/ipmi/ipmi_bmc_extern.c  |   5 +-
+ hw/isa/isa-bus.c           |   7 +-
+ hw/isa/vt82c686.c          |   2 +-
+ hw/mips/gt64xxx_pci.c      |   2 +-
+ hw/misc/cbus.c             |  12 +-
+ hw/misc/omap_clk.c         |   4 +-
+ hw/misc/omap_gpmc.c        |   6 +-
+ hw/misc/omap_l4.c          |   4 +-
+ hw/misc/omap_sdrc.c        |   2 +-
+ hw/misc/omap_tap.c         |   6 +-
+ hw/misc/tmp105.c           |   2 +-
+ hw/pci-host/bonito.c       |   2 +-
+ hw/ssi/omap_spi.c          |   6 +-
+ hw/timer/omap_gptimer.c    |   6 +-
+ hw/timer/twl92230.c        |   6 +-
+ hw/usb/desc.c              |   2 +-
+ hw/usb/dev-bluetooth.c     |   4 +-
+ hw/usb/hcd-musb.c          |   4 +-
+ hw/usb/tusb6010.c          |  14 +--
+ hw/xenpv/xen_domainbuild.c |  16 +--
+ hw/xenpv/xen_machine_pv.c  |   2 +-
+ include/hw/arm/omap.h      |  10 +-
+ include/hw/arm/sharpsl.h   |   2 +-
+ memory_mapping.c           |   2 +-
+ migration/block.c          |   4 +-
+ tests/Makefile.include     |   6 +-
+ tests/cpu-plug-test.c      | 267 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/pc-cpu-test.c        | 135 -----------------------
+ ui/cursor.c                |   6 +-
+ ui/spice-display.c         |   4 +-
+ 68 files changed, 580 insertions(+), 448 deletions(-)
+ create mode 100644 tests/cpu-plug-test.c
+ delete mode 100644 tests/pc-cpu-test.c
+
+Alistair Francis (5):
+  Replace all occurances of __FUNCTION__ with __func__
+  Fixes after renaming __FUNCTION__ to __func__
+  hw/bt: Replace fprintf(stderr, "*\n" with error_report()
+  hw/ipmi: Replace fprintf(stderr, "*\n" with error_report()
+  hw/isa: Replace fprintf(stderr, "*\n" with error_report()
+
+Thomas Huth (4):
+  tests: Rename pc-cpu-test.c to cpu-plug-test.c
+  tests/cpu-plug-test: Check the CPU hot-plugging with device_add, too
+  tests/cpu-plug-test: Check CPU hot-plugging on ppc64, too
+  tests/cpu-plug-test: Test CPU hot-plugging on s390x
+
+ hw/arm/nseries.c           |   2 +-
+ hw/arm/omap1.c             |  46 ++++----
+ hw/arm/omap2.c             |  12 +-
+ hw/arm/palm.c              |  14 +--
+ hw/arm/pxa2xx.c            |  46 ++++----
+ hw/arm/pxa2xx_gpio.c       |   6 +-
+ hw/arm/pxa2xx_pic.c        |   4 +-
+ hw/arm/tosa.c              |  10 +-
+ hw/audio/hda-codec.c       |  10 +-
+ hw/audio/intel-hda.c       |  28 ++---
+ hw/audio/wm8750.c          |   4 +-
+ hw/block/nand.c            |   4 +-
+ hw/block/onenand.c         |   8 +-
+ hw/bt/core.c               |  15 ++-
+ hw/bt/hci-csr.c            |  21 ++--
+ hw/bt/hci.c                |  46 ++++----
+ hw/bt/hid.c                |   4 +-
+ hw/bt/l2cap.c              |  49 +++++----
+ hw/bt/sdp.c                |  11 +-
+ hw/display/blizzard.c      |  18 +--
+ hw/display/omap_dss.c      |   6 +-
+ hw/display/pxa2xx_lcd.c    |  14 +--
+ hw/display/qxl-render.c    |   6 +-
+ hw/display/qxl.h           |   2 +-
+ hw/display/tc6393xb.c      |   2 +-
+ hw/display/xenfb.c         |   2 +-
+ hw/dma/omap_dma.c          |  26 ++---
+ hw/dma/pxa2xx_dma.c        |  14 +--
+ hw/gpio/max7310.c          |   8 +-
+ hw/gpio/omap_gpio.c        |   2 +-
+ hw/i2c/omap_i2c.c          |   6 +-
+ hw/ide/ahci.c              |   2 +-
+ hw/ide/microdrive.c        |   4 +-
+ hw/input/lm832x.c          |   6 +-
+ hw/input/pxa2xx_keypad.c   |   6 +-
+ hw/input/tsc2005.c         |   8 +-
+ hw/input/tsc210x.c         |   4 +-
+ hw/intc/omap_intc.c        |   2 +-
+ hw/ipmi/ipmi_bmc_extern.c  |   5 +-
+ hw/isa/isa-bus.c           |   7 +-
+ hw/isa/vt82c686.c          |   2 +-
+ hw/mips/gt64xxx_pci.c      |   2 +-
+ hw/misc/cbus.c             |  12 +-
+ hw/misc/omap_clk.c         |   4 +-
+ hw/misc/omap_gpmc.c        |   6 +-
+ hw/misc/omap_l4.c          |   4 +-
+ hw/misc/omap_sdrc.c        |   2 +-
+ hw/misc/omap_tap.c         |   6 +-
+ hw/misc/tmp105.c           |   2 +-
+ hw/pci-host/bonito.c       |   2 +-
+ hw/ssi/omap_spi.c          |   6 +-
+ hw/timer/omap_gptimer.c    |   6 +-
+ hw/timer/twl92230.c        |   6 +-
+ hw/usb/desc.c              |   2 +-
+ hw/usb/dev-bluetooth.c     |   4 +-
+ hw/usb/hcd-musb.c          |   4 +-
+ hw/usb/tusb6010.c          |  14 +--
+ hw/xenpv/xen_domainbuild.c |  16 +--
+ hw/xenpv/xen_machine_pv.c  |   2 +-
+ include/hw/arm/omap.h      |  10 +-
+ include/hw/arm/sharpsl.h   |   2 +-
+ memory_mapping.c           |   2 +-
+ migration/block.c          |   4 +-
+ tests/Makefile.include     |   6 +-
+ tests/cpu-plug-test.c      | 267 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/pc-cpu-test.c        | 135 -----------------------
+ ui/cursor.c                |   6 +-
+ ui/spice-display.c         |   4 +-
+ 68 files changed, 580 insertions(+), 448 deletions(-)
+ create mode 100644 tests/cpu-plug-test.c
+ delete mode 100644 tests/pc-cpu-test.c
+
 --=20
 1.8.3.1
