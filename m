@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edhEQ-00069l-2m
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 13:54:11 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1edhYg-0004c6-Hx
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:15:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edhEO-0007Ie-AI
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 13:54:10 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38398)
+	(envelope-from <alex.bennee@linaro.org>) id 1edhYd-00032u-Ee
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:15:06 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:43103)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1edhEO-0007IR-42
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 13:54:08 -0500
-Received: by mail-ot0-x244.google.com with SMTP id v5so8408708oth.5
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 10:54:07 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180117161435.28981-3-richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1edhYd-00032k-7e
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:15:03 -0500
+Received: by mail-wm0-x242.google.com with SMTP id g1so18325404wmg.2
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 11:15:03 -0800 (PST)
 References: <20180117161435.28981-1-richard.henderson@linaro.org>
-	<20180117161435.28981-3-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 18:53:46 +0000
-Message-ID: <CAFEAcA-R0XrQrLRAt5XQtOki0jk1qFnPuBQsf7a5xh2MX37usA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v10.5 02/20] tcg: Add types and basic
- operations for host vectors
+	<20180117161435.28981-2-richard.henderson@linaro.org>
+	<CAFEAcA-TfkUUP8C1u_WiPhQj+seMBER-MkcHXBOai4Yt27pCsw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-TfkUUP8C1u_WiPhQj+seMBER-MkcHXBOai4Yt27pCsw@mail.gmail.com>
+Date: Mon, 22 Jan 2018 19:15:00 +0000
+Message-ID: <87fu6xk8nf.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v10.5 01/20] tcg: Allow multiple word
+ entries into the constant pool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,274 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 17 January 2018 at 16:14, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Nothing uses or enables them yet.
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 17 January 2018 at 16:14, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> This will be required for storing vector constants.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  tcg/tcg-pool.inc.c | 115 +++++++++++++++++++++++++++++++++++++++++++---=
+-------
+>>  1 file changed, 93 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/tcg/tcg-pool.inc.c b/tcg/tcg-pool.inc.c
+>> index 8a85131405..0f76e7bee3 100644
+>> --- a/tcg/tcg-pool.inc.c
+>> +++ b/tcg/tcg-pool.inc.c
+>> @@ -22,39 +22,110 @@
+>>
+>>  typedef struct TCGLabelPoolData {
+>>      struct TCGLabelPoolData *next;
+>> -    tcg_target_ulong data;
+>>      tcg_insn_unit *label;
+>> -    intptr_t addend;
+>> -    int type;
+>> +    int addend  : 32;
+>> +    int rtype   : 16;
+>> +    int nlong   : 16;
+>> +    tcg_target_ulong data[];
+>>  } TCGLabelPoolData;
+>>
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  Makefile.target  |   4 +-
->  tcg/tcg-op.h     |  30 +++++
->  tcg/tcg-opc.h    |  26 ++++
->  tcg/tcg.h        |  56 +++++++++
->  tcg/tcg-op-vec.c | 362 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  tcg/tcg.c        | 100 ++++++++++++++-
->  tcg/README       |  58 +++++++++
->  7 files changed, 630 insertions(+), 6 deletions(-)
->  create mode 100644 tcg/tcg-op-vec.c
+> Seems a bit odd to use bitfields for 32 and 16 bit values, but whatever.
+> (My default reaction to bitfields is "be suspicious" :-))
 
-> --- /dev/null
-> +++ b/tcg/tcg-op-vec.c
-> @@ -0,0 +1,362 @@
-> +/*
-> + * Tiny Code Generator for QEMU
-> + *
-> + * Copyright (c) 2008 Fabrice Bellard
+I'm guessing this is the same reason as the softfloat re-factor. By
+manually forcing stuff into a bitfield the compiler does a better job of
+passing multiple structure elements in a single register?
 
-Surely this should have some newer date and copyright owner too?
+It would be nice if the compiler could spot this itself though.
 
-
-> +void vec_gen_2(TCGOpcode opc, TCGType type, unsigned vece, TCGArg r, TCGArg a)
-> +{
-> +    TCGOp *op = tcg_emit_op(opc);
-> +    TCGOP_VECL(op) = type - TCG_TYPE_V64;
-> +    TCGOP_VECE(op) = vece;
-> +    op->args[0] = r;
-> +    op->args[1] = a;
-> +}
-> +
-> +void vec_gen_3(TCGOpcode opc, TCGType type, unsigned vece,
-> +               TCGArg r, TCGArg a, TCGArg b)
-> +{
-> +    TCGOp *op = tcg_emit_op(opc);
-> +    TCGOP_VECL(op) = type - TCG_TYPE_V64;
-> +    TCGOP_VECE(op) = vece;
-> +    op->args[0] = r;
-> +    op->args[1] = a;
-> +    op->args[2] = b;
-> +}
-> +
-> +void vec_gen_4(TCGOpcode opc, TCGType type, unsigned vece,
-> +               TCGArg r, TCGArg a, TCGArg b, TCGArg c)
-> +{
-> +    TCGOp *op = tcg_emit_op(opc);
-> +    TCGOP_VECL(op) = type - TCG_TYPE_V64;
-> +    TCGOP_VECE(op) = vece;
-> +    op->args[0] = r;
-> +    op->args[1] = a;
-> +    op->args[2] = b;
-> +    op->args[3] = c;
-> +}
-> +
-> +static void vec_gen_op2(TCGOpcode opc, unsigned vece, TCGv_vec r, TCGv_vec a)
-> +{
-> +    TCGTemp *rt = tcgv_vec_temp(r);
-> +    TCGTemp *at = tcgv_vec_temp(a);
-> +    TCGType type = rt->base_type;
-> +
-> +    tcg_debug_assert(at->base_type == type);
-> +    vec_gen_2(opc, type, vece, temp_arg(rt), temp_arg(at));
-> +}
-> +
-> +static void vec_gen_op3(TCGOpcode opc, unsigned vece,
-> +                        TCGv_vec r, TCGv_vec a, TCGv_vec b)
-> +{
-> +    TCGTemp *rt = tcgv_vec_temp(r);
-> +    TCGTemp *at = tcgv_vec_temp(a);
-> +    TCGTemp *bt = tcgv_vec_temp(b);
-> +    TCGType type = rt->base_type;
-> +
-> +    tcg_debug_assert(at->base_type == type);
-> +    tcg_debug_assert(bt->base_type == type);
-> +    vec_gen_3(opc, type, vece, temp_arg(rt), temp_arg(at), temp_arg(bt));
-> +}
-> +
-> +void tcg_gen_mov_vec(TCGv_vec r, TCGv_vec a)
-> +{
-> +    if (r != a) {
-> +        vec_gen_op2(INDEX_op_mov_vec, 0, r, a);
-> +    }
-> +}
-> +
-> +#define MO_REG  (TCG_TARGET_REG_BITS == 64 ? MO_64 : MO_32)
-> +
-> +static void tcg_gen_dupi_vec(TCGv_vec r, unsigned vece, TCGArg a)
-> +{
-> +    TCGTemp *rt = tcgv_vec_temp(r);
-> +    vec_gen_2(INDEX_op_dupi_vec, rt->base_type, vece, temp_arg(rt), a);
-> +}
-> +
-> +TCGv_vec tcg_const_zeros_vec(TCGType type)
-> +{
-> +    TCGv_vec ret = tcg_temp_new_vec(type);
-> +    tcg_gen_dupi_vec(ret, MO_REG, 0);
-> +    return ret;
-> +}
-> +
-> +TCGv_vec tcg_const_ones_vec(TCGType type)
-> +{
-> +    TCGv_vec ret = tcg_temp_new_vec(type);
-> +    tcg_gen_dupi_vec(ret, MO_REG, -1);
-> +    return ret;
-> +}
-> +
-> +TCGv_vec tcg_const_zeros_vec_matching(TCGv_vec m)
-> +{
-> +    TCGTemp *t = tcgv_vec_temp(m);
-> +    return tcg_const_zeros_vec(t->base_type);
-> +}
-> +
-> +TCGv_vec tcg_const_ones_vec_matching(TCGv_vec m)
-> +{
-> +    TCGTemp *t = tcgv_vec_temp(m);
-> +    return tcg_const_ones_vec(t->base_type);
-> +}
-> +
-> +void tcg_gen_dup64i_vec(TCGv_vec r, uint64_t a)
-> +{
-> +    if (TCG_TARGET_REG_BITS == 32 && a == deposit64(a, 32, 32, a)) {
-> +        tcg_gen_dupi_vec(r, MO_32, a);
-> +    } else if (TCG_TARGET_REG_BITS == 64 || a == (uint64_t)(int32_t)a) {
-> +        tcg_gen_dupi_vec(r, MO_64, a);
-> +    } else {
-> +        TCGv_i64 c = tcg_const_i64(a);
-> +        tcg_gen_dup_i64_vec(MO_64, r, c);
-> +        tcg_temp_free_i64(c);
-> +    }
-> +}
-> +
-> +void tcg_gen_dup32i_vec(TCGv_vec r, uint32_t a)
-> +{
-> +    tcg_gen_dupi_vec(r, MO_REG, ((TCGArg)-1 / 0xffffffffu) * a);
-> +}
-> +
-> +void tcg_gen_dup16i_vec(TCGv_vec r, uint32_t a)
-> +{
-> +    tcg_gen_dupi_vec(r, MO_REG, ((TCGArg)-1 / 0xffff) * (a & 0xffff));
-> +}
-> +
-> +void tcg_gen_dup8i_vec(TCGv_vec r, uint32_t a)
-> +{
-> +    tcg_gen_dupi_vec(r, MO_REG, ((TCGArg)-1 / 0xff) * (a & 0xff));
-> +}
-> +
-> +void tcg_gen_movi_v64(TCGv_vec r, uint64_t a)
-> +{
-> +    TCGTemp *rt = tcgv_vec_temp(r);
-> +    TCGArg ri = temp_arg(rt);
-> +
-> +    tcg_debug_assert(rt->base_type == TCG_TYPE_V64);
-> +    if (TCG_TARGET_REG_BITS == 64) {
-> +        vec_gen_2(INDEX_op_movi_vec, TCG_TYPE_V64, 0, ri, a);
-> +    } else {
-> +        vec_gen_3(INDEX_op_movi_vec, TCG_TYPE_V64, 0, ri, a, a >> 32);
-> +    }
-> +}
-> +
-> +void tcg_gen_movi_v128(TCGv_vec r, uint64_t a, uint64_t b)
-> +{
-> +    TCGTemp *rt = tcgv_vec_temp(r);
-> +    TCGArg ri = temp_arg(rt);
-> +
-> +    tcg_debug_assert(rt->base_type == TCG_TYPE_V128);
-> +    if (a == b) {
-> +        tcg_gen_dup64i_vec(r, a);
-> +    } else if (TCG_TARGET_REG_BITS == 64) {
-> +        vec_gen_3(INDEX_op_movi_vec, TCG_TYPE_V128, 0, ri, a, b);
-> +    } else {
-> +        TCGOp *op = tcg_emit_op(INDEX_op_movi_vec);
-> +        TCGOP_VECL(op) = TCG_TYPE_V128 - TCG_TYPE_V64;
-> +        op->args[0] = ri;
-> +        op->args[1] = a;
-> +        op->args[2] = a >> 32;
-> +        op->args[3] = b;
-> +        op->args[4] = b >> 32;
-
-Is it intentional that this doesn't set TCGOP_VECE(op) ?
-The vec_gen_* functions all do.
-
-This seems like it ought to be a vec_gen_5().
-
-> +    }
-> +}
-> +
-> +void tcg_gen_movi_v256(TCGv_vec r, uint64_t a, uint64_t b,
-> +                       uint64_t c, uint64_t d)
-> +{
-> +    TCGArg ri = tcgv_vec_arg(r);
-> +    TCGTemp *rt = arg_temp(ri);
-> +
-> +    tcg_debug_assert(rt->base_type == TCG_TYPE_V256);
-> +    if (a == b && a == c && a == d) {
-> +        tcg_gen_dup64i_vec(r, a);
-> +    } else {
-> +        TCGOp *op = tcg_emit_op(INDEX_op_movi_vec);
-> +        TCGOP_VECL(op) = TCG_TYPE_V256 - TCG_TYPE_V64;
-> +        op->args[0] = ri;
-> +        if (TCG_TARGET_REG_BITS == 64) {
-> +            op->args[1] = a;
-> +            op->args[2] = b;
-> +            op->args[3] = c;
-> +            op->args[4] = d;
-> +        } else {
-> +            op->args[1] = a;
-> +            op->args[2] = a >> 32;
-> +            op->args[3] = b;
-> +            op->args[4] = b >> 32;
-> +            op->args[5] = c;
-> +            op->args[6] = c >> 32;
-> +            op->args[7] = d;
-> +            op->args[8] = d >> 32;
-> +        }
-
-and this would be vec_gen_5() and vec_gen_9(), I guess.
-
-> +    }
-> +}
-> +
-> +void tcg_gen_dup_i64_vec(unsigned vece, TCGv_vec r, TCGv_i64 a)
-> +{
-> +    TCGArg ri = tcgv_vec_arg(r);
-> +    TCGTemp *rt = arg_temp(ri);
-> +    TCGType type = rt->base_type;
-> +
-> +    if (TCG_TARGET_REG_BITS == 64) {
-> +        TCGArg ai = tcgv_i64_arg(a);
-> +        vec_gen_2(INDEX_op_dup_vec, type, MO_64, ri, ai);
-> +    } else if (vece == MO_64) {
-> +        TCGArg al = tcgv_i32_arg(TCGV_LOW(a));
-> +        TCGArg ah = tcgv_i32_arg(TCGV_HIGH(a));
-> +        vec_gen_3(INDEX_op_dup2_vec, type, MO_64, ri, al, ah);
-> +    } else {
-> +        TCGArg ai = tcgv_i32_arg(TCGV_LOW(a));
-> +        vec_gen_2(INDEX_op_dup_vec, type, MO_64, ri, ai);
-> +    }
-> +}
-> +
-
-> diff --git a/tcg/README b/tcg/README
-> index 03bfb6acd4..e14990fb9b 100644
-> --- a/tcg/README
-> +++ b/tcg/README
-> @@ -503,6 +503,64 @@ of the memory access.
->  For a 32-bit host, qemu_ld/st_i64 is guaranteed to only be used with a
->  64-bit memory access specified in flags.
 >
-> +********* Host vector operations
-> +
-> +All of the vector ops have two parameters, TCGOP_VECL & TCGOP_VECE.
-> +The former specifies the length of the vector in log2 64-bit units; the
-> +later specifies the length of the element (if applicable) in log2 8-bit units.
-> +E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> thanks
+> -- PMM
 
-...but at the tcg_gen_and_vec() function level, the functions
-take a parameter for VECE but not one for VECL ? That's a bit
-confusing. (I think this is perhaps an example of the awkwardness of
-our documenting the TCG interface only at an abstract "ops" level
-and not documenting the concrete function APIs at all.)
 
-thanks
--- PMM
+--
+Alex Benn=C3=A9e
