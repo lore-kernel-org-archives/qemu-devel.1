@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT0Z-0005fh-Mu
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:00 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1edT0e-0005lp-Q7
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT0Y-0006bd-Sf
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:55 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:45719)
+	(envelope-from <richard.henderson@linaro.org>) id 1edT0c-0006dg-Qy
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:00 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:46221)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1edT0Y-0006bA-Lj
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:54 -0500
-Received: by mail-pg0-x242.google.com with SMTP id c194so6078071pga.12
-	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:42:54 -0800 (PST)
+	id 1edT0c-0006dK-KF
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:58 -0500
+Received: by mail-pf0-x241.google.com with SMTP id y5so6066960pff.13
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:42:58 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 21 Jan 2018 19:41:57 -0800
-Message-Id: <20180122034217.19593-24-richard.henderson@linaro.org>
+Date: Sun, 21 Jan 2018 19:42:00 -0800
+Message-Id: <20180122034217.19593-27-richard.henderson@linaro.org>
 In-Reply-To: <20180122034217.19593-1-richard.henderson@linaro.org>
 References: <20180122034217.19593-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 23/43] target/hppa: Implement LDWA
+Subject: [Qemu-devel] [PULL 26/43] target/hppa: Implement SYNCDMA insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +31,22 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ target/hppa/translate.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 44e566837d..5b49cc5332 100644
+index b207ae192a..a311a464bf 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2943,12 +2943,50 @@ static DisasJumpType trans_stby(DisasContext *ctx, uint32_t insn,
-     return nullify_end(ctx, DISAS_NEXT);
- }
- 
-+#ifndef CONFIG_USER_ONLY
-+static DisasJumpType trans_ldwa_idx_i(DisasContext *ctx, uint32_t insn,
-+                                      const DisasInsn *di)
-+{
-+    int hold_mmu_idx = ctx->mmu_idx;
-+    DisasJumpType ret;
-+
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+
-+    /* ??? needs fixing for hppa64 -- ldda does not follow the same
-+       format wrt the sub-opcode in bits 6:9.  */
-+    ctx->mmu_idx = MMU_PHYS_IDX;
-+    ret = trans_ld_idx_i(ctx, insn, di);
-+    ctx->mmu_idx = hold_mmu_idx;
-+    return ret;
-+}
-+
-+static DisasJumpType trans_ldwa_idx_x(DisasContext *ctx, uint32_t insn,
-+                                      const DisasInsn *di)
-+{
-+    int hold_mmu_idx = ctx->mmu_idx;
-+    DisasJumpType ret;
-+
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+
-+    /* ??? needs fixing for hppa64 -- ldda does not follow the same
-+       format wrt the sub-opcode in bits 6:9.  */
-+    ctx->mmu_idx = MMU_PHYS_IDX;
-+    ret = trans_ld_idx_x(ctx, insn, di);
-+    ctx->mmu_idx = hold_mmu_idx;
-+    return ret;
-+}
-+#endif
-+
- static const DisasInsn table_index_mem[] = {
-     { 0x0c001000u, 0xfc001300, trans_ld_idx_i }, /* LD[BHWD], im */
-     { 0x0c000000u, 0xfc001300, trans_ld_idx_x }, /* LD[BHWD], rx */
-     { 0x0c001200u, 0xfc001300, trans_st_idx_i }, /* ST[BHWD] */
-     { 0x0c0001c0u, 0xfc0003c0, trans_ldcw },
-     { 0x0c001300u, 0xfc0013c0, trans_stby },
-+#ifndef CONFIG_USER_ONLY
-+    { 0x0c001180u, 0xfc00d3c0, trans_ldwa_idx_i }, /* LDWA, im */
-+    { 0x0c000180u, 0xfc00d3c0, trans_ldwa_idx_x }, /* LDWA, rx */
-+#endif
- };
- 
- static DisasJumpType trans_ldil(DisasContext *ctx, uint32_t insn)
+@@ -2301,7 +2301,8 @@ static const DisasInsn table_system[] = {
+     { 0x000014a0u, 0xffffffe0u, trans_mfia },
+     { 0x000004a0u, 0xffff1fe0u, trans_mfsp },
+     { 0x000008a0u, 0xfc1fbfe0u, trans_mfctl },
+-    { 0x00000400u, 0xffffffffu, trans_sync },
++    { 0x00000400u, 0xffffffffu, trans_sync },  /* sync */
++    { 0x00100400u, 0xffffffffu, trans_sync },  /* syncdma */
+     { 0x000010a0u, 0xfc1f3fe0u, trans_ldsid },
+ #ifndef CONFIG_USER_ONLY
+     { 0x00000e60u, 0xfc00ffe0u, trans_rsm },
 -- 
 2.14.3
