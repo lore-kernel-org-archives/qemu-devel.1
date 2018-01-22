@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ede0e-0001UJ-Ny
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:27:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1ede6b-0004hc-GF
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ede0d-00046h-Lp
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:27:44 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 22 Jan 2018 16:27:33 +0100
-Message-Id: <1516634853-15883-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] i2c: Add a CONFIG_I2C master switch to the
- configuration files
+	(envelope-from <eblake@redhat.com>) id 1ede6a-0008S7-De
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:33:53 -0500
+References: <20180120154412.9990-1-mreitz@redhat.com>
+	<20180120154412.9990-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <39ad6e43-024c-6384-d014-e0b8f83ed3a7@redhat.com>
+Date: Mon, 22 Jan 2018 09:33:43 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180120154412.9990-2-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="l5sKKp4Q3TZ3lBrFa47eslySyuIO7CMLH"
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qapi: Add qobject_to()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,106 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-The i2c core and the at24c EEPROM should only be compiled and linked
-on the machines that support i2c. Otherwise it's quite strange to see
-the at24c-eeprom to be "available" on qemu-system-s390x for example.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--l5sKKp4Q3TZ3lBrFa47eslySyuIO7CMLH
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <39ad6e43-024c-6384-d014-e0b8f83ed3a7@redhat.com>
+Subject: Re: [PATCH v2 1/6] qapi: Add qobject_to()
+References: <20180120154412.9990-1-mreitz@redhat.com>
+ <20180120154412.9990-2-mreitz@redhat.com>
+In-Reply-To: <20180120154412.9990-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/arm-softmmu.mak         | 1 +
- default-configs/i386-softmmu.mak        | 1 +
- default-configs/mips-softmmu-common.mak | 1 +
- default-configs/ppc-softmmu.mak         | 1 +
- default-configs/ppcemb-softmmu.mak      | 1 +
- default-configs/x86_64-softmmu.mak      | 1 +
- hw/i2c/Makefile.objs                    | 2 +-
- hw/nvram/Makefile.objs                  | 2 +-
- 8 files changed, 8 insertions(+), 2 deletions(-)
+On 01/20/2018 09:44 AM, Max Reitz wrote:
+> This is a dynamic casting macro that, given a QObject type, returns an
+> object as that type or NULL if the object is of a different type (or
+> NULL itself).
+>=20
+> The macro uses lower-case letters because:
+> 1. There does not seem to be a hard rule on whether qemu macros have to=
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index b0d6e65..ca34cf4 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -67,6 +67,7 @@ CONFIG_CADENCE=y
- CONFIG_XGMAC=y
- CONFIG_EXYNOS4=y
- CONFIG_PXA2XX=y
-+CONFIG_I2C=y
- CONFIG_BITBANG_I2C=y
- CONFIG_FRAMEBUFFER=y
- CONFIG_XILINX_SPIPS=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 95ac4b4..4bc8f25 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
- CONFIG_PXB=y
- CONFIG_ACPI_VMGENID=y
- CONFIG_FW_CFG_DMA=y
-+CONFIG_I2C=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index 7d8f5db..e31f046 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -34,3 +34,4 @@ CONFIG_ISA_TESTDEV=y
- CONFIG_EMPTY_SLOT=y
- CONFIG_MIPS_CPS=y
- CONFIG_MIPS_ITU=y
-+CONFIG_I2C=y
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 3baed6a..65680d8 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -23,6 +23,7 @@ CONFIG_PLATFORM_BUS=y
- CONFIG_ETSEC=y
- CONFIG_SM501=y
- CONFIG_IDE_SII3112=y
-+CONFIG_I2C=y
- 
- # For Macs
- CONFIG_MAC=y
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 5db4618..bc5e1b3 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -17,3 +17,4 @@ CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
- CONFIG_SM501=y
- CONFIG_IDE_SII3112=y
-+CONFIG_I2C=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 0221236..f0b7bcd 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
- CONFIG_PXB=y
- CONFIG_ACPI_VMGENID=y
- CONFIG_FW_CFG_DMA=y
-+CONFIG_I2C=y
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-index 0594dea..37cacde 100644
---- a/hw/i2c/Makefile.objs
-+++ b/hw/i2c/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += core.o smbus.o smbus_eeprom.o
-+common-obj-$(CONFIG_I2C) += core.o smbus.o smbus_eeprom.o
- common-obj-$(CONFIG_DDC) += i2c-ddc.o
- common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
- common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
-diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
-index 0f4ee71..a912d25 100644
---- a/hw/nvram/Makefile.objs
-+++ b/hw/nvram/Makefile.objs
-@@ -1,6 +1,6 @@
- common-obj-$(CONFIG_DS1225Y) += ds1225y.o
- common-obj-y += eeprom93xx.o
--common-obj-y += eeprom_at24c.o
-+common-obj-$(CONFIG_I2C) += eeprom_at24c.o
- common-obj-y += fw_cfg.o
- common-obj-y += chrp_nvram.o
- common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
--- 
-1.8.3.1
+>    be upper-cased,
+> 2. The current situation in qapi/qmp is inconsistent (compare e.g.
+>    QINCREF() vs. qdict_put()),
+> 3. qobject_to() will evaluate its @obj parameter only once, thus it is
+>    generally not important to the caller whether it is a macro or not,
+> 4. I prefer it aesthetically.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> You're more than welcome to convince me to call it QOBJECT_TO()!
+
+I can live with the lower-case version; especially with your good list
+of reasons for it ;)
+
+> ---
+>  include/qapi/qmp/qobject.h | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+>=20
+> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+> index 38ac68845c..1211989ca0 100644
+> --- a/include/qapi/qmp/qobject.h
+> +++ b/include/qapi/qmp/qobject.h
+> @@ -50,6 +50,24 @@ struct QObject {
+>  #define QDECREF(obj)              \
+>      qobject_decref(obj ? QOBJECT(obj) : NULL)
+> =20
+> +/* Required for qobject_to() */
+> +#define QTYPE_CAST_TO_QNull     QTYPE_QNULL
+> +#define QTYPE_CAST_TO_QNum      QTYPE_QNUM
+> +#define QTYPE_CAST_TO_QString   QTYPE_QSTRING
+> +#define QTYPE_CAST_TO_QDict     QTYPE_QDICT
+> +#define QTYPE_CAST_TO_QList     QTYPE_QLIST
+> +#define QTYPE_CAST_TO_QBool     QTYPE_QBOOL
+> +
+> +#ifdef CONFIG_STATIC_ASSERT
+> +_Static_assert(QTYPE__MAX =3D=3D 7,
+> +               "The QTYPE_CAST_TO_* list needs to be extended");
+> +#endif
+
+Why not use QEMU_BUILD_BUG_ON() instead of _Static_assert?  That way,
+this check will break the build even on older compilers that lack
+_Static_assert but where we still know how to trigger a build failure.
+
+> +
+> +#define qobject_to(obj, type) \
+> +    container_of(qobject_check_type(obj, glue(QTYPE_CAST_TO_, type)) ?=
+: \
+> +                     QOBJECT((type *)NULL), \
+> +                 type, base)
+
+Slick!
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--l5sKKp4Q3TZ3lBrFa47eslySyuIO7CMLH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpmBFcACgkQp6FrSiUn
+Q2oDdwgAntwAp/jfBhXlpfDALDi5h8hbKreXIVl+DuzJvLOEeXE7I1dNokpYLQ2Q
+EiULI9tLKx3Jdfi6MuGYLtfs1+SeAw2iNxxRdUj8oddGQJ6oswID6+R3eBehsbap
+hDxc/A6+CqCGAy4or7z/QuLCvjGYpb6Yhzbmq2LeQHvvORrS/gzs6KPPfP/tudIe
+SWLfD1/iPMAnOjfHC1j6nBroTx6twHRYhg/p9O7YghUCHGxn5q/i/sVgbdArW1Xe
+q8zt9kK9eZtp3jkokI6MkZd32/t6fgECZdiaBPyQCAK2bSQxF+IGk/4bEG6QzWXc
+KcdIy+4SQlpxrN37rTYzaXYCqZ8VoA==
+=jelo
+-----END PGP SIGNATURE-----
+
+--l5sKKp4Q3TZ3lBrFa47eslySyuIO7CMLH--
