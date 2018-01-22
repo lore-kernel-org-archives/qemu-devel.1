@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1edj1g-0003VW-Ti
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:49:11 -0500
+	(envelope-from <apahim@redhat.com>) id 1edj3N-0004ZS-RP
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1edj1g-0007gD-1J
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:49:08 -0500
-References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516366207-109842-4-git-send-email-anton.nefedov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <45080fc9-c869-a8c8-0f20-ca9d950fb2cc@redhat.com>
-Date: Mon, 22 Jan 2018 14:48:55 -0600
-MIME-Version: 1.0
-In-Reply-To: <1516366207-109842-4-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="og1h25ZcIN7pP9mrECi2eSzeG1lRddYqQ"
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] ide: account UNMAP (TRIM) operations
+	(envelope-from <apahim@redhat.com>) id 1edj3M-0000Ur-QS
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1edj3M-0000Sb-Km
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:52 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 290E081DE5
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 20:50:51 +0000 (UTC)
+From: Amador Pahim <apahim@redhat.com>
+Date: Mon, 22 Jan 2018 21:50:27 +0100
+Message-Id: <20180122205033.24893-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v12 0/6] scripts/qemu.py fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, den@virtuozzo.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, Amador Pahim <apahim@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---og1h25ZcIN7pP9mrECi2eSzeG1lRddYqQ
-From: Eric Blake <eblake@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, den@virtuozzo.com
-Message-ID: <45080fc9-c869-a8c8-0f20-ca9d950fb2cc@redhat.com>
-Subject: Re: [PATCH v2 3/8] ide: account UNMAP (TRIM) operations
-References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1516366207-109842-4-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1516366207-109842-4-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Changes v11->v12:
+ - Rebase.
+ - Drop the already queued commit (qemu.py: remove unused import)
+ - Fix code filling the _monitor_address when it's None.
+ - Drop the redundant commit checking whether VM was running on launch()
+ - Improve the exception message when launch() is called twice with no
+   shutdown() in between.
+Changes v10->v11:
+ - Fix messed indentation.
+ - Rename self._qemu_log_fd to self._qemu_log_file.
+ - Patch changelog in reverse order.
+Changes v9->v10:
+ - Keep method _remove_if_exists().
+Changes v8->v9:
+ - Some commits were already merged. Rebased the remaining ones.
+ - New commit to remove unused import.
+ - VM files control logic changed to use a temporary directory.
+ - Better naming for variable controlling the need of a shutdown before
+   next launch.
+Changes v7->v8:
+ - Rebased.
+ - Reorder commits to avoid break->fix sequence.
+ - Split commits "use poll() instead of 'returncode'" and "refactor
+   launch()".
+ - Don't ignore errors in _load_io_log(). Instead, check if we created
+   the file before reading it.
+ - Use LOG.warn() instead of LOG.debug() for the negative exit code
+   message.
+ - Fix the exception name called in commits "launch vm only if it's not
+   running" and "don't launch again before shutdown()".
+ - Minor style fixes.
+Changes v6->v7:
+ - Split commits in self-contained/atomic changes.
+ - Addressed the comments from previous version, basically improving the
+   logging messages and the control over created files. See individual
+   commit messages for details.
+Changes v5->v6:
+ - Remove the commit to rename self._args.
+ - Fix is_running() return before first call to maunch().
+ - Use python logging system.
+ - Include the full command line on negative exit code error message.
+ - Use os.path.null instead of /dev/null.
+ - Improve the control over the created/deleted files.
+Changes v4->v5:
+ - Break the cleanup commit into logical changes and include in the
+   commit messages the rationale for making them.
+Changes v3->v4:
+ - Squash the 2 first commits since they are co-dependant.
+ - Cleanup launch() and shutdown().
+ - Reorder the commits, putting the rename of self._args first.
+ - Rebased.
+Changes v2->v3:
+ - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
+Changes v1->v2:
+ - Style fixes to make checkpatch.pl happy.
+ - Rebased.
 
-On 01/19/2018 06:50 AM, Anton Nefedov wrote:
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  hw/ide/core.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->=20
+*** SUBJECT HERE ***
 
-> @@ -460,10 +468,15 @@ static void ide_issue_trim_cb(void *opaque, int r=
-et)
->                  }
-> =20
->                  if (!ide_sect_range_ok(s, sector, count)) {
-> +                    block_acct_invalid(blk_get_stats(s->blk),
-> +                                       BLOCK_ACCT_UNMAP);
->                      iocb->is_invalid =3D true;
->                      goto done;
->                  }
-> =20
-> +                block_acct_start(blk_get_stats(s->blk), &s->acct,
-> +                                 count << BDRV_SECTOR_BITS, BLOCK_ACCT=
-_UNMAP);
+*** BLURB HERE ***
 
-We're still mixing bytes- and block-based reporting; how easy or hard
-would it be to flip block_acct_start() and friends to be byte-based?
-But not the subject of this series, per se.
+Amador Pahim (6):
+  qemu.py: better control of created files
+  qemu.py: refactor launch()
+  qemu.py: always cleanup on shutdown()
+  qemu.py: use poll() instead of 'returncode'
+  qemu.py: cleanup redundant calls in launch()
+  qemu.py: don't launch again before shutdown()
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ scripts/qemu.py | 93 ++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 62 insertions(+), 31 deletions(-)
 
-
---og1h25ZcIN7pP9mrECi2eSzeG1lRddYqQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpmTjcACgkQp6FrSiUn
-Q2qBOwgAkrvySqBmAB8q+0rz0JDXPPS+wvCZvh4geb2w2k/3jYxuBhHclc+/zjrw
-fM8N900d+QLQ+Iq+TTalDIGHfcEVuv0WeG7kCi1YP7mqr1csqjJzFRadMqdDPZ9A
-QeGJXfH4YKfwncz5M6Ox2/TKnlvIFOu16u3hVSE4QsoIen7S+0+12WYrta/Ul/93
-8Czgeobc76+Hy+QOaIBPYQKkcticU0q2c0bXHvmOIb7Izlii2k0yXlzAeyRS5TaZ
-C5GOOragG7rUEF9SBmesFUZvMwhEx2g1JquDHufKRs9HS/Vhn/YdFtmmDpkk2r6n
-mrGzX6uXwjpwmgoqbnduW2WBVC0MbA==
-=mU57
------END PGP SIGNATURE-----
-
---og1h25ZcIN7pP9mrECi2eSzeG1lRddYqQ--
+-- 
+2.14.3
