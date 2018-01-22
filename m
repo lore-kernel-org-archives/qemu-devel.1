@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1edeXA-0006HW-1T
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:25 -0500
+	(envelope-from <stefanha@redhat.com>) id 1edeXZ-0006Ul-7n
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1edeX4-0002O6-8a
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55852)
+	(envelope-from <stefanha@redhat.com>) id 1edeXT-0002gs-SV
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46744)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1edeX4-0002NL-2z
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:14 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1edeXT-0002gU-Jy
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:39 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 22 Jan 2018 16:00:43 +0000
-Message-Id: <20180122160048.29571-2-stefanha@redhat.com>
+Date: Mon, 22 Jan 2018 16:00:44 +0000
+Message-Id: <20180122160048.29571-3-stefanha@redhat.com>
 In-Reply-To: <20180122160048.29571-1-stefanha@redhat.com>
 References: <20180122160048.29571-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 1/6] block: add block_set_io_throttle
- virtio-blk-pci QMP example
+Subject: [Qemu-devel] [PULL v2 2/6] docs/interop/prl-xml: description of
+ Parallels Disk format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +25,188 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Klim Kireev <klim.kireev@virtuozzo.com>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The block_set_io_throttle command can look up BlockBackends by the
-attached qdev device ID.  virtio-blk-pci is a special case because the
-actual VirtIOBlock device is the "/virtio-backend" child of the PCI
-adapter device.
+From: Klim Kireev <klim.kireev@virtuozzo.com>
 
-Add a QMP schema example so clients will know how to use
-block_set_io_throttle on the virtio-blk-pci device.
+This patch adds main information about Parallels Disk
+format, which consists of DiskDescriptor.xml and other files.
 
-The alternative is to implement some sort of aliasing for qmp_get_blk()
-but that is likely to cause confusion and could break future use cases.
-Let's not go there.
-
-Cc: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20180117090700.25811-1-stefanha@redhat.com
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Message-id: 20180112090122.1702-2-klim.kireev@virtuozzo.com
+CC: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- qapi/block-core.json | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ docs/interop/prl-xml.txt | 158 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 158 insertions(+)
+ create mode 100644 docs/interop/prl-xml.txt
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e94a6881b2..4e84cf29db 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1799,6 +1799,24 @@
- # Example:
- #
- # -> { "execute": "block_set_io_throttle",
-+#      "arguments": { "id": "virtio-blk-pci0/virtio-backend",
-+#                     "bps": 0,
-+#                     "bps_rd": 0,
-+#                     "bps_wr": 0,
-+#                     "iops": 512,
-+#                     "iops_rd": 0,
-+#                     "iops_wr": 0,
-+#                     "bps_max": 0,
-+#                     "bps_rd_max": 0,
-+#                     "bps_wr_max": 0,
-+#                     "iops_max": 0,
-+#                     "iops_rd_max": 0,
-+#                     "iops_wr_max": 0,
-+#                     "bps_max_length": 0,
-+#                     "iops_size": 0 } }
-+# <- { "return": {} }
-+#
-+# -> { "execute": "block_set_io_throttle",
- #      "arguments": { "id": "ide0-1-0",
- #                     "bps": 1000000,
- #                     "bps_rd": 0,
+diff --git a/docs/interop/prl-xml.txt b/docs/interop/prl-xml.txt
+new file mode 100644
+index 0000000000..7031f8752c
+--- /dev/null
++++ b/docs/interop/prl-xml.txt
+@@ -0,0 +1,158 @@
++= License =
++
++Copyright (c) 2015-2017, Virtuozzo, Inc.
++Authors:
++        2015 Denis Lunev <den@openvz.org>
++        2015 Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
++        2016-2017 Klim Kireev <klim.kireev@virtuozzo.com>
++        2016-2017 Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
++
++This work is licensed under the terms of the GNU GPL, version 2 or later.
++See the COPYING file in the top-level directory.
++
++This specification contains minimal information about Parallels Disk Format,
++which is enough to proper work with QEMU. Nevertheless, Parallels Cloud Server
++and Parallels Desktop are able to add some unspecified nodes to xml and use
++them, but they are for internal work and don't affect functionality. Also it
++uses auxiliary xml "Snapshot.xml", which allows to store optional snapshot
++information, but it doesn't influence open/read/write functionality. QEMU and
++other software should not use fields not covered in this document and
++Snapshot.xml file and must leave them as is.
++
++= Parallels Disk Format =
++
++Parallels disk consists of two parts: the set of snapshots and the disk
++descriptor file, which stores information about all files and snapshots.
++
++== Definitions ==
++    Snapshot       a record of the contents captured at a particular time,
++                   capable of storing current state. A snapshot has UUID and
++                   parent UUID.
++
++ Snapshot image    an overlay representing the difference between this
++                   snapshot and some earlier snapshot.
++
++    Overlay        an image storing the different sectors between two captured
++                   states.
++
++   Root image      snapshot image with no parent, the root of snapshot tree.
++
++    Storage        the backing storage for a subset of the virtual disk. When
++                   there is more than one storage in a Parallels disk then that
++                   is referred to as a split image. In this case every storage
++                   covers specific address space area of the disk and has its
++                   particular root image. Split images are not considered here
++                   and are not supported. Each storage consists of disk
++                   parameters and a list of images. The list of images always
++                   contains a root image and may also contain overlays. The
++                   root image can be an expandable Parallels image file or
++                   plain. Overlays must be expandable.
++
++  Description      DiskDescriptor.xml stores information about disk parameters,
++     file          snapshots, storages.
++
++     Top           The overlay between actual state and some previous snapshot.
++   Snapshot        It is not a snapshot in the classical sense because it
++                   serves as the active image that the guest writes to.
++
++    Sector         a 512-byte data chunk.
++
++== Description file ==
++All information is placed in a single XML element Parallels_disk_image.
++The element has only one attribute "Version", that must be 1.0.
++Schema of DiskDescriptor.xml:
++
++<Parallels_disk_image Version="1.0">
++    <Disk_Parameters>
++        ...
++    </Disk_Parameters>
++    <StorageData>
++        ...
++    </StorageData>
++    <Snapshots>
++        ...
++    </Snapshots>
++</Parallels_disk_image>
++
++== Disk_Parameters element ==
++The Disk_Parameters element describes the physical layout of the virtual disk
++and some general settings.
++
++The Disk_Parameters element MUST contain the following child elements:
++    * Disk_size - number of sectors in the disk,
++                  desired size of the disk.
++    * Cylinders - number of the disk cylinders.
++    * Heads     - number of the disk heads.
++    * Sectors   - number of the disk sectors per cylinder
++                  (sector size is 512 bytes)
++                  Limitation: Product of the Heads, Sectors and Cylinders
++                  values MUST be equal to the value of the Disk_size parameter.
++    * Padding   - must be 0. Parallels Cloud Server and Parallels Desktop may
++                  use padding set to 1, however this case is not covered
++                  by this spec, QEMU and other software should not open
++                  such disks and should not create them.
++
++== StorageData element ==
++This element of the file describes the root image and all snapshot images.
++
++The StorageData element consists of the Storage child element, as shown below:
++<StorageData>
++    <Storage>
++        ...
++    </Storage>
++</StorageData>
++
++A Storage element has following child elements:
++    * Start     - start sector of the storage, in case of non split storage
++                  equals to 0.
++    * End       - number of sector following the last sector, in case of non
++                  split storage equals to Disk_size.
++    * Blocksize - storage cluster size, number of sectors per one cluster.
++                  Cluster size for each "Compressed" (see below) image in
++                  parallels disk must be equal to this field. Note: cluster
++                  size for Parallels Expandable Image is in 'tracks' field of
++                  its header (see docs/interop/parallels.txt).
++    * Several Image child elements.
++
++Each Image element has following child elements:
++    * GUID - image identifier, UUID in curly brackets.
++             For instance, {12345678-9abc-def1-2345-6789abcdef12}.
++             The GUID is used by the Snapshots element to reference images
++             (see below)
++    * Type - image type of the element. It can be:
++             "Plain" for raw files.
++             "Compressed" for expanding disks.
++    * File - path to image file. Path can be relative to DiskDecriptor.xml or
++             absolute.
++
++== Snapshots element ==
++The Snapshots element describes the snapshot relations with the snapshot tree.
++
++The element contains the set of Shot child elements, as shown below:
++<Snapshots>
++    <TopGUID> ... </TopGUID> /* Optional child element */
++    <Shot>
++        ...
++    </Shot>
++    <Shot>
++        ...
++    </Shot>
++    ...
++</Snapshots>
++
++Each Shot element contains the following child elements:
++    * GUID       - an image GUID.
++    * ParentGUID - GUID of the image of the parent snapshot.
++
++The software may traverse snapshots from child to parent using <ParentGUID>
++field as reference. ParentGUID of root snapshot is
++{00000000-0000-0000-0000-000000000000}. There should be only one root
++snapshot. Top snapshot could be described via two ways: via TopGUID child
++element of the Snapshots element or via predefined GUID
++{5fbaabe3-6958-40ff-92a7-860e329aab41}. If TopGUID is defined, predefined GUID is
++interpreted as usual GUID. All snapshot images (except Top Snapshot) should be
++opened read-only. There is another predefined GUID,
++BackupID = {704718e1-2314-44c8-9087-d78ed36b0f4e}, which is used by original and
++some third-party software for backup, QEMU and other software may operate with
++images with GUID = BackupID as usual, however, it is not recommended to use this
++GUID for new disks. Top snapshot cannot have this GUID.
 -- 
 2.14.3
