@@ -1,28 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1edZai-0003cQ-DW
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:44:42 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1edZbQ-00046c-UH
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1edZad-0008BN-7c
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:44:40 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41903)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1edZac-0008AE-Qk
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:44:35 -0500
-Received: by mail-wr0-x243.google.com with SMTP id v15so5256879wrb.8
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 02:44:34 -0800 (PST)
-References: <20180119045438.28582-1-richard.henderson@linaro.org>
-	<20180119045438.28582-4-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180119045438.28582-4-richard.henderson@linaro.org>
-Date: Mon, 22 Jan 2018 10:44:32 +0000
-Message-ID: <874lnekwa7.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <luwei.kang@intel.com>) id 1edZbN-0000JD-Jv
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:45:24 -0500
+Received: from mga02.intel.com ([134.134.136.20]:46945)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1edZbN-0000II-3O
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:45:21 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Mon, 22 Jan 2018 10:45:16 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E7D6FE@SHSMSX101.ccr.corp.intel.com>
+References: <20180115140455.GN6646@localhost.localdomain>
+	<20180115142518.GN1602429@orkuz.home>
+	<20180115143156.GO6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
+	<20180116115113.GA627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
+	<20180118024232.GT627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
+	<20180118132415.GU627@localhost.localdomain>
+	<c67f0021-0ca0-413b-bb84-3ff54dd791de@redhat.com>
+	<20180118143744.GY627@localhost.localdomain>
+In-Reply-To: <20180118143744.GY627@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/16] target/arm: Use pointers in neon
- zip/uzp helpers
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,436 +39,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
+> > On 18/01/2018 14:24, Eduardo Habkost wrote:
+> > > However, if there's a simple way to make it possible to migrate
+> > > between hosts with different CPUID[14h] data, it would be even
+> > > better.  With the current KVM intel-pt implementation, what happens
+> > > if the CPUID[14h] data seen by the guest doesn't match exactly the
+> > > CPUID[14h] leaves from the host?
+> >
+> > Some bits in there can be treated as CPU features (e.g. EBX bit 0 "CR3
+> > filtering support").  Probably we should handle these in KVM right now.
+> > KVM needs to compute a mask of valid 1 bits for IA32_RTIT_CTL based on
+> > CPUID, and apply it when the MSR is written.
+>=20
+> Does this mean QEMU can't set CPUID values that won't match the host with=
+ the existing implementation, or this won't matter for
+> well-behaved guests that don't try to set reserved bits on the MSRs?
+>=20
+>=20
+> >                                               It also needs to
+> > whitelist bits like we do for other feature words.  These include:
+> >
+> > - CPUID[EAX=3D14h,ECX=3D0].EBX
+> >
+> > - CPUID[EAX=3D14h,ECX=3D0].ECX except bit 31
+> >
+> > - CPUID[EAX=3D14h,ECX=3D1].EAX bits 16:31 (if
+> > CPUID[EAX=3D14h,ECX=3D0].EBX[3]=3D1)
+> >
+> > - CPUID[EAX=3D14h,ECX=3D1].EBX (if CPUID[EAX=3D14h,ECX=3D0].EBX[1]=3D1)
+>=20
+> What do you mean by whitelist?
+>=20
+>=20
+> >
+> > Others, currently only CPUID[EAX=3D14h,ECX=3D0].ECX[31] must match, the=
+re
+> > is no way to emulate the "wrong" value.
+>=20
+> In this case we could make it configurable but require the host and guest=
+ value to always match.
+>=20
+> This might be an obstacle to enabling intel-pt by default (because it cou=
+ld make VMs not migratable to newer hosts), but may allow
+> the feature to be configured in a predictable way.
+>=20
+>=20
+> >
+> > Others, currently only CPUID[EAX=3D14h,ECX=3D1].EAX[2:0] are numeric
+> > values, and it's possible to emulate a lower value than the one in the =
+processor.
+>=20
+> This could be handled by QEMU.  There's no requirement that all GET_SUPPO=
+RTED_CPUID values should be validated by simple bit
+> masking.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+So, we can get a lower value on the numeric of CPUID[EAX=3D14h,ECX=3D1].EAX=
+[2:0] between different host. How about other bits of CPUID[14] ? Can we do=
+ like this as well?
 
-> Rather than passing regnos to the helpers, pass pointers to the
-> vector registers directly.  This eliminates the need to pass in
-> the environment pointer and reduces the number of places that
-> directly access env->vfp.regs[].
->
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/helper.h      |  20 +++---
->  target/arm/neon_helper.c | 162 +++++++++++++++++++++++++----------------=
-------
->  target/arm/translate.c   |  42 ++++++------
->  3 files changed, 120 insertions(+), 104 deletions(-)
->
-> diff --git a/target/arm/helper.h b/target/arm/helper.h
-> index 688380af6b..dbdc38fcb7 100644
-> --- a/target/arm/helper.h
-> +++ b/target/arm/helper.h
-> @@ -511,16 +511,16 @@ DEF_HELPER_3(iwmmxt_muladdsl, i64, i64, i32, i32)
->  DEF_HELPER_3(iwmmxt_muladdsw, i64, i64, i32, i32)
->  DEF_HELPER_3(iwmmxt_muladdswl, i64, i64, i32, i32)
->
-> -DEF_HELPER_3(neon_unzip8, void, env, i32, i32)
-> -DEF_HELPER_3(neon_unzip16, void, env, i32, i32)
-> -DEF_HELPER_3(neon_qunzip8, void, env, i32, i32)
-> -DEF_HELPER_3(neon_qunzip16, void, env, i32, i32)
-> -DEF_HELPER_3(neon_qunzip32, void, env, i32, i32)
-> -DEF_HELPER_3(neon_zip8, void, env, i32, i32)
-> -DEF_HELPER_3(neon_zip16, void, env, i32, i32)
-> -DEF_HELPER_3(neon_qzip8, void, env, i32, i32)
-> -DEF_HELPER_3(neon_qzip16, void, env, i32, i32)
-> -DEF_HELPER_3(neon_qzip32, void, env, i32, i32)
-> +DEF_HELPER_FLAGS_2(neon_unzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_unzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_qunzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_qunzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_qunzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_zip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_zip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_qzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_qzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-> +DEF_HELPER_FLAGS_2(neon_qzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
->
->  DEF_HELPER_FLAGS_3(crypto_aese, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
->  DEF_HELPER_FLAGS_3(crypto_aesmc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-> diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
-> index ebdf7c9b10..689491cad3 100644
-> --- a/target/arm/neon_helper.c
-> +++ b/target/arm/neon_helper.c
-> @@ -2027,12 +2027,12 @@ uint64_t HELPER(neon_acgt_f64)(uint64_t a, uint64=
-_t b, void *fpstp)
->
->  #define ELEM(V, N, SIZE) (((V) >> ((N) * (SIZE))) & ((1ull << (SIZE)) - =
-1))
->
-> -void HELPER(neon_qunzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_qunzip8)(void *vd, void *vm)
->  {
-> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
-> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
-> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
-> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
-> +
->      uint64_t d0 =3D ELEM(zd0, 0, 8) | (ELEM(zd0, 2, 8) << 8)
->          | (ELEM(zd0, 4, 8) << 16) | (ELEM(zd0, 6, 8) << 24)
->          | (ELEM(zd1, 0, 8) << 32) | (ELEM(zd1, 2, 8) << 40)
-> @@ -2049,18 +2049,19 @@ void HELPER(neon_qunzip8)(CPUARMState *env, uint3=
-2_t rd, uint32_t rm)
->          | (ELEM(zm0, 5, 8) << 16) | (ELEM(zm0, 7, 8) << 24)
->          | (ELEM(zm1, 1, 8) << 32) | (ELEM(zm1, 3, 8) << 40)
->          | (ELEM(zm1, 5, 8) << 48) | (ELEM(zm1, 7, 8) << 56);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
-> +
-> +    rm[0] =3D m0;
-> +    rm[1] =3D m1;
-> +    rd[0] =3D d0;
-> +    rd[1] =3D d1;
->  }
->
-> -void HELPER(neon_qunzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_qunzip16)(void *vd, void *vm)
->  {
-> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
-> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
-> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
-> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
-> +
->      uint64_t d0 =3D ELEM(zd0, 0, 16) | (ELEM(zd0, 2, 16) << 16)
->          | (ELEM(zd1, 0, 16) << 32) | (ELEM(zd1, 2, 16) << 48);
->      uint64_t d1 =3D ELEM(zm0, 0, 16) | (ELEM(zm0, 2, 16) << 16)
-> @@ -2069,32 +2070,35 @@ void HELPER(neon_qunzip16)(CPUARMState *env, uint=
-32_t rd, uint32_t rm)
->          | (ELEM(zd1, 1, 16) << 32) | (ELEM(zd1, 3, 16) << 48);
->      uint64_t m1 =3D ELEM(zm0, 1, 16) | (ELEM(zm0, 3, 16) << 16)
->          | (ELEM(zm1, 1, 16) << 32) | (ELEM(zm1, 3, 16) << 48);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
-> +
-> +    rm[0] =3D m0;
-> +    rm[1] =3D m1;
-> +    rd[0] =3D d0;
-> +    rd[1] =3D d1;
->  }
->
-> -void HELPER(neon_qunzip32)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_qunzip32)(void *vd, void *vm)
->  {
-> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
-> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
-> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
-> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
-> +
->      uint64_t d0 =3D ELEM(zd0, 0, 32) | (ELEM(zd1, 0, 32) << 32);
->      uint64_t d1 =3D ELEM(zm0, 0, 32) | (ELEM(zm1, 0, 32) << 32);
->      uint64_t m0 =3D ELEM(zd0, 1, 32) | (ELEM(zd1, 1, 32) << 32);
->      uint64_t m1 =3D ELEM(zm0, 1, 32) | (ELEM(zm1, 1, 32) << 32);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
-> +
-> +    rm[0] =3D m0;
-> +    rm[1] =3D m1;
-> +    rd[0] =3D d0;
-> +    rd[1] =3D d1;
->  }
->
-> -void HELPER(neon_unzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_unzip8)(void *vd, void *vm)
->  {
-> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd =3D rd[0], zm =3D rm[0];
-> +
->      uint64_t d0 =3D ELEM(zd, 0, 8) | (ELEM(zd, 2, 8) << 8)
->          | (ELEM(zd, 4, 8) << 16) | (ELEM(zd, 6, 8) << 24)
->          | (ELEM(zm, 0, 8) << 32) | (ELEM(zm, 2, 8) << 40)
-> @@ -2103,28 +2107,31 @@ void HELPER(neon_unzip8)(CPUARMState *env, uint32=
-_t rd, uint32_t rm)
->          | (ELEM(zd, 5, 8) << 16) | (ELEM(zd, 7, 8) << 24)
->          | (ELEM(zm, 1, 8) << 32) | (ELEM(zm, 3, 8) << 40)
->          | (ELEM(zm, 5, 8) << 48) | (ELEM(zm, 7, 8) << 56);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> +
-> +    rm[0] =3D m0;
-> +    rd[0] =3D d0;
->  }
->
-> -void HELPER(neon_unzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_unzip16)(void *vd, void *vm)
->  {
-> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd =3D rd[0], zm =3D rm[0];
-> +
->      uint64_t d0 =3D ELEM(zd, 0, 16) | (ELEM(zd, 2, 16) << 16)
->          | (ELEM(zm, 0, 16) << 32) | (ELEM(zm, 2, 16) << 48);
->      uint64_t m0 =3D ELEM(zd, 1, 16) | (ELEM(zd, 3, 16) << 16)
->          | (ELEM(zm, 1, 16) << 32) | (ELEM(zm, 3, 16) << 48);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> +
-> +    rm[0] =3D m0;
-> +    rd[0] =3D d0;
->  }
->
-> -void HELPER(neon_qzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_qzip8)(void *vd, void *vm)
->  {
-> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
-> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
-> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
-> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
-> +
->      uint64_t d0 =3D ELEM(zd0, 0, 8) | (ELEM(zm0, 0, 8) << 8)
->          | (ELEM(zd0, 1, 8) << 16) | (ELEM(zm0, 1, 8) << 24)
->          | (ELEM(zd0, 2, 8) << 32) | (ELEM(zm0, 2, 8) << 40)
-> @@ -2141,18 +2148,19 @@ void HELPER(neon_qzip8)(CPUARMState *env, uint32_=
-t rd, uint32_t rm)
->          | (ELEM(zd1, 5, 8) << 16) | (ELEM(zm1, 5, 8) << 24)
->          | (ELEM(zd1, 6, 8) << 32) | (ELEM(zm1, 6, 8) << 40)
->          | (ELEM(zd1, 7, 8) << 48) | (ELEM(zm1, 7, 8) << 56);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
-> +
-> +    rm[0] =3D m0;
-> +    rm[1] =3D m1;
-> +    rd[0] =3D d0;
-> +    rd[1] =3D d1;
->  }
->
-> -void HELPER(neon_qzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_qzip16)(void *vd, void *vm)
->  {
-> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
-> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
-> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
-> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
-> +
->      uint64_t d0 =3D ELEM(zd0, 0, 16) | (ELEM(zm0, 0, 16) << 16)
->          | (ELEM(zd0, 1, 16) << 32) | (ELEM(zm0, 1, 16) << 48);
->      uint64_t d1 =3D ELEM(zd0, 2, 16) | (ELEM(zm0, 2, 16) << 16)
-> @@ -2161,32 +2169,35 @@ void HELPER(neon_qzip16)(CPUARMState *env, uint32=
-_t rd, uint32_t rm)
->          | (ELEM(zd1, 1, 16) << 32) | (ELEM(zm1, 1, 16) << 48);
->      uint64_t m1 =3D ELEM(zd1, 2, 16) | (ELEM(zm1, 2, 16) << 16)
->          | (ELEM(zd1, 3, 16) << 32) | (ELEM(zm1, 3, 16) << 48);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
-> +
-> +    rm[0] =3D m0;
-> +    rm[1] =3D m1;
-> +    rd[0] =3D d0;
-> +    rd[1] =3D d1;
->  }
->
-> -void HELPER(neon_qzip32)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_qzip32)(void *vd, void *vm)
->  {
-> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
-> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
-> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
-> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
-> +
->      uint64_t d0 =3D ELEM(zd0, 0, 32) | (ELEM(zm0, 0, 32) << 32);
->      uint64_t d1 =3D ELEM(zd0, 1, 32) | (ELEM(zm0, 1, 32) << 32);
->      uint64_t m0 =3D ELEM(zd1, 0, 32) | (ELEM(zm1, 0, 32) << 32);
->      uint64_t m1 =3D ELEM(zd1, 1, 32) | (ELEM(zm1, 1, 32) << 32);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
-> +
-> +    rm[0] =3D m0;
-> +    rm[1] =3D m1;
-> +    rd[0] =3D d0;
-> +    rd[1] =3D d1;
->  }
->
-> -void HELPER(neon_zip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_zip8)(void *vd, void *vm)
->  {
-> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd =3D rd[0], zm =3D rm[0];
-> +
->      uint64_t d0 =3D ELEM(zd, 0, 8) | (ELEM(zm, 0, 8) << 8)
->          | (ELEM(zd, 1, 8) << 16) | (ELEM(zm, 1, 8) << 24)
->          | (ELEM(zd, 2, 8) << 32) | (ELEM(zm, 2, 8) << 40)
-> @@ -2195,20 +2206,23 @@ void HELPER(neon_zip8)(CPUARMState *env, uint32_t=
- rd, uint32_t rm)
->          | (ELEM(zd, 5, 8) << 16) | (ELEM(zm, 5, 8) << 24)
->          | (ELEM(zd, 6, 8) << 32) | (ELEM(zm, 6, 8) << 40)
->          | (ELEM(zd, 7, 8) << 48) | (ELEM(zm, 7, 8) << 56);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> +
-> +    rm[0] =3D m0;
-> +    rd[0] =3D d0;
->  }
->
-> -void HELPER(neon_zip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
-> +void HELPER(neon_zip16)(void *vd, void *vm)
->  {
-> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
-> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
-> +    uint64_t *rd =3D vd, *rm =3D vm;
-> +    uint64_t zd =3D rd[0], zm =3D rm[0];
-> +
->      uint64_t d0 =3D ELEM(zd, 0, 16) | (ELEM(zm, 0, 16) << 16)
->          | (ELEM(zd, 1, 16) << 32) | (ELEM(zm, 1, 16) << 48);
->      uint64_t m0 =3D ELEM(zd, 2, 16) | (ELEM(zm, 2, 16) << 16)
->          | (ELEM(zd, 3, 16) << 32) | (ELEM(zm, 3, 16) << 48);
-> -    env->vfp.regs[rm] =3D make_float64(m0);
-> -    env->vfp.regs[rd] =3D make_float64(d0);
-> +
-> +    rm[0] =3D m0;
-> +    rd[0] =3D d0;
->  }
->
->  /* Helper function for 64 bit polynomial multiply case:
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 7b5db15861..6f02c56abb 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -4687,22 +4687,23 @@ static inline TCGv_i32 neon_get_scalar(int size, =
-int reg)
->
->  static int gen_neon_unzip(int rd, int rm, int size, int q)
->  {
-> -    TCGv_i32 tmp, tmp2;
-> +    TCGv_ptr pd, pm;
-> +
->      if (!q && size =3D=3D 2) {
->          return 1;
->      }
-> -    tmp =3D tcg_const_i32(rd);
-> -    tmp2 =3D tcg_const_i32(rm);
-> +    pd =3D vfp_reg_ptr(true, rd);
-> +    pm =3D vfp_reg_ptr(true, rm);
->      if (q) {
->          switch (size) {
->          case 0:
-> -            gen_helper_neon_qunzip8(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_qunzip8(pd, pm);
->              break;
->          case 1:
-> -            gen_helper_neon_qunzip16(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_qunzip16(pd, pm);
->              break;
->          case 2:
-> -            gen_helper_neon_qunzip32(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_qunzip32(pd, pm);
->              break;
->          default:
->              abort();
-> @@ -4710,38 +4711,39 @@ static int gen_neon_unzip(int rd, int rm, int siz=
-e, int q)
->      } else {
->          switch (size) {
->          case 0:
-> -            gen_helper_neon_unzip8(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_unzip8(pd, pm);
->              break;
->          case 1:
-> -            gen_helper_neon_unzip16(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_unzip16(pd, pm);
->              break;
->          default:
->              abort();
->          }
->      }
-> -    tcg_temp_free_i32(tmp);
-> -    tcg_temp_free_i32(tmp2);
-> +    tcg_temp_free_ptr(pd);
-> +    tcg_temp_free_ptr(pm);
->      return 0;
->  }
->
->  static int gen_neon_zip(int rd, int rm, int size, int q)
->  {
-> -    TCGv_i32 tmp, tmp2;
-> +    TCGv_ptr pd, pm;
-> +
->      if (!q && size =3D=3D 2) {
->          return 1;
->      }
-> -    tmp =3D tcg_const_i32(rd);
-> -    tmp2 =3D tcg_const_i32(rm);
-> +    pd =3D vfp_reg_ptr(true, rd);
-> +    pm =3D vfp_reg_ptr(true, rm);
->      if (q) {
->          switch (size) {
->          case 0:
-> -            gen_helper_neon_qzip8(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_qzip8(pd, pm);
->              break;
->          case 1:
-> -            gen_helper_neon_qzip16(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_qzip16(pd, pm);
->              break;
->          case 2:
-> -            gen_helper_neon_qzip32(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_qzip32(pd, pm);
->              break;
->          default:
->              abort();
-> @@ -4749,17 +4751,17 @@ static int gen_neon_zip(int rd, int rm, int size,=
- int q)
->      } else {
->          switch (size) {
->          case 0:
-> -            gen_helper_neon_zip8(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_zip8(pd, pm);
->              break;
->          case 1:
-> -            gen_helper_neon_zip16(cpu_env, tmp, tmp2);
-> +            gen_helper_neon_zip16(pd, pm);
->              break;
->          default:
->              abort();
->          }
->      }
-> -    tcg_temp_free_i32(tmp);
-> -    tcg_temp_free_i32(tmp2);
-> +    tcg_temp_free_ptr(pd);
-> +    tcg_temp_free_ptr(pm);
->      return 0;
->  }
-
-
---
-Alex Benn=C3=A9e
+Thanks,
+Luwei Kang
+>=20
+>=20
+> >
+> > CPUID[EAX=3D14h,ECX=3D0].EAX is the maximum subleaf.  It should be
+> > (barring guest bugs) okay to always present leaf 1.
+> >
+> > Paolo
+>=20
+> --
+> Eduardo
