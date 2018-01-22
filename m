@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eddmR-0001qx-Dc
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:13:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eddsd-0004Um-QY
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:19:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eddmO-0001uq-90
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:13:03 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:42380)
+	(envelope-from <peter.maydell@linaro.org>) id 1eddsc-0005mA-JQ
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:19:27 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eddmO-0001uG-2L
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:13:00 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id r71so4431160wmd.1
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 07:13:00 -0800 (PST)
-References: <20180119045438.28582-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180119045438.28582-1-richard.henderson@linaro.org>
-Date: Mon, 22 Jan 2018 15:12:57 +0000
-Message-ID: <87k1waj5ae.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eddsc-0005kw-9j
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:19:26 -0500
+Received: by mail-oi0-x241.google.com with SMTP id b11so6152620oif.2
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 07:19:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] target/arm: Prepatory work for SVE
+In-Reply-To: <20180119145756.7629-6-luc.michel@greensocs.com>
+References: <20180119145756.7629-1-luc.michel@greensocs.com>
+	<20180119145756.7629-6-luc.michel@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jan 2018 15:19:05 +0000
+Message-ID: <CAFEAcA8VJAfksRenr_CJauTc2wpfN1fUchixrfGbvjBkeoR-Vg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/intc/arm_gic: Fix the NS view of
+ C_BPR when C_CTRL.CBPR is 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: luc.michel@greensocs.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Luc MICHEL <luc.michel@git.antfield.fr>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> I believe that this addresses all of the comments Peter had with
-> respect to v1.  I did go ahead and add the system registers, so that
-> I could figure out how they're supposed to work.
+On 19 January 2018 at 14:57,  <luc.michel@greensocs.com> wrote:
+> From: Luc MICHEL <luc.michel@git.antfield.fr>
 >
-> This has been rebased to master so that it has no dependencies.
+> When C_CTRL.CBPR is 1, the Non-Secure view of C_BPR is altered:
+>   - A Non-Secure read of C_BPR should return the BPR value plus 1,
+>   saturated to 7,
+>   - A Non-Secure write should be ignored.
+>
+> Signed-off-by: Luc MICHEL <luc.michel@git.antfield.fr>
+> ---
+>  hw/intc/arm_gic.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index d0a41a89ae..7418b7a082 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -1211,8 +1211,13 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+>          break;
+>      case 0x08: /* Binary Point */
+>          if (s->security_extn && !attrs.secure) {
+> -            /* BPR is banked. Non-secure copy stored in ABPR. */
+> -            *data = s->abpr[cpu];
+> +            if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
+> +                /* NS view of BPR when CBPR is 1 */
+> +                *data = MIN(s->bpr[cpu] + 1, 7);
+> +            } else {
+> +                /* BPR is banked. Non-secure copy stored in ABPR. */
+> +                *data = s->abpr[cpu];
+> +            }
+>          } else {
+>              *data = s->bpr[cpu];
+>          }
+> @@ -1285,7 +1290,12 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+>          break;
+>      case 0x08: /* Binary Point */
+>          if (s->security_extn && !attrs.secure) {
+> -            s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
+> +            if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
+> +                /* WI when CTLR is 1 */
 
-I've completed my review pass for this series now, looking pretty good.
+should be "CBPR", yes?
 
---
-Alex Benn=C3=A9e
+> +                return MEMTX_OK;
+> +            } else {
+> +                s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
+> +            }
+>          } else {
+>              s->bpr[cpu] = MAX(value & 0x7, GIC_MIN_BPR);
+>          }
+> --
+
+thanks
+-- PMM
