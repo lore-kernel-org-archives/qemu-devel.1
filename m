@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eddZZ-0001Rz-9Y
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:59:46 -0500
+	(envelope-from <mark.kanda@oracle.com>) id 1eddZo-0001fs-CC
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:00:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eddZY-0007hf-Gz
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:59:45 -0500
-Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:36126)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eddZY-0007hO-CV
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:59:44 -0500
-Received: by mail-ot0-x233.google.com with SMTP id f100so7682958otf.3
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 06:59:44 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAHQ1cqHXHxSH4LxSu0Jjug5hy1FhMYF-O2FtYbjpnm68VjTDpA@mail.gmail.com>
-References: <20180113113445.2705-1-jcd@tribudubois.net>
-	<CAFEAcA_epX=BOj5sxNVB2z-k3wQ+RRAry=OQi2b=i0d9pJaSeA@mail.gmail.com>
-	<CAHQ1cqHXHxSH4LxSu0Jjug5hy1FhMYF-O2FtYbjpnm68VjTDpA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 14:59:23 +0000
-Message-ID: <CAFEAcA-XKE=KkOdT62i3VdU=pfQZq7D9KRHNQFjn4Ei_EdpPoQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] i.MX: Fix FEC/ENET receive funtions
+	(envelope-from <mark.kanda@oracle.com>) id 1eddZn-0007sM-Kd
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:00:00 -0500
+From: Mark Kanda <mark.kanda@oracle.com>
+Date: Mon, 22 Jan 2018 09:01:49 -0600
+Message-Id: <1516633309-20803-1-git-send-email-mark.kanda@oracle.com>
+Subject: [Qemu-devel] [PATCH] virtio-blk: check for NULL BlockDriverState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +17,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: Jean-Christophe Dubois <jcd@tribudubois.net>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, fyleo45@gmail.com, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, karl.heubaum@oracle.com, ameya.more@oracle.com, Mark Kanda <mark.kanda@oracle.com>
 
-On 22 January 2018 at 14:54, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> On Mon, Jan 22, 2018 at 3:48 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 13 January 2018 at 11:34, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
->>> The actual imx_eth_enable_rx() function is buggy.
->>>
->>> It updates s->regs[ENET_RDAR] after calling qemu_flush_queued_packets().
->>>
->>> qemu_flush_queued_packets() is going to call imx_XXX_receive() which itself
->>> is going to call imx_eth_enable_rx().
->>>
->>> By updating s->regs[ENET_RDAR] after calling qemu_flush_queued_packets()
->>> we end up updating the register with an outdated value which might
->>> lead to disabling the receive function in the i.MX FEC/ENET device.
->>>
->>> This patch change the place where the register update is done so that the
->>> register value stays up to date and the receive function can keep
->>> running.
->>>
->>> Reported-by: Fyleo <fyleo45@gmail.com>
->>> Tested-by: Fyleo  <fyleo45@gmail.com>
->>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
->>> ---
->>
->> Andrey, do you have an opinion on this patch, since you've been
->> looking at i.MX code recently?
->>
->
-> The rationale makes sense to me and patch looks like a good cleanup in
-> general, so FWIW:
->
-> Reviewed-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->
-> I also gave it a spin against my i.MX7 changes with doing basic things
-> like ping and scp of 1GB file, so I can give my:
->
-> Tested-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Add a BlockDriverState NULL check to virtio_blk_handle_request()
+to prevent a segfault if the drive is forcibly removed using HMP
+'drive_del' (without performing a hotplug 'device_del' first).
 
-Thanks; I've applied the patch to target-arm.next.
+Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Ameya More <ameya.more@oracle.com>
+---
+ hw/block/virtio-blk.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
--- PMM
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index b1532e4..76ddbbf 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -507,6 +507,13 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+         return -1;
+     }
+ 
++    /* If the drive was forcibly removed (e.g. HMP 'drive_del'), the block
++     * driver state may be NULL and there is nothing left to do. */
++    if (!blk_bs(req->dev->blk)) {
++        virtio_error(vdev, "virtio-blk BlockDriverState is NULL");
++        return -1;
++    }
++
+     /* We always touch the last byte, so just see how big in_iov is.  */
+     req->in_len = iov_size(in_iov, in_num);
+     req->in = (void *)in_iov[in_num - 1].iov_base
+-- 
+1.8.3.1
