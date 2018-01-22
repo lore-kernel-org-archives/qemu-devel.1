@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1edfE5-00086c-QP
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:45:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1edfG6-0000b6-78
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1edfE5-0002Pc-2j
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:45:41 -0500
-References: <20180122072102.4141-1-lma@suse.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <17afc198-ba65-e0b8-f568-34f5899e7477@redhat.com>
-Date: Mon, 22 Jan 2018 17:45:26 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1edfG5-00042y-AG
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:47:46 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:39422)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1edfG5-00041q-3O
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:47:45 -0500
+Received: by mail-oi0-x243.google.com with SMTP id t8so6382642oie.6
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 08:47:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180122072102.4141-1-lma@suse.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Pqtt93JpTXhvrA386iQk5LUYvPOZv0FeU"
-Subject: Re: [Qemu-devel] [PATCH] raw: Disable probing if image format is
- given by driver-specific options
+In-Reply-To: <20180119141707.11733-3-ard.biesheuvel@linaro.org>
+References: <20180119141707.11733-1-ard.biesheuvel@linaro.org>
+	<20180119141707.11733-3-ard.biesheuvel@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jan 2018 16:47:23 +0000
+Message-ID: <CAFEAcA997FE0OJmf2YXd7FXurDTZeEwb38ND85agXebP72uRag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] target/arm: implement SHA-3
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lin Ma <lma@suse.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Pqtt93JpTXhvrA386iQk5LUYvPOZv0FeU
-From: Max Reitz <mreitz@redhat.com>
-To: Lin Ma <lma@suse.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com
-Message-ID: <17afc198-ba65-e0b8-f568-34f5899e7477@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] raw: Disable probing if image format is
- given by driver-specific options
-References: <20180122072102.4141-1-lma@suse.com>
-In-Reply-To: <20180122072102.4141-1-lma@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-01-22 08:21, Lin Ma wrote:
-> If the user specifies image format through driver-specific options, The=
-
-> format probing should be prohibited and the warning message should not
-> be printed.
->=20
-> e.g.:
-> $ qemu-system-x86_64 ... -drive file.file.filename=3Ddisk0.raw,file.dri=
-ver=3Draw ...
-> WARNING: Image format was not specified for 'disk0.raw' and probing gue=
-ssed raw.
->          Automatically detecting the format is dangerous for raw images=
-, ...
->=20
-> Signed-off-by: Lin Ma <lma@suse.com>
+On 19 January 2018 at 14:17, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> This implements emulation of the new SHA-3 instructions that have
+> been added as an optional extensions to the ARMv8 Crypto Extensions
+> in ARM v8.2.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  blockdev.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  target/arm/cpu.h           |   1 +
+>  target/arm/crypto_helper.c |  69 +++++++++++++
+>  target/arm/helper.h        |   5 +
+>  target/arm/translate-a64.c | 108 +++++++++++++++++++-
+>  4 files changed, 179 insertions(+), 4 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 295529366c0a..8e355398e3e0 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1341,6 +1341,7 @@ enum arm_features {
+>      ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
+>      ARM_FEATURE_JAZELLE, /* has (trivial) Jazelle implementation */
+>      ARM_FEATURE_V8_SHA512, /* implements SHA512 part of v8 Crypto Extensions */
+> +    ARM_FEATURE_V8_SHA3, /* implements SHA3 part of v8 Crypto Extensions */
+>  };
+>
 
-But what has been proped is the driver for the root BDS, so the warning
-is actually correct.
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>  /* initialize TCG globals.  */
+>  void a64_translate_init(void)
+> @@ -11125,6 +11127,7 @@ static void disas_crypto_three_reg_sha512(DisasContext *s, uint32_t insn)
+>      int rn = extract32(insn, 5, 5);
+>      int rd = extract32(insn, 0, 5);
+>      TCGv_i32 tcg_rd_regno, tcg_rn_regno, tcg_rm_regno;
+> +    int feature;
+>      CryptoThreeOpEnvFn *genfn;
+>
+>      if (o != 0) {
+> @@ -11134,20 +11137,24 @@ static void disas_crypto_three_reg_sha512(DisasContext *s, uint32_t insn)
+>
+>      switch (opcode) {
+>      case 0: /* SHA512H */
+> +        feature = ARM_FEATURE_V8_SHA512;
+>          genfn = gen_helper_crypto_sha512h;
+>          break;
+>      case 1: /* SHA512H2 */
+> +        feature = ARM_FEATURE_V8_SHA512;
+>          genfn = gen_helper_crypto_sha512h2;
+>          break;
+>      case 2: /* SHA512SU1 */
+> +        feature = ARM_FEATURE_V8_SHA512;
+>          genfn = gen_helper_crypto_sha512su1;
+>          break;
 
-(That command line is creating a chain of three BDS:
-raw (probed) -> raw (explicitly specified) -> file (default protocol))
+I think these lines should have been in patch 1, right?
 
-Max
+> -    default:
+> -        unallocated_encoding(s);
+> -        return;
+> +    case 3: /* RAX1 */
+> +        feature = ARM_FEATURE_V8_SHA3;
+> +        genfn = gen_helper_crypto_rax1;
+> +        break;
+>      }
+>
+> -    if (!arm_dc_feature(s, ARM_FEATURE_V8_SHA512)) {
+> +    if (!arm_dc_feature(s, feature)) {
+>          unallocated_encoding(s);
+>          return;
 
-
---Pqtt93JpTXhvrA386iQk5LUYvPOZv0FeU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpmFScSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A9A0H/AnaiaKsS7cTBNwyFXOFvEV6o8I1GpPK
-lwbJo/GKeucP34ADNsweSZnZ/GurrdUBxM/nGwln2oA4fas32Ec/mfDDXgeDuzqA
-AcfA2wA1ojkdKdKoQEJAm60PCL7L2fSiPaDStiv6X6P8Wmdlbtlewxg86DW2nY+w
-AgwD3OvSaMtDaSOQJnPwRjZ5XNN6RSBJCwMYCkrNzpmJx/DhKTK2R/41Vsy2jP+6
-zMmRnEqhllT6dE1GJAp6gEn0cmIUKcbErQcx90FqswmNNYTqlk0wiXzJPXesdmBi
-1snrPJ7t2teehsmdKoNpa2iT7bB19tuLiRx/LQtnQJnQo3k4UrmPJL4=
-=nrfl
------END PGP SIGNATURE-----
-
---Pqtt93JpTXhvrA386iQk5LUYvPOZv0FeU--
+thanks
+-- PMM
