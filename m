@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1edeXm-0006fY-5P
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:02:08 -0500
+	(envelope-from <stefanha@redhat.com>) id 1edeXy-0006qe-VW
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:02:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1edeXj-0002wk-Sg
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47682)
+	(envelope-from <stefanha@redhat.com>) id 1edeXu-000323-Aw
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:02:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47874)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1edeXj-0002wN-K4
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:55 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1edeXu-00031Q-3D
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:02:06 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 22 Jan 2018 16:00:46 +0000
-Message-Id: <20180122160048.29571-5-stefanha@redhat.com>
+Date: Mon, 22 Jan 2018 16:00:47 +0000
+Message-Id: <20180122160048.29571-6-stefanha@redhat.com>
 In-Reply-To: <20180122160048.29571-1-stefanha@redhat.com>
 References: <20180122160048.29571-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 4/6] block/parallels: move some structures
- into header
+Subject: [Qemu-devel] [PULL v2 5/6] block/parallels: replace some magic
+ numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,192 +29,47 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Klim Kireev <klim.kireev@virtuozzo
 
 From: Klim Kireev <klim.kireev@virtuozzo.com>
 
-To implement xml format, some defines and structures
-from parallels.c are required.
-
 Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Message-id: 20180112090122.1702-4-klim.kireev@virtuozzo.com
+Message-id: 20180112090122.1702-5-klim.kireev@virtuozzo.com
 CC: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/parallels.h | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/parallels.c | 53 +---------------------------------
- 2 files changed, 87 insertions(+), 52 deletions(-)
- create mode 100644 block/parallels.h
+ block/parallels.h | 2 ++
+ block/parallels.c | 5 +++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/block/parallels.h b/block/parallels.h
-new file mode 100644
-index 0000000000..71183c0c8e
---- /dev/null
+index 71183c0c8e..4b044079ef 100644
+--- a/block/parallels.h
 +++ b/block/parallels.h
-@@ -0,0 +1,86 @@
-+/*
-+* Block driver for Parallels disk image format
-+*
-+* Copyright (c) 2015-2017 Virtuozzo, Inc.
-+* Authors:
-+*         2016-2017 Klim S. Kireev <klim.kireev@virtuozzo.com>
-+*         2015 Denis V. Lunev <den@openvz.org>
-+*
-+* This code was originally based on comparing different disk images created
-+* by Parallels. Currently it is based on opened OpenVZ sources
-+* available at
-+*     https://github.com/OpenVZ/ploop
-+*
-+* Permission is hereby granted, free of charge, to any person obtaining a copy
-+* of this software and associated documentation files (the "Software"), to deal
-+* in the Software without restriction, including without limitation the rights
-+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+* copies of the Software, and to permit persons to whom the Software is
-+* furnished to do so, subject to the following conditions:
-+*
-+* The above copyright notice and this permission notice shall be included in
-+* all copies or substantial portions of the Software.
-+*
-+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+* THE SOFTWARE.
-+*/
-+#ifndef BLOCK_PARALLELS_H
-+#define BLOCK_PARALLELS_H
-+#include "qemu/coroutine.h"
-+#include "qemu/typedefs.h"
-+
-+#define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
-+
-+/* always little-endian */
-+typedef struct ParallelsHeader {
-+    char magic[16]; /* "WithoutFreeSpace" */
-+    uint32_t version;
-+    uint32_t heads;
-+    uint32_t cylinders;
-+    uint32_t tracks;
-+    uint32_t bat_entries;
-+    uint64_t nb_sectors;
-+    uint32_t inuse;
-+    uint32_t data_off;
-+    char padding[12];
-+} QEMU_PACKED ParallelsHeader;
-+
-+typedef enum ParallelsPreallocMode {
-+    PRL_PREALLOC_MODE_FALLOCATE = 0,
-+    PRL_PREALLOC_MODE_TRUNCATE = 1,
-+    PRL_PREALLOC_MODE__MAX = 2,
-+} ParallelsPreallocMode;
-+
-+typedef struct BDRVParallelsState {
-+    /** Locking is conservative, the lock protects
-+     *   - image file extending (truncate, fallocate)
-+     *   - any access to block allocation table
-+     */
-+    CoMutex lock;
-+
-+    ParallelsHeader *header;
-+    uint32_t header_size;
-+    bool header_unclean;
-+
-+    unsigned long *bat_dirty_bmap;
-+    unsigned int  bat_dirty_block;
-+
-+    uint32_t *bat_bitmap;
-+    unsigned int bat_size;
-+
-+    int64_t  data_end;
-+    uint64_t prealloc_size;
-+    ParallelsPreallocMode prealloc_mode;
-+
-+    unsigned int tracks;
-+
-+    unsigned int off_multiplier;
-+    Error *migration_blocker;
-+} BDRVParallelsState;
-+
-+#endif
+@@ -34,6 +34,8 @@
+ #include "qemu/coroutine.h"
+ #include "qemu/typedefs.h"
+ 
++#define HEADS_NUMBER 16
++#define SEC_IN_CYL 32
+ #define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
+ 
+ /* always little-endian */
 diff --git a/block/parallels.c b/block/parallels.c
-index 9545761f49..f9a3b999ea 100644
+index f9a3b999ea..7a8e8b05a9 100644
 --- a/block/parallels.c
 +++ b/block/parallels.c
-@@ -36,6 +36,7 @@
- #include "qemu/bswap.h"
- #include "qemu/bitmap.h"
- #include "migration/blocker.h"
-+#include "parallels.h"
- 
- /**************************************************************/
- 
-@@ -45,30 +46,6 @@
- #define HEADER_INUSE_MAGIC  (0x746F6E59)
- #define MAX_PARALLELS_IMAGE_FACTOR (1ull << 32)
- 
--#define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
--
--
--// always little-endian
--typedef struct ParallelsHeader {
--    char magic[16]; // "WithoutFreeSpace"
--    uint32_t version;
--    uint32_t heads;
--    uint32_t cylinders;
--    uint32_t tracks;
--    uint32_t bat_entries;
--    uint64_t nb_sectors;
--    uint32_t inuse;
--    uint32_t data_off;
--    char padding[12];
--} QEMU_PACKED ParallelsHeader;
--
--
--typedef enum ParallelsPreallocMode {
--    PRL_PREALLOC_MODE_FALLOCATE = 0,
--    PRL_PREALLOC_MODE_TRUNCATE = 1,
--    PRL_PREALLOC_MODE__MAX = 2,
--} ParallelsPreallocMode;
--
- static QEnumLookup prealloc_mode_lookup = {
-     .array = (const char *const[]) {
-         "falloc",
-@@ -77,34 +54,6 @@ static QEnumLookup prealloc_mode_lookup = {
-     .size = PRL_PREALLOC_MODE__MAX
- };
- 
--typedef struct BDRVParallelsState {
--    /** Locking is conservative, the lock protects
--     *   - image file extending (truncate, fallocate)
--     *   - any access to block allocation table
--     */
--    CoMutex lock;
--
--    ParallelsHeader *header;
--    uint32_t header_size;
--    bool header_unclean;
--
--    unsigned long *bat_dirty_bmap;
--    unsigned int  bat_dirty_block;
--
--    uint32_t *bat_bitmap;
--    unsigned int bat_size;
--
--    int64_t  data_end;
--    uint64_t prealloc_size;
--    ParallelsPreallocMode prealloc_mode;
--
--    unsigned int tracks;
--
--    unsigned int off_multiplier;
--    Error *migration_blocker;
--} BDRVParallelsState;
--
--
- #define PARALLELS_OPT_PREALLOC_MODE     "prealloc-mode"
- #define PARALLELS_OPT_PREALLOC_SIZE     "prealloc-size"
- 
+@@ -476,8 +476,9 @@ static int parallels_create(const char *filename, QemuOpts *opts, Error **errp)
+     memcpy(header.magic, HEADER_MAGIC2, sizeof(header.magic));
+     header.version = cpu_to_le32(HEADER_VERSION);
+     /* don't care much about geometry, it is not used on image level */
+-    header.heads = cpu_to_le32(16);
+-    header.cylinders = cpu_to_le32(total_size / BDRV_SECTOR_SIZE / 16 / 32);
++    header.heads = cpu_to_le32(HEADS_NUMBER);
++    header.cylinders = cpu_to_le32(total_size / BDRV_SECTOR_SIZE
++                                   / HEADS_NUMBER / SEC_IN_CYL);
+     header.tracks = cpu_to_le32(cl_size >> BDRV_SECTOR_BITS);
+     header.bat_entries = cpu_to_le32(bat_entries);
+     header.nb_sectors = cpu_to_le64(DIV_ROUND_UP(total_size, BDRV_SECTOR_SIZE));
 -- 
 2.14.3
