@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1edkHz-0006zn-7B
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:10:04 -0500
+	(envelope-from <mreitz@redhat.com>) id 1edkID-0007GW-9X
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:10:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1edkHx-0003zE-Pk
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:10:03 -0500
+	(envelope-from <mreitz@redhat.com>) id 1edkIC-00049d-Av
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:10:17 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 22 Jan 2018 23:08:00 +0100
-Message-Id: <20180122220806.22154-11-mreitz@redhat.com>
+Date: Mon, 22 Jan 2018 23:08:02 +0100
+Message-Id: <20180122220806.22154-13-mreitz@redhat.com>
 In-Reply-To: <20180122220806.22154-1-mreitz@redhat.com>
 References: <20180122220806.22154-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/16] hbitmap: Add @advance param to
- hbitmap_iter_next()
+Subject: [Qemu-devel] [PATCH v2 12/16] block/mirror: Distinguish active from
+ passive ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,161 +23,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This new parameter allows the caller to just query the next dirty
-position without moving the iterator.
+Currently, the mirror block job only knows passive operations.  But once
+we introduce active writes, we need to distinguish between the two; for
+example, mirror_wait_for_free_in_flight_slot() should wait for a passive
+operation because active writes will not use the same in-flight slots.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qemu/hbitmap.h |  5 ++++-
- block/backup.c         |  2 +-
- block/dirty-bitmap.c   |  2 +-
- tests/test-hbitmap.c   | 26 +++++++++++++-------------
- util/hbitmap.c         | 10 +++++++---
- 5 files changed, 26 insertions(+), 19 deletions(-)
+ block/mirror.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 6b6490ecad..ddca52c48e 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -324,11 +324,14 @@ void hbitmap_free_meta(HBitmap *hb);
- /**
-  * hbitmap_iter_next:
-  * @hbi: HBitmapIter to operate on.
-+ * @advance: If true, advance the iterator.  Otherwise, the next call
-+ *           of this function will return the same result (if that
-+ *           position is still dirty).
-  *
-  * Return the next bit that is set in @hbi's associated HBitmap,
-  * or -1 if all remaining bits are zero.
-  */
--int64_t hbitmap_iter_next(HBitmapIter *hbi);
-+int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
+diff --git a/block/mirror.c b/block/mirror.c
+index 2363e79563..bb46f3c4e9 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -89,6 +89,7 @@ struct MirrorOp {
+     int64_t *bytes_handled;
  
- /**
-  * hbitmap_iter_next_word:
-diff --git a/block/backup.c b/block/backup.c
-index 4a16a37229..c083ce0deb 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -368,7 +368,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-     HBitmapIter hbi;
+     bool is_pseudo_op;
++    bool is_active_write;
+     CoQueue waiting_requests;
  
-     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
--    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
-+    while ((cluster = hbitmap_iter_next(&hbi, true)) != -1) {
-         do {
-             if (yield_and_check(job)) {
-                 return 0;
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 7879d13ddb..50564fa1e2 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -498,7 +498,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
- 
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
- {
--    return hbitmap_iter_next(&iter->hbi);
-+    return hbitmap_iter_next(&iter->hbi, true);
- }
- 
- /* Called within bdrv_dirty_bitmap_lock..unlock */
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 9091c639b3..2a2aa5bd43 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
- 
-     i = first;
-     for (;;) {
--        next = hbitmap_iter_next(&hbi);
-+        next = hbitmap_iter_next(&hbi, true);
-         if (next < 0) {
-             next = data->size;
+     QTAILQ_ENTRY(MirrorOp) next;
+@@ -281,8 +282,10 @@ static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+          * some other operation to start, which may in fact be the
+          * caller of this function.  Since there is only one pseudo op
+          * at any given time, we will always find some real operation
+-         * to wait on. */
+-        if (!op->is_pseudo_op) {
++         * to wait on.
++         * Also, only non-active operations use up in-flight slots, so
++         * we can ignore active operations. */
++        if (!op->is_pseudo_op && !op->is_active_write) {
+             qemu_co_queue_wait(&op->waiting_requests, NULL);
+             return;
          }
-@@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
-     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
-     hbitmap_test_init(data, 131072 << 7, 7);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_test_set(data, (131072 << 7) - 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- }
- 
- static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
-@@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
-     for (i = 0; i < num_positions; i++) {
-         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
-         hbitmap_iter_init(&iter, data->hb, 0);
--        next = hbitmap_iter_next(&iter);
-+        next = hbitmap_iter_next(&iter, true);
-         if (i == num_positions - 1) {
-             g_assert_cmpint(next, ==, -1);
-         } else {
-@@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
- 
-     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
- 
--    hbitmap_iter_next(&hbi);
-+    hbitmap_iter_next(&hbi, true);
- 
-     hbitmap_reset_all(data->hb);
--    hbitmap_iter_next(&hbi);
-+    hbitmap_iter_next(&hbi, true);
- }
- 
- static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 289778a55c..ceb7b75bc6 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -141,7 +141,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
-     return cur;
- }
- 
--int64_t hbitmap_iter_next(HBitmapIter *hbi)
-+int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
- {
-     unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
-             hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
-@@ -154,8 +154,12 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi)
-         }
-     }
- 
--    /* The next call will resume work from the next bit.  */
--    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-+    if (advance) {
-+        /* The next call will resume work from the next bit.  */
-+        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-+    } else {
-+        hbi->cur[HBITMAP_LEVELS - 1] = cur;
-+    }
-     item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
- 
-     return item << hbi->granularity;
 -- 
 2.14.3
