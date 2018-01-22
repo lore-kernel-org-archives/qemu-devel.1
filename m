@@ -1,41 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1edXWF-0007SH-QW
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:31:56 -0500
+	(envelope-from <peterx@redhat.com>) id 1edXhG-0001mz-7k
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:43:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1edXWC-0002XM-LA
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:31:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37194
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1edXWC-0002Uq-Fl
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:31:52 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0M8TdFo188604
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 03:31:50 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fnc23h9b4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 03:31:50 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 22 Jan 2018 08:31:48 -0000
-References: <20180118085628.40798-1-borntraeger@de.ibm.com>
-	<20180118085628.40798-2-borntraeger@de.ibm.com>
-	<8c31b940-cc9e-d410-0e0d-46e6dc4c84f0@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 22 Jan 2018 09:31:43 +0100
+	(envelope-from <peterx@redhat.com>) id 1edXhB-0001zj-7H
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:43:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:28199)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1edXhB-0001zH-0y
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:43:13 -0500
+Date: Mon, 22 Jan 2018 16:42:56 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180122084256.GE29532@xz-mi>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-21-peterx@redhat.com>
+	<20180109134528.GE31400@stefanha-x1.localdomain>
+	<20180112061610.GL2551@xz-mi>
+	<20180112142036.GC11423@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <8c31b940-cc9e-d410-0e0d-46e6dc4c84f0@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <5450c5b0-8079-e562-3ecd-86e293bcf0b3@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/3] header sync
+Content-Disposition: inline
+In-Reply-To: <20180112142036.GC11423@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v6 20/27] qmp: export qmp_dispatch_check_obj
+ and allow "id"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,94 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-kernel patch has now landed as 
-
-commit 35b3fde6203b932b2b1a5b53b3d8808abc9c4f60
-    KVM: s390: wire up bpb feature
-
-in Linus tree.
-
-
-The new number is
-#define KVM_CAP_S390_BPB 152
-(instead of 151)
-    
-
-
-
-
-On 01/18/2018 12:42 PM, David Hildenbrand wrote:
-> On 18.01.2018 09:56, Christian Borntraeger wrote:
->> replace with proper header sync
->>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  linux-headers/asm-s390/kvm.h | 9 ++++-----
->>  linux-headers/linux/kvm.h    | 5 +++--
->>  2 files changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
->> index 32d372e..11def14 100644
->> --- a/linux-headers/asm-s390/kvm.h
->> +++ b/linux-headers/asm-s390/kvm.h
->> @@ -6,10 +6,6 @@
->>   *
->>   * Copyright IBM Corp. 2008
->>   *
->> - * This program is free software; you can redistribute it and/or modify
->> - * it under the terms of the GNU General Public License (version 2 only)
->> - * as published by the Free Software Foundation.
->> - *
->>   *    Author(s): Carsten Otte <cotte@de.ibm.com>
->>   *               Christian Borntraeger <borntraeger@de.ibm.com>
->>   */
->> @@ -228,6 +224,7 @@ struct kvm_guest_debug_arch {
->>  #define KVM_SYNC_RICCB  (1UL << 7)
->>  #define KVM_SYNC_FPRS   (1UL << 8)
->>  #define KVM_SYNC_GSCB   (1UL << 9)
->> +#define KVM_SYNC_BPBC   (1UL << 10)
->>  /* length and alignment of the sdnx as a power of two */
->>  #define SDNXC 8
->>  #define SDNXL (1UL << SDNXC)
->> @@ -251,7 +248,9 @@ struct kvm_sync_regs {
->>  	};
->>  	__u8  reserved[512];	/* for future vector expansion */
->>  	__u32 fpc;		/* valid on KVM_SYNC_VRS or KVM_SYNC_FPRS */
->> -	__u8 padding1[52];	/* riccb needs to be 64byte aligned */
->> +	__u8 bpbc : 1;		/* bp mode */
->> +	__u8 reserved2 : 7;
->> +	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
->>  	__u8 riccb[64];		/* runtime instrumentation controls block */
->>  	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
->>  	union {
->> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
->> index ce6c2f1..b4503d8 100644
->> --- a/linux-headers/linux/kvm.h
->> +++ b/linux-headers/linux/kvm.h
->> @@ -630,9 +630,9 @@ struct kvm_s390_irq {
->>  
->>  struct kvm_s390_irq_state {
->>  	__u64 buf;
->> -	__u32 flags;
->> +	__u32 flags;        /* will stay unused for compatibility reasons */
->>  	__u32 len;
->> -	__u32 reserved[4];
->> +	__u32 reserved[4];  /* will stay unused for compatibility reasons */
->>  };
->>  
->>  /* for KVM_SET_GUEST_DEBUG */
->> @@ -932,6 +932,7 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_HYPERV_SYNIC2 148
->>  #define KVM_CAP_HYPERV_VP_INDEX 149
->>  #define KVM_CAP_S390_AIS_MIGRATION 150
->> +#define KVM_CAP_S390_BPB 151
->>  
->>  #ifdef KVM_CAP_IRQ_ROUTING
->>  
->>
+On Fri, Jan 12, 2018 at 02:20:36PM +0000, Stefan Hajnoczi wrote:
+> On Fri, Jan 12, 2018 at 02:16:10PM +0800, Peter Xu wrote:
+> > On Tue, Jan 09, 2018 at 01:45:28PM +0000, Stefan Hajnoczi wrote:
+> > > On Tue, Dec 19, 2017 at 04:45:50PM +0800, Peter Xu wrote:
+> > > > We need this for earlier check for OOB, before reaching
+> > > > do_qmp_dispatch().  Meanwhile, a small touch-up to allow "id" field,
+> > > > after all we allow that for sure in the spec (in any form).
+> > > 
+> > > This change would be better as part of the patch that needs it.  I don't
+> > > understand the commit description and there is no context in this patch
+> > > showing how this change is used.
+> > 
+> > Maybe I should mention it explicitly that "it'll be used in the
+> > following up patch".
+> > 
+> > Logically I think this has nothing to do with OOB so I splitted it
+> > out.  I would prefer it to be a separate patch (though I can enrich
+> > the commit message).  Or, I'm also fine if you think squashing this
+> > into next would be nicer.  Thanks,
 > 
-> Acked-by: David Hildenbrand <david@redhat.com>
-> 
+> I didn't understand the patch in isolation.  Maybe rephrasing the commit
+> description would help.  My suggestion to squash it means there will be
+> more context to review this change and hopefully it will become
+> self-explanatory.
+
+Let me squash it. :-) And, sorry for the confusion.  Thanks,
+
+-- 
+Peter Xu
