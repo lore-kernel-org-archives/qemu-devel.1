@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1edkHz-000707-GH
+	(envelope-from <mreitz@redhat.com>) id 1edkHz-0006zn-7B
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:10:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1edkHy-0003zV-DO
+	(envelope-from <mreitz@redhat.com>) id 1edkHx-0003zE-Pk
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:10:03 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 22 Jan 2018 23:08:01 +0100
-Message-Id: <20180122220806.22154-12-mreitz@redhat.com>
+Date: Mon, 22 Jan 2018 23:08:00 +0100
+Message-Id: <20180122220806.22154-11-mreitz@redhat.com>
 In-Reply-To: <20180122220806.22154-1-mreitz@redhat.com>
 References: <20180122220806.22154-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/16] block/dirty-bitmap: Add
- bdrv_dirty_iter_next_area
+Subject: [Qemu-devel] [PATCH v2 10/16] hbitmap: Add @advance param to
+ hbitmap_iter_next()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +23,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This new function allows to look for a consecutively dirty area in a
-dirty bitmap.
+This new parameter allows the caller to just query the next dirty
+position without moving the iterator.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/dirty-bitmap.h |  2 ++
- block/dirty-bitmap.c         | 51 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ include/qemu/hbitmap.h |  5 ++++-
+ block/backup.c         |  2 +-
+ block/dirty-bitmap.c   |  2 +-
+ tests/test-hbitmap.c   | 26 +++++++++++++-------------
+ util/hbitmap.c         | 10 +++++++---
+ 5 files changed, 26 insertions(+), 19 deletions(-)
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index a591c27213..35f3ccc44c 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -79,6 +79,8 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t offset, int64_t bytes);
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
-+bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
-+                               uint64_t *offset, int *bytes);
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 6b6490ecad..ddca52c48e 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -324,11 +324,14 @@ void hbitmap_free_meta(HBitmap *hb);
+ /**
+  * hbitmap_iter_next:
+  * @hbi: HBitmapIter to operate on.
++ * @advance: If true, advance the iterator.  Otherwise, the next call
++ *           of this function will return the same result (if that
++ *           position is still dirty).
+  *
+  * Return the next bit that is set in @hbi's associated HBitmap,
+  * or -1 if all remaining bits are zero.
+  */
+-int64_t hbitmap_iter_next(HBitmapIter *hbi);
++int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
+ 
+ /**
+  * hbitmap_iter_next_word:
+diff --git a/block/backup.c b/block/backup.c
+index 4a16a37229..c083ce0deb 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -368,7 +368,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+     HBitmapIter hbi;
+ 
+     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
+-    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
++    while ((cluster = hbitmap_iter_next(&hbi, true)) != -1) {
+         do {
+             if (yield_and_check(job)) {
+                 return 0;
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 50564fa1e2..484b5dda43 100644
+index 7879d13ddb..50564fa1e2 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -501,6 +501,57 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
-     return hbitmap_iter_next(&iter->hbi, true);
+@@ -498,7 +498,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
+ 
+ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+ {
+-    return hbitmap_iter_next(&iter->hbi);
++    return hbitmap_iter_next(&iter->hbi, true);
  }
  
-+/**
-+ * Return the next consecutively dirty area in the dirty bitmap
-+ * belonging to the given iterator @iter.
-+ *
-+ * @max_offset: Maximum value that may be returned for
-+ *              *offset + *bytes
-+ * @offset:     Will contain the start offset of the next dirty area
-+ * @bytes:      Will contain the length of the next dirty area
-+ *
-+ * Returns: True if a dirty area could be found before max_offset
-+ *          (which means that *offset and *bytes then contain valid
-+ *          values), false otherwise.
-+ */
-+bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
-+                               uint64_t *offset, int *bytes)
-+{
-+    uint32_t granularity = bdrv_dirty_bitmap_granularity(iter->bitmap);
-+    uint64_t gran_max_offset;
-+    int64_t ret;
-+    int size;
-+
-+    if (max_offset == iter->bitmap->size) {
-+        /* If max_offset points to the image end, round it up by the
-+         * bitmap granularity */
-+        gran_max_offset = ROUND_UP(max_offset, granularity);
-+    } else {
-+        gran_max_offset = max_offset;
-+    }
-+
-+    ret = hbitmap_iter_next(&iter->hbi, false);
-+    if (ret < 0 || ret + granularity > gran_max_offset) {
-+        return false;
-+    }
-+
-+    *offset = ret;
-+    size = 0;
-+
-+    assert(granularity <= INT_MAX);
-+
-+    do {
-+        /* Advance iterator */
-+        ret = hbitmap_iter_next(&iter->hbi, true);
-+        size += granularity;
-+    } while (ret + granularity <= gran_max_offset &&
-+             hbitmap_iter_next(&iter->hbi, false) == ret + granularity &&
-+             size <= INT_MAX - granularity);
-+
-+    *bytes = MIN(size, max_offset - *offset);
-+    return true;
-+}
-+
  /* Called within bdrv_dirty_bitmap_lock..unlock */
- void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t offset, int64_t bytes)
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index 9091c639b3..2a2aa5bd43 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
+ 
+     i = first;
+     for (;;) {
+-        next = hbitmap_iter_next(&hbi);
++        next = hbitmap_iter_next(&hbi, true);
+         if (next < 0) {
+             next = data->size;
+         }
+@@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
+     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
+     hbitmap_test_init(data, 131072 << 7, 7);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_test_set(data, (131072 << 7) - 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ }
+ 
+ static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
+@@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
+     for (i = 0; i < num_positions; i++) {
+         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
+         hbitmap_iter_init(&iter, data->hb, 0);
+-        next = hbitmap_iter_next(&iter);
++        next = hbitmap_iter_next(&iter, true);
+         if (i == num_positions - 1) {
+             g_assert_cmpint(next, ==, -1);
+         } else {
+@@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+ 
+     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
+ 
+-    hbitmap_iter_next(&hbi);
++    hbitmap_iter_next(&hbi, true);
+ 
+     hbitmap_reset_all(data->hb);
+-    hbitmap_iter_next(&hbi);
++    hbitmap_iter_next(&hbi, true);
+ }
+ 
+ static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 289778a55c..ceb7b75bc6 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -141,7 +141,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
+     return cur;
+ }
+ 
+-int64_t hbitmap_iter_next(HBitmapIter *hbi)
++int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
+ {
+     unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
+             hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
+@@ -154,8 +154,12 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi)
+         }
+     }
+ 
+-    /* The next call will resume work from the next bit.  */
+-    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
++    if (advance) {
++        /* The next call will resume work from the next bit.  */
++        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
++    } else {
++        hbi->cur[HBITMAP_LEVELS - 1] = cur;
++    }
+     item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
+ 
+     return item << hbi->granularity;
 -- 
 2.14.3
