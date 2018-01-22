@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eddCo-00012K-4Y
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:36:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eddF2-0001rk-Gx
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:38:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eddCl-00016C-Fa
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:36:14 -0500
-Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:35210)
+	(envelope-from <peter.maydell@linaro.org>) id 1eddF1-0003Sx-5l
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:38:32 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:47042)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eddCl-00015X-7P
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:36:11 -0500
-Received: by mail-pg0-x229.google.com with SMTP id o13so2096476pgs.2
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 06:36:10 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-References: <1516326941-11832-1-git-send-email-minyard@acm.org>
-	<20180119051309-mutt-send-email-mst@kernel.org>
-	<19605015-5d30-f91e-3344-32ae4555a7dd@acm.org>
-	<3dc61d47-9315-0d59-912d-9952cbff970c@acm.org>
-	<c027971f-e8e0-2cb1-4411-1cf93dc03eb4@reactos.org>
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <e5713994-931a-d69d-b909-2af9fbb28a53@acm.org>
-Date: Mon, 22 Jan 2018 08:36:06 -0600
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eddF0-0003SX-Ts
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:38:31 -0500
+Received: by mail-oi0-x242.google.com with SMTP id d124so6039869oib.13
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 06:38:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c027971f-e8e0-2cb1-4411-1cf93dc03eb4@reactos.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH] Revert "smbus: do not immediately complete
- commands"
+In-Reply-To: <20180119045438.28582-13-richard.henderson@linaro.org>
+References: <20180119045438.28582-1-richard.henderson@linaro.org>
+	<20180119045438.28582-13-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jan 2018 14:38:09 +0000
+Message-ID: <CAFEAcA9iqVP5FTwy=dbPrtUTWNaH0t16TvbyYAzZXj_cnGpkYg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 12/16] target/arm: Add ZCR_ELx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,124 +29,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Corey Minyard <cminyard@mvista.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/21/2018 11:36 AM, Hervé Poussineau wrote:
-> Le 19/01/2018 à 22:15, Corey Minyard a écrit :
->> On 01/19/2018 08:07 AM, Corey Minyard wrote:
->>> On 01/18/2018 09:17 PM, Michael S. Tsirkin wrote:
->>>> On Thu, Jan 18, 2018 at 07:55:41PM -0600, minyard@acm.org wrote:
->>>>> From: Corey Minyard <cminyard@mvista.com>
->>>>>
->>>>> This reverts commit 880b1ffe6ec2f0ae25cc4175716227ad275e8b8a.
->>>>>
->>>>> The commit being reverted says:
->>>>>
->>>>>      PIIX4 errata says that "immediate polling of the Host Status 
->>>>> Register BUSY
->>>>>      bit may indicate that the SMBus is NOT busy."
->>>>>      Due to this, some code does the following steps:
->>>>>      (a) set parameters
->>>>>      (b) start command
->>>>>      (c) check for smbus busy bit set (to know that command started)
->>>>>      (d) check for smbus busy bit not set (to know that command 
->>>>> finished)
->>>>>
->>>>>      Let (c) happen, by immediately setting the busy bit, and 
->>>>> really executing
->>>>>      the command when status register has been read once.
->>>>>
->>>>>      This fixes a problem with AMIBIOS, which can now properly 
->>>>> initialize the
->>>>>      PIIX4.
->>>>>
->>>>> Emulating bad hardware so badly written software will work doesn't 
->>>>> sound
->>>>> like a good idea to me.  I have patches that add interrupt capability
->>>>> to pm_smbus, but this change breaks that because the Linux driver
->>>>> starts the transaction then waits for interrupts before reading the
->>>>> status register.  That obviously won't work with these changes.
->>>>>
->>>>> The right way to fix this in AMIBIOS is to ignore the host busy bit
->>>>> and use the other bits in the host status register to tell if the
->>>>> transaction has completed.  Using host busy is racy, anyway, if you
->>>>> get interrupted or something while processing, you may miss step (c)
->>>>> in your algorithm and fail.
->>>>>
->>>>> Cc: Hervé Poussineau <hpoussin@reactos.org>
->>>>> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->>>> Would it be possible to limit the change to when guest uses
->>>> interrupts?
->>>
->>> I did think about that, but it seems rather frail.  What if another 
->>> piece of software
->>> does this but has the interrupt enable bit set?  And AMIBIOS is 
->>> still broken doing
->>> that algorithm on real hardware.  If you get a bus collision, for 
->>> instance, that will
->>> be almost instantaneous and the firmware is likely to miss it.
->>>
->>> The 82801 documentation is pretty clear that you should use the INTR 
->>> and error
->>> bits in the status register to know if a transaction is complete.
->>>
->>> If you really want to emulate real hardware, I guess the right way 
->>> to do this
->>> would be to add a delay between the start bit being set and the 
->>> transaction
->>> being done.  I'm not sure how timers work with vmstate, I'd have to 
->>> look at
->>> that.
->>
->> I realized that the timer is not going to be able to correctly work 
->> around the
->> AMIBIOS.  It would probably work most of the time, but if qemu got 
->> switched
->> out, then switched back and the timer went off before the guest was 
->> allowed
->> to run, then you would have the same issue.
->>
->> Also, looking at a more complete implementation of the pm_smbus device,
->> using the host busy bit to know when to start the transaction won't 
->> work,
->> that bit also does other things when doing byte at a time block 
->> transfers.
->> So a separate bool is needed to know when to do this.
+On 19 January 2018 at 04:54, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Define ZCR_EL[1-3].
 >
-> AMIBIOS can't be fixed to do the right thing.
-
-That's a real bummer.
-
-> My first implementation of this patch was using a timer, and it was 
-> working quite well.
-> I don't think that smbus is very latency-sensitive, so I think a timer 
-> is a valid
-> solution to this problem. If a timer also works for your use case, 
-> I'll be happy with it.
-
-A timer is not a 100% guaranteed solution.  It should work most of the 
-time, but if you
-get a situation like I describe above, it is possible for the BIOS to 
-miss the setting of the
-busy bit.
-
-I've modified my code that adds interrupts to use your solution only 
-when interrupts are
-disabled  Unfortunately, the current pm_smbus.c code is a fairly 
-incomplete implementation
-of the device, so I can't do a patch to the main tree for that change.
-
--corey
-
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h    |  5 ++++
+>  target/arm/helper.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 85 insertions(+)
 >
-> See my patch proposal to use a timer instead. Does it fit your needs?
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 0a923e42d8..c8e8155b6e 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -547,6 +547,9 @@ typedef struct CPUARMState {
+>           */
+>          float_status fp_status;
+>          float_status standard_fp_status;
+> +
+> +        /* ZCR_EL[1-3] */
+> +        uint64_t zcr_el[4];
+>      } vfp;
+>      uint64_t exclusive_addr;
+>      uint64_t exclusive_val;
+> @@ -921,6 +924,8 @@ void pmccntr_sync(CPUARMState *env);
+>  #define CPTR_TCPAC    (1U << 31)
+>  #define CPTR_TTA      (1U << 20)
+>  #define CPTR_TFP      (1U << 10)
+> +#define CPTR_TZ       (1U << 8)   /* CPTR_EL2 */
+> +#define CPTR_EZ       (1U << 8)   /* CPTR_EL3 */
 >
-> An improvement might be to execute the command either on the timer or 
-> when the guest
-> reads the host status register.
+>  #define MDCR_EPMAD    (1U << 21)
+>  #define MDCR_EDAD     (1U << 20)
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 6705903301..984a4b1306 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -4266,6 +4266,82 @@ static const ARMCPRegInfo debug_lpae_cp_reginfo[] = {
+>      REGINFO_SENTINEL
+>  };
 >
-> Regards,
+> +/* Return the exception level to which SVE-disabled exceptions should
+> + * be taken, or 0 if SVE is enabled.
+> + */
+> +static int sve_exception_el(CPUARMState *env)
+> +{
+> +#ifndef CONFIG_USER_ONLY
+> +    int highest_el = arm_highest_el(env);
+> +    int current_el = arm_current_el(env);
+> +    int i;
+> +
+> +    for (i = highest_el; i >= MAX(1, current_el); --i) {
+
+This structure is a bit odd, because it doesn't account for the
+possibility that EL3 could be implemented but EL2 not. Usually
+these access checks are written as a series of if()s (see eg
+access_tda(), access_tpm()). Where the register bit defaults to
+the right thing for an unimplemented EL we can get away without
+the arm_feature(env, ARM_FEATURE_ELx) test.
+
+It also doesn't get the prioritization right if more than one
+trap bit is set. This is defined by "Synchronous exception
+prioritization for exceptions taken to AArch64" in the v8A Arm ARM,
+which says that exceptions taken to EL2 because of CPTR_EL2
+bits take precedence over taking an exception to EL3 because
+of CPTR_EL3 bits (items 10 and 15 in the list), and taking
+the exception to EL1 because of CPACR_EL1 takes precedence
+over both (item 8).
+
+> +        switch (i) {
+> +        case 3:
+> +            if ((env->cp15.cptr_el[3] & CPTR_EZ) == 0) {
+> +                return 3;
+> +            }
+> +            break;
+> +        case 2:
+> +            if (env->cp15.cptr_el[2] & CPTR_TZ) {
+> +                return 2;
+> +            }
+
+You need to check that we're in NonSecure before honouring
+this trap bit, otherwise Secure EL1/EL0 would trap to EL2.
+
+> +            break;
+> +        case 1:
+> +            switch (extract32(env->cp15.cpacr_el1, 16, 2)) {
+> +            case 1:
+> +                return current_el == 0 ? 1 : 0;
+> +            case 3:
+> +                return 0;
+> +            default:
+> +                return 1;
+> +            }
+> +        }
+> +    }
+> +#endif
+> +    return 0;
+> +}
+> +
+> +static CPAccessResult zcr_access(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                                 bool isread)
+> +{
+> +    switch (sve_exception_el(env)) {
+> +    case 3:
+> +        return CP_ACCESS_TRAP_EL3;
+> +    case 2:
+> +        return CP_ACCESS_TRAP_EL2;
+> +    case 1:
+> +        return CP_ACCESS_TRAP;
+> +    }
+> +    return CP_ACCESS_OK;
+> +}
+> +
+> +static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                      uint64_t value)
+> +{
+> +    /* Bits other than [3:0] are RAZ/WI.  */
+> +    raw_write(env, ri, value & 0xf);
+> +}
+> +
+> +static const ARMCPRegInfo sve_cp_reginfo[] = {
+> +    { .name = "ZCR_EL1", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 2, .opc1 = 0, .crn = 1, .crm = 2, .opc2 = 0,
+
+Are you sure the encodings are right here? My docs say opc0 == 3
+for all of these.
+
+> +      .access = PL1_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
+> +      .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[1]),
+> +      .writefn = zcr_write, .raw_writefn = raw_write, },
+> +    { .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 2, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
+> +      .access = PL2_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
+> +      .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[2]),
+> +      .writefn = zcr_write, .raw_writefn = raw_write, },
+> +    { .name = "ZCR_EL3", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 2, .opc1 = 6, .crn = 1, .crm = 2, .opc2 = 0,
+> +      .access = PL1_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
+
+Shouldn't this be PL3_RW ? At any rate you need something to
+stop NS EL1 and EL2 from being able to access it.
+
+> +      .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[3]),
+> +      .writefn = zcr_write, .raw_writefn = raw_write, },
+> +};
+> +
+>  void hw_watchpoint_update(ARMCPU *cpu, int n)
+>  {
+>      CPUARMState *env = &cpu->env;
+> @@ -5332,6 +5408,10 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>          }
+>          define_one_arm_cp_reg(cpu, &sctlr);
+>      }
+> +
+> +    if (arm_feature(env, ARM_FEATURE_SVE)) {
+> +        define_arm_cp_regs(cpu, sve_cp_reginfo);
+> +    }
+>  }
 >
-> Hervé
+>  void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
+> --
+> 2.14.3
+
+thanks
+-- PMM
