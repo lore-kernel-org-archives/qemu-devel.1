@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1edWS5-00064b-Ts
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:23:34 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1edWWb-0007Ox-S8
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:28:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1edWS5-00028K-4f
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:23:33 -0500
-From: Lin Ma <lma@suse.com>
-Date: Mon, 22 Jan 2018 15:21:02 +0800
-Message-Id: <20180122072102.4141-1-lma@suse.com>
-Subject: [Qemu-devel] [PATCH] raw: Disable probing if image format is given
- by driver-specific options
+	(envelope-from <jianjay.zhou@huawei.com>) id 1edWWY-0006BD-Mx
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:28:13 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2311 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1edWWY-00068i-Cd
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:28:10 -0500
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Mon, 22 Jan 2018 07:27:59 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7473AB57547@DGGEMM505-MBS.china.huawei.com>
+References: <cover.1515724314.git.jianjay.zhou@huawei.com>
+	<20180116064025-mutt-send-email-mst@kernel.org>
+	<B2D15215269B544CADD246097EACE7473AB45B31@DGGEMM505-MBS.china.huawei.com>
+	<20180119215042-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180119215042-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] vhost: two fixes and used_memslots
+ refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,35 +32,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
 
-If the user specifies image format through driver-specific options, The
-format probing should be prohibited and the warning message should not
-be printed.
+> So please simply rebase on top of master now.
+>=20
 
-e.g.:
-$ qemu-system-x86_64 ... -drive file.file.filename=disk0.raw,file.driver=raw ...
-WARNING: Image format was not specified for 'disk0.raw' and probing guessed raw.
-         Automatically detecting the format is dangerous for raw images, ...
+Hi Michael,
+Having done that and pls help to review again.
 
-Signed-off-by: Lin Ma <lma@suse.com>
----
- blockdev.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/blockdev.c b/blockdev.c
-index 29d569a24e..ef4c167235 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -529,6 +529,8 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
-             goto early_err;
-         }
-         qdict_put_str(bs_opts, "driver", buf);
-+    } else if (qdict_haskey(bs_opts, "file.driver")) {
-+        qdict_put_str(bs_opts, "driver", qdict_get_str(bs_opts, "file.driver"));
-     }
- 
-     on_write_error = BLOCKDEV_ON_ERROR_ENOSPC;
--- 
-2.15.1
+Regards,
+Jay
