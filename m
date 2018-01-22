@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT0T-0005Yb-P2
+	(envelope-from <richard.henderson@linaro.org>) id 1edT0P-0005Uy-QE
 	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT0Q-0006Vd-Gq
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:49 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:42344)
+	(envelope-from <richard.henderson@linaro.org>) id 1edT0M-0006Pt-Qm
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:45 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:46296)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1edT0Q-0006UW-9K
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:46 -0500
-Received: by mail-pg0-x243.google.com with SMTP id q67so6080458pga.9
-	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:42:46 -0800 (PST)
+	id 1edT0M-0006Ov-Ff
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:42 -0500
+Received: by mail-pg0-x241.google.com with SMTP id s9so6073896pgq.13
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:42:42 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 21 Jan 2018 19:41:51 -0800
-Message-Id: <20180122034217.19593-18-richard.henderson@linaro.org>
+Date: Sun, 21 Jan 2018 19:41:48 -0800
+Message-Id: <20180122034217.19593-15-richard.henderson@linaro.org>
 In-Reply-To: <20180122034217.19593-1-richard.henderson@linaro.org>
 References: <20180122034217.19593-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 17/43] target/hppa: Implement tlb_fill
+Subject: [Qemu-devel] [PULL 14/43] target/hppa: Use space registers in data
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,271 +30,743 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-However since HPPA has a software-managed TLB, and the relevant
-TLB manipulation instructions are not implemented, this does not
-actually do anything.
+This changes the system virtual address width to 64-bit and
+incorporates the space registers into load/store operations.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h        |  29 ++++++++-
- target/hppa/int_helper.c |  12 ++++
- target/hppa/mem_helper.c | 149 +++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 184 insertions(+), 6 deletions(-)
+ target/hppa/cpu.h       |  14 ++
+ target/hppa/translate.c | 334 +++++++++++++++++++++++++++---------------------
+ 2 files changed, 201 insertions(+), 147 deletions(-)
 
 diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index d583ea43dd..c7a2fb5b20 100644
+index 6ec3430ae3..94f9c8ca2b 100644
 --- a/target/hppa/cpu.h
 +++ b/target/hppa/cpu.h
-@@ -165,6 +165,22 @@ typedef int64_t  target_sreg;
- #define TREG_FMT_ld   "%"PRId64
- #endif
+@@ -23,10 +23,24 @@
+ #include "qemu-common.h"
+ #include "cpu-qom.h"
  
-+typedef struct {
-+    uint64_t va_b;
-+    uint64_t va_e;
-+    target_ureg pa;
-+    unsigned u : 1;
-+    unsigned t : 1;
-+    unsigned d : 1;
-+    unsigned b : 1;
-+    unsigned page_size : 4;
-+    unsigned ar_type : 3;
-+    unsigned ar_pl1 : 2;
-+    unsigned ar_pl2 : 2;
-+    unsigned entry_valid : 1;
-+    unsigned access_id : 16;
-+} hppa_tlb_entry;
-+
- struct CPUHPPAState {
-     target_ureg gr[32];
-     uint64_t fr[32];
-@@ -198,6 +214,12 @@ struct CPUHPPAState {
- 
-     /* Those resources are used only in QEMU core */
-     CPU_COMMON
-+
-+    /* ??? The number of entries isn't specified by the architecture.  */
-+    /* ??? Implement a unified itlb/dtlb for the moment.  */
-+    /* ??? We should use a more intelligent data structure.  */
-+    hppa_tlb_entry tlb[256];
-+    uint32_t tlb_last;
- };
- 
- /**
-@@ -307,12 +329,17 @@ void cpu_hppa_loaded_fr0(CPUHPPAState *env);
- #define cpu_signal_handler cpu_hppa_signal_handler
- 
- int cpu_hppa_signal_handler(int host_signum, void *pinfo, void *puc);
--int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw, int midx);
- hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr);
- int hppa_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int hppa_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- void hppa_cpu_do_interrupt(CPUState *cpu);
- bool hppa_cpu_exec_interrupt(CPUState *cpu, int int_req);
- void hppa_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function, int);
-+#ifdef CONFIG_USER_ONLY
-+int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw, int midx);
++#ifdef TARGET_HPPA64
++#define TARGET_LONG_BITS            64
++#define TARGET_VIRT_ADDR_SPACE_BITS 64
++#define TARGET_REGISTER_BITS        64
++#define TARGET_PHYS_ADDR_SPACE_BITS 64
++#elif defined(CONFIG_USER_ONLY)
+ #define TARGET_LONG_BITS            32
+ #define TARGET_VIRT_ADDR_SPACE_BITS 32
+ #define TARGET_REGISTER_BITS        32
+ #define TARGET_PHYS_ADDR_SPACE_BITS 32
 +#else
-+int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-+                              MMUAccessType type, hwaddr *pphys, int *pprot);
++/* In order to form the GVA from space:offset,
++   we need a 64-bit virtual address space.  */
++#define TARGET_LONG_BITS            64
++#define TARGET_VIRT_ADDR_SPACE_BITS 64
++#define TARGET_REGISTER_BITS        32
++#define TARGET_PHYS_ADDR_SPACE_BITS 32
 +#endif
  
- #endif /* HPPA_CPU_H */
-diff --git a/target/hppa/int_helper.c b/target/hppa/int_helper.c
-index 297aa62c24..e66ca26941 100644
---- a/target/hppa/int_helper.c
-+++ b/target/hppa/int_helper.c
-@@ -78,12 +78,24 @@ void hppa_cpu_do_interrupt(CPUState *cs)
-         {
-             /* Avoid reading directly from the virtual address, lest we
-                raise another exception from some sort of TLB issue.  */
-+            /* ??? An alternate fool-proof method would be to store the
-+               instruction data into the unwind info.  That's probably
-+               a bit too much in the way of extra storage required.  */
-             vaddr vaddr;
-             hwaddr paddr;
+ #define CPUArchState struct CPUHPPAState
  
-             paddr = vaddr = iaoq_f & -4;
-             if (old_psw & PSW_C) {
-+                int prot, t;
-+
-                 vaddr = hppa_form_gva_psw(old_psw, iasq_f, iaoq_f & -4);
-+                t = hppa_get_physical_address(env, vaddr, 0, MMU_INST_FETCH,
-+                                              &paddr, &prot);
-+                if (t >= 0) {
-+                    /* We can't re-load the instruction.  */
-+                    env->cr[CR_IIR] = 0;
-+                    break;
-+                }
-             }
-             env->cr[CR_IIR] = ldl_phys(cs->as, paddr);
-         }
-diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index 1afaf89539..4e92e35957 100644
---- a/target/hppa/mem_helper.c
-+++ b/target/hppa/mem_helper.c
-@@ -36,18 +36,157 @@ int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
-     return 1;
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 58837044a6..0650c3e14e 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -272,8 +272,9 @@ typedef struct DisasContext {
+     target_ureg iaoq_n;
+     TCGv_reg iaoq_n_var;
+ 
+-    int ntemps;
+-    TCGv_reg temps[8];
++    int ntempr, ntempl;
++    TCGv_reg tempr[4];
++    TCGv_tl  templ[4];
+ 
+     DisasCond null_cond;
+     TCGLabel *null_lab;
+@@ -454,11 +455,20 @@ static void cond_free(DisasCond *cond)
+ 
+ static TCGv_reg get_temp(DisasContext *ctx)
+ {
+-    unsigned i = ctx->ntemps++;
+-    g_assert(i < ARRAY_SIZE(ctx->temps));
+-    return ctx->temps[i] = tcg_temp_new();
++    unsigned i = ctx->ntempr++;
++    g_assert(i < ARRAY_SIZE(ctx->tempr));
++    return ctx->tempr[i] = tcg_temp_new();
  }
- #else
-+static hppa_tlb_entry *hppa_find_tlb(CPUHPPAState *env, vaddr addr)
+ 
++#ifndef CONFIG_USER_ONLY
++static TCGv_tl get_temp_tl(DisasContext *ctx)
 +{
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(env->tlb); ++i) {
-+        hppa_tlb_entry *ent = &env->tlb[i];
-+        if (ent->va_b <= addr && addr <= ent->va_e && ent->entry_valid) {
-+            return ent;
-+        }
-+    }
-+    return NULL;
++    unsigned i = ctx->ntempl++;
++    g_assert(i < ARRAY_SIZE(ctx->templ));
++    return ctx->templ[i] = tcg_temp_new_tl();
 +}
++#endif
 +
-+int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-+                              MMUAccessType type, hwaddr *pphys, int *pprot)
+ static TCGv_reg load_const(DisasContext *ctx, target_sreg v)
+ {
+     TCGv_reg t = get_temp(ctx);
+@@ -1313,6 +1323,70 @@ static DisasJumpType do_unit(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+     return DISAS_NEXT;
+ }
+ 
++#ifndef CONFIG_USER_ONLY
++/* Top 2 bits of the base register select sp[4-7].  */
++static TCGv_i64 space_select(DisasContext *ctx, int sp, TCGv_reg base)
 +{
-+    hwaddr phys;
-+    int prot, ret, r_prot, w_prot, x_prot, a_prot;
-+    bool ifetch = type == MMU_INST_FETCH;
-+    hppa_tlb_entry *ent;
++    TCGv_ptr ptr;
++    TCGv_reg tmp;
++    TCGv_i64 spc;
 +
-+    /* Virtual translation disabled.  Direct map virtual to physical.  */
-+    if (mmu_idx == MMU_PHYS_IDX) {
-+        phys = addr;
-+        prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-+        ret = -1;
-+        goto egress;
++    if (sp != 0) {
++        return cpu_sr[sp];
 +    }
 +
-+    /* Find a valid tlb entry that matches the virtual address.  */
-+    ent = hppa_find_tlb(env, addr);
-+    if (ent == NULL) {
-+        phys = 0;
-+        prot = 0;
-+        ret = (ifetch ? EXCP_ITLB_MISS : EXCP_DTLB_MISS);
-+        goto egress;
-+    }
++    ptr = tcg_temp_new_ptr();
++    tmp = tcg_temp_new();
++    spc = get_temp_tl(ctx);
 +
-+    /* We now know the physical address.  */
-+    phys = ent->pa + (addr & ~TARGET_PAGE_MASK);
++    tcg_gen_shri_reg(tmp, base, TARGET_REGISTER_BITS - 5);
++    tcg_gen_andi_reg(tmp, tmp, 030);
++    tcg_gen_trunc_reg_ptr(ptr, tmp);
++    tcg_temp_free(tmp);
 +
-+    /* Map TLB access_rights field to QEMU protection.  */
-+    r_prot = (mmu_idx <= ent->ar_pl1 ? PROT_READ : 0);
-+    w_prot = (mmu_idx <= ent->ar_pl2 ? PROT_WRITE : 0);
-+    x_prot = (ent->ar_pl2 <= mmu_idx && mmu_idx <= ent->ar_pl1 ? PROT_EXEC : 0);
-+    switch (ent->ar_type) {
-+    case 0: /* read-only: data page */
-+        prot = r_prot;
-+        break;
-+    case 1: /* read/write: dynamic data page */
-+        prot = r_prot | w_prot;
-+        break;
-+    case 2: /* read/execute: normal code page */
-+        prot = r_prot | x_prot;
-+        break;
-+    case 3: /* read/write/execute: dynamic code page */
-+        prot = r_prot | w_prot | x_prot;
-+        break;
-+    default: /* execute: promote to privilege level type & 3 */
-+        prot = x_prot;
-+    }
++    tcg_gen_add_ptr(ptr, ptr, cpu_env);
++    tcg_gen_ld_i64(spc, ptr, offsetof(CPUHPPAState, sr[4]));
++    tcg_temp_free_ptr(ptr);
 +
-+    /* ??? Check PSW_P and ent->access_prot.  This can remove PROT_WRITE.  */
++    return spc;
++}
++#endif
 +
-+    /* Map MMUAccessType to QEMU protection.  */
-+    if (ifetch) {
-+        a_prot = PROT_EXEC;
-+    } else if (type == MMU_DATA_STORE) {
-+        a_prot = PROT_WRITE;
++static void form_gva(DisasContext *ctx, TCGv_tl *pgva, TCGv_reg *pofs,
++                     unsigned rb, unsigned rx, int scale, target_sreg disp,
++                     unsigned sp, int modify, bool is_phys)
++{
++    TCGv_reg base = load_gpr(ctx, rb);
++    TCGv_reg ofs;
++
++    /* Note that RX is mutually exclusive with DISP.  */
++    if (rx) {
++        ofs = get_temp(ctx);
++        tcg_gen_shli_reg(ofs, cpu_gr[rx], scale);
++        tcg_gen_add_reg(ofs, ofs, base);
++    } else if (disp || modify) {
++        ofs = get_temp(ctx);
++        tcg_gen_addi_reg(ofs, base, disp);
 +    } else {
-+        a_prot = PROT_READ;
++        ofs = base;
 +    }
 +
-+    if (unlikely(!(prot & a_prot))) {
-+        /* The access isn't allowed -- Inst/Data Memory Protection Fault.  */
-+        ret = (ifetch ? EXCP_IMP : EXCP_DMP);
-+        goto egress;
++    *pofs = ofs;
++#ifdef CONFIG_USER_ONLY
++    *pgva = (modify <= 0 ? ofs : base);
++#else
++    TCGv_tl addr = get_temp_tl(ctx);
++    tcg_gen_extu_reg_tl(addr, modify <= 0 ? ofs : base);
++    if (ctx->base.tb->flags & PSW_W) {
++        tcg_gen_andi_tl(addr, addr, 0x3fffffffffffffffull);
 +    }
-+
-+    /* In reverse priority order, check for conditions which raise faults.
-+       As we go, remove PROT bits that cover the condition we want to check.
-+       In this way, the resulting PROT will force a re-check of the
-+       architectural TLB entry for the next access.  */
-+    ret = -1;
-+    if (unlikely(!ent->d)) {
-+        if (type == MMU_DATA_STORE) {
-+            /* The D bit is not set -- TLB Dirty Bit Fault.  */
-+            ret = EXCP_TLB_DIRTY;
-+        }
-+        prot &= PROT_READ | PROT_EXEC;
++    if (!is_phys) {
++        tcg_gen_or_tl(addr, addr, space_select(ctx, sp, base));
 +    }
-+    if (unlikely(ent->b)) {
-+        if (type == MMU_DATA_STORE) {
-+            /* The B bit is set -- Data Memory Break Fault.  */
-+            ret = EXCP_DMB;
-+        }
-+        prot &= PROT_READ | PROT_EXEC;
-+    }
-+    if (unlikely(ent->t)) {
-+        if (!ifetch) {
-+            /* The T bit is set -- Page Reference Fault.  */
-+            ret = EXCP_PAGE_REF;
-+        }
-+        prot &= PROT_EXEC;
-+    }
-+
-+ egress:
-+    *pphys = phys;
-+    *pprot = prot;
-+    return ret;
++    *pgva = addr;
++#endif
 +}
 +
- hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ /* Emit a memory load.  The modify parameter should be
+  * < 0 for pre-modify,
+  * > 0 for post-modify,
+@@ -1320,118 +1394,74 @@ static DisasJumpType do_unit(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+  */
+ static void do_load_32(DisasContext *ctx, TCGv_i32 dest, unsigned rb,
+                        unsigned rx, int scale, target_sreg disp,
+-                       int modify, TCGMemOp mop)
++                       unsigned sp, int modify, TCGMemOp mop)
  {
--    /* Stub */
--    return addr;
-+    HPPACPU *cpu = HPPA_CPU(cs);
-+    hwaddr phys;
-+    int prot, excp;
-+
-+    /* If the (data) mmu is disabled, bypass translation.  */
-+    /* ??? We really ought to know if the code mmu is disabled too,
-+       in order to get the correct debugging dumps.  */
-+    if (!(cpu->env.psw & PSW_D)) {
-+        return addr;
-+    }
-+
-+    excp = hppa_get_physical_address(&cpu->env, addr, MMU_KERNEL_IDX,
-+                                     MMU_DATA_LOAD, &phys, &prot);
-+
-+    /* Since we're translating for debugging, the only error that is a
-+       hard error is no translation at all.  Otherwise, while a real cpu
-+       access might not have permission, the debugger does.  */
-+    return excp == EXCP_DTLB_MISS ? -1 : phys;
+-    TCGv_reg addr, base;
++    TCGv_reg ofs;
++    TCGv_tl addr;
+ 
+     /* Caller uses nullify_over/nullify_end.  */
+     assert(ctx->null_cond.c == TCG_COND_NEVER);
+ 
+-    addr = tcg_temp_new();
+-    base = load_gpr(ctx, rb);
+-
+-    /* Note that RX is mutually exclusive with DISP.  */
+-    if (rx) {
+-        tcg_gen_shli_reg(addr, cpu_gr[rx], scale);
+-        tcg_gen_add_reg(addr, addr, base);
+-    } else {
+-        tcg_gen_addi_reg(addr, base, disp);
+-    }
+-
+-    if (modify == 0) {
+-        tcg_gen_qemu_ld_i32(dest, addr, ctx->mmu_idx, mop);
+-    } else {
+-        tcg_gen_qemu_ld_i32(dest, (modify < 0 ? addr : base),
+-                            ctx->mmu_idx, mop);
+-        save_gpr(ctx, rb, addr);
++    form_gva(ctx, &addr, &ofs, rb, rx, scale, disp, sp, modify,
++             ctx->mmu_idx == MMU_PHYS_IDX);
++    tcg_gen_qemu_ld_reg(dest, addr, ctx->mmu_idx, mop);
++    if (modify) {
++        save_gpr(ctx, rb, ofs);
+     }
+-    tcg_temp_free(addr);
  }
  
- void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType type,
-               int mmu_idx, uintptr_t retaddr)
+ static void do_load_64(DisasContext *ctx, TCGv_i64 dest, unsigned rb,
+                        unsigned rx, int scale, target_sreg disp,
+-                       int modify, TCGMemOp mop)
++                       unsigned sp, int modify, TCGMemOp mop)
  {
--    /* Stub */
--    int prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
--    hwaddr phys = addr;
-+    HPPACPU *cpu = HPPA_CPU(cs);
-+    int prot, excp;
-+    hwaddr phys;
-+
-+    excp = hppa_get_physical_address(&cpu->env, addr, mmu_idx,
-+                                     type, &phys, &prot);
-+    if (unlikely(excp >= 0)) {
-+        /* Failure.  Raise the indicated exception.  */
-+        cs->exception_index = excp;
-+        /* ??? Needs tweaking for hppa64.  */
-+        cpu->env.cr[CR_IOR] = addr;
-+        cpu->env.cr[CR_ISR] = addr >> 32;
-+        cpu_loop_exit_restore(cs, retaddr);
-+    }
+-    TCGv_reg addr, base;
++    TCGv_reg ofs;
++    TCGv_tl addr;
  
-     /* Success!  Store the translation into the QEMU TLB.  */
-     tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
+     /* Caller uses nullify_over/nullify_end.  */
+     assert(ctx->null_cond.c == TCG_COND_NEVER);
+ 
+-    addr = tcg_temp_new();
+-    base = load_gpr(ctx, rb);
+-
+-    /* Note that RX is mutually exclusive with DISP.  */
+-    if (rx) {
+-        tcg_gen_shli_reg(addr, cpu_gr[rx], scale);
+-        tcg_gen_add_reg(addr, addr, base);
+-    } else {
+-        tcg_gen_addi_reg(addr, base, disp);
+-    }
+-
+-    if (modify == 0) {
+-        tcg_gen_qemu_ld_i64(dest, addr, ctx->mmu_idx, mop);
+-    } else {
+-        tcg_gen_qemu_ld_i64(dest, (modify < 0 ? addr : base),
+-                            ctx->mmu_idx, mop);
+-        save_gpr(ctx, rb, addr);
++    form_gva(ctx, &addr, &ofs, rb, rx, scale, disp, sp, modify,
++             ctx->mmu_idx == MMU_PHYS_IDX);
++    tcg_gen_qemu_ld_i64(dest, addr, ctx->mmu_idx, mop);
++    if (modify) {
++        save_gpr(ctx, rb, ofs);
+     }
+-    tcg_temp_free(addr);
+ }
+ 
+ static void do_store_32(DisasContext *ctx, TCGv_i32 src, unsigned rb,
+                         unsigned rx, int scale, target_sreg disp,
+-                        int modify, TCGMemOp mop)
++                        unsigned sp, int modify, TCGMemOp mop)
+ {
+-    TCGv_reg addr, base;
++    TCGv_reg ofs;
++    TCGv_tl addr;
+ 
+     /* Caller uses nullify_over/nullify_end.  */
+     assert(ctx->null_cond.c == TCG_COND_NEVER);
+ 
+-    addr = tcg_temp_new();
+-    base = load_gpr(ctx, rb);
+-
+-    /* Note that RX is mutually exclusive with DISP.  */
+-    if (rx) {
+-        tcg_gen_shli_reg(addr, cpu_gr[rx], scale);
+-        tcg_gen_add_reg(addr, addr, base);
+-    } else {
+-        tcg_gen_addi_reg(addr, base, disp);
+-    }
+-
+-    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
+-
+-    if (modify != 0) {
+-        save_gpr(ctx, rb, addr);
++    form_gva(ctx, &addr, &ofs, rb, rx, scale, disp, sp, modify,
++             ctx->mmu_idx == MMU_PHYS_IDX);
++    tcg_gen_qemu_st_i32(src, addr, ctx->mmu_idx, mop);
++    if (modify) {
++        save_gpr(ctx, rb, ofs);
+     }
+-    tcg_temp_free(addr);
+ }
+ 
+ static void do_store_64(DisasContext *ctx, TCGv_i64 src, unsigned rb,
+                         unsigned rx, int scale, target_sreg disp,
+-                        int modify, TCGMemOp mop)
++                        unsigned sp, int modify, TCGMemOp mop)
+ {
+-    TCGv_reg addr, base;
++    TCGv_reg ofs;
++    TCGv_tl addr;
+ 
+     /* Caller uses nullify_over/nullify_end.  */
+     assert(ctx->null_cond.c == TCG_COND_NEVER);
+ 
+-    addr = tcg_temp_new();
+-    base = load_gpr(ctx, rb);
+-
+-    /* Note that RX is mutually exclusive with DISP.  */
+-    if (rx) {
+-        tcg_gen_shli_reg(addr, cpu_gr[rx], scale);
+-        tcg_gen_add_reg(addr, addr, base);
+-    } else {
+-        tcg_gen_addi_reg(addr, base, disp);
+-    }
+-
+-    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
+-
+-    if (modify != 0) {
+-        save_gpr(ctx, rb, addr);
++    form_gva(ctx, &addr, &ofs, rb, rx, scale, disp, sp, modify,
++             ctx->mmu_idx == MMU_PHYS_IDX);
++    tcg_gen_qemu_st_i64(src, addr, ctx->mmu_idx, mop);
++    if (modify) {
++        save_gpr(ctx, rb, ofs);
+     }
+-    tcg_temp_free(addr);
+ }
+ 
+ #if TARGET_REGISTER_BITS == 64
+@@ -1444,7 +1474,7 @@ static void do_store_64(DisasContext *ctx, TCGv_i64 src, unsigned rb,
+ 
+ static DisasJumpType do_load(DisasContext *ctx, unsigned rt, unsigned rb,
+                              unsigned rx, int scale, target_sreg disp,
+-                             int modify, TCGMemOp mop)
++                             unsigned sp, int modify, TCGMemOp mop)
+ {
+     TCGv_reg dest;
+ 
+@@ -1457,7 +1487,7 @@ static DisasJumpType do_load(DisasContext *ctx, unsigned rt, unsigned rb,
+         /* Make sure if RT == RB, we see the result of the load.  */
+         dest = get_temp(ctx);
+     }
+-    do_load_reg(ctx, dest, rb, rx, scale, disp, modify, mop);
++    do_load_reg(ctx, dest, rb, rx, scale, disp, sp, modify, mop);
+     save_gpr(ctx, rt, dest);
+ 
+     return nullify_end(ctx, DISAS_NEXT);
+@@ -1465,14 +1495,14 @@ static DisasJumpType do_load(DisasContext *ctx, unsigned rt, unsigned rb,
+ 
+ static DisasJumpType do_floadw(DisasContext *ctx, unsigned rt, unsigned rb,
+                                unsigned rx, int scale, target_sreg disp,
+-                               int modify)
++                               unsigned sp, int modify)
+ {
+     TCGv_i32 tmp;
+ 
+     nullify_over(ctx);
+ 
+     tmp = tcg_temp_new_i32();
+-    do_load_32(ctx, tmp, rb, rx, scale, disp, modify, MO_TEUL);
++    do_load_32(ctx, tmp, rb, rx, scale, disp, sp, modify, MO_TEUL);
+     save_frw_i32(rt, tmp);
+     tcg_temp_free_i32(tmp);
+ 
+@@ -1485,14 +1515,14 @@ static DisasJumpType do_floadw(DisasContext *ctx, unsigned rt, unsigned rb,
+ 
+ static DisasJumpType do_floadd(DisasContext *ctx, unsigned rt, unsigned rb,
+                                unsigned rx, int scale, target_sreg disp,
+-                               int modify)
++                               unsigned sp, int modify)
+ {
+     TCGv_i64 tmp;
+ 
+     nullify_over(ctx);
+ 
+     tmp = tcg_temp_new_i64();
+-    do_load_64(ctx, tmp, rb, rx, scale, disp, modify, MO_TEQ);
++    do_load_64(ctx, tmp, rb, rx, scale, disp, sp, modify, MO_TEQ);
+     save_frd(rt, tmp);
+     tcg_temp_free_i64(tmp);
+ 
+@@ -1504,23 +1534,24 @@ static DisasJumpType do_floadd(DisasContext *ctx, unsigned rt, unsigned rb,
+ }
+ 
+ static DisasJumpType do_store(DisasContext *ctx, unsigned rt, unsigned rb,
+-                              target_sreg disp, int modify, TCGMemOp mop)
++                              target_sreg disp, unsigned sp,
++                              int modify, TCGMemOp mop)
+ {
+     nullify_over(ctx);
+-    do_store_reg(ctx, load_gpr(ctx, rt), rb, 0, 0, disp, modify, mop);
++    do_store_reg(ctx, load_gpr(ctx, rt), rb, 0, 0, disp, sp, modify, mop);
+     return nullify_end(ctx, DISAS_NEXT);
+ }
+ 
+ static DisasJumpType do_fstorew(DisasContext *ctx, unsigned rt, unsigned rb,
+                                 unsigned rx, int scale, target_sreg disp,
+-                                int modify)
++                                unsigned sp, int modify)
+ {
+     TCGv_i32 tmp;
+ 
+     nullify_over(ctx);
+ 
+     tmp = load_frw_i32(rt);
+-    do_store_32(ctx, tmp, rb, rx, scale, disp, modify, MO_TEUL);
++    do_store_32(ctx, tmp, rb, rx, scale, disp, sp, modify, MO_TEUL);
+     tcg_temp_free_i32(tmp);
+ 
+     return nullify_end(ctx, DISAS_NEXT);
+@@ -1528,14 +1559,14 @@ static DisasJumpType do_fstorew(DisasContext *ctx, unsigned rt, unsigned rb,
+ 
+ static DisasJumpType do_fstored(DisasContext *ctx, unsigned rt, unsigned rb,
+                                 unsigned rx, int scale, target_sreg disp,
+-                                int modify)
++                                unsigned sp, int modify)
+ {
+     TCGv_i64 tmp;
+ 
+     nullify_over(ctx);
+ 
+     tmp = load_frd(rt);
+-    do_store_64(ctx, tmp, rb, rx, scale, disp, modify, MO_TEQ);
++    do_store_64(ctx, tmp, rb, rx, scale, disp, sp, modify, MO_TEQ);
+     tcg_temp_free_i64(tmp);
+ 
+     return nullify_end(ctx, DISAS_NEXT);
+@@ -2217,18 +2248,21 @@ static DisasJumpType trans_probe(DisasContext *ctx, uint32_t insn,
+                                  const DisasInsn *di)
+ {
+     unsigned rt = extract32(insn, 0, 5);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned rb = extract32(insn, 21, 5);
+     unsigned is_write = extract32(insn, 6, 1);
+-    TCGv_reg dest;
++    TCGv_reg dest, ofs;
++    TCGv_tl addr;
+ 
+     nullify_over(ctx);
+ 
+     /* ??? Do something with priv level operand.  */
+     dest = dest_gpr(ctx, rt);
++    form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
+     if (is_write) {
+-        gen_helper_probe_w(dest, load_gpr(ctx, rb));
++        gen_helper_probe_w(dest, addr);
+     } else {
+-        gen_helper_probe_r(dest, load_gpr(ctx, rb));
++        gen_helper_probe_r(dest, addr);
+     }
+     save_gpr(ctx, rt, dest);
+     return nullify_end(ctx, DISAS_NEXT);
+@@ -2617,12 +2651,13 @@ static DisasJumpType trans_ld_idx_i(DisasContext *ctx, uint32_t insn,
+     unsigned m = extract32(insn, 5, 1);
+     unsigned sz = extract32(insn, 6, 2);
+     unsigned a = extract32(insn, 13, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     int disp = low_sextract(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+     int modify = (m ? (a ? -1 : 1) : 0);
+     TCGMemOp mop = MO_TE | sz;
+ 
+-    return do_load(ctx, rt, rb, 0, 0, disp, modify, mop);
++    return do_load(ctx, rt, rb, 0, 0, disp, sp, modify, mop);
+ }
+ 
+ static DisasJumpType trans_ld_idx_x(DisasContext *ctx, uint32_t insn,
+@@ -2632,11 +2667,12 @@ static DisasJumpType trans_ld_idx_x(DisasContext *ctx, uint32_t insn,
+     unsigned m = extract32(insn, 5, 1);
+     unsigned sz = extract32(insn, 6, 2);
+     unsigned u = extract32(insn, 13, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned rx = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+     TCGMemOp mop = MO_TE | sz;
+ 
+-    return do_load(ctx, rt, rb, rx, u ? sz : 0, 0, m, mop);
++    return do_load(ctx, rt, rb, rx, u ? sz : 0, 0, sp, m, mop);
+ }
+ 
+ static DisasJumpType trans_st_idx_i(DisasContext *ctx, uint32_t insn,
+@@ -2646,12 +2682,13 @@ static DisasJumpType trans_st_idx_i(DisasContext *ctx, uint32_t insn,
+     unsigned m = extract32(insn, 5, 1);
+     unsigned sz = extract32(insn, 6, 2);
+     unsigned a = extract32(insn, 13, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned rr = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+     int modify = (m ? (a ? -1 : 1) : 0);
+     TCGMemOp mop = MO_TE | sz;
+ 
+-    return do_store(ctx, rr, rb, disp, modify, mop);
++    return do_store(ctx, rr, rb, disp, sp, modify, mop);
+ }
+ 
+ static DisasJumpType trans_ldcw(DisasContext *ctx, uint32_t insn,
+@@ -2661,16 +2698,16 @@ static DisasJumpType trans_ldcw(DisasContext *ctx, uint32_t insn,
+     unsigned m = extract32(insn, 5, 1);
+     unsigned i = extract32(insn, 12, 1);
+     unsigned au = extract32(insn, 13, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned rx = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+     TCGMemOp mop = MO_TEUL | MO_ALIGN_16;
+-    TCGv_reg zero, addr, base, dest;
++    TCGv_reg zero, dest, ofs;
++    TCGv_tl addr;
+     int modify, disp = 0, scale = 0;
+ 
+     nullify_over(ctx);
+ 
+-    /* ??? Share more code with do_load and do_load_{32,64}.  */
+-
+     if (i) {
+         modify = (m ? (au ? -1 : 1) : 0);
+         disp = low_sextract(rx, 0, 5);
+@@ -2682,27 +2719,19 @@ static DisasJumpType trans_ldcw(DisasContext *ctx, uint32_t insn,
+         }
+     }
+     if (modify) {
+-        /* Base register modification.  Make sure if RT == RB, we see
+-           the result of the load.  */
++        /* Base register modification.  Make sure if RT == RB,
++           we see the result of the load.  */
+         dest = get_temp(ctx);
+     } else {
+         dest = dest_gpr(ctx, rt);
+     }
+ 
+-    addr = tcg_temp_new();
+-    base = load_gpr(ctx, rb);
+-    if (rx) {
+-        tcg_gen_shli_reg(addr, cpu_gr[rx], scale);
+-        tcg_gen_add_reg(addr, addr, base);
+-    } else {
+-        tcg_gen_addi_reg(addr, base, disp);
+-    }
+-
++    form_gva(ctx, &addr, &ofs, rb, rx, scale, disp, sp, modify,
++             ctx->mmu_idx == MMU_PHYS_IDX);
+     zero = tcg_const_reg(0);
+-    tcg_gen_atomic_xchg_reg(dest, (modify <= 0 ? addr : base),
+-                            zero, ctx->mmu_idx, mop);
++    tcg_gen_atomic_xchg_reg(dest, addr, zero, ctx->mmu_idx, mop);
+     if (modify) {
+-        save_gpr(ctx, rb, addr);
++        save_gpr(ctx, rb, ofs);
+     }
+     save_gpr(ctx, rt, dest);
+ 
+@@ -2715,20 +2744,17 @@ static DisasJumpType trans_stby(DisasContext *ctx, uint32_t insn,
+     target_sreg disp = low_sextract(insn, 0, 5);
+     unsigned m = extract32(insn, 5, 1);
+     unsigned a = extract32(insn, 13, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned rt = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+-    TCGv_reg addr, val;
++    TCGv_reg ofs, val;
++    TCGv_tl addr;
+ 
+     nullify_over(ctx);
+ 
+-    addr = tcg_temp_new();
+-    if (m || disp == 0) {
+-        tcg_gen_mov_reg(addr, load_gpr(ctx, rb));
+-    } else {
+-        tcg_gen_addi_reg(addr, load_gpr(ctx, rb), disp);
+-    }
++    form_gva(ctx, &addr, &ofs, rb, 0, 0, disp, sp, m,
++             ctx->mmu_idx == MMU_PHYS_IDX);
+     val = load_gpr(ctx, rt);
+-
+     if (a) {
+         if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
+             gen_helper_stby_e_parallel(cpu_env, addr, val);
+@@ -2744,11 +2770,9 @@ static DisasJumpType trans_stby(DisasContext *ctx, uint32_t insn,
+     }
+ 
+     if (m) {
+-        tcg_gen_addi_reg(addr, addr, disp);
+-        tcg_gen_andi_reg(addr, addr, ~3);
+-        save_gpr(ctx, rb, addr);
++        tcg_gen_andi_reg(ofs, ofs, ~3);
++        save_gpr(ctx, rb, ofs);
+     }
+-    tcg_temp_free(addr);
+ 
+     return nullify_end(ctx, DISAS_NEXT);
+ }
+@@ -2813,15 +2837,18 @@ static DisasJumpType trans_load(DisasContext *ctx, uint32_t insn,
+ {
+     unsigned rb = extract32(insn, 21, 5);
+     unsigned rt = extract32(insn, 16, 5);
++    unsigned sp = extract32(insn, 14, 2);
+     target_sreg i = assemble_16(insn);
+ 
+-    return do_load(ctx, rt, rb, 0, 0, i, is_mod ? (i < 0 ? -1 : 1) : 0, mop);
++    return do_load(ctx, rt, rb, 0, 0, i, sp,
++                   is_mod ? (i < 0 ? -1 : 1) : 0, mop);
+ }
+ 
+ static DisasJumpType trans_load_w(DisasContext *ctx, uint32_t insn)
+ {
+     unsigned rb = extract32(insn, 21, 5);
+     unsigned rt = extract32(insn, 16, 5);
++    unsigned sp = extract32(insn, 14, 2);
+     target_sreg i = assemble_16a(insn);
+     unsigned ext2 = extract32(insn, 1, 2);
+ 
+@@ -2829,11 +2856,11 @@ static DisasJumpType trans_load_w(DisasContext *ctx, uint32_t insn)
+     case 0:
+     case 1:
+         /* FLDW without modification.  */
+-        return do_floadw(ctx, ext2 * 32 + rt, rb, 0, 0, i, 0);
++        return do_floadw(ctx, ext2 * 32 + rt, rb, 0, 0, i, sp, 0);
+     case 2:
+         /* LDW with modification.  Note that the sign of I selects
+            post-dec vs pre-inc.  */
+-        return do_load(ctx, rt, rb, 0, 0, i, (i < 0 ? 1 : -1), MO_TEUL);
++        return do_load(ctx, rt, rb, 0, 0, i, sp, (i < 0 ? 1 : -1), MO_TEUL);
+     default:
+         return gen_illegal(ctx);
+     }
+@@ -2844,11 +2871,12 @@ static DisasJumpType trans_fload_mod(DisasContext *ctx, uint32_t insn)
+     target_sreg i = assemble_16a(insn);
+     unsigned t1 = extract32(insn, 1, 1);
+     unsigned a = extract32(insn, 2, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned t0 = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+ 
+     /* FLDW with modification.  */
+-    return do_floadw(ctx, t1 * 32 + t0, rb, 0, 0, i, (a ? -1 : 1));
++    return do_floadw(ctx, t1 * 32 + t0, rb, 0, 0, i, sp, (a ? -1 : 1));
+ }
+ 
+ static DisasJumpType trans_store(DisasContext *ctx, uint32_t insn,
+@@ -2856,15 +2884,17 @@ static DisasJumpType trans_store(DisasContext *ctx, uint32_t insn,
+ {
+     unsigned rb = extract32(insn, 21, 5);
+     unsigned rt = extract32(insn, 16, 5);
++    unsigned sp = extract32(insn, 14, 2);
+     target_sreg i = assemble_16(insn);
+ 
+-    return do_store(ctx, rt, rb, i, is_mod ? (i < 0 ? -1 : 1) : 0, mop);
++    return do_store(ctx, rt, rb, i, sp, is_mod ? (i < 0 ? -1 : 1) : 0, mop);
+ }
+ 
+ static DisasJumpType trans_store_w(DisasContext *ctx, uint32_t insn)
+ {
+     unsigned rb = extract32(insn, 21, 5);
+     unsigned rt = extract32(insn, 16, 5);
++    unsigned sp = extract32(insn, 14, 2);
+     target_sreg i = assemble_16a(insn);
+     unsigned ext2 = extract32(insn, 1, 2);
+ 
+@@ -2872,10 +2902,10 @@ static DisasJumpType trans_store_w(DisasContext *ctx, uint32_t insn)
+     case 0:
+     case 1:
+         /* FSTW without modification.  */
+-        return do_fstorew(ctx, ext2 * 32 + rt, rb, 0, 0, i, 0);
++        return do_fstorew(ctx, ext2 * 32 + rt, rb, 0, 0, i, sp, 0);
+     case 2:
+         /* LDW with modification.  */
+-        return do_store(ctx, rt, rb, i, (i < 0 ? 1 : -1), MO_TEUL);
++        return do_store(ctx, rt, rb, i, sp, (i < 0 ? 1 : -1), MO_TEUL);
+     default:
+         return gen_illegal(ctx);
+     }
+@@ -2886,11 +2916,12 @@ static DisasJumpType trans_fstore_mod(DisasContext *ctx, uint32_t insn)
+     target_sreg i = assemble_16a(insn);
+     unsigned t1 = extract32(insn, 1, 1);
+     unsigned a = extract32(insn, 2, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned t0 = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+ 
+     /* FSTW with modification.  */
+-    return do_fstorew(ctx, t1 * 32 + t0, rb, 0, 0, i, (a ? -1 : 1));
++    return do_fstorew(ctx, t1 * 32 + t0, rb, 0, 0, i, sp, (a ? -1 : 1));
+ }
+ 
+ static DisasJumpType trans_copr_w(DisasContext *ctx, uint32_t insn)
+@@ -2902,6 +2933,7 @@ static DisasJumpType trans_copr_w(DisasContext *ctx, uint32_t insn)
+     /* unsigned cc = extract32(insn, 10, 2); */
+     unsigned i = extract32(insn, 12, 1);
+     unsigned ua = extract32(insn, 13, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned rx = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+     unsigned rt = t1 * 32 + t0;
+@@ -2921,9 +2953,9 @@ static DisasJumpType trans_copr_w(DisasContext *ctx, uint32_t insn)
+ 
+     switch (ext3) {
+     case 0: /* FLDW */
+-        return do_floadw(ctx, rt, rb, rx, scale, disp, modify);
++        return do_floadw(ctx, rt, rb, rx, scale, disp, sp, modify);
+     case 4: /* FSTW */
+-        return do_fstorew(ctx, rt, rb, rx, scale, disp, modify);
++        return do_fstorew(ctx, rt, rb, rx, scale, disp, sp, modify);
+     }
+     return gen_illegal(ctx);
+ }
+@@ -2936,6 +2968,7 @@ static DisasJumpType trans_copr_dw(DisasContext *ctx, uint32_t insn)
+     /* unsigned cc = extract32(insn, 10, 2); */
+     unsigned i = extract32(insn, 12, 1);
+     unsigned ua = extract32(insn, 13, 1);
++    unsigned sp = extract32(insn, 14, 2);
+     unsigned rx = extract32(insn, 16, 5);
+     unsigned rb = extract32(insn, 21, 5);
+     int modify = (m ? (ua ? -1 : 1) : 0);
+@@ -2954,9 +2987,9 @@ static DisasJumpType trans_copr_dw(DisasContext *ctx, uint32_t insn)
+ 
+     switch (ext4) {
+     case 0: /* FLDD */
+-        return do_floadd(ctx, rt, rb, rx, scale, disp, modify);
++        return do_floadd(ctx, rt, rb, rx, scale, disp, sp, modify);
+     case 8: /* FSTD */
+-        return do_fstored(ctx, rt, rb, rx, scale, disp, modify);
++        return do_fstored(ctx, rt, rb, rx, scale, disp, sp, modify);
+     default:
+         return gen_illegal(ctx);
+     }
+@@ -4197,8 +4230,10 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+     bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
+     bound = MIN(max_insns, bound);
+ 
+-    ctx->ntemps = 0;
+-    memset(ctx->temps, 0, sizeof(ctx->temps));
++    ctx->ntempr = 0;
++    ctx->ntempl = 0;
++    memset(ctx->tempr, 0, sizeof(ctx->tempr));
++    memset(ctx->templ, 0, sizeof(ctx->templ));
+ 
+     return bound;
+ }
+@@ -4275,11 +4310,16 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     }
+ 
+     /* Free any temporaries allocated.  */
+-    for (i = 0, n = ctx->ntemps; i < n; ++i) {
+-        tcg_temp_free(ctx->temps[i]);
+-        ctx->temps[i] = NULL;
++    for (i = 0, n = ctx->ntempr; i < n; ++i) {
++        tcg_temp_free(ctx->tempr[i]);
++        ctx->tempr[i] = NULL;
++    }
++    for (i = 0, n = ctx->ntempl; i < n; ++i) {
++        tcg_temp_free_tl(ctx->templ[i]);
++        ctx->templ[i] = NULL;
+     }
+-    ctx->ntemps = 0;
++    ctx->ntempr = 0;
++    ctx->ntempl = 0;
+ 
+     /* Advance the insn queue.  Note that this check also detects
+        a priority change within the instruction queue.  */
+@@ -4389,7 +4429,7 @@ void restore_state_to_opc(CPUHPPAState *env, TranslationBlock *tb,
+                           target_ulong *data)
+ {
+     env->iaoq_f = data[0];
+-    if (data[1] != -1) {
++    if (data[1] != (target_ureg)-1) {
+         env->iaoq_b = data[1];
+     }
+     /* Since we were executing the instruction at IAOQ_F, and took some
 -- 
 2.14.3
