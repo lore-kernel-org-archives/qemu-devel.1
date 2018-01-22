@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52528)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edapX-0003tH-4m
+	id 1edapW-0003tF-FR
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:04:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edapW-0000Cj-2D
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:04:03 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35486)
+	id 1edapT-0000Bg-8z
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:04:02 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:44722)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edapV-0000CW-Uu
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:04:02 -0500
-Received: by mail-qt0-x242.google.com with SMTP id g14so10832639qti.2
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 04:04:01 -0800 (PST)
+	id 1edapT-0000BZ-5u
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:03:59 -0500
+Received: by mail-qt0-x243.google.com with SMTP id l20so18686127qtj.11
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 04:03:59 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 22 Jan 2018 09:03:45 -0300
-Message-Id: <20180122120351.22369-2-f4bug@amsat.org>
-In-Reply-To: <20180122120351.22369-1-f4bug@amsat.org>
-References: <20180122120351.22369-1-f4bug@amsat.org>
+Date: Mon, 22 Jan 2018 09:03:44 -0300
+Message-Id: <20180122120351.22369-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/7] hw/i2c/smbus: use DeviceClass::realize
- instead of SMBusDeviceClass::init
+Subject: [Qemu-devel] [PATCH v2 0/7] qdev: remove DeviceClass::init/exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,80 +34,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-and remove SMBusDeviceClass::init, there are no more users.
+since v1:
+  - fix format string on 32-bit host (patchew)
+  - do not add smbus_eeprom_reset() (Eduardo)
+  - directly use DeviceClass::realize (Eduardo)
+  - squashed 2 patches (Eduardo)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/i2c/smbus.h | 1 -
- hw/i2c/smbus.c         | 9 ---------
- hw/i2c/smbus_eeprom.c  | 5 ++---
- 3 files changed, 2 insertions(+), 13 deletions(-)
+Hi,
 
-diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
-index 544bbc1957..cfe3fa69f3 100644
---- a/include/hw/i2c/smbus.h
-+++ b/include/hw/i2c/smbus.h
-@@ -38,7 +38,6 @@
- typedef struct SMBusDeviceClass
- {
-     I2CSlaveClass parent_class;
--    int (*init)(SMBusDevice *dev);
-     void (*quick_cmd)(SMBusDevice *dev, uint8_t read);
-     void (*send_byte)(SMBusDevice *dev, uint8_t val);
-     uint8_t (*receive_byte)(SMBusDevice *dev);
-diff --git a/hw/i2c/smbus.c b/hw/i2c/smbus.c
-index 2d1b79a689..587ce1ab7f 100644
---- a/hw/i2c/smbus.c
-+++ b/hw/i2c/smbus.c
-@@ -202,14 +202,6 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
-     return 0;
- }
- 
--static int smbus_device_init(I2CSlave *i2c)
--{
--    SMBusDevice *dev = SMBUS_DEVICE(i2c);
--    SMBusDeviceClass *sc = SMBUS_DEVICE_GET_CLASS(dev);
--
--    return sc->init(dev);
--}
--
- /* Master device commands.  */
- int smbus_quick_command(I2CBus *bus, uint8_t addr, int read)
- {
-@@ -350,7 +342,6 @@ static void smbus_device_class_init(ObjectClass *klass, void *data)
- {
-     I2CSlaveClass *sc = I2C_SLAVE_CLASS(klass);
- 
--    sc->init = smbus_device_init;
-     sc->event = smbus_i2c_event;
-     sc->recv = smbus_i2c_recv;
-     sc->send = smbus_i2c_send;
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index b13ec0fe7a..125c887d1f 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -97,12 +97,11 @@ static uint8_t eeprom_read_data(SMBusDevice *dev, uint8_t cmd, int n)
-     return eeprom_receive_byte(dev);
- }
- 
--static int smbus_eeprom_initfn(SMBusDevice *dev)
-+static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
- {
-     SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
- 
-     eeprom->offset = 0;
--    return 0;
- }
- 
- static Property smbus_eeprom_properties[] = {
-@@ -115,7 +114,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(klass);
- 
--    sc->init = smbus_eeprom_initfn;
-+    dc->realize = smbus_eeprom_realize;
-     sc->quick_cmd = eeprom_quick_cmd;
-     sc->send_byte = eeprom_send_byte;
-     sc->receive_byte = eeprom_receive_byte;
+This series finalize the qdev QOMification.
+
+We first convert the I2CSlave/SMBusDevice,
+then the usb-ccid and virtio-ccw,
+and finally the SysBusDevice.
+
+At the end we get one less TODO :)
+
+    /* TODO remove, once users are converted to unrealize */
+
+There is still one standing in SysBusDeviceClass::init().
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (7):
+  hw/i2c/smbus: use DeviceClass::realize instead of SMBusDeviceClass::init
+  hw/i2c: use DeviceClass::realize instead of I2CSlaveClass::init
+  usb-ccid: convert CCIDCardClass::init -> realize
+  virtio-ccw: convert VirtIOCCWDeviceClass::exit -> unrealize
+  qdev: simplify the SysBusDeviceClass::init path
+  qdev: remove DeviceClass::exit
+  qdev: rename typedef qdev_resetfn() -> DeviceReset()
+
+ include/hw/i2c/i2c.h          |  3 ---
+ include/hw/i2c/smbus.h        |  1 -
+ include/hw/qdev-core.h        |  8 ++----
+ hw/s390x/virtio-ccw.h         |  2 +-
+ hw/usb/ccid.h                 |  9 +++++--
+ hw/audio/wm8750.c             |  8 +++---
+ hw/core/qdev.c                | 28 ---------------------
+ hw/core/sysbus.c              | 15 ++++++++----
+ hw/display/ssd0303.c          |  9 +++----
+ hw/gpio/max7310.c             |  9 +++----
+ hw/i2c/core.c                 | 13 ----------
+ hw/i2c/smbus.c                |  9 -------
+ hw/i2c/smbus_eeprom.c         |  5 ++--
+ hw/input/lm832x.c             |  9 +++----
+ hw/misc/tmp105.c              |  7 +++---
+ hw/misc/tmp421.c              |  8 +++---
+ hw/nvram/eeprom_at24c.c       | 24 +++++++++---------
+ hw/s390x/virtio-ccw.c         | 35 +++++++++++++-------------
+ hw/timer/twl92230.c           | 11 +++------
+ hw/usb/ccid-card-emulated.c   | 45 ++++++++++++++++++----------------
+ hw/usb/ccid-card-passthru.c   | 10 ++++----
+ hw/usb/dev-smartcard-reader.c | 57 +++++++++++++++----------------------------
+ 22 files changed, 124 insertions(+), 201 deletions(-)
+
 -- 
 2.15.1
