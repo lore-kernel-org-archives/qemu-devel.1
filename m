@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1edWyF-0007cD-Pz
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:56:50 -0500
+	(envelope-from <groug@kaod.org>) id 1edXJu-0004fy-GD
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:19:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1edWyB-0005wf-QW
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:56:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48606)
+	(envelope-from <groug@kaod.org>) id 1edXJr-0002ya-AM
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:19:10 -0500
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:55997)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1edWyB-0005wF-ID
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 02:56:43 -0500
-Date: Mon, 22 Jan 2018 15:56:24 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180122075624.GD29532@xz-mi>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-16-peterx@redhat.com>
-	<20171221112738.GL10812@lemon> <20171225032613.GD2443@xz-mi>
-	<20180108164936.GG11758@stefanha-x1.localdomain>
-	<20180112045149.GH2551@xz-mi>
-	<20180112142832.GE11423@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1edXJr-0002tX-0J
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 03:19:07 -0500
+Received: from player698.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id EFB23B4A1C
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 09:18:57 +0100 (CET)
+Date: Mon, 22 Jan 2018 09:18:53 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180122091853.1c06665e@bahia.lan>
+In-Reply-To: <1516571878-13321-1-git-send-email-thuth@redhat.com>
+References: <1516571878-13321-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180112142832.GE11423@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v6 15/27] monitor: let suspend/resume work
- even with QMPs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] ppc: Deprecate
+ qemu-system-ppcemb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +30,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <dgibson@redhat.com>, qemu-ppc@nongnu.org
 
-On Fri, Jan 12, 2018 at 02:28:32PM +0000, Stefan Hajnoczi wrote:
-> On Fri, Jan 12, 2018 at 12:51:49PM +0800, Peter Xu wrote:
-> > On Mon, Jan 08, 2018 at 04:49:36PM +0000, Stefan Hajnoczi wrote:
-> > > On Mon, Dec 25, 2017 at 11:26:13AM +0800, Peter Xu wrote:
-> > > > On Thu, Dec 21, 2017 at 07:27:38PM +0800, Fam Zheng wrote:
-> > > > > On Tue, 12/19 16:45, Peter Xu wrote:
-> > > > > > One thing to mention is that for QMPs that are using IOThreads, we need
-> > > > > > an explicit kick for the IOThread in case it is sleeping.
-> > > > > > 
-> > > > > > Since at it, add traces for the operations.
-> > > > > > 
-> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > > ---
-> > > > > >  monitor.c    | 26 +++++++++++++++++++++-----
-> > > > > >  trace-events |  1 +
-> > > > > >  2 files changed, 22 insertions(+), 5 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/monitor.c b/monitor.c
-> > > > > > index 844508d134..5f05f2e9da 100644
-> > > > > > --- a/monitor.c
-> > > > > > +++ b/monitor.c
-> > > > > > @@ -3992,19 +3992,35 @@ static void monitor_command_cb(void *opaque, const char *cmdline,
-> > > > > >  
-> > > > > >  int monitor_suspend(Monitor *mon)
-> > > > > >  {
-> > > > > > -    if (!mon->rs)
-> > > > > > -        return -ENOTTY;
-> > > > > 
-> > > > > Please add to the commit message why the mon->rs check is dropped, for this and
-> > > > > the other one.
-> > > > 
-> > > > I thought it would be clear enough since mon->rs is only used by HMP
-> > > > and the subject tells us that this patch is adding support for QMP.
-> > > > But... sure I can add one more sentence for that!
-> > > 
-> > > This change breaks hmp.c:hmp_migrate():
-> > > 
-> > >   if (monitor_suspend(mon) < 0) {
-> > >       monitor_printf(mon, "terminal does not allow synchronous "
-> > >                      "migration, continuing detached\n");
-> > >       return;
-> > >   }
-> > > 
-> > > mon->rs is used by HMP code to determine whether this is an interactive
-> > > terminal.  Both live migration and password prompting rely on this
-> > > because they must be forbidden when doing so would be impossible (e.g.
-> > > GDB stub tunneling HMP commands).
-> > > 
-> > > Suspending the QMP monitor is useful, but please don't break the HMP
-> > > code.
-> > 
-> > Could you elaborate a bit on how this patch breaks anything?
-> > 
-> > IMHO HMP monitors always have Monitor.rs setup, so here in
-> > hmp_migrate() I don't really understand why we need this check, since
-> > IIUC monitor_suspend() for a HMP monitor will never fail before.
-> 
-> No, HMP monitors do not always have ->rs.  I mentioned that the GDB stub
-> uses a non-interactive HMP monitor.
-> 
-> Here is the code from gdbstub.c:
-> 
->   /* Initialize a monitor terminal for gdb */
->   mon_chr = qemu_chardev_new(NULL, TYPE_CHARDEV_GDB,
->                              NULL, &error_abort);
->   monitor_init(mon_chr, 0);
-> 
-> flags=0 means !MONITOR_USE_CONTROL (HMP) and !MONITOR_USE_READLINE
-> (non-interactive).
-> 
-> Your patch breaks this feature.
+On Sun, 21 Jan 2018 22:57:58 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-Ah I see the point.  I'll fix that up.  So Fam's questioning is valid,
-mon->rs needs to be checked.
+> qemu-system-ppcemb has been once split of qemu-system-ppc to support
+> CPU page sizes < 4096 for some of the embedded 4xx PowerPC CPUs.
+> However, there was hardly any OS available in the wild that really
+> used such small page sizes (Linux uses 4096 on PPC), so there is
+> no known recent use case for this separate build anymore. It's
+> rather cumbersome to maintain a separate set of config switches for
+> this, and it's wasting compile and test time of all the developers
+> who have to build all QEMU targets to verify that their changes did
+> not break anything.
+> 
+> Except for the small CPU page sizes, qemu-system-ppc can be used as
+> a full replacement for qemu-system-ppcemb since it contains all the
+> embedded 4xx PPC boards and CPUs, too. Thus let's start the deprecation
+> process for qemu-system-ppcemb to see whether somebody still needs
+> the small page sizes or whether we could finally remove this unloved
+> separate build.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v3: Use qtest_enabled() and emit the deprecation message in the
+>      machine init functions (I unfortunately haven't found a better
+>      common spot for all 4xx machines where qtest_enabled() works).
+> 
 
-Even, I would prefer to check the flags - they are more understandable
-than checking against mon->rs.
+I guess this is totally acceptable for deprecated code :)
 
-Thanks for explaining.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
--- 
-Peter Xu
+>  hw/ppc/ppc405_boards.c | 14 ++++++++++++++
+>  hw/ppc/ppc440_bamboo.c |  9 +++++++++
+>  hw/ppc/virtex_ml507.c  |  8 ++++++++
+>  qemu-doc.texi          |  6 ++++++
+>  4 files changed, 37 insertions(+)
+> 
+> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> index e92db2c..6f7f2ee 100644
+> --- a/hw/ppc/ppc405_boards.c
+> +++ b/hw/ppc/ppc405_boards.c
+> @@ -202,6 +202,13 @@ static void ref405ep_init(MachineState *machine)
+>      DriveInfo *dinfo;
+>      MemoryRegion *sysmem = get_system_memory();
+>  
+> +#ifdef TARGET_PPCEMB
+> +    if (!qtest_enabled()) {
+> +        warn_report("qemu-system-ppcemb is deprecated, "
+> +                    "please use qemu-system-ppc instead.");
+> +    }
+> +#endif
+> +
+>      /* XXX: fix this */
+>      memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.ram",
+>                                           0x08000000);
+> @@ -497,6 +504,13 @@ static void taihu_405ep_init(MachineState *machine)
+>      int fl_idx, fl_sectors;
+>      DriveInfo *dinfo;
+>  
+> +#ifdef TARGET_PPCEMB
+> +    if (!qtest_enabled()) {
+> +        warn_report("qemu-system-ppcemb is deprecated, "
+> +                    "please use qemu-system-ppc instead.");
+> +    }
+> +#endif
+> +
+>      /* RAM is soldered to the board so the size cannot be changed */
+>      ram_size = 0x08000000;
+>      memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index 693c215..a299206 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -13,6 +13,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> +#include "qemu/error-report.h"
+>  #include "net/net.h"
+>  #include "hw/hw.h"
+>  #include "hw/pci/pci.h"
+> @@ -27,6 +28,7 @@
+>  #include "hw/ppc/ppc.h"
+>  #include "ppc405.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/qtest.h"
+>  #include "hw/sysbus.h"
+>  
+>  #define BINARY_DEVICE_TREE_FILE "bamboo.dtb"
+> @@ -191,6 +193,13 @@ static void bamboo_init(MachineState *machine)
+>          exit(1);
+>      }
+>  
+> +#ifdef TARGET_PPCEMB
+> +    if (!qtest_enabled()) {
+> +        warn_report("qemu-system-ppcemb is deprecated, "
+> +                    "please use qemu-system-ppc instead.");
+> +    }
+> +#endif
+> +
+>      qemu_register_reset(main_cpu_reset, cpu);
+>      ppc_booke_timers_init(cpu, 400000000, 0);
+>      ppc_dcr_init(env, NULL, NULL);
+> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+> index 5ac4f76..9fe7655 100644
+> --- a/hw/ppc/virtex_ml507.c
+> +++ b/hw/ppc/virtex_ml507.c
+> @@ -29,6 +29,7 @@
+>  #include "hw/char/serial.h"
+>  #include "hw/block/flash.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/qtest.h"
+>  #include "hw/devices.h"
+>  #include "hw/boards.h"
+>  #include "sysemu/device_tree.h"
+> @@ -210,6 +211,13 @@ static void virtex_init(MachineState *machine)
+>      int kernel_size;
+>      int i;
+>  
+> +#ifdef TARGET_PPCEMB
+> +    if (!qtest_enabled()) {
+> +        warn_report("qemu-system-ppcemb is deprecated, "
+> +                    "please use qemu-system-ppc instead.");
+> +    }
+> +#endif
+> +
+>      /* init CPUs */
+>      cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_type, 400000000);
+>      env = &cpu->env;
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 3e9eb81..b13c633 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2766,6 +2766,12 @@ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
+>  The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
+>  or ``ivshmem-doorbell`` device types.
+>  
+> +@subsection Page size support < 4k for embedded PowerPC CPUs (since 2.12.0)
+> +
+> +qemu-system-ppcemb will be removed. qemu-system-ppc (or qemu-system-ppc64)
+> +should be used instead. That means that embedded 4xx PowerPC CPUs will not
+> +support page sizes < 4096 any longer.
+> +
+>  @section System emulator machines
+>  
+>  @subsection Xilinx EP108 (since 2.11.0)
