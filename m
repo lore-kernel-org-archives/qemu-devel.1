@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1edfL9-0003Xn-Du
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:53:00 -0500
+	(envelope-from <mreitz@redhat.com>) id 1edfMG-0004H8-Nb
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1edfL8-0008At-Cx
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:52:59 -0500
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:46448)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1edfL8-0008A7-5l
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:52:58 -0500
-Received: by mail-io0-x242.google.com with SMTP id f34so10085695ioi.13
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 08:52:58 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1edfMF-0000gD-Lt
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:54:08 -0500
+References: <20180120154412.9990-1-mreitz@redhat.com>
+	<20180120154412.9990-2-mreitz@redhat.com>
+	<39ad6e43-024c-6384-d014-e0b8f83ed3a7@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <db14dd01-2a01-8ab3-d4b6-bf1a46425eef@redhat.com>
+Date: Mon, 22 Jan 2018 17:53:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA82WAfmdWTt438ioLoQTztQk-r4Pq2ak8Bcjqv-xWasyw@mail.gmail.com>
-References: <20180119182248.10821-1-ard.biesheuvel@linaro.org>
-	<20180119182248.10821-4-ard.biesheuvel@linaro.org>
-	<CAFEAcA82WAfmdWTt438ioLoQTztQk-r4Pq2ak8Bcjqv-xWasyw@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 22 Jan 2018 16:52:56 +0000
-Message-ID: <CAKv+Gu87P07jeBezDdxAqoGZCtY-t0y0d4i5UvJ1-BK24UWuJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 3/4] target/arm: implement SM3
- instructions
+In-Reply-To: <39ad6e43-024c-6384-d014-e0b8f83ed3a7@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xiktfVjtnitHckWVsztuVntFGTxnIKDUT"
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qapi: Add qobject_to()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,161 +25,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 22 January 2018 at 16:39, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 19 January 2018 at 18:22, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> This implements emulation of the new SM3 instructions that have
->> been added as an optional extension to the ARMv8 Crypto Extensions
->> in ARM v8.2.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xiktfVjtnitHckWVsztuVntFGTxnIKDUT
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <db14dd01-2a01-8ab3-d4b6-bf1a46425eef@redhat.com>
+Subject: Re: [PATCH v2 1/6] qapi: Add qobject_to()
+References: <20180120154412.9990-1-mreitz@redhat.com>
+ <20180120154412.9990-2-mreitz@redhat.com>
+ <39ad6e43-024c-6384-d014-e0b8f83ed3a7@redhat.com>
+In-Reply-To: <39ad6e43-024c-6384-d014-e0b8f83ed3a7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-01-22 16:33, Eric Blake wrote:
+> On 01/20/2018 09:44 AM, Max Reitz wrote:
+>> This is a dynamic casting macro that, given a QObject type, returns an=
+
+>> object as that type or NULL if the object is of a different type (or
+>> NULL itself).
 >>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->
->
->> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
->> index 787b94047286..1e3ff9a6152f 100644
->> --- a/target/arm/translate-a64.c
->> +++ b/target/arm/translate-a64.c
->> @@ -11148,28 +11148,39 @@ static void disas_crypto_three_reg_sha512(DisasContext *s, uint32_t insn)
->>      CryptoThreeOpFn *genfn;
->>      int feature;
+>> The macro uses lower-case letters because:
+>> 1. There does not seem to be a hard rule on whether qemu macros have t=
+o
+>>    be upper-cased,
+>> 2. The current situation in qapi/qmp is inconsistent (compare e.g.
+>>    QINCREF() vs. qdict_put()),
+>> 3. qobject_to() will evaluate its @obj parameter only once, thus it is=
+
+>>    generally not important to the caller whether it is a macro or not,=
+
+>> 4. I prefer it aesthetically.
 >>
->> -    if (o != 0) {
->> -        unallocated_encoding(s);
->> -        return;
->> -    }
->
-> If you wrote this code in the first patch in the
->      if (o == 0) {
->          stuff;
->      } else {
->          unallocated_encoding(s);
->          return;
->      }
->
-> form, it would make this patch easier to read as it wouldn't
-> need to change the lines for the SHA512 cases.
->
-
-ok
-
->> -
->> -    switch (opcode) {
->> -    case 0: /* SHA512H */
->> -        feature = ARM_FEATURE_V8_SHA512;
->> -        genfn = gen_helper_crypto_sha512h;
->> -        break;
->> -    case 1: /* SHA512H2 */
->> -        feature = ARM_FEATURE_V8_SHA512;
->> -        genfn = gen_helper_crypto_sha512h2;
->> -        break;
->> -    case 2: /* SHA512SU1 */
->> -        feature = ARM_FEATURE_V8_SHA512;
->> -        genfn = gen_helper_crypto_sha512su1;
->> -        break;
->> -    case 3: /* RAX1 */
->> -        feature = ARM_FEATURE_V8_SHA3;
->> -        genfn = NULL;
->> -        break;
->> +    if (o == 0) {
->> +        switch (opcode) {
->> +        case 0: /* SHA512H */
->> +            feature = ARM_FEATURE_V8_SHA512;
->> +            genfn = gen_helper_crypto_sha512h;
->> +            break;
->> +        case 1: /* SHA512H2 */
->> +            feature = ARM_FEATURE_V8_SHA512;
->> +            genfn = gen_helper_crypto_sha512h2;
->> +            break;
->> +        case 2: /* SHA512SU1 */
->> +            feature = ARM_FEATURE_V8_SHA512;
->> +            genfn = gen_helper_crypto_sha512su1;
->> +            break;
->> +        case 3: /* RAX1 */
->> +            feature = ARM_FEATURE_V8_SHA3;
->> +            genfn = NULL;
->> +            break;
->> +        }
->> +    } else {
->> +        switch (opcode) {
->> +        case 0: /* SM3PARTW1 */
->> +            feature = ARM_FEATURE_V8_SM3;
->> +            genfn = gen_helper_crypto_sm3partw1;
->> +            break;
->> +        case 1: /* SM3PARTW2 */
->> +            feature = ARM_FEATURE_V8_SM3;
->> +            genfn = gen_helper_crypto_sm3partw2;
->> +            break;
->> +        default:
->> +            unallocated_encoding(s);
->> +            return;
->> +        }
->
-> This seems to be missing support for SM4EKEY (which is O==1
-> opcode == 0b10 and also part of the v8.2 SM feature) ?
->
-
-It is part of the v8.2 SM extension, which consists of SM3 secure hash
-and SM4 encryption, which are two different things (and AA64ISAR0 has
-separate feature bits for each). The ARM ARM does stipulate that both
-should be set if either one is set, but still provides two separate
-bits, and so one can be enabled without the other.
-
->
->>      }
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> You're more than welcome to convince me to call it QOBJECT_TO()!
+>=20
+> I can live with the lower-case version; especially with your good list
+> of reasons for it ;)
+>=20
+>> ---
+>>  include/qapi/qmp/qobject.h | 32 ++++++++++++++++++++++++++++++++
+>>  1 file changed, 32 insertions(+)
 >>
->>      if (!arm_dc_feature(s, feature)) {
->> @@ -11273,10 +11284,22 @@ static void disas_crypto_four_reg(DisasContext *s, uint32_t insn)
->>      int ra = extract32(insn, 10, 5);
->>      int rn = extract32(insn, 5, 5);
->>      int rd = extract32(insn, 0, 5);
->> -    TCGv_i64 tcg_op1, tcg_op2, tcg_op3, tcg_res[2];
->> -    int pass;
->> +    int feature;
->>
->> -    if (op0 > 1 || !arm_dc_feature(s, ARM_FEATURE_V8_SHA3)) {
->> +    switch (op0) {
->> +    case 0: /* EOR3 */
->> +    case 1: /* BCAX */
->> +        feature = ARM_FEATURE_V8_SHA3;
->> +        break;
->> +    case 2: /* SM3SS1 */
->> +        feature = ARM_FEATURE_V8_SM3;
->> +        break;
->> +    default:
->> +        unallocated_encoding(s);
->> +        return;
->> +    }
+>> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+>> index 38ac68845c..1211989ca0 100644
+>> --- a/include/qapi/qmp/qobject.h
+>> +++ b/include/qapi/qmp/qobject.h
+>> @@ -50,6 +50,24 @@ struct QObject {
+>>  #define QDECREF(obj)              \
+>>      qobject_decref(obj ? QOBJECT(obj) : NULL)
+>> =20
+>> +/* Required for qobject_to() */
+>> +#define QTYPE_CAST_TO_QNull     QTYPE_QNULL
+>> +#define QTYPE_CAST_TO_QNum      QTYPE_QNUM
+>> +#define QTYPE_CAST_TO_QString   QTYPE_QSTRING
+>> +#define QTYPE_CAST_TO_QDict     QTYPE_QDICT
+>> +#define QTYPE_CAST_TO_QList     QTYPE_QLIST
+>> +#define QTYPE_CAST_TO_QBool     QTYPE_QBOOL
 >> +
->> +    if (!arm_dc_feature(s, feature)) {
->>          unallocated_encoding(s);
->>          return;
->>      }
->> @@ -11285,34 +11308,54 @@ static void disas_crypto_four_reg(DisasContext *s, uint32_t insn)
->>          return;
->>      }
->>
->> -    tcg_op1 = tcg_temp_new_i64();
->> -    tcg_op2 = tcg_temp_new_i64();
->> -    tcg_op3 = tcg_temp_new_i64();
->> -    tcg_res[0] = tcg_temp_new_i64();
->> -    tcg_res[1] = tcg_temp_new_i64();
->> +    if (op0 == 2) {
->> +        TCGv_ptr tcg_rd_ptr, tcg_rn_ptr, tcg_ra_ptr, tcg_rm_ptr;
->>
->> -    for (pass = 0; pass < 2; pass++) {
->> -        read_vec_element(s, tcg_op1, rn, pass, MO_64);
->> -        read_vec_element(s, tcg_op2, rm, pass, MO_64);
->> -        read_vec_element(s, tcg_op3, ra, pass, MO_64);
->> +        tcg_rd_ptr = vec_full_reg_ptr(s, rd);
->> +        tcg_rn_ptr = vec_full_reg_ptr(s, rn);
->> +        tcg_ra_ptr = vec_full_reg_ptr(s, ra);
->> +        tcg_rm_ptr = vec_full_reg_ptr(s, rm);
->
-> Similarly this part of this patch is a pain to read, and you
-> could avoid that by making the patch that introduces the function
-> structure things so this patch doesn't need do then reformat them.
->
+>> +#ifdef CONFIG_STATIC_ASSERT
+>> +_Static_assert(QTYPE__MAX =3D=3D 7,
+>> +               "The QTYPE_CAST_TO_* list needs to be extended");
+>> +#endif
+>=20
+> Why not use QEMU_BUILD_BUG_ON() instead of _Static_assert?  That way,
+> this check will break the build even on older compilers that lack
+> _Static_assert but where we still know how to trigger a build failure.
 
-OK
+One reason would be because _Static_assert() allows me to give a nice
+warning message -- I could add a comment above the QEMU_BUILD_BUG_ON()
+line and hope for the best, but still, I like that better.
+
+The other is that I assumed most people would be using C11 compilers
+now, so the omission would be spotted sufficiently early.
+"Sufficiently" because it's actually not that bad for this list to be
+incomplete.  The worst is that you can't use qobject_to() for your
+desired target type, but that's hardly catastrophic.
+
+I could add an #else branch with QEMU_BUILD_BUG_ON().  Or I could add a
+QEMU_BUILD_BUG_MSG() macro that takes a message (which is omitted if you
+don't have _Static_assert() but would still make for a nice comment).  I
+guess the latter would be a nice idea in general...?
+
+Max
+
+>> +
+>> +#define qobject_to(obj, type) \
+>> +    container_of(qobject_check_type(obj, glue(QTYPE_CAST_TO_, type)) =
+?: \
+>> +                     QOBJECT((type *)NULL), \
+>> +                 type, base)
+>=20
+> Slick!
+>=20
+
+
+
+--xiktfVjtnitHckWVsztuVntFGTxnIKDUT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpmFyYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A3/YH/j95CvvxgDTv6lfGDnpbCQ1juhEciB+L
+gzOD9TiTw6L9TdSyq4ntWjEDTHTCpHdTDO0HDtxB1ChoQvLGCfczsEkEVlfH+1P1
+hOcnlwbQYVI01Ed7EQeGROdDm2DFb3GiVcEtv4ryAxEYM5tHKcS/dX3Q6R7HffPG
+kCxFTvucUQBoTNXRQDZYkGhrUGQh1iyIx60/AkursynY8LzjS/0XUzQTMZ9ztNwP
+Tj8UKMlIYZLGNpDqPAlPO8H+U3MCXEwNe3jHBirXZrstFIyKY6xt8s+oKs2opndc
+Jj9OY/7zTpxZA9V1lSTPjwQnnytmTtEAduMH55ae4Gjkr6xQ5JVyrjM=
+=SxS+
+-----END PGP SIGNATURE-----
+
+--xiktfVjtnitHckWVsztuVntFGTxnIKDUT--
