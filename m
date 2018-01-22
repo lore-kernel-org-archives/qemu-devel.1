@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1edjj4-0004XI-OJ
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 16:33:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1edkGT-0005hB-S5
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:08:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1edjiz-00081r-Qy
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 16:33:58 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40466)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1edjiz-00081E-Im
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 16:33:53 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0MLXpLx099631
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 16:33:51 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fnpghbh58-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 16:33:51 -0500
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 22 Jan 2018 14:33:42 -0700
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 22 Jan 2018 16:33:38 -0500
-Message-Id: <1516656818-31834-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] tpm: Set the flags of the CMD_INIT command to 0
+	(envelope-from <mreitz@redhat.com>) id 1edkGS-0003LQ-QL
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 17:08:29 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 22 Jan 2018 23:07:51 +0100
+Message-Id: <20180122220806.22154-2-mreitz@redhat.com>
+In-Reply-To: <20180122220806.22154-1-mreitz@redhat.com>
+References: <20180122220806.22154-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/16] block: BDS deletion during
+ bdrv_drain_recurse
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +20,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The flags of the CMD_INIT control channel command were not
-initialized properly. Fix this and set to 0.
+Draining a BDS child may lead to other children of the same parent being
+detached and/or deleted.  We should prepare for the former case (by
+copying the children list before iterating through it) and prevent the
+latter (by bdrv_ref()'ing all nodes if we are in the main loop).
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- hw/tpm/tpm_emulator.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/io.c | 40 ++++++++++++++++++++++++++++++----------
+ 1 file changed, 30 insertions(+), 10 deletions(-)
 
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index 35c78de..532d3e3 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -320,7 +320,9 @@ static int tpm_emulator_set_buffer_size(TPMBackend *tb,
- static int tpm_emulator_startup_tpm(TPMBackend *tb, size_t buffersize)
- {
-     TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
--    ptm_init init;
-+    ptm_init init = {
-+        .u.req.init_flags = 0,
-+    };
-     ptm_res res;
+diff --git a/block/io.c b/block/io.c
+index 7ea402352e..ca7dfecfc9 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -189,31 +189,51 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin, bool recursive)
  
-     if (buffersize != 0 &&
+ static bool bdrv_drain_recurse(BlockDriverState *bs)
+ {
+-    BdrvChild *child, *tmp;
++    BdrvChild *child;
+     bool waited;
++    struct BDSToDrain {
++        BlockDriverState *bs;
++        QLIST_ENTRY(BDSToDrain) next;
++    };
++    QLIST_HEAD(, BDSToDrain) bs_list = QLIST_HEAD_INITIALIZER(bs_list);
++    bool in_main_loop =
++        qemu_get_current_aio_context() == qemu_get_aio_context();
+ 
+     /* Wait for drained requests to finish */
+     waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+ 
+-    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+-        BlockDriverState *bs = child->bs;
+-        bool in_main_loop =
+-            qemu_get_current_aio_context() == qemu_get_aio_context();
+-        assert(bs->refcnt > 0);
++    /* Draining children may result in other children being removed from this
++     * parent and maybe even deleted, so copy the children list first */
++    QLIST_FOREACH(child, &bs->children, next) {
++        struct BDSToDrain *bs2d = g_new0(struct BDSToDrain, 1);
++
++        bs2d->bs = child->bs;
+         if (in_main_loop) {
+             /* In case the recursive bdrv_drain_recurse processes a
+              * block_job_defer_to_main_loop BH and modifies the graph,
+-             * let's hold a reference to bs until we are done.
++             * let's hold a reference to the BDS until we are done.
+              *
+              * IOThread doesn't have such a BH, and it is not safe to call
+              * bdrv_unref without BQL, so skip doing it there.
+              */
+-            bdrv_ref(bs);
++            bdrv_ref(bs2d->bs);
+         }
+-        waited |= bdrv_drain_recurse(bs);
++
++        QLIST_INSERT_HEAD(&bs_list, bs2d, next);
++    }
++
++    while (!QLIST_EMPTY(&bs_list)) {
++        struct BDSToDrain *bs2d = QLIST_FIRST(&bs_list);
++        QLIST_REMOVE(bs2d, next);
++
++        assert(bs2d->bs->refcnt > 0);
++
++        waited |= bdrv_drain_recurse(bs2d->bs);
+         if (in_main_loop) {
+-            bdrv_unref(bs);
++            bdrv_unref(bs2d->bs);
+         }
++
++        g_free(bs2d);
+     }
+ 
+     return waited;
 -- 
-2.5.5
+2.14.3
