@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1edVCJ-0000TB-Ub
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:12 -0500
+	(envelope-from <peterx@redhat.com>) id 1edVCU-0000aJ-Ef
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1edVCG-0004Xq-1m
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40896)
+	(envelope-from <peterx@redhat.com>) id 1edVCQ-0004aP-Hi
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39182)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1edVCF-0004Xl-SP
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:07 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1edVCQ-0004aE-C1
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 01:03:18 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 22 Jan 2018 14:02:42 +0800
-Message-Id: <20180122060244.29368-3-peterx@redhat.com>
+Date: Mon, 22 Jan 2018 14:02:43 +0800
+Message-Id: <20180122060244.29368-4-peterx@redhat.com>
 In-Reply-To: <20180122060244.29368-1-peterx@redhat.com>
 References: <20180122060244.29368-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] arm: postpone device listener unregister
+Subject: [Qemu-devel] [PATCH v2 3/4] vfio: listener unregister before unset
+ container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +27,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, peterx@redhat.com
 
-It's a preparation for follow-up patch to call region_del() in
-memory_listener_unregister(), otherwise all device addr attached with
-kvm_devices_head will be reset before calling kvm_arm_set_device_addr.
+After next patch, listener unregister will need the container to be
+alive.  Let's move this unregister phase to be before unset container,
+since that operation will free the backend container in kernel,
+otherwise we'll get these after next patch:
+
+qemu-system-x86_64: VFIO_UNMAP_DMA: -22
+qemu-system-x86_64: vfio_dma_unmap(0x559bf53a4590, 0x0, 0xa0000) = -22 (Invalid argument)
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- target/arm/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/vfio/common.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 211a7bf7be..1219d0062b 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -266,7 +266,6 @@ static void kvm_arm_machine_init_done(Notifier *notifier, void *data)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index b77be3a8b3..76cf28d462 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1161,19 +1161,27 @@ static void vfio_disconnect_container(VFIOGroup *group)
  {
-     KVMDevice *kd, *tkd;
+     VFIOContainer *container = group->container;
  
--    memory_listener_unregister(&devlistener);
-     QSLIST_FOREACH_SAFE(kd, &kvm_devices_head, entries, tkd) {
-         if (kd->kda.addr != -1) {
-             kvm_arm_set_device_addr(kd);
-@@ -274,6 +273,7 @@ static void kvm_arm_machine_init_done(Notifier *notifier, void *data)
-         memory_region_unref(kd->mr);
-         g_free(kd);
++    QLIST_REMOVE(group, container_next);
++    group->container = NULL;
++
++    /*
++     * Explicitly release the listener first before unset container,
++     * since unset may destroy the backend container if it's the last
++     * group.
++     */
++    if (QLIST_EMPTY(&container->group_list)) {
++        vfio_listener_release(container);
++    }
++
+     if (ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER, &container->fd)) {
+         error_report("vfio: error disconnecting group %d from container",
+                      group->groupid);
      }
-+    memory_listener_unregister(&devlistener);
- }
  
- static Notifier notify = {
+-    QLIST_REMOVE(group, container_next);
+-    group->container = NULL;
+-
+     if (QLIST_EMPTY(&container->group_list)) {
+         VFIOAddressSpace *space = container->space;
+         VFIOGuestIOMMU *giommu, *tmp;
+ 
+-        vfio_listener_release(container);
+         QLIST_REMOVE(container, next);
+ 
+         QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
 -- 
 2.14.3
