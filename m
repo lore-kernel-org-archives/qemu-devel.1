@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edcu5-0004Ea-NZ
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:16:54 -0500
+	(envelope-from <sameeh@daynix.com>) id 1edd1W-0005yc-2y
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edcu4-0001i8-OG
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:16:53 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:40568)
+	(envelope-from <sameeh@daynix.com>) id 1edd1S-0005vN-Mq
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:24:34 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:39739)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1edcu4-0001gd-Jl
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:16:52 -0500
-Received: by mail-ot0-x242.google.com with SMTP id x4so7571928otg.7
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 06:16:52 -0800 (PST)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1edd1S-0005v3-DF
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:24:30 -0500
+Received: by mail-it0-x241.google.com with SMTP id 68so9885476ite.4
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 06:24:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180119045438.28582-12-richard.henderson@linaro.org>
-References: <20180119045438.28582-1-richard.henderson@linaro.org>
-	<20180119045438.28582-12-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 14:16:31 +0000
-Message-ID: <CAFEAcA_ACU1KRgth8B+hNr2BeDYzRQEz4KeA2cOytPsn_xfKjQ@mail.gmail.com>
+In-Reply-To: <CAKPgXcGfgdMUt3tYKynrn+0nioi+qju10E+Jg9tjRhhObtUNqg@mail.gmail.com>
+References: <20170813155849.11368-1-sameeh@daynix.com>
+	<150906187318.17222.17361197183146152660@sif>
+	<CAKPgXcGfgdMUt3tYKynrn+0nioi+qju10E+Jg9tjRhhObtUNqg@mail.gmail.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Mon, 22 Jan 2018 16:24:29 +0200
+Message-ID: <CAKPgXcFhy0-7xa3K3Co3x9EFys8yv0ZJC0S59Stc=xdggFY1aQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 11/16] target/arm: Add SVE to migration
- state
+Subject: Re: [Qemu-devel] [PATCH 0/3]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +29,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
 
-On 19 January 2018 at 04:54, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Save the high parts of the Zregs and all of the Pregs.
-> The ZCR_ELx registers are migrated via the CP mechanism.
+Ping.
+
+On Fri, Oct 27, 2017 at 10:08 AM, Sameeh Jubran <sameeh@daynix.com> wrote:
+
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/machine.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 53 insertions(+)
 >
-> diff --git a/target/arm/machine.c b/target/arm/machine.c
-> index cb0e1c92bb..2c8b43062f 100644
-> --- a/target/arm/machine.c
-> +++ b/target/arm/machine.c
-> @@ -122,6 +122,56 @@ static const VMStateDescription vmstate_iwmmxt = {
->      }
->  };
+> On Fri, Oct 27, 2017 at 2:51 AM, Michael Roth <mdroth@linux.vnet.ibm.com>
+> wrote:
 >
-> +#ifdef TARGET_AARCH64
-> +/* The expression ARM_MAX_VQ - 2 is 0 for pure AArch32 build,
-> + * and ARMPredicateReg is actively empty.  This triggers errors
-> + * in the expansion of the VMSTATE macros.
-> + */
-> +
-> +static bool sve_needed(void *opaque)
-> +{
-> +    ARMCPU *cpu = opaque;
-> +    CPUARMState *env = &cpu->env;
-> +
-> +    return arm_feature(env, ARM_FEATURE_SVE);
-> +}
-> +
-> +/* The first two words of each Zreg is stored in VFP state.  */
-> +static const VMStateDescription vmstate_zreg_hi_reg = {
-> +    .name = "cpu/sve/zreg_hi",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64_SUB_ARRAY(d, ARMVectorReg, 2, ARM_MAX_VQ - 2),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_preg_reg = {
-> +    .name = "cpu/sve/preg",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64_ARRAY(p, ARMPredicateReg, 2 * ARM_MAX_VQ / 8),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_sve = {
-> +    .name = "cpu/sve",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = sve_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_STRUCT_ARRAY(env.vfp.zregs, ARMCPU, 32, 0,
-> +                             vmstate_zreg_hi_reg, ARMVectorReg),
-> +        VMSTATE_STRUCT_ARRAY(env.vfp.pregs, ARMCPU, 17, 0,
-> +                             vmstate_preg_reg, ARMPredicateReg),
+>> Quoting Sameeh Jubran (2017-08-13 10:58:46)
+>> > From: Sameeh Jubran <sjubran@redhat.com>
+>> >
+>> > This series fixes qemu-ga's behaviour upon facing a missing
+>> serial/serial
+>> > driver by listening to the serial device's events.
+>> >
+>> > For more info on why this series is needed checkout the commit message
+>> > of the third patch and the following bugzilla:
+>> https://bugzilla.redhat.com/show_bug.cgi?id=990629.
+>> >
+>> > Sameeh Jubran (3):
+>> >   qga: Channel: Add functions for checking serial status
+>> >   qga: main: make qga config and socket activation global
+>> >   qga: Prevent qemu-ga exit if serial doesn't exist
+>>
+>> Hi Sameeh,
+>>
+>> The event handling stuff is spiffy and could be useful for other use-cases
+>> (e.g. cpu/mem hotplug events that can be consumed by management), but
+>> since
+>> the actual bug here is somewhat of an edge case (we *could* just tell
+>> people that installing the agent before virtio-serial drivers is a bug,
+>> or that unplugging the agent's communication channel is a bad idea),
+>> I'm not too comfortable with adding this much complexity unless there's
+>> a stronger argument for it.
+>>
+> I can relate to your concerns, it is somehow an edge case but I think that
+> this
+> is the elegant way to handle it instead of just polling forever. This
+> patch series
+> is more related to Windows than Linux as this edge case is much more common
+> on Windows since when the virtio-serial driver is installed sometimes
+> usually
+> it requires a post-installation reboot and when the system is up, qemu-ga
+> runs before
+> the virtio-serial driver is fully configured and it fails to load and then
+> another reboot is needed.
+>
+>
+>>
+>> There's also a couple issues I had with this series as it stands, namely
+>> the lack of a ./configure check for udev (which could cause build
+>> breakage in some environments), and a lot of spillage of GAConfig into
+>> qga/channel-*, which I think could be avoided.
+>>
+> I think we can use the --retry with linux clients and use the device
+> notifications
+> API provided by Windows as it is supported since xp.
+>
+>>
+>> I've sent an alternative series that I think we should consider as it
+>> uses a much simpler mechanism to implement this support (basically
+>> just periodically retrying the channel if it doesn't exist, or if it
+>> disappears for whatever reason). I've tested it on Windows, but would
+>> be good to confirm that it adequately addresses the use-case you were
+>> looking at. Thanks!
+>>
+> I haven't tested it yet, but I think it might solve the issue. Your series
+> is much
+> simpler and less intrusive to the code but I don't think this is the right
+> approach.
+>
+>>
+>> >
+>> >  Makefile            |   4 +
+>> >  qga/channel-posix.c |  54 ++++++++++
+>> >  qga/channel-win32.c |  60 +++++++++++
+>> >  qga/channel.h       |   9 ++
+>> >  qga/main.c          | 284 ++++++++++++++++++++++++++++++
+>> ++++++++++++++++------
+>> >  qga/service-win32.h |   4 +
+>> >  6 files changed, 385 insertions(+), 30 deletions(-)
+>> >
+>> > --
+>> > 2.9.4
+>> >
+>>
+>>
+>
+>
+> --
+> Respectfully,
+> *Sameeh Jubran*
+> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+> *Software Engineer @ Daynix <http://www.daynix.com>.*
+>
 
-Is it the QEMU_ALIGNED attribute that means we need to do the pregs
-via a STRUCT_ARRAY rather than being able to use a UINT64_2DARRAY ?
 
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +#endif /* AARCH64 */
 
-thanks
--- PMM
+-- 
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
