@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1edagi-0007wq-7r
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:54:57 -0500
+	(envelope-from <cohuck@redhat.com>) id 1edamW-0001XC-Tl
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1edagf-0002TD-6y
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:54:56 -0500
-Received: from mga06.intel.com ([134.134.136.31]:46677)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1edage-0002SK-UT
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:54:53 -0500
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Mon, 22 Jan 2018 19:36:39 +0800
-Message-Id: <1516620999-25669-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v2] migration: use s->threshold_size inside
- migration_update_counters
+	(envelope-from <cohuck@redhat.com>) id 1edamS-0005lq-W4
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:00:57 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 22 Jan 2018 13:00:36 +0100
+Message-Id: <20180122120045.13538-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 0/9] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +17,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: Wei Wang <wei.w.wang@intel.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-Fixes: b15df1ae50 ("migration: cleanup stats update into function")
-The threshold size is changed to be recorded in s->threshold_size.
+The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc78f:
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2018-01-19 16:35:25 +0000)
 
-v1->v2 change:
-	only commit log description change
+are available in the git repository at:
 
-diff --git a/migration/migration.c b/migration/migration.c
-index d3a1c49..bfd1a16 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2212,7 +2212,6 @@ static void migration_update_counters(MigrationState *s,
-                                       int64_t current_time)
- {
-     uint64_t transferred, time_spent;
--    int64_t threshold_size;
-     double bandwidth;
- 
-     if (current_time < s->iteration_start_time + BUFFER_DELAY) {
-@@ -2222,7 +2221,7 @@ static void migration_update_counters(MigrationState *s,
-     transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-     time_spent = current_time - s->iteration_start_time;
-     bandwidth = (double)transferred / time_spent;
--    threshold_size = bandwidth * s->parameters.downtime_limit;
-+    s->threshold_size = bandwidth * s->parameters.downtime_limit;
- 
-     s->mbps = (((double) transferred * 8.0) /
-                ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
-@@ -2242,7 +2241,7 @@ static void migration_update_counters(MigrationState *s,
-     s->iteration_initial_bytes = qemu_ftell(s->to_dst_file);
- 
-     trace_migrate_transferred(transferred, time_spent,
--                              bandwidth, threshold_size);
-+                              bandwidth, s->threshold_size);
- }
- 
- /* Migration thread iteration status */
+  git://github.com/cohuck/qemu tags/s390x-20180122
+
+for you to fetch changes up to 9f0d13f4f1de3cf9b70435cc4e87a301ee12471f:
+
+  s390x/kvm: provide stfle.81 (2018-01-22 11:22:43 +0100)
+
+----------------------------------------------------------------
+Various fixes/improvements, and support for the new 81/82
+facility bits.
+
+----------------------------------------------------------------
+
+Alistair Francis (1):
+  hw/s390x: Replace fprintf(stderr, "*\n" with qemu_log_mask()
+
+Christian Borntraeger (3):
+  s390x/sclp: fixup highest CPU address
+  s390x/kvm: Handle bpb feature
+  s390x/kvm: provide stfle.81
+
+Claudio Imbrenda (1):
+  s390x: fix storage attributes migration for non-small guests
+
+Cornelia Huck (1):
+  linux-headers: update
+
+David Hildenbrand (3):
+  s390x/tcg: implement TEST PROTECTION
+  s390x/sclp: fix missing be conversion
+  s390x/tcg: fixup TEST PROTECTION
+
+ hw/s390x/s390-stattrib-kvm.c                   |  4 +--
+ hw/s390x/sclp.c                                |  6 ++--
+ hw/s390x/virtio-ccw.c                          |  5 ++--
+ include/standard-headers/asm-s390/virtio-ccw.h |  6 +---
+ linux-headers/asm-powerpc/kvm.h                | 25 ++++++++++++++++
+ linux-headers/asm-s390/kvm.h                   |  9 +++---
+ linux-headers/asm-s390/kvm_para.h              |  4 ---
+ linux-headers/linux/kvm.h                      |  8 ++++--
+ target/s390x/cpu.c                             |  1 +
+ target/s390x/cpu.h                             |  3 ++
+ target/s390x/cpu_features.c                    |  2 ++
+ target/s390x/cpu_features_def.h                |  2 ++
+ target/s390x/gen-features.c                    |  2 ++
+ target/s390x/helper.h                          |  2 +-
+ target/s390x/kvm.c                             | 14 +++++++++
+ target/s390x/machine.c                         | 17 +++++++++++
+ target/s390x/mem_helper.c                      | 40 ++++++++++++++++++++++++--
+ target/s390x/translate.c                       |  2 +-
+ 18 files changed, 124 insertions(+), 28 deletions(-)
+
 -- 
-1.8.3.1
+2.13.6
