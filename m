@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edb80-0002Iz-2Z
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:08 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1edb84-0002Mo-R2
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edb7z-0001Zw-94
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:08 -0500
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:38966)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1edb7z-0001Zq-3x
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:07 -0500
-Received: by mail-ot0-x230.google.com with SMTP id d9so7264582oth.6
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 04:23:07 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1edb83-0001aO-GE
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:12 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+	<8cb52056-e57c-ec72-60a1-adc41f21b9c3@redhat.com>
+	<d64cd344-bbcb-a088-f74d-a3e5446085f4@virtuozzo.com>
+Message-ID: <ea632dcf-28f5-5f33-e22f-db7e622da823@virtuozzo.com>
+Date: Mon, 22 Jan 2018 15:22:50 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180120200358.19991-1-marcandre.lureau@redhat.com>
-References: <20180120200358.19991-1-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 12:22:46 +0000
-Message-ID: <CAFEAcA-5sZNimPxeSabBXmJUd_C+NLnoXbDDQ9w0tSjtbrXCyg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <d64cd344-bbcb-a088-f74d-a3e5446085f4@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/1] Dump patches
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-On 20 January 2018 at 20:03, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc7=
-8f:
+22.01.2018 12:20, Vladimir Sementsov-Ogievskiy wrote:
+> 20.01.2018 02:30, John Snow wrote:
+>>
+>> On 01/16/2018 07:54 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hi all.
+>>>
+>>> There are three qmp commands, needed to implement external backup API.
+>>>
+>>> Using these three commands, client may do all needed bitmap=20
+>>> management by
+>>> hand:
+>>>
+>>> on backup start we need to do a transaction:
+>>> =C2=A0 {disable old bitmap, create new bitmap}
+>>>
+>>> on backup success:
+>>> =C2=A0 drop old bitmap
+>>>
+>>> on backup fail:
+>>> =C2=A0 enable old bitmap
+>>> =C2=A0 merge new bitmap to old bitmap
+>>> =C2=A0 drop new bitmap
+>>>
+>>> v2: fix merge command deadlock
+>>> =C2=A0=C2=A0 add new patches: 1 and 6
+>>>
+>>> Vladimir Sementsov-Ogievskiy (6):
+>>> =C2=A0=C2=A0 block: maintain persistent disabled bitmaps
+>>> =C2=A0=C2=A0 block/dirty-bitmap: add lock to bdrv_enable/disable_dirty_=
+bitmap
+>>> =C2=A0=C2=A0 qapi: add block-dirty-bitmap-enable/disable
+>>> =C2=A0=C2=A0 qmp: transaction support for block-dirty-bitmap-enable/dis=
+able
+>>> =C2=A0=C2=A0 qapi: add block-dirty-bitmap-merge
+>>> =C2=A0=C2=A0 qapi: add disabled parameter to block-dirty-bitmap-add
+>>>
+>>> =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 92 ++++++++++++++++++++++-
+>>> =C2=A0 qapi/transaction.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0 4 +
+>>> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
+>>> =C2=A0 include/block/dirty-bitmap.h |=C2=A0=C2=A0 3 +-
+>>> =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 42 ++++++-----
+>>> =C2=A0 block/qcow2-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 12 +--
+>>> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
+>>> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 169=20
+>>> +++++++++++++++++++++++++++++++++++++++++--
+>>> =C2=A0 8 files changed, 287 insertions(+), 39 deletions(-)
+>>>
+>> Fails to apply to master (b384cd95) on patch four and five. Only
+>> contextual problems, I've patched it up and I'll review that.
+>>
+>> (mirrored here if you want to check my rebase work:
+>> https://github.com/jnsnow/qemu/tree/vlad-review)
+>>
+>> Since I was full of such bad and stupid ideas last time, I'd like
+>> someone else to look over this one for design and I'll just review it
+>> for accuracy.
+>>
+>> --js
 >
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-01-19 16:35:25 +0000)
+> Thank you for review, John!
 >
-> are available in the Git repository at:
+> Ok, so, I'll going to:
 >
->   https://github.com/elmarco/qemu.git tags/dump-pull-request
+> - take patch 1 into migration and respin it today (I hope) with test=20
+> about qcow2-based bitmap migration disabled.
+> - separate fixes and refactoring from here (locking + _bitmap_clear=20
+> transaction), send them separately
+> - than, make test for external backup and respin these series with it
 >
-> for you to fetch changes up to 6f49ec4034e55dfb675a56a62c9579384f7fb8cc:
->
->   dump-guest-memory.py: fix python 2 support (2018-01-20 20:59:00 +0100)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Marc-Andr=C3=A9 Lureau (1):
->   dump-guest-memory.py: fix python 2 support
->
->  scripts/dump-guest-memory.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied, thanks.
+changed to:
 
--- PMM
+1. send patch 1/6 separately with the whole reasoning[done], as it=20
+blocks two series, wait for accepting
+2. respin postcopy series
+3. finish up discussion on bitmap locking under "[PATCH v9 03/13]=20
+block/dirty-bitmap: add _locked version of bdrv_reclaim_dirty_bitmap"
+4. separate fixes and refactoring from here (locking + _bitmap_clear=20
+transaction), send them separately
+5. make test for external backup and respin these series with it
+
+2 depends on 1
+4 depends on 3
+5 depends on 1 and 4
+
+--=20
+Best regards,
+Vladimir
