@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Hongzhi.Song@windriver.com>) id 1edRTk-0001MT-Ln
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 21:04:58 -0500
+	(envelope-from <jasowang@redhat.com>) id 1edSrz-0003Od-Jk
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:34:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Hongzhi.Song@windriver.com>) id 1edRTf-0008UI-MJ
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 21:04:56 -0500
-From: "Hongzhi, Song" <hongzhi.song@windriver.com>
-Message-ID: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
-Date: Mon, 22 Jan 2018 10:06:26 +0800
+	(envelope-from <jasowang@redhat.com>) id 1edSrv-0000D7-O8
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:34:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1edSrv-0000CG-Eg
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:33:59 -0500
+References: <20180119130653.24044-1-stefanha@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <9048a120-a3be-404d-e977-39f40b4d4561@redhat.com>
+Date: Mon, 22 Jan 2018 11:33:46 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20180119130653.24044-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] (v2. forward to qemu )-Panic with ext4, nbd, qemu-img,
- block
+Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,246 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
-
-Hello,
-
-I create a virtual disk-image using qemu-img.
-
-And then I use /dev/nbd to map the image.
-
-I mount the /dev/nbd to a local dir with ext4-format
-
-Finally, I have some trouble about ext4-filesystem and block device,=20
-with using demand of rsync or dd to write the image.
-
-Reproduce :
-
- =C2=A0=C2=A0=C2=A0 qemu-img create test.img 2G
-
- =C2=A0=C2=A0=C2=A0 mkfs.ext4 -F test.img
-
- =C2=A0=C2=A0=C2=A0=C2=A0 qemu-nbd -f raw -c /dev/nbd0 test.img
-
- =C2=A0=C2=A0=C2=A0=C2=A0 mount -r ext4 /dev/nbd0 LOCAL_DIR/
-
- =C2=A0=C2=A0=C2=A0 rsync -av META_DATA_DIR/=C2=A0 LOCAL_DIR/
-
-Qemu Version:
-
-     QEMU emulator version 2.10.0
-     Copyright (c) 2003-2017 Fabrice Bellard and the QEMU \
-     Project developers
-
-Kernel Version:
-
- =C2=A0=C2=A0=C2=A0 4.12+HEAD (I have test 4.15-rc7 and 4.12)
-
-Machine:
-
- =C2=A0=C2=A0=C2=A0 intel-x86-64
-
-CPU:
-
- =C2=A0=C2=A0=C2=A0 xeon
-
-Architecture:
-
- =C2=A0=C2=A0=C2=A0 I86
-
-The problem is not always=C2=A0 appear step by step, but often using lava=
-=20
-that is a auto-testing method.
-
-And it just appears in some special board.
-
-If someone has similar trouble or has resolution or wants more detail,=20
-please connect with me. Thanks.
-
-Detail:
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, zhiyong.yang@intel.com, Maxime Coquelin <maxime.coquelin@redhat.com>, Wei Wang <wei.w.wang@intel.com>
 
 
-329.11 EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts:=20
-(null)
-329.12 block nbd0: Connection timed out
-329.13 block nbd0: shutting down sockets
-329.14 blk_update_request: I/O error, dev nbd0, sector 304384
-329.15 blk_update_request: I/O error, dev nbd0, sector 304640
-329.16 blk_update_request: I/O error, dev nbd0, sector 304896
-329.17 blk_update_request: I/O error, dev nbd0, sector 305152
-329.18 blk_update_request: I/O error, dev nbd0, sector 305408
-329.19 blk_update_request: I/O error, dev nbd0, sector 305664
-329.20 blk_update_request: I/O error, dev nbd0, sector 305920
-329.21 blk_update_request: I/O error, dev nbd0, sector 306176
-329.22 blk_update_request: I/O error, dev nbd0, sector 306432
-329.23 blk_update_request: I/O error, dev nbd0, sector 306688
-329.24 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 8388608 size 8388608 starting block 38400)
-329.25 Buffer I/O error on device nbd0, logical block 38144
-329.26 Buffer I/O error on device nbd0, logical block 38145
-329.27 Buffer I/O error on device nbd0, logical block 38146
-329.28 Buffer I/O error on device nbd0, logical block 38147
-329.29 Buffer I/O error on device nbd0, logical block 38148
-329.30 Buffer I/O error on device nbd0, logical block 38149
-329.31 Buffer I/O error on device nbd0, logical block 38150
-329.32 Buffer I/O error on device nbd0, logical block 38151
-329.33 Buffer I/O error on device nbd0, logical block 38152
-329.34 Buffer I/O error on device nbd0, logical block 38153
-329.35 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 8388608 size 8388608 starting block 38656)
-329.36 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 8388608 size 8388608 starting block 38912)
-329.37 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 16777216 size 8388608 starting block 39168)
-329.38 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 16777216 size 8388608 starting block 39424)
-329.39 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 16777216 size 8388608 starting block 39680)
-329.40 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 16777216 size 8388608 starting block 39936)
-329.41 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 16777216 size 8388608 starting block 40192)
-329.42 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 16777216 size 8388608 starting block 40448)
-329.43 EXT4-fs error (device nbd0): __ext4_get_inode_loc:4520: inode=20
-#222: block 174: comm kworker/u113:0: unable to read itable block
-329.44 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5=20
-writing to inode 160 (offset 16777216 size 8388608 starting block 40704)
-329.45 ------------[ cut here ]------------
-329.46 kernel BUG at /kernel-source//fs/buffer.c:3091!
-329.47 invalid opcode: 0000 [#1] PREEMPT SMP
-329.48 Modules linked in: nbd xt_CHECKSUM iptable_mangle ipt_REJECT=20
-nf_reject_ipv4 xt_tcpudp ebtable_filter ebtables ip6_tables=20
-ipt_MASQUERADE nf_nat_masquerade_ipv4 nf_conntrack_netlink nfnetlink=20
-xfrm_user iptable_nat xt_addrtype iptable_filter ip_tables xt_conntrack=20
-x_tables br_netfilter bridge stp llc intel_rapl sb_edac intel_powerclamp=20
-coretemp crct10dif_pclmul crct10dif_common aesni_intel aes_x86_64=20
-crypto_simd cryptd glue_helper iTCO_wdt iTCO_vendor_support lpc_ich=20
-i2c_i801 wmi acpi_pad acpi_power_meter nfsd openvswitch nf_defrag_ipv6=20
-nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack=20
-kvm_intel kvm irqbypass fuse
-329.49 CPU: 30 PID: 6 Comm: kworker/u113:0 Not tainted=20
-4.12.18-rt0-yocto-preempt-rt #1
-329.50 Hardware name: Intel Corporation S2600WTT/S2600WTT, BIOS=20
-GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
-329.51 Workqueue: writeback wb_workfn (flush-43:0)
-329.52 task: ffff977bec759e00 task.stack: ffffa2930524c000
-329.53 RIP: 0010:submit_bh_wbc+0x155/0x160
-329.54 RSP: 0018:ffffa2930524f7e0 EFLAGS: 00010246
-329.55 RAX: 0000000000620005 RBX: ffff977f05cddc18 RCX: 0000000000000000
-329.56 RDX: ffff977f05cddc18 RSI: 0000000000020800 RDI: 0000000000000001
-329.57 RBP: ffffa2930524f808 R08: ff00000000000000 R09: 00ffffffffffffff
-329.58 R10: ffffa2930524f920 R11: 000000000000058c R12: 000000000000a598
-329.59 R13: ffffffffba15c500 R14: ffff977fe1bab400 R15: ffff977fea643000
-329.60 FS: 0000000000000000(0000) GS:ffff977befa00000(0000)=20
-knlGS:0000000000000000
-329.61 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-329.62 CR2: 00007f7d70000010 CR3: 000000035ce0e000 CR4: 00000000001406e0
-329.63 Call Trace:
-329.64 __sync_dirty_buffer+0x41/0xa0
-329.65 ext4_commit_super+0x1d6/0x2a0
-329.66 __ext4_error_inode+0xb2/0x170
-329.67 ? wake_up_bit+0x30/0x30
-329.68 __ext4_get_inode_loc+0x365/0x460
-329.69 ext4_reserve_inode_write+0x51/0xb0
-329.70 ? ext4_writepages+0xd23/0x1090
-329.71 ext4_mark_inode_dirty+0x48/0x200
-329.72 ext4_writepages+0xd23/0x1090
-329.73 ? __schedule+0x25b/0x6a0
-329.74 do_writepages+0x39/0xc0
-329.75 ? do_writepages+0x39/0xc0
-329.76 ? unpin_current_cpu+0x5e/0x80
-329.77 ? migrate_enable+0x2dd/0x3c0
-329.78 __writeback_single_inode+0x4d/0x490
-329.79 ? __writeback_single_inode+0x4d/0x490
-329.80 ? rt_spin_unlock+0x27/0x40
-329.81 writeback_sb_inodes+0x230/0x4d0
-329.82 wb_writeback+0xde/0x3d0
-329.83 wb_workfn+0xb8/0x420
-329.84 ? wb_workfn+0xb8/0x420
-329.85 ? unpin_current_cpu+0x5e/0x80
-329.86 ? migrate_enable+0x2dd/0x3c0
-329.87 ? _raw_spin_lock+0x17/0x40
-329.88 process_one_work+0x1cf/0x470
-329.89 ? migrate_disable+0x12f/0x200
-329.90 worker_thread+0x4b/0x450
-329.91 kthread+0x124/0x140
-329.92 ? process_one_work+0x470/0x470
-329.93 ? kthread_create_on_node+0x40/0x40
-329.94 ret_from_fork+0x22/0x30
-329.95 Code: 89 ef 44 09 f7 41 89 7c 24 14 4c 89 e7 e8 04 c4 22 00 5b 31=20
-c0 41 5c 41 5d 41 5e 41 5f 5d c3 f0 80 62 01 f7 e9 19 ff ff ff 0f 0b=20
-<0f> 0b 0f 0b 0f 0b 0f 0b 0f 0b 90 0f 1f 44 00 00 55 49 89 f9 48
-329.96 RIP: submit_bh_wbc+0x155/0x160 RSP: ffffa2930524f7e0
-329.97 ---[ end trace 0000000000000002 ]---
-329.98 Buffer I/O error on dev nbd0, logical block 262144, lost sync=20
-page write
-329.99 JBD2: Error -5 detected when updating journal superblock for nbd0-=
-8.
-329.100 Aborting journal on device nbd0-8.
-329.101 ------------[ cut here ]------------
-329.102 kernel BUG at /kernel-source//fs/buffer.c:3091!
-329.103 invalid opcode: 0000 [#2] PREEMPT SMP
-329.104 Modules linked in: nbd xt_CHECKSUM iptable_mangle ipt_REJECT=20
-nf_reject_ipv4 xt_tcpudp ebtable_filter ebtables ip6_tables=20
-ipt_MASQUERADE nf_nat_masquerade_ipv4 nf_conntrack_netlink nfnetlink=20
-xfrm_user iptable_nat xt_addrtype iptable_filter ip_tables xt_conntrack=20
-x_tables br_netfilter bridge stp llc intel_rapl sb_edac intel_powerclamp=20
-coretemp crct10dif_pclmul crct10dif_common aesni_intel aes_x86_64=20
-crypto_simd cryptd glue_helper iTCO_wdt iTCO_vendor_support lpc_ich=20
-i2c_i801 wmi acpi_pad acpi_power_meter nfsd openvswitch nf_defrag_ipv6=20
-nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack=20
-kvm_intel kvm irqbypass fuse
-329.105 CPU: 36 PID: 7760 Comm: jbd2/nbd0-8 Tainted: G D=20
-4.12.18-rt0-yocto-preempt-rt #1
-329.106 Hardware name: Intel Corporation S2600WTT/S2600WTT, BIOS=20
-GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
-329.107 task: ffff977fdd853c00 task.stack: ffffa29308934000
-329.108 RIP: 0010:submit_bh_wbc+0x155/0x160
-329.109 RSP: 0018:ffffa29308937bd0 EFLAGS: 00010246
-329.110 RAX: 0000000004000005 RBX: ffff977f05cf62e8 RCX: 0000000000000000
-329.111 RDX: ffff977f05cf62e8 RSI: 0000000000020800 RDI: 0000000000000001
-329.112 RBP: ffffa29308937bf8 R08: 0000000000000100 R09: 0000000000000000
-329.113 R10: ffff977fdd853f30 R11: 0000000000000000 R12: ffff977fea6bc800
-329.114 R13: 0000000000020800 R14: ffff977fc8a33000 R15: ffff977fea6bc800
-329.115 FS: 0000000000000000(0000) GS:ffff977befb80000(0000)=20
-knlGS:0000000000000000
-329.116 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-329.117 CR2: 0000000000915d50 CR3: 000000035ce0e000 CR4: 00000000001406e0
-329.118 Call Trace:
-329.119 submit_bh+0x10/0x20
-329.120 jbd2_write_superblock+0xaf/0x1e0
-329.121 jbd2_journal_update_sb_errno+0x3f/0x50
-329.122 __journal_abort_soft+0x3d/0x60
-329.123 jbd2_write_superblock+0x1b4/0x1e0
-329.124 jbd2_journal_update_sb_log_tail+0x3a/0x90
-329.125 jbd2_journal_commit_transaction+0xb89/0x18d0
-329.126 ? __this_cpu_preempt_check+0x13/0x20
-329.127 ? __perf_event_task_sched_in+0x66/0x190
-329.128 ? _raw_spin_lock_irqsave+0x1d/0x50
-329.129 ? lock_timer_base+0x81/0xa0
-329.130 ? _raw_spin_unlock_irqrestore+0x18/0x50
-329.131 ? try_to_del_timer_sync+0x44/0x60
-329.132 ? del_timer_sync+0x47/0xf0
-329.133 kjournald2+0xc6/0x250
-329.134 ? kjournald2+0xc6/0x250
-329.135 ? wake_bit_function+0x60/0x60
-329.136 kthread+0x124/0x140
-329.137 ? commit_timeout+0x10/0x10
-329.138 ? kthread_create_on_node+0x40/0x40
-329.139 ret_from_fork+0x22/0x30
-329.140 Code: 89 ef 44 09 f7 41 89 7c 24 14 4c 89 e7 e8 04 c4 22 00 5b=20
-31 c0 41 5c 41 5d 41 5e 41 5f 5d c3 f0 80 62 01 f7 e9 19 ff ff ff 0f 0b=20
-<0f> 0b 0f 0b 0f 0b 0f 0b 0f 0b 90 0f 1f 44 00 00 55 49 89 f9 48
-329.141 RIP: submit_bh_wbc+0x155/0x160 RSP: ffffa29308937bd0
-329.142 ---[ end trace 0000000000000003 ]---
-329.143 block nbd0: Connection timed out
-329.144 block nbd0: Connection timed out
-329.145 block nbd0: Connection timed out
-329.146 block nbd0: Connection timed out
-329.147 block nbd0: Connection timed out
-329.148 block nbd0: Connection timed out
-329.149 block nbd0: Connection timed out
-329.150 block nbd0: Connection timed out
-329.151 block nbd0: Connection timed out
+
+On 2018=E5=B9=B401=E6=9C=8819=E6=97=A5 21:06, Stefan Hajnoczi wrote:
+> These patches implement the virtio-vhost-user device design that I have
+> described here:
+> https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2830007
+
+Thanks for the patches, looks rather interesting and similar to split=20
+device model used by Xen.
+
+>
+> The goal is to let the guest act as the vhost device backend for other =
+guests.
+> This allows virtual networking and storage appliances to run inside gue=
+sts.
+
+So the question still, what kind of protocol do you want to run on top?=20
+If it was ethernet based, virtio-net work pretty well and it can even do=20
+migration.
+
+> This device is particularly interesting for poll mode drivers where exi=
+tless
+> VM-to-VM communication is possible, completely bypassing the hypervisor=
+ in the
+> data path.
+
+It's better to clarify the reason of hypervisor bypassing. (performance,=20
+security or scalability).
+
+Probably not for the following cases:
+
+1) kick/call
+2) device IOTLB / IOMMU transaction (or any other case that backends=20
+needs metadata from qemu).
+
+>
+> The DPDK driver is here:
+> https://github.com/stefanha/dpdk/tree/virtio-vhost-user
+>
+> For more information, see
+> https://wiki.qemu.org/Features/VirtioVhostUser.
+>
+> virtio-vhost-user is inspired by Wei Wang and Zhiyong Yang's vhost-pci =
+work.
+> It differs from vhost-pci in that it has:
+> 1. Vhost-user protocol message tunneling, allowing existing vhost-user
+>     slave software to be reused inside the guest.
+> 2. Support for all vhost device types.
+> 3. Disconnected operation and reconnection support.
+> 4. Asynchronous vhost-user socket implementation that avoids blocking.
+>
+> I have written this code to demonstrate how the virtio-vhost-user appro=
+ach
+> works and that it is more maintainable than vhost-pci because vhost-use=
+r slave
+> software can use both AF_UNIX and virtio-vhost-user without significant=
+ code
+> changes to the vhost device backends.
+
+Yes, this looks cleaner than vhost-pci.
+
+>
+> One of the main concerns about virtio-vhost-user was that the QEMU
+> virtio-vhost-user device implementation could be complex because it nee=
+ds to
+> parse all messages.  I hope this patch series shows that it's actually =
+very
+> simple because most messages are passed through.
+>
+> After this patch series has been reviewed, we need to decide whether to=
+ follow
+> the original vhost-pci approach or to use this one.  Either way, both p=
+atch
+> series still require improvements before they can be merged.  Here are =
+my todos
+> for this series:
+>
+>   * Implement "Additional Device Resources over PCI" for shared memory,
+>     doorbells, and notifications instead of hardcoding a BAR with magic
+>     offsets into virtio-vhost-user:
+>     https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2920007
+
+Does this mean we need to standardize vhost-user protocol first?
+
+>   * Implement the VRING_KICK eventfd - currently vhost-user slaves must=
+ be poll
+>     mode drivers.
+>   * Optimize VRING_CALL doorbell with ioeventfd to avoid QEMU exit.
+
+The performance implication needs to be measured. It looks to me both=20
+kick and call will introduce more latency form the point of guest.
+
+>   * vhost-user log feature
+>   * UUID config field for stable device identification regardless of PC=
+I
+>     bus addresses.
+>   * vhost-user IOMMU and SLAVE_REQ_FD feature
+
+So an assumption is the VM that implements vhost backends should be at=20
+least as secure as vhost-user backend process on host. Could we have=20
+this conclusion?
+
+>   * VhostUserMsg little-endian conversion for cross-endian support
+>   * Chardev disconnect using qemu_chr_fe_set_watch() since CHR_CLOSED i=
+s
+>     only emitted while a read callback is registered.  We don't keep a
+>     read callback registered all the time.
+>   * Drain txq on reconnection to discard stale messages.
+>
+> Stefan Hajnoczi (1):
+>    virtio-vhost-user: add virtio-vhost-user device
+>
+> Wei Wang (1):
+>    vhost-user: share the vhost-user protocol related structures
+>
+>   configure                                   |   18 +
+>   hw/virtio/Makefile.objs                     |    1 +
+>   hw/virtio/virtio-pci.h                      |   21 +
+>   include/hw/pci/pci.h                        |    1 +
+>   include/hw/virtio/vhost-user.h              |  106 +++
+>   include/hw/virtio/virtio-vhost-user.h       |   88 +++
+>   include/standard-headers/linux/virtio_ids.h |    1 +
+>   hw/virtio/vhost-user.c                      |  100 +--
+>   hw/virtio/virtio-pci.c                      |   61 ++
+>   hw/virtio/virtio-vhost-user.c               | 1047 ++++++++++++++++++=
++++++++++
+>   hw/virtio/trace-events                      |   22 +
+>   11 files changed, 1367 insertions(+), 99 deletions(-)
+>   create mode 100644 include/hw/virtio/vhost-user.h
+>   create mode 100644 include/hw/virtio/virtio-vhost-user.h
+>   create mode 100644 hw/virtio/virtio-vhost-user.c
+>
+
+Btw, it's better to have some early numbers, e.g what testpmd reports=20
+during forwarding.
+
+Thanks
