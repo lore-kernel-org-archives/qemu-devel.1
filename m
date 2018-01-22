@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1edSrz-0003Od-Jk
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:34:05 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1edT07-0005Fp-Bi
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1edSrv-0000D7-O8
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:34:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1edSrv-0000CG-Eg
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:33:59 -0500
-References: <20180119130653.24044-1-stefanha@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9048a120-a3be-404d-e977-39f40b4d4561@redhat.com>
-Date: Mon, 22 Jan 2018 11:33:46 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180119130653.24044-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
- device
+	(envelope-from <richard.henderson@linaro.org>) id 1edT04-0005zz-C0
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:27 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:43965)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1edT04-0005zZ-3r
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:24 -0500
+Received: by mail-pg0-x243.google.com with SMTP id n17so6073782pgf.10
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:42:23 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Sun, 21 Jan 2018 19:41:36 -0800
+Message-Id: <20180122034217.19593-3-richard.henderson@linaro.org>
+In-Reply-To: <20180122034217.19593-1-richard.henderson@linaro.org>
+References: <20180122034217.19593-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL 02/43] target/hppa: Define the rest of the PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +26,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, zhiyong.yang@intel.com, Maxime Coquelin <maxime.coquelin@redhat.com>, Wei Wang <wei.w.wang@intel.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
+We don't actually do anything with most of the bits yet,
+but at least they have names and we have somewhere to
+store them.
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/hppa/cpu.h    | 47 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/hppa/helper.c | 53 ++++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 86 insertions(+), 14 deletions(-)
 
-On 2018=E5=B9=B401=E6=9C=8819=E6=97=A5 21:06, Stefan Hajnoczi wrote:
-> These patches implement the virtio-vhost-user device design that I have
-> described here:
-> https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2830007
-
-Thanks for the patches, looks rather interesting and similar to split=20
-device model used by Xen.
-
->
-> The goal is to let the guest act as the vhost device backend for other =
-guests.
-> This allows virtual networking and storage appliances to run inside gue=
-sts.
-
-So the question still, what kind of protocol do you want to run on top?=20
-If it was ethernet based, virtio-net work pretty well and it can even do=20
-migration.
-
-> This device is particularly interesting for poll mode drivers where exi=
-tless
-> VM-to-VM communication is possible, completely bypassing the hypervisor=
- in the
-> data path.
-
-It's better to clarify the reason of hypervisor bypassing. (performance,=20
-security or scalability).
-
-Probably not for the following cases:
-
-1) kick/call
-2) device IOTLB / IOMMU transaction (or any other case that backends=20
-needs metadata from qemu).
-
->
-> The DPDK driver is here:
-> https://github.com/stefanha/dpdk/tree/virtio-vhost-user
->
-> For more information, see
-> https://wiki.qemu.org/Features/VirtioVhostUser.
->
-> virtio-vhost-user is inspired by Wei Wang and Zhiyong Yang's vhost-pci =
-work.
-> It differs from vhost-pci in that it has:
-> 1. Vhost-user protocol message tunneling, allowing existing vhost-user
->     slave software to be reused inside the guest.
-> 2. Support for all vhost device types.
-> 3. Disconnected operation and reconnection support.
-> 4. Asynchronous vhost-user socket implementation that avoids blocking.
->
-> I have written this code to demonstrate how the virtio-vhost-user appro=
-ach
-> works and that it is more maintainable than vhost-pci because vhost-use=
-r slave
-> software can use both AF_UNIX and virtio-vhost-user without significant=
- code
-> changes to the vhost device backends.
-
-Yes, this looks cleaner than vhost-pci.
-
->
-> One of the main concerns about virtio-vhost-user was that the QEMU
-> virtio-vhost-user device implementation could be complex because it nee=
-ds to
-> parse all messages.  I hope this patch series shows that it's actually =
-very
-> simple because most messages are passed through.
->
-> After this patch series has been reviewed, we need to decide whether to=
- follow
-> the original vhost-pci approach or to use this one.  Either way, both p=
-atch
-> series still require improvements before they can be merged.  Here are =
-my todos
-> for this series:
->
->   * Implement "Additional Device Resources over PCI" for shared memory,
->     doorbells, and notifications instead of hardcoding a BAR with magic
->     offsets into virtio-vhost-user:
->     https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2920007
-
-Does this mean we need to standardize vhost-user protocol first?
-
->   * Implement the VRING_KICK eventfd - currently vhost-user slaves must=
- be poll
->     mode drivers.
->   * Optimize VRING_CALL doorbell with ioeventfd to avoid QEMU exit.
-
-The performance implication needs to be measured. It looks to me both=20
-kick and call will introduce more latency form the point of guest.
-
->   * vhost-user log feature
->   * UUID config field for stable device identification regardless of PC=
-I
->     bus addresses.
->   * vhost-user IOMMU and SLAVE_REQ_FD feature
-
-So an assumption is the VM that implements vhost backends should be at=20
-least as secure as vhost-user backend process on host. Could we have=20
-this conclusion?
-
->   * VhostUserMsg little-endian conversion for cross-endian support
->   * Chardev disconnect using qemu_chr_fe_set_watch() since CHR_CLOSED i=
-s
->     only emitted while a read callback is registered.  We don't keep a
->     read callback registered all the time.
->   * Drain txq on reconnection to discard stale messages.
->
-> Stefan Hajnoczi (1):
->    virtio-vhost-user: add virtio-vhost-user device
->
-> Wei Wang (1):
->    vhost-user: share the vhost-user protocol related structures
->
->   configure                                   |   18 +
->   hw/virtio/Makefile.objs                     |    1 +
->   hw/virtio/virtio-pci.h                      |   21 +
->   include/hw/pci/pci.h                        |    1 +
->   include/hw/virtio/vhost-user.h              |  106 +++
->   include/hw/virtio/virtio-vhost-user.h       |   88 +++
->   include/standard-headers/linux/virtio_ids.h |    1 +
->   hw/virtio/vhost-user.c                      |  100 +--
->   hw/virtio/virtio-pci.c                      |   61 ++
->   hw/virtio/virtio-vhost-user.c               | 1047 ++++++++++++++++++=
-+++++++++
->   hw/virtio/trace-events                      |   22 +
->   11 files changed, 1367 insertions(+), 99 deletions(-)
->   create mode 100644 include/hw/virtio/vhost-user.h
->   create mode 100644 include/hw/virtio/virtio-vhost-user.h
->   create mode 100644 hw/virtio/virtio-vhost-user.c
->
-
-Btw, it's better to have some early numbers, e.g what testpmd reports=20
-during forwarding.
-
-Thanks
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 7fad92144c..ea7e495408 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -46,6 +46,52 @@
+ #define EXCP_SIGILL      4
+ #define EXCP_SIGFPE      5
+ 
++/* Taken from Linux kernel: arch/parisc/include/asm/psw.h */
++#define PSW_I            0x00000001
++#define PSW_D            0x00000002
++#define PSW_P            0x00000004
++#define PSW_Q            0x00000008
++#define PSW_R            0x00000010
++#define PSW_F            0x00000020
++#define PSW_G            0x00000040 /* PA1.x only */
++#define PSW_O            0x00000080 /* PA2.0 only */
++#define PSW_CB           0x0000ff00
++#define PSW_M            0x00010000
++#define PSW_V            0x00020000
++#define PSW_C            0x00040000
++#define PSW_B            0x00080000
++#define PSW_X            0x00100000
++#define PSW_N            0x00200000
++#define PSW_L            0x00400000
++#define PSW_H            0x00800000
++#define PSW_T            0x01000000
++#define PSW_S            0x02000000
++#define PSW_E            0x04000000
++#ifdef TARGET_HPPA64
++#define PSW_W            0x08000000 /* PA2.0 only */
++#else
++#define PSW_W            0
++#endif
++#define PSW_Z            0x40000000 /* PA1.x only */
++#define PSW_Y            0x80000000 /* PA1.x only */
++
++#define PSW_SM (PSW_W | PSW_E | PSW_O | PSW_G | PSW_F \
++               | PSW_R | PSW_Q | PSW_P | PSW_D | PSW_I)
++
++/* ssm/rsm instructions number PSW_W and PSW_E differently */
++#define PSW_SM_I         PSW_I      /* Enable External Interrupts */
++#define PSW_SM_D         PSW_D
++#define PSW_SM_P         PSW_P
++#define PSW_SM_Q         PSW_Q      /* Enable Interrupt State Collection */
++#define PSW_SM_R         PSW_R      /* Enable Recover Counter Trap */
++#ifdef TARGET_HPPA64
++#define PSW_SM_E         0x100
++#define PSW_SM_W         0x200      /* PA2.0 only : Enable Wide Mode */
++#else
++#define PSW_SM_E         0
++#define PSW_SM_W         0
++#endif
++
+ typedef struct CPUHPPAState CPUHPPAState;
+ 
+ struct CPUHPPAState {
+@@ -56,6 +102,7 @@ struct CPUHPPAState {
+     target_ulong cr26;
+     target_ulong cr27;
+ 
++    target_long  psw;        /* All psw bits except the following:  */
+     target_ulong psw_n;      /* boolean */
+     target_long  psw_v;      /* in most significant bit */
+ 
+diff --git a/target/hppa/helper.c b/target/hppa/helper.c
+index d6d6f06cb0..4231ef3bff 100644
+--- a/target/hppa/helper.c
++++ b/target/hppa/helper.c
+@@ -39,10 +39,11 @@ target_ulong cpu_hppa_get_psw(CPUHPPAState *env)
+     /* .........................bcdefgh */
+     psw |= (psw >> 12) & 0xf;
+     psw |= env->psw_cb_msb << 7;
+-    psw <<= 8;
++    psw = (psw & 0xff) << 8;
+ 
+-    psw |= env->psw_n << 21;
+-    psw |= (env->psw_v < 0) << 17;
++    psw |= env->psw_n * PSW_N;
++    psw |= (env->psw_v < 0) * PSW_V;
++    psw |= env->psw;
+ 
+     return psw;
+ }
+@@ -51,8 +52,9 @@ void cpu_hppa_put_psw(CPUHPPAState *env, target_ulong psw)
+ {
+     target_ulong cb = 0;
+ 
+-    env->psw_n = (psw >> 21) & 1;
+-    env->psw_v = -((psw >> 17) & 1);
++    env->psw = psw & ~(PSW_N | PSW_V | PSW_CB);
++    env->psw_n = (psw / PSW_N) & 1;
++    env->psw_v = -((psw / PSW_V) & 1);
+     env->psw_cb_msb = (psw >> 15) & 1;
+ 
+     cb |= ((psw >> 14) & 1) << 28;
+@@ -106,22 +108,45 @@ void hppa_cpu_dump_state(CPUState *cs, FILE *f,
+ {
+     HPPACPU *cpu = HPPA_CPU(cs);
+     CPUHPPAState *env = &cpu->env;
++    target_ulong psw = cpu_hppa_get_psw(env);
++    target_ulong psw_cb;
++    char psw_c[20];
+     int i;
+ 
+-    cpu_fprintf(f, "IA_F " TARGET_FMT_lx
+-                   " IA_B " TARGET_FMT_lx
+-                   " PSW  " TARGET_FMT_lx
+-                   " [N:" TARGET_FMT_ld " V:%d"
+-                   " CB:" TARGET_FMT_lx "]\n              ",
+-                env->iaoq_f, env->iaoq_b, cpu_hppa_get_psw(env),
+-                env->psw_n, env->psw_v < 0,
+-                ((env->psw_cb >> 4) & 0x01111111) | (env->psw_cb_msb << 28));
+-    for (i = 1; i < 32; i++) {
++    cpu_fprintf(f, "IA_F " TARGET_FMT_lx " IA_B " TARGET_FMT_lx "\n",
++                env->iaoq_f, env->iaoq_b);
++
++    psw_c[0]  = (psw & PSW_W ? 'W' : '-');
++    psw_c[1]  = (psw & PSW_E ? 'E' : '-');
++    psw_c[2]  = (psw & PSW_S ? 'S' : '-');
++    psw_c[3]  = (psw & PSW_T ? 'T' : '-');
++    psw_c[4]  = (psw & PSW_H ? 'H' : '-');
++    psw_c[5]  = (psw & PSW_L ? 'L' : '-');
++    psw_c[6]  = (psw & PSW_N ? 'N' : '-');
++    psw_c[7]  = (psw & PSW_X ? 'X' : '-');
++    psw_c[8]  = (psw & PSW_B ? 'B' : '-');
++    psw_c[9]  = (psw & PSW_C ? 'C' : '-');
++    psw_c[10] = (psw & PSW_V ? 'V' : '-');
++    psw_c[11] = (psw & PSW_M ? 'M' : '-');
++    psw_c[12] = (psw & PSW_F ? 'F' : '-');
++    psw_c[13] = (psw & PSW_R ? 'R' : '-');
++    psw_c[14] = (psw & PSW_Q ? 'Q' : '-');
++    psw_c[15] = (psw & PSW_P ? 'P' : '-');
++    psw_c[16] = (psw & PSW_D ? 'D' : '-');
++    psw_c[17] = (psw & PSW_I ? 'I' : '-');
++    psw_c[18] = '\0';
++    psw_cb = ((env->psw_cb >> 4) & 0x01111111) | (env->psw_cb_msb << 28);
++
++    cpu_fprintf(f, "PSW  " TARGET_FMT_lx " CB   " TARGET_FMT_lx " %s\n",
++                psw, psw_cb, psw_c);
++
++    for (i = 0; i < 32; i++) {
+         cpu_fprintf(f, "GR%02d " TARGET_FMT_lx " ", i, env->gr[i]);
+         if ((i % 4) == 3) {
+             cpu_fprintf(f, "\n");
+         }
+     }
++    cpu_fprintf(f, "\n");
+ 
+     /* ??? FR */
+ }
+-- 
+2.14.3
