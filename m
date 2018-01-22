@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1edZXH-0002FS-TA
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:41:09 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1edZaB-0003K9-1Z
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:44:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1edZXE-0005EP-KZ
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:41:07 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 22 Jan 2018 13:41:00 +0300
-Message-Id: <20180122104100.3674-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2] block: maintain persistent disabled bitmaps
+	(envelope-from <alex.bennee@linaro.org>) id 1edZa7-0007px-R3
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:44:07 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1edZa7-0007p2-FQ
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:44:03 -0500
+Received: by mail-wm0-x242.google.com with SMTP id f3so15849361wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 02:44:03 -0800 (PST)
+References: <20180119045438.28582-1-richard.henderson@linaro.org>
+	<20180119045438.28582-4-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180119045438.28582-4-richard.henderson@linaro.org>
+Date: Mon, 22 Jan 2018 10:44:00 +0000
+Message-ID: <87607ukwb3.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 03/16] target/arm: Use pointers in neon
+ zip/uzp helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,309 +31,436 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-To maintain load/store disabled bitmap there is new approach:
 
- - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored
- - store enabled bitmaps as "auto" to qcow2
- - store disabled bitmaps without "auto" flag to qcow2
- - on qcow2 open load "auto" bitmaps as enabled and others
-   as disabled (except in_use bitmaps)
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
+> Rather than passing regnos to the helpers, pass pointers to the
+> vector registers directly.  This eliminates the need to pass in
+> the environment pointer and reduces the number of places that
+> directly access env->vfp.regs[].
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-v2: add John's r-b
-    fix spelling
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-bitmaps-api and bitmaps-postcopy migrations depend on this patch, so
-let's discuss (and merge if in case of consent) as soon as possible.
+> ---
+>  target/arm/helper.h      |  20 +++---
+>  target/arm/neon_helper.c | 162 +++++++++++++++++++++++++----------------=
+------
+>  target/arm/translate.c   |  42 ++++++------
+>  3 files changed, 120 insertions(+), 104 deletions(-)
+>
+> diff --git a/target/arm/helper.h b/target/arm/helper.h
+> index 688380af6b..dbdc38fcb7 100644
+> --- a/target/arm/helper.h
+> +++ b/target/arm/helper.h
+> @@ -511,16 +511,16 @@ DEF_HELPER_3(iwmmxt_muladdsl, i64, i64, i32, i32)
+>  DEF_HELPER_3(iwmmxt_muladdsw, i64, i64, i32, i32)
+>  DEF_HELPER_3(iwmmxt_muladdswl, i64, i64, i32, i32)
+>
+> -DEF_HELPER_3(neon_unzip8, void, env, i32, i32)
+> -DEF_HELPER_3(neon_unzip16, void, env, i32, i32)
+> -DEF_HELPER_3(neon_qunzip8, void, env, i32, i32)
+> -DEF_HELPER_3(neon_qunzip16, void, env, i32, i32)
+> -DEF_HELPER_3(neon_qunzip32, void, env, i32, i32)
+> -DEF_HELPER_3(neon_zip8, void, env, i32, i32)
+> -DEF_HELPER_3(neon_zip16, void, env, i32, i32)
+> -DEF_HELPER_3(neon_qzip8, void, env, i32, i32)
+> -DEF_HELPER_3(neon_qzip16, void, env, i32, i32)
+> -DEF_HELPER_3(neon_qzip32, void, env, i32, i32)
+> +DEF_HELPER_FLAGS_2(neon_unzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_unzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_qunzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_qunzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_qunzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_zip8, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_zip16, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_qzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_qzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
+> +DEF_HELPER_FLAGS_2(neon_qzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
+>
+>  DEF_HELPER_FLAGS_3(crypto_aese, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+>  DEF_HELPER_FLAGS_3(crypto_aesmc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+> diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
+> index ebdf7c9b10..689491cad3 100644
+> --- a/target/arm/neon_helper.c
+> +++ b/target/arm/neon_helper.c
+> @@ -2027,12 +2027,12 @@ uint64_t HELPER(neon_acgt_f64)(uint64_t a, uint64=
+_t b, void *fpstp)
+>
+>  #define ELEM(V, N, SIZE) (((V) >> ((N) * (SIZE))) & ((1ull << (SIZE)) - =
+1))
+>
+> -void HELPER(neon_qunzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_qunzip8)(void *vd, void *vm)
+>  {
+> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
+> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
+> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
+> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
+> +
+>      uint64_t d0 =3D ELEM(zd0, 0, 8) | (ELEM(zd0, 2, 8) << 8)
+>          | (ELEM(zd0, 4, 8) << 16) | (ELEM(zd0, 6, 8) << 24)
+>          | (ELEM(zd1, 0, 8) << 32) | (ELEM(zd1, 2, 8) << 40)
+> @@ -2049,18 +2049,19 @@ void HELPER(neon_qunzip8)(CPUARMState *env, uint3=
+2_t rd, uint32_t rm)
+>          | (ELEM(zm0, 5, 8) << 16) | (ELEM(zm0, 7, 8) << 24)
+>          | (ELEM(zm1, 1, 8) << 32) | (ELEM(zm1, 3, 8) << 40)
+>          | (ELEM(zm1, 5, 8) << 48) | (ELEM(zm1, 7, 8) << 56);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
+> +
+> +    rm[0] =3D m0;
+> +    rm[1] =3D m1;
+> +    rd[0] =3D d0;
+> +    rd[1] =3D d1;
+>  }
+>
+> -void HELPER(neon_qunzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_qunzip16)(void *vd, void *vm)
+>  {
+> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
+> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
+> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
+> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
+> +
+>      uint64_t d0 =3D ELEM(zd0, 0, 16) | (ELEM(zd0, 2, 16) << 16)
+>          | (ELEM(zd1, 0, 16) << 32) | (ELEM(zd1, 2, 16) << 48);
+>      uint64_t d1 =3D ELEM(zm0, 0, 16) | (ELEM(zm0, 2, 16) << 16)
+> @@ -2069,32 +2070,35 @@ void HELPER(neon_qunzip16)(CPUARMState *env, uint=
+32_t rd, uint32_t rm)
+>          | (ELEM(zd1, 1, 16) << 32) | (ELEM(zd1, 3, 16) << 48);
+>      uint64_t m1 =3D ELEM(zm0, 1, 16) | (ELEM(zm0, 3, 16) << 16)
+>          | (ELEM(zm1, 1, 16) << 32) | (ELEM(zm1, 3, 16) << 48);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
+> +
+> +    rm[0] =3D m0;
+> +    rm[1] =3D m1;
+> +    rd[0] =3D d0;
+> +    rd[1] =3D d1;
+>  }
+>
+> -void HELPER(neon_qunzip32)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_qunzip32)(void *vd, void *vm)
+>  {
+> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
+> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
+> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
+> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
+> +
+>      uint64_t d0 =3D ELEM(zd0, 0, 32) | (ELEM(zd1, 0, 32) << 32);
+>      uint64_t d1 =3D ELEM(zm0, 0, 32) | (ELEM(zm1, 0, 32) << 32);
+>      uint64_t m0 =3D ELEM(zd0, 1, 32) | (ELEM(zd1, 1, 32) << 32);
+>      uint64_t m1 =3D ELEM(zm0, 1, 32) | (ELEM(zm1, 1, 32) << 32);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
+> +
+> +    rm[0] =3D m0;
+> +    rm[1] =3D m1;
+> +    rd[0] =3D d0;
+> +    rd[1] =3D d1;
+>  }
+>
+> -void HELPER(neon_unzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_unzip8)(void *vd, void *vm)
+>  {
+> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd =3D rd[0], zm =3D rm[0];
+> +
+>      uint64_t d0 =3D ELEM(zd, 0, 8) | (ELEM(zd, 2, 8) << 8)
+>          | (ELEM(zd, 4, 8) << 16) | (ELEM(zd, 6, 8) << 24)
+>          | (ELEM(zm, 0, 8) << 32) | (ELEM(zm, 2, 8) << 40)
+> @@ -2103,28 +2107,31 @@ void HELPER(neon_unzip8)(CPUARMState *env, uint32=
+_t rd, uint32_t rm)
+>          | (ELEM(zd, 5, 8) << 16) | (ELEM(zd, 7, 8) << 24)
+>          | (ELEM(zm, 1, 8) << 32) | (ELEM(zm, 3, 8) << 40)
+>          | (ELEM(zm, 5, 8) << 48) | (ELEM(zm, 7, 8) << 56);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> +
+> +    rm[0] =3D m0;
+> +    rd[0] =3D d0;
+>  }
+>
+> -void HELPER(neon_unzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_unzip16)(void *vd, void *vm)
+>  {
+> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd =3D rd[0], zm =3D rm[0];
+> +
+>      uint64_t d0 =3D ELEM(zd, 0, 16) | (ELEM(zd, 2, 16) << 16)
+>          | (ELEM(zm, 0, 16) << 32) | (ELEM(zm, 2, 16) << 48);
+>      uint64_t m0 =3D ELEM(zd, 1, 16) | (ELEM(zd, 3, 16) << 16)
+>          | (ELEM(zm, 1, 16) << 32) | (ELEM(zm, 3, 16) << 48);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> +
+> +    rm[0] =3D m0;
+> +    rd[0] =3D d0;
+>  }
+>
+> -void HELPER(neon_qzip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_qzip8)(void *vd, void *vm)
+>  {
+> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
+> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
+> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
+> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
+> +
+>      uint64_t d0 =3D ELEM(zd0, 0, 8) | (ELEM(zm0, 0, 8) << 8)
+>          | (ELEM(zd0, 1, 8) << 16) | (ELEM(zm0, 1, 8) << 24)
+>          | (ELEM(zd0, 2, 8) << 32) | (ELEM(zm0, 2, 8) << 40)
+> @@ -2141,18 +2148,19 @@ void HELPER(neon_qzip8)(CPUARMState *env, uint32_=
+t rd, uint32_t rm)
+>          | (ELEM(zd1, 5, 8) << 16) | (ELEM(zm1, 5, 8) << 24)
+>          | (ELEM(zd1, 6, 8) << 32) | (ELEM(zm1, 6, 8) << 40)
+>          | (ELEM(zd1, 7, 8) << 48) | (ELEM(zm1, 7, 8) << 56);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
+> +
+> +    rm[0] =3D m0;
+> +    rm[1] =3D m1;
+> +    rd[0] =3D d0;
+> +    rd[1] =3D d1;
+>  }
+>
+> -void HELPER(neon_qzip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_qzip16)(void *vd, void *vm)
+>  {
+> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
+> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
+> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
+> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
+> +
+>      uint64_t d0 =3D ELEM(zd0, 0, 16) | (ELEM(zm0, 0, 16) << 16)
+>          | (ELEM(zd0, 1, 16) << 32) | (ELEM(zm0, 1, 16) << 48);
+>      uint64_t d1 =3D ELEM(zd0, 2, 16) | (ELEM(zm0, 2, 16) << 16)
+> @@ -2161,32 +2169,35 @@ void HELPER(neon_qzip16)(CPUARMState *env, uint32=
+_t rd, uint32_t rm)
+>          | (ELEM(zd1, 1, 16) << 32) | (ELEM(zm1, 1, 16) << 48);
+>      uint64_t m1 =3D ELEM(zd1, 2, 16) | (ELEM(zm1, 2, 16) << 16)
+>          | (ELEM(zd1, 3, 16) << 32) | (ELEM(zm1, 3, 16) << 48);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
+> +
+> +    rm[0] =3D m0;
+> +    rm[1] =3D m1;
+> +    rd[0] =3D d0;
+> +    rd[1] =3D d1;
+>  }
+>
+> -void HELPER(neon_qzip32)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_qzip32)(void *vd, void *vm)
+>  {
+> -    uint64_t zm0 =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zm1 =3D float64_val(env->vfp.regs[rm + 1]);
+> -    uint64_t zd0 =3D float64_val(env->vfp.regs[rd]);
+> -    uint64_t zd1 =3D float64_val(env->vfp.regs[rd + 1]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd0 =3D rd[0], zd1 =3D rd[1];
+> +    uint64_t zm0 =3D rm[0], zm1 =3D rm[1];
+> +
+>      uint64_t d0 =3D ELEM(zd0, 0, 32) | (ELEM(zm0, 0, 32) << 32);
+>      uint64_t d1 =3D ELEM(zd0, 1, 32) | (ELEM(zm0, 1, 32) << 32);
+>      uint64_t m0 =3D ELEM(zd1, 0, 32) | (ELEM(zm1, 0, 32) << 32);
+>      uint64_t m1 =3D ELEM(zd1, 1, 32) | (ELEM(zm1, 1, 32) << 32);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rm + 1] =3D make_float64(m1);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> -    env->vfp.regs[rd + 1] =3D make_float64(d1);
+> +
+> +    rm[0] =3D m0;
+> +    rm[1] =3D m1;
+> +    rd[0] =3D d0;
+> +    rd[1] =3D d1;
+>  }
+>
+> -void HELPER(neon_zip8)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_zip8)(void *vd, void *vm)
+>  {
+> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd =3D rd[0], zm =3D rm[0];
+> +
+>      uint64_t d0 =3D ELEM(zd, 0, 8) | (ELEM(zm, 0, 8) << 8)
+>          | (ELEM(zd, 1, 8) << 16) | (ELEM(zm, 1, 8) << 24)
+>          | (ELEM(zd, 2, 8) << 32) | (ELEM(zm, 2, 8) << 40)
+> @@ -2195,20 +2206,23 @@ void HELPER(neon_zip8)(CPUARMState *env, uint32_t=
+ rd, uint32_t rm)
+>          | (ELEM(zd, 5, 8) << 16) | (ELEM(zm, 5, 8) << 24)
+>          | (ELEM(zd, 6, 8) << 32) | (ELEM(zm, 6, 8) << 40)
+>          | (ELEM(zd, 7, 8) << 48) | (ELEM(zm, 7, 8) << 56);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> +
+> +    rm[0] =3D m0;
+> +    rd[0] =3D d0;
+>  }
+>
+> -void HELPER(neon_zip16)(CPUARMState *env, uint32_t rd, uint32_t rm)
+> +void HELPER(neon_zip16)(void *vd, void *vm)
+>  {
+> -    uint64_t zm =3D float64_val(env->vfp.regs[rm]);
+> -    uint64_t zd =3D float64_val(env->vfp.regs[rd]);
+> +    uint64_t *rd =3D vd, *rm =3D vm;
+> +    uint64_t zd =3D rd[0], zm =3D rm[0];
+> +
+>      uint64_t d0 =3D ELEM(zd, 0, 16) | (ELEM(zm, 0, 16) << 16)
+>          | (ELEM(zd, 1, 16) << 32) | (ELEM(zm, 1, 16) << 48);
+>      uint64_t m0 =3D ELEM(zd, 2, 16) | (ELEM(zm, 2, 16) << 16)
+>          | (ELEM(zd, 3, 16) << 32) | (ELEM(zm, 3, 16) << 48);
+> -    env->vfp.regs[rm] =3D make_float64(m0);
+> -    env->vfp.regs[rd] =3D make_float64(d0);
+> +
+> +    rm[0] =3D m0;
+> +    rd[0] =3D d0;
+>  }
+>
+>  /* Helper function for 64 bit polynomial multiply case:
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 7b5db15861..6f02c56abb 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -4687,22 +4687,23 @@ static inline TCGv_i32 neon_get_scalar(int size, =
+int reg)
+>
+>  static int gen_neon_unzip(int rd, int rm, int size, int q)
+>  {
+> -    TCGv_i32 tmp, tmp2;
+> +    TCGv_ptr pd, pm;
+> +
+>      if (!q && size =3D=3D 2) {
+>          return 1;
+>      }
+> -    tmp =3D tcg_const_i32(rd);
+> -    tmp2 =3D tcg_const_i32(rm);
+> +    pd =3D vfp_reg_ptr(true, rd);
+> +    pm =3D vfp_reg_ptr(true, rm);
+>      if (q) {
+>          switch (size) {
+>          case 0:
+> -            gen_helper_neon_qunzip8(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_qunzip8(pd, pm);
+>              break;
+>          case 1:
+> -            gen_helper_neon_qunzip16(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_qunzip16(pd, pm);
+>              break;
+>          case 2:
+> -            gen_helper_neon_qunzip32(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_qunzip32(pd, pm);
+>              break;
+>          default:
+>              abort();
+> @@ -4710,38 +4711,39 @@ static int gen_neon_unzip(int rd, int rm, int siz=
+e, int q)
+>      } else {
+>          switch (size) {
+>          case 0:
+> -            gen_helper_neon_unzip8(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_unzip8(pd, pm);
+>              break;
+>          case 1:
+> -            gen_helper_neon_unzip16(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_unzip16(pd, pm);
+>              break;
+>          default:
+>              abort();
+>          }
+>      }
+> -    tcg_temp_free_i32(tmp);
+> -    tcg_temp_free_i32(tmp2);
+> +    tcg_temp_free_ptr(pd);
+> +    tcg_temp_free_ptr(pm);
+>      return 0;
+>  }
+>
+>  static int gen_neon_zip(int rd, int rm, int size, int q)
+>  {
+> -    TCGv_i32 tmp, tmp2;
+> +    TCGv_ptr pd, pm;
+> +
+>      if (!q && size =3D=3D 2) {
+>          return 1;
+>      }
+> -    tmp =3D tcg_const_i32(rd);
+> -    tmp2 =3D tcg_const_i32(rm);
+> +    pd =3D vfp_reg_ptr(true, rd);
+> +    pm =3D vfp_reg_ptr(true, rm);
+>      if (q) {
+>          switch (size) {
+>          case 0:
+> -            gen_helper_neon_qzip8(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_qzip8(pd, pm);
+>              break;
+>          case 1:
+> -            gen_helper_neon_qzip16(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_qzip16(pd, pm);
+>              break;
+>          case 2:
+> -            gen_helper_neon_qzip32(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_qzip32(pd, pm);
+>              break;
+>          default:
+>              abort();
+> @@ -4749,17 +4751,17 @@ static int gen_neon_zip(int rd, int rm, int size,=
+ int q)
+>      } else {
+>          switch (size) {
+>          case 0:
+> -            gen_helper_neon_zip8(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_zip8(pd, pm);
+>              break;
+>          case 1:
+> -            gen_helper_neon_zip16(cpu_env, tmp, tmp2);
+> +            gen_helper_neon_zip16(pd, pm);
+>              break;
+>          default:
+>              abort();
+>          }
+>      }
+> -    tcg_temp_free_i32(tmp);
+> -    tcg_temp_free_i32(tmp2);
+> +    tcg_temp_free_ptr(pd);
+> +    tcg_temp_free_ptr(pm);
+>      return 0;
+>  }
 
-Reasoning:
 
-Firstly, consider only enabled bitmaps (for now, actually, we can't
-get disabled bitmap in Qemu, as block-dirty-bitmap-enable command
-is not merged yet).
-
-We (Virtuozzo) always use persistent=true and autoload=true. As, to
-maintain dirty bitmap (enabled) valid, we must to load it every time,
-when we load our disk for r/w, to track disk changes. I do not think,
-that something like "not loading enabled dirty bitmaps, when open disk
-for read-only" gives real benefits (and now it is not possible,
-anyway, as loading depends on qcow2 bitmap "auto" flag, not on r-w
-mode).
-
-So, this flag is useless for now. Moreover, if we save bitmap with
-autoload=false, it will not be loaded next time, and will become
-invalid on first write to the disk. Creating bitmap with flags
-"persistent=true, autoload=false", actually means "make it disabled
-after storing" (weird semantic, isn't it?), so it will not be
-automatically updated more. So, this flag is a bit dangerous.
-
-Let's move to disabled bitmaps. Assume, that my patches will be
-merged, and we will really have a possibility of enable/disable
-bitmaps when we want. So, it's natural to expect, that if we have
-persistent-enabled bitmaps and persistent-disabled bitmaps, then
-enabled one will be enabled on next Qemu start and disabled will be
-disabled.
-
-How to achieve this?
-
-Let's start from qcow2. We need a stored information on "is this
-bitmap enabled or not". But we actually have it. Let's look on qcow2
-"auto" flag definiton:
-1: auto
-   The bitmap must reflect all changes of the virtual
-   disk by any application that would write to this qcow2
-   file (including writes, snapshot switching, etc.). The
-   type of this bitmap must be 'dirty tracking bitmap'.
-
-Isn't it a definition of "enabled" bitmap?
-And yes, current mapping from qapi flag "autoload" to qcow2 flag
-"auto" is not good mapping.
-
-So, it looks ok, to map !BdrvDirtyBitmap.disabled to "auto". If we
-have in future some bitmaps in qcow2, which are not enabled and
-not disabled (something more complicated), we can introduce new flags
-or even new bitmap type.
-(from qcow2 spec):
-16:    type
-       This field describes the sort of the bitmap.
-       Values:
-         1: Dirty tracking bitmap
-
-       Values 0, 2 - 255 are reserved.
-So, it looks like we _do not need_ qcow2 format changing for now. It
-already maintain enabled (auto=true) and disabled (auto=false) bitmaps
-(may be, additional note in spec about mapping of this flag in Qemu
-will be not bad)
-
-And actually, we do not have anything about "load this bitmap or not"
-in qcow2.  And I do not think that we need. Qemu (and user) should
-decide, which bitmaps to load. (and it is obvious, that we must load
-"auto" bitmaps, to not break them)
-
-Then about qapi. What will occur, if we store
-disabled-persistent-autolading bitmap? It will be enabled on next
-Qemu start! And it shows that mapping "autoload"->"auto" is definitely
-bad. So, as we do not want information on "load or not the bitmap" in
-qcow2 (ok, I don't want, but I think Kevin and Max will agree, as it
-keeps qcow2 format more generic and separated from Qemu specifics), we
-see again, that "autoload" is useless, dangerous and wrong.
-
-If we agreed, that for now auto = !BdrvDirtyBitmap.disabled and
-"autoload" is deprecated, we need to decide, which disabled bitmaps we
-want to load.
-
-The simplest way to solve the problem is to load all bitmaps, mapping
-BdrvDirtyBitmap.disabled = !auto. In future, if we need, we'll be able
-to introduce some cmd-line flags to select disabled bitmaps for
-loading or separate qmp-command to load them (and do not load them on
-start).
-
-Or we can go another way, and continue loading all disabled bitmaps,
-but in "lazy mode", so bitmap is not actually loaded, only its name
-and some metadata. And we can actually load it, if user enables or
-exports it. It looks very interesting approach, as we do not lose RAM
-on (possibly) a lot of not needed bitmaps, but we can manage them (for
-example, remove).
-
-Any way, loading all bitmaps looks like a good start.
-
- qapi/block-core.json         |  6 +++---
- block/qcow2.h                |  2 +-
- include/block/dirty-bitmap.h |  1 -
- block/dirty-bitmap.c         | 18 ------------------
- block/qcow2-bitmap.c         | 12 +++++++-----
- block/qcow2.c                |  2 +-
- blockdev.c                   | 10 ++--------
- 7 files changed, 14 insertions(+), 37 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e94a6881b2..a3fffeac19 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1593,9 +1593,9 @@
- #              Qcow2 disks support persistent bitmaps. Default is false for
- #              block-dirty-bitmap-add. (Since: 2.10)
- #
--# @autoload: the bitmap will be automatically loaded when the image it is stored
--#            in is opened. This flag may only be specified for persistent
--#            bitmaps. Default is false for block-dirty-bitmap-add. (Since: 2.10)
-+# @autoload: ignored and deprecated since 2.12.
-+#            Currently, all dirty tracking bitmaps are loaded from Qcow2 on
-+#            open.
- #
- # Since: 2.4
- ##
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 46c8cf44ec..016e87c81a 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -663,7 +663,7 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
- int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
--bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index a591c27213..89dc50946b 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -65,7 +65,6 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- 
- void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
--void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
- void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
-                                        bool persistent);
- 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 7879d13ddb..909f0517f8 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -52,8 +52,6 @@ struct BdrvDirtyBitmap {
-                                    Such operations must fail and both the image
-                                    and this bitmap must remain unchanged while
-                                    this flag is set. */
--    bool autoload;              /* For persistent bitmaps: bitmap must be
--                                   autoloaded on image opening */
-     bool persistent;            /* bitmap must be saved to owner disk image */
-     QLIST_ENTRY(BdrvDirtyBitmap) list;
- };
-@@ -104,7 +102,6 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
-     g_free(bitmap->name);
-     bitmap->name = NULL;
-     bitmap->persistent = false;
--    bitmap->autoload = false;
- }
- 
- /* Called with BQL taken.  */
-@@ -261,8 +258,6 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
-     bitmap->successor = NULL;
-     successor->persistent = bitmap->persistent;
-     bitmap->persistent = false;
--    successor->autoload = bitmap->autoload;
--    bitmap->autoload = false;
-     bdrv_release_dirty_bitmap(bs, bitmap);
- 
-     return successor;
-@@ -667,19 +662,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
- }
- 
- /* Called with BQL taken. */
--void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
--{
--    qemu_mutex_lock(bitmap->mutex);
--    bitmap->autoload = autoload;
--    qemu_mutex_unlock(bitmap->mutex);
--}
--
--bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
--{
--    return bitmap->autoload;
--}
--
--/* Called with BQL taken. */
- void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
- {
-     qemu_mutex_lock(bitmap->mutex);
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index f45e46cfbd..ae14464de6 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -933,14 +933,14 @@ static void set_readonly_helper(gpointer bitmap, gpointer value)
-     bdrv_dirty_bitmap_set_readonly(bitmap, (bool)value);
- }
- 
--/* qcow2_load_autoloading_dirty_bitmaps()
-+/* qcow2_load_dirty_bitmaps()
-  * Return value is a hint for caller: true means that the Qcow2 header was
-  * updated. (false doesn't mean that the header should be updated by the
-  * caller, it just means that updating was not needed or the image cannot be
-  * written to).
-  * On failure the function returns false.
-  */
--bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-+bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2BitmapList *bm_list;
-@@ -960,14 +960,16 @@ bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-     }
- 
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
--        if ((bm->flags & BME_FLAG_AUTO) && !(bm->flags & BME_FLAG_IN_USE)) {
-+        if (!(bm->flags & BME_FLAG_IN_USE)) {
-             BdrvDirtyBitmap *bitmap = load_bitmap(bs, bm, errp);
-             if (bitmap == NULL) {
-                 goto fail;
-             }
- 
-+            if (!(bm->flags & BME_FLAG_AUTO)) {
-+                bdrv_disable_dirty_bitmap(bitmap);
-+            }
-             bdrv_dirty_bitmap_set_persistance(bitmap, true);
--            bdrv_dirty_bitmap_set_autoload(bitmap, true);
-             bm->flags |= BME_FLAG_IN_USE;
-             created_dirty_bitmaps =
-                     g_slist_append(created_dirty_bitmaps, bitmap);
-@@ -1369,7 +1371,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-             bm->table.size = 0;
-             QSIMPLEQ_INSERT_TAIL(&drop_tables, tb, entry);
-         }
--        bm->flags = bdrv_dirty_bitmap_get_autoload(bitmap) ? BME_FLAG_AUTO : 0;
-+        bm->flags = bdrv_dirty_bitmap_enabled(bitmap) ? BME_FLAG_AUTO : 0;
-         bm->granularity_bits = ctz32(bdrv_dirty_bitmap_granularity(bitmap));
-         bm->dirty_bitmap = bitmap;
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4348b2c0c5..47df95b416 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1450,7 +1450,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-         s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
-     }
- 
--    if (qcow2_load_autoloading_dirty_bitmaps(bs, &local_err)) {
-+    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
-         update_header = false;
-     }
-     if (local_err != NULL) {
-diff --git a/blockdev.c b/blockdev.c
-index 29d569a24e..79aab74d27 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2805,14 +2805,9 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-     if (!has_persistent) {
-         persistent = false;
-     }
--    if (!has_autoload) {
--        autoload = false;
--    }
- 
--    if (has_autoload && !persistent) {
--        error_setg(errp, "Autoload flag must be used only for persistent "
--                         "bitmaps");
--        return;
-+    if (has_autoload) {
-+        warn_report("Autoload option is deprecated and its value is ignored");
-     }
- 
-     if (persistent &&
-@@ -2827,7 +2822,6 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-     }
- 
-     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
--    bdrv_dirty_bitmap_set_autoload(bitmap, autoload);
- }
- 
- void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
--- 
-2.11.1
+--
+Alex Benn=C3=A9e
