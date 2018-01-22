@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFu-0002kd-U2
+	(envelope-from <thuth@redhat.com>) id 1edaFu-0002kf-VB
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFs-0007F7-Lk
+	(envelope-from <thuth@redhat.com>) id 1edaFu-0007Ft-2r
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33528)
+Received: from mx1.redhat.com ([209.132.183.28]:18292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFs-0007Eb-Cg
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:12 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFt-0007FL-Pw
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:13 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 22 Jan 2018 12:26:59 +0100
-Message-Id: <1516620426-18530-3-git-send-email-thuth@redhat.com>
+Date: Mon, 22 Jan 2018 12:27:00 +0100
+Message-Id: <1516620426-18530-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1516620426-18530-1-git-send-email-thuth@redhat.com>
 References: <1516620426-18530-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 2/9] tests/cpu-plug-test: Check the CPU
- hot-plugging with device_add, too
+Subject: [Qemu-devel] [PULL 3/9] tests/cpu-plug-test: Check CPU hot-plugging
+ on ppc64, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: Alistair Francis <alistair.francis@xilinx.com>
 
-Using 'device_add' instead of 'cpu-add' is the new way for
-hot-plugging CPUs, so we should test this regularly, too.
+Hot plugging on ppc64 is possible via "device_add", too. Unlike x86,
+we must not specify a 'socket-id' and 'thread-id' here, so this needs
+to be done with a separate function that just specifies the 'core-id'
+during the "device_add".
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
+Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/cpu-plug-test.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 45 insertions(+), 2 deletions(-)
+ tests/Makefile.include |  1 +
+ tests/cpu-plug-test.c  | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 669f7f6..092ad5f 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -340,6 +340,7 @@ check-qtest-ppc64-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+ check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
+ check-qtest-ppc64-y += tests/numa-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
++check-qtest-ppc64-y += tests/cpu-plug-test$(EXESUF)
+ 
+ check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+ 
 diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index 4579119..1e622cb 100644
+index 1e622cb..a306340 100644
 --- a/tests/cpu-plug-test.c
 +++ b/tests/cpu-plug-test.c
-@@ -16,6 +16,7 @@
- struct PlugTestData {
-     char *machine;
-     const char *cpu_model;
-+    char *device_model;
-     unsigned sockets;
-     unsigned cores;
-     unsigned threads;
-@@ -71,11 +72,40 @@ static void test_plug_without_cpu_add(gconstpointer data)
+@@ -100,6 +100,28 @@ static void test_plug_with_device_add_x86(gconstpointer data)
      g_free(args);
  }
  
-+static void test_plug_with_device_add_x86(gconstpointer data)
++static void test_plug_with_device_add_coreid(gconstpointer data)
 +{
 +    const PlugTestData *td = data;
 +    char *args;
-+    unsigned int s, c, t;
++    unsigned int c;
 +
 +    args = g_strdup_printf("-machine %s -cpu %s "
-+                           "-smp sockets=%u,cores=%u,threads=%u,maxcpus=%u",
++                           "-smp 1,sockets=%u,cores=%u,threads=%u,maxcpus=%u",
 +                           td->machine, td->cpu_model,
 +                           td->sockets, td->cores, td->threads, td->maxcpus);
 +    qtest_start(args);
 +
-+    for (s = td->sockets; s < td->maxcpus / td->cores / td->threads; s++) {
-+        for (c = 0; c < td->cores; c++) {
-+            for (t = 0; t < td->threads; t++) {
-+                char *id = g_strdup_printf("id-%i-%i-%i", s, c, t);
-+                qtest_qmp_device_add(td->device_model, id, "'socket-id':'%i', "
-+                                     "'core-id':'%i', 'thread-id':'%i'",
-+                                     s, c, t);
-+                g_free(id);
-+            }
-+        }
++    for (c = td->cores; c < td->maxcpus / td->sockets / td->threads; c++) {
++        char *id = g_strdup_printf("id-%i", c);
++        qtest_qmp_device_add(td->device_model, id, "'core-id':'%i'", c);
++        g_free(id);
 +    }
 +
 +    qtest_end();
@@ -85,53 +85,47 @@ index 4579119..1e622cb 100644
  static void test_data_free(gpointer data)
  {
      PlugTestData *pc = data;
- 
-     g_free(pc->machine);
-+    g_free(pc->device_model);
-     g_free(pc);
- }
- 
-@@ -90,6 +120,8 @@ static void add_pc_test_case(const char *mname)
-     data = g_new(PlugTestData, 1);
-     data->machine = g_strdup(mname);
-     data->cpu_model = "Haswell"; /* 1.3+ theoretically */
-+    data->device_model = g_strdup_printf("%s-%s-cpu", data->cpu_model,
-+                                         qtest_get_arch());
-     data->sockets = 1;
-     data->cores = 3;
-     data->threads = 2;
-@@ -105,19 +137,30 @@ static void add_pc_test_case(const char *mname)
-         (strcmp(mname, "pc-0.12") == 0) ||
-         (strcmp(mname, "pc-0.11") == 0) ||
-         (strcmp(mname, "pc-0.10") == 0)) {
--        path = g_strdup_printf("cpu/%s/init/%ux%ux%u&maxcpus=%u",
-+        path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
-                                mname, data->sockets, data->cores,
-                                data->threads, data->maxcpus);
-         qtest_add_data_func_full(path, data, test_plug_without_cpu_add,
-                                  test_data_free);
-         g_free(path);
-     } else {
--        path = g_strdup_printf("cpu/%s/add/%ux%ux%u&maxcpus=%u",
-+        PlugTestData *data2 = g_memdup(data, sizeof(PlugTestData));
-+
-+        data2->machine = g_strdup(data->machine);
-+        data2->device_model = g_strdup(data->device_model);
-+
-+        path = g_strdup_printf("cpu-plug/%s/cpu-add/%ux%ux%u&maxcpus=%u",
-                                mname, data->sockets, data->cores,
-                                data->threads, data->maxcpus);
-         qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
-                                  test_data_free);
-         g_free(path);
-+        path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
-+                               mname, data2->sockets, data2->cores,
-+                               data2->threads, data2->maxcpus);
-+        qtest_add_data_func_full(path, data2, test_plug_with_device_add_x86,
-+                                 test_data_free);
-+        g_free(path);
+@@ -164,6 +186,32 @@ static void add_pc_test_case(const char *mname)
      }
  }
  
++static void add_pseries_test_case(const char *mname)
++{
++    char *path;
++    PlugTestData *data;
++
++    if (!g_str_has_prefix(mname, "pseries-") ||
++        (g_str_has_prefix(mname, "pseries-2.") && atoi(&mname[10]) < 7)) {
++        return;
++    }
++    data = g_new(PlugTestData, 1);
++    data->machine = g_strdup(mname);
++    data->cpu_model = "power8_v2.0";
++    data->device_model = g_strdup("power8_v2.0-spapr-cpu-core");
++    data->sockets = 2;
++    data->cores = 3;
++    data->threads = 1;
++    data->maxcpus = data->sockets * data->cores * data->threads * 2;
++
++    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
++                           mname, data->sockets, data->cores,
++                           data->threads, data->maxcpus);
++    qtest_add_data_func_full(path, data, test_plug_with_device_add_coreid,
++                             test_data_free);
++    g_free(path);
++}
++
+ int main(int argc, char **argv)
+ {
+     const char *arch = qtest_get_arch();
+@@ -172,6 +220,8 @@ int main(int argc, char **argv)
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qtest_cb_for_every_machine(add_pc_test_case);
++    } else if (g_str_equal(arch, "ppc64")) {
++        qtest_cb_for_every_machine(add_pseries_test_case);
+     }
+ 
+     return g_test_run();
 -- 
 1.8.3.1
