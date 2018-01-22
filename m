@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ediIq-0002Mn-PE
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:02:49 -0500
+	(envelope-from <mst@redhat.com>) id 1ediKV-0003do-Oi
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:04:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ediIn-0004Fl-Jt
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:02:48 -0500
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:44677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ediIn-0004Fb-CZ
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:02:45 -0500
-Received: by mail-pg0-x22f.google.com with SMTP id m20so7909817pgc.11
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 12:02:45 -0800 (PST)
-References: <20180117161435.28981-1-richard.henderson@linaro.org>
-	<20180117161435.28981-3-richard.henderson@linaro.org>
-	<CAFEAcA-R0XrQrLRAt5XQtOki0jk1qFnPuBQsf7a5xh2MX37usA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <21d81fa8-8bcf-f492-ce4f-52bf9cfed88e@linaro.org>
-Date: Mon, 22 Jan 2018 12:02:39 -0800
+	(envelope-from <mst@redhat.com>) id 1ediKS-0005C5-Gv
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:04:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34540)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ediKS-0005BM-7J
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:04:28 -0500
+Date: Mon, 22 Jan 2018 22:04:18 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180122215348-mutt-send-email-mst@kernel.org>
+References: <20180119130653.24044-1-stefanha@redhat.com>
+	<9048a120-a3be-404d-e977-39f40b4d4561@redhat.com>
+	<20180122121751.GD31621@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-R0XrQrLRAt5XQtOki0jk1qFnPuBQsf7a5xh2MX37usA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10.5 02/20] tcg: Add types and basic
- operations for host vectors
+Content-Disposition: inline
+In-Reply-To: <20180122121751.GD31621@stefanha-x1.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +30,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, zhiyong.yang@intel.com, Maxime Coquelin <maxime.coquelin@redhat.com>, Wei Wang <wei.w.wang@intel.com>
 
-On 01/22/2018 10:53 AM, Peter Maydell wrote:
->> +void tcg_gen_movi_v128(TCGv_vec r, uint64_t a, uint64_t b)
->> +{
->> +    TCGTemp *rt = tcgv_vec_temp(r);
->> +    TCGArg ri = temp_arg(rt);
->> +
->> +    tcg_debug_assert(rt->base_type == TCG_TYPE_V128);
->> +    if (a == b) {
->> +        tcg_gen_dup64i_vec(r, a);
->> +    } else if (TCG_TARGET_REG_BITS == 64) {
->> +        vec_gen_3(INDEX_op_movi_vec, TCG_TYPE_V128, 0, ri, a, b);
->> +    } else {
->> +        TCGOp *op = tcg_emit_op(INDEX_op_movi_vec);
->> +        TCGOP_VECL(op) = TCG_TYPE_V128 - TCG_TYPE_V64;
->> +        op->args[0] = ri;
->> +        op->args[1] = a;
->> +        op->args[2] = a >> 32;
->> +        op->args[3] = b;
->> +        op->args[4] = b >> 32;
-> 
-> Is it intentional that this doesn't set TCGOP_VECE(op) ?
-> The vec_gen_* functions all do.
-> 
-> This seems like it ought to be a vec_gen_5().
+On Mon, Jan 22, 2018 at 12:17:51PM +0000, Stefan Hajnoczi wrote:
+> On Mon, Jan 22, 2018 at 11:33:46AM +0800, Jason Wang wrote:
+> > On 2018=E5=B9=B401=E6=9C=8819=E6=97=A5 21:06, Stefan Hajnoczi wrote:
+> > > These patches implement the virtio-vhost-user device design that I =
+have
+> > > described here:
+> > > https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2830007
+> >=20
+> > Thanks for the patches, looks rather interesting and similar to split=
+ device
+> > model used by Xen.
+> >=20
+> > >=20
+> > > The goal is to let the guest act as the vhost device backend for ot=
+her guests.
+> > > This allows virtual networking and storage appliances to run inside=
+ guests.
+> >=20
+> > So the question still, what kind of protocol do you want to run on to=
+p? If
+> > it was ethernet based, virtio-net work pretty well and it can even do
+> > migration.
+> >=20
+> > > This device is particularly interesting for poll mode drivers where=
+ exitless
+> > > VM-to-VM communication is possible, completely bypassing the hyperv=
+isor in the
+> > > data path.
+> >=20
+> > It's better to clarify the reason of hypervisor bypassing. (performan=
+ce,
+> > security or scalability).
+>=20
+> Performance - yes, definitely.  Exitless VM-to-VM is the fastest
+> possible way to communicate between VMs.  Today it can only be done
+> using ivshmem.  This patch series allows virtio devices to take
+> advantage of it and will encourage people to use virtio instead of
+> non-standard ivshmem devices.
+>=20
+> Security - I don't think this feature is a security improvement.  It
+> reduces isolation because VM1 has full shared memory access to VM2.  In
+> fact, this is a reason for users to consider carefully whether they
+> even want to use this feature.
 
-It's not intentional.  That said, I had put this in for use by backends in
-expanding operations, but they aren't used so far.  I should just remove them
-for now.
+True without an IOMMU, however using a vIOMMU within VM2
+can protect the VM2, can't it?
 
->> +********* Host vector operations
->> +
->> +All of the vector ops have two parameters, TCGOP_VECL & TCGOP_VECE.
->> +The former specifies the length of the vector in log2 64-bit units; the
->> +later specifies the length of the element (if applicable) in log2 8-bit units.
->> +E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
-> 
-> ...but at the tcg_gen_and_vec() function level, the functions
-> take a parameter for VECE but not one for VECL ? That's a bit
-> confusing. (I think this is perhaps an example of the awkwardness of
-> our documenting the TCG interface only at an abstract "ops" level
-> and not documenting the concrete function APIs at all.)
+> Scalability - much for the same reasons as the Performance section
+> above.  Bypassing the hypervisor eliminates scalability bottlenecks
+> (e.g. host network stack and bridge).
+>=20
+> > Probably not for the following cases:
+> >=20
+> > 1) kick/call
+>=20
+> I disagree here because kick/call is actually very efficient!
+>=20
+> VM1's irqfd is the ioeventfd for VM2.  When VM2 writes to the ioeventfd
+> there is a single lightweight vmexit which injects an interrupt into
+> VM1.  QEMU is not involved and the host kernel scheduler is not involve=
+d
+> so this is a low-latency operation.
+>=20
+> I haven't tested this yet but the ioeventfd code looks like this will
+> work.
+>=20
+> > 2) device IOTLB / IOMMU transaction (or any other case that backends =
+needs
+> > metadata from qemu).
+>=20
+> Yes, this is the big weakness of vhost-user in general.  The IOMMU
+> feature doesn't offer good isolation
 
-For the functions, VECL is taken from the type of the TCGv_vec operands.
-
-But, yes, README is for the ops only...
+I think that's an implementation issue, not a protocol issue.
 
 
+> and even when it does, performance
+> will be an issue.
 
-r~
+If the IOMMU mappings are dynamic - but they are mostly
+static with e.g. dpdk, right?
+
+
+> > >   * Implement "Additional Device Resources over PCI" for shared mem=
+ory,
+> > >     doorbells, and notifications instead of hardcoding a BAR with m=
+agic
+> > >     offsets into virtio-vhost-user:
+> > >     https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2920=
+007
+> >=20
+> > Does this mean we need to standardize vhost-user protocol first?
+>=20
+> Currently the draft spec says:
+>=20
+>   This section relies on definitions from the Vhost-user Protocol [1].
+>=20
+>   [1] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob_plain;f=3Ddocs/intero=
+p/vhost-user.txt;hb=3DHEAD
+>=20
+> Michael: Is it okay to simply include this link?
+
+
+It is OK to include normative and non-normative references,
+they go in the introduction and then you refer to them
+anywhere in the document.
+
+
+I'm still reviewing the draft.  At some level, this is a general tunnel
+feature, it can tunnel any protocol. That would be one way to
+isolate it.
+
+> > >   * Implement the VRING_KICK eventfd - currently vhost-user slaves =
+must be poll
+> > >     mode drivers.
+> > >   * Optimize VRING_CALL doorbell with ioeventfd to avoid QEMU exit.
+> >=20
+> > The performance implication needs to be measured. It looks to me both=
+ kick
+> > and call will introduce more latency form the point of guest.
+>=20
+> I described the irqfd + ioeventfd approach above.  It should be faster
+> than virtio-net + bridge today.
+>=20
+> > >   * vhost-user log feature
+> > >   * UUID config field for stable device identification regardless o=
+f PCI
+> > >     bus addresses.
+> > >   * vhost-user IOMMU and SLAVE_REQ_FD feature
+> >=20
+> > So an assumption is the VM that implements vhost backends should be a=
+t least
+> > as secure as vhost-user backend process on host. Could we have this
+> > conclusion?
+>=20
+> Yes.
+>=20
+> Sadly the vhost-user IOMMU protocol feature does not provide isolation.
+> At the moment IOMMU is basically a layer of indirection (mapping) but
+> the vhost-user backend process still has full access to guest RAM :(.
+
+An important feature would be to do the isolation in the qemu.
+So trust the qemu running VM2 but not VM2 itself.
+
+
+> > Btw, it's better to have some early numbers, e.g what testpmd reports=
+ during
+> > forwarding.
+>=20
+> I need to rely on others to do this (and many other things!) because
+> virtio-vhost-user isn't the focus of my work.
+>=20
+> These patches were written to demonstrate my suggestions for vhost-pci.
+> They were written at work but also on weekends, early mornings, and lat=
+e
+> nights to avoid delaying Wei and Zhiyong's vhost-pci work too much.
+>=20
+> If this approach has merit then I hope others will take over and I'll
+> play a smaller role addressing some of the todo items and cleanups.
+>=20
+> Stefan
