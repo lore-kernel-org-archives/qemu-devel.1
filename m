@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFw-0002lB-Mf
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:17 -0500
+	(envelope-from <thuth@redhat.com>) id 1edaFz-0002o3-O9
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1edaFv-0007Gq-Lj
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35646)
+	(envelope-from <thuth@redhat.com>) id 1edaFy-0007IS-TK
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52066)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFv-0007GG-D0
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:15 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1edaFy-0007IA-No
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 06:27:18 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 22 Jan 2018 12:27:01 +0100
-Message-Id: <1516620426-18530-5-git-send-email-thuth@redhat.com>
+Date: Mon, 22 Jan 2018 12:27:03 +0100
+Message-Id: <1516620426-18530-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1516620426-18530-1-git-send-email-thuth@redhat.com>
 References: <1516620426-18530-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 4/9] tests/cpu-plug-test: Test CPU hot-plugging
- on s390x
+Subject: [Qemu-devel] [PULL 6/9] Fixes after renaming __FUNCTION__ to
+ __func__
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +27,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: Alistair Francis <alistair.francis@xilinx.com>
 
-CPU hot-plugging on s390x is possible with both, "cpu-add"
-and "device_add", so test both.
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include |  1 +
- tests/cpu-plug-test.c  | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 40 insertions(+)
+ hw/arm/omap1.c     | 8 +++-----
+ hw/block/onenand.c | 2 +-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 092ad5f..851aafe 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -380,6 +380,7 @@ check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
-+check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
- 
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index a306340..05d82f7 100644
---- a/tests/cpu-plug-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -212,6 +212,43 @@ static void add_pseries_test_case(const char *mname)
-     g_free(path);
- }
- 
-+static void add_s390x_test_case(const char *mname)
-+{
-+    char *path;
-+    PlugTestData *data, *data2;
-+
-+    if (!g_str_has_prefix(mname, "s390-ccw-virtio-")) {
-+        return;
-+    }
-+
-+    data = g_new(PlugTestData, 1);
-+    data->machine = g_strdup(mname);
-+    data->cpu_model = "qemu";
-+    data->device_model = g_strdup("qemu-s390x-cpu");
-+    data->sockets = 1;
-+    data->cores = 3;
-+    data->threads = 1;
-+    data->maxcpus = data->sockets * data->cores * data->threads * 2;
-+
-+    data2 = g_memdup(data, sizeof(PlugTestData));
-+    data2->machine = g_strdup(data->machine);
-+    data2->device_model = g_strdup(data->device_model);
-+
-+    path = g_strdup_printf("cpu-plug/%s/cpu-add/%ux%ux%u&maxcpus=%u",
-+                           mname, data->sockets, data->cores,
-+                           data->threads, data->maxcpus);
-+    qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
-+                             test_data_free);
-+    g_free(path);
-+
-+    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
-+                           mname, data2->sockets, data2->cores,
-+                           data2->threads, data2->maxcpus);
-+    qtest_add_data_func_full(path, data2, test_plug_with_device_add_coreid,
-+                             test_data_free);
-+    g_free(path);
-+}
-+
- int main(int argc, char **argv)
- {
-     const char *arch = qtest_get_arch();
-@@ -222,6 +259,8 @@ int main(int argc, char **argv)
-         qtest_cb_for_every_machine(add_pc_test_case);
-     } else if (g_str_equal(arch, "ppc64")) {
-         qtest_cb_for_every_machine(add_pseries_test_case);
-+    } else if (g_str_equal(arch, "s390x")) {
-+        qtest_cb_for_every_machine(add_s390x_test_case);
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 1388200..92e58f0 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -1717,7 +1717,7 @@ static void omap_clkm_write(void *opaque, hwaddr addr,
+         if ((s->clkm.clocking_scheme ^ (value >> 11)) & 7) {
+             s->clkm.clocking_scheme = (value >> 11) & 7;
+             printf("%s: clocking scheme set to %s\n", __func__,
+-                            clkschemename[s->clkm.clocking_scheme]);
++                   clkschemename[s->clkm.clocking_scheme]);
+         }
+         s->clkm.cold_start &= value & 0x3f;
+         return;
+@@ -3329,14 +3329,12 @@ static void omap_mcbsp_writeh(void *opaque, hwaddr addr,
+     case 0x18:	/* MCR2 */
+         s->mcr[1] = value & 0x03e3;
+         if (value & 3)					/* XMCM */
+-            printf("%s: Tx channel selection mode enable attempt\n",
+-                            __func__);
++            printf("%s: Tx channel selection mode enable attempt\n", __func__);
+         return;
+     case 0x1a:	/* MCR1 */
+         s->mcr[0] = value & 0x03e1;
+         if (value & 1)					/* RMCM */
+-            printf("%s: Rx channel selection mode enable attempt\n",
+-                            __func__);
++            printf("%s: Rx channel selection mode enable attempt\n", __func__);
+         return;
+     case 0x1c:	/* RCERA */
+         s->rcer[0] = value & 0xffff;
+diff --git a/hw/block/onenand.c b/hw/block/onenand.c
+index e243182..ed77f85 100644
+--- a/hw/block/onenand.c
++++ b/hw/block/onenand.c
+@@ -659,7 +659,7 @@ static uint64_t onenand_read(void *opaque, hwaddr addr,
+     case 0xff02:	/* ECC Result of spare area data */
+     case 0xff03:	/* ECC Result of main area data */
+     case 0xff04:	/* ECC Result of spare area data */
+-        hw_error("%s: imeplement ECC\n", __func__);
++        hw_error("%s: implement ECC\n", __func__);
+         return 0x0000;
      }
  
-     return g_test_run();
 -- 
 1.8.3.1
