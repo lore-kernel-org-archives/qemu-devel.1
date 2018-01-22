@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1edgBt-0000gM-AC
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:47:34 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1edgD4-0001OK-Ji
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:48:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1edgBo-0002dx-U3
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:47:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56012)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1edgBo-0002bu-Jg
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:47:24 -0500
-Date: Mon, 22 Jan 2018 15:47:15 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180122174715.GM5292@localhost.localdomain>
-References: <20180119141105.29095-1-marcandre.lureau@redhat.com>
-	<20180119141105.29095-5-marcandre.lureau@redhat.com>
-	<f2ecf612-8538-f8d1-ffd8-f875aa453c42@amsat.org>
-	<3c334ed0-3d9d-1ef5-27b7-aa587e5acd81@linux.vnet.ibm.com>
-	<CAMxuvaxyBmEEnk_dtFR4qbk_-95ROnR6o-3gR7U=HNJAhV5DdA@mail.gmail.com>
-	<6cb2b88f-0c8b-4bab-c8fc-018dd0cbc662@linux.vnet.ibm.com>
-	<CAMxuvazYZZwzSBPvbmKLPv_YG2uYPkPA1meiYoMkizegEozC_g@mail.gmail.com>
-	<20180122172546.GI5292@localhost.localdomain>
-	<CAJ+F1CKrkirvv=5=M1OSQXg5RwRgNYZ+r7BzHW7Pd1W-utEGaw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1edgD2-0004Il-0p
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:48:42 -0500
+Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:41202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1edgD1-0004Hk-Pl
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:48:39 -0500
+Received: by mail-ot0-x236.google.com with SMTP id 44so8212010otk.8
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 09:48:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKrkirvv=5=M1OSQXg5RwRgNYZ+r7BzHW7Pd1W-utEGaw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] tpm: add CRB device
+In-Reply-To: <c2d2d787-8e45-f26a-54cf-9670a27dc836@lauterbach.com>
+References: <c2d2d787-8e45-f26a-54cf-9670a27dc836@lauterbach.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jan 2018 17:48:17 +0000
+Message-ID: <CAFEAcA_LZYfsOKuq9e-uCQPRBsi5XGNyCWw4E_YhyebNJeyRLQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH RFC] target-arm:Add a dynamic
+ XML-description of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,215 +29,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Jan 22, 2018 at 06:32:37PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Jan 22, 2018 at 6:25 PM, Eduardo Habkost <ehabkost@redhat.com> =
-wrote:
-> > On Mon, Jan 22, 2018 at 04:08:30PM +0100, Marc-Andre Lureau wrote:
-> >> Hi
-> >>
-> >> On Sun, Jan 21, 2018 at 11:01 PM, Stefan Berger
-> >> <stefanb@linux.vnet.ibm.com> wrote:
-> >> > On 01/21/2018 02:24 PM, Marc-Andre Lureau wrote:
-> >> >>
-> >> >> Hi
-> >> >>
-> >> >> On Sun, Jan 21, 2018 at 6:46 AM, Stefan Berger
-> >> >> <stefanb@linux.vnet.ibm.com> wrote:
-> >> >>>
-> >> >>> On 01/20/2018 07:54 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >> >>>>
-> >> >>>> On 01/19/2018 11:11 AM, Marc-Andr=C3=A9 Lureau wrote:
-> >> >>>>>
-> >> >>>>> tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB)
-> >> >>>>> Interface as defined in TCG PC Client Platform TPM Profile (PT=
-P)
-> >> >>>>> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 0=
-1.03 v22.
-> >> >>>>>
-> >> >>>>> The PTP allows device implementation to switch between TIS and=
- CRB
-> >> >>>>> model at run time, but given that CRB is a simpler device to
-> >> >>>>> implement, I chose to implement it as a different device.
-> >> >>>>>
-> >> >>>>> The device doesn't implement other locality than 0 for now (my=
- laptop
-> >> >>>>> TPM doesn't either, so I assume this isn't so bad)
-> >> >>>>>
-> >> >>>>> The command/reply memory region is statically allocated after =
-the CRB
-> >> >>>>> registers address TPM_CRB_ADDR_BASE + sizeof(struct crb_regs) =
-(I
-> >> >>>>> wonder if the BIOS could or should allocate it instead, or wha=
-t size
-> >> >>>>> to use, again this seems to fit well expectations)
-> >> >>>>>
-> >> >>>>> The PTP doesn't specify a particular bus to put the device. So=
- I added
-> >> >>>>> it on the system bus directly, so it could hopefully be used e=
-asily on
-> >> >>>>> a different platform than x86. Currently, it fails to init on =
-piix,
-> >> >>>>> because error_on_sysbus_device() check. The check may be chang=
-ed in a
-> >> >>>>> near future, see discussion on the qemu-devel ML.
-> >> >>>>>
-> >> >>>>> Tested with some success with Linux upstream and Windows 10, s=
-eabios &
-> >> >>>>> modified ovmf. The device is recognized and correctly transmit
-> >> >>>>> command/response with passthrough & emu. However, we are missi=
-ng PPI
-> >> >>>>> ACPI part atm.
-> >> >>>>>
-> >> >>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat=
-.com>
-> >> >>>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >> >>>>> ---
-> >> >>>>>    qapi/tpm.json                      |   5 +-
-> >> >>>>>    include/hw/acpi/tpm.h              |  72 ++++++++
-> >> >>>>>    include/sysemu/tpm.h               |   3 +
-> >> >>>>>    hw/i386/acpi-build.c               |  34 +++-
-> >> >>>>>    hw/tpm/tpm_crb.c                   | 327
-> >> >>>>> +++++++++++++++++++++++++++++++++++++
-> >> >>>>>    default-configs/i386-softmmu.mak   |   1 +
-> >> >>>>>    default-configs/x86_64-softmmu.mak |   1 +
-> >> >>>>>    hw/tpm/Makefile.objs               |   1 +
-> >> >>>>>    8 files changed, 434 insertions(+), 10 deletions(-)
-> >> >>>>>    create mode 100644 hw/tpm/tpm_crb.c
-> >> >>>>>
-> >> >>>>> diff --git a/qapi/tpm.json b/qapi/tpm.json
-> >> >>>>> index 7093f268fb..d50deef5e9 100644
-> >> >>>>> --- a/qapi/tpm.json
-> >> >>>>> +++ b/qapi/tpm.json
-> >> >>>>> @@ -11,10 +11,11 @@
-> >> >>>>>    # An enumeration of TPM models
-> >> >>>>>    #
-> >> >>>>>    # @tpm-tis: TPM TIS model
-> >> >>>>> +# @tpm-crb: TPM CRB model (since 2.12)
-> >> >>>>>    #
-> >> >>>>>    # Since: 1.5
-> >> >>>>>    ##
-> >> >>>>> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
-> >> >>>>> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
-> >> >>>>>      ##
-> >> >>>>>    # @query-tpm-models:
-> >> >>>>> @@ -28,7 +29,7 @@
-> >> >>>>>    # Example:
-> >> >>>>>    #
-> >> >>>>>    # -> { "execute": "query-tpm-models" }
-> >> >>>>> -# <- { "return": [ "tpm-tis" ] }
-> >> >>>>> +# <- { "return": [ "tpm-tis", "tpm-crb" ] }
-> >> >>>>>    #
-> >> >>>>>    ##
-> >> >>>>>    { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
-> >> >>>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> >> >>>>> index 6d516c6a7f..b0048515fa 100644
-> >> >>>>> --- a/include/hw/acpi/tpm.h
-> >> >>>>> +++ b/include/hw/acpi/tpm.h
-> >> >>>>> @@ -16,11 +16,82 @@
-> >> >>>>>    #ifndef HW_ACPI_TPM_H
-> >> >>>>>    #define HW_ACPI_TPM_H
-> >> >>>>>    +#include "qemu/osdep.h"
-> >> >>>>> +
-> >> >>>>>    #define TPM_TIS_ADDR_BASE           0xFED40000
-> >> >>>>>    #define TPM_TIS_ADDR_SIZE           0x5000
-> >> >>>>>      #define TPM_TIS_IRQ                 5
-> >> >>>>>    +struct crb_regs {
-> >> >>>>> +    union {
-> >> >>>>> +        uint32_t reg;
-> >> >>>>> +        struct {
-> >> >>>>> +            unsigned tpm_established:1;
-> >> >>>>> +            unsigned loc_assigned:1;
-> >> >>>>> +            unsigned active_locality:3;
-> >> >>>>> +            unsigned reserved:2;
-> >> >>>>> +            unsigned tpm_reg_valid_sts:1;
-> >> >>>>> +        } bits;
-> >> >>>>
-> >> >>>> I suppose this is little-endian layout, so this won't work on b=
-ig-endian
-> >> >>>> hosts.
-> >> >>>>
-> >> >>>> Can you add a qtest?
-> >> >>>>
-> >> >>>>> +    } loc_state;
-> >> >>>>> +    uint32_t reserved1;
-> >> >>>>> +    uint32_t loc_ctrl;
-> >> >>>>> +    union {
-> >> >>>>> +        uint32_t reg;
-> >> >>>>> +        struct {
-> >> >>>>> +            unsigned granted:1;
-> >> >>>>> +            unsigned been_seized:1;
-> >> >>>>> +        } bits;
-> >> >>>>
-> >> >>>>
-> >> >>>> This is unclear where you expect those bits (right/left aligned=
-).
-> >> >>>>
-> >> >>>> Can you add an unnamed field to be more explicit?
-> >> >>>>
-> >> >>>> i.e. without using struct if left alignment expected:
-> >> >>>>
-> >> >>>>              unsigned granted:1, been_seized:1, :30;
-> >> >>>
-> >> >>>
-> >> >>>
-> >> >>> I got rid of all the bitfields and this patch here makes it work=
- on a
-> >> >>> ppc64
-> >> >>> big endian and also x86_64 host:
-> >> >>>
-> >> >>>
-> >> >>> https://github.com/stefanberger/qemu-tpm/commit/28fc07f0d9314168=
-986190effd6d72d9fd3972dd
-> >> >>>
-> >> >> Thank you Stefan! I am all for squashing this fix to the patch. Y=
-ou
-> >> >> should then add your signed-off to the commit.
-> >> >
-> >> >
-> >> > I'll do that.
-> >> >
-> >> > The TIS is an ISA Device and the CRB is similar. Considering the
-> >>
-> >> How much similarity is there between TIS and CRB is there? The two
-> >> devices look quite different to me, CRB is way simpler it seems. Or =
-is
-> >> the CRB implementation just lacking many bells and whistles that TIS
-> >> has? Should we consider merging CRB in TIS?
-> >>
-> >> > complications with the sysbus devices where one has to explicitly =
-allow it
-> >> > for a certain machine type, I would advocate to convert the CRB to=
- an ISA
-> >> > device. A patch that does that is this one:
-> >>
-> >> If it's only for that reason (an explicit enable), I would rather ke=
-ep
-> >> it on the system bus. Or should it be on an LPC bus?
-> >>
-> >> Eduardo, what do you think?
-> >
-> > Everything about sysbus is exceptional and confusing, so I would
-> > prefer to avoid using sysbus every time we have an alternative.
-> > If tpm-tis is already an ISA device, what are the reasons to not
-> > use ISA for tpm-crb too?
->=20
-> I was hoping this would make the device more portable (especially on
-> arm) and avoid using legacy bus or resources.
->=20
-> Putting it on ISA doesn't reflect better what a real hardware is like,
-> or does it?
+On 16 January 2018 at 09:40, Abdallah Bouassida
+<abdallah.bouassida@lauterbach.com> wrote:
+> [PATCH RFC] target-arm:Add a dynamic XML-description of the cp-registers to
+> GDB
+>
+> This patch offers to GDB the ability to read/write all the coprocessor
+> registers for ARM and ARM64 by generating dynamically an XML-description for
+> these registers.
 
-I don't know what the hardware interface for those devices look
-like, the documentation I found for TPM-CRB seem to be purely for
-the software interface.
+Thanks for this patch. This is definitely a feature we've been asked
+for in the past (eg https://bugs.launchpad.net/qemu/+bug/741115).
 
-Is there a reason to make it a sysbus device instead of a
-bus-less device, then?
+> - gdbstub.c :
+>         *Extend the get_feature_xml() to handle the dynamic XML generation
+> for
+>            architectures that support this (gdb_coprocessor_dynnamic_xml ==
+> true)
+>         *Extend the gdb_write_register() and gdb_read_register() to handle
+> the
+>           write and the read of these registers.
+> - include/qom/cpu.h:
+>         *Add a new structure "XMLDynamicDescription".
+>         *Declare the new variables and function pointers.
+> - target/arm/cpu.c:
+>         *Initialize the new variables and function pointers for ARM.
+> - target/arm/cpu.h:
+>         *Declare the new read, write and XML dynamic generation functions.
+>         *Declare the write_raw_cp_reg() as I have changed it to non static.
+> - target/arm/gdbstub.c:
+>         *Define the new functions for ARM:
+>             arm_generate_xml(): is called for each register of the hashtable
+> cp_regs
+>                          to generate the right XML "<reg />" line for it.
+>             arm_get_feature_xml_dynamically(): generate the XML dynamically.
+>             arm_cpu_gdb_read_cpregister(): To read the coprocessor
+> registers.
+>             arm_cpu_gdb_write_cpregister(): To write the coprocessor
+> registers.
 
---=20
-Eduardo
+You don't need to put this kind of gcc-style "what got changed at a very
+fine level of detail" into the commit message -- people can look at the patch or
+the diffstat for that. The commit message is for overview of what is being
+changed and why.
+
+> This patch is tagged as [RFC] because I need help to review the following
+> points:
+> *I only take the registers that (!(ri->type & (ARM_CP_NO_RAW|ARM_CP_ALIAS)))
+> So, am I covering all the Coprocessor registers with that?
+
+More the other way around -- you may be including some things you
+should not...
+
+> *For the ARM64, should I differentiate the registers that have two views (32
+> and 64)
+> Maybe by adding in the XML description a "32" tag for the registers name for
+> the
+> 32bit view and a "64" for the 64bit view.
+> *How to properly handle the secure and the non secure views?
+
+I think it might be useful to approach it from the other end -- what
+are we trying to achieve?
+
+For 32 vs 64 bit, it depends on what interface we're showing to the
+debugger. If we're saying "this is a 64 bit CPU" then we should just
+present the 64-bit sysregs, in the same way we only present the 64-bit
+GPRs. If a 32-bit CPU, present the coprocessor regs only. (It's not
+currently possible to have gdb switch between 32 and 64 bit views
+as a 64-bit CPU changes from aarch32 to aarch64, though upstream gdb
+are working on it.)
+
+For secure vs non-secure, follow how the architecture does it:
+ * for a 64-bit CPU, there are no banked sysregs like this, so you
+   just expose 1 register
+ * for a 32-bit CPU, maybe banked registers should be exposed as 2 registers
+
+...but this depends on what you're trying to do, and whether there's
+existing practice in for instance how JTAG debugging presents these
+sysregs to gdb.
+
+I'm pretty hesitant about allowing the user to modify system registers
+in the debugger, that is unlikely to work in quite a lot of cases.
+I'd rather we just made these registers all readonly.
+
+What does the UI in gdb look like? What gdb commands display
+the list of and values of system registers now? (Are there any
+commands that used to be useful and are now swamped by lists of
+hundreds of system registers?)
+
+I've made some more comments on the code below.
+
+> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+> ---
+>  gdbstub.c            | 18 +++++++++++
+>  include/qom/cpu.h    | 19 +++++++++++
+>  target/arm/cpu.c     |  5 +++
+>  target/arm/cpu.h     |  6 +++-
+>  target/arm/gdbstub.c | 90
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/helper.c  |  3 +-
+>  6 files changed, 138 insertions(+), 3 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index f1d5148..b0124c8 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -670,10 +670,20 @@ static const char *get_feature_xml(const char *p,
+> const char **newp,
+>                  pstrcat(target_xml, sizeof(target_xml), r->xml);
+>                  pstrcat(target_xml, sizeof(target_xml), "\"/>");
+>              }
+> +            if (cc->gdb_coprocessor_dynamic_xml) {
+> +                pstrcat(target_xml, sizeof(target_xml), "<xi:include
+> href=\"");
+> +                pstrcat(target_xml, sizeof(target_xml), \
+> +                        "coprocessor_dynamic.xml");
+> +                pstrcat(target_xml, sizeof(target_xml), "\"/>");
+> +            }
+>              pstrcat(target_xml, sizeof(target_xml), "</target>");
+>          }
+>          return target_xml;
+>      }
+> +    if (strncmp(p, "coprocessor_dynamic.xml", len) == 0) {
+> +        CPUState *cpu = first_cpu;
+> +        return cc->get_feature_xml_dynamically(cpu);
+> +    }
+
+Don't we run into problems where this XML exceeds our gdbstub
+MAX_PACKET_LENGTH (which is only 4K) ?
+
+This is a pre-existing bug (https://bugs.launchpad.net/qemu/+bug/1703147)
+but I would expect that if we start autogenerating xml for all the
+coprocessor registers we're going to hit the packet limit pretty
+quickly.
+
+>      for (i = 0; ; i++) {
+>          name = xml_builtin[i][0];
+>          if (!name || (strncmp(name, p, len) == 0 && strlen(name) == len))
+> @@ -697,6 +707,10 @@ static int gdb_read_register(CPUState *cpu, uint8_t
+> *mem_buf, int reg)
+>              return r->get_reg(env, mem_buf, reg - r->base_reg);
+>          }
+>      }
+> +
+> +    if (reg < cpu->gdb_num_regs + cc->gdb_num_cpregs) {
+> +        return cc->gdb_read_cpregister(cpu, mem_buf, reg -
+> cpu->gdb_num_regs);
+> +    }
+>      return 0;
+>  }
+>
+> @@ -715,6 +729,10 @@ static int gdb_write_register(CPUState *cpu, uint8_t
+> *mem_buf, int reg)
+>              return r->set_reg(env, mem_buf, reg - r->base_reg);
+>          }
+>      }
+> +
+> +    if (reg < cpu->gdb_num_regs + cc->gdb_num_cpregs) {
+> +        return cc->gdb_write_cpregister(cpu, mem_buf, reg -
+> cpu->gdb_num_regs);
+> +    }
+>      return 0;
+>  }
+>
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 93bd546..f40ee59 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -76,6 +76,19 @@ typedef void (*CPUUnassignedAccess)(CPUState *cpu, hwaddr
+> addr,
+>  struct TranslationBlock;
+>
+>  /**
+> + * XMLDynamicDescription:
+> + * @desc: Contains the XML descriptions.
+> + * @num_cpregs: Number of the Coprocessor registers seen by GDB.
+> + * @xml_cpregs_ordred_keys: Array that contains the corresponding Key of
+> + * a given cpreg with the same order of the cpreg in the XML description.
+> + */
+> +typedef struct XMLDynamicDescription {
+> +    char * desc;
+> +    int num_cpregs;
+> +    uint32_t *xml_cpregs_ordred_keys;
+> +} XMLDynamicDescription;
+
+cpregs are an arm-specific concept so this data structure doesn't
+belong in the for-all-cpus header.
+
+> +
+> +/**
+>   * CPUClass:
+>   * @class_by_name: Callback to map -cpu command line model name to an
+>   * instantiatable CPU type.
+> @@ -196,6 +209,12 @@ typedef struct CPUClass {
+>
+>      const struct VMStateDescription *vmsd;
+>      const char *gdb_core_xml_file;
+> +    bool gdb_coprocessor_dynamic_xml;
+> +    XMLDynamicDescription dyn_xml;
+> +    int gdb_num_cpregs;
+> +    char * (*get_feature_xml_dynamically)(CPUState *cpu);
+> +    int (*gdb_read_cpregister)(CPUState *cpu, uint8_t *buf, int reg);
+> +    int (*gdb_write_cpregister)(CPUState *cpu, uint8_t *buf, int reg);
+
+Do we really need a new set of functions rather than just being
+able to use the existing gdb_read_register/gdb_write_register ?
+The API seems to be the same, so I was expecting to just have
+the same functions be called, with the register number distinguishing
+the existing regs from the new coprocessor ones.
+
+>      gchar * (*gdb_arch_name)(CPUState *cpu);
+>
+>      void (*cpu_exec_enter)(CPUState *cpu);
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index cc1856c..00efae4 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1751,6 +1751,11 @@ static void arm_cpu_class_init(ObjectClass *oc, void
+> *data)
+>  #endif
+>      cc->gdb_num_core_regs = 26;
+>      cc->gdb_core_xml_file = "arm-core.xml";
+> +    cc->gdb_coprocessor_dynamic_xml=true;
+> +    cc->gdb_num_cpregs = 0;
+> +    cc->get_feature_xml_dynamically = arm_get_feature_xml_dynamically;
+> +    cc->gdb_read_cpregister = arm_cpu_gdb_read_cpregister;
+> +    cc->gdb_write_cpregister = arm_cpu_gdb_write_cpregister;
+>      cc->gdb_arch_name = arm_gdb_arch_name;
+>      cc->gdb_stop_before_watchpoint = true;
+>      cc->debug_excp_handler = arm_debug_excp_handler;
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 9631670..16f84e3 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -797,6 +797,9 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cpu,
+> vaddr addr,
+>
+>  int arm_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+>  int arm_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+> +char *arm_get_feature_xml_dynamically(CPUState *cpu);
+> +int arm_cpu_gdb_read_cpregister(CPUState *cpu, uint8_t *buf, int reg);
+> +int arm_cpu_gdb_write_cpregister(CPUState *cpu, uint8_t *buf, int reg);
+>
+>  int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+>                               int cpuid, void *opaque);
+> @@ -2005,7 +2008,8 @@ static inline bool cp_access_ok(int current_el,
+>
+>  /* Raw read of a coprocessor register (as needed for migration, etc) */
+>  uint64_t read_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri);
+> -
+> +void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                             uint64_t v);
+>  /**
+>   * write_list_to_cpustate
+>   * @cpu: ARMCPU
+> diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+> index 04c1208..123da12 100644
+> --- a/target/arm/gdbstub.c
+> +++ b/target/arm/gdbstub.c
+> @@ -101,3 +101,93 @@ int arm_cpu_gdb_write_register(CPUState *cs, uint8_t
+> *mem_buf, int n)
+>      /* Unknown register.  */
+>      return 0;
+>  }
+> +
+> +static void arm_generate_xml(gpointer key, gpointer value, gpointer cs)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(cs);
+> +    CPUClass *cc = CPU_GET_CLASS(cpu);
+> +    XMLDynamicDescription *dyn_xml = &cc->dyn_xml;
+> +    ARMCPRegInfo *ri = value;
+> +    uint32_t ri_key= *(uint32_t *)key;
+> +    CPUARMState *env = &cpu->env;
+> +    char **target_xml=(char **)&(dyn_xml->desc);
+> +    char *tmp_xml=*target_xml;
+
+If you run your patch through scripts/checkpatch.pl it will
+hopefully point out the places where your code doesn't match our
+coding style (whitespace, etc).
+
+
+thanks
+-- PMM
