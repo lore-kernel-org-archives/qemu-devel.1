@@ -1,25 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edZPV-0007q7-3v
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:33:06 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1edZSx-0000a7-Dn
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edZPU-0007Mc-3j
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:33:05 -0500
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:46291)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1edZPT-0007ME-TA
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:33:04 -0500
-Received: by mail-oi0-x235.google.com with SMTP id d124so5574242oib.13
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 02:33:03 -0800 (PST)
+	(envelope-from <luwei.kang@intel.com>) id 1edZSu-0001ZC-8J
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:36:39 -0500
+Received: from mga06.intel.com ([134.134.136.31]:43471)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1edZSt-0001Uw-Sb
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:36:36 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Mon, 22 Jan 2018 10:36:29 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E7D6CB@SHSMSX101.ccr.corp.intel.com>
+References: <20180115143156.GO6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
+	<20180116115113.GA627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
+	<20180118024232.GT627@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
+	<20180118132415.GU627@localhost.localdomain>
+	<c67f0021-0ca0-413b-bb84-3ff54dd791de@redhat.com>
+	<20180118143744.GY627@localhost.localdomain>
+	<12d650bf-8fd7-49f5-2c96-869393263899@redhat.com>
+	<20180118165244.GZ627@localhost.localdomain>
+	<9b4fc8d2-c2fe-9b80-4dbc-02ea0d447b31@redhat.com>
+In-Reply-To: <9b4fc8d2-c2fe-9b80-4dbc-02ea0d447b31@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1516392192-6491-1-git-send-email-jcmvbkbc@gmail.com>
-References: <1516392192-6491-1-git-send-email-jcmvbkbc@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 10:32:42 +0000
-Message-ID: <CAFEAcA-r9uO9kUMJ7zztpwFsOqByaKmH-cv8kG_76KcuF9QBpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/10] target/xtensa updates
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +40,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
-On 19 January 2018 at 20:03, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> Hi Peter,
->
-> please pull the following batch of updates for the target/xtensa.
->
-> The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75b9ff:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180111' into staging (2018-01-11 14:34:41 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/OSLL/qemu-xtensa.git tags/20180119-xtensa
->
-> for you to fetch changes up to 8030ed759be52b2517356c3d0291c45cedc65fd9:
->
->   target/xtensa: disas/xtensa: fix coverity warnings (2018-01-18 10:27:04 -0800)
->
-> ----------------------------------------------------------------
-> target/xtensa updates:
->
-> - make mini-bootloader independent of the initial CPU state;
-> - add noMMU XTFPGA variants;
-> - add two noMMU cores: de212 and sample_controller;
-> - fix issues reported by coverity against xtensa translator and disassembler.
->
-> ----------------------------------------------------------------
-
-This merge fails make check (all hosts):
-
-QTEST_QEMU_BINARY=xtensaeb-softmmu/qemu-system-xtensaeb
-QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((
-${RANDOM:-0} % 255 + 1))} gtester -k --verbose -m=quick
-tests/qmp-test tests/device-introspect-test tests/qom-test
-tests/test-hmp
-[...]
-
-TEST: tests/qom-test... (pid=28150)
-  /xtensaeb/qom/lx60:                                                  OK
-  /xtensaeb/qom/ml605:                                                 OK
-  /xtensaeb/qom/kc705:                                                 OK
-  /xtensaeb/qom/lx60-nommu:                                            **
-ERROR:/home/peter.maydell/qemu/qom/object.c:488:object_new_with_type:
-assertion failed: (type != NULL)
-Broken pipe
-FAIL
-GTester: last random seed: R02S503ca4c02ea3c0d048fa6ddad7f72d6b
-(pid=28164)
-  /xtensaeb/qom/lx200:                                                 OK
-  /xtensaeb/qom/none:                                                  OK
-  /xtensaeb/qom/lx200-nommu:                                           **
-ERROR:/home/peter.maydell/qemu/qom/object.c:488:object_new_with_type:
-assertion failed: (type != NULL)
-Broken pipe
-FAIL
-GTester: last random seed: R02S354e3434cb9a78bcc813c3a564053150
-(pid=28174)
-  /xtensaeb/qom/ml605-nommu:                                           **
-ERROR:/home/peter.maydell/qemu/qom/object.c:488:object_new_with_type:
-assertion failed: (type != NULL)
-Broken pipe
-FAIL
-GTester: last random seed: R02S15ab1f19833d9f4724ff6a760af17841
-(pid=28179)
-  /xtensaeb/qom/sim:                                                   OK
-  /xtensaeb/qom/kc705-nommu:                                           **
-ERROR:/home/peter.maydell/qemu/qom/object.c:488:object_new_with_type:
-assertion failed: (type != NULL)
-Broken pipe
-FAIL
-GTester: last random seed: R02Sfbce6559af977ed9aaa201d5f8525f99
-(pid=28187)
-FAIL: tests/qom-test
-
-All the -nommu machines seem to fail qom-test with this assertion.
-(Possibly the just-applied machine.next pullreq included something
-that means your queue needs fixes?)
-
-thanks
--- PMM
+PiA+IE9uIFRodSwgSmFuIDE4LCAyMDE4IGF0IDAzOjQ0OjQ5UE0gKzAxMDAsIFBhb2xvIEJvbnpp
+bmkgd3JvdGU6DQo+ID4+IE9uIDE4LzAxLzIwMTggMTU6MzcsIEVkdWFyZG8gSGFia29zdCB3cm90
+ZToNCj4gPj4+IE9uIFRodSwgSmFuIDE4LCAyMDE4IGF0IDAyOjM5OjU3UE0gKzAxMDAsIFBhb2xv
+IEJvbnppbmkgd3JvdGU6DQo+ID4+Pj4gT24gMTgvMDEvMjAxOCAxNDoyNCwgRWR1YXJkbyBIYWJr
+b3N0IHdyb3RlOg0KPiA+Pj4+PiBIb3dldmVyLCBpZiB0aGVyZSdzIGEgc2ltcGxlIHdheSB0byBt
+YWtlIGl0IHBvc3NpYmxlIHRvIG1pZ3JhdGUNCj4gPj4+Pj4gYmV0d2VlbiBob3N0cyB3aXRoIGRp
+ZmZlcmVudCBDUFVJRFsxNGhdIGRhdGEsIGl0IHdvdWxkIGJlIGV2ZW4NCj4gPj4+Pj4gYmV0dGVy
+LiAgV2l0aCB0aGUgY3VycmVudCBLVk0gaW50ZWwtcHQgaW1wbGVtZW50YXRpb24sIHdoYXQNCj4g
+Pj4+Pj4gaGFwcGVucyBpZiB0aGUgQ1BVSURbMTRoXSBkYXRhIHNlZW4gYnkgdGhlIGd1ZXN0IGRv
+ZXNuJ3QgbWF0Y2gNCj4gPj4+Pj4gZXhhY3RseSB0aGUgQ1BVSURbMTRoXSBsZWF2ZXMgZnJvbSB0
+aGUgaG9zdD8NCj4gPj4+Pg0KPiA+Pj4+IFNvbWUgYml0cyBpbiB0aGVyZSBjYW4gYmUgdHJlYXRl
+ZCBhcyBDUFUgZmVhdHVyZXMgKGUuZy4gRUJYIGJpdCAwDQo+ID4+Pj4gIkNSMyBmaWx0ZXJpbmcg
+c3VwcG9ydCIpLiAgUHJvYmFibHkgd2Ugc2hvdWxkIGhhbmRsZSB0aGVzZSBpbiBLVk0gcmlnaHQg
+bm93Lg0KPiA+Pj4+IEtWTSBuZWVkcyB0byBjb21wdXRlIGEgbWFzayBvZiB2YWxpZCAxIGJpdHMg
+Zm9yIElBMzJfUlRJVF9DVEwgYmFzZWQNCj4gPj4+PiBvbiBDUFVJRCwgYW5kIGFwcGx5IGl0IHdo
+ZW4gdGhlIE1TUiBpcyB3cml0dGVuLg0KPiA+Pj4NCj4gPj4+IERvZXMgdGhpcyBtZWFuIFFFTVUg
+Y2FuJ3Qgc2V0IENQVUlEIHZhbHVlcyB0aGF0IHdvbid0IG1hdGNoIHRoZSBob3N0DQo+ID4+PiB3
+aXRoIHRoZSBleGlzdGluZyBpbXBsZW1lbnRhdGlvbiwgb3IgdGhpcyB3b24ndCBtYXR0ZXIgZm9y
+DQo+ID4+PiB3ZWxsLWJlaGF2ZWQgZ3Vlc3RzIHRoYXQgZG9uJ3QgdHJ5IHRvIHNldCByZXNlcnZl
+ZCBiaXRzIG9uIHRoZSBNU1JzPw0KPiA+Pg0KPiA+PiBBbGwgdGhlIGZlYXR1cmVzIGNvdWxkIGJl
+IGhhbmRsZWQgZXhhY3RseSBsaWtlIHJlZ3VsYXIgZmVhdHVyZSBiaXRzLg0KPiA+PiBJZiBRRU1V
+IHNldHMgdGhlbSBpbmNvcnJlY3RseSBhbmQgImVuZm9yY2UiIGlzIG5vdCB1c2VkLCBiYWQgdGhp
+bmdzDQo+ID4+IGhhcHBlbiBidXQgaXQncyB0aGUgdXNlcidzIGZhdWx0Lg0KPiA+DQo+ID4gT2gs
+IEkgbWVhbiBzZXR0aW5nIHRoZSBiaXQgdG8gMCB3aGVuIGl0J3MgMSBvbiB0aGUgaG9zdCAoaWYg
+aXQncw0KPiA+IDAgb24gdGhlIGhvc3QsIFFFTVUgd291bGQgbmV2ZXIgc2V0IGl0IGFueXdheSku
+ICBJcyBpdCBzYWZlIHRvIGRvIGl0DQo+ID4gd2l0aCB0aGUgY3VycmVudCBLVk0gaW50ZWwtcHQg
+aW1wbGVtZW50YXRpb24/DQo+IA0KPiBJdCdzIG5vdCwgYnV0IGl0J3MgKHZlcnkpIGVhc3kgdG8g
+Zml4Lg0KDQpIaSBQYW9sbywNCiAgICBEbyB5b3UgbWVhbiB0aGVyZSBuZWVkIHRvIGFkZCBzb21l
+IGNoZWNrIGJlZm9yZSBzZXR0aW5nIElBMzJfUlRJVF9DVEwgTVNSIGluIEtWTSBiZWNhdXNlIHNv
+bWUgYml0cyBvZiB0aGlzIE1TUiBpcyBkZXBlbmQgb24gdGhlIHJlc3VsdCBvZiBDUFVJRFsxNF0u
+IEFueSBhdHRlbXB0cyB0byBjaGFuZ2UgdGhlc2UgcmVzZXJ2ZWQgYml0IHNob3VsZCBjYXVzZSBh
+ICNHUC4NCg0KPiA+DQo+ID4+DQo+ID4+Pg0KPiA+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBJdCBhbHNvIG5lZWRzIHRvDQo+ID4+Pj4gd2hpdGVsaXN0
+IGJpdHMgbGlrZSB3ZSBkbyBmb3Igb3RoZXIgZmVhdHVyZSB3b3Jkcy4gIFRoZXNlIGluY2x1ZGU6
+DQo+ID4+Pj4NCj4gPj4+PiAtIENQVUlEW0VBWD0xNGgsRUNYPTBdLkVCWA0KPiA+Pj4+DQo+ID4+
+Pj4gLSBDUFVJRFtFQVg9MTRoLEVDWD0wXS5FQ1ggZXhjZXB0IGJpdCAzMQ0KPiA+Pj4+DQo+ID4+
+Pj4gLSBDUFVJRFtFQVg9MTRoLEVDWD0xXS5FQVggYml0cyAxNjozMSAoaWYNCj4gPj4+PiBDUFVJ
+RFtFQVg9MTRoLEVDWD0wXS5FQlhbM109MSkNCj4gPj4+Pg0KPiA+Pj4+IC0gQ1BVSURbRUFYPTE0
+aCxFQ1g9MV0uRUJYIChpZiBDUFVJRFtFQVg9MTRoLEVDWD0wXS5FQlhbMV09MSkNCj4gPj4+DQo+
+ID4+PiBXaGF0IGRvIHlvdSBtZWFuIGJ5IHdoaXRlbGlzdD8NCj4gPj4NCj4gPj4gS1ZNIG5lZWRz
+IHRvIHRlbGwgUUVNVSB0aGUgYml0cyBpdCBrbm93cyBhYm91dC4NCg0KSSB0aGluayBrdm1fYXJj
+aF9nZXRfc3VwcG9ydGVkX2NwdWlkKCkgZnVuY3Rpb24gY2FuIGdldCB0aGUgcmVzdWx0IG9mIENQ
+VUlEWzE0XSBmcm9tIEtWTS4gSXMgdGhpcyB0aGUgd2hpdGVsaXN0IHdoYXQgeW91IG1lbnRpb25l
+ZD8NCg0KVGhhbmtzLA0KTHV3ZWkgS2FuZw0KDQo+ID4NCj4gPiBTbyBLVk0gaXNuJ3QgY3VycmVu
+dGx5IGRvaW5nIGl0IG9uIEdFVF9TVVBQT1JURURfQ1BVSUQ/ICBPb3BzLg0KPiA+DQo+ID4NCj4g
+Pj4NCj4gPj4+PiBPdGhlcnMsIGN1cnJlbnRseSBvbmx5IENQVUlEW0VBWD0xNGgsRUNYPTBdLkVD
+WFszMV0gbXVzdCBtYXRjaCwNCj4gPj4+PiB0aGVyZSBpcyBubyB3YXkgdG8gZW11bGF0ZSB0aGUg
+Indyb25nIiB2YWx1ZS4NCj4gPj4+DQo+ID4+PiBJbiB0aGlzIGNhc2Ugd2UgY291bGQgbWFrZSBp
+dCBjb25maWd1cmFibGUgYnV0IHJlcXVpcmUgdGhlIGhvc3QgYW5kDQo+ID4+PiBndWVzdCB2YWx1
+ZSB0byBhbHdheXMgbWF0Y2guDQo+ID4+Pg0KPiA+Pj4gVGhpcyBtaWdodCBiZSBhbiBvYnN0YWNs
+ZSB0byBlbmFibGluZyBpbnRlbC1wdCBieSBkZWZhdWx0IChiZWNhdXNlDQo+ID4+PiBpdCBjb3Vs
+ZCBtYWtlIFZNcyBub3QgbWlncmF0YWJsZSB0byBuZXdlciBob3N0cyksIGJ1dCBtYXkgYWxsb3cg
+dGhlDQo+ID4+PiBmZWF0dXJlIHRvIGJlIGNvbmZpZ3VyZWQgaW4gYSBwcmVkaWN0YWJsZSB3YXku
+DQo+ID4+DQo+ID4+IFllYWgsIGJ1dCBjb25zaWRlciB0aGF0IHZpcnR1YWxpemVkIFBUIGFueXdh
+eSB3b3VsZCBvbmx5IGJlIGVuYWJsZWQNCj4gPj4gb24gSWNlIExha2UgcHJvY2Vzc29ycy4gIEl0
+J3MgYSBmZXcgeWVhcnMgYXdheSBhbnl3YXkhDQo+ID4+DQo+ID4+Pj4gT3RoZXJzLCBjdXJyZW50
+bHkgb25seSBDUFVJRFtFQVg9MTRoLEVDWD0xXS5FQVhbMjowXSBhcmUgbnVtZXJpYw0KPiA+Pj4+
+IHZhbHVlcywgYW5kIGl0J3MgcG9zc2libGUgdG8gZW11bGF0ZSBhIGxvd2VyIHZhbHVlIHRoYW4g
+dGhlIG9uZSBpbiB0aGUgcHJvY2Vzc29yLg0KPiA+Pj4NCj4gPj4+IFRoaXMgY291bGQgYmUgaGFu
+ZGxlZCBieSBRRU1VLiAgVGhlcmUncyBubyByZXF1aXJlbWVudCB0aGF0IGFsbA0KPiA+Pj4gR0VU
+X1NVUFBPUlRFRF9DUFVJRCB2YWx1ZXMgc2hvdWxkIGJlIHZhbGlkYXRlZCBieSBzaW1wbGUgYml0
+DQo+ID4+PiBtYXNraW5nLg0KPiA+Pg0KPiA+PiBHb29kIQ0KPiA+Pg0KPiA+PiBQYW9sbw0KPiA+
+DQoNCg==
