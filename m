@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edb7S-0001wk-Pw
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:22:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1edb80-0002Iz-2Z
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edb7R-00017R-W0
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:22:34 -0500
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:45934)
+	(envelope-from <peter.maydell@linaro.org>) id 1edb7z-0001Zw-94
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:08 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:38966)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1edb7R-00017G-Qq
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:22:33 -0500
-Received: by mail-oi0-x22a.google.com with SMTP id j129so5754915oib.12
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 04:22:33 -0800 (PST)
+	id 1edb7z-0001Zq-3x
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:07 -0500
+Received: by mail-ot0-x230.google.com with SMTP id d9so7264582oth.6
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 04:23:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180115115309.23982-1-quintela@redhat.com>
-References: <20180115115309.23982-1-quintela@redhat.com>
+In-Reply-To: <20180120200358.19991-1-marcandre.lureau@redhat.com>
+References: <20180120200358.19991-1-marcandre.lureau@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 12:22:12 +0000
-Message-ID: <CAFEAcA8AMejrf1P26QX1xne2+JvYziBvT1Q-HjcC2Pa=40gB6A@mail.gmail.com>
+Date: Mon, 22 Jan 2018 12:22:46 +0000
+Message-ID: <CAFEAcA-5sZNimPxeSabBXmJUd_C+NLnoXbDDQ9w0tSjtbrXCyg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/27] Migration pull
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/1] Dump patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 15 January 2018 at 11:52, Juan Quintela <quintela@redhat.com> wrote:
-> Hi
-> - rebase on top of lastest
-> - fix compilation on 32bit machines
-> - add Peter Xu cleanups
+On 20 January 2018 at 20:03, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc7=
+8f:
 >
-> Please, apply.
->
-> The following changes since commit fd06527b80c88c8dde1b35fdc692685b68d2fd93:
->
->   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2018-01-15 10:39:29 +0000)
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
+equest' into staging (2018-01-19 16:35:25 +0000)
 >
 > are available in the Git repository at:
 >
->   git://github.com/juanquintela/qemu.git tags/migration/20180115
+>   https://github.com/elmarco/qemu.git tags/dump-pull-request
 >
-> for you to fetch changes up to 816306826a45f4d15352e32d157172af3a35899f:
+> for you to fetch changes up to 6f49ec4034e55dfb675a56a62c9579384f7fb8cc:
 >
->   migration: remove notify in fd_error (2018-01-15 12:48:13 +0100)
->
-> ----------------------------------------------------------------
-> migration/next for 20180115
+>   dump-guest-memory.py: fix python 2 support (2018-01-20 20:59:00 +0100)
 >
 > ----------------------------------------------------------------
-> Alexey Perevalov (6):
->       migration: introduce postcopy-blocktime capability
->       migration: add postcopy blocktime ctx into MigrationIncomingState
->       migration: calculate vCPU blocktime on dst side
->       migration: postcopy_blocktime documentation
->       migration: add blocktime calculation into migration-test
->       migration: add postcopy total blocktime into query-migrate
+>
+> ----------------------------------------------------------------
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>   dump-guest-memory.py: fix python 2 support
+>
+>  scripts/dump-guest-memory.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I suggest that we should for the moment revert
-3be98be4e9f5  migration: calculate vCPU blocktime on dst side
-5f32dc8ee073  migration: add blocktime calculation into migration-test
-ca6011c23291  migration: add postcopy total blocktime into query-migrate
+Applied, thanks.
 
-unless there is an imminent fix for the ppc32 issues (which seems
-unlikely since the code is fundamentally assuming it can atomically
-do operations which can't be done atomically on all hosts).
-
-I haven't yet tested that combination of reverts, I'm guessing
-at which subsequent commits depend on 3be98be4e9f5. Let me know
-if you have suggestions for additions/removals from the revert list.
-
-thanks
 -- PMM
