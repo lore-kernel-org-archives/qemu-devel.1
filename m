@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1edfxZ-0002aM-N6
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:32:44 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1edfzu-0004Nn-Ie
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:35:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1edfxX-0000J2-Tm
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:32:41 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:37990)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1edfzt-0001cD-6C
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:35:06 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:45223)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1edfxX-0000IE-Ku
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:32:39 -0500
-Received: by mail-wm0-x243.google.com with SMTP id 141so18326971wme.3
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 09:32:39 -0800 (PST)
+	id 1edfzs-0001bm-Sh
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 12:35:05 -0500
+Received: by mail-wr0-x242.google.com with SMTP id 16so9564448wry.12
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 09:35:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180122172546.GI5292@localhost.localdomain>
-References: <20180119141105.29095-1-marcandre.lureau@redhat.com>
-	<20180119141105.29095-5-marcandre.lureau@redhat.com>
-	<f2ecf612-8538-f8d1-ffd8-f875aa453c42@amsat.org>
-	<3c334ed0-3d9d-1ef5-27b7-aa587e5acd81@linux.vnet.ibm.com>
-	<CAMxuvaxyBmEEnk_dtFR4qbk_-95ROnR6o-3gR7U=HNJAhV5DdA@mail.gmail.com>
-	<6cb2b88f-0c8b-4bab-c8fc-018dd0cbc662@linux.vnet.ibm.com>
-	<CAMxuvazYZZwzSBPvbmKLPv_YG2uYPkPA1meiYoMkizegEozC_g@mail.gmail.com>
-	<20180122172546.GI5292@localhost.localdomain>
+In-Reply-To: <584986dc-eeb6-4cfe-8ee3-330b17c55c09@redhat.com>
+References: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
+	<1515924416-9266-3-git-send-email-ghammer@redhat.com>
+	<584986dc-eeb6-4cfe-8ee3-330b17c55c09@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 22 Jan 2018 18:32:37 +0100
-Message-ID: <CAJ+F1CKrkirvv=5=M1OSQXg5RwRgNYZ+r7BzHW7Pd1W-utEGaw@mail.gmail.com>
+Date: Mon, 22 Jan 2018 18:35:03 +0100
+Message-ID: <CAJ+F1CL+_zXOW1920UcU3d0E4Sv3yA2pYUrDQFHW8nLbk2QcDQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] tpm: add CRB device
+Subject: Re: [Qemu-devel] [PATCH 2/3] virtio: postpone the execution of
+ event_notifier_cleanup function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,200 +32,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: Gal Hammer <ghammer@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
 Hi
 
-On Mon, Jan 22, 2018 at 6:25 PM, Eduardo Habkost <ehabkost@redhat.com> wrot=
-e:
-> On Mon, Jan 22, 2018 at 04:08:30PM +0100, Marc-Andre Lureau wrote:
->> Hi
+On Mon, Jan 22, 2018 at 12:53 PM, Michal Privoznik <mprivozn@redhat.com> wr=
+ote:
+> On 01/14/2018 11:06 AM, Gal Hammer wrote:
+>> Use the EventNotifier's cleanup callback function to execute the
+>> event_notifier_cleanup function after kvm unregistered the eventfd.
 >>
->> On Sun, Jan 21, 2018 at 11:01 PM, Stefan Berger
->> <stefanb@linux.vnet.ibm.com> wrote:
->> > On 01/21/2018 02:24 PM, Marc-Andre Lureau wrote:
->> >>
->> >> Hi
->> >>
->> >> On Sun, Jan 21, 2018 at 6:46 AM, Stefan Berger
->> >> <stefanb@linux.vnet.ibm.com> wrote:
->> >>>
->> >>> On 01/20/2018 07:54 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> >>>>
->> >>>> On 01/19/2018 11:11 AM, Marc-Andr=C3=A9 Lureau wrote:
->> >>>>>
->> >>>>> tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB)
->> >>>>> Interface as defined in TCG PC Client Platform TPM Profile (PTP)
->> >>>>> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03=
- v22.
->> >>>>>
->> >>>>> The PTP allows device implementation to switch between TIS and CRB
->> >>>>> model at run time, but given that CRB is a simpler device to
->> >>>>> implement, I chose to implement it as a different device.
->> >>>>>
->> >>>>> The device doesn't implement other locality than 0 for now (my lap=
-top
->> >>>>> TPM doesn't either, so I assume this isn't so bad)
->> >>>>>
->> >>>>> The command/reply memory region is statically allocated after the =
-CRB
->> >>>>> registers address TPM_CRB_ADDR_BASE + sizeof(struct crb_regs) (I
->> >>>>> wonder if the BIOS could or should allocate it instead, or what si=
-ze
->> >>>>> to use, again this seems to fit well expectations)
->> >>>>>
->> >>>>> The PTP doesn't specify a particular bus to put the device. So I a=
-dded
->> >>>>> it on the system bus directly, so it could hopefully be used easil=
-y on
->> >>>>> a different platform than x86. Currently, it fails to init on piix=
+>> This change supports running the virtio_bus_set_host_notifier
+>> function inside a memory region transaction. Otherwise, a closed
+>> fd is sent to kvm, which results in a failure.
+>>
+>> Signed-off-by: Gal Hammer <ghammer@redhat.com>
+>> ---
+>>  accel/kvm/kvm-all.c    |  4 ++++
+>>  hw/virtio/virtio-bus.c | 19 +++++++++++--------
+>>  2 files changed, 15 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index f290f48..071f4f5 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -812,6 +812,10 @@ static void kvm_mem_ioeventfd_del(MemoryListener *l=
+istener,
+>>      if (r < 0) {
+>>          abort();
+>>      }
+>> +
+>> +    if (e->cleanup) {
+>> +        e->cleanup(e);
+>> +    }
+>>  }
+>>
+>>  static void kvm_io_ioeventfd_add(MemoryListener *listener,
+>> diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+>> index 3042232..8106346 100644
+>> --- a/hw/virtio/virtio-bus.c
+>> +++ b/hw/virtio/virtio-bus.c
+>> @@ -256,6 +256,15 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *b=
+us)
+>>      return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
+>>  }
+>>
+>> +static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
+>> +{
+>> +    /* Test and clear notifier after disabling event,
+>> +     * in case poll callback didn't have time to run.
+>> +     */
+>> +    virtio_queue_host_notifier_read(notifier);
+>> +    event_notifier_cleanup(notifier);
+>> +}
+>> +
+>>  /*
+>>   * This function switches ioeventfd on/off in the device.
+>>   * The caller must set or clear the handlers for the EventNotifier.
+>> @@ -283,19 +292,13 @@ int virtio_bus_set_host_notifier(VirtioBusState *b=
+us, int n, bool assign)
+>>          r =3D k->ioeventfd_assign(proxy, notifier, n, true);
+>>          if (r < 0) {
+>>              error_report("%s: unable to assign ioeventfd: %d", __func__=
+, r);
+>> -            goto cleanup_event_notifier;
+>> +            virtio_bus_cleanup_event_notifier(notifier);
+>>          }
+>> -        return 0;
+>>      } else {
+>> +        notifier->cleanup =3D virtio_bus_cleanup_event_notifier;
+>>          k->ioeventfd_assign(proxy, notifier, n, false);
+>>      }
+>>
+>> -cleanup_event_notifier:
+>> -    /* Test and clear notifier after disabling event,
+>> -     * in case poll callback didn't have time to run.
+>> -     */
+>> -    virtio_queue_host_notifier_read(notifier);
+>> -    event_notifier_cleanup(notifier);
+>>      return r;
+>>  }
+>>
+>>
+>
+> This causes abort() to me:
+>
+> Thread 7 "CPU 3/KVM" received signal SIGABRT, Aborted.
+> [Switching to Thread 0x7f78fa1f4700 (LWP 13737)]
+> __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:51
+> 51      }
+> __GI_raise 7 # bt
+> #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
+c:51
+> #1  0x00007f7a09ff5c1a in __GI_abort () at abort.c:89
+> #2  0x000055f2a70bce9d in kvm_io_ioeventfd_del (listener=3D0x55f2a7d19200=
+ <kvm_io_listener>, section=3D0x7f78fa1f10f0, match_data=3Dtrue, data=3D0, =
+e=3D0x7f79fc81f080) at /home/zippy/work/qemu/qemu.git/accel/kvm/kvm-all.c:8=
+52
+> #3  0x000055f2a70a6fac in address_space_add_del_ioeventfds (as=3D0x55f2a7=
+e86620 <address_space_io>, fds_new=3D0x7f78e40b9e80, fds_new_nb=3D2, fds_ol=
+d=3D0x7f78e40b9f10, fds_old_nb=3D3) at /home/zippy/work/qemu/qemu.git/memor=
+y.c:832
+> #4  0x000055f2a70a744d in address_space_update_ioeventfds (as=3D0x55f2a7e=
+86620 <address_space_io>) at /home/zippy/work/qemu/qemu.git/memory.c:895
+> #5  0x000055f2a70a7f04 in memory_region_transaction_commit () at /home/zi=
+ppy/work/qemu/qemu.git/memory.c:1097
+> #6  0x000055f2a70ab0d1 in memory_region_del_eventfd (mr=3D0x55f2a9422250,=
+ addr=3D16, size=3D2, match_data=3Dtrue, data=3D0, e=3D0x7f79fc81f080) at /=
+home/zippy/work/qemu/qemu.git/memory.c:2273
+> #7  0x000055f2a7411f18 in virtio_pci_ioeventfd_assign (d=3D0x55f2a9421970=
+, notifier=3D0x7f79fc81f080, n=3D0, assign=3Dfalse) at hw/virtio/virtio-pci=
+.c:280
+> #8  0x000055f2a7418e6f in virtio_bus_set_host_notifier (bus=3D0x55f2a9429=
+a68, n=3D0, assign=3Dfalse) at hw/virtio/virtio-bus.c:299
+> #9  0x000055f2a710236a in virtio_scsi_dataplane_stop (vdev=3D0x55f2a9429a=
+e0) at /home/zippy/work/qemu/qemu.git/hw/scsi/virtio-scsi-dataplane.c:215
+> #10 0x000055f2a7418bb3 in virtio_bus_stop_ioeventfd (bus=3D0x55f2a9429a68=
+) at hw/virtio/virtio-bus.c:246
+> #11 0x000055f2a7411f63 in virtio_pci_stop_ioeventfd (proxy=3D0x55f2a94219=
+70) at hw/virtio/virtio-pci.c:294
+> #12 0x000055f2a74144ab in virtio_pci_common_write (opaque=3D0x55f2a942197=
+0, addr=3D20, val=3D0, size=3D1) at hw/virtio/virtio-pci.c:1262
+> #13 0x000055f2a70a6016 in memory_region_write_accessor (mr=3D0x55f2a94223=
+40, addr=3D20, value=3D0x7f78fa1f1558, size=3D1, shift=3D0, mask=3D255, att=
+rs=3D...) at /home/zippy/work/qemu/qemu.git/memory.c:560
+> #14 0x000055f2a70a622e in access_with_adjusted_size (addr=3D20, value=3D0=
+x7f78fa1f1558, size=3D1, access_size_min=3D1, access_size_max=3D4, access_f=
+n=3D0x55f2a70a5f2c <memory_region_write_accessor>, mr=3D0x55f2a9422340, att=
+rs=3D...) at /home/zippy/work/qemu/qemu.git/memory.c:627
+> #15 0x000055f2a70a8eb0 in memory_region_dispatch_write (mr=3D0x55f2a94223=
+40, addr=3D20, data=3D0, size=3D1, attrs=3D...) at /home/zippy/work/qemu/qe=
+mu.git/memory.c:1503
+> #16 0x000055f2a7058b2b in flatview_write_continue (fv=3D0x7f78e405eba0, a=
+ddr=3D4269834260, attrs=3D..., buf=3D0x7f7a26c36028 "", len=3D1, addr1=3D20=
+, l=3D1, mr=3D0x55f2a9422340) at /home/zippy/work/qemu/qemu.git/exec.c:3038
+> #17 0x000055f2a7058c79 in flatview_write (fv=3D0x7f78e405eba0, addr=3D426=
+9834260, attrs=3D..., buf=3D0x7f7a26c36028 "", len=3D1) at /home/zippy/work=
+/qemu/qemu.git/exec.c:3083
+> #18 0x000055f2a7059050 in flatview_rw (fv=3D0x7f78e405eba0, addr=3D426983=
+4260, attrs=3D..., buf=3D0x7f7a26c36028 "", len=3D1, is_write=3Dtrue) at /h=
+ome/zippy/work/qemu/qemu.git/exec.c:3192
+> #19 0x000055f2a7059108 in address_space_rw (as=3D0x55f2a7e86680 <address_=
+space_memory>, addr=3D4269834260, attrs=3D..., buf=3D0x7f7a26c36028 "", len=
+=3D1, is_write=3Dtrue) at /home/zippy/work/qemu/qemu.git/exec.c:3202
+> #20 0x000055f2a70bf42c in kvm_cpu_exec (cpu=3D0x55f2a850cda0) at /home/zi=
+ppy/work/qemu/qemu.git/accel/kvm/kvm-all.c:1941
+> #21 0x000055f2a708d455 in qemu_kvm_cpu_thread_fn (arg=3D0x55f2a850cda0) a=
+t /home/zippy/work/qemu/qemu.git/cpus.c:1196
+> #22 0x000055f2a75ce829 in qemu_thread_start (args=3D0x55f2a852e260) at ut=
+il/qemu-thread-posix.c:504
+> #23 0x00007f7a0a375887 in start_thread (arg=3D0x7f78fa1f4700) at pthread_=
+create.c:456
+> #24 0x00007f7a0a0b7d4f in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:97
+> __GI_raise 7 # up
+> #1  0x00007f7a09ff5c1a in __GI_abort () at abort.c:89
+> 89            raise (SIGABRT);
+> __GI_abort 7 #
+> #2  0x000055f2a70bce9d in kvm_io_ioeventfd_del (listener=3D0x55f2a7d19200=
+ <kvm_io_listener>, section=3D0x7f78fa1f10f0, match_data=3Dtrue, data=3D0, =
+e=3D0x7f79fc81f080) at /home/zippy/work/qemu/qemu.git/accel/kvm/kvm-all.c:8=
+52
+> 852             abort();
+> kvm_io_ioeventfd_del 7 # p *e
+> $1 =3D {rfd =3D -1, wfd =3D -1, cleanup =3D 0x0}
+>
+>
+> I think the problem is that event_notifier_cleanup() is called before
+> kvm_io_ioeventfd_del() and both are called over the same EventNotifier.
+> This is supported by another data I was able to collect in a different
+> run:
+>
+> Thread 4 "CPU 0/KVM" hit Breakpoint 1, event_notifier_cleanup (e=3D0x7fc6=
+ac26f080) at util/event_notifier-posix.c:83
+> 83          if (e->rfd !=3D e->wfd) {
+> event_notifier_cleanup 4 # p *e
+> $1 =3D {rfd =3D 48, wfd =3D 48, cleanup =3D 0x55c91c76ac87 <virtio_bus_cl=
+eanup_event_notifier>}
+> event_notifier_cleanup 4 # c
+> Continuing.
+>
+> Thread 4 "CPU 0/KVM" received signal SIGABRT, Aborted.
+> __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:51
+> 51      }
+> __GI_raise 4 # up
+> #1  0x00007fc6b9a45c1a in __GI_abort () at abort.c:89
+> 89            raise (SIGABRT);
+> __GI_abort 4 #
+> #2  0x000055c91c40ee9d in kvm_io_ioeventfd_del (listener=3D0x55c91d06b200=
+ <kvm_io_listener>, section=3D0x7fc5ab1fa0f0, match_data=3Dtrue, data=3D0, =
+e=3D0x7fc6ac26f080) at /home/zippy/work/qemu/qemu.git/accel/kvm/kvm-all.c:8=
+52
+> 852             abort();
+> kvm_io_ioeventfd_del 4 # p *e
+> $2 =3D {rfd =3D -1, wfd =3D -1, cleanup =3D 0x0}
+>
+>
+> So I drafted dirty workaround:
+>
+> index 071f4f57c0..bf15344533 100644
+> --- i/accel/kvm/kvm-all.c
+> +++ w/accel/kvm/kvm-all.c
+> @@ -845,6 +845,9 @@ static void kvm_io_ioeventfd_del(MemoryListener *list=
+ener,
+>      int fd =3D event_notifier_get_fd(e);
+>      int r;
+>
+> +    if (fd =3D=3D -1)
+> +        return;
+> +
+>      r =3D kvm_set_ioeventfd_pio(fd, section->offset_within_address_space=
 ,
->> >>>>> because error_on_sysbus_device() check. The check may be changed i=
-n a
->> >>>>> near future, see discussion on the qemu-devel ML.
->> >>>>>
->> >>>>> Tested with some success with Linux upstream and Windows 10, seabi=
-os &
->> >>>>> modified ovmf. The device is recognized and correctly transmit
->> >>>>> command/response with passthrough & emu. However, we are missing P=
-PI
->> >>>>> ACPI part atm.
->> >>>>>
->> >>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com=
+>                                data, false, int128_get64(section->size),
+>                                match_data);
 >
->> >>>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> >>>>> ---
->> >>>>>    qapi/tpm.json                      |   5 +-
->> >>>>>    include/hw/acpi/tpm.h              |  72 ++++++++
->> >>>>>    include/sysemu/tpm.h               |   3 +
->> >>>>>    hw/i386/acpi-build.c               |  34 +++-
->> >>>>>    hw/tpm/tpm_crb.c                   | 327
->> >>>>> +++++++++++++++++++++++++++++++++++++
->> >>>>>    default-configs/i386-softmmu.mak   |   1 +
->> >>>>>    default-configs/x86_64-softmmu.mak |   1 +
->> >>>>>    hw/tpm/Makefile.objs               |   1 +
->> >>>>>    8 files changed, 434 insertions(+), 10 deletions(-)
->> >>>>>    create mode 100644 hw/tpm/tpm_crb.c
->> >>>>>
->> >>>>> diff --git a/qapi/tpm.json b/qapi/tpm.json
->> >>>>> index 7093f268fb..d50deef5e9 100644
->> >>>>> --- a/qapi/tpm.json
->> >>>>> +++ b/qapi/tpm.json
->> >>>>> @@ -11,10 +11,11 @@
->> >>>>>    # An enumeration of TPM models
->> >>>>>    #
->> >>>>>    # @tpm-tis: TPM TIS model
->> >>>>> +# @tpm-crb: TPM CRB model (since 2.12)
->> >>>>>    #
->> >>>>>    # Since: 1.5
->> >>>>>    ##
->> >>>>> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
->> >>>>> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
->> >>>>>      ##
->> >>>>>    # @query-tpm-models:
->> >>>>> @@ -28,7 +29,7 @@
->> >>>>>    # Example:
->> >>>>>    #
->> >>>>>    # -> { "execute": "query-tpm-models" }
->> >>>>> -# <- { "return": [ "tpm-tis" ] }
->> >>>>> +# <- { "return": [ "tpm-tis", "tpm-crb" ] }
->> >>>>>    #
->> >>>>>    ##
->> >>>>>    { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
->> >>>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
->> >>>>> index 6d516c6a7f..b0048515fa 100644
->> >>>>> --- a/include/hw/acpi/tpm.h
->> >>>>> +++ b/include/hw/acpi/tpm.h
->> >>>>> @@ -16,11 +16,82 @@
->> >>>>>    #ifndef HW_ACPI_TPM_H
->> >>>>>    #define HW_ACPI_TPM_H
->> >>>>>    +#include "qemu/osdep.h"
->> >>>>> +
->> >>>>>    #define TPM_TIS_ADDR_BASE           0xFED40000
->> >>>>>    #define TPM_TIS_ADDR_SIZE           0x5000
->> >>>>>      #define TPM_TIS_IRQ                 5
->> >>>>>    +struct crb_regs {
->> >>>>> +    union {
->> >>>>> +        uint32_t reg;
->> >>>>> +        struct {
->> >>>>> +            unsigned tpm_established:1;
->> >>>>> +            unsigned loc_assigned:1;
->> >>>>> +            unsigned active_locality:3;
->> >>>>> +            unsigned reserved:2;
->> >>>>> +            unsigned tpm_reg_valid_sts:1;
->> >>>>> +        } bits;
->> >>>>
->> >>>> I suppose this is little-endian layout, so this won't work on big-e=
-ndian
->> >>>> hosts.
->> >>>>
->> >>>> Can you add a qtest?
->> >>>>
->> >>>>> +    } loc_state;
->> >>>>> +    uint32_t reserved1;
->> >>>>> +    uint32_t loc_ctrl;
->> >>>>> +    union {
->> >>>>> +        uint32_t reg;
->> >>>>> +        struct {
->> >>>>> +            unsigned granted:1;
->> >>>>> +            unsigned been_seized:1;
->> >>>>> +        } bits;
->> >>>>
->> >>>>
->> >>>> This is unclear where you expect those bits (right/left aligned).
->> >>>>
->> >>>> Can you add an unnamed field to be more explicit?
->> >>>>
->> >>>> i.e. without using struct if left alignment expected:
->> >>>>
->> >>>>              unsigned granted:1, been_seized:1, :30;
->> >>>
->> >>>
->> >>>
->> >>> I got rid of all the bitfields and this patch here makes it work on =
-a
->> >>> ppc64
->> >>> big endian and also x86_64 host:
->> >>>
->> >>>
->> >>> https://github.com/stefanberger/qemu-tpm/commit/28fc07f0d93141689861=
-90effd6d72d9fd3972dd
->> >>>
->> >> Thank you Stefan! I am all for squashing this fix to the patch. You
->> >> should then add your signed-off to the commit.
->> >
->> >
->> > I'll do that.
->> >
->> > The TIS is an ISA Device and the CRB is similar. Considering the
->>
->> How much similarity is there between TIS and CRB is there? The two
->> devices look quite different to me, CRB is way simpler it seems. Or is
->> the CRB implementation just lacking many bells and whistles that TIS
->> has? Should we consider merging CRB in TIS?
->>
->> > complications with the sysbus devices where one has to explicitly allo=
-w it
->> > for a certain machine type, I would advocate to convert the CRB to an =
-ISA
->> > device. A patch that does that is this one:
->>
->> If it's only for that reason (an explicit enable), I would rather keep
->> it on the system bus. Or should it be on an LPC bus?
->>
->> Eduardo, what do you think?
+> But this time I'm getting following error:
 >
-> Everything about sysbus is exceptional and confusing, so I would
-> prefer to avoid using sysbus every time we have an alternative.
-> If tpm-tis is already an ISA device, what are the reasons to not
-> use ISA for tpm-crb too?
+> kvm_io_ioeventfd_add: error adding ioeventfd: File exists
+>
+> __GI_raise 7 # up
+> #1  0x00007f3ccd579c1a in __GI_abort () at abort.c:89
+> 89            raise (SIGABRT);
+> __GI_abort 7 #
+> #2  0x000055c68ac84e08 in kvm_io_ioeventfd_add (listener=3D0x55c68b8e1200=
+ <kvm_io_listener>, section=3D0x7f3bbd7f1090, match_data=3Dtrue, data=3D0, =
+e=3D0x7f3bbcf8d080) at /home/zippy/work/qemu/qemu.git/accel/kvm/kvm-all.c:8=
+35
+> 835             abort();
+> kvm_io_ioeventfd_add 7 # p *e
+> $1 =3D {rfd =3D 48, wfd =3D 48, cleanup =3D 0x0}
+>
 
-I was hoping this would make the device more portable (especially on
-arm) and avoid using legacy bus or resources.
+I was about to report the same error when booting an uefi guest, I
+bisected down to the same first bad commit.
 
-Putting it on ISA doesn't reflect better what a real hardware is like,
-or does it?
+Thanks Michal
 
 --=20
 Marc-Andr=C3=A9 Lureau
