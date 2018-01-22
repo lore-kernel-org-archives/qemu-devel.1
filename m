@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1edb84-0002Mo-R2
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:14 -0500
+	(envelope-from <stefanha@redhat.com>) id 1edbBb-0004RI-FS
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1edb83-0001aO-GE
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:23:12 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
-	<8cb52056-e57c-ec72-60a1-adc41f21b9c3@redhat.com>
-	<d64cd344-bbcb-a088-f74d-a3e5446085f4@virtuozzo.com>
-Message-ID: <ea632dcf-28f5-5f33-e22f-db7e622da823@virtuozzo.com>
-Date: Mon, 22 Jan 2018 15:22:50 +0300
+	(envelope-from <stefanha@redhat.com>) id 1edbBa-0003QQ-FT
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:26:51 -0500
+Date: Mon, 22 Jan 2018 12:26:37 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180122122637.GE31621@stefanha-x1.localdomain>
+References: <20180116060901.17413-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d64cd344-bbcb-a088-f74d-a3e5446085f4@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] qmp dirty bitmap API
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="M/SuVGWktc5uNpra"
+Content-Disposition: inline
+In-Reply-To: <20180116060901.17413-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/9] block: Add VFIO based driver for
+ NVMe device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +24,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, alex.williamson@redhat.com, Markus Armbruster <armbru@redhat.com>, Karl Rister <krister@redhat.com>
 
-22.01.2018 12:20, Vladimir Sementsov-Ogievskiy wrote:
-> 20.01.2018 02:30, John Snow wrote:
->>
->> On 01/16/2018 07:54 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all.
->>>
->>> There are three qmp commands, needed to implement external backup API.
->>>
->>> Using these three commands, client may do all needed bitmap=20
->>> management by
->>> hand:
->>>
->>> on backup start we need to do a transaction:
->>> =C2=A0 {disable old bitmap, create new bitmap}
->>>
->>> on backup success:
->>> =C2=A0 drop old bitmap
->>>
->>> on backup fail:
->>> =C2=A0 enable old bitmap
->>> =C2=A0 merge new bitmap to old bitmap
->>> =C2=A0 drop new bitmap
->>>
->>> v2: fix merge command deadlock
->>> =C2=A0=C2=A0 add new patches: 1 and 6
->>>
->>> Vladimir Sementsov-Ogievskiy (6):
->>> =C2=A0=C2=A0 block: maintain persistent disabled bitmaps
->>> =C2=A0=C2=A0 block/dirty-bitmap: add lock to bdrv_enable/disable_dirty_=
-bitmap
->>> =C2=A0=C2=A0 qapi: add block-dirty-bitmap-enable/disable
->>> =C2=A0=C2=A0 qmp: transaction support for block-dirty-bitmap-enable/dis=
-able
->>> =C2=A0=C2=A0 qapi: add block-dirty-bitmap-merge
->>> =C2=A0=C2=A0 qapi: add disabled parameter to block-dirty-bitmap-add
->>>
->>> =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 92 ++++++++++++++++++++++-
->>> =C2=A0 qapi/transaction.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0 4 +
->>> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
->>> =C2=A0 include/block/dirty-bitmap.h |=C2=A0=C2=A0 3 +-
->>> =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 42 ++++++-----
->>> =C2=A0 block/qcow2-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 12 +--
->>> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
->>> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 169=20
->>> +++++++++++++++++++++++++++++++++++++++++--
->>> =C2=A0 8 files changed, 287 insertions(+), 39 deletions(-)
->>>
->> Fails to apply to master (b384cd95) on patch four and five. Only
->> contextual problems, I've patched it up and I'll review that.
->>
->> (mirrored here if you want to check my rebase work:
->> https://github.com/jnsnow/qemu/tree/vlad-review)
->>
->> Since I was full of such bad and stupid ideas last time, I'd like
->> someone else to look over this one for design and I'll just review it
->> for accuracy.
->>
->> --js
->
-> Thank you for review, John!
->
-> Ok, so, I'll going to:
->
-> - take patch 1 into migration and respin it today (I hope) with test=20
-> about qcow2-based bitmap migration disabled.
-> - separate fixes and refactoring from here (locking + _bitmap_clear=20
-> transaction), send them separately
-> - than, make test for external backup and respin these series with it
->
 
-changed to:
+--M/SuVGWktc5uNpra
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-1. send patch 1/6 separately with the whole reasoning[done], as it=20
-blocks two series, wait for accepting
-2. respin postcopy series
-3. finish up discussion on bitmap locking under "[PATCH v9 03/13]=20
-block/dirty-bitmap: add _locked version of bdrv_reclaim_dirty_bitmap"
-4. separate fixes and refactoring from here (locking + _bitmap_clear=20
-transaction), send them separately
-5. make test for external backup and respin these series with it
+On Tue, Jan 16, 2018 at 02:08:52PM +0800, Fam Zheng wrote:
+> v6: Fix the cleaning up around nvme_init() and write cache setup in
+>     nvme_file_open(). [Stefan]
+>     Add Stefan's rev-by to the doc patch.
+>     Rebase on to Paolo's coroutine series for q->free_req_queue:
+>=20
+> Based-on: 20180115220822.10156-1-pbonzini@redhat.com
+> ([PATCH 0/4] coroutine-lock: polymorphic CoQueue)
+>=20
+> v5: Add Stefan's rev-bys.
+>     Add Paolo's sob line.
+>     Address Stefan's, Alex's and Eric's comments, including:
+>     - Add PCI Bar MMIO offset/size parameter to VFIO utility API. [Alex]
+>     - Fix various lock and memory leakings. [Stefan]
+>     - Improve documentation. [Stefan]
+>     - Add one missing "Since 2.12" in QAPI schema. [Eric]
+>     - Fix locking of BDRVNVMeState->inflight. [Stefan]
+>     - Add one missing endianness conversion for cmd.nsid. [Stefan]
+>     - Use bdrv_get_aio_context() instead of qemu_get_current_aio_context(=
+).
+>     - When init, issue "Set Features" command to enable/disable volatile =
+write
+>       cache according to "flags & BDRV_O_NOCACHE".
+>=20
+> v4: - Rebase, address Stefan's comments.
+>     - Add QAPI and doc patches.
+>=20
+> v3: Rebase, small tweaks/fixes and add locks to provide basic thread safe=
+ty
+>     (basic because it is not really tested).
+>=20
+> v2:
+>     - Implement "split vfio addr space" appraoch. [Paolo]
+>     - Add back 'device reset' in nvme_close(). [Paolo]
+>     - Better variable namings. [Stefan]
+>     - "Reuse" macro definitions from NVMe emulation code.
+>     - Rebase onto current master which has polling by default and update
+>       performance results accordingly.
+>     - Update MAINTAINERS.
+>     - Specify namespace in URI.
+>     - The sporadical I/O error from v1 "disappeared" in this version.
+>     - Tests one: qemu-img bench, fio, bonnie++ and installation of
+>       ubuntu/fedora/rhel on QEMU emulated nvme and a Intel P3700 card.
+>=20
+> Fam Zheng (9):
+>   stubs: Add stubs for ram block API
+>   util: Introduce vfio helpers
+>   block: Add VFIO based NVMe driver
+>   block: Introduce buf register API
+>   block/nvme: Implement .bdrv_(un)register_buf
+>   qemu-img: Map bench buffer
+>   block: Move NVMe constants to a separate header
+>   docs: Add section for NVMe VFIO driver
+>   qapi: Add NVMe driver options to the schema
+>=20
+>  MAINTAINERS                    |    6 +
+>  block/Makefile.objs            |    1 +
+>  block/block-backend.c          |   10 +
+>  block/io.c                     |   24 +
+>  block/nvme.c                   | 1199 ++++++++++++++++++++++++++++++++++=
+++++++
+>  block/trace-events             |   21 +
+>  docs/qemu-block-drivers.texi   |   37 ++
+>  hw/block/nvme.h                |  698 +----------------------
+>  include/block/block.h          |   11 +-
+>  include/block/block_int.h      |    9 +
+>  include/block/nvme.h           |  700 +++++++++++++++++++++++
+>  include/qemu/vfio-helpers.h    |   33 ++
+>  include/sysemu/block-backend.h |    3 +
+>  qapi/block-core.json           |   17 +-
+>  qemu-img.c                     |    9 +-
+>  stubs/Makefile.objs            |    1 +
+>  stubs/ram-block.c              |   16 +
+>  util/Makefile.objs             |    1 +
+>  util/trace-events              |   11 +
+>  util/vfio-helpers.c            |  726 ++++++++++++++++++++++++
+>  20 files changed, 2833 insertions(+), 700 deletions(-)
+>  create mode 100644 block/nvme.c
+>  create mode 100644 include/block/nvme.h
+>  create mode 100644 include/qemu/vfio-helpers.h
+>  create mode 100644 stubs/ram-block.c
+>  create mode 100644 util/vfio-helpers.c
+>=20
+> --=20
+> 2.14.3
+>=20
 
-2 depends on 1
-4 depends on 3
-5 depends on 1 and 4
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---=20
-Best regards,
-Vladimir
+--M/SuVGWktc5uNpra
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaZdh9AAoJEJykq7OBq3PIqvEH/iG5ukLmU9CjMKVmvaeRH4Sf
+NxnK4Kr15q6J+RtBdAkjqleN4EF1StPMug4Nb1MiSIbpgD0aiZPTfNrCi+oBHFb7
+cppBLf7BACbYhxAfJMCOOBqh2QC7+85cTPJOgI4yBK3hJVkTX1sePpjj8h8xPrMl
+c7Wb/7Oh4bppWU7LVRm7FVyB7epUCjPwxS9wNm/gSZmr5FUY+8j2N1N5yqEoi377
+zSwAoLTtJbXNu0gPo6sYt/Az5qf9VMZruNGnurnOJihbZ5+POrp3lszkW/JRtT4C
+W5yIcgswrYNSQSj6przoWqvei3k+TVW7sMvWvdPCe/WPCe6pyImpFVjzDOA0oDU=
+=WUTJ
+-----END PGP SIGNATURE-----
+
+--M/SuVGWktc5uNpra--
