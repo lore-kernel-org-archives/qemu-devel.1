@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1edeXZ-0006Ul-7n
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:49 -0500
+	(envelope-from <stefanha@redhat.com>) id 1edeXg-0006bW-MP
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1edeXT-0002gs-SV
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46744)
+	(envelope-from <stefanha@redhat.com>) id 1edeXa-0002nR-I2
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1edeXT-0002gU-Jy
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:39 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1edeXa-0002le-A5
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:46 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 22 Jan 2018 16:00:44 +0000
-Message-Id: <20180122160048.29571-3-stefanha@redhat.com>
+Date: Mon, 22 Jan 2018 16:00:45 +0000
+Message-Id: <20180122160048.29571-4-stefanha@redhat.com>
 In-Reply-To: <20180122160048.29571-1-stefanha@redhat.com>
 References: <20180122160048.29571-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 2/6] docs/interop/prl-xml: description of
- Parallels Disk format
+Subject: [Qemu-devel] [PULL v2 3/6] configure: add dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,188 +24,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Klim Kireev <klim.kireev@virtuozzo.com>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Klim Kireev <klim.kireev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 From: Klim Kireev <klim.kireev@virtuozzo.com>
 
-This patch adds main information about Parallels Disk
-format, which consists of DiskDescriptor.xml and other files.
+This dependency is required for adequate Parallels images support.
+Typically the disk consists of several images which are glued by
+XML disk descriptor. Also XML hides inside several important parameters
+which are not available in the image header.
 
-Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The patch also adds clause to checkpatch.pl to understand libxml2 types.
+
 Signed-off-by: Denis V. Lunev <den@openvz.org>
-Message-id: 20180112090122.1702-2-klim.kireev@virtuozzo.com
+Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20180112090122.1702-3-klim.kireev@virtuozzo.com
 CC: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/interop/prl-xml.txt | 158 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 158 insertions(+)
- create mode 100644 docs/interop/prl-xml.txt
+ configure             | 27 +++++++++++++++++++++++++++
+ block/Makefile.objs   |  2 ++
+ scripts/checkpatch.pl |  1 +
+ 3 files changed, 30 insertions(+)
 
-diff --git a/docs/interop/prl-xml.txt b/docs/interop/prl-xml.txt
-new file mode 100644
-index 0000000000..7031f8752c
---- /dev/null
-+++ b/docs/interop/prl-xml.txt
-@@ -0,0 +1,158 @@
-+= License =
+diff --git a/configure b/configure
+index 6d8c996c62..044c6fafe2 100755
+--- a/configure
++++ b/configure
+@@ -435,6 +435,7 @@ tcmalloc="no"
+ jemalloc="no"
+ replication="yes"
+ vxhs=""
++libxml2=""
+ 
+ supported_cpu="no"
+ supported_os="no"
+@@ -1298,6 +1299,10 @@ for opt do
+   ;;
+   --enable-numa) numa="yes"
+   ;;
++  --disable-libxml2) libxml2="no"
++  ;;
++  --enable-libxml2) libxml2="yes"
++  ;;
+   --disable-tcmalloc) tcmalloc="no"
+   ;;
+   --enable-tcmalloc) tcmalloc="yes"
+@@ -1573,6 +1578,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   tpm             TPM support
+   libssh2         ssh block device support
+   numa            libnuma support
++  libxml2         for Parallels image format
+   tcmalloc        tcmalloc support
+   jemalloc        jemalloc support
+   replication     replication support
+@@ -3748,6 +3754,20 @@ EOF
+   fi
+ fi
+ 
++##########################################
++# libxml2 probe
++if test "$libxml2" != "no" ; then
++    if $pkg_config --exists libxml-2.0; then
++        libxml2="yes"
++        libxml2_cflags=$($pkg_config --cflags libxml-2.0)
++        libxml2_libs=$($pkg_config --libs libxml-2.0)
++    else
++        if test "$libxml2" = "yes"; then
++            feature_not_found "libxml2" "Install libxml2 devel"
++        fi
++        libxml2="no"
++    fi
++fi
+ 
+ ##########################################
+ # glusterfs probe
+@@ -5630,6 +5650,7 @@ echo "lzo support       $lzo"
+ echo "snappy support    $snappy"
+ echo "bzip2 support     $bzip2"
+ echo "NUMA host support $numa"
++echo "libxml2           $libxml2"
+ echo "tcmalloc support  $tcmalloc"
+ echo "jemalloc support  $jemalloc"
+ echo "avx2 optimization $avx2_opt"
+@@ -6299,6 +6320,12 @@ if test "$have_rtnetlink" = "yes" ; then
+   echo "CONFIG_RTNETLINK=y" >> $config_host_mak
+ fi
+ 
++if test "$libxml2" = "yes" ; then
++  echo "CONFIG_LIBXML2=y" >> $config_host_mak
++  echo "LIBXML2_CFLAGS=$libxml2_cflags" >> $config_host_mak
++  echo "LIBXML2_LIBS=$libxml2_libs" >> $config_host_mak
++fi
 +
-+Copyright (c) 2015-2017, Virtuozzo, Inc.
-+Authors:
-+        2015 Denis Lunev <den@openvz.org>
-+        2015 Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-+        2016-2017 Klim Kireev <klim.kireev@virtuozzo.com>
-+        2016-2017 Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-+
-+This work is licensed under the terms of the GNU GPL, version 2 or later.
-+See the COPYING file in the top-level directory.
-+
-+This specification contains minimal information about Parallels Disk Format,
-+which is enough to proper work with QEMU. Nevertheless, Parallels Cloud Server
-+and Parallels Desktop are able to add some unspecified nodes to xml and use
-+them, but they are for internal work and don't affect functionality. Also it
-+uses auxiliary xml "Snapshot.xml", which allows to store optional snapshot
-+information, but it doesn't influence open/read/write functionality. QEMU and
-+other software should not use fields not covered in this document and
-+Snapshot.xml file and must leave them as is.
-+
-+= Parallels Disk Format =
-+
-+Parallels disk consists of two parts: the set of snapshots and the disk
-+descriptor file, which stores information about all files and snapshots.
-+
-+== Definitions ==
-+    Snapshot       a record of the contents captured at a particular time,
-+                   capable of storing current state. A snapshot has UUID and
-+                   parent UUID.
-+
-+ Snapshot image    an overlay representing the difference between this
-+                   snapshot and some earlier snapshot.
-+
-+    Overlay        an image storing the different sectors between two captured
-+                   states.
-+
-+   Root image      snapshot image with no parent, the root of snapshot tree.
-+
-+    Storage        the backing storage for a subset of the virtual disk. When
-+                   there is more than one storage in a Parallels disk then that
-+                   is referred to as a split image. In this case every storage
-+                   covers specific address space area of the disk and has its
-+                   particular root image. Split images are not considered here
-+                   and are not supported. Each storage consists of disk
-+                   parameters and a list of images. The list of images always
-+                   contains a root image and may also contain overlays. The
-+                   root image can be an expandable Parallels image file or
-+                   plain. Overlays must be expandable.
-+
-+  Description      DiskDescriptor.xml stores information about disk parameters,
-+     file          snapshots, storages.
-+
-+     Top           The overlay between actual state and some previous snapshot.
-+   Snapshot        It is not a snapshot in the classical sense because it
-+                   serves as the active image that the guest writes to.
-+
-+    Sector         a 512-byte data chunk.
-+
-+== Description file ==
-+All information is placed in a single XML element Parallels_disk_image.
-+The element has only one attribute "Version", that must be 1.0.
-+Schema of DiskDescriptor.xml:
-+
-+<Parallels_disk_image Version="1.0">
-+    <Disk_Parameters>
-+        ...
-+    </Disk_Parameters>
-+    <StorageData>
-+        ...
-+    </StorageData>
-+    <Snapshots>
-+        ...
-+    </Snapshots>
-+</Parallels_disk_image>
-+
-+== Disk_Parameters element ==
-+The Disk_Parameters element describes the physical layout of the virtual disk
-+and some general settings.
-+
-+The Disk_Parameters element MUST contain the following child elements:
-+    * Disk_size - number of sectors in the disk,
-+                  desired size of the disk.
-+    * Cylinders - number of the disk cylinders.
-+    * Heads     - number of the disk heads.
-+    * Sectors   - number of the disk sectors per cylinder
-+                  (sector size is 512 bytes)
-+                  Limitation: Product of the Heads, Sectors and Cylinders
-+                  values MUST be equal to the value of the Disk_size parameter.
-+    * Padding   - must be 0. Parallels Cloud Server and Parallels Desktop may
-+                  use padding set to 1, however this case is not covered
-+                  by this spec, QEMU and other software should not open
-+                  such disks and should not create them.
-+
-+== StorageData element ==
-+This element of the file describes the root image and all snapshot images.
-+
-+The StorageData element consists of the Storage child element, as shown below:
-+<StorageData>
-+    <Storage>
-+        ...
-+    </Storage>
-+</StorageData>
-+
-+A Storage element has following child elements:
-+    * Start     - start sector of the storage, in case of non split storage
-+                  equals to 0.
-+    * End       - number of sector following the last sector, in case of non
-+                  split storage equals to Disk_size.
-+    * Blocksize - storage cluster size, number of sectors per one cluster.
-+                  Cluster size for each "Compressed" (see below) image in
-+                  parallels disk must be equal to this field. Note: cluster
-+                  size for Parallels Expandable Image is in 'tracks' field of
-+                  its header (see docs/interop/parallels.txt).
-+    * Several Image child elements.
-+
-+Each Image element has following child elements:
-+    * GUID - image identifier, UUID in curly brackets.
-+             For instance, {12345678-9abc-def1-2345-6789abcdef12}.
-+             The GUID is used by the Snapshots element to reference images
-+             (see below)
-+    * Type - image type of the element. It can be:
-+             "Plain" for raw files.
-+             "Compressed" for expanding disks.
-+    * File - path to image file. Path can be relative to DiskDecriptor.xml or
-+             absolute.
-+
-+== Snapshots element ==
-+The Snapshots element describes the snapshot relations with the snapshot tree.
-+
-+The element contains the set of Shot child elements, as shown below:
-+<Snapshots>
-+    <TopGUID> ... </TopGUID> /* Optional child element */
-+    <Shot>
-+        ...
-+    </Shot>
-+    <Shot>
-+        ...
-+    </Shot>
-+    ...
-+</Snapshots>
-+
-+Each Shot element contains the following child elements:
-+    * GUID       - an image GUID.
-+    * ParentGUID - GUID of the image of the parent snapshot.
-+
-+The software may traverse snapshots from child to parent using <ParentGUID>
-+field as reference. ParentGUID of root snapshot is
-+{00000000-0000-0000-0000-000000000000}. There should be only one root
-+snapshot. Top snapshot could be described via two ways: via TopGUID child
-+element of the Snapshots element or via predefined GUID
-+{5fbaabe3-6958-40ff-92a7-860e329aab41}. If TopGUID is defined, predefined GUID is
-+interpreted as usual GUID. All snapshot images (except Top Snapshot) should be
-+opened read-only. There is another predefined GUID,
-+BackupID = {704718e1-2314-44c8-9087-d78ed36b0f4e}, which is used by original and
-+some third-party software for backup, QEMU and other software may operate with
-+images with GUID = BackupID as usual, however, it is not recommended to use this
-+GUID for new disks. Top snapshot cannot have this GUID.
+ if test "$replication" = "yes" ; then
+   echo "CONFIG_REPLICATION=y" >> $config_host_mak
+ fi
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 6eaf78a046..a73387f1bf 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -47,3 +47,5 @@ block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
+ dmg-bz2.o-libs     := $(BZIP2_LIBS)
+ qcow.o-libs        := -lz
+ linux-aio.o-libs   := -laio
++parallels.o-cflags := $(LIBXML2_CFLAGS)
++parallels.o-libs   := $(LIBXML2_LIBS)
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index accba24a31..1b4b812e28 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -265,6 +265,7 @@ our @typeList = (
+ 	qr{${Ident}_handler_fn},
+ 	qr{target_(?:u)?long},
+ 	qr{hwaddr},
++	qr{xml${Ident}},
+ );
+ 
+ # This can be modified by sub possible.  Since it can be empty, be careful
 -- 
 2.14.3
