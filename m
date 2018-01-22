@@ -1,43 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1edeJZ-0000VV-A4
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:47:19 -0500
+	(envelope-from <berto@igalia.com>) id 1edeTA-0004XF-ID
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:57:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1edeJV-0001Vq-9w
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:47:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1edeJV-0001U9-16
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:47:13 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0MFk78w035353
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 10:47:10 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fnhbkmyk3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 10:47:10 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 22 Jan 2018 08:47:09 -0700
-References: <20180119141105.29095-1-marcandre.lureau@redhat.com>
-	<20180119141105.29095-5-marcandre.lureau@redhat.com>
-	<f2ecf612-8538-f8d1-ffd8-f875aa453c42@amsat.org>
-	<3c334ed0-3d9d-1ef5-27b7-aa587e5acd81@linux.vnet.ibm.com>
-	<CAMxuvaxyBmEEnk_dtFR4qbk_-95ROnR6o-3gR7U=HNJAhV5DdA@mail.gmail.com>
-	<6cb2b88f-0c8b-4bab-c8fc-018dd0cbc662@linux.vnet.ibm.com>
-	<CAMxuvazYZZwzSBPvbmKLPv_YG2uYPkPA1meiYoMkizegEozC_g@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 22 Jan 2018 10:47:03 -0500
+	(envelope-from <berto@igalia.com>) id 1edeT7-0008A5-Ff
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:57:12 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <67060769-70fc-e6d4-673c-81f1382fe735@virtuozzo.com>
+References: <cover.1513342045.git.berto@igalia.com>
+	<8525e16caa2fecac537aa62a449ea8626f5c7e36.1513342045.git.berto@igalia.com>
+	<67060769-70fc-e6d4-673c-81f1382fe735@virtuozzo.com>
+Date: Mon, 22 Jan 2018 16:56:30 +0100
+Message-ID: <w51d121x4y9.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMxuvazYZZwzSBPvbmKLPv_YG2uYPkPA1meiYoMkizegEozC_g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <8cbe6eed-169d-2158-4d7b-20a1360a0864@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] tpm: add CRB device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 31/32] qcow2: Allow configuring the L2
+ slice size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,188 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 01/22/2018 10:08 AM, Marc-Andre Lureau wrote:
-> Hi
+On Tue 16 Jan 2018 05:57:22 PM CET, Anton Nefedov wrote:
+>> -    r->l2_slice_size = s->cluster_size / sizeof(uint64_t);
+>> -    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size);
+>> -    r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size);
+>> +    l2_cache_size *= s->cluster_size / l2_cache_entry_size;
 >
-> On Sun, Jan 21, 2018 at 11:01 PM, Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->> On 01/21/2018 02:24 PM, Marc-Andre Lureau wrote:
->>> Hi
->>>
->>> On Sun, Jan 21, 2018 at 6:46 AM, Stefan Berger
->>> <stefanb@linux.vnet.ibm.com> wrote:
->>>> On 01/20/2018 07:54 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> On 01/19/2018 11:11 AM, Marc-Andr=C3=A9 Lureau wrote:
->>>>>> tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB)
->>>>>> Interface as defined in TCG PC Client Platform TPM Profile (PTP)
->>>>>> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03=
- v22.
->>>>>>
->>>>>> The PTP allows device implementation to switch between TIS and CRB
->>>>>> model at run time, but given that CRB is a simpler device to
->>>>>> implement, I chose to implement it as a different device.
->>>>>>
->>>>>> The device doesn't implement other locality than 0 for now (my lap=
-top
->>>>>> TPM doesn't either, so I assume this isn't so bad)
->>>>>>
->>>>>> The command/reply memory region is statically allocated after the =
-CRB
->>>>>> registers address TPM_CRB_ADDR_BASE + sizeof(struct crb_regs) (I
->>>>>> wonder if the BIOS could or should allocate it instead, or what si=
-ze
->>>>>> to use, again this seems to fit well expectations)
->>>>>>
->>>>>> The PTP doesn't specify a particular bus to put the device. So I a=
-dded
->>>>>> it on the system bus directly, so it could hopefully be used easil=
-y on
->>>>>> a different platform than x86. Currently, it fails to init on piix=
-,
->>>>>> because error_on_sysbus_device() check. The check may be changed i=
-n a
->>>>>> near future, see discussion on the qemu-devel ML.
->>>>>>
->>>>>> Tested with some success with Linux upstream and Windows 10, seabi=
-os &
->>>>>> modified ovmf. The device is recognized and correctly transmit
->>>>>> command/response with passthrough & emu. However, we are missing P=
-PI
->>>>>> ACPI part atm.
->>>>>>
->>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com=
->
->>>>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->>>>>> ---
->>>>>>     qapi/tpm.json                      |   5 +-
->>>>>>     include/hw/acpi/tpm.h              |  72 ++++++++
->>>>>>     include/sysemu/tpm.h               |   3 +
->>>>>>     hw/i386/acpi-build.c               |  34 +++-
->>>>>>     hw/tpm/tpm_crb.c                   | 327
->>>>>> +++++++++++++++++++++++++++++++++++++
->>>>>>     default-configs/i386-softmmu.mak   |   1 +
->>>>>>     default-configs/x86_64-softmmu.mak |   1 +
->>>>>>     hw/tpm/Makefile.objs               |   1 +
->>>>>>     8 files changed, 434 insertions(+), 10 deletions(-)
->>>>>>     create mode 100644 hw/tpm/tpm_crb.c
->>>>>>
->>>>>> diff --git a/qapi/tpm.json b/qapi/tpm.json
->>>>>> index 7093f268fb..d50deef5e9 100644
->>>>>> --- a/qapi/tpm.json
->>>>>> +++ b/qapi/tpm.json
->>>>>> @@ -11,10 +11,11 @@
->>>>>>     # An enumeration of TPM models
->>>>>>     #
->>>>>>     # @tpm-tis: TPM TIS model
->>>>>> +# @tpm-crb: TPM CRB model (since 2.12)
->>>>>>     #
->>>>>>     # Since: 1.5
->>>>>>     ##
->>>>>> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
->>>>>> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
->>>>>>       ##
->>>>>>     # @query-tpm-models:
->>>>>> @@ -28,7 +29,7 @@
->>>>>>     # Example:
->>>>>>     #
->>>>>>     # -> { "execute": "query-tpm-models" }
->>>>>> -# <- { "return": [ "tpm-tis" ] }
->>>>>> +# <- { "return": [ "tpm-tis", "tpm-crb" ] }
->>>>>>     #
->>>>>>     ##
->>>>>>     { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
->>>>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
->>>>>> index 6d516c6a7f..b0048515fa 100644
->>>>>> --- a/include/hw/acpi/tpm.h
->>>>>> +++ b/include/hw/acpi/tpm.h
->>>>>> @@ -16,11 +16,82 @@
->>>>>>     #ifndef HW_ACPI_TPM_H
->>>>>>     #define HW_ACPI_TPM_H
->>>>>>     +#include "qemu/osdep.h"
->>>>>> +
->>>>>>     #define TPM_TIS_ADDR_BASE           0xFED40000
->>>>>>     #define TPM_TIS_ADDR_SIZE           0x5000
->>>>>>       #define TPM_TIS_IRQ                 5
->>>>>>     +struct crb_regs {
->>>>>> +    union {
->>>>>> +        uint32_t reg;
->>>>>> +        struct {
->>>>>> +            unsigned tpm_established:1;
->>>>>> +            unsigned loc_assigned:1;
->>>>>> +            unsigned active_locality:3;
->>>>>> +            unsigned reserved:2;
->>>>>> +            unsigned tpm_reg_valid_sts:1;
->>>>>> +        } bits;
->>>>> I suppose this is little-endian layout, so this won't work on big-e=
-ndian
->>>>> hosts.
->>>>>
->>>>> Can you add a qtest?
->>>>>
->>>>>> +    } loc_state;
->>>>>> +    uint32_t reserved1;
->>>>>> +    uint32_t loc_ctrl;
->>>>>> +    union {
->>>>>> +        uint32_t reg;
->>>>>> +        struct {
->>>>>> +            unsigned granted:1;
->>>>>> +            unsigned been_seized:1;
->>>>>> +        } bits;
->>>>>
->>>>> This is unclear where you expect those bits (right/left aligned).
->>>>>
->>>>> Can you add an unnamed field to be more explicit?
->>>>>
->>>>> i.e. without using struct if left alignment expected:
->>>>>
->>>>>               unsigned granted:1, been_seized:1, :30;
->>>>
->>>>
->>>> I got rid of all the bitfields and this patch here makes it work on =
-a
->>>> ppc64
->>>> big endian and also x86_64 host:
->>>>
->>>>
->>>> https://github.com/stefanberger/qemu-tpm/commit/28fc07f0d93141689861=
-90effd6d72d9fd3972dd
->>>>
->>> Thank you Stefan! I am all for squashing this fix to the patch. You
->>> should then add your signed-off to the commit.
->>
->> I'll do that.
->>
->> The TIS is an ISA Device and the CRB is similar. Considering the
-> How much similarity is there between TIS and CRB is there? The two
-> devices look quite different to me, CRB is way simpler it seems. Or is
-> the CRB implementation just lacking many bells and whistles that TIS
-> has? Should we consider merging CRB in TIS?
+> A bit confusing; l2_cache_size first means the size in bytes, then the
+> size in clusters and now the size in entries.
 
-That is the question. It would be a pain for users to have to choose the=20
-interface. Basically TIS and CRB can be implemented in a single device=20
-and let the software choose the interface following flags that are set=20
-by the interface advertising whether it offers TIS and/or CRB. Maybe we=20
-could keep the CRB code in a separate file and, upon choosing the CRB=20
-interface call into CRB functions rather than TIS functions.
+You're right, I'll convert it to entries right after the
+read_cache_sizes() call, there's no use for the size in clusters
+anymore.
 
+> Maybe in the comparison with MIN_L2_CACHE_SIZE, we should multiply
+> MIN_L2_CACHE_SIZE to cluster_size instead.
+> And perhaps MIN_L2_CACHE_CLUSTERS is a better name. Or should it even
+> be MIN_L2_CACHE_ENTRIES instead, taking into account its motivation to
+> make it possible to handle COW.
 
->
->> complications with the sysbus devices where one has to explicitly allo=
-w it
->> for a certain machine type, I would advocate to convert the CRB to an =
-ISA
->> device. A patch that does that is this one:
-> If it's only for that reason (an explicit enable), I would rather keep
-> it on the system bus. Or should it be on an LPC bus?
+I think I'll keep the MIN_L2_CACHE_SIZE name but clarify in the
+documentation that it means cache entries.
 
-I do not think there's an LPC bus. Merging the code into the TIS would=20
-put the whoe device on the ISA Bus per current TIS implementation.
+One consequence of this is that the L2 cache can be made smaller now,
+and there's nothing wrong with that (it actually allows us to use less
+memory in images with large clusters).
 
+>> +    r->l2_slice_size = l2_cache_entry_size / sizeof(uint64_t);
+>> +    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size,
+>> +                                           l2_cache_entry_size);
 >
-> Eduardo, what do you think?
->
-> Thanks
->
+> my gcc thinks l2_cache_entry_size may be used uninitialized here.
+> can't quite see how that may happen though..
+
+My gcc doesn't say anything but I've seen the warning:
+
+   https://lists.gnu.org/archive/html/qemu-block/2017-12/msg00521.html
+
+l2_cache_entry_size can remain uninitialized if read_cache_sizes()
+fails, but then the calling function would return immediately. I guess
+gcc doesn't know that.
+
+I guess I'll initialize it to 0 to fix the warning.
+
+Berto
