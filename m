@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1edeTA-0004XF-ID
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:57:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1edeWv-0006A6-98
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1edeT7-0008A5-Ff
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 10:57:12 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <67060769-70fc-e6d4-673c-81f1382fe735@virtuozzo.com>
-References: <cover.1513342045.git.berto@igalia.com>
-	<8525e16caa2fecac537aa62a449ea8626f5c7e36.1513342045.git.berto@igalia.com>
-	<67060769-70fc-e6d4-673c-81f1382fe735@virtuozzo.com>
-Date: Mon, 22 Jan 2018 16:56:30 +0100
-Message-ID: <w51d121x4y9.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 31/32] qcow2: Allow configuring the L2
- slice size
+	(envelope-from <stefanha@redhat.com>) id 1edeWq-0002EJ-JU
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1edeWq-0002De-Cy
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 11:01:00 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 22 Jan 2018 16:00:42 +0000
+Message-Id: <20180122160048.29571-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL v2 0/6] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +21,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue 16 Jan 2018 05:57:22 PM CET, Anton Nefedov wrote:
->> -    r->l2_slice_size = s->cluster_size / sizeof(uint64_t);
->> -    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size);
->> -    r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size);
->> +    l2_cache_size *= s->cluster_size / l2_cache_entry_size;
->
-> A bit confusing; l2_cache_size first means the size in bytes, then the
-> size in clusters and now the size in entries.
+The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc78f:
 
-You're right, I'll convert it to entries right after the
-read_cache_sizes() call, there's no use for the size in clusters
-anymore.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2018-01-19 16:35:25 +0000)
 
-> Maybe in the comparison with MIN_L2_CACHE_SIZE, we should multiply
-> MIN_L2_CACHE_SIZE to cluster_size instead.
-> And perhaps MIN_L2_CACHE_CLUSTERS is a better name. Or should it even
-> be MIN_L2_CACHE_ENTRIES instead, taking into account its motivation to
-> make it possible to handle COW.
+are available in the Git repository at:
 
-I think I'll keep the MIN_L2_CACHE_SIZE name but clarify in the
-documentation that it means cache entries.
+  git://github.com/stefanha/qemu.git tags/block-pull-request
 
-One consequence of this is that the L2 cache can be made smaller now,
-and there's nothing wrong with that (it actually allows us to use less
-memory in images with large clusters).
+for you to fetch changes up to bcbb3866da19cce4360c828b6ec1c2a137757927:
 
->> +    r->l2_slice_size = l2_cache_entry_size / sizeof(uint64_t);
->> +    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size,
->> +                                           l2_cache_entry_size);
->
-> my gcc thinks l2_cache_entry_size may be used uninitialized here.
-> can't quite see how that may happen though..
+  block/parallels: add backing support to readv/writev (2018-01-22 14:02:33 +0000)
 
-My gcc doesn't say anything but I've seen the warning:
+----------------------------------------------------------------
+Pull request
 
-   https://lists.gnu.org/archive/html/qemu-block/2017-12/msg00521.html
+v2:
+ * Drop merge failure from a previous pull request that broke virtio-blk on ARM
+   guests
+ * Add Parallels XML patch series
 
-l2_cache_entry_size can remain uninitialized if read_cache_sizes()
-fails, but then the calling function would return immediately. I guess
-gcc doesn't know that.
+----------------------------------------------------------------
 
-I guess I'll initialize it to 0 to fix the warning.
+Edgar Kaziakhmedov (1):
+  block/parallels: add backing support to readv/writev
 
-Berto
+Klim Kireev (4):
+  docs/interop/prl-xml: description of Parallels Disk format
+  configure: add dependency
+  block/parallels: move some structures into header
+  block/parallels: replace some magic numbers
+
+Stefan Hajnoczi (1):
+  block: add block_set_io_throttle virtio-blk-pci QMP example
+
+ docs/interop/prl-xml.txt | 158 +++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json     |  18 ++++++
+ configure                |  27 ++++++++
+ block/Makefile.objs      |   2 +
+ block/parallels.h        |  88 ++++++++++++++++++++++++++
+ block/parallels.c        | 108 ++++++++++++++------------------
+ scripts/checkpatch.pl    |   1 +
+ 7 files changed, 342 insertions(+), 60 deletions(-)
+ create mode 100644 docs/interop/prl-xml.txt
+ create mode 100644 block/parallels.h
+
+-- 
+2.14.3
