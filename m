@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eddGr-00035T-TZ
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:40:26 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eddMC-00050k-2X
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:45:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eddGr-0004cu-2n
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:40:25 -0500
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:46195)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eddGq-0004cZ-OW
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:40:24 -0500
-Received: by mail-oi0-x231.google.com with SMTP id d124so6044420oib.13
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 06:40:24 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180119045438.28582-17-richard.henderson@linaro.org>
-References: <20180119045438.28582-1-richard.henderson@linaro.org>
-	<20180119045438.28582-17-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jan 2018 14:40:03 +0000
-Message-ID: <CAFEAcA-5=sVBxvWTZRA7GFM7GV4PQ3Zvgh=2zdOBbNSXGd3+bw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] target/arm: Add SVE state to
- TB->FLAGS
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eddM9-0007so-Ga
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 09:45:56 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 22 Jan 2018 17:45:49 +0300
+Message-Id: <20180122144549.25318-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [RFC] block-backend: fix double inc/dec inflight
+ requests number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +18,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-On 19 January 2018 at 04:54, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Add both SVE exception state and vector length.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+blk_co_preadv and blk_co_pwritev calls bdrv_inc_in_flight and
+bdrv_dec_in_flight. But they calls correspondingly bdrv_co_preadv
+and bdrv_co_pwritev, which inc/dec in-flight count by themselves.
+Counting in-flight requests in blk_ layer is redundant, drop it.
 
-> @@ -11772,14 +11772,35 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->                            target_ulong *cs_base, uint32_t *pflags)
->  {
->      ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
-> +    int fp_el = fp_exception_el(env);
->      uint32_t flags;
->
->      if (is_a64(env)) {
-> +        int sve_el = sve_exception_el(env);
-> +        uint32_t zcr_len;
-> +
->          *pc = env->pc;
->          flags = ARM_TBFLAG_AARCH64_STATE_MASK;
->          /* Get control bits for tagged addresses */
->          flags |= (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SHIFT);
->          flags |= (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SHIFT);
-> +        flags |= sve_el << ARM_TBFLAG_SVEEXC_EL_SHIFT;
-> +
-> +        /* If SVE is disabled, but FP is enabled,
-> +           then the effective len is 0.  */
-> +        if (sve_el != 0 && fp_el == 0) {
-> +            zcr_len = 0;
-> +        } else {
-> +            int highest_el = arm_highest_el(env);
-> +            int current_el = arm_current_el(env);
-> +            int i;
-> +
-> +            zcr_len = 0xf & (uint32_t)env->vfp.zcr_el[highest_el];
-> +            for (i = highest_el - 1; i >= MAX(1, current_el); --i) {
-> +                zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[i]);
-> +            }
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-This loop also doesn't consider the case of EL3 implemented but
-EL2 not, I think.
+Hi all!
 
-thanks
--- PMM
+Is it a bug or a feature? Why do we call inc/dec twice for read/write?
+We don't do this for flush and discard..
+
+(patch is called RFC, but it may be applied as is, if it is OK)
+
+ block/block-backend.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index baef8e7abc..8219f59d93 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1094,17 +1094,13 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+         return ret;
+     }
+ 
+-    bdrv_inc_in_flight(bs);
+-
+     /* throttling disk I/O */
+     if (blk->public.throttle_group_member.throttle_state) {
+         throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
+                 bytes, false);
+     }
+ 
+-    ret = bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
+-    bdrv_dec_in_flight(bs);
+-    return ret;
++    return bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
+ }
+ 
+ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+@@ -1121,7 +1117,6 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+         return ret;
+     }
+ 
+-    bdrv_inc_in_flight(bs);
+     /* throttling disk I/O */
+     if (blk->public.throttle_group_member.throttle_state) {
+         throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
+@@ -1132,9 +1127,7 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+         flags |= BDRV_REQ_FUA;
+     }
+ 
+-    ret = bdrv_co_pwritev(blk->root, offset, bytes, qiov, flags);
+-    bdrv_dec_in_flight(bs);
+-    return ret;
++    return bdrv_co_pwritev(blk->root, offset, bytes, qiov, flags);
+ }
+ 
+ typedef struct BlkRwCo {
+-- 
+2.11.1
