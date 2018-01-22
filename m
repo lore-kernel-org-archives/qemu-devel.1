@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1edhsL-0003xJ-PX
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:35:26 -0500
+	(envelope-from <alistair23@gmail.com>) id 1edi4E-0006l8-4V
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:47:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1edhsH-00084g-R7
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:35:25 -0500
-Date: Mon, 22 Jan 2018 19:35:05 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180122193504.GB2628@work-vm>
-References: <1513700253-10045-1-git-send-email-thuth@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1edi4A-0005hj-8m
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:47:42 -0500
+Sender: Alistair Francis <alistair23@gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 22 Jan 2018 11:43:11 -0800
+Message-Id: <cover.1516650109.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1513700253-10045-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] monitor: Remove legacy "-mon default=on"
- parameter
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 0/9]  Add the ZynqMP PMU and IPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +21,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
-
-* Thomas Huth (thuth@redhat.com) wrote:
-> The "default" parameter of the "-mon" option is useless since
-> QEMU v2.4.0, and marked as deprecated since QEMU v2.8.0. That
-> should have been long enough to let people update their scripts,
-> so time to remove it now.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Seems reasonable.
+To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This series adds the ZynqMP Power Management Unit (PMU) machine with basic
+functionality.
 
-> ---
->  monitor.c     | 3 ---
->  qemu-doc.texi | 9 ---------
->  vl.c          | 4 ----
->  3 files changed, 16 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index e36fb53..e53c6e1 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4141,9 +4141,6 @@ QemuOptsList qemu_mon_opts = {
->              .name = "chardev",
->              .type = QEMU_OPT_STRING,
->          },{
-> -            .name = "default",  /* deprecated */
-> -            .type = QEMU_OPT_BOOL,
-> -        },{
->              .name = "pretty",
->              .type = QEMU_OPT_BOOL,
->          },
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index d9861b3..6913b32 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2401,15 +2401,6 @@ setting ``-machine kernel_irqchip=off''.
->  The ``-no-kvm'' argument is now a synonym for setting
->  ``-machine accel=tcg''.
->  
-> -@subsection -mon default=on (since 2.4.0)
-> -
-> -The ``default'' option to the ``-mon'' argument is
-> -now ignored. When multiple monitors were enabled, it
-> -indicated which monitor would receive log messages
-> -from the various subsystems. This feature is no longer
-> -required as messages are now only sent to the monitor
-> -in response to explicitly monitor commands.
-> -
->  @subsection -vnc tls (since 2.5.0)
->  
->  The ``-vnc tls'' argument is now a synonym for setting
-> diff --git a/vl.c b/vl.c
-> index 2644400..4e7a7e4 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2438,10 +2438,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
->      if (qemu_opt_get_bool(opts, "pretty", 0))
->          flags |= MONITOR_USE_PRETTY;
->  
-> -    if (qemu_opt_get_bool(opts, "default", 0)) {
-> -        error_report("option 'default' does nothing and is deprecated");
-> -    }
-> -
->      chardev = qemu_opt_get(opts, "chardev");
->      chr = qemu_chr_find(chardev);
->      if (chr == NULL) {
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The machine only has the
+ - CPU
+ - Memory
+ - Interrupt controller
+ - IPI device
+
+connected, but that is enough to run some of the ROM and firmware
+code on the machine
+
+The series also adds the IPI device and connects it to the ZynqMP ARM
+side and the ZynqMP PMU. These IPI devices don't connect between the ARM
+and MicroBlaze instances though.
+
+V7:
+ - Fix Phipippe's comments
+V6:
+ - Pass initrd instead of kernel to microblaze_load_kernel()
+V5:
+ - Fix clang makecheck error
+ - Rebase on master
+V4:
+ - Rename the ZCU102 machine to just ZynqMP
+ - Rename the PMC SoC to "xlnx,zynqmp-pmu-soc"
+ - Move the IPI device to the machine instead of the SoC
+V3:
+ - Add the interrupt controller
+ - Replace some of the error_fatals with errp
+ - Fix the PMU CPU name
+
+
+
+Alistair Francis (9):
+  microblaze: boot.c: Don't try to find NULL file
+  xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
+  xlnx-zynqmp-pmu: Add the CPU and memory
+  aarch64-softmmu.mak: Use an ARM specific config
+  xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
+  xlnx-zynqmp-pmu: Connect the PMU interrupt controller
+  xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
+  xlnx-zynqmp-pmu: Connect the IPI device to the PMU
+  xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
+
+ default-configs/aarch64-softmmu.mak    |   1 +
+ default-configs/microblaze-softmmu.mak |   1 +
+ include/hw/arm/xlnx-zynqmp.h           |   2 +
+ include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
+ include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
+ hw/arm/xlnx-zynqmp.c                   |  14 +
+ hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
+ hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
+ hw/microblaze/boot.c                   |   2 +-
+ hw/microblaze/xlnx-zynqmp-pmu.c        | 204 ++++++++++++
+ hw/arm/Makefile.objs                   |   2 +-
+ hw/display/Makefile.objs               |   2 +-
+ hw/dma/Makefile.objs                   |   1 +
+ hw/intc/Makefile.objs                  |   2 +
+ hw/microblaze/Makefile.objs            |   1 +
+ 15 files changed, 1275 insertions(+), 3 deletions(-)
+ create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
+ create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
+ create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
+ create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
+ create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
+
+-- 
+2.14.1
