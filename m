@@ -1,37 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1edZSx-0000a7-Dn
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:36:40 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1edZXH-0002FS-TA
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:41:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1edZSu-0001ZC-8J
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:36:39 -0500
-Received: from mga06.intel.com ([134.134.136.31]:43471)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1edZSt-0001Uw-Sb
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:36:36 -0500
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Mon, 22 Jan 2018 10:36:29 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E7D6CB@SHSMSX101.ccr.corp.intel.com>
-References: <20180115143156.GO6646@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E776B5@SHSMSX101.ccr.corp.intel.com>
-	<20180116115113.GA627@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E79545@SHSMSX101.ccr.corp.intel.com>
-	<20180118024232.GT627@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E7A61F@SHSMSX101.ccr.corp.intel.com>
-	<20180118132415.GU627@localhost.localdomain>
-	<c67f0021-0ca0-413b-bb84-3ff54dd791de@redhat.com>
-	<20180118143744.GY627@localhost.localdomain>
-	<12d650bf-8fd7-49f5-2c96-869393263899@redhat.com>
-	<20180118165244.GZ627@localhost.localdomain>
-	<9b4fc8d2-c2fe-9b80-4dbc-02ea0d447b31@redhat.com>
-In-Reply-To: <9b4fc8d2-c2fe-9b80-4dbc-02ea0d447b31@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
- Trace feature support
+	(envelope-from <vsementsov@virtuozzo.com>) id 1edZXE-0005EP-KZ
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 05:41:07 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 22 Jan 2018 13:41:00 +0300
+Message-Id: <20180122104100.3674-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2] block: maintain persistent disabled bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,69 +17,309 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
-PiA+IE9uIFRodSwgSmFuIDE4LCAyMDE4IGF0IDAzOjQ0OjQ5UE0gKzAxMDAsIFBhb2xvIEJvbnpp
-bmkgd3JvdGU6DQo+ID4+IE9uIDE4LzAxLzIwMTggMTU6MzcsIEVkdWFyZG8gSGFia29zdCB3cm90
-ZToNCj4gPj4+IE9uIFRodSwgSmFuIDE4LCAyMDE4IGF0IDAyOjM5OjU3UE0gKzAxMDAsIFBhb2xv
-IEJvbnppbmkgd3JvdGU6DQo+ID4+Pj4gT24gMTgvMDEvMjAxOCAxNDoyNCwgRWR1YXJkbyBIYWJr
-b3N0IHdyb3RlOg0KPiA+Pj4+PiBIb3dldmVyLCBpZiB0aGVyZSdzIGEgc2ltcGxlIHdheSB0byBt
-YWtlIGl0IHBvc3NpYmxlIHRvIG1pZ3JhdGUNCj4gPj4+Pj4gYmV0d2VlbiBob3N0cyB3aXRoIGRp
-ZmZlcmVudCBDUFVJRFsxNGhdIGRhdGEsIGl0IHdvdWxkIGJlIGV2ZW4NCj4gPj4+Pj4gYmV0dGVy
-LiAgV2l0aCB0aGUgY3VycmVudCBLVk0gaW50ZWwtcHQgaW1wbGVtZW50YXRpb24sIHdoYXQNCj4g
-Pj4+Pj4gaGFwcGVucyBpZiB0aGUgQ1BVSURbMTRoXSBkYXRhIHNlZW4gYnkgdGhlIGd1ZXN0IGRv
-ZXNuJ3QgbWF0Y2gNCj4gPj4+Pj4gZXhhY3RseSB0aGUgQ1BVSURbMTRoXSBsZWF2ZXMgZnJvbSB0
-aGUgaG9zdD8NCj4gPj4+Pg0KPiA+Pj4+IFNvbWUgYml0cyBpbiB0aGVyZSBjYW4gYmUgdHJlYXRl
-ZCBhcyBDUFUgZmVhdHVyZXMgKGUuZy4gRUJYIGJpdCAwDQo+ID4+Pj4gIkNSMyBmaWx0ZXJpbmcg
-c3VwcG9ydCIpLiAgUHJvYmFibHkgd2Ugc2hvdWxkIGhhbmRsZSB0aGVzZSBpbiBLVk0gcmlnaHQg
-bm93Lg0KPiA+Pj4+IEtWTSBuZWVkcyB0byBjb21wdXRlIGEgbWFzayBvZiB2YWxpZCAxIGJpdHMg
-Zm9yIElBMzJfUlRJVF9DVEwgYmFzZWQNCj4gPj4+PiBvbiBDUFVJRCwgYW5kIGFwcGx5IGl0IHdo
-ZW4gdGhlIE1TUiBpcyB3cml0dGVuLg0KPiA+Pj4NCj4gPj4+IERvZXMgdGhpcyBtZWFuIFFFTVUg
-Y2FuJ3Qgc2V0IENQVUlEIHZhbHVlcyB0aGF0IHdvbid0IG1hdGNoIHRoZSBob3N0DQo+ID4+PiB3
-aXRoIHRoZSBleGlzdGluZyBpbXBsZW1lbnRhdGlvbiwgb3IgdGhpcyB3b24ndCBtYXR0ZXIgZm9y
-DQo+ID4+PiB3ZWxsLWJlaGF2ZWQgZ3Vlc3RzIHRoYXQgZG9uJ3QgdHJ5IHRvIHNldCByZXNlcnZl
-ZCBiaXRzIG9uIHRoZSBNU1JzPw0KPiA+Pg0KPiA+PiBBbGwgdGhlIGZlYXR1cmVzIGNvdWxkIGJl
-IGhhbmRsZWQgZXhhY3RseSBsaWtlIHJlZ3VsYXIgZmVhdHVyZSBiaXRzLg0KPiA+PiBJZiBRRU1V
-IHNldHMgdGhlbSBpbmNvcnJlY3RseSBhbmQgImVuZm9yY2UiIGlzIG5vdCB1c2VkLCBiYWQgdGhp
-bmdzDQo+ID4+IGhhcHBlbiBidXQgaXQncyB0aGUgdXNlcidzIGZhdWx0Lg0KPiA+DQo+ID4gT2gs
-IEkgbWVhbiBzZXR0aW5nIHRoZSBiaXQgdG8gMCB3aGVuIGl0J3MgMSBvbiB0aGUgaG9zdCAoaWYg
-aXQncw0KPiA+IDAgb24gdGhlIGhvc3QsIFFFTVUgd291bGQgbmV2ZXIgc2V0IGl0IGFueXdheSku
-ICBJcyBpdCBzYWZlIHRvIGRvIGl0DQo+ID4gd2l0aCB0aGUgY3VycmVudCBLVk0gaW50ZWwtcHQg
-aW1wbGVtZW50YXRpb24/DQo+IA0KPiBJdCdzIG5vdCwgYnV0IGl0J3MgKHZlcnkpIGVhc3kgdG8g
-Zml4Lg0KDQpIaSBQYW9sbywNCiAgICBEbyB5b3UgbWVhbiB0aGVyZSBuZWVkIHRvIGFkZCBzb21l
-IGNoZWNrIGJlZm9yZSBzZXR0aW5nIElBMzJfUlRJVF9DVEwgTVNSIGluIEtWTSBiZWNhdXNlIHNv
-bWUgYml0cyBvZiB0aGlzIE1TUiBpcyBkZXBlbmQgb24gdGhlIHJlc3VsdCBvZiBDUFVJRFsxNF0u
-IEFueSBhdHRlbXB0cyB0byBjaGFuZ2UgdGhlc2UgcmVzZXJ2ZWQgYml0IHNob3VsZCBjYXVzZSBh
-ICNHUC4NCg0KPiA+DQo+ID4+DQo+ID4+Pg0KPiA+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBJdCBhbHNvIG5lZWRzIHRvDQo+ID4+Pj4gd2hpdGVsaXN0
-IGJpdHMgbGlrZSB3ZSBkbyBmb3Igb3RoZXIgZmVhdHVyZSB3b3Jkcy4gIFRoZXNlIGluY2x1ZGU6
-DQo+ID4+Pj4NCj4gPj4+PiAtIENQVUlEW0VBWD0xNGgsRUNYPTBdLkVCWA0KPiA+Pj4+DQo+ID4+
-Pj4gLSBDUFVJRFtFQVg9MTRoLEVDWD0wXS5FQ1ggZXhjZXB0IGJpdCAzMQ0KPiA+Pj4+DQo+ID4+
-Pj4gLSBDUFVJRFtFQVg9MTRoLEVDWD0xXS5FQVggYml0cyAxNjozMSAoaWYNCj4gPj4+PiBDUFVJ
-RFtFQVg9MTRoLEVDWD0wXS5FQlhbM109MSkNCj4gPj4+Pg0KPiA+Pj4+IC0gQ1BVSURbRUFYPTE0
-aCxFQ1g9MV0uRUJYIChpZiBDUFVJRFtFQVg9MTRoLEVDWD0wXS5FQlhbMV09MSkNCj4gPj4+DQo+
-ID4+PiBXaGF0IGRvIHlvdSBtZWFuIGJ5IHdoaXRlbGlzdD8NCj4gPj4NCj4gPj4gS1ZNIG5lZWRz
-IHRvIHRlbGwgUUVNVSB0aGUgYml0cyBpdCBrbm93cyBhYm91dC4NCg0KSSB0aGluayBrdm1fYXJj
-aF9nZXRfc3VwcG9ydGVkX2NwdWlkKCkgZnVuY3Rpb24gY2FuIGdldCB0aGUgcmVzdWx0IG9mIENQ
-VUlEWzE0XSBmcm9tIEtWTS4gSXMgdGhpcyB0aGUgd2hpdGVsaXN0IHdoYXQgeW91IG1lbnRpb25l
-ZD8NCg0KVGhhbmtzLA0KTHV3ZWkgS2FuZw0KDQo+ID4NCj4gPiBTbyBLVk0gaXNuJ3QgY3VycmVu
-dGx5IGRvaW5nIGl0IG9uIEdFVF9TVVBQT1JURURfQ1BVSUQ/ICBPb3BzLg0KPiA+DQo+ID4NCj4g
-Pj4NCj4gPj4+PiBPdGhlcnMsIGN1cnJlbnRseSBvbmx5IENQVUlEW0VBWD0xNGgsRUNYPTBdLkVD
-WFszMV0gbXVzdCBtYXRjaCwNCj4gPj4+PiB0aGVyZSBpcyBubyB3YXkgdG8gZW11bGF0ZSB0aGUg
-Indyb25nIiB2YWx1ZS4NCj4gPj4+DQo+ID4+PiBJbiB0aGlzIGNhc2Ugd2UgY291bGQgbWFrZSBp
-dCBjb25maWd1cmFibGUgYnV0IHJlcXVpcmUgdGhlIGhvc3QgYW5kDQo+ID4+PiBndWVzdCB2YWx1
-ZSB0byBhbHdheXMgbWF0Y2guDQo+ID4+Pg0KPiA+Pj4gVGhpcyBtaWdodCBiZSBhbiBvYnN0YWNs
-ZSB0byBlbmFibGluZyBpbnRlbC1wdCBieSBkZWZhdWx0IChiZWNhdXNlDQo+ID4+PiBpdCBjb3Vs
-ZCBtYWtlIFZNcyBub3QgbWlncmF0YWJsZSB0byBuZXdlciBob3N0cyksIGJ1dCBtYXkgYWxsb3cg
-dGhlDQo+ID4+PiBmZWF0dXJlIHRvIGJlIGNvbmZpZ3VyZWQgaW4gYSBwcmVkaWN0YWJsZSB3YXku
-DQo+ID4+DQo+ID4+IFllYWgsIGJ1dCBjb25zaWRlciB0aGF0IHZpcnR1YWxpemVkIFBUIGFueXdh
-eSB3b3VsZCBvbmx5IGJlIGVuYWJsZWQNCj4gPj4gb24gSWNlIExha2UgcHJvY2Vzc29ycy4gIEl0
-J3MgYSBmZXcgeWVhcnMgYXdheSBhbnl3YXkhDQo+ID4+DQo+ID4+Pj4gT3RoZXJzLCBjdXJyZW50
-bHkgb25seSBDUFVJRFtFQVg9MTRoLEVDWD0xXS5FQVhbMjowXSBhcmUgbnVtZXJpYw0KPiA+Pj4+
-IHZhbHVlcywgYW5kIGl0J3MgcG9zc2libGUgdG8gZW11bGF0ZSBhIGxvd2VyIHZhbHVlIHRoYW4g
-dGhlIG9uZSBpbiB0aGUgcHJvY2Vzc29yLg0KPiA+Pj4NCj4gPj4+IFRoaXMgY291bGQgYmUgaGFu
-ZGxlZCBieSBRRU1VLiAgVGhlcmUncyBubyByZXF1aXJlbWVudCB0aGF0IGFsbA0KPiA+Pj4gR0VU
-X1NVUFBPUlRFRF9DUFVJRCB2YWx1ZXMgc2hvdWxkIGJlIHZhbGlkYXRlZCBieSBzaW1wbGUgYml0
-DQo+ID4+PiBtYXNraW5nLg0KPiA+Pg0KPiA+PiBHb29kIQ0KPiA+Pg0KPiA+PiBQYW9sbw0KPiA+
-DQoNCg==
+To maintain load/store disabled bitmap there is new approach:
+
+ - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored
+ - store enabled bitmaps as "auto" to qcow2
+ - store disabled bitmaps without "auto" flag to qcow2
+ - on qcow2 open load "auto" bitmaps as enabled and others
+   as disabled (except in_use bitmaps)
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+
+v2: add John's r-b
+    fix spelling
+
+bitmaps-api and bitmaps-postcopy migrations depend on this patch, so
+let's discuss (and merge if in case of consent) as soon as possible.
+
+Reasoning:
+
+Firstly, consider only enabled bitmaps (for now, actually, we can't
+get disabled bitmap in Qemu, as block-dirty-bitmap-enable command
+is not merged yet).
+
+We (Virtuozzo) always use persistent=true and autoload=true. As, to
+maintain dirty bitmap (enabled) valid, we must to load it every time,
+when we load our disk for r/w, to track disk changes. I do not think,
+that something like "not loading enabled dirty bitmaps, when open disk
+for read-only" gives real benefits (and now it is not possible,
+anyway, as loading depends on qcow2 bitmap "auto" flag, not on r-w
+mode).
+
+So, this flag is useless for now. Moreover, if we save bitmap with
+autoload=false, it will not be loaded next time, and will become
+invalid on first write to the disk. Creating bitmap with flags
+"persistent=true, autoload=false", actually means "make it disabled
+after storing" (weird semantic, isn't it?), so it will not be
+automatically updated more. So, this flag is a bit dangerous.
+
+Let's move to disabled bitmaps. Assume, that my patches will be
+merged, and we will really have a possibility of enable/disable
+bitmaps when we want. So, it's natural to expect, that if we have
+persistent-enabled bitmaps and persistent-disabled bitmaps, then
+enabled one will be enabled on next Qemu start and disabled will be
+disabled.
+
+How to achieve this?
+
+Let's start from qcow2. We need a stored information on "is this
+bitmap enabled or not". But we actually have it. Let's look on qcow2
+"auto" flag definiton:
+1: auto
+   The bitmap must reflect all changes of the virtual
+   disk by any application that would write to this qcow2
+   file (including writes, snapshot switching, etc.). The
+   type of this bitmap must be 'dirty tracking bitmap'.
+
+Isn't it a definition of "enabled" bitmap?
+And yes, current mapping from qapi flag "autoload" to qcow2 flag
+"auto" is not good mapping.
+
+So, it looks ok, to map !BdrvDirtyBitmap.disabled to "auto". If we
+have in future some bitmaps in qcow2, which are not enabled and
+not disabled (something more complicated), we can introduce new flags
+or even new bitmap type.
+(from qcow2 spec):
+16:    type
+       This field describes the sort of the bitmap.
+       Values:
+         1: Dirty tracking bitmap
+
+       Values 0, 2 - 255 are reserved.
+So, it looks like we _do not need_ qcow2 format changing for now. It
+already maintain enabled (auto=true) and disabled (auto=false) bitmaps
+(may be, additional note in spec about mapping of this flag in Qemu
+will be not bad)
+
+And actually, we do not have anything about "load this bitmap or not"
+in qcow2.  And I do not think that we need. Qemu (and user) should
+decide, which bitmaps to load. (and it is obvious, that we must load
+"auto" bitmaps, to not break them)
+
+Then about qapi. What will occur, if we store
+disabled-persistent-autolading bitmap? It will be enabled on next
+Qemu start! And it shows that mapping "autoload"->"auto" is definitely
+bad. So, as we do not want information on "load or not the bitmap" in
+qcow2 (ok, I don't want, but I think Kevin and Max will agree, as it
+keeps qcow2 format more generic and separated from Qemu specifics), we
+see again, that "autoload" is useless, dangerous and wrong.
+
+If we agreed, that for now auto = !BdrvDirtyBitmap.disabled and
+"autoload" is deprecated, we need to decide, which disabled bitmaps we
+want to load.
+
+The simplest way to solve the problem is to load all bitmaps, mapping
+BdrvDirtyBitmap.disabled = !auto. In future, if we need, we'll be able
+to introduce some cmd-line flags to select disabled bitmaps for
+loading or separate qmp-command to load them (and do not load them on
+start).
+
+Or we can go another way, and continue loading all disabled bitmaps,
+but in "lazy mode", so bitmap is not actually loaded, only its name
+and some metadata. And we can actually load it, if user enables or
+exports it. It looks very interesting approach, as we do not lose RAM
+on (possibly) a lot of not needed bitmaps, but we can manage them (for
+example, remove).
+
+Any way, loading all bitmaps looks like a good start.
+
+ qapi/block-core.json         |  6 +++---
+ block/qcow2.h                |  2 +-
+ include/block/dirty-bitmap.h |  1 -
+ block/dirty-bitmap.c         | 18 ------------------
+ block/qcow2-bitmap.c         | 12 +++++++-----
+ block/qcow2.c                |  2 +-
+ blockdev.c                   | 10 ++--------
+ 7 files changed, 14 insertions(+), 37 deletions(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index e94a6881b2..a3fffeac19 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1593,9 +1593,9 @@
+ #              Qcow2 disks support persistent bitmaps. Default is false for
+ #              block-dirty-bitmap-add. (Since: 2.10)
+ #
+-# @autoload: the bitmap will be automatically loaded when the image it is stored
+-#            in is opened. This flag may only be specified for persistent
+-#            bitmaps. Default is false for block-dirty-bitmap-add. (Since: 2.10)
++# @autoload: ignored and deprecated since 2.12.
++#            Currently, all dirty tracking bitmaps are loaded from Qcow2 on
++#            open.
+ #
+ # Since: 2.4
+ ##
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 46c8cf44ec..016e87c81a 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -663,7 +663,7 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
+ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+-bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index a591c27213..89dc50946b 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -65,7 +65,6 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
+ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+ 
+ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+-void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
+ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+                                        bool persistent);
+ 
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 7879d13ddb..909f0517f8 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -52,8 +52,6 @@ struct BdrvDirtyBitmap {
+                                    Such operations must fail and both the image
+                                    and this bitmap must remain unchanged while
+                                    this flag is set. */
+-    bool autoload;              /* For persistent bitmaps: bitmap must be
+-                                   autoloaded on image opening */
+     bool persistent;            /* bitmap must be saved to owner disk image */
+     QLIST_ENTRY(BdrvDirtyBitmap) list;
+ };
+@@ -104,7 +102,6 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
+     g_free(bitmap->name);
+     bitmap->name = NULL;
+     bitmap->persistent = false;
+-    bitmap->autoload = false;
+ }
+ 
+ /* Called with BQL taken.  */
+@@ -261,8 +258,6 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+     bitmap->successor = NULL;
+     successor->persistent = bitmap->persistent;
+     bitmap->persistent = false;
+-    successor->autoload = bitmap->autoload;
+-    bitmap->autoload = false;
+     bdrv_release_dirty_bitmap(bs, bitmap);
+ 
+     return successor;
+@@ -667,19 +662,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+ }
+ 
+ /* Called with BQL taken. */
+-void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
+-{
+-    qemu_mutex_lock(bitmap->mutex);
+-    bitmap->autoload = autoload;
+-    qemu_mutex_unlock(bitmap->mutex);
+-}
+-
+-bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
+-{
+-    return bitmap->autoload;
+-}
+-
+-/* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
+ {
+     qemu_mutex_lock(bitmap->mutex);
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index f45e46cfbd..ae14464de6 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -933,14 +933,14 @@ static void set_readonly_helper(gpointer bitmap, gpointer value)
+     bdrv_dirty_bitmap_set_readonly(bitmap, (bool)value);
+ }
+ 
+-/* qcow2_load_autoloading_dirty_bitmaps()
++/* qcow2_load_dirty_bitmaps()
+  * Return value is a hint for caller: true means that the Qcow2 header was
+  * updated. (false doesn't mean that the header should be updated by the
+  * caller, it just means that updating was not needed or the image cannot be
+  * written to).
+  * On failure the function returns false.
+  */
+-bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
++bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     Qcow2BitmapList *bm_list;
+@@ -960,14 +960,16 @@ bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+     }
+ 
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+-        if ((bm->flags & BME_FLAG_AUTO) && !(bm->flags & BME_FLAG_IN_USE)) {
++        if (!(bm->flags & BME_FLAG_IN_USE)) {
+             BdrvDirtyBitmap *bitmap = load_bitmap(bs, bm, errp);
+             if (bitmap == NULL) {
+                 goto fail;
+             }
+ 
++            if (!(bm->flags & BME_FLAG_AUTO)) {
++                bdrv_disable_dirty_bitmap(bitmap);
++            }
+             bdrv_dirty_bitmap_set_persistance(bitmap, true);
+-            bdrv_dirty_bitmap_set_autoload(bitmap, true);
+             bm->flags |= BME_FLAG_IN_USE;
+             created_dirty_bitmaps =
+                     g_slist_append(created_dirty_bitmaps, bitmap);
+@@ -1369,7 +1371,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+             bm->table.size = 0;
+             QSIMPLEQ_INSERT_TAIL(&drop_tables, tb, entry);
+         }
+-        bm->flags = bdrv_dirty_bitmap_get_autoload(bitmap) ? BME_FLAG_AUTO : 0;
++        bm->flags = bdrv_dirty_bitmap_enabled(bitmap) ? BME_FLAG_AUTO : 0;
+         bm->granularity_bits = ctz32(bdrv_dirty_bitmap_granularity(bitmap));
+         bm->dirty_bitmap = bitmap;
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4348b2c0c5..47df95b416 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1450,7 +1450,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+         s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+     }
+ 
+-    if (qcow2_load_autoloading_dirty_bitmaps(bs, &local_err)) {
++    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
+         update_header = false;
+     }
+     if (local_err != NULL) {
+diff --git a/blockdev.c b/blockdev.c
+index 29d569a24e..79aab74d27 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2805,14 +2805,9 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     if (!has_persistent) {
+         persistent = false;
+     }
+-    if (!has_autoload) {
+-        autoload = false;
+-    }
+ 
+-    if (has_autoload && !persistent) {
+-        error_setg(errp, "Autoload flag must be used only for persistent "
+-                         "bitmaps");
+-        return;
++    if (has_autoload) {
++        warn_report("Autoload option is deprecated and its value is ignored");
+     }
+ 
+     if (persistent &&
+@@ -2827,7 +2822,6 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     }
+ 
+     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
+-    bdrv_dirty_bitmap_set_autoload(bitmap, autoload);
+ }
+ 
+ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+-- 
+2.11.1
