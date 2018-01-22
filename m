@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1edi8N-0001mZ-8J
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:52:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1edi97-0002Ku-7j
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1edi8M-0007P7-Fv
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:51:59 -0500
-References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
-	<20180116125427.18540-4-vsementsov@virtuozzo.com>
-	<887a889a-e5bc-1a38-7fc9-87bf5d7a6e1b@redhat.com>
-	<d838bf06-3198-79b4-53d0-1c729e9ce580@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b6e71cfa-19f6-8b98-4e6a-a5d230129f62@redhat.com>
-Date: Mon, 22 Jan 2018 13:51:41 -0600
+	(envelope-from <dgilbert@redhat.com>) id 1edi94-0007vr-4p
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:52:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1edi93-0007vO-Tx
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 14:52:42 -0500
+Date: Mon, 22 Jan 2018 19:52:21 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180122195221.GC2628@work-vm>
+References: <CAFEAcA-SxiJyKa84UwG8CESpkTXEM9AG5HqEgpPrzSFwrTPzYg@mail.gmail.com>
+	<CGME20180119162746epcas1p2143cef3a97b076ce3fbc0b79d7d347b7@epcas1p2.samsung.com>
+	<d746e2e8-3690-c27e-f816-9892b36d8a1c@amsat.org>
+	<f399b096-6e75-c04f-bb02-80e327de45c4@samsung.com>
+	<CAFEAcA-S5yB-3itnRJ41JriJYbsu2EKs9qjPjMC0488vsCZrRw@mail.gmail.com>
+	<87h8rg2jdh.fsf@secure.laptop>
+	<CAFEAcA-4HcQwWk2rEUuUc2PyGP8hnopbrL2zVOLiCayP3S7FrQ@mail.gmail.com>
+	<016e04bd-3ee3-dffc-943f-394c8583c886@samsung.com>
+	<CAFEAcA8wsQ7drfnyNbYHWcuNri4rn30BuE-4dXAnNFw_RZjxkw@mail.gmail.com>
+	<96f66b1f-2248-04ed-aabb-0cac1342b0cc@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <d838bf06-3198-79b4-53d0-1c729e9ce580@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GNRIIJ8p9sneh2Z9FhlpmRtz4Pp7UVVBK"
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add
- block-dirty-bitmap-enable/disable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96f66b1f-2248-04ed-aabb-0cac1342b0cc@samsung.com>
+Subject: Re: [Qemu-devel] [PULL 00/27] Migration pull
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Xu <peterx@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GNRIIJ8p9sneh2Z9FhlpmRtz4Pp7UVVBK
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com,
- mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com,
- den@openvz.org
-Message-ID: <b6e71cfa-19f6-8b98-4e6a-a5d230129f62@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add
- block-dirty-bitmap-enable/disable
-References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
- <20180116125427.18540-4-vsementsov@virtuozzo.com>
- <887a889a-e5bc-1a38-7fc9-87bf5d7a6e1b@redhat.com>
- <d838bf06-3198-79b4-53d0-1c729e9ce580@virtuozzo.com>
-In-Reply-To: <d838bf06-3198-79b4-53d0-1c729e9ce580@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> On 01/22/2018 07:26 PM, Peter Maydell wrote:
+> > On 22 January 2018 at 16:25, Alexey Perevalov <a.perevalov@samsung.com> wrote:
+> > > I want to keep 64bit atomic operations in migration.
+> > Sorry, you can't -- some 32 bit CPUs simply do not provide these
+> > operations. You need to rework your design to not require this.
+> I would like to ask David,
+> how do you think is it normal to use just one half of now_ms (int64_t), one
+> half
+> of 64 bit value should represent 1200 hours and probably it's enough to keep
+> time
+> difference.
 
-On 01/22/2018 03:09 AM, Vladimir Sementsov-Ogievskiy wrote:
+Yes you could use an offset (start of migration?) - if the postcopy
+phase is taking more than that long we're probably in trouble.
+But remember your '0' value is special.
 
->>>
->> I have to admit exposing this interface still makes me nervous, but :)=
+Dave
 
->>
->> Mechanically correct, and with suggesting phrasing changes:
->>
->> Reviewed-by: John Snow <jsnow@redhat.com>
-
-Should we go with an x- prefix for now, and let things settle for a
-release before promoting it to fully supported, just in case we find
-something that justifies your nervousness in accepting the interface?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---GNRIIJ8p9sneh2Z9FhlpmRtz4Pp7UVVBK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpmQM0ACgkQp6FrSiUn
-Q2rdpwf/Vma6uUvC7GHlx5bTT+xdMj7/5F4T63sUGkJJgbqXf4MKBZjXS/cD4kpa
-felRzVAeXmTYS6+mA5RdvifSYaIOiE3tkVFK5SCRbq89xn+dmmcg64uqBCZWctW3
-ptyxSZbwhnWOMmEQ8mAB40CTeyBGky4PxaTDEhlo/w8zabHkm8jv+9e+XGDBQM4H
-8voH4nhB7XiZG0o7eKT/XXI7Aqr8IJTB5NeQeHpoFT4hjTFF308tOtFaFEdmmr12
-yVzWMjoziHnIPmDOEpwfmRlQ6isxqhwW3c7E1uD6KpUC5UJIXs8iG0KcqwDE7Rpl
-uSHqOnPrzA2LcpP24SbMVCRzUyXJEQ==
-=hTrh
------END PGP SIGNATURE-----
-
---GNRIIJ8p9sneh2Z9FhlpmRtz4Pp7UVVBK--
+> > 
+> > thanks
+> > -- PMM
+> > 
+> > 
+> > 
+> 
+> -- 
+> Best regards,
+> Alexey Perevalov
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
