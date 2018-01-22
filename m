@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT10-00064r-5v
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:23 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1edT11-00066V-Rs
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT0w-0006sF-Du
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:22 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33591)
+	(envelope-from <richard.henderson@linaro.org>) id 1edT0x-0006tP-R4
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:23 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1edT0w-0006rq-8C
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:18 -0500
-Received: by mail-pg0-x241.google.com with SMTP id u1so6097458pgr.0
-	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:43:18 -0800 (PST)
+	id 1edT0x-0006sl-LD
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:43:19 -0500
+Received: by mail-pg0-x243.google.com with SMTP id r19so6096579pgn.1
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:43:19 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 21 Jan 2018 19:42:13 -0800
-Message-Id: <20180122034217.19593-40-richard.henderson@linaro.org>
+Date: Sun, 21 Jan 2018 19:42:14 -0800
+Message-Id: <20180122034217.19593-41-richard.henderson@linaro.org>
 In-Reply-To: <20180122034217.19593-1-richard.henderson@linaro.org>
 References: <20180122034217.19593-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 39/43] target/hppa: Implement STWA
+Subject: [Qemu-devel] [PULL 40/43] target/hppa: Enable MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +31,38 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ target/hppa/cpu.h | 6 ++++++
+ configure         | 1 +
+ 2 files changed, 7 insertions(+)
 
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 8884754f05..74f78ab4e0 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -3097,6 +3097,22 @@ static DisasJumpType trans_ldwa_idx_x(DisasContext *ctx, uint32_t insn,
-     ctx->mmu_idx = hold_mmu_idx;
-     return ret;
- }
-+
-+static DisasJumpType trans_stwa_idx_i(DisasContext *ctx, uint32_t insn,
-+                                      const DisasInsn *di)
-+{
-+    int hold_mmu_idx = ctx->mmu_idx;
-+    DisasJumpType ret;
-+
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+
-+    /* ??? needs fixing for hppa64 -- ldda does not follow the same
-+       format wrt the sub-opcode in bits 6:9.  */
-+    ctx->mmu_idx = MMU_PHYS_IDX;
-+    ret = trans_st_idx_i(ctx, insn, di);
-+    ctx->mmu_idx = hold_mmu_idx;
-+    return ret;
-+}
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 79763b254c..3df3ebd19d 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -42,6 +42,12 @@
+ #define TARGET_PHYS_ADDR_SPACE_BITS 32
  #endif
  
- static const DisasInsn table_index_mem[] = {
-@@ -3106,8 +3122,9 @@ static const DisasInsn table_index_mem[] = {
-     { 0x0c0001c0u, 0xfc0003c0, trans_ldcw },
-     { 0x0c001300u, 0xfc0013c0, trans_stby },
- #ifndef CONFIG_USER_ONLY
--    { 0x0c001180u, 0xfc00d3c0, trans_ldwa_idx_i }, /* LDWA, im */
-     { 0x0c000180u, 0xfc00d3c0, trans_ldwa_idx_x }, /* LDWA, rx */
-+    { 0x0c001180u, 0xfc00d3c0, trans_ldwa_idx_i }, /* LDWA, im */
-+    { 0x0c001380u, 0xfc00d3c0, trans_stwa_idx_i }, /* STWA, im */
- #endif
- };
++/* PA-RISC 1.x processors have a strong memory model.  */
++/* ??? While we do not yet implement PA-RISC 2.0, those processors have
++   a weak memory model, but with TLB bits that force ordering on a per-page
++   basis.  It's probably easier to fall back to a strong memory model.  */
++#define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL
++
+ #define CPUArchState struct CPUHPPAState
  
+ #include "exec/cpu-defs.h"
+diff --git a/configure b/configure
+index 6d8c996c62..420d50a47d 100755
+--- a/configure
++++ b/configure
+@@ -6522,6 +6522,7 @@ case "$target_name" in
+   cris)
+   ;;
+   hppa)
++    mttcg="yes"
+   ;;
+   lm32)
+   ;;
 -- 
 2.14.3
