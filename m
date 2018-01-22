@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT0B-0005Ix-Cg
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1edT0I-0005OK-5Z
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edT09-00062c-Vx
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:31 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:38203)
+	(envelope-from <richard.henderson@linaro.org>) id 1edT0E-00067V-OE
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:38 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:40175)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1edT09-00062H-Nx
-	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:29 -0500
-Received: by mail-pf0-x243.google.com with SMTP id k19so6079995pfj.5
-	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:42:29 -0800 (PST)
+	id 1edT0E-00066i-G8
+	for qemu-devel@nongnu.org; Sun, 21 Jan 2018 22:42:34 -0500
+Received: by mail-pg0-x242.google.com with SMTP id g16so6082277pgn.7
+	for <qemu-devel@nongnu.org>; Sun, 21 Jan 2018 19:42:34 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 21 Jan 2018 19:41:40 -0800
-Message-Id: <20180122034217.19593-7-richard.henderson@linaro.org>
+Date: Sun, 21 Jan 2018 19:41:43 -0800
+Message-Id: <20180122034217.19593-10-richard.henderson@linaro.org>
 In-Reply-To: <20180122034217.19593-1-richard.henderson@linaro.org>
 References: <20180122034217.19593-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 06/43] target/hppa: Implement mmu_idx from IA
- privilege level
+Subject: [Qemu-devel] [PULL 09/43] target/hppa: Add control registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,229 +29,319 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Most aspects of privilege are not yet handled.  But this
-gives us the start from which to begin checking.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h       | 19 +++++++++++++----
- target/hppa/cpu.c       |  2 +-
- target/hppa/translate.c | 55 ++++++++++++++++++++++++++++++-------------------
- 3 files changed, 50 insertions(+), 26 deletions(-)
+ linux-user/hppa/target_cpu.h |  2 +-
+ target/hppa/cpu.h            | 23 +++++++++++----
+ linux-user/main.c            |  4 +--
+ linux-user/signal.c          |  4 +--
+ target/hppa/gdbstub.c        | 12 ++++----
+ target/hppa/mem_helper.c     |  2 +-
+ target/hppa/translate.c      | 70 ++++++++++++++++++++++++++++++--------------
+ 7 files changed, 77 insertions(+), 40 deletions(-)
 
+diff --git a/linux-user/hppa/target_cpu.h b/linux-user/hppa/target_cpu.h
+index e50522eae9..7b78bbea80 100644
+--- a/linux-user/hppa/target_cpu.h
++++ b/linux-user/hppa/target_cpu.h
+@@ -33,7 +33,7 @@ static inline void cpu_clone_regs(CPUHPPAState *env, target_ulong newsp)
+ 
+ static inline void cpu_set_tls(CPUHPPAState *env, target_ulong newtls)
+ {
+-    env->cr27 = newtls;
++    env->cr[27] = newtls;
+ }
+ 
+ #endif
 diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index 1524ef91b6..805c93db9c 100644
+index 24c728c0d2..c92c564a7f 100644
 --- a/target/hppa/cpu.h
 +++ b/target/hppa/cpu.h
-@@ -36,8 +36,10 @@
- #define TARGET_PAGE_BITS 12
+@@ -123,6 +123,20 @@
+ #define PSW_SM_W         0
+ #endif
  
- #define ALIGNED_ONLY
--#define NB_MMU_MODES     1
--#define MMU_USER_IDX     0
-+#define NB_MMU_MODES     5
-+#define MMU_KERNEL_IDX   0
-+#define MMU_USER_IDX     3
-+#define MMU_PHYS_IDX     4
- #define TARGET_INSN_START_EXTRA_WORDS 1
++#define CR_RC            0
++#define CR_SCRCCR        10
++#define CR_SAR           11
++#define CR_IVA           14
++#define CR_EIEM          15
++#define CR_IT            16
++#define CR_IIASQ         17
++#define CR_IIAOQ         18
++#define CR_IIR           19
++#define CR_ISR           20
++#define CR_IOR           21
++#define CR_IPSW          22
++#define CR_EIRR          23
++
+ typedef struct CPUHPPAState CPUHPPAState;
  
- /* Hardware exceptions, interupts, faults, and traps.  */
-@@ -195,7 +197,14 @@ static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
+ #if TARGET_REGISTER_BITS == 32
+@@ -142,10 +156,6 @@ struct CPUHPPAState {
+     uint64_t fr[32];
+     uint64_t sr[8];          /* stored shifted into place for gva */
  
- static inline int cpu_mmu_index(CPUHPPAState *env, bool ifetch)
- {
--    return 0;
-+#ifdef CONFIG_USER_ONLY
-+    return MMU_USER_IDX;
-+#else
-+    if (env->psw & (ifetch ? PSW_C : PSW_D)) {
-+        return env->iaoq_f & 3;
-+    }
-+    return MMU_PHYS_IDX;  /* mmu disabled */
-+#endif
+-    target_ureg sar;
+-    target_ureg cr26;
+-    target_ureg cr27;
+-
+     target_ureg psw;         /* All psw bits except the following:  */
+     target_ureg psw_n;       /* boolean */
+     target_sreg psw_v;       /* in most significant bit */
+@@ -163,11 +173,12 @@ struct CPUHPPAState {
+     target_ureg iaoq_f;      /* front */
+     target_ureg iaoq_b;      /* back, aka next instruction */
+ 
+-    target_ureg ior;         /* interrupt offset register */
+-
+     uint32_t fr0_shadow;     /* flags, c, ca/cq, rm, d, enables */
+     float_status fp_status;
+ 
++    target_ureg cr[32];      /* control registers */
++    target_ureg cr_back[2];  /* back of cr17/cr18 */
++
+     /* Those resources are used only in QEMU core */
+     CPU_COMMON
+ };
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 42f4c66ce6..90ae447368 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -3781,14 +3781,14 @@ void cpu_loop(CPUHPPAState *env)
+             info.si_signo = TARGET_SIGSEGV;
+             info.si_errno = 0;
+             info.si_code = TARGET_SEGV_ACCERR;
+-            info._sifields._sigfault._addr = env->ior;
++            info._sifields._sigfault._addr = env->cr[CR_IOR];
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+             break;
+         case EXCP_UNALIGN:
+             info.si_signo = TARGET_SIGBUS;
+             info.si_errno = 0;
+             info.si_code = 0;
+-            info._sifields._sigfault._addr = env->ior;
++            info._sifields._sigfault._addr = env->cr[CR_IOR];
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+             break;
+         case EXCP_ILL:
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index f85f0dd780..40d5d849f0 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -6440,7 +6440,7 @@ static void setup_sigcontext(struct target_sigcontext *sc, CPUArchState *env)
+         __put_user(env->fr[i], &sc->sc_fr[i]);
+     }
+ 
+-    __put_user(env->sar, &sc->sc_sar);
++    __put_user(env->cr[CR_SAR], &sc->sc_sar);
  }
  
- void hppa_translate_init(void);
-@@ -210,7 +219,9 @@ static inline void cpu_get_tb_cpu_state(CPUHPPAState *env, target_ulong *pc,
- {
-     *pc = env->iaoq_f;
-     *cs_base = env->iaoq_b;
--    *pflags = env->psw_n;
-+    /* ??? E, T, H, L, B, P bits need to be here, when implemented.  */
-+    *pflags = (env->psw & (PSW_W | PSW_C | PSW_D))
-+            | env->psw_n * PSW_N;
+ static void restore_sigcontext(CPUArchState *env, struct target_sigcontext *sc)
+@@ -6461,7 +6461,7 @@ static void restore_sigcontext(CPUArchState *env, struct target_sigcontext *sc)
+ 
+     __get_user(env->iaoq_f, &sc->sc_iaoq[0]);
+     __get_user(env->iaoq_b, &sc->sc_iaoq[1]);
+-    __get_user(env->sar, &sc->sc_sar);
++    __get_user(env->cr[CR_SAR], &sc->sc_sar);
  }
  
- target_ureg cpu_hppa_get_psw(CPUHPPAState *env);
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index f6d92de972..9962ab71ee 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -39,7 +39,7 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
- 
-     cpu->env.iaoq_f = tb->pc;
-     cpu->env.iaoq_b = tb->cs_base;
--    cpu->env.psw_n = tb->flags & 1;
-+    cpu->env.psw_n = (tb->flags & PSW_N) != 0;
+ /* No, this doesn't look right, but it's copied straight from the kernel.  */
+diff --git a/target/hppa/gdbstub.c b/target/hppa/gdbstub.c
+index 228d282fe9..fc27aec073 100644
+--- a/target/hppa/gdbstub.c
++++ b/target/hppa/gdbstub.c
+@@ -36,7 +36,7 @@ int hppa_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+         val = env->gr[n];
+         break;
+     case 32:
+-        val = env->sar;
++        val = env->cr[CR_SAR];
+         break;
+     case 33:
+         val = env->iaoq_f;
+@@ -45,10 +45,10 @@ int hppa_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+         val = env->iaoq_b;
+         break;
+     case 59:
+-        val = env->cr26;
++        val = env->cr[26];
+         break;
+     case 60:
+-        val = env->cr27;
++        val = env->cr[27];
+         break;
+     case 64 ... 127:
+         val = extract64(env->fr[(n - 64) / 2], (n & 1 ? 0 : 32), 32);
+@@ -89,7 +89,7 @@ int hppa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+         env->gr[n] = val;
+         break;
+     case 32:
+-        env->sar = val;
++        env->cr[CR_SAR] = val;
+         break;
+     case 33:
+         env->iaoq_f = val;
+@@ -98,10 +98,10 @@ int hppa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+         env->iaoq_b = val;
+         break;
+     case 59:
+-        env->cr26 = val;
++        env->cr[26] = val;
+         break;
+     case 60:
+-        env->cr27 = val;
++        env->cr[27] = val;
+         break;
+     case 64:
+         env->fr[0] = deposit64(env->fr[0], 32, 32, val);
+diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
+index 2901f3e29c..1afaf89539 100644
+--- a/target/hppa/mem_helper.c
++++ b/target/hppa/mem_helper.c
+@@ -32,7 +32,7 @@ int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+     /* ??? Test between data page fault and data memory protection trap,
+        which would affect si_code.  */
+     cs->exception_index = EXCP_DMP;
+-    cpu->env.ior = address;
++    cpu->env.cr[CR_IOR] = address;
+     return 1;
  }
- 
- static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
+ #else
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index b3996cfcdc..8a40c3f46b 100644
+index 1b03573292..0408dbedf1 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -278,6 +278,8 @@ typedef struct DisasContext {
-     DisasCond null_cond;
-     TCGLabel *null_lab;
+@@ -324,8 +324,6 @@ static TCGv_reg cpu_psw_n;
+ static TCGv_reg cpu_psw_v;
+ static TCGv_reg cpu_psw_cb;
+ static TCGv_reg cpu_psw_cb_msb;
+-static TCGv_reg cpu_cr26;
+-static TCGv_reg cpu_cr27;
  
-+    int mmu_idx;
-+    int privilege;
-     bool psw_n_nonzero;
- } DisasContext;
+ #include "exec/gen-icount.h"
  
-@@ -1288,10 +1290,10 @@ static void do_load_32(DisasContext *ctx, TCGv_i32 dest, unsigned rb,
+@@ -335,9 +333,7 @@ void hppa_translate_init(void)
+ 
+     typedef struct { TCGv_reg *var; const char *name; int ofs; } GlobalVar;
+     static const GlobalVar vars[] = {
+-        DEF_VAR(sar),
+-        DEF_VAR(cr26),
+-        DEF_VAR(cr27),
++        { &cpu_sar, "sar", offsetof(CPUHPPAState, cr[CR_SAR]) },
+         DEF_VAR(psw_n),
+         DEF_VAR(psw_v),
+         DEF_VAR(psw_cb),
+@@ -1856,7 +1852,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
+         return DISAS_NORETURN;
+ 
+     case 0xe0: /* SET_THREAD_POINTER */
+-        tcg_gen_mov_reg(cpu_cr27, cpu_gr[26]);
++        tcg_gen_st_reg(cpu_gr[26], cpu_env, offsetof(CPUHPPAState, cr[27]));
+         tcg_gen_mov_reg(cpu_iaoq_f, cpu_gr[31]);
+         tcg_gen_addi_reg(cpu_iaoq_b, cpu_iaoq_f, 4);
+         return DISAS_IAQ_N_UPDATED;
+@@ -1937,34 +1933,39 @@ static DisasJumpType trans_mfctl(DisasContext *ctx, uint32_t insn,
+     TCGv_reg tmp;
+ 
+     switch (ctl) {
+-    case 11: /* SAR */
++    case CR_SAR:
+ #ifdef TARGET_HPPA64
+         if (extract32(insn, 14, 1) == 0) {
+             /* MFSAR without ,W masks low 5 bits.  */
+             tmp = dest_gpr(ctx, rt);
+             tcg_gen_andi_reg(tmp, cpu_sar, 31);
+             save_gpr(ctx, rt, tmp);
+-            break;
++            goto done;
+         }
+ #endif
+         save_gpr(ctx, rt, cpu_sar);
+-        break;
+-    case 16: /* Interval Timer */
++        goto done;
++    case CR_IT: /* Interval Timer */
++        /* FIXME: Respect PSW_S bit.  */
++        nullify_over(ctx);
+         tmp = dest_gpr(ctx, rt);
+-        tcg_gen_movi_tl(tmp, 0); /* FIXME */
++        tcg_gen_movi_reg(tmp, 0); /* FIXME */
+         save_gpr(ctx, rt, tmp);
+         break;
+     case 26:
+-        save_gpr(ctx, rt, cpu_cr26);
+-        break;
+     case 27:
+-        save_gpr(ctx, rt, cpu_cr27);
+         break;
+     default:
+         /* All other control registers are privileged.  */
+-        return gen_illegal(ctx);
++        CHECK_MOST_PRIVILEGED(EXCP_PRIV_REG);
++        break;
      }
  
-     if (modify == 0) {
--        tcg_gen_qemu_ld_i32(dest, addr, MMU_USER_IDX, mop);
-+        tcg_gen_qemu_ld_i32(dest, addr, ctx->mmu_idx, mop);
-     } else {
-         tcg_gen_qemu_ld_i32(dest, (modify < 0 ? addr : base),
--                            MMU_USER_IDX, mop);
-+                            ctx->mmu_idx, mop);
-         save_gpr(ctx, rb, addr);
-     }
-     tcg_temp_free(addr);
-@@ -1318,10 +1320,10 @@ static void do_load_64(DisasContext *ctx, TCGv_i64 dest, unsigned rb,
-     }
- 
-     if (modify == 0) {
--        tcg_gen_qemu_ld_i64(dest, addr, MMU_USER_IDX, mop);
-+        tcg_gen_qemu_ld_i64(dest, addr, ctx->mmu_idx, mop);
-     } else {
-         tcg_gen_qemu_ld_i64(dest, (modify < 0 ? addr : base),
--                            MMU_USER_IDX, mop);
-+                            ctx->mmu_idx, mop);
-         save_gpr(ctx, rb, addr);
-     }
-     tcg_temp_free(addr);
-@@ -1347,7 +1349,7 @@ static void do_store_32(DisasContext *ctx, TCGv_i32 src, unsigned rb,
-         tcg_gen_addi_reg(addr, base, disp);
-     }
- 
--    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
-+    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
- 
-     if (modify != 0) {
-         save_gpr(ctx, rb, addr);
-@@ -1375,7 +1377,7 @@ static void do_store_64(DisasContext *ctx, TCGv_i64 src, unsigned rb,
-         tcg_gen_addi_reg(addr, base, disp);
-     }
- 
--    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
-+    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
- 
-     if (modify != 0) {
-         save_gpr(ctx, rb, addr);
-@@ -2486,7 +2488,7 @@ static DisasJumpType trans_ldcw(DisasContext *ctx, uint32_t insn,
- 
-     zero = tcg_const_reg(0);
-     tcg_gen_atomic_xchg_reg(dest, (modify <= 0 ? addr : base),
--                            zero, MMU_USER_IDX, mop);
-+                            zero, ctx->mmu_idx, mop);
-     if (modify) {
-         save_gpr(ctx, rb, addr);
-     }
-@@ -3960,30 +3962,43 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
-                                       CPUState *cs, int max_insns)
++    tmp = get_temp(ctx);
++    tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
++    save_gpr(ctx, rt, tmp);
++
++ done:
+     cond_free(&ctx->null_cond);
+     return DISAS_NEXT;
+ }
+@@ -2000,20 +2001,45 @@ static DisasJumpType trans_mtctl(DisasContext *ctx, uint32_t insn,
  {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
--    TranslationBlock *tb = ctx->base.tb;
-     int bound;
+     unsigned rin = extract32(insn, 16, 5);
+     unsigned ctl = extract32(insn, 21, 5);
++    TCGv_reg reg = load_gpr(ctx, rin);
+     TCGv_reg tmp;
  
-     ctx->cs = cs;
--    ctx->iaoq_f = tb->pc;
--    ctx->iaoq_b = tb->cs_base;
+-    if (ctl == 11) { /* SAR */
++    if (ctl == CR_SAR) {
+         tmp = tcg_temp_new();
+-        tcg_gen_andi_reg(tmp, load_gpr(ctx, rin), TARGET_REGISTER_BITS - 1);
++        tcg_gen_andi_reg(tmp, reg, TARGET_REGISTER_BITS - 1);
+         save_or_nullify(ctx, cpu_sar, tmp);
+         tcg_temp_free(tmp);
+-    } else {
+-        /* All other control registers are privileged or read-only.  */
+-        return gen_illegal(ctx);
 +
-+#ifdef CONFIG_USER_ONLY
-+    ctx->privilege = MMU_USER_IDX;
-+    ctx->mmu_idx = MMU_USER_IDX;
-+#else
-+    ctx->privilege = ctx->base.pc_first & 3;
-+    ctx->mmu_idx = (ctx->base.tb->flags & PSW_D
-+                    ? ctx->privilege : MMU_PHYS_IDX);
-+#endif
-+    ctx->iaoq_f = ctx->base.pc_first;
-+    ctx->iaoq_b = ctx->base.tb->cs_base;
-+    ctx->base.pc_first &= -4;
-+
-     ctx->iaoq_n = -1;
-     ctx->iaoq_n_var = NULL;
- 
-+    /* Bound the number of instructions by those left on the page.  */
-+    bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
-+    bound = MIN(max_insns, bound);
-+
-     ctx->ntemps = 0;
-     memset(ctx->temps, 0, sizeof(ctx->temps));
- 
--    bound = -(tb->pc | TARGET_PAGE_MASK) / 4;
--    return MIN(max_insns, bound);
-+    return bound;
- }
- 
- static void hppa_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    /* Seed the nullification status from PSW[N], as shown in TB->FLAGS.  */
-+    /* Seed the nullification status from PSW[N], as saved in TB->FLAGS.  */
-     ctx->null_cond = cond_make_f();
-     ctx->psw_n_nonzero = false;
--    if (ctx->base.tb->flags & 1) {
-+    if (ctx->base.tb->flags & PSW_N) {
-         ctx->null_cond.c = TCG_COND_ALWAYS;
-         ctx->psw_n_nonzero = true;
++        cond_free(&ctx->null_cond);
++        return DISAS_NEXT;
      }
-@@ -4003,7 +4018,7 @@ static bool hppa_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
  
-     ctx->base.is_jmp = gen_excp(ctx, EXCP_DEBUG);
--    ctx->base.pc_next = ctx->iaoq_f + 4;
-+    ctx->base.pc_next = (ctx->iaoq_f & -4) + 4;
-     return true;
+-    cond_free(&ctx->null_cond);
+-    return DISAS_NEXT;
++    /* All other control registers are privileged or read-only.  */
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_REG);
++
++    nullify_over(ctx);
++    switch (ctl) {
++    case CR_IT:
++        /* ??? modify interval timer offset */
++        break;
++
++    case CR_IIASQ:
++    case CR_IIAOQ:
++        /* FIXME: Respect PSW_Q bit */
++        /* The write advances the queue and stores to the back element.  */
++        tmp = get_temp(ctx);
++        tcg_gen_ld_reg(tmp, cpu_env,
++                       offsetof(CPUHPPAState, cr_back[ctl - CR_IIASQ]));
++        tcg_gen_st_reg(tmp, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
++        tcg_gen_st_reg(reg, cpu_env,
++                       offsetof(CPUHPPAState, cr_back[ctl - CR_IIASQ]));
++        break;
++
++    default:
++        tcg_gen_st_reg(reg, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
++        break;
++    }
++    return nullify_end(ctx, DISAS_NEXT);
  }
  
-@@ -4024,7 +4039,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     {
-         /* Always fetch the insn, even if nullified, so that we check
-            the page permissions for execute.  */
--        uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f);
-+        uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f & -4);
- 
-         /* Set up the IA queue for the next insn.
-            This will be overwritten by a branch.  */
-@@ -4053,10 +4068,8 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     }
-     ctx->ntemps = 0;
- 
--    /* Advance the insn queue.  */
--    /* ??? The non-linear instruction restriction is purely due to
--       the debugging dump.  Otherwise we *could* follow unconditional
--       branches within the same page.  */
-+    /* Advance the insn queue.  Note that this check also detects
-+       a priority change within the instruction queue.  */
-     if (ret == DISAS_NEXT && ctx->iaoq_b != ctx->iaoq_f + 4) {
-         if (ctx->null_cond.c == TCG_COND_NEVER
-             || ctx->null_cond.c == TCG_COND_ALWAYS) {
-@@ -4110,7 +4123,7 @@ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
- 
-     /* We don't actually use this during normal translation,
-        but we should interact with the generic main loop.  */
--    ctx->base.pc_next = ctx->base.tb->pc + 4 * ctx->base.num_insns;
-+    ctx->base.pc_next = ctx->base.pc_first + 4 * ctx->base.num_insns;
- }
- 
- static void hppa_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
+ static DisasJumpType trans_mtsarcm(DisasContext *ctx, uint32_t insn,
 -- 
 2.14.3
