@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1edj3N-0004ZS-RP
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:57 -0500
+	(envelope-from <apahim@redhat.com>) id 1edj3R-0004bZ-GS
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1edj3M-0000Ur-QS
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38028)
+	(envelope-from <apahim@redhat.com>) id 1edj3Q-0000XW-GQ
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1edj3M-0000Sb-Km
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:52 -0500
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1edj3Q-0000Wq-7M
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 15:50:56 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 290E081DE5
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 20:50:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 44BD71A407E
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 20:50:55 +0000 (UTC)
 From: Amador Pahim <apahim@redhat.com>
-Date: Mon, 22 Jan 2018 21:50:27 +0100
-Message-Id: <20180122205033.24893-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 0/6] scripts/qemu.py fixes and cleanups
+Date: Mon, 22 Jan 2018 21:50:28 +0100
+Message-Id: <20180122205033.24893-2-apahim@redhat.com>
+In-Reply-To: <20180122205033.24893-1-apahim@redhat.com>
+References: <20180122205033.24893-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v12 1/6] qemu.py: better control of created
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +33,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, Amador Pahim <apahim@redhat.com>
 
-Changes v11->v12:
- - Rebase.
- - Drop the already queued commit (qemu.py: remove unused import)
- - Fix code filling the _monitor_address when it's None.
- - Drop the redundant commit checking whether VM was running on launch()
- - Improve the exception message when launch() is called twice with no
-   shutdown() in between.
-Changes v10->v11:
- - Fix messed indentation.
- - Rename self._qemu_log_fd to self._qemu_log_file.
- - Patch changelog in reverse order.
-Changes v9->v10:
- - Keep method _remove_if_exists().
-Changes v8->v9:
- - Some commits were already merged. Rebased the remaining ones.
- - New commit to remove unused import.
- - VM files control logic changed to use a temporary directory.
- - Better naming for variable controlling the need of a shutdown before
-   next launch.
-Changes v7->v8:
- - Rebased.
- - Reorder commits to avoid break->fix sequence.
- - Split commits "use poll() instead of 'returncode'" and "refactor
-   launch()".
- - Don't ignore errors in _load_io_log(). Instead, check if we created
-   the file before reading it.
- - Use LOG.warn() instead of LOG.debug() for the negative exit code
-   message.
- - Fix the exception name called in commits "launch vm only if it's not
-   running" and "don't launch again before shutdown()".
- - Minor style fixes.
-Changes v6->v7:
- - Split commits in self-contained/atomic changes.
- - Addressed the comments from previous version, basically improving the
-   logging messages and the control over created files. See individual
-   commit messages for details.
-Changes v5->v6:
- - Remove the commit to rename self._args.
- - Fix is_running() return before first call to maunch().
- - Use python logging system.
- - Include the full command line on negative exit code error message.
- - Use os.path.null instead of /dev/null.
- - Improve the control over the created/deleted files.
-Changes v4->v5:
- - Break the cleanup commit into logical changes and include in the
-   commit messages the rationale for making them.
-Changes v3->v4:
- - Squash the 2 first commits since they are co-dependant.
- - Cleanup launch() and shutdown().
- - Reorder the commits, putting the rename of self._args first.
- - Rebased.
-Changes v2->v3:
- - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
-Changes v1->v2:
- - Style fixes to make checkpatch.pl happy.
- - Rebased.
+To launch a VM, we need to create basically two files: the monitor
+socket (if it's a UNIX socket) and the qemu log file.
 
-*** SUBJECT HERE ***
+For the qemu log file, we currently just open the path, which will
+create the file if it does not exist or overwrite the file if it does
+exist.
 
-*** BLURB HERE ***
+For the monitor socket, if it already exists, we are currently removing
+it, even if it's not created by us.
 
-Amador Pahim (6):
-  qemu.py: better control of created files
-  qemu.py: refactor launch()
-  qemu.py: always cleanup on shutdown()
-  qemu.py: use poll() instead of 'returncode'
-  qemu.py: cleanup redundant calls in launch()
-  qemu.py: don't launch again before shutdown()
+This patch moves to _pre_launch() the responsibility to create a
+temporary directory to host the files so we can remove the whole
+directory on _post_shutdown().
 
- scripts/qemu.py | 93 ++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 62 insertions(+), 31 deletions(-)
+Signed-off-by: Amador Pahim <apahim@redhat.com>
+---
+ scripts/qemu.py | 39 +++++++++++++++++++++++++++++----------
+ 1 file changed, 29 insertions(+), 10 deletions(-)
 
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 9bfdf6d37d..453a67250a 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -18,6 +18,8 @@ import os
+ import sys
+ import subprocess
+ import qmp.qmp
++import shutil
++import tempfile
+ 
+ 
+ LOG = logging.getLogger(__name__)
+@@ -73,10 +75,11 @@ class QEMUMachine(object):
+             wrapper = []
+         if name is None:
+             name = "qemu-%d" % os.getpid()
+-        if monitor_address is None:
+-            monitor_address = os.path.join(test_dir, name + "-monitor.sock")
++        self._name = name
+         self._monitor_address = monitor_address
+-        self._qemu_log_path = os.path.join(test_dir, name + ".log")
++        self._vm_monitor = None
++        self._qemu_log_path = None
++        self._qemu_log_file = None
+         self._popen = None
+         self._binary = binary
+         self._args = list(args)     # Force copy args in case we modify them
+@@ -86,6 +89,8 @@ class QEMUMachine(object):
+         self._socket_scm_helper = socket_scm_helper
+         self._qmp = None
+         self._qemu_full_args = None
++        self._test_dir = test_dir
++        self._temp_dir = None
+ 
+         # just in case logging wasn't configured by the main script:
+         logging.basicConfig()
+@@ -168,36 +173,50 @@ class QEMUMachine(object):
+                 self._monitor_address[0],
+                 self._monitor_address[1])
+         else:
+-            moncdev = 'socket,id=mon,path=%s' % self._monitor_address
++            moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
+         return ['-chardev', moncdev,
+                 '-mon', 'chardev=mon,mode=control',
+                 '-display', 'none', '-vga', 'none']
+ 
+     def _pre_launch(self):
+-        self._qmp = qmp.qmp.QEMUMonitorProtocol(self._monitor_address,
++        self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
++        if self._monitor_address is not None:
++            self._vm_monitor = self._monitor_address
++        else:
++            self._vm_monitor = os.path.join(self._temp_dir,
++                                            self._name + "-monitor.sock")
++        self._qemu_log_path = os.path.join(self._temp_dir, self._name + ".log")
++        self._qemu_log_file = open(self._qemu_log_path, 'wb')
++
++        self._qmp = qmp.qmp.QEMUMonitorProtocol(self._vm_monitor,
+                                                 server=True)
+ 
+     def _post_launch(self):
+         self._qmp.accept()
+ 
+     def _post_shutdown(self):
+-        if not isinstance(self._monitor_address, tuple):
+-            self._remove_if_exists(self._monitor_address)
+-        self._remove_if_exists(self._qemu_log_path)
++        if self._qemu_log_file is not None:
++            self._qemu_log_file.close()
++            self._qemu_log_file = None
++
++        self._qemu_log_path = None
++
++        if self._temp_dir is not None:
++            shutil.rmtree(self._temp_dir)
++            self._temp_dir = None
+ 
+     def launch(self):
+         '''Launch the VM and establish a QMP connection'''
+         self._iolog = None
+         self._qemu_full_args = None
+         devnull = open(os.path.devnull, 'rb')
+-        qemulog = open(self._qemu_log_path, 'wb')
+         try:
+             self._pre_launch()
+             self._qemu_full_args = (self._wrapper + [self._binary] +
+                                     self._base_args() + self._args)
+             self._popen = subprocess.Popen(self._qemu_full_args,
+                                            stdin=devnull,
+-                                           stdout=qemulog,
++                                           stdout=self._qemu_log_file,
+                                            stderr=subprocess.STDOUT,
+                                            shell=False)
+             self._post_launch()
 -- 
 2.14.3
