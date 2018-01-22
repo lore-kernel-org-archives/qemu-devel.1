@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1edan2-0001xD-Lf
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:30 -0500
+	(envelope-from <cohuck@redhat.com>) id 1edan4-0001zM-OM
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1edams-00060S-Tw
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:28 -0500
+	(envelope-from <cohuck@redhat.com>) id 1edamy-0006CX-I5
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:30 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 22 Jan 2018 13:00:43 +0100
-Message-Id: <20180122120045.13538-8-cohuck@redhat.com>
+Date: Mon, 22 Jan 2018 13:00:44 +0100
+Message-Id: <20180122120045.13538-9-cohuck@redhat.com>
 In-Reply-To: <20180122120045.13538-1-cohuck@redhat.com>
 References: <20180122120045.13538-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 7/9] linux-headers: update
+Subject: [Qemu-devel] [PULL 8/9] s390x/kvm: Handle bpb feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,155 +20,165 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-Update headers against 4.15-rc9.
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
+We need to handle the bpb control on reset and migration. Normally
+stfle.82 is transparent (and the normal guest part works without
+hypervisor activity). To prevent any issues we require full
+host kernel support for this feature.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20180118085628.40798-3-borntraeger@de.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+[CH: 'Branch Prediction Blocking' -> 'Branch prediction blocking']
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- include/standard-headers/asm-s390/virtio-ccw.h |  6 +-----
- linux-headers/asm-powerpc/kvm.h                | 25 +++++++++++++++++++++++++
- linux-headers/asm-s390/kvm.h                   |  9 ++++-----
- linux-headers/asm-s390/kvm_para.h              |  4 ----
- linux-headers/linux/kvm.h                      |  8 ++++++--
- 5 files changed, 36 insertions(+), 16 deletions(-)
+ target/s390x/cpu.c              |  1 +
+ target/s390x/cpu.h              |  1 +
+ target/s390x/cpu_features.c     |  1 +
+ target/s390x/cpu_features_def.h |  1 +
+ target/s390x/gen-features.c     |  1 +
+ target/s390x/kvm.c              | 14 ++++++++++++++
+ target/s390x/machine.c          | 17 +++++++++++++++++
+ 7 files changed, 36 insertions(+)
 
-diff --git a/include/standard-headers/asm-s390/virtio-ccw.h b/include/standard-headers/asm-s390/virtio-ccw.h
-index 967aad3901..2b605f7e84 100644
---- a/include/standard-headers/asm-s390/virtio-ccw.h
-+++ b/include/standard-headers/asm-s390/virtio-ccw.h
-@@ -1,13 +1,9 @@
--/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
- /*
-  * Definitions for virtio-ccw devices.
-  *
-  * Copyright IBM Corp. 2013
-  *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License (version 2 only)
-- * as published by the Free Software Foundation.
-- *
-  *  Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index ae3cee91a2..d2e6b9f5c7 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -89,6 +89,7 @@ static void s390_cpu_reset(CPUState *s)
+     CPUS390XState *env = &cpu->env;
+ 
+     env->pfault_token = -1UL;
++    env->bpbc = false;
+     scc->parent_reset(s);
+     cpu->env.sigp_order = 0;
+     s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 915bccbc75..a1123ad621 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -93,6 +93,7 @@ struct CPUS390XState {
+ 
+     uint32_t fpc;          /* floating-point control register */
+     uint32_t cc_op;
++    bool bpbc;             /* branch prediction blocking */
+ 
+     float_status fpu_status; /* passed to softfloat lib */
+ 
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 31a4676f05..b45ef09f93 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -89,6 +89,7 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("msa4-base", S390_FEAT_TYPE_STFL, 77, "Message-security-assist-extension-4 facility (excluding subfunctions)"),
+     FEAT_INIT("edat2", S390_FEAT_TYPE_STFL, 78, "Enhanced-DAT facility 2"),
+     FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point packed-conversion facility"),
++    FEAT_INIT("bpb", S390_FEAT_TYPE_STFL, 82, "Branch prediction blocking"),
+     FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
+     FEAT_INIT("iep", S390_FEAT_TYPE_STFL, 130, "Instruction-execution-protection facility"),
+     FEAT_INIT("sea_esop2", S390_FEAT_TYPE_STFL, 131, "Side-effect-access facility and Enhanced-suppression-on-protection facility 2"),
+diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+index 4b6d4e9cc0..4487cfd53b 100644
+--- a/target/s390x/cpu_features_def.h
++++ b/target/s390x/cpu_features_def.h
+@@ -80,6 +80,7 @@ typedef enum {
+     S390_FEAT_MSA_EXT_4,
+     S390_FEAT_EDAT_2,
+     S390_FEAT_DFP_PACKED_CONVERSION,
++    S390_FEAT_BPB,
+     S390_FEAT_VECTOR,
+     S390_FEAT_INSTRUCTION_EXEC_PROT,
+     S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index b24f6ada5b..563aced35e 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -352,6 +352,7 @@ static uint16_t base_GEN14_GA1[] = {
+  * support these features yet.
   */
- #ifndef __KVM_VIRTIO_CCW_H
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
-index 61d6049f4c..637b7263cb 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -443,6 +443,31 @@ struct kvm_ppc_rmmu_info {
- 	__u32	ap_encodings[8];
+ static uint16_t full_GEN7_GA1[] = {
++    S390_FEAT_BPB,
+     S390_FEAT_SIE_F2,
+     S390_FEAT_SIE_SKEY,
+     S390_FEAT_SIE_GPERE,
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 6a18a413b4..8736001156 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -490,6 +490,11 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_GSCB;
+     }
+ 
++    if (can_sync_regs(cs, KVM_SYNC_BPBC)) {
++        cs->kvm_run->s.regs.bpbc = env->bpbc;
++        cs->kvm_run->kvm_dirty_regs |= KVM_SYNC_BPBC;
++    }
++
+     /* Finally the prefix */
+     if (can_sync_regs(cs, KVM_SYNC_PREFIX)) {
+         cs->kvm_run->s.regs.prefix = env->psa;
+@@ -600,6 +605,10 @@ int kvm_arch_get_registers(CPUState *cs)
+         memcpy(env->gscb, cs->kvm_run->s.regs.gscb, 32);
+     }
+ 
++    if (can_sync_regs(cs, KVM_SYNC_BPBC)) {
++        env->bpbc = cs->kvm_run->s.regs.bpbc;
++    }
++
+     /* pfault parameters */
+     if (can_sync_regs(cs, KVM_SYNC_PFAULT)) {
+         env->pfault_token = cs->kvm_run->s.regs.pft;
+@@ -2278,6 +2287,11 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+         clear_bit(S390_FEAT_CMM_NT, model->features);
+     }
+ 
++    /* bpb needs kernel support for migration, VSIE and reset */
++    if (!kvm_check_extension(kvm_state, KVM_CAP_S390_BPB)) {
++        clear_bit(S390_FEAT_BPB, model->features);
++    }
++
+     /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
+     if (pci_available) {
+         set_bit(S390_FEAT_ZPCI, model->features);
+diff --git a/target/s390x/machine.c b/target/s390x/machine.c
+index b78f326d3a..84b4928755 100644
+--- a/target/s390x/machine.c
++++ b/target/s390x/machine.c
+@@ -194,6 +194,22 @@ const VMStateDescription vmstate_gscb = {
+         }
  };
  
-+/* For KVM_PPC_GET_CPU_CHAR */
-+struct kvm_ppc_cpu_char {
-+	__u64	character;		/* characteristics of the CPU */
-+	__u64	behaviour;		/* recommended software behaviour */
-+	__u64	character_mask;		/* valid bits in character */
-+	__u64	behaviour_mask;		/* valid bits in behaviour */
++static bool bpbc_needed(void *opaque)
++{
++    return s390_has_feat(S390_FEAT_BPB);
++}
++
++const VMStateDescription vmstate_bpbc = {
++    .name = "cpu/bpbc",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = bpbc_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(env.bpbc, S390CPU),
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+/*
-+ * Values for character and character_mask.
-+ * These are identical to the values used by H_GET_CPU_CHARACTERISTICS.
-+ */
-+#define KVM_PPC_CPU_CHAR_SPEC_BAR_ORI31		(1ULL << 63)
-+#define KVM_PPC_CPU_CHAR_BCCTRL_SERIALISED	(1ULL << 62)
-+#define KVM_PPC_CPU_CHAR_L1D_FLUSH_ORI30	(1ULL << 61)
-+#define KVM_PPC_CPU_CHAR_L1D_FLUSH_TRIG2	(1ULL << 60)
-+#define KVM_PPC_CPU_CHAR_L1D_THREAD_PRIV	(1ULL << 59)
-+#define KVM_PPC_CPU_CHAR_BR_HINT_HONOURED	(1ULL << 58)
-+#define KVM_PPC_CPU_CHAR_MTTRIG_THR_RECONF	(1ULL << 57)
-+#define KVM_PPC_CPU_CHAR_COUNT_CACHE_DIS	(1ULL << 56)
-+
-+#define KVM_PPC_CPU_BEHAV_FAVOUR_SECURITY	(1ULL << 63)
-+#define KVM_PPC_CPU_BEHAV_L1D_FLUSH_PR		(1ULL << 62)
-+#define KVM_PPC_CPU_BEHAV_BNDS_CHK_SPEC_BAR	(1ULL << 61)
-+
- /* Per-vcpu XICS interrupt controller state */
- #define KVM_REG_PPC_ICP_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x8c)
- 
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index 32d372e977..11def14301 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -6,10 +6,6 @@
-  *
-  * Copyright IBM Corp. 2008
-  *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License (version 2 only)
-- * as published by the Free Software Foundation.
-- *
-  *    Author(s): Carsten Otte <cotte@de.ibm.com>
-  *               Christian Borntraeger <borntraeger@de.ibm.com>
-  */
-@@ -228,6 +224,7 @@ struct kvm_guest_debug_arch {
- #define KVM_SYNC_RICCB  (1UL << 7)
- #define KVM_SYNC_FPRS   (1UL << 8)
- #define KVM_SYNC_GSCB   (1UL << 9)
-+#define KVM_SYNC_BPBC   (1UL << 10)
- /* length and alignment of the sdnx as a power of two */
- #define SDNXC 8
- #define SDNXL (1UL << SDNXC)
-@@ -251,7 +248,9 @@ struct kvm_sync_regs {
- 	};
- 	__u8  reserved[512];	/* for future vector expansion */
- 	__u32 fpc;		/* valid on KVM_SYNC_VRS or KVM_SYNC_FPRS */
--	__u8 padding1[52];	/* riccb needs to be 64byte aligned */
-+	__u8 bpbc : 1;		/* bp mode */
-+	__u8 reserved2 : 7;
-+	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
- 	__u8 riccb[64];		/* runtime instrumentation controls block */
- 	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
- 	union {
-diff --git a/linux-headers/asm-s390/kvm_para.h b/linux-headers/asm-s390/kvm_para.h
-index 0dc86b3a7c..b9ab584adf 100644
---- a/linux-headers/asm-s390/kvm_para.h
-+++ b/linux-headers/asm-s390/kvm_para.h
-@@ -4,9 +4,5 @@
-  *
-  * Copyright IBM Corp. 2008
-  *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License (version 2 only)
-- * as published by the Free Software Foundation.
-- *
-  *    Author(s): Christian Borntraeger <borntraeger@de.ibm.com>
-  */
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index ce6c2f11f4..d92c9b2f0e 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -630,9 +630,9 @@ struct kvm_s390_irq {
- 
- struct kvm_s390_irq_state {
- 	__u64 buf;
--	__u32 flags;
-+	__u32 flags;        /* will stay unused for compatibility reasons */
- 	__u32 len;
--	__u32 reserved[4];
-+	__u32 reserved[4];  /* will stay unused for compatibility reasons */
+ const VMStateDescription vmstate_s390_cpu = {
+     .name = "cpu",
+     .post_load = cpu_post_load,
+@@ -228,6 +244,7 @@ const VMStateDescription vmstate_s390_cpu = {
+         &vmstate_riccb,
+         &vmstate_exval,
+         &vmstate_gscb,
++        &vmstate_bpbc,
+         NULL
+     },
  };
- 
- /* for KVM_SET_GUEST_DEBUG */
-@@ -932,6 +932,8 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_HYPERV_SYNIC2 148
- #define KVM_CAP_HYPERV_VP_INDEX 149
- #define KVM_CAP_S390_AIS_MIGRATION 150
-+#define KVM_CAP_PPC_GET_CPU_CHAR 151
-+#define KVM_CAP_S390_BPB 152
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1261,6 +1263,8 @@ struct kvm_s390_ucas_mapping {
- #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
- /* Available with KVM_CAP_PPC_RADIX_MMU */
- #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
-+/* Available with KVM_CAP_PPC_GET_CPU_CHAR */
-+#define KVM_PPC_GET_CPU_CHAR	  _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
 -- 
 2.13.6
