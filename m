@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1edame-0001cI-H4
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1edaml-0001jd-Q5
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1edamZ-0005qn-Ka
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:04 -0500
+	(envelope-from <cohuck@redhat.com>) id 1edamh-0005uk-BD
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 07:01:11 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 22 Jan 2018 13:00:38 +0100
-Message-Id: <20180122120045.13538-3-cohuck@redhat.com>
+Date: Mon, 22 Jan 2018 13:00:40 +0100
+Message-Id: <20180122120045.13538-5-cohuck@redhat.com>
 In-Reply-To: <20180122120045.13538-1-cohuck@redhat.com>
 References: <20180122120045.13538-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 2/9] s390x/tcg: implement TEST PROTECTION
+Subject: [Qemu-devel] [PULL 4/9] hw/s390x: Replace fprintf(stderr,
+ "*\n" with qemu_log_mask()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,103 +21,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Alistair Francis <alistair.francis@xilinx.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-Linux uses TEST PROTECTION to sense for available memory locations.
+One fprintf(stderr, was manually converted to a
+qemu_log_mask(LOG_GUEST_ERROR,
 
-Let's implement what we can for now (just as for the other instructions,
-excluding AR mode and special protection mechanisms).
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20171218224616.21030-2-david@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <3f49c0ff601f27534d4536c87c00d01c233e067f.1513790495.git.alistair.francis@xilinx.com>
+[CH: tweaked commit message]
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/helper.h     |  2 +-
- target/s390x/mem_helper.c | 41 +++++++++++++++++++++++++++++++++++++++--
- target/s390x/translate.c  |  2 +-
- 3 files changed, 41 insertions(+), 4 deletions(-)
+ hw/s390x/virtio-ccw.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 2f17b62d3d..26c1b07b44 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -137,7 +137,7 @@ DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_2(testblock, TCG_CALL_NO_WG, i32, env, i64)
--DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
-+DEF_HELPER_FLAGS_3(tprot, TCG_CALL_NO_RWG, i32, env, i64, i64)
- DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
- DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
- DEF_HELPER_FLAGS_2(rrbe, TCG_CALL_NO_RWG, i32, env, i64)
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 2625d843b3..359e446c6f 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1717,9 +1717,46 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
-     return 0;
- }
- 
--uint32_t HELPER(tprot)(uint64_t a1, uint64_t a2)
-+uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t a1, uint64_t a2)
- {
--    /* XXX implement */
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    CPUState *cs = CPU(cpu);
-+
-+    /*
-+     * TODO: we currently don't handle all access protection types
-+     * (including access-list and key-controlled) as well as AR mode.
-+     */
-+    if (!s390_cpu_virt_mem_check_write(cpu, a1, 0, 1)) {
-+        /* Fetching permitted; storing permitted */
-+        return 0;
-+    }
-+    switch (env->int_pgm_code) {
-+    case PGM_PROTECTION:
-+        /* Fetching permitted; storing not permitted */
-+        cs->exception_index = 0;
-+        return 1;
-+    case PGM_ADDRESSING:
-+        /* Fetching not permitted; storing not permitted */
-+        cs->exception_index = 0;
-+        return 2;
-+    case PGM_ASCE_TYPE:
-+    case PGM_REG_FIRST_TRANS:
-+    case PGM_REG_SEC_TRANS:
-+    case PGM_REG_THIRD_TRANS:
-+    case PGM_SEGMENT_TRANS:
-+    case PGM_PAGE_TRANS:
-+    case PGM_ALET_SPEC:
-+    case PGM_ALEN_SPEC:
-+    case PGM_ALE_SEQ:
-+    case PGM_ASTE_VALID:
-+    case PGM_ASTE_SEQ:
-+    case PGM_EXT_AUTH:
-+        /* Translation not available */
-+        cs->exception_index = 0;
-+        return 3;
-+    }
-+    /* any other exception is forwarded to the guest */
-+    s390_cpu_virt_mem_handle_exc(cpu, GETPC());
-     return 0;
- }
- 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index ac55886792..df0b41606d 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4532,7 +4532,7 @@ static ExitStatus op_testblock(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
- {
--    gen_helper_tprot(cc_op, o->addr1, o->in2);
-+    gen_helper_tprot(cc_op, cpu_env, o->addr1, o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
- }
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 38f6a8afc9..3d8f26949b 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -426,8 +426,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+                  * passes us zeroes for those we don't support.
+                  */
+                 if (features.features) {
+-                    fprintf(stderr, "Guest bug: features[%i]=%x (expected 0)\n",
+-                            features.index, features.features);
++                    qemu_log_mask(LOG_GUEST_ERROR,
++                                  "Guest bug: features[%i]=%x (expected 0)",
++                                  features.index, features.features);
+                     /* XXX: do a unit check here? */
+                 }
+             }
 -- 
 2.13.6
