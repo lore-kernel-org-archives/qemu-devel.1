@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edmYZ-0008JN-8a
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 19:35:20 -0500
+	(envelope-from <laurent@vivier.eu>) id 1edmbF-0000tu-3q
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 19:38:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edmYW-00016a-3m
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 19:35:19 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:50905)
+	(envelope-from <laurent@vivier.eu>) id 1edmbC-00038z-1d
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 19:38:05 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:61894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edmYV-00014N-LP
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 19:35:16 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edmbB-00038g-Nb
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 19:38:01 -0500
 References: <mvmk1w9lreq.fsf@suse.de>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7ee5ca93-da4e-c1e6-e534-6cc9b2f257b5@vivier.eu>
-Date: Tue, 23 Jan 2018 01:35:10 +0100
+Message-ID: <40b82ee1-416b-20c6-4745-218d8e3cdd24@vivier.eu>
+Date: Tue, 23 Jan 2018 01:37:58 +0100
 MIME-Version: 1.0
 In-Reply-To: <mvmk1w9lreq.fsf@suse.de>
 Content-Type: text/plain; charset=utf-8
@@ -54,43 +54,10 @@ Le 22/01/2018 à 18:44, Andreas Schwab a écrit :
 > +#else
 > +static int sys_renameat2(int oldfd, const char *old,
 > +                         int newfd, const chat *new, int flags)
-> +{
-> +    if (flags == 0)
-> +        return renameat(oldfd, old, newfd, new);
 
-Please fix style problem reported by patchew
-(or ./scripts/checkpatch.pl)
+"const char *" would look better.
 
-> +    errno = ENOSYS;
-> +    return -1;
-> +}
-> +#endif
-> +#endif /* TARGET_NR_renameat2 */
-> +
->  #ifdef CONFIG_INOTIFY
->  #include <sys/inotify.h>
->  
-> @@ -8342,6 +8359,22 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->          }
->          break;
->  #endif
-> +#if defined(TARGET_NR_renameat2)
-> +    case TARGET_NR_renameat2:
-> +        {
-> +            void *p2;
-> +            p  = lock_user_string(arg2);
-> +            p2 = lock_user_string(arg4);
-> +            if (!p || !p2)
-> +                ret = -TARGET_EFAULT;
-> +            else
-> +                ret = get_errno(sys_renameat2(arg1, p, arg3, p2,
-> +                                              target_to_host_bitmask(arg5, fcntl_flags_tbl)));
-
-You can't use fcntl_flags_tbl
-(because it converts fcntl/open flags O_*).
-
-I think you can provide directly arg5 to sys_renameat2() because flags
-are the same for all architectures (and value is already byte-swapped).
+And, please, test it (build/run).
 
 Thanks,
 Laurent
