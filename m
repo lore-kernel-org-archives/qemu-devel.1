@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35394)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9d-0003Om-2q
+	id 1edp9d-0003Op-JS
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9Z-0000Hw-Tz
+	id 1edp9c-0000LO-P6
 	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:45 -0500
-Received: from mail-qt0-x22f.google.com ([2607:f8b0:400d:c0d::22f]:36479)
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:46490)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9Z-0000HF-Pk
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:41 -0500
-Received: by mail-qt0-x22f.google.com with SMTP id z11so26426259qtm.3
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:21:41 -0800 (PST)
+	id 1edp9c-0000Kq-KC
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:44 -0500
+Received: by mail-qt0-x241.google.com with SMTP id o35so26410030qtj.13
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:21:44 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 23 Jan 2018 00:21:23 -0300
-Message-Id: <20180123032135.28863-1-f4bug@amsat.org>
+Date: Tue, 23 Jan 2018 00:21:24 -0300
+Message-Id: <20180123032135.28863-2-f4bug@amsat.org>
+In-Reply-To: <20180123032135.28863-1-f4bug@amsat.org>
+References: <20180123032135.28863-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/12] SDCard: housekeeping,
- add tracing (part 4)
+Subject: [Qemu-devel] [PATCH v3 01/12] sdcard: reorder SDState struct members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +36,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>
 
-Since v2:
-- split again in 2... this part is cleanup/tracing
-- add more tracepoints
-- move some code reusable by sdbus in sdmmc-internal.h
+place card registers first, this will ease further code movements.
 
-Since v1:
-- rewrote mostly all patches to keep it simpler.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+ hw/sd/sd.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-$ git backport-diff
-001/12:[0007] [FC] 'sdcard: reorder SDState struct members'
-002/12:[0002] [FC] 'sdcard: replace DPRINTF() by trace events'
-003/12:[down] 'sdcard: add a trace event for command responses'
-004/12:[down] 'sdcard: replace fprintf() by qemu_hexdump()'
-005/12:[0035] [FC] 'sdcard: add more trace events'
-006/12:[down] 'sdcard: do not trace CMD55 when expecting ACMD'
-007/12:[down] 'sdcard: define SDMMC_CMD_MAX instead of using the magic '64''
-008/12:[0083] [FC] 'sdcard: display command name when tracing CMD/ACMD'
-009/12:[down] 'sdcard: display protocol used when tracing'
-010/12:[----] [--] 'sdcard: rename sd_set_$REG() functions called once as sd_reset_$REG()'
-011/12:[0002] [FC] 'sdcard: use G_BYTE from cutils'
-012/12:[0008] [FC] 'sdcard: use the registerfields API to access the OCR register'
-
-Based-on: 20180123030630.26613-15-f4bug@amsat.org
-
-Philippe Mathieu-Daudé (12):
-  sdcard: reorder SDState struct members
-  sdcard: replace DPRINTF() by trace events
-  sdcard: add a trace event for command responses
-  sdcard: replace fprintf() by qemu_hexdump()
-  sdcard: add more trace events
-  sdcard: do not trace CMD55 when expecting ACMD
-  sdcard: define SDMMC_CMD_MAX instead of using the magic '64'
-  sdcard: display command name when tracing CMD/ACMD
-  sdcard: display protocol used when tracing
-  sdcard: rename sd_set_$REG() functions called once as sd_reset_$REG()
-  sdcard: use G_BYTE from cutils
-  sdcard: use the registerfields API to access the OCR register
-
- include/hw/sd/sd.h     |   1 -
- hw/sd/sdmmc-internal.h |  20 +++++
- hw/sd/sd.c             | 212 ++++++++++++++++++++++++++++++++++---------------
- hw/sd/sdmmc-common.c   |  72 +++++++++++++++++
- hw/sd/Makefile.objs    |   2 +-
- hw/sd/trace-events     |  20 +++++
- 6 files changed, 259 insertions(+), 68 deletions(-)
- create mode 100644 hw/sd/sdmmc-internal.h
- create mode 100644 hw/sd/sdmmc-common.c
-
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index ab9be561d2..55d2ba2dd7 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -88,16 +88,21 @@ enum SDCardStates {
+ struct SDState {
+     DeviceState parent_obj;
+ 
+-    uint32_t mode;    /* current card mode, one of SDCardModes */
+-    int32_t state;    /* current card state, one of SDCardStates */
++    /* SD Memory Card Registers */
+     uint32_t ocr;
+-    QEMUTimer *ocr_power_timer;
+     uint8_t scr[8];
+     uint8_t cid[16];
+     uint8_t csd[16];
+     uint16_t rca;
+     uint32_t card_status;
+     uint8_t sd_status[64];
++
++    /* Configurable properties */
++    BlockBackend *blk;
++    bool spi;
++
++    uint32_t mode;    /* current card mode, one of SDCardModes */
++    int32_t state;    /* current card state, one of SDCardStates */
+     uint32_t vhs;
+     bool wp_switch;
+     unsigned long *wp_groups;
+@@ -110,8 +115,6 @@ struct SDState {
+     uint8_t pwd[16];
+     uint32_t pwd_len;
+     uint8_t function_group[6];
+-
+-    bool spi;
+     uint8_t current_cmd;
+     /* True if we will handle the next command as an ACMD. Note that this does
+      * *not* track the APP_CMD status bit!
+@@ -123,8 +126,7 @@ struct SDState {
+     uint8_t data[512];
+     qemu_irq readonly_cb;
+     qemu_irq inserted_cb;
+-    BlockBackend *blk;
+-
++    QEMUTimer *ocr_power_timer;
+     bool enable;
+     uint8_t dat_lines;
+     bool cmd_line;
 -- 
 2.15.1
