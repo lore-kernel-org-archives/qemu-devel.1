@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edpep-0001t2-Dd
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:00 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1edper-0001tt-4x
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edpeo-00047V-G4
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:53:59 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:42916)
+	(envelope-from <richard.henderson@linaro.org>) id 1edpep-00049X-UQ
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:01 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42050)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1edpeo-00046l-Aq
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:53:58 -0500
-Received: by mail-pg0-x243.google.com with SMTP id q67so8762871pga.9
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:53:58 -0800 (PST)
+	id 1edpep-00048T-LS
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:53:59 -0500
+Received: by mail-pf0-x243.google.com with SMTP id b25so8755872pfd.9
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:53:59 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 22 Jan 2018 19:53:47 -0800
-Message-Id: <20180123035349.24538-4-richard.henderson@linaro.org>
+Date: Mon, 22 Jan 2018 19:53:48 -0800
+Message-Id: <20180123035349.24538-5-richard.henderson@linaro.org>
 In-Reply-To: <20180123035349.24538-1-richard.henderson@linaro.org>
 References: <20180123035349.24538-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 3/5] target/arm: Add SVE to migration state
+Subject: [Qemu-devel] [PATCH v3 4/5] target/arm: Add ZCR_ELx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +29,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Save the high parts of the Zregs and all of the Pregs.
-The ZCR_ELx registers are migrated via the CP mechanism.
+Define ZCR_EL[1-3].
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/machine.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ target/arm/cpu.h    |   5 ++
+ target/arm/helper.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 136 insertions(+)
 
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index cb0e1c92bb..2c8b43062f 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -122,6 +122,56 @@ static const VMStateDescription vmstate_iwmmxt = {
-     }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 3f4f6b6144..17955ad3ef 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -549,6 +549,9 @@ typedef struct CPUARMState {
+          */
+         float_status fp_status;
+         float_status standard_fp_status;
++
++        /* ZCR_EL[1-3] */
++        uint64_t zcr_el[4];
+     } vfp;
+     uint64_t exclusive_addr;
+     uint64_t exclusive_val;
+@@ -923,6 +926,8 @@ void pmccntr_sync(CPUARMState *env);
+ #define CPTR_TCPAC    (1U << 31)
+ #define CPTR_TTA      (1U << 20)
+ #define CPTR_TFP      (1U << 10)
++#define CPTR_TZ       (1U << 8)   /* CPTR_EL2 */
++#define CPTR_EZ       (1U << 8)   /* CPTR_EL3 */
+ 
+ #define MDCR_EPMAD    (1U << 21)
+ #define MDCR_EDAD     (1U << 20)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index bfce09643b..db67e8ac72 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4266,6 +4266,125 @@ static const ARMCPRegInfo debug_lpae_cp_reginfo[] = {
+     REGINFO_SENTINEL
  };
  
-+#ifdef TARGET_AARCH64
-+/* The expression ARM_MAX_VQ - 2 is 0 for pure AArch32 build,
-+ * and ARMPredicateReg is actively empty.  This triggers errors
-+ * in the expansion of the VMSTATE macros.
++/* Return the exception level to which SVE-disabled exceptions should
++ * be taken, or 0 if SVE is enabled.
 + */
-+
-+static bool sve_needed(void *opaque)
++static int sve_exception_el(CPUARMState *env)
 +{
-+    ARMCPU *cpu = opaque;
-+    CPUARMState *env = &cpu->env;
++#ifndef CONFIG_USER_ONLY
++    unsigned current_el = arm_current_el(env);
 +
-+    return arm_feature(env, ARM_FEATURE_SVE);
++    /* The CPACR.ZEN controls traps to EL1:
++     * 0, 2 : trap EL0 and EL1 accesses
++     * 1    : trap only EL0 accesses
++     * 3    : trap no accesses
++     */
++    switch (extract32(env->cp15.cpacr_el1, 16, 2)) {
++    default:
++        if (current_el <= 1) {
++            /* Trap to PL1, which might be EL1 or EL3 */
++            if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
++                return 3;
++            }
++            return 1;
++        }
++        break;
++    case 1:
++        if (current_el == 0) {
++            return 1;
++        }
++        break;
++    case 3:
++        break;
++    }
++
++    /* Similarly for CPACR.FPEN, after having checked ZEN.  */
++    switch (extract32(env->cp15.cpacr_el1, 20, 2)) {
++    default:
++        if (current_el <= 1) {
++            if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
++                return 3;
++            }
++            return 1;
++        }
++        break;
++    case 1:
++        if (current_el == 0) {
++            return 1;
++        }
++        break;
++    case 3:
++        break;
++    }
++
++    /* CPTR_EL2.  Check both TZ and TFP.  */
++    if (current_el <= 2
++        && (env->cp15.cptr_el[2] & (CPTR_TFP | CPTR_TZ))
++        && !arm_is_secure_below_el3(env)) {
++        return 2;
++    }
++
++    /* CPTR_EL3.  Check both EZ and TFP.  */
++    if (!(env->cp15.cptr_el[3] & CPTR_EZ)
++        || (env->cp15.cptr_el[3] & CPTR_TFP)) {
++        return 3;
++    }
++#endif
++    return 0;
 +}
 +
-+/* The first two words of each Zreg is stored in VFP state.  */
-+static const VMStateDescription vmstate_zreg_hi_reg = {
-+    .name = "cpu/sve/zreg_hi",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64_SUB_ARRAY(d, ARMVectorReg, 2, ARM_MAX_VQ - 2),
-+        VMSTATE_END_OF_LIST()
++static CPAccessResult zcr_access(CPUARMState *env, const ARMCPRegInfo *ri,
++                                 bool isread)
++{
++    switch (sve_exception_el(env)) {
++    case 3:
++        return CP_ACCESS_TRAP_EL3;
++    case 2:
++        return CP_ACCESS_TRAP_EL2;
++    case 1:
++        return CP_ACCESS_TRAP;
 +    }
++    return CP_ACCESS_OK;
++}
++
++static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                      uint64_t value)
++{
++    /* Bits other than [3:0] are RAZ/WI.  */
++    raw_write(env, ri, value & 0xf);
++}
++
++static const ARMCPRegInfo zcr_el1_reginfo = {
++    .name = "ZCR_EL1", .state = ARM_CP_STATE_AA64,
++    .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 2, .opc2 = 0,
++    .access = PL1_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
++    .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[1]),
++    .writefn = zcr_write, .raw_writefn = raw_write
 +};
 +
-+static const VMStateDescription vmstate_preg_reg = {
-+    .name = "cpu/sve/preg",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64_ARRAY(p, ARMPredicateReg, 2 * ARM_MAX_VQ / 8),
-+        VMSTATE_END_OF_LIST()
-+    }
++static const ARMCPRegInfo zcr_el2_reginfo = {
++    .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
++    .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
++    .access = PL2_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
++    .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[2]),
++    .writefn = zcr_write, .raw_writefn = raw_write
 +};
 +
-+static const VMStateDescription vmstate_sve = {
-+    .name = "cpu/sve",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = sve_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_STRUCT_ARRAY(env.vfp.zregs, ARMCPU, 32, 0,
-+                             vmstate_zreg_hi_reg, ARMVectorReg),
-+        VMSTATE_STRUCT_ARRAY(env.vfp.pregs, ARMCPU, 17, 0,
-+                             vmstate_preg_reg, ARMPredicateReg),
-+        VMSTATE_END_OF_LIST()
-+    }
++static const ARMCPRegInfo zcr_no_el2_reginfo = {
++    .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
++    .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
++    .access = PL2_RW, .type = ARM_CP_64BIT,
++    .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore
 +};
-+#endif /* AARCH64 */
 +
- static bool m_needed(void *opaque)
++static const ARMCPRegInfo zcr_el3_reginfo = {
++    .name = "ZCR_EL3", .state = ARM_CP_STATE_AA64,
++    .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 2, .opc2 = 0,
++    .access = PL3_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
++    .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[3]),
++    .writefn = zcr_write, .raw_writefn = raw_write
++};
++
+ void hw_watchpoint_update(ARMCPU *cpu, int n)
  {
-     ARMCPU *cpu = opaque;
-@@ -586,6 +636,9 @@ const VMStateDescription vmstate_arm_cpu = {
-         &vmstate_pmsav7,
-         &vmstate_pmsav8,
-         &vmstate_m_security,
-+#ifdef TARGET_AARCH64
-+        &vmstate_sve,
-+#endif
-         NULL
+     CPUARMState *env = &cpu->env;
+@@ -5332,6 +5451,18 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         }
+         define_one_arm_cp_reg(cpu, &sctlr);
      }
- };
++
++    if (arm_feature(env, ARM_FEATURE_SVE)) {
++        define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
++        if (arm_feature(env, ARM_FEATURE_EL2)) {
++            define_one_arm_cp_reg(cpu, &zcr_el2_reginfo);
++        } else {
++            define_one_arm_cp_reg(cpu, &zcr_no_el2_reginfo);
++        }
++        if (arm_feature(env, ARM_FEATURE_EL3)) {
++            define_one_arm_cp_reg(cpu, &zcr_el3_reginfo);
++        }
++    }
+ }
+ 
+ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
 -- 
 2.14.3
