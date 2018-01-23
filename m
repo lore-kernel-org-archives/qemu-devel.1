@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMb-0002pY-SP
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:32 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMi-0002u5-Mm
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMa-0000hU-95
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:29 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:57478)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMf-0000lx-LG
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:36 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:57510)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMZ-0000hF-RS
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:28 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMf-0000ku-DC
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:33 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 23 Jan 2018 11:55:28 +0300
-Message-ID: <20180123085528.3419.20398.stgit@pasha-VirtualBox>
+Date: Tue, 23 Jan 2018 11:55:33 +0300
+Message-ID: <20180123085533.3419.31061.stgit@pasha-VirtualBox>
 In-Reply-To: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
 References: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v5 23/24] replay: save vmstate of the
- asynchronous events
+Subject: [Qemu-devel] [RFC PATCH v5 24/24] replay: don't drain/flush bdrv
+ queue while RR is working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,159 +30,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-This patch fixes saving and loading the snapshots in the replay mode.
-It is required for the snapshots created in the moment when the header
-of the asynchronous event is read. This information was not saved in
-the snapshot. After loading the vmstate replay continued with the file offset
-passed the event header. The event header is lost in this case and replay
-hangs.
+In record/replay mode bdrv queue is controlled by replay mechanism.
+It does not allow stopping the vm, saving or loading the snapshots
+when bdrv queue is not empty. Therefore draining and flushing is unnecessary
+(and may cause deadlocks in replay mode).
+This patch disables bdrv_drain_all and bdrv_flush_all in replay mode.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- replay/replay-events.c   |   44 +++++++++++++++++++++-----------------------
- replay/replay-internal.h |    6 ++++++
- replay/replay-snapshot.c |    3 +++
- 3 files changed, 30 insertions(+), 23 deletions(-)
+ block/io.c |   22 ++++++++++++++++++++++
+ cpus.c     |    2 --
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/replay/replay-events.c b/replay/replay-events.c
-index 18d769f..29c6185 100644
---- a/replay/replay-events.c
-+++ b/replay/replay-events.c
-@@ -27,10 +27,6 @@ typedef struct Event {
- } Event;
+diff --git a/block/io.c b/block/io.c
+index 7ea4023..e773e68 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -31,6 +31,7 @@
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
++#include "sysemu/replay.h"
  
- static QTAILQ_HEAD(, Event) events_list = QTAILQ_HEAD_INITIALIZER(events_list);
--static unsigned int read_event_kind = -1;
--static uint64_t read_id = -1;
--static int read_checkpoint = -1;
--
- static bool events_enabled;
+ #define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
  
- /* Functions */
-@@ -217,58 +213,60 @@ void replay_save_events(int checkpoint)
- static Event *replay_read_event(int checkpoint)
- {
-     Event *event;
--    if (read_event_kind == -1) {
--        read_checkpoint = replay_get_byte();
--        read_event_kind = replay_get_byte();
--        read_id = -1;
-+    if (replay_state.read_event_kind == -1) {
-+        replay_state.read_event_checkpoint = replay_get_byte();
-+        replay_state.read_event_kind = replay_get_byte();
-+        replay_state.read_event_id = -1;
-         replay_check_error();
+@@ -407,6 +408,13 @@ void bdrv_drain_all_begin(void)
+     BdrvNextIterator it;
+     GSList *aio_ctxs = NULL, *ctx;
+ 
++    /* bdrv queue is managed by record/replay,
++       waiting for finishing the I/O requests may
++       be infinite */
++    if (replay_events_enabled()) {
++        return;
++    }
++
+     /* BDRV_POLL_WHILE() for a node can only be called from its own I/O thread
+      * or the main loop AioContext. We potentially use BDRV_POLL_WHILE() on
+      * nodes in several different AioContexts, so make sure we're in the main
+@@ -458,6 +466,13 @@ void bdrv_drain_all_end(void)
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+ 
++    /* bdrv queue is managed by record/replay,
++       waiting for finishing the I/O requests may
++       be endless */
++    if (replay_events_enabled()) {
++        return;
++    }
++
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+ 
+@@ -1839,6 +1854,13 @@ int bdrv_flush_all(void)
+     BlockDriverState *bs = NULL;
+     int result = 0;
+ 
++    /* bdrv queue is managed by record/replay,
++       creating new flush request for stopping
++       the VM may break the determinism */
++    if (replay_events_enabled()) {
++        return result;
++    }
++
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+         int ret;
+diff --git a/cpus.c b/cpus.c
+index a1f8808..e84f041 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1005,7 +1005,6 @@ static int do_vm_stop(RunState state)
      }
  
--    if (checkpoint != read_checkpoint) {
-+    if (checkpoint != replay_state.read_event_checkpoint) {
-         return NULL;
-     }
+     bdrv_drain_all();
+-    replay_disable_events();
+     ret = bdrv_flush_all();
  
-     /* Events that has not to be in the queue */
--    switch (read_event_kind) {
-+    switch (replay_state.read_event_kind) {
-     case REPLAY_ASYNC_EVENT_BH:
--        if (read_id == -1) {
--            read_id = replay_get_qword();
-+        if (replay_state.read_event_id == -1) {
-+            replay_state.read_event_id = replay_get_qword();
-         }
-         break;
-     case REPLAY_ASYNC_EVENT_INPUT:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = replay_read_input_event();
-         return event;
-     case REPLAY_ASYNC_EVENT_INPUT_SYNC:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = 0;
-         return event;
-     case REPLAY_ASYNC_EVENT_CHAR_READ:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = replay_event_char_read_load();
-         return event;
-     case REPLAY_ASYNC_EVENT_BLOCK:
--        if (read_id == -1) {
--            read_id = replay_get_qword();
-+        if (replay_state.read_event_id == -1) {
-+            replay_state.read_event_id = replay_get_qword();
-         }
-         break;
-     case REPLAY_ASYNC_EVENT_NET:
-         event = g_malloc0(sizeof(Event));
--        event->event_kind = read_event_kind;
-+        event->event_kind = replay_state.read_event_kind;
-         event->opaque = replay_event_net_load();
-         return event;
-     default:
--        error_report("Unknown ID %d of replay event", read_event_kind);
-+        error_report("Unknown ID %d of replay event",
-+            replay_state.read_event_kind);
-         exit(1);
-         break;
-     }
- 
-     QTAILQ_FOREACH(event, &events_list, events) {
--        if (event->event_kind == read_event_kind
--            && (read_id == -1 || read_id == event->id)) {
-+        if (event->event_kind == replay_state.read_event_kind
-+            && (replay_state.read_event_id == -1
-+                || replay_state.read_event_id == event->id)) {
-             break;
-         }
-     }
-@@ -293,7 +291,7 @@ void replay_read_events(int checkpoint)
-             break;
-         }
-         replay_finish_event();
--        read_event_kind = -1;
-+        replay_state.read_event_kind = -1;
-         replay_run_event(event);
- 
-         g_free(event);
-@@ -302,7 +300,7 @@ void replay_read_events(int checkpoint)
- 
- void replay_init_events(void)
- {
--    read_event_kind = -1;
-+    replay_state.read_event_kind = -1;
- }
- 
- void replay_finish_events(void)
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index f5f8e96..bace4c2 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -80,6 +80,12 @@ typedef struct ReplayState {
-     uint64_t block_request_id;
-     /*! Prior value of the host clock */
-     uint64_t host_clock_last;
-+    /*! Asynchronous event type read from the log */
-+    int32_t read_event_kind;
-+    /*! Asynchronous event id read from the log */
-+    uint64_t read_event_id;
-+    /*! Asynchronous event checkpoint id read from the log */
-+    int32_t read_event_checkpoint;
- } ReplayState;
- extern ReplayState replay_state;
- 
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index e0b2204..2ab85cf 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -57,6 +57,9 @@ static const VMStateDescription vmstate_replay = {
-         VMSTATE_UINT64(file_offset, ReplayState),
-         VMSTATE_UINT64(block_request_id, ReplayState),
-         VMSTATE_UINT64(host_clock_last, ReplayState),
-+        VMSTATE_INT32(read_event_kind, ReplayState),
-+        VMSTATE_UINT64(read_event_id, ReplayState),
-+        VMSTATE_INT32(read_event_checkpoint, ReplayState),
-         VMSTATE_END_OF_LIST()
-     },
- };
+     return ret;
+@@ -1988,7 +1987,6 @@ int vm_prepare_start(void)
+         qapi_event_send_stop(&error_abort);
+         res = -1;
+     } else {
+-        replay_enable_events();
+         cpu_enable_ticks();
+         runstate_set(RUN_STATE_RUNNING);
+         vm_state_notify(1, RUN_STATE_RUNNING);
