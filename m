@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1edtfA-0007d1-EC
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:37 -0500
+	(envelope-from <imammedo@redhat.com>) id 1edtfB-0007ew-OS
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1edtf9-00024k-6d
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:36 -0500
+	(envelope-from <imammedo@redhat.com>) id 1edtfA-00026Q-Iu
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:37 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 23 Jan 2018 09:08:10 +0100
-Message-Id: <1516694904-64879-12-git-send-email-imammedo@redhat.com>
+Date: Tue, 23 Jan 2018 09:08:11 +0100
+Message-Id: <1516694904-64879-13-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
 References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 11/25] moxie: cpu: add CPU_RESOLVING_TYPE
+Subject: [Qemu-devel] [PATCH v3 12/25] nios2: cpu: add CPU_RESOLVING_TYPE
  macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,7 +21,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Anthony Green <green@moxielogic.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
 
 it will be used for providing to cpu name resolving class for
 parsing cpu model for system and user emulation code.
@@ -30,35 +30,40 @@ Along with change add target to null-machine test, so
 that when switch to CPU_RESOLVING_TYPE happens,
 test would ensure that null-mchine usecase still works.
 
+TODO:
+ make nios2_cpu_class_by_name() to do name check instead of
+ accepting anything
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: Anthony Green <green@moxielogic.com>
+CC: Chris Wulff <crwulff@gmail.com>
+CC: Marek Vasut <marex@denx.de>
 ---
- target/moxie/cpu.h        | 1 +
+ target/nios2/cpu.h        | 1 +
  tests/machine-none-test.c | 1 +
  2 files changed, 2 insertions(+)
 
-diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-index d37e6a5..3f94a5a 100644
---- a/target/moxie/cpu.h
-+++ b/target/moxie/cpu.h
-@@ -124,6 +124,7 @@ int cpu_moxie_signal_handler(int host_signum, void *pinfo,
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index 88823a6..2234bff 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -232,6 +232,7 @@ void nios2_check_interrupts(CPUNios2State *env);
+ #endif
  
- #define MOXIE_CPU_TYPE_SUFFIX "-" TYPE_MOXIE_CPU
- #define MOXIE_CPU_TYPE_NAME(model) model MOXIE_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_MOXIE_CPU
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
++#define CPU_RESOLVING_TYPE TYPE_NIOS2_CPU
  
- #define cpu_signal_handler cpu_moxie_signal_handler
- 
+ #define cpu_gen_code cpu_nios2_gen_code
+ #define cpu_signal_handler cpu_nios2_signal_handler
 diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index 9bc6a06..c15a857 100644
+index c15a857..c6ad495 100644
 --- a/tests/machine-none-test.c
 +++ b/tests/machine-none-test.c
-@@ -38,6 +38,7 @@ static struct arch2cpu cpus_map[] = {
-     { "mipsel", "4Kc" },
+@@ -39,6 +39,7 @@ static struct arch2cpu cpus_map[] = {
      { "mips64", "20Kc" },
      { "mips64el", "20Kc" },
-+    { "moxie", "MoxieLite" },
+     { "moxie", "MoxieLite" },
++    { "nios2", "FIXME" },
  };
  
  static const char *get_cpu_model_by_arch(const char *arch)
