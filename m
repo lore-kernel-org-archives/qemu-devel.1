@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edvbY-00054T-JJ
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:15:01 -0500
+	(envelope-from <cohuck@redhat.com>) id 1edvfe-000771-7T
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:19:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1edvbX-0006tV-LK
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:15:00 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:44222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1edvbX-0006tG-GU
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:14:59 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id t20so10184595ote.11
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 02:14:59 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1edvfa-0000uS-8b
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:19:14 -0500
+Date: Tue, 23 Jan 2018 11:19:04 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180123111904.5c8ce96f.cohuck@redhat.com>
+In-Reply-To: <1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
+References: <20180118020157.25401-1-ehabkost@redhat.com>
+	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
+	<CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
+	<1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180122034217.19593-1-richard.henderson@linaro.org>
-References: <20180122034217.19593-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 23 Jan 2018 10:14:38 +0000
-Message-ID: <CAFEAcA-RKozBvsEm1d_52=nm367-7d3m=dUid8vwOyEQzZcBzA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/43] Add hppa-softmmu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x]  [PULL 0/8] x86 queue, 2018-01-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 22 January 2018 at 03:41, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> This has some improvements to the patch set posted on Dec 28.
->
->   * Change cpu init as requested by Igor Mammedov.
->   * Add SMP support
->   * Add firmware image
->   * Implement qemu-specific pause and system reset insns.
->
->
-> r~
->
->
-> The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc7=
-8f:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-01-19 16:35:25 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-hppa-20180121
->
-> for you to fetch changes up to 350e2a714ac8db559b255f9e8fe91c574f45df53:
->
->   hw/hppa: Add MAINTAINERS entry (2018-01-21 14:05:03 -0800)
->
-> ----------------------------------------------------------------
-> Add hppa-softmmu
+On Tue, 23 Jan 2018 10:59:39 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Hi. Patchew is complaining that this doesn't build on some hosts:
+> On 01/23/2018 09:40 AM, Christian Ehrhardt wrote:
+> > On Thu, Jan 18, 2018 at 2:51 PM, Peter Maydell <peter.maydell@linaro.org> wrote:  
+> >> On 18 January 2018 at 02:01, Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> >>> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
+> >>>
+> >>>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
+> >>>
+> >>> are available in the Git repository at:
+> >>>
+> >>>   git://github.com/ehabkost/qemu.git tags/x86-pull-request
+> >>>
+> >>> for you to fetch changes up to 6cfbc54e8903a9bcc0346119949162d040c144c1:
+> >>>
+> >>>   i386: Add EPYC-IBPB CPU model (2018-01-17 23:54:39 -0200)
+> >>>
+> >>> ----------------------------------------------------------------
+> >>> x86 queue, 2018-01-17
+> >>>
+> >>> Highlight: new CPU models that expose CPU features that guests
+> >>> can use to mitigate CVE-2017-5715 (Spectre variant #2).
+> >>>  
+> >>
+> >> Applied, thanks.
+> >>
+> >> -- PMM
+> >>  
+> > 
+> > Hi,
+> > I was kind of clinging to [1] so far and had the expectation that all
+> > those would be wrapped up in 2.11.1 once ready.
+> > I see that the s390x changes are targeted to qemu-stable (well to
+> > admit I suggested so referring the article above).
+> > So I'd expected to see this series to show up on qemu-stable as well
+> > but haven't seen it so far.
+> > 
+> > Therefore I wanted to ask if there was a change of plans in that
+> > regard or if it needs just a few days more to see (part of) this
+> > series on qemu-stable and on its way into 2.11.1?
+> > 
+> > [1]: https://www.qemu.org/2018/01/04/spectre/  
+> 
+> Adding Michael,
+> 
+> Yes, I think it makes sense to have the guest enablement for the spectre 
+> mitigations available in 2.11.1 for all architectures that provide it. 
+> (this queue for x86, Connies pending S390 patches, whatever Power
+> and arm will do).
 
+Also note that we will need a headers update for 2.11.1.
 
-/var/tmp/patchew-tester-tmp-z8zo58jf/src/target/sh4/op_helper.c: In
-function =E2=80=98superh_cpu_do_unaligned_access=E2=80=99:
-/var/tmp/patchew-tester-tmp-z8zo58jf/src/target/sh4/op_helper.c:31:5:
-error: enumeration value =E2=80=98MMU_DEBUG_LOAD=E2=80=99 not handled in sw=
-itch
-[-Werror=3Dswitch]
-     switch (access_type) {
-     ^~~~~~
+> 
+> Not sure about a 2.10.3?
 
-so I'm going to drop it from my to-process queue.
-
-Also, the patchew coding style check seems to be showing a lot
-of whitespace and similar nits which I don't think there's any
-reason to have in new code. Could you also fix those, please?
-
-thanks
--- PMM
+I'm not sure how far back we want to do stable changes (the further
+back, the more likely it is that the patches need some massaging).
+Also, I'm still not quite sure what the intended consumers are for our
+stable trees.
