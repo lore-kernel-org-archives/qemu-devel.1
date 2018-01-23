@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eds37-0006ey-Hu
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 01:27:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1edsem-0006rI-8m
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 02:06:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eds34-0001Kh-So
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 01:27:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37786)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eds34-0001JZ-J8
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 01:27:10 -0500
-Date: Tue, 23 Jan 2018 14:27:00 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180123062700.GA8001@xz-mi>
-References: <20180119104715.22184-1-klim.kireev@virtuozzo.com>
+	(envelope-from <bounces@canonical.com>) id 1edseh-0004EN-BB
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 02:06:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1edseh-0004Dj-59
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 02:06:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1edseg-0008FL-5Y
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 07:06:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 27BB72E806E
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 07:06:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180119104715.22184-1-klim.kireev@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3] chardev/char-socket: add POLLHUP handler
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Jan 2018 06:53:57 -0000
+From: Thomas Huth <1176366@bugs.launchpad.net>
+Reply-To: Bug 1176366 <1176366@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130504161319.14721.75130.malonedeb@gac.canonical.com>
+Message-Id: <151669043740.19986.1353369967284689653.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1176366] Re: TCPIP not working on qemu 1.4.50
+ (master)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Klim Kireev <klim.kireev@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
 
-On Fri, Jan 19, 2018 at 01:47:15PM +0300, Klim Kireev wrote:
-> The following behavior was observed for QEMU configured by libvirt
-> to use guest agent as usual for the guests without virtio-serial
-> driver (Windows or the guest remaining in BIOS stage).
-> 
-> In QEMU on first connect to listen character device socket
-> the listen socket is removed from poll just after the accept().
-> virtio_serial_guest_ready() returns 0 and the descriptor
-> of the connected Unix socket is removed from poll and it will
-> not be present in poll() until the guest will initialize the driver
-> and change the state of the serial to "guest connected".
-> 
-> In libvirt connect() to guest agent is performed on restart and
-> is run under VM state lock. Connect() is blocking and can
-> wait forever.
-> In this case libvirt can not perform ANY operation on that VM.
-> 
-> The bug can be easily reproduced this way:
-> 
-> Terminal 1:
-> qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
-> (virtio-serial and isa-serial also fit)
-> 
-> Terminal 2:
-> minicom -D unix\#/tmp/console.sock
-> (type something and press enter)
-> C-a x (to exit)
-> 
-> Do 3 times:
-> minicom -D unix\#/tmp/console.sock
-> C-a x
-> 
-> It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
-> the kernel, and the 4th blocks.
-> 
-> The problem is that QEMU doesn't add a read watcher after succesful read
-> until the guest device wants to acquire recieved data, so
-> I propose to install a separate pullhup watcher regardless of
-> whether the device waits for data or not.
-> 
-> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-> ---
-> Changelog:
-> v2: Remove timer as a redundant feature
-> 
-> v3: Remove read call and return G_SOURCE_REMOVE
-> 
->  chardev/char-socket.c | 25 ++++++++++++++++++++++++-
->  1 file changed, 24 insertions(+), 1 deletion(-)
-> 
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 77cdf487eb..83fa7b70f0 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -42,6 +42,7 @@ typedef struct {
->      QIOChannel *ioc; /* Client I/O channel */
->      QIOChannelSocket *sioc; /* Client master channel */
->      QIONetListener *listener;
-> +    guint hup_tag;
->      QCryptoTLSCreds *tls_creds;
->      int connected;
->      int max_size;
-> @@ -352,6 +353,11 @@ static void tcp_chr_free_connection(Chardev *chr)
->          s->read_msgfds_num = 0;
->      }
->  
-> +    if (s->hup_tag != 0) {
-> +        g_source_remove(s->hup_tag);
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-Note that recently we are preparing the chardev to support non-default
-gcontext.  So IMHO we'd better start to use GSource always, instead of
-the old tags. g_source_remove() is tailored for default gcontext only.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Please refer to 938eb9e9c8 ("chardev: let g_idle_add() be with chardev
-gcontext", 2018-01-12) as an example.
+-- =
 
-So even if the current patch works for now, it may break in a very
-unpredictable way if we start to run chardevs in non-default
-gcontexts.  Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1176366
 
-> +        s->hup_tag = 0;
-> +    }
-> +
->      tcp_set_msgfds(chr, NULL, 0);
->      remove_fd_in_watch(chr);
->      object_unref(OBJECT(s->sioc));
-> @@ -455,6 +461,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
->      return TRUE;
->  }
->  
-> +static gboolean tcp_chr_hup(QIOChannel *channel,
-> +                               GIOCondition cond,
-> +                               void *opaque)
-> +{
-> +    Chardev *chr = CHARDEV(opaque);
-> +    tcp_chr_disconnect(chr);
-> +    return G_SOURCE_REMOVE;
-> +}
-> +
->  static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
->  {
->      SocketChardev *s = SOCKET_CHARDEV(chr);
-> @@ -528,6 +543,10 @@ static void tcp_chr_connect(void *opaque)
->                                             tcp_chr_read,
->                                             chr, chr->gcontext);
->      }
-> +    if (s->hup_tag == 0) {
-> +        s->hup_tag = qio_channel_add_watch(s->ioc, G_IO_HUP,
-> +                                           tcp_chr_hup, chr, NULL);
+Title:
+  TCPIP not working on qemu 1.4.50 (master)
 
--- 
-Peter Xu
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  whenever I try, in the guest OS, in this case it's NT 3.1, to enable
+  TCP/IP, it crashes the whole emulator. With either the ne2000 isa,
+  ne2000 pci or PCnet, still crashes
+
+  below is attached a screenshot.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1176366/+subscriptions
