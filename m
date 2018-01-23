@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzAM-00049B-PV
+	(envelope-from <kwolf@redhat.com>) id 1edzAE-00040S-MI
 	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzAD-0006PD-60
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edzA9-0006KU-7Q
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:02 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:02:01 +0100
-Message-Id: <20180123140201.31163-30-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:01:59 +0100
+Message-Id: <20180123140201.31163-28-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 29/29] iotests: Disable some tests for
- compat=0.10
+Subject: [Qemu-devel] [PULL 27/29] iotests: Make 059 pass on machines with
+ little RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +25,28 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Tests 080, 130, 137, and 176 simply do not work with compat=0.10 for the
-reasons stated there.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20171123020832.8165-10-mreitz@redhat.com>
-[eblake: fix 177 in a separate commit]
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180117165420.15946-3-eblake@redhat.com
+Message-id: 20171129192411.6637-1-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/080 | 5 +++--
- tests/qemu-iotests/130 | 2 ++
- tests/qemu-iotests/137 | 2 ++
- tests/qemu-iotests/176 | 2 ++
- 4 files changed, 9 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/059 | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 55044c700b..1c2bd85742 100755
---- a/tests/qemu-iotests/080
-+++ b/tests/qemu-iotests/080
-@@ -41,8 +41,9 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
--# Internal snapshots are (currently) impossible with refcount_bits=1
--_unsupported_imgopts 'refcount_bits=1[^0-9]'
-+# - Internal snapshots are (currently) impossible with refcount_bits=1
-+# - This is generally a test for compat=1.1 images
-+_unsupported_imgopts 'refcount_bits=1[^0-9]' 'compat=0.10'
+diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
+index a1c34eeb7c..40f89eae18 100755
+--- a/tests/qemu-iotests/059
++++ b/tests/qemu-iotests/059
+@@ -152,7 +152,9 @@ done
+ echo
+ echo "=== Testing afl image with a very large capacity ==="
+ _use_sample_img afl9.vmdk.bz2
+-_img_info
++# The sed makes this test pass on machines with little RAM
++# (and also with 32 bit builds)
++_img_info | sed -e 's/Cannot allocate memory/Invalid argument/'
+ _cleanup_test_img
  
- header_size=104
- 
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index e7e43de6d6..2c4b94da1b 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -45,6 +45,8 @@ _supported_fmt qcow2
- _supported_proto generic
- _unsupported_proto vxhs
- _supported_os Linux
-+# We are going to use lazy-refcounts
-+_unsupported_imgopts 'compat=0.10'
- 
- qemu_comm_method="monitor"
- 
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index eb91e517d7..5a01250005 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -41,6 +41,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
-+# We are going to use lazy-refcounts
-+_unsupported_imgopts 'compat=0.10'
- 
- 
- _make_test_img 64M
-diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index b8dc17c592..d38b3aeb91 100755
---- a/tests/qemu-iotests/176
-+++ b/tests/qemu-iotests/176
-@@ -48,6 +48,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
-+# Persistent dirty bitmaps require compat=1.1
-+_unsupported_imgopts 'compat=0.10'
- 
- function run_qemu()
- {
+ # success, all done
 -- 
 2.13.6
