@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzs1-00075P-0G
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:18 -0500
+	(envelope-from <laurent@vivier.eu>) id 1edzs2-00075d-3t
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzrw-0002Ix-5X
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:17 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:57659)
+	(envelope-from <laurent@vivier.eu>) id 1edzry-0002MS-7W
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:18 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:61908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edzrv-0002HV-RE
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:12 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edzrx-0002KF-Ta
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:14 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 23 Jan 2018 15:47:54 +0100
-Message-Id: <20180123144807.5618-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/13] Linux user for 2.12 patches
+Date: Tue, 23 Jan 2018 15:47:59 +0100
+Message-Id: <20180123144807.5618-6-laurent@vivier.eu>
+In-Reply-To: <20180123144807.5618-1-laurent@vivier.eu>
+References: <20180123144807.5618-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 05/13] linux-user: Translate flags argument to
+ dup3 syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +25,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-The following changes since commit 52483b067cce4a88ffbf8fbeea26de7549d2ad23:
+From: Peter Maydell <peter.maydell@linaro.org>
 
-  Merge remote-tracking branch 'remotes/huth/tags/pull-request-2018-01-22' into staging (2018-01-23 10:15:09 +0000)
+The third argument to dup3() is a flags word which may be
+O_CLOEXEC. We weren't translating this flag from target to
+host value, which meant that if the target used a different
+value from the host (eg sparc guest and x86 host) the dup3()
+call would fail EINVAL. Do the correct translation.
 
-are available in the Git repository at:
+Fixes: https://bugs.launchpad.net/qemu/+bug/1704658
+Reported-by: Bruno Haible  <bruno@clisp.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <1513351080-25917-1-git-send-email-peter.maydell@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-2.12-pull-request
-
-for you to fetch changes up to 95d0307cc10ca3df879c1be519f1ad650efb20a8:
-
-  linux-user: implement renameat2 (2018-01-23 14:27:33 +0100)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Andreas Schwab (1):
-  linux-user: implement renameat2
-
-Laurent Vivier (1):
-  linux-user: remove nmi.c and fw-path-provider.c
-
-Marco A L Barbosa (1):
-  linux-user: Add AT_SECURE auxval
-
-Maximilian Riemensberger (1):
-  linux-user/mmap.c: Avoid choosing NULL as start address
-
-Peter Maydell (7):
-  linux-user: Fix locking order in fork_start()
-  linux-user: wrap fork() in a start/end exclusive section
-  linux-user: Fix length calculations in host_to_target_cmsg()
-  linux-user: Don't use CMSG_ALIGN(sizeof struct cmsghdr)
-  linux-user: Translate flags argument to dup3 syscall
-  linux-user: Propagate siginfo_t through to handle_cpu_signal()
-  page_unprotect(): handle calls to pages that are PAGE_WRITE
-
-Samuel Thibault (2):
-  linux-user: Fix sched_get/setaffinity conversion
-  linux-user: Add getcpu() support
-
- accel/tcg/translate-all.c |  50 ++++++++-----
- accel/tcg/user-exec.c     |  52 +++++++-------
- hw/core/Makefile.objs     |   5 +-
- hw/core/qdev-fw.c         |  96 +++++++++++++++++++++++++
- hw/core/qdev.c            |  77 --------------------
- linux-user/elfload.c      |   3 +-
- linux-user/main.c         |   9 ++-
- linux-user/mmap.c         |   2 +-
- linux-user/syscall.c      | 177 +++++++++++++++++++++++++++++++++++++++++-----
- linux-user/syscall_defs.h |   6 +-
- 10 files changed, 328 insertions(+), 149 deletions(-)
- create mode 100644 hw/core/qdev-fw.c
-
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 39553c81b6..41ded90ee6 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8490,11 +8490,19 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ #endif
+ #if defined(CONFIG_DUP3) && defined(TARGET_NR_dup3)
+     case TARGET_NR_dup3:
+-        ret = get_errno(dup3(arg1, arg2, arg3));
++    {
++        int host_flags;
++
++        if ((arg3 & ~TARGET_O_CLOEXEC) != 0) {
++            return -EINVAL;
++        }
++        host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
++        ret = get_errno(dup3(arg1, arg2, host_flags));
+         if (ret >= 0) {
+             fd_trans_dup(arg1, arg2);
+         }
+         break;
++    }
+ #endif
+ #ifdef TARGET_NR_getppid /* not on alpha */
+     case TARGET_NR_getppid:
 -- 
 2.14.3
