@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edz9u-0003cf-HC
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9z-0003h3-CA
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edz9k-0005sj-SW
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:42 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9y-00060D-Ct
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:47 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:44 +0100
-Message-Id: <20180123140201.31163-13-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:01:51 +0100
+Message-Id: <20180123140201.31163-20-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 12/29] qcow2: No persistent dirty bitmaps for
- compat=0.10
+Subject: [Qemu-devel] [PULL 19/29] iotests: Fix 020 for vmdk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +24,79 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Persistent dirty bitmaps require a properly functioning
-autoclear_features field, or we cannot track when an unsupporting
-program might overwrite them.  Therefore, we cannot support them for
-compat=0.10 images.
+vmdk cannot work with anything but vmdk backing files, so make the
+backing file be the same format as the overlay.
 
+Reported-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171123020832.8165-3-mreitz@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20171123020832.8165-11-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-bitmap.c | 10 ++++++++++
- block/qcow2.c        | 14 +++++++++++---
- 2 files changed, 21 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/020     | 9 ++++++---
+ tests/qemu-iotests/020.out | 6 ++++--
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index f45e46cfbd..efa10c6663 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1449,6 +1449,16 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-     bool found;
-     Qcow2BitmapList *bm_list;
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index d22ab81414..eac5080f83 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -111,10 +111,12 @@ echo
+ echo 'Testing failing commit'
+ echo
  
-+    if (s->qcow_version < 3) {
-+        /* Without autoclear_features, we would always have to assume
-+         * that a program without persistent dirty bitmap support has
-+         * accessed this qcow2 file when opening it, and would thus
-+         * have to drop all dirty bitmaps (defeating their purpose).
-+         */
-+        error_setg(errp, "Cannot store dirty bitmaps in qcow2 v2 files");
-+        goto fail;
-+    }
++TEST_IMG="$TEST_IMG.base" _make_test_img 1M
 +
-     if (check_constraints_on_bitmap(bs, name, granularity, errp) != 0) {
-         goto fail;
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4348b2c0c5..1f80961e1b 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -302,9 +302,17 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-             }
+ # Create an image with a null backing file to which committing will fail (with
+ # ENOSPC so we can distinguish the result from some generic EIO which may be
+ # generated anywhere in the block layer)
+-_make_test_img -b "json:{'driver': 'raw',
++_make_test_img -b "json:{'driver': '$IMGFMT',
+                          'file': {
+                              'driver': 'blkdebug',
+                              'inject-error': [{
+@@ -123,14 +125,15 @@ _make_test_img -b "json:{'driver': 'raw',
+                                  'once': true
+                              }],
+                              'image': {
+-                                 'driver': 'null-co'
++                                 'driver': 'file',
++                                 'filename': '$TEST_IMG.base'
+                              }}}"
  
-             if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) {
--                warn_report("a program lacking bitmap support "
--                            "modified this file, so all bitmaps are now "
--                            "considered inconsistent");
-+                if (s->qcow_version < 3) {
-+                    /* Let's be a bit more specific */
-+                    warn_report("This qcow2 v2 image contains bitmaps, but "
-+                                "they may have been modified by a program "
-+                                "without persistent bitmap support; so now "
-+                                "they must all be considered inconsistent");
-+                } else {
-+                    warn_report("a program lacking bitmap support "
-+                                "modified this file, so all bitmaps are now "
-+                                "considered inconsistent");
-+                }
-                 error_printf("Some clusters may be leaked, "
-                              "run 'qemu-img check -r' on the image "
-                              "file to fix.");
+ # Just write anything so committing will not be a no-op
+ $QEMU_IO -c 'writev 0 64k' "$TEST_IMG" | _filter_qemu_io
+ 
+ $QEMU_IMG commit "$TEST_IMG"
+-_cleanup_test_img
++_cleanup
+ 
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/020.out b/tests/qemu-iotests/020.out
+index 165b70aa49..4b722b2dd0 100644
+--- a/tests/qemu-iotests/020.out
++++ b/tests/qemu-iotests/020.out
+@@ -1078,7 +1078,8 @@ No errors were found on the image.
+ 
+ Testing failing commit
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 backing_file=json:{'driver': 'raw',,
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=1048576
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=json:{'driver': 'IMGFMT',,
+                          'file': {
+                              'driver': 'blkdebug',,
+                              'inject-error': [{
+@@ -1087,7 +1088,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 backing_file=json:{'d
+                                  'once': true
+                              }],,
+                              'image': {
+-                                 'driver': 'null-co'
++                                 'driver': 'file',,
++                                 'filename': 'TEST_DIR/t.IMGFMT.base'
+                              }}}
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
 2.13.6
