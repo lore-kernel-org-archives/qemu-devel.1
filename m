@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christian.ehrhardt@canonical.com>)
-	id 1edu8J-000633-Li
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:40:44 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKc-0000wB-B3
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christian.ehrhardt@canonical.com>)
-	id 1edu8G-00019G-GD
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:40:43 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:55422)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <christian.ehrhardt@canonical.com>)
-	id 1edu8G-00018u-AD
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:40:40 -0500
-Received: from mail-yb0-f197.google.com ([209.85.213.197])
-	by youngberry.canonical.com with esmtps
-	(TLS1.0:RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <christian.ehrhardt@canonical.com>)
-	id 1edu8F-0006mf-5G
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:40:39 +0000
-Received: by mail-yb0-f197.google.com with SMTP id d13so8130861ybn.14
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 00:40:39 -0800 (PST)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKZ-00082g-7j
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:26 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:56956)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKY-00081e-Qt
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:23 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 23 Jan 2018 11:53:20 +0300
+Message-ID: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
-References: <20180118020157.25401-1-ehabkost@redhat.com>
-	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Tue, 23 Jan 2018 09:40:07 +0100
-Message-ID: <CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-01-17
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH v5 00/24] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-On Thu, Jan 18, 2018 at 2:51 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 18 January 2018 at 02:01, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
->>
->>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
->>
->> are available in the Git repository at:
->>
->>   git://github.com/ehabkost/qemu.git tags/x86-pull-request
->>
->> for you to fetch changes up to 6cfbc54e8903a9bcc0346119949162d040c144c1:
->>
->>   i386: Add EPYC-IBPB CPU model (2018-01-17 23:54:39 -0200)
->>
->> ----------------------------------------------------------------
->> x86 queue, 2018-01-17
->>
->> Highlight: new CPU models that expose CPU features that guests
->> can use to mitigate CVE-2017-5715 (Spectre variant #2).
->>
->
-> Applied, thanks.
->
-> -- PMM
->
+Accidentally sent draft version of patches to the mailing list.
+Please consider this one as the correct one.
 
-Hi,
-I was kind of clinging to [1] so far and had the expectation that all
-those would be wrapped up in 2.11.1 once ready.
-I see that the s390x changes are targeted to qemu-stable (well to
-admit I suggested so referring the article above).
-So I'd expected to see this series to show up on qemu-stable as well
-but haven't seen it so far.
+This set of patches includex fixes from Alex Benn=C3=A9e for fixing
+BQL and replay locks after inventing the MTTCG. It also includes some
+additional replay patches that makes this set of fixes working.
+It is also fixes some vmstate creation (and loading) issues
+in record/replay modes:
+ - VM start/stop fixes in replay mode
+ - overlay creation for blkreplay filter
+ - fixes for vmstate save/load in record/replay mode
+ - fixes for host clock vmstate
 
-Therefore I wanted to ask if there was a change of plans in that
-regard or if it needs just a few days more to see (part of) this
-series on qemu-stable and on its way into 2.11.1?
+There is also a set of helper scripts written by Alex Benn=C3=A9e
+for debugging the record/replay code.
 
-[1]: https://www.qemu.org/2018/01/04/spectre/
+v5 changes:
+ - removed patch for narrowing BQL-protected code
+ - disabled bdrv_(drain/flush)_all for record/replay mode
+
+v4 changes:
+ - removed upstreamed patches
+ - added patch for saving async queue state in replay
+ - minor fixes
+
+v3 changes:
+ - removed upstreamed patches
+ - fixed bug with recursive checkpoints
+ - fixed bug with icount warp checkpoint
+
+v2 changes:
+ - updated lock/unlock logic (as suggested by Paolo Bonzini)
+ - updated cpu execution loop to avoid races in setting/resetting exit re=
+quest (as suggested by Paolo Bonzini)
+ - minor changes
+
+---
+
+Alex Benn=C3=A9e (7):
+      target/arm/arm-powertctl: drop BQL assertions
+      cpus: push BQL lock to qemu_*_wait_io_event
+      replay/replay.c: bump REPLAY_VERSION again
+      replay/replay-internal.c: track holding of replay_lock
+      replay: make locking visible outside replay code
+      replay: push replay_mutex_lock up the call tree
+      scripts/replay-dump.py: replay log dumper
+
+Pavel Dovgalyuk (17):
+      cpu-exec: fix exception_index handling
+      block: implement bdrv_snapshot_goto for blkreplay
+      blkreplay: create temporary overlay for underlaying devices
+      replay: disable default snapshot for record/replay
+      replay: fix processing async events
+      replay: fixed replay_enable_events
+      replay: fix save/load vm for non-empty queue
+      replay: added replay log format description
+      replay: save prior value of the host clock
+      hax: remove BQL lock/unlock
+      kvm: remove BQL lock/unlock
+      replay: don't destroy mutex at exit
+      replay: check return values of fwrite
+      replay: avoid recursive call of checkpoints
+      replay: don't process async events when warping the clock
+      replay: save vmstate of the asynchronous events
+      replay: don't drain/flush bdrv queue while RR is working
+
+
+ accel/kvm/kvm-all.c       |    3=20
+ accel/tcg/cpu-exec.c      |    5 +
+ block/blkreplay.c         |   73 +++++++++++
+ block/io.c                |   22 +++
+ cpus.c                    |   47 +++++--
+ docs/replay.txt           |   91 +++++++++++++
+ include/qemu/timer.h      |   14 ++
+ include/sysemu/replay.h   |   19 +++
+ migration/savevm.c        |   13 ++
+ replay/replay-char.c      |   21 +--
+ replay/replay-events.c    |   73 +++++------
+ replay/replay-internal.c  |   48 ++++++-
+ replay/replay-internal.h  |   15 ++
+ replay/replay-snapshot.c  |   12 ++
+ replay/replay-time.c      |   10 +
+ replay/replay.c           |   62 ++++++---
+ scripts/replay-dump.py    |  308 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ stubs/replay.c            |   16 ++
+ target/arm/arm-powerctl.c |    8 -
+ target/i386/hax-all.c     |    2=20
+ util/main-loop.c          |   17 ++
+ util/qemu-timer.c         |   12 ++
+ vl.c                      |   12 +-
+ 23 files changed, 777 insertions(+), 126 deletions(-)
+ create mode 100755 scripts/replay-dump.py
+
+--=20
+Pavel Dovgalyuk
