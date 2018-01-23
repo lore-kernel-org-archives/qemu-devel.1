@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37834)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edpIm-0003Ue-QK
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:13 -0500
+	id 1edpIn-0003VU-IS
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edpIj-0007zb-Ky
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:12 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35198)
+	id 1edpIm-00081q-NN
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:13 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:42564)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edpIj-0007zS-Gw
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:09 -0500
-Received: by mail-qt0-x242.google.com with SMTP id g14so17283096qti.2
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:31:09 -0800 (PST)
+	id 1edpIm-00081X-JS
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:12 -0500
+Received: by mail-qt0-x241.google.com with SMTP id c2so26487178qtn.9
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:31:12 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 23 Jan 2018 00:30:25 -0300
-Message-Id: <20180123033034.29493-10-f4bug@amsat.org>
+Date: Tue, 23 Jan 2018 00:30:26 -0300
+Message-Id: <20180123033034.29493-11-f4bug@amsat.org>
 In-Reply-To: <20180123033034.29493-1-f4bug@amsat.org>
 References: <20180123033034.29493-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 09/18] sdcard: handles more commands in SPI
- mode
+Subject: [Qemu-devel] [PATCH v3 10/18] sdcard: handle CMD54 (SDIO)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,123 +36,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>
 
+Linux uses it to poll the bus before polling for a card.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 54 insertions(+), 3 deletions(-)
+ hw/sd/sd.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 2eca999bc3..07424aa56e 100644
+index 07424aa56e..bbf9496e8a 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -1390,9 +1390,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
- 
-     /* Application specific commands (Class 8) */
-     case 55:	/* CMD55:  APP_CMD */
--        if (sd->rca != rca)
--            return sd_r0;
--
-+        if (!sd->spi) {
-+            if (sd->rca != rca) {
-+                return sd_r0;
-+            }
-+        }
-         sd->expecting_acmd = true;
-         sd->card_status |= APP_CMD;
-         return sd_r1;
-@@ -1412,6 +1414,18 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+@@ -1378,9 +1378,8 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
          }
          break;
  
-+    case 58:    /* CMD58:   READ_OCR (SPI) */
-+        if (!sd->spi) {
-+            goto bad_cmd;
-+        }
-+        return sd_r3;
-+
-+    case 59:    /* CMD59:   CRC_ON_OFF (SPI) */
-+        if (!sd->spi) {
-+            goto bad_cmd;
-+        }
-+        goto unimplemented_cmd;
-+
-     default:
-     bad_cmd:
-         qemu_log_mask(LOG_GUEST_ERROR, "SD: Unknown CMD%i\n", req.cmd);
-@@ -1436,6 +1450,9 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-     sd->card_status |= APP_CMD;
-     switch (req.cmd) {
-     case 6:	/* ACMD6:  SET_BUS_WIDTH */
-+        if (sd->spi) {
-+            goto unimplemented_cmd;
-+        }
-         switch (sd->state) {
-         case sd_transfer_state:
-             sd->sd_status[0] &= 0x3f;
-@@ -1460,6 +1477,12 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-         }
-         break;
- 
-+    case 18:
-+        if (sd->spi) {
-+            goto unimplemented_cmd;
-+        }
-+        break;
-+
-     case 22:	/* ACMD22: SEND_NUM_WR_BLOCKS */
-         switch (sd->state) {
-         case sd_transfer_state:
-@@ -1485,6 +1508,19 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-         }
-         break;
- 
-+    case 25:
-+    case 26:
-+        if (sd->spi) {
-+            goto unimplemented_cmd;
-+        }
-+        break;
-+
-+    case 38:
-+        if (sd->spi) {
-+            goto unimplemented_cmd;
-+        }
-+        break;
-+
-     case 41:	/* ACMD41: SD_APP_OP_COND */
-         if (sd->spi) {
-             /* SEND_OP_CMD */
-@@ -1542,6 +1578,12 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-         }
-         break;
- 
-+    case 43 ... 49:
-+        if (sd->spi) {
-+            goto unimplemented_cmd;
-+        }
-+        break;
-+
-     case 51:	/* ACMD51: SEND_SCR */
-         switch (sd->state) {
-         case sd_transfer_state:
-@@ -1555,9 +1597,18 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-         }
-         break;
- 
-+    case 55:    /* Not exist */
-+        break;
-+
-     default:
-         /* Fall back to standard commands.  */
-         return sd_normal_command(sd, req);
-+
-+    unimplemented_cmd:
-+        /* Commands that are recognised but not yet implemented in SPI mode.  */
-+        qemu_log_mask(LOG_UNIMP, "SD: CMD%i not implemented in SPI mode\n",
-+                      req.cmd);
-+        return sd_illegal;
-     }
- 
-     qemu_log_mask(LOG_GUEST_ERROR, "SD: ACMD%i in a wrong state\n", req.cmd);
+-    case 52:
+-    case 53:
+-        /* CMD52, CMD53: reserved for SDIO cards
++    case 52 ... 54:
++        /* CMD52, CMD53, CMD54: reserved for SDIO cards
+          * (see the SDIO Simplified Specification V2.0)
+          * Handle as illegal command but do not complain
+          * on stderr, as some OSes may use these in their
 -- 
 2.15.1
