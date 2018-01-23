@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee7Kl-0004JC-MN
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:46:29 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee7LP-0004s6-Oo
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:47:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee7Kj-0003Y0-U1
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:46:27 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee7LO-0004TX-2J
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:47:07 -0500
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180123030630.26613-9-f4bug@amsat.org>
+In-Reply-To: <20180123030630.26613-10-f4bug@amsat.org>
 References: <20180123030630.26613-1-f4bug@amsat.org>
-	<20180123030630.26613-9-f4bug@amsat.org>
+	<20180123030630.26613-10-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 23 Jan 2018 14:45:53 -0800
-Message-ID: <CAKmqyKMBYoNqUVALJzpg8b=LtXr7wrOkMLiMeqhoe8rrMq0sNw@mail.gmail.com>
+Date: Tue, 23 Jan 2018 14:46:33 -0800
+Message-ID: <CAKmqyKM3TpAF3bJMpiYF=JVRpiuMJbfSTMOeRgm2i3EerTeadQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 08/14] hw/arm/bcm2835_peripherals:
- change maximum block size to 1kB
+Subject: Re: [Qemu-devel] [PATCH v8 09/14] hw/arm/fsl-imx6: implement SDHCI
+ Spec. v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,8 +30,6 @@ Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell
 
 On Mon, Jan 22, 2018 at 7:06 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
-> following the datasheet.
->
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Acked-by: Alistair Francis <alistair.francis@xilinx.com>
@@ -39,23 +37,42 @@ Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 Alistair
 
 > ---
->  hw/arm/bcm2835_peripherals.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> various FreeBSD console output from google search show this register havi=
+ng
+> a value of 0x0377c800.
 >
-> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 0570cc4ad3..6b86a99b14 100644
-> --- a/hw/arm/bcm2835_peripherals.c
-> +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -19,7 +19,7 @@
->  #define BCM2835_VC_PERI_BASE 0x7e000000
+>  hw/arm/fsl-imx6.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
->  /* Capabilities for SD controller: no DMA, high-speed, default clocks et=
-c. */
-> -#define BCM2835_SDHC_CAPAREG 0x52034b4
-> +#define BCM2835_SDHC_CAPAREG 0x52134b4
+> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+> index b0d4088290..1f4607f206 100644
+> --- a/hw/arm/fsl-imx6.c
+> +++ b/hw/arm/fsl-imx6.c
+> @@ -27,6 +27,8 @@
+>  #include "chardev/char.h"
+>  #include "qemu/error-report.h"
 >
->  static void bcm2835_peripherals_init(Object *obj)
->  {
+> +#define IMX6_ESDHC_CAPABILITIES     0x057834b4
+> +
+>  #define NAME_SIZE 20
+>
+>  static void fsl_imx6_init(Object *obj)
+> @@ -348,6 +350,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error=
+ **errp)
+>              { FSL_IMX6_uSDHC4_ADDR, FSL_IMX6_uSDHC4_IRQ },
+>          };
+>
+> +        /* UHS-I SDIO3.0 SDR104 1.8V ADMA */
+> +        object_property_set_uint(OBJECT(&s->esdhc[i]), 3, "sd-spec-versi=
+on",
+> +                                 &err);
+> +        object_property_set_uint(OBJECT(&s->esdhc[i]), IMX6_ESDHC_CAPABI=
+LITIES,
+> +                                 "capareg", &err);
+>          object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized",=
+ &err);
+>          if (err) {
+>              error_propagate(errp, err);
 > --
 > 2.15.1
 >
