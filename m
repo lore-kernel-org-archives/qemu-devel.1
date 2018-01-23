@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzs5-00078E-RD
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:22 -0500
+	(envelope-from <laurent@vivier.eu>) id 1edzs1-00075R-4U
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzs4-0002U9-Fe
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:21 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:56431)
+	(envelope-from <laurent@vivier.eu>) id 1edzrw-0002Jr-VL
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:17 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:53116)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edzs4-0002T6-5w
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:20 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edzrw-0002IY-LT
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:12 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 23 Jan 2018 15:48:07 +0100
-Message-Id: <20180123144807.5618-14-laurent@vivier.eu>
+Date: Tue, 23 Jan 2018 15:47:56 +0100
+Message-Id: <20180123144807.5618-3-laurent@vivier.eu>
 In-Reply-To: <20180123144807.5618-1-laurent@vivier.eu>
 References: <20180123144807.5618-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 13/13] linux-user: implement renameat2
+Subject: [Qemu-devel] [PULL 02/13] linux-user: wrap fork() in a start/end
+ exclusive section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +25,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Andreas Schwab <schwab@suse.de>, Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-From: Andreas Schwab <schwab@suse.de>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-This is needed for new architectures like RISC-V which do not provide any
-other rename-like syscall.
+When we do a fork() in usermode emulation, we need to be in
+a start/end exclusive section, so that we can ensure that no
+other thread is in an RCU section. Otherwise you can get this
+deadlock:
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <mvm607su9qs.fsf@suse.de>
+- fork thread: has mmap_lock, waits for rcu_sync_lock
+  (because rcu_init_lock() is registered as a pthread_atfork() hook)
+- RCU thread: has rcu_sync_lock, waits for rcu_read_(un)lock
+- another CPU thread: in RCU critical section, waits for mmap_lock
+
+This can show up if you have a heavily multithreaded guest program
+that does a fork().
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reported-by: Stuart Monteith <stuart.monteith@linaro.org>
+Message-Id: <1512650481-1723-1-git-send-email-peter.maydell@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ linux-user/main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 104408c050..74378947f0 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -600,6 +600,24 @@ static int sys_utimensat(int dirfd, const char *pathname,
- #endif
- #endif /* TARGET_NR_utimensat */
+diff --git a/linux-user/main.c b/linux-user/main.c
+index e8406917e3..2140465709 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -127,6 +127,7 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+ /* Make sure everything is in a consistent state for calling fork().  */
+ void fork_start(void)
+ {
++    start_exclusive();
+     mmap_fork_start();
+     qemu_mutex_lock(&tb_ctx.tb_lock);
+     cpu_list_lock();
+@@ -147,9 +148,13 @@ void fork_end(int child)
+         qemu_mutex_init(&tb_ctx.tb_lock);
+         qemu_init_cpu_list();
+         gdbserver_fork(thread_cpu);
++        /* qemu_init_cpu_list() takes care of reinitializing the
++         * exclusive state, so we don't need to end_exclusive() here.
++         */
+     } else {
+         qemu_mutex_unlock(&tb_ctx.tb_lock);
+         cpu_list_unlock();
++        end_exclusive();
+     }
+ }
  
-+#ifdef TARGET_NR_renameat2
-+#if defined(__NR_renameat2)
-+#define __NR_sys_renameat2 __NR_renameat2
-+_syscall5(int, sys_renameat2, int, oldfd, const char *, old, int, newfd,
-+          const char *, new, unsigned int, flags)
-+#else
-+static int sys_renameat2(int oldfd, const char *old,
-+                         int newfd, const char *new, int flags)
-+{
-+    if (flags == 0) {
-+        return renameat(oldfd, old, newfd, new);
-+    }
-+    errno = ENOSYS;
-+    return -1;
-+}
-+#endif
-+#endif /* TARGET_NR_renameat2 */
-+
- #ifdef CONFIG_INOTIFY
- #include <sys/inotify.h>
- 
-@@ -8426,6 +8444,22 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-         }
-         break;
- #endif
-+#if defined(TARGET_NR_renameat2)
-+    case TARGET_NR_renameat2:
-+        {
-+            void *p2;
-+            p  = lock_user_string(arg2);
-+            p2 = lock_user_string(arg4);
-+            if (!p || !p2) {
-+                ret = -TARGET_EFAULT;
-+            } else {
-+                ret = get_errno(sys_renameat2(arg1, p, arg3, p2, arg5));
-+            }
-+            unlock_user(p2, arg4, 0);
-+            unlock_user(p, arg2, 0);
-+        }
-+        break;
-+#endif
- #ifdef TARGET_NR_mkdir
-     case TARGET_NR_mkdir:
-         if (!(p = lock_user_string(arg1)))
 -- 
 2.14.3
