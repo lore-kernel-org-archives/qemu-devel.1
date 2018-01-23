@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ee19t-0006xL-Jt
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:10:50 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ee1Bj-00086n-Ij
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ee19n-0004Hg-KR
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:10:49 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ee1Bi-0005Nu-Cy
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:12:43 -0500
 References: <20180123145222.2487-1-f4bug@amsat.org>
 	<20180123152339.GA23245@bogon.m.sigxcpu.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <052b681a-5067-6090-d761-94b26170c608@vivier.eu>
-Date: Tue, 23 Jan 2018 17:10:31 +0100
+Message-ID: <6d55a3e7-9d70-1ea1-2d22-65e136bda06b@vivier.eu>
+Date: Tue, 23 Jan 2018 17:12:26 +0100
 MIME-Version: 1.0
 In-Reply-To: <20180123152339.GA23245@bogon.m.sigxcpu.org>
 Content-Type: text/plain; charset=utf-8
@@ -79,11 +79,16 @@ Le 23/01/2018 à 16:23, Guido Günther a écrit :
 > 
 >     4824  recvfrom(3, 0x1401f8eb4, 8988, MSG_PEEK|MSG_DONTWAIT, 0xffffe10a8620, 0x42) = -1 EFAULT (Bad address)
 > 
+> If you want me to report qemu -strace or s.th. please let me know.
+> Cheers,
+>  -- Guido
+> 
 
-And more, I don't think the patch is correct.
+Could you try:
 
-get_user_u32()/put_user_u32() should be correct because in kernel this
-is an "int *". And "int" is always 32bit. Only ptr and long vary.
+strace -f chroot . /usr/bin/qemu-arm-static tmp/nl-bad-addr
+
+to see if the fault comes from the kernel or from QEMU.
 
 Thanks,
 Laurent
