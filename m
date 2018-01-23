@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ee17Q-0005BE-Lu
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:08:18 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ee19t-0006xL-Jt
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:10:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ee17K-0002iN-KS
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:08:16 -0500
-Received: from mail-qt0-f193.google.com ([209.85.216.193]:42679)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ee17K-0002hI-G6
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:08:10 -0500
-Received: by mail-qt0-f193.google.com with SMTP id c2so2551062qtn.9
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 08:08:09 -0800 (PST)
+	(envelope-from <laurent@vivier.eu>) id 1ee19n-0004Hg-KR
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:10:49 -0500
+References: <20180123145222.2487-1-f4bug@amsat.org>
+	<20180123152339.GA23245@bogon.m.sigxcpu.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <052b681a-5067-6090-d761-94b26170c608@vivier.eu>
+Date: Tue, 23 Jan 2018 17:10:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180123153842.GT490@redhat.com>
-References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-	<1516112253-14480-11-git-send-email-pbonzini@redhat.com>
-	<20180123153842.GT490@redhat.com>
-From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Tue, 23 Jan 2018 17:08:08 +0100
-Message-ID: <CAMxuvawOjy-gwmCcc8TYHbNNbpmAs8aMPw6dfri8tOg15Kk=SA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 10/51] build-sys: silence make by default or
- V=0
+In-Reply-To: <20180123152339.GA23245@bogon.m.sigxcpu.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user/syscall: let recvfrom(struct
+ sockaddr *) use abi_ulong
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,151 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-Hi
-
-On Tue, Jan 23, 2018 at 4:38 PM, Daniel P. Berrange <berrange@redhat.com> w=
-rote:
-> On Tue, Jan 16, 2018 at 03:16:52PM +0100, Paolo Bonzini wrote:
->> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Le 23/01/2018 à 16:23, Guido Günther a écrit :
+> Hi,
+> Thanks for having a look!
+> 
+> On Tue, Jan 23, 2018 at 11:52:22AM -0300, Philippe Mathieu-Daudé wrote:
+>> Currently recvfrom() is restricted to handle 32-bit pointers,
+>> remove this limit for 64-bit hosts.
 >>
->> Move generic make flags in MAKEFLAGS (SUBDIR_MAKEFLAGS is more qemu spec=
-ific).
+>> This fixes:
 >>
->> Use --quiet to silence make 'is up to date' message.
+>>   31572 socket(AF_NETLINK, SOCK_RAW, NETLINK_AUDIT) = 3
+>>   ...
+>>   31572 sendto(3, {{len=124, type=0x454 /* NLMSG_??? */, flags=NLM_F_REQUEST|NLM_F_ACK, seq=1, pid=0}, "op=test:message acct=\"?\" exe=\"/tmp/nl-bad-addr\" hostname=localhost addr=? terminal=/dev/pts/2 res=success\0\0\0"}, 124, 0, 0xfffffa3897d0, 0) = 124
+>>   31572 ppoll([{fd=3, events=POLLIN}], 1, {tv_sec=0, tv_nsec=500000000}, NULL, 0) = 1 ([{fd=3, revents=POLLIN}], left {tv_sec=0, tv_nsec=499993180})
+>>   31572 recvfrom(3, 0x112a50eb4, 8988, MSG_PEEK|MSG_DONTWAIT, 0xfffffa3897e0, 0x42) = -1 EFAULT (Bad address)
 >>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> Tested-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->> Message-Id: <20180104160523.22995-3-marcandre.lureau@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Reported-by: Guido Günther <agx@sigxcpu.org>
+>> Message-id: 20180123120541.GA14216@bogon.m.sigxcpu.org
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>  Makefile  | 2 +-
->>  rules.mak | 2 ++
->>  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> After applying it when you run 'make install' absolutely nothing is
-> displayed, but it none the less does work. This is very misleading
-> to devs who thing nothing is being installed...
-
-Right, you would need V=3D1 now
-
-> Either this needs reverting, or we need to re-write the 'install' target
-> so that it generates messages of whats being installed. Perhaps something
-> like this
->
-
-Make sense to me, could you send a former patch for review?
-
-thanks
-
-> diff --git a/Makefile b/Makefile
-> index f26ef1b1df..8ef195a0df 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -697,28 +697,33 @@ ifneq ($(TOOLS),)
->  endif
->  ifneq ($(CONFIG_MODULES),)
->         $(INSTALL_DIR) "$(DESTDIR)$(qemu_moddir)"
-> +       $(call quiet-command,\
->         for s in $(modules-m:.mo=3D$(DSOSUF)); do \
->                 t=3D"$(DESTDIR)$(qemu_moddir)/$$(echo $$s | tr / -)"; \
->                 $(INSTALL_LIB) $$s "$$t"; \
->                 test -z "$(STRIP)" || $(STRIP) "$$t"; \
-> -       done
-> +       done, "INSTALL", "$(modules-m)")
->  endif
->  ifneq ($(HELPERS-y),)
->         $(call install-prog,$(HELPERS-y),$(DESTDIR)$(libexecdir))
->  endif
->  ifneq ($(BLOBS),)
-> +       $(call quiet-command,\
->         set -e; for x in $(BLOBS); do \
->                 $(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu=
-_datadir)"; \
-> -       done
-> +       done, "INSTALL", "$(BLOBS)")
->  endif
->  ifeq ($(CONFIG_GTK),y)
->         $(MAKE) -C po $@
->  endif
->         $(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
-> +       $(call quiet-command,\
->         set -e; for x in $(KEYMAPS); do \
->                 $(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDI=
-R)$(qemu_datadir)/keymaps"; \
-> -       done
-> -       $(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_d=
-atadir)/trace-events-all"
-> +       done, "INSTALL", "$(KEYMAPS)")
-> +       $(call quiet-command,\
-> +       $(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_d=
-atadir)/trace-events-all",\
-> +       "INSTALL", "trace-events-all")
->         for d in $(TARGET_DIRS); do \
->         $(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=3D$$d/ -C $$d $@ || exit 1=
- ; \
->          done
-> diff --git a/rules.mak b/rules.mak
-> index 5fb4951561..cd669833bf 100644
-> --- a/rules.mak
-> +++ b/rules.mak
-> @@ -147,7 +147,8 @@ set-vpath =3D $(if $1,$(foreach PATTERN,$(VPATH_SUFFI=
-XES),$(eval vpath $(PATTERN)
->  # install-prog list, dir
->  define install-prog
->         $(INSTALL_DIR) "$2"
-> -       $(INSTALL_PROG) $1 "$2"
-> +       $(call quiet-command,\
-> +           $(INSTALL_PROG) $1 "$2", "INSTALL", "$1")
->         $(if $(STRIP),$(STRIP) $(foreach T,$1,"$2/$(notdir $T)"),)
->  endef
->
->
->
->
+>>  linux-user/syscall.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
 >>
->> diff --git a/Makefile b/Makefile
->> index d86ecd2..1671db3 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -277,7 +277,7 @@ else
->>  DOCS=3D
->>  endif
->>
->> -SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory) BUILD_DIR=3D$(BUILD=
-_DIR)
->> +SUBDIR_MAKEFLAGS=3DBUILD_DIR=3D$(BUILD_DIR)
->>  SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_DIRS)=
-)
->>  SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARGET=
-_DIRS))
->>
->> diff --git a/rules.mak b/rules.mak
->> index 6e94333..5fb4951 100644
->> --- a/rules.mak
->> +++ b/rules.mak
->> @@ -131,6 +131,8 @@ modules:
->>  # If called with only a single argument, will print nothing in quiet mo=
-de.
->>  quiet-command =3D $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 &&=
- $1, @$1))
->>
->> +MAKEFLAGS +=3D $(if $(V),,--no-print-directory --quiet)
->> +
->>  # cc-option
->>  # Usage: CFLAGS+=3D$(call cc-option, -falign-functions=3D0, -malign-fun=
-ctions=3D0)
->>
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 11c9116c4a..28805b1785 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -4032,7 +4032,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>>      if (!host_msg)
+>>          return -TARGET_EFAULT;
+>>      if (target_addr) {
+>> -        if (get_user_u32(addrlen, target_addrlen)) {
+>> +        if (get_user_ual(addrlen, target_addrlen)) {
+>>              ret = -TARGET_EFAULT;
+>>              goto fail;
+>>          }
+>> @@ -4053,7 +4053,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>>          }
+>>          if (target_addr) {
+>>              host_to_target_sockaddr(target_addr, addr, addrlen);
+>> -            if (put_user_u32(addrlen, target_addrlen)) {
+>> +            if (put_user_ual(addrlen, target_addrlen)) {
+>>                  ret = -TARGET_EFAULT;
+>>                  goto fail;
+>>              }
+> 
+> Ahh...I saw these and was wondering how this would work on
+> 64bit. Unfortunately the patch doesn't change things:
+> 
+>     4824  recvfrom(3, 0x1401f8eb4, 8988, MSG_PEEK|MSG_DONTWAIT, 0xffffe10a8620, 0x42) = -1 EFAULT (Bad address)
+> 
+
+And more, I don't think the patch is correct.
+
+get_user_u32()/put_user_u32() should be correct because in kernel this
+is an "int *". And "int" is always 32bit. Only ptr and long vary.
+
+Thanks,
+Laurent
