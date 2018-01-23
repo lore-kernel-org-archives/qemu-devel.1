@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKo-00012H-4i
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:39 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKv-00016a-IL
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKn-00088g-2t
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:38 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:57018)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKs-0008BL-HO
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:45 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:57056)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKm-000888-MY
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:37 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduKs-0008B6-96
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:53:42 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 23 Jan 2018 11:53:37 +0300
-Message-ID: <20180123085336.3419.85806.stgit@pasha-VirtualBox>
+Date: Tue, 23 Jan 2018 11:53:42 +0300
+Message-ID: <20180123085342.3419.74762.stgit@pasha-VirtualBox>
 In-Reply-To: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
 References: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v5 03/24] blkreplay: create temporary
- overlay for underlaying devices
+Subject: [Qemu-devel] [RFC PATCH v5 04/24] replay: disable default snapshot
+ for record/replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,132 +32,31 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@
 
 From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-This patch allows using '-snapshot' behavior in record/replay mode.
-blkreplay layer creates temporary overlays on top of underlaying
-disk images. It is needed, because creating an overlay over blkreplay
-breaks the determinism.
-This patch creates similar temporary overlay (when it is needed)
-under the blkreplay driver. Therefore all block operations are controlled
-by blkreplay.
+This patch disables setting '-snapshot' option on by default
+in record/replay mode. This is needed for creating vmstates in record
+and replay modes.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- block/blkreplay.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- stubs/replay.c    |    1 +
- vl.c              |    2 +-
- 3 files changed, 67 insertions(+), 1 deletion(-)
+ vl.c |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index 4c58bd2..2bef4d6 100755
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -14,12 +14,69 @@
- #include "block/block_int.h"
- #include "sysemu/replay.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qstring.h"
- 
- typedef struct Request {
-     Coroutine *co;
-     QEMUBH *bh;
- } Request;
- 
-+static BlockDriverState *blkreplay_append_snapshot(BlockDriverState *bs,
-+                                                   Error **errp)
-+{
-+    int ret;
-+    BlockDriverState *bs_snapshot;
-+    int64_t total_size;
-+    QemuOpts *opts = NULL;
-+    char tmp_filename[PATH_MAX + 1];
-+    QDict *snapshot_options = qdict_new();
-+
-+    /* Prepare options QDict for the overlay file */
-+    qdict_put(snapshot_options, "file.driver", qstring_from_str("file"));
-+    qdict_put(snapshot_options, "driver", qstring_from_str("qcow2"));
-+
-+    /* Create temporary file */
-+    ret = get_tmp_filename(tmp_filename, PATH_MAX + 1);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Could not get temporary filename");
-+        goto out;
-+    }
-+    qdict_put(snapshot_options, "file.filename",
-+              qstring_from_str(tmp_filename));
-+
-+    /* Get the required size from the image */
-+    total_size = bdrv_getlength(bs);
-+    if (total_size < 0) {
-+        error_setg_errno(errp, -total_size, "Could not get image size");
-+        goto out;
-+    }
-+
-+    opts = qemu_opts_create(bdrv_qcow2.create_opts, NULL, 0, &error_abort);
-+    qemu_opt_set_number(opts, BLOCK_OPT_SIZE, total_size, &error_abort);
-+    ret = bdrv_create(&bdrv_qcow2, tmp_filename, opts, errp);
-+    qemu_opts_del(opts);
-+    if (ret < 0) {
-+        error_prepend(errp, "Could not create temporary overlay '%s': ",
-+                      tmp_filename);
-+        goto out;
-+    }
-+
-+    bs_snapshot = bdrv_open(NULL, NULL, snapshot_options,
-+                            BDRV_O_RDWR | BDRV_O_TEMPORARY, errp);
-+    snapshot_options = NULL;
-+    if (!bs_snapshot) {
-+        goto out;
-+    }
-+
-+    bdrv_append(bs_snapshot, bs, errp);
-+
-+    return bs_snapshot;
-+
-+out:
-+    QDECREF(snapshot_options);
-+    return NULL;
-+}
-+
- static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp)
- {
-@@ -35,6 +92,14 @@ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
- 
-+    /* Add temporary snapshot to preserve the image */
-+    if (!replay_snapshot
-+        && !blkreplay_append_snapshot(bs->file->bs, &local_err)) {
-+        ret = -EINVAL;
-+        error_propagate(errp, local_err);
-+        goto fail;
-+    }
-+
-     ret = 0;
- fail:
-     return ret;
-diff --git a/stubs/replay.c b/stubs/replay.c
-index 9c8aa48..9991ee5 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -3,6 +3,7 @@
- #include "sysemu/sysemu.h"
- 
- ReplayMode replay_mode;
-+char *replay_snapshot;
- 
- int64_t replay_save_clock(unsigned int kind, int64_t clock)
- {
 diff --git a/vl.c b/vl.c
-index e725ecb..d147bfb 100644
+index d147bfb..1d5ea70 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -4548,7 +4548,7 @@ int main(int argc, char **argv, char **envp)
-         qapi_free_BlockdevOptions(bdo->bdo);
-         g_free(bdo);
-     }
--    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-+    if (snapshot) {
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
-     }
+@@ -3251,7 +3251,13 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
+                 break;
+             case QEMU_OPTION_snapshot:
+-                snapshot = 1;
++                {
++                    Error *blocker = NULL;
++                    snapshot = 1;
++                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
++                               "-snapshot");
++                    replay_add_blocker(blocker);
++                }
+                 break;
+             case QEMU_OPTION_numa:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
