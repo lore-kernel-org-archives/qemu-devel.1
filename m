@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1edvHj-0005eS-Qs
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:54:32 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1edvMu-0007UD-Gi
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:59:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1edvHe-0001cv-S7
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:54:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1edvHe-0001cI-M2
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:54:26 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BDC0F7853C
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 09:54:25 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 23 Jan 2018 10:52:46 +0100
-Message-Id: <1516701166-81245-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1516694904-64879-5-git-send-email-imammedo@redhat.com>
-References: <1516694904-64879-5-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 04/25] x86: cpu: add CPU_RESOLVING_TYPE macro
+	(envelope-from <borntraeger@de.ibm.com>) id 1edvMp-0005XE-HU
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:59:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60512
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1edvMp-0005Wf-BE
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:59:47 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0N9x7rE022573
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 04:59:46 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fny1197tk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 04:59:45 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 23 Jan 2018 09:59:44 -0000
+References: <20180118020157.25401-1-ehabkost@redhat.com>
+	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
+	<CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 23 Jan 2018 10:59:39 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
+Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-01-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +44,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-ppc@nongnu.org
 
-it will be used for providing to cpu name resolving class for
-parsing cpu model for system and user emulation code.
 
-Along with change add target to null-machine test, so
-that when switch to CPU_RESOLVING_TYPE happens,
-test would ensure that null-mchine usecase still works.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v2:
-  - fix conflict due to cortex-a57 change in aarch64 entry
-    in previous patch
+On 01/23/2018 09:40 AM, Christian Ehrhardt wrote:
+> On Thu, Jan 18, 2018 at 2:51 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 18 January 2018 at 02:01, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
+>>>
+>>>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>   git://github.com/ehabkost/qemu.git tags/x86-pull-request
+>>>
+>>> for you to fetch changes up to 6cfbc54e8903a9bcc0346119949162d040c144c1:
+>>>
+>>>   i386: Add EPYC-IBPB CPU model (2018-01-17 23:54:39 -0200)
+>>>
+>>> ----------------------------------------------------------------
+>>> x86 queue, 2018-01-17
+>>>
+>>> Highlight: new CPU models that expose CPU features that guests
+>>> can use to mitigate CVE-2017-5715 (Spectre variant #2).
+>>>
+>>
+>> Applied, thanks.
+>>
+>> -- PMM
+>>
+> 
+> Hi,
+> I was kind of clinging to [1] so far and had the expectation that all
+> those would be wrapped up in 2.11.1 once ready.
+> I see that the s390x changes are targeted to qemu-stable (well to
+> admit I suggested so referring the article above).
+> So I'd expected to see this series to show up on qemu-stable as well
+> but haven't seen it so far.
+> 
+> Therefore I wanted to ask if there was a change of plans in that
+> regard or if it needs just a few days more to see (part of) this
+> series on qemu-stable and on its way into 2.11.1?
+> 
+> [1]: https://www.qemu.org/2018/01/04/spectre/
 
-CC: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.h         | 1 +
- tests/machine-none-test.c | 2 ++
- 2 files changed, 3 insertions(+)
+Adding Michael,
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 30cc562..82c7381 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1568,6 +1568,7 @@ uint64_t cpu_get_tsc(CPUX86State *env);
- 
- #define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
- #define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
-+#define CPU_RESOLVING_TYPE TYPE_X86_CPU
- 
- #ifdef TARGET_X86_64
- #define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu64")
-diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index 06139f5..f4e00f5 100644
---- a/tests/machine-none-test.c
-+++ b/tests/machine-none-test.c
-@@ -26,6 +26,8 @@ static struct arch2cpu cpus_map[] = {
-     /* tested targets list */
-     { "arm", "cortex-a15" },
-     { "aarch64", "cortex-a57" },
-+    { "x86_64", "qemu64,apic-id=0" },
-+    { "i386", "qemu32,apic-id=0" },
- };
- 
- static const char *get_cpu_model_by_arch(const char *arch)
--- 
-2.7.4
+Yes, I think it makes sense to have the guest enablement for the spectre 
+mitigations available in 2.11.1 for all architectures that provide it. 
+(this queue for x86, Connies pending S390 patches, whatever Power
+and arm will do).
+
+Not sure about a 2.10.3?
