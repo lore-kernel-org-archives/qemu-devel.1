@@ -1,35 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IJ-00042Y-7b
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:41 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ee3SJ-0003dO-AI
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:38:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IG-0006T6-35
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52144)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ee3SG-00030i-6H
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:37:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58158
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ee3IF-0006SW-Rr
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:36 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0NIRTx7026303
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:35 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp9fxt6k5-1
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1ee3SG-00030Z-1V
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:37:56 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0NIYqd7033155
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:37:55 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fp8bt60mb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:34 -0500
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:37:54 -0500
 Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 23 Jan 2018 11:27:33 -0700
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 23 Jan 2018 13:26:52 -0500
-In-Reply-To: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1516732013-18272-10-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 09/10] s390-ccw: read user input for boot
- index via the SCLP console
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 23 Jan 2018 11:37:53 -0700
+References: <20180123175409.9349-1-joserz@linux.vnet.ibm.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 23 Jan 2018 16:37:46 -0200
+MIME-Version: 1.0
+In-Reply-To: <20180123175409.9349-1-joserz@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <b6e5beda-f5d9-7fb3-b814-0e5be86879df@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] kvm-all: Partially reverts 4fe6d78b2e
+ to remove the cleanup call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,264 +43,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+Cc: ghammer@redhat.com, anton@samba.org
 
-Implements an sclp_read function to capture input from the
-console and a wrapper function that handles parsing certain
-characters and adding input to a buffer. The input is checked
-for any erroneous values and is handled appropriately.
 
-A prompt will persist until input is entered or the timeout
-expires (if one was set). Example:
+On 01/23/2018 03:54 PM, Jose Ricardo Ziviani wrote:
+> This commit partially reverts the commit 4fe6d78b2e because of issues
+> reported in the virtio.
+>
+> Examples:
+>
+> $ qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G \
+>    -M pseries,accel=kvm -netdev type=user,id=net0 \
+>    -device virtio-net-pci,netdev=net0 -drive file=../disk.qcow2,if=virtio
+>
+> Populating /vdevice/nvram@71000001
+> Populating /vdevice/v-scsi@71000002
+>         SCSI: Looking for devices
+>            8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+> Populating /pci@800000020000000
+>                       00 0000 (D) : 1af4 1000    virtio [ net ]
+> Aborted
+>
+> $ qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
+>
+> Running QEMU with GTK 2.x is deprecated, and will be removed
+> in a future release. Please switch to GTK 3.x instead
+> [1]    5282 abort
+>
+> Reference http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
+>
+> Reported-by: Anton Blanchard <anton@samba.org>
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> ---
 
-    Please choose (default will boot in 10 seconds):
+This patch also fixed a migration problem I was investigating today. 
+Turns out 4fe6d78b2e
+is also to be blamed for this P8 -> P8 migration being broken in current 
+master:
 
-Correct input will boot the respective boot index. If the
-user's input is empty, 0, or if the timeout expires, then
-the default zipl entry will be chosen. If the input is
-within the range of available boot entries, then the
-selection will be booted. Any erroneous input will cancel
-the timeout and re-prompt the user.
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
----
- pc-bios/s390-ccw/menu.c     | 152 +++++++++++++++++++++++++++++++++++++++++++-
- pc-bios/s390-ccw/s390-ccw.h |   2 +
- pc-bios/s390-ccw/sclp.c     |  20 ++++++
- pc-bios/s390-ccw/virtio.c   |   2 +-
- 4 files changed, 172 insertions(+), 4 deletions(-)
+$ sudo ./qemu-system-ppc64 --enable-kvm --nographic -vga none -machine 
+pseries -m 4G,slots=32,maxmem=32G -smp 1,maxcpus=32 -device 
+virtio-blk-pci,drive=rootdisk -drive 
+file=/home/danielhb/vm_imgs/f26.qcow2,if=none,cache=none,format=qcow2,id=rootdisk 
+-incoming tcp:0:4444
+qemu-system-ppc64: load of migration failed: Input/output error
 
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 174285e..24d4bba 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -12,16 +12,162 @@
- #include "menu.h"
- #include "s390-ccw.h"
- 
--static uint8_t flags;
--static uint64_t timeout;
-+#define KEYCODE_NO_INP '\0'
-+#define KEYCODE_ESCAPE '\033'
-+#define KEYCODE_BACKSP '\177'
-+#define KEYCODE_ENTER  '\r'
- 
- /* Offsets from zipl fields to zipl banner start */
- #define ZIPL_TIMEOUT_OFFSET 138
- #define ZIPL_FLAG_OFFSET    140
- 
-+#define TOD_CLOCK_SECOND    0xf4240000
-+
-+static uint8_t flags;
-+static uint64_t timeout;
-+
-+static inline void enable_clock_int(void)
-+{
-+    uint64_t tmp = 0;
-+
-+    asm volatile(
-+        "stctg      0,0,%0\n"
-+        "oi         6+%0, 0x8\n"
-+        "lctlg      0,0,%0"
-+        : : "Q" (tmp) : "memory"
-+    );
-+}
-+
-+static inline void disable_clock_int(void)
-+{
-+    uint64_t tmp = 0;
-+
-+    asm volatile(
-+        "stctg      0,0,%0\n"
-+        "ni         6+%0, 0xf7\n"
-+        "lctlg      0,0,%0"
-+        : : "Q" (tmp) : "memory"
-+    );
-+}
-+
-+static inline void set_clock_comparator(uint64_t time)
-+{
-+    asm volatile("sckc %0" : : "Q" (time));
-+}
-+
-+static inline bool check_clock_int(void)
-+{
-+    uint16_t *code = (uint16_t *)0x86; /* low-core external interrupt code */
-+
-+    consume_sclp_int();
-+
-+    return *code == 0x1004;
-+}
-+
-+static int read_prompt(char *buf, size_t len)
-+{
-+    char inp[2] = {};
-+    uint8_t idx = 0;
-+    uint64_t time;
-+
-+    if (timeout) {
-+        time = get_clock() + (timeout * TOD_CLOCK_SECOND);
-+        set_clock_comparator(time);
-+        enable_clock_int();
-+        timeout = 0;
-+    }
-+
-+    while (!check_clock_int()) {
-+
-+        /* Process only one character at a time */
-+        sclp_read(inp, 1);
-+
-+        switch (inp[0]) {
-+        case KEYCODE_NO_INP:
-+        case KEYCODE_ESCAPE:
-+            continue;
-+        case KEYCODE_BACKSP:
-+            if (idx > 0) {
-+                buf[--idx] = 0;
-+                sclp_print("\b \b");
-+            }
-+            continue;
-+        case KEYCODE_ENTER:
-+            disable_clock_int();
-+            return idx;
-+        }
-+
-+        /* Echo input and add to buffer */
-+        if (idx < len) {
-+            buf[idx] = inp[0];
-+            sclp_print(inp);
-+            idx++;
-+        }
-+    }
-+
-+    disable_clock_int();
-+    *buf = 0;
-+
-+    return 0;
-+}
-+
-+static int get_index(void)
-+{
-+    char buf[10];
-+    int len;
-+    int i;
-+
-+    memset(buf, 0, sizeof(buf));
-+
-+    len = read_prompt(buf, sizeof(buf));
-+
-+    /* If no input, boot default */
-+    if (len == 0) {
-+        return 0;
-+    }
-+
-+    /* Check for erroneous input */
-+    for (i = 0; i < len; i++) {
-+        if (!isdigit(buf[i])) {
-+            return -1;
-+        }
-+    }
-+
-+    return atoi(buf);
-+}
-+
-+static void boot_menu_prompt(bool retry)
-+{
-+    char tmp[6];
-+
-+    if (retry) {
-+        sclp_print("\nError: undefined configuration"
-+                   "\nPlease choose:\n");
-+    } else if (timeout > 0) {
-+        sclp_print("Please choose (default will boot in ");
-+        sclp_print(itostr(timeout, tmp, sizeof(tmp)));
-+        sclp_print(" seconds):\n");
-+    } else {
-+        sclp_print("Please choose:\n");
-+    }
-+}
-+
- static int get_boot_index(int entries)
- {
--    return 0; /* Implemented next patch */
-+    int boot_index;
-+    bool retry = false;
-+    char tmp[5];
-+
-+    do {
-+        boot_menu_prompt(retry);
-+        boot_index = get_index();
-+        retry = true;
-+    } while (boot_index < 0 || boot_index >= entries);
-+
-+    sclp_print("\nBooting entry #");
-+    sclp_print(itostr(boot_index, tmp, sizeof(tmp)));
-+
-+    return boot_index;
- }
- 
- static void zipl_println(const char *data, size_t len)
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 25d4d21..df4bc88 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -71,6 +71,7 @@ unsigned int get_loadparm_index(void);
- void sclp_print(const char *string);
- void sclp_setup(void);
- void sclp_get_loadparm_ascii(char *loadparm);
-+void sclp_read(char *str, size_t len);
- 
- /* virtio.c */
- unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
-@@ -79,6 +80,7 @@ bool virtio_is_supported(SubChannelId schid);
- void virtio_blk_setup_device(SubChannelId schid);
- int virtio_read(ulong sector, void *load_addr);
- int enable_mss_facility(void);
-+u64 get_clock(void);
- ulong get_second(void);
- 
- /* bootmap.c */
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index 486fce1..5e4a78b 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -101,3 +101,23 @@ void sclp_get_loadparm_ascii(char *loadparm)
-         ebcdic_to_ascii((char *) sccb->loadparm, loadparm, 8);
-     }
- }
-+
-+void sclp_read(char *str, size_t len)
-+{
-+    ReadEventData *sccb = (void *)_sccb;
-+    char *buf = (char *)(&sccb->ebh) + 7;
-+
-+    /* Len should not exceed the maximum size of the event buffer */
-+    if (len > SCCB_SIZE - 8) {
-+        len = SCCB_SIZE - 8;
-+    }
-+
-+    sccb->h.length = SCCB_SIZE;
-+    sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
-+    sccb->ebh.length = sizeof(EventBufferHeader);
-+    sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
-+    sccb->ebh.flags = 0;
-+
-+    sclp_service_call(SCLP_CMD_READ_EVENT_DATA, sccb);
-+    memcpy(str, buf, len);
-+}
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index c890a03..817e7f5 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -176,7 +176,7 @@ void vring_send_buf(VRing *vr, void *p, int len, int flags)
-     }
- }
- 
--static u64 get_clock(void)
-+u64 get_clock(void)
- {
-     u64 r;
- 
--- 
-2.7.4
+
+Reverting 4fe6d78b2e or applying this patch fixes this migration issue too.
+
+
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+
+
+>   accel/kvm/kvm-all.c | 4 ----
+>   1 file changed, 4 deletions(-)
+>
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 071f4f57c0..f290f487a5 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
+>       if (r < 0) {
+>           abort();
+>       }
+> -
+> -    if (e->cleanup) {
+> -        e->cleanup(e);
+> -    }
+>   }
+>
+>   static void kvm_io_ioeventfd_add(MemoryListener *listener,
