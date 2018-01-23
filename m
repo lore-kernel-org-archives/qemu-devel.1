@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1edviu-0008Dg-IA
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:22:37 -0500
+	(envelope-from <schwab@suse.de>) id 1edvmK-0002Gb-U5
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1edviq-0002ny-Gg
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:22:36 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37672)
+	(envelope-from <schwab@suse.de>) id 1edvmH-0007nd-La
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:26:08 -0500
+Received: from mx2.suse.de ([195.135.220.15]:38171)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1edviq-0002ni-9R
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:22:32 -0500
+	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1edvmH-0007mC-EW
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:26:05 -0500
 From: Andreas Schwab <schwab@suse.de>
 References: <mvmk1w9lreq.fsf@suse.de>
-	<7ee5ca93-da4e-c1e6-e534-6cc9b2f257b5@vivier.eu>
-Date: Tue, 23 Jan 2018 11:22:30 +0100
-In-Reply-To: <7ee5ca93-da4e-c1e6-e534-6cc9b2f257b5@vivier.eu> (Laurent
-	Vivier's message of "Tue, 23 Jan 2018 01:35:10 +0100")
-Message-ID: <mvmmv14ub6h.fsf@suse.de>
+	<40b82ee1-416b-20c6-4745-218d8e3cdd24@vivier.eu>
+Date: Tue, 23 Jan 2018 11:26:04 +0100
+In-Reply-To: <40b82ee1-416b-20c6-4745-218d8e3cdd24@vivier.eu> (Laurent
+	Vivier's message of "Tue, 23 Jan 2018 01:37:58 +0100")
+Message-ID: <mvminbsub0j.fsf@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH] linux-user: implement renameat2
@@ -32,31 +32,9 @@ Cc: qemu-devel@nongnu.org
 
 On Jan 23 2018, Laurent Vivier <laurent@vivier.eu> wrote:
 
-> Please fix style problem reported by patchew
-> (or ./scripts/checkpatch.pl)
+> And, please, test it (build/run).
 
-This was mostly copy-pasted from surrounding code. :-)
-
->> @@ -8342,6 +8359,22 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>          }
->>          break;
->>  #endif
->> +#if defined(TARGET_NR_renameat2)
->> +    case TARGET_NR_renameat2:
->> +        {
->> +            void *p2;
->> +            p  = lock_user_string(arg2);
->> +            p2 = lock_user_string(arg4);
->> +            if (!p || !p2)
->> +                ret = -TARGET_EFAULT;
->> +            else
->> +                ret = get_errno(sys_renameat2(arg1, p, arg3, p2,
->> +                                              target_to_host_bitmask(arg5, fcntl_flags_tbl)));
->
-> You can't use fcntl_flags_tbl
-
-Of course!  I was confused by another patch I was working on which does
-need such a conversion. :-/
+This was tested by bootstrapping openSUSE Factory for RISC-V.
 
 Andreas.
 
