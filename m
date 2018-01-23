@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1edyFV-00046M-9x
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:04:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1edyLK-0005ax-Cp
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:10:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1edyFQ-0004YC-LP
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:04:25 -0500
-Received: from mga01.intel.com ([192.55.52.88]:49137)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1edyFQ-0004XP-Bw
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:04:20 -0500
-Message-ID: <5A673369.6050408@intel.com>
-Date: Tue, 23 Jan 2018 21:06:49 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1edyLJ-00086m-4s
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:10:26 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:42714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1edyLJ-00086V-07
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:10:25 -0500
+Received: by mail-ot0-x230.google.com with SMTP id s3so336301otc.9
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 05:10:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20180119130653.24044-1-stefanha@redhat.com>
-	<5A65C652.6080307@intel.com>
-	<20180123111238.GC6565@stefanha-x1.localdomain>
-In-Reply-To: <20180123111238.GC6565@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
- device
+In-Reply-To: <1516620426-18530-1-git-send-email-thuth@redhat.com>
+References: <1516620426-18530-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Jan 2018 13:10:03 +0000
+Message-ID: <CAFEAcA9mTTFCp2C5gODqFFj54hnJfDZ9dN_mPA92bZA77novMg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] CPU hotplug test,
+ __FUNCTION__ and some fprintf patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, zhiyong.yang@intel.com, Maxime Coquelin <maxime.coquelin@redhat.com>, jasowang@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-On 01/23/2018 07:12 PM, Stefan Hajnoczi wrote:
-> On Mon, Jan 22, 2018 at 07:09:06PM +0800, Wei Wang wrote:
->> On 01/19/2018 09:06 PM, Stefan Hajnoczi wrote:
->>
->>
->>   - Suppose in the future there is also a kernel virtio-vhost-user driver as
->> other PCI devices, can we unbind the kernel driver first, and then bind the
->> device to the dpdk driver? A normal PCI device should be able to smoothly
->> switch between the kernel driver and dpdk driver.
-> It depends what you mean by "smoothly switch".
+On 22 January 2018 at 11:26, Thomas Huth <thuth@redhat.com> wrote:
+> The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc78f:
 >
-> If you mean whether it's possible to go from a kernel driver to
-> vfio-pci, then the answer is yes.
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2018-01-19 16:35:25 +0000)
 >
-> But if the kernel driver has an established vhost-user connection then
-> it will be closed.  This is the same as reconnecting with AF_UNIX
-> vhost-user.
+> are available in the git repository at:
+>
+>   https://github.com/huth/qemu.git tags/pull-request-2018-01-22
+>
+> for you to fetch changes up to 1081ed2c4b71b5fe8bd31f6de8cdaa630c8acfd3:
+>
+>   hw/isa: Replace fprintf(stderr, "*\n" with error_report() (2018-01-22 09:51:00 +0100)
+>
+> ----------------------------------------------------------------
+> Pull request for various patches that have been reviewed and
+> laying on the mailing list for a while, but where apparently
+> no maintainer currently feels responsible for picking up.
+> ----------------------------------------------------------------
+> Alistair Francis (5):
+>       Replace all occurances of __FUNCTION__ with __func__
+>       Fixes after renaming __FUNCTION__ to __func__
+>       hw/bt: Replace fprintf(stderr, "*\n" with error_report()
+>       hw/ipmi: Replace fprintf(stderr, "*\n" with error_report()
+>       hw/isa: Replace fprintf(stderr, "*\n" with error_report()
+>
+> Thomas Huth (4):
+>       tests: Rename pc-cpu-test.c to cpu-plug-test.c
+>       tests/cpu-plug-test: Check the CPU hot-plugging with device_add, too
+>       tests/cpu-plug-test: Check CPU hot-plugging on ppc64, too
+>       tests/cpu-plug-test: Test CPU hot-plugging on s390x
 >
 
-Actually not only the case of switching to testpmd after kernel 
-establishes the connection, but also for several runs of testpmd. That 
-is, if we run testpmd, then exit testpmd. I think the second run of 
-testpmd won't work. I'm thinking about caching the received master msgs 
-in QEMU when virtio_vhost_user_parse_m2s().
+Applied, thanks.
 
-Btw, I'm trying to run the code, but couldn't bind the virito-vhost-user 
-device to vfio-pci (reports Unknown device), not sure if it is because 
-the device type is "Unclassified device".
-
-Best,
-Wei
+-- PMM
