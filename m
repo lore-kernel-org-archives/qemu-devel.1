@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1ee3V6-0005mJ-Gl
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:40:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1ee3t5-0007M9-Te
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1ee3V3-0004iB-Bk
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:40:52 -0500
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <eblake@redhat.com>) id 1ee3t1-0002Sy-A4
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:05:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ee3t0-0002SK-U5
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:05:35 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 26ECFC0587E5
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 19:05:34 +0000 (UTC)
+References: <20180123164718.12714-1-berrange@redhat.com>
+	<20180123164718.12714-3-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <68283d62-6bab-987b-b820-830606992b3a@redhat.com>
+Date: Tue, 23 Jan 2018 13:05:31 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180123115045.51963136.cohuck@redhat.com>
-References: <20180118020157.25401-1-ehabkost@redhat.com>
-	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
-	<CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
-	<1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
-	<CAATJJ0+swtq=6Q7U9fShDRvbm13YukdfXqOX0pcvf9=z-KR3ZQ@mail.gmail.com>
-	<20180123115045.51963136.cohuck@redhat.com>
-Message-ID: <151673284318.4211.15973291434934779003@sif>
-Date: Tue, 23 Jan 2018 12:40:43 -0600
-Subject: Re: [Qemu-devel] [qemu-s390x]  [PULL 0/8] x86 queue, 2018-01-17
+In-Reply-To: <20180123164718.12714-3-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IKn2WvdRNhpW4tfryH2ed5RhauqhIoz1J"
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] make: fix help message reference to
+ bogus V=0 variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Quoting Cornelia Huck (2018-01-23 04:50:45)
-> On Tue, 23 Jan 2018 11:34:18 +0100
-> Christian Ehrhardt <christian.ehrhardt@canonical.com> wrote:
-> =
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IKn2WvdRNhpW4tfryH2ed5RhauqhIoz1J
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Message-ID: <68283d62-6bab-987b-b820-830606992b3a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] make: fix help message reference to
+ bogus V=0 variable
+References: <20180123164718.12714-1-berrange@redhat.com>
+ <20180123164718.12714-3-berrange@redhat.com>
+In-Reply-To: <20180123164718.12714-3-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> > On Tue, Jan 23, 2018 at 10:59 AM, Christian Borntraeger
-> > <borntraeger@de.ibm.com> wrote:
-> > >
-> > >
-> > > On 01/23/2018 09:40 AM, Christian Ehrhardt wrote:  =
+On 01/23/2018 10:47 AM, Daniel P. Berrange wrote:
+> The make rules for building QEMU are mostly silent by default. They can=
 
-> > >> On Thu, Jan 18, 2018 at 2:51 PM, Peter Maydell <peter.maydell@linaro=
-.org> wrote:  =
+> be made verbose by setting the variable V=3D1. The default state does n=
+ot
+> however correspond to a V=3D0 setting - $(V) must be undefined / empty =
+to
+> get the default quiet build.
 
-> > >>> On 18 January 2018 at 02:01, Eduardo Habkost <ehabkost@redhat.com> =
-wrote:  =
+Makefiles generated by automake support V=3D0; how hard would it be to
+instead tweak things so that 'V=3D' and 'V=3D0' have the same effect?
 
-> > >>>> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e4=
-2ae7ada7c:
-> > >>>>
-> > >>>>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116=
-' into staging (2018-01-16 17:36:39 +0000)
-> > >>>>
-> > >>>> are available in the Git repository at:
-> > >>>>
-> > >>>>   git://github.com/ehabkost/qemu.git tags/x86-pull-request
-> > >>>>
-> > >>>> for you to fetch changes up to 6cfbc54e8903a9bcc0346119949162d040c=
-144c1:
-> > >>>>
-> > >>>>   i386: Add EPYC-IBPB CPU model (2018-01-17 23:54:39 -0200)
-> > >>>>
-> > >>>> ----------------------------------------------------------------
-> > >>>> x86 queue, 2018-01-17
-> > >>>>
-> > >>>> Highlight: new CPU models that expose CPU features that guests
-> > >>>> can use to mitigate CVE-2017-5715 (Spectre variant #2).
-> > >>>>  =
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  Makefile | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index c263190b8d..554ba69ced 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -940,4 +940,5 @@ ifdef QEMU_GA_MSI_ENABLED
+>  endif
+>  	@echo  ''
+>  endif
+> -	@echo  '  $(MAKE) V=3D0|1 [targets] 0 =3D> quiet build (default), 1 =3D=
+> verbose build'
+> +	@echo  '  $(MAKE) [targets]      (quiet build, default)'
+> +	@echo  '  $(MAKE) V=3D1 [targets]  (verbose build)'
+>=20
 
-> > >>>
-> > >>> Applied, thanks.
-> > >>>
-> > >>> -- PMM
-> > >>>  =
-
-> > >>
-> > >> Hi,
-> > >> I was kind of clinging to [1] so far and had the expectation that all
-> > >> those would be wrapped up in 2.11.1 once ready.
-> > >> I see that the s390x changes are targeted to qemu-stable (well to
-> > >> admit I suggested so referring the article above).
-> > >> So I'd expected to see this series to show up on qemu-stable as well
-> > >> but haven't seen it so far.
-> > >>
-> > >> Therefore I wanted to ask if there was a change of plans in that
-> > >> regard or if it needs just a few days more to see (part of) this
-> > >> series on qemu-stable and on its way into 2.11.1?
-> > >>
-> > >> [1]: https://www.qemu.org/2018/01/04/spectre/  =
-
-> > >
-> > > Adding Michael,
-> > >
-> > > Yes, I think it makes sense to have the guest enablement for the spec=
-tre
-> > > mitigations available in 2.11.1 for all architectures that provide it.
-> > > (this queue for x86, Connies pending S390 patches, whatever Power
-> > > and arm will do).  =
-
-> > =
-
-> > Also adding Suraj for a statement in this regard about his "[QEMU-PPC]
-> > [PATCH V5 0/7] target/ppc: Rework spapr_caps" series which I think is
-> > the PPC version of all of this right?
-> > Not sure who to add for Arm :-/
-> > =
-
-> > @Cornelia - the consumers of these stable changes in particular IMHO
-> > are Distributions for security updates.
-> > Seeing at least one backport into 2.11.1 would be very helpful to
-> > avoid issues that would not apply to a forward thinking 2.12 commit.
-> > Such a (even short distance) backport being done by the Author would
-> > have the lowest risk of such issues creeping in.
-> > I'm not so sure on 2.(<11).x  - but one backport at least into the
-> > latest release would be very nice to fulfill the [1] announcement
-> > referenced above and provide a first release of these important
-> > changes available earlier than full 2.12.
-> =
-
-> I agree that a backport unto 2.11.x is useful.
-> =
-
-> But I still think we should clarify the purpose of our stable tree --
-> not necessarily in this thread, though.
-> =
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Generally the idea is a development cycle's worth of bug/security fixes
-that a distro that bases on, say, 2.11, can pull in without any other
-changes throughout their stack. Stuff like this is somewhat of an
-exceptional case because it doesn't have any benefit to someone who
-just drops it into their existing stack, but if it seems likely they'll
-become reliant on it then it makes sense. We've done this in the past to
-fix stuff like migration breakages that were discovered after release
-and required new machine options. Certainly not an ideal situation
-though.
+--IKn2WvdRNhpW4tfryH2ed5RhauqhIoz1J
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpnh3sACgkQp6FrSiUn
+Q2o7cAf/c+6FKjYfHvlUOkCFVIOGSluIAkVAclnYMvv12DyRZSIdYnvqlqn1rjcD
+KhhwP0E8D9oiPKi4GGs++SpFP/3UNCBLvhlk7Pur87DVbsgelIy9eWGD1rMXJXd0
+NVZqhJqmD/EYOmn+ZCyJU1VbEO4qYb+MRECW+EWHonE7BLsERNvp6l9CnAalz7dm
+EYBy2zpCpR29JmMf9Q8CI0L1+eqw4hwuNqDGYbafHEWQDI3eUUnog0bG/rcLGBuE
+SHFJpiWBuxcqWl71A4FkM+6N9mPxXjfNnOsZTqxqAbt9Dt39FvGdh9yTNb3a5at6
+1eVIJGPICohPERCpDq5S2gjq8vgTvQ==
+=cTm7
+-----END PGP SIGNATURE-----
+
+--IKn2WvdRNhpW4tfryH2ed5RhauqhIoz1J--
