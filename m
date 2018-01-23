@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edper-0001tt-4x
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:02 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1edpes-0001vI-Et
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edpep-00049X-UQ
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:01 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42050)
+	(envelope-from <richard.henderson@linaro.org>) id 1edper-0004BK-E0
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:02 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1edpep-00048T-LS
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:53:59 -0500
-Received: by mail-pf0-x243.google.com with SMTP id b25so8755872pfd.9
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:53:59 -0800 (PST)
+	id 1edper-0004AW-6T
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:01 -0500
+Received: by mail-pg0-x242.google.com with SMTP id z17so8768372pgc.4
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:54:01 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 22 Jan 2018 19:53:48 -0800
-Message-Id: <20180123035349.24538-5-richard.henderson@linaro.org>
+Date: Mon, 22 Jan 2018 19:53:49 -0800
+Message-Id: <20180123035349.24538-6-richard.henderson@linaro.org>
 In-Reply-To: <20180123035349.24538-1-richard.henderson@linaro.org>
 References: <20180123035349.24538-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 4/5] target/arm: Add ZCR_ELx
+Subject: [Qemu-devel] [PATCH v3 5/5] target/arm: Add SVE state to TB->FLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,185 +29,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Define ZCR_EL[1-3].
+Add both SVE exception state and vector length.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h    |   5 ++
- target/arm/helper.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 136 insertions(+)
+ target/arm/cpu.h           |  8 ++++++++
+ target/arm/translate.h     |  2 ++
+ target/arm/helper.c        | 25 ++++++++++++++++++++++++-
+ target/arm/translate-a64.c |  2 ++
+ 4 files changed, 36 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 3f4f6b6144..17955ad3ef 100644
+index 17955ad3ef..a311d4e327 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -549,6 +549,9 @@ typedef struct CPUARMState {
-          */
-         float_status fp_status;
-         float_status standard_fp_status;
-+
-+        /* ZCR_EL[1-3] */
-+        uint64_t zcr_el[4];
-     } vfp;
-     uint64_t exclusive_addr;
-     uint64_t exclusive_val;
-@@ -923,6 +926,8 @@ void pmccntr_sync(CPUARMState *env);
- #define CPTR_TCPAC    (1U << 31)
- #define CPTR_TTA      (1U << 20)
- #define CPTR_TFP      (1U << 10)
-+#define CPTR_TZ       (1U << 8)   /* CPTR_EL2 */
-+#define CPTR_EZ       (1U << 8)   /* CPTR_EL3 */
+@@ -2648,6 +2648,10 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+ #define ARM_TBFLAG_TBI0_MASK (0x1ull << ARM_TBFLAG_TBI0_SHIFT)
+ #define ARM_TBFLAG_TBI1_SHIFT 1        /* TBI1 for EL0/1  */
+ #define ARM_TBFLAG_TBI1_MASK (0x1ull << ARM_TBFLAG_TBI1_SHIFT)
++#define ARM_TBFLAG_SVEEXC_EL_SHIFT  2
++#define ARM_TBFLAG_SVEEXC_EL_MASK   (0x3 << ARM_TBFLAG_SVEEXC_EL_SHIFT)
++#define ARM_TBFLAG_ZCR_LEN_SHIFT    4
++#define ARM_TBFLAG_ZCR_LEN_MASK     (0xf << ARM_TBFLAG_ZCR_LEN_SHIFT)
  
- #define MDCR_EPMAD    (1U << 21)
- #define MDCR_EDAD     (1U << 20)
+ /* some convenience accessor macros */
+ #define ARM_TBFLAG_AARCH64_STATE(F) \
+@@ -2684,6 +2688,10 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+     (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
+ #define ARM_TBFLAG_TBI1(F) \
+     (((F) & ARM_TBFLAG_TBI1_MASK) >> ARM_TBFLAG_TBI1_SHIFT)
++#define ARM_TBFLAG_SVEEXC_EL(F) \
++    (((F) & ARM_TBFLAG_SVEEXC_EL_MASK) >> ARM_TBFLAG_SVEEXC_EL_SHIFT)
++#define ARM_TBFLAG_ZCR_LEN(F) \
++    (((F) & ARM_TBFLAG_ZCR_LEN_MASK) >> ARM_TBFLAG_ZCR_LEN_SHIFT)
+ 
+ static inline bool bswap_code(bool sctlr_b)
+ {
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 3f4df91e5e..c47febf99d 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -29,6 +29,8 @@ typedef struct DisasContext {
+     bool tbi1;         /* TBI1 for EL0/1, not used for EL2/3 */
+     bool ns;        /* Use non-secure CPREG bank on access */
+     int fp_excp_el; /* FP exception EL or 0 if enabled */
++    int sve_excp_el; /* SVE exception EL or 0 if enabled */
++    int sve_len;     /* SVE vector length in bytes */
+     /* Flag indicating that exceptions from secure mode are routed to EL3. */
+     bool secure_routed_to_el3;
+     bool vfp_enabled; /* FP enabled via FPSCR.EN */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index bfce09643b..db67e8ac72 100644
+index db67e8ac72..d46d3622fc 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -4266,6 +4266,125 @@ static const ARMCPRegInfo debug_lpae_cp_reginfo[] = {
-     REGINFO_SENTINEL
- };
- 
-+/* Return the exception level to which SVE-disabled exceptions should
-+ * be taken, or 0 if SVE is enabled.
-+ */
-+static int sve_exception_el(CPUARMState *env)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    unsigned current_el = arm_current_el(env);
-+
-+    /* The CPACR.ZEN controls traps to EL1:
-+     * 0, 2 : trap EL0 and EL1 accesses
-+     * 1    : trap only EL0 accesses
-+     * 3    : trap no accesses
-+     */
-+    switch (extract32(env->cp15.cpacr_el1, 16, 2)) {
-+    default:
-+        if (current_el <= 1) {
-+            /* Trap to PL1, which might be EL1 or EL3 */
-+            if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
-+                return 3;
-+            }
-+            return 1;
-+        }
-+        break;
-+    case 1:
-+        if (current_el == 0) {
-+            return 1;
-+        }
-+        break;
-+    case 3:
-+        break;
-+    }
-+
-+    /* Similarly for CPACR.FPEN, after having checked ZEN.  */
-+    switch (extract32(env->cp15.cpacr_el1, 20, 2)) {
-+    default:
-+        if (current_el <= 1) {
-+            if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
-+                return 3;
-+            }
-+            return 1;
-+        }
-+        break;
-+    case 1:
-+        if (current_el == 0) {
-+            return 1;
-+        }
-+        break;
-+    case 3:
-+        break;
-+    }
-+
-+    /* CPTR_EL2.  Check both TZ and TFP.  */
-+    if (current_el <= 2
-+        && (env->cp15.cptr_el[2] & (CPTR_TFP | CPTR_TZ))
-+        && !arm_is_secure_below_el3(env)) {
-+        return 2;
-+    }
-+
-+    /* CPTR_EL3.  Check both EZ and TFP.  */
-+    if (!(env->cp15.cptr_el[3] & CPTR_EZ)
-+        || (env->cp15.cptr_el[3] & CPTR_TFP)) {
-+        return 3;
-+    }
-+#endif
-+    return 0;
-+}
-+
-+static CPAccessResult zcr_access(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                 bool isread)
-+{
-+    switch (sve_exception_el(env)) {
-+    case 3:
-+        return CP_ACCESS_TRAP_EL3;
-+    case 2:
-+        return CP_ACCESS_TRAP_EL2;
-+    case 1:
-+        return CP_ACCESS_TRAP;
-+    }
-+    return CP_ACCESS_OK;
-+}
-+
-+static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                      uint64_t value)
-+{
-+    /* Bits other than [3:0] are RAZ/WI.  */
-+    raw_write(env, ri, value & 0xf);
-+}
-+
-+static const ARMCPRegInfo zcr_el1_reginfo = {
-+    .name = "ZCR_EL1", .state = ARM_CP_STATE_AA64,
-+    .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 2, .opc2 = 0,
-+    .access = PL1_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
-+    .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[1]),
-+    .writefn = zcr_write, .raw_writefn = raw_write
-+};
-+
-+static const ARMCPRegInfo zcr_el2_reginfo = {
-+    .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
-+    .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
-+    .access = PL2_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
-+    .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[2]),
-+    .writefn = zcr_write, .raw_writefn = raw_write
-+};
-+
-+static const ARMCPRegInfo zcr_no_el2_reginfo = {
-+    .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
-+    .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
-+    .access = PL2_RW, .type = ARM_CP_64BIT,
-+    .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore
-+};
-+
-+static const ARMCPRegInfo zcr_el3_reginfo = {
-+    .name = "ZCR_EL3", .state = ARM_CP_STATE_AA64,
-+    .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 2, .opc2 = 0,
-+    .access = PL3_RW, .accessfn = zcr_access, .type = ARM_CP_64BIT,
-+    .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[3]),
-+    .writefn = zcr_write, .raw_writefn = raw_write
-+};
-+
- void hw_watchpoint_update(ARMCPU *cpu, int n)
+@@ -11823,14 +11823,37 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                           target_ulong *cs_base, uint32_t *pflags)
  {
-     CPUARMState *env = &cpu->env;
-@@ -5332,6 +5451,18 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         }
-         define_one_arm_cp_reg(cpu, &sctlr);
-     }
-+
-+    if (arm_feature(env, ARM_FEATURE_SVE)) {
-+        define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
-+        if (arm_feature(env, ARM_FEATURE_EL2)) {
-+            define_one_arm_cp_reg(cpu, &zcr_el2_reginfo);
-+        } else {
-+            define_one_arm_cp_reg(cpu, &zcr_no_el2_reginfo);
-+        }
-+        if (arm_feature(env, ARM_FEATURE_EL3)) {
-+            define_one_arm_cp_reg(cpu, &zcr_el3_reginfo);
-+        }
-+    }
- }
+     ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
++    int fp_el = fp_exception_el(env);
+     uint32_t flags;
  
- void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
+     if (is_a64(env)) {
++        int sve_el = sve_exception_el(env);
++        uint32_t zcr_len;
++
+         *pc = env->pc;
+         flags = ARM_TBFLAG_AARCH64_STATE_MASK;
+         /* Get control bits for tagged addresses */
+         flags |= (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SHIFT);
+         flags |= (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SHIFT);
++        flags |= sve_el << ARM_TBFLAG_SVEEXC_EL_SHIFT;
++
++        /* If SVE is disabled, but FP is enabled,
++           then the effective len is 0.  */
++        if (sve_el != 0 && fp_el == 0) {
++            zcr_len = 0;
++        } else {
++            int current_el = arm_current_el(env);
++
++            zcr_len = env->vfp.zcr_el[current_el <= 1 ? 1 : current_el];
++            zcr_len &= 0xf;
++            if (current_el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
++                zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[2]);
++            }
++            if (current_el < 3 && arm_feature(env, ARM_FEATURE_EL3)) {
++                zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[3]);
++            }
++        }
++        flags |= zcr_len << ARM_TBFLAG_ZCR_LEN_SHIFT;
+     } else {
+         *pc = env->regs[15];
+         flags = (env->thumb << ARM_TBFLAG_THUMB_SHIFT)
+@@ -11873,7 +11896,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+     if (arm_cpu_data_is_big_endian(env)) {
+         flags |= ARM_TBFLAG_BE_DATA_MASK;
+     }
+-    flags |= fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
++    flags |= fp_el << ARM_TBFLAG_FPEXC_EL_SHIFT;
+ 
+     if (arm_v7m_is_handler_mode(env)) {
+         flags |= ARM_TBFLAG_HANDLER_MASK;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 10eef870fe..4c1eca7062 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11263,6 +11263,8 @@ static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+     dc->user = (dc->current_el == 0);
+ #endif
+     dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
++    dc->sve_excp_el = ARM_TBFLAG_SVEEXC_EL(dc->base.tb->flags);
++    dc->sve_len = (ARM_TBFLAG_ZCR_LEN(dc->base.tb->flags) + 1) * 16;
+     dc->vec_len = 0;
+     dc->vec_stride = 0;
+     dc->cp_regs = arm_cpu->cp_regs;
 -- 
 2.14.3
