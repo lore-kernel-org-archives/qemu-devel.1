@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ee1d9-00042b-8n
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:41:07 -0500
+	(envelope-from <david@redhat.com>) id 1ee1dF-00047G-68
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:41:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ee1d6-0005v7-3x
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:41:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ee1d5-0005ue-R8
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:41:00 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 23 Jan 2018 17:40:38 +0100
-Message-Id: <20180123164041.30339-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20180123164041.30339-1-marcandre.lureau@redhat.com>
-References: <20180123164041.30339-1-marcandre.lureau@redhat.com>
+	(envelope-from <david@redhat.com>) id 1ee1dE-00061Z-EH
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 11:41:09 -0500
+References: <20180118020157.25401-1-ehabkost@redhat.com>
+	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
+	<CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
+	<1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
+	<CAATJJ0+swtq=6Q7U9fShDRvbm13YukdfXqOX0pcvf9=z-KR3ZQ@mail.gmail.com>
+	<CAFEAcA9RQB7xAzXgKN3E8cL2SauiwOkqFMpmQg43YzD09OF52A@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <e09cb727-6e0b-3e90-24a6-c4b0a53e55cb@redhat.com>
+Date: Tue, 23 Jan 2018 17:40:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v10 1/4] fw_cfg: add DMA register
+In-Reply-To: <CAFEAcA9RQB7xAzXgKN3E8cL2SauiwOkqFMpmQg43YzD09OF52A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x]  [PULL 0/8] x86 queue, 2018-01-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,200 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-kernel@vger.kernel.org
-Cc: bhe@redhat.com, slp@redhat.com, mst@redhat.com, somlo@cmu.edu, xiaolong.ye@intel.com, peterx@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Add an optional <dma_off> kernel module (or command line) parameter
-using the following syntax:
+On 23.01.2018 12:14, Peter Maydell wrote:
+> On 23 January 2018 at 10:34, Christian Ehrhardt
+> <christian.ehrhardt@canonical.com> wrote:
+>> Also adding Suraj for a statement in this regard about his "[QEMU-PPC]
+>> [PATCH V5 0/7] target/ppc: Rework spapr_caps" series which I think is
+>> the PPC version of all of this right?
+>> Not sure who to add for Arm :-/
+> 
+> AIUI for Arm no QEMU changes should be required -- KVM VMs always
+> use the same CPU type as the host, and the kernel always exposes
+> the same MIDR (main ID register) value to the guest as the host has,
+> and the guest kernel fixes will key off the MIDR.
 
-      [qemu_fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>[:<dma_o=
-ff>]]
- or
-      [qemu_fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>[:<dma_off=
->]]
+Unrelated, but how can ARM make sure that migration back and forth works
+reliably? (e.g. from a system with spectre fixes to a system without
+spectre fixes)
 
-and initializes the register address using given or default offset.
+Thanks!
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Gabriel Somlo <somlo@cmu.edu>
----
- drivers/firmware/qemu_fw_cfg.c | 53 ++++++++++++++++++++++++++++++++----=
-------
- 1 file changed, 41 insertions(+), 12 deletions(-)
+> 
+> thanks
+> -- PMM
+> 
 
-diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
-g.c
-index deb483064f53..740df0df2260 100644
---- a/drivers/firmware/qemu_fw_cfg.c
-+++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -10,20 +10,21 @@
-  * and select subsets of aarch64), a Device Tree node (on arm), or using
-  * a kernel module (or command line) parameter with the following syntax=
-:
-  *
-- *      [qemu_fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>]
-+ *      [qemu_fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>[:<dm=
-a_off>]]
-  * or
-- *      [qemu_fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>]
-+ *      [qemu_fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>[:<dma_=
-off>]]
-  *
-  * where:
-  *      <size>     :=3D size of ioport or mmio range
-  *      <base>     :=3D physical base address of ioport or mmio range
-  *      <ctrl_off> :=3D (optional) offset of control register
-  *      <data_off> :=3D (optional) offset of data register
-+ *      <dma_off> :=3D (optional) offset of dma register
-  *
-  * e.g.:
-- *      qemu_fw_cfg.ioport=3D2@0x510:0:1		(the default on x86)
-+ *      qemu_fw_cfg.ioport=3D12@0x510:0:1:4	(the default on x86)
-  * or
-- *      qemu_fw_cfg.mmio=3D0xA@0x9020000:8:0	(the default on arm)
-+ *      qemu_fw_cfg.mmio=3D16@0x9020000:8:0:16	(the default on arm)
-  */
-=20
- #include <linux/module.h>
-@@ -63,6 +64,7 @@ static resource_size_t fw_cfg_p_size;
- static void __iomem *fw_cfg_dev_base;
- static void __iomem *fw_cfg_reg_ctrl;
- static void __iomem *fw_cfg_reg_data;
-+static void __iomem *fw_cfg_reg_dma;
-=20
- /* atomic access to fw_cfg device (potentially slow i/o, so using mutex)=
- */
- static DEFINE_MUTEX(fw_cfg_dev_lock);
-@@ -118,12 +120,14 @@ static void fw_cfg_io_cleanup(void)
- # if (defined(CONFIG_ARM) || defined(CONFIG_ARM64))
- #  define FW_CFG_CTRL_OFF 0x08
- #  define FW_CFG_DATA_OFF 0x00
-+#  define FW_CFG_DMA_OFF 0x10
- # elif (defined(CONFIG_PPC_PMAC) || defined(CONFIG_SPARC32)) /* ppc/mac,=
-sun4m */
- #  define FW_CFG_CTRL_OFF 0x00
- #  define FW_CFG_DATA_OFF 0x02
- # elif (defined(CONFIG_X86) || defined(CONFIG_SPARC64)) /* x86, sun4u */
- #  define FW_CFG_CTRL_OFF 0x00
- #  define FW_CFG_DATA_OFF 0x01
-+#  define FW_CFG_DMA_OFF 0x04
- # else
- #  error "QEMU FW_CFG not available on this architecture!"
- # endif
-@@ -133,7 +137,7 @@ static void fw_cfg_io_cleanup(void)
- static int fw_cfg_do_platform_probe(struct platform_device *pdev)
- {
- 	char sig[FW_CFG_SIG_SIZE];
--	struct resource *range, *ctrl, *data;
-+	struct resource *range, *ctrl, *data, *dma;
-=20
- 	/* acquire i/o range details */
- 	fw_cfg_is_mmio =3D false;
-@@ -170,6 +174,7 @@ static int fw_cfg_do_platform_probe(struct platform_d=
-evice *pdev)
- 	/* were custom register offsets provided (e.g. on the command line)? */
- 	ctrl =3D platform_get_resource_byname(pdev, IORESOURCE_REG, "ctrl");
- 	data =3D platform_get_resource_byname(pdev, IORESOURCE_REG, "data");
-+	dma =3D platform_get_resource_byname(pdev, IORESOURCE_REG, "dma");
- 	if (ctrl && data) {
- 		fw_cfg_reg_ctrl =3D fw_cfg_dev_base + ctrl->start;
- 		fw_cfg_reg_data =3D fw_cfg_dev_base + data->start;
-@@ -179,6 +184,13 @@ static int fw_cfg_do_platform_probe(struct platform_=
-device *pdev)
- 		fw_cfg_reg_data =3D fw_cfg_dev_base + FW_CFG_DATA_OFF;
- 	}
-=20
-+	if (dma)
-+		fw_cfg_reg_dma =3D fw_cfg_dev_base + dma->start;
-+#ifdef FW_CFG_DMA_OFF
-+	else
-+		fw_cfg_reg_dma =3D fw_cfg_dev_base + FW_CFG_DMA_OFF;
-+#endif
-+
- 	/* verify fw_cfg device signature */
- 	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE);
- 	if (memcmp(sig, "QEMU", FW_CFG_SIG_SIZE) !=3D 0) {
-@@ -629,6 +641,7 @@ static struct platform_device *fw_cfg_cmdline_dev;
- /* use special scanf/printf modifier for phys_addr_t, resource_size_t */
- #define PH_ADDR_SCAN_FMT "@%" __PHYS_ADDR_PREFIX "i%n" \
- 			 ":%" __PHYS_ADDR_PREFIX "i" \
-+			 ":%" __PHYS_ADDR_PREFIX "i%n" \
- 			 ":%" __PHYS_ADDR_PREFIX "i%n"
-=20
- #define PH_ADDR_PR_1_FMT "0x%" __PHYS_ADDR_PREFIX "x@" \
-@@ -638,12 +651,15 @@ static struct platform_device *fw_cfg_cmdline_dev;
- 			 ":%" __PHYS_ADDR_PREFIX "u" \
- 			 ":%" __PHYS_ADDR_PREFIX "u"
-=20
-+#define PH_ADDR_PR_4_FMT PH_ADDR_PR_3_FMT \
-+			 ":%" __PHYS_ADDR_PREFIX "u"
-+
- static int fw_cfg_cmdline_set(const char *arg, const struct kernel_param=
- *kp)
- {
--	struct resource res[3] =3D {};
-+	struct resource res[4] =3D {};
- 	char *str;
- 	phys_addr_t base;
--	resource_size_t size, ctrl_off, data_off;
-+	resource_size_t size, ctrl_off, data_off, dma_off;
- 	int processed, consumed =3D 0;
-=20
- 	/* only one fw_cfg device can exist system-wide, so if one
-@@ -659,19 +675,20 @@ static int fw_cfg_cmdline_set(const char *arg, cons=
-t struct kernel_param *kp)
- 	/* consume "<size>" portion of command line argument */
- 	size =3D memparse(arg, &str);
-=20
--	/* get "@<base>[:<ctrl_off>:<data_off>]" chunks */
-+	/* get "@<base>[:<ctrl_off>:<data_off>[:<dma_off>]]" chunks */
- 	processed =3D sscanf(str, PH_ADDR_SCAN_FMT,
- 			   &base, &consumed,
--			   &ctrl_off, &data_off, &consumed);
-+			   &ctrl_off, &data_off, &consumed,
-+			   &dma_off, &consumed);
-=20
--	/* sscanf() must process precisely 1 or 3 chunks:
-+	/* sscanf() must process precisely 1, 3 or 4 chunks:
- 	 * <base> is mandatory, optionally followed by <ctrl_off>
--	 * and <data_off>;
-+	 * and <data_off>, and <dma_off>;
- 	 * there must be no extra characters after the last chunk,
- 	 * so str[consumed] must be '\0'.
- 	 */
- 	if (str[consumed] ||
--	    (processed !=3D 1 && processed !=3D 3))
-+	    (processed !=3D 1 && processed !=3D 3 && processed !=3D 4))
- 		return -EINVAL;
-=20
- 	res[0].start =3D base;
-@@ -688,6 +705,11 @@ static int fw_cfg_cmdline_set(const char *arg, const=
- struct kernel_param *kp)
- 		res[2].start =3D data_off;
- 		res[2].flags =3D IORESOURCE_REG;
- 	}
-+	if (processed > 3) {
-+		res[3].name =3D "dma";
-+		res[3].start =3D dma_off;
-+		res[3].flags =3D IORESOURCE_REG;
-+	}
-=20
- 	/* "processed" happens to nicely match the number of resources
- 	 * we need to pass in to this platform device.
-@@ -722,6 +744,13 @@ static int fw_cfg_cmdline_get(char *buf, const struc=
-t kernel_param *kp)
- 				fw_cfg_cmdline_dev->resource[0].start,
- 				fw_cfg_cmdline_dev->resource[1].start,
- 				fw_cfg_cmdline_dev->resource[2].start);
-+	case 4:
-+		return snprintf(buf, PAGE_SIZE, PH_ADDR_PR_4_FMT,
-+				resource_size(&fw_cfg_cmdline_dev->resource[0]),
-+				fw_cfg_cmdline_dev->resource[0].start,
-+				fw_cfg_cmdline_dev->resource[1].start,
-+				fw_cfg_cmdline_dev->resource[2].start,
-+				fw_cfg_cmdline_dev->resource[3].start);
- 	}
-=20
- 	/* Should never get here */
---=20
-2.16.0.rc1.1.gef27df75a1
+
+-- 
+
+Thanks,
+
+David / dhildenb
