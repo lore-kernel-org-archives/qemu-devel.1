@@ -1,33 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ee0f5-0003mS-Ij
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 10:39:01 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ee0nQ-0007N2-6l
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 10:47:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ee0f1-0001GC-MC
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 10:38:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ee0f1-0001B6-9p
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 10:38:55 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5C25DD554D
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 15:38:52 +0000 (UTC)
-Date: Tue, 23 Jan 2018 15:38:42 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180123153842.GT490@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-	<1516112253-14480-11-git-send-email-pbonzini@redhat.com>
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ee0nM-0000aO-7G
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 10:47:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32802)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1ee0nL-0000ZY-Tb
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 10:47:32 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0NFk51r143978
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 10:47:30 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp5a90cnb-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 10:47:23 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Tue, 23 Jan 2018 10:46:49 -0500
+Date: Tue, 23 Jan 2018 13:46:44 -0200
+From: joserz@linux.vnet.ibm.com
+References: <20180123132021.27593-1-joserz@linux.vnet.ibm.com>
+	<20180123172106-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1516112253-14480-11-git-send-email-pbonzini@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 10/51] build-sys: silence make by default or
- V=0
+In-Reply-To: <20180123172106-mutt-send-email-mst@kernel.org>
+Message-Id: <20180123154644.GA29621@pacoca.br.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] Revert "virtio: postpone the execution of
+ event_notifier_cleanup function"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,138 +42,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: ghammer@redhat.com, pbonzini@redhat.com, danielhb@linux.vnet.ibm.com, qemu-devel@nongnu.org, anton@samba.org
 
-On Tue, Jan 16, 2018 at 03:16:52PM +0100, Paolo Bonzini wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Move generic make flags in MAKEFLAGS (SUBDIR_MAKEFLAGS is more qemu spe=
-cific).
->=20
-> Use --quiet to silence make 'is up to date' message.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Tested-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20180104160523.22995-3-marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Makefile  | 2 +-
->  rules.mak | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
+On Tue, Jan 23, 2018 at 05:22:12PM +0200, Michael S. Tsirkin wrote:
+> On Tue, Jan 23, 2018 at 11:20:21AM -0200, Jose Ricardo Ziviani wrote:
+> > This reverts commit 4fe6d78b2e241f41208dfb07605aace4becfc747.
+> > 
+> > As reported http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
+> > The referred commit is causing regression issues in virtio.
+> > 
+> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> > Reported-by: Anton Blanchard <anton@samba.org>
+> 
+> Can you limit the patch to virtio bus please?
+> Maybe we want to drop the callback from the structure
+> but we don't want it to be there and just be ignored
+> I think.
+> 
 
-After applying it when you run 'make install' absolutely nothing is
-displayed, but it none the less does work. This is very misleading
-to devs who thing nothing is being installed...
+Absolutely, I'm working on it
 
-Either this needs reverting, or we need to re-write the 'install' target
-so that it generates messages of whats being installed. Perhaps something
-like this
+Thank you!
 
-diff --git a/Makefile b/Makefile
-index f26ef1b1df..8ef195a0df 100644
---- a/Makefile
-+++ b/Makefile
-@@ -697,28 +697,33 @@ ifneq ($(TOOLS),)
- endif
- ifneq ($(CONFIG_MODULES),)
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_moddir)"
-+	$(call quiet-command,\
- 	for s in $(modules-m:.mo=3D$(DSOSUF)); do \
- 		t=3D"$(DESTDIR)$(qemu_moddir)/$$(echo $$s | tr / -)"; \
- 		$(INSTALL_LIB) $$s "$$t"; \
- 		test -z "$(STRIP)" || $(STRIP) "$$t"; \
--	done
-+	done, "INSTALL", "$(modules-m)")
- endif
- ifneq ($(HELPERS-y),)
- 	$(call install-prog,$(HELPERS-y),$(DESTDIR)$(libexecdir))
- endif
- ifneq ($(BLOBS),)
-+	$(call quiet-command,\
- 	set -e; for x in $(BLOBS); do \
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir)"; \
--	done
-+	done, "INSTALL", "$(BLOBS)")
- endif
- ifeq ($(CONFIG_GTK),y)
- 	$(MAKE) -C po $@
- endif
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
-+	$(call quiet-command,\
- 	set -e; for x in $(KEYMAPS); do \
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_data=
-dir)/keymaps"; \
--	done
--	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir=
-)/trace-events-all"
-+	done, "INSTALL", "$(KEYMAPS)")
-+	$(call quiet-command,\
-+	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir=
-)/trace-events-all",\
-+	"INSTALL", "trace-events-all")
- 	for d in $(TARGET_DIRS); do \
- 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=3D$$d/ -C $$d $@ || exit 1 ; \
-         done
-diff --git a/rules.mak b/rules.mak
-index 5fb4951561..cd669833bf 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -147,7 +147,8 @@ set-vpath =3D $(if $1,$(foreach PATTERN,$(VPATH_SUFFI=
-XES),$(eval vpath $(PATTERN)
- # install-prog list, dir
- define install-prog
- 	$(INSTALL_DIR) "$2"
--	$(INSTALL_PROG) $1 "$2"
-+	$(call quiet-command,\
-+	    $(INSTALL_PROG) $1 "$2", "INSTALL", "$1")
- 	$(if $(STRIP),$(STRIP) $(foreach T,$1,"$2/$(notdir $T)"),)
- endef
-=20
-
-
-
->=20
-> diff --git a/Makefile b/Makefile
-> index d86ecd2..1671db3 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -277,7 +277,7 @@ else
->  DOCS=3D
->  endif
-> =20
-> -SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory) BUILD_DIR=3D$(BUIL=
-D_DIR)
-> +SUBDIR_MAKEFLAGS=3DBUILD_DIR=3D$(BUILD_DIR)
->  SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_DIRS=
-))
->  SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARGE=
-T_DIRS))
-> =20
-> diff --git a/rules.mak b/rules.mak
-> index 6e94333..5fb4951 100644
-> --- a/rules.mak
-> +++ b/rules.mak
-> @@ -131,6 +131,8 @@ modules:
->  # If called with only a single argument, will print nothing in quiet m=
-ode.
->  quiet-command =3D $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 &=
-& $1, @$1))
-> =20
-> +MAKEFLAGS +=3D $(if $(V),,--no-print-directory --quiet)
-> +
->  # cc-option
->  # Usage: CFLAGS+=3D$(call cc-option, -falign-functions=3D0, -malign-fu=
-nctions=3D0)
-> =20
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> > ---
+> >  accel/kvm/kvm-all.c    |  4 ----
+> >  hw/virtio/virtio-bus.c | 19 ++++++++-----------
+> >  2 files changed, 8 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > index 071f4f57c0..f290f487a5 100644
+> > --- a/accel/kvm/kvm-all.c
+> > +++ b/accel/kvm/kvm-all.c
+> > @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
+> >      if (r < 0) {
+> >          abort();
+> >      }
+> > -
+> > -    if (e->cleanup) {
+> > -        e->cleanup(e);
+> > -    }
+> >  }
+> >  
+> >  static void kvm_io_ioeventfd_add(MemoryListener *listener,
+> > diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+> > index 8106346927..3042232daf 100644
+> > --- a/hw/virtio/virtio-bus.c
+> > +++ b/hw/virtio/virtio-bus.c
+> > @@ -256,15 +256,6 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus)
+> >      return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
+> >  }
+> >  
+> > -static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
+> > -{
+> > -    /* Test and clear notifier after disabling event,
+> > -     * in case poll callback didn't have time to run.
+> > -     */
+> > -    virtio_queue_host_notifier_read(notifier);
+> > -    event_notifier_cleanup(notifier);
+> > -}
+> > -
+> >  /*
+> >   * This function switches ioeventfd on/off in the device.
+> >   * The caller must set or clear the handlers for the EventNotifier.
+> > @@ -292,13 +283,19 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, int n, bool assign)
+> >          r = k->ioeventfd_assign(proxy, notifier, n, true);
+> >          if (r < 0) {
+> >              error_report("%s: unable to assign ioeventfd: %d", __func__, r);
+> > -            virtio_bus_cleanup_event_notifier(notifier);
+> > +            goto cleanup_event_notifier;
+> >          }
+> > +        return 0;
+> >      } else {
+> > -        notifier->cleanup = virtio_bus_cleanup_event_notifier;
+> >          k->ioeventfd_assign(proxy, notifier, n, false);
+> >      }
+> >  
+> > +cleanup_event_notifier:
+> > +    /* Test and clear notifier after disabling event,
+> > +     * in case poll callback didn't have time to run.
+> > +     */
+> > +    virtio_queue_host_notifier_read(notifier);
+> > +    event_notifier_cleanup(notifier);
+> >      return r;
+> >  }
+> >  
+> > -- 
+> > 2.14.3
+> 
