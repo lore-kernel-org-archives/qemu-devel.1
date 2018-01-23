@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee78i-0005pG-3C
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:34:01 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee79M-0006EL-RK
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee78d-0005kf-4J
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:34:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57520)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ee78c-0005jK-SA
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:33:55 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0NMWtrs051968
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 17:33:53 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fpbkw54ab-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 17:33:52 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 23 Jan 2018 15:33:52 -0700
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-5-git-send-email-walling@linux.vnet.ibm.com>
-	<2a6618d7-566b-bec7-c267-26e4e7acb1a2@redhat.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 23 Jan 2018 17:33:46 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee79L-0006U6-7O
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:34:40 -0500
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:42810)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ee79K-0006SF-UW
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:34:39 -0500
+Received: by mail-lf0-x242.google.com with SMTP id q17so2646175lfa.9
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 14:34:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <2a6618d7-566b-bec7-c267-26e4e7acb1a2@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <ded3d6a0-3432-368a-3964-6641c7fef3fe@linux.vnet.ibm.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <20180123030630.26613-5-f4bug@amsat.org>
+References: <20180123030630.26613-1-f4bug@amsat.org>
+	<20180123030630.26613-5-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 23 Jan 2018 14:34:06 -0800
+Message-ID: <CAKmqyKMe0QnJbVavdCm1zbsAfnSs5r3xKJA=8vJqf8Vf2yhUKg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 04/10] s390-ccw: update libc
+Subject: Re: [Qemu-devel] [PATCH v8 04/14] sdbus: add trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,148 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>
 
-On 01/23/2018 02:23 PM, Eric Blake wrote:
-> On 01/23/2018 12:26 PM, Collin L. Walling wrote:
->> [...]
->> +/**
->> + * atoi:
->> + * @str: the string to be converted.
->> + *
->> + * Given a string @str, convert it to an integer. Leading whitespace =
-is
->> + * ignored. The first character (after any whitespace) is checked for=
- the
->> + * negative sign. Any other non-numerical value will terminate the
->> + * conversion.
->> + *
->> + * Returns: an integer converted from the string @str.
->> + */
->> +int atoi(const char *str)
->> +{
->> +    int val =3D 0;
->> +    int sign =3D 1;
->> +
->> +    if (!str || !str[0]) {
->> +        return 0;
->> +    }
->> +
->> +    while (*str =3D=3D ' ') {
->> +        str++;
->> +    }
-> That's not "any whitespace", but only spaces.  A fully compliant
-> implementation would be checking isspace(), but I don't expect you to
-> implement that; at a minimum, also checking '\t' would get you closer
-> (but not all the way to) compliance.
+On Mon, Jan 22, 2018 at 7:06 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-I'll fix the comment to be more clear.
+Alistair
 
-I think it's okay to just have the menu code treat any other kind
-of whitespace as an error (it will check before calling atoi). I
-added support for negatives in bothfunctions because it was easy
-enough to do so and for the sakeof completeness.
-
-However, I worry trying to be 100% compliant will just bloat the
-code when we only need it for very specific use cases.
-
-Would you say what we have (along with the fix to itostr below) is
-sufficient enough?
-
-
+> ---
+>  hw/sd/core.c       | 14 ++++++++++++--
+>  hw/sd/trace-events |  5 +++++
+>  2 files changed, 17 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sd/core.c b/hw/sd/core.c
+> index 295dc44ab7..498284f109 100644
+> --- a/hw/sd/core.c
+> +++ b/hw/sd/core.c
+> @@ -23,6 +23,12 @@
+>  #include "hw/qdev-core.h"
+>  #include "sysemu/block-backend.h"
+>  #include "hw/sd/sd.h"
+> +#include "trace.h"
+> +
+> +static inline const char *sdbus_name(SDBus *sdbus)
+> +{
+> +    return sdbus->qbus.name;
+> +}
+>
+>  static SDState *get_card(SDBus *sdbus)
+>  {
+> @@ -39,6 +45,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint=
+8_t *response)
+>  {
+>      SDState *card =3D get_card(sdbus);
+>
+> +    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc)=
+;
+>      if (card) {
+>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
+>
+> @@ -52,6 +59,7 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
+>  {
+>      SDState *card =3D get_card(sdbus);
+>
+> +    trace_sdbus_write(sdbus_name(sdbus), value);
+>      if (card) {
+>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
+>
+> @@ -62,14 +70,16 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
+>  uint8_t sdbus_read_data(SDBus *sdbus)
+>  {
+>      SDState *card =3D get_card(sdbus);
+> +    uint8_t value =3D 0;
+>
+>      if (card) {
+>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
+>
+> -        return sc->read_data(card);
+> +        value =3D sc->read_data(card);
+>      }
+> +    trace_sdbus_read(sdbus_name(sdbus), value);
+>
+> -    return 0;
+> +    return value;
+>  }
+>
+>  bool sdbus_data_ready(SDBus *sdbus)
+> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+> index 78d8707669..ea2746c8b7 100644
+> --- a/hw/sd/trace-events
+> +++ b/hw/sd/trace-events
+> @@ -1,5 +1,10 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>
+> +# hw/sd/core.c
+> +sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t c=
+rc) "@%s CMD%02d arg 0x%08x crc 0x%02x"
+> +sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+> +sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+> +
+>  # hw/sd/sdhci.c
+>  sdhci_set_inserted(const char *level) "card state changed: %s"
+>  sdhci_send_command(uint8_t cmd, uint32_t arg) "CMD%02u ARG[0x%08x]"
+> --
+> 2.15.1
 >
 >
->> +static char *_itostr(int num, char *str, size_t len)
->> +{
->> +    int num_idx =3D 0;
->> +    int tmp =3D num;
->> +    char sign =3D 0;
->> +
->> +    if (!str) {
->> +        return NULL;
->> +    }
->> +
->> +    /* Get index to ones place */
->> +    while ((tmp /=3D 10) !=3D 0) {
->> +        num_idx++;
->> +    }
->> +
->> +    if (num < 0) {
->> +        num *=3D -1;
->> +        sign =3D 1;
->> +    }
-> If num =3D=3D INT_MIN, then num is still negative at this point...
->
->> +
->> +    /* Check if we have enough space for num, sign, and null */
->> +    if (len <=3D num_idx + sign + 1) {
->> +        return NULL;
->> +    }
->> +
->> +    str[num_idx + sign + 1] =3D '\0';
->> +
->> +    /* Convert int to string */
->> +    while (num_idx >=3D 0) {
->> +        str[num_idx + sign] =3D num % 10 + '0';
-> ...which breaks this.
->
-> Either make it work, or document the corner case as unsupported.
->
-
-Might as well just make it work at this point:
-
-#define INT32_MIN 0x80000000
-
-static char *itostr(int num, char *str, size_t len)
-{
- =C2=A0=C2=A0=C2=A0 int num_idx =3D 0;
- =C2=A0=C2=A0=C2=A0 int tmp =3D num;
- =C2=A0=C2=A0=C2=A0 char sign =3D !!(num & INT32_MIN);
-
- =C2=A0=C2=A0=C2=A0 if (!str) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
- =C2=A0=C2=A0=C2=A0 }
-
- =C2=A0=C2=A0=C2=A0 /* Get index to ones place */
- =C2=A0=C2=A0=C2=A0 while ((tmp /=3D 10) !=3D 0) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_idx++;
- =C2=A0=C2=A0=C2=A0 }
-
- =C2=A0=C2=A0=C2=A0 /* Check if we have enough space for num, sign, and n=
-ull */
- =C2=A0=C2=A0=C2=A0 if (len <=3D num_idx + sign + 1) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
- =C2=A0=C2=A0=C2=A0 }
-
- =C2=A0=C2=A0=C2=A0 str[num_idx + sign + 1] =3D '\0';
-
- =C2=A0=C2=A0=C2=A0 if (sign) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[0] =3D '-';
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (num =3D=3D INT32_MIN) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[n=
-um_idx + sign] =3D '8';
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num /=
-=3D 10;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_i=
-dx--;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num *=3D -1;
- =C2=A0=C2=A0=C2=A0 }
-
- =C2=A0=C2=A0=C2=A0 /* Convert int to string */
- =C2=A0=C2=A0=C2=A0 while (num_idx >=3D 0) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[num_idx + sign] =3D num %=
- 10 + '0';
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num /=3D 10;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_idx--;
- =C2=A0=C2=A0=C2=A0 }
-
- =C2=A0=C2=A0=C2=A0 return str;
-}
-
-Thoughts?
-
---=20
-- Collin L Walling
