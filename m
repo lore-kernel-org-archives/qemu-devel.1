@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzAG-00042U-KL
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:11 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edzAP-0004AN-Qd
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzAA-0006N2-L6
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:04 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edzAK-0006Vd-1S
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:13 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:57 +0100
-Message-Id: <20180123140201.31163-26-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:02:00 +0100
+Message-Id: <20180123140201.31163-29-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 25/29] iotests: Make 191 work with qcow2 options
+Subject: [Qemu-devel] [PULL 28/29] iotests: Split 177 into two parts for
+ compat=0.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,708 +23,344 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-In order for 191 to work with an explicit refcount_bits or compat=0.10,
-we should strip format-specific information from the output--and we can
-do so by using _filter_img_info.
+When originally written, test 177 explicitly took care to run
+with compat=0.10.  Then I botched my own test in commit
+81c219ac and f0a9c18f, by adding additional actions that require
+v3 images.  Split out the new code into a new v3-only test, 204,
+and revert 177 back to its original state other than a new comment.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171123020832.8165-17-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20180117165420.15946-2-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/191     |   5 +-
- tests/qemu-iotests/191.out | 313 +++++++++++++--------------------------------
- 2 files changed, 91 insertions(+), 227 deletions(-)
+ tests/qemu-iotests/177     |  20 +++-----
+ tests/qemu-iotests/177.out |  22 ++-------
+ tests/qemu-iotests/204     | 119 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/204.out |  63 ++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 5 files changed, 193 insertions(+), 32 deletions(-)
+ create mode 100755 tests/qemu-iotests/204
+ create mode 100644 tests/qemu-iotests/204.out
 
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index ad785e10b1..dfad6555e4 100755
---- a/tests/qemu-iotests/191
-+++ b/tests/qemu-iotests/191
-@@ -45,7 +45,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.qemu
+diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
+index 28990977f1..396986da89 100755
+--- a/tests/qemu-iotests/177
++++ b/tests/qemu-iotests/177
+@@ -2,7 +2,7 @@
+ #
+ # Test corner cases with unusual block geometries
+ #
+-# Copyright (C) 2016-2017 Red Hat, Inc.
++# Copyright (C) 2016-2018 Red Hat, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -37,13 +37,15 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.rc
+ . ./common.filter
  
++# This test is runnable under compat=0.10; see test 204 for additional
++# tests specific to compat=1.1.
++
  _supported_fmt qcow2
--_unsupported_imgopts compat=0.10
  _supported_proto file
- _supported_os Linux
  
-@@ -92,7 +91,7 @@ echo === Check that both top and top2 point to base now ===
+ CLUSTER_SIZE=1M
+ size=128M
+ options=driver=blkdebug,image.driver=qcow2
+-nested_opts=image.file.driver=file,image.file.filename=$TEST_IMG
+ 
  echo
+ echo "== setting up files =="
+@@ -51,7 +53,7 @@ echo "== setting up files =="
+ TEST_IMG="$TEST_IMG.base" _make_test_img $size
+ $QEMU_IO -c "write -P 11 0 $size" "$TEST_IMG.base" | _filter_qemu_io
+ _make_test_img -b "$TEST_IMG.base"
+-$QEMU_IO -c "write -P 22 0 110M" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -P 22 0 $size" "$TEST_IMG" | _filter_qemu_io
  
- _send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
--    _filter_generated_node_ids | _filter_actual_image_size
-+    _filter_generated_node_ids | _filter_actual_image_size | _filter_img_info
- 
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
- wait=1 _cleanup_qemu
-@@ -140,7 +139,7 @@ echo === Check that both top and top2 point to base now ===
+ # Limited to 64k max-transfer
  echo
+@@ -82,13 +84,6 @@ $QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
+          -c "discard 80000001 30M" | _filter_qemu_io
  
- _send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
--    _filter_generated_node_ids | _filter_actual_image_size
-+    _filter_generated_node_ids | _filter_actual_image_size | _filter_img_info
+ echo
+-echo "== block status smaller than alignment =="
+-limits=align=4k
+-$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
+-	 -c "alloc 1 1" -c "alloc 0x6dffff0 1000" -c "alloc 127m 5P" \
+-	 -c map | _filter_qemu_io
+-
+-echo
+ echo "== verify image content =="
  
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
- wait=1 _cleanup_qemu
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
-index 73c0ed454c..190c5f049a 100644
---- a/tests/qemu-iotests/191.out
-+++ b/tests/qemu-iotests/191.out
-@@ -44,49 +44,31 @@ wrote 65536/65536 bytes at offset 1048576
-             "image": {
-                 "backing-image": {
-                     "virtual-size": 67108864,
--                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "filename": "TEST_DIR/t.IMGFMT.base",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
--                "backing-filename-format": "qcow2",
-+                "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "filename": "TEST_DIR/t.IMGFMT.ovl2",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
--                "full-backing-filename": "TEST_DIR/t.qcow2.base",
--                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
-+                "backing-filename": "TEST_DIR/t.IMGFMT.base",
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "top2",
-             "backing_file_depth": 1,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
--            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "backing_file": "TEST_DIR/t.IMGFMT.base",
-             "encrypted": false,
-             "bps": 0,
-             "bps_rd": 0,
-@@ -95,7 +77,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "file": "TEST_DIR/t.IMGFMT.ovl2",
-             "encryption_key_missing": false
-         },
-         {
-@@ -103,7 +85,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "filename": "TEST_DIR/t.IMGFMT.ovl2",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -124,7 +106,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "file": "TEST_DIR/t.IMGFMT.ovl2",
-             "encryption_key_missing": false
-         },
-         {
-@@ -133,49 +115,31 @@ wrote 65536/65536 bytes at offset 1048576
-             "image": {
-                 "backing-image": {
-                     "virtual-size": 67108864,
--                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "filename": "TEST_DIR/t.IMGFMT.base",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
--                "backing-filename-format": "qcow2",
-+                "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
--                "full-backing-filename": "TEST_DIR/t.qcow2.base",
--                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
-+                "backing-filename": "TEST_DIR/t.IMGFMT.base",
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "top",
-             "backing_file_depth": 1,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
--            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "backing_file": "TEST_DIR/t.IMGFMT.base",
-             "encrypted": false,
-             "bps": 0,
-             "bps_rd": 0,
-@@ -184,7 +148,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         },
-         {
-@@ -192,7 +156,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -213,7 +177,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         },
-         {
-@@ -222,49 +186,31 @@ wrote 65536/65536 bytes at offset 1048576
-             "image": {
-                 "backing-image": {
-                     "virtual-size": 67108864,
--                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "filename": "TEST_DIR/t.IMGFMT.base",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
--                "backing-filename-format": "qcow2",
-+                "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2.mid",
-+                "filename": "TEST_DIR/t.IMGFMT.mid",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
--                "full-backing-filename": "TEST_DIR/t.qcow2.base",
--                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
-+                "backing-filename": "TEST_DIR/t.IMGFMT.base",
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "mid",
-             "backing_file_depth": 1,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
--            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "backing_file": "TEST_DIR/t.IMGFMT.base",
-             "encrypted": false,
-             "bps": 0,
-             "bps_rd": 0,
-@@ -273,7 +219,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.mid",
-+            "file": "TEST_DIR/t.IMGFMT.mid",
-             "encryption_key_missing": false
-         },
-         {
-@@ -281,7 +227,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 393216,
--                "filename": "TEST_DIR/t.qcow2.mid",
-+                "filename": "TEST_DIR/t.IMGFMT.mid",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -302,7 +248,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.mid",
-+            "file": "TEST_DIR/t.IMGFMT.mid",
-             "encryption_key_missing": false
-         },
-         {
-@@ -310,26 +256,17 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2.base",
-+                "filename": "TEST_DIR/t.IMGFMT.base",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "base",
-             "backing_file_depth": 0,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
-@@ -341,7 +278,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.base",
-+            "file": "TEST_DIR/t.IMGFMT.base",
-             "encryption_key_missing": false
-         },
-         {
-@@ -349,7 +286,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 393216,
--                "filename": "TEST_DIR/t.qcow2.base",
-+                "filename": "TEST_DIR/t.IMGFMT.base",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -370,7 +307,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.base",
-+            "file": "TEST_DIR/t.IMGFMT.base",
-             "encryption_key_missing": false
-         }
-     ]
-@@ -447,49 +384,31 @@ wrote 65536/65536 bytes at offset 1048576
-             "image": {
-                 "backing-image": {
-                     "virtual-size": 67108864,
--                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "filename": "TEST_DIR/t.IMGFMT.base",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
--                "backing-filename-format": "qcow2",
-+                "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "filename": "TEST_DIR/t.IMGFMT.ovl2",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
--                "full-backing-filename": "TEST_DIR/t.qcow2.base",
--                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
-+                "backing-filename": "TEST_DIR/t.IMGFMT.base",
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": true,
-             "node-name": "NODE_NAME",
-             "backing_file_depth": 1,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
--            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "backing_file": "TEST_DIR/t.IMGFMT.base",
-             "encrypted": false,
-             "bps": 0,
-             "bps_rd": 0,
-@@ -498,7 +417,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "file": "TEST_DIR/t.IMGFMT.ovl2",
-             "encryption_key_missing": false
-         },
-         {
-@@ -506,7 +425,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "filename": "TEST_DIR/t.IMGFMT.ovl2",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -527,7 +446,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "file": "TEST_DIR/t.IMGFMT.ovl2",
-             "encryption_key_missing": false
-         },
-         {
-@@ -537,68 +456,41 @@ wrote 65536/65536 bytes at offset 1048576
-                 "backing-image": {
-                     "backing-image": {
-                         "virtual-size": 67108864,
--                        "filename": "TEST_DIR/t.qcow2.base",
-+                        "filename": "TEST_DIR/t.IMGFMT.base",
-                         "cluster-size": 65536,
--                        "format": "qcow2",
-+                        "format": "IMGFMT",
-                         "actual-size": SIZE,
--                        "format-specific": {
--                            "type": "qcow2",
--                            "data": {
--                                "compat": "1.1",
--                                "lazy-refcounts": false,
--                                "refcount-bits": 16,
--                                "corrupt": false
--                            }
--                        },
-                         "dirty-flag": false
-                     },
--                    "backing-filename-format": "qcow2",
-+                    "backing-filename-format": "IMGFMT",
-                     "virtual-size": 67108864,
--                    "filename": "TEST_DIR/t.qcow2.ovl2",
-+                    "filename": "TEST_DIR/t.IMGFMT.ovl2",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
--                    "full-backing-filename": "TEST_DIR/t.qcow2.base",
--                    "backing-filename": "TEST_DIR/t.qcow2.base",
-+                    "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
-+                    "backing-filename": "TEST_DIR/t.IMGFMT.base",
-                     "dirty-flag": false
-                 },
--                "backing-filename-format": "qcow2",
-+                "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2.ovl3",
-+                "filename": "TEST_DIR/t.IMGFMT.ovl3",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
--                "full-backing-filename": "TEST_DIR/t.qcow2.ovl2",
--                "backing-filename": "TEST_DIR/t.qcow2.ovl2",
-+                "full-backing-filename": "TEST_DIR/t.IMGFMT.ovl2",
-+                "backing-filename": "TEST_DIR/t.IMGFMT.ovl2",
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "top2",
-             "backing_file_depth": 2,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
--            "backing_file": "TEST_DIR/t.qcow2.ovl2",
-+            "backing_file": "TEST_DIR/t.IMGFMT.ovl2",
-             "encrypted": false,
-             "bps": 0,
-             "bps_rd": 0,
-@@ -607,7 +499,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.ovl3",
-+            "file": "TEST_DIR/t.IMGFMT.ovl3",
-             "encryption_key_missing": false
-         },
-         {
-@@ -615,7 +507,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2.ovl3",
-+                "filename": "TEST_DIR/t.IMGFMT.ovl3",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -636,7 +528,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.ovl3",
-+            "file": "TEST_DIR/t.IMGFMT.ovl3",
-             "encryption_key_missing": false
-         },
-         {
-@@ -644,26 +536,17 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2.base",
-+                "filename": "TEST_DIR/t.IMGFMT.base",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": true,
-             "node-name": "NODE_NAME",
-             "backing_file_depth": 0,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
-@@ -675,7 +558,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.base",
-+            "file": "TEST_DIR/t.IMGFMT.base",
-             "encryption_key_missing": false
-         },
-         {
-@@ -683,7 +566,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 393216,
--                "filename": "TEST_DIR/t.qcow2.base",
-+                "filename": "TEST_DIR/t.IMGFMT.base",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -704,7 +587,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2.base",
-+            "file": "TEST_DIR/t.IMGFMT.base",
-             "encryption_key_missing": false
-         },
-         {
-@@ -713,49 +596,31 @@ wrote 65536/65536 bytes at offset 1048576
-             "image": {
-                 "backing-image": {
-                     "virtual-size": 67108864,
--                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "filename": "TEST_DIR/t.IMGFMT.base",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
--                "backing-filename-format": "qcow2",
-+                "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
--                "full-backing-filename": "TEST_DIR/t.qcow2.base",
--                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
-+                "backing-filename": "TEST_DIR/t.IMGFMT.base",
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "top",
-             "backing_file_depth": 1,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
--            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "backing_file": "TEST_DIR/t.IMGFMT.base",
-             "encrypted": false,
-             "bps": 0,
-             "bps_rd": 0,
-@@ -764,7 +629,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         },
-         {
-@@ -772,7 +637,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -793,7 +658,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         }
-     ]
+ function verify_io()
+@@ -110,13 +105,10 @@ function verify_io()
+     echo read -P 0 32M 32M
+     echo read -P 22 64M 13M
+     echo read -P $discarded 77M 29M
+-    echo read -P 22 106M 4M
+-    echo read -P 11 110M 18M
++    echo read -P 22 106M 22M
+ }
+ 
+ verify_io | $QEMU_IO -r "$TEST_IMG" | _filter_qemu_io
+-$QEMU_IMG map --image-opts "$options,$nested_opts,align=4k" \
+-    | _filter_qemu_img_map
+ 
+ _check_test_img
+ 
+diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
+index f788b55e20..e887542678 100644
+--- a/tests/qemu-iotests/177.out
++++ b/tests/qemu-iotests/177.out
+@@ -5,8 +5,8 @@ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
+ wrote 134217728/134217728 bytes at offset 0
+ 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
+-wrote 115343360/115343360 bytes at offset 0
+-110 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 134217728/134217728 bytes at offset 0
++128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ == constrained alignment and max-transfer ==
+ wrote 131072/131072 bytes at offset 1000
+@@ -26,13 +26,6 @@ wrote 33554432/33554432 bytes at offset 33554432
+ discard 31457280/31457280 bytes at offset 80000001
+ 30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+-== block status smaller than alignment ==
+-1/1 bytes allocated at offset 1 bytes
+-16/1000 bytes allocated at offset 110 MiB
+-0/1048576 bytes allocated at offset 127 MiB
+-110 MiB (0x6e00000) bytes     allocated at offset 0 bytes (0x0)
+-18 MiB (0x1200000) bytes not allocated at offset 110 MiB (0x6e00000)
+-
+ == verify image content ==
+ read 1000/1000 bytes at offset 0
+ 1000 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -50,14 +43,7 @@ read 13631488/13631488 bytes at offset 67108864
+ 13 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 30408704/30408704 bytes at offset 80740352
+ 29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 4194304/4194304 bytes at offset 111149056
+-4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-read 18874368/18874368 bytes at offset 115343360
+-18 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-Offset          Length          File
+-0               0x800000        TEST_DIR/t.IMGFMT
+-0x900000        0x2400000       TEST_DIR/t.IMGFMT
+-0x3c00000       0x1100000       TEST_DIR/t.IMGFMT
+-0x6a00000       0x400000        TEST_DIR/t.IMGFMT
++read 23068672/23068672 bytes at offset 111149056
++22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ No errors were found on the image.
+ *** done
+diff --git a/tests/qemu-iotests/204 b/tests/qemu-iotests/204
+new file mode 100755
+index 0000000000..feb69d2ada
+--- /dev/null
++++ b/tests/qemu-iotests/204
+@@ -0,0 +1,119 @@
++#!/bin/bash
++#
++# Test corner cases with unusual block geometries
++#
++# Copyright (C) 2016-2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=eblake@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++# This test assumes that discard leaves zero clusters; see test 177 for
++# other tests that also work in older images
++_unsupported_imgopts 'compat=0.10'
++
++CLUSTER_SIZE=1M
++size=128M
++options=driver=blkdebug,image.driver=qcow2
++nested_opts=image.file.driver=file,image.file.filename=$TEST_IMG
++
++echo
++echo "== setting up files =="
++
++TEST_IMG="$TEST_IMG.base" _make_test_img $size
++$QEMU_IO -c "write -P 11 0 $size" "$TEST_IMG.base" | _filter_qemu_io
++_make_test_img -b "$TEST_IMG.base"
++$QEMU_IO -c "write -P 22 0 110M" "$TEST_IMG" | _filter_qemu_io
++
++# Limited to 64k max-transfer
++echo
++echo "== constrained alignment and max-transfer =="
++limits=align=4k,max-transfer=64k
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "write -P 33 1000 128k" -c "read -P 33 1000 128k" | _filter_qemu_io
++
++echo
++echo "== write zero with constrained max-transfer =="
++limits=align=512,max-transfer=64k,opt-write-zero=$CLUSTER_SIZE
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "write -z 8003584 2093056" | _filter_qemu_io
++
++# non-power-of-2 write-zero/discard alignments
++echo
++echo "== non-power-of-2 write zeroes limits =="
++
++limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "write -z 32M 32M" | _filter_qemu_io
++
++echo
++echo "== non-power-of-2 discard limits =="
++
++limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "discard 80000001 30M" | _filter_qemu_io
++
++echo
++echo "== block status smaller than alignment =="
++limits=align=4k
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++	 -c "alloc 1 1" -c "alloc 0x6dffff0 1000" -c "alloc 127m 5P" \
++	 -c map | _filter_qemu_io
++
++echo
++echo "== verify image content =="
++
++function verify_io()
++{
++    echo read -P 22 0 1000
++    echo read -P 33 1000 128k
++    echo read -P 22 132072 7871512
++    echo read -P 0 8003584 2093056
++    echo read -P 22 10096640 23457792
++    echo read -P 0 32M 32M
++    echo read -P 22 64M 13M
++    echo read -P 0 77M 29M
++    echo read -P 22 106M 4M
++    echo read -P 11 110M 18M
++}
++
++verify_io | $QEMU_IO -r "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --image-opts "$options,$nested_opts,align=4k" \
++    | _filter_qemu_img_map
++
++_check_test_img
++
++# success, all done
++echo "*** done"
++status=0
+diff --git a/tests/qemu-iotests/204.out b/tests/qemu-iotests/204.out
+new file mode 100644
+index 0000000000..f3a10fbe90
+--- /dev/null
++++ b/tests/qemu-iotests/204.out
+@@ -0,0 +1,63 @@
++QA output created by 204
++
++== setting up files ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
++wrote 134217728/134217728 bytes at offset 0
++128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 115343360/115343360 bytes at offset 0
++110 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== constrained alignment and max-transfer ==
++wrote 131072/131072 bytes at offset 1000
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 1000
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== write zero with constrained max-transfer ==
++wrote 2093056/2093056 bytes at offset 8003584
++1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== non-power-of-2 write zeroes limits ==
++wrote 33554432/33554432 bytes at offset 33554432
++32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== non-power-of-2 discard limits ==
++discard 31457280/31457280 bytes at offset 80000001
++30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== block status smaller than alignment ==
++1/1 bytes allocated at offset 1 bytes
++16/1000 bytes allocated at offset 110 MiB
++0/1048576 bytes allocated at offset 127 MiB
++110 MiB (0x6e00000) bytes     allocated at offset 0 bytes (0x0)
++18 MiB (0x1200000) bytes not allocated at offset 110 MiB (0x6e00000)
++
++== verify image content ==
++read 1000/1000 bytes at offset 0
++1000 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 1000
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 7871512/7871512 bytes at offset 132072
++7.507 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 2093056/2093056 bytes at offset 8003584
++1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 23457792/23457792 bytes at offset 10096640
++22.371 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 33554432/33554432 bytes at offset 33554432
++32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 13631488/13631488 bytes at offset 67108864
++13 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 30408704/30408704 bytes at offset 80740352
++29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4194304/4194304 bytes at offset 111149056
++4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 18874368/18874368 bytes at offset 115343360
++18 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0               0x800000        TEST_DIR/t.IMGFMT
++0x900000        0x2400000       TEST_DIR/t.IMGFMT
++0x3c00000       0x1100000       TEST_DIR/t.IMGFMT
++0x6a00000       0x400000        TEST_DIR/t.IMGFMT
++No errors were found on the image.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index c4703cd782..8fc4f62cca 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -200,3 +200,4 @@
+ 201 rw auto migration
+ 202 rw auto quick
+ 203 rw auto
++204 rw auto quick
 -- 
 2.13.6
