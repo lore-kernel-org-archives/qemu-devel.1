@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edz9r-0003a6-OR
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9t-0003by-0Z
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edz9l-0005tI-SL
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:39 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9o-0005uO-4Y
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:41 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:42 +0100
-Message-Id: <20180123140201.31163-11-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:01:45 +0100
+Message-Id: <20180123140201.31163-14-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 10/29] qemu-iotests: Fix locking issue in 102
+Subject: [Qemu-devel] [PULL 13/29] block/qcow: Add blkdebug events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +24,113 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-102 truncates a qcow2 file (the raw file) on purpose while a VM is
-running.  However, image locking will usually prevent exactly this.
-
-The fact that most people have not noticed until now (I suppose you may
-have seen sporadic failures, but not taken them too seriously, like me)
-further shows that this truncation is actually not really done
-concurrently, but that the VM is still starting up by this point and has
-not yet opened the image.  Remedy this by waiting for the monitor shell
-to appear before the qemu-img invocation so we know the VM is up.
+This is not necessarily complete, but it should include the most
+important places.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171129185102.29390-1-mreitz@redhat.com
+Message-id: 20171123020832.8165-4-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/102     | 7 ++++++-
- tests/qemu-iotests/102.out | 3 ++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ block/qcow.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index d7ad8d9840..04b3f28445 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -69,7 +69,12 @@ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
- 
- qemu_comm_method=monitor _launch_qemu -drive if=none,file="$TEST_IMG",id=drv0
- 
--$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
-+# Wait for a prompt to appear (so we know qemu has opened the image)
-+_send_qemu_cmd '' '(qemu)'
-+
-+$QEMU_IMG resize --shrink --image-opts \
-+    "driver=raw,file.driver=file,file.filename=$TEST_IMG,file.locking=off" \
-+    $((5 * 64 * 1024))
- 
- _send_qemu_cmd $QEMU_HANDLE 'qemu-io drv0 map' 'allocated' \
-     | sed -e 's/^(qemu).*qemu-io drv0 map...$/(qemu) qemu-io drv0 map/'
-diff --git a/tests/qemu-iotests/102.out b/tests/qemu-iotests/102.out
-index ccf172abd9..4401b08fee 100644
---- a/tests/qemu-iotests/102.out
-+++ b/tests/qemu-iotests/102.out
-@@ -14,8 +14,9 @@ Offset          Length          Mapped to       File
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
- wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--Image resized.
- QEMU X.Y.Z monitor - type 'help' for more information
-+Image resized.
-+(qemu)
- (qemu) qemu-io drv0 map
- 64 KiB (0x10000) bytes     allocated at offset 0 bytes (0x0)
- *** done
+diff --git a/block/qcow.c b/block/qcow.c
+index 9569deeaf0..d552a6eba8 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -379,6 +379,7 @@ static int get_cluster_offset(BlockDriverState *bs,
+         /* update the L1 entry */
+         s->l1_table[l1_index] = l2_offset;
+         tmp = cpu_to_be64(l2_offset);
++        BLKDBG_EVENT(bs->file, BLKDBG_L1_UPDATE);
+         ret = bdrv_pwrite_sync(bs->file,
+                                s->l1_table_offset + l1_index * sizeof(tmp),
+                                &tmp, sizeof(tmp));
+@@ -409,6 +410,7 @@ static int get_cluster_offset(BlockDriverState *bs,
+         }
+     }
+     l2_table = s->l2_cache + (min_index << s->l2_bits);
++    BLKDBG_EVENT(bs->file, BLKDBG_L2_LOAD);
+     if (new_l2_table) {
+         memset(l2_table, 0, s->l2_size * sizeof(uint64_t));
+         ret = bdrv_pwrite_sync(bs->file, l2_offset, l2_table,
+@@ -432,6 +434,7 @@ static int get_cluster_offset(BlockDriverState *bs,
+         ((cluster_offset & QCOW_OFLAG_COMPRESSED) && allocate == 1)) {
+         if (!allocate)
+             return 0;
++        BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
+         /* allocate a new cluster */
+         if ((cluster_offset & QCOW_OFLAG_COMPRESSED) &&
+             (n_end - n_start) < s->cluster_sectors) {
+@@ -447,6 +450,7 @@ static int get_cluster_offset(BlockDriverState *bs,
+             }
+             cluster_offset = QEMU_ALIGN_UP(cluster_offset, s->cluster_size);
+             /* write the cluster content */
++            BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+             ret = bdrv_pwrite(bs->file, cluster_offset, s->cluster_cache,
+                               s->cluster_size);
+             if (ret < 0) {
+@@ -486,6 +490,7 @@ static int get_cluster_offset(BlockDriverState *bs,
+                                                       NULL) < 0) {
+                                 return -EIO;
+                             }
++                            BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+                             ret = bdrv_pwrite(bs->file,
+                                               cluster_offset + i * 512,
+                                               s->cluster_data, 512);
+@@ -503,6 +508,11 @@ static int get_cluster_offset(BlockDriverState *bs,
+         /* update L2 table */
+         tmp = cpu_to_be64(cluster_offset);
+         l2_table[l2_index] = tmp;
++        if (allocate == 2) {
++            BLKDBG_EVENT(bs->file, BLKDBG_L2_UPDATE_COMPRESSED);
++        } else {
++            BLKDBG_EVENT(bs->file, BLKDBG_L2_UPDATE);
++        }
+         ret = bdrv_pwrite_sync(bs->file, l2_offset + l2_index * sizeof(tmp),
+                                &tmp, sizeof(tmp));
+         if (ret < 0) {
+@@ -579,6 +589,7 @@ static int decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+     if (s->cluster_cache_offset != coffset) {
+         csize = cluster_offset >> (63 - s->cluster_bits);
+         csize &= (s->cluster_size - 1);
++        BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
+         ret = bdrv_pread(bs->file, coffset, s->cluster_data, csize);
+         if (ret != csize)
+             return -1;
+@@ -635,6 +646,8 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+                 hd_iov.iov_len = n * 512;
+                 qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
+                 qemu_co_mutex_unlock(&s->lock);
++                /* qcow2 emits this on bs->file instead of bs->backing */
++                BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+                 ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
+                 qemu_co_mutex_lock(&s->lock);
+                 if (ret < 0) {
+@@ -661,6 +674,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+             hd_iov.iov_len = n * 512;
+             qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
+             qemu_co_mutex_unlock(&s->lock);
++            BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+             ret = bdrv_co_readv(bs->file,
+                                 (cluster_offset >> 9) + index_in_cluster,
+                                 n, &hd_qiov);
+@@ -754,6 +768,7 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+         hd_iov.iov_len = n * 512;
+         qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
+         qemu_co_mutex_unlock(&s->lock);
++        BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+         ret = bdrv_co_writev(bs->file,
+                              (cluster_offset >> 9) + index_in_cluster,
+                              n, &hd_qiov);
+@@ -1048,6 +1063,7 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+         .iov_len    = out_len,
+     };
+     qemu_iovec_init_external(&hd_qiov, &iov, 1);
++    BLKDBG_EVENT(bs->file, BLKDBG_WRITE_COMPRESSED);
+     ret = bdrv_co_pwritev(bs->file, cluster_offset, out_len, &hd_qiov, 0);
+     if (ret < 0) {
+         goto fail;
 -- 
 2.13.6
