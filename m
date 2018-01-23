@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IE-0003xm-DP
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:37 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IG-0003zg-Im
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IB-0006R0-PO
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46306)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3ID-0006Rt-E8
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35002
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ee3IB-0006QW-Ht
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:31 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0NIP5wM138528
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:27 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp9jpsxys-1
+	id 1ee3ID-0006Rl-9W
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:33 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0NIQHN1140772
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:32 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fp7dg0yay-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:26 -0500
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:32 -0500
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 23 Jan 2018 11:27:26 -0700
+	Tue, 23 Jan 2018 11:27:31 -0700
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 23 Jan 2018 13:26:48 -0500
+Date: Tue, 23 Jan 2018 13:26:51 -0500
 In-Reply-To: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1516732013-18272-6-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 05/10] s390-ccw: parse and set boot menu
- options
+Message-Id: <1516732013-18272-9-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 08/10] s390-ccw: print zipl boot menu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,173 +41,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
 
-Set boot menu options for an s390 guest and store them in
-the iplb. These options are set via the QEMU command line
-option:
+When the boot menu options are present and the guest's
+disk has been configured by the zipl tool, then the user
+will be presented with an interactive boot menu with
+labeled entries. An example of what the menu might look
+like:
 
-    -boot menu=on|off[,splash-time=X]
+zIPL v1.37.1-build-20170714 interactive boot menu.
 
-or via the libvirt domain xml:
+  0. default (linux-4.13.0)
 
-    <os>
-      <bootmenu enable='yes|no' timeout='X'/>
-    </os>
-
-Where X represents some positive integer representing
-milliseconds.
-
-Any value set for loadparm will override all boot menu options.
-If loadparm=PROMPT, then the menu will be enabled without a
-timeout.
-
-The absence of any boot options on the command line will flag
-to later use the zipl boot loader values.
+  1. linux-4.13.0
+  2. performance
+  3. kvm
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/s390x/ipl.c          | 55 +++++++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/ipl.h          | 11 ++++++++--
- pc-bios/s390-ccw/iplb.h |  8 +++++--
- 3 files changed, 70 insertions(+), 4 deletions(-)
+ pc-bios/s390-ccw/menu.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 0d06fc1..a1eb8fe 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -23,6 +23,8 @@
- #include "hw/s390x/ebcdic.h"
- #include "ipl.h"
- #include "qemu/error-report.h"
-+#include "qemu/config-file.h"
-+#include "qemu/cutils.h"
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+index de12c73..174285e 100644
+--- a/pc-bios/s390-ccw/menu.c
++++ b/pc-bios/s390-ccw/menu.c
+@@ -10,13 +10,62 @@
+  */
  
- #define KERN_IMAGE_START                0x010000UL
- #define KERN_PARM_AREA                  0x010480UL
-@@ -219,6 +221,56 @@ static Property s390_ipl_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
+ #include "menu.h"
++#include "s390-ccw.h"
  
-+static void s390_ipl_set_boot_menu(IplParameterBlock *iplb)
+ static uint8_t flags;
+ static uint64_t timeout;
+ 
++/* Offsets from zipl fields to zipl banner start */
++#define ZIPL_TIMEOUT_OFFSET 138
++#define ZIPL_FLAG_OFFSET    140
++
++static int get_boot_index(int entries)
 +{
-+    QemuOptsList *plist = qemu_find_opts("boot-opts");
-+    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
-+    uint8_t *flags;
-+    uint16_t *timeout;
-+    const char *tmp;
-+    unsigned long result = 0;
-+
-+    switch (iplb->pbt) {
-+    case S390_IPL_TYPE_CCW:
-+        flags = &iplb->ccw.boot_menu_flags;
-+        timeout = &iplb->ccw.boot_menu_timeout;
-+        break;
-+    case S390_IPL_TYPE_QEMU_SCSI:
-+        flags = &iplb->scsi.boot_menu_flags;
-+        timeout = &iplb->scsi.boot_menu_timeout;
-+        break;
-+    default:
-+        error_report("boot menu is not supported for this device type.");
-+        return;
-+    }
-+
-+    /* In the absence of -boot menu, use zipl parameters */
-+    if (!qemu_opt_get(opts, "menu")) {
-+        *flags = BOOT_MENU_FLAG_ZIPL_OPTS;
-+    } else if (boot_menu) {
-+        *flags = BOOT_MENU_FLAG_BOOT_OPTS;
-+
-+        tmp = qemu_opt_get(opts, "splash-time");
-+
-+        if (tmp && qemu_strtoul(tmp, NULL, 10, &result)) {
-+            error_report("splash-time value is invalid, forcing it to 0.");
-+            *timeout = 0;
-+            return;
-+        }
-+
-+        result = (result + 500) / 1000; /* Round and convert to seconds */
-+
-+        if (result > 0xffff) {
-+            error_report("splash-time value is greater than 65535000,"
-+                         " forcing it to 65535000.");
-+            *timeout = 0xffff;
-+            return;
-+        }
-+
-+        *timeout = cpu_to_be16(result);
-+    }
++    return 0; /* Implemented next patch */
 +}
 +
- static bool s390_gen_initial_iplb(S390IPLState *ipl)
++static void zipl_println(const char *data, size_t len)
++{
++    char buf[len + 2];
++
++    ebcdic_to_ascii(data, buf, len);
++    buf[len] = '\n';
++    buf[len + 1] = '\0';
++
++    sclp_print(buf);
++}
++
+ int menu_get_zipl_boot_index(const void *stage2, int offset)
  {
-     DeviceState *dev_st;
-@@ -273,6 +325,9 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
-         if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
-             ipl->iplb.flags |= DIAG308_FLAGS_LP_VALID;
-         }
+-    return 0; /* implemented next patch */
++    const char *data = stage2 + offset;
++    uint16_t flag;
++    size_t len;
++    int ct;
 +
-+        s390_ipl_set_boot_menu(&ipl->iplb);
++    flag = *(uint16_t *)(data - ZIPL_FLAG_OFFSET);
 +
-         return true;
-     }
- 
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 8a705e0..48e82cf 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -15,9 +15,14 @@
- #include "hw/qdev.h"
- #include "cpu.h"
- 
-+#define BOOT_MENU_FLAG_BOOT_OPTS 0x80
-+#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
++    if (flags & BOOT_MENU_FLAG_ZIPL_OPTS) {
++        if (flag) {
++            timeout = *(uint16_t *)(data - ZIPL_TIMEOUT_OFFSET);
++        } else {
++            return 0; /* Boot default */
++        }
++    }
 +
- struct IplBlockCcw {
-     uint64_t netboot_start_addr;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[74];
-+    uint16_t boot_menu_timeout;
-+    uint8_t  boot_menu_flags;
-     uint8_t  ssid;
-     uint16_t devno;
-     uint8_t  vm_flags;
-@@ -51,7 +56,9 @@ struct IplBlockQemuScsi {
-     uint32_t lun;
-     uint16_t target;
-     uint16_t channel;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[74];
-+    uint16_t boot_menu_timeout;
-+    uint8_t  boot_menu_flags;
-     uint8_t  ssid;
-     uint16_t devno;
- } QEMU_PACKED;
-diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-index 890aed9..fe909d2 100644
---- a/pc-bios/s390-ccw/iplb.h
-+++ b/pc-bios/s390-ccw/iplb.h
-@@ -14,7 +14,9 @@
++    /* Print and count all menu items, including the banner */
++    for (ct = 0; *data; ct++) {
++        len = strlen(data);
++        zipl_println(data, len);
++        data += len + 1;
++
++        if (ct < 2) {
++            sclp_print("\n");
++        }
++    }
++
++    sclp_print("\n");
++
++    return get_boot_index(ct - 1);
+ }
  
- struct IplBlockCcw {
-     uint64_t netboot_start_addr;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[74];
-+    uint16_t boot_menu_timeout;
-+    uint8_t  boot_menu_flags;
-     uint8_t  ssid;
-     uint16_t devno;
-     uint8_t  vm_flags;
-@@ -48,7 +50,9 @@ struct IplBlockQemuScsi {
-     uint32_t lun;
-     uint16_t target;
-     uint16_t channel;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[74];
-+    uint16_t boot_menu_timeout;
-+    uint8_t  boot_menu_flags;
-     uint8_t  ssid;
-     uint16_t devno;
- } __attribute__ ((packed));
+ void menu_set_parms(uint8_t boot_menu_flag, uint16_t boot_menu_timeout)
 -- 
 2.7.4
