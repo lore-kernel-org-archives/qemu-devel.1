@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee7KS-00045W-8k
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:46:09 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee7Kl-0004JC-MN
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:46:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee7KQ-0003Am-Pa
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:46:08 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee7Kj-0003Y0-U1
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:46:27 -0500
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180123030630.26613-8-f4bug@amsat.org>
+In-Reply-To: <20180123030630.26613-9-f4bug@amsat.org>
 References: <20180123030630.26613-1-f4bug@amsat.org>
-	<20180123030630.26613-8-f4bug@amsat.org>
+	<20180123030630.26613-9-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 23 Jan 2018 14:45:34 -0800
-Message-ID: <CAKmqyKMv4vhq2RYKX7cNMy4S5PWggZfpcQxUWMPXwF2Lm4+xvw@mail.gmail.com>
+Date: Tue, 23 Jan 2018 14:45:53 -0800
+Message-ID: <CAKmqyKMBYoNqUVALJzpg8b=LtXr7wrOkMLiMeqhoe8rrMq0sNw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 07/14] hw/arm/bcm2835_peripherals:
- implement SDHCI Spec. v3
+Subject: Re: [Qemu-devel] [PATCH v8 08/14] hw/arm/bcm2835_peripherals:
+ change maximum block size to 1kB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,32 @@ Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell
 
 On Mon, Jan 22, 2018 at 7:06 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
+> following the datasheet.
+>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/arm/bcm2835_peripherals.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 12e0dd11af..0570cc4ad3 100644
-> --- a/hw/arm/bcm2835_peripherals.c
-> +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -254,14 +254,19 @@ static void bcm2835_peripherals_realize(DeviceState=
- *dev, Error **errp)
->      memory_region_add_subregion(&s->peri_mr, RNG_OFFSET,
->                  sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0));
->
-> -    /* Extended Mass Media Controller */
-> -    object_property_set_int(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "ca=
-pareg",
-> -                            &err);
-> -    if (err) {
-> -        error_propagate(errp, err);
-> -        return;
-> -    }
-> -
-> +    /* Extended Mass Media Controller
-> +     *
-> +     * Compatible with:
-> +     * - SD Host Controller Specification Version 3.0 Draft 1.0
-> +     * - SDIO Specification Version 3.0
-> +     * - MMC Specification Version 4.4
-> +     *
-> +     * For the exact details please refer to the Arasan documentation:
-> +     *   SD3.0_Host_AHB_eMMC4.4_Usersguide_ver5.9_jan11_10.pdf   =C2=AF\=
-_(=E3=83=84)_/=C2=AF
 
-I don't think we need the shrugging face in the comments.
-
-Otherwise:
-
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Alistair
 
-
-> +     */
-> +    object_property_set_uint(OBJECT(&s->sdhci), 3, "sd-spec-version", &e=
-rr);
-> +    object_property_set_uint(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "c=
-apareg",
-> +                             &err);
->      object_property_set_bool(OBJECT(&s->sdhci), true, "pending-insert-qu=
-irk",
->                               &err);
->      if (err) {
+> ---
+>  hw/arm/bcm2835_peripherals.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+> index 0570cc4ad3..6b86a99b14 100644
+> --- a/hw/arm/bcm2835_peripherals.c
+> +++ b/hw/arm/bcm2835_peripherals.c
+> @@ -19,7 +19,7 @@
+>  #define BCM2835_VC_PERI_BASE 0x7e000000
+>
+>  /* Capabilities for SD controller: no DMA, high-speed, default clocks et=
+c. */
+> -#define BCM2835_SDHC_CAPAREG 0x52034b4
+> +#define BCM2835_SDHC_CAPAREG 0x52134b4
+>
+>  static void bcm2835_peripherals_init(Object *obj)
+>  {
 > --
 > 2.15.1
 >
