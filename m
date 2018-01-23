@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edpes-0001vI-Et
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:03 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1edpjT-00061r-Pf
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:58:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1edper-0004BK-E0
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:02 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37286)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1edpjQ-0002AZ-Nh
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:58:47 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:42833)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1edper-0004AW-6T
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:54:01 -0500
-Received: by mail-pg0-x242.google.com with SMTP id z17so8768372pgc.4
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:54:01 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 22 Jan 2018 19:53:49 -0800
-Message-Id: <20180123035349.24538-6-richard.henderson@linaro.org>
-In-Reply-To: <20180123035349.24538-1-richard.henderson@linaro.org>
-References: <20180123035349.24538-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 5/5] target/arm: Add SVE state to TB->FLAGS
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1edpjQ-0002A7-In
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:58:44 -0500
+Received: by mail-qt0-x244.google.com with SMTP id c2so26594719qtn.9
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:58:44 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 23 Jan 2018 00:58:31 -0300
+Message-Id: <20180123035837.16578-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/6] SDHCI: convert legacy devices to the
+ SDBus API (part 6)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,121 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefan Weil <sw@weilnetz.de>
 
-Add both SVE exception state and vector length.
+Hi,
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.h           |  8 ++++++++
- target/arm/translate.h     |  2 ++
- target/arm/helper.c        | 25 ++++++++++++++++++++++++-
- target/arm/translate-a64.c |  2 ++
- 4 files changed, 36 insertions(+), 1 deletion(-)
+Since v1:
+- rebased on /master (Peter sdcard reset() patches)
+- fix milkymist-mmc from previous seris using instance_init (Michael Walle)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 17955ad3ef..a311d4e327 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2648,6 +2648,10 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
- #define ARM_TBFLAG_TBI0_MASK (0x1ull << ARM_TBFLAG_TBI0_SHIFT)
- #define ARM_TBFLAG_TBI1_SHIFT 1        /* TBI1 for EL0/1  */
- #define ARM_TBFLAG_TBI1_MASK (0x1ull << ARM_TBFLAG_TBI1_SHIFT)
-+#define ARM_TBFLAG_SVEEXC_EL_SHIFT  2
-+#define ARM_TBFLAG_SVEEXC_EL_MASK   (0x3 << ARM_TBFLAG_SVEEXC_EL_SHIFT)
-+#define ARM_TBFLAG_ZCR_LEN_SHIFT    4
-+#define ARM_TBFLAG_ZCR_LEN_MASK     (0xf << ARM_TBFLAG_ZCR_LEN_SHIFT)
- 
- /* some convenience accessor macros */
- #define ARM_TBFLAG_AARCH64_STATE(F) \
-@@ -2684,6 +2688,10 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
-     (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
- #define ARM_TBFLAG_TBI1(F) \
-     (((F) & ARM_TBFLAG_TBI1_MASK) >> ARM_TBFLAG_TBI1_SHIFT)
-+#define ARM_TBFLAG_SVEEXC_EL(F) \
-+    (((F) & ARM_TBFLAG_SVEEXC_EL_MASK) >> ARM_TBFLAG_SVEEXC_EL_SHIFT)
-+#define ARM_TBFLAG_ZCR_LEN(F) \
-+    (((F) & ARM_TBFLAG_ZCR_LEN_MASK) >> ARM_TBFLAG_ZCR_LEN_SHIFT)
- 
- static inline bool bswap_code(bool sctlr_b)
- {
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 3f4df91e5e..c47febf99d 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -29,6 +29,8 @@ typedef struct DisasContext {
-     bool tbi1;         /* TBI1 for EL0/1, not used for EL2/3 */
-     bool ns;        /* Use non-secure CPREG bank on access */
-     int fp_excp_el; /* FP exception EL or 0 if enabled */
-+    int sve_excp_el; /* SVE exception EL or 0 if enabled */
-+    int sve_len;     /* SVE vector length in bytes */
-     /* Flag indicating that exceptions from secure mode are routed to EL3. */
-     bool secure_routed_to_el3;
-     bool vfp_enabled; /* FP enabled via FPSCR.EN */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index db67e8ac72..d46d3622fc 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11823,14 +11823,37 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
- {
-     ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
-+    int fp_el = fp_exception_el(env);
-     uint32_t flags;
- 
-     if (is_a64(env)) {
-+        int sve_el = sve_exception_el(env);
-+        uint32_t zcr_len;
-+
-         *pc = env->pc;
-         flags = ARM_TBFLAG_AARCH64_STATE_MASK;
-         /* Get control bits for tagged addresses */
-         flags |= (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SHIFT);
-         flags |= (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SHIFT);
-+        flags |= sve_el << ARM_TBFLAG_SVEEXC_EL_SHIFT;
-+
-+        /* If SVE is disabled, but FP is enabled,
-+           then the effective len is 0.  */
-+        if (sve_el != 0 && fp_el == 0) {
-+            zcr_len = 0;
-+        } else {
-+            int current_el = arm_current_el(env);
-+
-+            zcr_len = env->vfp.zcr_el[current_el <= 1 ? 1 : current_el];
-+            zcr_len &= 0xf;
-+            if (current_el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
-+                zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[2]);
-+            }
-+            if (current_el < 3 && arm_feature(env, ARM_FEATURE_EL3)) {
-+                zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[3]);
-+            }
-+        }
-+        flags |= zcr_len << ARM_TBFLAG_ZCR_LEN_SHIFT;
-     } else {
-         *pc = env->regs[15];
-         flags = (env->thumb << ARM_TBFLAG_THUMB_SHIFT)
-@@ -11873,7 +11896,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-     if (arm_cpu_data_is_big_endian(env)) {
-         flags |= ARM_TBFLAG_BE_DATA_MASK;
-     }
--    flags |= fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
-+    flags |= fp_el << ARM_TBFLAG_FPEXC_EL_SHIFT;
- 
-     if (arm_v7m_is_handler_mode(env)) {
-         flags |= ARM_TBFLAG_HANDLER_MASK;
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 10eef870fe..4c1eca7062 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11263,6 +11263,8 @@ static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->user = (dc->current_el == 0);
- #endif
-     dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
-+    dc->sve_excp_el = ARM_TBFLAG_SVEEXC_EL(dc->base.tb->flags);
-+    dc->sve_len = (ARM_TBFLAG_ZCR_LEN(dc->base.tb->flags) + 1) * 16;
-     dc->vec_len = 0;
-     dc->vec_stride = 0;
-     dc->cp_regs = arm_cpu->cp_regs;
+This series convert 3 devices using the legacy SDCard API to the SDBus API:
+- milkymist-mmc
+- pl181
+- ssi-sd
+
+Then move the legacy API to a separate header "sdcard_legacy.h".
+
+Now the OMAP MMC is the last device using the legacy API, but need to get
+QOM'ified first.
+
+Having a common sdbus interface simplify qtesting (next series)
+
+Regards,
+
+Phil.
+
+$ git backport-diff
+001/6:[----] [--] 'hw/sd/milkymist-memcard: use qemu_log_mask()'
+002/6:[0014] [FC] 'hw/sd/milkymist-memcard: split realize() out of SysBusDevice init()'
+003/6:[0004] [FC] 'hw/sd/milkymist-memcard: expose a SDBus and connect the SDCard to it'
+004/6:[0006] [FC] 'hw/sd/pl181: expose a SDBus and connect the SDCard to it'
+005/6:[down] 'hw/sd/ssi-sd: use the SDBus API, connect the SDCard to the bus'
+006/6:[----] [-C] 'hw/sd: move sdcard legacy API to "hw/sd/sdcard_legacy.h"'
+
+Based-on: 20180123033034.29493-19-f4bug@amsat.org
+          (or /master)
+
+Philippe Mathieu-Daudé (6):
+  hw/sd/milkymist-memcard: use qemu_log_mask()
+  hw/sd/milkymist-memcard: split realize() out of SysBusDevice init()
+  hw/sd/milkymist-memcard: expose a SDBus and connect the SDCard to it
+  hw/sd/pl181: expose a SDBus and connect the SDCard to it
+  hw/sd/ssi-sd: use the SDBus API, connect the SDCard to the bus
+  hw/sd: move sdcard legacy API to "hw/sd/sdcard_legacy.h"
+
+ include/hw/sd/sd.h            | 17 ---------
+ include/hw/sd/sdcard_legacy.h | 51 +++++++++++++++++++++++++++
+ hw/sd/milkymist-memcard.c     | 81 ++++++++++++++++++++++++-------------------
+ hw/sd/omap_mmc.c              |  2 +-
+ hw/sd/pl181.c                 | 32 +++++++++++------
+ hw/sd/sd.c                    |  1 +
+ hw/sd/ssi-sd.c                | 32 ++++++++++-------
+ 7 files changed, 139 insertions(+), 77 deletions(-)
+ create mode 100644 include/hw/sd/sdcard_legacy.h
+
 -- 
-2.14.3
+2.15.1
