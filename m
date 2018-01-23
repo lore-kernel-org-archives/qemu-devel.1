@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edzwE-0002Nk-AY
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:52:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1edzxN-0003UH-KF
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:53:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edzw9-0006xs-Kh
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:52:38 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 23 Jan 2018 11:52:22 -0300
-Message-Id: <20180123145222.2487-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1edzxM-00083u-Ow
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:53:49 -0500
+References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
+	<b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com>
+	<0ef02c21-bfd0-eb67-78bb-4728a8384cdb@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f509bbd3-b6a4-93ab-d432-0cfe104be721@redhat.com>
+Date: Tue, 23 Jan 2018 08:53:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] linux-user/syscall: let recvfrom(struct
- sockaddr *) use abi_ulong
+In-Reply-To: <0ef02c21-bfd0-eb67-78bb-4728a8384cdb@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FOvRpM1W6OGDH90KzBXVW03wTtXoFfgjj"
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] qapi: query-blockstat: add driver
+ specific file-posix stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, den@virtuozzo.com
 
-Currently recvfrom() is restricted to handle 32-bit pointers,
-remove this limit for 64-bit hosts.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FOvRpM1W6OGDH90KzBXVW03wTtXoFfgjj
+From: Eric Blake <eblake@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, den@virtuozzo.com
+Message-ID: <f509bbd3-b6a4-93ab-d432-0cfe104be721@redhat.com>
+Subject: Re: [PATCH v2 8/8] qapi: query-blockstat: add driver specific
+ file-posix stats
+References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
+ <b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com>
+ <0ef02c21-bfd0-eb67-78bb-4728a8384cdb@virtuozzo.com>
+In-Reply-To: <0ef02c21-bfd0-eb67-78bb-4728a8384cdb@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This fixes:
+On 01/23/2018 05:28 AM, Anton Nefedov wrote:
 
-  31572 socket(AF_NETLINK, SOCK_RAW, NETLINK_AUDIT) = 3
-  ...
-  31572 sendto(3, {{len=124, type=0x454 /* NLMSG_??? */, flags=NLM_F_REQUEST|NLM_F_ACK, seq=1, pid=0}, "op=test:message acct=\"?\" exe=\"/tmp/nl-bad-addr\" hostname=localhost addr=? terminal=/dev/pts/2 res=success\0\0\0"}, 124, 0, 0xfffffa3897d0, 0) = 124
-  31572 ppoll([{fd=3, events=POLLIN}], 1, {tv_sec=0, tv_nsec=500000000}, NULL, 0) = 1 ([{fd=3, revents=POLLIN}], left {tv_sec=0, tv_nsec=499993180})
-  31572 recvfrom(3, 0x112a50eb4, 8988, MSG_PEEK|MSG_DONTWAIT, 0xfffffa3897e0, 0x42) = -1 EFAULT (Bad address)
+>>> +
+>>> +##
+>>> +# @BlockDriverStats:
+>>> +#
+>>> +# Statistics of a block driver (driver-specific)
+>>> +#
+>>> +# Since: 2.12
+>>> +##
+>>> +{ 'union': 'BlockDriverStats',
+>>> +=C2=A0 'data': {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'file': 'BlockDriverStatsFile'
+>>> +=C2=A0 } }
+>>
+>> Markus has been adamant that we add no new "simple unions" (unions wit=
+h
+>> a 'discriminator' field) - because they are anything but simple in the=
 
-Reported-by: Guido Günther <agx@sigxcpu.org>
-Message-id: 20180123120541.GA14216@bogon.m.sigxcpu.org
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- linux-user/syscall.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+>> long run.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 11c9116c4a..28805b1785 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -4032,7 +4032,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-     if (!host_msg)
-         return -TARGET_EFAULT;
-     if (target_addr) {
--        if (get_user_u32(addrlen, target_addrlen)) {
-+        if (get_user_ual(addrlen, target_addrlen)) {
-             ret = -TARGET_EFAULT;
-             goto fail;
-         }
-@@ -4053,7 +4053,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-         }
-         if (target_addr) {
-             host_to_target_sockaddr(target_addr, addr, addrlen);
--            if (put_user_u32(addrlen, target_addrlen)) {
-+            if (put_user_ual(addrlen, target_addrlen)) {
-                 ret = -TARGET_EFAULT;
-                 goto fail;
-             }
--- 
-2.15.1
+>=20
+> Right, forgot about those unions.. Will fix.
+>=20
+> (I guess I will need an extra enum, like BlockdevDriverWithStats with a=
+
+> single 'file' member, otherwise it seems to require to define data for
+> each BlockdevDriver type)
+
+Kevin also recently requested an easier way to make a flat union that
+uses only a subset of a larger enum.  Maybe it's worth investing some
+time in a QAPI generator patch to make this part easier (I have a
+potential patch floating on one of my older branches that would allow
+'branch':{} rather than having to declare a dummy type, but that's
+slightly different than not even supplying the branches that you aren't
+implementing).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--FOvRpM1W6OGDH90KzBXVW03wTtXoFfgjj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpnTG4ACgkQp6FrSiUn
+Q2riGwf/R4fQjNWkDegKGXxTMVk37b5qYdEWZUl+aIionw9pVQuQT6UYlLdfM6hB
+R1f9x6EPNJFyOjfBACioFxmsvDhHlHTf00VVZHHiX8Vgy6nuugrAuDco9QnImTTW
+zTMswiYA1PL+1hs9fG0faWuu2wCxU/mZZleLazcpD+O5lo4QacxHZTSReLo7a3Jc
+BMO+fa4ZtJNR2zZ5wNVqPULfy1xm7G8tKRa4UYq9btXmGY2a3jxyUAu4u+C0sWfH
+tVVuksueWgvycoJ5ojnL5XFJ5pbmAWcKoEUy7ShMW1NKtBJicpBi29FFlZQ5OdBU
+hl5bRb0Sorzyx7mGiKG+R0Kk+Fw99Q==
+=Evm9
+-----END PGP SIGNATURE-----
+
+--FOvRpM1W6OGDH90KzBXVW03wTtXoFfgjj--
