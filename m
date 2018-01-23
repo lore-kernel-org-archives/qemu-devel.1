@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ee4wX-0007gc-AX
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:13:18 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ee508-0000e7-CS
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ee4wU-0007Yf-2B
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:13:17 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:54307)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ee4wT-0007VY-N5
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:13:13 -0500
-References: <mhng-571037c3-1629-46e7-8e0a-9c1e2c2a8fcc@palmer-si-x1c4>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a79e738c-525f-08b4-d96e-fae2caf7f5f8@vivier.eu>
-Date: Tue, 23 Jan 2018 21:13:07 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1ee505-0002qY-0b
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:17:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ee504-0002pZ-MO
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:16:56 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C0B52C0587C7
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 20:16:55 +0000 (UTC)
+Date: Tue, 23 Jan 2018 20:16:47 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180123201647.GC2530@work-vm>
+References: <20180110124723.11879-1-quintela@redhat.com>
+	<20180110124723.11879-6-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <mhng-571037c3-1629-46e7-8e0a-9c1e2c2a8fcc@palmer-si-x1c4>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 13/13] linux-user: implement renameat2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180110124723.11879-6-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v10 05/14] migration: Create
+ ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +34,367 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: qemu-devel@nongnu.org, schwab@suse.de
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-Le 23/01/2018 à 20:13, Palmer Dabbelt a écrit :
-> On Tue, 23 Jan 2018 06:48:07 PST (-0800), laurent@vivier.eu wrote:
->> From: Andreas Schwab <schwab@suse.de>
->>
->> This is needed for new architectures like RISC-V which do not provide any
->> other rename-like syscall.
->>
->> Signed-off-by: Andreas Schwab <schwab@suse.de>
->> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->> Message-Id: <mvm607su9qs.fsf@suse.de>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>  linux-user/syscall.c | 34 ++++++++++++++++++++++++++++++++++
->>  1 file changed, 34 insertions(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 104408c050..74378947f0 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -600,6 +600,24 @@ static int sys_utimensat(int dirfd, const char
->> *pathname,
->>  #endif
->>  #endif /* TARGET_NR_utimensat */
->>
->> +#ifdef TARGET_NR_renameat2
->> +#if defined(__NR_renameat2)
->> +#define __NR_sys_renameat2 __NR_renameat2
->> +_syscall5(int, sys_renameat2, int, oldfd, const char *, old, int, newfd,
->> +          const char *, new, unsigned int, flags)
->> +#else
->> +static int sys_renameat2(int oldfd, const char *old,
->> +                         int newfd, const char *new, int flags)
->> +{
->> +    if (flags == 0) {
->> +        return renameat(oldfd, old, newfd, new);
->> +    }
->> +    errno = ENOSYS;
->> +    return -1;
->> +}
->> +#endif
->> +#endif /* TARGET_NR_renameat2 */
->> +
->>  #ifdef CONFIG_INOTIFY
->>  #include <sys/inotify.h>
->>
->> @@ -8426,6 +8444,22 @@ abi_long do_syscall(void *cpu_env, int num,
->> abi_long arg1,
->>          }
->>          break;
->>  #endif
->> +#if defined(TARGET_NR_renameat2)
->> +    case TARGET_NR_renameat2:
->> +        {
->> +            void *p2;
->> +            p  = lock_user_string(arg2);
->> +            p2 = lock_user_string(arg4);
->> +            if (!p || !p2) {
->> +                ret = -TARGET_EFAULT;
->> +            } else {
->> +                ret = get_errno(sys_renameat2(arg1, p, arg3, p2, arg5));
->> +            }
->> +            unlock_user(p2, arg4, 0);
->> +            unlock_user(p, arg2, 0);
->> +        }
->> +        break;
->> +#endif
->>  #ifdef TARGET_NR_mkdir
->>      case TARGET_NR_mkdir:
->>          if (!(p = lock_user_string(arg1)))
+* Juan Quintela (quintela@redhat.com) wrote:
+> The function still don't use multifd, but we have simplified
+> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+> counter and a new flag for this type of pages.
 > 
-> Thanks!  My patch got lost in the shuffle, but I think these are
-> functionally identical.  Feel free to add my
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> Add last_page parameter
+> Add commets for done and address
+> Remove multifd field, it is the same than normal pages
+> Merge next patch, now we send multiple pages at a time
+> Remove counter for multifd pages, it is identical to normal pages
+> Use iovec's instead of creating the equivalent.
+> Clear memory used by pages (dave)
+> Use g_new0(danp)
+> define MULTIFD_CONTINUE
+> now pages member is a pointer
+> Fix off-by-one in number of pages in one packet
+> ---
+>  migration/ram.c        | 159 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  migration/trace-events |   2 +
+>  2 files changed, 160 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index aef5a323f3..5d6b46ac23 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -52,6 +52,7 @@
+>  #include "migration/block.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/uuid.h"
+> +#include "qemu/iov.h"
+>  
+>  /***********************************************************/
+>  /* ram save/restore */
+> @@ -71,6 +72,7 @@
+>  #define RAM_SAVE_FLAG_XBZRLE   0x40
+>  /* 0x80 is reserved in migration.h start with 0x100 next */
+>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+> +#define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
+>  
+>  static inline bool is_zero_range(uint8_t *p, uint64_t size)
+>  {
+> @@ -395,14 +397,36 @@ static void compress_threads_save_setup(void)
+>  
+>  /* Multiple fd's */
+>  
+> +/* used to continue on the same multifd group */
+> +#define MULTIFD_CONTINUE UINT16_MAX
+> +
+> +typedef struct {
+> +    /* number of used pages */
 
-I've seen your patch, but Andreas has implemented what was requested by
-Peter (use renameat() when flags == 0), so I took his one.
+      Telling us it's used doesn't help much; if I understand
+right, this is for accumulating them into one large block
+before actually sending them?
 
-> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+> +    uint32_t used;
+> +    /* number of allocated pages */
+> +    uint32_t allocated;
+> +    /* global number of generated multifd packets */
+> +    uint32_t seq;
+> +    struct iovec *iov;
+> +    RAMBlock *block;
+> +} multifd_pages_t;
+> +
+>  struct MultiFDSendParams {
+> +    /* not changed */
 
-To late for that (it's a pull request), sorry.
+???
 
-Thank you,
-Laurent
+>      uint8_t id;
+>      char *name;
+>      QemuThread thread;
+>      QIOChannel *c;
+>      QemuSemaphore sem;
+>      QemuMutex mutex;
+> +    /* protected by param mutex */
+>      bool quit;
+> +    multifd_pages_t *pages;
+> +    /* how many patches has sent this channel */
+
+s/patches/packets/
+
+> +    uint32_t packets_sent;
+> +    /* protected by multifd mutex */
+> +    /* has the thread finish the last submitted job */
+> +    bool done;
+>  };
+>  typedef struct MultiFDSendParams MultiFDSendParams;
+>  
+> @@ -410,8 +434,31 @@ struct {
+>      MultiFDSendParams *params;
+>      /* number of created threads */
+>      int count;
+> +    QemuMutex mutex;
+> +    QemuSemaphore sem;
+> +    multifd_pages_t *pages;
+>  } *multifd_send_state;
+>  
+> +static void multifd_pages_init(multifd_pages_t **ppages, size_t size)
+
+What is the 'size' here - it's allocated pages for something?
+
+> +{
+> +    multifd_pages_t *pages = g_new0(multifd_pages_t, 1);
+> +
+> +    pages->allocated = size;
+> +    pages->iov = g_new0(struct iovec, size);
+> +    *ppages = pages;
+> +}
+> +
+> +static void multifd_pages_clear(multifd_pages_t *pages)
+> +{
+> +    pages->used = 0;
+> +    pages->allocated = 0;
+> +    pages->seq = 0;
+> +    pages->block = NULL;
+> +    g_free(pages->iov);
+> +    pages->iov = NULL;
+> +    g_free(pages);
+> +}
+> +
+>  static void terminate_multifd_send_threads(Error *errp)
+>  {
+>      int i;
+> @@ -453,9 +500,13 @@ int multifd_save_cleanup(Error **errp)
+>          socket_send_channel_destroy(p->c);
+>          g_free(p->name);
+>          p->name = NULL;
+> +        multifd_pages_clear(p->pages);
+> +        p->pages = NULL;
+>      }
+>      g_free(multifd_send_state->params);
+>      multifd_send_state->params = NULL;
+> +    multifd_pages_clear(multifd_send_state->pages);
+> +    multifd_send_state->pages = NULL;
+>      g_free(multifd_send_state);
+>      multifd_send_state = NULL;
+>      return ret;
+> @@ -482,6 +533,7 @@ static void *multifd_send_thread(void *opaque)
+>          terminate_multifd_send_threads(local_err);
+>          return NULL;
+>      }
+> +    qemu_sem_post(&multifd_send_state->sem);
+>  
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+> @@ -489,9 +541,24 @@ static void *multifd_send_thread(void *opaque)
+>              qemu_mutex_unlock(&p->mutex);
+>              break;
+>          }
+> +        if (p->pages->used) {
+> +            p->pages->used = 0;
+> +            qemu_mutex_unlock(&p->mutex);
+> +
+> +            trace_multifd_send(p->id, p->pages->seq, p->pages->used);
+
+but p->pages->used is just been set to 0?
+
+> +            /* ToDo: send page here */
+> +
+> +            qemu_mutex_lock(&multifd_send_state->mutex);
+> +            p->done = true;
+> +            p->packets_sent++;
+> +            qemu_mutex_unlock(&multifd_send_state->mutex);
+> +            qemu_sem_post(&multifd_send_state->sem);
+> +            continue;
+> +        }
+>          qemu_mutex_unlock(&p->mutex);
+>          qemu_sem_wait(&p->sem);
+>      }
+> +    trace_multifd_send_thread(p->id, p->packets_sent);
+>  
+>      return NULL;
+>  }
+> @@ -529,6 +596,10 @@ int multifd_save_setup(void)
+>      multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
+>      multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
+>      multifd_send_state->count = 0;
+> +    qemu_mutex_init(&multifd_send_state->mutex);
+> +    qemu_sem_init(&multifd_send_state->sem, 0);
+> +    multifd_pages_init(&multifd_send_state->pages,
+> +                       migrate_multifd_page_count());
+>      for (i = 0; i < thread_count; i++) {
+>          MultiFDSendParams *p = &multifd_send_state->params[i];
+>  
+> @@ -536,12 +607,58 @@ int multifd_save_setup(void)
+>          qemu_sem_init(&p->sem, 0);
+>          p->quit = false;
+>          p->id = i;
+> +        p->done = true;
+> +        multifd_pages_init(&p->pages, migrate_multifd_page_count());
+>          p->name = g_strdup_printf("multifdsend_%d", i);
+>          socket_send_channel_create(multifd_new_send_channel_async, p);
+>      }
+>      return 0;
+>  }
+>  
+> +static uint16_t multifd_send_page(RAMBlock *block, ram_addr_t offset,
+> +                                  bool last_page)
+> +{
+> +    int i;
+> +    MultiFDSendParams *p = NULL; /* make happy gcc */
+
+(English: Make gcc happy)
+
+> +    multifd_pages_t *pages = multifd_send_state->pages;
+> +
+> +    if (!pages->block) {
+> +        pages->block = block;
+> +    }
+> +
+> +    pages->iov[pages->used].iov_base = block->host + offset;
+> +    pages->iov[pages->used].iov_len = TARGET_PAGE_SIZE;
+> +    pages->used++;
+> +
+> +    if (!last_page) {
+> +        if (pages->used < pages->allocated) {
+> +            return MULTIFD_CONTINUE;
+> +        }
+> +    }
+
+I'm confused by this a bit.
+Isn't the next bit waiting for a free thread?
+
+> +    qemu_sem_wait(&multifd_send_state->sem);
+> +    qemu_mutex_lock(&multifd_send_state->mutex);
+> +    for (i = 0; i < multifd_send_state->count; i++) {
+> +        p = &multifd_send_state->params[i];
+> +
+> +        if (p->done) {
+> +            p->done = false;
+> +            break;
+> +        }
+> +    }
+> +    qemu_mutex_unlock(&multifd_send_state->mutex);
+> +    qemu_mutex_lock(&p->mutex);
+> +    p->pages->used = 0;
+
+If we're handing the block of pages to the thread, I don't understand
+why we zero used here.
+
+> +    p->pages->seq = pages->seq + 1;
+> +    p->pages->block = NULL;
+> +    multifd_send_state->pages = p->pages;
+> +    p->pages = pages;
+> +    qemu_mutex_unlock(&p->mutex);
+> +    qemu_sem_post(&p->sem);
+> +
+> +    return i;
+> +}
+> +
+>  struct MultiFDRecvParams {
+>      uint8_t id;
+>      char *name;
+> @@ -1070,6 +1187,31 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+>      return pages;
+>  }
+>  
+> +static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+> +                            bool last_stage)
+> +{
+> +    int pages;
+> +    uint8_t *p;
+> +    RAMBlock *block = pss->block;
+> +    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
+> +
+> +    p = block->host + offset;
+> +
+> +    pages = save_zero_page(rs, block, offset);
+> +    if (pages == -1) {
+> +        ram_counters.transferred +=
+> +            save_page_header(rs, rs->f, block,
+> +                             offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+> +        multifd_send_page(block, offset, rs->migration_dirty_pages == 1);
+> +        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+
+So that's temporary - we're hoping multifd_send_page will do that?
+
+> +        ram_counters.transferred += TARGET_PAGE_SIZE;
+> +        pages = 1;
+> +        ram_counters.normal++;
+> +    }
+> +
+> +    return pages;
+> +}
+> +
+>  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>                                  ram_addr_t offset)
+>  {
+> @@ -1498,6 +1640,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>          if (migrate_use_compression() &&
+>              (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
+>              res = ram_save_compressed_page(rs, pss, last_stage);
+> +        } else if (migrate_use_multifd()) {
+> +            res = ram_multifd_page(rs, pss, last_stage);
+>          } else {
+>              res = ram_save_page(rs, pss, last_stage);
+>          }
+> @@ -2878,6 +3022,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>      if (!migrate_use_compression()) {
+>          invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
+>      }
+> +
+> +    if (!migrate_use_multifd()) {
+> +        invalid_flags |= RAM_SAVE_FLAG_MULTIFD_PAGE;
+> +    }
+>      /* This RCU critical section can be very long running.
+>       * When RCU reclaims in the code start to become numerous,
+>       * it will be necessary to reduce the granularity of this
+> @@ -2902,13 +3050,17 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>              if (flags & invalid_flags & RAM_SAVE_FLAG_COMPRESS_PAGE) {
+>                  error_report("Received an unexpected compressed page");
+>              }
+> +            if (flags & invalid_flags  & RAM_SAVE_FLAG_MULTIFD_PAGE) {
+> +                error_report("Received an unexpected multifd page");
+> +            }
+>  
+>              ret = -EINVAL;
+>              break;
+>          }
+>  
+>          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+> -                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+> +                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
+> +                     RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+>              RAMBlock *block = ram_block_from_stream(f, flags);
+>  
+>              host = host_from_ram_block_offset(block, addr);
+> @@ -2997,6 +3149,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>                  break;
+>              }
+>              break;
+> +
+> +        case RAM_SAVE_FLAG_MULTIFD_PAGE:
+> +            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+> +            break;
+> +
+>          case RAM_SAVE_FLAG_EOS:
+>              /* normal exit */
+>              break;
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 141e773305..61ee21a13e 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -77,6 +77,8 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
+>  ram_postcopy_send_discard_bitmap(void) ""
+>  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
+>  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
+> +multifd_send(char id, int seq, int num) "channel %d sequence %d num pages %d"
+> +multifd_send_thread(char id, uint32_t packets) "channel %d packets %d"
+>  
+>  # migration/migration.c
+>  await_return_path_close_on_source_close(void) ""
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
