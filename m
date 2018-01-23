@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMi-0002u5-Mm
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:37 -0500
+	(envelope-from <drjones@redhat.com>) id 1edv90-0002nI-Le
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:45:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMf-0000lx-LG
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:36 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:57510)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduMf-0000ku-DC
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:55:33 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 23 Jan 2018 11:55:33 +0300
-Message-ID: <20180123085533.3419.31061.stgit@pasha-VirtualBox>
-In-Reply-To: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
-References: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
+	(envelope-from <drjones@redhat.com>) id 1edv8x-0004d2-Gn
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:45:30 -0500
+Date: Tue, 23 Jan 2018 10:45:11 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180123094511.5m4uuocpgzlfldf3@kamzik.brq.redhat.com>
+References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
+	<1516694904-64879-4-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v5 24/24] replay: don't drain/flush bdrv
- queue while RR is working
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1516694904-64879-4-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 03/25] arm: cpu: add CPU_RESOLVING_TYPE
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <laurent@vivier.eu>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-In record/replay mode bdrv queue is controlled by replay mechanism.
-It does not allow stopping the vm, saving or loading the snapshots
-when bdrv queue is not empty. Therefore draining and flushing is unnecessary
-(and may cause deadlocks in replay mode).
-This patch disables bdrv_drain_all and bdrv_flush_all in replay mode.
+On Tue, Jan 23, 2018 at 09:08:02AM +0100, Igor Mammedov wrote:
+> it will be used for providing to cpu name resolving class for
+> parsing cpu model for system and user emulation code.
+> 
+> Along with change add target to null-machine test, so
+> that when switch to CPU_RESOLVING_TYPE happens,
+> thest would ensure that null-mchine usecase still works.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: qemu-arm@nongnu.org
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> CC: Andrew Jones <drjones@redhat.com>
+> ---
+>  target/arm/cpu.h          | 1 +
+>  linux-user/main.c         | 2 --
+>  tests/machine-none-test.c | 2 ++
+>  3 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 9631670..f9fb141 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2171,6 +2171,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+>  
+>  #define ARM_CPU_TYPE_SUFFIX "-" TYPE_ARM_CPU
+>  #define ARM_CPU_TYPE_NAME(name) (name ARM_CPU_TYPE_SUFFIX)
+> +#define CPU_RESOLVING_TYPE TYPE_ARM_CPU
+>  
+>  #define cpu_signal_handler cpu_arm_signal_handler
+>  #define cpu_list arm_cpu_list
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 450eb3c..a35477e 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -4325,8 +4325,6 @@ int main(int argc, char **argv, char **envp)
+>  #else
+>          cpu_model = "qemu32";
+>  #endif
+> -#elif defined(TARGET_ARM)
+> -        cpu_model = "any";
+>  #elif defined(TARGET_UNICORE32)
+>          cpu_model = "any";
+>  #elif defined(TARGET_M68K)
+> diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
+> index 2eb13e8..1b213ff 100644
+> --- a/tests/machine-none-test.c
+> +++ b/tests/machine-none-test.c
+> @@ -24,6 +24,8 @@ struct arch2cpu {
+>  
+>  static struct arch2cpu cpus_map[] = {
+>      /* tested targets list */
+> +    { "arm", "cortex-a15" },
+> +    { "aarch64", "cortex-a15" },
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- block/io.c |   22 ++++++++++++++++++++++
- cpus.c     |    2 --
- 2 files changed, 22 insertions(+), 2 deletions(-)
+I understand that this doesn't matter for your purposes, but can we change
+the aarch64 mapping to point to an aarch64 processor, e.g. cortex-a57,
+instead?
 
-diff --git a/block/io.c b/block/io.c
-index 7ea4023..e773e68 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -31,6 +31,7 @@
- #include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-+#include "sysemu/replay.h"
- 
- #define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
- 
-@@ -407,6 +408,13 @@ void bdrv_drain_all_begin(void)
-     BdrvNextIterator it;
-     GSList *aio_ctxs = NULL, *ctx;
- 
-+    /* bdrv queue is managed by record/replay,
-+       waiting for finishing the I/O requests may
-+       be infinite */
-+    if (replay_events_enabled()) {
-+        return;
-+    }
-+
-     /* BDRV_POLL_WHILE() for a node can only be called from its own I/O thread
-      * or the main loop AioContext. We potentially use BDRV_POLL_WHILE() on
-      * nodes in several different AioContexts, so make sure we're in the main
-@@ -458,6 +466,13 @@ void bdrv_drain_all_end(void)
-     BlockDriverState *bs;
-     BdrvNextIterator it;
- 
-+    /* bdrv queue is managed by record/replay,
-+       waiting for finishing the I/O requests may
-+       be endless */
-+    if (replay_events_enabled()) {
-+        return;
-+    }
-+
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-@@ -1839,6 +1854,13 @@ int bdrv_flush_all(void)
-     BlockDriverState *bs = NULL;
-     int result = 0;
- 
-+    /* bdrv queue is managed by record/replay,
-+       creating new flush request for stopping
-+       the VM may break the determinism */
-+    if (replay_events_enabled()) {
-+        return result;
-+    }
-+
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
-         int ret;
-diff --git a/cpus.c b/cpus.c
-index a1f8808..e84f041 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1005,7 +1005,6 @@ static int do_vm_stop(RunState state)
-     }
- 
-     bdrv_drain_all();
--    replay_disable_events();
-     ret = bdrv_flush_all();
- 
-     return ret;
-@@ -1988,7 +1987,6 @@ int vm_prepare_start(void)
-         qapi_event_send_stop(&error_abort);
-         res = -1;
-     } else {
--        replay_enable_events();
-         cpu_enable_ticks();
-         runstate_set(RUN_STATE_RUNNING);
-         vm_state_notify(1, RUN_STATE_RUNNING);
+Thanks,
+drew
+
+>  };
+>  
+>  static const char *get_cpu_model_by_arch(const char *arch)
+> -- 
+> 2.7.4
+> 
+> 
