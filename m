@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzAC-0003x2-66
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edzAM-00049B-PV
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzA6-0006FL-5l
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:00 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edzAD-0006PD-60
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:03:10 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:54 +0100
-Message-Id: <20180123140201.31163-23-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:02:01 +0100
+Message-Id: <20180123140201.31163-30-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 22/29] iotests: Fix 067 for compat=0.10
+Subject: [Qemu-devel] [PULL 29/29] iotests: Disable some tests for
+ compat=0.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,284 +25,76 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-067 works very well with compat=0.10 once you remove format-specific
-information from the QMP output.
+Tests 080, 130, 137, and 176 simply do not work with compat=0.10 for the
+reasons stated there.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171123020832.8165-14-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
+Message-Id: <20171123020832.8165-10-mreitz@redhat.com>
+[eblake: fix 177 in a separate commit]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20180117165420.15946-3-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/067     |  3 +-
- tests/qemu-iotests/067.out | 97 +++++++++++++---------------------------------
- 2 files changed, 28 insertions(+), 72 deletions(-)
+ tests/qemu-iotests/080 | 5 +++--
+ tests/qemu-iotests/130 | 2 ++
+ tests/qemu-iotests/137 | 2 ++
+ tests/qemu-iotests/176 | 2 ++
+ 4 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/067 b/tests/qemu-iotests/067
-index 9d561ef786..fe259f6165 100755
---- a/tests/qemu-iotests/067
-+++ b/tests/qemu-iotests/067
-@@ -57,7 +57,8 @@ function run_qemu()
+diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
+index 55044c700b..1c2bd85742 100755
+--- a/tests/qemu-iotests/080
++++ b/tests/qemu-iotests/080
+@@ -41,8 +41,9 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
+-# Internal snapshots are (currently) impossible with refcount_bits=1
+-_unsupported_imgopts 'refcount_bits=1[^0-9]'
++# - Internal snapshots are (currently) impossible with refcount_bits=1
++# - This is generally a test for compat=1.1 images
++_unsupported_imgopts 'refcount_bits=1[^0-9]' 'compat=0.10'
+ 
+ header_size=104
+ 
+diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
+index e7e43de6d6..2c4b94da1b 100755
+--- a/tests/qemu-iotests/130
++++ b/tests/qemu-iotests/130
+@@ -45,6 +45,8 @@ _supported_fmt qcow2
+ _supported_proto generic
+ _unsupported_proto vxhs
+ _supported_os Linux
++# We are going to use lazy-refcounts
++_unsupported_imgopts 'compat=0.10'
+ 
+ qemu_comm_method="monitor"
+ 
+diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+index eb91e517d7..5a01250005 100755
+--- a/tests/qemu-iotests/137
++++ b/tests/qemu-iotests/137
+@@ -41,6 +41,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
++# We are going to use lazy-refcounts
++_unsupported_imgopts 'compat=0.10'
+ 
+ 
+ _make_test_img 64M
+diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
+index b8dc17c592..d38b3aeb91 100755
+--- a/tests/qemu-iotests/176
++++ b/tests/qemu-iotests/176
+@@ -48,6 +48,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
++# Persistent dirty bitmaps require compat=1.1
++_unsupported_imgopts 'compat=0.10'
+ 
+ function run_qemu()
  {
-     do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp | _filter_qemu \
-                           | _filter_actual_image_size \
--                          | _filter_generated_node_ids | _filter_qmp_events
-+                          | _filter_generated_node_ids | _filter_qmp_events \
-+                          | _filter_img_info
- }
- 
- size=128M
-diff --git a/tests/qemu-iotests/067.out b/tests/qemu-iotests/067.out
-index 58e83c4505..2e71cff3ce 100644
---- a/tests/qemu-iotests/067.out
-+++ b/tests/qemu-iotests/067.out
-@@ -3,7 +3,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- 
- === -drive/-device and device_del ===
- 
--Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk -device virtio-blk,drive=disk,id=virtio0
-+Testing: -drive file=TEST_DIR/t.IMGFMT,format=IMGFMT,if=none,id=disk -device virtio-blk,drive=disk,id=virtio0
- {
-     QMP_VERSION
- }
-@@ -23,26 +23,17 @@ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk -device virti
-                 "detect_zeroes": "off",
-                 "image": {
-                     "virtual-size": 134217728,
--                    "filename": "TEST_DIR/t.qcow2",
-+                    "filename": "TEST_DIR/t.IMGFMT",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
-                 "iops_wr": 0,
-                 "ro": false,
-                 "node-name": "NODE_NAME",
-                 "backing_file_depth": 0,
--                "drv": "qcow2",
-+                "drv": "IMGFMT",
-                 "iops": 0,
-                 "bps_wr": 0,
-                 "write_threshold": 0,
-@@ -54,7 +45,7 @@ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk -device virti
-                     "direct": false,
-                     "writeback": true
-                 },
--                "file": "TEST_DIR/t.qcow2",
-+                "file": "TEST_DIR/t.IMGFMT",
-                 "encryption_key_missing": false
-             },
-             "qdev": "/machine/peripheral/virtio0/virtio-backend",
-@@ -81,7 +72,7 @@ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk -device virti
- 
- === -drive/device_add and device_del ===
- 
--Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk
-+Testing: -drive file=TEST_DIR/t.IMGFMT,format=IMGFMT,if=none,id=disk
- {
-     QMP_VERSION
- }
-@@ -100,26 +91,17 @@ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk
-                 "detect_zeroes": "off",
-                 "image": {
-                     "virtual-size": 134217728,
--                    "filename": "TEST_DIR/t.qcow2",
-+                    "filename": "TEST_DIR/t.IMGFMT",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
-                 "iops_wr": 0,
-                 "ro": false,
-                 "node-name": "NODE_NAME",
-                 "backing_file_depth": 0,
--                "drv": "qcow2",
-+                "drv": "IMGFMT",
-                 "iops": 0,
-                 "bps_wr": 0,
-                 "write_threshold": 0,
-@@ -131,7 +113,7 @@ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk
-                     "direct": false,
-                     "writeback": true
-                 },
--                "file": "TEST_DIR/t.qcow2",
-+                "file": "TEST_DIR/t.IMGFMT",
-                 "encryption_key_missing": false
-             },
-             "type": "unknown"
-@@ -183,26 +165,17 @@ Testing:
-                 "detect_zeroes": "off",
-                 "image": {
-                     "virtual-size": 134217728,
--                    "filename": "TEST_DIR/t.qcow2",
-+                    "filename": "TEST_DIR/t.IMGFMT",
-                     "cluster-size": 65536,
--                    "format": "qcow2",
-+                    "format": "IMGFMT",
-                     "actual-size": SIZE,
--                    "format-specific": {
--                        "type": "qcow2",
--                        "data": {
--                            "compat": "1.1",
--                            "lazy-refcounts": false,
--                            "refcount-bits": 16,
--                            "corrupt": false
--                        }
--                    },
-                     "dirty-flag": false
-                 },
-                 "iops_wr": 0,
-                 "ro": false,
-                 "node-name": "NODE_NAME",
-                 "backing_file_depth": 0,
--                "drv": "qcow2",
-+                "drv": "IMGFMT",
-                 "iops": 0,
-                 "bps_wr": 0,
-                 "write_threshold": 0,
-@@ -214,7 +187,7 @@ Testing:
-                     "direct": false,
-                     "writeback": true
-                 },
--                "file": "TEST_DIR/t.qcow2",
-+                "file": "TEST_DIR/t.IMGFMT",
-                 "encryption_key_missing": false
-             },
-             "type": "unknown"
-@@ -263,26 +236,17 @@ Testing:
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 134217728,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "disk",
-             "backing_file_depth": 0,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
-@@ -294,7 +258,7 @@ Testing:
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         },
-         {
-@@ -302,7 +266,7 @@ Testing:
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -323,7 +287,7 @@ Testing:
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         }
-     ]
-@@ -347,26 +311,17 @@ Testing:
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 134217728,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "cluster-size": 65536,
--                "format": "qcow2",
-+                "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "disk",
-             "backing_file_depth": 0,
--            "drv": "qcow2",
-+            "drv": "IMGFMT",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
-@@ -378,7 +333,7 @@ Testing:
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         },
-         {
-@@ -386,7 +341,7 @@ Testing:
-             "detect_zeroes": "off",
-             "image": {
-                 "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2",
-+                "filename": "TEST_DIR/t.IMGFMT",
-                 "format": "file",
-                 "actual-size": SIZE,
-                 "dirty-flag": false
-@@ -407,7 +362,7 @@ Testing:
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "TEST_DIR/t.IMGFMT",
-             "encryption_key_missing": false
-         }
-     ]
 -- 
 2.13.6
