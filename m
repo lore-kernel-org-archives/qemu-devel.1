@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzs1-00075Q-17
+	(envelope-from <laurent@vivier.eu>) id 1edzs1-00075P-0G
 	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzrw-0002JX-QB
+	(envelope-from <laurent@vivier.eu>) id 1edzrw-0002Ix-5X
 	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:17 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:57659)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edzrv-0002HV-RE
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:12 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 23 Jan 2018 15:47:55 +0100
-Message-Id: <20180123144807.5618-2-laurent@vivier.eu>
-In-Reply-To: <20180123144807.5618-1-laurent@vivier.eu>
-References: <20180123144807.5618-1-laurent@vivier.eu>
+Date: Tue, 23 Jan 2018 15:47:54 +0100
+Message-Id: <20180123144807.5618-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/13] linux-user: Fix locking order in
- fork_start()
+Subject: [Qemu-devel] [PULL 00/13] Linux user for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +25,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: Laurent Vivier <laurent@vivier.eu>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+The following changes since commit 52483b067cce4a88ffbf8fbeea26de7549d2ad23:
 
-Our locking order is that the tb lock should be taken
-inside the mmap_lock, but fork_start() grabs locks the
-other way around. This means that if a heavily multithreaded
-guest process (such as Java) calls fork() it can deadlock,
-with the thread that called fork() stuck in fork_start()
-with the tb lock and waiting for the mmap lock, but some
-other thread in tb_find() with the mmap lock and waiting
-for the tb lock. The cpu_list_lock() should also always be
-taken last, not first.
+  Merge remote-tracking branch 'remotes/huth/tags/pull-request-2018-01-22' into staging (2018-01-23 10:15:09 +0000)
 
-Fix this by making fork_start() grab the locks in the
-right order. The order in which we drop locks doesn't
-matter, so we leave fork_end() the way it is.
+are available in the Git repository at:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+  git://github.com/vivier/qemu.git tags/linux-user-for-2.12-pull-request
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 450eb3ce65..e8406917e3 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -127,9 +127,9 @@ int cpu_get_pic_interrupt(CPUX86State *env)
- /* Make sure everything is in a consistent state for calling fork().  */
- void fork_start(void)
- {
--    cpu_list_lock();
--    qemu_mutex_lock(&tb_ctx.tb_lock);
-     mmap_fork_start();
-+    qemu_mutex_lock(&tb_ctx.tb_lock);
-+    cpu_list_lock();
- }
- 
- void fork_end(int child)
+for you to fetch changes up to 95d0307cc10ca3df879c1be519f1ad650efb20a8:
+
+  linux-user: implement renameat2 (2018-01-23 14:27:33 +0100)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Andreas Schwab (1):
+  linux-user: implement renameat2
+
+Laurent Vivier (1):
+  linux-user: remove nmi.c and fw-path-provider.c
+
+Marco A L Barbosa (1):
+  linux-user: Add AT_SECURE auxval
+
+Maximilian Riemensberger (1):
+  linux-user/mmap.c: Avoid choosing NULL as start address
+
+Peter Maydell (7):
+  linux-user: Fix locking order in fork_start()
+  linux-user: wrap fork() in a start/end exclusive section
+  linux-user: Fix length calculations in host_to_target_cmsg()
+  linux-user: Don't use CMSG_ALIGN(sizeof struct cmsghdr)
+  linux-user: Translate flags argument to dup3 syscall
+  linux-user: Propagate siginfo_t through to handle_cpu_signal()
+  page_unprotect(): handle calls to pages that are PAGE_WRITE
+
+Samuel Thibault (2):
+  linux-user: Fix sched_get/setaffinity conversion
+  linux-user: Add getcpu() support
+
+ accel/tcg/translate-all.c |  50 ++++++++-----
+ accel/tcg/user-exec.c     |  52 +++++++-------
+ hw/core/Makefile.objs     |   5 +-
+ hw/core/qdev-fw.c         |  96 +++++++++++++++++++++++++
+ hw/core/qdev.c            |  77 --------------------
+ linux-user/elfload.c      |   3 +-
+ linux-user/main.c         |   9 ++-
+ linux-user/mmap.c         |   2 +-
+ linux-user/syscall.c      | 177 +++++++++++++++++++++++++++++++++++++++++-----
+ linux-user/syscall_defs.h |   6 +-
+ 10 files changed, 328 insertions(+), 149 deletions(-)
+ create mode 100644 hw/core/qdev-fw.c
+
 -- 
 2.14.3
