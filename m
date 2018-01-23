@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1ee7X1-0003Ka-Ir
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:59:10 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ee7dR-0006ky-Rq
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 18:05:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linus.walleij@linaro.org>) id 1ee7Wy-000430-22
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:59:07 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:44382)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
-	id 1ee7Wx-00040q-J4
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 17:59:03 -0500
-Received: by mail-lf0-x243.google.com with SMTP id v188so2706573lfa.11
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 14:59:03 -0800 (PST)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 23 Jan 2018 23:56:54 +0100
-Message-Id: <20180123225654.5764-1-linus.walleij@linaro.org>
-Subject: [Qemu-devel] [PATCH] pl110: Implement vertical compare/next base
- interrupts
+	(envelope-from <no-reply@patchew.org>) id 1ee7dO-0002GA-Be
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 18:05:45 -0500
+Resent-Message-Id: <E1ee7dO-0002GA-Be@eggs.gnu.org>
+In-Reply-To: <20180123225654.5764-1-linus.walleij@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151674871785.674.276197486276915619@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 23 Jan 2018 15:05:18 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] pl110: Implement vertical compare/next
+ base interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Linus Walleij <linus.walleij@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: linus.walleij@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-This implements rudimentary support for interrupt generation on the
-PL110. I am working on a new DRI/KMS driver for Linux and since that
-uses the blanking interrupt, we need something to fire here. Without
-any interrupt support Linux waits for a while and then gives ugly
-messages about the vblank not working in the console (it does not
-hang perpetually or anything though, DRI is pretty forgiving).
-
-I solved it for now by setting up a timer to fire at 60Hz and pull
-the interrupts for "vertical compare" and "next memory base"
-at this interval. This works fine and fires roughly the same number
-of IRQs on QEMU as on the hardware and leaves the console clean
-and nice.
-
-People who want to create more accurate emulation can probably work
-on top of this if need be. It is certainly closer to the hardware
-behaviour than what we have today anyway.
-
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- hw/display/pl110.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/hw/display/pl110.c b/hw/display/pl110.c
-index 8c7dcc6f0a69..777bb3f44503 100644
---- a/hw/display/pl110.c
-+++ b/hw/display/pl110.c
-@@ -12,6 +12,7 @@
- #include "ui/console.h"
- #include "framebuffer.h"
- #include "ui/pixel_ops.h"
-+#include "qemu/timer.h"
- #include "qemu/log.h"
- 
- #define PL110_CR_EN   0x001
-@@ -19,6 +20,8 @@
- #define PL110_CR_BEBO 0x200
- #define PL110_CR_BEPO 0x400
- #define PL110_CR_PWR  0x800
-+#define PL110_IE_NB   0x004
-+#define PL110_IE_VC   0x008
- 
- enum pl110_bppmode
- {
-@@ -50,6 +53,7 @@ typedef struct PL110State {
-     MemoryRegion iomem;
-     MemoryRegionSection fbsection;
-     QemuConsole *con;
-+    QEMUTimer *vblank_timer;
- 
-     int version;
-     uint32_t timing[4];
-@@ -320,7 +324,23 @@ static void pl110_resize(PL110State *s, int width, int height)
- /* Update interrupts.  */
- static void pl110_update(PL110State *s)
- {
--  /* TODO: Implement interrupts.  */
-+    /* Raise IRQ if enabled and any status bit is 1 */
-+    if (s->int_status & s->int_mask) {
-+        qemu_irq_raise(s->irq);
-+    } else {
-+        qemu_irq_lower(s->irq);
-+    }
-+}
-+
-+static void pl110_vblank_interrupt(void *opaque)
-+{
-+    PL110State *s = opaque;
-+
-+    /* Fire the vertical compare and next base IRQs and re-arm */
-+    s->int_status |= (PL110_IE_NB | PL110_IE_VC);
-+    timer_mod(s->vblank_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + NANOSECONDS_PER_SECOND / 60);
-+    pl110_update(s);
- }
- 
- static uint64_t pl110_read(void *opaque, hwaddr offset,
-@@ -429,6 +449,10 @@ static void pl110_write(void *opaque, hwaddr offset,
-         s->bpp = (val >> 1) & 7;
-         if (pl110_enabled(s)) {
-             qemu_console_resize(s->con, s->cols, s->rows);
-+            timer_mod(s->vblank_timer,
-+                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + NANOSECONDS_PER_SECOND / 60);
-+        } else {
-+            timer_del(s->vblank_timer);
-         }
-         break;
-     case 10: /* LCDICR */
-@@ -474,6 +498,7 @@ static void pl110_realize(DeviceState *dev, Error **errp)
-     memory_region_init_io(&s->iomem, OBJECT(s), &pl110_ops, s, "pl110", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
-     sysbus_init_irq(sbd, &s->irq);
-+    s->vblank_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, pl110_vblank_interrupt, s);
-     qdev_init_gpio_in(dev, pl110_mux_ctrl_set, 1);
-     s->con = graphic_console_init(dev, 0, &pl110_gfx_ops, s);
- }
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTIzMjI1NjU0LjU3NjQtMS1saW51cy53YWxsZWlqQGxpbmFyby5vcmcK
+U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gcGwxMTA6IEltcGxlbWVudCB2ZXJ0aWNhbCBj
+b21wYXJlL25leHQgYmFzZSBpbnRlcnJ1cHRzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
+ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
+ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
+dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
+ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDEyMzIyNTY1NC41NzY0LTEt
+bGludXMud2FsbGVpakBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODAxMjMyMjU2NTQuNTc2NC0x
+LWxpbnVzLndhbGxlaWpAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjI1MTJiMTUxYjYgcGwxMTA6IEltcGxlbWVudCB2ZXJ0aWNhbCBjb21wYXJlL25leHQgYmFzZSBp
+bnRlcnJ1cHRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHBsMTEw
+OiBJbXBsZW1lbnQgdmVydGljYWwgY29tcGFyZS9uZXh0IGJhc2UgaW50ZXJydXB0cy4uLgpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzY6IEZJTEU6IGh3L2Rpc3BsYXkvcGwxMTAu
+YzozNDI6CisgICAgICAgICAgICAgIHFlbXVfY2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfVklSVFVB
+TCkgKyBOQU5PU0VDT05EU19QRVJfU0VDT05EIC8gNjApOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiM4NjogRklMRTogaHcvZGlzcGxheS9wbDExMC5jOjQ1MzoKKyAgICAgICAgICAg
+ICAgICAgICAgICBxZW11X2Nsb2NrX2dldF9ucyhRRU1VX0NMT0NLX1ZJUlRVQUwpICsgTkFOT1NF
+Q09ORFNfUEVSX1NFQ09ORCAvIDYwKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiM5NjogRklMRTogaHcvZGlzcGxheS9wbDExMC5jOjUwMToKKyAgICBzLT52YmxhbmtfdGltZXIg
+PSB0aW1lcl9uZXdfbnMoUUVNVV9DTE9DS19WSVJUVUFMLCBwbDExMF92YmxhbmtfaW50ZXJydXB0
+LCBzKTsKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
