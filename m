@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzA7-0003qY-Ap
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:59 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edzA2-0003l0-LT
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edz9z-00061W-NQ
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9y-00060T-Oa
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:50 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:50 +0100
-Message-Id: <20180123140201.31163-19-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:01:49 +0100
+Message-Id: <20180123140201.31163-18-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 18/29] iotests: Skip 103 for refcount_bits=1
+Subject: [Qemu-devel] [PULL 17/29] iotests: Forbid 020 for non-file protocols
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +24,42 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
+This test does funny things like TEST_IMG="TEST_IMG.base" _make_test_img
+that usually only work with the file protocol.  More specifically, they
+do not work with the most interesting non-file protocols, so we might as
+well skip this for anything but file.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171123020832.8165-9-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20171123020832.8165-8-mreitz@redhat.com
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/103 | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/qemu-iotests/020 | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index ecbd8ebd71..d0cfab8844 100755
---- a/tests/qemu-iotests/103
-+++ b/tests/qemu-iotests/103
-@@ -40,6 +40,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2
- _supported_proto file nfs
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index cefe3a830e..d22ab81414 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -42,18 +42,12 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+-_supported_proto generic
+-_unsupported_proto vxhs
++_supported_proto file
  _supported_os Linux
-+# Internal snapshots are (currently) impossible with refcount_bits=1
-+_unsupported_imgopts 'refcount_bits=1[^0-9]'
+ _unsupported_imgopts "subformat=monolithicFlat" \
+                      "subformat=twoGbMaxExtentFlat" \
+                      "subformat=twoGbMaxExtentSparse"
  
- IMG_SIZE=64K
+-# NFS does not support bdrv_reopen_prepare thus qemu-img commit fails.
+-if [ "$IMGPROTO" = "nfs" ]; then
+-    _notrun "image protocol $IMGPROTO does not support bdrv_commit"
+-fi
+-
+ TEST_OFFSETS="0 4294967296"
  
+ TEST_IMG_SAVE="$TEST_IMG"
 -- 
 2.13.6
