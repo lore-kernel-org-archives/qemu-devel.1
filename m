@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48724)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edo1A-0005Pq-Jx
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:08:57 -0500
+	id 1edo1E-0005Su-2d
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edo19-0003PT-KY
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:08:56 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34037)
+	id 1edo1C-0003SF-W1
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:09:00 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:39008)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edo19-0003PC-Fv
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:08:55 -0500
-Received: by mail-qt0-x243.google.com with SMTP id a27so12959663qtd.1
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 18:08:55 -0800 (PST)
+	id 1edo1C-0003Rx-QM
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:08:58 -0500
+Received: by mail-qt0-x241.google.com with SMTP id f4so26132070qtj.6
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 18:08:58 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 22 Jan 2018 23:08:10 -0300
-Message-Id: <20180123020820.1288-7-f4bug@amsat.org>
+Date: Mon, 22 Jan 2018 23:08:11 -0300
+Message-Id: <20180123020820.1288-8-f4bug@amsat.org>
 In-Reply-To: <20180123020820.1288-1-f4bug@amsat.org>
 References: <20180123020820.1288-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 06/16] sdhci: add qtest to check the SD Spec
- version
+Subject: [Qemu-devel] [PATCH v9 07/16] sdhci: add a 'spec_version property'
+ (default to v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,61 +38,110 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xili
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- tests/sdhci-test.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ hw/sd/sdhci-internal.h |  4 ++--
+ include/hw/sd/sdhci.h  |  2 ++
+ hw/sd/sdhci.c          | 27 +++++++++++++++++++++++----
+ 3 files changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index f4c43b8120..094e0570e1 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -49,6 +49,21 @@ static struct {
-     QPCIBar mem_bar;
- } g = { };
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index fc807f08f3..b7751c815f 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -210,9 +210,9 @@
+ /* Slot interrupt status */
+ #define SDHC_SLOT_INT_STATUS            0xFC
  
-+static uint32_t sdhci_readl(uintptr_t base, uint32_t reg_addr)
-+{
-+    if (g.dev) {
-+        uint32_t value;
+-/* HWInit Host Controller Version Register 0x0401 */
++/* HWInit Host Controller Version Register */
+ #define SDHC_HCVER                      0xFE
+-#define SD_HOST_SPECv2_VERS             0x2401
++#define SDHC_HCVER_VENDOR               0x24
+ 
+ #define SDHC_REGISTERS_MAP_SIZE         0x100
+ #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index cb37182536..96e07de2a2 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -76,6 +76,7 @@ typedef struct SDHCIState {
+     /* Read-only registers */
+     uint64_t capareg;      /* Capabilities Register */
+     uint64_t maxcurr;      /* Maximum Current Capabilities Register */
++    uint16_t version;      /* Host Controller Version Register */
+ 
+     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
+     uint32_t buf_maxsz;
+@@ -90,6 +91,7 @@ typedef struct SDHCIState {
+ 
+     /* Configurable properties */
+     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
++    uint8_t sd_spec_version;
+ } SDHCIState;
+ 
+ #define TYPE_PCI_SDHCI "sdhci-pci"
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 8c9c0fbc2a..1331062306 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -174,7 +174,8 @@ static void sdhci_reset(SDHCIState *s)
+ 
+     timer_del(s->insert_timer);
+     timer_del(s->transfer_timer);
+-    /* Set all registers to 0. Capabilities registers are not cleared
 +
-+        qpci_memread(g.dev, g.mem_bar, reg_addr, &value, sizeof(value));
-+
-+        return value;
-+    } else {
-+        QTestState *qtest = global_qtest;
-+
-+        return qtest_readl(qtest, base + reg_addr);
-+    }
-+}
-+
- static uint64_t sdhci_readq(uintptr_t base, uint32_t reg_addr)
- {
-     if (g.dev) {
-@@ -75,6 +90,16 @@ static void sdhci_writeq(uintptr_t base, uint32_t reg_addr, uint64_t value)
++    /* Set all registers to 0. Capabilities/Version registers are not cleared
+      * and assumed to always preserve their value, given to them during
+      * initialization */
+     memset(&s->sdmasysad, 0, (uintptr_t)&s->capareg - (uintptr_t)&s->sdmasysad);
+@@ -918,7 +919,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+         ret = (uint32_t)(s->admasysaddr >> 32);
+         break;
+     case SDHC_SLOT_INT_STATUS:
+-        ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
++        ret = (s->version << 16) | sdhci_slotint(s);
+         break;
+     default:
+         qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
+@@ -1174,11 +1175,22 @@ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
      }
  }
  
-+static void check_specs_version(uintptr_t addr, uint8_t version)
++static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
 +{
-+    uint32_t v;
-+
-+    v = sdhci_readl(addr, SDHC_HCVER);
-+    v &= 0xff;
-+    v += 1;
-+    g_assert_cmpuint(v, ==, version);
++    if (s->sd_spec_version != 2) {
++        error_setg(errp, "Only Spec v2 is supported");
++        return;
++    }
++    s->version = (SDHC_HCVER_VENDOR << 8) | (s->sd_spec_version - 1);
 +}
 +
- static void check_capab_capareg(uintptr_t addr, uint64_t expected_capab)
+ /* --- qdev common --- */
+ 
+ #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
+-    /* Capabilities registers provide information on supported features
+-     * of this specific host controller implementation */ \
++    DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
++    \
++    /* Capabilities registers provide information on supported
++     * features of this specific host controller implementation */ \
+     DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEFAULT), \
+     DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
+ 
+@@ -1204,6 +1216,13 @@ static void sdhci_uninitfn(SDHCIState *s)
+ 
+ static void sdhci_common_realize(SDHCIState *s, Error **errp)
  {
-     uint64_t capab;
-@@ -157,6 +182,7 @@ static void test_machine(const void *data)
++    Error *local_err = NULL;
++
++    sdhci_init_readonly_registers(s, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+     s->buf_maxsz = sdhci_get_fifolen(s);
+     s->fifo_buffer = g_malloc0(s->buf_maxsz);
  
-     machine_start(test);
- 
-+    check_specs_version(test->sdhci.addr, test->sdhci.version);
-     check_capab_capareg(test->sdhci.addr, test->sdhci.capab.reg);
-     check_capab_readonly(test->sdhci.addr);
-     check_capab_sdma(test->sdhci.addr, test->sdhci.capab.sdma);
 -- 
 2.15.1
