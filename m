@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IN-00046Y-3i
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:44 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IJ-00042Y-7b
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IJ-0006Ug-W8
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44614)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1ee3IG-0006T6-35
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52144)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1ee3IJ-0006UN-O5
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:39 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1ee3IF-0006SW-Rr
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 13:27:36 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0NIO1Cl009832
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:37 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp780smvm-1
+	w0NIRTx7026303
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:35 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp9fxt6k5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:36 -0500
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 13:27:34 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Tue, 23 Jan 2018 11:27:36 -0700
+	Tue, 23 Jan 2018 11:27:33 -0700
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Tue, 23 Jan 2018 13:26:53 -0500
+Date: Tue, 23 Jan 2018 13:26:52 -0500
 In-Reply-To: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1516732013-18272-11-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 10/10] s390-ccw: interactive boot menu for
- scsi
+Message-Id: <1516732013-18272-10-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 09/10] s390-ccw: read user input for boot
+ index via the SCLP console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,99 +41,261 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
 
-Interactive boot menu for scsi. This follows a similar procedure
-as the interactive menu for eckd dasd. An example follows:
+Implements an sclp_read function to capture input from the
+console and a wrapper function that handles parsing certain
+characters and adding input to a buffer. The input is checked
+for any erroneous values and is handled appropriately.
 
-    s390x Enumerated Boot Menu.
+A prompt will persist until input is entered or the timeout
+expires (if one was set). Example:
 
-    3 entries detected. Select from index 0 to 2.
+    Please choose (default will boot in 10 seconds):
+
+Correct input will boot the respective boot index. If the
+user's input is empty, 0, or if the timeout expires, then
+the default zipl entry will be chosen. If the input is
+within the range of available boot entries, then the
+selection will be booted. Any erroneous input will cancel
+the timeout and re-prompt the user.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c |  9 +++++++++
- pc-bios/s390-ccw/main.c    |  3 +++
- pc-bios/s390-ccw/menu.c    | 14 ++++++++++++++
- pc-bios/s390-ccw/menu.h    |  1 +
- 4 files changed, 27 insertions(+)
+ pc-bios/s390-ccw/menu.c     | 152 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/s390-ccw/s390-ccw.h |   2 +
+ pc-bios/s390-ccw/sclp.c     |  20 ++++++
+ pc-bios/s390-ccw/virtio.c   |   2 +-
+ 4 files changed, 172 insertions(+), 4 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 7d7e0c5..87bf6ba 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -537,6 +537,7 @@ static void ipl_scsi(void)
-     ScsiMbr *mbr = (void *)sec;
-     BootMapTable *bmt = (void *)sec;
-     unsigned int loadparm = get_loadparm_index();
-+    int entries = 0;
+diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
+index 174285e..24d4bba 100644
+--- a/pc-bios/s390-ccw/menu.c
++++ b/pc-bios/s390-ccw/menu.c
+@@ -12,16 +12,162 @@
+ #include "menu.h"
+ #include "s390-ccw.h"
  
-     /* Grab the MBR */
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-@@ -558,6 +559,14 @@ static void ipl_scsi(void)
+-static uint8_t flags;
+-static uint64_t timeout;
++#define KEYCODE_NO_INP '\0'
++#define KEYCODE_ESCAPE '\033'
++#define KEYCODE_BACKSP '\177'
++#define KEYCODE_ENTER  '\r'
  
-     IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
+ /* Offsets from zipl fields to zipl banner start */
+ #define ZIPL_TIMEOUT_OFFSET 138
+ #define ZIPL_FLAG_OFFSET    140
  
-+    if (menu_check_flags(BOOT_MENU_FLAG_BOOT_OPTS)) {
-+        while (bmt->bte[entries].scsi.blockno) {
-+            entries++;
-+        }
-+        debug_print_int("program table entries", entries);
-+        loadparm = menu_get_enum_boot_index(entries);
++#define TOD_CLOCK_SECOND    0xf4240000
++
++static uint8_t flags;
++static uint64_t timeout;
++
++static inline void enable_clock_int(void)
++{
++    uint64_t tmp = 0;
++
++    asm volatile(
++        "stctg      0,0,%0\n"
++        "oi         6+%0, 0x8\n"
++        "lctlg      0,0,%0"
++        : : "Q" (tmp) : "memory"
++    );
++}
++
++static inline void disable_clock_int(void)
++{
++    uint64_t tmp = 0;
++
++    asm volatile(
++        "stctg      0,0,%0\n"
++        "ni         6+%0, 0xf7\n"
++        "lctlg      0,0,%0"
++        : : "Q" (tmp) : "memory"
++    );
++}
++
++static inline void set_clock_comparator(uint64_t time)
++{
++    asm volatile("sckc %0" : : "Q" (time));
++}
++
++static inline bool check_clock_int(void)
++{
++    uint16_t *code = (uint16_t *)0x86; /* low-core external interrupt code */
++
++    consume_sclp_int();
++
++    return *code == 0x1004;
++}
++
++static int read_prompt(char *buf, size_t len)
++{
++    char inp[2] = {};
++    uint8_t idx = 0;
++    uint64_t time;
++
++    if (timeout) {
++        time = get_clock() + (timeout * TOD_CLOCK_SECOND);
++        set_clock_comparator(time);
++        enable_clock_int();
++        timeout = 0;
 +    }
 +
-     debug_print_int("loadparm index", loadparm);
++    while (!check_clock_int()) {
++
++        /* Process only one character at a time */
++        sclp_read(inp, 1);
++
++        switch (inp[0]) {
++        case KEYCODE_NO_INP:
++        case KEYCODE_ESCAPE:
++            continue;
++        case KEYCODE_BACKSP:
++            if (idx > 0) {
++                buf[--idx] = 0;
++                sclp_print("\b \b");
++            }
++            continue;
++        case KEYCODE_ENTER:
++            disable_clock_int();
++            return idx;
++        }
++
++        /* Echo input and add to buffer */
++        if (idx < len) {
++            buf[idx] = inp[0];
++            sclp_print(inp);
++            idx++;
++        }
++    }
++
++    disable_clock_int();
++    *buf = 0;
++
++    return 0;
++}
++
++static int get_index(void)
++{
++    char buf[10];
++    int len;
++    int i;
++
++    memset(buf, 0, sizeof(buf));
++
++    len = read_prompt(buf, sizeof(buf));
++
++    /* If no input, boot default */
++    if (len == 0) {
++        return 0;
++    }
++
++    /* Check for erroneous input */
++    for (i = 0; i < len; i++) {
++        if (!isdigit(buf[i])) {
++            return -1;
++        }
++    }
++
++    return atoi(buf);
++}
++
++static void boot_menu_prompt(bool retry)
++{
++    char tmp[6];
++
++    if (retry) {
++        sclp_print("\nError: undefined configuration"
++                   "\nPlease choose:\n");
++    } else if (timeout > 0) {
++        sclp_print("Please choose (default will boot in ");
++        sclp_print(itostr(timeout, tmp, sizeof(tmp)));
++        sclp_print(" seconds):\n");
++    } else {
++        sclp_print("Please choose:\n");
++    }
++}
++
+ static int get_boot_index(int entries)
+ {
+-    return 0; /* Implemented next patch */
++    int boot_index;
++    bool retry = false;
++    char tmp[5];
++
++    do {
++        boot_menu_prompt(retry);
++        boot_index = get_index();
++        retry = true;
++    } while (boot_index < 0 || boot_index >= entries);
++
++    sclp_print("\nBooting entry #");
++    sclp_print(itostr(boot_index, tmp, sizeof(tmp)));
++
++    return boot_index;
+ }
  
-     zipl_run(&bmt->bte[loadparm].scsi); /* no return */
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 709e5ef..808d111 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -90,6 +90,9 @@ static void menu_setup(void)
-     case S390_IPL_TYPE_CCW:
-         menu_set_parms(iplb.ccw.boot_menu_flags, iplb.ccw.boot_menu_timeout);
-         return;
-+    case S390_IPL_TYPE_QEMU_SCSI:
-+        menu_set_parms(iplb.scsi.boot_menu_flags, iplb.scsi.boot_menu_timeout);
-+        return;
+ static void zipl_println(const char *data, size_t len)
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 25d4d21..df4bc88 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -71,6 +71,7 @@ unsigned int get_loadparm_index(void);
+ void sclp_print(const char *string);
+ void sclp_setup(void);
+ void sclp_get_loadparm_ascii(char *loadparm);
++void sclp_read(char *str, size_t len);
+ 
+ /* virtio.c */
+ unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
+@@ -79,6 +80,7 @@ bool virtio_is_supported(SubChannelId schid);
+ void virtio_blk_setup_device(SubChannelId schid);
+ int virtio_read(ulong sector, void *load_addr);
+ int enable_mss_facility(void);
++u64 get_clock(void);
+ ulong get_second(void);
+ 
+ /* bootmap.c */
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index 486fce1..5e4a78b 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -101,3 +101,23 @@ void sclp_get_loadparm_ascii(char *loadparm)
+         ebcdic_to_ascii((char *) sccb->loadparm, loadparm, 8);
+     }
+ }
++
++void sclp_read(char *str, size_t len)
++{
++    ReadEventData *sccb = (void *)_sccb;
++    char *buf = (char *)(&sccb->ebh) + 7;
++
++    /* Len should not exceed the maximum size of the event buffer */
++    if (len > SCCB_SIZE - 8) {
++        len = SCCB_SIZE - 8;
++    }
++
++    sccb->h.length = SCCB_SIZE;
++    sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
++    sccb->ebh.length = sizeof(EventBufferHeader);
++    sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
++    sccb->ebh.flags = 0;
++
++    sclp_service_call(SCLP_CMD_READ_EVENT_DATA, sccb);
++    memcpy(str, buf, len);
++}
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index c890a03..817e7f5 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -176,7 +176,7 @@ void vring_send_buf(VRing *vr, void *p, int len, int flags)
      }
  }
  
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 24d4bba..9e54346 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -214,6 +214,20 @@ int menu_get_zipl_boot_index(const void *stage2, int offset)
-     return get_boot_index(ct - 1);
- }
- 
-+int menu_get_enum_boot_index(int entries)
-+{
-+    char tmp[4];
-+
-+    sclp_print("s390x Enumerated Boot Menu.\n\n");
-+
-+    sclp_print(itostr(entries, tmp, sizeof(tmp)));
-+    sclp_print(" entries detected. Select from boot index 0 to ");
-+    sclp_print(itostr(entries - 1, tmp, sizeof(tmp)));
-+    sclp_print(".\n\n");
-+
-+    return get_boot_index(entries);
-+}
-+
- void menu_set_parms(uint8_t boot_menu_flag, uint16_t boot_menu_timeout)
+-static u64 get_clock(void)
++u64 get_clock(void)
  {
-     flags = boot_menu_flag;
-diff --git a/pc-bios/s390-ccw/menu.h b/pc-bios/s390-ccw/menu.h
-index f4a1068..e6788f2 100644
---- a/pc-bios/s390-ccw/menu.h
-+++ b/pc-bios/s390-ccw/menu.h
-@@ -18,6 +18,7 @@
- #define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
- 
- int menu_get_zipl_boot_index(const void *stage2, int offset);
-+int menu_get_enum_boot_index(int entries);
- void menu_set_parms(uint8_t boot_menu_flags, uint16_t boot_menu_timeout);
- bool menu_check_flags(uint8_t check_flags);
+     u64 r;
  
 -- 
 2.7.4
