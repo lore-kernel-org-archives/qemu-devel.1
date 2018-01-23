@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1edyVN-0000P2-4B
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:20:50 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1edyVZ-0000Xa-Aw
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1edyVJ-0005G0-VR
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:20:49 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48456
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1edyVJ-0005Fd-Pd
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:20:45 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0NDEqHp079487
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 08:20:45 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fp3d8xk26-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 08:20:44 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 23 Jan 2018 08:20:44 -0500
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Tue, 23 Jan 2018 11:20:21 -0200
-Message-Id: <20180123132021.27593-1-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] Revert "virtio: postpone the execution of
- event_notifier_cleanup function"
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1edyVW-0005MY-75
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:21:01 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:46642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1edyVW-0005MM-2y
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 08:20:58 -0500
+Received: by mail-qt0-x244.google.com with SMTP id o35so1076813qtj.13
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 05:20:58 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 23 Jan 2018 10:20:50 -0300
+Message-Id: <20180123132051.24448-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] sdhci: fix a NULL pointer dereference due to
+ uninitialized AddresSpace object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com, ghammer@redhat.com
-Cc: anton@samba.org, danielhb@linux.vnet.ibm.com, pbonzini@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
 
-This reverts commit 4fe6d78b2e241f41208dfb07605aace4becfc747.
+missed in 60765b6ceeb4.
 
-As reported http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
-The referred commit is causing regression issues in virtio.
+  Thread 1 "qemu-system-aarch64" received signal SIGSEGV, Segmentation fault.
+  address_space_init (as=0x0, root=0x55555726e410, name=name@entry=0x555555e3f0a7 "sdhci-dma") at memory.c:3050
+  3050	    as->root = root;
+  (gdb) bt
+  #0  address_space_init (as=0x0, root=0x55555726e410, name=name@entry=0x555555e3f0a7 "sdhci-dma") at memory.c:3050
+  #1  0x0000555555af62c3 in sdhci_sysbus_realize (dev=<optimized out>, errp=0x7fff7f931150) at hw/sd/sdhci.c:1564
+  #2  0x00005555558b25e5 in zynqmp_sdhci_realize (dev=0x555557051520, errp=0x7fff7f931150) at hw/sd/zynqmp-sdhci.c:151
+  #3  0x0000555555a2e7f3 in device_set_realized (obj=0x555557051520, value=<optimized out>, errp=0x7fff7f931270) at hw/core/qdev.c:966
+  #4  0x0000555555ba3f74 in property_set_bool (obj=0x555557051520, v=<optimized out>, name=<optimized out>, opaque=0x555556e04a20,
+      errp=0x7fff7f931270) at qom/object.c:1906
+  #5  0x0000555555ba51f4 in object_property_set (obj=obj@entry=0x555557051520, v=v@entry=0x5555576dbd60,
+      name=name@entry=0x555555dd6306 "realized", errp=errp@entry=0x7fff7f931270) at qom/object.c:1102
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Reported-by: Anton Blanchard <anton@samba.org>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- accel/kvm/kvm-all.c    |  4 ----
- hw/virtio/virtio-bus.c | 19 ++++++++-----------
- 2 files changed, 8 insertions(+), 15 deletions(-)
+ include/hw/sd/sdhci.h | 1 +
+ hw/sd/sdhci.c         | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 071f4f57c0..f290f487a5 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
-     if (r < 0) {
-         abort();
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index cb37182536..1cf70f8c23 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -41,6 +41,7 @@ typedef struct SDHCIState {
+     /*< public >*/
+     SDBus sdbus;
+     MemoryRegion iomem;
++    AddressSpace sysbus_dma_as;
+     AddressSpace *dma_as;
+     MemoryRegion *dma_mr;
+ 
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index f9264d3be5..fac7fa5c72 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1388,6 +1388,7 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
      }
--
--    if (e->cleanup) {
--        e->cleanup(e);
--    }
- }
  
- static void kvm_io_ioeventfd_add(MemoryListener *listener,
-diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-index 8106346927..3042232daf 100644
---- a/hw/virtio/virtio-bus.c
-+++ b/hw/virtio/virtio-bus.c
-@@ -256,15 +256,6 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus)
-     return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
- }
- 
--static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
--{
--    /* Test and clear notifier after disabling event,
--     * in case poll callback didn't have time to run.
--     */
--    virtio_queue_host_notifier_read(notifier);
--    event_notifier_cleanup(notifier);
--}
--
- /*
-  * This function switches ioeventfd on/off in the device.
-  * The caller must set or clear the handlers for the EventNotifier.
-@@ -292,13 +283,19 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, int n, bool assign)
-         r = k->ioeventfd_assign(proxy, notifier, n, true);
-         if (r < 0) {
-             error_report("%s: unable to assign ioeventfd: %d", __func__, r);
--            virtio_bus_cleanup_event_notifier(notifier);
-+            goto cleanup_event_notifier;
-         }
-+        return 0;
+     if (s->dma_mr) {
++        s->dma_as = &s->sysbus_dma_as;
+         address_space_init(s->dma_as, s->dma_mr, "sdhci-dma");
      } else {
--        notifier->cleanup = virtio_bus_cleanup_event_notifier;
-         k->ioeventfd_assign(proxy, notifier, n, false);
-     }
- 
-+cleanup_event_notifier:
-+    /* Test and clear notifier after disabling event,
-+     * in case poll callback didn't have time to run.
-+     */
-+    virtio_queue_host_notifier_read(notifier);
-+    event_notifier_cleanup(notifier);
-     return r;
- }
- 
+         /* use system_memory() if property "dma" not set */
 -- 
-2.14.3
+2.15.1
