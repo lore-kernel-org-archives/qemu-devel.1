@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35439)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9m-0003X4-T7
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:55 -0500
+	id 1edp9n-0003Xh-LX
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9j-0000UU-PH
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:54 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:45579)
+	id 1edp9m-0000Z9-NZ
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:55 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35112)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9j-0000Tc-LR
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:51 -0500
-Received: by mail-qt0-x243.google.com with SMTP id x27so26416310qtm.12
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:21:51 -0800 (PST)
+	id 1edp9m-0000Yg-J7
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:54 -0500
+Received: by mail-qt0-x242.google.com with SMTP id g14so17245529qti.2
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:21:54 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 23 Jan 2018 00:21:26 -0300
-Message-Id: <20180123032135.28863-4-f4bug@amsat.org>
+Date: Tue, 23 Jan 2018 00:21:27 -0300
+Message-Id: <20180123032135.28863-5-f4bug@amsat.org>
 In-Reply-To: <20180123032135.28863-1-f4bug@amsat.org>
 References: <20180123032135.28863-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 03/12] sdcard: add a trace event for command
- responses
+Subject: [Qemu-devel] [PATCH v3 04/12] sdcard: replace fprintf() by
+ qemu_hexdump()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,75 +39,41 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c         | 26 +++++++++++++++++++++++---
- hw/sd/trace-events |  1 +
- 2 files changed, 24 insertions(+), 3 deletions(-)
+ hw/sd/sd.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index f876973a2b..3590099ce8 100644
+index 3590099ce8..03263e08ae 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -152,6 +152,26 @@ static const char *sd_state_name(enum SDCardStates state)
-     return state_name[state];
- }
+@@ -44,13 +44,6 @@
  
-+static const char *sd_response_name(sd_rsp_type_t rsp)
-+{
-+    static const char *response_name[] = {
-+        [sd_r0]     = "RESP#0 (no response)",
-+        [sd_r1]     = "RESP#1 (normal cmd)",
-+        [sd_r2_i]   = "RESP#2 (CID reg)",
-+        [sd_r2_s]   = "RESP#2 (CSD reg)",
-+        [sd_r3]     = "RESP#3 (OCR reg)",
-+        [sd_r6]     = "RESP#6 (RCA)",
-+        [sd_r7]     = "RESP#7 (operating voltage)",
-+    };
-+    if (rsp == sd_illegal) {
-+        return "ILLEGAL RESP";
-+    }
-+    if (rsp == sd_r1b) {
-+        rsp = sd_r1;
-+    }
-+    return response_name[rsp];
-+}
-+
- static uint8_t sd_get_dat_lines(SDState *sd)
- {
-     return sd->enable ? sd->dat_lines : 0;
-@@ -1595,10 +1615,12 @@ send_response:
+ //#define DEBUG_SD 1
  
-     case sd_r0:
-     case sd_illegal:
--    default:
-         rsplen = 0;
-         break;
-+    default:
-+        g_assert_not_reached();
+-#ifdef DEBUG_SD
+-#define DPRINTF(fmt, ...) \
+-do { fprintf(stderr, "SD: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) do {} while(0)
+-#endif
+-
+ #define ACMD41_ENQUIRY_MASK     0x00ffffff
+ #define OCR_POWER_UP            0x80000000
+ #define OCR_POWER_DELAY_NS      500000 /* 0.5ms */
+@@ -1630,13 +1623,7 @@ send_response:
      }
-+    trace_sdcard_response(sd_response_name(rtype), rsplen);
  
-     if (rtype != sd_illegal) {
-         /* Clear the "clear on valid command" status bits now we've
-@@ -1614,8 +1636,6 @@ send_response:
-         for (i = 0; i < rsplen; i++)
-             fprintf(stderr, " %02x", response[i]);
-         fputc('\n', stderr);
--    } else {
--        DPRINTF("No response %d\n", sd->state);
-     }
+ #ifdef DEBUG_SD
+-    if (rsplen) {
+-        int i;
+-        DPRINTF("Response:");
+-        for (i = 0; i < rsplen; i++)
+-            fprintf(stderr, " %02x", response[i]);
+-        fputc('\n', stderr);
+-    }
++    qemu_hexdump((const char *)response, stderr, "Response", rsplen);
  #endif
  
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index 75dac5a2cd..b2aa19ec0d 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -26,6 +26,7 @@ sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
- # hw/sd/sd.c
- sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD%d arg 0x%08x (state %s)"
- sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
-+sdcard_response(const char *rspdesc, int rsplen) "%s (sz:%d)"
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- 
+     return rsplen;
 -- 
 2.15.1
