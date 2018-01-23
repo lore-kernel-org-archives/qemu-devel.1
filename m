@@ -1,37 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1edxmq-0007RV-Oz
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 07:34:49 -0500
+	(envelope-from <izik@veertu.com>) id 1edxoi-0008PR-Ie
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 07:36:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1edxmm-0002RQ-Qu
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 07:34:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35190)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1edxmm-0002R4-Hq
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 07:34:44 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0NCYarG068605
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 07:34:43 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp53cg7ed-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 07:34:38 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 23 Jan 2018 05:34:17 -0700
-Date: Tue, 23 Jan 2018 10:34:04 -0200
-From: joserz@linux.vnet.ibm.com
-References: <20180123030528.GA5780@pacoca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180123030528.GA5780@pacoca>
-Message-Id: <20180123123404.GA3765@pacoca.br.ibm.com>
-Subject: Re: [Qemu-devel] virtio block device is not working
+	(envelope-from <izik@veertu.com>) id 1edxog-0003o2-2G
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 07:36:44 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37292)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <izik@veertu.com>) id 1edxof-0003nc-PF
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 07:36:42 -0500
+Received: by mail-wm0-x244.google.com with SMTP id v71so1598714wmv.2
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 04:36:41 -0800 (PST)
+From: Izik Eidus <izik@veertu.com>
+Date: Tue, 23 Jan 2018 14:36:39 +0200
+Message-Id: <20180123123639.35255-3-izik@veertu.com>
+In-Reply-To: <20180123123639.35255-1-izik@veertu.com>
+References: <20180123123639.35255-1-izik@veertu.com>
+Subject: [Qemu-devel] [PATCH 2/2] ept_emulation_fault() need NetApp BSD
+ attribution:
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,73 +26,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ghammer@redhat.com, mst@redhat.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Izik Eidus <izik@veertu.com>
 
-On Tue, Jan 23, 2018 at 01:05:28AM -0200, joserz@linux.vnet.ibm.com wrote:
-> Hello people!
-> 
-> I'm not able to boot any guest that sets a virtio block device like:
-> (branch master)
-> 
-> [PPC64]
-> qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G -M pseries,accel=kvm,kvm-type=PR -drive file=disk.qcow2,if=virtio
+Moving it to a new file and add the BSD license there.
 
-my bad, actually the command line is:
+Signed-off-by: Izik Eidus <izik@veertu.com>
+---
+ target/i386/hvf/ept_fault.h | 70 +++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/hvf/hvf.c       | 38 +-----------------------
+ 2 files changed, 71 insertions(+), 37 deletions(-)
+ create mode 100644 target/i386/hvf/ept_fault.h
 
-qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G -M pseries,accel=kvm -netdev type=user,id=net0 -device virtio-net-pci,netdev=net0 -drive file=../disk.qcow2,if=virtio
-
-and the problem seem to be in virtio-net-pci, not in the block device
-
-
-> QEMU Starting
->  Build Date = Dec 18 2017 13:08:00
->  FW Version = git-fa981320a1e0968d
->  Press "s" to enter Open Firmware.
-> 
-> Populating /vdevice methods
-> Populating /vdevice/vty@71000000
-> Populating /vdevice/nvram@71000001
-> Populating /vdevice/v-scsi@71000002
->        SCSI: Looking for devices
->           8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-> Populating /pci@800000020000000
->                      00 0000 (D) : 1af4 1000    virtio [ net ]
-> Aborted
-> 
-> [x86]
-> 
-> qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
-> Running QEMU with GTK 2.x is deprecated, and will be removed
-> in a future release. Please switch to GTK 3.x instead
-> [1]    5282 abort
-> 
-> [Cause]
-> 
-> The commit 4fe6d78b2e introduces the
-> 
-> ...
-> kvm_mem_ioeventfd_del(...) {
->     ...
->     r = kvm_set_ioeventfd_mmio(fd, ...
->     if (r < 0) {
->         abort();
->     }
-> 
-> +    if (e->cleanup) {
-> +        e->cleanup(e);
-> +    }
-> }
-> 
-> For some reason, not yet clear to me, cleanup() calls the same
-> kvm_mem_ioeventfd_del again and again until kvm_set_ioeventfd_mmio
-> returns < 0 and abort().
-> 
-> I was going to send a patch to revert that 'if ()' but I think it could
-> cause a regression. What do you guys think?
-> 
-> Thanks,
-> 
-> Jose Ricardo Ziviani
-> 
-> 
+diff --git a/target/i386/hvf/ept_fault.h b/target/i386/hvf/ept_fault.h
+new file mode 100644
+index 0000000000..c2938d2bd4
+--- /dev/null
++++ b/target/i386/hvf/ept_fault.h
+@@ -0,0 +1,70 @@
++/*-
++ * Copyright (c) 2011 NetApp, Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
++#ifndef EPT_FAULT_H
++#define EPT_FAULT_H
++
++#include "hvf-i386.h"
++
++static inline bool ept_emulation_fault(hvf_slot *slot, uint64_t gpa, uint64_t ept_qual)
++{
++    int read, write;
++
++    /* EPT fault on an instruction fetch doesn't make sense here */
++    if (ept_qual & EPT_VIOLATION_INST_FETCH) {
++        return false;
++    }
++
++    /* EPT fault must be a read fault or a write fault */
++    read = ept_qual & EPT_VIOLATION_DATA_READ ? 1 : 0;
++    write = ept_qual & EPT_VIOLATION_DATA_WRITE ? 1 : 0;
++    if ((read | write) == 0) {
++        return false;
++    }
++
++    if (write && slot) {
++        if (slot->flags & HVF_SLOT_LOG) {
++            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
++            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
++                          HV_MEMORY_READ | HV_MEMORY_WRITE);
++        }
++    }
++
++    /*
++     * The EPT violation must have been caused by accessing a
++     * guest-physical address that is a translation of a guest-linear
++     * address.
++     */
++    if ((ept_qual & EPT_VIOLATION_GLA_VALID) == 0 ||
++        (ept_qual & EPT_VIOLATION_XLAT_VALID) == 0) {
++        return false;
++    }
++
++    return !slot;
++}
++
++
++#endif
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index ab4820c3f5..94d8d119d5 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -36,6 +36,7 @@
+ #include "x86_emu.h"
+ #include "x86_task.h"
+ #include "x86hvf.h"
++#include "ept_fault.h"
+ 
+ #include <Hypervisor/hv.h>
+ #include <Hypervisor/hv_vmx.h>
+@@ -292,43 +293,6 @@ void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
+     run_on_cpu(cpu_state, _hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+ }
+ 
+-static bool ept_emulation_fault(hvf_slot *slot, uint64_t gpa, uint64_t ept_qual)
+-{
+-    int read, write;
+-
+-    /* EPT fault on an instruction fetch doesn't make sense here */
+-    if (ept_qual & EPT_VIOLATION_INST_FETCH) {
+-        return false;
+-    }
+-
+-    /* EPT fault must be a read fault or a write fault */
+-    read = ept_qual & EPT_VIOLATION_DATA_READ ? 1 : 0;
+-    write = ept_qual & EPT_VIOLATION_DATA_WRITE ? 1 : 0;
+-    if ((read | write) == 0) {
+-        return false;
+-    }
+-
+-    if (write && slot) {
+-        if (slot->flags & HVF_SLOT_LOG) {
+-            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
+-            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
+-                          HV_MEMORY_READ | HV_MEMORY_WRITE);
+-        }
+-    }
+-
+-    /*
+-     * The EPT violation must have been caused by accessing a
+-     * guest-physical address that is a translation of a guest-linear
+-     * address.
+-     */
+-    if ((ept_qual & EPT_VIOLATION_GLA_VALID) == 0 ||
+-        (ept_qual & EPT_VIOLATION_XLAT_VALID) == 0) {
+-        return false;
+-    }
+-
+-    return !slot;
+-}
+-
+ static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
+ {
+     hvf_slot *slot;
+-- 
+2.13.6 (Apple Git-96)
