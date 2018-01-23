@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzA4-0003mU-9H
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9u-0003cf-HC
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzA3-000682-9S
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9k-0005sj-SW
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:42 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:52 +0100
-Message-Id: <20180123140201.31163-21-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:01:44 +0100
+Message-Id: <20180123140201.31163-13-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 20/29] iotests: Fix 051 for compat=0.10
+Subject: [Qemu-devel] [PULL 12/29] qcow2: No persistent dirty bitmaps for
+ compat=0.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +25,65 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-051 has both compat=1.1 and compat=0.10 tests (once it uses
-lazy_refcounts, once it tests that setting them does not work).
-For the compat=0.10 tests, it already explicitly creates a suitable
-image.  So let's just ignore the user-specified compat level for the
-lazy_refcounts test and explicitly create a compat=1.1 image there, too.
+Persistent dirty bitmaps require a properly functioning
+autoclear_features field, or we cannot track when an unsupporting
+program might overwrite them.  Therefore, we cannot support them for
+compat=0.10 images.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171123020832.8165-12-mreitz@redhat.com
+Message-id: 20171123020832.8165-3-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/051        | 2 ++
- tests/qemu-iotests/051.out    | 1 +
- tests/qemu-iotests/051.pc.out | 1 +
- 3 files changed, 4 insertions(+)
+ block/qcow2-bitmap.c | 10 ++++++++++
+ block/qcow2.c        | 14 +++++++++++---
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index dba8816c9f..0c3be16489 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -131,6 +131,8 @@ echo
- echo === Enable and disable lazy refcounting on the command line, plus some invalid values ===
- echo
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index f45e46cfbd..efa10c6663 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1449,6 +1449,16 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+     bool found;
+     Qcow2BitmapList *bm_list;
  
-+_make_test_img -o compat=1.1 "$size"
++    if (s->qcow_version < 3) {
++        /* Without autoclear_features, we would always have to assume
++         * that a program without persistent dirty bitmap support has
++         * accessed this qcow2 file when opening it, and would thus
++         * have to drop all dirty bitmaps (defeating their purpose).
++         */
++        error_setg(errp, "Cannot store dirty bitmaps in qcow2 v2 files");
++        goto fail;
++    }
 +
- run_qemu -drive file="$TEST_IMG",format=qcow2,lazy-refcounts=on
- run_qemu -drive file="$TEST_IMG",format=qcow2,lazy-refcounts=off
- run_qemu -drive file="$TEST_IMG",format=qcow2,lazy-refcounts=
-diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
-index e3c6eaba57..dd9846d1ce 100644
---- a/tests/qemu-iotests/051.out
-+++ b/tests/qemu-iotests/051.out
-@@ -77,6 +77,7 @@ QEMU_PROG: -drive file=TEST_DIR/t.qcow2,file.backing.driver=qcow2,file.backing.f
+     if (check_constraints_on_bitmap(bs, name, granularity, errp) != 0) {
+         goto fail;
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4348b2c0c5..1f80961e1b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -302,9 +302,17 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+             }
  
- === Enable and disable lazy refcounting on the command line, plus some invalid values ===
- 
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=on
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index f2c5622cee..830c11880a 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -77,6 +77,7 @@ QEMU_PROG: -drive file=TEST_DIR/t.qcow2,file.backing.driver=qcow2,file.backing.f
- 
- === Enable and disable lazy refcounting on the command line, plus some invalid values ===
- 
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=on
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
+             if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) {
+-                warn_report("a program lacking bitmap support "
+-                            "modified this file, so all bitmaps are now "
+-                            "considered inconsistent");
++                if (s->qcow_version < 3) {
++                    /* Let's be a bit more specific */
++                    warn_report("This qcow2 v2 image contains bitmaps, but "
++                                "they may have been modified by a program "
++                                "without persistent bitmap support; so now "
++                                "they must all be considered inconsistent");
++                } else {
++                    warn_report("a program lacking bitmap support "
++                                "modified this file, so all bitmaps are now "
++                                "considered inconsistent");
++                }
+                 error_printf("Some clusters may be leaked, "
+                              "run 'qemu-img check -r' on the image "
+                              "file to fix.");
 -- 
 2.13.6
