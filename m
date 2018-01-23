@@ -1,39 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ee2gb-0007tP-MD
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 12:48:43 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ee2nG-0002ml-8V
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 12:55:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ee2gY-0008D6-JS
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 12:48:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40896)
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ee2nB-0004E6-5m
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 12:55:34 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50462)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1ee2gY-0008BT-8e
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 12:48:38 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1ee2nA-0004DG-9j
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 12:55:28 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0NHlaCl037009
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 12:48:36 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp780r4ps-1
+	w0NHtIbh011786
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 12:55:26 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fp9jpgq09-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 12:48:36 -0500
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 12:55:21 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 23 Jan 2018 10:48:35 -0700
-Date: Tue, 23 Jan 2018 15:48:28 -0200
-From: joserz@linux.vnet.ibm.com
-References: <20180123132021.27593-1-joserz@linux.vnet.ibm.com>
-	<20180123172106-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180123172106-mutt-send-email-mst@kernel.org>
-Message-Id: <20180123174828.GA22001@pacoca.br.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] Revert "virtio: postpone the execution of
- event_notifier_cleanup function"
+	Tue, 23 Jan 2018 10:54:19 -0700
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Date: Tue, 23 Jan 2018 15:54:09 -0200
+Message-Id: <20180123175409.9349-1-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2] kvm-all: Partially reverts 4fe6d78b2e to
+ remove the cleanup call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,97 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: ghammer@redhat.com, pbonzini@redhat.com, danielhb@linux.vnet.ibm.com, qemu-devel@nongnu.org, anton@samba.org
+To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+Cc: anton@samba.org, danielhb@linux.vnet.ibm.com, ghammer@redhat.com
 
-On Tue, Jan 23, 2018 at 05:22:12PM +0200, Michael S. Tsirkin wrote:
-> On Tue, Jan 23, 2018 at 11:20:21AM -0200, Jose Ricardo Ziviani wrote:
-> > This reverts commit 4fe6d78b2e241f41208dfb07605aace4becfc747.
-> > 
-> > As reported http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
-> > The referred commit is causing regression issues in virtio.
-> > 
-> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > Reported-by: Anton Blanchard <anton@samba.org>
+This commit partially reverts the commit 4fe6d78b2e because of issues
+reported in the virtio.
 
-Hello Michael,
+Examples:
 
-> Can you limit the patch to virtio bus please?
+$ qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G \
+  -M pseries,accel=kvm -netdev type=user,id=net0 \
+  -device virtio-net-pci,netdev=net0 -drive file=../disk.qcow2,if=virtio
 
-Unfortunately it doesn't work. I made the change on virtio bus only but
-the error persists. Actually the only way I found to fix it is by
-reverting only the kvm_mem_ioeventfd_del() @ kvm-all.c, removing that
-if (e->cleanup) code. I'm sending the V2.
+Populating /vdevice/nvram@71000001
+Populating /vdevice/v-scsi@71000002
+       SCSI: Looking for devices
+          8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+Populating /pci@800000020000000
+                     00 0000 (D) : 1af4 1000    virtio [ net ]
+Aborted
 
-thank you!!
+$ qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
 
+Running QEMU with GTK 2.x is deprecated, and will be removed
+in a future release. Please switch to GTK 3.x instead
+[1]    5282 abort
 
-> Maybe we want to drop the callback from the structure
-> but we don't want it to be there and just be ignored
-> I think.
-> 
-> > ---
-> >  accel/kvm/kvm-all.c    |  4 ----
-> >  hw/virtio/virtio-bus.c | 19 ++++++++-----------
-> >  2 files changed, 8 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index 071f4f57c0..f290f487a5 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
-> >      if (r < 0) {
-> >          abort();
-> >      }
-> > -
-> > -    if (e->cleanup) {
-> > -        e->cleanup(e);
-> > -    }
-> >  }
-> >  
-> >  static void kvm_io_ioeventfd_add(MemoryListener *listener,
-> > diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-> > index 8106346927..3042232daf 100644
-> > --- a/hw/virtio/virtio-bus.c
-> > +++ b/hw/virtio/virtio-bus.c
-> > @@ -256,15 +256,6 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus)
-> >      return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
-> >  }
-> >  
-> > -static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
-> > -{
-> > -    /* Test and clear notifier after disabling event,
-> > -     * in case poll callback didn't have time to run.
-> > -     */
-> > -    virtio_queue_host_notifier_read(notifier);
-> > -    event_notifier_cleanup(notifier);
-> > -}
-> > -
-> >  /*
-> >   * This function switches ioeventfd on/off in the device.
-> >   * The caller must set or clear the handlers for the EventNotifier.
-> > @@ -292,13 +283,19 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, int n, bool assign)
-> >          r = k->ioeventfd_assign(proxy, notifier, n, true);
-> >          if (r < 0) {
-> >              error_report("%s: unable to assign ioeventfd: %d", __func__, r);
-> > -            virtio_bus_cleanup_event_notifier(notifier);
-> > +            goto cleanup_event_notifier;
-> >          }
-> > +        return 0;
-> >      } else {
-> > -        notifier->cleanup = virtio_bus_cleanup_event_notifier;
-> >          k->ioeventfd_assign(proxy, notifier, n, false);
-> >      }
-> >  
-> > +cleanup_event_notifier:
-> > +    /* Test and clear notifier after disabling event,
-> > +     * in case poll callback didn't have time to run.
-> > +     */
-> > +    virtio_queue_host_notifier_read(notifier);
-> > +    event_notifier_cleanup(notifier);
-> >      return r;
-> >  }
-> >  
-> > -- 
-> > 2.14.3
-> 
+Reference http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
+
+Reported-by: Anton Blanchard <anton@samba.org>
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+---
+ accel/kvm/kvm-all.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 071f4f57c0..f290f487a5 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
+     if (r < 0) {
+         abort();
+     }
+-
+-    if (e->cleanup) {
+-        e->cleanup(e);
+-    }
+ }
+ 
+ static void kvm_io_ioeventfd_add(MemoryListener *listener,
+-- 
+2.14.3
