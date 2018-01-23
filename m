@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1edter-0007Gk-1B
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:18 -0500
+	(envelope-from <imammedo@redhat.com>) id 1edtes-0007Ho-3h
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1edteq-0001tI-1u
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:17 -0500
+	(envelope-from <imammedo@redhat.com>) id 1edteq-0001tf-Sb
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:10:18 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 23 Jan 2018 09:08:01 +0100
-Message-Id: <1516694904-64879-3-git-send-email-imammedo@redhat.com>
+Date: Tue, 23 Jan 2018 09:08:02 +0100
+Message-Id: <1516694904-64879-4-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
 References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 02/25] tests: add machine 'none' with -cpu
- test
+Subject: [Qemu-devel] [PATCH v3 03/25] arm: cpu: add CPU_RESOLVING_TYPE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,114 +20,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>
 
-Check that "$QEMU -M none -cpu FOO" starts QEMU without error
+it will be used for providing to cpu name resolving class for
+parsing cpu model for system and user emulation code.
+
+Along with change add target to null-machine test, so
+that when switch to CPU_RESOLVING_TYPE happens,
+thest would ensure that null-mchine usecase still works.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-v2:
-  - rename file to machine-none-test.c (Thomas Huth <thuth@redhat.com>)
-  - use qtest_startf()/instead of qtest_start() (Thomas Huth <thuth@redhat.com>)
+CC: qemu-arm@nongnu.org
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Andrew Jones <drjones@redhat.com>
 ---
- tests/Makefile.include    |  2 ++
- tests/machine-none-test.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 70 insertions(+)
- create mode 100644 tests/machine-none-test.c
+ target/arm/cpu.h          | 1 +
+ linux-user/main.c         | 2 --
+ tests/machine-none-test.c | 2 ++
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8883274..ea0a803 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -380,6 +380,7 @@ check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9631670..f9fb141 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2171,6 +2171,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
  
-+check-qtest-generic-y += tests/machine-none-test$(EXESUF)
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
+ #define ARM_CPU_TYPE_SUFFIX "-" TYPE_ARM_CPU
+ #define ARM_CPU_TYPE_NAME(name) (name ARM_CPU_TYPE_SUFFIX)
++#define CPU_RESOLVING_TYPE TYPE_ARM_CPU
  
-@@ -782,6 +783,7 @@ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
- tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
- tests/qom-test$(EXESUF): tests/qom-test.o
- tests/test-hmp$(EXESUF): tests/test-hmp.o
-+tests/machine-none-test$(EXESUF): tests/machine-none-test.o
- tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-obj-y)
- tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-obj-y)
- tests/nvme-test$(EXESUF): tests/nvme-test.o
+ #define cpu_signal_handler cpu_arm_signal_handler
+ #define cpu_list arm_cpu_list
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 450eb3c..a35477e 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4325,8 +4325,6 @@ int main(int argc, char **argv, char **envp)
+ #else
+         cpu_model = "qemu32";
+ #endif
+-#elif defined(TARGET_ARM)
+-        cpu_model = "any";
+ #elif defined(TARGET_UNICORE32)
+         cpu_model = "any";
+ #elif defined(TARGET_M68K)
 diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-new file mode 100644
-index 0000000..2eb13e8
---- /dev/null
+index 2eb13e8..1b213ff 100644
+--- a/tests/machine-none-test.c
 +++ b/tests/machine-none-test.c
-@@ -0,0 +1,68 @@
-+/*
-+ * Machine 'none' tests.
-+ *
-+ * Copyright (c) 2018 Red Hat Inc.
-+ *
-+ * Authors:
-+ *  Igor Mammedov <imammedo@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "qemu-common.h"
-+#include "qemu/cutils.h"
-+#include "libqtest.h"
-+#include "qapi/qmp/types.h"
-+
-+struct arch2cpu {
-+    const char *arch;
-+    const char *cpu_model;
-+};
-+
-+static struct arch2cpu cpus_map[] = {
-+    /* tested targets list */
-+};
-+
-+static const char *get_cpu_model_by_arch(const char *arch)
-+{
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(cpus_map); i++) {
-+        if (!strcmp(arch, cpus_map[i].arch)) {
-+            return cpus_map[i].cpu_model;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void test_machine_cpu_cli(void)
-+{
-+    QDict *response;
-+    const char *arch = qtest_get_arch();
-+    const char *cpu_model = get_cpu_model_by_arch(arch);
-+
-+    if (!cpu_model) {
-+        fprintf(stderr, "WARNING: cpu name for target '%s' isn't defined,"
-+                " add it to cpus_map\n", arch);
-+        return; /* TODO: die here to force all targets have a test */
-+    }
-+    global_qtest = qtest_startf("-machine none -cpu %s", cpu_model);
-+
-+    response = qmp("{ 'execute': 'quit' }");
-+    g_assert(qdict_haskey(response, "return"));
-+    QDECREF(response);
-+
-+    qtest_quit(global_qtest);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_func("machine/none/cpu_option", test_machine_cpu_cli);
-+
-+    return g_test_run();
-+}
+@@ -24,6 +24,8 @@ struct arch2cpu {
+ 
+ static struct arch2cpu cpus_map[] = {
+     /* tested targets list */
++    { "arm", "cortex-a15" },
++    { "aarch64", "cortex-a15" },
+ };
+ 
+ static const char *get_cpu_model_by_arch(const char *arch)
 -- 
 2.7.4
