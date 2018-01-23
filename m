@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edz9h-0003Qj-O5
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9g-0003Pd-FZ
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edz9g-0005po-Hu
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edz9f-0005oh-6a
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:28 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:36 +0100
-Message-Id: <20180123140201.31163-5-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:01:40 +0100
+Message-Id: <20180123140201.31163-9-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 04/29] tests/qemu-iotests: adding savevm/loadvm
- with postcopy flag test
+Subject: [Qemu-devel] [PULL 08/29] blockdev: Drop BD-{remove,
+ insert}-medium's @device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,193 +23,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+From: Max Reitz <mreitz@redhat.com>
 
-This patch implements a test case for the scenario that was failing
-prior to the patch "migration/ram.c: do not set 'postcopy_running' in
-POSTCOPY_INCOMING_END", commit acab30b85d.
+This is an incompatible change, which is fine as the commands are
+experimental.
 
-This new test file 201 was derived from the test file 181 authored
-by Kevin Wolf.
-
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20171110224302.14424-4-mreitz@redhat.com
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/201     | 120 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/201.out |  23 +++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 144 insertions(+)
- create mode 100755 tests/qemu-iotests/201
- create mode 100644 tests/qemu-iotests/201.out
+ qapi/block-core.json | 10 ++--------
+ blockdev.c           | 30 +++++++++++++++++++++++-------
+ 2 files changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
-new file mode 100755
-index 0000000000..11f640f5df
---- /dev/null
-+++ b/tests/qemu-iotests/201
-@@ -0,0 +1,120 @@
-+#!/bin/bash
-+#
-+# Test savevm and loadvm after live migration with postcopy flag
-+#
-+# Copyright (C) 2017, IBM Corporation.
-+#
-+# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_cleanup()
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index e94a6881b2..d1df47de26 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3411,8 +3411,6 @@
+ #
+ # If the tray is open and there is no medium inserted, this will be a no-op.
+ #
+-# @device: Block device name (deprecated, use @id instead)
+-#
+ # @id:     The name or QOM path of the guest device (since: 2.8)
+ #
+ # Note: This command is still a work in progress and is considered experimental.
+@@ -3447,8 +3445,7 @@
+ #
+ ##
+ { 'command': 'x-blockdev-remove-medium',
+-  'data': { '*device': 'str',
+-            '*id': 'str' } }
++  'data': { 'id': 'str' } }
+ 
+ ##
+ # @x-blockdev-insert-medium:
+@@ -3457,8 +3454,6 @@
+ # device's tray must currently be open (unless there is no attached guest
+ # device) and there must be no medium inserted already.
+ #
+-# @device:    Block device name (deprecated, use @id instead)
+-#
+ # @id:        The name or QOM path of the guest device (since: 2.8)
+ #
+ # @node-name: name of a node in the block driver state graph
+@@ -3486,8 +3481,7 @@
+ #
+ ##
+ { 'command': 'x-blockdev-insert-medium',
+-  'data': { '*device': 'str',
+-            '*id': 'str',
++  'data': { 'id': 'str',
+             'node-name': 'str'} }
+ 
+ 
+diff --git a/blockdev.c b/blockdev.c
+index 29d569a24e..2f9aef4167 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -60,6 +60,11 @@ static QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =
+ 
+ static int do_open_tray(const char *blk_name, const char *qdev_id,
+                         bool force, Error **errp);
++static void blockdev_remove_medium(bool has_device, const char *device,
++                                   bool has_id, const char *id, Error **errp);
++static void blockdev_insert_medium(bool has_device, const char *device,
++                                   bool has_id, const char *id,
++                                   const char *node_name, Error **errp);
+ 
+ static const char *const if_name[IF_COUNT] = {
+     [IF_NONE] = "none",
+@@ -2323,7 +2328,7 @@ void qmp_eject(bool has_device, const char *device,
+     }
+     error_free(local_err);
+ 
+-    qmp_x_blockdev_remove_medium(has_device, device, has_id, id, errp);
++    blockdev_remove_medium(has_device, device, has_id, id, errp);
+ }
+ 
+ void qmp_block_passwd(bool has_device, const char *device,
+@@ -2446,8 +2451,8 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
+     }
+ }
+ 
+-void qmp_x_blockdev_remove_medium(bool has_device, const char *device,
+-                                  bool has_id, const char *id, Error **errp)
++static void blockdev_remove_medium(bool has_device, const char *device,
++                                   bool has_id, const char *id, Error **errp)
+ {
+     BlockBackend *blk;
+     BlockDriverState *bs;
+@@ -2503,6 +2508,11 @@ out:
+     aio_context_release(aio_context);
+ }
+ 
++void qmp_x_blockdev_remove_medium(const char *id, Error **errp)
 +{
-+    rm -f "${MIG_SOCKET}"
-+    _cleanup_test_img
-+    _cleanup_qemu
++    blockdev_remove_medium(false, NULL, true, id, errp);
 +}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+_supported_fmt qcow2
-+_supported_proto generic
-+_supported_os Linux
+ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
+                                             BlockDriverState *bs, Error **errp)
+ {
+@@ -2548,9 +2558,9 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
+     }
+ }
+ 
+-void qmp_x_blockdev_insert_medium(bool has_device, const char *device,
+-                                  bool has_id, const char *id,
+-                                  const char *node_name, Error **errp)
++static void blockdev_insert_medium(bool has_device, const char *device,
++                                   bool has_id, const char *id,
++                                   const char *node_name, Error **errp)
+ {
+     BlockBackend *blk;
+     BlockDriverState *bs;
+@@ -2576,6 +2586,12 @@ void qmp_x_blockdev_insert_medium(bool has_device, const char *device,
+     qmp_blockdev_insert_anon_medium(blk, bs, errp);
+ }
+ 
++void qmp_x_blockdev_insert_medium(const char *id, const char *node_name,
++                                  Error **errp)
++{
++    blockdev_insert_medium(false, NULL, true, id, node_name, errp);
++}
 +
-+# Internal snapshots are (currently) impossible with refcount_bits=1
-+# This was taken from test 080
-+_unsupported_imgopts 'refcount_bits=1[^0-9]'
-+
-+size=64M
-+_make_test_img $size
-+
-+echo
-+echo === Starting VMs ===
-+echo
-+
-+qemu_comm_method="monitor"
-+
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+fi
-+src=$QEMU_HANDLE
-+
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+fi
-+dest=$QEMU_HANDLE
-+
-+echo
-+echo === Set \'migrate_set_capability postcopy-ram on\' and migrate ===
-+echo
-+
-+silent=yes
-+_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
-+_send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
-+_send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
-+
-+QEMU_COMM_TIMEOUT=1 qemu_cmd_repeat=10 silent=yes \
-+    _send_qemu_cmd $src "info migrate" "completed\|failed"
-+silent=yes _send_qemu_cmd $src "" "(qemu)"
-+
-+echo
-+echo === Check if migration was successful ===
-+echo
-+
-+QEMU_COMM_TIMEOUT=1 silent=yes \
-+    _send_qemu_cmd $src "info migrate" "completed"
-+silent=yes _send_qemu_cmd $src "" "(qemu)"
-+
-+echo
-+echo === On destination, execute savevm and loadvm ===
-+echo
-+
-+silent=
-+_send_qemu_cmd $dest 'savevm state1' "(qemu)"
-+_send_qemu_cmd $dest 'loadvm state1' "(qemu)"
-+
-+echo
-+echo === Shut down and check image ===
-+echo
-+
-+_send_qemu_cmd $src 'quit' ""
-+_send_qemu_cmd $dest 'quit' ""
-+wait=1 _cleanup_qemu
-+
-+_check_test_img
-+
-+# success, all done
-+echo "*** done"
-+status=0
-diff --git a/tests/qemu-iotests/201.out b/tests/qemu-iotests/201.out
-new file mode 100644
-index 0000000000..9faf06f996
---- /dev/null
-+++ b/tests/qemu-iotests/201.out
-@@ -0,0 +1,23 @@
-+QA output created by 201
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+
-+=== Starting VMs ===
-+
-+
-+=== Set 'migrate_set_capability postcopy-ram on' and migrate ===
-+
-+
-+=== Check if migration was successful ===
-+
-+
-+=== On destination, execute savevm and loadvm ===
-+
-+(qemu) savevm state1
-+(qemu) loadvm state1
-+
-+=== Shut down and check image ===
-+
-+(qemu) quit
-+(qemu) quit
-+No errors were found on the image.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 93d96fb22f..c4703cd782 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -197,5 +197,6 @@
- 197 rw auto quick
- 198 rw auto
- 200 rw auto
-+201 rw auto migration
- 202 rw auto quick
- 203 rw auto
+ void qmp_blockdev_change_medium(bool has_device, const char *device,
+                                 bool has_id, const char *id,
+                                 const char *filename,
+@@ -2650,7 +2666,7 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
+     error_free(err);
+     err = NULL;
+ 
+-    qmp_x_blockdev_remove_medium(has_device, device, has_id, id, &err);
++    blockdev_remove_medium(has_device, device, has_id, id, &err);
+     if (err) {
+         error_propagate(errp, err);
+         goto fail;
 -- 
 2.13.6
