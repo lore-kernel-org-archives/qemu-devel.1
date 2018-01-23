@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ee7dR-0006ky-Rq
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 18:05:47 -0500
+	(envelope-from <mjc@sifive.com>) id 1ee7mc-000277-KB
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 18:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ee7dO-0002GA-Be
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 18:05:45 -0500
-Resent-Message-Id: <E1ee7dO-0002GA-Be@eggs.gnu.org>
-In-Reply-To: <20180123225654.5764-1-linus.walleij@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151674871785.674.276197486276915619@5adcb62bf0d6>
+	(envelope-from <mjc@sifive.com>) id 1ee7mZ-0001LL-0T
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 18:15:14 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33674)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ee7mY-0001Jy-Kc
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 18:15:10 -0500
+Received: by mail-oi0-x244.google.com with SMTP id y141so1597375oia.0
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 15:15:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 23 Jan 2018 15:05:18 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] pl110: Implement vertical compare/next
- base interrupts
+In-Reply-To: <f15753f1-7446-26f1-9937-f3b67d15c0a6@linaro.org>
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-7-git-send-email-mjc@sifive.com>
+	<f15753f1-7446-26f1-9937-f3b67d15c0a6@linaro.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Tue, 23 Jan 2018 15:15:09 -0800
+Message-ID: <CAHNT7NvcUU8D10jaq+y=B2odsD7-r0MnsZRsq2yheY_a-THSUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 06/21] RISC-V FPU Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +29,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linus.walleij@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>, Jim Wilson <jimw@sifive.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTIzMjI1NjU0LjU3NjQtMS1saW51cy53YWxsZWlqQGxpbmFyby5vcmcK
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gcGwxMTA6IEltcGxlbWVudCB2ZXJ0aWNhbCBj
-b21wYXJlL25leHQgYmFzZSBpbnRlcnJ1cHRzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDEyMzIyNTY1NC41NzY0LTEt
-bGludXMud2FsbGVpakBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODAxMjMyMjU2NTQuNTc2NC0x
-LWxpbnVzLndhbGxlaWpAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CjI1MTJiMTUxYjYgcGwxMTA6IEltcGxlbWVudCB2ZXJ0aWNhbCBjb21wYXJlL25leHQgYmFzZSBp
-bnRlcnJ1cHRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHBsMTEw
-OiBJbXBsZW1lbnQgdmVydGljYWwgY29tcGFyZS9uZXh0IGJhc2UgaW50ZXJydXB0cy4uLgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzY6IEZJTEU6IGh3L2Rpc3BsYXkvcGwxMTAu
-YzozNDI6CisgICAgICAgICAgICAgIHFlbXVfY2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfVklSVFVB
-TCkgKyBOQU5PU0VDT05EU19QRVJfU0VDT05EIC8gNjApOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiM4NjogRklMRTogaHcvZGlzcGxheS9wbDExMC5jOjQ1MzoKKyAgICAgICAgICAg
-ICAgICAgICAgICBxZW11X2Nsb2NrX2dldF9ucyhRRU1VX0NMT0NLX1ZJUlRVQUwpICsgTkFOT1NF
-Q09ORFNfUEVSX1NFQ09ORCAvIDYwKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiM5NjogRklMRTogaHcvZGlzcGxheS9wbDExMC5jOjUwMToKKyAgICBzLT52YmxhbmtfdGltZXIg
-PSB0aW1lcl9uZXdfbnMoUUVNVV9DTE9DS19WSVJUVUFMLCBwbDExMF92YmxhbmtfaW50ZXJydXB0
-LCBzKTsKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, Jan 3, 2018 at 12:10 PM, Richard Henderson <
+richard.henderson@linaro.org> wrote:
+
+> On 01/02/2018 04:44 PM, Michael Clark wrote:
+> > +/* convert RISC-V rounding mode to IEEE library numbers */
+> > +unsigned int ieee_rm[] = {
+>
+> static const.
+>
+> > +/* obtain rm value to use in computation
+> > + * as the last step, convert rm codes to what the softfloat library
+> expects
+> > + * Adapted from Spike's decode.h:RM
+> > + */
+> > +#define RM ({                                             \
+> > +if (rm == 7) {                                            \
+> > +    rm = env->frm;                               \
+> > +}                                                         \
+> > +if (rm > 4) {                                             \
+> > +    helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST); \
+> > +}                                                         \
+> > +ieee_rm[rm]; })
+>
+> Please use inline functions and not these macros.
+>
+> Probably this applies to some of the helpers that I've already reviewed,
+> but
+> you're going to need to use an exception raising function that also
+> performs an
+> unwind (usually via cpu_loop_exit_restore).  The GETPC() that feeds the
+> unwind
+> must be placed in the outer-most helper (including inlines).
+>
+> > +#ifndef CONFIG_USER_ONLY
+> > +#define require_fp if (!(env->mstatus & MSTATUS_FS)) { \
+> > +    helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST); \
+> > +}
+>
+> If you included MSTATUS_FS in cpu_get_tb_cpu_state flags, then you could be
+> checking for this at translation time instead of at run time.
+>
+> > +/* convert softfloat library flag numbers to RISC-V */
+> > +unsigned int softfloat_flags_to_riscv(unsigned int flags)
+> > +{
+> > +    int rv_flags = 0;
+> > +    rv_flags |= (flags & float_flag_inexact) ? 1 : 0;
+> > +    rv_flags |= (flags & float_flag_underflow) ? 2 : 0;
+> > +    rv_flags |= (flags & float_flag_overflow) ? 4 : 0;
+> > +    rv_flags |= (flags & float_flag_divbyzero) ? 8 : 0;
+> > +    rv_flags |= (flags & float_flag_invalid) ? 16 : 0;
+>
+> FPEXC_NX et al.
+>
+> > +/* adapted from Spike's decode.h:set_fp_exceptions */
+> > +#define set_fp_exceptions() do { \
+> > +    env->fflags |= softfloat_flags_to_riscv(get_float_exception_flags(\
+> > +                            &env->fp_status)); \
+> > +    set_float_exception_flags(0, &env->fp_status); \
+> > +} while (0)
+>
+> inline function.  Usually written as
+>
+>   int flags = get_float_exception_flags(&env->fp_status);
+>   if (flags) {
+>     set_float_exception_flags(0, &env->fp_status);
+>     env->fflags |= softfloat_flags_to_riscv(flags);
+>   }
+>
+> since we really do expect exceptions to be exceptional.
+>
+> > +uint64_t helper_fmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t
+> frs2,
+> > +                        uint64_t frs3, uint64_t rm)
+> > +{
+> > +    require_fp;
+> > +    set_float_rounding_mode(RM, &env->fp_status);
+> > +    frs1 = float32_muladd(frs1, frs2, frs3 ^ (uint32_t)INT32_MIN, 0,
+> > +                          &env->fp_status);
+>
+> Given that RISC-V always returns a default NaN, you obviously do not care
+> about
+> the sign of a NaN result.  Therefore you should use float_muladd_negate_c
+> as
+> the fourth argument here and not perform the sign flip manually.
+
+
+We do care about the sign of NaN results.
+
+Jim Wilson spotted this bug and removed a call to set_default_nan_mode
+
+https://github.com/riscv/riscv-qemu/commit/4223d89b0c5c671332d66bcd649db5c6f46559f5
+
+
+> > +uint64_t helper_fnmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t
+> frs2,
+> > +                         uint64_t frs3, uint64_t rm)
+> > +{
+> > +    require_fp;
+> > +    set_float_rounding_mode(RM, &env->fp_status);
+> > +    frs1 = float32_muladd(frs1 ^ (uint32_t)INT32_MIN, frs2, frs3, 0,
+> > +                          &env->fp_status);
+>
+> float_muladd_negate_product.
+>
+> > +uint64_t helper_fnmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t
+> frs2,
+> > +                         uint64_t frs3, uint64_t rm)
+> > +{
+> > +    require_fp;
+> > +    set_float_rounding_mode(RM, &env->fp_status);
+> > +    frs1 = float32_muladd(frs1 ^ (uint32_t)INT32_MIN, frs2,
+> > +                          frs3 ^ (uint32_t)INT32_MIN, 0,
+> &env->fp_status);
+>
+> float_muladd_negate_c | float_muladd_negate_product
+>
+> > +uint64_t helper_fmin_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
+> > +{
+> > +    require_fp;
+> > +    frs1 = float32_minnum(frs1, frs2, &env->fp_status);
+>
+> If you want minnum and not min, riscv-spec-v2.2.pdf could use some more
+> verbage
+> to specify that.
+
+
+We'll look at Spike (riscv-isa-sim)... Spike has the correct behavior.
+
+
+> > +/* adapted from spike */
+> > +#define isNaNF32UI(ui) (0xFF000000 < (uint32_t)((uint_fast32_t)ui << 1))
+>
+> float32_is_any_nan
+>
+> > +#define signF32UI(a) ((bool)((uint32_t)a >> 31))
+>
+> float32_is_neg
+>
+> > +#define expF32UI(a) ((int_fast16_t)(a >> 23) & 0xFF)
+> > +#define fracF32UI(a) (a & 0x007FFFFF)
+>
+> Either float32_is_infinity or float32_is_zero_or_denormal.
+>
+> > +union ui32_f32 { uint32_t ui; uint32_t f; };
+>
+> This is just silly.
+>
+> > +uint_fast16_t float32_classify(uint32_t a, float_status *status)
+>
+> Please drop *_fast*_t for just "int".
+>
+> > +    return
+> > +        (sign && infOrNaN && fracF32UI(uiA) == 0)           << 0 |
+> > +        (sign && !infOrNaN && !subnormalOrZero)             << 1 |
+> > +        (sign && subnormalOrZero && fracF32UI(uiA))         << 2 |
+> > +        (sign && subnormalOrZero && fracF32UI(uiA) == 0)    << 3 |
+> > +        (!sign && infOrNaN && fracF32UI(uiA) == 0)          << 7 |
+> > +        (!sign && !infOrNaN && !subnormalOrZero)            << 6 |
+> > +        (!sign && subnormalOrZero && fracF32UI(uiA))        << 5 |
+> > +        (!sign && subnormalOrZero && fracF32UI(uiA) == 0)   << 4 |
+> > +        (isNaNF32UI(uiA) &&  float32_is_signaling_nan(uiA, status)) <<
+> 8 |
+> > +        (isNaNF32UI(uiA) && !float32_is_signaling_nan(uiA, status)) <<
+> 9;
+>
+> These conditions are all exclusive.  You do not need to compute all of
+> them.
+>
+>   if (float32_is_any_nan(f)) {
+>     if (float32_is_signaling_nan(f, status)) {
+>       return 1 << 8;
+>     } else {
+>       return 1 << 9;
+>     }
+>   }
+>   if (float32_is_neg(f)) {
+>     if (float32_is_infinity(f)) {
+>       return 1 << 0;
+>     } else if (float32_is_zero(f)) {
+>       return 1 << 3;
+>     } else if (float32_is_zero_or_denormal(f)) {
+>       return 1 << 2;
+>     } else {
+>       return 1 << 1;
+>     }
+>   } else {
+>     ...
+>   }
+>
+> > +    frs1 = (int64_t)((int32_t)float64_to_int32(frs1, &env->fp_status));
+>
+> Double cast is pointless, as are the extra parenthesis.
+>
+> > +/* adapted from spike */
+> > +#define isNaNF64UI(ui) (UINT64_C(0xFFE0000000000000) \
+> > +                       < (uint64_t)((uint_fast64_t)ui << 1))
+> > +#define signF64UI(a) ((bool)((uint64_t) a >> 63))
+> > +#define expF64UI(a) ((int_fast16_t)(a >> 52) & 0x7FF)
+> > +#define fracF64UI(a) (a & UINT64_C(0x000FFFFFFFFFFFFF))
+> > +
+> > +union ui64_f64 { uint64_t ui; uint64_t f; };
+> > +
+> > +uint_fast16_t float64_classify(uint64_t a, float_status *status)
+>
+> Likewise.
+>
+>
+> r~
+>
