@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edo1n-0005u0-6x
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:09:36 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1edou4-0008LJ-87
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:05:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edo1k-0003oe-0u
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 21:09:35 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 22 Jan 2018 23:08:20 -0300
-Message-Id: <20180123020820.1288-17-f4bug@amsat.org>
-In-Reply-To: <20180123020820.1288-1-f4bug@amsat.org>
-References: <20180123020820.1288-1-f4bug@amsat.org>
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1edou1-0003eI-2z
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:05:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32782
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1edou0-0003bp-RR
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:05:36 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0N33npF008384
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 22:05:35 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fntrfbv37-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 22:05:34 -0500
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Mon, 22 Jan 2018 22:05:34 -0500
+Date: Tue, 23 Jan 2018 01:05:28 -0200
+From: joserz@linux.vnet.ibm.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 16/16] hw/arm/xilinx_zynq: fix the
- capabilities register to match the datasheet
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Message-Id: <20180123030528.GA5780@pacoca>
+Subject: [Qemu-devel] virtio block device is not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,111 +39,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:Xilinx Zynq" <qemu-arm@nongnu.org>
+To: ghammer@redhat.com, mst@redhat.com
+Cc: qemu-devel@nongnu.org
 
-checking Xilinx datasheet "UG585" (v1.12.1)
+Hello people!
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/xilinx_zynq.c | 53 ++++++++++++++++++++++++++++------------------------
- tests/sdhci-test.c   |  5 +++++
- 2 files changed, 34 insertions(+), 24 deletions(-)
+I'm not able to boot any guest that sets a virtio block device like:
+(branch master)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 1836a4ed45..0f76333770 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -61,6 +61,8 @@ static const int dma_irqs[8] = {
- #define SLCR_XILINX_UNLOCK_KEY  0xdf0d
- #define SLCR_XILINX_LOCK_KEY    0x767b
- 
-+#define ZYNQ_SDHCI_CAPABILITIES 0x69ec0080  /* Datasheet: UG585 (v1.12.1) */
-+
- #define ARMV7_IMM16(x) (extract32((x),  0, 12) | \
-                         extract32((x), 12,  4) << 16)
- 
-@@ -165,10 +167,8 @@ static void zynq_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
--    DeviceState *dev, *carddev;
-+    DeviceState *dev;
-     SysBusDevice *busdev;
--    DriveInfo *di;
--    BlockBackend *blk;
-     qemu_irq pic[64];
-     int n;
- 
-@@ -247,27 +247,32 @@ static void zynq_init(MachineState *machine)
-     gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
-     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
- 
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
--
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
-+    for (n = 0; n < 2; n++) {
-+        int hci_irq = n ? 79 : 56;
-+        hwaddr hci_addr = n ? 0xE0101000 : 0xE0100000;
-+        DriveInfo *di;
-+        BlockBackend *blk;
-+        DeviceState *carddev;
-+
-+        /* Compatible with:
-+         * - SD Host Controller Specification Version 2.0 Part A2
-+         * - SDIO Specification Version 2.0
-+         * - MMC Specification Version 3.31
-+         */
-+        dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-+        qdev_prop_set_uint8(dev, "sd-spec-version", 2);
-+        qdev_prop_set_uint64(dev, "capareg", ZYNQ_SDHCI_CAPABILITIES);
-+        qdev_init_nofail(dev);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, hci_addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[hci_irq - IRQ_OFFSET]);
-+
-+        di = drive_get_next(IF_SD);
-+        blk = di ? blk_by_legacy_dinfo(di) : NULL;
-+        carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
-+        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(carddev), true, "realized",
-+                                 &error_fatal);
+[PPC64]
+qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G -M pseries,accel=kvm,kvm-type=PR -drive file=disk.qcow2,if=virtio
+QEMU Starting
+ Build Date = Dec 18 2017 13:08:00
+ FW Version = git-fa981320a1e0968d
+ Press "s" to enter Open Firmware.
+
+Populating /vdevice methods
+Populating /vdevice/vty@71000000
+Populating /vdevice/nvram@71000001
+Populating /vdevice/v-scsi@71000002
+       SCSI: Looking for devices
+          8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+Populating /pci@800000020000000
+                     00 0000 (D) : 1af4 1000    virtio [ net ]
+Aborted
+
+[x86]
+
+qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
+Running QEMU with GTK 2.x is deprecated, and will be removed
+in a future release. Please switch to GTK 3.x instead
+[1]    5282 abort
+
+[Cause]
+
+The commit 4fe6d78b2e introduces the
+
+...
+kvm_mem_ioeventfd_del(...) {
+    ...
+    r = kvm_set_ioeventfd_mmio(fd, ...
+    if (r < 0) {
+        abort();
+    }
+
++    if (e->cleanup) {
++        e->cleanup(e);
 +    }
- 
-     dev = qdev_create(NULL, TYPE_ZYNQ_XADC);
-     qdev_init_nofail(dev);
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 094e0570e1..aae2cfc1b5 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -41,6 +41,11 @@ static const struct sdhci_t {
-     /* Exynos4210 */
-     { "arm",    "smdkc210",
-         {0x12510000, 2, 0,  {1, 0x5e80080} } },
-+
-+    /* Zynq-7000 */
-+    { "arm",    "xilinx-zynq-a9",   /* Datasheet: UG585 (v1.12.1) */
-+        {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
-+
- };
- 
- static struct {
--- 
-2.15.1
+}
+
+For some reason, not yet clear to me, cleanup() calls the same
+kvm_mem_ioeventfd_del again and again until kvm_set_ioeventfd_mmio
+returns < 0 and abort().
+
+I was going to send a patch to revert that 'if ()' but I think it could
+cause a regression. What do you guys think?
+
+Thanks,
+
+Jose Ricardo Ziviani
