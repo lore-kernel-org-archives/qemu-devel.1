@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzA7-0003qZ-BS
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1edzA7-0003qY-Ap
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1edzA2-00066J-Cb
+	(envelope-from <kwolf@redhat.com>) id 1edz9z-00061W-NQ
 	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:02:55 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 23 Jan 2018 15:01:56 +0100
-Message-Id: <20180123140201.31163-25-kwolf@redhat.com>
+Date: Tue, 23 Jan 2018 15:01:50 +0100
+Message-Id: <20180123140201.31163-19-kwolf@redhat.com>
 In-Reply-To: <20180123140201.31163-1-kwolf@redhat.com>
 References: <20180123140201.31163-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 24/29] iotests: Make 184 image-less
+Subject: [Qemu-devel] [PULL 18/29] iotests: Skip 103 for refcount_bits=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,182 +24,26 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-184 does not need an image, so don't use one.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171123020832.8165-16-mreitz@redhat.com
+Message-id: 20171123020832.8165-9-mreitz@redhat.com
 Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/184     | 25 ++++--------------
- tests/qemu-iotests/184.out | 63 +++++++---------------------------------------
- 2 files changed, 14 insertions(+), 74 deletions(-)
+ tests/qemu-iotests/103 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
-index ee96c99af3..2b68284d58 100755
---- a/tests/qemu-iotests/184
-+++ b/tests/qemu-iotests/184
-@@ -27,18 +27,12 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
- 
--_supported_fmt qcow2
--_supported_proto file
+diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
+index ecbd8ebd71..d0cfab8844 100755
+--- a/tests/qemu-iotests/103
++++ b/tests/qemu-iotests/103
+@@ -40,6 +40,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto file nfs
  _supported_os Linux
++# Internal snapshots are (currently) impossible with refcount_bits=1
++_unsupported_imgopts 'refcount_bits=1[^0-9]'
  
- function do_run_qemu()
-@@ -55,7 +49,6 @@ function run_qemu()
-                           | _filter_actual_image_size
- }
+ IMG_SIZE=64K
  
--_make_test_img 64M
- test_throttle=$($QEMU_IMG --help|grep throttle)
- [ "$test_throttle" = "" ] && _supported_fmt throttle
- 
-@@ -66,12 +59,8 @@ run_qemu <<EOF
- { "execute": "qmp_capabilities" }
- { "execute": "blockdev-add",
-   "arguments": {
--    "driver": "$IMGFMT",
--    "node-name": "disk0",
--    "file": {
--      "driver": "file",
--      "filename": "$TEST_IMG"
--    }
-+    "driver": "null-co",
-+    "node-name": "disk0"
-   }
- }
- { "execute": "object-add",
-@@ -181,12 +170,8 @@ run_qemu <<EOF
- { "execute": "qmp_capabilities" }
- { "execute": "blockdev-add",
-   "arguments": {
--    "driver": "$IMGFMT",
--    "node-name": "disk0",
--    "file": {
--      "driver": "file",
--      "filename": "$TEST_IMG"
--    }
-+    "driver": "null-co",
-+    "node-name": "disk0"
-   }
- }
- { "execute": "blockdev-add",
-diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
-index 4dc7984a85..672650cde8 100644
---- a/tests/qemu-iotests/184.out
-+++ b/tests/qemu-iotests/184.out
-@@ -1,5 +1,4 @@
- QA output created by 184
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- 
- == checking interface ==
- Testing:
-@@ -28,12 +27,9 @@ Testing:
-             "iops_rd": 0,
-             "detect_zeroes": "off",
-             "image": {
--                "virtual-size": 67108864,
--                "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"qcow2\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.qcow2\"}}}",
--                "cluster-size": 65536,
--                "format": "throttle",
--                "actual-size": SIZE,
--                "dirty-flag": false
-+                "virtual-size": 1073741824,
-+                "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"null-co\"}}",
-+                "format": "throttle"
-             },
-             "iops_wr": 0,
-             "ro": false,
-@@ -51,34 +47,22 @@ Testing:
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"qcow2\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.qcow2\"}}}",
-+            "file": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"null-co\"}}",
-             "encryption_key_missing": false
-         },
-         {
-             "iops_rd": 0,
-             "detect_zeroes": "off",
-             "image": {
--                "virtual-size": 67108864,
--                "filename": "TEST_DIR/t.qcow2",
--                "cluster-size": 65536,
--                "format": "qcow2",
--                "actual-size": SIZE,
--                "format-specific": {
--                    "type": "qcow2",
--                    "data": {
--                        "compat": "1.1",
--                        "lazy-refcounts": false,
--                        "refcount-bits": 16,
--                        "corrupt": false
--                    }
--                },
--                "dirty-flag": false
-+                "virtual-size": 1073741824,
-+                "filename": "null-co://",
-+                "format": "null-co"
-             },
-             "iops_wr": 0,
-             "ro": false,
-             "node-name": "disk0",
-             "backing_file_depth": 0,
--            "drv": "qcow2",
-+            "drv": "null-co",
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
-@@ -90,36 +74,7 @@ Testing:
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "TEST_DIR/t.qcow2",
--            "encryption_key_missing": false
--        },
--        {
--            "iops_rd": 0,
--            "detect_zeroes": "off",
--            "image": {
--                "virtual-size": 197120,
--                "filename": "TEST_DIR/t.qcow2",
--                "format": "file",
--                "actual-size": SIZE,
--                "dirty-flag": false
--            },
--            "iops_wr": 0,
--            "ro": false,
--            "node-name": "NODE_NAME",
--            "backing_file_depth": 0,
--            "drv": "file",
--            "iops": 0,
--            "bps_wr": 0,
--            "write_threshold": 0,
--            "encrypted": false,
--            "bps": 0,
--            "bps_rd": 0,
--            "cache": {
--                "no-flush": false,
--                "direct": false,
--                "writeback": true
--            },
--            "file": "TEST_DIR/t.qcow2",
-+            "file": "null-co://",
-             "encryption_key_missing": false
-         }
-     ]
 -- 
 2.13.6
