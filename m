@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35468)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9r-0003ZC-84
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:22:00 -0500
+	id 1edp9w-0003dp-1c
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:22:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9q-0000cz-1I
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:59 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:45580)
+	id 1edp9s-0000gh-TK
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:22:04 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:44332)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edp9p-0000cW-Oy
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:21:57 -0500
-Received: by mail-qt0-x243.google.com with SMTP id x27so26416744qtm.12
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:21:57 -0800 (PST)
+	id 1edp9s-0000g4-OO
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:22:00 -0500
+Received: by mail-qt0-x243.google.com with SMTP id l20so25095922qtj.11
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:22:00 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 23 Jan 2018 00:21:28 -0300
-Message-Id: <20180123032135.28863-6-f4bug@amsat.org>
+Date: Tue, 23 Jan 2018 00:21:29 -0300
+Message-Id: <20180123032135.28863-7-f4bug@amsat.org>
 In-Reply-To: <20180123032135.28863-1-f4bug@amsat.org>
 References: <20180123032135.28863-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 05/12] sdcard: add more trace events
+Subject: [Qemu-devel] [PATCH v3 06/12] sdcard: do not trace CMD55 when
+ expecting ACMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,144 +39,31 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c         | 32 ++++++++++++++++++++++++++------
- hw/sd/trace-events | 13 +++++++++++++
- 2 files changed, 39 insertions(+), 6 deletions(-)
+ hw/sd/sd.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 03263e08ae..dc4b2329e4 100644
+index dc4b2329e4..27c08aa894 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -177,6 +177,8 @@ static bool sd_get_cmd_line(SDState *sd)
+@@ -816,13 +816,15 @@ static void sd_lock_command(SDState *sd)
+         sd->card_status &= ~CARD_IS_LOCKED;
+ }
  
- static void sd_set_voltage(SDState *sd, uint16_t millivolts)
+-static sd_rsp_type_t sd_normal_command(SDState *sd,
+-                                       SDRequest req)
++static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
  {
-+    trace_sdcard_set_voltage(millivolts);
-+
-     switch (millivolts) {
-     case 3001 ... 3600: /* SD_VOLTAGE_3_3V */
-     case 2001 ... 3000: /* SD_VOLTAGE_3_0V */
-@@ -272,6 +274,7 @@ static void sd_ocr_powerup(void *opaque)
- {
-     SDState *sd = opaque;
+     uint32_t rca = 0x0000;
+     uint64_t addr = (sd->ocr & (1 << 30)) ? (uint64_t) req.arg << 9 : req.arg;
  
-+    trace_sdcard_powerup();
-     /* Set powered up bit in OCR */
-     assert(!(sd->ocr & OCR_POWER_UP));
-     sd->ocr |= OCR_POWER_UP;
-@@ -475,6 +478,7 @@ static void sd_reset(DeviceState *dev)
-     uint64_t size;
-     uint64_t sect;
- 
-+    trace_sdcard_reset();
-     if (sd->blk) {
-         blk_get_geometry(sd->blk, &sect);
-     } else {
-@@ -528,7 +532,10 @@ static void sd_cardchange(void *opaque, bool load, Error **errp)
-     bool readonly = sd_get_readonly(sd);
- 
-     if (inserted) {
-+        trace_sdcard_inserted(readonly);
-         sd_reset(dev);
-+    } else {
-+        trace_sdcard_ejected();
-     }
- 
-     /* The IRQ notification is for legacy non-QOM SD controller devices;
-@@ -660,6 +667,7 @@ static void sd_erase(SDState *sd)
-     uint64_t erase_start = sd->erase_start;
-     uint64_t erase_end = sd->erase_end;
- 
-+    trace_sdcard_erase();
-     if (!sd->erase_start || !sd->erase_end) {
-         sd->card_status |= ERASE_SEQ_ERROR;
-         return;
-@@ -749,6 +757,11 @@ static void sd_lock_command(SDState *sd)
-     else
-         pwd_len = 0;
- 
-+    if (lock) {
-+        trace_sdcard_lock();
-+    } else {
-+        trace_sdcard_unlock();
+-    trace_sdcard_normal_command(req.cmd, req.arg, sd_state_name(sd->state));
++    if (req.cmd != 55 || sd->expecting_acmd) {
++        trace_sdcard_normal_command(req.cmd, req.arg,
++                                    sd_state_name(sd->state));
 +    }
-     if (erase) {
-         if (!(sd->card_status & CARD_IS_LOCKED) || sd->blk_len > 1 ||
-                         set_pwd || clr_pwd || lock || sd->wp_switch ||
-@@ -1075,10 +1088,12 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
-     case 16:	/* CMD16:  SET_BLOCKLEN */
-         switch (sd->state) {
-         case sd_transfer_state:
--            if (req.arg > (1 << HWBLOCK_SHIFT))
-+            if (req.arg > (1 << HWBLOCK_SHIFT)) {
-                 sd->card_status |= BLOCK_LEN_ERROR;
--            else
-+            } else {
-+                trace_sdcard_set_blocklen(req.arg);
-                 sd->blk_len = req.arg;
-+            }
  
-             return sd_r1;
- 
-@@ -1450,10 +1465,13 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-                 if ((req.arg & ACMD41_ENQUIRY_MASK) != 0) {
-                     timer_del(sd->ocr_power_timer);
-                     sd_ocr_powerup(sd);
--                } else if (!timer_pending(sd->ocr_power_timer)) {
--                    timer_mod_ns(sd->ocr_power_timer,
--                                 (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)
--                                  + OCR_POWER_DELAY_NS));
-+                } else {
-+                    trace_sdcard_inquiry_cmd41();
-+                    if (!timer_pending(sd->ocr_power_timer)) {
-+                        timer_mod_ns(sd->ocr_power_timer,
-+                                     (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)
-+                                      + OCR_POWER_DELAY_NS));
-+                    }
-                 }
-             }
- 
-@@ -1666,6 +1684,7 @@ void sd_write_data(SDState *sd, uint8_t value)
-     if (sd->card_status & (ADDRESS_ERROR | WP_VIOLATION))
-         return;
- 
-+    trace_sdcard_write_data(sd->current_cmd, value);
-     switch (sd->current_cmd) {
-     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
-         sd->data[sd->data_offset ++] = value;
-@@ -1803,6 +1822,7 @@ uint8_t sd_read_data(SDState *sd)
- 
-     io_len = (sd->ocr & (1 << 30)) ? 512 : sd->blk_len;
- 
-+    trace_sdcard_read_data(sd->current_cmd, io_len);
-     switch (sd->current_cmd) {
-     case 6:	/* CMD6:   SWITCH_FUNCTION */
-         ret = sd->data[sd->data_offset ++];
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index b2aa19ec0d..3040d32560 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -27,8 +27,21 @@ sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
- sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD%d arg 0x%08x (state %s)"
- sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
- sdcard_response(const char *rspdesc, int rsplen) "%s (sz:%d)"
-+sdcard_powerup(void) ""
-+sdcard_inquiry_cmd41(void) ""
-+sdcard_set_enable(bool current_state, bool new_state) "%u -> %u"
-+sdcard_reset(void) ""
-+sdcard_set_blocklen(uint16_t length) "0x%04x"
-+sdcard_inserted(bool readonly) "read_only: %u"
-+sdcard_ejected(void) ""
-+sdcard_erase(void) ""
-+sdcard_lock(void) ""
-+sdcard_unlock(void) ""
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
-+sdcard_write_data(uint8_t cmd, uint8_t value) "CMD%02d value 0x%02x"
-+sdcard_read_data(uint8_t cmd, int length) "CMD%02d len %d"
-+sdcard_set_voltage(uint16_t millivolts) "%u mV"
- 
- # hw/sd/milkymist-memcard.c
- milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+     /* Not interpreting this as an app command */
+     sd->card_status &= ~APP_CMD;
 -- 
 2.15.1
