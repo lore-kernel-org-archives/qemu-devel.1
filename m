@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37824)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edpIh-0003RJ-IN
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:08 -0500
+	id 1edpIm-0003Ue-QK
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edpIg-0007xt-Kn
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:07 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33830)
+	id 1edpIj-0007zb-Ky
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:12 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35198)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1edpIg-0007xb-Ft
-	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:06 -0500
-Received: by mail-qt0-x244.google.com with SMTP id a27so13310356qtd.1
-	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:31:06 -0800 (PST)
+	id 1edpIj-0007zS-Gw
+	for qemu-devel@nongnu.org; Mon, 22 Jan 2018 22:31:09 -0500
+Received: by mail-qt0-x242.google.com with SMTP id g14so17283096qti.2
+	for <qemu-devel@nongnu.org>; Mon, 22 Jan 2018 19:31:09 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 23 Jan 2018 00:30:24 -0300
-Message-Id: <20180123033034.29493-9-f4bug@amsat.org>
+Date: Tue, 23 Jan 2018 00:30:25 -0300
+Message-Id: <20180123033034.29493-10-f4bug@amsat.org>
 In-Reply-To: <20180123033034.29493-1-f4bug@amsat.org>
 References: <20180123033034.29493-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 08/18] sdcard: use the registerfields API
- for the CARD_STATUS register masks
+Subject: [Qemu-devel] [PATCH v3 09/18] sdcard: handles more commands in SPI
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,72 +39,121 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 48 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 45 insertions(+), 3 deletions(-)
+ hw/sd/sd.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 54 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index ee381540aa..2eca999bc3 100644
+index 2eca999bc3..07424aa56e 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -423,14 +423,56 @@ static void sd_set_rca(SDState *sd)
-     sd->rca += 0x4567;
- }
+@@ -1390,9 +1390,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
  
-+FIELD(CSR, AKE_SEQ_ERROR,               3,  1)
-+FIELD(CSR, APP_CMD,                     5,  1)
-+FIELD(CSR, FX_EVENT,                    6,  1)
-+FIELD(CSR, READY_FOR_DATA,              8,  1)
-+FIELD(CSR, CURRENT_STATE,               9,  4)
-+FIELD(CSR, ERASE_RESET,                13,  1)
-+FIELD(CSR, CARD_ECC_DISABLED,          14,  1)
-+FIELD(CSR, WP_ERASE_SKIP,              15,  1)
-+FIELD(CSR, CSD_OVERWRITE,              16,  1)
-+FIELD(CSR, DEFERRED_RESPONSE,          17,  1)
-+FIELD(CSR, ERROR,                      19,  1)
-+FIELD(CSR, CC_ERROR,                   20,  1)
-+FIELD(CSR, CARD_ECC_FAILED,            21,  1)
-+FIELD(CSR, ILLEGAL_COMMAND,            22,  1)
-+FIELD(CSR, COM_CRC_ERROR,              23,  1)
-+FIELD(CSR, LOCK_UNLOCK_FAILED,         24,  1)
-+FIELD(CSR, CARD_IS_LOCKED,             25,  1)
-+FIELD(CSR, WP_VIOLATION,               26,  1)
-+FIELD(CSR, ERASE_PARAM,                27,  1)
-+FIELD(CSR, ERASE_SEQ_ERROR,            28,  1)
-+FIELD(CSR, BLOCK_LEN_ERROR,            29,  1)
-+FIELD(CSR, ADDRESS_ERROR,              30,  1)
-+FIELD(CSR, OUT_OF_RANGE,               31,  1)
+     /* Application specific commands (Class 8) */
+     case 55:	/* CMD55:  APP_CMD */
+-        if (sd->rca != rca)
+-            return sd_r0;
+-
++        if (!sd->spi) {
++            if (sd->rca != rca) {
++                return sd_r0;
++            }
++        }
+         sd->expecting_acmd = true;
+         sd->card_status |= APP_CMD;
+         return sd_r1;
+@@ -1412,6 +1414,18 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+         }
+         break;
+ 
++    case 58:    /* CMD58:   READ_OCR (SPI) */
++        if (!sd->spi) {
++            goto bad_cmd;
++        }
++        return sd_r3;
 +
- /* Card status bits, split by clear condition:
-  * A : According to the card current state
-  * B : Always related to the previous command
-  * C : Cleared by read
-  */
--#define CARD_STATUS_A	0x02004100
--#define CARD_STATUS_B	0x00c01e00
--#define CARD_STATUS_C	0xfd39a028
-+#define CARD_STATUS_A           (R_CSR_READY_FOR_DATA_MASK \
-+                               | R_CSR_CARD_ECC_DISABLED_MASK \
-+                               | R_CSR_CARD_IS_LOCKED_MASK)
-+#define CARD_STATUS_B           (R_CSR_CURRENT_STATE_MASK \
-+                               | R_CSR_ILLEGAL_COMMAND_MASK \
-+                               | R_CSR_COM_CRC_ERROR_MASK)
-+#define CARD_STATUS_C           (R_CSR_AKE_SEQ_ERROR_MASK \
-+                               | R_CSR_APP_CMD_MASK \
-+                               | R_CSR_ERASE_RESET_MASK \
-+                               | R_CSR_WP_ERASE_SKIP_MASK \
-+                               | R_CSR_CSD_OVERWRITE_MASK \
-+                               | R_CSR_ERROR_MASK \
-+                               | R_CSR_CC_ERROR_MASK \
-+                               | R_CSR_CARD_ECC_FAILED_MASK \
-+                               | R_CSR_LOCK_UNLOCK_FAILED_MASK \
-+                               | R_CSR_WP_VIOLATION_MASK \
-+                               | R_CSR_ERASE_PARAM_MASK \
-+                               | R_CSR_ERASE_SEQ_ERROR_MASK \
-+                               | R_CSR_BLOCK_LEN_ERROR_MASK \
-+                               | R_CSR_ADDRESS_ERROR_MASK \
-+                               | R_CSR_OUT_OF_RANGE_MASK)
++    case 59:    /* CMD59:   CRC_ON_OFF (SPI) */
++        if (!sd->spi) {
++            goto bad_cmd;
++        }
++        goto unimplemented_cmd;
++
+     default:
+     bad_cmd:
+         qemu_log_mask(LOG_GUEST_ERROR, "SD: Unknown CMD%i\n", req.cmd);
+@@ -1436,6 +1450,9 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
+     sd->card_status |= APP_CMD;
+     switch (req.cmd) {
+     case 6:	/* ACMD6:  SET_BUS_WIDTH */
++        if (sd->spi) {
++            goto unimplemented_cmd;
++        }
+         switch (sd->state) {
+         case sd_transfer_state:
+             sd->sd_status[0] &= 0x3f;
+@@ -1460,6 +1477,12 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
+         }
+         break;
  
- static void sd_reset_cardstatus(SDState *sd)
- {
++    case 18:
++        if (sd->spi) {
++            goto unimplemented_cmd;
++        }
++        break;
++
+     case 22:	/* ACMD22: SEND_NUM_WR_BLOCKS */
+         switch (sd->state) {
+         case sd_transfer_state:
+@@ -1485,6 +1508,19 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
+         }
+         break;
+ 
++    case 25:
++    case 26:
++        if (sd->spi) {
++            goto unimplemented_cmd;
++        }
++        break;
++
++    case 38:
++        if (sd->spi) {
++            goto unimplemented_cmd;
++        }
++        break;
++
+     case 41:	/* ACMD41: SD_APP_OP_COND */
+         if (sd->spi) {
+             /* SEND_OP_CMD */
+@@ -1542,6 +1578,12 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
+         }
+         break;
+ 
++    case 43 ... 49:
++        if (sd->spi) {
++            goto unimplemented_cmd;
++        }
++        break;
++
+     case 51:	/* ACMD51: SEND_SCR */
+         switch (sd->state) {
+         case sd_transfer_state:
+@@ -1555,9 +1597,18 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
+         }
+         break;
+ 
++    case 55:    /* Not exist */
++        break;
++
+     default:
+         /* Fall back to standard commands.  */
+         return sd_normal_command(sd, req);
++
++    unimplemented_cmd:
++        /* Commands that are recognised but not yet implemented in SPI mode.  */
++        qemu_log_mask(LOG_UNIMP, "SD: CMD%i not implemented in SPI mode\n",
++                      req.cmd);
++        return sd_illegal;
+     }
+ 
+     qemu_log_mask(LOG_GUEST_ERROR, "SD: ACMD%i in a wrong state\n", req.cmd);
 -- 
 2.15.1
