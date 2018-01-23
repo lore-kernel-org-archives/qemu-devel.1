@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ee4g3-00077T-HG
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:56:18 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ee4pU-0003CO-Mv
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ee4g0-0005nc-8I
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:56:15 -0500
-Date: Tue, 23 Jan 2018 12:56:09 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180123125609.4ac82c4c@w520.home>
-In-Reply-To: <9160fdc1-320d-eaee-2d7c-c319e9fd5996@redhat.com>
-References: <20171215062914.27927-1-aik@ozlabs.ru>
-	<3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
-	<20180105082916.480132af@t450s.home>
-	<51ac953b-da09-94ed-41a4-ae75ca045c5e@ozlabs.ru>
-	<20180118145920.2dd19c9a@w520.home>
-	<c97a4741-dac0-5186-91e9-3dd0b1e4bf1e@ozlabs.ru>
-	<20180118202541.6b40f2a8@w520.home>
-	<9160fdc1-320d-eaee-2d7c-c319e9fd5996@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ee4pQ-0007W4-MJ
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:06:00 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:33046)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ee4pQ-0007Ue-Az
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:05:56 -0500
+Received: by mail-wm0-x235.google.com with SMTP id x4so23507694wmc.0
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 12:05:56 -0800 (PST)
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-12-alex.bennee@linaro.org>
+	<CAFEAcA-3nkmeJMHFqMeiwZtQycmieXdPiaCvKZsFuKY3MqtdCQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-3nkmeJMHFqMeiwZtQycmieXdPiaCvKZsFuKY3MqtdCQ@mail.gmail.com>
+Date: Tue, 23 Jan 2018 20:05:53 +0000
+Message-ID: <87inbs7332.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX
- BAR
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 11/20] fpu/softfloat: re-factor add/sub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,355 +31,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, 19 Jan 2018 14:15:43 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
 
-> Hi,
-> 
-> On 19/01/18 04:25, Alex Williamson wrote:
-> > On Fri, 19 Jan 2018 13:41:41 +1100
-> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >   
-> >> On 19/01/18 08:59, Alex Williamson wrote:  
-> >>> On Tue, 16 Jan 2018 16:17:58 +1100
-> >>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >>>     
-> >>>> On 06/01/18 02:29, Alex Williamson wrote:    
-> >>>>> On Fri, 5 Jan 2018 10:48:07 +0100
-> >>>>> Auger Eric <eric.auger@redhat.com> wrote:
-> >>>>>       
-> >>>>>> Hi Alexey,
-> >>>>>>
-> >>>>>> On 15/12/17 07:29, Alexey Kardashevskiy wrote:      
-> >>>>>>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
-> >>>>>>> which tells that a region with MSIX data can be mapped entirely, i.e.
-> >>>>>>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
-> >>>>>>>
-> >>>>>>> With this change, all BARs are mapped in a single chunk and MSIX vectors
-> >>>>>>> are emulated on top unless the machine requests not to by defining and
-> >>>>>>> enabling a new "vfio-no-msix-emulation" property. At the moment only
-> >>>>>>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
-> >>>>>>> enabling it as it does not define the "set" callback for the new property;
-> >>>>>>> the new property also does not appear in "-machine pseries,help".
-> >>>>>>>
-> >>>>>>> If the new capability is present, this puts MSIX IO memory region under
-> >>>>>>> mapped memory region. If the capability is not there, it falls back to
-> >>>>>>> the old behaviour with the sparse capability.
-> >>>>>>>
-> >>>>>>> In MSIX vectors section is not aligned to the page size, the KVM memory
-> >>>>>>> listener does not register it with the KVM as a memory slot and MSIX is
-> >>>>>>> emulated by QEMU as before.
-> >>>>>>>
-> >>>>>>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
-> >>>>>>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
-> >>>>>>>
-> >>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>>>>>> ---
-> >>>>>>>
-> >>>>>>> This is mtree and flatview BEFORE this patch:
-> >>>>>>>
-> >>>>>>> "info mtree":
-> >>>>>>> memory-region: pci@800000020000000.mmio
-> >>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-> >>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>>>>>       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>>>>>       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-> >>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-> >>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>>>>>
-> >>>>>>> "info mtree -f":
-> >>>>>>> FlatView #0
-> >>>>>>>  AS "memory", root: system
-> >>>>>>>  AS "cpu-memory", root: system
-> >>>>>>>  Root memory region: system
-> >>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>>>>>>   0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>>>>>   000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
-> >>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>>>>>
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> This is AFTER this patch applied:
-> >>>>>>>
-> >>>>>>> "info mtree":
-> >>>>>>> memory-region: pci@800000020000000.mmio
-> >>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-> >>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
-> >>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-> >>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-> >>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> "info mtree -f":
-> >>>>>>> FlatView #2
-> >>>>>>>  AS "memory", root: system
-> >>>>>>>  AS "cpu-memory", root: system
-> >>>>>>>  Root memory region: system
-> >>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>>>>>>   0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>>>>>
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> This is AFTER this patch applied AND spapr_get_msix_emulation() patched
-> >>>>>>> to enable emulation:
-> >>>>>>>
-> >>>>>>> "info mtree":
-> >>>>>>> memory-region: pci@800000020000000.mmio
-> >>>>>>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-> >>>>>>>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-> >>>>>>>       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>>>>>         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>>>>>         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-> >>>>>>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-> >>>>>>>       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>>>>>
-> >>>>>>> "info mtree -f":
-> >>>>>>> FlatView #1
-> >>>>>>>  AS "memory", root: system
-> >>>>>>>  AS "cpu-memory", root: system
-> >>>>>>>  Root memory region: system
-> >>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>>>>>>   0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-> >>>>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-> >>>>>>>   000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
-> >>>>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> >>>>>>> ---
-> >>>>>>>  include/hw/vfio/vfio-common.h |  1 +
-> >>>>>>>  linux-headers/linux/vfio.h    |  5 +++++
-> >>>>>>>  hw/ppc/spapr.c                |  8 ++++++++
-> >>>>>>>  hw/vfio/common.c              | 15 +++++++++++++++
-> >>>>>>>  hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
-> >>>>>>>  5 files changed, 50 insertions(+), 2 deletions(-)
-> >>>>>>>
-> >>>>>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> >>>>>>> index f3a2ac9..927d600 100644
-> >>>>>>> --- a/include/hw/vfio/vfio-common.h
-> >>>>>>> +++ b/include/hw/vfio/vfio-common.h
-> >>>>>>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
-> >>>>>>>                           struct vfio_region_info **info);
-> >>>>>>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-> >>>>>>>                               uint32_t subtype, struct vfio_region_info **info);
-> >>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
-> >>>>>>>  #endif
-> >>>>>>>  extern const MemoryListener vfio_prereg_listener;
-> >>>>>>>  
-> >>>>>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> >>>>>>> index 4312e96..b45182e 100644
-> >>>>>>> --- a/linux-headers/linux/vfio.h
-> >>>>>>> +++ b/linux-headers/linux/vfio.h
-> >>>>>>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
-> >>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
-> >>>>>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-> >>>>>>>  
-> >>>>>>> +/*
-> >>>>>>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
-> >>>>>>> + */
-> >>>>>>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
-> >>>>>>> +
-> >>>>>>>  /**
-> >>>>>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-> >>>>>>>   *				    struct vfio_irq_info)
-> >>>>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>>>>>> index 9de63f0..693394a 100644
-> >>>>>>> --- a/hw/ppc/spapr.c
-> >>>>>>> +++ b/hw/ppc/spapr.c
-> >>>>>>> @@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
-> >>>>>>>      spapr->use_hotplug_event_source = value;
-> >>>>>>>  }
-> >>>>>>>  
-> >>>>>>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
-> >>>>>>> +{
-> >>>>>>> +    return true;
-> >>>>>>> +}
-> >>>>>>> +
-> >>>>>>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
-> >>>>>>>  {
-> >>>>>>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-> >>>>>>> @@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
-> >>>>>>>      object_property_set_description(obj, "vsmt",
-> >>>>>>>                                      "Virtual SMT: KVM behaves as if this were"
-> >>>>>>>                                      " the host's SMT mode", &error_abort);
-> >>>>>>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
-> >>>>>>> +                             spapr_get_msix_emulation, NULL, NULL);
-> >>>>>>>  }
-> >>>>>>>  
-> >>>>>>>  static void spapr_machine_finalizefn(Object *obj)
-> >>>>>>> @@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
-> >>>>>>>  /*
-> >>>>>>>   * pseries-2.11
-> >>>>>>>   */
-> >>>>>>> +
-> >>>>>>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
-> >>>>>>>  {
-> >>>>>>>  }
-> >>>>>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> >>>>>>> index 1fb8a8e..da5f182 100644
-> >>>>>>> --- a/hw/vfio/common.c
-> >>>>>>> +++ b/hw/vfio/common.c
-> >>>>>>> @@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-> >>>>>>>      return -ENODEV;
-> >>>>>>>  }
-> >>>>>>>  
-> >>>>>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
-> >>>>>>> +{
-> >>>>>>> +    struct vfio_region_info *info = NULL;
-> >>>>>>> +    bool ret = false;
-> >>>>>>> +
-> >>>>>>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
-> >>>>>>> +        if (vfio_get_region_info_cap(info, cap_type)) {
-> >>>>>>> +            ret = true;
-> >>>>>>> +        }
-> >>>>>>> +        g_free(info);
-> >>>>>>> +    }
-> >>>>>>> +
-> >>>>>>> +    return ret;
-> >>>>>>> +}
-> >>>>>>> +
-> >>>>>>>  /*
-> >>>>>>>   * Interfaces for IBM EEH (Enhanced Error Handling)
-> >>>>>>>   */
-> >>>>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> >>>>>>> index c977ee3..27a3706 100644
-> >>>>>>> --- a/hw/vfio/pci.c
-> >>>>>>> +++ b/hw/vfio/pci.c
-> >>>>>>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
-> >>>>>>>      off_t start, end;
-> >>>>>>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
-> >>>>>>>  
-> >>>>>>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
-> >>>>>>> +                            vdev->msix->table_bar)) {
-> >>>>>>> +        return;
-> >>>>>>> +    }        
-> >>>>>>
-> >>>>>> I am testing this patch on ARM with a Mellanox CX-4 card. Single bar0 +
-> >>>>>> msix table at 0x2000, using 64kB pages.
-> >>>>>>
-> >>>>>> 0000000000000000-0000000001ffffff (prio 1, i/o): 0000:01:00.0 BAR 0
-> >>>>>>  0000000000000000-0000000001ffffff (prio 0, ramd): 0000:01:00.0 BAR 0
-> >>>>>> mmaps[0]
-> >>>>>>   0000000000002000-00000000000023ff (prio 0, i/o): msix-table
-> >>>>>>   0000000000003000-0000000000003007 (prio 0, i/o): msix-pba [disabled]
-> >>>>>>
-> >>>>>>
-> >>>>>> My kernel includes your "vfio-pci: Allow mapping MSIX BAR" so we bypass
-> >>>>>> vfio_pci_fixup_msix_region. But as the mmaps[0] is not fixed up the
-> >>>>>> vfio_listener_region_add_ram gets called on the first 8kB which cannot
-> >>>>>> be mapped with 64kB page, leading to a qemu abort.
-> >>>>>>
-> >>>>>> 29520@1515145231.232161:vfio_listener_region_add_ram region_add [ram]
-> >>>>>> 0x8000000000 - 0x8000001fff [0xffffa8820000]
-> >>>>>> qemu-system-aarch64: VFIO_MAP_DMA: -22
-> >>>>>> qemu-system-aarch64: vfio_dma_map(0x1e265f60, 0x8000000000, 0x2000,
-> >>>>>> 0xffffa8820000) = -22 (Invalid argument)
-> >>>>>> qemu: hardware error: vfio: DMA mapping failed, unable to continue
-> >>>>>>
-> >>>>>> In my case don't we still need the fixup logic?      
-> >>>>>
-> >>>>> Ah, I didn't realize you had Alexey's QEMU patch when you asked about
-> >>>>> this.  I'd say no, the fixup shouldn't be needed, but apparently we
-> >>>>> can't remove it until we figure out this bug and who should be filtering
-> >>>>> out sub-page size listener events.  Thanks,      
-> >>>>
-> >>>>
-> >>>> This should do it:
-> >>>>
-> >>>> @@ -303,11 +303,19 @@ static bool
-> >>>> vfio_listener_skipped_section(MemoryRegionSection *section)
-> >>>>              * Sizing an enabled 64-bit BAR can cause spurious mappings to
-> >>>>              * addresses in the upper part of the 64-bit address space.  These
-> >>>>              * are never accessed by the CPU and beyond the address width of
-> >>>>              * some IOMMU hardware.  TODO: VFIO should tell us the IOMMU width.
-> >>>>              */
-> >>>> -           section->offset_within_address_space & (1ULL << 63);
-> >>>> +           section->offset_within_address_space & (1ULL << 63) ||
-> >>>> +           /*
-> >>>> +            * Non-system-page aligned RAM regions have no chance to be
-> >>>> +            * DMA mapped so skip them too.
-> >>>> +            */
-> >>>> +           (memory_region_is_ram(section->mr) &&
-> >>>> +            ((section->offset_within_region & qemu_real_host_page_mask) ||
-> >>>> +             (int128_getlo(section->size) & qemu_real_host_page_mask))
-> >>>> +           );
-> >>>>  }
-> >>>>
-> >>>>
-> >>>> Do we VFIO DMA map on every RAM MR just because it is not necessary to have
-> >>>> more complicated logic to detect whether it is MMIO? Or there is something
-> >>>> bigger?    
-> >>>
-> >>> Both, a) it's not clear how we determine a MR is MMIO vs RAM, thus the
-> >>> silly address hack above to try to exclude PCI BARs as they're being
-> >>> resized, and b) there is some value to enabling peer-to-peer mappings
-> >>> between devices.  Is there a better, more generic solution to a) now?    
-> >>
-> >> "now?" what? :)  
-> > 
-> > Now - adverb, at the present time or moment.  For example, vs in the
-> > past.
-> >   
-> >>> If we know a MR is MMIO, then I think we can handle any associated
-> >>> mapping failure as non-fatal.     
-> >>
-> >>
-> >> mr->ram_device sound like an appropriate flag to check.  
-> > 
-> > Yeah, I suppose we could, and that didn't exist when we added the
-> > bit 63 hack.
-> >   
-> >>> It's nice to enable p2p, but it's barely
-> >>> used and not clear that it works reliably (sometimes even on bare
-> >>> metal).Nit, we don't yet have the IOVA range of the IOMMU exposed,
-> >>> thus the silly address hack, but we do have supported page sizes, so we
-> >>> should probably be referencing that rather than host page size.    
-> >>
-> >> Ah, correct,
-> >> s/qemu_real_host_page_mask/memory_region_iommu_get_min_page_size()/  
-> > 
-> > No, that would be the emulated iommu page size, which may or may not
-> > (hopefully does) match the physical iommu page size.  The vfio iommu
-> > page sizes are exposed via VFIO_IOMMU_GET_INFO, at least for type1.
-> >   
-> >>>> As for now, it is possible to have non-aligned RAM MR, the KVM's listener
-> >>>> just does not register it with the KVM if unaligned.    
-> >>>
-> >>> For a sanity check, we don't support running a guest with a smaller
-> >>> page size than the host, right?    
-> >>
-> >> We do, at least on POWER.
-> >>  
-> >>> I assume that would be the only case
-> >>> where we would have a reasonable chance of the guest using a host
-> >>> sub-page as a DMA target, but that seems like just one of an infinite
-> >>> number of problems with such a setup.  Thanks,    
-> >>
-> >> Like what? I am missing the point here. The most popular config on POWER
-> >> today is 64k system page size in both host and guest and 4K IOMMU page size
-> >> for 32bit DMA, seems alright, I also tried 4K guests, no problem there too.  
-> > 
-> > The IOMMU supporting a smaller page size than the processor is the
-> > thing I think I was missing here, but it makes sense that they could,
-> > they're not necessarily linked.  Eric, will SMMU support 4K even while
-> > the CPU runs at 64K?  
-> 
-> Yes that's my understanding. Also we introduced:
-> 
-> 4644321 vfio/type1: handle case where IOMMU does not support PAGE_SIZE size
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-This is a bit of a different problem, for instance if PAGE_SIZE is 64K
-but the IOMMU only supports 4K, type1 would previously report an empty
-set in the pagesize bitmap.  With this change, we recognize that we can
-compose a 64K mapping using 4K pages and therefore report 64K as a
-valid page size.  It doesn't however report that we can create 4K
-mappings.  VT-d sort or works the same way, but at the IOMMU API level
-intel-iommu reports PAGE_MASK even though it only has native support
-for a few of those discrete sizes (of course PAGE_SIZE is always 4K, so
-the similarity ends there).  Thanks,
+<snip>
+>
+>> +                                        float_status *status)
+>> +{
+>> +    if (part.exp =3D=3D parm->exp_max) {
+>> +        if (part.frac =3D=3D 0) {
+>> +            part.cls =3D float_class_inf;
+>> +        } else {
+>> +#ifdef NO_SIGNALING_NANS
+>
+> The old code didn't seem to need to ifdef this; why's the new
+> code different? (at some point we'll want to make this a runtime
+> setting so we can support one binary handling CPUs with it both
+> set and unset, but that is a far future thing we can ignore for now)
 
-Alex
+It does, but it's hidden behind propagateFloatXXNaN which in turn calls
+floatXX_is_quiet/signalling_nan which are altered by the #ifdefs.
+
+>
+>> +            part.cls =3D float_class_qnan;
+>> +#else
+>> +            int64_t msb =3D part.frac << (parm->frac_shift + 2);
+>> +            if ((msb < 0) =3D=3D status->snan_bit_is_one) {
+>> +                part.cls =3D float_class_snan;
+>> +            } else {
+>> +                part.cls =3D float_class_qnan;
+>> +            }
+>> +#endif
+>> +        }
+>> +    } else if (part.exp =3D=3D 0) {
+>> +        if (likely(part.frac =3D=3D 0)) {
+>> +            part.cls =3D float_class_zero;
+>> +        } else if (status->flush_inputs_to_zero) {
+>> +            float_raise(float_flag_input_denormal, status);
+>> +            part.cls =3D float_class_zero;
+>> +            part.frac =3D 0;
+>> +        } else {
+>> +            int shift =3D clz64(part.frac) - 1;
+>> +            part.cls =3D float_class_normal;
+>
+> This is really confusing. This is a *denormal*, but we're setting
+> the classification to "normal" ? (It's particularly confusing in
+> the code that uses the decomposed numbers, because it looks like
+> "if (a.cls =3D=3D float_class_normal...)" is handling the normal-number
+> case and denormals are going to be in a later if branch, but actually
+> it's dealing with both.)
+
+The code deals with canonicalized numbers - so unless we explicitly
+flush denormals to zero they can be treated like any other for the rest
+of the code.
+
+What would you prefer? A comment in FloatClass?
+
+<snip>
+>> +
+>> +static float16 float16_round_pack_canonical(decomposed_parts p, float_s=
+tatus *s)
+>> +{
+>> +    switch (p.cls) {
+>> +    case float_class_dnan:
+>> +        return float16_default_nan(s);
+>> +    case float_class_msnan:
+>> +        return float16_maybe_silence_nan(float16_pack_raw(p), s);
+>
+> I think you will find that doing the silencing of the NaNs like this
+> isn't quite the right approach. Specifically, for Arm targets we
+> currently have a bug in float-to-float conversion from a wider
+> format to a narrower one when the input is a signaling NaN that we
+> want to silence, and its non-zero mantissa bits are all at the
+> less-significant end of the mantissa such that they don't fit into
+> the narrower format. If you pack the float into a float16 first and
+> then call maybe_silence_nan() on it you've lost the info about those
+> low bits which the silence function needs to know to return the
+> right answer. What you want to do instead is pass the silence_nan
+> function the decomposed value.
+
+So this is an inherited bug from softfloat-specialize.h? I guess we need
+a common specific decomposed specialisation we can use for all the sizes.
+
+>
+> (The effect of this bug is that we return a default NaN, with the
+> sign bit clear, but the Arm FPConvertNaN pseudocode says that we
+> should effectively get the default NaN but with the same sign bit
+> as the input SNaN.)
+>
+> Given that this is a bug currently in the version we have, we don't
+> necessarily need to fix it now, but I thought I'd mention it since
+> the redesign has almost but not quite managed to deliver the right
+> information to the silencing code to allow us to fix it soon :-)
+
+So comment for now? Currently all the information for decomposed is kept
+internal to softfloat.c - I'm not sure we want to expose the internals
+to a wider audience? Especially as these inline helpers in specialize.h
+are also used by helpers.
+
+<snip>
+>> +
+>> +
+>> +/*
+>> + * Returns the result of adding the absolute values of the
+>> + * floating-point values `a' and `b'. If `subtract' is set, the sum is
+>> + * negated before being returned. `subtract' is ignored if the result
+>> + * is a NaN. The addition is performed according to the IEC/IEEE
+>> + * Standard for Binary Floating-Point Arithmetic.
+>> + */
+>
+> This comment doesn't seem to match what the code is doing,
+> because it says it adds the absolute values of 'a' and 'b',
+> but the code looks at a_sign and b_sign to decide whether it's
+> doing an addition or subtraction rather than ignoring the signs
+> (as you would for absolute arithmetic).
+>
+> Put another way, this comment has been copied from the old addFloat64Sigs=
+()
+> and not updated to account for the way the new function includes handling
+> of subFloat64Sigs().
+>
+>> +
+>> +static decomposed_parts add_decomposed(decomposed_parts a, decomposed_p=
+arts b,
+>> +                                       bool subtract, float_status *s)
+>> +{
+>> +    bool a_sign =3D a.sign;
+>> +    bool b_sign =3D b.sign ^ subtract;
+>> +
+>> +    if (a_sign !=3D b_sign) {
+>> +        /* Subtraction */
+>> +
+>> +        if (a.cls =3D=3D float_class_normal && b.cls =3D=3D float_class=
+_normal) {
+>> +            int a_exp =3D a.exp;
+>> +            int b_exp =3D b.exp;
+>> +            uint64_t a_frac =3D a.frac;
+>> +            uint64_t b_frac =3D b.frac;
+>
+> Do we really have to use locals here rather than just using a.frac,
+> b.frac etc in place ? If we trust the compiler enough to throw
+> structs in and out of functions and let everything inline, it
+> ought to be able to handle a uint64_t in a struct local variable.
+
+Fixed.
+
+>> +        if (a.cls >=3D float_class_qnan
+>> +            ||
+>> +            b.cls >=3D float_class_qnan) {
+>
+> We should helper functions for "is some kind of NaN" rather than
+> baking the assumption about order of the enum values directly
+> into every function. (Also "float_is_any_nan(a)" is easier to read.)
+
+if (is_nan(a.cls) || is_nan(b.cls))
+>> +float64 float64_sub(float64 a, float64 b, float_status *status)
+>> +{
+>> +    decomposed_parts pa =3D float64_unpack_canonical(a, status);
+>> +    decomposed_parts pb =3D float64_unpack_canonical(b, status);
+>> +    decomposed_parts pr =3D add_decomposed(pa, pb, true, status);
+>> +
+>> +    return float64_round_pack_canonical(pr, status);
+>> +}
+>
+> This part is a pretty good advert for the benefits of the refactoring...
+>
+> I'm not particularly worried about the performance of softfloat,
+> but out of curiosity have you benchmarked the old vs new?
+
+Not yet but I can run some with my vector kernel benchmark.
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
