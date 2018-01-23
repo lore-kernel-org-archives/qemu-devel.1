@@ -1,41 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1edvMu-0007UD-Gi
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:59:53 -0500
+	(envelope-from <jasowang@redhat.com>) id 1edvOY-00008N-Qk
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:01:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1edvMp-0005XE-HU
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:59:52 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60512
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1edvMp-0005Wf-BE
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 04:59:47 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0N9x7rE022573
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 04:59:46 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fny1197tk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 04:59:45 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 23 Jan 2018 09:59:44 -0000
-References: <20180118020157.25401-1-ehabkost@redhat.com>
-	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
-	<CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 23 Jan 2018 10:59:39 +0100
+	(envelope-from <jasowang@redhat.com>) id 1edvOS-0006TB-Hx
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:01:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1edvOS-0006RQ-AT
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 05:01:28 -0500
+References: <20180119130653.24044-1-stefanha@redhat.com>
+	<9048a120-a3be-404d-e977-39f40b4d4561@redhat.com>
+	<20180122121751.GD31621@stefanha-x1.localdomain>
+	<20180122215348-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b0568f2d-928c-5124-757e-fe5b706c4df7@redhat.com>
+Date: Tue, 23 Jan 2018 18:01:15 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180122215348-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-01-17
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,57 +31,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-ppc@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, zhiyong.yang@intel.com, Maxime Coquelin <maxime.coquelin@redhat.com>, Wei Wang <wei.w.wang@intel.com>
 
 
 
-On 01/23/2018 09:40 AM, Christian Ehrhardt wrote:
-> On Thu, Jan 18, 2018 at 2:51 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 18 January 2018 at 02:01, Eduardo Habkost <ehabkost@redhat.com> wrote:
->>> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
+On 2018=E5=B9=B401=E6=9C=8823=E6=97=A5 04:04, Michael S. Tsirkin wrote:
+> On Mon, Jan 22, 2018 at 12:17:51PM +0000, Stefan Hajnoczi wrote:
+>> On Mon, Jan 22, 2018 at 11:33:46AM +0800, Jason Wang wrote:
+>>> On 2018=E5=B9=B401=E6=9C=8819=E6=97=A5 21:06, Stefan Hajnoczi wrote:
+>>>> These patches implement the virtio-vhost-user device design that I h=
+ave
+>>>> described here:
+>>>> https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2830007
+>>> Thanks for the patches, looks rather interesting and similar to split=
+ device
+>>> model used by Xen.
 >>>
->>>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
+>>>> The goal is to let the guest act as the vhost device backend for oth=
+er guests.
+>>>> This allows virtual networking and storage appliances to run inside =
+guests.
+>>> So the question still, what kind of protocol do you want to run on to=
+p? If
+>>> it was ethernet based, virtio-net work pretty well and it can even do
+>>> migration.
 >>>
->>> are available in the Git repository at:
->>>
->>>   git://github.com/ehabkost/qemu.git tags/x86-pull-request
->>>
->>> for you to fetch changes up to 6cfbc54e8903a9bcc0346119949162d040c144c1:
->>>
->>>   i386: Add EPYC-IBPB CPU model (2018-01-17 23:54:39 -0200)
->>>
->>> ----------------------------------------------------------------
->>> x86 queue, 2018-01-17
->>>
->>> Highlight: new CPU models that expose CPU features that guests
->>> can use to mitigate CVE-2017-5715 (Spectre variant #2).
->>>
+>>>> This device is particularly interesting for poll mode drivers where =
+exitless
+>>>> VM-to-VM communication is possible, completely bypassing the hypervi=
+sor in the
+>>>> data path.
+>>> It's better to clarify the reason of hypervisor bypassing. (performan=
+ce,
+>>> security or scalability).
+>> Performance - yes, definitely.  Exitless VM-to-VM is the fastest
+>> possible way to communicate between VMs.  Today it can only be done
+>> using ivshmem.  This patch series allows virtio devices to take
+>> advantage of it and will encourage people to use virtio instead of
+>> non-standard ivshmem devices.
 >>
->> Applied, thanks.
+>> Security - I don't think this feature is a security improvement.  It
+>> reduces isolation because VM1 has full shared memory access to VM2.  I=
+n
+>> fact, this is a reason for users to consider carefully whether they
+>> even want to use this feature.
+> True without an IOMMU, however using a vIOMMU within VM2
+> can protect the VM2, can't it?
+
+It's not clear to me how to do this. E.g need a way to report failure to=20
+VM2 or #PF?
+
+>
+>> Scalability - much for the same reasons as the Performance section
+>> above.  Bypassing the hypervisor eliminates scalability bottlenecks
+>> (e.g. host network stack and bridge).
 >>
->> -- PMM
+>>> Probably not for the following cases:
+>>>
+>>> 1) kick/call
+>> I disagree here because kick/call is actually very efficient!
 >>
-> 
-> Hi,
-> I was kind of clinging to [1] so far and had the expectation that all
-> those would be wrapped up in 2.11.1 once ready.
-> I see that the s390x changes are targeted to qemu-stable (well to
-> admit I suggested so referring the article above).
-> So I'd expected to see this series to show up on qemu-stable as well
-> but haven't seen it so far.
-> 
-> Therefore I wanted to ask if there was a change of plans in that
-> regard or if it needs just a few days more to see (part of) this
-> series on qemu-stable and on its way into 2.11.1?
-> 
-> [1]: https://www.qemu.org/2018/01/04/spectre/
+>> VM1's irqfd is the ioeventfd for VM2.  When VM2 writes to the ioeventf=
+d
+>> there is a single lightweight vmexit which injects an interrupt into
+>> VM1.  QEMU is not involved and the host kernel scheduler is not involv=
+ed
+>> so this is a low-latency operation.
 
-Adding Michael,
+Right, looks like I was wrong. But consider irqfd may do wakup which=20
+means scheduler is still needed.
 
-Yes, I think it makes sense to have the guest enablement for the spectre 
-mitigations available in 2.11.1 for all architectures that provide it. 
-(this queue for x86, Connies pending S390 patches, whatever Power
-and arm will do).
+>> I haven't tested this yet but the ioeventfd code looks like this will
+>> work.
+>>
+>>> 2) device IOTLB / IOMMU transaction (or any other case that backends =
+needs
+>>> metadata from qemu).
+>> Yes, this is the big weakness of vhost-user in general.  The IOMMU
+>> feature doesn't offer good isolation
+> I think that's an implementation issue, not a protocol issue.
+>
+>
+>> and even when it does, performance
+>> will be an issue.
+> If the IOMMU mappings are dynamic - but they are mostly
+> static with e.g. dpdk, right?
+>
+>
+>>>>    * Implement "Additional Device Resources over PCI" for shared mem=
+ory,
+>>>>      doorbells, and notifications instead of hardcoding a BAR with m=
+agic
+>>>>      offsets into virtio-vhost-user:
+>>>>      https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2920=
+007
+>>> Does this mean we need to standardize vhost-user protocol first?
+>> Currently the draft spec says:
+>>
+>>    This section relies on definitions from the Vhost-user Protocol [1]=
+.
+>>
+>>    [1] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob_plain;f=3Ddocs/inte=
+rop/vhost-user.txt;hb=3DHEAD
+>>
+>> Michael: Is it okay to simply include this link?
+>
+> It is OK to include normative and non-normative references,
+> they go in the introduction and then you refer to them
+> anywhere in the document.
+>
+>
+> I'm still reviewing the draft.  At some level, this is a general tunnel
+> feature, it can tunnel any protocol. That would be one way to
+> isolate it.
 
-Not sure about a 2.10.3?
+Right, but it should not be the main motivation, consider we can tunnel=20
+any protocol on top of ethernet too.
+
+>
+>>>>    * Implement the VRING_KICK eventfd - currently vhost-user slaves =
+must be poll
+>>>>      mode drivers.
+>>>>    * Optimize VRING_CALL doorbell with ioeventfd to avoid QEMU exit.
+>>> The performance implication needs to be measured. It looks to me both=
+ kick
+>>> and call will introduce more latency form the point of guest.
+>> I described the irqfd + ioeventfd approach above.  It should be faster
+>> than virtio-net + bridge today.
+>>
+>>>>    * vhost-user log feature
+>>>>    * UUID config field for stable device identification regardless o=
+f PCI
+>>>>      bus addresses.
+>>>>    * vhost-user IOMMU and SLAVE_REQ_FD feature
+>>> So an assumption is the VM that implements vhost backends should be a=
+t least
+>>> as secure as vhost-user backend process on host. Could we have this
+>>> conclusion?
+>> Yes.
+>>
+>> Sadly the vhost-user IOMMU protocol feature does not provide isolation=
+.
+>> At the moment IOMMU is basically a layer of indirection (mapping) but
+>> the vhost-user backend process still has full access to guest RAM :(.
+> An important feature would be to do the isolation in the qemu.
+> So trust the qemu running VM2 but not VM2 itself.
+
+Agree, we'd better not consider VM is as secure as qemu.
+
+>
+>
+>>> Btw, it's better to have some early numbers, e.g what testpmd reports=
+ during
+>>> forwarding.
+>> I need to rely on others to do this (and many other things!) because
+>> virtio-vhost-user isn't the focus of my work.
+>>
+>> These patches were written to demonstrate my suggestions for vhost-pci=
+.
+>> They were written at work but also on weekends, early mornings, and la=
+te
+>> nights to avoid delaying Wei and Zhiyong's vhost-pci work too much.
+
+Thanks a lot for the effort! If anyone want to benchmark, I would expect=20
+compare the following three solutions:
+
+1) vhost-pci
+2) virtio-vhost-user
+3) testpmd with two vhost-user ports
+
+
+Performance number is really important to show the advantages of new idea=
+s.
+
+>>
+>> If this approach has merit then I hope others will take over and I'll
+>> play a smaller role addressing some of the todo items and cleanups.
+
+It looks to me the advantages are 1) generic virtio layer (vhost-pci can=20
+achieve this too if necessary) 2) some kind of code reusing (vhost pmd).=20
+And I'd expect they have similar performance result consider no major=20
+differences between them.
+
+Thanks
+
+>> Stefan
+>
