@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ee508-0000e7-CS
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:17:02 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1ee5IF-0005Fg-FZ
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:35:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ee505-0002qY-0b
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:17:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39608)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ee504-0002pZ-MO
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:16:56 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C0B52C0587C7
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 20:16:55 +0000 (UTC)
-Date: Tue, 23 Jan 2018 20:16:47 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180123201647.GC2530@work-vm>
-References: <20180110124723.11879-1-quintela@redhat.com>
-	<20180110124723.11879-6-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180110124723.11879-6-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 05/14] migration: Create
- ram_multifd_page
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1ee5IA-0000H1-DV
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:35:43 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:46081)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1ee5IA-0000GO-1Q
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 15:35:38 -0500
+Received: by mail-wm0-x241.google.com with SMTP id 143so4296242wma.5
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 12:35:37 -0800 (PST)
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Tue, 23 Jan 2018 20:35:27 +0000
+Message-Id: <20180123203527.32726-1-ard.biesheuvel@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm: implement SM4 instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,367 +24,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> The function still don't use multifd, but we have simplified
-> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
-> counter and a new flag for this type of pages.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> Add last_page parameter
-> Add commets for done and address
-> Remove multifd field, it is the same than normal pages
-> Merge next patch, now we send multiple pages at a time
-> Remove counter for multifd pages, it is identical to normal pages
-> Use iovec's instead of creating the equivalent.
-> Clear memory used by pages (dave)
-> Use g_new0(danp)
-> define MULTIFD_CONTINUE
-> now pages member is a pointer
-> Fix off-by-one in number of pages in one packet
-> ---
->  migration/ram.c        | 159 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  migration/trace-events |   2 +
->  2 files changed, 160 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index aef5a323f3..5d6b46ac23 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -52,6 +52,7 @@
->  #include "migration/block.h"
->  #include "sysemu/sysemu.h"
->  #include "qemu/uuid.h"
-> +#include "qemu/iov.h"
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -71,6 +72,7 @@
->  #define RAM_SAVE_FLAG_XBZRLE   0x40
->  /* 0x80 is reserved in migration.h start with 0x100 next */
->  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
-> +#define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
->  
->  static inline bool is_zero_range(uint8_t *p, uint64_t size)
->  {
-> @@ -395,14 +397,36 @@ static void compress_threads_save_setup(void)
->  
->  /* Multiple fd's */
->  
-> +/* used to continue on the same multifd group */
-> +#define MULTIFD_CONTINUE UINT16_MAX
-> +
-> +typedef struct {
-> +    /* number of used pages */
+This implements emulation of the new SM4 instructions that have
+been added as an optional extension to the ARMv8 Crypto Extensions
+in ARM v8.2.
 
-      Telling us it's used doesn't help much; if I understand
-right, this is for accumulating them into one large block
-before actually sending them?
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
 
-> +    uint32_t used;
-> +    /* number of allocated pages */
-> +    uint32_t allocated;
-> +    /* global number of generated multifd packets */
-> +    uint32_t seq;
-> +    struct iovec *iov;
-> +    RAMBlock *block;
-> +} multifd_pages_t;
-> +
->  struct MultiFDSendParams {
-> +    /* not changed */
+I went ahead and did the implementation according to the pseudocode in
+the ARM ARM, even though i have no test code or reference vectors to
+compare it against. (There is some example code in the ARM ARM as well,
+but I haven't played with that)
 
-???
+ target/arm/cpu.h           |  1 +
+ target/arm/crypto_helper.c | 91 ++++++++++++++++++++
+ target/arm/helper.h        |  3 +
+ target/arm/translate-a64.c |  8 ++
+ 4 files changed, 103 insertions(+)
 
->      uint8_t id;
->      char *name;
->      QemuThread thread;
->      QIOChannel *c;
->      QemuSemaphore sem;
->      QemuMutex mutex;
-> +    /* protected by param mutex */
->      bool quit;
-> +    multifd_pages_t *pages;
-> +    /* how many patches has sent this channel */
-
-s/patches/packets/
-
-> +    uint32_t packets_sent;
-> +    /* protected by multifd mutex */
-> +    /* has the thread finish the last submitted job */
-> +    bool done;
->  };
->  typedef struct MultiFDSendParams MultiFDSendParams;
->  
-> @@ -410,8 +434,31 @@ struct {
->      MultiFDSendParams *params;
->      /* number of created threads */
->      int count;
-> +    QemuMutex mutex;
-> +    QemuSemaphore sem;
-> +    multifd_pages_t *pages;
->  } *multifd_send_state;
->  
-> +static void multifd_pages_init(multifd_pages_t **ppages, size_t size)
-
-What is the 'size' here - it's allocated pages for something?
-
-> +{
-> +    multifd_pages_t *pages = g_new0(multifd_pages_t, 1);
-> +
-> +    pages->allocated = size;
-> +    pages->iov = g_new0(struct iovec, size);
-> +    *ppages = pages;
-> +}
-> +
-> +static void multifd_pages_clear(multifd_pages_t *pages)
-> +{
-> +    pages->used = 0;
-> +    pages->allocated = 0;
-> +    pages->seq = 0;
-> +    pages->block = NULL;
-> +    g_free(pages->iov);
-> +    pages->iov = NULL;
-> +    g_free(pages);
-> +}
-> +
->  static void terminate_multifd_send_threads(Error *errp)
->  {
->      int i;
-> @@ -453,9 +500,13 @@ int multifd_save_cleanup(Error **errp)
->          socket_send_channel_destroy(p->c);
->          g_free(p->name);
->          p->name = NULL;
-> +        multifd_pages_clear(p->pages);
-> +        p->pages = NULL;
->      }
->      g_free(multifd_send_state->params);
->      multifd_send_state->params = NULL;
-> +    multifd_pages_clear(multifd_send_state->pages);
-> +    multifd_send_state->pages = NULL;
->      g_free(multifd_send_state);
->      multifd_send_state = NULL;
->      return ret;
-> @@ -482,6 +533,7 @@ static void *multifd_send_thread(void *opaque)
->          terminate_multifd_send_threads(local_err);
->          return NULL;
->      }
-> +    qemu_sem_post(&multifd_send_state->sem);
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> @@ -489,9 +541,24 @@ static void *multifd_send_thread(void *opaque)
->              qemu_mutex_unlock(&p->mutex);
->              break;
->          }
-> +        if (p->pages->used) {
-> +            p->pages->used = 0;
-> +            qemu_mutex_unlock(&p->mutex);
-> +
-> +            trace_multifd_send(p->id, p->pages->seq, p->pages->used);
-
-but p->pages->used is just been set to 0?
-
-> +            /* ToDo: send page here */
-> +
-> +            qemu_mutex_lock(&multifd_send_state->mutex);
-> +            p->done = true;
-> +            p->packets_sent++;
-> +            qemu_mutex_unlock(&multifd_send_state->mutex);
-> +            qemu_sem_post(&multifd_send_state->sem);
-> +            continue;
-> +        }
->          qemu_mutex_unlock(&p->mutex);
->          qemu_sem_wait(&p->sem);
->      }
-> +    trace_multifd_send_thread(p->id, p->packets_sent);
->  
->      return NULL;
->  }
-> @@ -529,6 +596,10 @@ int multifd_save_setup(void)
->      multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
->      multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
->      multifd_send_state->count = 0;
-> +    qemu_mutex_init(&multifd_send_state->mutex);
-> +    qemu_sem_init(&multifd_send_state->sem, 0);
-> +    multifd_pages_init(&multifd_send_state->pages,
-> +                       migrate_multifd_page_count());
->      for (i = 0; i < thread_count; i++) {
->          MultiFDSendParams *p = &multifd_send_state->params[i];
->  
-> @@ -536,12 +607,58 @@ int multifd_save_setup(void)
->          qemu_sem_init(&p->sem, 0);
->          p->quit = false;
->          p->id = i;
-> +        p->done = true;
-> +        multifd_pages_init(&p->pages, migrate_multifd_page_count());
->          p->name = g_strdup_printf("multifdsend_%d", i);
->          socket_send_channel_create(multifd_new_send_channel_async, p);
->      }
->      return 0;
->  }
->  
-> +static uint16_t multifd_send_page(RAMBlock *block, ram_addr_t offset,
-> +                                  bool last_page)
-> +{
-> +    int i;
-> +    MultiFDSendParams *p = NULL; /* make happy gcc */
-
-(English: Make gcc happy)
-
-> +    multifd_pages_t *pages = multifd_send_state->pages;
-> +
-> +    if (!pages->block) {
-> +        pages->block = block;
-> +    }
-> +
-> +    pages->iov[pages->used].iov_base = block->host + offset;
-> +    pages->iov[pages->used].iov_len = TARGET_PAGE_SIZE;
-> +    pages->used++;
-> +
-> +    if (!last_page) {
-> +        if (pages->used < pages->allocated) {
-> +            return MULTIFD_CONTINUE;
-> +        }
-> +    }
-
-I'm confused by this a bit.
-Isn't the next bit waiting for a free thread?
-
-> +    qemu_sem_wait(&multifd_send_state->sem);
-> +    qemu_mutex_lock(&multifd_send_state->mutex);
-> +    for (i = 0; i < multifd_send_state->count; i++) {
-> +        p = &multifd_send_state->params[i];
-> +
-> +        if (p->done) {
-> +            p->done = false;
-> +            break;
-> +        }
-> +    }
-> +    qemu_mutex_unlock(&multifd_send_state->mutex);
-> +    qemu_mutex_lock(&p->mutex);
-> +    p->pages->used = 0;
-
-If we're handing the block of pages to the thread, I don't understand
-why we zero used here.
-
-> +    p->pages->seq = pages->seq + 1;
-> +    p->pages->block = NULL;
-> +    multifd_send_state->pages = p->pages;
-> +    p->pages = pages;
-> +    qemu_mutex_unlock(&p->mutex);
-> +    qemu_sem_post(&p->sem);
-> +
-> +    return i;
-> +}
-> +
->  struct MultiFDRecvParams {
->      uint8_t id;
->      char *name;
-> @@ -1070,6 +1187,31 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->      return pages;
->  }
->  
-> +static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
-> +                            bool last_stage)
-> +{
-> +    int pages;
-> +    uint8_t *p;
-> +    RAMBlock *block = pss->block;
-> +    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
-> +
-> +    p = block->host + offset;
-> +
-> +    pages = save_zero_page(rs, block, offset);
-> +    if (pages == -1) {
-> +        ram_counters.transferred +=
-> +            save_page_header(rs, rs->f, block,
-> +                             offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
-> +        multifd_send_page(block, offset, rs->migration_dirty_pages == 1);
-> +        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
-
-So that's temporary - we're hoping multifd_send_page will do that?
-
-> +        ram_counters.transferred += TARGET_PAGE_SIZE;
-> +        pages = 1;
-> +        ram_counters.normal++;
-> +    }
-> +
-> +    return pages;
-> +}
-> +
->  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
->                                  ram_addr_t offset)
->  {
-> @@ -1498,6 +1640,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->          if (migrate_use_compression() &&
->              (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
->              res = ram_save_compressed_page(rs, pss, last_stage);
-> +        } else if (migrate_use_multifd()) {
-> +            res = ram_multifd_page(rs, pss, last_stage);
->          } else {
->              res = ram_save_page(rs, pss, last_stage);
->          }
-> @@ -2878,6 +3022,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      if (!migrate_use_compression()) {
->          invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
->      }
-> +
-> +    if (!migrate_use_multifd()) {
-> +        invalid_flags |= RAM_SAVE_FLAG_MULTIFD_PAGE;
-> +    }
->      /* This RCU critical section can be very long running.
->       * When RCU reclaims in the code start to become numerous,
->       * it will be necessary to reduce the granularity of this
-> @@ -2902,13 +3050,17 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->              if (flags & invalid_flags & RAM_SAVE_FLAG_COMPRESS_PAGE) {
->                  error_report("Received an unexpected compressed page");
->              }
-> +            if (flags & invalid_flags  & RAM_SAVE_FLAG_MULTIFD_PAGE) {
-> +                error_report("Received an unexpected multifd page");
-> +            }
->  
->              ret = -EINVAL;
->              break;
->          }
->  
->          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-> -                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
-> +                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
-> +                     RAM_SAVE_FLAG_MULTIFD_PAGE)) {
->              RAMBlock *block = ram_block_from_stream(f, flags);
->  
->              host = host_from_ram_block_offset(block, addr);
-> @@ -2997,6 +3149,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->                  break;
->              }
->              break;
-> +
-> +        case RAM_SAVE_FLAG_MULTIFD_PAGE:
-> +            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
-> +            break;
-> +
->          case RAM_SAVE_FLAG_EOS:
->              /* normal exit */
->              break;
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 141e773305..61ee21a13e 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -77,6 +77,8 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
->  ram_postcopy_send_discard_bitmap(void) ""
->  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
->  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-> +multifd_send(char id, int seq, int num) "channel %d sequence %d num pages %d"
-> +multifd_send_thread(char id, uint32_t packets) "channel %d packets %d"
->  
->  # migration/migration.c
->  await_return_path_close_on_source_close(void) ""
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 18383666e02d..bad13a76d06c 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1375,6 +1375,7 @@ enum arm_features {
+     ARM_FEATURE_V8_SHA512, /* implements SHA512 part of v8 Crypto Extensions */
+     ARM_FEATURE_V8_SHA3, /* implements SHA3 part of v8 Crypto Extensions */
+     ARM_FEATURE_V8_SM3, /* implements SM3 part of v8 Crypto Extensions */
++    ARM_FEATURE_V8_SM4, /* implements SM4 part of v8 Crypto Extensions */
+ };
+ 
+ static inline int arm_feature(CPUARMState *env, int feature)
+diff --git a/target/arm/crypto_helper.c b/target/arm/crypto_helper.c
+index c1d9f765cd40..b42c7e046ba3 100644
+--- a/target/arm/crypto_helper.c
++++ b/target/arm/crypto_helper.c
+@@ -609,3 +609,94 @@ void HELPER(crypto_sm3tt)(void *vd, void *vn, void *vm, uint32_t imm2,
+     rd[0] = d.l[0];
+     rd[1] = d.l[1];
+ }
++
++static uint8_t const sm4_sbox[] = {
++    0xd6, 0x90, 0xe9, 0xfe, 0xcc, 0xe1, 0x3d, 0xb7,
++    0x16, 0xb6, 0x14, 0xc2, 0x28, 0xfb, 0x2c, 0x05,
++    0x2b, 0x67, 0x9a, 0x76, 0x2a, 0xbe, 0x04, 0xc3,
++    0xaa, 0x44, 0x13, 0x26, 0x49, 0x86, 0x06, 0x99,
++    0x9c, 0x42, 0x50, 0xf4, 0x91, 0xef, 0x98, 0x7a,
++    0x33, 0x54, 0x0b, 0x43, 0xed, 0xcf, 0xac, 0x62,
++    0xe4, 0xb3, 0x1c, 0xa9, 0xc9, 0x08, 0xe8, 0x95,
++    0x80, 0xdf, 0x94, 0xfa, 0x75, 0x8f, 0x3f, 0xa6,
++    0x47, 0x07, 0xa7, 0xfc, 0xf3, 0x73, 0x17, 0xba,
++    0x83, 0x59, 0x3c, 0x19, 0xe6, 0x85, 0x4f, 0xa8,
++    0x68, 0x6b, 0x81, 0xb2, 0x71, 0x64, 0xda, 0x8b,
++    0xf8, 0xeb, 0x0f, 0x4b, 0x70, 0x56, 0x9d, 0x35,
++    0x1e, 0x24, 0x0e, 0x5e, 0x63, 0x58, 0xd1, 0xa2,
++    0x25, 0x22, 0x7c, 0x3b, 0x01, 0x21, 0x78, 0x87,
++    0xd4, 0x00, 0x46, 0x57, 0x9f, 0xd3, 0x27, 0x52,
++    0x4c, 0x36, 0x02, 0xe7, 0xa0, 0xc4, 0xc8, 0x9e,
++    0xea, 0xbf, 0x8a, 0xd2, 0x40, 0xc7, 0x38, 0xb5,
++    0xa3, 0xf7, 0xf2, 0xce, 0xf9, 0x61, 0x15, 0xa1,
++    0xe0, 0xae, 0x5d, 0xa4, 0x9b, 0x34, 0x1a, 0x55,
++    0xad, 0x93, 0x32, 0x30, 0xf5, 0x8c, 0xb1, 0xe3,
++    0x1d, 0xf6, 0xe2, 0x2e, 0x82, 0x66, 0xca, 0x60,
++    0xc0, 0x29, 0x23, 0xab, 0x0d, 0x53, 0x4e, 0x6f,
++    0xd5, 0xdb, 0x37, 0x45, 0xde, 0xfd, 0x8e, 0x2f,
++    0x03, 0xff, 0x6a, 0x72, 0x6d, 0x6c, 0x5b, 0x51,
++    0x8d, 0x1b, 0xaf, 0x92, 0xbb, 0xdd, 0xbc, 0x7f,
++    0x11, 0xd9, 0x5c, 0x41, 0x1f, 0x10, 0x5a, 0xd8,
++    0x0a, 0xc1, 0x31, 0x88, 0xa5, 0xcd, 0x7b, 0xbd,
++    0x2d, 0x74, 0xd0, 0x12, 0xb8, 0xe5, 0xb4, 0xb0,
++    0x89, 0x69, 0x97, 0x4a, 0x0c, 0x96, 0x77, 0x7e,
++    0x65, 0xb9, 0xf1, 0x09, 0xc5, 0x6e, 0xc6, 0x84,
++    0x18, 0xf0, 0x7d, 0xec, 0x3a, 0xdc, 0x4d, 0x20,
++    0x79, 0xee, 0x5f, 0x3e, 0xd7, 0xcb, 0x39, 0x48,
++};
++
++void HELPER(crypto_sm4e)(void *vd, void *vn)
++{
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    uint32_t t, i;
++
++    for (i = 0; i < 3; i++) {
++        t = CR_ST_WORD(d, (i + 1) % 4) ^
++            CR_ST_WORD(d, (i + 2) % 4) ^
++            CR_ST_WORD(d, (i + 3) % 4) ^
++            CR_ST_WORD(n, i);
++
++        t = sm4_sbox[t & 0xff] |
++            sm4_sbox[(t >> 8) & 0xff] << 8 |
++            sm4_sbox[(t >> 16) & 0xff] << 16 |
++            sm4_sbox[(t >> 24) & 0xff] << 24;
++
++        CR_ST_WORD(d, i) ^= t ^ rol32(t, 2) ^ rol32(t, 10) ^ rol32(t, 18) ^
++                            rol32(t, 24);
++    }
++
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
++}
++
++void HELPER(crypto_sm4ekey)(void *vd, void *vn, void* vm)
++{
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d;
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
++    uint32_t t, i;
++
++    d = n;
++    for (i = 0; i < 3; i++) {
++        t = CR_ST_WORD(d, (i + 1) % 4) ^
++            CR_ST_WORD(d, (i + 2) % 4) ^
++            CR_ST_WORD(d, (i + 3) % 4) ^
++            CR_ST_WORD(m, i);
++
++        t = sm4_sbox[t & 0xff] |
++            sm4_sbox[(t >> 8) & 0xff] << 8 |
++            sm4_sbox[(t >> 16) & 0xff] << 16 |
++            sm4_sbox[(t >> 24) & 0xff] << 24;
++
++        CR_ST_WORD(d, i) ^= t ^ rol32(t, 13) ^ rol32(t, 23);
++    }
++
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
++}
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 2d0bba10c006..ee5b0e98f624 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -544,6 +544,9 @@ DEF_HELPER_FLAGS_5(crypto_sm3tt, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32, i32)
+ DEF_HELPER_FLAGS_3(crypto_sm3partw1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
+ DEF_HELPER_FLAGS_3(crypto_sm3partw2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
+ 
++DEF_HELPER_FLAGS_2(crypto_sm4e, TCG_CALL_NO_RWG, void, ptr, ptr)
++DEF_HELPER_FLAGS_3(crypto_sm4ekey, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
++
+ DEF_HELPER_FLAGS_3(crc32, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_3(crc32c, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+ DEF_HELPER_2(dc_zva, void, env, i64)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 57cf1ded4db7..180882ad178e 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11177,6 +11177,10 @@ static void disas_crypto_three_reg_sha512(DisasContext *s, uint32_t insn)
+             feature = ARM_FEATURE_V8_SM3;
+             genfn = gen_helper_crypto_sm3partw2;
+             break;
++        case 2: /* SM4EKEY */
++            feature = ARM_FEATURE_V8_SM4;
++            genfn = gen_helper_crypto_sm4ekey;
++            break;
+         default:
+             unallocated_encoding(s);
+             return;
+@@ -11250,6 +11254,10 @@ static void disas_crypto_two_reg_sha512(DisasContext *s, uint32_t insn)
+         feature = ARM_FEATURE_V8_SHA512;
+         genfn = gen_helper_crypto_sha512su0;
+         break;
++    case 1: /* SM4E */
++        feature = ARM_FEATURE_V8_SM4;
++        genfn = gen_helper_crypto_sm4e;
++        break;
+     default:
+         unallocated_encoding(s);
+         return;
+-- 
+2.11.0
