@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ee4eM-0005i6-CF
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:54:31 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ee4fV-0006db-KG
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:55:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ee4eJ-0004mX-4v
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:54:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ee4eI-0004lw-VJ
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:54:27 -0500
-Date: Tue, 23 Jan 2018 17:54:24 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180123195424.GC4298@localhost.localdomain>
-References: <1516655269-1785-1-git-send-email-juterry@microsoft.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1ee4fR-0005S0-M5
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 14:55:41 -0500
+Date: Tue, 23 Jan 2018 12:55:31 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180123125531.0de84de2@w520.home>
+In-Reply-To: <424c3873-7368-5fbe-95bf-3040c2bec73a@redhat.com>
+References: <20180123012207.43459-1-aik@ozlabs.ru>
+	<424c3873-7368-5fbe-95bf-3040c2bec73a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1516655269-1785-1-git-send-email-juterry@microsoft.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Updates based on feedback.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v3] RFC: vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Justin Terry (VM)" <juterry@microsoft.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Jan 22, 2018 at 01:07:45PM -0800, Justin Terry (VM) wrote:
-> Updates based on review feedback.
-> 
-> 1. Fixes style issues and properly ran the scripts/checkpatch pre submission.
-> 2. Added migration blockers for CPUID, dirty memory tracking, and XSAVE/XRSTOR.
-> 3. Fixed some bugs around register states when using bios vs efi.
+On Tue, 23 Jan 2018 16:34:34 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-For reference to others, v1 seems to be:
+> Hi Alexey,
+> On 23/01/18 02:22, Alexey Kardashevskiy wrote:
+> > This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+> > which tells that a region with MSIX data can be mapped entirely, i.e.
+> > the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+> > 
+> > With this change, all BARs are mapped in a single chunk and MSIX vectors
+> > are emulated on top unless the machine requests not to by defining and
+> > enabling a new "vfio-no-msix-emulation" property. At the moment only
+> > sPAPR machine does so - it prohibits MSIX emulation and does not allow
+> > enabling it as it does not define the "set" callback for the new property;
+> > the new property also does not appear in "-machine pseries,help".
+> > 
+> > If MSIX vectors section is not aligned to the page size, the KVM memory
+> > listener does not register it with the KVM as a memory slot and MSIX is
+> > emulated by QEMU as before. This may create MMIO RAM memory sections with
+> > an address or/and a size not aligned which will make vfio_dma_map() fail;
+> > to address this, this makes treats such failures as non-fatal.
+> > 
+> > This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+> > for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
+> > 
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > ---
+> > Changes:
+> > v3:
+> > * vfio_listener_region_add() won't make qemu exit if failed on MMIO MR
+> > 
+> > ---
+> >  include/hw/vfio/vfio-common.h |  1 +
+> >  linux-headers/linux/vfio.h    |  5 +++++
+> >  hw/ppc/spapr.c                |  7 +++++++
+> >  hw/vfio/common.c              | 19 +++++++++++++++++++
+> >  hw/vfio/pci.c                 | 10 ++++++++++
+> >  5 files changed, 42 insertions(+)
+> > 
+> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> > index f3a2ac9..927d600 100644
+> > --- a/include/hw/vfio/vfio-common.h
+> > +++ b/include/hw/vfio/vfio-common.h
+> > @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+> >                           struct vfio_region_info **info);
+> >  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+> >                               uint32_t subtype, struct vfio_region_info **info);
+> > +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+> >  #endif
+> >  extern const MemoryListener vfio_prereg_listener;
+> >  
+> > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> > index 4312e96..b45182e 100644
+> > --- a/linux-headers/linux/vfio.h
+> > +++ b/linux-headers/linux/vfio.h
+> > @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+> >  
+> > +/*
+> > + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+> > + */
+> > +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+> > +
+> >  /**
+> >   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+> >   *				    struct vfio_irq_info)
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index d1acfe8..5ff43ce 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2789,6 +2789,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+> >      spapr->use_hotplug_event_source = value;
+> >  }
+> >  
+> > +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
+> > +{
+> > +    return true;
+> > +}
+> > +
+> >  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+> >  {
+> >      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> > @@ -2870,6 +2875,8 @@ static void spapr_instance_init(Object *obj)
+> >      object_property_set_description(obj, "vsmt",
+> >                                      "Virtual SMT: KVM behaves as if this were"
+> >                                      " the host's SMT mode", &error_abort);
+> > +    object_property_add_bool(obj, "vfio-no-msix-emulation",
+> > +                             spapr_get_msix_emulation, NULL, NULL);
+> >  }
+> >  
+> >  static void spapr_machine_finalizefn(Object *obj)
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index b77be3a..842c5b2 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -530,6 +530,10 @@ static void vfio_listener_region_add(MemoryListener *listener,
+> >      return;
+> >  
+> >  fail:
+> > +    if (memory_region_is_ram_device(section->mr)) {
+> > +        error_report("failed to vfio_dma_map. pci p2p may not work");
+> > +        return;
+> > +    }  
+> 
+> I don't think this is an acceptable solution as it produces plenty of
+> errors such as
+> 
+> qemu-system-aarch64: VFIO_MAP_DMA: -22
+> qemu-system-aarch64: vfio_dma_map(0x30a7ab90, 0x8000000000, 0x2000,
+> 0xfffd79a00000) = -22 (Invalid argument)
 
-  Subject: [PATCH 0/4] Implements the Windows Hypervisor Platform accelerator
-  https://www.mail-archive.com/qemu-devel@nongnu.org/msg505710.html
+This much of the error above could be avoided by looking at the type1
+page size bitmap before trying to perform the mapping.
 
-> 
-> Justin Terry (VM) (4):
->   Add the Windows Hypervisor Platform accelerator.
->   Add the WHPX vcpu API
->   Introduce the WHPX impl
->   Add the WHPX acceleration enlightenments
-> 
->  accel/stubs/Makefile.objs |    9 +-
->  accel/stubs/whpx-stub.c   |   48 ++
->  configure                 |   48 +-
->  cpus.c                    |   66 ++-
->  include/sysemu/hw_accel.h |   13 +
->  include/sysemu/whpx.h     |   40 ++
->  qemu-options.hx           |    8 +-
->  target/i386/Makefile.objs |    1 +
->  target/i386/helper.c      |    2 +-
->  target/i386/whpx-all.c    | 1366 +++++++++++++++++++++++++++++++++++++++++++++
->  10 files changed, 1590 insertions(+), 11 deletions(-)
->  create mode 100644 accel/stubs/whpx-stub.c
->  create mode 100644 include/sysemu/whpx.h
->  create mode 100644 target/i386/whpx-all.c
-> 
-> -- 
-> 2.7.4
-> 
+> qemu-system-aarch64: failed to vfio_dma_map. pci p2p may not work
 
--- 
-Eduardo
+This of course is still valid though we can continue to discuss if it's
+worthwhile user information.
+ 
+> testing context is: aarch64 + Mellanox CX-4 PF where we still try to map
+> the BAR0 area [0 - 0x2000] before the MSI-X table which is not aligned
+> with the host 64kB page.
+> 
+> Region 0: Memory at 80400000000 (64-bit, prefetchable) [size=32M]
+> Capabilities: [9c] MSI-X: Enable+ Count=64 Masked-
+> 		Vector table: BAR=0 offset=00002000
+> 		PBA: BAR=0 offset=00003000
+> 
+> 
+> To me a kind of mmaps region fixup looks required?
+
+I don't think so.  vfio is now telling us that we can mmap the entire
+BAR, this is true.  The type1 info is telling us that the minimum DMA
+mapping granularity, PAGE_SIZE on the host (64K in your case).  The
+MSI-X offset on this device introduces an 8K range that type1 cannot
+map and QEMU already has all the information it needs to know this.  The
+solutions are either to move MSI-X elsewhere or to extend type1 to
+allow DMA mappings down to the IOMMU minimum granularity.
+
+The MSI-X fixup that is now bypassed avoided this not generating an
+mmap over the vector table, which meant this 8K region wasn't covered
+by a memory slot and therefore never got passed through region_add.  So
+p2p dma was silently disabled.  Now we do mmap the entire BAR, but we
+add the MSI-X region on top of it so that when it gets flattened we end
+up with these sub-page slots.  Skipping them at region_add has the same
+overall effect.
+
+Before:
+
+  |-| <-- MSI-X vector emulation MR
++
+         |---PAGE_SIZE aligned mmap MR----|
++
+|------------slow mapped BAR M------------|
+
+=
+
+         |----Resulting region_add--------| (PAGE_SIZE aligned)
+
+After:
+
+  |-| <-- MSI-X vector emulation MR
++
+|------------PAGE_SIZE aligned mmap MR----|
++
+|------------slow mapped BAR M------------|
+
+=
+
+|-| |----Resulting region_add-------------| (Gap no longer PAGE_SIZE aligned)
+
+So doesn't it make sense that region_add would now filter these out?
+Should we continue to silently skip unmapped MMIO?  Thanks,
+
+Alex
