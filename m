@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzs1-00075T-9q
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:21 -0500
+	(envelope-from <laurent@vivier.eu>) id 1edzs2-00075q-NH
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1edzrx-0002L4-GN
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:17 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:53530)
+	(envelope-from <laurent@vivier.eu>) id 1edzs0-0002Pr-4b
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:18 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:52914)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edzrx-0002J7-5P
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:13 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1edzrz-0002OF-R7
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 09:48:16 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 23 Jan 2018 15:47:57 +0100
-Message-Id: <20180123144807.5618-4-laurent@vivier.eu>
+Date: Tue, 23 Jan 2018 15:48:02 +0100
+Message-Id: <20180123144807.5618-9-laurent@vivier.eu>
 In-Reply-To: <20180123144807.5618-1-laurent@vivier.eu>
 References: <20180123144807.5618-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 03/13] linux-user: Fix length calculations in
- host_to_target_cmsg()
+Subject: [Qemu-devel] [PULL 08/13] linux-user: Add AT_SECURE auxval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +24,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Marco A L Barbosa <malbarbo@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Marco A L Barbosa <malbarbo@gmail.com>
 
-The handling of length calculations in host_to_target_cmsg()
-was rather confused:
- * when checking for whether the target cmsg header fit in
-   the remaining buffer, we were using the host struct size,
-   not the target size
- * we were setting tgt_len to "target payload + header length"
-   but then using it as if it were the target payload length alone
- * in various message type cases we weren't handling the possibility
-   that host or target buffers were truncated
-
-Fix these problems. The second one in particular is liable
-to result in us overrunning the guest provided buffer,
-since we will try to convert more data than is actually
-present.
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1701808
-Reported-by: Bruno Haible  <bruno@clisp.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <1513345976-22958-2-git-send-email-peter.maydell@linaro.org>
+Signed-off-by: Marco A L Barbosa <malbarbo@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180111183714.22834-2-malbarbo@gmail.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 29 ++++++++++++++++++++++-------
- 1 file changed, 22 insertions(+), 7 deletions(-)
+ linux-user/elfload.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 11c9116c4a..a1b9772a85 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1782,7 +1782,7 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-          * to the guest via the CTRUNC bit), unlike truncation
-          * in target_to_host_cmsg, which is a QEMU bug.
-          */
--        if (msg_controllen < sizeof(struct cmsghdr)) {
-+        if (msg_controllen < sizeof(struct target_cmsghdr)) {
-             target_msgh->msg_flags |= tswap32(MSG_CTRUNC);
-             break;
-         }
-@@ -1794,8 +1794,6 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-         }
-         target_cmsg->cmsg_type = tswap32(cmsg->cmsg_type);
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 20f3d8c2c3..32a47674e6 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1354,7 +1354,7 @@ struct exec
+                                  ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
+ #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
  
--        tgt_len = TARGET_CMSG_LEN(len);
--
-         /* Payload types which need a different size of payload on
-          * the target must adjust tgt_len here.
-          */
-@@ -1809,12 +1807,13 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-                 break;
-             }
-         default:
-+            tgt_len = len;
-             break;
-         }
+-#define DLINFO_ITEMS 14
++#define DLINFO_ITEMS 15
  
--        if (msg_controllen < tgt_len) {
-+        if (msg_controllen < TARGET_CMSG_LEN(tgt_len)) {
-             target_msgh->msg_flags |= tswap32(MSG_CTRUNC);
--            tgt_len = msg_controllen;
-+            tgt_len = msg_controllen - sizeof(struct target_cmsghdr);
-         }
+ static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
+ {
+@@ -1786,6 +1786,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+     NEW_AUX_ENT(AT_HWCAP, (abi_ulong) ELF_HWCAP);
+     NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
+     NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
++    NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
  
-         /* We must now copy-and-convert len bytes of payload
-@@ -1875,6 +1874,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-                 uint32_t *v = (uint32_t *)data;
-                 uint32_t *t_int = (uint32_t *)target_data;
- 
-+                if (len != sizeof(uint32_t) ||
-+                    tgt_len != sizeof(uint32_t)) {
-+                    goto unimplemented;
-+                }
-                 __put_user(*v, t_int);
-                 break;
-             }
-@@ -1888,6 +1891,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-                 struct errhdr_t *target_errh =
-                     (struct errhdr_t *)target_data;
- 
-+                if (len != sizeof(struct errhdr_t) ||
-+                    tgt_len != sizeof(struct errhdr_t)) {
-+                    goto unimplemented;
-+                }
-                 __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
-                 __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
-                 __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-@@ -1911,6 +1918,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-                 uint32_t *v = (uint32_t *)data;
-                 uint32_t *t_int = (uint32_t *)target_data;
- 
-+                if (len != sizeof(uint32_t) ||
-+                    tgt_len != sizeof(uint32_t)) {
-+                    goto unimplemented;
-+                }
-                 __put_user(*v, t_int);
-                 break;
-             }
-@@ -1924,6 +1935,10 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-                 struct errhdr6_t *target_errh =
-                     (struct errhdr6_t *)target_data;
- 
-+                if (len != sizeof(struct errhdr6_t) ||
-+                    tgt_len != sizeof(struct errhdr6_t)) {
-+                    goto unimplemented;
-+                }
-                 __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
-                 __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
-                 __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-@@ -1950,8 +1965,8 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-             }
-         }
- 
--        target_cmsg->cmsg_len = tswapal(tgt_len);
--        tgt_space = TARGET_CMSG_SPACE(len);
-+        target_cmsg->cmsg_len = tswapal(TARGET_CMSG_LEN(tgt_len));
-+        tgt_space = TARGET_CMSG_SPACE(tgt_len);
-         if (msg_controllen < tgt_space) {
-             tgt_space = msg_controllen;
-         }
+ #ifdef ELF_HWCAP2
+     NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
 -- 
 2.14.3
