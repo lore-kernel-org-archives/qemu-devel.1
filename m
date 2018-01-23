@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduLh-0001re-H6
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:54:34 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduLp-00020d-PU
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:54:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduLg-000085-Gv
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:54:33 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:57252)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduLm-0000DE-12
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:54:41 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:57274)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduLg-00007r-8l
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:54:32 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eduLl-0000Ca-PE
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 03:54:37 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 23 Jan 2018 11:54:32 +0300
-Message-ID: <20180123085432.3419.84711.stgit@pasha-VirtualBox>
+Date: Tue, 23 Jan 2018 11:54:38 +0300
+Message-ID: <20180123085438.3419.21839.stgit@pasha-VirtualBox>
 In-Reply-To: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
 References: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v5 13/24] kvm: remove BQL lock/unlock
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH v5 14/24] replay/replay.c: bump
+ REPLAY_VERSION again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +30,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-BQL now is used only for waiting for IO events.
-This patch also removes lock/unlock from kvm module.
+From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+This time commit 802f045a5f61b781df55e4492d896b4d20503ba7 broke the
+replay file format. Also add a comment about this to
+replay-internal.h.
+
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c |    2 --
- 1 file changed, 2 deletions(-)
+ replay/replay-internal.h |    2 +-
+ replay/replay.c          |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9628512..d708c7f 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1861,7 +1861,6 @@ int kvm_cpu_exec(CPUState *cpu)
-         return EXCP_HLT;
-     }
- 
--    qemu_mutex_unlock_iothread();
-     cpu_exec_start(cpu);
-     do {
-         MemTxAttrs attrs;
-@@ -1992,7 +1991,6 @@ int kvm_cpu_exec(CPUState *cpu)
-     } while (ret == 0);
- 
-     cpu_exec_end(cpu);
--    qemu_mutex_lock_iothread();
- 
-     if (ret < 0) {
-         cpu_dump_state(cpu, stderr, fprintf, CPU_DUMP_CODE);
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index be96d7e..8e4c701 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -12,7 +12,7 @@
+  *
+  */
+=20
+-
++/* Any changes to order/number of events will need to bump REPLAY_VERSIO=
+N */
+ enum ReplayEvents {
+     /* for instruction event */
+     EVENT_INSTRUCTION,
+diff --git a/replay/replay.c b/replay/replay.c
+index ff58a5a..4f24498 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -22,7 +22,7 @@
+=20
+ /* Current version of the replay mechanism.
+    Increase it when file format changes. */
+-#define REPLAY_VERSION              0xe02006
++#define REPLAY_VERSION              0xe02007
+ /* Size of replay log header */
+ #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t)=
+)
+=20
