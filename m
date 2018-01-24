@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eeUGo-0000d3-TF
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:15:56 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeUR8-0004MU-PO
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eeUGj-0001HN-UL
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:15:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38440)
+	(envelope-from <richard.henderson@linaro.org>) id 1eeUR6-0001as-R0
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:34 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:39453)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eeUGj-0001GM-Ln
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:15:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eeUGi-0003xZ-Oy
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 23:15:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BBCEA2E854C
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 23:15:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Jan 2018 23:02:20 -0000
-From: Thomas Huth <902413@bugs.launchpad.net>
-Reply-To: Bug 902413 <902413@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111210020345.24327.32197.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151683494057.10726.6134469326817945741.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 902413] Re: qemu-i386-user on ARM host: wine
- hangs/spins when trying to run anything
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eeUR6-0001ad-IX
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:32 -0500
+Received: by mail-pf0-x241.google.com with SMTP id e11so4363328pff.6
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:32 -0800 (PST)
+Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
+	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
+	z19sm9760028pfh.185.2018.01.24.15.26.29 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 24 Jan 2018 15:26:30 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 24 Jan 2018 15:25:42 -0800
+Message-Id: <20180124232625.30105-3-richard.henderson@linaro.org>
+In-Reply-To: <20180124232625.30105-1-richard.henderson@linaro.org>
+References: <20180124232625.30105-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 02/45] target/hppa: Define the rest of the
+ PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,158 +34,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-There hasn't been an update within a year, so let's assume this bug has
-been fixed.
+We don't actually do anything with most of the bits yet,
+but at least they have names and we have somewhere to
+store them.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/hppa/cpu.h    | 47 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/hppa/helper.c | 53 ++++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 86 insertions(+), 14 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/902413
-
-Title:
-  qemu-i386-user on ARM host: wine hangs/spins when trying to run
-  anything
-
-Status in QEMU:
-  Fix Released
-Status in wine package in Gentoo Linux:
-  New
-
-Bug description:
-  With qemu built from git from 217bfb445b54db618a30f3a39170bebd9fd9dbf2
-  and configured with './configure --target-list=3Di386-linux-user
-  --static --interp-prefix=3D/home/pgriffais/natty-i386/', trying to run
-  wine 1.3.15 from an Ubuntu 11.04 chroot results in hangs. If I run an
-  i386 emulated wineserver, wineserver hangs in:
-
-  0x600c7f8c in read () at ../sysdeps/unix/syscall-template.S:82
-  82	../sysdeps/unix/syscall-template.S: No such file or directory.
-  	in ../sysdeps/unix/syscall-template.S
-  (gdb) bt
-  #0  0x600c7f8c in read () at ../sysdeps/unix/syscall-template.S:82
-  #1  0x6004a316 in read (cpu_env=3D0x622c3ee8, num=3D3, arg1=3D6, arg2=3D1=
-121255519, =
-
-      arg3=3D1, arg4=3D134875664, arg5=3D1, arg6=3D1121255528, arg7=3D0, ar=
-g8=3D0)
-      at /usr/include/bits/unistd.h:45
-  #2  do_syscall (cpu_env=3D0x622c3ee8, num=3D3, arg1=3D6, arg2=3D112125551=
-9, arg3=3D1, =
-
-      arg4=3D134875664, arg5=3D1, arg6=3D1121255528, arg7=3D0, arg8=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:4691
-  #3  0x600262f0 in cpu_loop (env=3D0x622c3ee8)
-      at /home/ubuntu/src/qemu/linux-user/main.c:321
-  #4  0x60026bbc in main (argc=3D<value optimized out>, =
-
-      argv=3D<value optimized out>, envp=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/linux-user/main.c:3817
-
-  While wine hangs in:
-
-  0x600c84ac in recvmsg () at ../sysdeps/unix/syscall-template.S:82
-  82	../sysdeps/unix/syscall-template.S: No such file or directory.
-  	in ../sysdeps/unix/syscall-template.S
-  (gdb) bt
-  #0  0x600c84ac in recvmsg () at ../sysdeps/unix/syscall-template.S:82
-  #1  0x60041c4e in do_sendrecvmsg (fd=3D4, target_msg=3D<value optimized o=
-ut>, =
-
-      flags=3D1073741824, send=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:1834
-  #2  0x600497ec in do_socketcall (cpu_env=3D<value optimized out>, num=3D1=
-02, =
-
-      arg1=3D17, arg2=3D1122504544, arg3=3D2076831732, arg4=3D1122504568, =
-
-      arg5=3D2076942688, arg6=3D1122504888, arg7=3D0, arg8=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:2235
-  #3  do_syscall (cpu_env=3D<value optimized out>, num=3D102, arg1=3D17, =
-
-      arg2=3D1122504544, arg3=3D2076831732, arg4=3D1122504568, arg5=3D20769=
-42688, =
-
-      arg6=3D1122504888, arg7=3D0, arg8=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:6085
-  #4  0x600262f0 in cpu_loop (env=3D0x622c3f08)
-      at /home/ubuntu/src/qemu/linux-user/main.c:321
-  #5  0x60026bbc in main (argc=3D<value optimized out>, =
-
-      argv=3D<value optimized out>, envp=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/linux-user/main.c:3817
-
-  However if I build wineserver 1.3.15 natively for ARM and run it on
-  the host while wine is emulated, I get the following:
-
-  root@tiberiusstation:/home/ubuntu# ./natty-i386/usr/bin/wine notepad
-  Unsupported ancillary data: 1/2
-  Unsupported ancillary data: 1/2
-  Unsupported ancillary data: 1/2
-  err:process:__wine_kernel_init boot event wait timed out
-
-  I assume the last one is due to wineboot.exe hanging. The main wine
-  process hangs in there:
-
-  cg_temp_new_internal_i32 (temp_local=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/tcg/tcg.c:483
-  483	}
-  (gdb) bt
-  #0  tcg_temp_new_internal_i32 (temp_local=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/tcg/tcg.c:483
-  #1  0x60052ac6 in tcg_temp_new_i32 (val=3D6)
-      at /home/ubuntu/src/qemu/tcg/tcg.h:442
-  #2  tcg_const_i32 (val=3D6) at /home/ubuntu/src/qemu/tcg/tcg.c:530
-  #3  0x6005ef0c in tcg_gen_shri_i32 (ot=3D2, op1=3D2, op2=3D7, is_right=3D=
-1, =
-
-      is_arith=3D0, s=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/tcg/tcg-op.h:605
-  #4  gen_shift_rm_im (ot=3D2, op1=3D2, op2=3D7, is_right=3D1, is_arith=3D0=
-, =
-
-      s=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:1514
-  #5  0x6006df90 in gen_shifti (s=3D0xbefea970, pc_start=3D<value optimized=
- out>)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:1946
-  #6  disas_insn (s=3D0xbefea970, pc_start=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:5397
-  #7  0x60091758 in gen_intermediate_code_internal (env=3D0x625656f8, =
-
-      tb=3D0x402cdf48) at /home/ubuntu/src/qemu/target-i386/translate.c:7825
-  #8  gen_intermediate_code_pc (env=3D0x625656f8, tb=3D0x402cdf48)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:7896
-  #9  0x60054bf2 in cpu_restore_state (tb=3D0x402cdf48, env=3D0x62565690, =
-
-      searched_pc=3D1617393812) at /home/ubuntu/src/qemu/translate-all.c:126
-  #10 0x60091d9e in handle_cpu_signal (host_signum=3D<value optimized out>, =
-
-      pinfo=3D<value optimized out>, puc=3D0xbefeab70)
-      at /home/ubuntu/src/qemu/user-exec.c:117
-  #11 cpu_x86_signal_handler (host_signum=3D<value optimized out>, =
-
-      pinfo=3D<value optimized out>, puc=3D0xbefeab70)
-      at /home/ubuntu/src/qemu/user-exec.c:458
-  #12 0x6003c764 in host_signal_handler (host_signum=3D11, info=3D0xbefeaaf=
-0, =
-
-      puc=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/linux-user/signal.c:492
-  #13 <signal handler called>
-  #14 0x60677894 in static_code_gen_buffer ()
-  #15 0x6000a260 in cpu_x86_exec (env=3D0x0)
-      at /home/ubuntu/src/qemu/cpu-exec.c:566
-  #16 0x68953200 in ?? ()
-  #17 0x68953200 in ?? ()
-  Backtrace stopped: previous frame identical to this frame (corrupt stack?
-
-  Running the same version of wine through qemu-user-i386 running on an
-  i386 host works fine with both wineserver and wine being emulated;
-  that's the result I'm trying to achieve.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/902413/+subscriptions
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 7fad92144c..ea7e495408 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -46,6 +46,52 @@
+ #define EXCP_SIGILL      4
+ #define EXCP_SIGFPE      5
+ 
++/* Taken from Linux kernel: arch/parisc/include/asm/psw.h */
++#define PSW_I            0x00000001
++#define PSW_D            0x00000002
++#define PSW_P            0x00000004
++#define PSW_Q            0x00000008
++#define PSW_R            0x00000010
++#define PSW_F            0x00000020
++#define PSW_G            0x00000040 /* PA1.x only */
++#define PSW_O            0x00000080 /* PA2.0 only */
++#define PSW_CB           0x0000ff00
++#define PSW_M            0x00010000
++#define PSW_V            0x00020000
++#define PSW_C            0x00040000
++#define PSW_B            0x00080000
++#define PSW_X            0x00100000
++#define PSW_N            0x00200000
++#define PSW_L            0x00400000
++#define PSW_H            0x00800000
++#define PSW_T            0x01000000
++#define PSW_S            0x02000000
++#define PSW_E            0x04000000
++#ifdef TARGET_HPPA64
++#define PSW_W            0x08000000 /* PA2.0 only */
++#else
++#define PSW_W            0
++#endif
++#define PSW_Z            0x40000000 /* PA1.x only */
++#define PSW_Y            0x80000000 /* PA1.x only */
++
++#define PSW_SM (PSW_W | PSW_E | PSW_O | PSW_G | PSW_F \
++               | PSW_R | PSW_Q | PSW_P | PSW_D | PSW_I)
++
++/* ssm/rsm instructions number PSW_W and PSW_E differently */
++#define PSW_SM_I         PSW_I      /* Enable External Interrupts */
++#define PSW_SM_D         PSW_D
++#define PSW_SM_P         PSW_P
++#define PSW_SM_Q         PSW_Q      /* Enable Interrupt State Collection */
++#define PSW_SM_R         PSW_R      /* Enable Recover Counter Trap */
++#ifdef TARGET_HPPA64
++#define PSW_SM_E         0x100
++#define PSW_SM_W         0x200      /* PA2.0 only : Enable Wide Mode */
++#else
++#define PSW_SM_E         0
++#define PSW_SM_W         0
++#endif
++
+ typedef struct CPUHPPAState CPUHPPAState;
+ 
+ struct CPUHPPAState {
+@@ -56,6 +102,7 @@ struct CPUHPPAState {
+     target_ulong cr26;
+     target_ulong cr27;
+ 
++    target_long  psw;        /* All psw bits except the following:  */
+     target_ulong psw_n;      /* boolean */
+     target_long  psw_v;      /* in most significant bit */
+ 
+diff --git a/target/hppa/helper.c b/target/hppa/helper.c
+index d6d6f06cb0..4231ef3bff 100644
+--- a/target/hppa/helper.c
++++ b/target/hppa/helper.c
+@@ -39,10 +39,11 @@ target_ulong cpu_hppa_get_psw(CPUHPPAState *env)
+     /* .........................bcdefgh */
+     psw |= (psw >> 12) & 0xf;
+     psw |= env->psw_cb_msb << 7;
+-    psw <<= 8;
++    psw = (psw & 0xff) << 8;
+ 
+-    psw |= env->psw_n << 21;
+-    psw |= (env->psw_v < 0) << 17;
++    psw |= env->psw_n * PSW_N;
++    psw |= (env->psw_v < 0) * PSW_V;
++    psw |= env->psw;
+ 
+     return psw;
+ }
+@@ -51,8 +52,9 @@ void cpu_hppa_put_psw(CPUHPPAState *env, target_ulong psw)
+ {
+     target_ulong cb = 0;
+ 
+-    env->psw_n = (psw >> 21) & 1;
+-    env->psw_v = -((psw >> 17) & 1);
++    env->psw = psw & ~(PSW_N | PSW_V | PSW_CB);
++    env->psw_n = (psw / PSW_N) & 1;
++    env->psw_v = -((psw / PSW_V) & 1);
+     env->psw_cb_msb = (psw >> 15) & 1;
+ 
+     cb |= ((psw >> 14) & 1) << 28;
+@@ -106,22 +108,45 @@ void hppa_cpu_dump_state(CPUState *cs, FILE *f,
+ {
+     HPPACPU *cpu = HPPA_CPU(cs);
+     CPUHPPAState *env = &cpu->env;
++    target_ulong psw = cpu_hppa_get_psw(env);
++    target_ulong psw_cb;
++    char psw_c[20];
+     int i;
+ 
+-    cpu_fprintf(f, "IA_F " TARGET_FMT_lx
+-                   " IA_B " TARGET_FMT_lx
+-                   " PSW  " TARGET_FMT_lx
+-                   " [N:" TARGET_FMT_ld " V:%d"
+-                   " CB:" TARGET_FMT_lx "]\n              ",
+-                env->iaoq_f, env->iaoq_b, cpu_hppa_get_psw(env),
+-                env->psw_n, env->psw_v < 0,
+-                ((env->psw_cb >> 4) & 0x01111111) | (env->psw_cb_msb << 28));
+-    for (i = 1; i < 32; i++) {
++    cpu_fprintf(f, "IA_F " TARGET_FMT_lx " IA_B " TARGET_FMT_lx "\n",
++                env->iaoq_f, env->iaoq_b);
++
++    psw_c[0]  = (psw & PSW_W ? 'W' : '-');
++    psw_c[1]  = (psw & PSW_E ? 'E' : '-');
++    psw_c[2]  = (psw & PSW_S ? 'S' : '-');
++    psw_c[3]  = (psw & PSW_T ? 'T' : '-');
++    psw_c[4]  = (psw & PSW_H ? 'H' : '-');
++    psw_c[5]  = (psw & PSW_L ? 'L' : '-');
++    psw_c[6]  = (psw & PSW_N ? 'N' : '-');
++    psw_c[7]  = (psw & PSW_X ? 'X' : '-');
++    psw_c[8]  = (psw & PSW_B ? 'B' : '-');
++    psw_c[9]  = (psw & PSW_C ? 'C' : '-');
++    psw_c[10] = (psw & PSW_V ? 'V' : '-');
++    psw_c[11] = (psw & PSW_M ? 'M' : '-');
++    psw_c[12] = (psw & PSW_F ? 'F' : '-');
++    psw_c[13] = (psw & PSW_R ? 'R' : '-');
++    psw_c[14] = (psw & PSW_Q ? 'Q' : '-');
++    psw_c[15] = (psw & PSW_P ? 'P' : '-');
++    psw_c[16] = (psw & PSW_D ? 'D' : '-');
++    psw_c[17] = (psw & PSW_I ? 'I' : '-');
++    psw_c[18] = '\0';
++    psw_cb = ((env->psw_cb >> 4) & 0x01111111) | (env->psw_cb_msb << 28);
++
++    cpu_fprintf(f, "PSW  " TARGET_FMT_lx " CB   " TARGET_FMT_lx " %s\n",
++                psw, psw_cb, psw_c);
++
++    for (i = 0; i < 32; i++) {
+         cpu_fprintf(f, "GR%02d " TARGET_FMT_lx " ", i, env->gr[i]);
+         if ((i % 4) == 3) {
+             cpu_fprintf(f, "\n");
+         }
+     }
++    cpu_fprintf(f, "\n");
+ 
+     /* ??? FR */
+ }
+-- 
+2.14.3
