@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeOmU-0000ei-Ez
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:24:15 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeOu0-0004y1-05
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:32:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeOmQ-0007Qs-Cg
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:24:14 -0500
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:46282)
+	(envelope-from <richard.henderson@linaro.org>) id 1eeOtw-00055A-Nh
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:31:59 -0500
+Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:33517)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeOmQ-0007QV-6R
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:24:10 -0500
-Received: by mail-pf0-x236.google.com with SMTP id y5so3588044pff.13
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 09:24:10 -0800 (PST)
+	id 1eeOtw-00054a-GK
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:31:56 -0500
+Received: by mail-pf0-x232.google.com with SMTP id t5so3626479pfi.0
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 09:31:56 -0800 (PST)
 References: <20180124131315.30567-1-alex.bennee@linaro.org>
-	<20180124131315.30567-16-alex.bennee@linaro.org>
+	<20180124131315.30567-21-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4099e682-25ae-7b31-71f5-bad1d92284f1@linaro.org>
-Date: Wed, 24 Jan 2018 09:24:06 -0800
+Message-ID: <07d6b33d-6236-0e2f-5615-b35512f87c6b@linaro.org>
+Date: Wed, 24 Jan 2018 09:31:52 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180124131315.30567-16-alex.bennee@linaro.org>
+In-Reply-To: <20180124131315.30567-21-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/22] fpu/softfloat: re-factor muladd
+Subject: Re: [Qemu-devel] [PATCH v3 20/22] fpu/softfloat: re-factor minmax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,11 +35,28 @@ To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.
 Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
 On 01/24/2018 05:13 AM, Alex Bennée wrote:
-> +    if (a.cls >= float_class_qnan ||
-> +        b.cls >= float_class_qnan ||
-> +        c.cls >= float_class_qnan) {
-> +        return pick_nan_muladd_parts(a, b, c, inf_zero, s);
-> +    }
+> +    if (a.cls >= float_class_qnan
+> +        ||
+> +        b.cls >= float_class_qnan)
+> +    {
+> +        if (ieee) {
+> +            /* Takes two floating-point values `a' and `b', one of
+> +             * which is a NaN, and returns the appropriate NaN
+> +             * result. If either `a' or `b' is a signaling NaN,
+> +             * the invalid exception is raised.
+> +             */
+> +            if (a.cls == float_class_snan || b.cls == float_class_snan) {
+> +                return pick_nan_parts(a, b, s);
+> +            } else if (a.cls >= float_class_qnan
+> +                       &&
+> +                       b.cls < float_class_qnan) {
+> +                return b;
+> +            } else if (b.cls >= float_class_qnan
+> +                       &&
+> +                       a.cls < float_class_qnan) {
+> +                return a;
+> +            }
+> +        }
 
 is_nan.
 
