@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeDnf-00016U-AG
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:40:44 -0500
+	(envelope-from <peterx@redhat.com>) id 1eeDni-00019G-J6
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:40:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeDnc-0006rZ-2m
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:40:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37838)
+	(envelope-from <peterx@redhat.com>) id 1eeDnh-0006yC-E2
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:40:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeDnb-0006qx-Sg
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:40:40 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeDnh-0006ww-7X
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:40:45 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 24 Jan 2018 13:39:37 +0800
-Message-Id: <20180124053957.29145-4-peterx@redhat.com>
+Date: Wed, 24 Jan 2018 13:39:38 +0800
+Message-Id: <20180124053957.29145-5-peterx@redhat.com>
 In-Reply-To: <20180124053957.29145-1-peterx@redhat.com>
 References: <20180124053957.29145-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 03/23] qobject: introduce
- qobject_get_try_str()
+Subject: [Qemu-devel] [PATCH v7 04/23] qobject: let
+ object_property_get_str() use new API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +27,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-A quick way to fetch string from qobject when it's a QString.
+We can simplify object_property_get_str() using the new
+qobject_get_try_str().
 
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/qapi/qmp/qstring.h |  1 +
- qobject/qstring.c          | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+ qom/object.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
-index a145c8ca00..6517d8e377 100644
---- a/include/qapi/qmp/qstring.h
-+++ b/include/qapi/qmp/qstring.h
-@@ -28,6 +28,7 @@ QString *qstring_from_substr(const char *str, int start, int end);
- size_t qstring_get_length(const QString *qstring);
- const char *qstring_get_str(const QString *qstring);
- const char *qstring_get_try_str(const QString *qstring);
-+const char *qobject_get_try_str(const QObject *qstring);
- void qstring_append_int(QString *qstring, int64_t value);
- void qstring_append(QString *qstring, const char *str);
- void qstring_append_chr(QString *qstring, int c);
-diff --git a/qobject/qstring.c b/qobject/qstring.c
-index 7638ab990d..e556b1afdf 100644
---- a/qobject/qstring.c
-+++ b/qobject/qstring.c
-@@ -138,6 +138,17 @@ const char *qstring_get_try_str(const QString *qstring)
-     return qstring ? qstring_get_str(qstring) : NULL;
- }
+diff --git a/qom/object.c b/qom/object.c
+index c58c52d518..9cbeb51f0b 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1116,18 +1116,15 @@ char *object_property_get_str(Object *obj, const char *name,
+                               Error **errp)
+ {
+     QObject *ret = object_property_get_qobject(obj, name, errp);
+-    QString *qstring;
+     char *retval;
  
-+/**
-+ * qobject_get_try_str(): Return a pointer to the corresponding string
-+ *
-+ * NOTE: the string will only be returned if the object is valid, and
-+ * its type is QString, otherwise NULL is returned.
-+ */
-+const char *qobject_get_try_str(const QObject *qstring)
-+{
-+    return qstring_get_try_str(qobject_to_qstring(qstring));
-+}
+     if (!ret) {
+         return NULL;
+     }
+-    qstring = qobject_to_qstring(ret);
+-    if (!qstring) {
 +
- /**
-  * qstring_is_equal(): Test whether the two QStrings are equal
-  */
++    retval = g_strdup(qobject_get_try_str(ret));
++    if (!retval) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name, "string");
+-        retval = NULL;
+-    } else {
+-        retval = g_strdup(qstring_get_str(qstring));
+     }
+ 
+     qobject_decref(ret);
 -- 
 2.14.3
