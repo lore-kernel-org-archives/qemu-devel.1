@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeDpz-00034A-3Z
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:43:08 -0500
+	(envelope-from <peterx@redhat.com>) id 1eeDq8-0003DB-Ak
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeDpw-00019V-0e
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:43:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57908)
+	(envelope-from <peterx@redhat.com>) id 1eeDq5-0001KP-6Z
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:43:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeDpv-00018v-Rf
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:43:03 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeDq5-0001JQ-00
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:43:13 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 24 Jan 2018 13:39:54 +0800
-Message-Id: <20180124053957.29145-21-peterx@redhat.com>
+Date: Wed, 24 Jan 2018 13:39:55 +0800
+Message-Id: <20180124053957.29145-22-peterx@redhat.com>
 In-Reply-To: <20180124053957.29145-1-peterx@redhat.com>
 References: <20180124053957.29145-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 20/23] monitor: enable IO thread for (qmp &
- !mux) typed
+Subject: [Qemu-devel] [PATCH v7 21/23] qmp: add command "x-oob-test"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +26,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Start to use dedicate IO thread for QMP monitors that are not using
-MUXed chardev.
+This command is only used to test OOB functionality.  It should not be
+used for any other purposes.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ qapi-schema.json | 18 ++++++++++++++++++
+ qmp.c            | 16 ++++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/monitor.c b/monitor.c
-index eac92c9b86..5b7da2b574 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -36,6 +36,7 @@
- #include "net/slirp.h"
- #include "chardev/char-fe.h"
- #include "chardev/char-io.h"
-+#include "chardev/char-mux.h"
- #include "ui/qemu-spice.h"
- #include "sysemu/numa.h"
- #include "monitor/monitor.h"
-@@ -4579,8 +4580,10 @@ static void monitor_qmp_setup_handlers(void *data)
- void monitor_init(Chardev *chr, int flags)
- {
-     Monitor *mon = g_malloc(sizeof(*mon));
-+    /* Enable IOThread for QMPs that are not using MUX chardev backends. */
-+    bool use_io_thr = (!CHARDEV_IS_MUX(chr)) && (flags & MONITOR_USE_CONTROL);
+diff --git a/qapi-schema.json b/qapi-schema.json
+index d6c89efc0d..59ea3e2051 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3252,3 +3252,21 @@
+ ##
+ { 'event': 'COMMAND_DROPPED' ,
+   'data': { 'id': 'any', 'reason': 'CommandDropReason' } }
++
++##
++# @x-oob-test:
++#
++# Test OOB functionality.  When send this command with lock=true,
++# it'll try to hang the dispatcher.  When send it with lock=false,
++# it'll try to notify the locked thread to continue.  Note: it should
++# only be used by QMP test program rather than anything else.
++#
++# Since: 2.12
++#
++# Example:
++#
++# { "execute": "x-oob-test",
++#   "arguments": { "lock": true } }
++##
++{ 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
++  'allow-oob': true }
+diff --git a/qmp.c b/qmp.c
+index 52cfd2d81c..c7dcbe72e3 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -717,3 +717,19 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
  
--    monitor_data_init(mon, false, false);
-+    monitor_data_init(mon, false, use_io_thr);
- 
-     qemu_chr_fe_init(&mon->chr, chr, &error_abort);
-     mon->flags = flags;
+     return mem_info;
+ }
++
++static QemuSemaphore x_oob_test_sem;
++
++static void __attribute__((constructor)) x_oob_test_init(void)
++{
++    qemu_sem_init(&x_oob_test_sem, 0);
++}
++
++void qmp_x_oob_test(bool lock, Error **errp)
++{
++    if (lock) {
++        qemu_sem_wait(&x_oob_test_sem);
++    } else {
++        qemu_sem_post(&x_oob_test_sem);
++    }
++}
 -- 
 2.14.3
