@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eeKww-0007pY-9k
+	(envelope-from <alex.bennee@linaro.org>) id 1eeKwv-0007oq-G4
 	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:18:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eeKwu-00014y-LZ
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:18:46 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:39317)
+	(envelope-from <alex.bennee@linaro.org>) id 1eeKwt-00014c-TV
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:18:45 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eeKwu-00014M-Br
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:18:44 -0500
-Received: by mail-wr0-x242.google.com with SMTP id z48so3992469wrz.6
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:18:44 -0800 (PST)
+	id 1eeKwt-00013q-JR
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:18:43 -0500
+Received: by mail-wm0-x241.google.com with SMTP id 141so8497792wme.3
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:18:43 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 24 Jan 2018 13:13:13 +0000
-Message-Id: <20180124131315.30567-21-alex.bennee@linaro.org>
+Date: Wed, 24 Jan 2018 13:13:09 +0000
+Message-Id: <20180124131315.30567-17-alex.bennee@linaro.org>
 In-Reply-To: <20180124131315.30567-1-alex.bennee@linaro.org>
 References: <20180124131315.30567-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 20/22] fpu/softfloat: re-factor minmax
+Subject: [Qemu-devel] [PATCH v3 16/22] fpu/softfloat: re-factor round_to_int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,290 +32,359 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Let's do the same re-factor treatment for minmax functions. I still
-use the MACRO trick to expand but now all the checking code is common.
+We can now add float16_round_to_int and use the common round_decomposed and
+canonicalize functions to have a single implementation for
+float16/32/64 round_to_int functions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
 ---
-v2
-  - minor indentation fix
 v3
-  - fix merge conflicts from dropping MINMAX patch
-  - fix naming of structs
+  - rename structures and functions
 ---
- fpu/softfloat.c         | 234 ++++++++++++++++++++++++++----------------------
- include/fpu/softfloat.h |   6 ++
- 2 files changed, 133 insertions(+), 107 deletions(-)
+ fpu/softfloat.c         | 302 ++++++++++++++++++++----------------------------
+ include/fpu/softfloat.h |   1 +
+ 2 files changed, 129 insertions(+), 174 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 24b7de30ce..09f9d12a06 100644
+index 1dac0d5af0..901d999825 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1646,6 +1646,133 @@ float64 uint16_to_float64(uint16_t a, float_status *status)
-     return uint64_to_float64(a, status);
+@@ -1175,6 +1175,134 @@ float64 float64_div(float64 a, float64 b, float_status *status)
+     return float64_round_pack_canonical(pr, status);
  }
  
-+/* Float Min/Max */
-+/* min() and max() functions. These can't be implemented as
-+ * 'compare and pick one input' because that would mishandle
-+ * NaNs and +0 vs -0.
-+ *
-+ * minnum() and maxnum() functions. These are similar to the min()
-+ * and max() functions but if one of the arguments is a QNaN and
-+ * the other is numerical then the numerical argument is returned.
-+ * SNaNs will get quietened before being returned.
-+ * minnum() and maxnum correspond to the IEEE 754-2008 minNum()
-+ * and maxNum() operations. min() and max() are the typical min/max
-+ * semantics provided by many CPUs which predate that specification.
-+ *
-+ * minnummag() and maxnummag() functions correspond to minNumMag()
-+ * and minNumMag() from the IEEE-754 2008.
++/*
++ * Rounds the floating-point value `a' to an integer, and returns the
++ * result as a floating-point value. The operation is performed
++ * according to the IEC/IEEE Standard for Binary Floating-Point
++ * Arithmetic.
 + */
-+static FloatParts minmax_decomposed(FloatParts a, FloatParts b, bool ismin,
-+                                    bool ieee, bool ismag, float_status *s)
++
++static FloatParts round_to_int(FloatParts a, int rounding_mode, float_status *s)
 +{
-+    if (a.cls >= float_class_qnan
-+        ||
-+        b.cls >= float_class_qnan)
-+    {
-+        if (ieee) {
-+            /* Takes two floating-point values `a' and `b', one of
-+             * which is a NaN, and returns the appropriate NaN
-+             * result. If either `a' or `b' is a signaling NaN,
-+             * the invalid exception is raised.
-+             */
-+            if (a.cls == float_class_snan || b.cls == float_class_snan) {
-+                return pick_nan_parts(a, b, s);
-+            } else if (a.cls >= float_class_qnan
-+                       &&
-+                       b.cls < float_class_qnan) {
-+                return b;
-+            } else if (b.cls >= float_class_qnan
-+                       &&
-+                       a.cls < float_class_qnan) {
-+                return a;
++
++    switch (a.cls) {
++    case float_class_snan:
++        a.cls = s->default_nan_mode ? float_class_dnan : float_class_msnan;
++        s->float_exception_flags |= float_flag_invalid;
++        break;
++    case float_class_zero:
++    case float_class_inf:
++    case float_class_qnan:
++        /* already "integral" */
++        break;
++    case float_class_normal:
++        if (a.exp >= DECOMPOSED_BINARY_POINT) {
++            /* already integral */
++            break;
++        }
++        if (a.exp < 0) {
++            bool one;
++            /* all fractional */
++            s->float_exception_flags |= float_flag_inexact;
++            switch (rounding_mode) {
++            case float_round_nearest_even:
++                one = a.exp == -1 && a.frac > DECOMPOSED_IMPLICIT_BIT;
++                break;
++            case float_round_ties_away:
++                one = a.exp == -1 && a.frac >= DECOMPOSED_IMPLICIT_BIT;
++                break;
++            case float_round_to_zero:
++                one = false;
++                break;
++            case float_round_up:
++                one = !a.sign;
++                break;
++            case float_round_down:
++                one = a.sign;
++                break;
++            default:
++                g_assert_not_reached();
 +            }
-+        }
-+        return pick_nan_parts(a, b, s);
-+    } else {
-+        int a_exp, b_exp;
-+        bool a_sign, b_sign;
 +
-+        switch (a.cls) {
-+        case float_class_normal:
-+            a_exp = a.exp;
-+            break;
-+        case float_class_inf:
-+            a_exp = INT_MAX;
-+            break;
-+        case float_class_zero:
-+            a_exp = INT_MIN;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+            break;
-+        }
-+        switch (b.cls) {
-+        case float_class_normal:
-+            b_exp = b.exp;
-+            break;
-+        case float_class_inf:
-+            b_exp = INT_MAX;
-+            break;
-+        case float_class_zero:
-+            b_exp = INT_MIN;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+            break;
-+        }
-+
-+        a_sign = a.sign;
-+        b_sign = b.sign;
-+        if (ismag) {
-+            a_sign = b_sign = 0;
-+        }
-+
-+        if (a_sign == b_sign) {
-+            bool a_less = a_exp < b_exp;
-+            if (a_exp == b_exp) {
-+                a_less = a.frac < b.frac;
++            if (one) {
++                a.frac = DECOMPOSED_IMPLICIT_BIT;
++                a.exp = 0;
++            } else {
++                a.cls = float_class_zero;
 +            }
-+            return a_sign ^ a_less ^ ismin ? b : a;
 +        } else {
-+            return a_sign ^ ismin ? b : a;
++            uint64_t frac_lsb, frac_lsbm1, round_mask, roundeven_mask, inc;
++
++            frac_lsb = DECOMPOSED_IMPLICIT_BIT >> a.exp;
++            frac_lsbm1 = frac_lsb >> 1;
++            roundeven_mask = (frac_lsb - 1) | frac_lsb;
++            round_mask = roundeven_mask >> 1;
++
++            switch (rounding_mode) {
++            case float_round_nearest_even:
++                inc = ((a.frac & roundeven_mask) != frac_lsbm1 ? frac_lsbm1 : 0);
++                break;
++            case float_round_ties_away:
++                inc = frac_lsbm1;
++                break;
++            case float_round_to_zero:
++                inc = 0;
++                break;
++            case float_round_up:
++                inc = a.sign ? 0 : round_mask;
++                break;
++            case float_round_down:
++                inc = a.sign ? round_mask : 0;
++                break;
++            default:
++                g_assert_not_reached();
++            }
++
++            if (a.frac & round_mask) {
++                s->float_exception_flags |= float_flag_inexact;
++                a.frac += inc;
++                a.frac &= ~round_mask;
++                if (a.frac & DECOMPOSED_OVERFLOW_BIT) {
++                    a.frac >>= 1;
++                    a.exp++;
++                }
++            }
 +        }
++        break;
++    default:
++        g_assert_not_reached();
 +    }
++    return a;
 +}
 +
-+#define MINMAX(sz, name, ismin, isiee, ismag)                           \
-+float ## sz float ## sz ## _ ## name(float ## sz a, float ## sz b,      \
-+                                     float_status *s)                   \
-+{                                                                       \
-+    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
-+    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
-+    FloatParts pr = minmax_decomposed(pa, pb, ismin, isiee, ismag, s);  \
-+                                                                        \
-+    return float ## sz ## _round_pack_canonical(pr, s);                 \
++float16 float16_round_to_int(float16 a, float_status *s)
++{
++    FloatParts pa = float16_unpack_canonical(a, s);
++    FloatParts pr = round_to_int(pa, s->float_rounding_mode, s);
++    return float16_round_pack_canonical(pr, s);
 +}
 +
-+MINMAX(16, min, true, false, false)
-+MINMAX(16, minnum, true, true, false)
-+MINMAX(16, minnummag, true, true, true)
-+MINMAX(16, max, false, false, false)
-+MINMAX(16, maxnum, false, true, false)
-+MINMAX(16, maxnummag, false, true, true)
++float32 float32_round_to_int(float32 a, float_status *s)
++{
++    FloatParts pa = float32_unpack_canonical(a, s);
++    FloatParts pr = round_to_int(pa, s->float_rounding_mode, s);
++    return float32_round_pack_canonical(pr, s);
++}
 +
-+MINMAX(32, min, true, false, false)
-+MINMAX(32, minnum, true, true, false)
-+MINMAX(32, minnummag, true, true, true)
-+MINMAX(32, max, false, false, false)
-+MINMAX(32, maxnum, false, true, false)
-+MINMAX(32, maxnummag, false, true, true)
++float64 float64_round_to_int(float64 a, float_status *s)
++{
++    FloatParts pa = float64_unpack_canonical(a, s);
++    FloatParts pr = round_to_int(pa, s->float_rounding_mode, s);
++    return float64_round_pack_canonical(pr, s);
++}
 +
-+MINMAX(64, min, true, false, false)
-+MINMAX(64, minnum, true, true, false)
-+MINMAX(64, minnummag, true, true, true)
-+MINMAX(64, max, false, false, false)
-+MINMAX(64, maxnum, false, true, false)
-+MINMAX(64, maxnummag, false, true, true)
++float64 float64_trunc_to_int(float64 a, float_status *s)
++{
++    FloatParts pa = float64_unpack_canonical(a, s);
++    FloatParts pr = round_to_int(pa, float_round_to_zero, s);
++    return float64_round_pack_canonical(pr, s);
++}
 +
-+#undef MINMAX
-+
- /* Multiply A by 2 raised to the power N.  */
- static FloatParts scalbn_decomposed(FloatParts a, int n,
-                                           float_status *s)
-@@ -6893,113 +7020,6 @@ int float128_compare_quiet(float128 a, float128 b, float_status *status)
-     return float128_compare_internal(a, b, 1, status);
+ /*----------------------------------------------------------------------------
+ | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
+ | and 7, and returns the properly rounded 32-bit integer corresponding to the
+@@ -2905,87 +3033,6 @@ float128 float32_to_float128(float32 a, float_status *status)
+ 
  }
  
--/* min() and max() functions. These can't be implemented as
-- * 'compare and pick one input' because that would mishandle
-- * NaNs and +0 vs -0.
-- *
-- * minnum() and maxnum() functions. These are similar to the min()
-- * and max() functions but if one of the arguments is a QNaN and
-- * the other is numerical then the numerical argument is returned.
-- * minnum() and maxnum correspond to the IEEE 754-2008 minNum()
-- * and maxNum() operations. min() and max() are the typical min/max
-- * semantics provided by many CPUs which predate that specification.
-- *
-- * minnummag() and maxnummag() functions correspond to minNumMag()
-- * and minNumMag() from the IEEE-754 2008.
-- */
--#define MINMAX(s)                                                       \
--static inline float ## s float ## s ## _minmax(float ## s a, float ## s b,     \
--                                               int ismin, int isieee,   \
--                                               int ismag,               \
--                                               float_status *status)    \
--{                                                                       \
--    flag aSign, bSign;                                                  \
--    uint ## s ## _t av, bv, aav, abv;                                   \
--    a = float ## s ## _squash_input_denormal(a, status);                \
--    b = float ## s ## _squash_input_denormal(b, status);                \
--    if (float ## s ## _is_any_nan(a) ||                                 \
--        float ## s ## _is_any_nan(b)) {                                 \
--        if (isieee) {                                                   \
--            if (float ## s ## _is_quiet_nan(a, status) &&               \
--                !float ## s ##_is_any_nan(b)) {                         \
--                return b;                                               \
--            } else if (float ## s ## _is_quiet_nan(b, status) &&        \
--                       !float ## s ## _is_any_nan(a)) {                \
--                return a;                                               \
--            }                                                           \
--        }                                                               \
--        return propagateFloat ## s ## NaN(a, b, status);                \
--    }                                                                   \
--    aSign = extractFloat ## s ## Sign(a);                               \
--    bSign = extractFloat ## s ## Sign(b);                               \
--    av = float ## s ## _val(a);                                         \
--    bv = float ## s ## _val(b);                                         \
--    if (ismag) {                                                        \
--        aav = float ## s ## _abs(av);                                   \
--        abv = float ## s ## _abs(bv);                                   \
--        if (aav != abv) {                                               \
--            if (ismin) {                                                \
--                return (aav < abv) ? a : b;                             \
--            } else {                                                    \
--                return (aav < abv) ? b : a;                             \
--            }                                                           \
--        }                                                               \
--    }                                                                   \
--    if (aSign != bSign) {                                               \
--        if (ismin) {                                                    \
--            return aSign ? a : b;                                       \
--        } else {                                                        \
--            return aSign ? b : a;                                       \
--        }                                                               \
--    } else {                                                            \
--        if (ismin) {                                                    \
--            return (aSign ^ (av < bv)) ? a : b;                         \
--        } else {                                                        \
--            return (aSign ^ (av < bv)) ? b : a;                         \
--        }                                                               \
--    }                                                                   \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _min(float ## s a, float ## s b,               \
--                              float_status *status)                     \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 1, 0, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _max(float ## s a, float ## s b,               \
--                              float_status *status)                     \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 0, 0, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _minnum(float ## s a, float ## s b,            \
--                                 float_status *status)                  \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 1, 1, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _maxnum(float ## s a, float ## s b,            \
--                                 float_status *status)                  \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 0, 1, 0, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _minnummag(float ## s a, float ## s b,         \
--                                    float_status *status)               \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 1, 1, 1, status);                \
--}                                                                       \
--                                                                        \
--float ## s float ## s ## _maxnummag(float ## s a, float ## s b,         \
--                                    float_status *status)               \
--{                                                                       \
--    return float ## s ## _minmax(a, b, 0, 1, 1, status);                \
+-/*----------------------------------------------------------------------------
+-| Rounds the single-precision floating-point value `a' to an integer, and
+-| returns the result as a single-precision floating-point value.  The
+-| operation is performed according to the IEC/IEEE Standard for Binary
+-| Floating-Point Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-float32 float32_round_to_int(float32 a, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint32_t lastBitMask, roundBitsMask;
+-    uint32_t z;
+-    a = float32_squash_input_denormal(a, status);
+-
+-    aExp = extractFloat32Exp( a );
+-    if ( 0x96 <= aExp ) {
+-        if ( ( aExp == 0xFF ) && extractFloat32Frac( a ) ) {
+-            return propagateFloat32NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if ( aExp <= 0x7E ) {
+-        if ( (uint32_t) ( float32_val(a)<<1 ) == 0 ) return a;
+-        status->float_exception_flags |= float_flag_inexact;
+-        aSign = extractFloat32Sign( a );
+-        switch (status->float_rounding_mode) {
+-         case float_round_nearest_even:
+-            if ( ( aExp == 0x7E ) && extractFloat32Frac( a ) ) {
+-                return packFloat32( aSign, 0x7F, 0 );
+-            }
+-            break;
+-        case float_round_ties_away:
+-            if (aExp == 0x7E) {
+-                return packFloat32(aSign, 0x7F, 0);
+-            }
+-            break;
+-         case float_round_down:
+-            return make_float32(aSign ? 0xBF800000 : 0);
+-         case float_round_up:
+-            return make_float32(aSign ? 0x80000000 : 0x3F800000);
+-        }
+-        return packFloat32( aSign, 0, 0 );
+-    }
+-    lastBitMask = 1;
+-    lastBitMask <<= 0x96 - aExp;
+-    roundBitsMask = lastBitMask - 1;
+-    z = float32_val(a);
+-    switch (status->float_rounding_mode) {
+-    case float_round_nearest_even:
+-        z += lastBitMask>>1;
+-        if ((z & roundBitsMask) == 0) {
+-            z &= ~lastBitMask;
+-        }
+-        break;
+-    case float_round_ties_away:
+-        z += lastBitMask >> 1;
+-        break;
+-    case float_round_to_zero:
+-        break;
+-    case float_round_up:
+-        if (!extractFloat32Sign(make_float32(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    case float_round_down:
+-        if (extractFloat32Sign(make_float32(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    default:
+-        abort();
+-    }
+-    z &= ~ roundBitsMask;
+-    if (z != float32_val(a)) {
+-        status->float_exception_flags |= float_flag_inexact;
+-    }
+-    return make_float32(z);
+-
 -}
 -
--MINMAX(32)
--MINMAX(64)
+ /*----------------------------------------------------------------------------
+ | Returns the remainder of the single-precision floating-point value `a'
+ | with respect to the corresponding value `b'.  The operation is performed
+@@ -4129,99 +4176,6 @@ float128 float64_to_float128(float64 a, float_status *status)
+ 
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Rounds the double-precision floating-point value `a' to an integer, and
+-| returns the result as a double-precision floating-point value.  The
+-| operation is performed according to the IEC/IEEE Standard for Binary
+-| Floating-Point Arithmetic.
+-*----------------------------------------------------------------------------*/
 -
+-float64 float64_round_to_int(float64 a, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint64_t lastBitMask, roundBitsMask;
+-    uint64_t z;
+-    a = float64_squash_input_denormal(a, status);
 -
- floatx80 floatx80_scalbn(floatx80 a, int n, float_status *status)
- {
-     flag aSign;
+-    aExp = extractFloat64Exp( a );
+-    if ( 0x433 <= aExp ) {
+-        if ( ( aExp == 0x7FF ) && extractFloat64Frac( a ) ) {
+-            return propagateFloat64NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if ( aExp < 0x3FF ) {
+-        if ( (uint64_t) ( float64_val(a)<<1 ) == 0 ) return a;
+-        status->float_exception_flags |= float_flag_inexact;
+-        aSign = extractFloat64Sign( a );
+-        switch (status->float_rounding_mode) {
+-         case float_round_nearest_even:
+-            if ( ( aExp == 0x3FE ) && extractFloat64Frac( a ) ) {
+-                return packFloat64( aSign, 0x3FF, 0 );
+-            }
+-            break;
+-        case float_round_ties_away:
+-            if (aExp == 0x3FE) {
+-                return packFloat64(aSign, 0x3ff, 0);
+-            }
+-            break;
+-         case float_round_down:
+-            return make_float64(aSign ? LIT64( 0xBFF0000000000000 ) : 0);
+-         case float_round_up:
+-            return make_float64(
+-            aSign ? LIT64( 0x8000000000000000 ) : LIT64( 0x3FF0000000000000 ));
+-        }
+-        return packFloat64( aSign, 0, 0 );
+-    }
+-    lastBitMask = 1;
+-    lastBitMask <<= 0x433 - aExp;
+-    roundBitsMask = lastBitMask - 1;
+-    z = float64_val(a);
+-    switch (status->float_rounding_mode) {
+-    case float_round_nearest_even:
+-        z += lastBitMask >> 1;
+-        if ((z & roundBitsMask) == 0) {
+-            z &= ~lastBitMask;
+-        }
+-        break;
+-    case float_round_ties_away:
+-        z += lastBitMask >> 1;
+-        break;
+-    case float_round_to_zero:
+-        break;
+-    case float_round_up:
+-        if (!extractFloat64Sign(make_float64(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    case float_round_down:
+-        if (extractFloat64Sign(make_float64(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    default:
+-        abort();
+-    }
+-    z &= ~ roundBitsMask;
+-    if (z != float64_val(a)) {
+-        status->float_exception_flags |= float_flag_inexact;
+-    }
+-    return make_float64(z);
+-
+-}
+-
+-float64 float64_trunc_to_int(float64 a, float_status *status)
+-{
+-    int oldmode;
+-    float64 res;
+-    oldmode = status->float_rounding_mode;
+-    status->float_rounding_mode = float_round_to_zero;
+-    res = float64_round_to_int(a, status);
+-    status->float_rounding_mode = oldmode;
+-    return res;
+-}
+-
+ 
+ /*----------------------------------------------------------------------------
+ | Returns the remainder of the double-precision floating-point value `a'
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 52621e0b79..35df225a55 100644
+index 65bc7442d2..4650758c23 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -245,6 +245,12 @@ float16 float16_mul(float16, float16, float_status *status);
- float16 float16_muladd(float16, float16, float16, int, float_status *status);
- float16 float16_div(float16, float16, float_status *status);
- float16 float16_scalbn(float16, int, float_status *status);
-+float16 float16_min(float16, float16, float_status *status);
-+float16 float16_max(float16, float16, float_status *status);
-+float16 float16_minnum(float16, float16, float_status *status);
-+float16 float16_maxnum(float16, float16, float_status *status);
-+float16 float16_minnummag(float16, float16, float_status *status);
-+float16 float16_maxnummag(float16, float16, float_status *status);
+@@ -237,6 +237,7 @@ float64 float16_to_float64(float16 a, flag ieee, float_status *status);
+ | Software half-precision operations.
+ *----------------------------------------------------------------------------*/
  
- int float16_is_quiet_nan(float16, float_status *status);
- int float16_is_signaling_nan(float16, float_status *status);
++float16 float16_round_to_int(float16, float_status *status);
+ float16 float16_add(float16, float16, float_status *status);
+ float16 float16_sub(float16, float16, float_status *status);
+ float16 float16_mul(float16, float16, float_status *status);
 -- 
 2.15.1
