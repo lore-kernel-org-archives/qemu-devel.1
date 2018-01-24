@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee95i-0003Yj-9L
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:40:08 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee97P-0004es-Qq
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:43:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee95G-0002zo-1W
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:39:02 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:40176)
+	(envelope-from <alistair23@gmail.com>) id 1ee96z-0007Rc-31
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:40:47 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34158)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ee95F-0002vw-Kf
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:38:33 -0500
-Received: by mail-lf0-x244.google.com with SMTP id h92so2944130lfi.7
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 16:38:33 -0800 (PST)
+	id 1ee96y-0007Nz-5x
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:40:20 -0500
+Received: by mail-lf0-x243.google.com with SMTP id k19so2969350lfj.1
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 16:40:20 -0800 (PST)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180123020820.1288-10-f4bug@amsat.org>
-References: <20180123020820.1288-1-f4bug@amsat.org>
-	<20180123020820.1288-10-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 23 Jan 2018 16:38:01 -0800
-Message-ID: <CAKmqyKNghZ3BJFURBC4195Ztq2oN8iEz6FnB7W38ySvnJAroBA@mail.gmail.com>
+In-Reply-To: <d332aaad-ce74-a304-a177-047c401b9306@redhat.com>
+References: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
+	<CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
+	<CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
+	<CAKmqyKP2cQGXSmPvaGt3AwDz6zewJ6HH=vVTSnk6GVAQAhW5uA@mail.gmail.com>
+	<d332aaad-ce74-a304-a177-047c401b9306@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 23 Jan 2018 16:39:48 -0800
+Message-ID: <CAKmqyKM587sXPYHFam9A_YzyiUE=g_ZVn3TUoO5Mbd6OuyLY3Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 09/16] sdhci: simplify
- sdhci_get_fifolen()
+Subject: Re: [Qemu-devel] Call for GSoC & Outreachy 2018 mentors & project
+ ideas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +33,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin O'Connor <kevin@koconnor.net>, Marcel Apfelbaum <marcel@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>
 
-On Mon, Jan 22, 2018 at 6:08 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Thu, Jan 18, 2018 at 8:49 AM, David Hildenbrand <david@redhat.com> wrote:
+> On 12.01.2018 00:25, Alistair Francis wrote:
+>> On Wed, Jan 10, 2018 at 4:52 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>> On Tue, Jan 9, 2018 at 9:45 PM, Alistair Francis <alistair23@gmail.com> wrote:
+>>>> Can anyone who has done this before chime in.
+>>>>
+>>>> What do you think about getting someone to cleanup and improve the GDB
+>>>> support in QEMU? Would that be the right difficulty of task for a GSoC
+>>>> project?
+>
+> Don't understand that sentence. We already support multiple CPUs
+> (represented and switchable just like threads in GDB), no?
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+We support multiple of the same CPU, such as multiple cores. What we
+don't support is multiple of different types of CPUs. Something like
+ARMs bit.LITTLE or Xilinx's 4xA53s and 2xR5s.
 
 Alistair
 
-> ---
->  hw/sd/sdhci-internal.h |  4 +++-
->  hw/sd/sdhci.c          | 20 +++++---------------
->  2 files changed, 8 insertions(+), 16 deletions(-)
 >
-> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-> index b7751c815f..577ca9da54 100644
-> --- a/hw/sd/sdhci-internal.h
-> +++ b/hw/sd/sdhci-internal.h
-> @@ -24,6 +24,8 @@
->  #ifndef SDHCI_INTERNAL_H
->  #define SDHCI_INTERNAL_H
+> An interesting thing to look at could be tracepoint support in GDB.
 >
-> +#include "hw/registerfields.h"
-> +
->  /* R/W SDMA System Address register 0x0 */
->  #define SDHC_SYSAD                     0x00
+>>>
+>>> There is not enough information to give feedback on whether this
+>>> project idea is suitable.  What are the specific tasks you'd like the
+>>> student to work on?
+>>>
+>>> In general, I'm sure there are well-defined 12-week project ideas
+>>> around the GDB stub.  New features are easy to propose and are usually
+>>> well-defined (e.g. implement these commands that are documented in the
+>>> GDB protocol documentation).  Cleaning up code is less clear and it
+>>> would depend on exactly what needs to be done.  Interns will not have
+>>> a background in the QEMU codebase and may not be able to make
+>>> judgements about how to structure things, so I would be more careful
+>>> about refactoring/cleanup projects.
+>>>
+>>> Please see my talk about QEMU GSoC for guidelines on project ideas:
+>>> https://www.youtube.com/watch?v=xNVCX7YMUL8&t=19m11s
+>>> http://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
+>>
+>> That helps a lot, thanks for that.
+>>
+>> So for a more concrete solution, how would adding support for multi
+>> CPU support to the GDB server sound?
+>>
+>> This would allow GDB debugging for the A53 and the R5 on the Xilinx
+>> ZynqMP for example. This is something we have in the Xilinx tree, but
+>> it is in no state to go upstream and really needs to be re-write to be
+>> upstreamable and more generic.
+>>
+>> Alistair
+>>
+>>>
+>>> Hope this helps,
+>>> Stefan
 >
-> @@ -179,7 +181,7 @@
->  #define SDHC_CAN_DO_ADMA2              0x00080000
->  #define SDHC_CAN_DO_ADMA1              0x00100000
->  #define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
-> -#define SDHC_CAPAB_BLOCKSIZE(x)        (((x) >> 16) & 0x3)
-> +FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
 >
->  /* HWInit Maximum Current Capabilities Register 0x0 */
->  #define SDHC_MAXCURR                   0x48
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 1c781c4ba5..dce1a49af1 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -59,6 +59,11 @@
->   */
->  #define SDHC_CAPAB_REG_DEFAULT 0x057834b4
->
-> +static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
-> +{
-> +    return 1 << (9 + FIELD_EX32(s->capareg, SDHC_CAPAB, MAXBLOCKLENGTH))=
-;
-> +}
-> +
->  static uint8_t sdhci_slotint(SDHCIState *s)
->  {
->      return (s->norintsts & s->norintsigen) || (s->errintsts & s->errints=
-igen) ||
-> @@ -1118,21 +1123,6 @@ static const MemoryRegionOps sdhci_mmio_ops =3D {
->      .endianness =3D DEVICE_LITTLE_ENDIAN,
->  };
->
-> -static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
-> -{
-> -    switch (SDHC_CAPAB_BLOCKSIZE(s->capareg)) {
-> -    case 0:
-> -        return 512;
-> -    case 1:
-> -        return 1024;
-> -    case 2:
-> -        return 2048;
-> -    default:
-> -        hw_error("SDHC: unsupported value for maximum block size\n");
-> -        return 0;
-> -    }
-> -}
-> -
->  static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
->  {
->      if (s->sd_spec_version !=3D 2) {
 > --
-> 2.15.1
 >
+> Thanks,
 >
+> David / dhildenb
