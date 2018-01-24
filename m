@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eeMZn-0000pV-L9
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 10:03:01 -0500
+	(envelope-from <groug@kaod.org>) id 1eeMh0-0003YP-4I
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 10:10:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eeMZi-0003kF-RA
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 10:02:59 -0500
-Date: Wed, 24 Jan 2018 08:02:30 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180124080230.580c28c6@w520.home>
-In-Reply-To: <bd0063fa-6c2d-cfce-d255-400cb9e4cf0a@redhat.com>
-References: <20180123012207.43459-1-aik@ozlabs.ru>
-	<424c3873-7368-5fbe-95bf-3040c2bec73a@redhat.com>
-	<20180123125531.0de84de2@w520.home>
-	<bd0063fa-6c2d-cfce-d255-400cb9e4cf0a@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1eeMgt-00079z-76
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 10:10:25 -0500
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:39281)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eeMgs-000782-7H
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 10:10:19 -0500
+Received: from player692.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 73958111326
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 16:09:58 +0100 (CET)
+Date: Wed, 24 Jan 2018 16:09:47 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180124160947.309fa51e@bahia.lan>
+In-Reply-To: <bde08479-11e7-566b-f82d-9a8df183052c@huawei.com>
+References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
+	<20180112171416.6048ae9e@bahia.lan>
+	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
+	<20180119112733.4a9dd43f@bahia.lan>
+	<05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
+	<899644b1-e401-8ed5-8a49-1f0e2dbf9b2b@huawei.com>
+	<bde08479-11e7-566b-f82d-9a8df183052c@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3] RFC: vfio-pci: Allow mmap of MSIX
- BAR
+Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,198 +35,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Eduard Shishkin <eduard.shishkin@huawei.com>
+Cc: Veaceslav Falico <veaceslav.falico@huawei.com>, Antonios Motakis <antonios.motakis@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei
+	(CR)" <zhangwei555@huawei.com>, "Emilio G. Cota" <cota@braap.org>
 
-On Wed, 24 Jan 2018 15:13:06 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On Mon, 22 Jan 2018 13:40:00 +0100
+Eduard Shishkin <eduard.shishkin@huawei.com> wrote:
 
-> Hi Alex,
-> On 23/01/18 20:55, Alex Williamson wrote:
-> > On Tue, 23 Jan 2018 16:34:34 +0100
-> > Auger Eric <eric.auger@redhat.com> wrote:
-> >   
-> >> Hi Alexey,
-> >> On 23/01/18 02:22, Alexey Kardashevskiy wrote:  
-> >>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
-> >>> which tells that a region with MSIX data can be mapped entirely, i.e.
-> >>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
-> >>>
-> >>> With this change, all BARs are mapped in a single chunk and MSIX vectors
-> >>> are emulated on top unless the machine requests not to by defining and
-> >>> enabling a new "vfio-no-msix-emulation" property. At the moment only
-> >>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
-> >>> enabling it as it does not define the "set" callback for the new property;
-> >>> the new property also does not appear in "-machine pseries,help".
-> >>>
-> >>> If MSIX vectors section is not aligned to the page size, the KVM memory
-> >>> listener does not register it with the KVM as a memory slot and MSIX is
-> >>> emulated by QEMU as before. This may create MMIO RAM memory sections with
-> >>> an address or/and a size not aligned which will make vfio_dma_map() fail;
-> >>> to address this, this makes treats such failures as non-fatal.
-> >>>
-> >>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
-> >>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
-> >>>
-> >>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>> ---
-> >>> Changes:
-> >>> v3:
-> >>> * vfio_listener_region_add() won't make qemu exit if failed on MMIO MR
-> >>>
-> >>> ---
-> >>>  include/hw/vfio/vfio-common.h |  1 +
-> >>>  linux-headers/linux/vfio.h    |  5 +++++
-> >>>  hw/ppc/spapr.c                |  7 +++++++
-> >>>  hw/vfio/common.c              | 19 +++++++++++++++++++
-> >>>  hw/vfio/pci.c                 | 10 ++++++++++
-> >>>  5 files changed, 42 insertions(+)
-> >>>
-> >>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> >>> index f3a2ac9..927d600 100644
-> >>> --- a/include/hw/vfio/vfio-common.h
-> >>> +++ b/include/hw/vfio/vfio-common.h
-> >>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
-> >>>                           struct vfio_region_info **info);
-> >>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-> >>>                               uint32_t subtype, struct vfio_region_info **info);
-> >>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
-> >>>  #endif
-> >>>  extern const MemoryListener vfio_prereg_listener;
-> >>>  
-> >>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> >>> index 4312e96..b45182e 100644
-> >>> --- a/linux-headers/linux/vfio.h
-> >>> +++ b/linux-headers/linux/vfio.h
-> >>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
-> >>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
-> >>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-> >>>  
-> >>> +/*
-> >>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
-> >>> + */
-> >>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
-> >>> +
-> >>>  /**
-> >>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-> >>>   *				    struct vfio_irq_info)
-> >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>> index d1acfe8..5ff43ce 100644
-> >>> --- a/hw/ppc/spapr.c
-> >>> +++ b/hw/ppc/spapr.c
-> >>> @@ -2789,6 +2789,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
-> >>>      spapr->use_hotplug_event_source = value;
-> >>>  }
-> >>>  
-> >>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
-> >>> +{
-> >>> +    return true;
-> >>> +}
-> >>> +
-> >>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
-> >>>  {
-> >>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-> >>> @@ -2870,6 +2875,8 @@ static void spapr_instance_init(Object *obj)
-> >>>      object_property_set_description(obj, "vsmt",
-> >>>                                      "Virtual SMT: KVM behaves as if this were"
-> >>>                                      " the host's SMT mode", &error_abort);
-> >>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
-> >>> +                             spapr_get_msix_emulation, NULL, NULL);
-> >>>  }
-> >>>  
-> >>>  static void spapr_machine_finalizefn(Object *obj)
-> >>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> >>> index b77be3a..842c5b2 100644
-> >>> --- a/hw/vfio/common.c
-> >>> +++ b/hw/vfio/common.c
-> >>> @@ -530,6 +530,10 @@ static void vfio_listener_region_add(MemoryListener *listener,
-> >>>      return;
-> >>>  
-> >>>  fail:
-> >>> +    if (memory_region_is_ram_device(section->mr)) {
-> >>> +        error_report("failed to vfio_dma_map. pci p2p may not work");
-> >>> +        return;
-> >>> +    }    
-> >>
-> >> I don't think this is an acceptable solution as it produces plenty of
-> >> errors such as
-> >>
-> >> qemu-system-aarch64: VFIO_MAP_DMA: -22
-> >> qemu-system-aarch64: vfio_dma_map(0x30a7ab90, 0x8000000000, 0x2000,
-> >> 0xfffd79a00000) = -22 (Invalid argument)  
-> > 
-> > This much of the error above could be avoided by looking at the type1
-> > page size bitmap before trying to perform the mapping.
-> >   
-> >> qemu-system-aarch64: failed to vfio_dma_map. pci p2p may not work  
-> > 
-> > This of course is still valid though we can continue to discuss if it's
-> > worthwhile user information.
-> >    
-> >> testing context is: aarch64 + Mellanox CX-4 PF where we still try to map
-> >> the BAR0 area [0 - 0x2000] before the MSI-X table which is not aligned
-> >> with the host 64kB page.
-> >>
-> >> Region 0: Memory at 80400000000 (64-bit, prefetchable) [size=32M]
-> >> Capabilities: [9c] MSI-X: Enable+ Count=64 Masked-
-> >> 		Vector table: BAR=0 offset=00002000
-> >> 		PBA: BAR=0 offset=00003000
+> On 1/19/2018 5:37 PM, Veaceslav Falico wrote:
+> > On 1/19/2018 4:52 PM, Eduard Shishkin wrote:  
 > >>
 > >>
-> >> To me a kind of mmaps region fixup looks required?  
-> > 
-> > I don't think so.  vfio is now telling us that we can mmap the entire
-> > BAR, this is true.  The type1 info is telling us that the minimum DMA
-> > mapping granularity, PAGE_SIZE on the host (64K in your case).  The
-> > MSI-X offset on this device introduces an 8K range that type1 cannot
-> > map and QEMU already has all the information it needs to know this.  The
-> > solutions are either to move MSI-X elsewhere or to extend type1 to
-> > allow DMA mappings down to the IOMMU minimum granularity.
-> > 
-> > The MSI-X fixup that is now bypassed avoided this not generating an
-> > mmap over the vector table, which meant this 8K region wasn't covered
-> > by a memory slot and therefore never got passed through region_add.  So
-> > p2p dma was silently disabled.  Now we do mmap the entire BAR, but we
-> > add the MSI-X region on top of it so that when it gets flattened we end
-> > up with these sub-page slots.  Skipping them at region_add has the same
-> > overall effect.
-> > 
-> > Before:
-> > 
-> >   |-| <-- MSI-X vector emulation MR
-> > +
-> >          |---PAGE_SIZE aligned mmap MR----|
-> > +
-> > |------------slow mapped BAR M------------|
-> > 
-> > =
-> > 
-> >          |----Resulting region_add--------| (PAGE_SIZE aligned)
-> > 
-> > After:
-> > 
-> >   |-| <-- MSI-X vector emulation MR
-> > +
-> > |------------PAGE_SIZE aligned mmap MR----|
-> > +
-> > |------------slow mapped BAR M------------|
-> > 
-> > =
-> > 
-> > |-| |----Resulting region_add-------------| (Gap no longer PAGE_SIZE aligned)
-> > 
-> > So doesn't it make sense that region_add would now filter these out?
-> > Should we continue to silently skip unmapped MMIO?  Thanks,  
+> >> On 1/19/2018 11:27 AM, Greg Kurz wrote:  
+> >>> On Mon, 15 Jan 2018 11:49:31 +0800
+> >>> Antonios Motakis <antonios.motakis@huawei.com> wrote:
+> >>>  
+> >>>> On 13-Jan-18 00:14, Greg Kurz wrote:  
+> >>>>> On Fri, 12 Jan 2018 19:32:10 +0800
+> >>>>> Antonios Motakis <antonios.motakis@huawei.com> wrote:
+> >>>>>  
+> >>>>>> Hello all,
+> >>>>>>  
+> >>>>>
+> >>>>> Hi Antonios,
+> >>>>>
+> >>>>> I see you have attached a patch to this email... this really isn't the preferred
+> >>>>> way to do things since it prevents to comment the patch (at least with my mail
+> >>>>> client). The appropriate way would have been to send the patch with a cover
+> >>>>> letter, using git-send-email for example.  
+> >>>>
+> >>>> I apologize for attaching the patch, I should have known better!
+> >>>>  
+> >>>
+> >>> np :)
+> >>>  
+> >>>>>  
+> >>>>>> We have found an issue in the 9p implementation of QEMU, with how qid paths are generated, which can cause qid path collisions and several issues caused by them. In our use case (running containers under VMs) these have proven to be critical.
+> >>>>>>  
+> >>>>>
+> >>>>> Ouch...
+> >>>>>  
+> >>>>>> In particular, stat_to_qid in hw/9pfs/9p.c generates a qid path using the inode number of the file as input. According to the 9p spec the path should be able to uniquely identify a file, distinct files should not share a path value.
+> >>>>>>
+> >>>>>> The current implementation that defines qid.path = inode nr works fine as long as there are not files from multiple partitions visible under the 9p share. In that case, distinct files from different devices are allowed to have the same inode number. So with multiple partitions, we have a very high probability of qid path collisions.
+> >>>>>>
+> >>>>>> How to demonstrate the issue:
+> >>>>>> 1) Prepare a problematic share:
+> >>>>>>  - mount one partition under share/p1/ with some files inside
+> >>>>>>  - mount another one *with identical contents* under share/p2/
+> >>>>>>  - confirm that both partitions have files with same inode nr, size, etc
+> >>>>>> 2) Demonstrate breakage:
+> >>>>>>  - start a VM with a virtio-9p pointing to the share
+> >>>>>>  - mount 9p share with FSCACHE on
+> >>>>>>  - keep open share/p1/file
+> >>>>>>  - open and write to share/p2/file
+> >>>>>>
+> >>>>>> What should happen is, the guest will consider share/p1/file and share/p2/file to be the same file, and since we are using the cache it will not reopen it. We intended to write to partition 2, but we just wrote to partition 1. This is just one example on how the guest may rely on qid paths being unique.
+> >>>>>>
+> >>>>>> In the use case of containers where we commonly have a few containers per VM, all based on similar images, these kind of qid path collisions are very common and they seem to cause all kinds of funny behavior (sometimes very subtle).
+> >>>>>>
+> >>>>>> To avoid this situation, the device id of a file needs to be also taken as input for generating a qid path. Unfortunately, the size of both inode nr + device id together would be 96 bits, while we have only 64 bits for the qid path, so we can't just append them and call it a day :(
+> >>>>>>
+> >>>>>> We have thought of a few approaches, but we would definitely like to hear what the upstream maintainers and community think:
+> >>>>>>
+> >>>>>> * Full fix: Change the 9p protocol
+> >>>>>>
+> >>>>>> We would need to support a longer qid path, based on a virtio feature flag. This would take reworking of host and guest parts of virtio-9p, so both QEMU and Linux for most users.
+> >>>>>>  
+> >>>>>
+> >>>>> I agree for a longer qid path, but we shouldn't tie it to a virtio flag since
+> >>>>> 9p is transport agnostic. And it happens to be used with a variety of transports.
+> >>>>> QEMU has both virtio-9p and a Xen backend for example.
+> >>>>>  
+> >>>>>> * Fallback and/or interim solutions
+> >>>>>>
+> >>>>>> A virtio feature flag may be refused by the guest, so we think we still need to make collisions less likely even with 64 bit paths. E.g.  
+> >>>>>
+> >>>>> In all cases, we would need a fallback solution to support current
+> >>>>> guest setups. Also there are several 9p server implementations out
+> >>>>> there (ganesha, diod, kvmtool) that are currently used with linux
+> >>>>> clients... it will take some time to get everyone in sync :-\
+> >>>>>  
+> >>>>>> 1. XOR the device id with inode nr to produce the qid path (we attach a proof of concept patch)  
+> >>>>>
+> >>>>> Hmm... this would still allow collisions. Not good for fallback.
+> >>>>>  
+> >>>>>> 2. 64 bit hash of device id and inode nr  
+> >>>>>
+> >>>>> Same here.
+> >>>>>  
+> >>>>>> 3. other ideas, such as allocating new qid paths and keep a look up table of some sorts (possibly too expensive)
+> >>>>>>  
+> >>>>>
+> >>>>> This would be acceptable for fallback.  
+> >>>>
+> >>>> Maybe we can use the QEMU hash table (https://github.com/qemu/qemu/blob/master/util/qht.c) but I wonder if it scales to millions of entries. Do you think it is appropriate in this case?
+> >>>>  
+> >>>
+> >>> I don't know QHT, hence Cc'ing Emilio for insights.
+> >>>  
+> >>>> I was thinking on how to implement something like this, without having to maintain millions of entries... One option we could consider is to split the bits into a directly-mapped part, and a lookup part. For example:
+> >>>>
+> >>>> Inode =
+> >>>> [ 10 first bits ] + [ 54 lowest bits ]
+> >>>>
+> >>>> A hash table maps [ inode 10 first bits ] + [ device id ] => [ 10 bit prefix ]
+> >>>> The prefix is uniquely allocated for each input.
+> >>>>
+> >>>> Qid path =
+> >>>> [ 10 bit prefix ] + [ inode 54 lowest bits ]
+> >>>>
+> >>>> Since inodes are not completely random, and we usually have a handful of device IDs, we get a much smaller number of entries to track in the hash table.
+> >>>>
+> >>>> So what this would give:
+> >>>> (1)    Would be faster and take less memory than mapping the full inode_nr,devi_id tuple to unique QID paths
+> >>>> (2)    Guaranteed not to run out of bits when inode numbers stay below the lowest 54 bits and we have less than 1024 devices.
+> >>>> (3)    When we get beyond this this limit, there is a chance we run out of bits to allocate new QID paths, but we can detect this and refuse to serve the offending files instead of allowing a collision.
+> >>>>
+> >>>> We could tweak the prefix size to match the scenarios that we consider more likely, but I think close to 10-16 bits sounds reasonable enough. What do you think?
+> >>>>  
+> >>>
+> >>> I think that should work. Please send a patchset :)  
+> >>
+> >> Hi Greg,
+> >>
+> >> This is based on the assumption that high bits of inode numbers are
+> >> always zero, which is unacceptable from my standpoint. Inode numbers
+> >> allocator is a per-volume file system feature, so there may appear
+> >> allocators, which don't use simple increment and assign inode number
+> >> with non-zero high bits even for the first file of a volume.
+> >>
+> >> As I understand, the problem is that the guest doesn't have enough
+> >> information for proper files identification (in our case share/p1/file
+> >> and share/p2/file are wrongly identified as the same file). It seems
+> >> that we need to transmit device ID to the guest, and not in the high bits of the inode number.
+> >>
+> >> AFAIK Slava has patches for such transmission, I hope that he will send
+> >> it eventually.  
+> >
+> > They're pretty trivial, however it'll require great effort and coordination
+> > for all parties involved, as they break backwards compatibility (QID becomes
+> > bigger and, thus, breaks "Q" transmission).
+> >
+> > I'd like to raise another issue - it seems that st_dev and i_no aren't
+> > enough:
+> >
+> > mkdir -p /tmp/mounted
+> > touch /tmp/mounted/file
+> > mount -o bind /tmp/mounted t1
+> > mount -o bind /tmp/mounted t2
+> > stat t{1,2}/file  | grep Inode
+> > Device: 805h/2053d      Inode: 42729487    Links: 3
+> > Device: 805h/2053d      Inode: 42729487    Links: 3
+> >
+> > In that case, even with the patch applied, we'll still have the issue of
+> > colliding QIDs guest-side - so, for example, after umount t1, t2/file
+> > becomes unaccessible, as the inode points to t1...
+> >
+> > I'm not sure how to fix this one. Ideas?  
 > 
-> I am confused because I don't see the vfio_region_read/write for
-> segments whose mmap failed. Nevertheless the assignment looks to work
-> properly.
+> t1/file and t2/file have different mount IDs,
+> which can be retrieved by name_to_handle_at(2).
+> So the idea is to transmit also that mount ID along with st_dev.
+> 
 
-Segments whose mmap failed or whose dma map failed?  When we have the
-"after" case above, the ram_device mmap covers the entire direct access
-range to the device, therefore the flattened view will hit those
-MemoryRegion.ops first, which will be ram_device_mem_ops.  We'll only
-get to vfio_region_ops in the "before" case where the flattened map
-exposes the slow MR.  Thanks,
+As for transmitting st_dev, this calls for a spec change and might take
+some time... :-\
 
-Alex
+And anyway, we really want to have a fallback in QEMU. Maybe you can try
+something like Emilio suggested in another mail ?
+
+The first step would be to allow fsdev backends to return the mount id
+along with the struct stat:
+- add a uint32_t *mnt_id arg to the .fstat and .stat ops in file-op-9p.h
+- adapt the 9p-local backend to fill out *mnt_id with name_to_handle_at()
+
+If this works, then same thing should be done in 9p-proxy/virtfs-proxy-helper.
+Other backends can be left behind.
+
+Cheers,
+
+--
+Greg
+
+> Thanks,
+> Eduard.
+> 
+> >  
+> >>
+> >> Thanks,
+> >> Eduard.
+> >>  
+> >>>  
+> >>>>>  
+> >>>>>> With our proof of concept patch, the issues caused by qid path collisions go away, so it can be seen as an interim solution of sorts. However, the chance of collisions is not eliminated, we are just replacing the current strategy, which is almost guaranteed to cause collisions in certain use cases, with one that makes them more rare. We think that a virtio feature flag for longer qid paths is the only way to eliminate these issues completely.
+> >>>>>>
+> >>>>>> This is the extent that we were able to analyze the issue from our side, we would like to hear if there are some better ideas, or which approach would be more appropriate for upstream.
+> >>>>>>
+> >>>>>> Best regards,
+> >>>>>>  
+> >>>>>
+> >>>>> Cheers,
+> >>>>>
+> >>>>> --
+> >>>>> Greg
+> >>>>>  
+> >>>>  
+> >>>  
+> >>
+> >> .
+> >>  
+> >
+> >  
+> 
