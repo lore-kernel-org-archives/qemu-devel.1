@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eeLnE-0003RU-RY
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 09:12:53 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eeLna-0003iB-22
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 09:13:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eeLn9-0006Ap-SC
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 09:12:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eeLn9-00069m-I9
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 09:12:43 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 85C3F4B703
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 14:12:42 +0000 (UTC)
-Date: Wed, 24 Jan 2018 14:12:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180124141235.GC2497@work-vm>
-References: <20180110124723.11879-1-quintela@redhat.com>
-	<20180110124723.11879-10-quintela@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eeLnU-0006g4-45
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 09:13:10 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:37840)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eeLnT-0006fc-V2
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 09:13:04 -0500
+Received: by mail-qt0-x242.google.com with SMTP id d54so10603481qtd.4
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 06:13:03 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180124131315.30567-1-alex.bennee@linaro.org>
+	<20180124131315.30567-8-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f4b4e663-8dc7-e687-1b50-13aead2b18b4@amsat.org>
+Date: Wed, 24 Jan 2018 11:12:58 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180110124723.11879-10-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 09/14] migration: Flush receive queue
+In-Reply-To: <20180124131315.30567-8-alex.bennee@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="f3wrEheuSL2AG2y4umv6igFtAJ3Q3EDpF"
+Subject: Re: [Qemu-devel] [PATCH v3 07/22] include/fpu/softfloat: implement
+ float16_set_sign helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,183 +36,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Each time that we sync the bitmap, it is a possiblity that we receive
-> a page that is being processed by a different thread.  We fix this
-> problem just making sure that we wait for all receiving threads to
-> finish its work before we procedeed with the next stage.
-> 
-> We are low on page flags, so we use a combination that is not valid to
-> emit that message:  MULTIFD_PAGE and COMPRESSED.
-> 
-> I tried to make a migration command for it, but it don't work because
-> we sync the bitmap sometimes when we have already sent the beggining
-> of the section, so I just added a new page flag.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> Create RAM_SAVE_FLAG_MULTIFD_SYNC (dave suggestion)
-> Move the set of need_flush to inside the bitmap_sync code (peter suggestion)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--f3wrEheuSL2AG2y4umv6igFtAJ3Q3EDpF
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu,
+ bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <f4b4e663-8dc7-e687-1b50-13aead2b18b4@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v3 07/22] include/fpu/softfloat: implement
+ float16_set_sign helper
+References: <20180124131315.30567-1-alex.bennee@linaro.org>
+ <20180124131315.30567-8-alex.bennee@linaro.org>
+In-Reply-To: <20180124131315.30567-8-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/24/2018 10:13 AM, Alex Benn=C3=A9e wrote:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
 > ---
->  migration/ram.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 55 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 20f3726909..b1ad7b2730 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -74,6 +74,14 @@
->  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
->  #define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
->  
-> +/* We are getting low on pages flags, so we start using combinations
-> +   When we need to flush a page, we sent it as
-> +   RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO
-> +   We don't allow that combination
-> +*/
-> +#define RAM_SAVE_FLAG_MULTIFD_SYNC \
-> +    (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)
-> +
->  static inline bool is_zero_range(uint8_t *p, uint64_t size)
->  {
->      return buffer_is_zero(p, size);
-> @@ -226,6 +234,9 @@ struct RAMState {
->      uint64_t iterations_prev;
->      /* Iterations since start */
->      uint64_t iterations;
-> +    /* Indicates if we have synced the bitmap and we need to assure that
-> +       target has processeed all previous pages */
-> +    bool multifd_needs_flush;
->      /* number of dirty bits in the bitmap */
->      uint64_t migration_dirty_pages;
->      /* protects modification of the bitmap */
-> @@ -675,11 +686,13 @@ struct MultiFDRecvParams {
->      QIOChannel *c;
->      QemuSemaphore ready;
->      QemuSemaphore sem;
-> +    QemuCond cond_sync;
->      QemuMutex mutex;
->      /* proteced by param mutex */
->      bool quit;
->      /* how many patches has sent this channel */
->      uint32_t packets_recv;
-> +    bool sync;
->      multifd_pages_t *pages;
->      bool done;
->  };
-> @@ -734,6 +747,7 @@ int multifd_load_cleanup(Error **errp)
->          qemu_thread_join(&p->thread);
->          qemu_mutex_destroy(&p->mutex);
->          qemu_sem_destroy(&p->sem);
-> +        qemu_cond_destroy(&p->cond_sync);
->          socket_recv_channel_unref(p->c);
->          g_free(p->name);
->          p->name = NULL;
-> @@ -779,6 +793,10 @@ static void *multifd_recv_thread(void *opaque)
->              qemu_mutex_lock(&p->mutex);
->              p->done = true;
->              p->packets_recv++;
-> +            if (p->sync) {
-> +                qemu_cond_signal(&p->cond_sync);
-> +                p->sync = false;
-> +            }
->              qemu_mutex_unlock(&p->mutex);
->              qemu_sem_post(&p->ready);
->              continue;
-> @@ -845,9 +863,11 @@ void multifd_recv_new_channel(QIOChannel *ioc)
->      qemu_mutex_init(&p->mutex);
->      qemu_sem_init(&p->sem, 0);
->      qemu_sem_init(&p->ready, 0);
-> +    qemu_cond_init(&p->cond_sync);
->      p->quit = false;
->      p->id = msg.id;
->      p->done = false;
-> +    p->sync = false;
->      multifd_pages_init(&p->pages, migrate_multifd_page_count());
->      p->c = ioc;
->      multifd_recv_state->count++;
-> @@ -891,6 +911,27 @@ static void multifd_recv_page(RAMBlock *block, ram_addr_t offset,
->      qemu_sem_post(&p->sem);
+>  include/fpu/softfloat.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index f75aa59100..59c06ef192 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -281,6 +281,11 @@ static inline float16 float16_chs(float16 a)
+>      return make_float16(float16_val(a) ^ 0x8000);
 >  }
->  
-> +static int multifd_flush(void)
+> =20
+> +static inline float16 float16_set_sign(float16 a, int sign)
 > +{
-> +    int i, thread_count;
-> +
-> +    if (!migrate_use_multifd()) {
-> +        return 0;
-> +    }
-> +    thread_count = migrate_multifd_channels();
-> +    for (i = 0; i < thread_count; i++) {
-> +        MultiFDRecvParams *p = &multifd_recv_state->params[i];
-> +
-> +        qemu_mutex_lock(&p->mutex);
-> +        while (!p->done) {
-> +            p->sync = true;
-> +            qemu_cond_wait(&p->cond_sync, &p->mutex);
-> +        }
-
-I think this can get stuck if there's an error at just the wrong time
-in the recv_thread;  perhaps if you make sure the
-terminate_multifd_recev_threads wakes all the cond_sync's it would work?
-
-Dave
-
-> +        qemu_mutex_unlock(&p->mutex);
-> +    }
-> +    return 0;
+> +    return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
 > +}
 > +
->  /**
->   * save_page_header: write page header to wire
->   *
-> @@ -908,6 +949,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
->  {
->      size_t size, len;
->  
-> +    if (rs->multifd_needs_flush &&
-> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
-> +        offset |= RAM_SAVE_FLAG_ZERO;
-> +        rs->multifd_needs_flush = false;
-> +    }
-> +
->      if (block == rs->last_sent_block) {
->          offset |= RAM_SAVE_FLAG_CONTINUE;
->      }
-> @@ -1196,6 +1243,9 @@ static void migration_bitmap_sync(RAMState *rs)
->      if (migrate_use_events()) {
->          qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
->      }
-> +    if (!rs->ram_bulk_stage && migrate_use_multifd()) {
-> +        rs->multifd_needs_flush = true;
-> +    }
->  }
->  
->  /**
-> @@ -3201,6 +3251,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->              break;
->          }
->  
-> +        if ((flags & RAM_SAVE_FLAG_MULTIFD_SYNC)
-> +            == RAM_SAVE_FLAG_MULTIFD_SYNC) {
-> +            multifd_flush();
-> +            flags = flags & ~RAM_SAVE_FLAG_ZERO;
+>  /*--------------------------------------------------------------------=
+--------
+>  | The pattern for a default generated half-precision NaN.
+>  *---------------------------------------------------------------------=
+-------*/
+>=20
 
-OK, so it's worth a comment saying that a MULTIFD_SYNC is not just a
-sync, it's a sync and a page.
 
-Dave
+--f3wrEheuSL2AG2y4umv6igFtAJ3Q3EDpF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> +        }
->          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
->                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
->                       RAM_SAVE_FLAG_MULTIFD_PAGE)) {
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlpolGoACgkQ4+MsLN6t
+wN4utRAAgUPCk/Gz/I8OLZ7wvkHEp+OItZFdmnuEDrmMQRTK2cAOYKWn+/I/qFx/
+4nfsFGJsxQluHKwG3brxsIGSj2tlmsit4H06fOK4IEycxfhaenvePdfjuexyVgt6
+tX679SgSavZFdDAQ16ZAoyRUdq+bigMnpSeSAt79qn/pvEhNZBUlcgS8cI9v1PjQ
+3a87p7rU8JUrYzRJ0mby8b5s5friOKjUqsU+CUety2HqgI0dXTZed72rSwm8fL7/
+QdqaAX5NCi3ksW0XJM08wx0mRajUvFKZ+Cd0Ud98z3yauJ1pSB+Cjg70J0y9A4Fj
+Dl8YuO5C3xAyaHKp2XImmwwF3WwcxVa2n/sojkLEJ+TyBb+tT22ZzhUbhRJvgkz6
++qUgdPvadbdkiDn2B5AaiN4Pxe8msWN1RRsSVNrYqlUSrcQvRtLRSP/O3Q4vd0PM
+2HBmvrdo5rJK2TqREmdA+PWd8+q0CM2Dc6j0KRGi8nehmHf/rZKvSbBQzbr3wIP6
+26D5zPaILcErLUEOuh0u7nIb4LtwlMITjd6VvWWNlxe4ec7yR8OhhjFaxEPAz6Rd
+psYvazxHyYJSPuzQkqReRnc3+Rvg4a8IqFsBw4+LcifIN+SEeBDzoIbnyziBiqnh
+tCRAZiNgDP7PY+r/BMTcKWYSBhUxzf94fnryPnrPrhYOUdx3YVc=
+=ItNF
+-----END PGP SIGNATURE-----
+
+--f3wrEheuSL2AG2y4umv6igFtAJ3Q3EDpF--
