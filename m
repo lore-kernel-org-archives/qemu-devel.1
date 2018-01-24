@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agx@sigxcpu.org>) id 1eeH9C-00037m-RC
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:15:14 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eeH9J-0003DS-Oz
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agx@sigxcpu.org>) id 1eeH98-0008DR-2R
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:15:10 -0500
-Date: Wed, 24 Jan 2018 10:14:56 +0100
-From: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
-Message-ID: <39441aea4e2d05cc505ed3a373e81d3869eb994a.1516785202.git.agx@sigxcpu.org>
+	(envelope-from <pbonzini@redhat.com>) id 1eeH9F-0008Jw-Lh
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:15:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eeH9F-0008JN-DO
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:15:13 -0500
+References: <1516747387-31760-1-git-send-email-mst@redhat.com>
+	<1516747387-31760-2-git-send-email-mst@redhat.com>
+	<20180124094621.46ff2f43@bahia.lan> <20180124100500.1f9bf54a@bahia.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d0698024-65ae-fb6b-397d-cccdc1fb36f4@redhat.com>
+Date: Wed, 24 Jan 2018 10:14:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20180124100500.1f9bf54a@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] linux-user: Fix register used for 6th syscall
- argument on aarch64
+Subject: Re: [Qemu-devel] [PULL 1/1] kvm-all: Partially reverts 4fe6d78b2e
+ to remove the cleanup call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +30,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Greg Kurz <groug@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Anton Blanchard <anton@samba.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Unbreaks the testcase from
+On 24/01/2018 10:05, Greg Kurz wrote:
+> On Wed, 24 Jan 2018 09:46:21 +0100
+> Greg Kurz <groug@kaod.org> wrote:
+>=20
+>> Please note that Peter usually doesn't work on Wednesdays. The master =
+branch
+>> might remain broken for everyone until tomorrow... :-\
+>>
+>> And I don't think this is the right fix anyway. See below.
+>>
+>> On Wed, 24 Jan 2018 00:44:14 +0200
+>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>
+>>> From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+>>>
+>>> This commit partially reverts the commit 4fe6d78b2e because of issues
+>>> reported in the virtio.
+>>>
+>>> Examples:
+>>>
+>>> $ qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G \
+>>>   -M pseries,accel=3Dkvm -netdev type=3Duser,id=3Dnet0 \
+>>>   -device virtio-net-pci,netdev=3Dnet0 -drive file=3D../disk.qcow2,if=
+=3Dvirtio
+>>>
+>>> Populating /vdevice/nvram@71000001
+>>> Populating /vdevice/v-scsi@71000002
+>>>        SCSI: Looking for devices
+>>>           8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+=
+"
+>>> Populating /pci@800000020000000
+>>>                      00 0000 (D) : 1af4 1000    virtio [ net ]
+>>> Aborted
+>>>
+>>> $ qemu-system-x86_64 -m 4G -enable-kvm -drive file=3Dutil.qcow2,if=3D=
+virtio
+>>>
+>>> Running QEMU with GTK 2.x is deprecated, and will be removed
+>>> in a future release. Please switch to GTK 3.x instead
+>>> [1]    5282 abort
+>>>
+>>> Reference http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg=
+05457.html
+>>>
+>>> Reported-by: Anton Blanchard <anton@samba.org>
+>>> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+>>> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>>> Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>  accel/kvm/kvm-all.c | 4 ----
+>>>  1 file changed, 4 deletions(-)
+>>>
+>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>>> index 071f4f5..f290f48 100644
+>>> --- a/accel/kvm/kvm-all.c
+>>> +++ b/accel/kvm/kvm-all.c
+>>> @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener=
+ *listener,
+>>>      if (r < 0) {
+>>>          abort();
+>>>      }
+>>> -
+>>> -    if (e->cleanup) {
+>>> -        e->cleanup(e);
+>>> -    } =20
+>>
+>> This looks wrong as the cleanup is expected to do things like closing =
+fds:
+>>
+>> static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
+>> {
+>>     /* Test and clear notifier after disabling event,
+>>      * in case poll callback didn't have time to run.
+>>      */
+>>     virtio_queue_host_notifier_read(notifier);
+>>     event_notifier_cleanup(notifier);
+>> }
+>>
+>> void event_notifier_cleanup(EventNotifier *e)
+>> {
+>>     if (e->rfd !=3D e->wfd) {
+>>         close(e->rfd);
+>>     }
+>>     close(e->wfd);
+>>     e->rfd =3D -1;
+>>     e->wfd =3D -1;
+>>     e->cleanup =3D NULL;
+>> }
+>>
+>> And indeed, with this patch applied, QEMU leaks eventfds on every mach=
+ine
+>> reset.
+>>
+>=20
+> Reverting 4fe6d78b2e entirely isn't even enough and QEMU aborts at the
+> next machine reset. The following commit must be reverted as well:
+>=20
+> commit 6f0bb230722931d17fb284eee8efd40b9d653822
+> Author: Gal Hammer <ghammer@redhat.com>
+> Date:   Sun Jan 14 12:06:56 2018 +0200
+>=20
+>     virtio: improve virtio devices initialization time
 
-    http://lists.nongnu.org/archive/html/qemu-arm/2018-01/msg00514.html
+I'm a bit confused by this patch.  The basic idea of wrapping with
+transaction_begin/commit is clear (without it you have quadratic
+behavior from removing one ioeventfd at a time), but I don't understand
+why the new ->cleanup member is needed.
 
-Signed-off-by: Guido G=FCnther <agx@sigxcpu.org>
----
- linux-user/host/aarch64/safe-syscall.inc.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/linux-user/host/aarch64/safe-syscall.inc.S b/linux-user/host=
-/aarch64/safe-syscall.inc.S
-index 58a2329b37..e4fbc31454 100644
---- a/linux-user/host/aarch64/safe-syscall.inc.S
-+++ b/linux-user/host/aarch64/safe-syscall.inc.S
-@@ -36,7 +36,7 @@ safe_syscall_base:
- 	 *               and return the result in x0
- 	 * and the syscall instruction needs
- 	 *               x8 =3D=3D syscall number
--	 *               x0 ... x7 =3D=3D syscall arguments
-+	 *               x0 ... x5 =3D=3D syscall arguments
- 	 *               and returns the result in x0
- 	 * Shuffle everything around appropriately.
- 	 */
-@@ -47,7 +47,7 @@ safe_syscall_base:
- 	mov	x2, x4
- 	mov	x3, x5
- 	mov	x4, x6
--	mov	x6, x7
-+	mov	x5, x7
- 	ldr	x7, [sp]
-=20
- 	/* This next sequence of code works in conjunction with the
---=20
-2.15.1
+Paolo
