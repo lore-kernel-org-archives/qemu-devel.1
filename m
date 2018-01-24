@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eeLCq-0003df-2O
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:35:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1eeLHH-0007mh-ID
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eeLCm-0006GK-S8
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:35:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eeLCm-0006FM-HI
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:35:08 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7FC4B7EA9E
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 13:35:07 +0000 (UTC)
-Date: Wed, 24 Jan 2018 13:34:58 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180124133458.GA2497@work-vm>
-References: <20180110124723.11879-1-quintela@redhat.com>
-	<20180110124723.11879-8-quintela@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eeLHE-0002GF-Aa
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:39:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33228)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eeLHD-0002Et-UH
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:39:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eeLHC-0007Jk-A8
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 13:39:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3EB842E854F
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 13:39:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180110124723.11879-8-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 07/14] migration: Create thread
- infrastructure for multifd recv side
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Jan 2018 13:25:24 -0000
+From: Richard Jones <rjones@redhat.com>
+Reply-To: Bug 1269606 <1269606@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140115213002.25492.78294.malonedeb@wampee.canonical.com>
+Message-Id: <151680032437.19781.4815642139618743275.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1269606] Re: curl driver (https) always says "No
+ such file or directory"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,340 +37,321 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We make the locking and the transfer of information specific, even if we
-> are still receiving things through the main thread.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+I restored the original description.  Please report a new bug.
 
-It might be better to split the change to
-migration_incoming_process/setup out into a separate patch.
-I'm not too sure what it's trying to do here.
+** Description changed:
 
-> --
-> 
-> We split when we create the main channel and where we start the main
-> migration thread, so we wait for the creation of the other threads.
-> 
-> Use multifd_clear_pages().
-> Don't remove object_unref()
-> We use correctly the channel numbres
-> Denife multifd_new_channel/multifd_recv_thread in this patch, that is
-> where it is used.
-> rename migrate_new_channel to migrate_new_send_channel
-> Add ToDo comment
-> Add trace
-> ---
->  migration/migration.c  |   5 +-
->  migration/migration.h  |   1 +
->  migration/ram.c        | 129 ++++++++++++++++++++++++++++++++++++++++++++++---
->  migration/socket.c     |   3 ++
->  migration/trace-events |   2 +
->  5 files changed, 132 insertions(+), 8 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 77fc17f723..1545f3a0b0 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -406,7 +406,7 @@ static void migration_incoming_setup(QEMUFile *f)
->      qemu_file_set_blocking(f, false);
->  }
->  
-> -static void migration_incoming_process(void)
-> +void migration_incoming_process(void)
->  {
->      Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
->      qemu_coroutine_enter(co);
-> @@ -424,7 +424,8 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
->  
->      if (!mis->from_src_file) {
->          QEMUFile *f = qemu_fopen_channel_input(ioc);
-> -        migration_fd_process_incoming(f);
-> +        migration_incoming_setup(f);
-> +        return;
->      }
->      multifd_recv_new_channel(ioc);
->  }
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 29a7b79a39..7de193a9c0 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -172,6 +172,7 @@ void migrate_set_state(int *state, int old_state, int new_state);
->  
->  void migration_fd_process_incoming(QEMUFile *f);
->  void migration_ioc_process_incoming(QIOChannel *ioc);
-> +void migration_incoming_process(void);
->  
->  bool  migration_has_all_channels(void);
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 19c8089c4b..8443806f12 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -660,13 +660,20 @@ static uint16_t multifd_send_page(RAMBlock *block, ram_addr_t offset,
->  }
->  
++ =
 
-mostly same comments as the sent side:
+  I have a remote server, on which an http disk image definitely exists.
+- However the qemu curl block driver cannot open it.  It always gives the
++ However the qemu curl block driver cannot open it. It always gives the
+  bogus error:
+  =
 
->  struct MultiFDRecvParams {
-> +    /* not changed */
-?
+  CURL: Error opening file: Connection time-out
+  qemu-system-x86_64: -drive file=3Dhttp://onuma/scratch/cirros-0.3.1-x86_6=
+4-disk.img,snapshot=3Don,cache=3Dwriteback,id=3Dhd0,if=3Dnone: could not op=
+en disk image http://onuma/scratch/cirros-0.3.1-x86_64-disk.img: Could not =
+open backing file: Could not open 'http://onuma/scratch/cirros-0.3.1-x86_64=
+-disk.img': No such file or directory
+  =
 
->      uint8_t id;
->      char *name;
->      QemuThread thread;
->      QIOChannel *c;
-> +    QemuSemaphore ready;
->      QemuSemaphore sem;
->      QemuMutex mutex;
-> +    /* proteced by param mutex */
+  On the server, I can see from the logs that qemu/curl is opening it:
+  =
 
-Typo: 't'
+  192.168.0.175 - - [15/Jan/2014:21:25:37 +0000] "HEAD /scratch/cirros-0.3.=
+1-x86_64-disk.img HTTP/1.1" 200 - "-" "-"
+  192.168.0.175 - - [15/Jan/2014:21:25:37 +0000] "GET /scratch/cirros-0.3.1=
+-x86_64-disk.img HTTP/1.1" 206 264192 "-" "-"
+  =
 
->      bool quit;
-> +    /* how many patches has sent this channel */
+  I am using qemu & curl from git today.
+  =
 
-s/patches/packets/
+  curl: curl-7_34_0-177-gc7a76bb
+  qemu: for-anthony-839-g1cf892c
+  =
 
-> +    uint32_t packets_recv;
-> +    multifd_pages_t *pages;
-> +    bool done;
+  Here is the full command I am using:
+  =
 
->  };
->  typedef struct MultiFDRecvParams MultiFDRecvParams;
->  
-> @@ -676,6 +683,7 @@ struct {
->      int count;
->      /* Should we finish */
->      bool quit;
-> +    multifd_pages_t *pages;
->  } *multifd_recv_state;
->  
->  static void terminate_multifd_recv_threads(Error *errp)
-> @@ -721,15 +729,51 @@ int multifd_load_cleanup(Error **errp)
->          socket_recv_channel_unref(p->c);
->          g_free(p->name);
->          p->name = NULL;
-> +        multifd_pages_clear(p->pages);
-> +        p->pages = NULL;
->      }
->      g_free(multifd_recv_state->params);
->      multifd_recv_state->params = NULL;
-> +    multifd_pages_clear(multifd_recv_state->pages);
-> +    multifd_recv_state->pages = NULL;
->      g_free(multifd_recv_state);
->      multifd_recv_state = NULL;
->  
->      return ret;
->  }
->  
-> +static void *multifd_recv_thread(void *opaque)
-> +{
-> +    MultiFDRecvParams *p = opaque;
-> +
-> +    qemu_sem_post(&p->ready);
-> +    while (true) {
-> +        qemu_mutex_lock(&p->mutex);
-> +        if (p->quit) {
-> +            qemu_mutex_unlock(&p->mutex);
-> +            break;
-> +        }
-> +        if (p->pages->used) {
-> +            p->pages->used = 0;
-> +
-> +            trace_multifd_recv(p->id, p->pages->seq, p->pages->used);
+- 0622001a98105b80ecfad39dbf0b84c0ed71e12bb603a81a2b9b52e19ca7ae80E
++ http_proxy=3D \
++ LD_LIBRARY_PATH=3D/home/rjones/d/curl/lib/.libs \
++ LIBGUESTFS_BACKEND=3Ddirect \
++ LIBGUESTFS_HV=3D/home/rjones/d/qemu/x86_64-softmmu/qemu-system-x86_64 \
++ guestfish -v --ro -a http://onuma/scratch/cirros-0.3.1-x86_64-disk.img run
++ =
 
-Same as on send, ->used is 0 here
++ The full output (includes qemu command itself) is:
++ =
 
-> +            /* ToDo: receive pages here */
-> +
-> +            p->done = true;
-> +            p->packets_recv++;
-> +            qemu_mutex_unlock(&p->mutex);
-> +            qemu_sem_post(&p->ready);
-> +            continue;
-> +        }
-> +        qemu_mutex_unlock(&p->mutex);
-> +        qemu_sem_wait(&p->sem);
-> +    }
-> +    trace_multifd_recv_thread(p->id, p->packets_recv);
-> +
-> +    return NULL;
-> +}
-> +
->  int multifd_load_setup(void)
->  {
->      int thread_count;
-> @@ -742,6 +786,8 @@ int multifd_load_setup(void)
->      multifd_recv_state->params = g_new0(MultiFDRecvParams, thread_count);
->      multifd_recv_state->count = 0;
->      multifd_recv_state->quit = false;
-> +    multifd_pages_init(&multifd_recv_state->pages,
-> +                       migrate_multifd_page_count());
++ libguestfs: launch: program=3Dguestfish
++ libguestfs: launch: version=3D1.25.20fedora=3D21,release=3D1.fc21,libvirt
++ libguestfs: launch: backend registered: unix
++ libguestfs: launch: backend registered: uml
++ libguestfs: launch: backend registered: libvirt
++ libguestfs: launch: backend registered: direct
++ libguestfs: launch: backend=3Ddirect
++ libguestfs: launch: tmpdir=3D/tmp/libguestfsoQctgE
++ libguestfs: launch: umask=3D0002
++ libguestfs: launch: euid=3D1000
++ libguestfs: command: run: /usr/bin/supermin-helper
++ libguestfs: command: run: \ --verbose
++ libguestfs: command: run: \ -f checksum
++ libguestfs: command: run: \ --host-cpu x86_64
++ libguestfs: command: run: \ /usr/lib64/guestfs/supermin.d
++ supermin helper [00000ms] whitelist =3D (not specified)
++ supermin helper [00000ms] host_cpu =3D x86_64
++ supermin helper [00000ms] dtb_wildcard =3D (not specified)
++ supermin helper [00000ms] inputs:
++ supermin helper [00000ms] inputs[0] =3D /usr/lib64/guestfs/supermin.d
++ supermin helper [00000ms] outputs:
++ supermin helper [00000ms] kernel =3D (none)
++ supermin helper [00000ms] dtb =3D (none)
++ supermin helper [00000ms] initrd =3D (none)
++ supermin helper [00000ms] appliance =3D (none)
++ checking modpath /lib/modules/3.12.5-302.fc20.x86_64 is a directory
++ checking modpath /lib/modules/3.11.9-200.fc19.x86_64 is a directory
++ checking modpath /lib/modules/3.11.10-200.fc19.x86_64 is a directory
++ checking modpath /lib/modules/3.11.4-201.fc19.x86_64 is a directory
++ picked kernel vmlinuz-3.12.5-302.fc20.x86_64
++ supermin helper [00000ms] finished creating kernel
++ supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d
++ supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d/base.img=
+.gz
++ supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d/daemon.i=
+mg.gz
++ supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d/hostfiles
++ supermin helper [00041ms] visiting /usr/lib64/guestfs/supermin.d/init.img
++ supermin helper [00041ms] visiting /usr/lib64/guestfs/supermin.d/udev-rul=
+es.img
++ supermin helper [00041ms] adding kernel modules
++ supermin helper [00064ms] finished creating appliance
++ libguestfs: checksum of existing appliance: 2017df18eaeee7c45b87139c9bd80=
+be2216d655a1513322c47f58a7a3668cd1f
++ libguestfs: [00066ms] begin testing qemu features
++ libguestfs: command: run: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-=
+x86_64
++ libguestfs: command: run: \ -display none
++ libguestfs: command: run: \ -help
++ libguestfs: command: run: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-=
+x86_64
++ libguestfs: command: run: \ -display none
++ libguestfs: command: run: \ -version
++ libguestfs: qemu version 1.7
++ libguestfs: command: run: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-=
+x86_64
++ libguestfs: command: run: \ -display none
++ libguestfs: command: run: \ -machine accel=3Dkvm:tcg
++ libguestfs: command: run: \ -device ?
++ libguestfs: [00127ms] finished testing qemu features
++ [00128ms] /home/rjones/d/qemu/x86_64-softmmu/qemu-system-x86_64 \
++     -global virtio-blk-pci.scsi=3Doff \
++     -nodefconfig \
++     -enable-fips \
++     -nodefaults \
++     -display none \
++     -machine accel=3Dkvm:tcg \
++     -cpu host,+kvmclock \
++     -m 500 \
++     -no-reboot \
++     -no-hpet \
++     -kernel /var/tmp/.guestfs-1000/kernel.19645 \
++     -initrd /var/tmp/.guestfs-1000/initrd.19645 \
++     -device virtio-scsi-pci,id=3Dscsi \
++     -drive file=3Dhttp://onuma/scratch/cirros-0.3.1-x86_64-disk.img,snaps=
+hot=3Don,cache=3Dwriteback,id=3Dhd0,if=3Dnone \
++     -device scsi-hd,drive=3Dhd0 \
++     -drive file=3D/var/tmp/.guestfs-1000/root.19645,snapshot=3Don,id=3Dap=
+pliance,cache=3Dunsafe,if=3Dnone \
++     -device scsi-hd,drive=3Dappliance \
++     -device virtio-serial-pci \
++     -serial stdio \
++     -device sga \
++     -chardev socket,path=3D/tmp/libguestfsoQctgE/guestfsd.sock,id=3Dchann=
+el0 \
++     -device virtserialport,chardev=3Dchannel0,name=3Dorg.libguestfs.chann=
+el.0 \
++     -append 'panic=3D1 console=3DttyS0 udevtimeout=3D600 no_timer_check a=
+cpi=3Doff printk.time=3D1 cgroup_disable=3Dmemory root=3D/dev/sdb selinux=
+=3D0 guestfs_verbose=3D1 TERM=3Dxterm-256color'
++ CURL: Error opening file: Connection time-out
++ qemu-system-x86_64: -drive file=3Dhttp://onuma/scratch/cirros-0.3.1-x86_6=
+4-disk.img,snapshot=3Don,cache=3Dwriteback,id=3Dhd0,if=3Dnone: could not op=
+en disk image http://onuma/scratch/cirros-0.3.1-x86_64-disk.img: Could not =
+open image: Invalid argument
++ libguestfs: error: appliance closed the connection unexpectedly, see earl=
+ier error messages
++ libguestfs: child_cleanup: 0x7f07bf6599b0: child process died
++ libguestfs: sending SIGTERM to process 19654
++ libguestfs: error: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-x86_64 =
+exited with error status 1, see debug messages above
++ libguestfs: error: guestfs_launch failed, see earlier error messages
++ libguestfs: closing guestfs handle 0x7f07bf6599b0 (state 0)
++ libguestfs: command: run: rm
++ libguestfs: command: run: \ -rf /tmp/libguestfsoQctgE
 
-What happens if the migrate parameter for multifd-page-count is
-different on source and dest?
+** Summary changed:
 
->      return 0;
->  }
->  
-> @@ -752,7 +798,80 @@ int multifd_created_channels(void)
->  
->  void multifd_recv_new_channel(QIOChannel *ioc)
->  {
-> -    socket_recv_channel_unref(ioc);
-> +    MultiFDRecvParams *p;
-> +    MultiFDInit_t msg;
-> +    Error *local_err = NULL;
-> +    size_t ret;
-> +
-> +    ret = qio_channel_read_all(ioc, (char *)&msg, sizeof(msg), &local_err);
-> +    if (ret != 0) {
-> +        terminate_multifd_recv_threads(local_err);
-> +        return;
-> +    }
-> +
-> +    if (memcmp(msg.uuid, &qemu_uuid, sizeof(qemu_uuid))) {
-> +        char *uuid = qemu_uuid_unparse_strdup(&qemu_uuid);
-> +        error_setg(&local_err, "multifd: received uuid '%s' and expected "
-> +                   "uuid '%s' for channel %hhd", msg.uuid, uuid, msg.id);
-> +        g_free(uuid);
-> +        terminate_multifd_recv_threads(local_err);
-> +        return;
-> +    }
-> +
-> +    p = &multifd_recv_state->params[msg.id];
+- curl driver (https) always says "No such file or directory"
++ curl driver (http) always says "No such file or directory"
 
-msg.id needs to be checked against the size of params (thread_count ?)
-before that array index.
+-- =
 
-> +    if (p->id != 0) {
-> +        error_setg(&local_err, "multifd: received id '%d' already setup'",
-> +                   msg.id);
-> +        terminate_multifd_recv_threads(local_err);
-> +        return;
-> +    }
-> +    qemu_mutex_init(&p->mutex);
-> +    qemu_sem_init(&p->sem, 0);
-> +    qemu_sem_init(&p->ready, 0);
-> +    p->quit = false;
-> +    p->id = msg.id;
-> +    p->done = false;
-> +    multifd_pages_init(&p->pages, migrate_multifd_page_count());
-> +    p->c = ioc;
-> +    multifd_recv_state->count++;
-> +    p->name = g_strdup_printf("multifdrecv_%d", msg.id);
-> +    socket_recv_channel_ref(ioc);
-> +
-> +    qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-> +                       QEMU_THREAD_JOINABLE);
-> +    if (multifd_recv_state->count == migrate_multifd_channels()) {
-> +        migration_incoming_process();
-> +    }
-> +}
-> +
-> +static void multifd_recv_page(RAMBlock *block, ram_addr_t offset,
-> +                              uint8_t *address, uint16_t fd_num)
-> +{
-> +    int thread_count;
-> +    MultiFDRecvParams *p;
-> +    multifd_pages_t *pages = multifd_recv_state->pages;
-> +
-> +    pages->iov[pages->used].iov_base = address;
-> +    pages->iov[pages->used].iov_len = TARGET_PAGE_SIZE;
-> +    pages->used++;
-> +
-> +    if (fd_num == MULTIFD_CONTINUE) {
-> +        return;
-> +    }
-> +
-> +    thread_count = migrate_multifd_channels();
-> +    assert(fd_num < thread_count);
-> +    p = &multifd_recv_state->params[fd_num];
-> +
-> +    qemu_sem_wait(&p->ready);
-> +
-> +    qemu_mutex_lock(&p->mutex);
-> +    p->done = false;
-> +    p->pages->used = 0;
-> +    multifd_recv_state->pages = p->pages;
-> +    p->pages = pages;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1269606
 
-This needs a comment; I'm a bit confused - too many things called
-'pages' to know what is going where.  I think you've just waited for
-one of the threads to get data, then passed the received data
-out into multifd_recv_state?  But then the last p->pages = pages I'm
-not sure.
+Title:
+  curl driver (http) always says "No such file or directory"
 
+Status in QEMU:
+  New
 
-> +    qemu_mutex_unlock(&p->mutex);
-> +    qemu_sem_post(&p->sem);
->  }
->  
->  /**
-> @@ -3042,6 +3161,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      }
->  
->      while (!postcopy_running && !ret && !(flags & RAM_SAVE_FLAG_EOS)) {
-> +        RAMBlock *block = NULL;
->          ram_addr_t addr, total_ram_bytes;
->          void *host = NULL;
->          uint16_t fd_num;
-> @@ -3066,7 +3186,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
->                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
->                       RAM_SAVE_FLAG_MULTIFD_PAGE)) {
-> -            RAMBlock *block = ram_block_from_stream(f, flags);
-> +            block = ram_block_from_stream(f, flags);
->  
->              host = host_from_ram_block_offset(block, addr);
->              if (!host) {
-> @@ -3157,10 +3277,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->  
->          case RAM_SAVE_FLAG_MULTIFD_PAGE:
->              fd_num = qemu_get_be16(f);
-> -            if (fd_num != 0) {
-> -                /* this is yet an unused variable, changed later */
-> -                fd_num = fd_num;
-> -            }
-> +            multifd_recv_page(block, addr, host, fd_num);
->              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
->              break;
->  
-> diff --git a/migration/socket.c b/migration/socket.c
-> index aedabee8a1..ba23442175 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -192,6 +192,9 @@ out:
->      if (migration_has_all_channels()) {
->          /* Close listening socket as its no longer needed */
->          qio_channel_close(ioc, NULL);
-> +        if (!migrate_use_multifd()) {
-> +            migration_incoming_process();
-> +        }
->          return G_SOURCE_REMOVE;
->      } else {
->          return G_SOURCE_CONTINUE;
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 61ee21a13e..06aef4d4a3 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -77,7 +77,9 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
->  ram_postcopy_send_discard_bitmap(void) ""
->  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
->  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-> +multifd_recv(char id, int seq, int num) "channel %d sequence %d num pages %d"
->  multifd_send(char id, int seq, int num) "channel %d sequence %d num pages %d"
-> +multifd_recv_thread(char id, uint32_t packets) "channel %d packets %d"
->  multifd_send_thread(char id, uint32_t packets) "channel %d packets %d"
->  
->  # migration/migration.c
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Bug description:
+
+  I have a remote server, on which an http disk image definitely exists.
+  However the qemu curl block driver cannot open it. It always gives the
+  bogus error:
+
+  CURL: Error opening file: Connection time-out
+  qemu-system-x86_64: -drive file=3Dhttp://onuma/scratch/cirros-0.3.1-x86_6=
+4-disk.img,snapshot=3Don,cache=3Dwriteback,id=3Dhd0,if=3Dnone: could not op=
+en disk image http://onuma/scratch/cirros-0.3.1-x86_64-disk.img: Could not =
+open backing file: Could not open 'http://onuma/scratch/cirros-0.3.1-x86_64=
+-disk.img': No such file or directory
+
+  On the server, I can see from the logs that qemu/curl is opening it:
+
+  192.168.0.175 - - [15/Jan/2014:21:25:37 +0000] "HEAD /scratch/cirros-0.3.=
+1-x86_64-disk.img HTTP/1.1" 200 - "-" "-"
+  192.168.0.175 - - [15/Jan/2014:21:25:37 +0000] "GET /scratch/cirros-0.3.1=
+-x86_64-disk.img HTTP/1.1" 206 264192 "-" "-"
+
+  I am using qemu & curl from git today.
+
+  curl: curl-7_34_0-177-gc7a76bb
+  qemu: for-anthony-839-g1cf892c
+
+  Here is the full command I am using:
+
+  http_proxy=3D \
+  LD_LIBRARY_PATH=3D/home/rjones/d/curl/lib/.libs \
+  LIBGUESTFS_BACKEND=3Ddirect \
+  LIBGUESTFS_HV=3D/home/rjones/d/qemu/x86_64-softmmu/qemu-system-x86_64 \
+  guestfish -v --ro -a http://onuma/scratch/cirros-0.3.1-x86_64-disk.img run
+
+  The full output (includes qemu command itself) is:
+
+  libguestfs: launch: program=3Dguestfish
+  libguestfs: launch: version=3D1.25.20fedora=3D21,release=3D1.fc21,libvirt
+  libguestfs: launch: backend registered: unix
+  libguestfs: launch: backend registered: uml
+  libguestfs: launch: backend registered: libvirt
+  libguestfs: launch: backend registered: direct
+  libguestfs: launch: backend=3Ddirect
+  libguestfs: launch: tmpdir=3D/tmp/libguestfsoQctgE
+  libguestfs: launch: umask=3D0002
+  libguestfs: launch: euid=3D1000
+  libguestfs: command: run: /usr/bin/supermin-helper
+  libguestfs: command: run: \ --verbose
+  libguestfs: command: run: \ -f checksum
+  libguestfs: command: run: \ --host-cpu x86_64
+  libguestfs: command: run: \ /usr/lib64/guestfs/supermin.d
+  supermin helper [00000ms] whitelist =3D (not specified)
+  supermin helper [00000ms] host_cpu =3D x86_64
+  supermin helper [00000ms] dtb_wildcard =3D (not specified)
+  supermin helper [00000ms] inputs:
+  supermin helper [00000ms] inputs[0] =3D /usr/lib64/guestfs/supermin.d
+  supermin helper [00000ms] outputs:
+  supermin helper [00000ms] kernel =3D (none)
+  supermin helper [00000ms] dtb =3D (none)
+  supermin helper [00000ms] initrd =3D (none)
+  supermin helper [00000ms] appliance =3D (none)
+  checking modpath /lib/modules/3.12.5-302.fc20.x86_64 is a directory
+  checking modpath /lib/modules/3.11.9-200.fc19.x86_64 is a directory
+  checking modpath /lib/modules/3.11.10-200.fc19.x86_64 is a directory
+  checking modpath /lib/modules/3.11.4-201.fc19.x86_64 is a directory
+  picked kernel vmlinuz-3.12.5-302.fc20.x86_64
+  supermin helper [00000ms] finished creating kernel
+  supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d
+  supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d/base.img=
+.gz
+  supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d/daemon.i=
+mg.gz
+  supermin helper [00000ms] visiting /usr/lib64/guestfs/supermin.d/hostfiles
+  supermin helper [00041ms] visiting /usr/lib64/guestfs/supermin.d/init.img
+  supermin helper [00041ms] visiting /usr/lib64/guestfs/supermin.d/udev-rul=
+es.img
+  supermin helper [00041ms] adding kernel modules
+  supermin helper [00064ms] finished creating appliance
+  libguestfs: checksum of existing appliance: 2017df18eaeee7c45b87139c9bd80=
+be2216d655a1513322c47f58a7a3668cd1f
+  libguestfs: [00066ms] begin testing qemu features
+  libguestfs: command: run: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-=
+x86_64
+  libguestfs: command: run: \ -display none
+  libguestfs: command: run: \ -help
+  libguestfs: command: run: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-=
+x86_64
+  libguestfs: command: run: \ -display none
+  libguestfs: command: run: \ -version
+  libguestfs: qemu version 1.7
+  libguestfs: command: run: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-=
+x86_64
+  libguestfs: command: run: \ -display none
+  libguestfs: command: run: \ -machine accel=3Dkvm:tcg
+  libguestfs: command: run: \ -device ?
+  libguestfs: [00127ms] finished testing qemu features
+  [00128ms] /home/rjones/d/qemu/x86_64-softmmu/qemu-system-x86_64 \
+      -global virtio-blk-pci.scsi=3Doff \
+      -nodefconfig \
+      -enable-fips \
+      -nodefaults \
+      -display none \
+      -machine accel=3Dkvm:tcg \
+      -cpu host,+kvmclock \
+      -m 500 \
+      -no-reboot \
+      -no-hpet \
+      -kernel /var/tmp/.guestfs-1000/kernel.19645 \
+      -initrd /var/tmp/.guestfs-1000/initrd.19645 \
+      -device virtio-scsi-pci,id=3Dscsi \
+      -drive file=3Dhttp://onuma/scratch/cirros-0.3.1-x86_64-disk.img,snaps=
+hot=3Don,cache=3Dwriteback,id=3Dhd0,if=3Dnone \
+      -device scsi-hd,drive=3Dhd0 \
+      -drive file=3D/var/tmp/.guestfs-1000/root.19645,snapshot=3Don,id=3Dap=
+pliance,cache=3Dunsafe,if=3Dnone \
+      -device scsi-hd,drive=3Dappliance \
+      -device virtio-serial-pci \
+      -serial stdio \
+      -device sga \
+      -chardev socket,path=3D/tmp/libguestfsoQctgE/guestfsd.sock,id=3Dchann=
+el0 \
+      -device virtserialport,chardev=3Dchannel0,name=3Dorg.libguestfs.chann=
+el.0 \
+      -append 'panic=3D1 console=3DttyS0 udevtimeout=3D600 no_timer_check a=
+cpi=3Doff printk.time=3D1 cgroup_disable=3Dmemory root=3D/dev/sdb selinux=
+=3D0 guestfs_verbose=3D1 TERM=3Dxterm-256color'
+  CURL: Error opening file: Connection time-out
+  qemu-system-x86_64: -drive file=3Dhttp://onuma/scratch/cirros-0.3.1-x86_6=
+4-disk.img,snapshot=3Don,cache=3Dwriteback,id=3Dhd0,if=3Dnone: could not op=
+en disk image http://onuma/scratch/cirros-0.3.1-x86_64-disk.img: Could not =
+open image: Invalid argument
+  libguestfs: error: appliance closed the connection unexpectedly, see earl=
+ier error messages
+  libguestfs: child_cleanup: 0x7f07bf6599b0: child process died
+  libguestfs: sending SIGTERM to process 19654
+  libguestfs: error: /home/rjones/d/qemu/x86_64-softmmu/qemu-system-x86_64 =
+exited with error status 1, see debug messages above
+  libguestfs: error: guestfs_launch failed, see earlier error messages
+  libguestfs: closing guestfs handle 0x7f07bf6599b0 (state 0)
+  libguestfs: command: run: rm
+  libguestfs: command: run: \ -rf /tmp/libguestfsoQctgE
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1269606/+subscriptions
