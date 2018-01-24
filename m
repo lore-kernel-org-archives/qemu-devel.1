@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eeGzx-0006dc-H8
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:05:38 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eeH19-0007SS-G8
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eeGzs-00073q-GU
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:05:37 -0500
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:36752)
+	(envelope-from <dgilbert@redhat.com>) id 1eeH14-0000C4-Ek
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:06:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53370)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eeGzs-00072Z-7T
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:05:32 -0500
-Received: from player692.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 918AC11241F
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 10:05:26 +0100 (CET)
-Date: Wed, 24 Jan 2018 10:05:00 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180124100500.1f9bf54a@bahia.lan>
-In-Reply-To: <20180124094621.46ff2f43@bahia.lan>
-References: <1516747387-31760-1-git-send-email-mst@redhat.com>
-	<1516747387-31760-2-git-send-email-mst@redhat.com>
-	<20180124094621.46ff2f43@bahia.lan>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eeH14-00009l-8z
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:06:46 -0500
+Date: Wed, 24 Jan 2018 09:06:34 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180124090633.GB2496@work-vm>
+References: <20171205065307.21853-1-peterx@redhat.com>
+	<20171205065307.21853-27-peterx@redhat.com>
+	<20171219105859.GC2730@work-vm> <20180124082817.GF8001@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 1/1] kvm-all: Partially reverts 4fe6d78b2e
- to remove the cleanup call
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180124082817.GF8001@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v5 26/28] migration: allow migrate_cancel
+ to pause postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Anton Blanchard <anton@samba.org>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
 
-On Wed, 24 Jan 2018 09:46:21 +0100
-Greg Kurz <groug@kaod.org> wrote:
+* Peter Xu (peterx@redhat.com) wrote:
+> On Tue, Dec 19, 2017 at 10:58:59AM +0000, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > It was allowed in the past to even cancel a postcopy migration, but it
+> > > does not really make sense, and no one should be using it, since
+> > > cancelling a migration during postcopy means crashing the VM at no time.
+> > > 
+> > > Let's just use re-use this command as a way to pause the postcopy
+> > > migration when we detected that we are in postcopy migration.  This can
+> > > be used when we want to trigger the postcopy recovery manually.
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > 
+> > Yes, OK, this is a little odd without having any flags or anything, but
+> > it's essentially the saem reason that cancel exists - to stop a
+> > migration we know that's broken for some reason.
+> > 
+> > (I could argue whether this should be special cased in migrate_fd_cancel
+> > instead, but that's just a preference).
+> > 
+> > 
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Firstly, thanks for the r-b.
+> 
+> Now after knowing your iptable test, I think we reached a consensus
+> that we need to provide a command (for example, reuse migrate-cancel)
+> to allow destination to shutdown its incoming migration port too.  At
+> the same time, if we want to make sure the command can always work on
+> destination, we'd better also let that command to be OOB-capable.
+> 
+> However I'm not sure whether I can let migrate-cancel be OOB-capable
+> since recently we added bdrv_invalidate_cache_all() into
+> migrate_fd_cancel().  That invalidation needs some mutex which might
+> block.  I don't know whether it means migrate-cancel will no longer be
+> suitable as an OOB command now.
+> 
+> So, maybe now I can do this: firstly, drop this patch; then add a new
+> command to do the shutdown explicitly (allow either src/dst to
+> shutdown its migration fd) and keep migrate-cancel untouched. In that
+> case, I can make sure the new command will be OOB-compatible.
+> 
+> What do you think?
 
-> Please note that Peter usually doesn't work on Wednesdays. The master branch
-> might remain broken for everyone until tomorrow... :-\
-> 
-> And I don't think this is the right fix anyway. See below.
-> 
-> On Wed, 24 Jan 2018 00:44:14 +0200
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > 
-> > This commit partially reverts the commit 4fe6d78b2e because of issues
-> > reported in the virtio.
-> > 
-> > Examples:
-> > 
-> > $ qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G \
-> >   -M pseries,accel=kvm -netdev type=user,id=net0 \
-> >   -device virtio-net-pci,netdev=net0 -drive file=../disk.qcow2,if=virtio
-> > 
-> > Populating /vdevice/nvram@71000001
-> > Populating /vdevice/v-scsi@71000002
-> >        SCSI: Looking for devices
-> >           8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-> > Populating /pci@800000020000000
-> >                      00 0000 (D) : 1af4 1000    virtio [ net ]
-> > Aborted
-> > 
-> > $ qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
-> > 
-> > Running QEMU with GTK 2.x is deprecated, and will be removed
-> > in a future release. Please switch to GTK 3.x instead
-> > [1]    5282 abort
-> > 
-> > Reference http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
-> > 
-> > Reported-by: Anton Blanchard <anton@samba.org>
-> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  accel/kvm/kvm-all.c | 4 ----
-> >  1 file changed, 4 deletions(-)
-> > 
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index 071f4f5..f290f48 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
-> >      if (r < 0) {
-> >          abort();
-> >      }
-> > -
-> > -    if (e->cleanup) {
-> > -        e->cleanup(e);
-> > -    }  
-> 
-> This looks wrong as the cleanup is expected to do things like closing fds:
-> 
-> static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
-> {
->     /* Test and clear notifier after disabling event,
->      * in case poll callback didn't have time to run.
->      */
->     virtio_queue_host_notifier_read(notifier);
->     event_notifier_cleanup(notifier);
-> }
-> 
-> void event_notifier_cleanup(EventNotifier *e)
-> {
->     if (e->rfd != e->wfd) {
->         close(e->rfd);
->     }
->     close(e->wfd);
->     e->rfd = -1;
->     e->wfd = -1;
->     e->cleanup = NULL;
-> }
-> 
-> And indeed, with this patch applied, QEMU leaks eventfds on every machine
-> reset.
-> 
+Yes I'm fine with that; misusing another command did feel a bit odd.
 
-Reverting 4fe6d78b2e entirely isn't even enough and QEMU aborts at the
-next machine reset. The following commit must be reverted as well:
+Dave
 
-commit 6f0bb230722931d17fb284eee8efd40b9d653822
-Author: Gal Hammer <ghammer@redhat.com>
-Date:   Sun Jan 14 12:06:56 2018 +0200
-
-    virtio: improve virtio devices initialization time
-
-> >  }
-> >  
-> >  static void kvm_io_ioeventfd_add(MemoryListener *listener,  
-> 
-> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
