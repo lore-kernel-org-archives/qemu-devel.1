@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eeOl4-0007yv-7e
+	(envelope-from <mst@redhat.com>) id 1eeOl4-0007yw-8A
 	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:22:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eeOl0-0006Ub-4O
+	(envelope-from <mst@redhat.com>) id 1eeOl2-0006Xv-90
 	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:22:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41010)
+Received: from mx1.redhat.com ([209.132.183.28]:33466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eeOkz-0006Tk-Ui
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:22:42 -0500
-Date: Wed, 24 Jan 2018 19:22:39 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eeOl2-0006Wf-2c
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 12:22:44 -0500
+Date: Wed, 24 Jan 2018 19:22:40 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516814467-25906-1-git-send-email-mst@redhat.com>
+Message-ID: <1516814467-25906-2-git-send-email-mst@redhat.com>
+References: <1516814467-25906-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PULL v2 0/3] virtio: quick fix
+In-Reply-To: <1516814467-25906-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL v2 1/3] Revert "virtio: improve virtio devices
+ initialization time"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +28,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gal Hammer <ghammer@redhat.com>, Sitong Liu <siliu@redhat.com>, Xiaoling Gao <xiagao@redhat.com>, Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-So this just reverts Gal's patches. I hope he'll be able to resubmit
-shortly but it's causing too many issues to too many people to try to do
-incremental fixups, and this way there's no timing pressure on anyone.
+This reverts commit 6f0bb230722931d17fb284eee8efd40b9d653822.
 
-The following changes since commit 52483b067cce4a88ffbf8fbeea26de7549d2ad23:
+This reverts commit f87d72f5c5bff0837d409a56bd34f439a90119ca as that is
+reported to break cleanup and migration.
 
-  Merge remote-tracking branch 'remotes/huth/tags/pull-request-2018-01-22' into staging (2018-01-23 10:15:09 +0000)
+Cc: Gal Hammer <ghammer@redhat.com>
+Cc: Sitong Liu <siliu@redhat.com>
+Cc: Xiaoling Gao <xiagao@redhat.com>
+Suggested-by: Greg Kurz <groug@kaod.org>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Reported-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Reported-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ hw/virtio/virtio.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to e044c0f8dd028ea296396ad8066ba436e9acf350:
-
-  Revert "qemu: add a cleanup callback function to EventNotifier" (2018-01-24 19:20:19 +0200)
-
-----------------------------------------------------------------
-virtio: quick fix
-
-Fixes a regression in virtio that's causing issues
-for many people.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Michael S. Tsirkin (3):
-      Revert "virtio: improve virtio devices initialization time"
-      Revert "virtio: postpone the execution of event_notifier_cleanup function"
-      Revert "qemu: add a cleanup callback function to EventNotifier"
-
- include/qemu/event_notifier.h |  1 -
- accel/kvm/kvm-all.c           |  4 ----
- hw/virtio/virtio-bus.c        | 19 ++++++++-----------
- hw/virtio/virtio.c            |  5 -----
- util/event_notifier-posix.c   |  5 +----
- util/event_notifier-win32.c   |  2 --
- 6 files changed, 9 insertions(+), 27 deletions(-)
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 3ac3491..d6002ee 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2574,7 +2574,6 @@ static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
+     VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
+     int n, r, err;
+ 
+-    memory_region_transaction_begin();
+     for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
+         VirtQueue *vq = &vdev->vq[n];
+         if (!virtio_queue_get_num(vdev, n)) {
+@@ -2597,7 +2596,6 @@ static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
+         }
+         event_notifier_set(&vq->host_notifier);
+     }
+-    memory_region_transaction_commit();
+     return 0;
+ 
+ assign_error:
+@@ -2611,7 +2609,6 @@ assign_error:
+         r = virtio_bus_set_host_notifier(qbus, n, false);
+         assert(r >= 0);
+     }
+-    memory_region_transaction_commit();
+     return err;
+ }
+ 
+@@ -2628,7 +2625,6 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
+     VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
+     int n, r;
+ 
+-    memory_region_transaction_begin();
+     for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
+         VirtQueue *vq = &vdev->vq[n];
+ 
+@@ -2639,7 +2635,6 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
+         r = virtio_bus_set_host_notifier(qbus, n, false);
+         assert(r >= 0);
+     }
+-    memory_region_transaction_commit();
+ }
+ 
+ void virtio_device_stop_ioeventfd(VirtIODevice *vdev)
+-- 
+MST
