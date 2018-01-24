@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeGQ8-000208-1v
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:28:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eeGXh-0004dZ-Ds
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:36:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeGQ4-00033B-2v
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:28:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35608)
+	(envelope-from <pbonzini@redhat.com>) id 1eeGXd-0004mj-Fz
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:36:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeGQ3-00030l-Sq
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:28:32 -0500
-Date: Wed, 24 Jan 2018 16:28:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180124082817.GF8001@xz-mi>
-References: <20171205065307.21853-1-peterx@redhat.com>
-	<20171205065307.21853-27-peterx@redhat.com>
-	<20171219105859.GC2730@work-vm>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eeGXd-0004ll-9a
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:36:21 -0500
+References: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <91c5c098-702a-5c48-a56c-6f81fcdde264@redhat.com>
+Date: Wed, 24 Jan 2018 09:36:15 +0100
 MIME-Version: 1.0
+In-Reply-To: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171219105859.GC2730@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v5 26/28] migration: allow migrate_cancel
- to pause postcopy
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory-internal.h: Remove obsolete claim
+ that header is obsolete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Tue, Dec 19, 2017 at 10:58:59AM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > It was allowed in the past to even cancel a postcopy migration, but it
-> > does not really make sense, and no one should be using it, since
-> > cancelling a migration during postcopy means crashing the VM at no time.
-> > 
-> > Let's just use re-use this command as a way to pause the postcopy
-> > migration when we detected that we are in postcopy migration.  This can
-> > be used when we want to trigger the postcopy recovery manually.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
+On 21/11/2017 16:08, Peter Maydell wrote:
+> The memory-internal.h header claims that it is for "obsolete
+> exec.c functions" which "will be removed soon". This statement
+> was added in 2011, six years ago, but the header is still here.
+> (Admittedly none of the prototypes added in commit 67d95c153bef55f6
+> are still in the header.)
 > 
-> Yes, OK, this is a little odd without having any flags or anything, but
-> it's essentially the saem reason that cancel exists - to stop a
-> migration we know that's broken for some reason.
+> It's convenient to have a place to put prototypes for functions
+> which are used internally to the various .c files of the memory
+> system or by the accel/tcg code, which is inevitably fairly
+> closely coupled. So keep the header but update the comments to
+> reflect what we're actually using it for.
 > 
-> (I could argue whether this should be special cased in migrate_fd_cancel
-> instead, but that's just a preference).
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/exec/memory-internal.h | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
+> diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+> index 98d8296..4162474 100644
+> --- a/include/exec/memory-internal.h
+> +++ b/include/exec/memory-internal.h
+> @@ -1,5 +1,5 @@
+>  /*
+> - * Declarations for obsolete exec.c functions
+> + * Declarations for functions which are internal to the memory subsystem.
+>   *
+>   * Copyright 2011 Red Hat, Inc. and/or its affiliates
+>   *
+> @@ -12,8 +12,9 @@
+>   */
+>  
+>  /*
+> - * This header is for use by exec.c and memory.c ONLY.  Do not include it.
+> - * The functions declared here will be removed soon.
+> + * This header is for use by exec.c, memory.c and accel/tcg/cputlb.c ONLY,
+> + * for declarations which are shared between the memory subsystem's
+> + * internals and the TCG TLB code. Do not include it from elsewhere.
+>   */
+>  
+>  #ifndef MEMORY_INTERNAL_H
 > 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Firstly, thanks for the r-b.
+Queued, thanks.
 
-Now after knowing your iptable test, I think we reached a consensus
-that we need to provide a command (for example, reuse migrate-cancel)
-to allow destination to shutdown its incoming migration port too.  At
-the same time, if we want to make sure the command can always work on
-destination, we'd better also let that command to be OOB-capable.
-
-However I'm not sure whether I can let migrate-cancel be OOB-capable
-since recently we added bdrv_invalidate_cache_all() into
-migrate_fd_cancel().  That invalidation needs some mutex which might
-block.  I don't know whether it means migrate-cancel will no longer be
-suitable as an OOB command now.
-
-So, maybe now I can do this: firstly, drop this patch; then add a new
-command to do the shutdown explicitly (allow either src/dst to
-shutdown its migration fd) and keep migrate-cancel untouched. In that
-case, I can make sure the new command will be OOB-compatible.
-
-What do you think?
-
--- 
-Peter Xu
+Paolo
