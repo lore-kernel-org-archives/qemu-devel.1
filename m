@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURL-0004UN-5T
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURO-0004XD-2q
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURK-0001fA-0D
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:47 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:38591)
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURN-0001gY-91
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:50 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36932)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeURJ-0001eg-RS
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:45 -0500
-Received: by mail-pg0-x243.google.com with SMTP id y27so3814880pgc.5
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:45 -0800 (PST)
+	id 1eeURN-0001gI-3g
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:49 -0500
+Received: by mail-pg0-x242.google.com with SMTP id z17so3815345pgc.4
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:48 -0800 (PST)
 Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
 	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
-	z19sm9760028pfh.185.2018.01.24.15.26.43 for <qemu-devel@nongnu.org>
+	z19sm9760028pfh.185.2018.01.24.15.26.46 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Jan 2018 15:26:43 -0800 (PST)
+	Wed, 24 Jan 2018 15:26:46 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 24 Jan 2018 15:25:51 -0800
-Message-Id: <20180124232625.30105-12-richard.henderson@linaro.org>
+Date: Wed, 24 Jan 2018 15:25:53 -0800
+Message-Id: <20180124232625.30105-14-richard.henderson@linaro.org>
 In-Reply-To: <20180124232625.30105-1-richard.henderson@linaro.org>
 References: <20180124232625.30105-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 11/45] target/hppa: Implement rfi
+Subject: [Qemu-devel] [PATCH v3 13/45] target/hppa: Implement unaligned
+ access trap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,130 +36,45 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h       |  1 +
- target/hppa/helper.h    |  2 ++
- target/hppa/op_helper.c | 24 ++++++++++++++++++++++++
- target/hppa/translate.c | 30 ++++++++++++++++++++++++++++--
- 4 files changed, 55 insertions(+), 2 deletions(-)
+ target/hppa/cpu.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index c92c564a7f..6ec3430ae3 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -178,6 +178,7 @@ struct CPUHPPAState {
- 
-     target_ureg cr[32];      /* control registers */
-     target_ureg cr_back[2];  /* back of cr17/cr18 */
-+    target_ureg shadow[7];   /* shadow registers */
- 
-     /* Those resources are used only in QEMU core */
-     CPU_COMMON
-diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 254a4da133..79d22ae486 100644
---- a/target/hppa/helper.h
-+++ b/target/hppa/helper.h
-@@ -78,5 +78,7 @@ DEF_HELPER_FLAGS_4(fmpyfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
- DEF_HELPER_FLAGS_4(fmpynfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
- 
- #ifndef CONFIG_USER_ONLY
-+DEF_HELPER_1(rfi, void, env)
-+DEF_HELPER_1(rfi_r, void, env)
- DEF_HELPER_FLAGS_2(swap_system_mask, TCG_CALL_NO_RWG, tr, env, tr)
- #endif
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index 1c3e043cc0..3f5dcbbca0 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -614,4 +614,28 @@ target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
-     env->psw = (psw & ~PSW_SM) | (nsm & PSW_SM);
-     return psw & PSW_SM;
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index ca619578dd..4d0b760baa 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -48,6 +48,23 @@ static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
+     info->print_insn = print_insn_hppa;
  }
-+
-+void HELPER(rfi)(CPUHPPAState *env)
+ 
++static void hppa_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
++                                         MMUAccessType access_type,
++                                         int mmu_idx, uintptr_t retaddr)
 +{
-+    /* ??? On second reading this condition simply seems
-+       to be undefined rather than a diagnosed trap.  */
-+    if (env->psw & (PSW_I | PSW_R | PSW_Q)) {
-+        helper_excp(env, EXCP_ILL);
++    HPPACPU *cpu = HPPA_CPU(cs);
++    CPUHPPAState *env = &cpu->env;
++
++    cs->exception_index = EXCP_UNALIGN;
++    if (env->psw & PSW_Q) {
++        /* ??? Needs tweaking for hppa64.  */
++        env->cr[CR_IOR] = addr;
++        env->cr[CR_ISR] = addr >> 32;
 +    }
-+    env->iaoq_f = env->cr[CR_IIAOQ];
-+    env->iaoq_b = env->cr_back[1];
-+    cpu_hppa_put_psw(env, env->cr[CR_IPSW]);
++
++    cpu_loop_exit_restore(cs, retaddr);
 +}
 +
-+void HELPER(rfi_r)(CPUHPPAState *env)
-+{
-+    env->gr[1] = env->shadow[0];
-+    env->gr[8] = env->shadow[1];
-+    env->gr[9] = env->shadow[2];
-+    env->gr[16] = env->shadow[3];
-+    env->gr[17] = env->shadow[4];
-+    env->gr[24] = env->shadow[5];
-+    env->gr[25] = env->shadow[6];
-+    helper_rfi(env);
-+}
- #endif
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 8ca58f3df3..df0bb04907 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -655,6 +655,10 @@ static DisasJumpType nullify_end(DisasContext *ctx, DisasJumpType status)
+ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
  {
-     TCGLabel *null_lab = ctx->null_lab;
- 
-+    /* For NEXT, NORETURN, STALE, we can easily continue (or exit).
-+       For UPDATED, we cannot update on the nullified path.  */
-+    assert(status != DISAS_IAQ_N_UPDATED);
-+
-     if (likely(null_lab == NULL)) {
-         /* The current insn wasn't conditional or handled the condition
-            applied to it without a branch, so the (new) setting of
-@@ -676,8 +680,6 @@ static DisasJumpType nullify_end(DisasContext *ctx, DisasJumpType status)
-         gen_set_label(null_lab);
-         ctx->null_cond = cond_make_n();
-     }
--
--    assert(status != DISAS_NORETURN && status != DISAS_IAQ_N_UPDATED);
-     if (status == DISAS_NORETURN) {
-         status = DISAS_NEXT;
-     }
-@@ -2153,6 +2155,29 @@ static DisasJumpType trans_mtsm(DisasContext *ctx, uint32_t insn,
-     /* Exit the TB to recognize new interrupts.  */
-     return nullify_end(ctx, DISAS_IAQ_N_STALE_EXIT);
- }
-+
-+static DisasJumpType trans_rfi(DisasContext *ctx, uint32_t insn,
-+                               const DisasInsn *di)
-+{
-+    unsigned comp = extract32(insn, 5, 4);
-+
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+    nullify_over(ctx);
-+
-+    if (comp == 5) {
-+        gen_helper_rfi_r(cpu_env);
-+    } else {
-+        gen_helper_rfi(cpu_env);
-+    }
-+    if (ctx->base.singlestep_enabled) {
-+        gen_excp_1(EXCP_DEBUG);
-+    } else {
-+        tcg_gen_exit_tb(0);
-+    }
-+
-+    /* Exit the TB to recognize new interrupts.  */
-+    return nullify_end(ctx, DISAS_NORETURN);
-+}
- #endif /* !CONFIG_USER_ONLY */
- 
- static const DisasInsn table_system[] = {
-@@ -2169,6 +2194,7 @@ static const DisasInsn table_system[] = {
-     { 0x00000e60u, 0xfc00ffe0u, trans_rsm },
-     { 0x00000d60u, 0xfc00ffe0u, trans_ssm },
-     { 0x00001860u, 0xffe0ffffu, trans_mtsm },
-+    { 0x00000c00u, 0xfffffe1fu, trans_rfi },
+     CPUState *cs = CPU(dev);
+@@ -139,7 +156,7 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
+ #else
+     cc->get_phys_page_debug = hppa_cpu_get_phys_page_debug;
  #endif
- };
+-
++    cc->do_unaligned_access = hppa_cpu_do_unaligned_access;
+     cc->disas_set_info = hppa_cpu_disas_set_info;
+     cc->tcg_initialize = hppa_translate_init;
  
 -- 
 2.14.3
