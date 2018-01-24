@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eeJHA-000076-KU
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 06:31:33 -0500
+	(envelope-from <prvs=555fae414=Ian.Jackson@citrix.com>)
+	id 1eeJHe-0000LN-4r
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 06:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eeJH9-00022j-O4
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 06:31:32 -0500
-Date: Wed, 24 Jan 2018 11:31:23 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180124113123.GB17193@stefanha-x1.localdomain>
-References: <1516633309-20803-1-git-send-email-mark.kanda@oracle.com>
+	(envelope-from <prvs=555fae414=Ian.Jackson@citrix.com>)
+	id 1eeJHb-0002O5-0j
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 06:32:02 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:31817)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=555fae414=Ian.Jackson@citrix.com>)
+	id 1eeJHa-0002M8-Qt
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 06:31:58 -0500
+From: Ian Jackson <ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qlTNgmc+xy1dBmNv"
-Content-Disposition: inline
-In-Reply-To: <1516633309-20803-1-git-send-email-mark.kanda@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: check for NULL BlockDriverState
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23144.28329.891216.174515@mariner.uk.xensource.com>
+Date: Wed, 24 Jan 2018 11:31:53 +0000
+In-Reply-To: <d2261f2c-b727-6b1c-183b-78a7661a8741@citrix.com>
+References: <1508431916-9412-1-git-send-email-ian.jackson@eu.citrix.com>
+	<20171020133001.GD11934@perard.uk.xensource.com>
+	<23017.64539.31230.43449@mariner.uk.xensource.com>
+	<d2261f2c-b727-6b1c-183b-78a7661a8741@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/8] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, karl.heubaum@oracle.com, ameya.more@oracle.com, Mark Kanda <mark.kanda@oracle.com>
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano  Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
+Ross Lagerwall writes ("Re: [PATCH v5 0/8] xen: xen-domid-restrict improvements"):
+> What's the status of this patch series? There don't seem to be many 
+> outstanding complaints but they haven't been pushed into master. At 
+> least the Xen changes have all been reviewed by Anthony (except for 
+> configure changes) so they could probably go in.
 
---qlTNgmc+xy1dBmNv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The short answer is I don't really know; my brain was eaten by
+meltdown/spectre.  I'll hope to get back to this RSN.
 
-On Mon, Jan 22, 2018 at 09:01:49AM -0600, Mark Kanda wrote:
-> Add a BlockDriverState NULL check to virtio_blk_handle_request()
-> to prevent a segfault if the drive is forcibly removed using HMP
-> 'drive_del' (without performing a hotplug 'device_del' first).
->=20
-> Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> Reviewed-by: Ameya More <ameya.more@oracle.com>
-> ---
->  hw/block/virtio-blk.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index b1532e4..76ddbbf 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -507,6 +507,13 @@ static int virtio_blk_handle_request(VirtIOBlockReq =
-*req, MultiReqBuffer *mrb)
->          return -1;
->      }
-> =20
-> +    /* If the drive was forcibly removed (e.g. HMP 'drive_del'), the blo=
-ck
-> +     * driver state may be NULL and there is nothing left to do. */
-> +    if (!blk_bs(req->dev->blk)) {
-
-Adding Markus Armbruster to check my understanding of drive_del:
-
-1. If id is a node name (e.g. created via blockdev-add) then attempting
-   to remove the root node produces the "Node %s is in use" error.  In
-   that case this patch isn't needed.
-
-2. If id is a BlockBackend (e.g. created via -drive) then removing the
-   root node is allowed.  The BlockBackend stays in place but blk->root
-   becomes NULL, hence this patch is needed.
-
-Markus: What are the valid use cases for #2?  If blk->bs becomes NULL I
-would think a lot more code beyond virtio-blk can segfault.
-
-> +        virtio_error(vdev, "virtio-blk BlockDriverState is NULL");
-> +        return -1;
-> +    }
-> +
->      /* We always touch the last byte, so just see how big in_iov is.  */
->      req->in_len =3D iov_size(in_iov, in_num);
->      req->in =3D (void *)in_iov[in_num - 1].iov_base
-> --=20
-> 1.8.3.1
->=20
-
---qlTNgmc+xy1dBmNv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaaG6LAAoJEJykq7OBq3PI7mEH/2scS6onYMcL8K8SWg2CggmX
-yB8WG6ak12/wOm5DxWWhTKUvX0XxqMO4cY0iOBJzKdPRoffktTcsTaCBZzPh4LkF
-MaUoVc48hotNXczSPtsB3WGzM7k2xd6LspsUNVwl6uXuX3xemQJINFZCYDtho1fk
-9fXwv1C3AWmOUH2Qw8dGBlXuOOcpk3GUZdxgjSCR14p9J1ODWNrJowDgYnHpnGyr
-5+p2n3Ldy8uYSICPNwsDe32khRyiNOWiYVbPxBBa4xBGCgEd4vbWZfJL79UK3Mh5
-mSbwdmDAeoaZ/XlgySeLSyemnGFo0ZpZueFNwN11lw0ni6wSne3EoGlx5094J78=
-=2DH8
------END PGP SIGNATURE-----
-
---qlTNgmc+xy1dBmNv--
+Thanks,
+Ian.
