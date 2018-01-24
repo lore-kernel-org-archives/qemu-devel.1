@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee94x-0003Hp-BT
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:39:48 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee95i-0003Yj-9L
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ee93t-0008DE-6v
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:38:15 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ee95G-0002zo-1W
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:39:02 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:40176)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ee95F-0002vw-Kf
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 19:38:33 -0500
+Received: by mail-lf0-x244.google.com with SMTP id h92so2944130lfi.7
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 16:38:33 -0800 (PST)
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180123020820.1288-17-f4bug@amsat.org>
+In-Reply-To: <20180123020820.1288-10-f4bug@amsat.org>
 References: <20180123020820.1288-1-f4bug@amsat.org>
-	<20180123020820.1288-17-f4bug@amsat.org>
+	<20180123020820.1288-10-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 23 Jan 2018 16:36:36 -0800
-Message-ID: <CAKmqyKMDrb2VJsndm1X1Bk_iPmLJ_MpSAx6DJqJ49_d1B7-3Dw@mail.gmail.com>
+Date: Tue, 23 Jan 2018 16:38:01 -0800
+Message-ID: <CAKmqyKNghZ3BJFURBC4195Ztq2oN8iEz6FnB7W38ySvnJAroBA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 16/16] hw/arm/xilinx_zynq: fix the
- capabilities register to match the datasheet
+Subject: Re: [Qemu-devel] [PATCH v9 09/16] sdhci: simplify
+ sdhci_get_fifolen()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,12 +33,10 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin O'Connor <kevin@koconnor.net>, "open list:Xilinx Zynq" <qemu-arm@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin O'Connor <kevin@koconnor.net>, Marcel Apfelbaum <marcel@redhat.com>
 
 On Mon, Jan 22, 2018 at 6:08 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
-> checking Xilinx datasheet "UG585" (v1.12.1)
->
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
@@ -39,113 +44,72 @@ Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Alistair
 
 > ---
->  hw/arm/xilinx_zynq.c | 53 ++++++++++++++++++++++++++++------------------=
-------
->  tests/sdhci-test.c   |  5 +++++
->  2 files changed, 34 insertions(+), 24 deletions(-)
+>  hw/sd/sdhci-internal.h |  4 +++-
+>  hw/sd/sdhci.c          | 20 +++++---------------
+>  2 files changed, 8 insertions(+), 16 deletions(-)
 >
-> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-> index 1836a4ed45..0f76333770 100644
-> --- a/hw/arm/xilinx_zynq.c
-> +++ b/hw/arm/xilinx_zynq.c
-> @@ -61,6 +61,8 @@ static const int dma_irqs[8] =3D {
->  #define SLCR_XILINX_UNLOCK_KEY  0xdf0d
->  #define SLCR_XILINX_LOCK_KEY    0x767b
+> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+> index b7751c815f..577ca9da54 100644
+> --- a/hw/sd/sdhci-internal.h
+> +++ b/hw/sd/sdhci-internal.h
+> @@ -24,6 +24,8 @@
+>  #ifndef SDHCI_INTERNAL_H
+>  #define SDHCI_INTERNAL_H
 >
-> +#define ZYNQ_SDHCI_CAPABILITIES 0x69ec0080  /* Datasheet: UG585 (v1.12.1=
-) */
+> +#include "hw/registerfields.h"
 > +
->  #define ARMV7_IMM16(x) (extract32((x),  0, 12) | \
->                          extract32((x), 12,  4) << 16)
+>  /* R/W SDMA System Address register 0x0 */
+>  #define SDHC_SYSAD                     0x00
 >
-> @@ -165,10 +167,8 @@ static void zynq_init(MachineState *machine)
->      MemoryRegion *address_space_mem =3D get_system_memory();
->      MemoryRegion *ext_ram =3D g_new(MemoryRegion, 1);
->      MemoryRegion *ocm_ram =3D g_new(MemoryRegion, 1);
-> -    DeviceState *dev, *carddev;
-> +    DeviceState *dev;
->      SysBusDevice *busdev;
-> -    DriveInfo *di;
-> -    BlockBackend *blk;
->      qemu_irq pic[64];
->      int n;
+> @@ -179,7 +181,7 @@
+>  #define SDHC_CAN_DO_ADMA2              0x00080000
+>  #define SDHC_CAN_DO_ADMA1              0x00100000
+>  #define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
+> -#define SDHC_CAPAB_BLOCKSIZE(x)        (((x) >> 16) & 0x3)
+> +FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
 >
-> @@ -247,27 +247,32 @@ static void zynq_init(MachineState *machine)
->      gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
->      gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
+>  /* HWInit Maximum Current Capabilities Register 0x0 */
+>  #define SDHC_MAXCURR                   0x48
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 1c781c4ba5..dce1a49af1 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -59,6 +59,11 @@
+>   */
+>  #define SDHC_CAPAB_REG_DEFAULT 0x057834b4
 >
-> -    dev =3D qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-> -    qdev_init_nofail(dev);
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
-> -    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
-> -
-> -    di =3D drive_get_next(IF_SD);
-> -    blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
-> -    carddev =3D qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_C=
-ARD);
-> -    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-> -    object_property_set_bool(OBJECT(carddev), true, "realized", &error_f=
-atal);
-> -
-> -    dev =3D qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-> -    qdev_init_nofail(dev);
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
-> -    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
-> -
-> -    di =3D drive_get_next(IF_SD);
-> -    blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
-> -    carddev =3D qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_C=
-ARD);
-> -    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-> -    object_property_set_bool(OBJECT(carddev), true, "realized", &error_f=
-atal);
-> +    for (n =3D 0; n < 2; n++) {
-> +        int hci_irq =3D n ? 79 : 56;
-> +        hwaddr hci_addr =3D n ? 0xE0101000 : 0xE0100000;
-> +        DriveInfo *di;
-> +        BlockBackend *blk;
-> +        DeviceState *carddev;
+> +static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+> +{
+> +    return 1 << (9 + FIELD_EX32(s->capareg, SDHC_CAPAB, MAXBLOCKLENGTH))=
+;
+> +}
 > +
-> +        /* Compatible with:
-> +         * - SD Host Controller Specification Version 2.0 Part A2
-> +         * - SDIO Specification Version 2.0
-> +         * - MMC Specification Version 3.31
-> +         */
-> +        dev =3D qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-> +        qdev_prop_set_uint8(dev, "sd-spec-version", 2);
-> +        qdev_prop_set_uint64(dev, "capareg", ZYNQ_SDHCI_CAPABILITIES);
-> +        qdev_init_nofail(dev);
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, hci_addr);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[hci_irq - IRQ_OFF=
-SET]);
-> +
-> +        di =3D drive_get_next(IF_SD);
-> +        blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
-> +        carddev =3D qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_=
-SD_CARD);
-> +        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-> +        object_property_set_bool(OBJECT(carddev), true, "realized",
-> +                                 &error_fatal);
-> +    }
->
->      dev =3D qdev_create(NULL, TYPE_ZYNQ_XADC);
->      qdev_init_nofail(dev);
-> diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-> index 094e0570e1..aae2cfc1b5 100644
-> --- a/tests/sdhci-test.c
-> +++ b/tests/sdhci-test.c
-> @@ -41,6 +41,11 @@ static const struct sdhci_t {
->      /* Exynos4210 */
->      { "arm",    "smdkc210",
->          {0x12510000, 2, 0,  {1, 0x5e80080} } },
-> +
-> +    /* Zynq-7000 */
-> +    { "arm",    "xilinx-zynq-a9",   /* Datasheet: UG585 (v1.12.1) */
-> +        {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
-> +
+>  static uint8_t sdhci_slotint(SDHCIState *s)
+>  {
+>      return (s->norintsts & s->norintsigen) || (s->errintsts & s->errints=
+igen) ||
+> @@ -1118,21 +1123,6 @@ static const MemoryRegionOps sdhci_mmio_ops =3D {
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
 >  };
 >
->  static struct {
+> -static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+> -{
+> -    switch (SDHC_CAPAB_BLOCKSIZE(s->capareg)) {
+> -    case 0:
+> -        return 512;
+> -    case 1:
+> -        return 1024;
+> -    case 2:
+> -        return 2048;
+> -    default:
+> -        hw_error("SDHC: unsupported value for maximum block size\n");
+> -        return 0;
+> -    }
+> -}
+> -
+>  static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+>  {
+>      if (s->sd_spec_version !=3D 2) {
 > --
 > 2.15.1
 >
