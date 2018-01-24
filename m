@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURU-0004eB-Pu
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURU-0004de-8b
 	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURS-0001n3-To
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURS-0001lY-0u
 	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:56 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:38598)
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:45020)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeURS-0001m1-M5
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:54 -0500
-Received: by mail-pf0-x244.google.com with SMTP id k19so4360186pfj.5
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:54 -0800 (PST)
+	id 1eeURR-0001kY-Of
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:53 -0500
+Received: by mail-pg0-x231.google.com with SMTP id m20so3808955pgc.11
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:53 -0800 (PST)
 Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
 	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
-	z19sm9760028pfh.185.2018.01.24.15.26.52 for <qemu-devel@nongnu.org>
+	z19sm9760028pfh.185.2018.01.24.15.26.50 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Jan 2018 15:26:52 -0800 (PST)
+	Wed, 24 Jan 2018 15:26:51 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 24 Jan 2018 15:25:57 -0800
-Message-Id: <20180124232625.30105-18-richard.henderson@linaro.org>
+Date: Wed, 24 Jan 2018 15:25:56 -0800
+Message-Id: <20180124232625.30105-17-richard.henderson@linaro.org>
 In-Reply-To: <20180124232625.30105-1-richard.henderson@linaro.org>
 References: <20180124232625.30105-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 17/45] target/hppa: Implement tlb_fill
+Subject: [Qemu-devel] [PATCH v3 16/45] target/hppa: Implement IASQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,275 +33,458 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-However since HPPA has a software-managed TLB, and the relevant
-TLB manipulation instructions are not implemented, this does not
-actually do anything.
+Any one TB will have only one space value.  If we change spaces,
+we change TBs.  Thus BE and BEV must exit the TB immediately.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h        |  29 ++++++++-
- target/hppa/int_helper.c |  15 ++++-
- target/hppa/mem_helper.c | 151 +++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 188 insertions(+), 7 deletions(-)
+ target/hppa/cpu.h        |  53 ++++++++++++++++++++-
+ target/hppa/cpu.c        |  15 ++++++
+ target/hppa/helper.c     |   3 +-
+ target/hppa/int_helper.c |  16 +++++--
+ target/hppa/op_helper.c  |   2 +
+ target/hppa/translate.c  | 117 ++++++++++++++++++++++++++++++++++++++---------
+ 6 files changed, 179 insertions(+), 27 deletions(-)
 
 diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index d583ea43dd..c7a2fb5b20 100644
+index 94f9c8ca2b..d583ea43dd 100644
 --- a/target/hppa/cpu.h
 +++ b/target/hppa/cpu.h
-@@ -165,6 +165,22 @@ typedef int64_t  target_sreg;
- #define TREG_FMT_ld   "%"PRId64
- #endif
+@@ -186,6 +186,8 @@ struct CPUHPPAState {
  
-+typedef struct {
-+    uint64_t va_b;
-+    uint64_t va_e;
-+    target_ureg pa;
-+    unsigned u : 1;
-+    unsigned t : 1;
-+    unsigned d : 1;
-+    unsigned b : 1;
-+    unsigned page_size : 4;
-+    unsigned ar_type : 3;
-+    unsigned ar_pl1 : 2;
-+    unsigned ar_pl2 : 2;
-+    unsigned entry_valid : 1;
-+    unsigned access_id : 16;
-+} hppa_tlb_entry;
-+
- struct CPUHPPAState {
-     target_ureg gr[32];
-     uint64_t fr[32];
-@@ -198,6 +214,12 @@ struct CPUHPPAState {
+     target_ureg iaoq_f;      /* front */
+     target_ureg iaoq_b;      /* back, aka next instruction */
++    uint64_t iasq_f;
++    uint64_t iasq_b;
  
-     /* Those resources are used only in QEMU core */
-     CPU_COMMON
-+
-+    /* ??? The number of entries isn't specified by the architecture.  */
-+    /* ??? Implement a unified itlb/dtlb for the moment.  */
-+    /* ??? We should use a more intelligent data structure.  */
-+    hppa_tlb_entry tlb[256];
-+    uint32_t tlb_last;
- };
+     uint32_t fr0_shadow;     /* flags, c, ca/cq, rm, d, enables */
+     float_status fp_status;
+@@ -240,15 +242,62 @@ void hppa_translate_init(void);
  
- /**
-@@ -307,12 +329,17 @@ void cpu_hppa_loaded_fr0(CPUHPPAState *env);
- #define cpu_signal_handler cpu_hppa_signal_handler
+ void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf);
  
- int cpu_hppa_signal_handler(int host_signum, void *pinfo, void *puc);
--int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw, int midx);
- hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr);
- int hppa_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int hppa_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- void hppa_cpu_do_interrupt(CPUState *cpu);
- bool hppa_cpu_exec_interrupt(CPUState *cpu, int int_req);
- void hppa_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function, int);
++static inline target_ulong hppa_form_gva_psw(target_ureg psw, uint64_t spc,
++                                             target_ureg off)
++{
 +#ifdef CONFIG_USER_ONLY
-+int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw, int midx);
++    return off;
 +#else
-+int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-+                              MMUAccessType type, hwaddr *pphys, int *pprot);
++    off &= (psw & PSW_W ? 0x3fffffffffffffffull : 0xffffffffull);
++    return spc | off;
 +#endif
++}
++
++static inline target_ulong hppa_form_gva(CPUHPPAState *env, uint64_t spc,
++                                         target_ureg off)
++{
++    return hppa_form_gva_psw(env->psw, spc, off);
++}
++
++/* Since PSW_CB will never need to be in tb->flags, reuse them.  */
++#define TB_FLAG_PRIV_SHIFT  8
++
+ static inline void cpu_get_tb_cpu_state(CPUHPPAState *env, target_ulong *pc,
+                                         target_ulong *cs_base,
+                                         uint32_t *pflags)
+ {
++    uint32_t flags = env->psw_n * PSW_N;
++
++    /* TB lookup assumes that PC contains the complete virtual address.
++       If we leave space+offset separate, we'll get ITLB misses to an
++       incomplete virtual address.  This also means that we must separate
++       out current cpu priviledge from the low bits of IAOQ_F.  */
++#ifdef CONFIG_USER_ONLY
+     *pc = env->iaoq_f;
+     *cs_base = env->iaoq_b;
++#else
+     /* ??? E, T, H, L, B, P bits need to be here, when implemented.  */
+-    *pflags = (env->psw & (PSW_W | PSW_C | PSW_D))
+-            | env->psw_n * PSW_N;
++    flags |= env->psw & (PSW_W | PSW_C | PSW_D);
++    flags |= (env->iaoq_f & 3) << TB_FLAG_PRIV_SHIFT;
++
++    *pc = (env->psw & PSW_C
++           ? hppa_form_gva_psw(env->psw, env->iasq_f, env->iaoq_f & -4)
++           : env->iaoq_f & -4);
++    *cs_base = env->iasq_f;
++
++    /* Insert a difference between IAOQ_B and IAOQ_F within the otherwise zero
++       low 32-bits of CS_BASE.  This will succeed for all direct branches,
++       which is the primary case we care about -- using goto_tb within a page.
++       Failure is indicated by a zero difference.  */
++    if (env->iasq_f == env->iasq_b) {
++        target_sreg diff = env->iaoq_b - env->iaoq_f;
++        if (TARGET_REGISTER_BITS == 32 || diff == (int32_t)diff) {
++            *cs_base |= (uint32_t)diff;
++        }
++    }
++#endif
++
++    *pflags = flags;
+ }
  
- #endif /* HPPA_CPU_H */
+ target_ureg cpu_hppa_get_psw(CPUHPPAState *env);
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 4d0b760baa..2970afd58d 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -37,8 +37,23 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
+ {
+     HPPACPU *cpu = HPPA_CPU(cs);
+ 
++#ifdef CONFIG_USER_ONLY
+     cpu->env.iaoq_f = tb->pc;
+     cpu->env.iaoq_b = tb->cs_base;
++#else
++    /* Recover the IAOQ values from the GVA + PRIV.  */
++    uint32_t priv = (tb->flags >> TB_FLAG_PRIV_SHIFT) & 3;
++    target_ulong cs_base = tb->cs_base;
++    target_ulong iasq_f = cs_base & ~0xffffffffull;
++    int32_t diff = cs_base;
++
++    cpu->env.iasq_f = iasq_f;
++    cpu->env.iaoq_f = (tb->pc & ~iasq_f) + priv;
++    if (diff) {
++        cpu->env.iaoq_b = cpu->env.iaoq_f + diff;
++    }
++#endif
++
+     cpu->env.psw_n = (tb->flags & PSW_N) != 0;
+ }
+ 
+diff --git a/target/hppa/helper.c b/target/hppa/helper.c
+index 6e8758f82c..858ec205b6 100644
+--- a/target/hppa/helper.c
++++ b/target/hppa/helper.c
+@@ -78,7 +78,8 @@ void hppa_cpu_dump_state(CPUState *cs, FILE *f,
+     int i;
+ 
+     cpu_fprintf(f, "IA_F " TARGET_FMT_lx " IA_B " TARGET_FMT_lx "\n",
+-                (target_ulong)env->iaoq_f, (target_ulong)env->iaoq_b);
++                hppa_form_gva_psw(psw, env->iasq_f, env->iaoq_f),
++                hppa_form_gva_psw(psw, env->iasq_b, env->iaoq_b));
+ 
+     psw_c[0]  = (psw & PSW_W ? 'W' : '-');
+     psw_c[1]  = (psw & PSW_E ? 'E' : '-');
 diff --git a/target/hppa/int_helper.c b/target/hppa/int_helper.c
-index 02963b80c6..5ae5233a96 100644
+index a59aae1189..02963b80c6 100644
 --- a/target/hppa/int_helper.c
 +++ b/target/hppa/int_helper.c
-@@ -79,12 +79,25 @@ void hppa_cpu_do_interrupt(CPUState *cs)
-             {
-                 /* Avoid reading directly from the virtual address, lest we
-                    raise another exception from some sort of TLB issue.  */
-+                /* ??? An alternate fool-proof method would be to store the
-+                   instruction data into the unwind info.  That's probably
-+                   a bit too much in the way of extra storage required.  */
-                 vaddr vaddr;
+@@ -32,6 +32,8 @@ void hppa_cpu_do_interrupt(CPUState *cs)
+     int i = cs->exception_index;
+     target_ureg iaoq_f = env->iaoq_f;
+     target_ureg iaoq_b = env->iaoq_b;
++    uint64_t iasq_f = env->iasq_f;
++    uint64_t iasq_b = env->iasq_b;
+ 
+ #ifndef CONFIG_USER_ONLY
+     target_ureg old_psw;
+@@ -44,6 +46,8 @@ void hppa_cpu_do_interrupt(CPUState *cs)
+     cpu_hppa_put_psw(env, PSW_W | (i == EXCP_HPMC ? PSW_M : 0));
+ 
+     /* step 3 */
++    env->cr[CR_IIASQ] = iasq_f >> 32;
++    env->cr_back[0] = iasq_b >> 32;
+     env->cr[CR_IIAOQ] = iaoq_f;
+     env->cr_back[1] = iaoq_b;
+ 
+@@ -79,6 +83,9 @@ void hppa_cpu_do_interrupt(CPUState *cs)
                  hwaddr paddr;
  
                  paddr = vaddr = iaoq_f & -4;
-                 if (old_psw & PSW_C) {
--                    vaddr = hppa_form_gva_psw(old_psw, iasq_f, iaoq_f & -4);
-+                    int prot, t;
-+
-+                    vaddr = hppa_form_gva_psw(old_psw, iasq_f, vaddr);
-+                    t = hppa_get_physical_address(env, vaddr, 0,
-+                                                  MMU_INST_FETCH,
-+                                                  &paddr, &prot);
-+                    if (t >= 0) {
-+                        /* We can't re-load the instruction.  */
-+                        env->cr[CR_IIR] = 0;
-+                        break;
-+                    }
-                 }
++                if (old_psw & PSW_C) {
++                    vaddr = hppa_form_gva_psw(old_psw, iasq_f, iaoq_f & -4);
++                }
                  env->cr[CR_IIR] = ldl_phys(cs->as, paddr);
              }
-diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index 1afaf89539..08ab19aacf 100644
---- a/target/hppa/mem_helper.c
-+++ b/target/hppa/mem_helper.c
-@@ -36,18 +36,159 @@ int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
-     return 1;
+             break;
+@@ -101,6 +108,8 @@ void hppa_cpu_do_interrupt(CPUState *cs)
+     /* step 7 */
+     env->iaoq_f = env->cr[CR_IVA] + 32 * i;
+     env->iaoq_b = env->iaoq_f + 4;
++    env->iasq_f = 0;
++    env->iasq_b = 0;
+ #endif
+ 
+     if (qemu_loglevel_mask(CPU_LOG_INT)) {
+@@ -151,10 +160,11 @@ void hppa_cpu_do_interrupt(CPUState *cs)
+         qemu_log("INT %6d: %s @ " TARGET_FMT_lx "," TARGET_FMT_lx
+                  " -> " TREG_FMT_lx " " TARGET_FMT_lx "\n",
+                  ++count, name,
+-                 (target_ulong)iaoq_f,
+-                 (target_ulong)iaoq_b,
++                 hppa_form_gva(env, iasq_f, iaoq_f),
++                 hppa_form_gva(env, iasq_b, iaoq_b),
+                  env->iaoq_f,
+-                 (target_ulong)env->cr[CR_IOR]);
++                 hppa_form_gva(env, (uint64_t)env->cr[CR_ISR] << 32,
++                               env->cr[CR_IOR]));
+     }
+     cs->exception_index = -1;
  }
- #else
-+static hppa_tlb_entry *hppa_find_tlb(CPUHPPAState *env, vaddr addr)
-+{
-+    int i;
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 3f5dcbbca0..1963b2439b 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -622,6 +622,8 @@ void HELPER(rfi)(CPUHPPAState *env)
+     if (env->psw & (PSW_I | PSW_R | PSW_Q)) {
+         helper_excp(env, EXCP_ILL);
+     }
++    env->iasq_f = (uint64_t)env->cr[CR_IIASQ] << 32;
++    env->iasq_b = (uint64_t)env->cr_back[0] << 32;
+     env->iaoq_f = env->cr[CR_IIAOQ];
+     env->iaoq_b = env->cr_back[1];
+     cpu_hppa_put_psw(env, env->cr[CR_IPSW]);
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 4a69f05a91..44abc9006b 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -325,6 +325,8 @@ static TCGv_reg cpu_gr[32];
+ static TCGv_i64 cpu_sr[4];
+ static TCGv_reg cpu_iaoq_f;
+ static TCGv_reg cpu_iaoq_b;
++static TCGv_i64 cpu_iasq_f;
++static TCGv_i64 cpu_iasq_b;
+ static TCGv_reg cpu_sar;
+ static TCGv_reg cpu_psw_n;
+ static TCGv_reg cpu_psw_v;
+@@ -380,6 +382,13 @@ void hppa_translate_init(void)
+         const GlobalVar *v = &vars[i];
+         *v->var = tcg_global_mem_new(cpu_env, v->ofs, v->name);
+     }
 +
-+    for (i = 0; i < ARRAY_SIZE(env->tlb); ++i) {
-+        hppa_tlb_entry *ent = &env->tlb[i];
-+        if (ent->va_b <= addr && addr <= ent->va_e && ent->entry_valid) {
-+            return ent;
++    cpu_iasq_f = tcg_global_mem_new_i64(cpu_env,
++                                        offsetof(CPUHPPAState, iasq_f),
++                                        "iasq_f");
++    cpu_iasq_b = tcg_global_mem_new_i64(cpu_env,
++                                        offsetof(CPUHPPAState, iasq_b),
++                                        "iasq_b");
+ }
+ 
+ static DisasCond cond_make_f(void)
+@@ -1760,6 +1769,11 @@ static DisasJumpType do_cbranch(DisasContext *ctx, target_sreg disp, bool is_n,
+             ctx->null_lab = NULL;
+         }
+         nullify_set(ctx, n);
++        if (ctx->iaoq_n == -1) {
++            /* The temporary iaoq_n_var died at the branch above.
++               Regenerate it here instead of saving it.  */
++            tcg_gen_addi_reg(ctx->iaoq_n_var, cpu_iaoq_b, 4);
 +        }
+         gen_goto_tb(ctx, 0, ctx->iaoq_b, ctx->iaoq_n);
+     }
+ 
+@@ -1801,11 +1815,17 @@ static DisasJumpType do_ibranch(DisasContext *ctx, TCGv_reg dest,
+         }
+         next = get_temp(ctx);
+         tcg_gen_mov_reg(next, dest);
+-        ctx->iaoq_n = -1;
+-        ctx->iaoq_n_var = next;
+         if (is_n) {
++            if (use_nullify_skip(ctx)) {
++                tcg_gen_mov_reg(cpu_iaoq_f, next);
++                tcg_gen_addi_reg(cpu_iaoq_b, next, 4);
++                nullify_set(ctx, 0);
++                return DISAS_IAQ_N_UPDATED;
++            }
+             ctx->null_cond.c = TCG_COND_ALWAYS;
+         }
++        ctx->iaoq_n = -1;
++        ctx->iaoq_n_var = next;
+     } else if (is_n && use_nullify_skip(ctx)) {
+         /* The (conditional) branch, B, nullifies the next insn, N,
+            and we're allowed to skip execution N (no single-step or
+@@ -3477,26 +3497,55 @@ static DisasJumpType trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
+     target_sreg disp = assemble_17(insn);
+     TCGv_reg tmp;
+ 
+-    /* unsigned s = low_uextract(insn, 13, 3); */
++#ifdef CONFIG_USER_ONLY
+     /* ??? It seems like there should be a good way of using
+        "be disp(sr2, r0)", the canonical gateway entry mechanism
+        to our advantage.  But that appears to be inconvenient to
+        manage along side branch delay slots.  Therefore we handle
+        entry into the gateway page via absolute address.  */
+-
+-#ifdef CONFIG_USER_ONLY
+     /* Since we don't implement spaces, just branch.  Do notice the special
+        case of "be disp(*,r0)" using a direct branch to disp, so that we can
+        goto_tb to the TB containing the syscall.  */
+     if (b == 0) {
+         return do_dbranch(ctx, disp, is_l ? 31 : 0, n);
+     }
++#else
++    int sp = assemble_sr3(insn);
++    nullify_over(ctx);
+ #endif
+ 
+     tmp = get_temp(ctx);
+     tcg_gen_addi_reg(tmp, load_gpr(ctx, b), disp);
+     tmp = do_ibranch_priv(ctx, tmp);
++
++#ifdef CONFIG_USER_ONLY
+     return do_ibranch(ctx, tmp, is_l ? 31 : 0, n);
++#else
++    TCGv_i64 new_spc = tcg_temp_new_i64();
++
++    load_spr(ctx, new_spc, sp);
++    if (is_l) {
++        copy_iaoq_entry(cpu_gr[31], ctx->iaoq_n, ctx->iaoq_n_var);
++        tcg_gen_mov_i64(cpu_sr[0], cpu_iasq_f);
 +    }
-+    return NULL;
-+}
-+
-+int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-+                              MMUAccessType type, hwaddr *pphys, int *pprot)
-+{
-+    hwaddr phys;
-+    int prot, ret, r_prot, w_prot, x_prot, a_prot;
-+    bool ifetch = type == MMU_INST_FETCH;
-+    hppa_tlb_entry *ent;
-+
-+    /* Virtual translation disabled.  Direct map virtual to physical.  */
-+    if (mmu_idx == MMU_PHYS_IDX) {
-+        phys = addr;
-+        prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-+        ret = -1;
-+        goto egress;
-+    }
-+
-+    /* Find a valid tlb entry that matches the virtual address.  */
-+    ent = hppa_find_tlb(env, addr);
-+    if (ent == NULL) {
-+        phys = 0;
-+        prot = 0;
-+        ret = (ifetch ? EXCP_ITLB_MISS : EXCP_DTLB_MISS);
-+        goto egress;
-+    }
-+
-+    /* We now know the physical address.  */
-+    phys = ent->pa + (addr & ~TARGET_PAGE_MASK);
-+
-+    /* Map TLB access_rights field to QEMU protection.  */
-+    r_prot = (mmu_idx <= ent->ar_pl1 ? PROT_READ : 0);
-+    w_prot = (mmu_idx <= ent->ar_pl2 ? PROT_WRITE : 0);
-+    x_prot = (ent->ar_pl2 <= mmu_idx && mmu_idx <= ent->ar_pl1 ? PROT_EXEC : 0);
-+    switch (ent->ar_type) {
-+    case 0: /* read-only: data page */
-+        prot = r_prot;
-+        break;
-+    case 1: /* read/write: dynamic data page */
-+        prot = r_prot | w_prot;
-+        break;
-+    case 2: /* read/execute: normal code page */
-+        prot = r_prot | x_prot;
-+        break;
-+    case 3: /* read/write/execute: dynamic code page */
-+        prot = r_prot | w_prot | x_prot;
-+        break;
-+    default: /* execute: promote to privilege level type & 3 */
-+        prot = x_prot;
-+    }
-+
-+    /* ??? Check PSW_P and ent->access_prot.  This can remove PROT_WRITE.  */
-+
-+    /* Map MMUAccessType to QEMU protection.  */
-+    if (ifetch) {
-+        a_prot = PROT_EXEC;
-+    } else if (type == MMU_DATA_STORE) {
-+        a_prot = PROT_WRITE;
++    if (n && use_nullify_skip(ctx)) {
++        tcg_gen_mov_reg(cpu_iaoq_f, tmp);
++        tcg_gen_addi_reg(cpu_iaoq_b, cpu_iaoq_f, 4);
++        tcg_gen_mov_i64(cpu_iasq_f, new_spc);
++        tcg_gen_mov_i64(cpu_iasq_b, cpu_iasq_f);
 +    } else {
-+        a_prot = PROT_READ;
-+    }
-+
-+    if (unlikely(!(prot & a_prot))) {
-+        /* The access isn't allowed -- Inst/Data Memory Protection Fault.  */
-+        ret = (ifetch ? EXCP_IMP : EXCP_DMP);
-+        goto egress;
-+    }
-+
-+    /* In reverse priority order, check for conditions which raise faults.
-+       As we go, remove PROT bits that cover the condition we want to check.
-+       In this way, the resulting PROT will force a re-check of the
-+       architectural TLB entry for the next access.  */
-+    ret = -1;
-+    if (unlikely(!ent->d)) {
-+        if (type == MMU_DATA_STORE) {
-+            /* The D bit is not set -- TLB Dirty Bit Fault.  */
-+            ret = EXCP_TLB_DIRTY;
++        copy_iaoq_entry(cpu_iaoq_f, ctx->iaoq_b, cpu_iaoq_b);
++        if (ctx->iaoq_b == -1) {
++            tcg_gen_mov_i64(cpu_iasq_f, cpu_iasq_b);
 +        }
-+        prot &= PROT_READ | PROT_EXEC;
++        tcg_gen_mov_reg(cpu_iaoq_b, tmp);
++        tcg_gen_mov_i64(cpu_iasq_b, new_spc);
++        nullify_set(ctx, n);
 +    }
-+    if (unlikely(ent->b)) {
-+        if (type == MMU_DATA_STORE) {
-+            /* The B bit is set -- Data Memory Break Fault.  */
-+            ret = EXCP_DMB;
-+        }
-+        prot &= PROT_READ | PROT_EXEC;
-+    }
-+    if (unlikely(ent->t)) {
-+        if (!ifetch) {
-+            /* The T bit is set -- Page Reference Fault.  */
-+            ret = EXCP_PAGE_REF;
-+        }
-+        prot &= PROT_EXEC;
-+    }
-+
-+ egress:
-+    *pphys = phys;
-+    *pprot = prot;
-+    return ret;
-+}
-+
- hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- {
--    /* Stub */
--    return addr;
-+    HPPACPU *cpu = HPPA_CPU(cs);
-+    hwaddr phys;
-+    int prot, excp;
-+
-+    /* If the (data) mmu is disabled, bypass translation.  */
-+    /* ??? We really ought to know if the code mmu is disabled too,
-+       in order to get the correct debugging dumps.  */
-+    if (!(cpu->env.psw & PSW_D)) {
-+        return addr;
-+    }
-+
-+    excp = hppa_get_physical_address(&cpu->env, addr, MMU_KERNEL_IDX,
-+                                     MMU_DATA_LOAD, &phys, &prot);
-+
-+    /* Since we're translating for debugging, the only error that is a
-+       hard error is no translation at all.  Otherwise, while a real cpu
-+       access might not have permission, the debugger does.  */
-+    return excp == EXCP_DTLB_MISS ? -1 : phys;
++    tcg_temp_free_i64(new_spc);
++    tcg_gen_lookup_and_goto_ptr();
++    return nullify_end(ctx, DISAS_NORETURN);
++#endif
  }
  
- void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType type,
-               int mmu_idx, uintptr_t retaddr)
- {
--    /* Stub */
--    int prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
--    hwaddr phys = addr;
-+    HPPACPU *cpu = HPPA_CPU(cs);
-+    int prot, excp;
-+    hwaddr phys;
-+
-+    excp = hppa_get_physical_address(&cpu->env, addr, mmu_idx,
-+                                     type, &phys, &prot);
-+    if (unlikely(excp >= 0)) {
-+        /* Failure.  Raise the indicated exception.  */
-+        cs->exception_index = excp;
-+        if (cpu->env.psw & PSW_Q) {
-+            /* ??? Needs tweaking for hppa64.  */
-+            cpu->env.cr[CR_IOR] = addr;
-+            cpu->env.cr[CR_ISR] = addr >> 32;
-+        }
-+        cpu_loop_exit_restore(cs, retaddr);
-+    }
+ static DisasJumpType trans_bl(DisasContext *ctx, uint32_t insn,
+@@ -3559,8 +3608,26 @@ static DisasJumpType trans_bve(DisasContext *ctx, uint32_t insn,
+     unsigned link = extract32(insn, 13, 1) ? 2 : 0;
+     TCGv_reg dest;
  
-     /* Success!  Store the translation into the QEMU TLB.  */
-     tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
++#ifdef CONFIG_USER_ONLY
+     dest = do_ibranch_priv(ctx, load_gpr(ctx, rb));
+     return do_ibranch(ctx, dest, link, n);
++#else
++    nullify_over(ctx);
++    dest = do_ibranch_priv(ctx, load_gpr(ctx, rb));
++
++    copy_iaoq_entry(cpu_iaoq_f, ctx->iaoq_b, cpu_iaoq_b);
++    if (ctx->iaoq_b == -1) {
++        tcg_gen_mov_i64(cpu_iasq_f, cpu_iasq_b);
++    }
++    copy_iaoq_entry(cpu_iaoq_b, -1, dest);
++    tcg_gen_mov_i64(cpu_iasq_b, space_select(ctx, 0, dest));
++    if (link) {
++        copy_iaoq_entry(cpu_gr[link], ctx->iaoq_n, ctx->iaoq_n_var);
++    }
++    nullify_set(ctx, n);
++    tcg_gen_lookup_and_goto_ptr();
++    return nullify_end(ctx, DISAS_NORETURN);
++#endif
+ }
+ 
+ static const DisasInsn table_branch[] = {
+@@ -4267,15 +4334,21 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+ #ifdef CONFIG_USER_ONLY
+     ctx->privilege = MMU_USER_IDX;
+     ctx->mmu_idx = MMU_USER_IDX;
++    ctx->iaoq_f = ctx->base.pc_first;
++    ctx->iaoq_b = ctx->base.tb->cs_base;
+ #else
+-    ctx->privilege = ctx->base.pc_first & 3;
++    ctx->privilege = (ctx->base.tb->flags >> TB_FLAG_PRIV_SHIFT) & 3;
+     ctx->mmu_idx = (ctx->base.tb->flags & PSW_D
+                     ? ctx->privilege : MMU_PHYS_IDX);
+-#endif
+-    ctx->iaoq_f = ctx->base.pc_first;
+-    ctx->iaoq_b = ctx->base.tb->cs_base;
+-    ctx->base.pc_first &= -4;
+ 
++    /* Recover the IAOQ values from the GVA + PRIV.  */
++    uint64_t cs_base = ctx->base.tb->cs_base;
++    uint64_t iasq_f = cs_base & ~0xffffffffull;
++    int32_t diff = cs_base;
++
++    ctx->iaoq_f = (ctx->base.pc_first & ~iasq_f) + ctx->privilege;
++    ctx->iaoq_b = (diff ? ctx->iaoq_f + diff : -1);
++#endif
+     ctx->iaoq_n = -1;
+     ctx->iaoq_n_var = NULL;
+ 
+@@ -4318,7 +4391,7 @@ static bool hppa_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+     ctx->base.is_jmp = gen_excp(ctx, EXCP_DEBUG);
+-    ctx->base.pc_next = (ctx->iaoq_f & -4) + 4;
++    ctx->base.pc_next += 4;
+     return true;
+ }
+ 
+@@ -4331,7 +4404,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+ 
+     /* Execute one insn.  */
+ #ifdef CONFIG_USER_ONLY
+-    if (ctx->iaoq_f < TARGET_PAGE_SIZE) {
++    if (ctx->base.pc_next < TARGET_PAGE_SIZE) {
+         ret = do_page_zero(ctx);
+         assert(ret != DISAS_NEXT);
+     } else
+@@ -4339,7 +4412,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     {
+         /* Always fetch the insn, even if nullified, so that we check
+            the page permissions for execute.  */
+-        uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f & -4);
++        uint32_t insn = cpu_ldl_code(env, ctx->base.pc_next);
+ 
+         /* Set up the IA queue for the next insn.
+            This will be overwritten by a branch.  */
+@@ -4377,18 +4450,21 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     /* Advance the insn queue.  Note that this check also detects
+        a priority change within the instruction queue.  */
+     if (ret == DISAS_NEXT && ctx->iaoq_b != ctx->iaoq_f + 4) {
+-        if (ctx->null_cond.c == TCG_COND_NEVER
+-            || ctx->null_cond.c == TCG_COND_ALWAYS) {
++        if (ctx->iaoq_b != -1 && ctx->iaoq_n != -1
++            && use_goto_tb(ctx, ctx->iaoq_b)
++            && (ctx->null_cond.c == TCG_COND_NEVER
++                || ctx->null_cond.c == TCG_COND_ALWAYS)) {
+             nullify_set(ctx, ctx->null_cond.c == TCG_COND_ALWAYS);
+             gen_goto_tb(ctx, 0, ctx->iaoq_b, ctx->iaoq_n);
+             ret = DISAS_NORETURN;
+         } else {
+             ret = DISAS_IAQ_N_STALE;
+-       }
++        }
+     }
+     ctx->iaoq_f = ctx->iaoq_b;
+     ctx->iaoq_b = ctx->iaoq_n;
+     ctx->base.is_jmp = ret;
++    ctx->base.pc_next += 4;
+ 
+     if (ret == DISAS_NORETURN || ret == DISAS_IAQ_N_UPDATED) {
+         return;
+@@ -4396,6 +4472,9 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     if (ctx->iaoq_f == -1) {
+         tcg_gen_mov_reg(cpu_iaoq_f, cpu_iaoq_b);
+         copy_iaoq_entry(cpu_iaoq_b, ctx->iaoq_n, ctx->iaoq_n_var);
++#ifndef CONFIG_USER_ONLY
++        tcg_gen_mov_i64(cpu_iasq_f, cpu_iasq_b);
++#endif
+         nullify_save(ctx);
+         ctx->base.is_jmp = DISAS_IAQ_N_UPDATED;
+     } else if (ctx->iaoq_b == -1) {
+@@ -4430,15 +4509,11 @@ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+     default:
+         g_assert_not_reached();
+     }
+-
+-    /* We don't actually use this during normal translation,
+-       but we should interact with the generic main loop.  */
+-    ctx->base.pc_next = ctx->base.pc_first + 4 * ctx->base.num_insns;
+ }
+ 
+ static void hppa_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
+ {
+-    target_ureg pc = dcbase->pc_first;
++    target_ulong pc = dcbase->pc_first;
+ 
+ #ifdef CONFIG_USER_ONLY
+     switch (pc) {
 -- 
 2.14.3
