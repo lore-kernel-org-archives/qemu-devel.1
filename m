@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eeSMO-0007kA-2N
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:33 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eeSMQ-0007kl-1w
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eeSMJ-0006TZ-3e
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:32 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:51758)
+	(envelope-from <laurent@vivier.eu>) id 1eeSML-0006Uu-JG
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:34 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:51511)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eeSMI-0006Sx-QE
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:27 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eeSML-0006U7-8n
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:29 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 24 Jan 2018 22:12:59 +0100
-Message-Id: <20180124211301.10095-3-laurent@vivier.eu>
+Date: Wed, 24 Jan 2018 22:13:00 +0100
+Message-Id: <20180124211301.10095-4-laurent@vivier.eu>
 In-Reply-To: <20180124211301.10095-1-laurent@vivier.eu>
 References: <20180124211301.10095-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v4 2/4] linux-user: introduce functions to
- detect CPU type
+Subject: [Qemu-devel] [PATCH v4 3/4] linux-user,
+ m68k: select CPU according to ELF header values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,117 +27,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aaron Sierra <asierra@xes-inc.com>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, YunQiang Su <syq@debian.org>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>
 
-From: YunQiang Su <syq@debian.org>
+M680x0 doesn't support the same set of instructions
+as ColdFire, so we can't use "any" CPU type to execute
+m68020 instructions.
+We select CPU type ("m68040" or "any" for ColdFire)
+according to the ELF header. If we can't, we
+use by default the value used until now: "any".
 
-Add a function to return ELF e_flags and use it
-to select the CPU model.
-
-Signed-off-by: YunQiang Su <syq@debian.org>
-[lv: split the patch and some cleanup in get_elf_eflags()]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/elfload.c | 35 +++++++++++++++++++++++++++++++++++
- linux-user/main.c    | 20 ++++++++++----------
- linux-user/qemu.h    |  1 +
- 3 files changed, 46 insertions(+), 10 deletions(-)
+ include/elf.h                | 28 ++++++++++++++++++++++++++++
+ linux-user/m68k/target_elf.h |  6 ++++++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 20f3d8c2c3..67e2425ac6 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2376,6 +2376,41 @@ give_up:
-     g_free(syms);
- }
+diff --git a/include/elf.h b/include/elf.h
+index e8a515ce3d..ca9a419043 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -537,6 +537,34 @@ typedef struct {
+ #define HWCAP_S390_HIGH_GPRS    512
+ #define HWCAP_S390_TE           1024
  
-+uint32_t get_elf_eflags(int fd)
-+{
-+    struct elfhdr ehdr;
-+    off_t offset;
-+    int ret;
++/* M68K specific definitions. */
++/* We use the top 24 bits to encode information about the
++   architecture variant.  */
++#define EF_M68K_CPU32    0x00810000
++#define EF_M68K_M68000   0x01000000
++#define EF_M68K_CFV4E    0x00008000
++#define EF_M68K_FIDO     0x02000000
++#define EF_M68K_ARCH_MASK                                               \
++  (EF_M68K_M68000 | EF_M68K_CPU32 | EF_M68K_CFV4E | EF_M68K_FIDO)
 +
-+    /* Read ELF header */
-+    offset = lseek(fd, 0, SEEK_SET);
-+    if (offset == (off_t) -1) {
-+        return 0;
-+    }
-+    ret = read(fd, &ehdr, sizeof(ehdr));
-+    if (ret < sizeof(ehdr)) {
-+        return 0;
-+    }
-+    offset = lseek(fd, offset, SEEK_SET);
-+    if (offset == (off_t) -1) {
-+        return 0;
-+    }
++/* We use the bottom 8 bits to encode information about the
++   coldfire variant.  If we use any of these bits, the top 24 bits are
++   either 0 or EF_M68K_CFV4E.  */
++#define EF_M68K_CF_ISA_MASK     0x0F  /* Which ISA */
++#define EF_M68K_CF_ISA_A_NODIV  0x01  /* ISA A except for div */
++#define EF_M68K_CF_ISA_A        0x02
++#define EF_M68K_CF_ISA_A_PLUS   0x03
++#define EF_M68K_CF_ISA_B_NOUSP  0x04  /* ISA_B except for USP */
++#define EF_M68K_CF_ISA_B        0x05
++#define EF_M68K_CF_ISA_C        0x06
++#define EF_M68K_CF_ISA_C_NODIV  0x07  /* ISA C except for div */
++#define EF_M68K_CF_MAC_MASK     0x30
++#define EF_M68K_CF_MAC          0x10  /* MAC */
++#define EF_M68K_CF_EMAC         0x20  /* EMAC */
++#define EF_M68K_CF_EMAC_B       0x30  /* EMAC_B */
++#define EF_M68K_CF_FLOAT        0x40  /* Has float insns */
++#define EF_M68K_CF_MASK         0xFF
 +
-+    /* Check ELF signature */
-+    if (!elf_check_ident(&ehdr)) {
-+        return 0;
-+    }
-+
-+    /* check header */
-+    bswap_ehdr(&ehdr);
-+    if (!elf_check_ehdr(&ehdr)) {
-+        return 0;
-+    }
-+
-+    /* return architecture id */
-+    return ehdr.e_flags;
-+}
-+
- int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
+ /*
+  * 68k ELF relocation types
+  */
+diff --git a/linux-user/m68k/target_elf.h b/linux-user/m68k/target_elf.h
+index df375ad5d3..998fe0fe2f 100644
+--- a/linux-user/m68k/target_elf.h
++++ b/linux-user/m68k/target_elf.h
+@@ -9,6 +9,12 @@
+ #define M68K_TARGET_ELF_H
+ static inline const char *cpu_get_model(uint32_t eflags)
  {
-     struct image_info interp_info;
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 3954e8996b..6845b56030 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -4319,8 +4319,17 @@ int main(int argc, char **argv, char **envp)
- 
-     init_qemu_uname_release();
- 
-+    execfd = qemu_getauxval(AT_EXECFD);
-+    if (execfd == 0) {
-+        execfd = open(filename, O_RDONLY);
-+        if (execfd < 0) {
-+            printf("Error while loading %s: %s\n", filename, strerror(errno));
-+            _exit(EXIT_FAILURE);
-+        }
++    if (eflags == 0 || (eflags & EF_M68K_M68000)) {
++        /* 680x0 */
++        return "m68040";
 +    }
 +
-     if (cpu_model == NULL) {
--        cpu_model = cpu_get_model(0);
-+        cpu_model = cpu_get_model(get_elf_eflags(execfd));
-     }
-     tcg_exec_init(0);
-     /* NOTE: we need to init the CPU at this stage to get
-@@ -4413,15 +4422,6 @@ int main(int argc, char **argv, char **envp)
-     cpu->opaque = ts;
-     task_settid(ts);
- 
--    execfd = qemu_getauxval(AT_EXECFD);
--    if (execfd == 0) {
--        execfd = open(filename, O_RDONLY);
--        if (execfd < 0) {
--            printf("Error while loading %s: %s\n", filename, strerror(errno));
--            _exit(EXIT_FAILURE);
--        }
--    }
--
-     ret = loader_exec(execfd, filename, target_argv, target_environ, regs,
-         info, &bprm);
-     if (ret != 0) {
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 4edd7d0c08..47ca71159c 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -188,6 +188,7 @@ int loader_exec(int fdexec, const char *filename, char **argv, char **envp,
-              struct target_pt_regs * regs, struct image_info *infop,
-              struct linux_binprm *);
- 
-+uint32_t get_elf_eflags(int fd);
- int load_elf_binary(struct linux_binprm *bprm, struct image_info *info);
- int load_flt_binary(struct linux_binprm *bprm, struct image_info *info);
- 
++    /* Coldfire */
+     return "any";
+ }
+ #endif
 -- 
 2.14.3
