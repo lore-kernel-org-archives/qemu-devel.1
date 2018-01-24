@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eeQIN-0005SC-SE
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:01:20 -0500
+	(envelope-from <eblake@redhat.com>) id 1eeQXR-0002eP-SP
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eeQII-0001Nw-2d
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:01:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53158)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eeQIH-0001NR-SH
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:01:09 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eeQIG-0003eT-Ny
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 19:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B453E2E854E
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 19:01:08 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1eeQXQ-0003Ij-Qs
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:16:49 -0500
+References: <20180124061728.GA99621@localhost>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d49dfbf5-b6e4-43d2-c24d-5c493aa5bfe5@redhat.com>
+Date: Wed, 24 Jan 2018 13:16:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Jan 2018 18:46:56 -0000
-From: Thomas Huth <1381879@bugs.launchpad.net>
-Reply-To: Bug 1381879 <1381879@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141016054140.18041.12891.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151681961690.19954.3824067502030729246.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1381879] Re: can not run vm with a serial port
+In-Reply-To: <20180124061728.GA99621@localhost>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8JSZWCDxoEr6jLdhSY72H53E1dz8UPaAf"
+Subject: Re: [Qemu-devel] [PATCH] block/mirror: fix fail to cancel when VM
+ has heavy BLK IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,71 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Huaitong Han <hanhuaitong@didichuxing.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-(or if you just wanted to complain about the rather ugly traceback
-instead of a nice error message: Please file a bug against virt-manager
-instead. Thanks!)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8JSZWCDxoEr6jLdhSY72H53E1dz8UPaAf
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Huaitong Han <hanhuaitong@didichuxing.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Message-ID: <d49dfbf5-b6e4-43d2-c24d-5c493aa5bfe5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block/mirror: fix fail to cancel when VM has
+ heavy BLK IO
+References: <20180124061728.GA99621@localhost>
+In-Reply-To: <20180124061728.GA99621@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 01/24/2018 12:17 AM, Liang Li wrote:
+> We found that when doing drive mirror to a low speed shared storage,
+> if there was heavy BLK IO write workload in VM after the 'ready' event,=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1381879
+> drive mirror block job can't be canceled immediately, it would keep
+> running until the heavy BLK IO workload stopped in the VM. This patch
+> fixed this issue.
 
-Title:
-  can not run vm with a serial port
+I think you are breaking semantics here.  Libvirt relies on
+'block-job-cancel' after the 'ready' event to be a clean point-in-time
+snapshot, but that is only possible if there is no out-of-order pending
+I/O at the time the action takes place.  Breaking in the middle of the
+loop, without using bdrv_drain(), risks leaving an inconsistent copy of
+data in the mirror not corresponding to any point-in-time on the source.
 
-Status in QEMU:
-  Invalid
+There's ongoing work on adding async mirroring; this may be a better
+solution to the issue you are seeing.
 
-Bug description:
-  environment:
-  server: centOS 6.5, 3.14.19, x86_64
-  qemu-kvm: QEMU PC emulator version 0.12.1 (qemu-kvm-0.12.1.2), Copyright =
-(c) 2003-2008 Fabrice Bellard
-  qemu-system-x86_64 :QEMU emulator version 1.2.0 (qemu-kvm-1.2.0), Copyrig=
-ht (c) 2003-2008 Fabrice Bellard
-  virt-manager: 0.9.0
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg05419.html
 
-  VM: centOS 6.5, 3.12.30, x86_64
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  reproduce step:
-  1. add serial device
-  2. select device type: unix socket
-                   device parameters: path=3D/dev/ttyS0
-                                                         mode=3Dclient mode=
-(connect)
-  3. run the VM
 
-  phenomenon:
-  Error starting domain: internal error process exited while connecting to =
-monitor: qemu-kvm: -chardev socket,id=3Dcharserial0,path=3D/dev/ttyS0,serve=
-r,nowait: socket bind failed: Address already in use
-  qemu-kvm: -chardev socket,id=3Dcharserial0,path=3D/dev/ttyS0,server,nowai=
-t: chardev: opening backend "socket" failed
+--8JSZWCDxoEr6jLdhSY72H53E1dz8UPaAf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  =
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 44, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 65, in tmp=
-cb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/domain.py", line 1114, in sta=
-rtup
-      self._backend.create()
-    File "/usr/lib64/python2.6/site-packages/libvirt.py", line 678, in crea=
-te
-      if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
-=3Dself)
-  libvirtError: internal error process exited while connecting to monitor: =
-qemu-kvm: -chardev socket,id=3Dcharserial0,path=3D/dev/ttyS0,server,nowait:=
- socket bind failed: Address already in use
-  qemu-kvm: -chardev socket,id=3Dcharserial0,path=3D/dev/ttyS0,server,nowai=
-t: chardev: opening backend "socket" failed
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpo25cACgkQp6FrSiUn
+Q2qu2wf+Ml/vjeYEbLYSKwgJWJVeBWzjYIeefl3R1sjrkfEnbgqEGhV97TMwn4Gh
+FadCXg3DYChErBki8rwwYtxHs1EbD+7uh9FNRhR61R0FS4V36FQTX778pf6IDGz5
+uRQDQh59+9C4TE+bra1x4OtZBrEk/jmyVpnLs61w4VHdETv/3Scb8d2se7CVskCc
+W2xFTb3t9x9iypXRIPEM74PHDt0kwcuyjNuvJgK0GlZgIciwI1akGSNwNA+C7LVI
+roq2m5uLeY1St9Q/AsAi+HzrQSGdAinWR7thq3eneHh0UXqsjDdeOeHZtzbBqBBB
+wejFwNfbf1HJEgRF/bTtxMkFJdudVQ==
+=GFsQ
+-----END PGP SIGNATURE-----
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1381879/+subscriptions
+--8JSZWCDxoEr6jLdhSY72H53E1dz8UPaAf--
