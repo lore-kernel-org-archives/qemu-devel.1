@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eeSMV-0007pN-3H
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:43 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eeSQg-0002Tb-Bl
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:17:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eeSMS-0006XR-Nd
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:39 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:55822)
+	(envelope-from <laurent@vivier.eu>) id 1eeSQb-0000XT-Qt
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:17:58 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:51280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eeSMS-0006X1-69
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:13:36 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eeSQb-0000XA-Gx
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 16:17:53 -0500
+References: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA90dgSX9kYC5TbPBV2UHgQjz3HWT3eyE4RUC6x9P=7_QQ@mail.gmail.com>
+	<21eaac25-23d4-7c03-b541-a93b79157e23@vivier.eu>
+	<20180119145152.GA28929@kos.to>
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 24 Jan 2018 22:12:58 +0100
-Message-Id: <20180124211301.10095-2-laurent@vivier.eu>
-In-Reply-To: <20180124211301.10095-1-laurent@vivier.eu>
-References: <20180124211301.10095-1-laurent@vivier.eu>
+Message-ID: <96fd163b-e066-947c-35e0-925bb469b1b6@vivier.eu>
+Date: Wed, 24 Jan 2018 22:17:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180119145152.GA28929@kos.to>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 1/4] linux-user: Move CPU type name
- selection to a function
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: Fix race between threads
+ in page_unprotect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,528 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aaron Sierra <asierra@xes-inc.com>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, YunQiang Su <syq@debian.org>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Instead of a sequence of "#if ... #endif" move the
-selection to a function in linux-user/*/target_elf.h
+Le 19/01/2018 à 15:51, Riku Voipio a écrit :
+> Hi Laurent,
+> 
+> On Mon, Jan 15, 2018 at 01:52:32PM +0100, Laurent Vivier wrote:
+>> Le 15/01/2018 à 13:48, Peter Maydell a écrit :
+>>> On 28 November 2017 at 14:35, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>> If multiple guest threads in user-mode emulation write to a
+>>>> page which QEMU has marked read-only because of cached TCG
+>>>> translations, the threads can race in page_unprotect:
+>>>
+>>>> Peter Maydell (2):
+>>>>   linux-user: Propagate siginfo_t through to handle_cpu_signal()
+>>>>   page_unprotect(): handle calls to pages that are PAGE_WRITE
+>>>
+>>> Ping! Linux-user maintainers, any chance this could get into
+>>> a pull-request sometime soon? (I have another cleanup I'm
+>>> thinking of that will touch the same code so I'd rather this
+>>> went into master before I look at that.)
+>>>
+>>> (I have a bunch of other pending linux-user patchsets which
+>>> I shan't bother to ping individually unless you want me to.)
+>>
+>> Riku,
+>>
+>> if you have no time to prepare a pull request, I can.
+> 
+> Thanks, that would be great.
 
-We can't add them in linux-user/*/target_cpu.h
-because we will need to include "elf.h" to
-use ELF flags with eflags, and including
-"elf.h" in "target_cpu.h" introduces some
-conflicts in elfload.c
+Riku, if you agree, I can continue to collect patches for the next
+pull-request. It's easier to collect patches on the fly than scanning
+the ML when we want to create a pull request.
 
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- linux-user/aarch64/target_elf.h    | 14 +++++++++++++
- linux-user/alpha/target_elf.h      | 14 +++++++++++++
- linux-user/arm/target_elf.h        | 14 +++++++++++++
- linux-user/cris/target_elf.h       | 14 +++++++++++++
- linux-user/hppa/target_elf.h       | 14 +++++++++++++
- linux-user/i386/target_elf.h       | 14 +++++++++++++
- linux-user/m68k/target_elf.h       | 14 +++++++++++++
- linux-user/main.c                  | 41 ++------------------------------------
- linux-user/microblaze/target_elf.h | 14 +++++++++++++
- linux-user/mips/target_elf.h       | 14 +++++++++++++
- linux-user/mips64/target_elf.h     | 14 +++++++++++++
- linux-user/nios2/target_elf.h      | 14 +++++++++++++
- linux-user/openrisc/target_elf.h   | 14 +++++++++++++
- linux-user/ppc/target_elf.h        | 18 +++++++++++++++++
- linux-user/s390x/target_elf.h      | 14 +++++++++++++
- linux-user/sh4/target_elf.h        | 14 +++++++++++++
- linux-user/sparc/target_elf.h      | 14 +++++++++++++
- linux-user/sparc64/target_elf.h    | 14 +++++++++++++
- linux-user/tilegx/target_elf.h     | 14 +++++++++++++
- linux-user/unicore32/target_elf.h  | 14 +++++++++++++
- linux-user/x86_64/target_elf.h     | 14 +++++++++++++
- 21 files changed, 286 insertions(+), 39 deletions(-)
- create mode 100644 linux-user/aarch64/target_elf.h
- create mode 100644 linux-user/alpha/target_elf.h
- create mode 100644 linux-user/arm/target_elf.h
- create mode 100644 linux-user/cris/target_elf.h
- create mode 100644 linux-user/hppa/target_elf.h
- create mode 100644 linux-user/i386/target_elf.h
- create mode 100644 linux-user/m68k/target_elf.h
- create mode 100644 linux-user/microblaze/target_elf.h
- create mode 100644 linux-user/mips/target_elf.h
- create mode 100644 linux-user/mips64/target_elf.h
- create mode 100644 linux-user/nios2/target_elf.h
- create mode 100644 linux-user/openrisc/target_elf.h
- create mode 100644 linux-user/ppc/target_elf.h
- create mode 100644 linux-user/s390x/target_elf.h
- create mode 100644 linux-user/sh4/target_elf.h
- create mode 100644 linux-user/sparc/target_elf.h
- create mode 100644 linux-user/sparc64/target_elf.h
- create mode 100644 linux-user/tilegx/target_elf.h
- create mode 100644 linux-user/unicore32/target_elf.h
- create mode 100644 linux-user/x86_64/target_elf.h
-
-diff --git a/linux-user/aarch64/target_elf.h b/linux-user/aarch64/target_elf.h
-new file mode 100644
-index 0000000000..a7eb962fba
---- /dev/null
-+++ b/linux-user/aarch64/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef AARCH64_TARGET_ELF_H
-+#define AARCH64_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/alpha/target_elf.h b/linux-user/alpha/target_elf.h
-new file mode 100644
-index 0000000000..344e9f4d39
---- /dev/null
-+++ b/linux-user/alpha/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef ALPHA_TARGET_ELF_H
-+#define ALPHA_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/arm/target_elf.h b/linux-user/arm/target_elf.h
-new file mode 100644
-index 0000000000..58ff6a0986
---- /dev/null
-+++ b/linux-user/arm/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef ARM_TARGET_ELF_H
-+#define ARM_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/cris/target_elf.h b/linux-user/cris/target_elf.h
-new file mode 100644
-index 0000000000..99eb4ec704
---- /dev/null
-+++ b/linux-user/cris/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef CRIS_TARGET_ELF_H
-+#define CRIS_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/hppa/target_elf.h b/linux-user/hppa/target_elf.h
-new file mode 100644
-index 0000000000..82b4e9535e
---- /dev/null
-+++ b/linux-user/hppa/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HPPA_TARGET_ELF_H
-+#define HPPA_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/i386/target_elf.h b/linux-user/i386/target_elf.h
-new file mode 100644
-index 0000000000..1c6142e7da
---- /dev/null
-+++ b/linux-user/i386/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef I386_TARGET_ELF_H
-+#define I386_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "qemu32";
-+}
-+#endif
-diff --git a/linux-user/m68k/target_elf.h b/linux-user/m68k/target_elf.h
-new file mode 100644
-index 0000000000..df375ad5d3
---- /dev/null
-+++ b/linux-user/m68k/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef M68K_TARGET_ELF_H
-+#define M68K_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 450eb3ce65..3954e8996b 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -35,6 +35,7 @@
- #include "elf.h"
- #include "exec/log.h"
- #include "trace/control.h"
-+#include "target_elf.h"
- 
- char *exec_path;
- 
-@@ -4319,45 +4320,7 @@ int main(int argc, char **argv, char **envp)
-     init_qemu_uname_release();
- 
-     if (cpu_model == NULL) {
--#if defined(TARGET_I386)
--#ifdef TARGET_X86_64
--        cpu_model = "qemu64";
--#else
--        cpu_model = "qemu32";
--#endif
--#elif defined(TARGET_ARM)
--        cpu_model = "any";
--#elif defined(TARGET_UNICORE32)
--        cpu_model = "any";
--#elif defined(TARGET_M68K)
--        cpu_model = "any";
--#elif defined(TARGET_SPARC)
--#ifdef TARGET_SPARC64
--        cpu_model = "TI UltraSparc II";
--#else
--        cpu_model = "Fujitsu MB86904";
--#endif
--#elif defined(TARGET_MIPS)
--#if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64)
--        cpu_model = "5KEf";
--#else
--        cpu_model = "24Kf";
--#endif
--#elif defined TARGET_OPENRISC
--        cpu_model = "or1200";
--#elif defined(TARGET_PPC)
--# ifdef TARGET_PPC64
--        cpu_model = "POWER8";
--# else
--        cpu_model = "750";
--# endif
--#elif defined TARGET_SH4
--        cpu_model = "sh7785";
--#elif defined TARGET_S390X
--        cpu_model = "qemu";
--#else
--        cpu_model = "any";
--#endif
-+        cpu_model = cpu_get_model(0);
-     }
-     tcg_exec_init(0);
-     /* NOTE: we need to init the CPU at this stage to get
-diff --git a/linux-user/microblaze/target_elf.h b/linux-user/microblaze/target_elf.h
-new file mode 100644
-index 0000000000..8a8f1debff
---- /dev/null
-+++ b/linux-user/microblaze/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef MICROBLAZE_TARGET_ELF_H
-+#define MICROBLAZE_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/mips/target_elf.h b/linux-user/mips/target_elf.h
-new file mode 100644
-index 0000000000..bed0b43259
---- /dev/null
-+++ b/linux-user/mips/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef MIPS_TARGET_ELF_H
-+#define MIPS_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "24Kf";
-+}
-+#endif
-diff --git a/linux-user/mips64/target_elf.h b/linux-user/mips64/target_elf.h
-new file mode 100644
-index 0000000000..5b6f4692e0
---- /dev/null
-+++ b/linux-user/mips64/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef MIPS64_TARGET_ELF_H
-+#define MIPS64_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "5KEf";
-+}
-+#endif
-diff --git a/linux-user/nios2/target_elf.h b/linux-user/nios2/target_elf.h
-new file mode 100644
-index 0000000000..801e20afaf
---- /dev/null
-+++ b/linux-user/nios2/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef NIOS2_TARGET_ELF_H
-+#define NIOS2_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/openrisc/target_elf.h b/linux-user/openrisc/target_elf.h
-new file mode 100644
-index 0000000000..40ceb025c9
---- /dev/null
-+++ b/linux-user/openrisc/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef OPENRISC_TARGET_ELF_H
-+#define OPENRISC_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "or1200";
-+}
-+#endif
-diff --git a/linux-user/ppc/target_elf.h b/linux-user/ppc/target_elf.h
-new file mode 100644
-index 0000000000..576a5b9959
---- /dev/null
-+++ b/linux-user/ppc/target_elf.h
-@@ -0,0 +1,18 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef PPC_TARGET_ELF_H
-+#define PPC_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+#ifdef TARGET_PPC64
-+    return "POWER8";
-+#else
-+    return "750";
-+#endif
-+}
-+#endif
-diff --git a/linux-user/s390x/target_elf.h b/linux-user/s390x/target_elf.h
-new file mode 100644
-index 0000000000..8114b59c1d
---- /dev/null
-+++ b/linux-user/s390x/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef S390X_TARGET_ELF_H
-+#define S390X_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "qemu";
-+}
-+#endif
-diff --git a/linux-user/sh4/target_elf.h b/linux-user/sh4/target_elf.h
-new file mode 100644
-index 0000000000..f485e0cef2
---- /dev/null
-+++ b/linux-user/sh4/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef SH4_TARGET_ELF_H
-+#define SH4_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "sh7785";
-+}
-+#endif
-diff --git a/linux-user/sparc/target_elf.h b/linux-user/sparc/target_elf.h
-new file mode 100644
-index 0000000000..31d508c0df
---- /dev/null
-+++ b/linux-user/sparc/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef SPARC_TARGET_ELF_H
-+#define SPARC_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "Fujitsu MB86904";
-+}
-+#endif
-diff --git a/linux-user/sparc64/target_elf.h b/linux-user/sparc64/target_elf.h
-new file mode 100644
-index 0000000000..d6e388f1cf
---- /dev/null
-+++ b/linux-user/sparc64/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef SPARC64_TARGET_ELF_H
-+#define SPARC64_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "TI UltraSparc II";
-+}
-+#endif
-diff --git a/linux-user/tilegx/target_elf.h b/linux-user/tilegx/target_elf.h
-new file mode 100644
-index 0000000000..7197bb0005
---- /dev/null
-+++ b/linux-user/tilegx/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef TILEGX_TARGET_ELF_H
-+#define TILEGX_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/unicore32/target_elf.h b/linux-user/unicore32/target_elf.h
-new file mode 100644
-index 0000000000..e2bfcb2ca3
---- /dev/null
-+++ b/linux-user/unicore32/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef UNICORE32_TARGET_ELF_H
-+#define UNICORE32_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "any";
-+}
-+#endif
-diff --git a/linux-user/x86_64/target_elf.h b/linux-user/x86_64/target_elf.h
-new file mode 100644
-index 0000000000..7b76a90de8
---- /dev/null
-+++ b/linux-user/x86_64/target_elf.h
-@@ -0,0 +1,14 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef X86_64_TARGET_ELF_H
-+#define X86_64_TARGET_ELF_H
-+static inline const char *cpu_get_model(uint32_t eflags)
-+{
-+    return "qemu64";
-+}
-+#endif
--- 
-2.14.3
+Thanks,
+Laurent
