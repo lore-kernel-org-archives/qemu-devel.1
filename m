@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeUS1-000592-2B
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:29 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeUS1-00058z-19
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURz-0002Du-GU
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURx-0002BQ-51
 	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:29 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:44785)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:43639)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeURz-0002Cr-At
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:27 -0500
-Received: by mail-pf0-x243.google.com with SMTP id m26so4356011pfj.11
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:27:27 -0800 (PST)
-Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
-	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
-	z19sm9760028pfh.185.2018.01.24.15.27.24 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Jan 2018 15:27:25 -0800 (PST)
+	id 1eeURw-0002AM-VR
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:25 -0500
+Received: by mail-pf0-x244.google.com with SMTP id y26so4357787pfi.10
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:27:24 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 24 Jan 2018 15:26:19 -0800
-Message-Id: <20180124232625.30105-40-richard.henderson@linaro.org>
+Date: Wed, 24 Jan 2018 15:26:17 -0800
+Message-Id: <20180124232625.30105-38-richard.henderson@linaro.org>
 In-Reply-To: <20180124232625.30105-1-richard.henderson@linaro.org>
 References: <20180124232625.30105-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 39/45] target/hppa: Implement STWA
+Subject: [Qemu-devel] [PATCH v3 37/45] target/hppa: Implement LDSID for
+ system mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +28,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Helge Deller <deller@gmx.de>
 
+From: Helge Deller <deller@gmx.de>
+
+Signed-off-by: Helge Deller <deller@gmx.de>
+Message-Id: <20180102203145.GA17059@ls3530.fritz.box>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ target/hppa/translate.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index d84090d479..b9b097acc9 100644
+index 3327c085ff..cf67ca026e 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -3108,6 +3108,22 @@ static DisasJumpType trans_ldwa_idx_x(DisasContext *ctx, uint32_t insn,
-     ctx->mmu_idx = hold_mmu_idx;
-     return ret;
- }
-+
-+static DisasJumpType trans_stwa_idx_i(DisasContext *ctx, uint32_t insn,
-+                                      const DisasInsn *di)
-+{
-+    int hold_mmu_idx = ctx->mmu_idx;
-+    DisasJumpType ret;
-+
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+
-+    /* ??? needs fixing for hppa64 -- ldda does not follow the same
-+       format wrt the sub-opcode in bits 6:9.  */
-+    ctx->mmu_idx = MMU_PHYS_IDX;
-+    ret = trans_st_idx_i(ctx, insn, di);
-+    ctx->mmu_idx = hold_mmu_idx;
-+    return ret;
-+}
- #endif
+@@ -2211,8 +2211,20 @@ static DisasJumpType trans_ldsid(DisasContext *ctx, uint32_t insn,
+     unsigned rt = extract32(insn, 0, 5);
+     TCGv_reg dest = dest_gpr(ctx, rt);
  
- static const DisasInsn table_index_mem[] = {
-@@ -3117,8 +3133,9 @@ static const DisasInsn table_index_mem[] = {
-     { 0x0c0001c0u, 0xfc0003c0, trans_ldcw },
-     { 0x0c001300u, 0xfc0013c0, trans_stby },
- #ifndef CONFIG_USER_ONLY
--    { 0x0c001180u, 0xfc00d3c0, trans_ldwa_idx_i }, /* LDWA, im */
-     { 0x0c000180u, 0xfc00d3c0, trans_ldwa_idx_x }, /* LDWA, rx */
-+    { 0x0c001180u, 0xfc00d3c0, trans_ldwa_idx_i }, /* LDWA, im */
-+    { 0x0c001380u, 0xfc00d3c0, trans_stwa_idx_i }, /* STWA, im */
- #endif
- };
+-    /* Since we don't implement space registers, this returns zero.  */
++#ifdef CONFIG_USER_ONLY
++    /* We don't implement space registers in user mode. */
+     tcg_gen_movi_reg(dest, 0);
++#else
++    unsigned rb = extract32(insn, 21, 5);
++    unsigned sp = extract32(insn, 14, 2);
++    TCGv_i64 t0 = tcg_temp_new_i64();
++
++    tcg_gen_mov_i64(t0, space_select(ctx, sp, load_gpr(ctx, rb)));
++    tcg_gen_shri_i64(t0, t0, 32);
++    tcg_gen_trunc_i64_reg(dest, t0);
++
++    tcg_temp_free_i64(t0);
++#endif
+     save_gpr(ctx, rt, dest);
  
+     cond_free(&ctx->null_cond);
 -- 
 2.14.3
