@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1eeCMt-0006tx-G7
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 23:10:05 -0500
+	(envelope-from <fzheng@redhat.com>) id 1eeCXK-0000u4-QX
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 23:20:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1eeCMQ-0003KQ-2w
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 23:08:59 -0500
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:33788)
+	(envelope-from <fzheng@redhat.com>) id 1eeCWq-0005gt-BW
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 23:19:46 -0500
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:40474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1eeCMP-0003Im-Qw
-	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 23:08:29 -0500
-Received: by mail-wm0-f53.google.com with SMTP id x4so24701514wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 20:08:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1eeCWp-0005fU-L3
+	for qemu-devel@nongnu.org; Tue, 23 Jan 2018 23:19:15 -0500
+Received: by mail-wr0-f193.google.com with SMTP id 100so2773104wrb.7
+	for <qemu-devel@nongnu.org>; Tue, 23 Jan 2018 20:19:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <B2D15215269B544CADD246097EACE7473AB52A7A@DGGEMM505-MBS.china.huawei.com>
-References: <cover.1516329752.git.arei.gonglei@huawei.com>
-	<151634631594.596.13980731914055637021@5adcb62bf0d6>
-	<B2D15215269B544CADD246097EACE7473AB52A7A@DGGEMM505-MBS.china.huawei.com>
+In-Reply-To: <3f6911ff-bc2e-d32d-6516-ec737ebf4703@redhat.com>
+References: <20170709170614.24967-1-peter.maydell@linaro.org>
+	<20170728125446.GE3983@localhost.localdomain>
+	<3f6911ff-bc2e-d32d-6516-ec737ebf4703@redhat.com>
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 24 Jan 2018 12:07:58 +0800
-Message-ID: <CAK1Eb9kjRgxOz_0UqWonOdjC8Zei1+ypwU1zULTepXWBpZ63Vw@mail.gmail.com>
+Date: Wed, 24 Jan 2018 12:18:44 +0800
+Message-ID: <CAK1Eb9n0pRRD-_o7L7yYYJtaYtsKzw9O6AnjsJfFHXWvy6CqLw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] cryptodev: add vhost support
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/vmdk: Report failures
+ in vmdk_read_cid()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org, patches@linaro.org
 
-On Fri, Jan 19, 2018 at 4:13 PM, Zhoujian (jay) <jianjay.zhou@huawei.com> wrote:
-> [...]
->
->> Configure options:
->> --enable-werror --target-list=x86_64-softmmu,aarch64-softmmu --
->> prefix=/tmp/qemu-test/install
-> [...]
->
->> KVM support       yes
->> HAX support       no
->> HVF support       no
->> TCG support       yes
->> TCG debug enabled no
->> TCG interpreter   no
->> malloc trim support yes
->> RDMA support      yes
->> fdt support       yes
->> preadv support    yes
->> fdatasync         yes
->> madvise           yes
->> posix_madvise     yes
->> libcap-ng support no
->> vhost-net support yes
->> vhost-crypto support yes
->> vhost-scsi support yes
->> vhost-vsock support yes
->> vhost-user support yes
-> [...]
->
->> make[1]: *** No rule to make target `../backends/cryptodev-vhost-user.o',
->> needed by `qemu-system-x86_64'.  Stop.
->> make[1]: *** Waiting for unfinished jobs....
->
-> But it's successfully compiled using centos7 and mingw32 locally, and I couldn't
-> reproduce this. Is it related to docker? (I don't have docker environment in hand)
->
+On Fri, Jan 19, 2018 at 7:35 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 28/07/2017 14:54, Kevin Wolf wrote:
+>> Am 09.07.2017 um 19:06 hat Peter Maydell geschrieben:
+>>> The function vmdk_read_cid() can fail if the read on the underlying
+>>> block device fails, or if there's a format error in the VMDK file.
+>>> However its API doesn't provide a mechanism to report these errors,
+>>> and in some cases we were returning a CID of 0 and in some cases a
+>>> CID of 0xffffffff, either of which might potentially be valid values.
+>>>
+>>> Change the function to return 0 on success or a negative errno, and
+>>> return the CID via a uint32_t* argument. Update the callsites to
+>>> handle and propagate the error appropriately.
+>>>
+>>> This fixes in passing a Coverity-spotted issue (CID 1350038) where
+>>> we weren't checking the return value from sscanf().
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>
+>> Fam, this is the commit that introduced the qemu-iotests 059 failure for
+>> vmdk. I think what's happening is that we use an image produced by a
+>> fuzzer, and with the additional checks introduced in this patch, we now
+>> fail earlier and don't test the condition any more that we wanted to
+>> test.
+>>
+>> So do we need a new version of sample_images/afl9.vmdk.bz2 that has a
+>> valid CID?
 
-I don't know, maybe it's related to the -j8 parallelism? If you simply do:
-
-$ sudo yum install docker
-$ sudo systemctl start docker
-
-You'll have a docker environment ready. (you should be root or make
-sure passwordless sudo works in order to run docker commands). Then:
-
-$ make docker-test-build@min-glib V=1 J=8
-
-If it fails, add DEBUG=1 to the command line and start again. If will
-prompt you in a shell before building QEMU. Press ctrl-d to start
-building. When error happens, you'll be in the shell again to do usual
-things (debug, edit-build-run...).
-
-(We should add a docs/devel/docker-testing.txt describing the steps).
+I'll send a patch to fix the CID today.
 
 Fam
+
+>
+> This has never been fixed, has it?  I still see the failure.
+>
+> Paolo
