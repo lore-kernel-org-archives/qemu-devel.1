@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eeR4y-0005Sd-Ny
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:51:29 -0500
+	(envelope-from <rom@stratoscale.com>) id 1eeRAy-00076K-I7
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:57:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eeR4v-0004I0-K7
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:51:28 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:54731
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eeR4v-000470-DD
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:51:25 -0500
-References: <20180110204327.22510-1-jcd@tribudubois.net>
-	<a2aa7ea7-ac15-d69e-82cd-dad6c89c61c7@adacore.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <a2112b45-6e33-9d91-aa4a-ce424f8ffeb1@ilande.co.uk>
-Date: Wed, 24 Jan 2018 19:51:09 +0000
+	(envelope-from <rom@stratoscale.com>) id 1eeRAx-0001D7-LA
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:57:40 -0500
+Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:36015)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rom@stratoscale.com>) id 1eeRAx-0001Bx-Er
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 14:57:39 -0500
+Received: by mail-io0-x229.google.com with SMTP id l17so6103374ioc.3
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 11:57:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a2aa7ea7-ac15-d69e-82cd-dad6c89c61c7@adacore.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] LEON3 IRQMP: Fix IRQ software ack
+From: Rom Freiman <rom@stratoscale.com>
+Date: Wed, 24 Jan 2018 19:57:26 +0000
+Message-ID: <CADs-y4TVn-AZuhBFHCNTuHcyQHw+Q446Zq5b8Dh45tZCJNJ9qw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Solaris vm does not recognize all cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabien Chouteau <chouteau@adacore.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
-Cc: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 11/01/18 11:48, Fabien Chouteau wrote:
+Hey,
 
-> On 10/01/2018 21:43, Jean-Christophe Dubois wrote:
->> With the LEON3 IRQ controller IRQs can be acknoledged 2 ways:
->> * Explicitely by software writing to the CLEAR_OFFSET register
->> * Implicitely when the procesor is done running the trap handler attached
->>    to the IRQ.
->>
-> 
-> Thanks Jean-Christophe,
-> 
-> I tested the patch with our software and it works.
-> 
-> Reviewed-by: Fabien Chouteau <chouteau@adacore.com>
+I'm running solaris 11.2 vm above kvm/qemu (centos 7.3. x86_64).
+Unfortunately, inside the vm it does not recognize the correct cpu topology:
 
-Thanks. I've applied this (with some minor touch-ups to the commit 
-message) to my qemu-sparc branch.
+Seems that only one core per socket is recognized as device_type=cpu, while
+the rest are recognized as device_type="acpicpu" (prtconf -v) and are not
+counted as part of the cores (psrinfo -t).
+Not sure how to enforce all cores to be recognized.
+
+The cpu which is recognized appears as
+name='device_type' type=string items=1
+value='cpu'
+And those that are not:
+name='device_type' type=string items=1
+value='acpicpu'
+
+Libvirt xml is:
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cputune>
+    <shares>16384</shares>
+  </cputune>
+  <clock offset="utc">
+    <timer name="pit" tickpolicy="delay"/>
+    <timer name="rtc" tickpolicy="catchup"/>
+    <timer name="kvmclock" present="no"/>
+    <timer name="hpet" present="no"/>
+  </clock>
+  <cpu mode="custom" match="exact">
+    <model>Haswell-noTSX</model>
+    <feature name="x2apic" policy="disable"/>
+    <topology sockets='8' cores='4' threads='1'/>
+  </cpu>
 
 
-ATB,
+But tried other options as well (host model instead of Hasswell).
 
-Mark.
+Any help will be appreciated.
+
+Thanks,
+Rom
