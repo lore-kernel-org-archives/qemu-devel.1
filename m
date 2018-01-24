@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeONG-0004vz-JA
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 11:58:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eeOOk-0005wP-6m
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 11:59:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeONB-0004Ax-Nm
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 11:58:10 -0500
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:40679)
+	(envelope-from <peter.maydell@linaro.org>) id 1eeOOj-0005cp-LS
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 11:59:42 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeONB-00049z-HM
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 11:58:05 -0500
-Received: by mail-pf0-x236.google.com with SMTP id i66so3528011pfd.7
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 08:58:05 -0800 (PST)
-References: <20180124131315.30567-1-alex.bennee@linaro.org>
-	<20180124131315.30567-15-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f5053f60-9885-7aef-5f3e-b77a6cb924da@linaro.org>
-Date: Wed, 24 Jan 2018 08:58:01 -0800
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eeOOj-0005cU-HY
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 11:59:41 -0500
+Received: by mail-ot0-x243.google.com with SMTP id x15so4172264ote.1
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 08:59:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180124131315.30567-15-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 14/22] fpu/softfloat: re-factor div
+In-Reply-To: <20180122160048.29571-1-stefanha@redhat.com>
+References: <20180122160048.29571-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 24 Jan 2018 16:59:20 +0000
+Message-ID: <CAFEAcA-WdnbLTnDgONskNW6aBLYgUChnGpW-MK2cuXcVm9OL7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 0/6] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,15 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/24/2018 05:13 AM, Alex Bennée wrote:
-> +    if (a.cls >= float_class_qnan || b.cls >= float_class_qnan) {
-> +        return pick_nan_parts(a, b, s);
-> +    }
+On 22 January 2018 at 16:00, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit b384cd95eb9c6f73ad84ed1bb0717a26e29cc78f:
+>
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2018-01-19 16:35:25 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to bcbb3866da19cce4360c828b6ec1c2a137757927:
+>
+>   block/parallels: add backing support to readv/writev (2018-01-22 14:02:33 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> v2:
+>  * Drop merge failure from a previous pull request that broke virtio-blk on ARM
+>    guests
+>  * Add Parallels XML patch series
+>
 
-is_nan.
+Applied, thanks.
 
-
-r~
+-- PMM
