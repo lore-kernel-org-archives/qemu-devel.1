@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eeHU1-0001Kw-3P
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:36:42 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eeHUA-0001PC-2x
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:36:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eeHTx-0007vp-QP
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:36:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eeHTx-0007tM-Ho
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:36:37 -0500
-References: <1516747387-31760-1-git-send-email-mst@redhat.com>
-	<1516747387-31760-2-git-send-email-mst@redhat.com>
-	<20180124094621.46ff2f43@bahia.lan> <20180124100500.1f9bf54a@bahia.lan>
-	<d0698024-65ae-fb6b-397d-cccdc1fb36f4@redhat.com>
-	<20180124103402.6ef42523@bahia.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c8276936-5786-fd71-15ba-49143a64da49@redhat.com>
-Date: Wed, 24 Jan 2018 10:36:24 +0100
+	(envelope-from <laurent@vivier.eu>) id 1eeHU6-0008Li-Qr
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:36:50 -0500
+References: <39441aea4e2d05cc505ed3a373e81d3869eb994a.1516785202.git.agx@sigxcpu.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <88c65afc-cbc5-9091-7c9e-535a242c65ed@vivier.eu>
+Date: Wed, 24 Jan 2018 10:36:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180124103402.6ef42523@bahia.lan>
+In-Reply-To: <39441aea4e2d05cc505ed3a373e81d3869eb994a.1516785202.git.agx@sigxcpu.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 1/1] kvm-all: Partially reverts 4fe6d78b2e
- to remove the cleanup call
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix register used for 6th
+ syscall argument on aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,125 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Anton Blanchard <anton@samba.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-On 24/01/2018 10:34, Greg Kurz wrote:
-> On Wed, 24 Jan 2018 10:14:57 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
->> On 24/01/2018 10:05, Greg Kurz wrote:
->>> On Wed, 24 Jan 2018 09:46:21 +0100
->>> Greg Kurz <groug@kaod.org> wrote:
->>>   
->>>> Please note that Peter usually doesn't work on Wednesdays. The master branch
->>>> might remain broken for everyone until tomorrow... :-\
->>>>
->>>> And I don't think this is the right fix anyway. See below.
->>>>
->>>> On Wed, 24 Jan 2018 00:44:14 +0200
->>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>>>  
->>>>> From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
->>>>>
->>>>> This commit partially reverts the commit 4fe6d78b2e because of issues
->>>>> reported in the virtio.
->>>>>
->>>>> Examples:
->>>>>
->>>>> $ qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G \
->>>>>   -M pseries,accel=kvm -netdev type=user,id=net0 \
->>>>>   -device virtio-net-pci,netdev=net0 -drive file=../disk.qcow2,if=virtio
->>>>>
->>>>> Populating /vdevice/nvram@71000001
->>>>> Populating /vdevice/v-scsi@71000002
->>>>>        SCSI: Looking for devices
->>>>>           8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
->>>>> Populating /pci@800000020000000
->>>>>                      00 0000 (D) : 1af4 1000    virtio [ net ]
->>>>> Aborted
->>>>>
->>>>> $ qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
->>>>>
->>>>> Running QEMU with GTK 2.x is deprecated, and will be removed
->>>>> in a future release. Please switch to GTK 3.x instead
->>>>> [1]    5282 abort
->>>>>
->>>>> Reference http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
->>>>>
->>>>> Reported-by: Anton Blanchard <anton@samba.org>
->>>>> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
->>>>> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->>>>> Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->>>>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>>>> ---
->>>>>  accel/kvm/kvm-all.c | 4 ----
->>>>>  1 file changed, 4 deletions(-)
->>>>>
->>>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>>>> index 071f4f5..f290f48 100644
->>>>> --- a/accel/kvm/kvm-all.c
->>>>> +++ b/accel/kvm/kvm-all.c
->>>>> @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
->>>>>      if (r < 0) {
->>>>>          abort();
->>>>>      }
->>>>> -
->>>>> -    if (e->cleanup) {
->>>>> -        e->cleanup(e);
->>>>> -    }    
->>>>
->>>> This looks wrong as the cleanup is expected to do things like closing fds:
->>>>
->>>> static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
->>>> {
->>>>     /* Test and clear notifier after disabling event,
->>>>      * in case poll callback didn't have time to run.
->>>>      */
->>>>     virtio_queue_host_notifier_read(notifier);
->>>>     event_notifier_cleanup(notifier);
->>>> }
->>>>
->>>> void event_notifier_cleanup(EventNotifier *e)
->>>> {
->>>>     if (e->rfd != e->wfd) {
->>>>         close(e->rfd);
->>>>     }
->>>>     close(e->wfd);
->>>>     e->rfd = -1;
->>>>     e->wfd = -1;
->>>>     e->cleanup = NULL;
->>>> }
->>>>
->>>> And indeed, with this patch applied, QEMU leaks eventfds on every machine
->>>> reset.
->>>>  
->>>
->>> Reverting 4fe6d78b2e entirely isn't even enough and QEMU aborts at the
->>> next machine reset. The following commit must be reverted as well:
->>>
->>> commit 6f0bb230722931d17fb284eee8efd40b9d653822
->>> Author: Gal Hammer <ghammer@redhat.com>
->>> Date:   Sun Jan 14 12:06:56 2018 +0200
->>>
->>>     virtio: improve virtio devices initialization time  
->>
->> I'm a bit confused by this patch.  The basic idea of wrapping with
->> transaction_begin/commit is clear (without it you have quadratic
->> behavior from removing one ioeventfd at a time), but I don't understand
->> why the new ->cleanup member is needed.
-> 
-> I don't understand either... the cover letter of the series says:
-> 
-> "The patch wraps all the changes made to the Memory Regions during the
-> eventfd registrations in a memory regions transaction. I had to add a
-> cleanup callback function to the EventNotifier struct, so it will be
-> possible to use a transaction in the shutdown code path as well."
-> 
-> Until this is sorted out, maybe best to revert both commits or even
-> the full series (ie, f87d72f5c5bf as well), no ?
+CC: Richard has he wrote this code.
 
-Yes, indeed.
+Thanks,
+Laurent
 
-Paolo
+Le 24/01/2018 à 10:14, Guido Günther a écrit :
+> Unbreaks the testcase from
+> 
+>     http://lists.nongnu.org/archive/html/qemu-arm/2018-01/msg00514.html
+> 
+> Signed-off-by: Guido Günther <agx@sigxcpu.org>
+> ---
+>  linux-user/host/aarch64/safe-syscall.inc.S | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-user/host/aarch64/safe-syscall.inc.S b/linux-user/host/aarch64/safe-syscall.inc.S
+> index 58a2329b37..e4fbc31454 100644
+> --- a/linux-user/host/aarch64/safe-syscall.inc.S
+> +++ b/linux-user/host/aarch64/safe-syscall.inc.S
+> @@ -36,7 +36,7 @@ safe_syscall_base:
+>  	 *               and return the result in x0
+>  	 * and the syscall instruction needs
+>  	 *               x8 == syscall number
+> -	 *               x0 ... x7 == syscall arguments
+> +	 *               x0 ... x5 == syscall arguments
+>  	 *               and returns the result in x0
+>  	 * Shuffle everything around appropriately.
+>  	 */
+> @@ -47,7 +47,7 @@ safe_syscall_base:
+>  	mov	x2, x4
+>  	mov	x3, x5
+>  	mov	x4, x6
+> -	mov	x6, x7
+> +	mov	x5, x7
+>  	ldr	x7, [sp]
+>  
+>  	/* This next sequence of code works in conjunction with the
+> 
