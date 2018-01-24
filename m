@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeDpd-0002jS-7r
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:42:47 -0500
+	(envelope-from <peterx@redhat.com>) id 1eeDpi-0002pQ-Vb
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:42:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eeDpa-0000jE-0v
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:42:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39460)
+	(envelope-from <peterx@redhat.com>) id 1eeDph-0000qf-HF
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:42:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeDpZ-0000iI-Na
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:42:41 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeDph-0000pi-7O
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 00:42:49 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 24 Jan 2018 13:39:51 +0800
-Message-Id: <20180124053957.29145-18-peterx@redhat.com>
+Date: Wed, 24 Jan 2018 13:39:52 +0800
+Message-Id: <20180124053957.29145-19-peterx@redhat.com>
 In-Reply-To: <20180124053957.29145-1-peterx@redhat.com>
 References: <20180124053957.29145-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 17/23] qapi: introduce new cmd option
- "allow-oob"
+Subject: [Qemu-devel] [PATCH v7 18/23] qmp: support out-of-band (oob)
+ execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,247 +27,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Here "oob" stands for "Out-Of-Band".  When "allow-oob" is set, it means
-the command allows out-of-band execution.
+Having "allow-oob" to true for a command does not mean that this command
+will always be run in out-of-band mode.  The out-of-band quick path will
+only be executed if we specify the extra "run-oob" flag when sending the
+QMP request:
 
-The "oob" idea is proposed by Markus Armbruster in following thread:
+    { "execute":   "command-that-allows-oob",
+      "arguments": { ... },
+      "control":   { "run-oob": true } }
 
-  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg02057.html
+The "control" key is introduced to store this extra flag.  "control"
+field is used to store arguments that are shared by all the commands,
+rather than command specific arguments.  Let "run-oob" be the first.
 
-This new "allow-oob" boolean will be exposed by "query-qmp-schema" as
-well for command entries, so that QMP clients can know which command can
-be used as out-of-band calls. For example the command "migrate"
-originally looks like:
+Note that in the patch I exported qmp_dispatch_check_obj() to be used to
+check the request earlier, and at the same time allowed "id" field to be
+there since actually we always allow that.
 
-  {"name": "migrate", "ret-type": "17", "meta-type": "command",
-   "arg-type": "86"}
-
-And it'll be changed into:
-
-  {"name": "migrate", "ret-type": "17", "allow-oob": false,
-   "meta-type": "command", "arg-type": "86"}
-
-This patch only provides the QMP interface level changes.  It does not
-contains the real out-of-band execution implementation yet.
-
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/qapi/qmp/dispatch.h    |  1 +
- qapi/introspect.json           |  6 +++++-
- scripts/qapi-commands.py       | 19 ++++++++++++++-----
- scripts/qapi-introspect.py     | 10 ++++++++--
- scripts/qapi.py                | 15 ++++++++++-----
- scripts/qapi2texi.py           |  2 +-
- tests/qapi-schema/test-qapi.py |  2 +-
- 7 files changed, 40 insertions(+), 15 deletions(-)
+ include/qapi/qmp/dispatch.h |  2 ++
+ monitor.c                   | 84 ++++++++++++++++++++++++++++++++++++++++-----
+ qapi/qmp-dispatch.c         | 32 ++++++++++++++++-
+ trace-events                |  2 ++
+ 4 files changed, 110 insertions(+), 10 deletions(-)
 
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 20578dcd48..b76798800c 100644
+index b76798800c..d8d913b338 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -23,6 +23,7 @@ typedef enum QmpCommandOptions
+@@ -49,6 +49,8 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+ QObject *qmp_build_error_object(Error *err);
++QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp);
++bool qmp_is_oob(QDict *dict);
+ 
+ typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
+ 
+diff --git a/monitor.c b/monitor.c
+index bf0f3d1662..d31da3fd1b 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1106,6 +1106,44 @@ static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
+     }
+ }
+ 
++/*
++ * Return true if check successful, or false otherwise.  When false is
++ * returned, detailed error will be in errp if provided.
++ */
++static bool qmp_cmd_oob_check(Monitor *mon, QDict *req, Error **errp)
++{
++    const char *command;
++    QmpCommand *cmd;
++
++    command = qdict_get_try_str(req, "execute");
++    if (!command) {
++        error_setg(errp, "Command field 'execute' missing");
++        return false;
++    }
++
++    cmd = qmp_find_command(mon->qmp.commands, command);
++    if (!cmd) {
++        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
++                  "The command %s has not been found", command);
++        return false;
++    }
++
++    if (qmp_is_oob(req)) {
++        if (!qmp_oob_enabled(mon)) {
++            error_setg(errp, "Please enable Out-Of-Band first "
++                       "for the session during capabilities negociation");
++            return false;
++        }
++        if (!(cmd->options & QCO_ALLOW_OOB)) {
++            error_setg(errp, "The command %s does not support OOB",
++                       command);
++            return false;
++        }
++    }
++
++    return true;
++}
++
+ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+                           Error **errp)
  {
-     QCO_NO_OPTIONS = 0x0,
-     QCO_NO_SUCCESS_RESP = 0x1,
-+    QCO_ALLOW_OOB = 0x2,
- } QmpCommandOptions;
+@@ -4049,6 +4087,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
+     QMPRequest *req_obj = monitor_qmp_requests_pop_one();
  
- typedef struct QmpCommand
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 5b3e6e9d78..c7f67b7d78 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -259,12 +259,16 @@
- #
- # @ret-type: the name of the command's result type.
- #
-+# @allow-oob: whether the command allows out-of-band execution.
-+#             (Since: 2.12)
-+#
- # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
- #
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoCommand',
--  'data': { 'arg-type': 'str', 'ret-type': 'str' } }
-+  'data': { 'arg-type': 'str', 'ret-type': 'str',
-+            'allow-oob': 'bool' } }
- 
- ##
- # @SchemaInfoEvent:
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 974d0a4a80..b2b0bc0510 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -192,10 +192,18 @@ out:
-     return ret
- 
- 
--def gen_register_command(name, success_response):
--    options = 'QCO_NO_OPTIONS'
-+def gen_register_command(name, success_response, allow_oob):
-+    options = []
+     if (req_obj) {
++        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
+         monitor_qmp_dispatch_one(req_obj);
+         /* Reschedule instead of looping so the main loop stays responsive */
+         qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+@@ -4072,17 +4111,31 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         error_setg(&err, QERR_JSON_PARSING);
+     }
+     if (err) {
+-        monitor_qmp_respond(mon, NULL, err, NULL);
+-        qobject_decref(req);
+-        return;
++        goto err;
++    }
 +
-     if not success_response:
--        options = 'QCO_NO_SUCCESS_RESP'
-+        options += ['QCO_NO_SUCCESS_RESP']
-+    if allow_oob:
-+        options += ['QCO_ALLOW_OOB']
++    /* Check against the request in general layout */
++    qdict = qmp_dispatch_check_obj(req, &err);
++    if (!qdict) {
++        goto err;
+     }
+ 
+-    qdict = qobject_to_qdict(req);
+-    if (qdict) {
+-        id = qdict_get(qdict, "id");
+-        qobject_incref(id);
+-        qdict_del(qdict, "id");
+-    } /* else will fail qmp_dispatch() */
++    /* Check against OOB specific */
++    if (!qmp_cmd_oob_check(mon, qdict, &err)) {
++        goto err;
++    }
 +
-+    if not options:
-+        options = ['QCO_NO_OPTIONS']
++    id = qdict_get(qdict, "id");
 +
-+    options = " | ".join(options)
++    /* When OOB is enabled, the "id" field is mandatory. */
++    if (qmp_oob_enabled(mon) && !id) {
++        error_setg(&err, "Out-Of-Band capability requires that "
++                   "every command contains an 'id' field");
++        goto err;
++    }
++
++    qobject_incref(id);
++    qdict_del(qdict, "id");
  
-     ret = mcgen('''
-     qmp_register_command(cmds, "%(name)s",
-@@ -241,7 +249,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-         self._visited_ret_types = None
+     req_obj = g_new0(QMPRequest, 1);
+     req_obj->mon = mon;
+@@ -4090,6 +4143,14 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+     req_obj->req = req;
+     req_obj->need_resume = false;
  
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         if not gen:
-             return
-         self.decl += gen_command_decl(name, arg_type, boxed, ret_type)
-@@ -250,7 +258,8 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-             self.defn += gen_marshal_output(ret_type)
-         self.decl += gen_marshal_decl(name)
-         self.defn += gen_marshal(name, arg_type, boxed, ret_type)
--        self._regy += gen_register_command(name, success_response)
-+        self._regy += gen_register_command(name, success_response,
-+                                           allow_oob)
++    if (qmp_is_oob(qdict)) {
++        /* Out-Of-Band (OOB) requests are executed directly in parser. */
++        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req_obj->id)
++                                          ?: "");
++        monitor_qmp_dispatch_one(req_obj);
++        return;
++    }
++
+     /* Protect qmp_requests and fetching its length. */
+     qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
  
+@@ -4126,6 +4187,11 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
  
- (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index 032bcea491..9fbf88b644 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -28,6 +28,11 @@ def to_json(obj, level=0):
-                               to_json(obj[key], level + 1))
-                 for key in sorted(obj.keys())]
-         ret = '{' + ', '.join(elts) + '}'
-+    elif isinstance(obj, bool):
-+        if obj:
-+            ret = 'true'
-+        else:
-+            ret = 'false'
-     else:
-         assert False                # not implemented
-     if level == 1:
-@@ -154,12 +159,13 @@ const char %(c_name)s[] = %(c_string)s;
-                                     for m in variants.variants]})
+     /* Kick the dispatcher routine */
+     qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
++    return;
++
++err:
++    monitor_qmp_respond(mon, NULL, err, NULL);
++    qobject_decref(req);
+ }
  
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         arg_type = arg_type or self._schema.the_empty_object_type
-         ret_type = ret_type or self._schema.the_empty_object_type
-         self._gen_json(name, 'command',
-                        {'arg-type': self._use_type(arg_type),
--                        'ret-type': self._use_type(ret_type)})
-+                        'ret-type': self._use_type(ret_type),
-+                        'allow-oob': allow_oob})
+ static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index b41fa174fe..675223e0ec 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -20,7 +20,7 @@
+ #include "qapi-types.h"
+ #include "qapi/qmp/qerror.h"
  
-     def visit_event(self, name, info, arg_type, boxed):
-         arg_type = arg_type or self._schema.the_empty_object_type
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 43a54bf40f..61cc33660b 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -911,7 +911,8 @@ def check_exprs(exprs):
-         elif 'command' in expr:
-             meta = 'command'
-             check_keys(expr_elem, 'command', [],
--                       ['data', 'returns', 'gen', 'success-response', 'boxed'])
-+                       ['data', 'returns', 'gen', 'success-response',
-+                        'boxed', 'allow-oob'])
-         elif 'event' in expr:
-             meta = 'event'
-             check_keys(expr_elem, 'event', [], ['data', 'boxed'])
-@@ -1022,7 +1023,7 @@ class QAPISchemaVisitor(object):
-         pass
+-static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
++QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ {
+     const QDictEntry *ent;
+     const char *arg_name;
+@@ -52,6 +52,14 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+                            "QMP input member 'arguments' must be an object");
+                 return NULL;
+             }
++        } else if (!strcmp(arg_name, "id")) {
++            continue;
++        } else if (!strcmp(arg_name, "control")) {
++            if (qobject_type(arg_obj) != QTYPE_QDICT) {
++                error_setg(errp,
++                           "QMP input member 'control' must be a dict");
++                return NULL;
++            }
+         } else {
+             error_setg(errp, "QMP input member '%s' is unexpected",
+                        arg_name);
+@@ -122,6 +130,28 @@ QObject *qmp_build_error_object(Error *err)
+                               error_get_pretty(err));
+ }
  
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         pass
++/*
++ * Detect whether a request should be run out-of-band, by quickly
++ * peeking at whether we have: { "control": { "run-oob": True } }. By
++ * default commands are run in-band.
++ */
++bool qmp_is_oob(QDict *dict)
++{
++    QBool *bool_obj;
++
++    dict = qdict_get_qdict(dict, "control");
++    if (!dict) {
++        return false;
++    }
++
++    bool_obj = qobject_to_qbool(qdict_get(dict, "run-oob"));
++    if (!bool_obj) {
++        return false;
++    }
++
++    return qbool_get_bool(bool_obj);
++}
++
+ QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request)
+ {
+     Error *err = NULL;
+diff --git a/trace-events b/trace-events
+index eecb68b1d5..d62d4e87ed 100644
+--- a/trace-events
++++ b/trace-events
+@@ -48,6 +48,8 @@ monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate) "event=
+ handle_hmp_command(void *mon, const char *cmdline) "mon %p cmdline: %s"
+ handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
+ monitor_suspend(void *ptr, int cnt) "mon %p: %d"
++monitor_qmp_cmd_in_band(const char *id) "%s"
++monitor_qmp_cmd_out_of_band(const char *id) "%s"
  
-     def visit_event(self, name, info, arg_type, boxed):
-@@ -1389,7 +1390,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
- 
- class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, doc, arg_type, ret_type,
--                 gen, success_response, boxed):
-+                 gen, success_response, boxed, allow_oob):
-         QAPISchemaEntity.__init__(self, name, info, doc)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-@@ -1400,6 +1401,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.gen = gen
-         self.success_response = success_response
-         self.boxed = boxed
-+        self.allow_oob = allow_oob
- 
-     def check(self, schema):
-         if self._arg_type_name:
-@@ -1423,7 +1425,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
-     def visit(self, visitor):
-         visitor.visit_command(self.name, self.info,
-                               self.arg_type, self.ret_type,
--                              self.gen, self.success_response, self.boxed)
-+                              self.gen, self.success_response,
-+                              self.boxed, self.allow_oob)
- 
- 
- class QAPISchemaEvent(QAPISchemaEntity):
-@@ -1631,6 +1634,7 @@ class QAPISchema(object):
-         gen = expr.get('gen', True)
-         success_response = expr.get('success-response', True)
-         boxed = expr.get('boxed', False)
-+        allow_oob = expr.get('allow-oob', False)
-         if isinstance(data, OrderedDict):
-             data = self._make_implicit_object_type(
-                 name, info, doc, 'arg', self._make_members(data, info))
-@@ -1638,7 +1642,8 @@ class QAPISchema(object):
-             assert len(rets) == 1
-             rets = self._make_array_type(rets[0], info)
-         self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
--                                           gen, success_response, boxed))
-+                                           gen, success_response,
-+                                           boxed, allow_oob))
- 
-     def _def_event(self, expr, info, doc):
-         name = expr['event']
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 92e2af2cd6..634ab3edb7 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -226,7 +226,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-                              body=texi_entity(doc, 'Members'))
- 
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         doc = self.cur_doc
-         if boxed:
-             body = texi_body(doc)
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index fe0ca08d78..5c3ddce6a2 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -36,7 +36,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_variants(variants)
- 
-     def visit_command(self, name, info, arg_type, ret_type,
--                      gen, success_response, boxed):
-+                      gen, success_response, boxed, allow_oob):
-         print 'command %s %s -> %s' % \
-             (name, arg_type and arg_type.name, ret_type and ret_type.name)
-         print '   gen=%s success_response=%s boxed=%s' % \
+ # dma-helpers.c
+ dma_blk_io(void *dbs, void *bs, int64_t offset, bool to_dev) "dbs=%p bs=%p offset=%" PRId64 " to_dev=%d"
 -- 
 2.14.3
