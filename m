@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eeKrv-0003P7-CO
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:38 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eeKrx-0003S7-7B
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eeKrs-0003vW-32
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:35 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:44452)
+	(envelope-from <alex.bennee@linaro.org>) id 1eeKrv-0003yV-6C
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:37 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37036)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eeKrr-0003tq-ND
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:32 -0500
-Received: by mail-wm0-x242.google.com with SMTP id t74so8450051wme.3
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:13:31 -0800 (PST)
+	id 1eeKru-0003yP-St
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:35 -0500
+Received: by mail-wm0-x241.google.com with SMTP id v71so8554006wmv.2
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:13:34 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 24 Jan 2018 13:13:05 +0000
-Message-Id: <20180124131315.30567-13-alex.bennee@linaro.org>
+Date: Wed, 24 Jan 2018 13:13:07 +0000
+Message-Id: <20180124131315.30567-15-alex.bennee@linaro.org>
 In-Reply-To: <20180124131315.30567-1-alex.bennee@linaro.org>
 References: <20180124131315.30567-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 12/22] fpu/softfloat: re-factor add/sub
+Subject: [Qemu-devel] [PATCH v3 14/22] fpu/softfloat: re-factor div
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,9 +32,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-We can now add float16_add/sub and use the common decompose and
+We can now add float16_div and use the common decompose and
 canonicalize functions to have a single implementation for
-float16/32/64 add and sub functions.
+float16/32/64 versions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
@@ -42,486 +42,160 @@ Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
 
 v3
- - renames for FloatParts
- - shorten internal names
- - fix comment style
- - use FloatFmt values for for extract/deposit in raw_pack/unpack
- - move #include bitops from previous patch
- - add is_nan helper
- - avoid temp variables where we can
+  - rename functions and structures
 ---
- fpu/softfloat.c         | 884 +++++++++++++++++++++++++-----------------------
- include/fpu/softfloat.h |   4 +
- 2 files changed, 461 insertions(+), 427 deletions(-)
+ fpu/softfloat-macros.h  |  44 +++++++++
+ fpu/softfloat.c         | 236 ++++++++++++++++++------------------------------
+ include/fpu/softfloat.h |   1 +
+ 3 files changed, 133 insertions(+), 148 deletions(-)
 
+diff --git a/fpu/softfloat-macros.h b/fpu/softfloat-macros.h
+index 9cc6158cb4..980be2c051 100644
+--- a/fpu/softfloat-macros.h
++++ b/fpu/softfloat-macros.h
+@@ -625,6 +625,50 @@ static uint64_t estimateDiv128To64( uint64_t a0, uint64_t a1, uint64_t b )
+ 
+ }
+ 
++/* Nicked from gmp longlong.h __udiv_qrnnd */
++static uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
++{
++    uint64_t d0, d1, q0, q1, r1, r0, m;
++
++    d0 = (uint32_t)d;
++    d1 = d >> 32;
++
++    r1 = n1 % d1;
++    q1 = n1 / d1;
++    m = q1 * d0;
++    r1 = (r1 << 32) | (n0 >> 32);
++    if (r1 < m) {
++        q1 -= 1;
++        r1 += d;
++        if (r1 >= d) {
++            if (r1 < m) {
++                q1 -= 1;
++                r1 += d;
++            }
++        }
++    }
++    r1 -= m;
++
++    r0 = r1 % d1;
++    q0 = r1 / d1;
++    m = q0 * d0;
++    r0 = (r0 << 32) | (uint32_t)n0;
++    if (r0 < m) {
++        q0 -= 1;
++        r0 += d;
++        if (r0 >= d) {
++            if (r0 < m) {
++                q0 -= 1;
++                r0 += d;
++            }
++        }
++    }
++    r0 -= m;
++
++    /* Return remainder in LSB */
++    return (q1 << 32) | q0 | (r0 != 0);
++}
++
+ /*----------------------------------------------------------------------------
+ | Returns an approximation to the square root of the 32-bit significand given
+ | by `a'.  Considered as an integer, `a' must be at least 2^31.  If bit 0 of
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 568d555595..b179790889 100644
+index bbd2ab9355..e536d423b7 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -83,6 +83,7 @@ this code that are retained.
-  * target-dependent and needs the TARGET_* macros.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/bitops.h"
- #include "fpu/softfloat.h"
+@@ -805,6 +805,94 @@ float64 float64_mul(float64 a, float64 b, float_status *status)
+     return float64_round_pack_canonical(pr, status);
+ }
  
- /* We only need stdlib for abort() */
-@@ -270,6 +271,462 @@ static const FloatFmt float64_params = {
-     FLOAT_PARAMS(11, 52)
- };
- 
-+/* Unpack a float to parts, but do not canonicalize.  */
-+static inline FloatParts unpack_raw(FloatFmt fmt, uint64_t raw)
-+{
-+    const int sign_pos = fmt.frac_size + fmt.exp_size;
-+
-+    return (FloatParts) {
-+        .cls = float_class_unclassified,
-+        .sign = extract64(raw, sign_pos, 1),
-+        .exp = extract64(raw, fmt.frac_size, fmt.exp_size),
-+        .frac = extract64(raw, 0, fmt.frac_size),
-+    };
-+}
-+
-+static inline FloatParts float16_unpack_raw(float16 f)
-+{
-+    return unpack_raw(float16_params, f);
-+}
-+
-+static inline FloatParts float32_unpack_raw(float32 f)
-+{
-+    return unpack_raw(float32_params, f);
-+}
-+
-+static inline FloatParts float64_unpack_raw(float64 f)
-+{
-+    return unpack_raw(float64_params, f);
-+}
-+
-+/* Pack a float from parts, but do not canonicalize.  */
-+static inline uint64_t pack_raw(FloatFmt fmt, FloatParts p)
-+{
-+    const int sign_pos = fmt.frac_size + fmt.exp_size;
-+    uint64_t ret = p.frac;
-+
-+    ret = deposit64(ret, fmt.frac_size, fmt.exp_size, p.exp);
-+    ret = deposit64(ret, sign_pos, 1, p.sign);
-+    return ret;
-+}
-+
-+static inline float16 float16_pack_raw(FloatParts p)
-+{
-+    return make_float16(pack_raw(float16_params, p));
-+}
-+
-+static inline float32 float32_pack_raw(FloatParts p)
-+{
-+    return make_float32(pack_raw(float32_params, p));
-+}
-+
-+static inline float64 float64_pack_raw(FloatParts p)
-+{
-+    return make_float64(pack_raw(float64_params, p));
-+}
-+
-+/* Canonicalize EXP and FRAC, setting CLS.  */
-+static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
-+                               float_status *status)
-+{
-+    if (part.exp == parm->exp_max) {
-+        if (part.frac == 0) {
-+            part.cls = float_class_inf;
-+        } else {
-+#ifdef NO_SIGNALING_NANS
-+            part.cls = float_class_qnan;
-+#else
-+            int64_t msb = part.frac << (parm->frac_shift + 2);
-+            if ((msb < 0) == status->snan_bit_is_one) {
-+                part.cls = float_class_snan;
-+            } else {
-+                part.cls = float_class_qnan;
-+            }
-+#endif
-+        }
-+    } else if (part.exp == 0) {
-+        if (likely(part.frac == 0)) {
-+            part.cls = float_class_zero;
-+        } else if (status->flush_inputs_to_zero) {
-+            float_raise(float_flag_input_denormal, status);
-+            part.cls = float_class_zero;
-+            part.frac = 0;
-+        } else {
-+            int shift = clz64(part.frac) - 1;
-+            part.cls = float_class_normal;
-+            part.exp = parm->frac_shift - parm->exp_bias - shift + 1;
-+            part.frac <<= shift;
-+        }
-+    } else {
-+        part.cls = float_class_normal;
-+        part.exp -= parm->exp_bias;
-+        part.frac = DECOMPOSED_IMPLICIT_BIT + (part.frac << parm->frac_shift);
-+    }
-+    return part;
-+}
-+
-+/* Round and uncanonicalize a floating-point number by parts. There
-+ * are FRAC_SHIFT bits that may require rounding at the bottom of the
-+ * fraction; these bits will be removed. The exponent will be biased
-+ * by EXP_BIAS and must be bounded by [EXP_MAX-1, 0].
-+ */
-+
-+static FloatParts round_canonical(FloatParts p, float_status *s,
-+                                  const FloatFmt *parm)
-+{
-+    const uint64_t frac_lsbm1 = parm->frac_lsbm1;
-+    const uint64_t round_mask = parm->round_mask;
-+    const uint64_t roundeven_mask = parm->roundeven_mask;
-+    const int exp_max = parm->exp_max;
-+    const int frac_shift = parm->frac_shift;
-+    uint64_t frac, inc;
-+    int exp, flags = 0;
-+    bool overflow_norm;
-+
-+    frac = p.frac;
-+    exp = p.exp;
-+
-+    switch (p.cls) {
-+    case float_class_normal:
-+        switch (s->float_rounding_mode) {
-+        case float_round_nearest_even:
-+            overflow_norm = false;
-+            inc = ((frac & roundeven_mask) != frac_lsbm1 ? frac_lsbm1 : 0);
-+            break;
-+        case float_round_ties_away:
-+            overflow_norm = false;
-+            inc = frac_lsbm1;
-+            break;
-+        case float_round_to_zero:
-+            overflow_norm = true;
-+            inc = 0;
-+            break;
-+        case float_round_up:
-+            inc = p.sign ? 0 : round_mask;
-+            overflow_norm = p.sign;
-+            break;
-+        case float_round_down:
-+            inc = p.sign ? round_mask : 0;
-+            overflow_norm = !p.sign;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+
-+        exp += parm->exp_bias;
-+        if (likely(exp > 0)) {
-+            if (frac & round_mask) {
-+                flags |= float_flag_inexact;
-+                frac += inc;
-+                if (frac & DECOMPOSED_OVERFLOW_BIT) {
-+                    frac >>= 1;
-+                    exp++;
-+                }
-+            }
-+            frac >>= frac_shift;
-+
-+            if (unlikely(exp >= exp_max)) {
-+                flags |= float_flag_overflow | float_flag_inexact;
-+                if (overflow_norm) {
-+                    exp = exp_max - 1;
-+                    frac = -1;
-+                } else {
-+                    p.cls = float_class_inf;
-+                    goto do_inf;
-+                }
-+            }
-+        } else if (s->flush_to_zero) {
-+            flags |= float_flag_output_denormal;
-+            p.cls = float_class_zero;
-+            goto do_zero;
-+        } else {
-+            bool is_tiny = (s->float_detect_tininess
-+                            == float_tininess_before_rounding)
-+                        || (exp < 0)
-+                        || !((frac + inc) & DECOMPOSED_OVERFLOW_BIT);
-+
-+            shift64RightJamming(frac, 1 - exp, &frac);
-+            if (frac & round_mask) {
-+                /* Need to recompute round-to-even.  */
-+                if (s->float_rounding_mode == float_round_nearest_even) {
-+                    inc = ((frac & roundeven_mask) != frac_lsbm1
-+                           ? frac_lsbm1 : 0);
-+                }
-+                flags |= float_flag_inexact;
-+                frac += inc;
-+            }
-+
-+            exp = (frac & DECOMPOSED_IMPLICIT_BIT ? 1 : 0);
-+            frac >>= frac_shift;
-+
-+            if (is_tiny && (flags & float_flag_inexact)) {
-+                flags |= float_flag_underflow;
-+            }
-+            if (exp == 0 && frac == 0) {
-+                p.cls = float_class_zero;
-+            }
-+        }
-+        break;
-+
-+    case float_class_zero:
-+    do_zero:
-+        exp = 0;
-+        frac = 0;
-+        break;
-+
-+    case float_class_inf:
-+    do_inf:
-+        exp = exp_max;
-+        frac = 0;
-+        break;
-+
-+    case float_class_qnan:
-+    case float_class_snan:
-+        exp = exp_max;
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    float_raise(flags, s);
-+    p.exp = exp;
-+    p.frac = frac;
-+    return p;
-+}
-+
-+static FloatParts float16_unpack_canonical(float16 f, float_status *s)
-+{
-+    return canonicalize(float16_unpack_raw(f), &float16_params, s);
-+}
-+
-+static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
-+{
-+    switch (p.cls) {
-+    case float_class_dnan:
-+        return float16_default_nan(s);
-+    case float_class_msnan:
-+        return float16_maybe_silence_nan(float16_pack_raw(p), s);
-+    default:
-+        p = round_canonical(p, s, &float16_params);
-+        return float16_pack_raw(p);
-+    }
-+}
-+
-+static FloatParts float32_unpack_canonical(float32 f, float_status *s)
-+{
-+    return canonicalize(float32_unpack_raw(f), &float32_params, s);
-+}
-+
-+static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
-+{
-+    switch (p.cls) {
-+    case float_class_dnan:
-+        return float32_default_nan(s);
-+    case float_class_msnan:
-+        return float32_maybe_silence_nan(float32_pack_raw(p), s);
-+    default:
-+        p = round_canonical(p, s, &float32_params);
-+        return float32_pack_raw(p);
-+    }
-+}
-+
-+static FloatParts float64_unpack_canonical(float64 f, float_status *s)
-+{
-+    return canonicalize(float64_unpack_raw(f), &float64_params, s);
-+}
-+
-+static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
-+{
-+    switch (p.cls) {
-+    case float_class_dnan:
-+        return float64_default_nan(s);
-+    case float_class_msnan:
-+        return float64_maybe_silence_nan(float64_pack_raw(p), s);
-+    default:
-+        p = round_canonical(p, s, &float64_params);
-+        return float64_pack_raw(p);
-+    }
-+}
-+
-+static FloatParts pick_nan_parts(FloatParts a, FloatParts b, float_status *s)
-+{
-+    if (a.cls == float_class_snan || b.cls == float_class_snan) {
-+        s->float_exception_flags |= float_flag_invalid;
-+    }
-+
-+    if (s->default_nan_mode) {
-+        a.cls = float_class_dnan;
-+    } else {
-+        if (pickNaN(a.cls == float_class_qnan,
-+                    a.cls == float_class_snan,
-+                    b.cls == float_class_qnan,
-+                    b.cls == float_class_snan,
-+                    a.frac > b.frac
-+                    || (a.frac == b.frac && a.sign < b.sign))) {
-+            a = b;
-+        }
-+        a.cls = float_class_msnan;
-+    }
-+    return a;
-+}
-+
-+/* Simple helper for checking if FloatClass is any NaN */
-+
-+static bool is_nan(FloatClass c)
-+{
-+    return c >= float_class_qnan;
-+}
-+
 +/*
-+ * Returns the result of adding or subtracting the values of the
-+ * floating-point values `a' and `b'. The operation is performed
-+ * according to the IEC/IEEE Standard for Binary Floating-Point
-+ * Arithmetic.
++ * Returns the result of dividing the floating-point value `a' by the
++ * corresponding value `b'. The operation is performed according to
++ * the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
 + */
 +
-+static FloatParts addsub_floats(FloatParts a, FloatParts b, bool subtract,
-+                                float_status *s)
++static FloatParts div_floats(FloatParts a, FloatParts b, float_status *s)
 +{
-+    bool a_sign = a.sign;
-+    bool b_sign = b.sign ^ subtract;
++    bool sign = a.sign ^ b.sign;
 +
-+    if (a_sign != b_sign) {
-+        /* Subtraction */
-+
-+        if (a.cls == float_class_normal && b.cls == float_class_normal) {
-+            if (a.exp > b.exp || (a.exp == b.exp && a.frac >= b.frac)) {
-+                shift64RightJamming(b.frac, a.exp - b.exp, &b.frac);
-+                a.frac = a.frac - b.frac;
-+            } else {
-+                shift64RightJamming(a.frac, b.exp - a.exp, &a.frac);
-+                a.frac = b.frac - a.frac;
-+                a.exp = b.exp;
-+                a_sign ^= 1;
-+            }
-+
-+            if (a.frac == 0) {
-+                a.cls = float_class_zero;
-+                a.sign = s->float_rounding_mode == float_round_down;
-+            } else {
-+                int shift = clz64(a.frac) - 1;
-+                a.frac = a.frac << shift;
-+                a.exp = a.exp - shift;
-+                a.sign = a_sign;
-+            }
-+            return a;
++    if (a.cls == float_class_normal && b.cls == float_class_normal) {
++        uint64_t temp_lo, temp_hi;
++        int exp = a.exp - b.exp;
++        if (a.frac < b.frac) {
++            exp -= 1;
++            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT + 1,
++                              &temp_hi, &temp_lo);
++        } else {
++            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT,
++                              &temp_hi, &temp_lo);
 +        }
-+        if (is_nan(a.cls) || is_nan(b.cls)) {
-+            return pick_nan_parts(a, b, s);
-+        }
-+        if (a.cls == float_class_inf) {
-+            if (b.cls == float_class_inf) {
-+                float_raise(float_flag_invalid, s);
-+                a.cls = float_class_dnan;
-+            }
-+            return a;
-+        }
-+        if (a.cls == float_class_zero && b.cls == float_class_zero) {
-+            a.sign = s->float_rounding_mode == float_round_down;
-+            return a;
-+        }
-+        if (a.cls == float_class_zero || b.cls == float_class_inf) {
-+            b.sign = a_sign ^ 1;
-+            return b;
-+        }
-+        if (b.cls == float_class_zero) {
-+            return a;
-+        }
-+    } else {
-+        /* Addition */
-+        if (a.cls == float_class_normal && b.cls == float_class_normal) {
-+            if (a.exp > b.exp) {
-+                shift64RightJamming(b.frac, a.exp - b.exp, &b.frac);
-+            } else if (a.exp < b.exp) {
-+                shift64RightJamming(a.frac, b.exp - a.exp, &a.frac);
-+                a.exp = b.exp;
-+            }
-+            a.frac += b.frac;
-+            if (a.frac & DECOMPOSED_OVERFLOW_BIT) {
-+                a.frac >>= 1;
-+                a.exp += 1;
-+            }
-+            return a;
-+        }
-+        if (is_nan(a.cls) || is_nan(b.cls)) {
-+            return pick_nan_parts(a, b, s);
-+        }
-+        if (a.cls == float_class_inf || b.cls == float_class_zero) {
-+            return a;
-+        }
-+        if (b.cls == float_class_inf || a.cls == float_class_zero) {
-+            b.sign = b_sign;
-+            return b;
-+        }
++        /* LSB of quot is set if inexact which roundandpack will use
++         * to set flags. Yet again we re-use a for the result */
++        a.frac = div128To64(temp_lo, temp_hi, b.frac);
++        a.sign = sign;
++        a.exp = exp;
++        return a;
++    }
++    /* handle all the NaN cases */
++    if (a.cls >= float_class_qnan || b.cls >= float_class_qnan) {
++        return pick_nan_parts(a, b, s);
++    }
++    /* 0/0 or Inf/Inf */
++    if (a.cls == b.cls
++        &&
++        (a.cls == float_class_inf || a.cls == float_class_zero)) {
++        s->float_exception_flags |= float_flag_invalid;
++        a.cls = float_class_dnan;
++        return a;
++    }
++    /* Div 0 => Inf */
++    if (b.cls == float_class_zero) {
++        s->float_exception_flags |= float_flag_divbyzero;
++        a.cls = float_class_inf;
++        a.sign = sign;
++        return a;
++    }
++    /* Inf / x or 0 / x */
++    if (a.cls == float_class_inf || a.cls == float_class_zero) {
++        a.sign = sign;
++        return a;
++    }
++    /* Div by Inf */
++    if (b.cls == float_class_inf) {
++        a.cls = float_class_zero;
++        a.sign = sign;
++        return a;
 +    }
 +    g_assert_not_reached();
 +}
 +
-+/*
-+ * Returns the result of adding or subtracting the floating-point
-+ * values `a' and `b'. The operation is performed according to the
-+ * IEC/IEEE Standard for Binary Floating-Point Arithmetic.
-+ */
-+
-+float16 float16_add(float16 a, float16 b, float_status *status)
++float16 float16_div(float16 a, float16 b, float_status *status)
 +{
 +    FloatParts pa = float16_unpack_canonical(a, status);
 +    FloatParts pb = float16_unpack_canonical(b, status);
-+    FloatParts pr = addsub_floats(pa, pb, false, status);
++    FloatParts pr = div_floats(pa, pb, status);
 +
 +    return float16_round_pack_canonical(pr, status);
 +}
 +
-+float32 float32_add(float32 a, float32 b, float_status *status)
++float32 float32_div(float32 a, float32 b, float_status *status)
 +{
 +    FloatParts pa = float32_unpack_canonical(a, status);
 +    FloatParts pb = float32_unpack_canonical(b, status);
-+    FloatParts pr = addsub_floats(pa, pb, false, status);
++    FloatParts pr = div_floats(pa, pb, status);
 +
 +    return float32_round_pack_canonical(pr, status);
 +}
 +
-+float64 float64_add(float64 a, float64 b, float_status *status)
++float64 float64_div(float64 a, float64 b, float_status *status)
 +{
 +    FloatParts pa = float64_unpack_canonical(a, status);
 +    FloatParts pb = float64_unpack_canonical(b, status);
-+    FloatParts pr = addsub_floats(pa, pb, false, status);
-+
-+    return float64_round_pack_canonical(pr, status);
-+}
-+
-+float16 float16_sub(float16 a, float16 b, float_status *status)
-+{
-+    FloatParts pa = float16_unpack_canonical(a, status);
-+    FloatParts pb = float16_unpack_canonical(b, status);
-+    FloatParts pr = addsub_floats(pa, pb, true, status);
-+
-+    return float16_round_pack_canonical(pr, status);
-+}
-+
-+float32 float32_sub(float32 a, float32 b, float_status *status)
-+{
-+    FloatParts pa = float32_unpack_canonical(a, status);
-+    FloatParts pb = float32_unpack_canonical(b, status);
-+    FloatParts pr = addsub_floats(pa, pb, true, status);
-+
-+    return float32_round_pack_canonical(pr, status);
-+}
-+
-+float64 float64_sub(float64 a, float64 b, float_status *status)
-+{
-+    FloatParts pa = float64_unpack_canonical(a, status);
-+    FloatParts pb = float64_unpack_canonical(b, status);
-+    FloatParts pr = addsub_floats(pa, pb, true, status);
++    FloatParts pr = div_floats(pa, pb, status);
 +
 +    return float64_round_pack_canonical(pr, status);
 +}
@@ -529,461 +203,179 @@ index 568d555595..b179790889 100644
  /*----------------------------------------------------------------------------
  | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
  | and 7, and returns the properly rounded 32-bit integer corresponding to the
-@@ -2081,220 +2538,6 @@ float32 float32_round_to_int(float32 a, float_status *status)
+@@ -2616,77 +2704,6 @@ float32 float32_round_to_int(float32 a, float_status *status)
  
  }
  
+-
 -/*----------------------------------------------------------------------------
--| Returns the result of adding the absolute values of the single-precision
--| floating-point values `a' and `b'.  If `zSign' is 1, the sum is negated
--| before being returned.  `zSign' is ignored if the result is a NaN.
--| The addition is performed according to the IEC/IEEE Standard for Binary
--| Floating-Point Arithmetic.
+-| Returns the result of dividing the single-precision floating-point value `a'
+-| by the corresponding value `b'.  The operation is performed according to the
+-| IEC/IEEE Standard for Binary Floating-Point Arithmetic.
 -*----------------------------------------------------------------------------*/
 -
--static float32 addFloat32Sigs(float32 a, float32 b, flag zSign,
--                              float_status *status)
+-float32 float32_div(float32 a, float32 b, float_status *status)
 -{
+-    flag aSign, bSign, zSign;
 -    int aExp, bExp, zExp;
 -    uint32_t aSig, bSig, zSig;
--    int expDiff;
+-    a = float32_squash_input_denormal(a, status);
+-    b = float32_squash_input_denormal(b, status);
 -
 -    aSig = extractFloat32Frac( a );
 -    aExp = extractFloat32Exp( a );
+-    aSign = extractFloat32Sign( a );
 -    bSig = extractFloat32Frac( b );
 -    bExp = extractFloat32Exp( b );
--    expDiff = aExp - bExp;
--    aSig <<= 6;
--    bSig <<= 6;
--    if ( 0 < expDiff ) {
--        if ( aExp == 0xFF ) {
--            if (aSig) {
--                return propagateFloat32NaN(a, b, status);
--            }
--            return a;
+-    bSign = extractFloat32Sign( b );
+-    zSign = aSign ^ bSign;
+-    if ( aExp == 0xFF ) {
+-        if (aSig) {
+-            return propagateFloat32NaN(a, b, status);
 -        }
--        if ( bExp == 0 ) {
--            --expDiff;
--        }
--        else {
--            bSig |= 0x20000000;
--        }
--        shift32RightJamming( bSig, expDiff, &bSig );
--        zExp = aExp;
--    }
--    else if ( expDiff < 0 ) {
 -        if ( bExp == 0xFF ) {
 -            if (bSig) {
 -                return propagateFloat32NaN(a, b, status);
 -            }
--            return packFloat32( zSign, 0xFF, 0 );
+-            float_raise(float_flag_invalid, status);
+-            return float32_default_nan(status);
 -        }
--        if ( aExp == 0 ) {
--            ++expDiff;
--        }
--        else {
--            aSig |= 0x20000000;
--        }
--        shift32RightJamming( aSig, - expDiff, &aSig );
--        zExp = bExp;
+-        return packFloat32( zSign, 0xFF, 0 );
 -    }
--    else {
--        if ( aExp == 0xFF ) {
--            if (aSig | bSig) {
--                return propagateFloat32NaN(a, b, status);
--            }
--            return a;
--        }
--        if ( aExp == 0 ) {
--            if (status->flush_to_zero) {
--                if (aSig | bSig) {
--                    float_raise(float_flag_output_denormal, status);
--                }
--                return packFloat32(zSign, 0, 0);
--            }
--            return packFloat32( zSign, 0, ( aSig + bSig )>>6 );
--        }
--        zSig = 0x40000000 + aSig + bSig;
--        zExp = aExp;
--        goto roundAndPack;
--    }
--    aSig |= 0x20000000;
--    zSig = ( aSig + bSig )<<1;
--    --zExp;
--    if ( (int32_t) zSig < 0 ) {
--        zSig = aSig + bSig;
--        ++zExp;
--    }
-- roundAndPack:
--    return roundAndPackFloat32(zSign, zExp, zSig, status);
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the result of subtracting the absolute values of the single-
--| precision floating-point values `a' and `b'.  If `zSign' is 1, the
--| difference is negated before being returned.  `zSign' is ignored if the
--| result is a NaN.  The subtraction is performed according to the IEC/IEEE
--| Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--static float32 subFloat32Sigs(float32 a, float32 b, flag zSign,
--                              float_status *status)
--{
--    int aExp, bExp, zExp;
--    uint32_t aSig, bSig, zSig;
--    int expDiff;
--
--    aSig = extractFloat32Frac( a );
--    aExp = extractFloat32Exp( a );
--    bSig = extractFloat32Frac( b );
--    bExp = extractFloat32Exp( b );
--    expDiff = aExp - bExp;
--    aSig <<= 7;
--    bSig <<= 7;
--    if ( 0 < expDiff ) goto aExpBigger;
--    if ( expDiff < 0 ) goto bExpBigger;
--    if ( aExp == 0xFF ) {
--        if (aSig | bSig) {
--            return propagateFloat32NaN(a, b, status);
--        }
--        float_raise(float_flag_invalid, status);
--        return float32_default_nan(status);
--    }
--    if ( aExp == 0 ) {
--        aExp = 1;
--        bExp = 1;
--    }
--    if ( bSig < aSig ) goto aBigger;
--    if ( aSig < bSig ) goto bBigger;
--    return packFloat32(status->float_rounding_mode == float_round_down, 0, 0);
-- bExpBigger:
 -    if ( bExp == 0xFF ) {
 -        if (bSig) {
 -            return propagateFloat32NaN(a, b, status);
 -        }
--        return packFloat32( zSign ^ 1, 0xFF, 0 );
--    }
--    if ( aExp == 0 ) {
--        ++expDiff;
--    }
--    else {
--        aSig |= 0x40000000;
--    }
--    shift32RightJamming( aSig, - expDiff, &aSig );
--    bSig |= 0x40000000;
-- bBigger:
--    zSig = bSig - aSig;
--    zExp = bExp;
--    zSign ^= 1;
--    goto normalizeRoundAndPack;
-- aExpBigger:
--    if ( aExp == 0xFF ) {
--        if (aSig) {
--            return propagateFloat32NaN(a, b, status);
--        }
--        return a;
+-        return packFloat32( zSign, 0, 0 );
 -    }
 -    if ( bExp == 0 ) {
--        --expDiff;
+-        if ( bSig == 0 ) {
+-            if ( ( aExp | aSig ) == 0 ) {
+-                float_raise(float_flag_invalid, status);
+-                return float32_default_nan(status);
+-            }
+-            float_raise(float_flag_divbyzero, status);
+-            return packFloat32( zSign, 0xFF, 0 );
+-        }
+-        normalizeFloat32Subnormal( bSig, &bExp, &bSig );
 -    }
--    else {
--        bSig |= 0x40000000;
+-    if ( aExp == 0 ) {
+-        if ( aSig == 0 ) return packFloat32( zSign, 0, 0 );
+-        normalizeFloat32Subnormal( aSig, &aExp, &aSig );
 -    }
--    shift32RightJamming( bSig, expDiff, &bSig );
--    aSig |= 0x40000000;
-- aBigger:
--    zSig = aSig - bSig;
--    zExp = aExp;
-- normalizeRoundAndPack:
--    --zExp;
--    return normalizeRoundAndPackFloat32(zSign, zExp, zSig, status);
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the result of adding the single-precision floating-point values `a'
--| and `b'.  The operation is performed according to the IEC/IEEE Standard for
--| Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--float32 float32_add(float32 a, float32 b, float_status *status)
--{
--    flag aSign, bSign;
--    a = float32_squash_input_denormal(a, status);
--    b = float32_squash_input_denormal(b, status);
--
--    aSign = extractFloat32Sign( a );
--    bSign = extractFloat32Sign( b );
--    if ( aSign == bSign ) {
--        return addFloat32Sigs(a, b, aSign, status);
+-    zExp = aExp - bExp + 0x7D;
+-    aSig = ( aSig | 0x00800000 )<<7;
+-    bSig = ( bSig | 0x00800000 )<<8;
+-    if ( bSig <= ( aSig + aSig ) ) {
+-        aSig >>= 1;
+-        ++zExp;
 -    }
--    else {
--        return subFloat32Sigs(a, b, aSign, status);
+-    zSig = ( ( (uint64_t) aSig )<<32 ) / bSig;
+-    if ( ( zSig & 0x3F ) == 0 ) {
+-        zSig |= ( (uint64_t) bSig * zSig != ( (uint64_t) aSig )<<32 );
 -    }
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the result of subtracting the single-precision floating-point values
--| `a' and `b'.  The operation is performed according to the IEC/IEEE Standard
--| for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--float32 float32_sub(float32 a, float32 b, float_status *status)
--{
--    flag aSign, bSign;
--    a = float32_squash_input_denormal(a, status);
--    b = float32_squash_input_denormal(b, status);
--
--    aSign = extractFloat32Sign( a );
--    bSign = extractFloat32Sign( b );
--    if ( aSign == bSign ) {
--        return subFloat32Sigs(a, b, aSign, status);
--    }
--    else {
--        return addFloat32Sigs(a, b, aSign, status);
--    }
+-    return roundAndPackFloat32(zSign, zExp, zSig, status);
 -
 -}
 -
  /*----------------------------------------------------------------------------
- | Returns the result of multiplying the single-precision floating-point values
- | `a' and `b'.  The operation is performed according to the IEC/IEEE Standard
-@@ -3891,219 +4134,6 @@ float64 float64_trunc_to_int(float64 a, float_status *status)
+ | Returns the remainder of the single-precision floating-point value `a'
+ | with respect to the corresponding value `b'.  The operation is performed
+@@ -4148,83 +4165,6 @@ float64 float64_trunc_to_int(float64 a, float_status *status)
      return res;
  }
  
 -/*----------------------------------------------------------------------------
--| Returns the result of adding the absolute values of the double-precision
--| floating-point values `a' and `b'.  If `zSign' is 1, the sum is negated
--| before being returned.  `zSign' is ignored if the result is a NaN.
--| The addition is performed according to the IEC/IEEE Standard for Binary
--| Floating-Point Arithmetic.
+-| Returns the result of dividing the double-precision floating-point value `a'
+-| by the corresponding value `b'.  The operation is performed according to
+-| the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
 -*----------------------------------------------------------------------------*/
 -
--static float64 addFloat64Sigs(float64 a, float64 b, flag zSign,
--                              float_status *status)
+-float64 float64_div(float64 a, float64 b, float_status *status)
 -{
+-    flag aSign, bSign, zSign;
 -    int aExp, bExp, zExp;
 -    uint64_t aSig, bSig, zSig;
--    int expDiff;
+-    uint64_t rem0, rem1;
+-    uint64_t term0, term1;
+-    a = float64_squash_input_denormal(a, status);
+-    b = float64_squash_input_denormal(b, status);
 -
 -    aSig = extractFloat64Frac( a );
 -    aExp = extractFloat64Exp( a );
+-    aSign = extractFloat64Sign( a );
 -    bSig = extractFloat64Frac( b );
 -    bExp = extractFloat64Exp( b );
--    expDiff = aExp - bExp;
--    aSig <<= 9;
--    bSig <<= 9;
--    if ( 0 < expDiff ) {
--        if ( aExp == 0x7FF ) {
--            if (aSig) {
--                return propagateFloat64NaN(a, b, status);
--            }
--            return a;
--        }
--        if ( bExp == 0 ) {
--            --expDiff;
--        }
--        else {
--            bSig |= LIT64( 0x2000000000000000 );
--        }
--        shift64RightJamming( bSig, expDiff, &bSig );
--        zExp = aExp;
--    }
--    else if ( expDiff < 0 ) {
--        if ( bExp == 0x7FF ) {
--            if (bSig) {
--                return propagateFloat64NaN(a, b, status);
--            }
--            return packFloat64( zSign, 0x7FF, 0 );
--        }
--        if ( aExp == 0 ) {
--            ++expDiff;
--        }
--        else {
--            aSig |= LIT64( 0x2000000000000000 );
--        }
--        shift64RightJamming( aSig, - expDiff, &aSig );
--        zExp = bExp;
--    }
--    else {
--        if ( aExp == 0x7FF ) {
--            if (aSig | bSig) {
--                return propagateFloat64NaN(a, b, status);
--            }
--            return a;
--        }
--        if ( aExp == 0 ) {
--            if (status->flush_to_zero) {
--                if (aSig | bSig) {
--                    float_raise(float_flag_output_denormal, status);
--                }
--                return packFloat64(zSign, 0, 0);
--            }
--            return packFloat64( zSign, 0, ( aSig + bSig )>>9 );
--        }
--        zSig = LIT64( 0x4000000000000000 ) + aSig + bSig;
--        zExp = aExp;
--        goto roundAndPack;
--    }
--    aSig |= LIT64( 0x2000000000000000 );
--    zSig = ( aSig + bSig )<<1;
--    --zExp;
--    if ( (int64_t) zSig < 0 ) {
--        zSig = aSig + bSig;
--        ++zExp;
--    }
-- roundAndPack:
--    return roundAndPackFloat64(zSign, zExp, zSig, status);
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the result of subtracting the absolute values of the double-
--| precision floating-point values `a' and `b'.  If `zSign' is 1, the
--| difference is negated before being returned.  `zSign' is ignored if the
--| result is a NaN.  The subtraction is performed according to the IEC/IEEE
--| Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--static float64 subFloat64Sigs(float64 a, float64 b, flag zSign,
--                              float_status *status)
--{
--    int aExp, bExp, zExp;
--    uint64_t aSig, bSig, zSig;
--    int expDiff;
--
--    aSig = extractFloat64Frac( a );
--    aExp = extractFloat64Exp( a );
--    bSig = extractFloat64Frac( b );
--    bExp = extractFloat64Exp( b );
--    expDiff = aExp - bExp;
--    aSig <<= 10;
--    bSig <<= 10;
--    if ( 0 < expDiff ) goto aExpBigger;
--    if ( expDiff < 0 ) goto bExpBigger;
--    if ( aExp == 0x7FF ) {
--        if (aSig | bSig) {
--            return propagateFloat64NaN(a, b, status);
--        }
--        float_raise(float_flag_invalid, status);
--        return float64_default_nan(status);
--    }
--    if ( aExp == 0 ) {
--        aExp = 1;
--        bExp = 1;
--    }
--    if ( bSig < aSig ) goto aBigger;
--    if ( aSig < bSig ) goto bBigger;
--    return packFloat64(status->float_rounding_mode == float_round_down, 0, 0);
-- bExpBigger:
--    if ( bExp == 0x7FF ) {
--        if (bSig) {
--            return propagateFloat64NaN(a, b, status);
--        }
--        return packFloat64( zSign ^ 1, 0x7FF, 0 );
--    }
--    if ( aExp == 0 ) {
--        ++expDiff;
--    }
--    else {
--        aSig |= LIT64( 0x4000000000000000 );
--    }
--    shift64RightJamming( aSig, - expDiff, &aSig );
--    bSig |= LIT64( 0x4000000000000000 );
-- bBigger:
--    zSig = bSig - aSig;
--    zExp = bExp;
--    zSign ^= 1;
--    goto normalizeRoundAndPack;
-- aExpBigger:
+-    bSign = extractFloat64Sign( b );
+-    zSign = aSign ^ bSign;
 -    if ( aExp == 0x7FF ) {
 -        if (aSig) {
 -            return propagateFloat64NaN(a, b, status);
 -        }
--        return a;
+-        if ( bExp == 0x7FF ) {
+-            if (bSig) {
+-                return propagateFloat64NaN(a, b, status);
+-            }
+-            float_raise(float_flag_invalid, status);
+-            return float64_default_nan(status);
+-        }
+-        return packFloat64( zSign, 0x7FF, 0 );
+-    }
+-    if ( bExp == 0x7FF ) {
+-        if (bSig) {
+-            return propagateFloat64NaN(a, b, status);
+-        }
+-        return packFloat64( zSign, 0, 0 );
 -    }
 -    if ( bExp == 0 ) {
--        --expDiff;
+-        if ( bSig == 0 ) {
+-            if ( ( aExp | aSig ) == 0 ) {
+-                float_raise(float_flag_invalid, status);
+-                return float64_default_nan(status);
+-            }
+-            float_raise(float_flag_divbyzero, status);
+-            return packFloat64( zSign, 0x7FF, 0 );
+-        }
+-        normalizeFloat64Subnormal( bSig, &bExp, &bSig );
 -    }
--    else {
--        bSig |= LIT64( 0x4000000000000000 );
+-    if ( aExp == 0 ) {
+-        if ( aSig == 0 ) return packFloat64( zSign, 0, 0 );
+-        normalizeFloat64Subnormal( aSig, &aExp, &aSig );
 -    }
--    shift64RightJamming( bSig, expDiff, &bSig );
--    aSig |= LIT64( 0x4000000000000000 );
-- aBigger:
--    zSig = aSig - bSig;
--    zExp = aExp;
-- normalizeRoundAndPack:
--    --zExp;
--    return normalizeRoundAndPackFloat64(zSign, zExp, zSig, status);
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the result of adding the double-precision floating-point values `a'
--| and `b'.  The operation is performed according to the IEC/IEEE Standard for
--| Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--float64 float64_add(float64 a, float64 b, float_status *status)
--{
--    flag aSign, bSign;
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    aSign = extractFloat64Sign( a );
--    bSign = extractFloat64Sign( b );
--    if ( aSign == bSign ) {
--        return addFloat64Sigs(a, b, aSign, status);
+-    zExp = aExp - bExp + 0x3FD;
+-    aSig = ( aSig | LIT64( 0x0010000000000000 ) )<<10;
+-    bSig = ( bSig | LIT64( 0x0010000000000000 ) )<<11;
+-    if ( bSig <= ( aSig + aSig ) ) {
+-        aSig >>= 1;
+-        ++zExp;
 -    }
--    else {
--        return subFloat64Sigs(a, b, aSign, status);
+-    zSig = estimateDiv128To64( aSig, 0, bSig );
+-    if ( ( zSig & 0x1FF ) <= 2 ) {
+-        mul64To128( bSig, zSig, &term0, &term1 );
+-        sub128( aSig, 0, term0, term1, &rem0, &rem1 );
+-        while ( (int64_t) rem0 < 0 ) {
+-            --zSig;
+-            add128( rem0, rem1, 0, bSig, &rem0, &rem1 );
+-        }
+-        zSig |= ( rem1 != 0 );
 -    }
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns the result of subtracting the double-precision floating-point values
--| `a' and `b'.  The operation is performed according to the IEC/IEEE Standard
--| for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--float64 float64_sub(float64 a, float64 b, float_status *status)
--{
--    flag aSign, bSign;
--    a = float64_squash_input_denormal(a, status);
--    b = float64_squash_input_denormal(b, status);
--
--    aSign = extractFloat64Sign( a );
--    bSign = extractFloat64Sign( b );
--    if ( aSign == bSign ) {
--        return subFloat64Sigs(a, b, aSign, status);
--    }
--    else {
--        return addFloat64Sigs(a, b, aSign, status);
--    }
+-    return roundAndPackFloat64(zSign, zExp, zSig, status);
 -
 -}
  
  /*----------------------------------------------------------------------------
- | Returns the result of multiplying the double-precision floating-point values
+ | Returns the remainder of the double-precision floating-point value `a'
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 23824a3000..693ece0974 100644
+index 7fc63dd60f..85e4a74f1b 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -236,6 +236,10 @@ float64 float16_to_float64(float16 a, flag ieee, float_status *status);
- /*----------------------------------------------------------------------------
- | Software half-precision operations.
- *----------------------------------------------------------------------------*/
-+
-+float16 float16_add(float16, float16, float_status *status);
-+float16 float16_sub(float16, float16, float_status *status);
-+
+@@ -240,6 +240,7 @@ float64 float16_to_float64(float16 a, flag ieee, float_status *status);
+ float16 float16_add(float16, float16, float_status *status);
+ float16 float16_sub(float16, float16, float_status *status);
+ float16 float16_mul(float16, float16, float_status *status);
++float16 float16_div(float16, float16, float_status *status);
+ 
  int float16_is_quiet_nan(float16, float_status *status);
  int float16_is_signaling_nan(float16, float_status *status);
- float16 float16_maybe_silence_nan(float16, float_status *status);
 -- 
 2.15.1
