@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURB-0004NK-8m
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURE-0004Pf-9p
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeUR9-0001c0-Pm
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:37 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:43924)
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURD-0001co-0Y
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:40 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44263)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeUR9-0001bl-Hb
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:35 -0500
-Received: by mail-pg0-x242.google.com with SMTP id n17so3805415pgf.10
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:35 -0800 (PST)
+	id 1eeURC-0001cd-OC
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:38 -0500
+Received: by mail-pg0-x242.google.com with SMTP id m20so3808609pgc.11
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:38 -0800 (PST)
 Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
 	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
-	z19sm9760028pfh.185.2018.01.24.15.26.32 for <qemu-devel@nongnu.org>
+	z19sm9760028pfh.185.2018.01.24.15.26.35 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Jan 2018 15:26:33 -0800 (PST)
+	Wed, 24 Jan 2018 15:26:36 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 24 Jan 2018 15:25:44 -0800
-Message-Id: <20180124232625.30105-5-richard.henderson@linaro.org>
+Date: Wed, 24 Jan 2018 15:25:46 -0800
+Message-Id: <20180124232625.30105-7-richard.henderson@linaro.org>
 In-Reply-To: <20180124232625.30105-1-richard.henderson@linaro.org>
 References: <20180124232625.30105-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 04/45] target/hppa: Define hardware
- exception types
+Subject: [Qemu-devel] [PATCH v3 06/45] target/hppa: Implement mmu_idx from
+ IA privilege level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,273 +34,229 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Most aspects of privilege are not yet handled.  But this
+gives us the start from which to begin checking.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h        | 39 +++++++++++++++++++++++++++----
- linux-user/main.c        | 26 ++++++++++++++++++---
- target/hppa/helper.c     | 61 ++++++++++++++++++++++++++++++++++--------------
- target/hppa/mem_helper.c |  4 +++-
- target/hppa/op_helper.c  |  6 ++---
- target/hppa/translate.c  |  8 +++----
- 6 files changed, 111 insertions(+), 33 deletions(-)
+ target/hppa/cpu.h       | 19 +++++++++++++----
+ target/hppa/cpu.c       |  2 +-
+ target/hppa/translate.c | 55 ++++++++++++++++++++++++++++++-------------------
+ 3 files changed, 50 insertions(+), 26 deletions(-)
 
 diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index ea7e495408..d84af91860 100644
+index 1524ef91b6..805c93db9c 100644
 --- a/target/hppa/cpu.h
 +++ b/target/hppa/cpu.h
-@@ -40,11 +40,40 @@
- #define MMU_USER_IDX     0
+@@ -36,8 +36,10 @@
+ #define TARGET_PAGE_BITS 12
+ 
+ #define ALIGNED_ONLY
+-#define NB_MMU_MODES     1
+-#define MMU_USER_IDX     0
++#define NB_MMU_MODES     5
++#define MMU_KERNEL_IDX   0
++#define MMU_USER_IDX     3
++#define MMU_PHYS_IDX     4
  #define TARGET_INSN_START_EXTRA_WORDS 1
  
--#define EXCP_SYSCALL     1
--#define EXCP_SYSCALL_LWS 2
--#define EXCP_SIGSEGV     3
--#define EXCP_SIGILL      4
--#define EXCP_SIGFPE      5
-+/* Hardware exceptions, interupts, faults, and traps.  */
-+#define EXCP_HPMC                1  /* high priority machine check */
-+#define EXCP_POWER_FAIL          2
-+#define EXCP_RC                  3  /* recovery counter */
-+#define EXCP_EXT_INTERRUPT       4  /* external interrupt */
-+#define EXCP_LPMC                5  /* low priority machine check */
-+#define EXCP_ITLB_MISS           6  /* itlb miss / instruction page fault */
-+#define EXCP_IMP                 7  /* instruction memory protection trap */
-+#define EXCP_ILL                 8  /* illegal instruction trap */
-+#define EXCP_BREAK               9  /* break instruction */
-+#define EXCP_PRIV_OPR            10 /* privileged operation trap */
-+#define EXCP_PRIV_REG            11 /* privileged register trap */
-+#define EXCP_OVERFLOW            12 /* signed overflow trap */
-+#define EXCP_COND                13 /* trap-on-condition */
-+#define EXCP_ASSIST              14 /* assist exception trap */
-+#define EXCP_DTLB_MISS           15 /* dtlb miss / data page fault */
-+#define EXCP_NA_ITLB_MISS        16 /* non-access itlb miss */
-+#define EXCP_NA_DTLB_MISS        17 /* non-access dtlb miss */
-+#define EXCP_DMP                 18 /* data memory protection trap */
-+#define EXCP_DMB                 19 /* data memory break trap */
-+#define EXCP_TLB_DIRTY           20 /* tlb dirty bit trap */
-+#define EXCP_PAGE_REF            21 /* page reference trap */
-+#define EXCP_ASSIST_EMU          22 /* assist emulation trap */
-+#define EXCP_HPT                 23 /* high-privilege transfer trap */
-+#define EXCP_LPT                 24 /* low-privilege transfer trap */
-+#define EXCP_TB                  25 /* taken branch trap */
-+#define EXCP_DMAR                26 /* data memory access rights trap */
-+#define EXCP_DMPI                27 /* data memory protection id trap */
-+#define EXCP_UNALIGN             28 /* unaligned data reference trap */
-+#define EXCP_PER_INTERRUPT       29 /* performance monitor interrupt */
-+
-+/* Exceptions for linux-user emulation.  */
-+#define EXCP_SYSCALL             30
-+#define EXCP_SYSCALL_LWS         31
+ /* Hardware exceptions, interupts, faults, and traps.  */
+@@ -195,7 +197,14 @@ static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
  
- /* Taken from Linux kernel: arch/parisc/include/asm/psw.h */
- #define PSW_I            0x00000001
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 450eb3ce65..42f4c66ce6 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -3768,21 +3768,41 @@ void cpu_loop(CPUHPPAState *env)
-             env->iaoq_f = env->gr[31];
-             env->iaoq_b = env->gr[31] + 4;
-             break;
--        case EXCP_SIGSEGV:
-+        case EXCP_ITLB_MISS:
-+        case EXCP_DTLB_MISS:
-+        case EXCP_NA_ITLB_MISS:
-+        case EXCP_NA_DTLB_MISS:
-+        case EXCP_IMP:
-+        case EXCP_DMP:
-+        case EXCP_DMB:
-+        case EXCP_PAGE_REF:
-+        case EXCP_DMAR:
-+        case EXCP_DMPI:
-             info.si_signo = TARGET_SIGSEGV;
-             info.si_errno = 0;
-             info.si_code = TARGET_SEGV_ACCERR;
-             info._sifields._sigfault._addr = env->ior;
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
--        case EXCP_SIGILL:
-+        case EXCP_UNALIGN:
-+            info.si_signo = TARGET_SIGBUS;
-+            info.si_errno = 0;
-+            info.si_code = 0;
-+            info._sifields._sigfault._addr = env->ior;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ILL:
-+        case EXCP_PRIV_OPR:
-+        case EXCP_PRIV_REG:
-             info.si_signo = TARGET_SIGILL;
-             info.si_errno = 0;
-             info.si_code = TARGET_ILL_ILLOPN;
-             info._sifields._sigfault._addr = env->iaoq_f;
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
--        case EXCP_SIGFPE:
-+        case EXCP_OVERFLOW:
-+        case EXCP_COND:
-+        case EXCP_ASSIST:
-             info.si_signo = TARGET_SIGFPE;
-             info.si_errno = 0;
-             info.si_code = 0;
-diff --git a/target/hppa/helper.c b/target/hppa/helper.c
-index 4231ef3bff..6439179a0e 100644
---- a/target/hppa/helper.c
-+++ b/target/hppa/helper.c
-@@ -74,25 +74,52 @@ void hppa_cpu_do_interrupt(CPUState *cs)
-     int i = cs->exception_index;
- 
-     if (qemu_loglevel_mask(CPU_LOG_INT)) {
-+        static const char * const names[] = {
-+            [EXCP_HPMC]          = "high priority machine check",
-+            [EXCP_POWER_FAIL]    = "power fail interrupt",
-+            [EXCP_RC]            = "recovery counter trap",
-+            [EXCP_EXT_INTERRUPT] = "external interrupt",
-+            [EXCP_LPMC]          = "low priority machine check",
-+            [EXCP_ITLB_MISS]     = "instruction tlb miss fault",
-+            [EXCP_IMP]           = "instruction memory protection trap",
-+            [EXCP_ILL]           = "illegal instruction trap",
-+            [EXCP_BREAK]         = "break instruction trap",
-+            [EXCP_PRIV_OPR]      = "privileged operation trap",
-+            [EXCP_PRIV_REG]      = "privileged register trap",
-+            [EXCP_OVERFLOW]      = "overflow trap",
-+            [EXCP_COND]          = "conditional trap",
-+            [EXCP_ASSIST]        = "assist exception trap",
-+            [EXCP_DTLB_MISS]     = "data tlb miss fault",
-+            [EXCP_NA_ITLB_MISS]  = "non-access instruction tlb miss",
-+            [EXCP_NA_DTLB_MISS]  = "non-access data tlb miss",
-+            [EXCP_DMP]           = "data memory protection trap",
-+            [EXCP_DMB]           = "data memory break trap",
-+            [EXCP_TLB_DIRTY]     = "tlb dirty bit trap",
-+            [EXCP_PAGE_REF]      = "page reference trap",
-+            [EXCP_ASSIST_EMU]    = "assist emulation trap",
-+            [EXCP_HPT]           = "high-privilege transfer trap",
-+            [EXCP_LPT]           = "low-privilege transfer trap",
-+            [EXCP_TB]            = "taken branch trap",
-+            [EXCP_DMAR]          = "data memory access rights trap",
-+            [EXCP_DMPI]          = "data memory protection id trap",
-+            [EXCP_UNALIGN]       = "unaligned data reference trap",
-+            [EXCP_PER_INTERRUPT] = "performance monitor interrupt",
-+            [EXCP_SYSCALL]       = "syscall",
-+            [EXCP_SYSCALL_LWS]   = "syscall-lws",
-+        };
-         static int count;
--        const char *name = "<unknown>";
--
--        switch (i) {
--        case EXCP_SYSCALL:
--            name = "syscall";
--            break;
--        case EXCP_SIGSEGV:
--            name = "sigsegv";
--            break;
--        case EXCP_SIGILL:
--            name = "sigill";
--            break;
--        case EXCP_SIGFPE:
--            name = "sigfpe";
--            break;
-+        const char *name = NULL;
-+
-+        if (i >= 0 && i < ARRAY_SIZE(names)) {
-+            name = names[i];
-+        }
-+        if (name) {
-+            qemu_log("INT %6d: %s ia_f=" TARGET_FMT_lx "\n",
-+                     ++count, name, env->iaoq_f);
-+        } else {
-+            qemu_log("INT %6d: unknown %d ia_f=" TARGET_FMT_lx "\n",
-+                     ++count, i, env->iaoq_f);
-         }
--        qemu_log("INT %6d: %s ia_f=" TARGET_FMT_lx "\n",
--                 ++count, name, env->iaoq_f);
-     }
-     cs->exception_index = -1;
- }
-diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index e0802bc935..2901f3e29c 100644
---- a/target/hppa/mem_helper.c
-+++ b/target/hppa/mem_helper.c
-@@ -29,7 +29,9 @@ int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+ static inline int cpu_mmu_index(CPUHPPAState *env, bool ifetch)
  {
-     HPPACPU *cpu = HPPA_CPU(cs);
- 
--    cs->exception_index = EXCP_SIGSEGV;
-+    /* ??? Test between data page fault and data memory protection trap,
-+       which would affect si_code.  */
-+    cs->exception_index = EXCP_DMP;
-     cpu->env.ior = address;
-     return 1;
+-    return 0;
++#ifdef CONFIG_USER_ONLY
++    return MMU_USER_IDX;
++#else
++    if (env->psw & (ifetch ? PSW_C : PSW_D)) {
++        return env->iaoq_f & 3;
++    }
++    return MMU_PHYS_IDX;  /* mmu disabled */
++#endif
  }
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index 9c7603588f..d6b86834c1 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -44,14 +44,14 @@ static void QEMU_NORETURN dynexcp(CPUHPPAState *env, int excp, uintptr_t ra)
- void HELPER(tsv)(CPUHPPAState *env, target_ulong cond)
+ 
+ void hppa_translate_init(void);
+@@ -210,7 +219,9 @@ static inline void cpu_get_tb_cpu_state(CPUHPPAState *env, target_ulong *pc,
  {
-     if (unlikely((target_long)cond < 0)) {
--        dynexcp(env, EXCP_SIGFPE, GETPC());
-+        dynexcp(env, EXCP_OVERFLOW, GETPC());
-     }
+     *pc = env->iaoq_f;
+     *cs_base = env->iaoq_b;
+-    *pflags = env->psw_n;
++    /* ??? E, T, H, L, B, P bits need to be here, when implemented.  */
++    *pflags = (env->psw & (PSW_W | PSW_C | PSW_D))
++            | env->psw_n * PSW_N;
  }
  
- void HELPER(tcond)(CPUHPPAState *env, target_ulong cond)
- {
-     if (unlikely(cond)) {
--        dynexcp(env, EXCP_SIGFPE, GETPC());
-+        dynexcp(env, EXCP_COND, GETPC());
-     }
+ target_ureg cpu_hppa_get_psw(CPUHPPAState *env);
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index f6d92de972..9962ab71ee 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -39,7 +39,7 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
+ 
+     cpu->env.iaoq_f = tb->pc;
+     cpu->env.iaoq_b = tb->cs_base;
+-    cpu->env.psw_n = tb->flags & 1;
++    cpu->env.psw_n = (tb->flags & PSW_N) != 0;
  }
  
-@@ -235,7 +235,7 @@ static void update_fr0_op(CPUHPPAState *env, uintptr_t ra)
-     env->fr[0] = (uint64_t)shadow << 32;
- 
-     if (hard_exp & shadow) {
--        dynexcp(env, EXCP_SIGFPE, ra);
-+        dynexcp(env, EXCP_ASSIST, ra);
-     }
- }
- 
+ static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 8e357cc60c..8d85ed9df3 100644
+index dd96147bf1..33605a2d15 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -462,7 +462,7 @@ static DisasJumpType gen_excp(DisasContext *ctx, int exception)
- static DisasJumpType gen_illegal(DisasContext *ctx)
- {
-     nullify_over(ctx);
--    return nullify_end(ctx, gen_excp(ctx, EXCP_SIGILL));
-+    return nullify_end(ctx, gen_excp(ctx, EXCP_ILL));
- }
+@@ -282,6 +282,8 @@ typedef struct DisasContext {
+     DisasCond null_cond;
+     TCGLabel *null_lab;
  
- static bool use_goto_tb(DisasContext *ctx, target_ulong dest)
-@@ -1578,7 +1578,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
++    int mmu_idx;
++    int privilege;
+     bool psw_n_nonzero;
+ } DisasContext;
  
-     switch (ctx->iaoq_f) {
-     case 0x00: /* Null pointer call */
--        gen_excp_1(EXCP_SIGSEGV);
-+        gen_excp_1(EXCP_IMP);
-         return DISAS_NORETURN;
- 
-     case 0xb0: /* LWS */
-@@ -1597,7 +1597,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
- 
-     default:
-     do_sigill:
--        gen_excp_1(EXCP_SIGILL);
-+        gen_excp_1(EXCP_ILL);
-         return DISAS_NORETURN;
+@@ -1299,10 +1301,10 @@ static void do_load_32(DisasContext *ctx, TCGv_i32 dest, unsigned rb,
      }
- }
-@@ -1614,7 +1614,7 @@ static DisasJumpType trans_break(DisasContext *ctx, uint32_t insn,
-                                  const DisasInsn *di)
+ 
+     if (modify == 0) {
+-        tcg_gen_qemu_ld_i32(dest, addr, MMU_USER_IDX, mop);
++        tcg_gen_qemu_ld_i32(dest, addr, ctx->mmu_idx, mop);
+     } else {
+         tcg_gen_qemu_ld_i32(dest, (modify < 0 ? addr : base),
+-                            MMU_USER_IDX, mop);
++                            ctx->mmu_idx, mop);
+         save_gpr(ctx, rb, addr);
+     }
+     tcg_temp_free(addr);
+@@ -1329,10 +1331,10 @@ static void do_load_64(DisasContext *ctx, TCGv_i64 dest, unsigned rb,
+     }
+ 
+     if (modify == 0) {
+-        tcg_gen_qemu_ld_i64(dest, addr, MMU_USER_IDX, mop);
++        tcg_gen_qemu_ld_i64(dest, addr, ctx->mmu_idx, mop);
+     } else {
+         tcg_gen_qemu_ld_i64(dest, (modify < 0 ? addr : base),
+-                            MMU_USER_IDX, mop);
++                            ctx->mmu_idx, mop);
+         save_gpr(ctx, rb, addr);
+     }
+     tcg_temp_free(addr);
+@@ -1358,7 +1360,7 @@ static void do_store_32(DisasContext *ctx, TCGv_i32 src, unsigned rb,
+         tcg_gen_addi_reg(addr, base, disp);
+     }
+ 
+-    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
++    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
+ 
+     if (modify != 0) {
+         save_gpr(ctx, rb, addr);
+@@ -1386,7 +1388,7 @@ static void do_store_64(DisasContext *ctx, TCGv_i64 src, unsigned rb,
+         tcg_gen_addi_reg(addr, base, disp);
+     }
+ 
+-    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
++    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
+ 
+     if (modify != 0) {
+         save_gpr(ctx, rb, addr);
+@@ -2497,7 +2499,7 @@ static DisasJumpType trans_ldcw(DisasContext *ctx, uint32_t insn,
+ 
+     zero = tcg_const_reg(0);
+     tcg_gen_atomic_xchg_reg(dest, (modify <= 0 ? addr : base),
+-                            zero, MMU_USER_IDX, mop);
++                            zero, ctx->mmu_idx, mop);
+     if (modify) {
+         save_gpr(ctx, rb, addr);
+     }
+@@ -3971,30 +3973,43 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+                                       CPUState *cs, int max_insns)
  {
-     nullify_over(ctx);
--    return nullify_end(ctx, gen_excp(ctx, EXCP_DEBUG));
-+    return nullify_end(ctx, gen_excp(ctx, EXCP_BREAK));
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+-    TranslationBlock *tb = ctx->base.tb;
+     int bound;
+ 
+     ctx->cs = cs;
+-    ctx->iaoq_f = tb->pc;
+-    ctx->iaoq_b = tb->cs_base;
++
++#ifdef CONFIG_USER_ONLY
++    ctx->privilege = MMU_USER_IDX;
++    ctx->mmu_idx = MMU_USER_IDX;
++#else
++    ctx->privilege = ctx->base.pc_first & 3;
++    ctx->mmu_idx = (ctx->base.tb->flags & PSW_D
++                    ? ctx->privilege : MMU_PHYS_IDX);
++#endif
++    ctx->iaoq_f = ctx->base.pc_first;
++    ctx->iaoq_b = ctx->base.tb->cs_base;
++    ctx->base.pc_first &= -4;
++
+     ctx->iaoq_n = -1;
+     ctx->iaoq_n_var = NULL;
+ 
++    /* Bound the number of instructions by those left on the page.  */
++    bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
++    bound = MIN(max_insns, bound);
++
+     ctx->ntemps = 0;
+     memset(ctx->temps, 0, sizeof(ctx->temps));
+ 
+-    bound = -(tb->pc | TARGET_PAGE_MASK) / 4;
+-    return MIN(max_insns, bound);
++    return bound;
  }
  
- static DisasJumpType trans_sync(DisasContext *ctx, uint32_t insn,
+ static void hppa_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+-    /* Seed the nullification status from PSW[N], as shown in TB->FLAGS.  */
++    /* Seed the nullification status from PSW[N], as saved in TB->FLAGS.  */
+     ctx->null_cond = cond_make_f();
+     ctx->psw_n_nonzero = false;
+-    if (ctx->base.tb->flags & 1) {
++    if (ctx->base.tb->flags & PSW_N) {
+         ctx->null_cond.c = TCG_COND_ALWAYS;
+         ctx->psw_n_nonzero = true;
+     }
+@@ -4014,7 +4029,7 @@ static bool hppa_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+     ctx->base.is_jmp = gen_excp(ctx, EXCP_DEBUG);
+-    ctx->base.pc_next = ctx->iaoq_f + 4;
++    ctx->base.pc_next = (ctx->iaoq_f & -4) + 4;
+     return true;
+ }
+ 
+@@ -4035,7 +4050,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     {
+         /* Always fetch the insn, even if nullified, so that we check
+            the page permissions for execute.  */
+-        uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f);
++        uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f & -4);
+ 
+         /* Set up the IA queue for the next insn.
+            This will be overwritten by a branch.  */
+@@ -4064,10 +4079,8 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     }
+     ctx->ntemps = 0;
+ 
+-    /* Advance the insn queue.  */
+-    /* ??? The non-linear instruction restriction is purely due to
+-       the debugging dump.  Otherwise we *could* follow unconditional
+-       branches within the same page.  */
++    /* Advance the insn queue.  Note that this check also detects
++       a priority change within the instruction queue.  */
+     if (ret == DISAS_NEXT && ctx->iaoq_b != ctx->iaoq_f + 4) {
+         if (ctx->null_cond.c == TCG_COND_NEVER
+             || ctx->null_cond.c == TCG_COND_ALWAYS) {
+@@ -4121,7 +4134,7 @@ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+ 
+     /* We don't actually use this during normal translation,
+        but we should interact with the generic main loop.  */
+-    ctx->base.pc_next = ctx->base.tb->pc + 4 * ctx->base.num_insns;
++    ctx->base.pc_next = ctx->base.pc_first + 4 * ctx->base.num_insns;
+ }
+ 
+ static void hppa_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
 -- 
 2.14.3
