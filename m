@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50836)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eeKgL-00033H-FW
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:42 -0500
+	id 1eeKgO-00034k-2r
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eeKgK-0005MK-Oi
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:37 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44135)
+	id 1eeKgI-0005Ko-Gt
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:40 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:41612)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eeKgK-0005Lf-Lm
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:36 -0500
-Received: by mail-qt0-x241.google.com with SMTP id l20so9972740qtj.11
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:01:36 -0800 (PST)
+	id 1eeKgI-0005Kf-Dg
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:34 -0500
+Received: by mail-qt0-x242.google.com with SMTP id i1so9995517qtj.8
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:01:34 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 24 Jan 2018 10:01:17 -0300
-Message-Id: <20180124130126.20871-3-f4bug@amsat.org>
+Date: Wed, 24 Jan 2018 10:01:16 -0300
+Message-Id: <20180124130126.20871-2-f4bug@amsat.org>
 In-Reply-To: <20180124130126.20871-1-f4bug@amsat.org>
 References: <20180124130126.20871-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 02/11] linux-user/strace: improve sendto()
- output
+Subject: [Qemu-devel] [RFC PATCH 01/11] linux-user/strace: dump AF_NETLINK
+ sockaddr content
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,49 +39,95 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- linux-user/strace.c    | 16 ++++++++++++++++
- linux-user/strace.list |  2 +-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+please double check __pad and ntohl()
 
+ linux-user/syscall_defs.h |  7 +++++++
+ linux-user/strace.c       | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
+
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index bec3680b94..550e7d2939 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -151,6 +151,13 @@ struct target_sockaddr_un {
+     uint8_t sun_path[108];
+ };
+ 
++struct target_sockaddr_nl {
++    uint16_t nl_family;     /* AF_NETLINK */
++    int16_t __pad;
++    uint32_t nl_pid;
++    uint32_t nl_groups;
++};
++
+ struct target_in_addr {
+     uint32_t s_addr; /* big endian */
+ };
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 7eb5e2ab48..e7272f4ede 100644
+index bd897a3f20..7eb5e2ab48 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1922,6 +1922,22 @@ print_socketcall(const struct syscallname *name,
- }
- #endif
+@@ -8,6 +8,7 @@
+ #include <arpa/inet.h>
+ #include <netinet/tcp.h>
+ #include <linux/if_packet.h>
++#include <linux/netlink.h>
+ #include <sched.h>
+ #include "qemu.h"
  
-+#if defined(TARGET_NR_sendto)
-+static void
-+print_sendto(const struct syscallname *name,
-+             abi_long arg0, abi_long arg1, abi_long arg2,
-+             abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_raw_param(TARGET_ABI_FMT_ld, arg0, 0);
-+    print_buf(arg1, arg2, 0);
-+    print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
-+    print_flags(msg_flags, arg3, 0);
-+    print_sockaddr(arg4, arg5);
-+    print_syscall_epilogue(name);
-+}
-+#endif
+@@ -397,6 +398,12 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
+             gemu_log("}");
+             break;
+         }
++        case AF_NETLINK: {
++            struct target_sockaddr_nl *nl = (struct target_sockaddr_nl *)sa;
++            gemu_log("{nl_family=AF_NETLINK,nl_pid=%u,nl_groups=%u}",
++                     ntohl(nl->nl_pid), ntohl(nl->nl_groups));
++            break;
++        }
+         default:
+             gemu_log("{sa_family=%d, sa_data={", sa->sa_family);
+             for (i = 0; i < 13; i++) {
+@@ -423,6 +430,9 @@ print_socket_domain(int domain)
+     case PF_INET:
+         gemu_log("PF_INET");
+         break;
++    case PF_NETLINK:
++        gemu_log("PF_NETLINK");
++        break;
+     case PF_PACKET:
+         gemu_log("PF_PACKET");
+         break;
+@@ -472,6 +482,30 @@ print_socket_protocol(int domain, int type, int protocol)
+         return;
+     }
+ 
++    if (domain == AF_NETLINK) {
++        switch (protocol) {
++        case NETLINK_ROUTE:
++            gemu_log("NETLINK_ROUTE");
++            break;
++        case NETLINK_AUDIT:
++            gemu_log("NETLINK_AUDIT");
++            break;
++        case NETLINK_NETFILTER:
++            gemu_log("NETLINK_NETFILTER");
++            break;
++        case NETLINK_RDMA:
++            gemu_log("NETLINK_RDMA");
++            break;
++        case NETLINK_CRYPTO:
++            gemu_log("NETLINK_CRYPTO");
++            break;
++        default:
++            gemu_log("%d", protocol);
++            break;
++        }
++        return;
++    }
 +
- #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) || \
-     defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64)
- static void
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index a91e33f7e5..47669a2f50 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -1248,7 +1248,7 @@
- { TARGET_NR_sendmsg, "sendmsg" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_sendto
--{ TARGET_NR_sendto, "sendto" , NULL, NULL, NULL },
-+{ TARGET_NR_sendto, "sendto" , NULL, print_sendto, NULL },
- #endif
- #ifdef TARGET_NR_setdomainname
- { TARGET_NR_setdomainname, "setdomainname" , NULL, NULL, NULL },
+     switch (protocol) {
+     case IPPROTO_IP:
+         gemu_log("IPPROTO_IP");
 -- 
 2.15.1
