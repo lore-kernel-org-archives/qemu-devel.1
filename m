@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eeKdI-0000mv-1l
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 07:58:29 -0500
+	(envelope-from <wzssyqa@gmail.com>) id 1eeKg7-0002wx-PW
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eeKdH-0002eH-Bd
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 07:58:28 -0500
-References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
-	<1516694904-64879-9-git-send-email-imammedo@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e8f6a860-6c20-bfbe-e8c6-c65763a72102@vivier.eu>
-Date: Wed, 24 Jan 2018 13:58:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <1516694904-64879-9-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/25] m68k: cpu: add CPU_RESOLVING_TYPE
- macro
+	(envelope-from <wzssyqa@gmail.com>) id 1eeKg1-0004z6-A7
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:23 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:46449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wzssyqa@gmail.com>) id 1eeKg1-0004xd-3x
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:17 -0500
+Received: by mail-pg0-x244.google.com with SMTP id s9so2625931pgq.13
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:01:16 -0800 (PST)
+From: Yunqiang Su <wzssyqa@gmail.com>
+Message-Id: <47AAAB95-49AD-4A46-8D4A-30BA7C2483A4@gmail.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_AC93ED72-C9A1-4DE1-938D-6776B219C8E6";
+	protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Date: Wed, 24 Jan 2018 21:00:59 +0800
+In-Reply-To: <0871fe14-f1a5-b735-f7e0-b5f6e1c16dcc@linaro.org>
+References: <20171219115041.6611-1-syq@debian.org>
+	<0cf81c46-41c7-da9f-0a4b-0ac56a2fac6a@vivier.eu>
+	<0871fe14-f1a5-b735-f7e0-b5f6e1c16dcc@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] linux-user: MIPS set cpu to r6 CPU if
+ binary is R6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel <qemu-devel@nongnu.org>
 
-Le 23/01/2018 à 09:08, Igor Mammedov a écrit :
-> it will be used for providing to cpu name resolving class for
-> parsing cpu model for system and user emulation code.
-> 
-> Along with change add target to null-machine test, so
-> that when switch to CPU_RESOLVING_TYPE happens,
-> test would ensure that null-mchine usecase still works.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: Laurent Vivier <laurent@vivier.eu>
-> ---
->  target/m68k/cpu.h         | 1 +
->  tests/machine-none-test.c | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-> index 2985b03..8a4299a 100644
-> --- a/target/m68k/cpu.h
-> +++ b/target/m68k/cpu.h
-> @@ -405,6 +405,7 @@ void register_m68k_insns (CPUM68KState *env);
->  
->  #define M68K_CPU_TYPE_SUFFIX "-" TYPE_M68K_CPU
->  #define M68K_CPU_TYPE_NAME(model) model M68K_CPU_TYPE_SUFFIX
-> +#define CPU_RESOLVING_TYPE TYPE_M68K_CPU
->  
->  #define cpu_signal_handler cpu_m68k_signal_handler
->  #define cpu_list m68k_cpu_list
-> diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-> index 1159290..c9445b6 100644
-> --- a/tests/machine-none-test.c
-> +++ b/tests/machine-none-test.c
-> @@ -31,6 +31,7 @@ static struct arch2cpu cpus_map[] = {
->      { "alpha", "ev67" },
->      { "cris", "crisv32" },
->      { "lm32", "lm32-full" },
-> +    { "m68k", "m5206" },
->  };
->  
->  static const char *get_cpu_model_by_arch(const char *arch)
-> 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+--Apple-Mail=_AC93ED72-C9A1-4DE1-938D-6776B219C8E6
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
+
+Signed-off-by: YunQiang Su <syq@debian.org>
+
+On Tue, Jan 9, 2018 at 11:39 PM, Richard Henderson =
+<richard.henderson@linaro.org> wrote:
+> On 01/08/2018 03:34 PM, Laurent Vivier wrote:
+>> Peter, Riku,
+>>=20
+>> what do you think of the idea of using the ELF header to select the =
+CPU
+>> to emulate?
+>=20
+> I think it's a good way to cut down on mistakes and reduce -- or at =
+least not
+> increase -- the number of binaries we build.
+>=20
+>=20
+> r~
+
+
+--Apple-Mail=_AC93ED72-C9A1-4DE1-938D-6776B219C8E6
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEgWeQ/gp1Z34qbCLIFBNdJ3uI1+UFAlpog4wACgkQFBNdJ3uI
+1+WNZBAAqFFagcKlxdkQiqB8e+JIZNuODifwPN4Xq9HTiyBPE+/kOhnyTzSSPwPL
+M1BP+T/l3MvuGkOaOKZSH2SWIQu+GBTTPD4vYis1Ed0Uqon5Occq6l90fb63Urvk
+sraKZDxDoH6T2O/QKxh9NSjwUoC+mCn8DLVFGq3ZxQjGZE5aDG6i+Dzm8Dv2HVTU
+B5JAxBjFAsAwuqgN9MpIeLUihKMSlkc3ykmj8j61F1mX1IOxpqKsuVmANy+VGABy
+EkWg2rN5z+STQvdWUpzVNivuvtwsKkZhySwqizPvo2CMrRZ/Tf/HjjAvntmiYPbA
+31szx/rvsRKNCVNKv7cMQJY1XjiyH4FHDQWOnTMOLspymgKzNqvpBOyw+s15ZnBA
+rGU1iy4ZxHpivXHxAZsrFU0JWmVWuDITffRFyIP6k9GUiDvWsi+wWyWlpNqFZzTB
+hmrjSQIFqITnzoM4fw2jcSLXIm2UppwIBvrfJZW7F0QulXKmBgr1skj8UedX8cCa
+FiTR04rlBrXw45bAKgT74vZ5ftfQGyRQ9yet2HmWLlU/R6KhuOkw99L0eZwbThYL
+jPdPHX9eYZ7kJIZHr53jRn0UbAPAGcFg/pdxgxsmq6Kx5OdRM5dnUY6/nZiDiuE4
+N9mya4Y8O2AAqXEy3U2QhXix8/W9+K4Xr0DRGNYyMJnrQxmVeIg=
+=yrjp
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_AC93ED72-C9A1-4DE1-938D-6776B219C8E6--
