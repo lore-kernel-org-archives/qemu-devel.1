@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURj-0004tX-VD
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:12 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURl-0004vL-Hb
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURi-0001zR-Tn
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:11 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:46052)
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURk-0001zu-Dm
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:13 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:39196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeURi-0001zE-N0
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:10 -0500
-Received: by mail-pg0-x241.google.com with SMTP id m136so3804330pga.12
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:27:10 -0800 (PST)
+	id 1eeURk-0001zZ-5i
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:27:12 -0500
+Received: by mail-pg0-x244.google.com with SMTP id w17so3811227pgv.6
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:27:12 -0800 (PST)
+Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
+	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
+	z19sm9760028pfh.185.2018.01.24.15.27.09 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 24 Jan 2018 15:27:10 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 24 Jan 2018 15:26:07 -0800
-Message-Id: <20180124232625.30105-28-richard.henderson@linaro.org>
+Date: Wed, 24 Jan 2018 15:26:08 -0800
+Message-Id: <20180124232625.30105-29-richard.henderson@linaro.org>
 In-Reply-To: <20180124232625.30105-1-richard.henderson@linaro.org>
 References: <20180124232625.30105-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 27/45] target/hppa: Implement halt and reset
- instructions
+Subject: [Qemu-devel] [PATCH v3 28/45] target/hppa: Optimize for flat
+ addressing space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +33,169 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Helge Deller <deller@gmx.de>
 
-From: Helge Deller <deller@gmx.de>
+Linux sets sr4-sr7 all to the same value, which means that we
+need not do any runtime computation to find out what space to
+use in forming the GVA.
 
-Real hardware would use an external device to control the power.
-But for the moment let's invent instructions in reserved space,
-to be used by our custom firmware.
-
-Signed-off-by: Helge Deller <deller@gmx.de>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/helper.h    |  2 ++
- target/hppa/op_helper.c | 13 +++++++++++++
- target/hppa/translate.c | 25 ++++++++++++++++++++++++-
- 3 files changed, 39 insertions(+), 1 deletion(-)
+ target/hppa/cpu.h       | 11 ++++++++++-
+ target/hppa/translate.c | 29 ++++++++++++++++++++---------
+ 2 files changed, 30 insertions(+), 10 deletions(-)
 
-diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 1e733b7926..31320740da 100644
---- a/target/hppa/helper.h
-+++ b/target/hppa/helper.h
-@@ -80,6 +80,8 @@ DEF_HELPER_FLAGS_4(fmpynfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
- DEF_HELPER_FLAGS_0(read_interval_timer, TCG_CALL_NO_RWG, tr)
- 
- #ifndef CONFIG_USER_ONLY
-+DEF_HELPER_1(shutdown, noreturn, env)
-+DEF_HELPER_1(reset, noreturn, env)
- DEF_HELPER_1(rfi, void, env)
- DEF_HELPER_1(rfi_r, void, env)
- DEF_HELPER_FLAGS_2(write_interval_timer, TCG_CALL_NO_RWG, void, env, tr)
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index d270f94e31..c2eeced0e9 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -22,6 +22,7 @@
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
- #include "exec/cpu_ldst.h"
-+#include "sysemu/sysemu.h"
- #include "qemu/timer.h"
- 
- 
-@@ -639,6 +640,18 @@ void HELPER(write_interval_timer)(CPUHPPAState *env, target_ureg val)
-     timer_mod(cpu->alarm_timer, timeout);
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index a6e4091b6a..57e0bd6f0e 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -282,7 +282,11 @@ static inline target_ulong hppa_form_gva(CPUHPPAState *env, uint64_t spc,
+     return hppa_form_gva_psw(env->psw, spc, off);
  }
  
-+void HELPER(shutdown)(CPUHPPAState *env)
-+{
-+    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+    helper_excp(env, EXCP_HLT);
-+}
-+
-+void HELPER(reset)(CPUHPPAState *env)
-+{
-+    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+    helper_excp(env, EXCP_HLT);
-+}
-+
- target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
- {
-     target_ulong psw = env->psw;
+-/* Since PSW_CB will never need to be in tb->flags, reuse them.  */
++/* Since PSW_{I,CB} will never need to be in tb->flags, reuse them.
++ * TB_FLAG_SR_SAME indicates that SR4 through SR7 all contain the
++ * same value.
++ */
++#define TB_FLAG_SR_SAME     PSW_I
+ #define TB_FLAG_PRIV_SHIFT  8
+ 
+ static inline void cpu_get_tb_cpu_state(CPUHPPAState *env, target_ulong *pc,
+@@ -318,6 +322,11 @@ static inline void cpu_get_tb_cpu_state(CPUHPPAState *env, target_ulong *pc,
+             *cs_base |= (uint32_t)diff;
+         }
+     }
++    if ((env->sr[4] == env->sr[5])
++        & (env->sr[4] == env->sr[6])
++        & (env->sr[4] == env->sr[7])) {
++        flags |= TB_FLAG_SR_SAME;
++    }
+ #endif
+ 
+     *pflags = flags;
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index f3942b1baf..8c1ae4db78 100644
+index 8c1ae4db78..24d357889e 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2302,6 +2302,18 @@ static DisasJumpType trans_rfi(DisasContext *ctx, uint32_t insn,
-     /* Exit the TB to recognize new interrupts.  */
-     return nullify_end(ctx, DISAS_NORETURN);
- }
-+
-+static DisasJumpType gen_hlt(DisasContext *ctx, int reset)
-+{
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+    nullify_over(ctx);
-+    if (reset) {
-+        gen_helper_reset(cpu_env);
-+    } else {
-+        gen_helper_shutdown(cpu_env);
-+    }
-+    return nullify_end(ctx, DISAS_NORETURN);
-+}
- #endif /* !CONFIG_USER_ONLY */
+@@ -284,6 +284,7 @@ typedef struct DisasContext {
+     TCGLabel *null_lab;
  
- static const DisasInsn table_system[] = {
-@@ -4519,7 +4531,18 @@ static DisasJumpType translate_one(DisasContext *ctx, uint32_t insn)
-     case 0x15: /* unassigned */
-     case 0x1D: /* unassigned */
-     case 0x37: /* unassigned */
--    case 0x3F: /* unassigned */
-+        break;
-+    case 0x3F:
-+#ifndef CONFIG_USER_ONLY
-+        /* Unassigned, but use as system-halt.  */
-+        if (insn == 0xfffdead0) {
-+            return gen_hlt(ctx, 0); /* halt system */
-+        }
-+        if (insn == 0xfffdead1) {
-+            return gen_hlt(ctx, 1); /* reset system */
-+        }
-+#endif
-+        break;
-     default:
-         break;
+     uint32_t insn;
++    uint32_t tb_flags;
+     int mmu_idx;
+     int privilege;
+     bool psw_n_nonzero;
+@@ -323,6 +324,7 @@ typedef struct DisasInsn {
+ /* global register indexes */
+ static TCGv_reg cpu_gr[32];
+ static TCGv_i64 cpu_sr[4];
++static TCGv_i64 cpu_srH;
+ static TCGv_reg cpu_iaoq_f;
+ static TCGv_reg cpu_iaoq_b;
+ static TCGv_i64 cpu_iasq_f;
+@@ -360,8 +362,8 @@ void hppa_translate_init(void)
+         "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"
+     };
+     /* SR[4-7] are not global registers so that we can index them.  */
+-    static const char sr_names[4][4] = {
+-        "sr0", "sr1", "sr2", "sr3"
++    static const char sr_names[5][4] = {
++        "sr0", "sr1", "sr2", "sr3", "srH"
+     };
+ 
+     int i;
+@@ -377,6 +379,9 @@ void hppa_translate_init(void)
+                                            offsetof(CPUHPPAState, sr[i]),
+                                            sr_names[i]);
+     }
++    cpu_srH = tcg_global_mem_new_i64(cpu_env,
++                                     offsetof(CPUHPPAState, sr[4]),
++                                     sr_names[4]);
+ 
+     for (i = 0; i < ARRAY_SIZE(vars); ++i) {
+         const GlobalVar *v = &vars[i];
+@@ -604,6 +609,8 @@ static void load_spr(DisasContext *ctx, TCGv_i64 dest, unsigned reg)
+ #else
+     if (reg < 4) {
+         tcg_gen_mov_i64(dest, cpu_sr[reg]);
++    } else if (ctx->tb_flags & TB_FLAG_SR_SAME) {
++        tcg_gen_mov_i64(dest, cpu_srH);
+     } else {
+         tcg_gen_ld_i64(dest, cpu_env, offsetof(CPUHPPAState, sr[reg]));
+     }
+@@ -1362,6 +1369,9 @@ static TCGv_i64 space_select(DisasContext *ctx, int sp, TCGv_reg base)
+         load_spr(ctx, spc, sp);
+         return spc;
+     }
++    if (ctx->tb_flags & TB_FLAG_SR_SAME) {
++        return cpu_srH;
++    }
+ 
+     ptr = tcg_temp_new_ptr();
+     tmp = tcg_temp_new();
+@@ -1405,7 +1415,7 @@ static void form_gva(DisasContext *ctx, TCGv_tl *pgva, TCGv_reg *pofs,
+ #else
+     TCGv_tl addr = get_temp_tl(ctx);
+     tcg_gen_extu_reg_tl(addr, modify <= 0 ? ofs : base);
+-    if (ctx->base.tb->flags & PSW_W) {
++    if (ctx->tb_flags & PSW_W) {
+         tcg_gen_andi_tl(addr, addr, 0x3fffffffffffffffull);
+     }
+     if (!is_phys) {
+@@ -2112,6 +2122,7 @@ static DisasJumpType trans_mtsp(DisasContext *ctx, uint32_t insn,
+ 
+     if (rs >= 4) {
+         tcg_gen_st_i64(t64, cpu_env, offsetof(CPUHPPAState, sr[rs]));
++        ctx->tb_flags &= ~TB_FLAG_SR_SAME;
+     } else {
+         tcg_gen_mov_i64(cpu_sr[rs], t64);
+     }
+@@ -2407,7 +2418,7 @@ static DisasJumpType trans_ixtlbx(DisasContext *ctx, uint32_t insn,
+ 
+     /* Exit TB for ITLB change if mmu is enabled.  This *should* not be
+        the case, since the OS TLB fill handler runs with mmu disabled.  */
+-    return nullify_end(ctx, !is_data && (ctx->base.tb->flags & PSW_C)
++    return nullify_end(ctx, !is_data && (ctx->tb_flags & PSW_C)
+                        ? DISAS_IAQ_N_STALE : DISAS_NEXT);
+ }
+ 
+@@ -2443,7 +2454,7 @@ static DisasJumpType trans_pxtlbx(DisasContext *ctx, uint32_t insn,
+     }
+ 
+     /* Exit TB for TLB change if mmu is enabled.  */
+-    return nullify_end(ctx, !is_data && (ctx->base.tb->flags & PSW_C)
++    return nullify_end(ctx, !is_data && (ctx->tb_flags & PSW_C)
+                        ? DISAS_IAQ_N_STALE : DISAS_NEXT);
+ }
+ 
+@@ -4556,6 +4567,7 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+     int bound;
+ 
+     ctx->cs = cs;
++    ctx->tb_flags = ctx->base.tb->flags;
+ 
+ #ifdef CONFIG_USER_ONLY
+     ctx->privilege = MMU_USER_IDX;
+@@ -4563,9 +4575,8 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+     ctx->iaoq_f = ctx->base.pc_first;
+     ctx->iaoq_b = ctx->base.tb->cs_base;
+ #else
+-    ctx->privilege = (ctx->base.tb->flags >> TB_FLAG_PRIV_SHIFT) & 3;
+-    ctx->mmu_idx = (ctx->base.tb->flags & PSW_D
+-                    ? ctx->privilege : MMU_PHYS_IDX);
++    ctx->privilege = (ctx->tb_flags >> TB_FLAG_PRIV_SHIFT) & 3;
++    ctx->mmu_idx = (ctx->tb_flags & PSW_D ? ctx->privilege : MMU_PHYS_IDX);
+ 
+     /* Recover the IAOQ values from the GVA + PRIV.  */
+     uint64_t cs_base = ctx->base.tb->cs_base;
+@@ -4597,7 +4608,7 @@ static void hppa_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
+     /* Seed the nullification status from PSW[N], as saved in TB->FLAGS.  */
+     ctx->null_cond = cond_make_f();
+     ctx->psw_n_nonzero = false;
+-    if (ctx->base.tb->flags & PSW_N) {
++    if (ctx->tb_flags & PSW_N) {
+         ctx->null_cond.c = TCG_COND_ALWAYS;
+         ctx->psw_n_nonzero = true;
      }
 -- 
 2.14.3
