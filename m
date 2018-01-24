@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51041)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eeKgi-0003Jt-1H
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:02:03 -0500
+	id 1eeKgf-0003Gp-RZ
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eeKgc-0005am-Jb
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:02:00 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:46704)
+	id 1eeKgY-0005X5-7R
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:57 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:45236)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eeKgc-0005ab-Fa
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:54 -0500
-Received: by mail-qt0-x241.google.com with SMTP id o35so9976201qtj.13
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:01:54 -0800 (PST)
+	id 1eeKgY-0005X0-3f
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:01:50 -0500
+Received: by mail-qt0-x241.google.com with SMTP id x27so9984145qtm.12
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:01:49 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 24 Jan 2018 10:01:25 -0300
-Message-Id: <20180124130126.20871-11-f4bug@amsat.org>
+Date: Wed, 24 Jan 2018 10:01:23 -0300
+Message-Id: <20180124130126.20871-9-f4bug@amsat.org>
 In-Reply-To: <20180124130126.20871-1-f4bug@amsat.org>
 References: <20180124130126.20871-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 10/11] linux-user/syscall: verify
- recvfrom(addr) is user-writable
+Subject: [Qemu-devel] [PATCH 08/11] linux-user/strace: improve
+ gettimeofday() output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,24 +39,46 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- linux-user/syscall.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ linux-user/strace.c    | 13 +++++++++++++
+ linux-user/strace.list |  2 +-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 11c9116c4a..b6b9beca5b 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -4040,6 +4040,11 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-             ret = -TARGET_EINVAL;
-             goto fail;
-         }
-+        if (!access_ok(VERIFY_WRITE, target_addr, addrlen)) {
-+            ret = -TARGET_EFAULT;
-+            goto fail;
-+        }
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 4b8ab6bcfb..b7c4cfae58 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1526,6 +1526,19 @@ print_futimesat(const struct syscallname *name,
+ }
+ #endif
+ 
++#ifdef TARGET_NR_gettimeofday
++static void
++print_gettimeofday(const struct syscallname *name,
++                   abi_long arg0, abi_long arg1, abi_long arg2,
++                   abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_pointer(arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
 +
-         addr = alloca(addrlen);
-         ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
-                                       addr, &addrlen));
+ #ifdef TARGET_NR_link
+ static void
+ print_link(const struct syscallname *name,
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 958d10d48f..f90c0e8ee4 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -384,7 +384,7 @@
+ { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_gettimeofday
+-{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
++{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, print_gettimeofday, NULL },
+ #endif
+ #ifdef TARGET_NR_getuid
+ { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
 -- 
 2.15.1
