@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eeGiq-0001Q0-S2
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:47:58 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eeGvZ-00052N-D0
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:01:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eeGin-0007J3-NN
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:47:56 -0500
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:45938)
+	(envelope-from <pbonzini@redhat.com>) id 1eeGvT-0002Oo-Tg
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:01:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eeGin-0007He-Dk
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 03:47:53 -0500
-Received: from player692.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 359F8112C2D
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 09:47:51 +0100 (CET)
-Date: Wed, 24 Jan 2018 09:46:21 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180124094621.46ff2f43@bahia.lan>
-In-Reply-To: <1516747387-31760-2-git-send-email-mst@redhat.com>
-References: <1516747387-31760-1-git-send-email-mst@redhat.com>
-	<1516747387-31760-2-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eeGvT-0002N9-LD
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 04:00:59 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7C8475536E
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 09:00:58 +0000 (UTC)
+References: <20180116142316.30486-1-pbonzini@redhat.com>
+	<CAK1Eb9niRFD-QK4LMnevaonkrFyWcQidcmYqq2-hf1-4vVSWjg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ff1120c3-3613-459f-c6f0-c65ca2269b7e@redhat.com>
+Date: Wed, 24 Jan 2018 10:00:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAK1Eb9niRFD-QK4LMnevaonkrFyWcQidcmYqq2-hf1-4vVSWjg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 1/1] kvm-all: Partially reverts 4fe6d78b2e
- to remove the cleanup call
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] coroutine-lock: polymorphic CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Anton Blanchard <anton@samba.org>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Please note that Peter usually doesn't work on Wednesdays. The master branch
-might remain broken for everyone until tomorrow... :-\
+On 24/01/2018 04:58, Fam Zheng wrote:
+> On Tue, Jan 16, 2018 at 10:23 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> There are cases in which a queued coroutine must be restarted from
+>> non-coroutine context (with qemu_co_enter_next).  In this cases,
+>> qemu_co_enter_next also needs to be thread-safe, but it cannot use a
+>> CoMutex and so cannot qemu_co_queue_wait.  This happens in curl (which
+>> right now is rolling its own list of Coroutines) and will happen in
+>> Fam's NVMe driver as well.
+>>
+>> This series extracts the idea of a polymorphic lockable object
+>> from my "scoped lock guard" proposal, and applies it to CoQueue.
+>> The implementation of QemuLockable is similar to C11 _Generic, but
+>> redone using the preprocessor and GCC builtins for compatibility.
+>>
+>> In general, while a bit on the esoteric side, the functionality used
+>> to emulate _Generic is fairly old in GCC, and the builtins are already
+>> used by include/qemu/atomic.h; the series was tested with Fedora 27 (boot
+>> Damn Small Linux via http) and CentOS 6 (compiled only).
+>>
+>> Paolo
+>>
+>> v1->v2: fix typos and copyright year
+> 
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> 
+> Should I include this series in my pull request for the NVMe driver?
 
-And I don't think this is the right fix anyway. See below.
+Yes, please.  This is within block layer area, since CoQueue and
+block/curl.c are still the only users.
 
-On Wed, 24 Jan 2018 00:44:14 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> 
-> This commit partially reverts the commit 4fe6d78b2e because of issues
-> reported in the virtio.
-> 
-> Examples:
-> 
-> $ qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G \
->   -M pseries,accel=kvm -netdev type=user,id=net0 \
->   -device virtio-net-pci,netdev=net0 -drive file=../disk.qcow2,if=virtio
-> 
-> Populating /vdevice/nvram@71000001
-> Populating /vdevice/v-scsi@71000002
->        SCSI: Looking for devices
->           8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-> Populating /pci@800000020000000
->                      00 0000 (D) : 1af4 1000    virtio [ net ]
-> Aborted
-> 
-> $ qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
-> 
-> Running QEMU with GTK 2.x is deprecated, and will be removed
-> in a future release. Please switch to GTK 3.x instead
-> [1]    5282 abort
-> 
-> Reference http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
-> 
-> Reported-by: Anton Blanchard <anton@samba.org>
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  accel/kvm/kvm-all.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 071f4f5..f290f48 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
->      if (r < 0) {
->          abort();
->      }
-> -
-> -    if (e->cleanup) {
-> -        e->cleanup(e);
-> -    }
-
-This looks wrong as the cleanup is expected to do things like closing fds:
-
-static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
-{
-    /* Test and clear notifier after disabling event,
-     * in case poll callback didn't have time to run.
-     */
-    virtio_queue_host_notifier_read(notifier);
-    event_notifier_cleanup(notifier);
-}
-
-void event_notifier_cleanup(EventNotifier *e)
-{
-    if (e->rfd != e->wfd) {
-        close(e->rfd);
-    }
-    close(e->wfd);
-    e->rfd = -1;
-    e->wfd = -1;
-    e->cleanup = NULL;
-}
-
-And indeed, with this patch applied, QEMU leaks eventfds on every machine
-reset.
-
->  }
->  
->  static void kvm_io_ioeventfd_add(MemoryListener *listener,
+Paolo
