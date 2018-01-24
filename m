@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURE-0004Pf-9p
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:45 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURJ-0004SU-CD
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eeURD-0001co-0Y
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:40 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44263)
+	(envelope-from <richard.henderson@linaro.org>) id 1eeURE-0001dQ-Gj
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:45 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33730)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eeURC-0001cd-OC
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:38 -0500
-Received: by mail-pg0-x242.google.com with SMTP id m20so3808609pgc.11
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:38 -0800 (PST)
+	id 1eeURE-0001d8-7x
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 18:26:40 -0500
+Received: by mail-pf0-x243.google.com with SMTP id t5so4371297pfi.0
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 15:26:40 -0800 (PST)
 Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
 	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
-	z19sm9760028pfh.185.2018.01.24.15.26.35 for <qemu-devel@nongnu.org>
+	z19sm9760028pfh.185.2018.01.24.15.26.37 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 24 Jan 2018 15:26:36 -0800 (PST)
+	Wed, 24 Jan 2018 15:26:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 24 Jan 2018 15:25:46 -0800
-Message-Id: <20180124232625.30105-7-richard.henderson@linaro.org>
+Date: Wed, 24 Jan 2018 15:25:47 -0800
+Message-Id: <20180124232625.30105-8-richard.henderson@linaro.org>
 In-Reply-To: <20180124232625.30105-1-richard.henderson@linaro.org>
 References: <20180124232625.30105-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 06/45] target/hppa: Implement mmu_idx from
- IA privilege level
+Subject: [Qemu-devel] [PATCH v3 07/45] target/hppa: Implement the system
+ mask instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,229 +34,193 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Most aspects of privilege are not yet handled.  But this
-gives us the start from which to begin checking.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h       | 19 +++++++++++++----
- target/hppa/cpu.c       |  2 +-
- target/hppa/translate.c | 55 ++++++++++++++++++++++++++++++-------------------
- 3 files changed, 50 insertions(+), 26 deletions(-)
+ target/hppa/helper.h    |  4 +++
+ target/hppa/op_helper.c | 14 ++++++++
+ target/hppa/translate.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 113 insertions(+), 1 deletion(-)
 
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index 1524ef91b6..805c93db9c 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -36,8 +36,10 @@
- #define TARGET_PAGE_BITS 12
- 
- #define ALIGNED_ONLY
--#define NB_MMU_MODES     1
--#define MMU_USER_IDX     0
-+#define NB_MMU_MODES     5
-+#define MMU_KERNEL_IDX   0
-+#define MMU_USER_IDX     3
-+#define MMU_PHYS_IDX     4
- #define TARGET_INSN_START_EXTRA_WORDS 1
- 
- /* Hardware exceptions, interupts, faults, and traps.  */
-@@ -195,7 +197,14 @@ static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
- 
- static inline int cpu_mmu_index(CPUHPPAState *env, bool ifetch)
- {
--    return 0;
-+#ifdef CONFIG_USER_ONLY
-+    return MMU_USER_IDX;
-+#else
-+    if (env->psw & (ifetch ? PSW_C : PSW_D)) {
-+        return env->iaoq_f & 3;
-+    }
-+    return MMU_PHYS_IDX;  /* mmu disabled */
+diff --git a/target/hppa/helper.h b/target/hppa/helper.h
+index c720de523b..254a4da133 100644
+--- a/target/hppa/helper.h
++++ b/target/hppa/helper.h
+@@ -76,3 +76,7 @@ DEF_HELPER_FLAGS_4(fmpyfadd_s, TCG_CALL_NO_RWG, i32, env, i32, i32, i32)
+ DEF_HELPER_FLAGS_4(fmpynfadd_s, TCG_CALL_NO_RWG, i32, env, i32, i32, i32)
+ DEF_HELPER_FLAGS_4(fmpyfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
+ DEF_HELPER_FLAGS_4(fmpynfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
++
++#ifndef CONFIG_USER_ONLY
++DEF_HELPER_FLAGS_2(swap_system_mask, TCG_CALL_NO_RWG, tr, env, tr)
 +#endif
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 479bfc0fdf..1c3e043cc0 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -601,3 +601,17 @@ float64 HELPER(fmpynfadd_d)(CPUHPPAState *env, float64 a, float64 b, float64 c)
+     update_fr0_op(env, GETPC());
+     return ret;
  }
- 
- void hppa_translate_init(void);
-@@ -210,7 +219,9 @@ static inline void cpu_get_tb_cpu_state(CPUHPPAState *env, target_ulong *pc,
- {
-     *pc = env->iaoq_f;
-     *cs_base = env->iaoq_b;
--    *pflags = env->psw_n;
-+    /* ??? E, T, H, L, B, P bits need to be here, when implemented.  */
-+    *pflags = (env->psw & (PSW_W | PSW_C | PSW_D))
-+            | env->psw_n * PSW_N;
- }
- 
- target_ureg cpu_hppa_get_psw(CPUHPPAState *env);
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index f6d92de972..9962ab71ee 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -39,7 +39,7 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
- 
-     cpu->env.iaoq_f = tb->pc;
-     cpu->env.iaoq_b = tb->cs_base;
--    cpu->env.psw_n = tb->flags & 1;
-+    cpu->env.psw_n = (tb->flags & PSW_N) != 0;
- }
- 
- static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
++
++#ifndef CONFIG_USER_ONLY
++target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
++{
++    target_ulong psw = env->psw;
++    /* ??? On second reading this condition simply seems
++       to be undefined rather than a diagnosed trap.  */
++    if (nsm & ~psw & PSW_Q) {
++        dynexcp(env, EXCP_ILL, GETPC());
++    }
++    env->psw = (psw & ~PSW_SM) | (nsm & PSW_SM);
++    return psw & PSW_SM;
++}
++#endif
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index dd96147bf1..33605a2d15 100644
+index 33605a2d15..088031e7f3 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -282,6 +282,8 @@ typedef struct DisasContext {
-     DisasCond null_cond;
-     TCGLabel *null_lab;
+@@ -299,6 +299,10 @@ typedef struct DisasContext {
+    updated the iaq for the next instruction to be executed.  */
+ #define DISAS_IAQ_N_STALE    DISAS_TARGET_1
  
-+    int mmu_idx;
-+    int privilege;
-     bool psw_n_nonzero;
- } DisasContext;
- 
-@@ -1299,10 +1301,10 @@ static void do_load_32(DisasContext *ctx, TCGv_i32 dest, unsigned rb,
-     }
- 
-     if (modify == 0) {
--        tcg_gen_qemu_ld_i32(dest, addr, MMU_USER_IDX, mop);
-+        tcg_gen_qemu_ld_i32(dest, addr, ctx->mmu_idx, mop);
-     } else {
-         tcg_gen_qemu_ld_i32(dest, (modify < 0 ? addr : base),
--                            MMU_USER_IDX, mop);
-+                            ctx->mmu_idx, mop);
-         save_gpr(ctx, rb, addr);
-     }
-     tcg_temp_free(addr);
-@@ -1329,10 +1331,10 @@ static void do_load_64(DisasContext *ctx, TCGv_i64 dest, unsigned rb,
-     }
- 
-     if (modify == 0) {
--        tcg_gen_qemu_ld_i64(dest, addr, MMU_USER_IDX, mop);
-+        tcg_gen_qemu_ld_i64(dest, addr, ctx->mmu_idx, mop);
-     } else {
-         tcg_gen_qemu_ld_i64(dest, (modify < 0 ? addr : base),
--                            MMU_USER_IDX, mop);
-+                            ctx->mmu_idx, mop);
-         save_gpr(ctx, rb, addr);
-     }
-     tcg_temp_free(addr);
-@@ -1358,7 +1360,7 @@ static void do_store_32(DisasContext *ctx, TCGv_i32 src, unsigned rb,
-         tcg_gen_addi_reg(addr, base, disp);
-     }
- 
--    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
-+    tcg_gen_qemu_st_i32(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
- 
-     if (modify != 0) {
-         save_gpr(ctx, rb, addr);
-@@ -1386,7 +1388,7 @@ static void do_store_64(DisasContext *ctx, TCGv_i64 src, unsigned rb,
-         tcg_gen_addi_reg(addr, base, disp);
-     }
- 
--    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), MMU_USER_IDX, mop);
-+    tcg_gen_qemu_st_i64(src, (modify <= 0 ? addr : base), ctx->mmu_idx, mop);
- 
-     if (modify != 0) {
-         save_gpr(ctx, rb, addr);
-@@ -2497,7 +2499,7 @@ static DisasJumpType trans_ldcw(DisasContext *ctx, uint32_t insn,
- 
-     zero = tcg_const_reg(0);
-     tcg_gen_atomic_xchg_reg(dest, (modify <= 0 ? addr : base),
--                            zero, MMU_USER_IDX, mop);
-+                            zero, ctx->mmu_idx, mop);
-     if (modify) {
-         save_gpr(ctx, rb, addr);
-     }
-@@ -3971,30 +3973,43 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
-                                       CPUState *cs, int max_insns)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
--    TranslationBlock *tb = ctx->base.tb;
-     int bound;
- 
-     ctx->cs = cs;
--    ctx->iaoq_f = tb->pc;
--    ctx->iaoq_b = tb->cs_base;
++/* Similarly, but we want to return to the main loop immediately
++   to recognize unmasked interrupts.  */
++#define DISAS_IAQ_N_STALE_EXIT      DISAS_TARGET_2
 +
-+#ifdef CONFIG_USER_ONLY
-+    ctx->privilege = MMU_USER_IDX;
-+    ctx->mmu_idx = MMU_USER_IDX;
-+#else
-+    ctx->privilege = ctx->base.pc_first & 3;
-+    ctx->mmu_idx = (ctx->base.tb->flags & PSW_D
-+                    ? ctx->privilege : MMU_PHYS_IDX);
+ typedef struct DisasInsn {
+     uint32_t insn, mask;
+     DisasJumpType (*trans)(DisasContext *ctx, uint32_t insn,
+@@ -697,6 +701,14 @@ static DisasJumpType gen_illegal(DisasContext *ctx)
+     return nullify_end(ctx, gen_excp(ctx, EXCP_ILL));
+ }
+ 
++#define CHECK_MOST_PRIVILEGED(EXCP)                               \
++    do {                                                          \
++        if (ctx->privilege != 0) {                                \
++            nullify_over(ctx);                                    \
++            return nullify_end(ctx, gen_excp(ctx, EXCP));         \
++        }                                                         \
++    } while (0)
++
+ static bool use_goto_tb(DisasContext *ctx, target_ureg dest)
+ {
+     /* Suppress goto_tb in the case of single-steping and IO.  */
+@@ -1982,6 +1994,79 @@ static DisasJumpType trans_ldsid(DisasContext *ctx, uint32_t insn,
+     return DISAS_NEXT;
+ }
+ 
++#ifndef CONFIG_USER_ONLY
++/* Note that ssm/rsm instructions number PSW_W and PSW_E differently.  */
++static target_ureg extract_sm_imm(uint32_t insn)
++{
++    target_ureg val = extract32(insn, 16, 10);
++
++    if (val & PSW_SM_E) {
++        val = (val & ~PSW_SM_E) | PSW_E;
++    }
++    if (val & PSW_SM_W) {
++        val = (val & ~PSW_SM_W) | PSW_W;
++    }
++    return val;
++}
++
++static DisasJumpType trans_rsm(DisasContext *ctx, uint32_t insn,
++                               const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    target_ureg sm = extract_sm_imm(insn);
++    TCGv_reg tmp;
++
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++    nullify_over(ctx);
++
++    tmp = get_temp(ctx);
++    tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, psw));
++    tcg_gen_andi_reg(tmp, tmp, ~sm);
++    gen_helper_swap_system_mask(tmp, cpu_env, tmp);
++    save_gpr(ctx, rt, tmp);
++
++    /* Exit the TB to recognize new interrupts, e.g. PSW_M.  */
++    return nullify_end(ctx, DISAS_IAQ_N_STALE_EXIT);
++}
++
++static DisasJumpType trans_ssm(DisasContext *ctx, uint32_t insn,
++                               const DisasInsn *di)
++{
++    unsigned rt = extract32(insn, 0, 5);
++    target_ureg sm = extract_sm_imm(insn);
++    TCGv_reg tmp;
++
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++    nullify_over(ctx);
++
++    tmp = get_temp(ctx);
++    tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, psw));
++    tcg_gen_ori_reg(tmp, tmp, sm);
++    gen_helper_swap_system_mask(tmp, cpu_env, tmp);
++    save_gpr(ctx, rt, tmp);
++
++    /* Exit the TB to recognize new interrupts, e.g. PSW_I.  */
++    return nullify_end(ctx, DISAS_IAQ_N_STALE_EXIT);
++}
++
++static DisasJumpType trans_mtsm(DisasContext *ctx, uint32_t insn,
++                                const DisasInsn *di)
++{
++    unsigned rr = extract32(insn, 16, 5);
++    TCGv_reg tmp, reg;
++
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++    nullify_over(ctx);
++
++    reg = load_gpr(ctx, rr);
++    tmp = get_temp(ctx);
++    gen_helper_swap_system_mask(tmp, cpu_env, reg);
++
++    /* Exit the TB to recognize new interrupts.  */
++    return nullify_end(ctx, DISAS_IAQ_N_STALE_EXIT);
++}
++#endif /* !CONFIG_USER_ONLY */
++
+ static const DisasInsn table_system[] = {
+     { 0x00000000u, 0xfc001fe0u, trans_break },
+     /* We don't implement space register, so MTSP is a nop.  */
+@@ -1993,6 +2078,11 @@ static const DisasInsn table_system[] = {
+     { 0x000008a0u, 0xfc1fffe0u, trans_mfctl },
+     { 0x00000400u, 0xffffffffu, trans_sync },
+     { 0x000010a0u, 0xfc1f3fe0u, trans_ldsid },
++#ifndef CONFIG_USER_ONLY
++    { 0x00000e60u, 0xfc00ffe0u, trans_rsm },
++    { 0x00000d60u, 0xfc00ffe0u, trans_ssm },
++    { 0x00001860u, 0xffe0ffffu, trans_mtsm },
 +#endif
-+    ctx->iaoq_f = ctx->base.pc_first;
-+    ctx->iaoq_b = ctx->base.tb->cs_base;
-+    ctx->base.pc_first &= -4;
-+
-     ctx->iaoq_n = -1;
-     ctx->iaoq_n_var = NULL;
+ };
  
-+    /* Bound the number of instructions by those left on the page.  */
-+    bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
-+    bound = MIN(max_insns, bound);
-+
-     ctx->ntemps = 0;
-     memset(ctx->temps, 0, sizeof(ctx->temps));
- 
--    bound = -(tb->pc | TARGET_PAGE_MASK) / 4;
--    return MIN(max_insns, bound);
-+    return bound;
- }
- 
- static void hppa_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
+ static DisasJumpType trans_base_idx_mod(DisasContext *ctx, uint32_t insn,
+@@ -4111,12 +4201,14 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
  {
      DisasContext *ctx = container_of(dcbase, DisasContext, base);
++    DisasJumpType is_jmp = ctx->base.is_jmp;
  
--    /* Seed the nullification status from PSW[N], as shown in TB->FLAGS.  */
-+    /* Seed the nullification status from PSW[N], as saved in TB->FLAGS.  */
-     ctx->null_cond = cond_make_f();
-     ctx->psw_n_nonzero = false;
--    if (ctx->base.tb->flags & 1) {
-+    if (ctx->base.tb->flags & PSW_N) {
-         ctx->null_cond.c = TCG_COND_ALWAYS;
-         ctx->psw_n_nonzero = true;
-     }
-@@ -4014,7 +4029,7 @@ static bool hppa_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
-     ctx->base.is_jmp = gen_excp(ctx, EXCP_DEBUG);
--    ctx->base.pc_next = ctx->iaoq_f + 4;
-+    ctx->base.pc_next = (ctx->iaoq_f & -4) + 4;
-     return true;
- }
- 
-@@ -4035,7 +4050,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     {
-         /* Always fetch the insn, even if nullified, so that we check
-            the page permissions for execute.  */
--        uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f);
-+        uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f & -4);
- 
-         /* Set up the IA queue for the next insn.
-            This will be overwritten by a branch.  */
-@@ -4064,10 +4079,8 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     }
-     ctx->ntemps = 0;
- 
--    /* Advance the insn queue.  */
--    /* ??? The non-linear instruction restriction is purely due to
--       the debugging dump.  Otherwise we *could* follow unconditional
--       branches within the same page.  */
-+    /* Advance the insn queue.  Note that this check also detects
-+       a priority change within the instruction queue.  */
-     if (ret == DISAS_NEXT && ctx->iaoq_b != ctx->iaoq_f + 4) {
-         if (ctx->null_cond.c == TCG_COND_NEVER
-             || ctx->null_cond.c == TCG_COND_ALWAYS) {
-@@ -4121,7 +4134,7 @@ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
- 
-     /* We don't actually use this during normal translation,
-        but we should interact with the generic main loop.  */
--    ctx->base.pc_next = ctx->base.tb->pc + 4 * ctx->base.num_insns;
-+    ctx->base.pc_next = ctx->base.pc_first + 4 * ctx->base.num_insns;
- }
- 
- static void hppa_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
+-    switch (ctx->base.is_jmp) {
++    switch (is_jmp) {
+     case DISAS_NORETURN:
+         break;
+     case DISAS_TOO_MANY:
+     case DISAS_IAQ_N_STALE:
++    case DISAS_IAQ_N_STALE_EXIT:
+         copy_iaoq_entry(cpu_iaoq_f, ctx->iaoq_f, cpu_iaoq_f);
+         copy_iaoq_entry(cpu_iaoq_b, ctx->iaoq_b, cpu_iaoq_b);
+         nullify_save(ctx);
+@@ -4124,6 +4216,8 @@ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+     case DISAS_IAQ_N_UPDATED:
+         if (ctx->base.singlestep_enabled) {
+             gen_excp_1(EXCP_DEBUG);
++        } else if (is_jmp == DISAS_IAQ_N_STALE_EXIT) {
++            tcg_gen_exit_tb(0);
+         } else {
+             tcg_gen_lookup_and_goto_ptr();
+         }
 -- 
 2.14.3
