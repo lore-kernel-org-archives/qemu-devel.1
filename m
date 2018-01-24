@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eeKrq-0003LS-Al
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eeKru-0003NF-6z
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eeKrn-0003pY-4U
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:30 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38645)
+	(envelope-from <alex.bennee@linaro.org>) id 1eeKrs-0003wA-Pp
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:34 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36936)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eeKrm-0003oV-Uj
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:27 -0500
-Received: by mail-wr0-x241.google.com with SMTP id x1so3979491wrb.5
-	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:13:26 -0800 (PST)
+	id 1eeKrs-0003vB-GL
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 08:13:32 -0500
+Received: by mail-wr0-x244.google.com with SMTP id f11so3973031wre.4
+	for <qemu-devel@nongnu.org>; Wed, 24 Jan 2018 05:13:32 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 24 Jan 2018 13:13:01 +0000
-Message-Id: <20180124131315.30567-9-alex.bennee@linaro.org>
+Date: Wed, 24 Jan 2018 13:13:06 +0000
+Message-Id: <20180124131315.30567-14-alex.bennee@linaro.org>
 In-Reply-To: <20180124131315.30567-1-alex.bennee@linaro.org>
 References: <20180124131315.30567-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 08/22] include/fpu/softfloat: add some
- float16 constants
+Subject: [Qemu-devel] [PATCH v3 13/22] fpu/softfloat: re-factor mul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +32,265 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This defines the same set of common constants for float 16 as defined
-for 32 and 64 bit floats. These are often used by target helper
-functions. I've also removed constants that are not used by anybody.
+We can now add float16_mul and use the common decompose and
+canonicalize functions to have a single implementation for
+float16/32/64 versions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v2
-  - fixup constants, remove unused onces
----
- include/fpu/softfloat.h | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 59c06ef192..23824a3000 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -286,6 +286,11 @@ static inline float16 float16_set_sign(float16 a, int sign)
-     return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
+---
+v3
+  - mul compile fixes for new names
+  - remove duplicate s-o-b
+  - more explicit inf * zero check
+---
+ fpu/softfloat.c         | 206 ++++++++++++++++++------------------------------
+ include/fpu/softfloat.h |   1 +
+ 2 files changed, 79 insertions(+), 128 deletions(-)
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index b179790889..bbd2ab9355 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -727,6 +727,84 @@ float64 float64_sub(float64 a, float64 b, float_status *status)
+     return float64_round_pack_canonical(pr, status);
  }
  
-+#define float16_zero make_float16(0)
-+#define float16_one make_float16(0x3c00)
-+#define float16_half make_float16(0x3800)
-+#define float16_infinity make_float16(0x7c00)
++/*
++ * Returns the result of multiplying the floating-point values `a' and
++ * `b'. The operation is performed according to the IEC/IEEE Standard
++ * for Binary Floating-Point Arithmetic.
++ */
++
++static FloatParts mul_floats(FloatParts a, FloatParts b, float_status *s)
++{
++    bool sign = a.sign ^ b.sign;
++
++    if (a.cls == float_class_normal && b.cls == float_class_normal) {
++        uint64_t hi, lo;
++        int exp = a.exp + b.exp;
++
++        mul64To128(a.frac, b.frac, &hi, &lo);
++        shift128RightJamming(hi, lo, DECOMPOSED_BINARY_POINT, &hi, &lo);
++        if (lo & DECOMPOSED_OVERFLOW_BIT) {
++            shift64RightJamming(lo, 1, &lo);
++            exp += 1;
++        }
++
++        /* Re-use a */
++        a.exp = exp;
++        a.sign = sign;
++        a.frac = lo;
++        return a;
++    }
++    /* handle all the NaN cases */
++    if (a.cls >= float_class_qnan || b.cls >= float_class_qnan) {
++        return pick_nan_parts(a, b, s);
++    }
++    /* Inf * Zero == NaN */
++    if ((a.cls == float_class_inf && b.cls == float_class_zero) ||
++        (a.cls == float_class_zero && b.cls == float_class_inf)) {
++        s->float_exception_flags |= float_flag_invalid;
++        a.cls = float_class_dnan;
++        a.sign = sign;
++        return a;
++    }
++    /* Multiply by 0 or Inf */
++    if (a.cls == float_class_inf || a.cls == float_class_zero) {
++        a.sign = sign;
++        return a;
++    }
++    if (b.cls == float_class_inf || b.cls == float_class_zero) {
++        b.sign = sign;
++        return b;
++    }
++    g_assert_not_reached();
++}
++
++float16 float16_mul(float16 a, float16 b, float_status *status)
++{
++    FloatParts pa = float16_unpack_canonical(a, status);
++    FloatParts pb = float16_unpack_canonical(b, status);
++    FloatParts pr = mul_floats(pa, pb, status);
++
++    return float16_round_pack_canonical(pr, status);
++}
++
++float32 float32_mul(float32 a, float32 b, float_status *status)
++{
++    FloatParts pa = float32_unpack_canonical(a, status);
++    FloatParts pb = float32_unpack_canonical(b, status);
++    FloatParts pr = mul_floats(pa, pb, status);
++
++    return float32_round_pack_canonical(pr, status);
++}
++
++float64 float64_mul(float64 a, float64 b, float_status *status)
++{
++    FloatParts pa = float64_unpack_canonical(a, status);
++    FloatParts pb = float64_unpack_canonical(b, status);
++    FloatParts pr = mul_floats(pa, pb, status);
++
++    return float64_round_pack_canonical(pr, status);
++}
 +
  /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
- *----------------------------------------------------------------------------*/
-@@ -392,8 +397,6 @@ static inline float32 float32_set_sign(float32 a, int sign)
+ | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
+ | and 7, and returns the properly rounded 32-bit integer corresponding to the
+@@ -2538,70 +2616,6 @@ float32 float32_round_to_int(float32 a, float_status *status)
  
- #define float32_zero make_float32(0)
- #define float32_one make_float32(0x3f800000)
--#define float32_ln2 make_float32(0x3f317218)
--#define float32_pi make_float32(0x40490fdb)
- #define float32_half make_float32(0x3f000000)
- #define float32_infinity make_float32(0x7f800000)
+ }
  
-@@ -506,7 +509,6 @@ static inline float64 float64_set_sign(float64 a, int sign)
- #define float64_zero make_float64(0)
- #define float64_one make_float64(0x3ff0000000000000LL)
- #define float64_ln2 make_float64(0x3fe62e42fefa39efLL)
--#define float64_pi make_float64(0x400921fb54442d18LL)
- #define float64_half make_float64(0x3fe0000000000000LL)
- #define float64_infinity make_float64(0x7ff0000000000000LL)
+-/*----------------------------------------------------------------------------
+-| Returns the result of multiplying the single-precision floating-point values
+-| `a' and `b'.  The operation is performed according to the IEC/IEEE Standard
+-| for Binary Floating-Point Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-float32 float32_mul(float32 a, float32 b, float_status *status)
+-{
+-    flag aSign, bSign, zSign;
+-    int aExp, bExp, zExp;
+-    uint32_t aSig, bSig;
+-    uint64_t zSig64;
+-    uint32_t zSig;
+-
+-    a = float32_squash_input_denormal(a, status);
+-    b = float32_squash_input_denormal(b, status);
+-
+-    aSig = extractFloat32Frac( a );
+-    aExp = extractFloat32Exp( a );
+-    aSign = extractFloat32Sign( a );
+-    bSig = extractFloat32Frac( b );
+-    bExp = extractFloat32Exp( b );
+-    bSign = extractFloat32Sign( b );
+-    zSign = aSign ^ bSign;
+-    if ( aExp == 0xFF ) {
+-        if ( aSig || ( ( bExp == 0xFF ) && bSig ) ) {
+-            return propagateFloat32NaN(a, b, status);
+-        }
+-        if ( ( bExp | bSig ) == 0 ) {
+-            float_raise(float_flag_invalid, status);
+-            return float32_default_nan(status);
+-        }
+-        return packFloat32( zSign, 0xFF, 0 );
+-    }
+-    if ( bExp == 0xFF ) {
+-        if (bSig) {
+-            return propagateFloat32NaN(a, b, status);
+-        }
+-        if ( ( aExp | aSig ) == 0 ) {
+-            float_raise(float_flag_invalid, status);
+-            return float32_default_nan(status);
+-        }
+-        return packFloat32( zSign, 0xFF, 0 );
+-    }
+-    if ( aExp == 0 ) {
+-        if ( aSig == 0 ) return packFloat32( zSign, 0, 0 );
+-        normalizeFloat32Subnormal( aSig, &aExp, &aSig );
+-    }
+-    if ( bExp == 0 ) {
+-        if ( bSig == 0 ) return packFloat32( zSign, 0, 0 );
+-        normalizeFloat32Subnormal( bSig, &bExp, &bSig );
+-    }
+-    zExp = aExp + bExp - 0x7F;
+-    aSig = ( aSig | 0x00800000 )<<7;
+-    bSig = ( bSig | 0x00800000 )<<8;
+-    shift64RightJamming( ( (uint64_t) aSig ) * bSig, 32, &zSig64 );
+-    zSig = zSig64;
+-    if ( 0 <= (int32_t) ( zSig<<1 ) ) {
+-        zSig <<= 1;
+-        --zExp;
+-    }
+-    return roundAndPackFloat32(zSign, zExp, zSig, status);
+-
+-}
  
+ /*----------------------------------------------------------------------------
+ | Returns the result of dividing the single-precision floating-point value `a'
+@@ -4134,70 +4148,6 @@ float64 float64_trunc_to_int(float64 a, float_status *status)
+     return res;
+ }
+ 
+-
+-/*----------------------------------------------------------------------------
+-| Returns the result of multiplying the double-precision floating-point values
+-| `a' and `b'.  The operation is performed according to the IEC/IEEE Standard
+-| for Binary Floating-Point Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-float64 float64_mul(float64 a, float64 b, float_status *status)
+-{
+-    flag aSign, bSign, zSign;
+-    int aExp, bExp, zExp;
+-    uint64_t aSig, bSig, zSig0, zSig1;
+-
+-    a = float64_squash_input_denormal(a, status);
+-    b = float64_squash_input_denormal(b, status);
+-
+-    aSig = extractFloat64Frac( a );
+-    aExp = extractFloat64Exp( a );
+-    aSign = extractFloat64Sign( a );
+-    bSig = extractFloat64Frac( b );
+-    bExp = extractFloat64Exp( b );
+-    bSign = extractFloat64Sign( b );
+-    zSign = aSign ^ bSign;
+-    if ( aExp == 0x7FF ) {
+-        if ( aSig || ( ( bExp == 0x7FF ) && bSig ) ) {
+-            return propagateFloat64NaN(a, b, status);
+-        }
+-        if ( ( bExp | bSig ) == 0 ) {
+-            float_raise(float_flag_invalid, status);
+-            return float64_default_nan(status);
+-        }
+-        return packFloat64( zSign, 0x7FF, 0 );
+-    }
+-    if ( bExp == 0x7FF ) {
+-        if (bSig) {
+-            return propagateFloat64NaN(a, b, status);
+-        }
+-        if ( ( aExp | aSig ) == 0 ) {
+-            float_raise(float_flag_invalid, status);
+-            return float64_default_nan(status);
+-        }
+-        return packFloat64( zSign, 0x7FF, 0 );
+-    }
+-    if ( aExp == 0 ) {
+-        if ( aSig == 0 ) return packFloat64( zSign, 0, 0 );
+-        normalizeFloat64Subnormal( aSig, &aExp, &aSig );
+-    }
+-    if ( bExp == 0 ) {
+-        if ( bSig == 0 ) return packFloat64( zSign, 0, 0 );
+-        normalizeFloat64Subnormal( bSig, &bExp, &bSig );
+-    }
+-    zExp = aExp + bExp - 0x3FF;
+-    aSig = ( aSig | LIT64( 0x0010000000000000 ) )<<10;
+-    bSig = ( bSig | LIT64( 0x0010000000000000 ) )<<11;
+-    mul64To128( aSig, bSig, &zSig0, &zSig1 );
+-    zSig0 |= ( zSig1 != 0 );
+-    if ( 0 <= (int64_t) ( zSig0<<1 ) ) {
+-        zSig0 <<= 1;
+-        --zExp;
+-    }
+-    return roundAndPackFloat64(zSign, zExp, zSig0, status);
+-
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Returns the result of dividing the double-precision floating-point value `a'
+ | by the corresponding value `b'.  The operation is performed according to
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 693ece0974..7fc63dd60f 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -239,6 +239,7 @@ float64 float16_to_float64(float16 a, flag ieee, float_status *status);
+ 
+ float16 float16_add(float16, float16, float_status *status);
+ float16 float16_sub(float16, float16, float_status *status);
++float16 float16_mul(float16, float16, float_status *status);
+ 
+ int float16_is_quiet_nan(float16, float_status *status);
+ int float16_is_signaling_nan(float16, float_status *status);
 -- 
 2.15.1
