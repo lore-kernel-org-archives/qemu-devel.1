@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eeeg1-0001FN-9X
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:22:38 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eeekQ-0003Kj-W5
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:27:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eeefv-0004gd-JM
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:22:37 -0500
-Date: Thu, 25 Jan 2018 11:22:23 +0100
+	(envelope-from <cohuck@redhat.com>) id 1eeekM-0006ft-1T
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:27:10 -0500
+Date: Thu, 25 Jan 2018 11:26:59 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180125112223.77261b78.cohuck@redhat.com>
-In-Reply-To: <20180117174047.6382-8-david@redhat.com>
+Message-ID: <20180125112659.3c08063d.cohuck@redhat.com>
+In-Reply-To: <20180117174047.6382-13-david@redhat.com>
 References: <20180117174047.6382-1-david@redhat.com>
-	<20180117174047.6382-8-david@redhat.com>
+	<20180117174047.6382-13-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/18] s390x/tcg: tolerate wrong wakeups
- due to floating interrupts
+Subject: Re: [Qemu-devel] [PATCH v2 12/18] s390x: fix size + content of STSI
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +27,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Hildenbrand <david@redhat.com>
 Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-On Wed, 17 Jan 2018 18:40:36 +0100
+On Wed, 17 Jan 2018 18:40:41 +0100
 David Hildenbrand <david@redhat.com> wrote:
 
-> This is a prparation for floating interrupt support and only applies to
-
-s/prparation/preparation/
-
-(can fix while applying)
-
-> MTTCG, single threaded TCG works just fine. If a floating interrupt wakes
-> up a VCPU and the CPU thinks it can run (clearing cs->halted), at
-> the point where the interrupt would be delivered, already another VCPU
-> might have picked up the interrupt, resulting in a wakeup without an
-> interrupt (executing wrong code).
+> All blocks are 4k in size, which is only true for two of them right now.
+> Also some reserved fields were wrong, fix it and convert all reserved
+> fields to u8.
 > 
-> It is wrong to let the VCPU continue to execute (the WAIT PSW). Instead,
-> we have to put the VCPU back to sleep.
+> This also fixes the LPAR part output in /proc/sysinfo under TCG. (for
+> now, everything was indicated as 0)
 > 
+> While at it, introduce typedefs for these structs and use it in KVM
+> code. Not changing misc_helper.c as that will be overhauled soon.
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/excp_helper.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  target/s390x/cpu.h | 46 ++++++++++++++++++++++++++--------------------
+>  target/s390x/kvm.c |  2 +-
+>  2 files changed, 27 insertions(+), 21 deletions(-)
 > 
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index a18842ccbd..eeffb49f63 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -503,6 +503,11 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
->              s390_cpu_do_interrupt(cs);
->              return true;
->          }
-> +        if (env->psw.mask & PSW_MASK_WAIT) {
-> +            /* Woken up because of a floating interrupt but it has already
-> +             * been delivered. Go back to sleep. */
-> +            cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
-> +        }
->      }
->      return false;
->  }
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index b4a88830de..31593a5381 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -436,29 +436,31 @@ static inline void setcc(S390CPU *cpu, uint64_t cc)
+>  #define STSI_R1_SEL2_MASK       0x000000000000ffffULL
+>  
+>  /* Basic Machine Configuration */
+> -struct sysib_111 {
+> -    uint32_t res1[8];
+> +typedef struct sysib_111 {
+> +    uint8_t  res1[32];
+>      uint8_t  manuf[16];
+>      uint8_t  type[4];
+>      uint8_t  res2[12];
+>      uint8_t  model[16];
+>      uint8_t  sequence[16];
+>      uint8_t  plant[4];
+> -    uint8_t  res3[156];
+> -};
+> +    uint8_t  res3[3996];
+> +} sysib_111;
+
+Do you want to CamelCase this?
+
+> +QEMU_BUILD_BUG_ON(sizeof(sysib_111) != 4096);
