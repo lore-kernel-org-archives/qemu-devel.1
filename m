@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eekd9-0006d0-9K
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:04 -0500
+	(envelope-from <a.perevalov@samsung.com>) id 1eekdW-0006xs-5B
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eekd8-0000zQ-9L
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:03 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 25 Jan 2018 17:43:51 +0100
-Message-Id: <20180125164351.17154-4-kraxel@redhat.com>
-In-Reply-To: <20180125164351.17154-1-kraxel@redhat.com>
-References: <20180125164351.17154-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] usb-storage: Fix share-rw option parsing
+	(envelope-from <a.perevalov@samsung.com>) id 1eekdS-00016N-Qi
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:26 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:47787)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1eekdS-00014H-Cq
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:22 -0500
+MIME-version: 1.0
+Content-type: text/plain; charset="UTF-8"
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Thu, 25 Jan 2018 19:43:39 +0300
+Message-id: <1516898620-9486-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20180125164414eucas1p1bd675e187875c435e996131622e82656@eucas1p1.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1] Fix build on ppc platform in
+ migration/postcopy-ram.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,86 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, lvivier@redhat.com, peterx@redhat.com, quintela@redhat.com, f4bug@amsat.org, ash.billore@samsung.com
 
-From: Fam Zheng <famz@redhat.com>
+It was a problem with 64 atomics on ppc in migration/postcopy-ram.c repor=
+ted by
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>.
 
-Because usb-storage creates an internal scsi device, we should propagate
-options. We already do so for bootindex etc, but failed to take care of
-share-rw. Fix it in an apparent way: add a new parameter to
-scsi_bus_legacy_add_drive and pass in s->conf.share_rw.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-Message-id: 20180117005222.4781-1-famz@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/hw/scsi/scsi.h | 1 +
- hw/scsi/scsi-bus.c     | 9 ++++++++-
- hw/usb/dev-storage.c   | 3 ++-
- 3 files changed, 11 insertions(+), 2 deletions(-)
+I didn't check on ppc due to debina installation inside docker is failed,
+but I have my own debian on qemu-system-ppc, but build is still going.
+It also was tested on Ubuntu16.04 on i386.
 
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index 23a8ee6a7d..802a647cdc 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -151,6 +151,7 @@ static inline SCSIBus *scsi_bus_from_device(SCSIDevice *d)
- 
- SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
-                                       int unit, bool removable, int bootindex,
-+                                      bool share_rw,
-                                       const char *serial, Error **errp);
- void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, bool deprecated);
- void scsi_legacy_handle_cmdline(void);
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 965becf31f..05e501efd3 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -224,6 +224,7 @@ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
- /* handle legacy '-drive if=scsi,...' cmd line args */
- SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
-                                       int unit, bool removable, int bootindex,
-+                                      bool share_rw,
-                                       const char *serial, Error **errp)
- {
-     const char *driver;
-@@ -254,6 +255,12 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
-         object_unparent(OBJECT(dev));
-         return NULL;
-     }
-+    object_property_set_bool(OBJECT(dev), share_rw, "share-rw", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        object_unparent(OBJECT(dev));
-+        return NULL;
-+    }
-     object_property_set_bool(OBJECT(dev), true, "realized", &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-@@ -288,7 +295,7 @@ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, bool deprecated)
-             }
-         }
-         scsi_bus_legacy_add_drive(bus, blk_by_legacy_dinfo(dinfo),
--                                  unit, false, -1, NULL, &error_fatal);
-+                                  unit, false, -1, false, NULL, &error_fatal);
-     }
-     loc_pop(&loc);
- }
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index e44a5c72cf..b56c75a73a 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -633,7 +633,8 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
-     scsi_bus_new(&s->bus, sizeof(s->bus), DEVICE(dev),
-                  &usb_msd_scsi_info_storage, NULL);
-     scsi_dev = scsi_bus_legacy_add_drive(&s->bus, blk, 0, !!s->removable,
--                                         s->conf.bootindex, dev->serial,
-+                                         s->conf.bootindex, s->conf.share_rw,
-+                                         dev->serial,
-                                          errp);
-     blk_unref(blk);
-     if (!scsi_dev) {
--- 
-2.9.3
+This commit is based on commit ee264eb32c14f076c964fc34ee66f6f95cce2080
+"Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.12-20180121=
+' into staging"
+
+Alexey Perevalov (1):
+  migration: change blocktime type to uint32_t
+
+ hmp.c                    |  4 ++--
+ migration/postcopy-ram.c | 47 ++++++++++++++++++++++++++++++------------=
+-----
+ migration/trace-events   |  4 ++--
+ qapi/migration.json      |  4 ++--
+ 4 files changed, 36 insertions(+), 23 deletions(-)
+
+--=20
+2.7.4
