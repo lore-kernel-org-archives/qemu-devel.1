@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eeZ3p-0002C0-5z
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:22:50 -0500
+	(envelope-from <liliang.opensource@gmail.com>) id 1eeZdY-00034e-2e
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:59:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eeZ3l-00054b-4P
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:22:49 -0500
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 25 Jan 2018 15:22:10 +1100
-Message-Id: <20180125042210.7012-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v4] RFC: vfio-pci: Allow mmap of MSIX BAR
+	(envelope-from <liliang.opensource@gmail.com>) id 1eeZdX-0001zs-3j
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:59:44 -0500
+From: Liang Li <liliang.opensource@gmail.com>
+Date: Thu, 25 Jan 2018 12:59:29 +0800
+Message-ID: <20180125045926.GA4720@localhost>
+References: <20180124061728.GA99621@localhost>
+	<d49dfbf5-b6e4-43d2-c24d-5c493aa5bfe5@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d49dfbf5-b6e4-43d2-c24d-5c493aa5bfe5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block/mirror: fix fail to cancel when VM
+ has heavy BLK IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,193 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Auger Eric <eric.auger@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Huaitong Han <hanhuaitong@didichuxing.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
-which tells that a region with MSIX data can be mapped entirely, i.e.
-the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+On Wed, Jan 24, 2018 at 01:16:39PM -0600, Eric Blake wrote:
+> On 01/24/2018 12:17 AM, Liang Li wrote:
+> > We found that when doing drive mirror to a low speed shared storage,
+> > if there was heavy BLK IO write workload in VM after the 'ready' event,
+> > drive mirror block job can't be canceled immediately, it would keep
+> > running until the heavy BLK IO workload stopped in the VM. This patch
+> > fixed this issue.
+> 
+> I think you are breaking semantics here.  Libvirt relies on
+> 'block-job-cancel' after the 'ready' event to be a clean point-in-time
+> snapshot, but that is only possible if there is no out-of-order pending
+> I/O at the time the action takes place.  Breaking in the middle of the
+> loop, without using bdrv_drain(), risks leaving an inconsistent copy of
+> data in the mirror not corresponding to any point-in-time on the source.
+> 
+> There's ongoing work on adding async mirroring; this may be a better
+> solution to the issue you are seeing.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg05419.html
+> 
+Hi Eric,
 
-With this change, all BARs are mapped in a single chunk and MSIX vectors
-are emulated on top unless the machine requests not to by defining and
-enabling a new "vfio-no-msix-emulation" property. At the moment only
-sPAPR machine does so - it prohibits MSIX emulation and does not allow
-enabling it as it does not define the "set" callback for the new property;
-the new property also does not appear in "-machine pseries,help".
+Thinks for your information, I didn't know libvirt depends on 'block-job-cancel'
+for some of the block related operations.
 
-If MSIX vectors section is not aligned to the page size, the KVM memory
-listener does not register it with the KVM as a memory slot and MSIX is
-emulated by QEMU as before. This may create MMIO RAM memory sections with
-an address or/and a size not aligned which will make vfio_dma_map() fail;
-to address this, this treats such failures as non-fatal and does not print
-an error. This adds a return value from vfio_dma_map() to the tracepoint
-and moves the latter further down to let the user have a clue why P2P
-might not work.
+It's seems a new interface should provided by qemu for use case that just
+for aborting block job and don't care abort the mirror data integrality, and
+libvirt can make use of this new interface.
 
-This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
-for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
+Do you think this is the right direction?
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v4:
-* silenced dma map errors if unaligned mapping is attempted - they are going
-to fail anyway
-
-v3:
-* vfio_listener_region_add() won't make qemu exit if failed on MMIO MR
----
- include/hw/vfio/vfio-common.h |  1 +
- linux-headers/linux/vfio.h    |  5 +++++
- hw/ppc/spapr.c                |  7 +++++++
- hw/vfio/common.c              | 27 +++++++++++++++++++++++++--
- hw/vfio/pci.c                 | 10 ++++++++++
- hw/vfio/trace-events          |  2 +-
- 6 files changed, 49 insertions(+), 3 deletions(-)
-
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9..927d600 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
-                          struct vfio_region_info **info);
- int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-                              uint32_t subtype, struct vfio_region_info **info);
-+bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
- #endif
- extern const MemoryListener vfio_prereg_listener;
- 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 4312e96..b45182e 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
- 
-+/*
-+ * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
-+ */
-+#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
-+
- /**
-  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-  *				    struct vfio_irq_info)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d1acfe8..5ff43ce 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2789,6 +2789,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
-     spapr->use_hotplug_event_source = value;
- }
- 
-+static bool spapr_get_msix_emulation(Object *obj, Error **errp)
-+{
-+    return true;
-+}
-+
- static char *spapr_get_resize_hpt(Object *obj, Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-@@ -2870,6 +2875,8 @@ static void spapr_instance_init(Object *obj)
-     object_property_set_description(obj, "vsmt",
-                                     "Virtual SMT: KVM behaves as if this were"
-                                     " the host's SMT mode", &error_abort);
-+    object_property_add_bool(obj, "vfio-no-msix-emulation",
-+                             spapr_get_msix_emulation, NULL, NULL);
- }
- 
- static void spapr_machine_finalizefn(Object *obj)
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 3d652c8..04a8280 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -513,13 +513,21 @@ static void vfio_listener_region_add(MemoryListener *listener,
-             section->offset_within_region +
-             (iova - section->offset_within_address_space);
- 
--    trace_vfio_listener_region_add_ram(iova, end, vaddr);
--
-     llsize = int128_sub(llend, int128_make64(iova));
- 
-     ret = vfio_dma_map(container, iova, int128_get64(llsize),
-                        vaddr, section->readonly);
-+    trace_vfio_listener_region_add_ram(iova, end, vaddr, ret);
-+
-     if (ret) {
-+        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-+
-+        if (memory_region_is_ram_device(section->mr) &&
-+            ((section->offset_within_region & pgmask) ||
-+             (int128_getlo(section->size) & pgmask))) {
-+            return;
-+        }
-+
-         error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-                      "0x%"HWADDR_PRIx", %p) = %d (%m)",
-                      container, iova, int128_get64(llsize), vaddr, ret);
-@@ -1386,6 +1394,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-     return -ENODEV;
- }
- 
-+bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
-+{
-+    struct vfio_region_info *info = NULL;
-+    bool ret = false;
-+
-+    if (!vfio_get_region_info(vbasedev, region, &info)) {
-+        if (vfio_get_region_info_cap(info, cap_type)) {
-+            ret = true;
-+        }
-+        g_free(info);
-+    }
-+
-+    return ret;
-+}
-+
- /*
-  * Interfaces for IBM EEH (Enhanced Error Handling)
-  */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 359a8f1..a96ece6 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
-     off_t start, end;
-     VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
- 
-+    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
-+                            vdev->msix->table_bar)) {
-+        return;
-+    }
-+
-     /*
-      * We expect to find a single mmap covering the whole BAR, anything else
-      * means it's either unsupported or already setup.
-@@ -1569,6 +1574,11 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
-      */
-     memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
- 
-+    if (object_property_get_bool(OBJECT(qdev_get_machine()),
-+                                 "vfio-no-msix-emulation", NULL)) {
-+        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
-+    }
-+
-     return 0;
- }
- 
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 437ccdd..d747c11 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -89,7 +89,7 @@ vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t d
- vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "iommu %s @ 0x%"PRIx64" - 0x%"PRIx64
- vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
- vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
--vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
-+vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr, int ret) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p] ret=%d"
- vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
- vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
- vfio_disconnect_container(int fd) "close container->fd=%d"
--- 
-2.11.0
+Liang
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
