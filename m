@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehoo-0003M8-73
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:55 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eehoh-0003FO-4P
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehoi-0003Ay-DY
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:54 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45992)
+	(envelope-from <pm215@archaic.org.uk>) id 1eehog-00039P-7e
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:47 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eehoi-0003AO-5g
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:48 -0500
+	id 1eehog-00030M-05
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:46 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehog-0006x9-PI
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 13:43:46 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eehoe-0006v4-5e
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 13:43:44 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jan 2018 13:43:25 +0000
-Message-Id: <1516887809-6265-18-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 25 Jan 2018 13:43:22 +0000
+Message-Id: <1516887809-6265-15-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1516887809-6265-1-git-send-email-peter.maydell@linaro.org>
 References: <1516887809-6265-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 17/21] hw/intc/arm_gic: Fix the NS view of C_BPR
- when C_CTRL.CBPR is 1
+Subject: [Qemu-devel] [PULL 14/21] hw/intc/arm_gic: Prevent the GIC from
+ signaling an IRQ when it's "active and pending"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +32,50 @@ To: qemu-devel@nongnu.org
 
 From: Luc MICHEL <luc.michel@git.antfield.fr>
 
-When C_CTRL.CBPR is 1, the Non-Secure view of C_BPR is altered:
-  - A Non-Secure read of C_BPR should return the BPR value plus 1,
-  saturated to 7,
-  - A Non-Secure write should be ignored.
+In the GIC, when an IRQ is acknowledged, its state goes from "pending"
+to:
+   - "active" if the corresponding IRQ pin has been de-asserted
+   - "active and pending" otherwise.
+The GICv2 manual states that when a IRQ becomes active (or active and
+pending), the GIC should either signal another (higher priority) IRQ to
+the CPU if there is one, or de-assert the CPU IRQ pin.
+
+The current implementation of the GIC in QEMU does not check if the
+IRQ is already active when looking for pending interrupts with
+sufficient priority in gic_update(). This can lead to signaling an
+interrupt that is already active.
+
+This usually happens when splitting priority drop and interrupt
+deactivation. On priority drop, the IRQ stays active until deactivation.
+If it becomes pending again, chances are that it will be incorrectly
+selected as best_irq in gic_update().
+
+This commit fixes this by checking if the IRQ is not already active when
+looking for best_irq in gic_update().
+
+Note that regarding the ARM11MPCore GIC version, the corresponding
+manual is not clear on that point, but it has has no priority
+drop/interrupt deactivation separation, so this case should not happen.
 
 Signed-off-by: Luc MICHEL <luc.michel@git.antfield.fr>
-Message-id: 20180119145756.7629-6-luc.michel@greensocs.com
+Message-id: 20180119145756.7629-3-luc.michel@greensocs.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: fixed comment typo]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ hw/intc/arm_gic.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index b7989d2..724bc9f 100644
+index d701e49..dad383e 100644
 --- a/hw/intc/arm_gic.c
 +++ b/hw/intc/arm_gic.c
-@@ -1212,8 +1212,13 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
-         break;
-     case 0x08: /* Binary Point */
-         if (s->security_extn && !attrs.secure) {
--            /* BPR is banked. Non-secure copy stored in ABPR. */
--            *data = s->abpr[cpu];
-+            if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
-+                /* NS view of BPR when CBPR is 1 */
-+                *data = MIN(s->bpr[cpu] + 1, 7);
-+            } else {
-+                /* BPR is banked. Non-secure copy stored in ABPR. */
-+                *data = s->abpr[cpu];
-+            }
-         } else {
-             *data = s->bpr[cpu];
-         }
-@@ -1286,7 +1291,12 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
-         break;
-     case 0x08: /* Binary Point */
-         if (s->security_extn && !attrs.secure) {
--            s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
-+            if (s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) {
-+                /* WI when CBPR is 1 */
-+                return MEMTX_OK;
-+            } else {
-+                s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
-+            }
-         } else {
-             s->bpr[cpu] = MAX(value & 0x7, GIC_MIN_BPR);
-         }
+@@ -93,6 +93,7 @@ void gic_update(GICState *s)
+         best_irq = 1023;
+         for (irq = 0; irq < s->num_irq; irq++) {
+             if (GIC_TEST_ENABLED(irq, cm) && gic_test_pending(s, irq, cm) &&
++                (!GIC_TEST_ACTIVE(irq, cm)) &&
+                 (irq < GIC_INTERNAL || GIC_TARGET(irq) & cm)) {
+                 if (GIC_GET_PRIORITY(irq, cpu) < best_prio) {
+                     best_prio = GIC_GET_PRIORITY(irq, cpu);
 -- 
 2.7.4
