@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehoc-0003BL-9D
+	(envelope-from <pm215@archaic.org.uk>) id 1eehoc-0003BM-En
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehob-00035Q-As
+	(envelope-from <pm215@archaic.org.uk>) id 1eehob-00035C-4l
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:42 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45984)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eehob-00033y-1s
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:41 -0500
+	id 1eehoa-00030M-LL
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:40 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehoV-0006ro-Tu
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 13:43:35 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eehoW-0006sF-TF
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 13:43:36 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jan 2018 13:43:14 +0000
-Message-Id: <1516887809-6265-7-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 25 Jan 2018 13:43:15 +0000
+Message-Id: <1516887809-6265-8-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1516887809-6265-1-git-send-email-peter.maydell@linaro.org>
 References: <1516887809-6265-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/21] target/arm: Use pointers in neon tbl
- helper
+Subject: [Qemu-devel] [PULL 07/21] target/arm: Change the type of vfp.regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,94 +34,166 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Rather than passing a regno to the helper, pass pointers to the
-vector register directly.  This eliminates the need to pass in
-the environment pointer and reduces the number of places that
-directly access env->vfp.regs[].
+All direct users of this field want an integral value.  Drop all
+of the extra casting between uint64_t and float64.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180119045438.28582-5-richard.henderson@linaro.org
+Message-id: 20180119045438.28582-6-richard.henderson@linaro.org
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.h    |  2 +-
- target/arm/op_helper.c | 17 +++++++----------
- target/arm/translate.c |  8 ++++----
- 3 files changed, 12 insertions(+), 15 deletions(-)
+ target/arm/cpu.h           |  2 +-
+ target/arm/arch_dump.c     |  4 ++--
+ target/arm/helper.c        | 20 ++++++++++----------
+ target/arm/machine.c       |  2 +-
+ target/arm/translate-a64.c |  8 ++++----
+ target/arm/translate.c     |  2 +-
+ 6 files changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index dbdc38f..5dec2e6 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -188,7 +188,7 @@ DEF_HELPER_FLAGS_2(rsqrte_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
- DEF_HELPER_FLAGS_2(rsqrte_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
- DEF_HELPER_2(recpe_u32, i32, i32, ptr)
- DEF_HELPER_FLAGS_2(rsqrte_u32, TCG_CALL_NO_RWG, i32, i32, ptr)
--DEF_HELPER_5(neon_tbl, i32, env, i32, i32, i32, i32)
-+DEF_HELPER_FLAGS_4(neon_tbl, TCG_CALL_NO_RWG, i32, i32, i32, ptr, i32)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9631670..76ab795 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -492,7 +492,7 @@ typedef struct CPUARMState {
+          * the two execution states, and means we do not need to explicitly
+          * map these registers when changing states.
+          */
+-        float64 regs[64];
++        uint64_t regs[64];
  
- DEF_HELPER_3(shl_cc, i32, env, i32, i32)
- DEF_HELPER_3(shr_cc, i32, env, i32, i32)
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 712c5c5..a937e76 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -54,20 +54,17 @@ static int exception_target_el(CPUARMState *env)
-     return target_el;
- }
+         uint32_t xregs[16];
+         /* We store these fpcsr fields separately for convenience.  */
+diff --git a/target/arm/arch_dump.c b/target/arm/arch_dump.c
+index 9e5b2fb..0c43e0e 100644
+--- a/target/arm/arch_dump.c
++++ b/target/arm/arch_dump.c
+@@ -100,7 +100,7 @@ static int aarch64_write_elf64_prfpreg(WriteCoreDumpFunction f,
+     aarch64_note_init(&note, s, "CORE", 5, NT_PRFPREG, sizeof(note.vfp));
  
--uint32_t HELPER(neon_tbl)(CPUARMState *env, uint32_t ireg, uint32_t def,
--                          uint32_t rn, uint32_t maxindex)
-+uint32_t HELPER(neon_tbl)(uint32_t ireg, uint32_t def, void *vn,
-+                          uint32_t maxindex)
- {
--    uint32_t val;
--    uint32_t tmp;
--    int index;
--    int shift;
--    uint64_t *table;
--    table = (uint64_t *)&env->vfp.regs[rn];
-+    uint32_t val, shift;
-+    uint64_t *table = vn;
-+
-     val = 0;
-     for (shift = 0; shift < 32; shift += 8) {
--        index = (ireg >> shift) & 0xff;
-+        uint32_t index = (ireg >> shift) & 0xff;
-         if (index < maxindex) {
--            tmp = (table[index >> 3] >> ((index & 7) << 3)) & 0xff;
-+            uint32_t tmp = (table[index >> 3] >> ((index & 7) << 3)) & 0xff;
-             val |= tmp << shift;
-         } else {
-             val |= def & (0xff << shift);
+     for (i = 0; i < 64; ++i) {
+-        note.vfp.vregs[i] = cpu_to_dump64(s, float64_val(env->vfp.regs[i]));
++        note.vfp.vregs[i] = cpu_to_dump64(s, env->vfp.regs[i]);
+     }
+ 
+     if (s->dump_info.d_endian == ELFDATA2MSB) {
+@@ -229,7 +229,7 @@ static int arm_write_elf32_vfp(WriteCoreDumpFunction f, CPUARMState *env,
+     arm_note_init(&note, s, "LINUX", 6, NT_ARM_VFP, sizeof(note.vfp));
+ 
+     for (i = 0; i < 32; ++i) {
+-        note.vfp.vregs[i] = cpu_to_dump64(s, float64_val(env->vfp.regs[i]));
++        note.vfp.vregs[i] = cpu_to_dump64(s, env->vfp.regs[i]);
+     }
+ 
+     note.vfp.fpscr = cpu_to_dump32(s, vfp_get_fpscr(env));
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index bd05f8a..ff5d78c 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -64,15 +64,15 @@ static int vfp_gdb_get_reg(CPUARMState *env, uint8_t *buf, int reg)
+     /* VFP data registers are always little-endian.  */
+     nregs = arm_feature(env, ARM_FEATURE_VFP3) ? 32 : 16;
+     if (reg < nregs) {
+-        stfq_le_p(buf, env->vfp.regs[reg]);
++        stq_le_p(buf, env->vfp.regs[reg]);
+         return 8;
+     }
+     if (arm_feature(env, ARM_FEATURE_NEON)) {
+         /* Aliases for Q regs.  */
+         nregs += 16;
+         if (reg < nregs) {
+-            stfq_le_p(buf, env->vfp.regs[(reg - 32) * 2]);
+-            stfq_le_p(buf + 8, env->vfp.regs[(reg - 32) * 2 + 1]);
++            stq_le_p(buf, env->vfp.regs[(reg - 32) * 2]);
++            stq_le_p(buf + 8, env->vfp.regs[(reg - 32) * 2 + 1]);
+             return 16;
+         }
+     }
+@@ -90,14 +90,14 @@ static int vfp_gdb_set_reg(CPUARMState *env, uint8_t *buf, int reg)
+ 
+     nregs = arm_feature(env, ARM_FEATURE_VFP3) ? 32 : 16;
+     if (reg < nregs) {
+-        env->vfp.regs[reg] = ldfq_le_p(buf);
++        env->vfp.regs[reg] = ldq_le_p(buf);
+         return 8;
+     }
+     if (arm_feature(env, ARM_FEATURE_NEON)) {
+         nregs += 16;
+         if (reg < nregs) {
+-            env->vfp.regs[(reg - 32) * 2] = ldfq_le_p(buf);
+-            env->vfp.regs[(reg - 32) * 2 + 1] = ldfq_le_p(buf + 8);
++            env->vfp.regs[(reg - 32) * 2] = ldq_le_p(buf);
++            env->vfp.regs[(reg - 32) * 2 + 1] = ldq_le_p(buf + 8);
+             return 16;
+         }
+     }
+@@ -114,8 +114,8 @@ static int aarch64_fpu_gdb_get_reg(CPUARMState *env, uint8_t *buf, int reg)
+     switch (reg) {
+     case 0 ... 31:
+         /* 128 bit FP register */
+-        stfq_le_p(buf, env->vfp.regs[reg * 2]);
+-        stfq_le_p(buf + 8, env->vfp.regs[reg * 2 + 1]);
++        stq_le_p(buf, env->vfp.regs[reg * 2]);
++        stq_le_p(buf + 8, env->vfp.regs[reg * 2 + 1]);
+         return 16;
+     case 32:
+         /* FPSR */
+@@ -135,8 +135,8 @@ static int aarch64_fpu_gdb_set_reg(CPUARMState *env, uint8_t *buf, int reg)
+     switch (reg) {
+     case 0 ... 31:
+         /* 128 bit FP register */
+-        env->vfp.regs[reg * 2] = ldfq_le_p(buf);
+-        env->vfp.regs[reg * 2 + 1] = ldfq_le_p(buf + 8);
++        env->vfp.regs[reg * 2] = ldq_le_p(buf);
++        env->vfp.regs[reg * 2 + 1] = ldq_le_p(buf + 8);
+         return 16;
+     case 32:
+         /* FPSR */
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index 1762746..a85c243 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -50,7 +50,7 @@ static const VMStateDescription vmstate_vfp = {
+     .minimum_version_id = 3,
+     .needed = vfp_needed,
+     .fields = (VMStateField[]) {
+-        VMSTATE_FLOAT64_ARRAY(env.vfp.regs, ARMCPU, 64),
++        VMSTATE_UINT64_ARRAY(env.vfp.regs, ARMCPU, 64),
+         /* The xregs array is a little awkward because element 1 (FPSCR)
+          * requires a specific accessor, so we have to split it up in
+          * the vmstate:
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 6d9b3af..c14fb41 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -165,12 +165,12 @@ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
+     if (flags & CPU_DUMP_FPU) {
+         int numvfpregs = 32;
+         for (i = 0; i < numvfpregs; i += 2) {
+-            uint64_t vlo = float64_val(env->vfp.regs[i * 2]);
+-            uint64_t vhi = float64_val(env->vfp.regs[(i * 2) + 1]);
++            uint64_t vlo = env->vfp.regs[i * 2];
++            uint64_t vhi = env->vfp.regs[(i * 2) + 1];
+             cpu_fprintf(f, "q%02d=%016" PRIx64 ":%016" PRIx64 " ",
+                         i, vhi, vlo);
+-            vlo = float64_val(env->vfp.regs[(i + 1) * 2]);
+-            vhi = float64_val(env->vfp.regs[((i + 1) * 2) + 1]);
++            vlo = env->vfp.regs[(i + 1) * 2];
++            vhi = env->vfp.regs[((i + 1) * 2) + 1];
+             cpu_fprintf(f, "q%02d=%016" PRIx64 ":%016" PRIx64 "\n",
+                         i + 1, vhi, vlo);
+         }
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 6f02c56..852d2a7 100644
+index 852d2a7..cfe49bf 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -7544,9 +7544,9 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     tcg_gen_movi_i32(tmp, 0);
-                 }
-                 tmp2 = neon_load_reg(rm, 0);
--                tmp4 = tcg_const_i32(rn);
-+                ptr1 = vfp_reg_ptr(true, rn);
-                 tmp5 = tcg_const_i32(n);
--                gen_helper_neon_tbl(tmp2, cpu_env, tmp2, tmp, tmp4, tmp5);
-+                gen_helper_neon_tbl(tmp2, tmp2, tmp, ptr1, tmp5);
-                 tcg_temp_free_i32(tmp);
-                 if (insn & (1 << 6)) {
-                     tmp = neon_load_reg(rd, 1);
-@@ -7555,9 +7555,9 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     tcg_gen_movi_i32(tmp, 0);
-                 }
-                 tmp3 = neon_load_reg(rm, 1);
--                gen_helper_neon_tbl(tmp3, cpu_env, tmp3, tmp, tmp4, tmp5);
-+                gen_helper_neon_tbl(tmp3, tmp3, tmp, ptr1, tmp5);
-                 tcg_temp_free_i32(tmp5);
--                tcg_temp_free_i32(tmp4);
-+                tcg_temp_free_ptr(ptr1);
-                 neon_store_reg(rd, 0, tmp2);
-                 neon_store_reg(rd, 1, tmp3);
-                 tcg_temp_free_i32(tmp);
+@@ -12572,7 +12572,7 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+             numvfpregs += 16;
+         }
+         for (i = 0; i < numvfpregs; i++) {
+-            uint64_t v = float64_val(env->vfp.regs[i]);
++            uint64_t v = env->vfp.regs[i];
+             cpu_fprintf(f, "s%02d=%08x s%02d=%08x d%02d=%016" PRIx64 "\n",
+                         i * 2, (uint32_t)v,
+                         i * 2 + 1, (uint32_t)(v >> 32),
 -- 
 2.7.4
