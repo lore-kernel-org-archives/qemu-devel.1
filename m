@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eeaNY-0006s8-1Z
+	(envelope-from <famz@redhat.com>) id 1eeaNZ-0006tb-4a
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 00:47:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eeaNW-0007bg-Qr
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 00:47:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58988)
+	(envelope-from <famz@redhat.com>) id 1eeaNY-0007fo-7Q
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 00:47:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eeaNW-0007ZV-JF
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 00:47:14 -0500
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eeaNY-0007dw-2n
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 00:47:16 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 25 Jan 2018 13:46:43 +0800
-Message-Id: <20180125054648.18747-10-famz@redhat.com>
+Date: Thu, 25 Jan 2018 13:46:44 +0800
+Message-Id: <20180125054648.18747-11-famz@redhat.com>
 In-Reply-To: <20180125054648.18747-1-famz@redhat.com>
 References: <20180125054648.18747-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 09/14] block: Introduce buf register API
+Subject: [Qemu-devel] [PULL 10/14] block/nvme: Implement
+ .bdrv_(un)register_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +27,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Allow block driver to map and unmap a buffer for later I/O, as a performance
-hint.
+Forward these two calls to the IOVA manager.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20180110091846.10699-5-famz@redhat.com>
+Message-Id: <20180110091846.10699-6-famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20180116060901.17413-5-famz@redhat.com>
+Message-Id: <20180116060901.17413-6-famz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/block-backend.c          | 10 ++++++++++
- block/io.c                     | 24 ++++++++++++++++++++++++
- include/block/block.h          | 11 ++++++++++-
- include/block/block_int.h      |  9 +++++++++
- include/sysemu/block-backend.h |  3 +++
- 5 files changed, 56 insertions(+), 1 deletion(-)
+ block/nvme.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index baef8e7abc..f66349c2c9 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2096,3 +2096,13 @@ static void blk_root_drained_end(BdrvChild *child)
-         }
+diff --git a/block/nvme.c b/block/nvme.c
+index 99cc7702ad..30616f50c7 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -1145,6 +1145,27 @@ static void nvme_aio_unplug(BlockDriverState *bs)
      }
  }
-+
-+void blk_register_buf(BlockBackend *blk, void *host, size_t size)
-+{
-+    bdrv_register_buf(blk_bs(blk), host, size);
-+}
-+
-+void blk_unregister_buf(BlockBackend *blk, void *host)
-+{
-+    bdrv_unregister_buf(blk_bs(blk), host);
-+}
-diff --git a/block/io.c b/block/io.c
-index 7ea402352e..89d0745e95 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2825,3 +2825,27 @@ void bdrv_io_unplug(BlockDriverState *bs)
-         bdrv_io_unplug(child->bs);
-     }
- }
-+
-+void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size)
-+{
-+    BdrvChild *child;
-+
-+    if (bs->drv && bs->drv->bdrv_register_buf) {
-+        bs->drv->bdrv_register_buf(bs, host, size);
-+    }
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        bdrv_register_buf(child->bs, host, size);
-+    }
-+}
-+
-+void bdrv_unregister_buf(BlockDriverState *bs, void *host)
-+{
-+    BdrvChild *child;
-+
-+    if (bs->drv && bs->drv->bdrv_unregister_buf) {
-+        bs->drv->bdrv_unregister_buf(bs, host);
-+    }
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        bdrv_unregister_buf(child->bs, host);
-+    }
-+}
-diff --git a/include/block/block.h b/include/block/block.h
-index 9b12774ddf..2025d7ed19 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -631,5 +631,14 @@ void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
  
- bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
-                                      uint32_t granularity, Error **errp);
--
-+/**
-+ *
-+ * bdrv_register_buf/bdrv_unregister_buf:
-+ *
-+ * Register/unregister a buffer for I/O. For example, VFIO drivers are
-+ * interested to know the memory areas that would later be used for I/O, so
-+ * that they can prepare IOMMU mapping etc., to get better performance.
-+ */
-+void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size);
-+void bdrv_unregister_buf(BlockDriverState *bs, void *host);
- #endif
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 29cafa4236..99b9190627 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -446,6 +446,15 @@ struct BlockDriver {
-                                                 const char *name,
-                                                 Error **errp);
++static void nvme_register_buf(BlockDriverState *bs, void *host, size_t size)
++{
++    int ret;
++    BDRVNVMeState *s = bs->opaque;
++
++    ret = qemu_vfio_dma_map(s->vfio, host, size, false, NULL);
++    if (ret) {
++        /* FIXME: we may run out of IOVA addresses after repeated
++         * bdrv_register_buf/bdrv_unregister_buf, because nvme_vfio_dma_unmap
++         * doesn't reclaim addresses for fixed mappings. */
++        error_report("nvme_register_buf failed: %s", strerror(-ret));
++    }
++}
++
++static void nvme_unregister_buf(BlockDriverState *bs, void *host)
++{
++    BDRVNVMeState *s = bs->opaque;
++
++    qemu_vfio_dma_unmap(s->vfio, host);
++}
++
+ static BlockDriver bdrv_nvme = {
+     .format_name              = "nvme",
+     .protocol_name            = "nvme",
+@@ -1170,6 +1191,9 @@ static BlockDriver bdrv_nvme = {
  
-+    /**
-+     * Register/unregister a buffer for I/O. For example, when the driver is
-+     * interested to know the memory areas that will later be used in iovs, so
-+     * that it can do IOMMU mapping with VFIO etc., in order to get better
-+     * performance. In the case of VFIO drivers, this callback is used to do
-+     * DMA mapping for hot buffers.
-+     */
-+    void (*bdrv_register_buf)(BlockDriverState *bs, void *host, size_t size);
-+    void (*bdrv_unregister_buf)(BlockDriverState *bs, void *host);
-     QLIST_ENTRY(BlockDriver) list;
+     .bdrv_io_plug             = nvme_aio_plug,
+     .bdrv_io_unplug           = nvme_aio_unplug,
++
++    .bdrv_register_buf        = nvme_register_buf,
++    .bdrv_unregister_buf      = nvme_unregister_buf,
  };
  
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index c4e52a5fa3..92ab624fac 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -229,4 +229,7 @@ void blk_io_limits_enable(BlockBackend *blk, const char *group);
- void blk_io_limits_update_group(BlockBackend *blk, const char *group);
- void blk_set_force_allow_inactivate(BlockBackend *blk);
- 
-+void blk_register_buf(BlockBackend *blk, void *host, size_t size);
-+void blk_unregister_buf(BlockBackend *blk, void *host);
-+
- #endif
+ static void bdrv_nvme_init(void)
 -- 
 2.14.3
