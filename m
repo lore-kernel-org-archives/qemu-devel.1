@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eejFi-0006El-7d
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:48 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eejFe-0000kk-W8
+	(envelope-from <laurent@vivier.eu>) id 1eejFf-0006EH-UG
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:46 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:53026)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1eejFd-0000jn-NP
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:43 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:58774)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eejFe-0000js-MB
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:42 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eejFd-0000jD-9X
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:41 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 25 Jan 2018 16:15:33 +0100
-Message-Id: <20180125151535.25256-7-laurent@vivier.eu>
+Date: Thu, 25 Jan 2018 16:15:30 +0100
+Message-Id: <20180125151535.25256-4-laurent@vivier.eu>
 In-Reply-To: <20180125151535.25256-1-laurent@vivier.eu>
 References: <20180125151535.25256-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 6/8] target/m68k: add moves
+Subject: [Qemu-devel] [PULL 3/8] target/m68k: add MC68040 MMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,232 +26,599 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-and introduce SFC and DFC control registers.
+Only add MC68040 MMU page table processing and related
+registers (Special Status Word, Translation Control Register,
+User Root Pointer and Supervisor Root Pointer).
+
+Transparent Translation Registers, DFC/SFC and pflush/ptest
+will be added later.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180118193846.24953-6-laurent@vivier.eu>
+Message-Id: <20180118193846.24953-3-laurent@vivier.eu>
 ---
- target/m68k/cpu.h       | 19 ++++++++++++--
- target/m68k/helper.c    | 10 +++++++
- target/m68k/monitor.c   |  2 ++
- target/m68k/op_helper.c |  4 +--
- target/m68k/translate.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++---
- 5 files changed, 98 insertions(+), 7 deletions(-)
+ target/m68k/cpu.c       |   4 +-
+ target/m68k/cpu.h       | 115 +++++++++++++++++++++++--
+ target/m68k/helper.c    | 222 ++++++++++++++++++++++++++++++++++++++++++++++--
+ target/m68k/monitor.c   |   2 +
+ target/m68k/op_helper.c |  94 +++++++++++++++++++-
+ target/m68k/translate.c |   2 +
+ 6 files changed, 423 insertions(+), 16 deletions(-)
 
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 03126ba543..98919b358b 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -269,9 +269,9 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
+     cc->set_pc = m68k_cpu_set_pc;
+     cc->gdb_read_register = m68k_cpu_gdb_read_register;
+     cc->gdb_write_register = m68k_cpu_gdb_write_register;
+-#ifdef CONFIG_USER_ONLY
+     cc->handle_mmu_fault = m68k_cpu_handle_mmu_fault;
+-#else
++#if defined(CONFIG_SOFTMMU)
++    cc->do_unassigned_access = m68k_cpu_unassigned_access;
+     cc->get_phys_page_debug = m68k_cpu_get_phys_page_debug;
+ #endif
+     cc->disas_set_info = m68k_cpu_disas_set_info;
 diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 1c2bbac56d..cc1759bb5d 100644
+index c60564a047..38a74476ee 100644
 --- a/target/m68k/cpu.h
 +++ b/target/m68k/cpu.h
-@@ -138,6 +138,8 @@ typedef struct CPUM68KState {
-     uint32_t mbar;
-     uint32_t rambar0;
-     uint32_t cacr;
-+    uint32_t sfc;
-+    uint32_t dfc;
+@@ -116,6 +116,12 @@ typedef struct CPUM68KState {
+     /* MMU status.  */
+     struct {
+         uint32_t ar;
++        uint32_t ssw;
++        /* 68040 */
++        uint16_t tcr;
++        uint32_t urp;
++        uint32_t srp;
++        bool fault;
+     } mmu;
  
-     int pending_vector;
-     int pending_level;
-@@ -544,13 +546,26 @@ void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+     /* Control registers.  */
+@@ -226,6 +232,92 @@ typedef enum {
+ #define M68K_USP    1
+ #define M68K_ISP    2
+ 
++/* bits for 68040 special status word */
++#define M68K_CP_040  0x8000
++#define M68K_CU_040  0x4000
++#define M68K_CT_040  0x2000
++#define M68K_CM_040  0x1000
++#define M68K_MA_040  0x0800
++#define M68K_ATC_040 0x0400
++#define M68K_LK_040  0x0200
++#define M68K_RW_040  0x0100
++#define M68K_SIZ_040 0x0060
++#define M68K_TT_040  0x0018
++#define M68K_TM_040  0x0007
++
++#define M68K_TM_040_DATA  0x0001
++#define M68K_TM_040_CODE  0x0002
++#define M68K_TM_040_SUPER 0x0004
++
++/* bits for 68040 write back status word */
++#define M68K_WBV_040   0x80
++#define M68K_WBSIZ_040 0x60
++#define M68K_WBBYT_040 0x20
++#define M68K_WBWRD_040 0x40
++#define M68K_WBLNG_040 0x00
++#define M68K_WBTT_040  0x18
++#define M68K_WBTM_040  0x07
++
++/* bus access size codes */
++#define M68K_BA_SIZE_MASK    0x60
++#define M68K_BA_SIZE_BYTE    0x20
++#define M68K_BA_SIZE_WORD    0x40
++#define M68K_BA_SIZE_LONG    0x00
++#define M68K_BA_SIZE_LINE    0x60
++
++/* bus access transfer type codes */
++#define M68K_BA_TT_MOVE16    0x08
++
++/* bits for 68040 MMU status register (mmusr) */
++#define M68K_MMU_B_040   0x0800
++#define M68K_MMU_G_040   0x0400
++#define M68K_MMU_U1_040  0x0200
++#define M68K_MMU_U0_040  0x0100
++#define M68K_MMU_S_040   0x0080
++#define M68K_MMU_CM_040  0x0060
++#define M68K_MMU_M_040   0x0010
++#define M68K_MMU_WP_040  0x0004
++#define M68K_MMU_T_040   0x0002
++#define M68K_MMU_R_040   0x0001
++
++#define M68K_MMU_SR_MASK_040 (M68K_MMU_G_040 | M68K_MMU_U1_040 | \
++                              M68K_MMU_U0_040 | M68K_MMU_S_040 | \
++                              M68K_MMU_CM_040 | M68K_MMU_M_040 | \
++                              M68K_MMU_WP_040)
++
++/* bits for 68040 MMU Translation Control Register */
++#define M68K_TCR_ENABLED 0x8000
++#define M68K_TCR_PAGE_8K 0x4000
++
++/* bits for 68040 MMU Table Descriptor / Page Descriptor / TTR */
++#define M68K_DESC_WRITEPROT 0x00000004
++#define M68K_DESC_USED      0x00000008
++#define M68K_DESC_MODIFIED  0x00000010
++#define M68K_DESC_CACHEMODE 0x00000060
++#define M68K_DESC_CM_WRTHRU 0x00000000
++#define M68K_DESC_CM_COPYBK 0x00000020
++#define M68K_DESC_CM_SERIAL 0x00000040
++#define M68K_DESC_CM_NCACHE 0x00000060
++#define M68K_DESC_SUPERONLY 0x00000080
++#define M68K_DESC_USERATTR  0x00000300
++#define M68K_DESC_USERATTR_SHIFT     8
++#define M68K_DESC_GLOBAL    0x00000400
++#define M68K_DESC_URESERVED 0x00000800
++
++#define M68K_4K_PAGE_MASK           (~0xff)
++#define M68K_POINTER_BASE(entry)    (entry & ~0x1ff)
++#define M68K_ROOT_INDEX(addr)       ((address >> 23) & 0x1fc)
++#define M68K_POINTER_INDEX(addr)    ((address >> 16) & 0x1fc)
++#define M68K_4K_PAGE_BASE(entry)    (next & M68K_4K_PAGE_MASK)
++#define M68K_4K_PAGE_INDEX(addr)    ((address >> 10) & 0xfc)
++#define M68K_8K_PAGE_MASK           (~0x7f)
++#define M68K_8K_PAGE_BASE(entry)    (next & M68K_8K_PAGE_MASK)
++#define M68K_8K_PAGE_INDEX(addr)    ((address >> 11) & 0x7c)
++#define M68K_UDT_VALID(entry)       (entry & 2)
++#define M68K_PDT_VALID(entry)       (entry & 3)
++#define M68K_PDT_INDIRECT(entry)    ((entry & 3) == 2)
++#define M68K_INDIRECT_POINTER(addr) (addr & ~3)
++
+ /* m68k Control Registers */
+ 
+ /* ColdFire */
+@@ -387,16 +479,23 @@ void m68k_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ 
+ void register_m68k_insns (CPUM68KState *env);
+ 
+-#ifdef CONFIG_USER_ONLY
+ /* Coldfire Linux uses 8k pages
+  * and m68k linux uses 4k pages
+- * use the smaller one
++ * use the smallest one
+  */
+ #define TARGET_PAGE_BITS 12
+-#else
+-/* Smallest TLB entry size is 1k.  */
+-#define TARGET_PAGE_BITS 10
+-#endif
++
++enum {
++    /* 1 bit to define user level / supervisor access */
++    ACCESS_SUPER = 0x01,
++    /* 1 bit to indicate direction */
++    ACCESS_STORE = 0x02,
++    /* 1 bit to indicate debug access */
++    ACCESS_DEBUG = 0x04,
++    /* Type of instruction that generated the access */
++    ACCESS_CODE  = 0x10, /* Code fetch access                */
++    ACCESS_DATA  = 0x20, /* Data load/store access        */
++};
+ 
+ #define TARGET_PHYS_ADDR_SPACE_BITS 32
+ #define TARGET_VIRT_ADDR_SPACE_BITS 32
+@@ -412,6 +511,7 @@ void register_m68k_insns (CPUM68KState *env);
+ /* MMU modes definitions */
+ #define MMU_MODE0_SUFFIX _kernel
+ #define MMU_MODE1_SUFFIX _user
++#define MMU_KERNEL_IDX 0
+ #define MMU_USER_IDX 1
+ static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
+ {
+@@ -420,6 +520,9 @@ static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
+ 
+ int m68k_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
+                               int mmu_idx);
++void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr,
++                                bool is_write, bool is_exec, int is_asi,
++                                unsigned size);
  
  #include "exec/cpu-all.h"
  
-+/* TB flags */
-+#define TB_FLAGS_MACSR          0x0f
-+#define TB_FLAGS_MSR_S_BIT      13
-+#define TB_FLAGS_MSR_S          (1 << TB_FLAGS_MSR_S_BIT)
-+#define TB_FLAGS_SFC_S_BIT      14
-+#define TB_FLAGS_SFC_S          (1 << TB_FLAGS_SFC_S_BIT)
-+#define TB_FLAGS_DFC_S_BIT      15
-+#define TB_FLAGS_DFC_S          (1 << TB_FLAGS_DFC_S_BIT)
-+
- static inline void cpu_get_tb_cpu_state(CPUM68KState *env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *flags)
- {
-     *pc = env->pc;
-     *cs_base = 0;
--    *flags = (env->sr & SR_S)                   /* Bit  13 */
--            | ((env->macsr >> 4) & 0xf);        /* Bits 0-3 */
-+    *flags = (env->macsr >> 4) & TB_FLAGS_MACSR;
-+    if (env->sr & SR_S) {
-+        *flags |= TB_FLAGS_MSR_S;
-+        *flags |= (env->sfc << (TB_FLAGS_SFC_S_BIT - 2)) & TB_FLAGS_SFC_S;
-+        *flags |= (env->dfc << (TB_FLAGS_DFC_S_BIT - 2)) & TB_FLAGS_DFC_S;
-+    }
- }
- 
- #endif
 diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 58528f64ff..80db0b75b0 100644
+index ef0ec5dadf..f1d3c8c7dd 100644
 --- a/target/m68k/helper.c
 +++ b/target/m68k/helper.c
-@@ -203,6 +203,12 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
- 
-     switch (reg) {
-     /* MC680[1234]0 */
-+    case M68K_CR_SFC:
-+        env->sfc = val & 7;
-+        return;
-+    case M68K_CR_DFC:
-+        env->dfc = val & 7;
-+        return;
-     case M68K_CR_VBR:
-         env->vbr = val;
+@@ -212,6 +212,15 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+         m68k_switch_sp(env);
          return;
-@@ -254,6 +260,10 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
+     /* MC680[34]0 */
++    case M68K_CR_TC:
++        env->mmu.tcr = val;
++        return;
++    case M68K_CR_SRP:
++        env->mmu.srp = val;
++        return;
++    case M68K_CR_URP:
++        env->mmu.urp = val;
++        return;
+     case M68K_CR_USP:
+         env->sp[M68K_USP] = val;
+         return;
+@@ -238,12 +247,19 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
+     case M68K_CR_CACR:
+         return env->cacr;
+     /* MC680[34]0 */
++    case M68K_CR_TC:
++        return env->mmu.tcr;
++    case M68K_CR_SRP:
++        return env->mmu.srp;
+     case M68K_CR_USP:
+         return env->sp[M68K_USP];
+     case M68K_CR_MSP:
+         return env->sp[M68K_SSP];
+     case M68K_CR_ISP:
+         return env->sp[M68K_ISP];
++    /* MC68040/MC68LC040 */
++    case M68K_CR_URP:
++        return env->mmu.urp;
+     }
+     cpu_abort(CPU(cpu), "Unimplemented control register read 0x%x\n",
+               reg);
+@@ -320,23 +336,215 @@ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
  
-     switch (reg) {
-     /* MC680[1234]0 */
-+    case M68K_CR_SFC:
-+        return env->sfc;
-+    case M68K_CR_DFC:
-+        return env->dfc;
-     case M68K_CR_VBR:
-         return env->vbr;
-     /* MC680[234]0 */
+ #else
+ 
+-/* MMU */
++/* MMU: 68040 only */
++
++static int get_physical_address(CPUM68KState *env, hwaddr *physical,
++                                int *prot, target_ulong address,
++                                int access_type, target_ulong *page_size)
++{
++    M68kCPU *cpu = m68k_env_get_cpu(env);
++    CPUState *cs = CPU(cpu);
++    uint32_t entry;
++    uint32_t next;
++    target_ulong page_mask;
++    bool debug = access_type & ACCESS_DEBUG;
++    int page_bits;
++
++    /* Page Table Root Pointer */
++    *prot = PAGE_READ | PAGE_WRITE;
++    if (access_type & ACCESS_CODE) {
++        *prot |= PAGE_EXEC;
++    }
++    if (access_type & ACCESS_SUPER) {
++        next = env->mmu.srp;
++    } else {
++        next = env->mmu.urp;
++    }
++
++    /* Root Index */
++    entry = M68K_POINTER_BASE(next) | M68K_ROOT_INDEX(address);
++
++    next = ldl_phys(cs->as, entry);
++    if (!M68K_UDT_VALID(next)) {
++        return -1;
++    }
++    if (!(next & M68K_DESC_USED) && !debug) {
++        stl_phys(cs->as, entry, next | M68K_DESC_USED);
++    }
++    if (next & M68K_DESC_WRITEPROT) {
++        *prot &= ~PAGE_WRITE;
++        if (access_type & ACCESS_STORE) {
++            return -1;
++        }
++    }
++
++    /* Pointer Index */
++    entry = M68K_POINTER_BASE(next) | M68K_POINTER_INDEX(address);
++
++    next = ldl_phys(cs->as, entry);
++    if (!M68K_UDT_VALID(next)) {
++        return -1;
++    }
++    if (!(next & M68K_DESC_USED) && !debug) {
++        stl_phys(cs->as, entry, next | M68K_DESC_USED);
++    }
++    if (next & M68K_DESC_WRITEPROT) {
++        *prot &= ~PAGE_WRITE;
++        if (access_type & ACCESS_STORE) {
++            return -1;
++        }
++    }
++
++    /* Page Index */
++    if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
++        entry = M68K_8K_PAGE_BASE(next) | M68K_8K_PAGE_INDEX(address);
++    } else {
++        entry = M68K_4K_PAGE_BASE(next) | M68K_4K_PAGE_INDEX(address);
++    }
++
++    next = ldl_phys(cs->as, entry);
++
++    if (!M68K_PDT_VALID(next)) {
++        return -1;
++    }
++    if (M68K_PDT_INDIRECT(next)) {
++        next = ldl_phys(cs->as, M68K_INDIRECT_POINTER(next));
++    }
++    if (access_type & ACCESS_STORE) {
++        if (next & M68K_DESC_WRITEPROT) {
++            if (!(next & M68K_DESC_USED) && !debug) {
++                stl_phys(cs->as, entry, next | M68K_DESC_USED);
++            }
++        } else if ((next & (M68K_DESC_MODIFIED | M68K_DESC_USED)) !=
++                           (M68K_DESC_MODIFIED | M68K_DESC_USED) && !debug) {
++                stl_phys(cs->as, entry,
++                         next | (M68K_DESC_MODIFIED | M68K_DESC_USED));
++        }
++    } else {
++        if (!(next & M68K_DESC_USED) && !debug) {
++            stl_phys(cs->as, entry, next | M68K_DESC_USED);
++        }
++    }
++
++    if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
++        page_bits = 13;
++    } else {
++        page_bits = 12;
++    }
++    *page_size = 1 << page_bits;
++    page_mask = ~(*page_size - 1);
++    *physical = next & page_mask;
++
++    if (next & M68K_DESC_WRITEPROT) {
++        *prot &= ~PAGE_WRITE;
++        if (access_type & ACCESS_STORE) {
++            return -1;
++        }
++    }
++    if (next & M68K_DESC_SUPERONLY) {
++        if ((access_type & ACCESS_SUPER) == 0) {
++            return -1;
++        }
++    }
++
++    return 0;
++}
+ 
+-/* TODO: This will need fixing once the MMU is implemented.  */
+ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ {
+-    return addr;
++    M68kCPU *cpu = M68K_CPU(cs);
++    CPUM68KState *env = &cpu->env;
++    hwaddr phys_addr;
++    int prot;
++    int access_type;
++    target_ulong page_size;
++
++    if ((env->mmu.tcr & M68K_TCR_ENABLED) == 0) {
++        /* MMU disabled */
++        return addr;
++    }
++
++    access_type = ACCESS_DATA | ACCESS_DEBUG;
++    if (env->sr & SR_S) {
++        access_type |= ACCESS_SUPER;
++    }
++    if (get_physical_address(env, &phys_addr, &prot,
++                             addr, access_type, &page_size) != 0) {
++        return -1;
++    }
++    return phys_addr;
+ }
+ 
+ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+                               int mmu_idx)
+ {
++    M68kCPU *cpu = M68K_CPU(cs);
++    CPUM68KState *env = &cpu->env;
++    hwaddr physical;
+     int prot;
++    int access_type;
++    int ret;
++    target_ulong page_size;
++
++    if ((env->mmu.tcr & M68K_TCR_ENABLED) == 0) {
++        /* MMU disabled */
++        tlb_set_page(cs, address & TARGET_PAGE_MASK,
++                     address & TARGET_PAGE_MASK,
++                     PAGE_READ | PAGE_WRITE | PAGE_EXEC,
++                     mmu_idx, TARGET_PAGE_SIZE);
++        return 0;
++    }
++
++    if (rw == 2) {
++        access_type = ACCESS_CODE;
++        rw = 0;
++    } else {
++        access_type = ACCESS_DATA;
++        if (rw) {
++            access_type |= ACCESS_STORE;
++        }
++    }
+ 
+-    address &= TARGET_PAGE_MASK;
+-    prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+-    tlb_set_page(cs, address, address, prot, mmu_idx, TARGET_PAGE_SIZE);
+-    return 0;
++    if (mmu_idx != MMU_USER_IDX) {
++        access_type |= ACCESS_SUPER;
++    }
++
++    ret = get_physical_address(&cpu->env, &physical, &prot,
++                               address, access_type, &page_size);
++    if (ret == 0) {
++        address &= TARGET_PAGE_MASK;
++        physical += address & (page_size - 1);
++        tlb_set_page(cs, address, physical,
++                     prot, mmu_idx, TARGET_PAGE_SIZE);
++        return 0;
++    }
++    /* page fault */
++    env->mmu.ssw = M68K_ATC_040;
++    switch (size) {
++    case 1:
++        env->mmu.ssw |= M68K_BA_SIZE_BYTE;
++        break;
++    case 2:
++        env->mmu.ssw |= M68K_BA_SIZE_WORD;
++        break;
++    case 4:
++        env->mmu.ssw |= M68K_BA_SIZE_LONG;
++        break;
++    }
++    if (access_type & ACCESS_SUPER) {
++        env->mmu.ssw |= M68K_TM_040_SUPER;
++    }
++    if (access_type & ACCESS_CODE) {
++        env->mmu.ssw |= M68K_TM_040_CODE;
++    } else {
++        env->mmu.ssw |= M68K_TM_040_DATA;
++    }
++    if (!(access_type & ACCESS_STORE)) {
++        env->mmu.ssw |= M68K_RW_040;
++    }
++    env->mmu.ar = address;
++    cs->exception_index = EXCP_ACCESS;
++    return 1;
+ }
+ 
+ /* Notify CPU of a pending interrupt.  Prioritization and vectoring should
 diff --git a/target/m68k/monitor.c b/target/m68k/monitor.c
-index a20af6b09c..c31feb4b02 100644
+index 52781e85f0..2b83e3bc0d 100644
 --- a/target/m68k/monitor.c
 +++ b/target/m68k/monitor.c
 @@ -31,6 +31,8 @@ static const MonitorDef monitor_defs[] = {
      { "ssp", offsetof(CPUM68KState, sp[0]) },
      { "usp", offsetof(CPUM68KState, sp[1]) },
      { "isp", offsetof(CPUM68KState, sp[2]) },
-+    { "sfc", offsetof(CPUM68KState, sfc) },
-+    { "dfc", offsetof(CPUM68KState, dfc) },
-     { "urp", offsetof(CPUM68KState, mmu.urp) },
-     { "srp", offsetof(CPUM68KState, mmu.srp) },
-     { "dttr0", offsetof(CPUM68KState, mmu.ttr[M68K_DTTR0]) },
++    { "urp", offsetof(CPUM68KState, mmu.urp) },
++    { "srp", offsetof(CPUM68KState, mmu.srp) },
+     { NULL },
+ };
+ 
 diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index f023901061..4609caa546 100644
+index 67697d4e6d..f023901061 100644
 --- a/target/m68k/op_helper.c
 +++ b/target/m68k/op_helper.c
-@@ -399,8 +399,8 @@ static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
-         env->mmu.fault = false;
-         if (qemu_loglevel_mask(CPU_LOG_INT)) {
-             qemu_log("            "
--                     "ssw:  %08x ea:   %08x\n",
--                     env->mmu.ssw, env->mmu.ar);
-+                     "ssw:  %08x ea:   %08x sfc:  %d    dfc: %d\n",
-+                     env->mmu.ssw, env->mmu.ar, env->sfc, env->dfc);
-         }
-     } else if (cs->exception_index == EXCP_ADDRESS) {
-         do_stack_frame(env, &sp, 2, oldsr, 0, retaddr);
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index ecb89e4239..c0edaa533c 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -115,7 +115,6 @@ typedef struct DisasContext {
-     int is_jmp;
-     CCOp cc_op; /* Current CC operation */
-     int cc_op_synced;
--    int user;
-     struct TranslationBlock *tb;
-     int singlestep_enabled;
-     TCGv_i64 mactmp;
-@@ -178,7 +177,11 @@ static void do_writebacks(DisasContext *s)
- #if defined(CONFIG_USER_ONLY)
- #define IS_USER(s) 1
- #else
--#define IS_USER(s) s->user
-+#define IS_USER(s)   (!(s->tb->flags & TB_FLAGS_MSR_S))
-+#define SFC_INDEX(s) ((s->tb->flags & TB_FLAGS_SFC_S) ? \
-+                      MMU_KERNEL_IDX : MMU_USER_IDX)
-+#define DFC_INDEX(s) ((s->tb->flags & TB_FLAGS_DFC_S) ? \
-+                      MMU_KERNEL_IDX : MMU_USER_IDX)
- #endif
+@@ -360,7 +360,49 @@ static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
+     sp = env->aregs[7];
  
- typedef void (*disas_proc)(CPUM68KState *env, DisasContext *s, uint16_t insn);
-@@ -4453,6 +4456,64 @@ DISAS_INSN(move_from_sr)
- }
- 
- #if defined(CONFIG_SOFTMMU)
-+DISAS_INSN(moves)
-+{
-+    int opsize;
-+    uint16_t ext;
-+    TCGv reg;
-+    TCGv addr;
-+    int extend;
-+
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-+        return;
-+    }
-+
-+    ext = read_im16(env, s);
-+
-+    opsize = insn_opsize(insn);
-+
-+    if (ext & 0x8000) {
-+        /* address register */
-+        reg = AREG(ext, 12);
-+        extend = 1;
-+    } else {
-+        /* data register */
-+        reg = DREG(ext, 12);
-+        extend = 0;
-+    }
-+
-+    addr = gen_lea(env, s, insn, opsize);
-+    if (IS_NULL_QREG(addr)) {
-+        gen_addr_fault(s);
-+        return;
-+    }
-+
-+    if (ext & 0x0800) {
-+        /* from reg to ea */
-+        gen_store(s, opsize, addr, reg, DFC_INDEX(s));
-+    } else {
-+        /* from ea to reg */
-+        TCGv tmp = gen_load(s, opsize, addr, 0, SFC_INDEX(s));
-+        if (extend) {
-+            gen_ext(reg, tmp, opsize, 1);
-+        } else {
-+            gen_partset_reg(opsize, reg, tmp);
+     sp &= ~1;
+-    if (cs->exception_index == EXCP_ADDRESS) {
++    if (cs->exception_index == EXCP_ACCESS) {
++        if (env->mmu.fault) {
++            cpu_abort(cs, "DOUBLE MMU FAULT\n");
 +        }
++        env->mmu.fault = true;
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* push data 3 */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* push data 2 */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* push data 1 */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* write back 1 / push data 0 */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* write back 1 address */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* write back 2 data */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* write back 2 address */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, 0); /* write back 3 data */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, env->mmu.ar); /* write back 3 address */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, env->mmu.ar); /* fault address */
++        sp -= 2;
++        cpu_stw_kernel(env, sp, 0); /* write back 1 status */
++        sp -= 2;
++        cpu_stw_kernel(env, sp, 0); /* write back 2 status */
++        sp -= 2;
++        cpu_stw_kernel(env, sp, 0); /* write back 3 status */
++        sp -= 2;
++        cpu_stw_kernel(env, sp, env->mmu.ssw); /* special status word */
++        sp -= 4;
++        cpu_stl_kernel(env, sp, env->mmu.ar); /* effective address */
++        do_stack_frame(env, &sp, 7, oldsr, 0, retaddr);
++        env->mmu.fault = false;
++        if (qemu_loglevel_mask(CPU_LOG_INT)) {
++            qemu_log("            "
++                     "ssw:  %08x ea:   %08x\n",
++                     env->mmu.ssw, env->mmu.ar);
++        }
++    } else if (cs->exception_index == EXCP_ADDRESS) {
+         do_stack_frame(env, &sp, 2, oldsr, 0, retaddr);
+     } else if (cs->exception_index == EXCP_ILLEGAL ||
+                cs->exception_index == EXCP_DIV0 ||
+@@ -408,6 +450,56 @@ static inline void do_interrupt_m68k_hardirq(CPUM68KState *env)
+ {
+     do_interrupt_all(env, 1);
+ }
++
++void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
++                                bool is_exec, int is_asi, unsigned size)
++{
++    M68kCPU *cpu = M68K_CPU(cs);
++    CPUM68KState *env = &cpu->env;
++#ifdef DEBUG_UNASSIGNED
++    qemu_log_mask(CPU_LOG_INT, "Unassigned " TARGET_FMT_plx " wr=%d exe=%d\n",
++             addr, is_write, is_exec);
++#endif
++    if (env == NULL) {
++        /* when called from gdb, env is NULL */
++        return;
 +    }
-+    switch (extract32(insn, 3, 3)) {
-+    case 3: /* Indirect postincrement.  */
-+        tcg_gen_addi_i32(AREG(insn, 0), addr,
-+                         REG(insn, 0) == 7 && opsize == OS_BYTE
-+                         ? 2
-+                         : opsize_bytes(opsize));
-+        break;
-+    case 4: /* Indirect predecrememnt.  */
-+        tcg_gen_mov_i32(AREG(insn, 0), addr);
-+        break;
++
++    if (m68k_feature(env, M68K_FEATURE_M68040)) {
++        env->mmu.ssw |= M68K_ATC_040;
++        /* FIXME: manage MMU table access error */
++        env->mmu.ssw &= ~M68K_TM_040;
++        if (env->sr & SR_S) { /* SUPERVISOR */
++            env->mmu.ssw |= M68K_TM_040_SUPER;
++        }
++        if (is_exec) { /* instruction or data */
++            env->mmu.ssw |= M68K_TM_040_CODE;
++        } else {
++            env->mmu.ssw |= M68K_TM_040_DATA;
++        }
++        env->mmu.ssw &= ~M68K_BA_SIZE_MASK;
++        switch (size) {
++        case 1:
++            env->mmu.ssw |= M68K_BA_SIZE_BYTE;
++            break;
++        case 2:
++            env->mmu.ssw |= M68K_BA_SIZE_WORD;
++            break;
++        case 4:
++            env->mmu.ssw |= M68K_BA_SIZE_LONG;
++            break;
++        }
++
++        if (!is_write) {
++            env->mmu.ssw |= M68K_RW_040;
++        }
++
++        env->mmu.ar = addr;
++
++        cs->exception_index = EXCP_ACCESS;
++        cpu_loop_exit(cs);
 +    }
 +}
-+
- DISAS_INSN(move_to_sr)
- {
-     if (IS_USER(s)) {
-@@ -5607,6 +5668,9 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(bitop_im,  08c0, ffc0);
-     INSN(arith_im,  0a80, fff8, CF_ISA_A);
-     INSN(arith_im,  0a00, ff00, M68000);
-+#if defined(CONFIG_SOFTMMU)
-+    INSN(moves,     0e00, ff00, M68000);
-+#endif
-     INSN(cas,       0ac0, ffc0, CAS);
-     INSN(cas,       0cc0, ffc0, CAS);
-     INSN(cas,       0ec0, ffc0, CAS);
-@@ -5828,7 +5892,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     dc->cc_op = CC_OP_DYNAMIC;
-     dc->cc_op_synced = 1;
-     dc->singlestep_enabled = cs->singlestep_enabled;
--    dc->user = (env->sr & SR_S) == 0;
-     dc->done_mac = 0;
-     dc->writeback_mask = 0;
-     num_insns = 0;
-@@ -5987,6 +6050,7 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+ #endif
+ 
+ bool m68k_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index ea18df940a..fd6db3e1fc 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -5980,6 +5980,8 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
                 env->current_sp == M68K_USP ? "->" : "  ", env->sp[M68K_USP],
                 env->current_sp == M68K_ISP ? "->" : "  ", env->sp[M68K_ISP]);
      cpu_fprintf(f, "VBR = 0x%08x\n", env->vbr);
-+    cpu_fprintf(f, "SFC = %x DFC %x\n", env->sfc, env->dfc);
-     cpu_fprintf(f, "SSW %08x TCR %08x URP %08x SRP %08x\n",
-                 env->mmu.ssw, env->mmu.tcr, env->mmu.urp, env->mmu.srp);
-     cpu_fprintf(f, "DTTR0/1: %08x/%08x ITTR0/1: %08x/%08x\n",
++    cpu_fprintf(f, "SSW %08x TCR %08x URP %08x SRP %08x\n",
++                env->mmu.ssw, env->mmu.tcr, env->mmu.urp, env->mmu.srp);
+ #endif
+ }
+ 
 -- 
 2.14.3
