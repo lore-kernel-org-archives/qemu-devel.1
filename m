@@ -1,25 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eeh09-0008Ei-KX
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:51:35 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eeh4t-0001ZN-2c
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:56:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eeh08-0001gV-59
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:51:33 -0500
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:46773)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eeh07-0001ei-VU
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:51:32 -0500
-Received: by mail-ot0-x22b.google.com with SMTP id t35so6573729otd.13
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 04:51:31 -0800 (PST)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eeh4p-0005od-Tb
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:56:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eeh4p-0005oI-Kp
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:56:23 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0PCsguu063053
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:56:22 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fqf2n9pnt-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:56:21 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 25 Jan 2018 12:56:19 -0000
+References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
+	<f9224bba-08fb-589e-ed6e-d8e967a8fe67@linux.vnet.ibm.com>
+	<20180115085945.GC12499@bjsdjshi@linux.vnet.ibm.com>
+	<a4f39e6e-c031-0861-ff6b-e29747ba9489@linux.vnet.ibm.com>
+	<20180123062356.GC32354@bjsdjshi@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 25 Jan 2018 13:56:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180124195843.dk7efcmdwoba2jtw@kentang.home>
-References: <20180124195843.dk7efcmdwoba2jtw@kentang.home>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jan 2018 12:51:10 +0000
-Message-ID: <CAFEAcA-T4P6pQTmQG2OuwA0XrHcvjvrzoiE4o=TYDfUv77OWsQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] qemu-sparc updates
+In-Reply-To: <20180123062356.GC32354@bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <879459e4-e6b1-2030-e3d4-0b991b532f51@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] vfio: ccw: basic channel path
+ event handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +46,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
-
-On 24 January 2018 at 19:58, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> Hi Peter,
->
-> Here are the latest updates for SPARC. Please pull.
->
->
-> ATB,
->
-> Mark.
->
->
-> The following changes since commit 52483b067cce4a88ffbf8fbeea26de7549d2ad23:
->
->   Merge remote-tracking branch 'remotes/huth/tags/pull-request-2018-01-22' into staging (2018-01-23 10:15:09 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
->
-> for you to fetch changes up to 9a323c89102f741e3a91a42906c26186a43f379e:
->
->   sun4u: implement power device (2018-01-24 19:46:10 +0000)
->
-> ----------------------------------------------------------------
-> qemu-sparc update
->
-
-Hi; I'm afraid this has format-string issues:
-
-In file included from hw/sparc64/trace.h:69:0,
-                 from hw/sparc64/trace.c:4:
-hw/sparc64/trace.h: In function '_nocheck__trace_sparc64_cpu_tick_set_count':
-hw/sparc64/trace.h:466:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 6 has type 'uint64_t {aka long
-long unsigned int}' [-Werror=format=]
-                       "%d@%zd.%06zd:sparc64_cpu_tick_set_count " "%s
-set_count count=0x%016lx (npt %s) p=%p" "\n",
-                       ^
-/home/peter.maydell/qemu/include/qemu/log.h:94:22: note: in definition
-of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-hw/sparc64/trace.h: In function '_nocheck__trace_sparc64_cpu_tick_get_count':
-hw/sparc64/trace.h:490:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 6 has type 'uint64_t {aka long
-long unsigned int}' [-Werror=format=]
-                       "%d@%zd.%06zd:sparc64_cpu_tick_get_count " "%s
-get_count count=0x%016lx (npt %s) p=%p" "\n",
-                       ^
-/home/peter.maydell/qemu/include/qemu/log.h:94:22: note: in definition
-of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-hw/sparc64/trace.h: In function '_nocheck__trace_sparc64_cpu_tick_set_limit':
-hw/sparc64/trace.h:514:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 6 has type 'uint64_t {aka long
-long unsigned int}' [-Werror=format=]
-                       "%d@%zd.%06zd:sparc64_cpu_tick_set_limit " "%s
-set_limit limit=0x%016lx (%s) p=%p called with limit=0x%016lx at
-0x%016lx (delta=0x%016lx)" "\n",
-                       ^
-/home/peter.maydell/qemu/include/qemu/log.h:94:22: note: in definition
-of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-hw/sparc64/trace.h:514:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 9 has type 'uint64_t {aka long
-long unsigned int}' [-Werror=format=]
-                       "%d@%zd.%06zd:sparc64_cpu_tick_set_limit " "%s
-set_limit limit=0x%016lx (%s) p=%p called with limit=0x%016lx at
-0x%016lx (delta=0x%016lx)" "\n",
-                       ^
-/home/peter.maydell/qemu/include/qemu/log.h:94:22: note: in definition
-of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-hw/sparc64/trace.h:514:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 10 has type 'uint64_t {aka long
-long unsigned int}' [-Werror=format=]
-                       "%d@%zd.%06zd:sparc64_cpu_tick_set_limit " "%s
-set_limit limit=0x%016lx (%s) p=%p called with limit=0x%016lx at
-0x%016lx (delta=0x%016lx)" "\n",
-                       ^
-/home/peter.maydell/qemu/include/qemu/log.h:94:22: note: in definition
-of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-hw/sparc64/trace.h:514:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 11 has type 'uint64_t {aka long
-long unsigned int}' [-Werror=format=]
-                       "%d@%zd.%06zd:sparc64_cpu_tick_set_limit " "%s
-set_limit limit=0x%016lx (%s) p=%p called with limit=0x%016lx at
-0x%016lx (delta=0x%016lx)" "\n",
-                       ^
-/home/peter.maydell/qemu/include/qemu/log.h:94:22: note: in definition
-of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-
-Printing uint64_t requires the PRIx64 macros.
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, pmorel@linux.vnet.ibm.com
 
 
-thanks
--- PMM
+
+On 01/23/2018 07:23 AM, Dong Jia Shi wrote:
+> * Halil Pasic <pasic@linux.vnet.ibm.com> [2018-01-16 16:57:13 +0100]:
+> 
+>>
+>>
+>> On 01/15/2018 09:59 AM, Dong Jia Shi wrote:
+>>> * Halil Pasic <pasic@linux.vnet.ibm.com> [2018-01-12 19:10:20 +0100]:
+>>>
+>>>>
+>>>>
+>>>> On 01/11/2018 04:04 AM, Dong Jia Shi wrote:
+>>>>> What are still missing, thus need to be offered in the next version are:
+>>>>> - I/O termination and FSM state handling if currently we have I/O on the status
+>>>>>   switched path.
+>>>>> - Vary on/off event is not sensible to a guest.
+>>>>
+>>>> I don't see a doc update. We do have documentation (in
+>>>> Documentation/s390/vfio-ccw.txt) in which the uapi interface with the
+>>>> regions and their purpose/usage  is at least kind of explained. You are
+>>>> changing this interface without updating the doc.
+>>>>
+>>>> I would like to see documentation on this because I'm under the
+>>>> impression either the design is pretty convoluted or I did not
+>>>> get it at all.
+>>> Ah, I missed the documentation part. Thanks for pointing out. I will add
+>>> it in the next cycle.
+>>>
+>>
+>> I would have preferred having a doc update in this cycle. E.g. as
+>> an answer to the cover letter.
+> Ok. If you prefer this, let's try to clarify questions right here and
+> update documentations in the next review cycle (if there is any).
+> 
+>>
+>> As previously pointed out I don't really understand your design.
+>> I wanted to avoid summarizing the design myself (that is my understanding
+>> of it), to then question the design.
+> Fair enough.
+> 
+>>
+>> To give you a feeling of what I mean here some bullet points:
+>> * Channel paths are css level resources (simplified).
+> Yes, and it's the means for the machine to talk to the device.
+> 
+>> * When a channel path malfunctions a CRW is generated and a machine
+>> check channel report pending is generated. Same goes for
+>> channel paths popping up (on HW level). Should not these get
+>> propagated?
+> AFAIR, channel path related CRW is not that reliable. I mean it seems
+> that it's not mandatory to generate CRWs for channel path malfunctions.
+> AFAIU, it depneds on machine models. For example, we won't get
+> CRW_ERC_INIT for a "path has come" event on many models I believe. And
+> that's why nobody noticed the misuse of CRW_ERC_IPARM and CRW_ERC_INIT
+> in the CRW handling logic for channel path CRWs.
+> Ref:
+> 2daace78a8c9 s390: chp: handle CRW_ERC_INIT for channel-path status change
+> 
+
+Honestly, I forgot about this discussion. I've refreshed my memories by
+now, but I could not find why is it supposed to be architecturally OK
+to loose CRWs when for instance a chp goes away.
+
+> So my understanding for this is: it really a design decision for us to
+> propagate all of the channel path CRWs, or we just use other ways (like
+> using PNO and PNOM as this series shows).
+
+>From what I read, CRWs did not seem optional. I wonder what should I
+read in order to change my mind. I'm not talking about the hardware
+in the wild -- but that could be buggy hardware.
+
+> 
+> Of course, CRW propagation is good to have. But as a discussion result
+> of a former thread, that is something we can consider only after we have
+> a good channel path re-modelling. That is the problem. We can try to
+> trigger CRW event in some work of machine checks handling enhancement
+> later.
+> 
+>> * Kind of instead of the CRW you introduce a per device interrupt
+>> for channel path events on the qemu/kvm boundary. AFAIU for a chp
+>> event you do an STSCH for each (affected?) subchannel
+> Until here, yes and right.
+> 
+>> and generate an irq. Right? Why is this a good idea.
+> This is not right. This series does not generate an irq for the guest.
+
+You misunderstood this. The word 'irq' this sentence is a short version
+of 'per device interrupt for channel path events on the qemu/kvm boundary'
+form the previous sentence. It's not an irq injected into the guest but
+a notification (which you call irq in '[RFC PATCH 2/3] vfio: ccw:
+introduce channel path irq') for QEMU.
+
+> In QEMU, when it gets the notification of a channel path status change
+> event, it read the newest SCHIB from the schib region, and update the
+> SCHIB (patch related parts) for the virtual subchannel. The guest will
+> get the new SCHIB whenever it calls STSCH then.
+
+We are in agreement. I just wanted to say, if let's say 42 vfio-ccw devices
+are using the same chp and it goes away, you will generate 42 notifications.
+
+> 
+> I think this is a good idea, because:
+> 1. This is complies the Linux implementation. Path status change could
+>    be noticed by Linux.
+> 2. This provides enhancement with a small work. On the contrary, channel
+>    path re-modelling needs a lot of work.
+
+I thing your answer is based on the misunderstanding explained above.
+
+My idea was to be lazy in a different way. Instead of being lazy about
+reading the subsection, I was wondering why not do an STSCH in the host
+as a response to one being done in the guest.
+
+That means: if there is no activity on the passed trough devices, nothing
+needs to be done. (Except maybe the CRWs).
+
+The things aren't observable by the guest if it does not do STSCH anyway.
+
+
+> 
+>> * SCHIB.PMCW provides path information relevant for a given device.
+>> This information is retrieved using store subchannel. Is your series
+>> sufficient for making store subchannel work properly (correct and
+>> reasonably up to date)?
+> Introducing a SCHIB region is the basis of further STSCH hanlding work.
+> This series depends on it, and only focuses on the update of the channel
+> path related parts of it. And for these parts, this work I think is
+> basically correct (more review comments are surely to be welcomed).
+> 
+
+Please elaborate on that basically. Or are those actually just correct
+in your opinion?!
+
+> For the rest parts, this does not change anything than what have. As
+> replied to Conny in other mail of this thread: I think, if the other
+> fields are handled by QEMU well, then we don't need to trigger update
+> events for them. Currently I don't find things that need extra trigger.
+> 
+
+Fair.
+
+>> Regarding PMCW it's supposed to get updated when io functions are
+>> preformed by the css, AFAIR. Is that right?
+> I think so. And also for some other cases, for example, when we
+> configure on/off a channel path.
+> 
+
+Sorry, I ended up confusing opm with pom. That would have been illegal
+(as Connie has pointed out recently) because it can only  change
+only if the path is tried for IO.
+
+
+>>  If yes what are the implications? Are the manipulations you do on
+>>  some PMCW fields architecturally correct?
+> If "architecturally correct" means what guest sees/senses is all obey to
+> the PoP, then I think so. We don't have to emulate the internal
+> behaviors (which could not be seen by OS) of CSS exactly when we
+> emulate, if the emulation does not impact on what Linux guest will see,
+> right?
+> 
+> I mean, the time point we update the PMCW does not has to be in the time
+> slot of io function performance. The guest would still have to get the
+> updated information through the calls of STSCH. We only need to provide
+> the updaetd result to the guest by handling STSCH well. And that's why
+> we say we do that lazily.
+> 
+> Nothing different (added value) will be seen by the guest, comparing
+> with the current lazy implementation I think.> 
+>> * The one thing I would very much appreciate as an user of vfio,
+>> and should in my understanding be the user story of this series
+>> (and the qemu counterpart of course) is the following. If my device
+>> (that is IO operation) failed because no path could be found on
+>> which the device is accessible, I would like to be able to identify
+>> that. Preferably the same way I would do for an LPAR guest. Is this
+>> series accomplishing that? 
+> With this the guest could lazily identify that. But since we have no
+> machine check propagation yet, for those cases which generate CRWs, it
+> might not be the same way for an LPAR guest I think.
+> 
+
+This was a yes/no question. I can't interpret your answer neither as
+yes or as no. Maybe a little clarification: I'm talking about a
+recent linux guest. 
+
+>> * Why not just do proper STSCH for vfio-ccw?
+> I only did the interested parts (path related). For the other parts, the
+> current handling is enough, no? Anyway, after we have the schib region,
+> we can do further STSCH handling any time later we want then.
+> 
+
+I mean, your approach works on the premise, that the host will notify
+QEMU each time the content of the SCHIB (area) changes (modulo stuff) so
+it can do an update in QEMU, and give the guest an up to date virtualized
+SCHIB when it asks for it executing the STSCH instruction.
+
+I was asking myself. Why not instead while interpreting STSCH do a
+STSCH on the host device (that is passed through), and virtualize the
+result as necessary.
+
+It occurred to me if nothing simpler. 
+
+>> * Shouldn't we virtualize CHPIDs?
+> Nobody would say no for this. :) The problem is that this is something
+> big, and it's not a short-term goal in my current working project... I
+> really want to deliver a minimal function set in the near future
+> firstly. If the current working does not hurt, can we defer channel path
+> re-modelling and CHPIDs virtualization?
+
+The problem is, I'm not sure it does not hurt. For instance because of
+the question below. I would also prefer having a fair idea of what
+we need for the envisioned (complete) solution before introducing
+kernel interfaces (to avoid: pity in the end we need something
+different, and resulting cluttered interface).
+
+> 
+>> What if we have a clash? Lets say my dasd is only accessible via chp
+>> 0.00 in the host. Currently we have a problem there, or (as the only
+>> path would end up being ignored)?
+> You mean the clash that sharing path 0.00 between a physical dasd and
+> the virtio ccw devices? The problem I saw is in the checking of the
+> chpid.is_virtual in css_do_rchp(). For a virtual chp, we should generate
+> INIT CRWs; while for a non-virtual one, we shouldn't. If the chp is
+> shared with virtual and non-virtual device, I don't know what to do
+> then...
+> 
+> I don't think we can fix this before we re-modelled the channel path.
+> But this is neither introduced nor aggravated by this series, right?
+
+I'm not sure about the later. What prevents the guest from believing
+the (to use your terminology shared) chp 0.00 has become unavailable
+if 0.00 becomes unavailable in the host?
+
+Would that adversely affect the virtual devices? It would at
+least look strange.
+
+> 
+> We'd have to document this either I think.
+> 
+>> Note: this is another unpleasant effect of not having MCSSE in the
+>> guest. The original design was to have a separate css for vfio, and
+>> then we would not have this kind of a problem.  (Virtualization of
+>> chps would still be good for migration.)
+> Nod. BTW, I don't say that I do not want channel path virtualization in
+> the long run. It's just I want a minimal function set more currently
+> from what I'm focusing perspective.
+> 
+> THANKS for these insightful questions!
+> 
