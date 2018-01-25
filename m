@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1eej6J-0001CI-5X
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:06:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1eej8b-0002CQ-TF
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:08:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1eej6F-0001eX-2O
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:06:03 -0500
-Received: from mail-wr0-f179.google.com ([209.85.128.179]:46199)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1eej6E-0001eL-Ry
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:05:59 -0500
-Received: by mail-wr0-f179.google.com with SMTP id g21so7980770wrb.13
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:05:58 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1eej8S-00030L-Tq
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:08:25 -0500
+References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516732013-18272-5-git-send-email-walling@linux.vnet.ibm.com>
+	<2a6618d7-566b-bec7-c267-26e4e7acb1a2@redhat.com>
+	<ded3d6a0-3432-368a-3964-6641c7fef3fe@linux.vnet.ibm.com>
+	<24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cfd9af56-8122-e195-f89f-e219bec9b23c@redhat.com>
+Date: Thu, 25 Jan 2018 09:08:09 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180116142316.30486-1-pbonzini@redhat.com>
-References: <20180116142316.30486-1-pbonzini@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 25 Jan 2018 23:05:27 +0800
-Message-ID: <CAK1Eb9moXi5y0TO42smwLYn3Wgx_Zm0ndjV_u_VtRGQYtNxf6w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] coroutine-lock: polymorphic CoQueue
+In-Reply-To: <24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY"
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 04/10] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
 
-On Tue, Jan 16, 2018 at 10:23 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> There are cases in which a queued coroutine must be restarted from
-> non-coroutine context (with qemu_co_enter_next).  In this cases,
-> qemu_co_enter_next also needs to be thread-safe, but it cannot use a
-> CoMutex and so cannot qemu_co_queue_wait.  This happens in curl (which
-> right now is rolling its own list of Coroutines) and will happen in
-> Fam's NVMe driver as well.
->
-> This series extracts the idea of a polymorphic lockable object
-> from my "scoped lock guard" proposal, and applies it to CoQueue.
-> The implementation of QemuLockable is similar to C11 _Generic, but
-> redone using the preprocessor and GCC builtins for compatibility.
->
-> In general, while a bit on the esoteric side, the functionality used
-> to emulate _Generic is fairly old in GCC, and the builtins are already
-> used by include/qemu/atomic.h; the series was tested with Fedora 27 (boot
-> Damn Small Linux via http) and CentOS 6 (compiled only).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>,
+ "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com,
+ alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
+Message-ID: <cfd9af56-8122-e195-f89f-e219bec9b23c@redhat.com>
+Subject: Re: [qemu-s390x] [Qemu-devel] [PATCH v4 04/10] s390-ccw: update libc
+References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
+ <1516732013-18272-5-git-send-email-walling@linux.vnet.ibm.com>
+ <2a6618d7-566b-bec7-c267-26e4e7acb1a2@redhat.com>
+ <ded3d6a0-3432-368a-3964-6641c7fef3fe@linux.vnet.ibm.com>
+ <24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
+In-Reply-To: <24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm seeing this crash with the series:
+On 01/25/2018 06:06 AM, Thomas Huth wrote:
+>>> That's not "any whitespace", but only spaces.=C2=A0 A fully compliant=
 
-(gdb) bt
-#0  0x00007ff76204d66b in raise () at /lib64/libc.so.6
-#1  0x00007ff76204f381 in abort () at /lib64/libc.so.6
-#2  0x00007ff7620458fa in __assert_fail_base () at /lib64/libc.so.6
-#3  0x00007ff762045972 in  () at /lib64/libc.so.6
-#4  0x000055eaab249c68 in qemu_co_mutex_unlock (mutex=0x7ff750bf7b40)
-at /stor/work/qemu/util/qemu-coroutine-lock.c:320
-#5  0x000055eaab249da3 in qemu_lockable_unlock (x=0x7ff750bf7b40) at
-/stor/work/qemu/include/qemu/lockable.h:72
-#6  0x000055eaab249da3 in qemu_co_queue_wait_impl
-(queue=0x55eaaef41a08, lock=lock@entry=0x7ff750bf7b40) at
-/stor/work/qemu/util/qemu-coroutine-lock.c:49
-#7  0x000055eaab19f2b9 in handle_dependencies
-(bs=bs@entry=0x55eaad9c6620, guest_offset=guest_offset@entry=1597440,
-cur_bytes=cur_bytes@entry=0x7ff750bf7ba0, m=m@entry=0x7ff7
-50bf7c58) at /stor/work/qemu/block/qcow2-cluster.c:1067
-#8  0x000055eaab1a1b85 in qcow2_alloc_cluster_offset
-(bs=bs@entry=0x55eaad9c6620, offset=offset@entry=1597440,
-bytes=bytes@entry=0x7ff750bf7c4c, host_offset=host_offset@entry
-=0x7ff750bf7c50, m=m@entry=0x7ff750bf7c58) at
-/stor/work/qemu/block/qcow2-cluster.c:1497
-#9  0x000055eaab19411e in qcow2_co_pwritev (bs=0x55eaad9c6620,
-offset=1597440, bytes=8192, qiov=0x55eaaedb4880, flags=<optimized
-out>) at /stor/work/qemu/block/qcow2.c:1896
-#10 0x000055eaab1c2962 in bdrv_driver_pwritev
-(bs=bs@entry=0x55eaad9c6620, offset=offset@entry=1597440,
-bytes=bytes@entry=8192, qiov=qiov@entry=0x55eaaedb4880, flags=flags@en
-try=0) at /stor/work/qemu/block/io.c:976
-#11 0x000055eaab1c3985 in bdrv_aligned_pwritev
-(child=child@entry=0x55eaad92bd00, req=req@entry=0x7ff750bf7e70,
-offset=offset@entry=1597440, bytes=bytes@entry=8192, align=ali
-gn@entry=1, qiov=qiov@entry=0x55eaaedb4880, flags=0) at
-/stor/work/qemu/block/io.c:1534
-#12 0x000055eaab1c4ca5 in bdrv_co_pwritev (child=0x55eaad92bd00,
-offset=offset@entry=1597440, bytes=bytes@entry=8192,
-qiov=qiov@entry=0x55eaaedb4880, flags=flags@entry=0)
-   at /stor/work/qemu/block/io.c:1785
-#13 0x000055eaab1b4f06 in blk_co_pwritev (blk=0x55eaad9c63c0,
-offset=1597440, bytes=8192, qiov=0x55eaaedb4880, flags=0) at
-/stor/work/qemu/block/block-backend.c:1135
-#14 0x000055eaab1b4fff in blk_aio_write_entry (opaque=0x55eaaefc5eb0)
-at /stor/work/qemu/block/block-backend.c:1326
-#15 0x000055eaab24a77a in coroutine_trampoline (i0=<optimized out>,
-i1=<optimized out>) at /stor/work/qemu/util/coroutine-ucontext.c:79
-#16 0x00007ff762066bc0 in __start_context () at /lib64/libc.so.6
-#17 0x00007ffdf69102d0 in  ()
-#18 0x0000000000000000 in  ()
+>>> implementation would be checking isspace(), but I don't expect you to=
+
+>>> implement that; at a minimum, also checking '\t' would get you closer=
+
+>>> (but not all the way to) compliance.
+>>
+>>
+>> I'll fix the comment to be more clear.
+>>
+>> I think it's okay to just have the menu code treat any other kind
+>> of whitespace as an error (it will check before calling atoi). I
+>> added support for negatives in bothfunctions because it was easy
+>> enough to do so and for the sakeof completeness.
+>>
+>> However, I worry trying to be 100% compliant will just bloat the
+>> code when we only need it for very specific use cases.
+>>
+>> Would you say what we have (along with the fix to itostr below) is
+>> sufficient enough?
+>=20
+> IMHO the current way is good enough for a BIOS implementation. We're no=
+t
+> doing a full replacement of glibc here ;-)
+
+Documenting the issue is the best approach; don't bloat the code for
+something that none of the callers care about.  Perhaps as simple as addi=
+ng:
+
+NOTE: This function is not quite like the standardized version in libc;
+it does not handle all forms of leading space or INT_MIN.
+
+(or whatever the actual differences are, based on your implementation
+choices).
+
+Another solution is to just not use the standardized name; keeping it
+named _atoi() instead of atoi() makes it obvious that you are calling an
+internal function that does not have to have standardized semantics.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-It's late today so I'll take a closer look tomorrow.
+--BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Fam
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpp8tkACgkQp6FrSiUn
+Q2prJwf9HzWp/8RXfqqNb1ejbWUDnSHeK9A87vxjtC/1Wzc0uNlaPZPYVYWCt2y7
+Roh1hah7IVu0AnKa0vX1U4tFntmkks4V7PeaO3WdYKja5CcuZtrbevjbtL5fX6/C
+iOgxi3KgZdbrSGCv22U7RyZIYClLLpeXxyr8IoVN7t6j024Cq/b5BjMbrezgWDoL
+wmsQqdVP61t9PYh+AyE7onPUsqA3fXysC8ijeL4AOK0Kg7ZUyxMPj26aMroUfNzA
+4B0aK8lELPql+DYPsEM6dyZuJT4mk0wOaHycQw8mELJYbmt6B6xpgbIxz+fsgNz9
+3QW+izLKEzOBWLNK6YoeMX7MzjO+rA==
+=iWTq
+-----END PGP SIGNATURE-----
+
+--BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY--
