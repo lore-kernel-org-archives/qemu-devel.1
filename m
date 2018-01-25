@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1eecU4-00014o-8c
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 03:02:14 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eecqn-0007Gi-8L
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 03:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1eecTy-0005HJ-Vj
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 03:02:08 -0500
-Received: from victor.provo.novell.com ([137.65.250.26]:42387
-	helo=prv3-mh.provo.novell.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1eecTy-0005C1-MH
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 03:02:02 -0500
-From: Fei Li <fli@suse.com>
-Message-ID: <7833ad34-e056-c1f7-3a92-f7598dcf1467@suse.com>
-Date: Thu, 25 Jan 2018 16:01:39 +0800
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eecqj-0001VM-Vc
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 03:25:37 -0500
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:15587)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eecqj-0001UZ-Gu
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 03:25:33 -0500
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Date: Thu, 25 Jan 2018 09:24:50 +0100
+References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<201801242122.31033.pisa@cmp.felk.cvut.cz>
+	<abe89c1b-b6fa-3021-fad1-469d2eb2060a@amsat.org>
+In-Reply-To: <abe89c1b-b6fa-3021-fad1-469d2eb2060a@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] Can not hotplug device to pci-to-pci bridge using
- machine type older than 1.7
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Message-Id: <201801250924.50877.pisa@cmp.felk.cvut.cz>
+Subject: Re: [Qemu-devel] [PATCH V4 0/7] CAN bus support for QEMU (SJA1000
+ PCI so far)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-Hi,
+Hello Philippe,
 
-After I hotplug a pci device to a pci2pci bridge (I use "pci.1") with 
-machine type 1.7 or older,
-I can not see the pci device via `lspci` in the guest, but can see it 
-via `info qtree` in the hmp.
-What's more, after I reboot the guest or hotplug another pci device to 
-pci.0, I can see the
-previous hotplugged pci device via `lspci`.
+On Wednesday 24 of January 2018 22:41:16 Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Pavel,
+> > I have seen that a few other type_init-s do more
+> > than simple sequence of type_register_static().
+> > Is it acceptable to use type_init for registration
+> > to CAN core by function call for now? Conversion simplifies
+> > makefiles and unnecessary stub file is removed.
+> >
+> > But I would use attribute if that solution is preferred because
+> > it is allways present on Linux where SocketCAN is used anyway
+> > and it is used in other Qemu subsystems as well.
+>
+> using stubs/monitor.c as a template for stubs/can_host_variant.c doesn't
+> work?
 
-I use qemu v2.9.* (but machine type =1.7 or 1.6) and kernel 4.4.
-I also do the test on self-build qemu v1.7, v1.6 and kernel 4.4, the 
-same phenomenon.
-My qemu command line is as follows:
-/usr/bin/qemu-system-x86_64 -m 1024 -machine 
-pc-i440fx-1.7,accel=kvm,kernel_irqchip=on -enable-kvm \
--smp sockets=1,cores=1,threads=1 -no-user-config -cpu Skylake-Client \
--name "pci-hp-qemu" -monitor telnet:127.0.0.1:8848,server,nowait \
--drive file=/opt/pcihp.qcow2,if=none,id=drive0,format=qcow2 \
--device virtio-blk-pci,drive=drive0,id=sata0,bootindex=1 \
--device pci-bridge,chassis_nr=1 \
--device virtio-net-pci,bus=pci.1,addr=01,id=netdev1 \
--device virtio-net-pci,bus=pci.0,addr=07,id=netdev2 \
--boot order=c
-...
-(qemu) device_add virtio-net-pci,bus=pci.1,addr=12,id=netdev12
+If that is preferred then I implement the stub this way.
+As for the location, can I add
 
-Checking the qemu commit log, I see qemu v2.0 introduces the acpi based 
-pci hotplug
-support and enables hotplug for pci devices behind pci2pci bridges
-(upstream commit 99fd437d, 9e047b98 and db4728e6).
+  stub-obj-y +=3D can_host_stub.o
 
-I also checked qemu v2.9 code, and notice there's a judge: if 
-use_acpi_pci_hotplug is true (MT >= 2.0),
-the code will update the hotplug_handler for *all buses* to PIIX4PMState 
-and uses
-acpi_pcihp_device_plug_cb as the hp callback; else, for MT<=1.7, the 
-code will only update the
-hotplug_handler for pci.0 and leave other buses continue to use its 
-default hp_handler: the
-pci2pci bridge and default callback: pci_bridge_dev_hotplug_cb => 
-shpc_device_hotplug_cb.
-With the latter shpc* hotplug callback, hotplug a pci device to a 
-pci2pci bridge, like pci.1, I can
-not be seen it in the guest via `lspci`.
+into hw/can/Makefile.objs same as it is in crypto/Makefile.objs
+to keep CAN stuff together at least for now or it should go
+to stubs directory?
 
-I am just wondering whether the qemu code does not support the shpc 
-hotplug to pci2pci bridge,
-or the shpc spec does not support this.
-Could someone shed some light on me? Thanks a lot!
+  stub-obj-$(CONFIG_CAN_BUS) +=3D can_host_variant.o
 
-Have a nice day
-Fei
+As for connection to host, again I have weak preference
+to keep it in hw/can to keep CAN related code together
+but if you think that it should go t chardev, I would prepare
+patch that way
+
+  chardev/can-socketcan.c
+
+As for the rest of the remarks
+
+You are right that there is some code duplication
+in the SJA1000 CAN PCI cards support but problem
+is that KVASER single uses S5920 PCI local bus bridge
+which requires additional BARs and additional bridge
+specific interrupt enable support. There are more KVASER
+variants which combine multiple SJA1000 in a single BAR.
+pcm3680 and mioe3680 have different BAR structure,
+each SJA1000 uses one BAR. The first uses I/O mapped
+SJA1000 and another memory mapped with stride 4.
+Yes, it all can be combined into one C file.
+But it would require to to add more more fields
+into CardX_PCIState structure and some mechanisms
+and code to select right combination of the BARs,
+handlers etc for each card. It all can be done,
+but I am not sure if I find time for such changes now.
+I expect to have time again in summer when my teaching
+semester ends.
+Another disadvantage is that if somebody else wants
+to implement other card emulation then actual simple
+can_kvaser_pci.c is easily readable. Code gets much
+more complex with all variants selection logic and
+we have already abandoned that simple PCI example
+(can_pci.c) with dummy PCI ID which as been included
+in the past.
+
+If the code duplication is a problem for now then
+I vote to include only can_kvaser_pci.c for now.
+But Deniz Eren would be sad because he uses the
+cards (which he has contributed) in his test environment.
+
+Anyway, I would follow what is proposed.
+
+Thanks for your review and time,
+
+Pavel
