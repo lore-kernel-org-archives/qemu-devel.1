@@ -1,43 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eeh4t-0001ZN-2c
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:56:28 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eeh8M-0002wu-PS
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:00:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eeh4p-0005od-Tb
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:56:27 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eeh4p-0005oI-Kp
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:56:23 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0PCsguu063053
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:56:22 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fqf2n9pnt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:56:21 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 25 Jan 2018 12:56:19 -0000
-References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
-	<f9224bba-08fb-589e-ed6e-d8e967a8fe67@linux.vnet.ibm.com>
-	<20180115085945.GC12499@bjsdjshi@linux.vnet.ibm.com>
-	<a4f39e6e-c031-0861-ff6b-e29747ba9489@linux.vnet.ibm.com>
-	<20180123062356.GC32354@bjsdjshi@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 25 Jan 2018 13:56:14 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1eeh8J-0008Di-N9
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:00:02 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eeh8J-0008Cv-Fo
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:59:59 -0500
+Received: by mail-wm0-x229.google.com with SMTP id r78so14802655wme.0
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 04:59:59 -0800 (PST)
+References: <CABLmASFzQz+=LD_RBn_PfPzY2JdMT71DM3F5jK9J=i2CmxOShQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CABLmASFzQz+=LD_RBn_PfPzY2JdMT71DM3F5jK9J=i2CmxOShQ@mail.gmail.com>
+Date: Thu, 25 Jan 2018 12:59:56 +0000
+Message-ID: <87a7x26qlv.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180123062356.GC32354@bjsdjshi@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <879459e4-e6b1-2030-e3d4-0b991b532f51@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] vfio: ccw: basic channel path
- event handling
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 00/22] re-factor softfloat and add fp16
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,254 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, pmorel@linux.vnet.ibm.com
+To: Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
 
+Howard Spoelstra <hsp.cat7@gmail.com> writes:
 
-On 01/23/2018 07:23 AM, Dong Jia Shi wrote:
-> * Halil Pasic <pasic@linux.vnet.ibm.com> [2018-01-16 16:57:13 +0100]:
-> 
->>
->>
->> On 01/15/2018 09:59 AM, Dong Jia Shi wrote:
->>> * Halil Pasic <pasic@linux.vnet.ibm.com> [2018-01-12 19:10:20 +0100]:
->>>
->>>>
->>>>
->>>> On 01/11/2018 04:04 AM, Dong Jia Shi wrote:
->>>>> What are still missing, thus need to be offered in the next version are:
->>>>> - I/O termination and FSM state handling if currently we have I/O on the status
->>>>>   switched path.
->>>>> - Vary on/off event is not sensible to a guest.
->>>>
->>>> I don't see a doc update. We do have documentation (in
->>>> Documentation/s390/vfio-ccw.txt) in which the uapi interface with the
->>>> regions and their purpose/usage  is at least kind of explained. You are
->>>> changing this interface without updating the doc.
->>>>
->>>> I would like to see documentation on this because I'm under the
->>>> impression either the design is pretty convoluted or I did not
->>>> get it at all.
->>> Ah, I missed the documentation part. Thanks for pointing out. I will add
->>> it in the next cycle.
->>>
->>
->> I would have preferred having a doc update in this cycle. E.g. as
->> an answer to the cover letter.
-> Ok. If you prefer this, let's try to clarify questions right here and
-> update documentations in the next review cycle (if there is any).
-> 
->>
->> As previously pointed out I don't really understand your design.
->> I wanted to avoid summarizing the design myself (that is my understanding
->> of it), to then question the design.
-> Fair enough.
-> 
->>
->> To give you a feeling of what I mean here some bullet points:
->> * Channel paths are css level resources (simplified).
-> Yes, and it's the means for the machine to talk to the device.
-> 
->> * When a channel path malfunctions a CRW is generated and a machine
->> check channel report pending is generated. Same goes for
->> channel paths popping up (on HW level). Should not these get
->> propagated?
-> AFAIR, channel path related CRW is not that reliable. I mean it seems
-> that it's not mandatory to generate CRWs for channel path malfunctions.
-> AFAIU, it depneds on machine models. For example, we won't get
-> CRW_ERC_INIT for a "path has come" event on many models I believe. And
-> that's why nobody noticed the misuse of CRW_ERC_IPARM and CRW_ERC_INIT
-> in the CRW handling logic for channel path CRWs.
-> Ref:
-> 2daace78a8c9 s390: chp: handle CRW_ERC_INIT for channel-path status change
-> 
+> Hi,
+>
+> I built qemu-system-ppc for OSX and Windows from
+> https://github.com/stsquad/qemu/tree/softfloat-refactor-and-fp16-v3
+> and noticed a considerable drop in floating point performance on both
+> hosts.
+> Running Mac OS 9.2 in OSX, using MacBench 3.0, the score for the
+> floating point performance dropped from ~60 to ~42.
+>
+> Recent tcg optimisations had improved processor and floating point
+> performance considerably, but that gain seems to be more than lost for
+> the floating point performance.
+>
+> Any idea what is causing this?
 
-Honestly, I forgot about this discussion. I've refreshed my memories by
-now, but I could not find why is it supposed to be architecturally OK
-to loose CRWs when for instance a chp goes away.
+Well we expected a little degradation but it's a bit more than I
+expected.
 
-> So my understanding for this is: it really a design decision for us to
-> propagate all of the channel path CRWs, or we just use other ways (like
-> using PNO and PNOM as this series shows).
+Re-factor
 
->From what I read, CRWs did not seem optional. I wonder what should I
-read in order to change my mind. I'm not talking about the hardware
-in the wild -- but that could be buggy hardware.
+12:32:18 [alex@zen:~/m/t/aarch64] master(+0/-0) =C2=B1 ~/lsrc/qemu/qemu.git=
+/aarch64-linux-user/qemu-aarch64 ./vector-benchmark -b float64-add
+float64-add         : test took 1743387 msec
+                      67108864 ops, ~25978 nsec/kop
+12:32:26 [alex@zen:~/m/t/aarch64] master(+0/-0) =C2=B1 ~/lsrc/qemu/qemu.git=
+/aarch64-linux-user/qemu-aarch64 ./vector-benchmark -b float64-add
+float64-add         : test took 1735526 msec
+                      67108864 ops, ~25861 nsec/kop
+12:32:32 [alex@zen:~/m/t/aarch64] master(+0/-0) =C2=B1 ~/lsrc/qemu/qemu.git=
+/aarch64-linux-user/qemu-aarch64 ./vector-benchmark -b float64-add
+float64-add         : test took 1742030 msec
+                      67108864 ops, ~25958 nsec/kop
 
-> 
-> Of course, CRW propagation is good to have. But as a discussion result
-> of a former thread, that is something we can consider only after we have
-> a good channel path re-modelling. That is the problem. We can try to
-> trigger CRW event in some work of machine checks handling enhancement
-> later.
-> 
->> * Kind of instead of the CRW you introduce a per device interrupt
->> for channel path events on the qemu/kvm boundary. AFAIU for a chp
->> event you do an STSCH for each (affected?) subchannel
-> Until here, yes and right.
-> 
->> and generate an irq. Right? Why is this a good idea.
-> This is not right. This series does not generate an irq for the guest.
+Original
 
-You misunderstood this. The word 'irq' this sentence is a short version
-of 'per device interrupt for channel path events on the qemu/kvm boundary'
-form the previous sentence. It's not an irq injected into the guest but
-a notification (which you call irq in '[RFC PATCH 2/3] vfio: ccw:
-introduce channel path irq') for QEMU.
+12:32:35 [alex@zen:~/m/t/aarch64] master(+0/-0) =C2=B1 ~/lsrc/qemu/qemu-bui=
+lddirs/arm-targets.build/aarch64-linux-user/qemu-aarch64 ./vector-benchmark=
+ -b float64-add
+float64-add         : test took 1255007 msec
+                      67108864 ops, ~18701 nsec/kop
+12:32:44 [alex@zen:~/m/t/aarch64] master(+0/-0) =C2=B1 ~/lsrc/qemu/qemu-bui=
+lddirs/arm-targets.build/aarch64-linux-user/qemu-aarch64 ./vector-benchmark=
+ -b float64-add
+float64-add         : test took 1243866 msec
+                      67108864 ops, ~18535 nsec/kop
+12:32:46 [alex@zen:~/m/t/aarch64] master(+0/-0) =C2=B1 ~/lsrc/qemu/qemu-bui=
+lddirs/arm-targets.build/aarch64-linux-user/qemu-aarch64 ./vector-benchmark=
+ -b float64-add
+float64-add         : test took 1278100 msec
+                      67108864 ops, ~19045 nsec/kop
 
-> In QEMU, when it gets the notification of a channel path status change
-> event, it read the newest SCHIB from the schib region, and update the
-> SCHIB (patch related parts) for the virtual subchannel. The guest will
-> get the new SCHIB whenever it calls STSCH then.
+The main difference is all the code has a common path now and works on a
+canonicalized representation of the floating point number rather than
+direct bit-fiddling of the register representation. This is obviously
+going to have some cost but it looks like we should spend a bit more
+time seeing if we can claw some of that back.
 
-We are in agreement. I just wanted to say, if let's say 42 vfio-ccw devices
-are using the same chp and it goes away, you will generate 42 notifications.
+That said any floating point on QEMU is going to be slow by the very
+nature of the implementation. Because we don't translate guest<->host
+instructions directly we will be several orders of magnitude slower for
+floating point instructions compared to normal integer and bitwise
+operations. If we want to bring on FPU performance we need to look at
+how we can safely use host instructions to get the exact same results as
+we currently do with softfloat.
 
-> 
-> I think this is a good idea, because:
-> 1. This is complies the Linux implementation. Path status change could
->    be noticed by Linux.
-> 2. This provides enhancement with a small work. On the contrary, channel
->    path re-modelling needs a lot of work.
+I'm still keen on the re-factor as it does achieve the other goals of
+improving readability of the code and making it much easier to reason
+with. It also reduces the amount of effective copy and paste but with
+slightly different constants which the old code had.
 
-I thing your answer is based on the misunderstanding explained above.
-
-My idea was to be lazy in a different way. Instead of being lazy about
-reading the subsection, I was wondering why not do an STSCH in the host
-as a response to one being done in the guest.
-
-That means: if there is no activity on the passed trough devices, nothing
-needs to be done. (Except maybe the CRWs).
-
-The things aren't observable by the guest if it does not do STSCH anyway.
+>
+> Best regards,
+> Howard
 
 
-> 
->> * SCHIB.PMCW provides path information relevant for a given device.
->> This information is retrieved using store subchannel. Is your series
->> sufficient for making store subchannel work properly (correct and
->> reasonably up to date)?
-> Introducing a SCHIB region is the basis of further STSCH hanlding work.
-> This series depends on it, and only focuses on the update of the channel
-> path related parts of it. And for these parts, this work I think is
-> basically correct (more review comments are surely to be welcomed).
-> 
-
-Please elaborate on that basically. Or are those actually just correct
-in your opinion?!
-
-> For the rest parts, this does not change anything than what have. As
-> replied to Conny in other mail of this thread: I think, if the other
-> fields are handled by QEMU well, then we don't need to trigger update
-> events for them. Currently I don't find things that need extra trigger.
-> 
-
-Fair.
-
->> Regarding PMCW it's supposed to get updated when io functions are
->> preformed by the css, AFAIR. Is that right?
-> I think so. And also for some other cases, for example, when we
-> configure on/off a channel path.
-> 
-
-Sorry, I ended up confusing opm with pom. That would have been illegal
-(as Connie has pointed out recently) because it can only  change
-only if the path is tried for IO.
-
-
->>  If yes what are the implications? Are the manipulations you do on
->>  some PMCW fields architecturally correct?
-> If "architecturally correct" means what guest sees/senses is all obey to
-> the PoP, then I think so. We don't have to emulate the internal
-> behaviors (which could not be seen by OS) of CSS exactly when we
-> emulate, if the emulation does not impact on what Linux guest will see,
-> right?
-> 
-> I mean, the time point we update the PMCW does not has to be in the time
-> slot of io function performance. The guest would still have to get the
-> updated information through the calls of STSCH. We only need to provide
-> the updaetd result to the guest by handling STSCH well. And that's why
-> we say we do that lazily.
-> 
-> Nothing different (added value) will be seen by the guest, comparing
-> with the current lazy implementation I think.> 
->> * The one thing I would very much appreciate as an user of vfio,
->> and should in my understanding be the user story of this series
->> (and the qemu counterpart of course) is the following. If my device
->> (that is IO operation) failed because no path could be found on
->> which the device is accessible, I would like to be able to identify
->> that. Preferably the same way I would do for an LPAR guest. Is this
->> series accomplishing that? 
-> With this the guest could lazily identify that. But since we have no
-> machine check propagation yet, for those cases which generate CRWs, it
-> might not be the same way for an LPAR guest I think.
-> 
-
-This was a yes/no question. I can't interpret your answer neither as
-yes or as no. Maybe a little clarification: I'm talking about a
-recent linux guest. 
-
->> * Why not just do proper STSCH for vfio-ccw?
-> I only did the interested parts (path related). For the other parts, the
-> current handling is enough, no? Anyway, after we have the schib region,
-> we can do further STSCH handling any time later we want then.
-> 
-
-I mean, your approach works on the premise, that the host will notify
-QEMU each time the content of the SCHIB (area) changes (modulo stuff) so
-it can do an update in QEMU, and give the guest an up to date virtualized
-SCHIB when it asks for it executing the STSCH instruction.
-
-I was asking myself. Why not instead while interpreting STSCH do a
-STSCH on the host device (that is passed through), and virtualize the
-result as necessary.
-
-It occurred to me if nothing simpler. 
-
->> * Shouldn't we virtualize CHPIDs?
-> Nobody would say no for this. :) The problem is that this is something
-> big, and it's not a short-term goal in my current working project... I
-> really want to deliver a minimal function set in the near future
-> firstly. If the current working does not hurt, can we defer channel path
-> re-modelling and CHPIDs virtualization?
-
-The problem is, I'm not sure it does not hurt. For instance because of
-the question below. I would also prefer having a fair idea of what
-we need for the envisioned (complete) solution before introducing
-kernel interfaces (to avoid: pity in the end we need something
-different, and resulting cluttered interface).
-
-> 
->> What if we have a clash? Lets say my dasd is only accessible via chp
->> 0.00 in the host. Currently we have a problem there, or (as the only
->> path would end up being ignored)?
-> You mean the clash that sharing path 0.00 between a physical dasd and
-> the virtio ccw devices? The problem I saw is in the checking of the
-> chpid.is_virtual in css_do_rchp(). For a virtual chp, we should generate
-> INIT CRWs; while for a non-virtual one, we shouldn't. If the chp is
-> shared with virtual and non-virtual device, I don't know what to do
-> then...
-> 
-> I don't think we can fix this before we re-modelled the channel path.
-> But this is neither introduced nor aggravated by this series, right?
-
-I'm not sure about the later. What prevents the guest from believing
-the (to use your terminology shared) chp 0.00 has become unavailable
-if 0.00 becomes unavailable in the host?
-
-Would that adversely affect the virtual devices? It would at
-least look strange.
-
-> 
-> We'd have to document this either I think.
-> 
->> Note: this is another unpleasant effect of not having MCSSE in the
->> guest. The original design was to have a separate css for vfio, and
->> then we would not have this kind of a problem.  (Virtualization of
->> chps would still be good for migration.)
-> Nod. BTW, I don't say that I do not want channel path virtualization in
-> the long run. It's just I want a minimal function set more currently
-> from what I'm focusing perspective.
-> 
-> THANKS for these insightful questions!
-> 
+--
+Alex Benn=C3=A9e
