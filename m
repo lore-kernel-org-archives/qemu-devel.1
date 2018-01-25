@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eeeLh-0002SN-IY
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:01:43 -0500
+	(envelope-from <thuth@redhat.com>) id 1eeeRk-0004EJ-BU
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:07:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eeeLc-0007f8-Qc
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:01:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60404)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eeeLc-0007dS-L2
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:01:32 -0500
-Date: Thu, 25 Jan 2018 10:01:13 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180125100112.GA2442@work-vm>
-References: <20180124053957.29145-1-peterx@redhat.com>
-	<20180125023500.GB19899@xz-mi>
+	(envelope-from <thuth@redhat.com>) id 1eeeRf-00030P-8A
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:07:52 -0500
+References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516732013-18272-2-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0eee8b09-bcd6-9945-ae8c-1094a797f0b7@redhat.com>
+Date: Thu, 25 Jan 2018 11:07:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180125023500.GB19899@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v7 00/23] QMP: out-of-band (OOB) execution
- support
+In-Reply-To: <1516732013-18272-2-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 01/10] s390-ccw: refactor boot map table
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +25,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Jan 24, 2018 at 01:39:34PM +0800, Peter Xu wrote:
-> > This version should have addressed all comments in previous one, also
-> > fixed another race condition after I addressed all the comments (a new
-> > race condition introduced by addressing the comments...).  For some
-> > more details of the race condition, please see the last entry of
-> > change log, and please refer to patch 9 for the code change.
-> > 
-> > I removed RFC tag from this version.  Please review.  Thanks.
-> > 
-> > v7:
-> > - add some r-bs, and remove some.
-> > - remove the chardev fix since already queued by Paolo
-> > - use local var in qemu_chr_fe_add_watch [Stefan]
-> > - move doc patch to front, mention it in some patches [Eric]
-> > - Quite a few of English fixes [Eric]
-> > - fix unlock missing in handle_qmp_command [Stefan]
-> > - squash some patches according to the review comments
-> > - don't break gdbserver usage on HMP non-interactive mode by fixing up
-> >   the suspend/resume logic [Fam, Stefan]
-> > - move the qemu_chr_fe_set_handlers() call in monitor_init() into a
-> >   bottom half to avoid race between the call itself and
-> >   iothread. [Stefan]
-> > - spent quite a lot of time debugging another assertion failure in
-> >   io_watch_poll_finalize() after above change is made (ouch! I really
-> >   hoped we always have the latest glib): when QEMU inits chardevs in
-> >   chardev_init_func() it's possible that QEMU registers the chardev
-> >   handlers there, even before CharBackend is connected to that chardev
-> >   in monitor_init().  Then, when we reach monitor_init() we must make
-> >   sure we unregister that old one first, or there can have one orphan
-> >   GSource still in default gcontext (note that this can really happen
-> >   when we start to use QEMUBH to setup chardev frontends, which is
-> >   above change).
-> 
-> Online repository updated for v7:
-> 
->   https://github.com/xzpeter/qemu/tree/monitor-oob
+On 23.01.2018 19:26, Collin L. Walling wrote:
+> - replace ScsiMbr in ECKD code with BootMapTable
+> - fix read_block messages to reflect BMT
+> - reduce ipl_scsi code with BMT struct
+>=20
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> ---
+>  pc-bios/s390-ccw/bootmap.c | 58 ++++++++++++++++----------------------=
+--------
+>  pc-bios/s390-ccw/bootmap.h |  9 ++++++-
+>  2 files changed, 28 insertions(+), 39 deletions(-)
+>=20
+> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+> index 67a6123..6b6c915 100644
+> --- a/pc-bios/s390-ccw/bootmap.c
+> +++ b/pc-bios/s390-ccw/bootmap.c
+> @@ -182,13 +182,13 @@ static block_number_t load_eckd_segments(block_nu=
+mber_t blk, uint64_t *address)
+>      return block_nr;
+>  }
+> =20
+> -static void run_eckd_boot_script(block_number_t mbr_block_nr)
+> +static void run_eckd_boot_script(block_number_t bmt_block_nr)
+>  {
+>      int i;
+>      unsigned int loadparm =3D get_loadparm_index();
+>      block_number_t block_nr;
+>      uint64_t address;
+> -    ScsiMbr *bte =3D (void *)sec; /* Eckd bootmap table entry */
+> +    BootMapTable *bmt =3D (void *)sec;
+>      BootMapScript *bms =3D (void *)sec;
+> =20
+>      debug_print_int("loadparm", loadparm);
+> @@ -196,10 +196,10 @@ static void run_eckd_boot_script(block_number_t m=
+br_block_nr)
+>                 " maximum number of boot entries allowed");
+> =20
+>      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+> -    read_block(mbr_block_nr, sec, "Cannot read MBR");
+> +    read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
+> =20
+> -    block_nr =3D eckd_block_num((void *)&(bte->blockptr[loadparm]));
+> -    IPL_assert(block_nr !=3D -1, "No Boot Map");
+> +    block_nr =3D eckd_block_num((void *)&(bmt->bte[loadparm]));
 
-This version seems to have fixed the problem I had where after an error
-I couldn't reconnect (the one I mentioned on the 12th).
+Ok, I checked that sizeof(ScsiBlockPtr) =3D=3D sizeof(BootMapPointer), so
+this should be fine.
 
-Dave
+But I think you can now remove the "(void *)". And while you're at it,
+please also remove the superfluous parentheses:
 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    block_nr =3D eckd_block_num(&bmt->bte[loadparm]);
+
+[...]
+> @@ -449,10 +451,7 @@ static void zipl_run(ScsiBlockPtr *pte)
+>  static void ipl_scsi(void)
+>  {
+>      ScsiMbr *mbr =3D (void *)sec;
+> -    uint8_t *ns, *ns_end;
+> -    int program_table_entries =3D 0;
+> -    const int pte_len =3D sizeof(ScsiBlockPtr);
+> -    ScsiBlockPtr *prog_table_entry =3D NULL;
+> +    BootMapTable *bmt =3D (void *)sec;
+>      unsigned int loadparm =3D get_loadparm_index();
+> =20
+>      /* Grab the MBR */
+> @@ -467,34 +466,17 @@ static void ipl_scsi(void)
+>      debug_print_int("MBR Version", mbr->version_id);
+>      IPL_check(mbr->version_id =3D=3D 1,
+>                "Unknown MBR layout version, assuming version 1");
+> -    debug_print_int("program table", mbr->blockptr[0].blockno);
+> -    IPL_assert(mbr->blockptr[0].blockno, "No Program Table");
+> +    debug_print_int("program table", mbr->bmt.blockno);
+> +    IPL_assert(mbr->bmt.blockno, "No Program Table");
+> =20
+>      /* Parse the program table */
+> -    read_block(mbr->blockptr[0].blockno, sec,
+> -               "Error reading Program Table");
+> +    read_block(mbr->bmt.blockno, sec, "Error reading Program Table");
+> =20
+>      IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
+> =20
+>      debug_print_int("loadparm index", loadparm);
+> -    ns_end =3D sec + virtio_get_block_size();
+> -    for (ns =3D (sec + pte_len); (ns + pte_len) < ns_end; ns +=3D pte_=
+len) {
+> -        prog_table_entry =3D (ScsiBlockPtr *)ns;
+> -        if (!prog_table_entry->blockno) {
+> -            break;
+> -        }
+> -
+> -        program_table_entries++;
+> -        if (program_table_entries =3D=3D loadparm + 1) {
+> -            break; /* selected entry found */
+> -        }
+> -    }
+> -
+> -    debug_print_int("program table entries", program_table_entries);
+> -
+> -    IPL_assert(program_table_entries !=3D 0, "Empty Program Table");
+
+The new code looks much easier, indeed!
+
+But is it OK that the "Empty Program Table" check is gone now? ... I
+assume that zipl_run() will catch errors anyway, right?
+
+ Thomas
