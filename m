@@ -1,41 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eejE7-00056Q-1c
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:14:08 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eejFf-0006EC-EG
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eejE3-0008Rt-Vl
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:14:07 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51634)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eejE3-0008RU-N9
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:14:03 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0PFB4jr037507
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 10:14:02 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fqf707g7p-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 10:14:02 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Thu, 25 Jan 2018 10:14:00 -0500
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-4-git-send-email-walling@linux.vnet.ibm.com>
-	<c6161112-4dd4-d626-556f-b3a958607779@redhat.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Thu, 25 Jan 2018 10:13:57 -0500
-MIME-Version: 1.0
-In-Reply-To: <c6161112-4dd4-d626-556f-b3a958607779@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <2a10bb90-7a82-bfe8-30da-6ba17b01a212@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 03/10] s390-ccw: refactor
- IPL structs
+	(envelope-from <laurent@vivier.eu>) id 1eejFc-0000ir-53
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:43 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:56752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eejFb-0000i2-Rw
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:40 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu, 25 Jan 2018 16:15:27 +0100
+Message-Id: <20180125151535.25256-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 0/8] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,40 +21,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, frankja@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 
-On 01/25/2018 06:39 AM, Thomas Huth wrote:
-> On 23.01.2018 19:26, Collin L. Walling wrote:
->> ECKD DASDs have different IPL structures for CDL and LDL
->> formats. The current Ipl1 and Ipl2 structs follow the CDL
->> format, so we prepend "EckdCdl" to them. Boot info for LDL
->> has been moved to a new struct: EckdLdlIpl1.
->>
->> Also introduce structs for IPL stages 1 and 1b.
-> I'd maybe move the 1b stuff into a later patch, when you really need it.
+The following changes since commit 0f79bfe38a2cf0f43c7ea4959da7f8ebd7858f3d:
 
-Makes sense to me.
+  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.12-pull-request' into staging (2018-01-25 09:53:53 +0000)
 
->
-> By the way, is there a public spec available somewhere for these ECKD
-> boot structures?
+are available in the Git repository at:
 
-The zipl source code should be available if you have the time and
-want to understand the nitty-gritty of how all the data gets written.
+  git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
 
-https://github.com/ibm-s390-tools/s390-tools/tree/master/zipl
+for you to fetch changes up to 2097dca6d3a30b80ac5a6232f518548d5ae644a9:
 
-I'm also fairly confident we have a document available /somewhere/...
-I'll ask around and provide something for you ASAP.
+  target/m68k: add HMP command "info tlb" (2018-01-25 16:02:25 +0100)
 
->
-> Anyway, patch looks fine to me, so:
->
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
->
+----------------------------------------------------------------
 
-Thanks for the review!
+----------------------------------------------------------------
+
+Laurent Vivier (8):
+  target/m68k: fix TCG variable double free
+  accel/tcg: add size paremeter in tlb_fill()
+  target/m68k: add MC68040 MMU
+  target/m68k: add Transparent Translation
+  target/m68k: add index parameter to gen_load()/gen_store() and Co.
+  target/m68k: add moves
+  target/m68k: add pflush/ptest
+  target/m68k: add HMP command "info tlb"
+
+ accel/tcg/cputlb.c            |  13 +-
+ accel/tcg/softmmu_template.h  |  14 +-
+ accel/tcg/user-exec.c         |   2 +-
+ hmp-commands-info.hx          |   2 +-
+ include/exec/exec-all.h       |   6 +-
+ include/qom/cpu.h             |   2 +-
+ target/alpha/cpu.h            |   2 +-
+ target/alpha/helper.c         |   4 +-
+ target/alpha/mem_helper.c     |   6 +-
+ target/arm/cpu.c              |   4 +-
+ target/arm/op_helper.c        |   4 +-
+ target/cris/cpu.h             |   2 +-
+ target/cris/helper.c          |   4 +-
+ target/cris/op_helper.c       |   6 +-
+ target/hppa/cpu.h             |   3 +-
+ target/hppa/helper.c          |   2 +-
+ target/hppa/op_helper.c       |   2 +-
+ target/i386/cpu.h             |   2 +-
+ target/i386/excp_helper.c     |   4 +-
+ target/i386/mem_helper.c      |   6 +-
+ target/lm32/cpu.h             |   2 +-
+ target/lm32/helper.c          |   2 +-
+ target/lm32/op_helper.c       |   6 +-
+ target/m68k/cpu.c             |   4 +-
+ target/m68k/cpu.h             | 161 ++++++++++-
+ target/m68k/helper.c          | 606 +++++++++++++++++++++++++++++++++++++++++-
+ target/m68k/helper.h          |   2 +
+ target/m68k/monitor.c         |  22 ++
+ target/m68k/op_helper.c       | 101 ++++++-
+ target/m68k/translate.c       | 234 +++++++++++-----
+ target/microblaze/cpu.h       |   2 +-
+ target/microblaze/helper.c    |   4 +-
+ target/microblaze/op_helper.c |   6 +-
+ target/mips/helper.c          |   2 +-
+ target/mips/internal.h        |   2 +-
+ target/mips/op_helper.c       |  10 +-
+ target/moxie/cpu.h            |   2 +-
+ target/moxie/helper.c         |  10 +-
+ target/nios2/cpu.h            |   2 +-
+ target/nios2/helper.c         |   6 +-
+ target/nios2/mmu.c            |   6 +-
+ target/openrisc/cpu.h         |   2 +-
+ target/openrisc/mmu.c         |   8 +-
+ target/openrisc/mmu_helper.c  |   6 +-
+ target/ppc/cpu.h              |   2 +-
+ target/ppc/mmu_helper.c       |   4 +-
+ target/ppc/user_only_helper.c |   2 +-
+ target/s390x/excp_helper.c    |   4 +-
+ target/s390x/internal.h       |   2 +-
+ target/s390x/mem_helper.c     |   8 +-
+ target/sh4/cpu.h              |   2 +-
+ target/sh4/helper.c           |   4 +-
+ target/sh4/op_helper.c        |   6 +-
+ target/sparc/cpu.h            |   2 +-
+ target/sparc/ldst_helper.c    |   6 +-
+ target/sparc/mmu_helper.c     |   6 +-
+ target/tilegx/cpu.c           |   4 +-
+ target/tricore/op_helper.c    |   4 +-
+ target/unicore32/cpu.h        |   2 +-
+ target/unicore32/helper.c     |   2 +-
+ target/unicore32/op_helper.c  |   6 +-
+ target/unicore32/softmmu.c    |   2 +-
+ target/xtensa/op_helper.c     |   4 +-
+ 63 files changed, 1167 insertions(+), 203 deletions(-)
 
 -- 
-- Collin L Walling
+2.14.3
