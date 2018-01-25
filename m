@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eefxc-0003px-25
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 06:44:53 -0500
+	(envelope-from <thuth@redhat.com>) id 1eegJ4-00033H-IA
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eefxY-0004EB-Qp
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 06:44:52 -0500
-Date: Thu, 25 Jan 2018 11:44:35 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180125114435.GB28396@stefanha-x1.localdomain>
-References: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+	(envelope-from <thuth@redhat.com>) id 1eegJ1-0001T8-Ss
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 07:07:02 -0500
+References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1516732013-18272-5-git-send-email-walling@linux.vnet.ibm.com>
+	<2a6618d7-566b-bec7-c267-26e4e7acb1a2@redhat.com>
+	<ded3d6a0-3432-368a-3964-6641c7fef3fe@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
+Date: Thu, 25 Jan 2018 13:06:52 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
-Content-Disposition: inline
-In-Reply-To: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
-Subject: Re: [Qemu-devel] [Qemu-block] (v2. forward to qemu )-Panic with
- ext4, nbd, qemu-img, block
+In-Reply-To: <ded3d6a0-3432-368a-3964-6641c7fef3fe@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 04/10] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,298 +26,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Hongzhi, Song" <hongzhi.song@windriver.com>
-Cc: qemu-block@nongnu.org, linux-block@vger.kernel.org, qemu-discuss@nongnu.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
 
+On 23.01.2018 23:33, Collin L. Walling wrote:
+> On 01/23/2018 02:23 PM, Eric Blake wrote:
+>> On 01/23/2018 12:26 PM, Collin L. Walling wrote:
+>>> [...]
+>>> +/**
+>>> + * atoi:
+>>> + * @str: the string to be converted.
+>>> + *
+>>> + * Given a string @str, convert it to an integer. Leading whitespace=
+ is
+>>> + * ignored. The first character (after any whitespace) is checked
+>>> for the
+>>> + * negative sign. Any other non-numerical value will terminate the
+>>> + * conversion.
+>>> + *
+>>> + * Returns: an integer converted from the string @str.
+>>> + */
+>>> +int atoi(const char *str)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int val =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0 int sign =3D 1;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (!str || !str[0]) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 while (*str =3D=3D ' ') {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str++;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>> That's not "any whitespace", but only spaces.=C2=A0 A fully compliant
+>> implementation would be checking isspace(), but I don't expect you to
+>> implement that; at a minimum, also checking '\t' would get you closer
+>> (but not all the way to) compliance.
+>=20
+>=20
+> I'll fix the comment to be more clear.
+>=20
+> I think it's okay to just have the menu code treat any other kind
+> of whitespace as an error (it will check before calling atoi). I
+> added support for negatives in bothfunctions because it was easy
+> enough to do so and for the sakeof completeness.
+>=20
+> However, I worry trying to be 100% compliant will just bloat the
+> code when we only need it for very specific use cases.
+>=20
+> Would you say what we have (along with the fix to itostr below) is
+> sufficient enough?
 
---LpQ9ahxlCli8rRTG
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+IMHO the current way is good enough for a BIOS implementation. We're not
+doing a full replacement of glibc here ;-)
 
-On Mon, Jan 22, 2018 at 10:06:26AM +0800, Hongzhi, Song wrote:
-> Hello,
 >=20
-> I create a virtual disk-image using qemu-img.
+>>
+>>
+>>> +static char *_itostr(int num, char *str, size_t len)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int num_idx =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0 int tmp =3D num;
+>>> +=C2=A0=C2=A0=C2=A0 char sign =3D 0;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (!str) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 /* Get index to ones place */
+>>> +=C2=A0=C2=A0=C2=A0 while ((tmp /=3D 10) !=3D 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_idx++;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (num < 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num *=3D -1;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sign =3D 1;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>> If num =3D=3D INT_MIN, then num is still negative at this point...
+>>
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 /* Check if we have enough space for num, sign, a=
+nd null */
+>>> +=C2=A0=C2=A0=C2=A0 if (len <=3D num_idx + sign + 1) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 str[num_idx + sign + 1] =3D '\0';
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 /* Convert int to string */
+>>> +=C2=A0=C2=A0=C2=A0 while (num_idx >=3D 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[num_idx + sign] =3D n=
+um % 10 + '0';
+>> ...which breaks this.
+>>
+>> Either make it work, or document the corner case as unsupported.
+>>
 >=20
-> And then I use /dev/nbd to map the image.
+> Might as well just make it work at this point:
 >=20
-> I mount the /dev/nbd to a local dir with ext4-format
+> #define INT32_MIN 0x80000000
 >=20
-> Finally, I have some trouble about ext4-filesystem and block device, with
-> using demand of rsync or dd to write the image.
+> static char *itostr(int num, char *str, size_t len)
+> {
+> =C2=A0=C2=A0=C2=A0 int num_idx =3D 0;
+> =C2=A0=C2=A0=C2=A0 int tmp =3D num;
+> =C2=A0=C2=A0=C2=A0 char sign =3D !!(num & INT32_MIN);
+>=20
+> =C2=A0=C2=A0=C2=A0 if (!str) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+> =C2=A0=C2=A0=C2=A0 }
+>=20
+> =C2=A0=C2=A0=C2=A0 /* Get index to ones place */
+> =C2=A0=C2=A0=C2=A0 while ((tmp /=3D 10) !=3D 0) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_idx++;
+> =C2=A0=C2=A0=C2=A0 }
+>=20
+> =C2=A0=C2=A0=C2=A0 /* Check if we have enough space for num, sign, and =
+null */
+> =C2=A0=C2=A0=C2=A0 if (len <=3D num_idx + sign + 1) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+> =C2=A0=C2=A0=C2=A0 }
+>=20
+> =C2=A0=C2=A0=C2=A0 str[num_idx + sign + 1] =3D '\0';
+>=20
+> =C2=A0=C2=A0=C2=A0 if (sign) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[0] =3D '-';
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (num =3D=3D INT32_MIN) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[=
+num_idx + sign] =3D '8';
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num =
+/=3D 10;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_=
+idx--;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num *=3D -1;
+> =C2=A0=C2=A0=C2=A0 }
+>=20
+> =C2=A0=C2=A0=C2=A0 /* Convert int to string */
+> =C2=A0=C2=A0=C2=A0 while (num_idx >=3D 0) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[num_idx + sign] =3D num =
+% 10 + '0';
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num /=3D 10;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_idx--;
+> =C2=A0=C2=A0=C2=A0 }
+>=20
+> =C2=A0=C2=A0=C2=A0 return str;
+> }
+>=20
+> Thoughts?
 
-CCing Eric Blake and Paolo Bonzini (NBD maintainers in QEMU).
+Looks fine to me. With that modification:
 
-Is QEMU running?
-
-Is anything accessing test.img while rsync is running?
-
-> Reproduce :
->=20
-> =A0=A0=A0 qemu-img create test.img 2G
->=20
-> =A0=A0=A0 mkfs.ext4 -F test.img
->=20
-> =A0=A0=A0=A0 qemu-nbd -f raw -c /dev/nbd0 test.img
->=20
-> =A0=A0=A0=A0 mount -r ext4 /dev/nbd0 LOCAL_DIR/
->=20
-> =A0=A0=A0 rsync -av META_DATA_DIR/=A0 LOCAL_DIR/
->=20
-> Qemu Version:
->=20
->     QEMU emulator version 2.10.0
->     Copyright (c) 2003-2017 Fabrice Bellard and the QEMU \
->     Project developers
->=20
-> Kernel Version:
->=20
-> =A0=A0=A0 4.12+HEAD (I have test 4.15-rc7 and 4.12)
->=20
-> Machine:
->=20
-> =A0=A0=A0 intel-x86-64
->=20
-> CPU:
->=20
-> =A0=A0=A0 xeon
->=20
-> Architecture:
->=20
-> =A0=A0=A0 I86
->=20
-> The problem is not always=A0 appear step by step, but often using lava th=
-at is
-> a auto-testing method.
->=20
-> And it just appears in some special board.
->=20
-> If someone has similar trouble or has resolution or wants more detail,
-> please connect with me. Thanks.
->=20
-> Detail:
->=20
->=20
-> 329.11 EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts:
-> (null)
-> 329.12 block nbd0: Connection timed out
-> 329.13 block nbd0: shutting down sockets
-> 329.14 blk_update_request: I/O error, dev nbd0, sector 304384
-> 329.15 blk_update_request: I/O error, dev nbd0, sector 304640
-> 329.16 blk_update_request: I/O error, dev nbd0, sector 304896
-> 329.17 blk_update_request: I/O error, dev nbd0, sector 305152
-> 329.18 blk_update_request: I/O error, dev nbd0, sector 305408
-> 329.19 blk_update_request: I/O error, dev nbd0, sector 305664
-> 329.20 blk_update_request: I/O error, dev nbd0, sector 305920
-> 329.21 blk_update_request: I/O error, dev nbd0, sector 306176
-> 329.22 blk_update_request: I/O error, dev nbd0, sector 306432
-> 329.23 blk_update_request: I/O error, dev nbd0, sector 306688
-> 329.24 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 8388608 size 8388608 starting block 38400)
-> 329.25 Buffer I/O error on device nbd0, logical block 38144
-> 329.26 Buffer I/O error on device nbd0, logical block 38145
-> 329.27 Buffer I/O error on device nbd0, logical block 38146
-> 329.28 Buffer I/O error on device nbd0, logical block 38147
-> 329.29 Buffer I/O error on device nbd0, logical block 38148
-> 329.30 Buffer I/O error on device nbd0, logical block 38149
-> 329.31 Buffer I/O error on device nbd0, logical block 38150
-> 329.32 Buffer I/O error on device nbd0, logical block 38151
-> 329.33 Buffer I/O error on device nbd0, logical block 38152
-> 329.34 Buffer I/O error on device nbd0, logical block 38153
-> 329.35 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 8388608 size 8388608 starting block 38656)
-> 329.36 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 8388608 size 8388608 starting block 38912)
-> 329.37 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 16777216 size 8388608 starting block 39168)
-> 329.38 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 16777216 size 8388608 starting block 39424)
-> 329.39 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 16777216 size 8388608 starting block 39680)
-> 329.40 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 16777216 size 8388608 starting block 39936)
-> 329.41 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 16777216 size 8388608 starting block 40192)
-> 329.42 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 16777216 size 8388608 starting block 40448)
-> 329.43 EXT4-fs error (device nbd0): __ext4_get_inode_loc:4520: inode #222:
-> block 174: comm kworker/u113:0: unable to read itable block
-> 329.44 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 writ=
-ing
-> to inode 160 (offset 16777216 size 8388608 starting block 40704)
-> 329.45 ------------[ cut here ]------------
-> 329.46 kernel BUG at /kernel-source//fs/buffer.c:3091!
-> 329.47 invalid opcode: 0000 [#1] PREEMPT SMP
-> 329.48 Modules linked in: nbd xt_CHECKSUM iptable_mangle ipt_REJECT
-> nf_reject_ipv4 xt_tcpudp ebtable_filter ebtables ip6_tables ipt_MASQUERADE
-> nf_nat_masquerade_ipv4 nf_conntrack_netlink nfnetlink xfrm_user iptable_n=
-at
-> xt_addrtype iptable_filter ip_tables xt_conntrack x_tables br_netfilter
-> bridge stp llc intel_rapl sb_edac intel_powerclamp coretemp crct10dif_pcl=
-mul
-> crct10dif_common aesni_intel aes_x86_64 crypto_simd cryptd glue_helper
-> iTCO_wdt iTCO_vendor_support lpc_ich i2c_i801 wmi acpi_pad acpi_power_met=
-er
-> nfsd openvswitch nf_defrag_ipv6 nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_i=
-pv4
-> nf_nat nf_conntrack kvm_intel kvm irqbypass fuse
-> 329.49 CPU: 30 PID: 6 Comm: kworker/u113:0 Not tainted
-> 4.12.18-rt0-yocto-preempt-rt #1
-> 329.50 Hardware name: Intel Corporation S2600WTT/S2600WTT, BIOS
-> GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
-> 329.51 Workqueue: writeback wb_workfn (flush-43:0)
-> 329.52 task: ffff977bec759e00 task.stack: ffffa2930524c000
-> 329.53 RIP: 0010:submit_bh_wbc+0x155/0x160
-> 329.54 RSP: 0018:ffffa2930524f7e0 EFLAGS: 00010246
-> 329.55 RAX: 0000000000620005 RBX: ffff977f05cddc18 RCX: 0000000000000000
-> 329.56 RDX: ffff977f05cddc18 RSI: 0000000000020800 RDI: 0000000000000001
-> 329.57 RBP: ffffa2930524f808 R08: ff00000000000000 R09: 00ffffffffffffff
-> 329.58 R10: ffffa2930524f920 R11: 000000000000058c R12: 000000000000a598
-> 329.59 R13: ffffffffba15c500 R14: ffff977fe1bab400 R15: ffff977fea643000
-> 329.60 FS: 0000000000000000(0000) GS:ffff977befa00000(0000)
-> knlGS:0000000000000000
-> 329.61 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> 329.62 CR2: 00007f7d70000010 CR3: 000000035ce0e000 CR4: 00000000001406e0
-> 329.63 Call Trace:
-> 329.64 __sync_dirty_buffer+0x41/0xa0
-> 329.65 ext4_commit_super+0x1d6/0x2a0
-> 329.66 __ext4_error_inode+0xb2/0x170
-> 329.67 ? wake_up_bit+0x30/0x30
-> 329.68 __ext4_get_inode_loc+0x365/0x460
-> 329.69 ext4_reserve_inode_write+0x51/0xb0
-> 329.70 ? ext4_writepages+0xd23/0x1090
-> 329.71 ext4_mark_inode_dirty+0x48/0x200
-> 329.72 ext4_writepages+0xd23/0x1090
-> 329.73 ? __schedule+0x25b/0x6a0
-> 329.74 do_writepages+0x39/0xc0
-> 329.75 ? do_writepages+0x39/0xc0
-> 329.76 ? unpin_current_cpu+0x5e/0x80
-> 329.77 ? migrate_enable+0x2dd/0x3c0
-> 329.78 __writeback_single_inode+0x4d/0x490
-> 329.79 ? __writeback_single_inode+0x4d/0x490
-> 329.80 ? rt_spin_unlock+0x27/0x40
-> 329.81 writeback_sb_inodes+0x230/0x4d0
-> 329.82 wb_writeback+0xde/0x3d0
-> 329.83 wb_workfn+0xb8/0x420
-> 329.84 ? wb_workfn+0xb8/0x420
-> 329.85 ? unpin_current_cpu+0x5e/0x80
-> 329.86 ? migrate_enable+0x2dd/0x3c0
-> 329.87 ? _raw_spin_lock+0x17/0x40
-> 329.88 process_one_work+0x1cf/0x470
-> 329.89 ? migrate_disable+0x12f/0x200
-> 329.90 worker_thread+0x4b/0x450
-> 329.91 kthread+0x124/0x140
-> 329.92 ? process_one_work+0x470/0x470
-> 329.93 ? kthread_create_on_node+0x40/0x40
-> 329.94 ret_from_fork+0x22/0x30
-> 329.95 Code: 89 ef 44 09 f7 41 89 7c 24 14 4c 89 e7 e8 04 c4 22 00 5b 31 =
-c0
-> 41 5c 41 5d 41 5e 41 5f 5d c3 f0 80 62 01 f7 e9 19 ff ff ff 0f 0b <0f> 0b=
- 0f
-> 0b 0f 0b 0f 0b 0f 0b 90 0f 1f 44 00 00 55 49 89 f9 48
-> 329.96 RIP: submit_bh_wbc+0x155/0x160 RSP: ffffa2930524f7e0
-> 329.97 ---[ end trace 0000000000000002 ]---
-> 329.98 Buffer I/O error on dev nbd0, logical block 262144, lost sync page
-> write
-> 329.99 JBD2: Error -5 detected when updating journal superblock for nbd0-=
-8.
-> 329.100 Aborting journal on device nbd0-8.
-> 329.101 ------------[ cut here ]------------
-> 329.102 kernel BUG at /kernel-source//fs/buffer.c:3091!
-> 329.103 invalid opcode: 0000 [#2] PREEMPT SMP
-> 329.104 Modules linked in: nbd xt_CHECKSUM iptable_mangle ipt_REJECT
-> nf_reject_ipv4 xt_tcpudp ebtable_filter ebtables ip6_tables ipt_MASQUERADE
-> nf_nat_masquerade_ipv4 nf_conntrack_netlink nfnetlink xfrm_user iptable_n=
-at
-> xt_addrtype iptable_filter ip_tables xt_conntrack x_tables br_netfilter
-> bridge stp llc intel_rapl sb_edac intel_powerclamp coretemp crct10dif_pcl=
-mul
-> crct10dif_common aesni_intel aes_x86_64 crypto_simd cryptd glue_helper
-> iTCO_wdt iTCO_vendor_support lpc_ich i2c_i801 wmi acpi_pad acpi_power_met=
-er
-> nfsd openvswitch nf_defrag_ipv6 nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_i=
-pv4
-> nf_nat nf_conntrack kvm_intel kvm irqbypass fuse
-> 329.105 CPU: 36 PID: 7760 Comm: jbd2/nbd0-8 Tainted: G D
-> 4.12.18-rt0-yocto-preempt-rt #1
-> 329.106 Hardware name: Intel Corporation S2600WTT/S2600WTT, BIOS
-> GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
-> 329.107 task: ffff977fdd853c00 task.stack: ffffa29308934000
-> 329.108 RIP: 0010:submit_bh_wbc+0x155/0x160
-> 329.109 RSP: 0018:ffffa29308937bd0 EFLAGS: 00010246
-> 329.110 RAX: 0000000004000005 RBX: ffff977f05cf62e8 RCX: 0000000000000000
-> 329.111 RDX: ffff977f05cf62e8 RSI: 0000000000020800 RDI: 0000000000000001
-> 329.112 RBP: ffffa29308937bf8 R08: 0000000000000100 R09: 0000000000000000
-> 329.113 R10: ffff977fdd853f30 R11: 0000000000000000 R12: ffff977fea6bc800
-> 329.114 R13: 0000000000020800 R14: ffff977fc8a33000 R15: ffff977fea6bc800
-> 329.115 FS: 0000000000000000(0000) GS:ffff977befb80000(0000)
-> knlGS:0000000000000000
-> 329.116 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> 329.117 CR2: 0000000000915d50 CR3: 000000035ce0e000 CR4: 00000000001406e0
-> 329.118 Call Trace:
-> 329.119 submit_bh+0x10/0x20
-> 329.120 jbd2_write_superblock+0xaf/0x1e0
-> 329.121 jbd2_journal_update_sb_errno+0x3f/0x50
-> 329.122 __journal_abort_soft+0x3d/0x60
-> 329.123 jbd2_write_superblock+0x1b4/0x1e0
-> 329.124 jbd2_journal_update_sb_log_tail+0x3a/0x90
-> 329.125 jbd2_journal_commit_transaction+0xb89/0x18d0
-> 329.126 ? __this_cpu_preempt_check+0x13/0x20
-> 329.127 ? __perf_event_task_sched_in+0x66/0x190
-> 329.128 ? _raw_spin_lock_irqsave+0x1d/0x50
-> 329.129 ? lock_timer_base+0x81/0xa0
-> 329.130 ? _raw_spin_unlock_irqrestore+0x18/0x50
-> 329.131 ? try_to_del_timer_sync+0x44/0x60
-> 329.132 ? del_timer_sync+0x47/0xf0
-> 329.133 kjournald2+0xc6/0x250
-> 329.134 ? kjournald2+0xc6/0x250
-> 329.135 ? wake_bit_function+0x60/0x60
-> 329.136 kthread+0x124/0x140
-> 329.137 ? commit_timeout+0x10/0x10
-> 329.138 ? kthread_create_on_node+0x40/0x40
-> 329.139 ret_from_fork+0x22/0x30
-> 329.140 Code: 89 ef 44 09 f7 41 89 7c 24 14 4c 89 e7 e8 04 c4 22 00 5b 31=
- c0
-> 41 5c 41 5d 41 5e 41 5f 5d c3 f0 80 62 01 f7 e9 19 ff ff ff 0f 0b <0f> 0b=
- 0f
-> 0b 0f 0b 0f 0b 0f 0b 90 0f 1f 44 00 00 55 49 89 f9 48
-> 329.141 RIP: submit_bh_wbc+0x155/0x160 RSP: ffffa29308937bd0
-> 329.142 ---[ end trace 0000000000000003 ]---
-> 329.143 block nbd0: Connection timed out
-> 329.144 block nbd0: Connection timed out
-> 329.145 block nbd0: Connection timed out
-> 329.146 block nbd0: Connection timed out
-> 329.147 block nbd0: Connection timed out
-> 329.148 block nbd0: Connection timed out
-> 329.149 block nbd0: Connection timed out
-> 329.150 block nbd0: Connection timed out
-> 329.151 block nbd0: Connection timed out
->=20
->=20
->=20
-
---LpQ9ahxlCli8rRTG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaacMjAAoJEJykq7OBq3PIpMAIAJSEWF9nmUMX9T1VspnNLKTE
-TNObWRVAiSx8mCLxwrzf0ndUXTf3TMcrFGttNgBHf9pEyx+ZyAmrd1BpUis6l0/Y
-iG5v4m0zKdpAHtW9B+dhiMGKaMSNbF/WbXbEHg2Bz9x9+PIsXHyT7mUnKVMVL+6X
-VB72neRzeIWgGh5P4aV8KHP9LwdjkYUiFc8jVlCkbwh/lvNgawW2tqA3bRqMePtn
-rbAUHh7oFiWGE3eIChB/OxmVKlIfD3li/BI9N6XELgMpckSIrUOGIz1poXnEwgkz
-P8JiVXpDH4824ZTdZ4X7PKikLOJSgSrEnLnkKat/IG3ReSMhA3SFDm1WfygD4Cw=
-=AhRh
------END PGP SIGNATURE-----
-
---LpQ9ahxlCli8rRTG--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
