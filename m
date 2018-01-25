@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eejJp-0001TP-OI
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:20:05 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1eejOd-0005sl-0W
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:24:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eejJm-0003Be-I0
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:20:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56358)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1eejOa-0006uQ-Df
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:24:59 -0500
+Received: from out1.zte.com.cn ([202.103.147.172]:49008 helo=mxct.zte.com.cn)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eejJm-0003BO-Ct
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:19:58 -0500
-Date: Thu, 25 Jan 2018 16:19:49 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180125151949.wnagap36tytob57l@sirius.home.kraxel.org>
-References: <20171116075155.22378-1-ppandit@redhat.com>
-	<658ecab6-1f09-0c94-c89e-55f71c37309a@redhat.com>
-	<20171117093556.ntseydf7eiboeyww@sirius.home.kraxel.org>
-	<20171121131812.GC2434@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171121131812.GC2434@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v1] ps2: check PS2Queue pointers in
- post_load routine
+	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
+	id 1eejOa-0006qn-0z
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:24:56 -0500
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Fri, 26 Jan 2018 07:40:04 +0800
+Message-Id: <1516923604-101518-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH]  char-pty: avoid assertion warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +22,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, "Daniel P . Berrange" <berrange@redhat.com>, Cyrille Chatras <cyrille.chatras@orange.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: pbonzini@redhat.com, marcandre.lureau@redhat.com
+Cc: qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-  Hi,
+g_source_unref(s->open_source) in pty_chr_timer may trigger a assertion like this:
+g_source_unref: assertion 'source != NULL' failed.
+pty_chr_update_read_handler_locked-->pty_chr_state(chr, 0) may be called
+in pty_chr_timer, pty_chr_state(chr, 0) will call g_source_unref(s->open_source)
+and set s->open_source=NULL.
 
-> > v1 fixes this bug, v2 doesn't.
-> > 
-> > So, I'm tempted to just rip out the whole backward compatibility buffer
-> > shuffling logic.  Or take v1 of this patch.
-> 
-> I think v1 is OK.
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ chardev/char-pty.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Ok, finally queueed up v1 for merge.
-
-thanks,
-  Gerd
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index 89315e6..da0f286 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -58,8 +58,10 @@ static gboolean pty_chr_timer(gpointer opaque)
+ 
+     qemu_mutex_lock(&chr->chr_write_lock);
+     s->timer_src = NULL;
+-    g_source_unref(s->open_source);
+-    s->open_source = NULL;
++    if (s->open_source) {
++        g_source_unref(s->open_source);
++        s->open_source = NULL;
++    }
+     if (!s->connected) {
+         /* Next poll ... */
+         pty_chr_update_read_handler_locked(chr);
+-- 
+1.8.3.1
