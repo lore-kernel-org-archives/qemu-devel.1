@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eeiZn-0005Te-6Y
+	(envelope-from <kraxel@redhat.com>) id 1eeiZn-0005Tb-6K
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eeiZl-0006tJ-8w
+	(envelope-from <kraxel@redhat.com>) id 1eeiZk-0006sK-Nf
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44108)
+Received: from mx1.redhat.com ([209.132.183.28]:43026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eeiZl-0006s4-40
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:25 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eeiZk-0006rQ-Gk
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:24 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 73579C0528DC
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 14:32:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C408878232
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 14:32:23 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 25 Jan 2018 15:32:15 +0100
-Message-Id: <20180125143218.29528-6-kraxel@redhat.com>
+Date: Thu, 25 Jan 2018 15:32:11 +0100
+Message-Id: <20180125143218.29528-2-kraxel@redhat.com>
 In-Reply-To: <20180125143218.29528-1-kraxel@redhat.com>
 References: <20180125143218.29528-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 5/8] ui: ignore hardware keycode 255 on win32
+Subject: [Qemu-devel] [PULL 1/8] ui: avoid sign extension using client
+ width/height
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +35,87 @@ Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-It is a reserved value and doesn't have a corresponding
-valid scancode.
+Pixman returns a signed int for the image width/height, but the VNC
+protocol only permits a unsigned int16. Effective framebuffer size
+is determined by the guest, limited by the video RAM size, so the
+dimensions are unlikely to exceed the range of an unsigned int16,
+but this is not currently validated.
+
+With the current use of 'int' for client width/height, the calculation
+of offsets in vnc_update_throttle_offset() suffers from integer size
+promotion and sign extension, causing coverity warnings
+
+*** CID 1385147:  Integer handling issues  (SIGN_EXTENSION)
+/ui/vnc.c: 979 in vnc_update_throttle_offset()
+973      * than that the client would already suffering awful audio
+974      * glitches, so dropping samples is no worse really).
+975      */
+976     static void vnc_update_throttle_offset(VncState *vs)
+977     {
+978         size_t offset =
+>>>     CID 1385147:  Integer handling issues  (SIGN_EXTENSION)
+>>>     Suspicious implicit sign extension:
+    "vs->client_pf.bytes_per_pixel" with type "unsigned char" (8 bits,
+    unsigned) is promoted in "vs->client_width * vs->client_height *
+    vs->client_pf.bytes_per_pixel" to type "int" (32 bits, signed), then
+    sign-extended to type "unsigned long" (64 bits, unsigned).  If
+    "vs->client_width * vs->client_height * vs->client_pf.bytes_per_pixel"
+    is greater than 0x7FFFFFFF, the upper bits of the result will all be 1.
+979             vs->client_width * vs->client_height * vs->client_pf.bytes_per_pixel;
+
+Change client_width / client_height to be a size_t to avoid sign
+extension and integer promotion. Then validate that dimensions are in
+range wrt the RFB protocol u16 limits.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20180117164717.15855-5-berrange@redhat.com
+Message-id: 20180118155254.17053-1-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/gtk.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ ui/vnc.h | 4 ++--
+ ui/vnc.c | 9 +++++++++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 188c40eef5..f0ad63e431 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1206,6 +1206,12 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
-         return TRUE;
+diff --git a/ui/vnc.h b/ui/vnc.h
+index 0c33a5f7fe..bbda0540a7 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -278,8 +278,8 @@ struct VncState
+     int last_x;
+     int last_y;
+     uint32_t last_bmask;
+-    int client_width;
+-    int client_height;
++    size_t client_width; /* limited to u16 by RFB proto */
++    size_t client_height; /* limited to u16 by RFB proto */
+     VncShareMode share_mode;
+ 
+     uint32_t vnc_encoding;
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 665a143578..33b087221f 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -672,6 +672,11 @@ static void vnc_desktop_resize(VncState *vs)
+         vs->client_height == pixman_image_get_height(vs->vd->server)) {
+         return;
+     }
++
++    assert(pixman_image_get_width(vs->vd->server) < 65536 &&
++           pixman_image_get_width(vs->vd->server) >= 0);
++    assert(pixman_image_get_height(vs->vd->server) < 65536 &&
++           pixman_image_get_height(vs->vd->server) >= 0);
+     vs->client_width = pixman_image_get_width(vs->vd->server);
+     vs->client_height = pixman_image_get_height(vs->vd->server);
+     vnc_lock_output(vs);
+@@ -2490,6 +2495,10 @@ static int protocol_client_init(VncState *vs, uint8_t *data, size_t len)
+         return 0;
      }
  
-+#ifdef WIN32
-+    /* on windows, we ought to ignore the reserved key event? */
-+    if (key->hardware_keycode == 0xff)
-+        return false;
-+#endif
-+
-     if (key->keyval == GDK_KEY_Pause
- #ifdef G_OS_WIN32
-         /* for some reason GDK does not fill keyval for VK_PAUSE
++    assert(pixman_image_get_width(vs->vd->server) < 65536 &&
++           pixman_image_get_width(vs->vd->server) >= 0);
++    assert(pixman_image_get_height(vs->vd->server) < 65536 &&
++           pixman_image_get_height(vs->vd->server) >= 0);
+     vs->client_width = pixman_image_get_width(vs->vd->server);
+     vs->client_height = pixman_image_get_height(vs->vd->server);
+     vnc_write_u16(vs, vs->client_width);
 -- 
 2.9.3
