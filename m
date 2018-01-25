@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1eeYlx-000276-NW
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:04:23 -0500
+	(envelope-from <tiwei.bie@intel.com>) id 1eeYm0-00027u-8c
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:04:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1eeYlu-0005Wt-Uf
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:04:21 -0500
+	(envelope-from <tiwei.bie@intel.com>) id 1eeYly-0005Yi-Si
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:04:24 -0500
 Received: from mga14.intel.com ([192.55.52.115]:64671)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1eeYlu-0005Wb-IV
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:04:18 -0500
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1eeYly-0005Wb-ID
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 23:04:22 -0500
 From: Tiwei Bie <tiwei.bie@intel.com>
-Date: Thu, 25 Jan 2018 12:03:24 +0800
-Message-Id: <20180125040328.22867-3-tiwei.bie@intel.com>
+Date: Thu, 25 Jan 2018 12:03:26 +0800
+Message-Id: <20180125040328.22867-5-tiwei.bie@intel.com>
 In-Reply-To: <20180125040328.22867-1-tiwei.bie@intel.com>
 References: <20180125040328.22867-1-tiwei.bie@intel.com>
-Subject: [Qemu-devel] [PATCH v1 2/6] vhost-user: introduce shared vhost-user
- state
+Subject: [Qemu-devel] [PATCH v1 4/6] vfio: support getting VFIOGroup from
+ groupfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,259 +27,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, alex.williamson@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
 Cc: cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com, tiwei.bie@intel.com
 
-When multi-queue is enabled for virtio-net, each virtio
-queue pair will have a vhost_dev, and the only thing they
-share currently is the chardev. This patch introduces a
-vhost-user state structure which will be shared by all
-virtio queue pairs of the same virtio device.
+Add an API to support getting VFIOGroup from groupfd. When
+groupfd is shared by another process, the VFIOGroup may not
+have its container and address space in QEMU.
+
+Besides, add a reference counter to better support getting
+VFIOGroup multiple times.
 
 Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
 ---
- hw/scsi/vhost-user-scsi.c       |  6 +++---
- hw/virtio/vhost-user.c          |  9 +++++----
- include/hw/virtio/vhost-user.h  | 17 +++++++++++++++++
- include/hw/virtio/virtio-scsi.h |  6 +++++-
- net/vhost-user.c                | 30 ++++++++++++++++--------------
- 5 files changed, 46 insertions(+), 22 deletions(-)
- create mode 100644 include/hw/virtio/vhost-user.h
+ hw/vfio/common.c              | 96 ++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/vfio/vfio-common.h |  2 +
+ 2 files changed, 97 insertions(+), 1 deletion(-)
 
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index f7561e23fa..2c46c74128 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -73,7 +73,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-     Error *err = NULL;
-     int ret;
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 7b2924c0ef..027fa005c1 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -962,6 +962,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     int ret, fd;
+     VFIOAddressSpace *space;
  
--    if (!vs->conf.chardev.chr) {
-+    if (!vs->conf.vhost_user.chr.chr) {
-         error_setg(errp, "vhost-user-scsi: missing chardev");
++    if (as == NULL) {
++        vfio_kvm_device_add_group(group);
++        return 0;
++    }
++
+     space = vfio_get_address_space(as);
+ 
+     QLIST_FOREACH(container, &space->containers, next) {
+@@ -1153,6 +1158,10 @@ static void vfio_disconnect_container(VFIOGroup *group)
+ {
+     VFIOContainer *container = group->container;
+ 
++    if (container == NULL) {
++        return;
++    }
++
+     if (ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER, &container->fd)) {
+         error_report("vfio: error disconnecting group %d from container",
+                      group->groupid);
+@@ -1183,6 +1192,85 @@ static void vfio_disconnect_container(VFIOGroup *group)
+     }
+ }
+ 
++static int vfio_groupfd_to_groupid(int groupfd)
++{
++    char linkname[PATH_MAX];
++    char pathname[PATH_MAX];
++    char *filename;
++    int groupid, ret;
++
++    snprintf(linkname, sizeof(linkname), "/proc/self/fd/%d", groupfd);
++
++    ret = readlink(linkname, pathname, sizeof(pathname));
++    if (ret < 0) {
++        return -1;
++    }
++
++    filename = g_path_get_basename(pathname);
++    groupid = atoi(filename);
++    g_free(filename);
++
++    return groupid;
++}
++
++/*
++ * The @as param could be NULL. In this case, groupfd is shared by
++ * another process which will setup the DMA mapping for this group,
++ * and this group won't have container and address space in QEMU.
++ */
++VFIOGroup *vfio_get_group_from_fd(int groupfd, AddressSpace *as, Error **errp)
++{
++    VFIOGroup *group;
++    int groupid;
++
++    groupid = vfio_groupfd_to_groupid(groupfd);
++    if (groupid < 0) {
++        return NULL;
++    }
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        if (group->groupid == groupid) {
++            /* Found it.  Now is it already in the right context? */
++            if ((group->container == NULL && as == NULL) ||
++                (group->container && group->container->space->as == as)) {
++                    group->refcnt++;
++                    return group;
++            }
++            error_setg(errp, "group %d used in multiple address spaces",
++                       group->groupid);
++            return NULL;
++        }
++    }
++
++    group = g_malloc0(sizeof(*group));
++
++    group->fd = groupfd;
++    group->groupid = groupid;
++    group->refcnt = 1;
++
++    QLIST_INIT(&group->device_list);
++
++    if (vfio_connect_container(group, as, errp)) {
++        error_prepend(errp, "failed to setup container for group %d: ",
++                      groupid);
++        goto free_group_exit;
++    }
++
++    if (QLIST_EMPTY(&vfio_group_list)) {
++        qemu_register_reset(vfio_reset_handler, NULL);
++    }
++
++    QLIST_INSERT_HEAD(&vfio_group_list, group, next);
++
++    return group;
++
++free_group_exit:
++    g_free(group);
++
++    return NULL;
++}
++
++/* The @as param cannot be NULL. */
+ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+ {
+     VFIOGroup *group;
+@@ -1192,7 +1280,8 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+     QLIST_FOREACH(group, &vfio_group_list, next) {
+         if (group->groupid == groupid) {
+             /* Found it.  Now is it already in the right context? */
+-            if (group->container->space->as == as) {
++            if (group->container && group->container->space->as == as) {
++                group->refcnt++;
+                 return group;
+             } else {
+                 error_setg(errp, "group %d used in multiple address spaces",
+@@ -1225,6 +1314,7 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+     }
+ 
+     group->groupid = groupid;
++    group->refcnt = 1;
+     QLIST_INIT(&group->device_list);
+ 
+     if (vfio_connect_container(group, as, errp)) {
+@@ -1256,6 +1346,10 @@ void vfio_put_group(VFIOGroup *group)
          return;
      }
-@@ -91,7 +91,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-     vsc->dev.vq_index = 0;
-     vsc->dev.backend_features = 0;
  
--    ret = vhost_dev_init(&vsc->dev, (void *)&vs->conf.chardev,
-+    ret = vhost_dev_init(&vsc->dev, (void *)&vs->conf.vhost_user,
-                          VHOST_BACKEND_TYPE_USER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
-@@ -132,7 +132,7 @@ static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
- }
- 
- static Property vhost_user_scsi_properties[] = {
--    DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
-+    DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.vhost_user.chr),
-     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
-     DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index e7108138fd..3e308d0a62 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -12,6 +12,7 @@
- #include "qapi/error.h"
- #include "hw/virtio/vhost.h"
- #include "hw/virtio/vhost-backend.h"
-+#include "hw/virtio/vhost-user.h"
- #include "hw/virtio/virtio-net.h"
- #include "chardev/char-fe.h"
- #include "sysemu/kvm.h"
-@@ -123,7 +124,7 @@ static VhostUserMsg m __attribute__ ((unused));
- #define VHOST_USER_VERSION    (0x1)
- 
- struct vhost_user {
--    CharBackend *chr;
-+    VhostUser *shared;
-     int slave_fd;
- };
- 
-@@ -135,7 +136,7 @@ static bool ioeventfd_enabled(void)
- static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
- {
-     struct vhost_user *u = dev->opaque;
--    CharBackend *chr = u->chr;
-+    CharBackend *chr = &u->shared->chr;
-     uint8_t *p = (uint8_t *) msg;
-     int r, size = VHOST_USER_HDR_SIZE;
- 
-@@ -221,7 +222,7 @@ static int vhost_user_write(struct vhost_dev *dev, VhostUserMsg *msg,
-                             int *fds, int fd_num)
- {
-     struct vhost_user *u = dev->opaque;
--    CharBackend *chr = u->chr;
-+    CharBackend *chr = &u->shared->chr;
-     int ret, size = VHOST_USER_HDR_SIZE + msg->size;
- 
-     /*
-@@ -767,7 +768,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
- 
-     u = g_new0(struct vhost_user, 1);
--    u->chr = opaque;
-+    u->shared = opaque;
-     u->slave_fd = -1;
-     dev->opaque = u;
- 
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-new file mode 100644
-index 0000000000..4f5a1477d1
---- /dev/null
-+++ b/include/hw/virtio/vhost-user.h
-@@ -0,0 +1,17 @@
-+/*
-+ * Copyright (c) 2017-2018 Intel Corporation
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ */
++    if (--group->refcnt > 0) {
++        return;
++    }
 +
-+#ifndef HW_VIRTIO_VHOST_USER_H
-+#define HW_VIRTIO_VHOST_USER_H
-+
-+#include "chardev/char-fe.h"
-+
-+typedef struct VhostUser {
-+    CharBackend chr;
-+} VhostUser;
-+
-+#endif
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index 4c0bcdb788..885c3e84b5 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -19,6 +19,7 @@
- #define VIRTIO_SCSI_SENSE_SIZE 0
- #include "standard-headers/linux/virtio_scsi.h"
- #include "hw/virtio/virtio.h"
-+#include "hw/virtio/vhost-user.h"
- #include "hw/pci/pci.h"
- #include "hw/scsi/scsi.h"
- #include "chardev/char-fe.h"
-@@ -54,7 +55,10 @@ struct VirtIOSCSIConf {
-     char *vhostfd;
-     char *wwpn;
- #endif
--    CharBackend chardev;
-+    union {
-+        VhostUser vhost_user;
-+        CharBackend chardev;
-+    };
-     uint32_t boot_tpgt;
-     IOThread *iothread;
- };
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index c23927c912..b398294074 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -12,6 +12,7 @@
- #include "clients.h"
- #include "net/vhost_net.h"
- #include "net/vhost-user.h"
-+#include "hw/virtio/vhost-user.h"
- #include "chardev/char-fe.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-@@ -20,7 +21,7 @@
- 
- typedef struct VhostUserState {
-     NetClientState nc;
--    CharBackend chr; /* only queue index 0 */
-+    VhostUser vhost_user; /* only queue index 0 */
-     VHostNetState *vhost_net;
-     guint watch;
-     uint64_t acked_features;
-@@ -62,7 +63,7 @@ static void vhost_user_stop(int queues, NetClientState *ncs[])
-     }
- }
- 
--static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
-+static int vhost_user_start(int queues, NetClientState *ncs[], void *be)
- {
-     VhostNetOptions options;
-     struct vhost_net *net = NULL;
-@@ -155,7 +156,7 @@ static void vhost_user_cleanup(NetClientState *nc)
-             g_source_remove(s->watch);
-             s->watch = 0;
-         }
--        qemu_chr_fe_deinit(&s->chr, true);
-+        qemu_chr_fe_deinit(&s->vhost_user.chr, true);
-     }
- 
-     qemu_purge_queued_packets(nc);
-@@ -189,7 +190,7 @@ static gboolean net_vhost_user_watch(GIOChannel *chan, GIOCondition cond,
- {
-     VhostUserState *s = opaque;
- 
--    qemu_chr_fe_disconnect(&s->chr);
-+    qemu_chr_fe_disconnect(&s->vhost_user.chr);
- 
-     return TRUE;
- }
-@@ -214,7 +215,8 @@ static void chr_closed_bh(void *opaque)
-     qmp_set_link(name, false, &err);
-     vhost_user_stop(queues, ncs);
- 
--    qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_event,
-+    qemu_chr_fe_set_handlers(&s->vhost_user.chr, NULL, NULL,
-+                             net_vhost_user_event,
-                              NULL, opaque, NULL, true);
- 
-     if (err) {
-@@ -237,15 +239,15 @@ static void net_vhost_user_event(void *opaque, int event)
-     assert(queues < MAX_QUEUE_NUM);
- 
-     s = DO_UPCAST(VhostUserState, nc, ncs[0]);
--    chr = qemu_chr_fe_get_driver(&s->chr);
-+    chr = qemu_chr_fe_get_driver(&s->vhost_user.chr);
-     trace_vhost_user_event(chr->label, event);
-     switch (event) {
-     case CHR_EVENT_OPENED:
--        if (vhost_user_start(queues, ncs, &s->chr) < 0) {
--            qemu_chr_fe_disconnect(&s->chr);
-+        if (vhost_user_start(queues, ncs, &s->vhost_user) < 0) {
-+            qemu_chr_fe_disconnect(&s->vhost_user.chr);
-             return;
-         }
--        s->watch = qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
-+        s->watch = qemu_chr_fe_add_watch(&s->vhost_user.chr, G_IO_HUP,
-                                          net_vhost_user_watch, s);
-         qmp_set_link(name, true, &err);
-         s->started = true;
-@@ -261,8 +263,8 @@ static void net_vhost_user_event(void *opaque, int event)
- 
-             g_source_remove(s->watch);
-             s->watch = 0;
--            qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL, NULL,
--                                     NULL, NULL, false);
-+            qemu_chr_fe_set_handlers(&s->vhost_user.chr, NULL, NULL, NULL,
-+                                     NULL, NULL, NULL, false);
- 
-             aio_bh_schedule_oneshot(ctx, chr_closed_bh, opaque);
-         }
-@@ -294,7 +296,7 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-         if (!nc0) {
-             nc0 = nc;
-             s = DO_UPCAST(VhostUserState, nc, nc);
--            if (!qemu_chr_fe_init(&s->chr, chr, &err)) {
-+            if (!qemu_chr_fe_init(&s->vhost_user.chr, chr, &err)) {
-                 error_report_err(err);
-                 return -1;
-             }
-@@ -304,11 +306,11 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
- 
-     s = DO_UPCAST(VhostUserState, nc, nc0);
-     do {
--        if (qemu_chr_fe_wait_connected(&s->chr, &err) < 0) {
-+        if (qemu_chr_fe_wait_connected(&s->vhost_user.chr, &err) < 0) {
-             error_report_err(err);
-             return -1;
-         }
--        qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-+        qemu_chr_fe_set_handlers(&s->vhost_user.chr, NULL, NULL,
-                                  net_vhost_user_event, NULL, nc0->name, NULL,
-                                  true);
-     } while (!s->started);
+     vfio_kvm_device_del_group(group);
+     vfio_disconnect_container(group);
+     QLIST_REMOVE(group, next);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index f3a2ac9fee..2383ded670 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -136,6 +136,7 @@ struct VFIODeviceOps {
+ typedef struct VFIOGroup {
+     int fd;
+     int groupid;
++    int refcnt;
+     VFIOContainer *container;
+     QLIST_HEAD(, VFIODevice) device_list;
+     QLIST_ENTRY(VFIOGroup) next;
+@@ -158,6 +159,7 @@ void vfio_region_exit(VFIORegion *region);
+ void vfio_region_finalize(VFIORegion *region);
+ void vfio_reset_handler(void *opaque);
+ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
++VFIOGroup *vfio_get_group_from_fd(int groupfd, AddressSpace *as, Error **errp);
+ void vfio_put_group(VFIOGroup *group);
+ int vfio_get_device(VFIOGroup *group, const char *name,
+                     VFIODevice *vbasedev, Error **errp);
 -- 
 2.13.3
