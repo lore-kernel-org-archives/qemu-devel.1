@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eekk7-0003e9-3k
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1eekk8-0003fJ-HH
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eekk3-0004s9-Ok
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:15 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44242)
+	(envelope-from <bounces@canonical.com>) id 1eekk3-0004sS-TW
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:16 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44266)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eekk3-0004rR-Gr
+	id 1eekk3-0004rb-MN
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:11 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eekk1-00039u-7X
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 16:51:09 +0000
+	id 1eekk2-0003Rg-6i
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 16:51:10 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 36DC72E8557
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 16:51:09 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1DF922E854F
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 16:51:10 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Jan 2018 16:37:14 -0000
+Date: Thu, 25 Jan 2018 16:43:41 -0000
 From: John Arbuckle <programmingkidx@gmail.com>
 Reply-To: Bug 1737194 <1737194@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151274735709.11243.12332071284435970530.malonedeb@soybean.canonical.com>
 	<151686682161.4861.8851702267220024380.malone@wampee.canonical.com>
-Message-Id: <A6E37FF7-FB5F-4263-8BB0-8E1CCF2A3691@gmail.com>
+	<F19A160D-99BC-4170-B544-8BAFFC23FE83@gmail.com>
+	<CAFEAcA9vJ7A+J2OSPNsfyT575p+heE5o_++T-Jtp6S3dyG3NTQ@mail.gmail.com>
+Message-Id: <5FD1490A-41F7-4200-AB5C-3802358E1362@gmail.com>
 Errors-To: bounces@canonical.com
 Subject: Re: [Qemu-devel] [Bug 1737194] Re: Windows NT 4.0 fails to boot
  from qcow2 installation
@@ -40,43 +42,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-> # WinNT 4 Terminal Server
+> On Jan 25, 2018, at 11:16 AM, Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
 > =
 
-> Most of the time, NTLDR will fire up normally. But every so often...
+> On 25 January 2018 at 15:58, John Arbuckle <programmingkidx@gmail.com> wr=
+ote:
+>> I did try to build at commits 306ec6c3cece7004429c79c1ac93d49919f1f1cc
+>> and e689f7c668cbd9d08f330e17c3dd3a059c9553d3. Both failed to build on my
+>> Mac OS X system. Here is the error message I usually saw:
+>> =
+
+>>  LINK  qemu-io
+>> Undefined symbols for architecture x86_64:
+>>  "_use_rt_clock", referenced from:
+>>      _bdrv_acct_start in block.o
+>>      _bdrv_acct_done in block.o
+>> Undefined symbols for architecture x86_64:
+>>      _qemu_clock_get_ns in qemu-timer.o
+>>  "_use_rt_clock", referenced from:
+>>      _bdrv_acct_start in block.o
+>>      _bdrv_acct_done in block.o
+>>      _qemu_clock_get_ns in qemu-timer.o
 > =
 
->   SeaBIOS (version rel-1.7.3-117-g31b8b4e-20131206_080705-nilsson.home.kr=
-axel.org)
+> If you configure with --disable-tools does it manage to build,
+> or does it just go on to fail to link the main QEMU binary
+> with the same error? (We've had some issues in the past I think
+> where configure put libraries on the main binary link line but
+> not on the tools link lines, so maybe worth a try...)
 > =
 
->   Booting from Hard Disk...
->   A disk read error occurred.
->   Insert a system diskette and restart
->   the system.
-> =
-
-> (NB. You're seeing the old SeaBIOS version included with e689f7c, which w=
-as the first buggy commit.)
-> =
-
-> If NT gets past this point without erroring out (ie, it makes it to the b=
-oot menu), the rest of the system is 100% fine and there are no other disk =
-I/O issues whatsoever. For example, on QEMU 2.9.0 I was able to enable disk=
- compression, answer "Yes" to "Compress entire disk now?" and have the proc=
-ess fully complete. No hitches.
+> thanks
+> -- PMM
 > =
 
 
-I tried adding -M isapc to my Windows NT 4.0 VM's arguments and I saw
-the same error message at first. Then I tried it again by making a few
-changes. I played with the network card settings and removed the "-M
-isapc" argument to make things work again. Then I went back and added
-the "-M isapc" option again and Windows booted. I restarted several
-times and didn't see the error message. I am using qemu-system-i386
-version 2.10.1. Just to see if I could see any of the disk errors you
-saw I ran in the command prompt "chkdsk c:" a couple of times. It came
-back with no errors every time.
+It still fails to build:
+
+Build commands: ./configure --disable-tools --target-list=3Di386-softmmu
+&& make -j 4
+
+QEMU at commit: 306ec6c3cece7004429c79c1ac93d49919f1f1cc
+
+  LINK  i386-softmmu/qemu-system-i386
+Undefined symbols for architecture x86_64:
+  "_use_rt_clock", referenced from:
+      _bdrv_acct_start in block.o
+      _bdrv_acct_done in block.o
+      _qemu_clock_get_ns in qemu-timer.o
+      _cpu_get_clock in cpus.o
+      _cpu_enable_ticks in cpus.o
+      _cpu_disable_ticks in cpus.o
+      _icount_warp_rt in cpus.o
+      ...
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocat=
+ion)
+make[1]: *** [qemu-system-i386] Error 1
+make: *** [subdir-i386-softmmu] Error 2
 
 -- =
 
