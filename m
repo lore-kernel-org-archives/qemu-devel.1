@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eenMo-0004fm-1w
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 14:39:24 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eenj5-00017d-El
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 15:02:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eenMj-00077Y-FY
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 14:39:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41552)
+	(envelope-from <dgilbert@redhat.com>) id 1eenj2-0006E0-7s
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 15:02:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eenMj-00077I-73
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 14:39:17 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 471597109E
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 19:39:16 +0000 (UTC)
-References: <20180125171412.21627-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b0d71def-cf58-d844-a489-67498ec2ad8f@redhat.com>
-Date: Thu, 25 Jan 2018 13:39:12 -0600
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eenj1-0006Cd-W1
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 15:02:20 -0500
+Date: Thu, 25 Jan 2018 20:02:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180125200205.GB2442@work-vm>
+References: <1516898620-9486-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20180125164415eucas1p11691d02bf89c112ff25cfc43c400b5b2@eucas1p1.samsung.com>
+	<1516898620-9486-2-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <20180125171412.21627-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="43QZ9Xqo9jW8Uz41ulCNwvir0WZjpjFuO"
-Subject: Re: [Qemu-devel] [PATCH v2] sockets: fix parsing of ipv4/ipv6 opts
- in parse_socket_addr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1516898620-9486-2-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v1] migration: change blocktime type to
+ uint32_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,86 +29,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, quintela@redhat.com, f4bug@amsat.org, ash.billore@samsung.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---43QZ9Xqo9jW8Uz41ulCNwvir0WZjpjFuO
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b0d71def-cf58-d844-a489-67498ec2ad8f@redhat.com>
-Subject: Re: [PATCH v2] sockets: fix parsing of ipv4/ipv6 opts in
- parse_socket_addr
-References: <20180125171412.21627-1-berrange@redhat.com>
-In-Reply-To: <20180125171412.21627-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/25/2018 11:14 AM, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> The inet_parse() function looks for 'ipv4' and 'ipv6' flags, but only
-> treats them as bare bool flags. The normal QemuOpts parsing would allow=
-
-> on/off values to be set too.
->=20
-> This updates inet_parse() so that its handling of the 'ipv4' and 'ipv6'=
-
-> flags matches that done by QemuOpts.
->=20
-> This impacts the NBD block driver parsing the legacy filename syntax an=
-d
-> the migration code parsing the socket scheme.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> Initially int64_t was used, but on PowerPC architecture,
+> clang doesn't have atomic_*_8 function, so it produces
+> link time error.
+> 
+> QEMU is working with time as with 64bit value, but by
+> fact 32 bit is enough with CLOCK_REALTIME. In this case
+> blocktime will keep only 1200 hours time interval.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 > ---
->  util/qemu-sockets.c | 44 ++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 40 insertions(+), 4 deletions(-)
->=20
+>  hmp.c                    |  4 ++--
+>  migration/postcopy-ram.c | 47 ++++++++++++++++++++++++++++++-----------------
+>  migration/trace-events   |  4 ++--
+>  qapi/migration.json      |  4 ++--
+>  4 files changed, 36 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index c6bab53..3c376b3 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -265,7 +265,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>      }
+>  
+>      if (info->has_postcopy_blocktime) {
+> -        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
+> +        monitor_printf(mon, "postcopy blocktime: %u\n",
+>                         info->postcopy_blocktime);
+>      }
+>  
+> @@ -273,7 +273,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>          Visitor *v;
+>          char *str;
+>          v = string_output_visitor_new(false, &str);
+> -        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+> +        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>          visit_complete(v, &str);
+>          monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
+>          g_free(str);
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 7814da5..ce91de8 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -63,14 +63,14 @@ struct PostcopyDiscardState {
+>  
+>  typedef struct PostcopyBlocktimeContext {
+>      /* time when page fault initiated per vCPU */
+> -    int64_t *page_fault_vcpu_time;
+> +    uint32_t *page_fault_vcpu_time;
+>      /* page address per vCPU */
+>      uintptr_t *vcpu_addr;
+> -    int64_t total_blocktime;
+> +    uint32_t total_blocktime;
+>      /* blocktime per vCPU */
+> -    int64_t *vcpu_blocktime;
+> +    uint32_t *vcpu_blocktime;
+>      /* point in time when last page fault was initiated */
+> -    int64_t last_begin;
+> +    uint32_t last_begin;
+>      /* number of vCPU are suspended */
+>      int smp_cpus_down;
+>  
+> @@ -99,22 +99,22 @@ static void migration_exit_cb(Notifier *n, void *data)
+>  static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>  {
+>      PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+> -    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
+> +    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
+>      ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
+> -    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
+> +    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
+>  
+>      ctx->exit_notifier.notify = migration_exit_cb;
+>      qemu_add_exit_notifier(&ctx->exit_notifier);
+>      return ctx;
+>  }
+>  
+> -static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+> +static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>  {
+> -    int64List *list = NULL, *entry = NULL;
+> +    uint32List *list = NULL, *entry = NULL;
+>      int i;
+>  
+>      for (i = smp_cpus - 1; i >= 0; i--) {
+> -        entry = g_new0(int64List, 1);
+> +        entry = g_new0(uint32List, 1);
+>          entry->value = ctx->vcpu_blocktime[i];
+>          entry->next = list;
+>          list = entry;
+> @@ -145,7 +145,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
+>      info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
+>  }
+>  
+> -static uint64_t get_postcopy_total_blocktime(void)
+> +static uint32_t get_postcopy_total_blocktime(void)
+>  {
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
+> @@ -619,6 +619,16 @@ static int get_mem_fault_cpu_index(uint32_t pid)
+>      return -1;
+>  }
+>  
+> +static uint32_t get_least_significant_part(int64_t value)
+> +{
+> +    unsigned char *t = (unsigned char *)&value;
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +    return t[4] << 24 | t[5] << 16 | t[6] << 8 | t[7] << 0;
+> +#else
+> +    return t[0] << 0 | t[1] << 8 | t[2] << 16 | t[3] << 24;
+> +#endif /* HOST_WORDS_BIGENDIAN */
+> +}
 
-> +    if (len =3D=3D 0 || (len =3D=3D 3 && strncmp(optstr, "=3Don", len)=
- =3D=3D 0)) {
+This doesn't feel right.
+Firstly, we're doing a check for the magic value of read_vcpu_time==0 in
+mark_postcopy_blocktime_end - so we have to be careful not to hit it.
+Just masking the bottom 32bits of time means we've got a (rare) chance
+of hitting that; but we've got a much less rare change of hitting
+the case where one of the measurements happens after the roll-over
+of the bottom 32bits.
+If you stored a time at the start of the postcopy and just
+subtracted that from 'now' you're probably OK though.
 
-Good: no parens around 'len =3D=3D 3'
+Anding a 64bit value with 0xffffffff and casting is probably much
+easier than shifting etc.
 
-> +        *val =3D true;
-> +    } else if ((len =3D=3D 4) && strncmp(optstr, "=3Doff", len) =3D=3D=
- 0) {
-
-Not so good: redundant parens around 'len =3D=3D 4'
-
-Bad: Inconsistency between the two forms.
-
-With those made consistent, this matches the logic in the static
-util/qemu-option.c:parse_option_bool(), so it makes sense.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Dave
 
 
---43QZ9Xqo9jW8Uz41ulCNwvir0WZjpjFuO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpqMmAACgkQp6FrSiUn
-Q2qLGwf7BCY/+zELaDlGGvL0TMOw0YzDsV/32QOGCEyy1Q06TsXI4UONpWTveIqU
-TNUZ7OGDlUGz89+6gSnITlkoTEmJkqLS7chCIpPYKT1Hp4fYxtV2S2jDYdW91nKu
-+hQQDBGmQQQFC/zD0a53WnkZ7jgeVI27mXyJE0YiM3OhA8Z4ijupvV8yf7+ZjIZ0
-dz6FsuAC7B1CWeVG70tUWp2bhiZQBXLKQQmn91TokNcDTnscArU278xUYDsOHWoI
-GzXLY2PDwqqVSQ3p1i7bgV0ZAe3EqmMvQBPt2uPMTe+fudYZRL7ESMnVbU+BGXpp
-sHkOxXe8zdUHbR/Df1e7x1u0556YNw==
-=NcRR
------END PGP SIGNATURE-----
-
---43QZ9Xqo9jW8Uz41ulCNwvir0WZjpjFuO--
+>  /*
+>   * This function is being called when pagefault occurs. It
+>   * tracks down vCPU blocking time.
+> @@ -634,6 +644,7 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+>      int64_t now_ms;
+> +    uint32_t least_now;
+>  
+>      if (!dc || ptid == 0) {
+>          return;
+> @@ -644,13 +655,14 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>      }
+>  
+>      now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    least_now = get_least_significant_part(now_ms);
+>      if (dc->vcpu_addr[cpu] == 0) {
+>          atomic_inc(&dc->smp_cpus_down);
+>      }
+>  
+> -    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+> -    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+> -    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+> +    atomic_xchg(&dc->last_begin, least_now);
+> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], least_now);
+> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
+>  
+>      /* check it here, not at the begining of the function,
+>       * due to, check could accur early than bitmap_set in
+> @@ -699,20 +711,21 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>      int i, affected_cpu = 0;
+>      int64_t now_ms;
+>      bool vcpu_total_blocktime = false;
+> -    int64_t read_vcpu_time;
+> +    uint32_t read_vcpu_time, least_now;
+>  
+>      if (!dc) {
+>          return;
+>      }
+>  
+>      now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    least_now = get_least_significant_part(now_ms);
+>  
+>      /* lookup cpu, to clear it,
+>       * that algorithm looks straighforward, but it's not
+>       * optimal, more optimal algorithm is keeping tree or hash
+>       * where key is address value is a list of  */
+>      for (i = 0; i < smp_cpus; i++) {
+> -        uint64_t vcpu_blocktime = 0;
+> +        uint32_t vcpu_blocktime = 0;
+>  
+>          read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+>          if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
+> @@ -720,7 +733,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>              continue;
+>          }
+>          atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+> -        vcpu_blocktime = now_ms - read_vcpu_time;
+> +        vcpu_blocktime = least_now - read_vcpu_time;
+>          affected_cpu += 1;
+>          /* we need to know is that mark_postcopy_end was due to
+>           * faulted page, another possible case it's prefetched
+> @@ -735,7 +748,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>  
+>      atomic_sub(&dc->smp_cpus_down, affected_cpu);
+>      if (vcpu_total_blocktime) {
+> -        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+> +        dc->total_blocktime += least_now - atomic_fetch_add(&dc->last_begin, 0);
+>      }
+>      trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
+>                                        affected_cpu);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 141e773..0defbc3 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> -mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
+> -mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
+> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
+> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 70e7b67..ee55d7c 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -175,8 +175,8 @@
+>             '*setup-time': 'int',
+>             '*cpu-throttle-percentage': 'int',
+>             '*error-desc': 'str',
+> -           '*postcopy-blocktime' : 'int64',
+> -           '*postcopy-vcpu-blocktime': ['int64']} }
+> +           '*postcopy-blocktime' : 'uint32',
+> +           '*postcopy-vcpu-blocktime': ['uint32']} }
+>  
+>  ##
+>  # @query-migrate:
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
