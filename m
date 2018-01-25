@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eeeXC-0006D1-Fv
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:13:31 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eeeaN-0007OY-Ev
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:16:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eeeXB-0006J6-I3
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:13:30 -0500
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:36109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eeeXB-0006I0-C2
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:13:29 -0500
-Received: by mail-oi0-x22c.google.com with SMTP id w135so4906329oie.3
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 02:13:29 -0800 (PST)
+	(envelope-from <wei.w.wang@intel.com>) id 1eeeaK-0000ZC-8C
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:16:47 -0500
+Received: from mga09.intel.com ([134.134.136.24]:17630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eeeaJ-0000XZ-Vr
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 05:16:44 -0500
+Message-ID: <5A69AF21.5000209@intel.com>
+Date: Thu, 25 Jan 2018 18:19:13 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180123132051.24448-1-f4bug@amsat.org>
-References: <20180123132051.24448-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jan 2018 10:13:07 +0000
-Message-ID: <CAFEAcA97F9nwTajT21hJp5uQbDPsaAKgOBA_+bcOBQOTLc-9Pg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] sdhci: fix a NULL pointer dereference due
- to uninitialized AddresSpace object
+References: <20180119130653.24044-1-stefanha@redhat.com>
+	<5A65C652.6080307@intel.com>
+	<20180123111238.GC6565@stefanha-x1.localdomain>
+	<5A673369.6050408@intel.com>
+	<20180124114055.GC17193@stefanha-x1.localdomain>
+In-Reply-To: <20180124114055.GC17193@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, zhiyong.yang@intel.com, Maxime Coquelin <maxime.coquelin@redhat.com>, jasowang@redhat.com
 
-On 23 January 2018 at 13:20, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> missed in 60765b6ceeb4.
+On 01/24/2018 07:40 PM, Stefan Hajnoczi wrote:
+> On Tue, Jan 23, 2018 at 09:06:49PM +0800, Wei Wang wrote:
+>> On 01/23/2018 07:12 PM, Stefan Hajnoczi wrote:
+>>> On Mon, Jan 22, 2018 at 07:09:06PM +0800, Wei Wang wrote:
+>>>> On 01/19/2018 09:06 PM, Stefan Hajnoczi wrote:
+>>>>
+>>>>
+>>>>    - Suppose in the future there is also a kernel virtio-vhost-user driver as
+>>>> other PCI devices, can we unbind the kernel driver first, and then bind the
+>>>> device to the dpdk driver? A normal PCI device should be able to smoothly
+>>>> switch between the kernel driver and dpdk driver.
+>>> It depends what you mean by "smoothly switch".
+>>>
+>>> If you mean whether it's possible to go from a kernel driver to
+>>> vfio-pci, then the answer is yes.
+>>>
+>>> But if the kernel driver has an established vhost-user connection then
+>>> it will be closed.  This is the same as reconnecting with AF_UNIX
+>>> vhost-user.
+>>>
+>> Actually not only the case of switching to testpmd after kernel establishes
+>> the connection, but also for several runs of testpmd. That is, if we run
+>> testpmd, then exit testpmd. I think the second run of testpmd won't work.
+> The vhost-user master must reconnect and initialize again (SET_FEATURES,
+> SET_MEM_TABLE, etc).  Is your master reconnecting after the AF_UNIX
+> connection is closed?
+
+Is this an explicit qmp operation to make the master re-connect?
+
 >
->   Thread 1 "qemu-system-aarch64" received signal SIGSEGV, Segmentation fa=
-ult.
->   address_space_init (as=3D0x0, root=3D0x55555726e410, name=3Dname@entry=
-=3D0x555555e3f0a7 "sdhci-dma") at memory.c:3050
->   3050      as->root =3D root;
->   (gdb) bt
->   #0  address_space_init (as=3D0x0, root=3D0x55555726e410, name=3Dname@en=
-try=3D0x555555e3f0a7 "sdhci-dma") at memory.c:3050
->   #1  0x0000555555af62c3 in sdhci_sysbus_realize (dev=3D<optimized out>, =
-errp=3D0x7fff7f931150) at hw/sd/sdhci.c:1564
->   #2  0x00005555558b25e5 in zynqmp_sdhci_realize (dev=3D0x555557051520, e=
-rrp=3D0x7fff7f931150) at hw/sd/zynqmp-sdhci.c:151
->   #3  0x0000555555a2e7f3 in device_set_realized (obj=3D0x555557051520, va=
-lue=3D<optimized out>, errp=3D0x7fff7f931270) at hw/core/qdev.c:966
->   #4  0x0000555555ba3f74 in property_set_bool (obj=3D0x555557051520, v=3D=
-<optimized out>, name=3D<optimized out>, opaque=3D0x555556e04a20,
->       errp=3D0x7fff7f931270) at qom/object.c:1906
->   #5  0x0000555555ba51f4 in object_property_set (obj=3Dobj@entry=3D0x5555=
-57051520, v=3Dv@entry=3D0x5555576dbd60,
->       name=3Dname@entry=3D0x555555dd6306 "realized", errp=3Derrp@entry=3D=
-0x7fff7f931270) at qom/object.c:1102
+>> I'm thinking about caching the received master msgs in QEMU when
+>> virtio_vhost_user_parse_m2s().
+> Why is that necessary and how does QEMU know they are still up-to-date
+> when a new connection is made?
+
+OK. I think that's not needed if the master can reconnect.
+
 >
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Btw, I'm trying to run the code, but couldn't bind the virito-vhost-user
+>> device to vfio-pci (reports Unknown device), not sure if it is because the
+>> device type is "Unclassified device".
+> You need to use the modified usertools/dpdk-devbind.py from my patch
+> series inside the guest.  Please see:
+> https://dpdk.org/ml/archives/dev/2018-January/088177.html
 
+Thanks. I haven't got time on this yet due to some more urgent things. 
+I'll try.
 
-
-Applied to target-arm.next, thanks.
-
--- PMM
+Best,
+Wei
