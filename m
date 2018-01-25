@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1eekdW-0006xz-5C
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:27 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eekeF-0007aJ-6u
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:45:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1eekdS-00016Q-Qo
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:26 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:47718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1eekdS-00014J-EI
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:22 -0500
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 25 Jan 2018 19:43:40 +0300
-Message-id: <1516898620-9486-2-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1516898620-9486-1-git-send-email-a.perevalov@samsung.com>
-References: <1516898620-9486-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20180125164415eucas1p11691d02bf89c112ff25cfc43c400b5b2@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH v1] migration: change blocktime type to uint32_t
+	(envelope-from <peter.maydell@linaro.org>) id 1eekeA-0001IU-Up
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:45:11 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:47003)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eekeA-0001ID-OU
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:45:06 -0500
+Received: by mail-ot0-x241.google.com with SMTP id t35so7233994otd.13
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 08:45:06 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180117161435.28981-13-richard.henderson@linaro.org>
+References: <20180117161435.28981-1-richard.henderson@linaro.org>
+	<20180117161435.28981-13-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jan 2018 16:44:45 +0000
+Message-ID: <CAFEAcA9Nqc_bz=QY7F0RuCMvBX1m=JCDWjyoF37SOS0A+8CFLQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v10.5 12/20] target/arm: Use vector
+ infrastructure for aa64 add/sub/logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,221 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, lvivier@redhat.com, peterx@redhat.com, quintela@redhat.com, f4bug@amsat.org, ash.billore@samsung.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Initially int64_t was used, but on PowerPC architecture,
-clang doesn't have atomic_*_8 function, so it produces
-link time error.
+On 17 January 2018 at 16:14, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.c | 207 +++++++++++++++++++++++++++++----------=
+------
+>  1 file changed, 134 insertions(+), 73 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 70c1e08a36..b97bc9b83c 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -21,6 +21,7 @@
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "tcg-op.h"
+> +#include "tcg-op-gvec.h"
+>  #include "qemu/log.h"
+>  #include "arm_ldst.h"
+>  #include "translate.h"
+> @@ -83,6 +84,10 @@ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
+>  typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
+>  typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
+>
+> +/* Note that the gvec expanders operate on offsets + sizes.  */
+> +typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
+> +                        uint32_t, uint32_t, uint32_t);
+> +
+>  /* initialize TCG globals.  */
+>  void a64_translate_init(void)
+>  {
+> @@ -535,6 +540,21 @@ static inline int vec_reg_offset(DisasContext *s, in=
+t regno,
+>      return offs;
+>  }
+>
+> +/* Return the offset info CPUARMState of the "whole" vector register Qn.=
+  */
+> +static inline int vec_full_reg_offset(DisasContext *s, int regno)
+> +{
+> +    assert_fp_access_checked(s);
+> +    return offsetof(CPUARMState, vfp.regs[regno * 2]);
+> +}
 
-QEMU is working with time as with 64bit value, but by
-fact 32 bit is enough with CLOCK_REALTIME. In this case
-blocktime will keep only 1200 hours time interval.
+This function is already in the preparatory SVE code in target-arm.next,
+so it should go away on rebase...
 
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
----
- hmp.c                    |  4 ++--
- migration/postcopy-ram.c | 47 ++++++++++++++++++++++++++++++-----------------
- migration/trace-events   |  4 ++--
- qapi/migration.json      |  4 ++--
- 4 files changed, 36 insertions(+), 23 deletions(-)
+> +
+> +/* Return the byte size of the "whole" vector register, VL / 8.  */
+> +static inline int vec_full_reg_size(DisasContext *s)
+> +{
+> +    /* FIXME SVE: We should put the composite ZCR_EL* value into tb->fla=
+gs.
+> +       In the meantime this is just the AdvSIMD length of 128.  */
+> +    return 128 / 8;
+> +}
 
-diff --git a/hmp.c b/hmp.c
-index c6bab53..3c376b3 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -265,7 +265,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-     }
- 
-     if (info->has_postcopy_blocktime) {
--        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
-+        monitor_printf(mon, "postcopy blocktime: %u\n",
-                        info->postcopy_blocktime);
-     }
- 
-@@ -273,7 +273,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-         Visitor *v;
-         char *str;
-         v = string_output_visitor_new(false, &str);
--        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
-+        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
-         visit_complete(v, &str);
-         monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
-         g_free(str);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 7814da5..ce91de8 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -63,14 +63,14 @@ struct PostcopyDiscardState {
- 
- typedef struct PostcopyBlocktimeContext {
-     /* time when page fault initiated per vCPU */
--    int64_t *page_fault_vcpu_time;
-+    uint32_t *page_fault_vcpu_time;
-     /* page address per vCPU */
-     uintptr_t *vcpu_addr;
--    int64_t total_blocktime;
-+    uint32_t total_blocktime;
-     /* blocktime per vCPU */
--    int64_t *vcpu_blocktime;
-+    uint32_t *vcpu_blocktime;
-     /* point in time when last page fault was initiated */
--    int64_t last_begin;
-+    uint32_t last_begin;
-     /* number of vCPU are suspended */
-     int smp_cpus_down;
- 
-@@ -99,22 +99,22 @@ static void migration_exit_cb(Notifier *n, void *data)
- static struct PostcopyBlocktimeContext *blocktime_context_new(void)
- {
-     PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
--    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
-+    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
-     ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
--    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
-+    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
- 
-     ctx->exit_notifier.notify = migration_exit_cb;
-     qemu_add_exit_notifier(&ctx->exit_notifier);
-     return ctx;
- }
- 
--static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
-+static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
- {
--    int64List *list = NULL, *entry = NULL;
-+    uint32List *list = NULL, *entry = NULL;
-     int i;
- 
-     for (i = smp_cpus - 1; i >= 0; i--) {
--        entry = g_new0(int64List, 1);
-+        entry = g_new0(uint32List, 1);
-         entry->value = ctx->vcpu_blocktime[i];
-         entry->next = list;
-         list = entry;
-@@ -145,7 +145,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
-     info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
- }
- 
--static uint64_t get_postcopy_total_blocktime(void)
-+static uint32_t get_postcopy_total_blocktime(void)
- {
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
-@@ -619,6 +619,16 @@ static int get_mem_fault_cpu_index(uint32_t pid)
-     return -1;
- }
- 
-+static uint32_t get_least_significant_part(int64_t value)
-+{
-+    unsigned char *t = (unsigned char *)&value;
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    return t[4] << 24 | t[5] << 16 | t[6] << 8 | t[7] << 0;
-+#else
-+    return t[0] << 0 | t[1] << 8 | t[2] << 16 | t[3] << 24;
-+#endif /* HOST_WORDS_BIGENDIAN */
-+}
-+
- /*
-  * This function is being called when pagefault occurs. It
-  * tracks down vCPU blocking time.
-@@ -634,6 +644,7 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-     int64_t now_ms;
-+    uint32_t least_now;
- 
-     if (!dc || ptid == 0) {
-         return;
-@@ -644,13 +655,14 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
-     }
- 
-     now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    least_now = get_least_significant_part(now_ms);
-     if (dc->vcpu_addr[cpu] == 0) {
-         atomic_inc(&dc->smp_cpus_down);
-     }
- 
--    atomic_xchg__nocheck(&dc->last_begin, now_ms);
--    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
--    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
-+    atomic_xchg(&dc->last_begin, least_now);
-+    atomic_xchg(&dc->page_fault_vcpu_time[cpu], least_now);
-+    atomic_xchg(&dc->vcpu_addr[cpu], addr);
- 
-     /* check it here, not at the begining of the function,
-      * due to, check could accur early than bitmap_set in
-@@ -699,20 +711,21 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
-     int i, affected_cpu = 0;
-     int64_t now_ms;
-     bool vcpu_total_blocktime = false;
--    int64_t read_vcpu_time;
-+    uint32_t read_vcpu_time, least_now;
- 
-     if (!dc) {
-         return;
-     }
- 
-     now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    least_now = get_least_significant_part(now_ms);
- 
-     /* lookup cpu, to clear it,
-      * that algorithm looks straighforward, but it's not
-      * optimal, more optimal algorithm is keeping tree or hash
-      * where key is address value is a list of  */
-     for (i = 0; i < smp_cpus; i++) {
--        uint64_t vcpu_blocktime = 0;
-+        uint32_t vcpu_blocktime = 0;
- 
-         read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
-         if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
-@@ -720,7 +733,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
-             continue;
-         }
-         atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
--        vcpu_blocktime = now_ms - read_vcpu_time;
-+        vcpu_blocktime = least_now - read_vcpu_time;
-         affected_cpu += 1;
-         /* we need to know is that mark_postcopy_end was due to
-          * faulted page, another possible case it's prefetched
-@@ -735,7 +748,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
- 
-     atomic_sub(&dc->smp_cpus_down, affected_cpu);
-     if (vcpu_total_blocktime) {
--        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
-+        dc->total_blocktime += least_now - atomic_fetch_add(&dc->last_begin, 0);
-     }
-     trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
-                                       affected_cpu);
-diff --git a/migration/trace-events b/migration/trace-events
-index 141e773..0defbc3 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
- process_incoming_migration_co_postcopy_end_main(void) ""
- migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
- migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
--mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
--mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
-+mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
-+mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
- 
- # migration/rdma.c
- qemu_rdma_accept_incoming_migration(void) ""
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 70e7b67..ee55d7c 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -175,8 +175,8 @@
-            '*setup-time': 'int',
-            '*cpu-throttle-percentage': 'int',
-            '*error-desc': 'str',
--           '*postcopy-blocktime' : 'int64',
--           '*postcopy-vcpu-blocktime': ['int64']} }
-+           '*postcopy-blocktime' : 'uint32',
-+           '*postcopy-vcpu-blocktime': ['uint32']} }
- 
- ##
- # @query-migrate:
--- 
-2.7.4
+...and this is fixed in your other patchset with the leftovers from
+that preparatory set, right? What's the plan for what sequence we
+put these into master?
+
+Have you done risu-testing on this patchset?
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
