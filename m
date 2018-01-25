@@ -1,37 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eekk8-0003fJ-HH
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eekk9-0003ff-0N
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eekk3-0004sS-TW
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44266)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eekk5-0004wC-St
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:17 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:40628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eekk3-0004rb-MN
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:11 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eekk2-0003Rg-6i
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 16:51:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1DF922E854F
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 16:51:10 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eekk5-0004vd-PF
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:51:13 -0500
+Received: by mail-qt0-x243.google.com with SMTP id s39so20801486qth.7
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 08:51:13 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180125164351.17154-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d7a1afea-408f-3ecf-7aac-ed5cfd9f1bc9@amsat.org>
+Date: Thu, 25 Jan 2018 13:51:10 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Jan 2018 16:43:41 -0000
-From: John Arbuckle <programmingkidx@gmail.com>
-Reply-To: Bug 1737194 <1737194@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151274735709.11243.12332071284435970530.malonedeb@soybean.canonical.com>
-	<151686682161.4861.8851702267220024380.malone@wampee.canonical.com>
-	<F19A160D-99BC-4170-B544-8BAFFC23FE83@gmail.com>
-	<CAFEAcA9vJ7A+J2OSPNsfyT575p+heE5o_++T-Jtp6S3dyG3NTQ@mail.gmail.com>
-Message-Id: <5FD1490A-41F7-4200-AB5C-3802358E1362@gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1737194] Re: Windows NT 4.0 fails to boot
- from qcow2 installation
+In-Reply-To: <20180125164351.17154-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/3] Usb 20180125 v2 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,128 +34,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-> On Jan 25, 2018, at 11:16 AM, Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
-> =
+On 01/25/2018 01:43 PM, Gerd Hoffmann wrote:
+> The following changes since commit 834a336eb911db8a8ca00e760ee6a85faca19414:
+> 
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-01-24 19:24:26 +0000)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kraxel.org/qemu tags/usb-20180125-v2-pull-request
+> 
+> for you to fetch changes up to 112d9cb43c70658b890559ff6dcfc5d9e821f368:
+> 
+>   usb-storage: Fix share-rw option parsing (2018-01-25 17:26:07 +0100)
+> 
+> ----------------------------------------------------------------
+> usb: -usbdevice cleanups, storage fix, ccid cleanup.
+> 
+> ----------------------------------------------------------------
+> 
+> Fam Zheng (1):
+>   usb-storage: Fix share-rw option parsing
+> 
+> Mao Zhongyi (1):
+>   hw/usb/ccid: Make ccid_card_init() take an error parameter
 
-> On 25 January 2018 at 15:58, John Arbuckle <programmingkidx@gmail.com> wr=
-ote:
->> I did try to build at commits 306ec6c3cece7004429c79c1ac93d49919f1f1cc
->> and e689f7c668cbd9d08f330e17c3dd3a059c9553d3. Both failed to build on my
->> Mac OS X system. Here is the error message I usually saw:
->> =
+NACK s->card not set in ccid_card_realize() ?
 
->>  LINK  qemu-io
->> Undefined symbols for architecture x86_64:
->>  "_use_rt_clock", referenced from:
->>      _bdrv_acct_start in block.o
->>      _bdrv_acct_done in block.o
->> Undefined symbols for architecture x86_64:
->>      _qemu_clock_get_ns in qemu-timer.o
->>  "_use_rt_clock", referenced from:
->>      _bdrv_acct_start in block.o
->>      _bdrv_acct_done in block.o
->>      _qemu_clock_get_ns in qemu-timer.o
-> =
-
-> If you configure with --disable-tools does it manage to build,
-> or does it just go on to fail to link the main QEMU binary
-> with the same error? (We've had some issues in the past I think
-> where configure put libraries on the main binary link line but
-> not on the tools link lines, so maybe worth a try...)
-> =
-
-> thanks
-> -- PMM
-> =
-
-
-It still fails to build:
-
-Build commands: ./configure --disable-tools --target-list=3Di386-softmmu
-&& make -j 4
-
-QEMU at commit: 306ec6c3cece7004429c79c1ac93d49919f1f1cc
-
-  LINK  i386-softmmu/qemu-system-i386
-Undefined symbols for architecture x86_64:
-  "_use_rt_clock", referenced from:
-      _bdrv_acct_start in block.o
-      _bdrv_acct_done in block.o
-      _qemu_clock_get_ns in qemu-timer.o
-      _cpu_get_clock in cpus.o
-      _cpu_enable_ticks in cpus.o
-      _cpu_disable_ticks in cpus.o
-      _icount_warp_rt in cpus.o
-      ...
-ld: symbol(s) not found for architecture x86_64
-clang: error: linker command failed with exit code 1 (use -v to see invocat=
-ion)
-make[1]: *** [qemu-system-i386] Error 1
-make: *** [subdir-i386-softmmu] Error 2
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1737194
-
-Title:
-  Windows NT 4.0 fails to boot from qcow2 installation
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows NT 4.0 will not boot from an installation more than once if
-  installed in a qcow2 image file. A quick fix to this problem is to use
-  the qcow format instead.
-
-  Steps to reproduce this issue:
-
-  Create the image file:
-  qemu-img create -f qcow2 winnt4.qcow2 1G
-
-  Boot from a Windows NT 4.0 Workstation CD:
-  qemu-system-i386 -hda winnt4.qcow2 -cdrom /dev/cdrom -boot d -m 128 -cpu =
-pentium -vga cirrus
-
-  During the installation process you have the choise between FAT and
-  NTFS. You can pick anyone.
-
-  After finishing the installation the guest will reboot to install
-  additional items. Once this is done the guest will be bootable. Eject
-  any CD media from QEMU and reboot. You will then see Windows NT 4.0
-  booting up to the desktop. Go to "Start->Shut down" to shut down. Then
-  when Windows is ready quit QEMU.
-
-  Now try to boot using this command:
-  qemu-system-i386 -hda winnt4.qcow2 -boot c -m 128 -cpu pentium -vga cirru=
-s =
-
-   =
-
-  The BIOS screen will display an error message:
-
-  For NTFS: =
-
-  Booting from Hard Disk...
-  A disk read error occurred.
-  Insert a system diskette and restart
-  the system.
-
-  For FAT:
-  No bootable device.
-
-  Additional information:
-  qemu-system-i386 version: 2.10.1
-  qemu-img version: 2.10.92 (v2.11.0-rc4-dirty)
-
-  If you don't have a Windows NT 4.0 Workstation installation CD, you may d=
-ownload one from here:
-  https://winworldpc.com/product/windows-nt-40/40
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1737194/+subscriptions
+> 
+> Thomas Huth (1):
+>   usb: Remove legacy -usbdevice options (host, serial, disk and net)
+> 
+>  hw/usb/ccid.h                 |   2 +-
+>  include/hw/scsi/scsi.h        |   1 +
+>  include/hw/usb.h              |   1 -
+>  hw/scsi/scsi-bus.c            |   9 ++-
+>  hw/usb/ccid-card-emulated.c   |  44 ++++++-------
+>  hw/usb/ccid-card-passthru.c   |  12 ++--
+>  hw/usb/dev-network.c          |  26 --------
+>  hw/usb/dev-serial.c           |  30 ---------
+>  hw/usb/dev-smartcard-reader.c |  34 +++++-----
+>  hw/usb/dev-storage.c          |  61 +-----------------
+>  hw/usb/host-legacy.c          | 144 ------------------------------------------
+>  hw/usb/host-stub.c            |   6 --
+>  vl.c                          |  15 -----
+>  hw/usb/Makefile.objs          |   2 +-
+>  qemu-options.hx               |  19 ------
+>  15 files changed, 60 insertions(+), 346 deletions(-)
+>  delete mode 100644 hw/usb/host-legacy.c
+> 
