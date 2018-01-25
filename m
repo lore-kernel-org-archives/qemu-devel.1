@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egDgd-0001sX-8l
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:57:44 -0500
+	(envelope-from <no-reply@patchew.org>) id 1egDhH-0002Sn-VN
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:58:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egDgZ-0006wg-6E
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:57:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60082)
+	(envelope-from <no-reply@patchew.org>) id 1egDhE-0007IN-3U
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:58:24 -0500
+Resent-Message-Id: <E1egDhE-0007IN-3U@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1egDgY-0006wI-T0
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:57:39 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0THtWA2131647
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:57:37 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ft89k8gku-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:57:36 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 29 Jan 2018 10:57:36 -0700
-References: <20180129123227.15778-1-marcandre.lureau@redhat.com>
-	<3c1355ed-57af-d023-8da3-21f1600ee018@linux.vnet.ibm.com>
-	<CAMxuvaytO_73rzEGduvD6AeT==B-=D-WsmDt5XgeaueQ_uds-A@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 29 Jan 2018 12:57:31 -0500
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1egDhD-0007Hi-RZ
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:58:20 -0500
+In-Reply-To: <20180125175949.7780-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151690370921.746.8686094339154511431@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <CAMxuvaytO_73rzEGduvD6AeT==B-=D-WsmDt5XgeaueQ_uds-A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <eb97942e-058f-2ba7-301e-9c7950693cd8@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tpm: fix alignment issues
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 25 Jan 2018 10:08:30 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] coroutine-lock: polymorphic CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,204 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com
 
-On 01/29/2018 12:51 PM, Marc-Andre Lureau wrote:
-> Hi
->
-> On Mon, Jan 29, 2018 at 6:41 PM, Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->> On 01/29/2018 07:32 AM, Marc-Andr=C3=A9 Lureau wrote:
->>> The new tpm-crb-test fails on sparc host:
->>>
->>> TEST: tests/tpm-crb-test... (pid=3D230409)
->>>     /i386/tpm-crb/test:
->>> Broken pipe
->>> FAIL
->>> GTester: last random seed: R02S29cea50247fe1efa59ee885a26d51a85
->>> (pid=3D230423)
->>> FAIL: tests/tpm-crb-test
->>>
->>> and generates a new clang sanitizer runtime warning:
->>>
->>> /home/petmay01/linaro/qemu-for-merges/hw/tpm/tpm_util.h:36:24: runtim=
-e
->>> error: load of misaligned address 0x7fdc24c00002 for type 'const
->>> uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
->>> 0x7fdc24c00002: note: pointer points here
->>> <memory cannot be printed>
->>>
->>> The sparc architecture does not allow misaligned loads and will
->>> segfault if you try them.  For example, this function:
->>>
->>> static inline uint32_t tpm_cmd_get_size(const void *b)
->>> {
->>>       return be32_to_cpu(*(const uint32_t *)(b + 2));
->>> }
->>>
->>> Should read,
->>>       return ldl_be_p(b + 2);
->>>
->>> As a general rule you can't take an arbitrary pointer into a byte
->>> buffer and try to interpret it as a structure or a pointer to a
->>> larger-than-bytesize-data simply by casting the pointer.
->>>
->>> Use this clean up as an opportunity to remove unnecessary temporary
->>> buffers and casts.
->>>
->>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>    hw/tpm/tpm_util.h        | 17 ++++++++++-
->>>    hw/tpm/tpm_emulator.c    | 14 ++++-----
->>>    hw/tpm/tpm_passthrough.c |  6 ++--
->>>    hw/tpm/tpm_util.c        | 75
->>> ++++++++++++++++++++++--------------------------
->>>    4 files changed, 58 insertions(+), 54 deletions(-)
->>>
->>> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
->>> index 19b28474ae..c562140e52 100644
->>> --- a/hw/tpm/tpm_util.h
->>> +++ b/hw/tpm/tpm_util.h
->>> @@ -31,9 +31,24 @@ bool tpm_util_is_selftest(const uint8_t *in, uint3=
-2_t
->>> in_len);
->>>
->>>    int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
->>>
->>> +static inline uint16_t tpm_cmd_get_tag(const void *b)
->>> +{
->>> +    return lduw_be_p(b);;
->>> +}
->>> +
->>>    static inline uint32_t tpm_cmd_get_size(const void *b)
->>>    {
->>> -    return be32_to_cpu(*(const uint32_t *)(b + 2));
->>> +    return ldl_be_p(b + 2);;
->>
->> Why are there these two ';;' ?
->>
-> obvious typo (repeated..)
->
->>> +}
->>> +
->>> +static inline uint32_t tpm_cmd_get_ordinal(const void *b)
->>> +{
->>> +    return ldl_be_p(b + 6);;
->>> +}
->>> +
->>> +static inline uint32_t tpm_cmd_get_errcode(const void *b)
->>> +{
->>> +    return ldl_be_p(b + 6);;
->>>    }
->>>
->>>    int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
->>> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
->>> index 35c78de5a9..a34a18ac7a 100644
->>> --- a/hw/tpm/tpm_emulator.c
->>> +++ b/hw/tpm/tpm_emulator.c
->>> @@ -120,7 +120,6 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator
->>> *tpm_emu,
->>>    {
->>>        ssize_t ret;
->>>        bool is_selftest =3D false;
->>> -    const struct tpm_resp_hdr *hdr =3D NULL;
->>>
->>>        if (selftest_done) {
->>>            *selftest_done =3D false;
->>> @@ -132,22 +131,21 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulato=
-r
->>> *tpm_emu,
->>>            return -1;
->>>        }
->>>
->>> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
->>> sizeof(*hdr),
->>> -                               err);
->>> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
->>> +              sizeof(struct tpm_resp_hdr), err);
->>>        if (ret !=3D 0) {
->>>            return -1;
->>>        }
->>>
->>> -    hdr =3D (struct tpm_resp_hdr *)out;
->>> -    out +=3D sizeof(*hdr);
->>> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
->>> -                               be32_to_cpu(hdr->len) - sizeof(*hdr) =
-,
->>> err);
->>> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc,
->>> +              (char *)out + sizeof(struct tpm_resp_hdr),
->>> +              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), e=
-rr);
->>>        if (ret !=3D 0) {
->>>            return -1;
->>>        }
->>>
->>>        if (is_selftest) {
->>> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
->>> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
->>>        }
->>>
->>>        return 0;
->>> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
->>> index 29142f38bb..537e11a3f9 100644
->>> --- a/hw/tpm/tpm_passthrough.c
->>> +++ b/hw/tpm/tpm_passthrough.c
->>> @@ -87,7 +87,6 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthru=
-State
->>> *tpm_pt,
->>>    {
->>>        ssize_t ret;
->>>        bool is_selftest;
->>> -    const struct tpm_resp_hdr *hdr;
->>>
->>>        /* FIXME: protect shared variables or use other sync mechanism=
- */
->>>        tpm_pt->tpm_op_canceled =3D false;
->>> @@ -116,15 +115,14 @@ static int
->>> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->>>                             strerror(errno), errno);
->>>            }
->>>        } else if (ret < sizeof(struct tpm_resp_hdr) ||
->>> -               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D r=
-et) {
->>> +               tpm_cmd_get_size(out) !=3D ret) {
->>>            ret =3D -1;
->>>            error_report("tpm_passthrough: received invalid response "
->>>                         "packet from TPM");
->>>        }
->>>
->>>        if (is_selftest && (ret >=3D sizeof(struct tpm_resp_hdr))) {
->>> -        hdr =3D (struct tpm_resp_hdr *)out;
->>> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
->>> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
->>>        }
->>>
->>>    err_exit:
->>> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
->>> index 747075e244..8abde59915 100644
->>> --- a/hw/tpm/tpm_util.c
->>> +++ b/hw/tpm/tpm_util.c
->>> @@ -106,20 +106,16 @@ const PropertyInfo qdev_prop_tpm =3D {
->>>    void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t ou=
-t_len)
->>>    {
->>>        if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
->>> -        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
->>> -
->>> -        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
->>> -        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
->>> -        resp->errcode =3D cpu_to_be32(TPM_FAIL);
->>> +        stw_be_p(out, TPM_TAG_RSP_COMMAND);
->>> +        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
->>> +        stl_be_p(out + 6, TPM_FAIL);
->>
->> Since we wrapped the getters we should wrap the setters as well.
->> tpm_cmd_set_len(), tpm_cmd_set_errcode.
-> They were not as widely used (there was only a getter so far), but
-> that makes sense too. Could be done on top.
-
-Also please rebase on top of your series of patches. I had some problems=20
-with tpm_passthrough.c around line 115. Error reporting there has changed.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTI1MTc1OTQ5Ljc3ODAtMS1wYm9uemluaUByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC81XSBjb3JvdXRpbmUtbG9jazogcG9seW1vcnBo
+aWMgQ29RdWV1ZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
+ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
+IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
+aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
+ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIGEzZjkzNjJhZjUuLjIw
+NzdmZWY5MWQgIG1hc3RlciAgICAgLT4gbWFzdGVyCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
+IHBhdGNoZXcvMjAxODAxMjUxNzU5NDkuNzc4MC0xLXBib256aW5pQHJlZGhhdC5jb20gLT4gcGF0
+Y2hldy8yMDE4MDEyNTE3NTk0OS43NzgwLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjMxY2MzYzhiZDEgY3VybDogY29udmVydCB0byBDb1F1ZXVl
+CmI5Nzk2YWIwMTQgY29yb3V0aW5lLWxvY2s6IG1ha2UgcWVtdV9jb19lbnRlcl9uZXh0IHRocmVh
+ZC1zYWZlCjBhNDFkY2QxMTQgY29yb3V0aW5lLWxvY2s6IGNvbnZlcnQgQ29RdWV1ZSB0byB1c2Ug
+UWVtdUxvY2thYmxlCjcwMzk4Mzk4YWQgbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUKNjk1YTBk
+Y2FhNSB0ZXN0LWNvcm91dGluZTogYWRkIHNpbXBsZSBDb011dGV4IHRlc3QKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogdGVzdC1jb3JvdXRpbmU6IGFkZCBzaW1wbGUg
+Q29NdXRleCB0ZXN0Li4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAgb3Ig
+TlVMTAojMjk6IEZJTEU6IHRlc3RzL3Rlc3QtY29yb3V0aW5lLmM6MTk4Ogorc3RhdGljIGJvb2wg
+bG9ja2VkID0gZmFsc2U7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDc0IGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDIvNTogbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUuLi4KV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzU4OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDoxNDQ6Cisj
+ZGVmaW5lIFFFTVVfR0VORVJJQzIoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBR
+RU1VX0dFTkVSSUMxKHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiM1OTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTQ1OgorI2RlZmluZSBR
+RU1VX0dFTkVSSUMzKHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVNVV9HRU5F
+UklDMih4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+NjA6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE0NjoKKyNkZWZpbmUgUUVNVV9HRU5F
+UklDNCh4LCBhMCwgLi4uKSBRRU1VX0dFTkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJQzMoeCwg
+X19WQV9BUkdTX18pKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzYxOiBGSUxF
+OiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDoxNDc6CisjZGVmaW5lIFFFTVVfR0VORVJJQzUoeCwg
+YTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBRRU1VX0dFTkVSSUM0KHgsIF9fVkFfQVJH
+U19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MjogRklMRTogaW5jbHVk
+ZS9xZW11L2NvbXBpbGVyLmg6MTQ4OgorI2RlZmluZSBRRU1VX0dFTkVSSUM2KHgsIGEwLCAuLi4p
+IFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVNVV9HRU5FUklDNSh4LCBfX1ZBX0FSR1NfXykpCgpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjM6IEZJTEU6IGluY2x1ZGUvcWVtdS9j
+b21waWxlci5oOjE0OToKKyNkZWZpbmUgUUVNVV9HRU5FUklDNyh4LCBhMCwgLi4uKSBRRU1VX0dF
+TkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJQzYoeCwgX19WQV9BUkdTX18pKQoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY0OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIu
+aDoxNTA6CisjZGVmaW5lIFFFTVVfR0VORVJJQzgoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lG
+KHgsIGEwLCBRRU1VX0dFTkVSSUM3KHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiM2NTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTUxOgor
+I2RlZmluZSBRRU1VX0dFTkVSSUM5KHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwg
+UUVNVV9HRU5FUklDOCh4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojNjY6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE1MjoKKyNkZWZpbmUg
+UUVNVV9HRU5FUklDMTAoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBRRU1VX0dF
+TkVSSUM5KHgsIF9fVkFfQVJHU19fKSkKCnRvdGFsOiAwIGVycm9ycywgOSB3YXJuaW5ncywgMjM0
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hl
+Y2tpbmcgUEFUQ0ggMy81OiBjb3JvdXRpbmUtbG9jazogY29udmVydCBDb1F1ZXVlIHRvIHVzZSBR
+ZW11TG9ja2FibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiBjb3JvdXRpbmUtbG9jazogbWFrZSBx
+ZW11X2NvX2VudGVyX25leHQgdGhyZWFkLXNhZmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNS81OiBjdXJs
+OiBjb252ZXJ0IHRvIENvUXVldWUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
