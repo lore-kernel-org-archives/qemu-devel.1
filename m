@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eecO2-0008Gn-VO
+	(envelope-from <bounces@canonical.com>) id 1eecO3-0008Go-54
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 02:55:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eecNy-00021O-UK
+	(envelope-from <bounces@canonical.com>) id 1eecNz-000229-AG
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 02:55:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49356)
+Received: from indium.canonical.com ([91.189.90.7]:49370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eecNy-00020W-Kc
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 02:55:50 -0500
+	id 1eecNz-00020h-0I
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 02:55:51 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eecNx-00063S-HS
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:55:49 +0000
+	id 1eecNy-00063Q-13
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:55:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 82DDA2E8055
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:55:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 069B42E8055
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:55:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Jan 2018 07:44:16 -0000
+Date: Thu, 25 Jan 2018 07:44:54 -0000
 From: i336_ <asmqb7@gmail.com>
 Reply-To: Bug 1745316 <1745316@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151686617659.10193.11767183978354971795.malonedeb@gac.canonical.com>
-Message-Id: <151686625658.10543.1783078584244329817.malone@gac.canonical.com>
+Message-Id: <151686629421.19845.8089078104599514607.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1745316] Re: SDL1.x>SDL2 regressions:
  non-usbtablet mouse position reporting is broken,
@@ -40,10 +40,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "[File 1/2] SLS-based mouse tester (root HDD image) (s=
-ee report for details)"
-   https://bugs.launchpad.net/qemu/+bug/1745316/+attachment/5042704/+files/=
-sls-mousetest.img.xz
+** Attachment added: "[File 2/2] SLS-based mouse tester (boot floppy image)=
+ (see report for details)"
+   https://bugs.launchpad.net/qemu/+bug/1745316/+attachment/5042705/+files/=
+sls-boot.img.xz
 
 -- =
 
