@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eeVLe-0003zf-Aq
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 19:24:59 -0500
+	(envelope-from <peterx@redhat.com>) id 1eeXNu-0006v9-QY
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 21:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eeVLa-0006V0-7x
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 19:24:58 -0500
-Received: from mga06.intel.com ([134.134.136.31]:53105)
+	(envelope-from <peterx@redhat.com>) id 1eeXNr-00075t-NA
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 21:35:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49420)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eeVLZ-0006UO-U8
-	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 19:24:54 -0500
-Date: Thu, 25 Jan 2018 08:24:35 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180125002435.r3gjfo765obx3bv2@hz-desktop>
-References: <20180117081325.11924-1-haozhong.zhang@intel.com>
-	<20180117081325.11924-4-haozhong.zhang@intel.com>
-	<20180124222235-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eeXNq-000756-Ux
+	for qemu-devel@nongnu.org; Wed, 24 Jan 2018 21:35:23 -0500
+Date: Thu, 25 Jan 2018 10:35:00 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180125023500.GB19899@xz-mi>
+References: <20180124053957.29145-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180124222235-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] hostmem-file: add 'sync' option
+In-Reply-To: <20180124053957.29145-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 00/23] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 01/24/18 22:23 +0200, Michael S. Tsirkin wrote:
-> On Wed, Jan 17, 2018 at 04:13:25PM +0800, Haozhong Zhang wrote:
-> > This option controls whether QEMU mmap(2) the memory backend file with
-> > MAP_SYNC flag, which can fully guarantee the guest write persistence
-> > to the backend, if MAP_SYNC flag is supported by the host kernel
-> > (Linux kernel 4.15 and later) and the backend is a file supporting
-> > DAX (e.g., file on ext4/xfs file system mounted with '-o dax').
-> > 
-> > It can take one of following values:
-> >  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-> >         'share=off', QEMU will abort
-> >  - off: never pass MAP_SYNC to mmap(2)
-> >  - auto (default): if MAP_SYNC is supported and 'share=on', work as if
-> >         'sync=on'; otherwise, work as if 'sync=off'
-> > 
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-
-[..]
-> >  
-> >  @table @option
-> >  
-> > -@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
-> > +@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align},sync=@var{on|off|auto}
-> >  
-> >  Creates a memory file backend object, which can be used to back
-> >  the guest RAM with huge pages.
-> > @@ -4034,6 +4034,25 @@ requires an alignment different than the default one used by QEMU, eg
-> >  the device DAX /dev/dax0.0 requires 2M alignment rather than 4K. In
-> >  such cases, users can specify the required alignment via this option.
-> >  
-> > +The @option{sync} option specifies whether QEMU mmap(2) @option{mem-path}
-> > +with MAP_SYNC flag, which can fully guarantee the guest write
-> > +persistence to @option{mem-path}.
+On Wed, Jan 24, 2018 at 01:39:34PM +0800, Peter Xu wrote:
+> This version should have addressed all comments in previous one, also
+> fixed another race condition after I addressed all the comments (a new
+> race condition introduced by addressing the comments...).  For some
+> more details of the race condition, please see the last entry of
+> change log, and please refer to patch 9 for the code change.
 > 
-> I would add ... even in case of a host power loss.
-> Here and wherever you say "fully".
+> I removed RFC tag from this version.  Please review.  Thanks.
+> 
+> v7:
+> - add some r-bs, and remove some.
+> - remove the chardev fix since already queued by Paolo
+> - use local var in qemu_chr_fe_add_watch [Stefan]
+> - move doc patch to front, mention it in some patches [Eric]
+> - Quite a few of English fixes [Eric]
+> - fix unlock missing in handle_qmp_command [Stefan]
+> - squash some patches according to the review comments
+> - don't break gdbserver usage on HMP non-interactive mode by fixing up
+>   the suspend/resume logic [Fam, Stefan]
+> - move the qemu_chr_fe_set_handlers() call in monitor_init() into a
+>   bottom half to avoid race between the call itself and
+>   iothread. [Stefan]
+> - spent quite a lot of time debugging another assertion failure in
+>   io_watch_poll_finalize() after above change is made (ouch! I really
+>   hoped we always have the latest glib): when QEMU inits chardevs in
+>   chardev_init_func() it's possible that QEMU registers the chardev
+>   handlers there, even before CharBackend is connected to that chardev
+>   in monitor_init().  Then, when we reach monitor_init() we must make
+>   sure we unregister that old one first, or there can have one orphan
+>   GSource still in default gcontext (note that this can really happen
+>   when we start to use QEMUBH to setup chardev frontends, which is
+>   above change).
 
-Without MAP_SYNC, QEMU can only guarantee the guest data is written to
-the host NVDIMM after, for example, guest clwb+sfence. However, if
-some host file system meta data of the mapped file have not been
-written back to the host NVDIMM when a host power failure happens, the
-mapped file may be broken though all its data may be still there.
+Online repository updated for v7:
 
-Anyway, I'll remove the confusing word "fully" and add your suggestion.
+  https://github.com/xzpeter/qemu/tree/monitor-oob
 
 Thanks,
-Haozhong
 
-> 
-> > MAP_SYNC requires supports from both
-> > +the host kernel (since Linux kernel 4.15) and @option{mem-path} (only
-> > +files supporting DAX). It can take one of following values:
-> > +
-> > +@table @option
-> > +@item @var{on}
-> > +try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-> > +@option{share}=@var{off}, QEMU will abort
-> > +
-> > +@item @var{off}
-> > +never pass MAP_SYNC to mmap(2)
-> > +
-> > +@item @var{auto} (default)
-> > +if MAP_SYNC is supported and @option{share}=@var{on}, work as if
-> > +@option{sync}=@var{on}; otherwise, work as if @option{sync}=@var{off}
-> > +@end table
-> > +
-> >  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
-> >  
-> >  Creates a memory backend object, which can be used to back the guest RAM.
-> > -- 
-> > 2.14.1
+-- 
+Peter Xu
