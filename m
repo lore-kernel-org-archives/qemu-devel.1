@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eefpy-0005VU-HM
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 06:36:59 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eefqW-0005y0-BY
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 06:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eefpx-0007h7-LY
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 06:36:58 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:35501)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eefpx-0007gp-H8
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 06:36:57 -0500
-Received: by mail-oi0-x244.google.com with SMTP id b11so5021547oif.2
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 03:36:57 -0800 (PST)
+	(envelope-from <stefanha@gmail.com>) id 1eefqS-0007va-4I
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 06:37:32 -0500
+Date: Thu, 25 Jan 2018 11:37:24 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180125113724.GA28396@stefanha-x1.localdomain>
+References: <20180122144549.25318-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <29c39a6f9ce3734bf693581348ed78f4bff3e0ef.1516746211.git.alistair.francis@xilinx.com>
-References: <cover.1516746211.git.alistair.francis@xilinx.com>
-	<29c39a6f9ce3734bf693581348ed78f4bff3e0ef.1516746211.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jan 2018 11:36:36 +0000
-Message-ID: <CAFEAcA-eOMvYYv--wjs+i1wGG3AN1VueqZjtnE5vpBH=UavkfQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] xlnx-zynqmp-rtc: Add basic time
- support
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
+Content-Disposition: inline
+In-Reply-To: <20180122144549.25318-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC] block-backend: fix double
+ inc/dec inflight requests number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-On 23 January 2018 at 22:24, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> Allow the guest to determine the time set from the QEMU command line.
->
-> This includes adding a trace event to debug the new time.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
->  static const VMStateDescription vmstate_rtc = {
->      .name = TYPE_XLNX_ZYNQMP_RTC,
->      .version_id = 1,
->      .minimum_version_id = 1,
-> +    .post_load = rtc_post_load,
->      .fields = (VMStateField[]) {
->          VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPRTC, XLNX_ZYNQMP_RTC_R_MAX),
-> +        VMSTATE_INT32(current_tm.tm_sec, XlnxZynqMPRTC),
-> +        VMSTATE_INT32(current_tm.tm_min, XlnxZynqMPRTC),
-> +        VMSTATE_INT32(current_tm.tm_hour, XlnxZynqMPRTC),
-> +        VMSTATE_INT32(current_tm.tm_wday, XlnxZynqMPRTC),
-> +        VMSTATE_INT32(current_tm.tm_mday, XlnxZynqMPRTC),
-> +        VMSTATE_INT32(current_tm.tm_mon, XlnxZynqMPRTC),
-> +        VMSTATE_INT32(current_tm.tm_year, XlnxZynqMPRTC),
 
-I'm still not sure about having the current_tm struct fields
-here rather than whatever the hardware's natural representation
-of the current time is. Can you explain why you think this
-is the best approach?
+--2oS5YaxWCcQjTEyO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+On Mon, Jan 22, 2018 at 05:45:49PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Is it a bug or a feature? Why do we call inc/dec twice for read/write?
+> We don't do this for flush and discard..
+
+It's non-obvious and I asked Paolo the same question previously.
+
+> -    bdrv_inc_in_flight(bs);
+> -
+>      /* throttling disk I/O */
+>      if (blk->public.throttle_group_member.throttle_state) {
+>          throttle_group_co_io_limits_intercept(&blk->public.throttle_grou=
+p_member,
+>                  bytes, false);
+>      }
+
+^^^ HINT HINT HINT ^^^
+
+> =20
+> -    ret =3D bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
+> -    bdrv_dec_in_flight(bs);
+> -    return ret;
+> +    return bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
+
+The problem is what happens if the request is throttled?
+
+Even throttled requests must be counted so that bdrv_drain() and friends
+work.
+
+It may be possible to eliminate this now that throttling is a BDS node.
+It used to be implemented as a completely separate API outside the BDS
+node graph.  Now there is a throttling node in the graph, so maybe we
+can stop taking the extra reference but some refactoring may be
+necessary.
+
+Stefan
+
+--2oS5YaxWCcQjTEyO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaacF0AAoJEJykq7OBq3PIQa0H/jhQnlN72V/4UcrY+uGKOIJ0
+wz+sXZKM7DXJwysh8Cc3ilTNiWDvGq+HaiEDGvHk40x9SlATQv0naed6vCuHLIvR
+g6Qmn3AHOy7HO/LuC18BXti40iBY+aW7YuR3a0UGpBegr7xXJpXg5Qa3hu9jiEbe
+0RPtsd+cA17o1oy2rKMrs5NbnO93LuFbdqAIW3pO+r2bAY6dUdH1zEWOn3q3/CWu
+3Y2ImPbU0+uFxd82L0L8S5kvSqMkGTmbOm/52JbjhYtvsjyMtbrHpoxvg+RPY4+w
+shsxijBd+bRf6dRrouUk9blcjaIaifoTQZnZvtUos4yF92RQ/cM4W40o10Z0O4E=
+=nKyd
+-----END PGP SIGNATURE-----
+
+--2oS5YaxWCcQjTEyO--
