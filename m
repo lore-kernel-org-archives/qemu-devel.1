@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eejPZ-0006k7-23
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:25:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eejSW-0000tZ-HO
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:29:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eejPW-0007QE-EJ
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:25:57 -0500
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-8-git-send-email-walling@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6d81c288-2b93-35b4-fb27-24276342089d@redhat.com>
-Date: Thu, 25 Jan 2018 16:25:06 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eejSV-0001rm-It
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:29:00 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:36164)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eejSV-0001qj-DL
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:28:59 -0500
+Received: by mail-oi0-x241.google.com with SMTP id w135so5490930oie.3
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:28:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1516732013-18272-8-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390-ccw: read stage2 boot loader
- data to find menu
+In-Reply-To: <20180125091643.26195-1-kraxel@redhat.com>
+References: <20180125091643.26195-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jan 2018 15:28:38 +0000
+Message-ID: <CAFEAcA_U7Dw4m+wLeqHRij5YUO9eFkkpwwRjTWKr099Ux12+cw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Usb 20180125 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 23.01.2018 19:26, Collin L. Walling wrote:
-> Read the stage2 boot loader data block-by-block. We scan the
-> current block for the string "zIPL" to detect the start of the
-> boot menu banner. We then load the adjacent blocks (previous
-> block and next block) to account for the possibility of menu
-> data spanning multiple blocks.
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> ---
->  pc-bios/s390-ccw/bootmap.c | 94 +++++++++++++++++++++++++++++++++++++++++++---
->  pc-bios/s390-ccw/bootmap.h |  1 +
->  pc-bios/s390-ccw/menu.c    |  5 +++
->  pc-bios/s390-ccw/menu.h    |  1 +
->  4 files changed, 96 insertions(+), 5 deletions(-)
+On 25 January 2018 at 09:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 834a336eb911db8a8ca00e760ee6a85faca19414:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-01-24 19:24:26 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/usb-20180125-pull-request
+>
+> for you to fetch changes up to 2aef004483e34a42021dc98a3646971dc152cb1b:
+>
+>   usb-storage: Fix share-rw option parsing (2018-01-25 09:50:30 +0100)
+>
+> ----------------------------------------------------------------
+> usb: -usbdevice cleanups, storage fix, ccid cleanup.
+>
+> ----------------------------------------------------------------
+>
+> Fam Zheng (1):
+>   usb-storage: Fix share-rw option parsing
+>
+> Mao Zhongyi (1):
+>   hw/usb/ccid: Make ccid_card_init() take an error parameter
+>
+> Thomas Huth (1):
+>   usb: Remove legacy -usbdevice options (host, serial, disk and net)
 
-Looks good to me now!
+Hi. This fails to build on FreeBSD:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+  LINK    arm-softmmu/qemu-system-arm
+../vl.o: In function `usb_device_add':
+/root/qemu/vl.c:1471: undefined reference to `usb_host_device_open'
+
+There's still a call to that function in vl.c inside an
+ifndef CONFIG_LINUX...
+
+If we can really remove the function we should get rid of the
+stub in hw/usb/host-stub.c and the prototype in usb.h too.
+
+thanks
+-- PMM
