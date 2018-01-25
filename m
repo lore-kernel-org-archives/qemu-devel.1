@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eel6X-0004Kg-TE
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 12:14:26 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eel6q-0004b4-KQ
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 12:14:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eel6S-0004rO-Ub
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 12:14:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eel6S-0004qk-P2
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 12:14:20 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F076B486C2
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 17:14:19 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 25 Jan 2018 17:14:12 +0000
-Message-Id: <20180125171412.21627-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] sockets: fix parsing of ipv4/ipv6 opts in
- parse_socket_addr
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eel6p-0004zy-Lc
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 12:14:44 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33560)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eel6p-0004zq-Gw
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 12:14:43 -0500
+Received: by mail-qt0-x242.google.com with SMTP id d8so21039874qtm.0
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 09:14:43 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 25 Jan 2018 14:14:31 -0300
+Message-Id: <20180125171432.13554-3-f4bug@amsat.org>
+In-Reply-To: <20180125171432.13554-1-f4bug@amsat.org>
+References: <20180125171432.13554-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 2/3] usb-ccid: inline ccid_card_initfn() in
+ ccid_card_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +34,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
-
-The inet_parse() function looks for 'ipv4' and 'ipv6' flags, but only
-treats them as bare bool flags. The normal QemuOpts parsing would allow
-on/off values to be set too.
-
-This updates inet_parse() so that its handling of the 'ipv4' and 'ipv6'
-flags matches that done by QemuOpts.
-
-This impacts the NBD block driver parsing the legacy filename syntax and
-the migration code parsing the socket scheme.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- util/qemu-sockets.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+ hw/usb/dev-smartcard-reader.c | 25 +++++++------------------
+ 1 file changed, 7 insertions(+), 18 deletions(-)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index d6a1e1759e..300ebce795 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -554,6 +554,33 @@ err:
+diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
+index 0092493f4e..85f5f2247b 100644
+--- a/hw/usb/dev-smartcard-reader.c
++++ b/hw/usb/dev-smartcard-reader.c
+@@ -510,20 +510,6 @@ static void ccid_card_exitfn(CCIDCardState *card)
+ 
  }
  
- /* compatibility wrapper */
-+static int inet_parse_flag(const char *flagname, const char *optstr, bool *val,
-+                           Error **errp)
-+{
-+    char *end;
-+    size_t len;
-+
-+    end = strstr(optstr, ",");
-+    if (end) {
-+        if (end[1] == ',') { /* Reject 'ipv6=on,,foo' */
-+            error_setg(errp, "error parsing '%s' flag '%s'", flagname, optstr);
-+            return -1;
-+        }
-+        len = end - optstr;
-+    } else {
-+        len = strlen(optstr);
-+    }
-+    if (len == 0 || (len == 3 && strncmp(optstr, "=on", len) == 0)) {
-+        *val = true;
-+    } else if ((len == 4) && strncmp(optstr, "=off", len) == 0) {
-+        *val = false;
-+    } else {
-+        error_setg(errp, "error parsing '%s' flag '%s'", flagname, optstr);
-+        return -1;
-+    }
-+    return 0;
-+}
-+
- int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
+-static void ccid_card_initfn(CCIDCardState *card, Error **errp)
+-{
+-    CCIDCardClass *cc = CCID_CARD_GET_CLASS(card);
+-    Error *local_err = NULL;
+-
+-    if (cc->realize) {
+-        cc->realize(card, &local_err);
+-        if (local_err != NULL) {
+-            error_propagate(errp, local_err);
+-            return;
+-        }
+-    }
+-}
+-
+ static bool ccid_has_pending_answers(USBCCIDState *s)
  {
-     const char *optstr, *h;
-@@ -561,6 +588,7 @@ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
-     char port[33];
-     int to;
-     int pos;
-+    char *begin;
- 
-     memset(addr, 0, sizeof(*addr));
- 
-@@ -602,11 +630,19 @@ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
-         addr->has_to = true;
-         addr->to = to;
+     return s->pending_answers_num > 0;
+@@ -1302,6 +1288,7 @@ static int ccid_card_exit(DeviceState *qdev)
+ static void ccid_card_realize(DeviceState *qdev, Error **errp)
+ {
+     CCIDCardState *card = CCID_CARD(qdev);
++    CCIDCardClass *cc = CCID_CARD_GET_CLASS(card);
+     USBDevice *dev = USB_DEVICE(qdev->parent_bus->parent);
+     USBCCIDState *s = USB_CCID_DEV(dev);
+     Error *local_err = NULL;
+@@ -1315,10 +1302,12 @@ static void ccid_card_realize(DeviceState *qdev, Error **errp)
+         error_setg(errp, "usb-ccid card already full, not adding");
+         return;
      }
--    if (strstr(optstr, ",ipv4")) {
--        addr->ipv4 = addr->has_ipv4 = true;
-+    begin = strstr(optstr, ",ipv4");
-+    if (begin) {
-+        if (inet_parse_flag("ipv4", begin + 5, &addr->ipv4, errp) < 0) {
-+            return -1;
+-    ccid_card_initfn(card, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
+-        return;
++    if (cc->realize) {
++        cc->realize(card, &local_err);
++        if (local_err != NULL) {
++            error_propagate(errp, local_err);
++            return;
 +        }
-+        addr->has_ipv4 = true;
      }
--    if (strstr(optstr, ",ipv6")) {
--        addr->ipv6 = addr->has_ipv6 = true;
-+    begin = strstr(optstr, ",ipv6");
-+    if (begin) {
-+        if (inet_parse_flag("ipv6", begin + 5, &addr->ipv6, errp) < 0) {
-+            return -1;
-+        }
-+        addr->has_ipv6 = true;
-     }
-     return 0;
+     s->card = card;
  }
 -- 
-2.14.3
+2.15.1
