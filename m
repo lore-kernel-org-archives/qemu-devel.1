@@ -1,43 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eeiw6-0004cZ-MC
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:55:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1eeizZ-0006KJ-4k
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eeiw2-0001kF-LI
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:55:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39880
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eeiw2-0001jo-5y
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:55:26 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0PEsaMn106182
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 09:55:25 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fqevjfh7b-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 09:55:25 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Thu, 25 Jan 2018 09:55:24 -0500
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-3-git-send-email-walling@linux.vnet.ibm.com>
-	<ce230364-5139-e49c-0cb9-95fe36296c75@redhat.com>
-	<20180125121748.1e476515.cohuck@redhat.com>
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Thu, 25 Jan 2018 09:55:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1eeizX-0004hw-TT
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:59:05 -0500
+References: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77c33c7b-fb3d-27e7-a694-c0fe5f34e036@redhat.com>
+Date: Thu, 25 Jan 2018 08:58:39 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180125121748.1e476515.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <731e0f1b-fc6e-c523-3358-0dc28561d58e@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 02/10] s390-ccw: refactor
- eckd_block_num to use CHS
+In-Reply-To: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp"
+Subject: Re: [Qemu-devel] (v2. forward to qemu )-Panic with ext4, nbd,
+ qemu-img, block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,44 +24,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: frankja@linux.vnet.ibm.com, david@redhat.com, alifm@linux.vnet.ibm.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
+To: "Hongzhi, Song" <hongzhi.song@windriver.com>, qemu-block@nongnu.org
+Cc: linux-block@vger.kernel.org, qemu-discuss@nongnu.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
 
-On 01/25/2018 06:17 AM, Cornelia Huck wrote:
-> On Thu, 25 Jan 2018 12:06:50 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
->
->> On 23.01.2018 19:26, Collin L. Walling wrote:
->>> Add new cylinder/head/sector struct. Use it to calculate
->>> eckd block numbers instead of a BootMapPointer (which used
->>> eckd chs anyway).
->>>
->>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->>> ---
->>>   pc-bios/s390-ccw/bootmap.c | 28 ++++++++++++++--------------
->>>   pc-bios/s390-ccw/bootmap.h |  8 ++++++--
->>>   2 files changed, 20 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
->>> index 6b6c915..621adbe 100644
->>> --- a/pc-bios/s390-ccw/bootmap.c
->>> +++ b/pc-bios/s390-ccw/bootmap.c
->>> @@ -95,32 +95,32 @@ static inline void verify_boot_info(BootInfo *bip)
->>>                  "Bad block size in zIPL section of the 1st record.");
->>>   }
->>>   
->>> -static block_number_t eckd_block_num(BootMapPointer *p)
->>> +static block_number_t eckd_block_num(EckdCHS chs)
->> Should this maybe rather be call-by-pointer instead? I'm not a fan of
->> passing structs by value, though it might be OK in this case since it's
->> a small struct only...
->>
->> What do others think?
-> I think passing a struct by value is fine for things like a schid
-> (which is basically just the structured version of an integer). In this
-> case, I think passing a pointer would look nicer.
->
-Easy enough :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp
+From: Eric Blake <eblake@redhat.com>
+To: "Hongzhi, Song" <hongzhi.song@windriver.com>, qemu-block@nongnu.org
+Cc: linux-block@vger.kernel.org, qemu-discuss@nongnu.org,
+ linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+ qemu-devel@nongnu.org
+Message-ID: <77c33c7b-fb3d-27e7-a694-c0fe5f34e036@redhat.com>
+Subject: Re: [Qemu-devel] (v2. forward to qemu )-Panic with ext4, nbd,
+ qemu-img, block
+References: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+In-Reply-To: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- 
-- Collin L Walling
+On 01/21/2018 08:06 PM, Hongzhi, Song wrote:
+> Hello,
+>=20
+> I create a virtual disk-image using qemu-img.
+>=20
+> And then I use /dev/nbd to map the image.
+>=20
+> I mount the /dev/nbd to a local dir with ext4-format
+>=20
+> Finally, I have some trouble about ext4-filesystem and block device,
+> with using demand of rsync or dd to write the image.
+>=20
+> Reproduce :
+>=20
+> =C2=A0=C2=A0=C2=A0 qemu-img create test.img 2G
+>=20
+> =C2=A0=C2=A0=C2=A0 mkfs.ext4 -F test.img
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0 qemu-nbd -f raw -c /dev/nbd0 test.img
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0 mount -r ext4 /dev/nbd0 LOCAL_DIR/
+>=20
+> =C2=A0=C2=A0=C2=A0 rsync -av META_DATA_DIR/=C2=A0 LOCAL_DIR/
+>=20
+> Qemu Version:
+>=20
+> =C2=A0=C2=A0=C2=A0 QEMU emulator version 2.10.0
+
+There have been some bug fixes in the NBD code in qemu 2.11; does using
+a newer version make a difference in your results?
+
+
+> Detail:
+>=20
+>=20
+> 329.11 EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts:=
+
+> (null)
+> 329.12 block nbd0: Connection timed out
+> 329.13 block nbd0: shutting down sockets
+
+This sounds like a log of the kernel side; but it is rather sparse on
+details on why the kernel lost the connection to the socket provided by
+qemu-nbd -c.  Is there any chance we can get a corresponding trace from
+qemu-nbd when reproducing the lost connection?
+
+> 329.14 blk_update_request: I/O error, dev nbd0, sector 304384
+> 329.15 blk_update_request: I/O error, dev nbd0, sector 304640
+> 329.16 blk_update_request: I/O error, dev nbd0, sector 304896
+> 329.17 blk_update_request: I/O error, dev nbd0, sector 305152
+> 329.18 blk_update_request: I/O error, dev nbd0, sector 305408
+> 329.19 blk_update_request: I/O error, dev nbd0, sector 305664
+> 329.20 blk_update_request: I/O error, dev nbd0, sector 305920
+> 329.21 blk_update_request: I/O error, dev nbd0, sector 306176
+> 329.22 blk_update_request: I/O error, dev nbd0, sector 306432
+> 329.23 blk_update_request: I/O error, dev nbd0, sector 306688
+> 329.24 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5
+> writing to inode 160 (offset 8388608 size 8388608 starting block 38400)=
+
+
+Everything else in the trace looks like fallout from the initial lost
+connection - once the kernel can't communicate to the NBD server, it has
+to fail all pending and subsequent I/O requests to /dev/nbd0.  But until
+we can figure out why the connection is dropped, seeing this part of the
+trace doesn't add any information about the root cause.
+
+But oddly enough, once things go south in the kernel nbd module, it
+leads to a full-on kernel bug:
+
+> GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
+> 329.51 Workqueue: writeback wb_workfn (flush-43:0)
+> 329.52 task: ffff977bec759e00 task.stack: ffffa2930524c000
+> 329.53 RIP: 0010:submit_bh_wbc+0x155/0x160
+> 329.54 RSP: 0018:ffffa2930524f7e0 EFLAGS: 00010246
+> 329.55 RAX: 0000000000620005 RBX: ffff977f05cddc18 RCX: 000000000000000=
+0
+> 329.56 RDX: ffff977f05cddc18 RSI: 0000000000020800 RDI: 000000000000000=
+1
+> 329.57 RBP: ffffa2930524f808 R08: ff00000000000000 R09: 00fffffffffffff=
+f
+> 329.58 R10: ffffa2930524f920 R11: 000000000000058c R12: 000000000000a59=
+8
+> 329.59 R13: ffffffffba15c500 R14: ffff977fe1bab400 R15: ffff977fea64300=
+0
+> 329.60 FS: 0000000000000000(0000) GS:ffff977befa00000(0000)
+> knlGS:0000000000000000
+> 329.61 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> 329.62 CR2: 00007f7d70000010 CR3: 000000035ce0e000 CR4: 00000000001406e=
+0
+> 329.63 Call Trace:
+> 329.64 __sync_dirty_buffer+0x41/0xa0
+> 329.65 ext4_commit_super+0x1d6/0x2a0
+> 329.66 __ext4_error_inode+0xb2/0x170
+
+> 329.99 JBD2: Error -5 detected when updating journal superblock for nbd=
+0-8.
+> 329.100 Aborting journal on device nbd0-8.
+> 329.101 ------------[ cut here ]------------
+> 329.102 kernel BUG at /kernel-source//fs/buffer.c:3091!
+
+Well, that should certainly be reported to the kernel folks; nothing
+qemu can do about it (a userspace socket serving NBD data should not be
+able to cause the kernel NBD client to result in a subsequent kernel
+crash, regardless of how bad data loss is when the socket disappears out
+from under the kernel).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpp8J8ACgkQp6FrSiUn
+Q2rJ9wf8CB3dBoOdh+ZFyOYO1q88ZMUg0V4AzZiO49oAvk5yAu9Sq5KdZZDqelQH
+I19yN+X/McmAF+qOhebmIl0jqa0XB2Rc8En5KewCtpiqHSsxLRewe/AhwDQmKGJZ
+QVeG/JjqJMg7SaNsR/NnzAfte94IthCbe7tH/KEZhr+gHX/g5PqmWCB1o7H9W9BB
+PNsWrvZdglzrQO9Gc/w3E0kediwsEQZMMdAzp8vWrFOjhyZaIrtoZRnG9k723xyI
+I2BKPaBgIoLdZbiqAStNf/JaO5b4RJjIlTuI9t3n+WgiE3rYd/st04yxOBFddZj1
+B6YJybA+/mHGx4Qa49O14Wfkj3YyEw==
+=1XT1
+-----END PGP SIGNATURE-----
+
+--bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp--
