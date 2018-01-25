@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eej8b-0002CQ-TF
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:08:27 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eejB3-0003Ep-7s
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eej8S-00030L-Tq
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:08:25 -0500
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-5-git-send-email-walling@linux.vnet.ibm.com>
-	<2a6618d7-566b-bec7-c267-26e4e7acb1a2@redhat.com>
-	<ded3d6a0-3432-368a-3964-6641c7fef3fe@linux.vnet.ibm.com>
-	<24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cfd9af56-8122-e195-f89f-e219bec9b23c@redhat.com>
-Date: Thu, 25 Jan 2018 09:08:09 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1eejAz-0005N4-AQ
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:10:57 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:34601)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eejAz-0005Mf-4a
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:10:53 -0500
+Received: by mail-oi0-x241.google.com with SMTP id k15so5439173oib.1
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 07:10:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY"
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 04/10] s390-ccw: update libc
+In-Reply-To: <CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
+	<20171209010811.GJ3037@localhost.localdomain>
+	<CAFEAcA9oG=+mJ+jSGTM_z54S09gjHoFowDkOvofdkhJd+g3=Cw@mail.gmail.com>
+	<20180122183301.GA31237@localhost.localdomain>
+	<CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jan 2018 15:10:31 +0000
+Message-ID: <CAFEAcA96N1Nuh9rXVtWnmnmm_+xQRFiesdSLbTx4yJBGYEVJaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
+ gic-version=max)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>,
- "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com,
- alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
-Message-ID: <cfd9af56-8122-e195-f89f-e219bec9b23c@redhat.com>
-Subject: Re: [qemu-s390x] [Qemu-devel] [PATCH v4 04/10] s390-ccw: update libc
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
- <1516732013-18272-5-git-send-email-walling@linux.vnet.ibm.com>
- <2a6618d7-566b-bec7-c267-26e4e7acb1a2@redhat.com>
- <ded3d6a0-3432-368a-3964-6641c7fef3fe@linux.vnet.ibm.com>
- <24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
-In-Reply-To: <24ede72f-bc12-0911-a5c6-5d38fac2c060@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/25/2018 06:06 AM, Thomas Huth wrote:
->>> That's not "any whitespace", but only spaces.=C2=A0 A fully compliant=
-
->>> implementation would be checking isspace(), but I don't expect you to=
-
->>> implement that; at a minimum, also checking '\t' would get you closer=
-
->>> (but not all the way to) compliance.
+On 25 January 2018 at 14:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 22 January 2018 at 18:33, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> About QOM type names:
 >>
->>
->> I'll fix the comment to be more clear.
->>
->> I think it's okay to just have the menu code treat any other kind
->> of whitespace as an error (it will check before calling atoi). I
->> added support for negatives in bothfunctions because it was easy
->> enough to do so and for the sakeof completeness.
->>
->> However, I worry trying to be 100% compliant will just bloat the
->> code when we only need it for very specific use cases.
->>
->> Would you say what we have (along with the fix to itostr below) is
->> sufficient enough?
->=20
-> IMHO the current way is good enough for a BIOS implementation. We're no=
-t
-> doing a full replacement of glibc here ;-)
+>> On x86, all CPU models are resolved to "<model>-<suffix>", and
+>> i386 and x86_64 have different suffixes.  So the QOM type name is
+>> "max-x86_64-cpu" on qemu-system-x86_64, and "max-i386-cpu" on
+>> qemu-system-i386.
+>
+> OK. Looking at the target/arm code we do a similar suffix
+> trick, but we seem to have cut-n-pasted the handling in
+> aarch64_cpu_register(), so it uses the TYPE_ARM_CPU as the
+> suffix, rather the TYPE_AARCH64_CPU.
 
-Documenting the issue is the best approach; don't bloat the code for
-something that none of the callers care about.  Perhaps as simple as addi=
-ng:
+...and that's not as simple a fix as I thought, because the
+code in helper.c for implementing arch_query_cpu_definitions() and
+arm_cpu_list() assumes it can create the QOM type name by appending
+TYPE_ARM_CPU. The ARM_CPU_TYPE_NAME() macro which we use pretty
+extensively also assumes the suffix is the same regardless of
+what CPU type it's being applied to.
 
-NOTE: This function is not quite like the standardized version in libc;
-it does not handle all forms of leading space or INT_MIN.
+Looking at x86 it seems that TYPE_X86_CPU expands to a different
+string for qemu-system-x86_64 and qemu-system-i386. I could do
+that, but it seems very confusing: I would expect a QOM type
+name like TYPE_FOO to always mean the same QOM type.
 
-(or whatever the actual differences are, based on your implementation
-choices).
+Given that the type names don't appear to the user, I think
+we can go ahead with implementing "-cpu max" for Arm without
+having to first disentangle this? "max" isn't in any worse
+a position than the existing "host" and "any" types.
 
-Another solution is to just not use the standardized name; keeping it
-named _atoi() instead of atoi() makes it obvious that you are calling an
-internal function that does not have to have standardized semantics.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpp8tkACgkQp6FrSiUn
-Q2prJwf9HzWp/8RXfqqNb1ejbWUDnSHeK9A87vxjtC/1Wzc0uNlaPZPYVYWCt2y7
-Roh1hah7IVu0AnKa0vX1U4tFntmkks4V7PeaO3WdYKja5CcuZtrbevjbtL5fX6/C
-iOgxi3KgZdbrSGCv22U7RyZIYClLLpeXxyr8IoVN7t6j024Cq/b5BjMbrezgWDoL
-wmsQqdVP61t9PYh+AyE7onPUsqA3fXysC8ijeL4AOK0Kg7ZUyxMPj26aMroUfNzA
-4B0aK8lELPql+DYPsEM6dyZuJT4mk0wOaHycQw8mELJYbmt6B6xpgbIxz+fsgNz9
-3QW+izLKEzOBWLNK6YoeMX7MzjO+rA==
-=iWTq
------END PGP SIGNATURE-----
-
---BE0OW0nezxlyF8j6orp5eTtf3Xs7GIHyY--
+thanks
+-- PMM
