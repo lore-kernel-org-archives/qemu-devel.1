@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehom-0003LC-5O
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:54 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eehoo-0003MC-Pf
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehol-0003Cz-8I
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:52 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45994)
+	(envelope-from <pm215@archaic.org.uk>) id 1eehon-0003Ff-NP
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:54 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eehol-0003BN-18
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:51 -0500
+	id 1eehon-0003Co-Cr
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 08:43:53 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eehoj-0006y2-HC
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 13:43:49 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eehol-0006yj-Bc
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 13:43:51 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jan 2018 13:43:27 +0000
-Message-Id: <1516887809-6265-20-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 25 Jan 2018 13:43:29 +0000
+Message-Id: <1516887809-6265-22-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1516887809-6265-1-git-send-email-peter.maydell@linaro.org>
 References: <1516887809-6265-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/21] sdhci: fix a NULL pointer dereference due
- to uninitialized AddresSpace object
+Subject: [Qemu-devel] [PULL 21/21] pl110: Implement vertical compare/next
+ base interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +30,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Linus Walleij <linus.walleij@linaro.org>
 
-missed in 60765b6ceeb4.
+This implements rudimentary support for interrupt generation on the
+PL110. I am working on a new DRI/KMS driver for Linux and since that
+uses the blanking interrupt, we need something to fire here. Without
+any interrupt support Linux waits for a while and then gives ugly
+messages about the vblank not working in the console (it does not
+hang perpetually or anything though, DRI is pretty forgiving).
 
-  Thread 1 "qemu-system-aarch64" received signal SIGSEGV, Segmentation fault.
-  address_space_init (as=0x0, root=0x55555726e410, name=name@entry=0x555555e3f0a7 "sdhci-dma") at memory.c:3050
-  3050	    as->root = root;
-  (gdb) bt
-  #0  address_space_init (as=0x0, root=0x55555726e410, name=name@entry=0x555555e3f0a7 "sdhci-dma") at memory.c:3050
-  #1  0x0000555555af62c3 in sdhci_sysbus_realize (dev=<optimized out>, errp=0x7fff7f931150) at hw/sd/sdhci.c:1564
-  #2  0x00005555558b25e5 in zynqmp_sdhci_realize (dev=0x555557051520, errp=0x7fff7f931150) at hw/sd/zynqmp-sdhci.c:151
-  #3  0x0000555555a2e7f3 in device_set_realized (obj=0x555557051520, value=<optimized out>, errp=0x7fff7f931270) at hw/core/qdev.c:966
-  #4  0x0000555555ba3f74 in property_set_bool (obj=0x555557051520, v=<optimized out>, name=<optimized out>, opaque=0x555556e04a20,
-      errp=0x7fff7f931270) at qom/object.c:1906
-  #5  0x0000555555ba51f4 in object_property_set (obj=obj@entry=0x555557051520, v=v@entry=0x5555576dbd60,
-      name=name@entry=0x555555dd6306 "realized", errp=errp@entry=0x7fff7f931270) at qom/object.c:1102
+I solved it for now by setting up a timer to fire at 60Hz and pull
+the interrupts for "vertical compare" and "next memory base"
+at this interval. This works fine and fires roughly the same number
+of IRQs on QEMU as on the hardware and leaves the console clean
+and nice.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180123132051.24448-1-f4bug@amsat.org
+People who want to create more accurate emulation can probably work
+on top of this if need be. It is certainly closer to the hardware
+behaviour than what we have today anyway.
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Message-id: 20180123225654.5764-1-linus.walleij@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: folded long lines]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/sd/sdhci.h | 1 +
- hw/sd/sdhci.c         | 1 +
- 2 files changed, 2 insertions(+)
+ hw/display/pl110.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index cb37182..1cf70f8 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -41,6 +41,7 @@ typedef struct SDHCIState {
-     /*< public >*/
-     SDBus sdbus;
+diff --git a/hw/display/pl110.c b/hw/display/pl110.c
+index 8c7dcc6..cf68457 100644
+--- a/hw/display/pl110.c
++++ b/hw/display/pl110.c
+@@ -12,6 +12,7 @@
+ #include "ui/console.h"
+ #include "framebuffer.h"
+ #include "ui/pixel_ops.h"
++#include "qemu/timer.h"
+ #include "qemu/log.h"
+ 
+ #define PL110_CR_EN   0x001
+@@ -19,6 +20,8 @@
+ #define PL110_CR_BEBO 0x200
+ #define PL110_CR_BEPO 0x400
+ #define PL110_CR_PWR  0x800
++#define PL110_IE_NB   0x004
++#define PL110_IE_VC   0x008
+ 
+ enum pl110_bppmode
+ {
+@@ -50,6 +53,7 @@ typedef struct PL110State {
      MemoryRegion iomem;
-+    AddressSpace sysbus_dma_as;
-     AddressSpace *dma_as;
-     MemoryRegion *dma_mr;
+     MemoryRegionSection fbsection;
+     QemuConsole *con;
++    QEMUTimer *vblank_timer;
  
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index f9264d3..fac7fa5 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -1388,6 +1388,7 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-     }
+     int version;
+     uint32_t timing[4];
+@@ -320,7 +324,24 @@ static void pl110_resize(PL110State *s, int width, int height)
+ /* Update interrupts.  */
+ static void pl110_update(PL110State *s)
+ {
+-  /* TODO: Implement interrupts.  */
++    /* Raise IRQ if enabled and any status bit is 1 */
++    if (s->int_status & s->int_mask) {
++        qemu_irq_raise(s->irq);
++    } else {
++        qemu_irq_lower(s->irq);
++    }
++}
++
++static void pl110_vblank_interrupt(void *opaque)
++{
++    PL110State *s = opaque;
++
++    /* Fire the vertical compare and next base IRQs and re-arm */
++    s->int_status |= (PL110_IE_NB | PL110_IE_VC);
++    timer_mod(s->vblank_timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++                                NANOSECONDS_PER_SECOND / 60);
++    pl110_update(s);
+ }
  
-     if (s->dma_mr) {
-+        s->dma_as = &s->sysbus_dma_as;
-         address_space_init(s->dma_as, s->dma_mr, "sdhci-dma");
-     } else {
-         /* use system_memory() if property "dma" not set */
+ static uint64_t pl110_read(void *opaque, hwaddr offset,
+@@ -429,6 +450,11 @@ static void pl110_write(void *opaque, hwaddr offset,
+         s->bpp = (val >> 1) & 7;
+         if (pl110_enabled(s)) {
+             qemu_console_resize(s->con, s->cols, s->rows);
++            timer_mod(s->vblank_timer,
++                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++                                        NANOSECONDS_PER_SECOND / 60);
++        } else {
++            timer_del(s->vblank_timer);
+         }
+         break;
+     case 10: /* LCDICR */
+@@ -474,6 +500,8 @@ static void pl110_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->iomem, OBJECT(s), &pl110_ops, s, "pl110", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+     sysbus_init_irq(sbd, &s->irq);
++    s->vblank_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                                   pl110_vblank_interrupt, s);
+     qdev_init_gpio_in(dev, pl110_mux_ctrl_set, 1);
+     s->con = graphic_console_init(dev, 0, &pl110_gfx_ops, s);
+ }
 -- 
 2.7.4
