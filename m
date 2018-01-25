@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1ef4Fk-0000gX-6Y
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:13 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1ef4Ft-0000oA-NB
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1ef4Fc-0002gS-2r
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:12 -0500
-Received: from mga03.intel.com ([134.134.136.65]:11830)
+	(envelope-from <luwei.kang@intel.com>) id 1ef4Fq-0002my-HC
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:21 -0500
+Received: from mga01.intel.com ([192.55.52.88]:55840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1ef4FZ-0002eo-AY
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:04 -0500
+	id 1ef4Fp-0002lt-KL
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:18 -0500
 From: Luwei Kang <luwei.kang@intel.com>
-Date: Fri, 26 Jan 2018 02:25:51 +0800
-Message-Id: <1516904751-10248-2-git-send-email-luwei.kang@intel.com>
-In-Reply-To: <1516904751-10248-1-git-send-email-luwei.kang@intel.com>
-References: <1516904751-10248-1-git-send-email-luwei.kang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] i386: Add support to get/set/migrate
- Intel Processor Trace feature
+Date: Fri, 26 Jan 2018 02:25:50 +0800
+Message-Id: <1516904751-10248-1-git-send-email-luwei.kang@intel.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] i386: Add Intel Processor Trace feature
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,188 +28,192 @@ Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.c
 
 From: Chao Peng <chao.p.peng@linux.intel.com>
 
-Add Intel Processor Trace related definition. It also add
-corresponding part to kvm_get/set_msr and vmstate.
+Expose Intel Processor Trace feature to guest.
 
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+In order to make this feature migration-safe, new feature word
+information "FEAT_INTEL_PT_EBX" and "FEAT_INTEL_PT_ECX" be added.
+Some constant value initialized in CPUID[0x14].0x01 to guarantee
+get same result in diffrent hardware when this feature is enabled.
+
 Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 ---
- target/i386/cpu.h     | 22 ++++++++++++++++++++++
- target/i386/kvm.c     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/machine.c | 38 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 111 insertions(+)
+v1->v2:
+ - In order to make this feature migration-safe, new feature word
+   information "FEAT_INTEL_PT_EBX" and "FEAT_INTEL_PT_ECX" be added.
+   Some constant value initialized in CPUID[0x14].0x01 to guarantee
+   get same result in diffrent hardware when this feature is enabled.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 53908ff..85f0a04 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -419,6 +419,21 @@ typedef enum X86Seg {
- #define MSR_MC0_ADDR                    0x402
- #define MSR_MC0_MISC                    0x403
+---
+ target/i386/cpu.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ target/i386/cpu.h |  6 +++++
+ target/i386/kvm.c | 23 +++++++++++++++++++
+ 3 files changed, 95 insertions(+), 2 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index a49d222..ee8c6e6 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -172,7 +172,11 @@
+ #define L2_ITLB_4K_ASSOC       4
+ #define L2_ITLB_4K_ENTRIES   512
  
-+#define MSR_IA32_RTIT_OUTPUT_BASE       0x560
-+#define MSR_IA32_RTIT_OUTPUT_MASK       0x561
-+#define MSR_IA32_RTIT_CTL               0x570
-+#define MSR_IA32_RTIT_STATUS            0x571
-+#define MSR_IA32_RTIT_CR3_MATCH         0x572
-+#define MSR_IA32_RTIT_ADDR0_A           0x580
-+#define MSR_IA32_RTIT_ADDR0_B           0x581
-+#define MSR_IA32_RTIT_ADDR1_A           0x582
-+#define MSR_IA32_RTIT_ADDR1_B           0x583
-+#define MSR_IA32_RTIT_ADDR2_A           0x584
-+#define MSR_IA32_RTIT_ADDR2_B           0x585
-+#define MSR_IA32_RTIT_ADDR3_A           0x586
-+#define MSR_IA32_RTIT_ADDR3_B           0x587
-+#define MAX_RTIT_ADDRS                  8
-+
- #define MSR_EFER                        0xc0000080
+-
++/* CPUID Leaf 0x14 constants: */
++#define INTLE_PT_ADDR_RANGES_NUM 2
++#define INTEL_PT_MTC_BITMAP      (0x0249 << 16) /* Support ART(0,3,6,9) */
++#define INTEL_PT_CYCLE_BITMAP    0x3fff         /* Support 0,2^(0~12) */
++#define INTEL_PT_PSB_BITMAP      (0x003f << 16) /* Support 2K,4K,8K,16K,32K,64K */
  
- #define MSR_EFER_SCE   (1 << 0)
-@@ -1163,6 +1178,13 @@ typedef struct CPUX86State {
-     uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
-     uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
+ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+                                      uint32_t vendor2, uint32_t vendor3)
+@@ -427,7 +431,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, "mpx", NULL,
+             "avx512f", "avx512dq", "rdseed", "adx",
+             "smap", "avx512ifma", "pcommit", "clflushopt",
+-            "clwb", NULL, "avx512pf", "avx512er",
++            "clwb", "intel-pt", "avx512pf", "avx512er",
+             "avx512cd", "sha-ni", "avx512bw", "avx512vl",
+         },
+         .cpuid_eax = 7,
+@@ -545,6 +549,38 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .cpuid_reg = R_EDX,
+         .tcg_features = ~0U,
+     },
++    [FEAT_INTEL_PT_EBX] = {
++        .feat_names = {
++            "cr3-filter", "psb-cycle", "filtering", "mtc-cofi",
++            "ptwrite", "power-evt", NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid_eax = 0x14,
++        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
++        .cpuid_reg = R_EBX,
++        .tcg_features = ~0U,
++    },
++    [FEAT_INTEL_PT_ECX] = {
++        .feat_names = {
++            "topa-output", "any-entries", "single-range", "transport",
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid_eax = 0x14,
++        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
++        .cpuid_reg = R_ECX,
++        .tcg_features = ~0U,
++    },
+ };
  
-+    uint64_t msr_rtit_ctrl;
-+    uint64_t msr_rtit_status;
-+    uint64_t msr_rtit_output_base;
-+    uint64_t msr_rtit_output_mask;
-+    uint64_t msr_rtit_cr3_match;
-+    uint64_t msr_rtit_addrs[MAX_RTIT_ADDRS];
-+
-     /* exception/interrupt handling */
-     int error_code;
-     int exception_is_int;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f9f4cd1..097c953 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                 kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
-             }
+ typedef struct X86RegisterInfo32 {
+@@ -3452,6 +3488,34 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
          }
-+        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
-+                                                    0x14, 1, R_EAX) & 0x7;
+         break;
+     }
++    case 0x14: {
++	/* Intel Processor Trace Enumeration */
++        *eax = 0;
++        *ebx = 0;
++        *ecx = 0;
++        *edx = 0;
++        if (!(env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) ||
++             !kvm_enabled()) {
++            break;
++        }
 +
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-+                            env->msr_rtit_ctrl);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-+                            env->msr_rtit_status);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-+                            env->msr_rtit_output_base);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
-+                            env->msr_rtit_output_mask);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
-+                            env->msr_rtit_cr3_match);
-+            for (i = 0; i < addr_num; i++) {
-+                kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
-+                            env->msr_rtit_addrs[i]);
++        if (count == 0) {
++            *eax = 1;
++            *ebx = env->features[FEAT_INTEL_PT_EBX];
++            *ecx = env->features[FEAT_INTEL_PT_ECX];
++        } else if (count == 1) {
++            *eax = INTLE_PT_ADDR_RANGES_NUM;
++            if (env->features[FEAT_INTEL_PT_EBX] &
++                    CPUID_INTEL_PT_EBX_MTC_COFI) {
++                *eax |= INTEL_PT_MTC_BITMAP;
++            }
++            if (env->features[FEAT_INTEL_PT_EBX] &
++                    CPUID_INTEL_PT_EBX_PSB_CYCLE) {
++                *ebx = INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP;
 +            }
 +        }
- 
-         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
-          *       kvm_put_msr_feature_control. */
-@@ -2124,6 +2143,20 @@ static int kvm_get_msrs(X86CPU *cpu)
-         }
-     }
- 
-+    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+        int addr_num =
-+            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
-+
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH, 0);
-+        for (i = 0; i < addr_num; i++) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
-+        }
++        break;
 +    }
+     case 0x40000000:
+         /*
+          * CPUID code in kvm_arch_init_vcpu() ignores stuff
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 30cc562..53908ff 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -483,6 +483,8 @@ typedef enum FeatureWord {
+     FEAT_6_EAX,         /* CPUID[6].EAX */
+     FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
+     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
++    FEAT_INTEL_PT_EBX,  /* CPUID[EAX=0x14,ECX=0].EBX */
++    FEAT_INTEL_PT_ECX,  /* CPUID[EAX=0x14,ECX=0].ECX */
+     FEATURE_WORDS,
+ } FeatureWord;
+ 
+@@ -644,6 +646,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EBX_PCOMMIT  (1U << 22) /* Persistent Commit */
+ #define CPUID_7_0_EBX_CLFLUSHOPT (1U << 23) /* Flush a Cache Line Optimized */
+ #define CPUID_7_0_EBX_CLWB     (1U << 24) /* Cache Line Write Back */
++#define CPUID_7_0_EBX_INTEL_PT (1U << 25) /* Intel Processor Trace */
+ #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
+ #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and Reciprocal */
+ #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512 Conflict Detection */
+@@ -677,6 +680,9 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_XSAVE_XGETBV1    (1U << 2)
+ #define CPUID_XSAVE_XSAVES     (1U << 3)
+ 
++#define CPUID_INTEL_PT_EBX_PSB_CYCLE  (1U << 1) /* Support configurable PSB and  Cycle-Accurate Mode */
++#define CPUID_INTEL_PT_EBX_MTC_COFI   (1U << 3) /* Support MTC timing and suppression of COFI-based packets */
 +
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
-         return ret;
-@@ -2364,6 +2397,24 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_SPEC_CTRL:
-             env->spec_ctrl = msrs[i].data;
+ #define CPUID_6_EAX_ARAT       (1U << 2)
+ 
+ /* CPUID[0x80000007].EDX flags: */
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index ad4b159..f9f4cd1 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -865,6 +865,29 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 c = &cpuid_data.entries[cpuid_i++];
+             }
              break;
-+        case MSR_IA32_RTIT_CTL:
-+            env->msr_rtit_ctrl = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_STATUS:
-+            env->msr_rtit_status = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_BASE:
-+            env->msr_rtit_output_base = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_MASK:
-+            env->msr_rtit_output_mask = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_CR3_MATCH:
-+            env->msr_rtit_cr3_match = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-+            env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-+            break;
-         }
-     }
- 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 361c05a..c05fe6f 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -837,6 +837,43 @@ static const VMStateDescription vmstate_spec_ctrl = {
-     }
- };
- 
-+static bool intel_pt_enable_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    int i;
++        case 0x14: {
++            uint32_t times;
 +
-+    if (env->msr_rtit_ctrl || env->msr_rtit_status ||
-+        env->msr_rtit_output_base || env->msr_rtit_output_mask ||
-+        env->msr_rtit_cr3_match) {
-+        return true;
-+    }
++            c->function = i;
++            c->index = 0;
++            c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            times = c->eax;
 +
-+    for (i = 0; i < MAX_RTIT_ADDRS; i++) {
-+        if (env->msr_rtit_addrs[i]) {
-+            return true;
++            for (j = 1; j <= times; ++j) {
++                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
++                    fprintf(stderr, "cpuid_data is full, no space for "
++                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
++                    abort();
++                }
++                c = &cpuid_data.entries[cpuid_i++];
++                c->function = i;
++                c->index = j;
++                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            }
++            break;
 +        }
-+    }
-+
-+    return false;
-+}
-+
-+static const VMStateDescription vmstate_msr_intel_pt = {
-+    .name = "cpu/intel_pt",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = intel_pt_enable_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
-+        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -957,6 +994,7 @@ VMStateDescription vmstate_x86_cpu = {
- #endif
-         &vmstate_spec_ctrl,
-         &vmstate_mcg_ext_ctl,
-+        &vmstate_msr_intel_pt,
-         NULL
-     }
- };
+         default:
+             c->function = i;
+             c->flags = 0;
 -- 
 1.8.3.1
