@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ef4F4-0000L7-9D
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:40:31 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1ef4Fk-0000gX-6Y
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ef4Ez-0002Na-Dr
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:40:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51268)
+	(envelope-from <luwei.kang@intel.com>) id 1ef4Fc-0002gS-2r
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:12 -0500
+Received: from mga03.intel.com ([134.134.136.65]:11830)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ef4EO-00021i-Nn
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:40:24 -0500
-Date: Fri, 26 Jan 2018 13:39:44 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180126133944.GE1556@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAJSP0QWfwAbQwDUH3-e87+fB+FLPjJT3tXjQcDpPrxf7Rk-0cw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QWfwAbQwDUH3-e87+fB+FLPjJT3tXjQcDpPrxf7Rk-0cw@mail.gmail.com>
-Subject: Re: [Qemu-devel] QEMU related blogs, all in once place
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1ef4FZ-0002eo-AY
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:41:04 -0500
+From: Luwei Kang <luwei.kang@intel.com>
+Date: Fri, 26 Jan 2018 02:25:51 +0800
+Message-Id: <1516904751-10248-2-git-send-email-luwei.kang@intel.com>
+In-Reply-To: <1516904751-10248-1-git-send-email-luwei.kang@intel.com>
+References: <1516904751-10248-1-git-send-email-luwei.kang@intel.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] i386: Add support to get/set/migrate
+ Intel Processor Trace feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +25,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, Chao Peng <chao.p.peng@linux.intel.com>, Luwei Kang <luwei.kang@intel.com>
 
-On Fri, Jan 26, 2018 at 09:52:21AM +0000, Stefan Hajnoczi wrote:
-> If you want to follow blogs from QEMU contributors check out:
-> 
-> https://planet.virt-tools.org/
-> 
-> Daniel Berrange has provided the following steps for adding your own
-> blog to planet.virt-tools.org:
-> 
->   $ git clone git://libvirt.org/virttools-planet.git
-> 
-> and add your blog info to updater/virt-tools/config.ini.
-> 
-> Optionally add a icon in updater/virt-tools/images/.
-> 
-> Then send the changes as a patch to libvir-list@redhat.com with
-> git send-email.
+From: Chao Peng <chao.p.peng@linux.intel.com>
 
-Thanks for promoting this Stefan.
+Add Intel Processor Trace related definition. It also add
+corresponding part to kvm_get/set_msr and vmstate.
 
-As the URL suggests, we are not merely looking for QEMU or libvirt developer's
-blogs. We're interested in blogs from anyone who is involved in the open source
-virtualization toools stack, xen, qemu, kvm, libvirt, spice, libguestfs,
-virt-install, etc, etc, and likes writing blogs about it. Doesn't have to be
-all raw tech details either, just as important are people writing user facing
-blog content.
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+---
+ target/i386/cpu.h     | 22 ++++++++++++++++++++++
+ target/i386/kvm.c     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/machine.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 111 insertions(+)
 
-Regards,
-Daniel
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 53908ff..85f0a04 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -419,6 +419,21 @@ typedef enum X86Seg {
+ #define MSR_MC0_ADDR                    0x402
+ #define MSR_MC0_MISC                    0x403
+ 
++#define MSR_IA32_RTIT_OUTPUT_BASE       0x560
++#define MSR_IA32_RTIT_OUTPUT_MASK       0x561
++#define MSR_IA32_RTIT_CTL               0x570
++#define MSR_IA32_RTIT_STATUS            0x571
++#define MSR_IA32_RTIT_CR3_MATCH         0x572
++#define MSR_IA32_RTIT_ADDR0_A           0x580
++#define MSR_IA32_RTIT_ADDR0_B           0x581
++#define MSR_IA32_RTIT_ADDR1_A           0x582
++#define MSR_IA32_RTIT_ADDR1_B           0x583
++#define MSR_IA32_RTIT_ADDR2_A           0x584
++#define MSR_IA32_RTIT_ADDR2_B           0x585
++#define MSR_IA32_RTIT_ADDR3_A           0x586
++#define MSR_IA32_RTIT_ADDR3_B           0x587
++#define MAX_RTIT_ADDRS                  8
++
+ #define MSR_EFER                        0xc0000080
+ 
+ #define MSR_EFER_SCE   (1 << 0)
+@@ -1163,6 +1178,13 @@ typedef struct CPUX86State {
+     uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
+     uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
+ 
++    uint64_t msr_rtit_ctrl;
++    uint64_t msr_rtit_status;
++    uint64_t msr_rtit_output_base;
++    uint64_t msr_rtit_output_mask;
++    uint64_t msr_rtit_cr3_match;
++    uint64_t msr_rtit_addrs[MAX_RTIT_ADDRS];
++
+     /* exception/interrupt handling */
+     int error_code;
+     int exception_is_int;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index f9f4cd1..097c953 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+                 kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
+             }
+         }
++        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
++            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
++                                                    0x14, 1, R_EAX) & 0x7;
++
++            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
++                            env->msr_rtit_ctrl);
++            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
++                            env->msr_rtit_status);
++            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
++                            env->msr_rtit_output_base);
++            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
++                            env->msr_rtit_output_mask);
++            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
++                            env->msr_rtit_cr3_match);
++            for (i = 0; i < addr_num; i++) {
++                kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
++                            env->msr_rtit_addrs[i]);
++            }
++        }
+ 
+         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
+          *       kvm_put_msr_feature_control. */
+@@ -2124,6 +2143,20 @@ static int kvm_get_msrs(X86CPU *cpu)
+         }
+     }
+ 
++    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
++        int addr_num =
++            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
++
++        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
++        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
++        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE, 0);
++        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK, 0);
++        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH, 0);
++        for (i = 0; i < addr_num; i++) {
++            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
++        }
++    }
++
+     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
+     if (ret < 0) {
+         return ret;
+@@ -2364,6 +2397,24 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_IA32_SPEC_CTRL:
+             env->spec_ctrl = msrs[i].data;
+             break;
++        case MSR_IA32_RTIT_CTL:
++            env->msr_rtit_ctrl = msrs[i].data;
++            break;
++        case MSR_IA32_RTIT_STATUS:
++            env->msr_rtit_status = msrs[i].data;
++            break;
++        case MSR_IA32_RTIT_OUTPUT_BASE:
++            env->msr_rtit_output_base = msrs[i].data;
++            break;
++        case MSR_IA32_RTIT_OUTPUT_MASK:
++            env->msr_rtit_output_mask = msrs[i].data;
++            break;
++        case MSR_IA32_RTIT_CR3_MATCH:
++            env->msr_rtit_cr3_match = msrs[i].data;
++            break;
++        case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
++            env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
++            break;
+         }
+     }
+ 
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 361c05a..c05fe6f 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -837,6 +837,43 @@ static const VMStateDescription vmstate_spec_ctrl = {
+     }
+ };
+ 
++static bool intel_pt_enable_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++    int i;
++
++    if (env->msr_rtit_ctrl || env->msr_rtit_status ||
++        env->msr_rtit_output_base || env->msr_rtit_output_mask ||
++        env->msr_rtit_cr3_match) {
++        return true;
++    }
++
++    for (i = 0; i < MAX_RTIT_ADDRS; i++) {
++        if (env->msr_rtit_addrs[i]) {
++            return true;
++        }
++    }
++
++    return false;
++}
++
++static const VMStateDescription vmstate_msr_intel_pt = {
++    .name = "cpu/intel_pt",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = intel_pt_enable_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
++        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
++        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
++        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
++        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
++        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ VMStateDescription vmstate_x86_cpu = {
+     .name = "cpu",
+     .version_id = 12,
+@@ -957,6 +994,7 @@ VMStateDescription vmstate_x86_cpu = {
+ #endif
+         &vmstate_spec_ctrl,
+         &vmstate_mcg_ext_ctl,
++        &vmstate_msr_intel_pt,
+         NULL
+     }
+ };
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+1.8.3.1
