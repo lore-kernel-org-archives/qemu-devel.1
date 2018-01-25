@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eekOQ-0002Iw-BS
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:28:51 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eekd6-0006c7-De
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eekOM-0001e7-D5
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:28:50 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:58256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eekOM-0001cu-0t
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:28:46 -0500
-References: <mvm7es7sds9.fsf@suse.de> <mvm8tcmqdp3.fsf@suse.de>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f74a6cff-446e-0b98-de1b-7416561c650c@vivier.eu>
-Date: Thu, 25 Jan 2018 17:28:39 +0100
+	(envelope-from <kraxel@redhat.com>) id 1eekd3-0000wh-7N
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:44:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eekd3-0000wD-27
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:43:57 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF4D8916D7
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 16:43:55 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 25 Jan 2018 17:43:48 +0100
+Message-Id: <20180125164351.17154-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <mvm8tcmqdp3.fsf@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Implement ioctl cmd
- TIOCGPTPEER
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/3] Usb 20180125 v2 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Le 25/01/2018 à 14:18, Andreas Schwab a écrit :
-> With glibc 2.27 the openpty function will prefer the TIOCGPTPEER ioctl.
-> 
-> Signed-off-by: Andreas Schwab <schwab@suse.de>
-> ---
-> v2: handle host with old kernel headers
-> ---
->  linux-user/aarch64/termbits.h    | 2 ++
->  linux-user/alpha/termbits.h      | 1 +
->  linux-user/arm/termbits.h        | 1 +
->  linux-user/cris/termbits.h       | 1 +
->  linux-user/hppa/termbits.h       | 2 ++
->  linux-user/i386/termbits.h       | 1 +
->  linux-user/ioctls.h              | 3 +++
->  linux-user/m68k/termbits.h       | 1 +
->  linux-user/microblaze/termbits.h | 1 +
->  linux-user/mips/termbits.h       | 1 +
->  linux-user/nios2/termbits.h      | 2 ++
->  linux-user/openrisc/termbits.h   | 2 ++
->  linux-user/ppc/termbits.h        | 1 +
->  linux-user/s390x/termbits.h      | 1 +
->  linux-user/sh4/termbits.h        | 1 +
->  linux-user/sparc/termbits.h      | 1 +
->  linux-user/sparc64/termbits.h    | 1 +
->  linux-user/syscall.c             | 9 +++++++++
->  linux-user/tilegx/termbits.h     | 1 +
->  linux-user/x86_64/termbits.h     | 1 +
->  20 files changed, 34 insertions(+)
-> 
-...
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 35cad6f944..586c794639 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -40,6 +40,9 @@
->       IOCTL(TIOCSETD, IOC_W, MK_PTR(TYPE_INT))
->       IOCTL(TIOCGPTN, IOC_R, MK_PTR(TYPE_INT))
->       IOCTL(TIOCSPTLCK, IOC_W, MK_PTR(TYPE_INT))
-> +#ifdef TIOCGPTPEER
-> +     IOCTL_SPECIAL(TIOCGPTPEER, 0, do_ioctl_tiocgptpeer, TYPE_INT)
-> +#endif
->       IOCTL(FIOCLEX, 0, TYPE_NULL)
->       IOCTL(FIONCLEX, 0, TYPE_NULL)
->       IOCTL(FIOASYNC, IOC_W, MK_PTR(TYPE_INT))
-...
-> diff --git a/linux-user/sparc/termbits.h b/linux-user/sparc/termbits.h
-> index 691600d27a..98268936dc 100644
-> --- a/linux-user/sparc/termbits.h
-> +++ b/linux-user/sparc/termbits.h
-> @@ -245,6 +245,7 @@ struct target_termios {
->  /* Get minor device of a pty master's FD -- Solaris equiv is ISPTM */
->  #define TARGET_TIOCGPTN	TARGET_IOR('t', 134, unsigned int) /* Get Pty Number */
->  #define TARGET_TIOCSPTLCK	TARGET_IOW('t', 135, int) /* Lock/unlock PTY */
-> +#define TARGET_TIOCGPTPEER      TARGET_IO('T', 137) /* Safely open the slave */
+The following changes since commit 834a336eb911db8a8ca00e760ee6a85faca194=
+14:
 
-On sparc, it's:
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2018-01-24 19:24:26 +0000)
 
-#define TIOCGPTPEER     TARGET_IO('t', 137) /* Safely open the slave */
+are available in the git repository at:
 
->  
->  /* Little f */
->  #define TARGET_FIOCLEX		TARGET_IO('f', 1)
-> diff --git a/linux-user/sparc64/termbits.h b/linux-user/sparc64/termbits.h
-> index 691600d27a..98268936dc 100644
-> --- a/linux-user/sparc64/termbits.h
-> +++ b/linux-user/sparc64/termbits.h
-> @@ -245,6 +245,7 @@ struct target_termios {
->  /* Get minor device of a pty master's FD -- Solaris equiv is ISPTM */
->  #define TARGET_TIOCGPTN	TARGET_IOR('t', 134, unsigned int) /* Get Pty Number */
->  #define TARGET_TIOCSPTLCK	TARGET_IOW('t', 135, int) /* Lock/unlock PTY */
-> +#define TARGET_TIOCGPTPEER      TARGET_IO('T', 137) /* Safely open the slave */
+  git://git.kraxel.org/qemu tags/usb-20180125-v2-pull-request
 
-#define TIOCGPTPEER     TARGET_IO('t', 137) /* Safely open the slave */
+for you to fetch changes up to 112d9cb43c70658b890559ff6dcfc5d9e821f368:
 
-If you fix that, you can add:
+  usb-storage: Fix share-rw option parsing (2018-01-25 17:26:07 +0100)
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+----------------------------------------------------------------
+usb: -usbdevice cleanups, storage fix, ccid cleanup.
 
-Thanks,
-Laurent
+----------------------------------------------------------------
+
+Fam Zheng (1):
+  usb-storage: Fix share-rw option parsing
+
+Mao Zhongyi (1):
+  hw/usb/ccid: Make ccid_card_init() take an error parameter
+
+Thomas Huth (1):
+  usb: Remove legacy -usbdevice options (host, serial, disk and net)
+
+ hw/usb/ccid.h                 |   2 +-
+ include/hw/scsi/scsi.h        |   1 +
+ include/hw/usb.h              |   1 -
+ hw/scsi/scsi-bus.c            |   9 ++-
+ hw/usb/ccid-card-emulated.c   |  44 ++++++-------
+ hw/usb/ccid-card-passthru.c   |  12 ++--
+ hw/usb/dev-network.c          |  26 --------
+ hw/usb/dev-serial.c           |  30 ---------
+ hw/usb/dev-smartcard-reader.c |  34 +++++-----
+ hw/usb/dev-storage.c          |  61 +-----------------
+ hw/usb/host-legacy.c          | 144 ------------------------------------=
+------
+ hw/usb/host-stub.c            |   6 --
+ vl.c                          |  15 -----
+ hw/usb/Makefile.objs          |   2 +-
+ qemu-options.hx               |  19 ------
+ 15 files changed, 60 insertions(+), 346 deletions(-)
+ delete mode 100644 hw/usb/host-legacy.c
+
+--=20
+2.9.3
