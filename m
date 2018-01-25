@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eeoHK-0004UQ-BC
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 15:37:47 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eepAE-0000tz-Np
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 16:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eeoHG-0007R4-Av
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 15:37:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57498)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eeoHG-0007QQ-2v
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 15:37:42 -0500
-References: <1516898620-9486-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20180125164415eucas1p11691d02bf89c112ff25cfc43c400b5b2@eucas1p1.samsung.com>
-	<1516898620-9486-2-git-send-email-a.perevalov@samsung.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1dbf8f1d-2b4a-6ad3-9c84-619d42f2be33@redhat.com>
-Date: Thu, 25 Jan 2018 14:37:33 -0600
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eepAA-0006VR-PE
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 16:34:30 -0500
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:36124)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eepAA-0006Tz-CA
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 16:34:26 -0500
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Date: Thu, 25 Jan 2018 22:33:45 +0100
+References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<201801232242.31243.pisa@cmp.felk.cvut.cz>
+	<ca52867f-08bf-e79f-db63-0698ccd1a106@redhat.com>
+In-Reply-To: <ca52867f-08bf-e79f-db63-0698ccd1a106@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1516898620-9486-2-git-send-email-a.perevalov@samsung.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0GPnLwJtwBNY2rOzLsBW4dieSoxa6o27w"
-Subject: Re: [Qemu-devel] [PATCH v1] migration: change blocktime type to
- uint32_t
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <201801252233.45477.pisa@cmp.felk.cvut.cz>
+Subject: Re: [Qemu-devel] [PATCH V4 0/7] CAN bus support for QEMU (SJA1000
+ PCI so far)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +31,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: lvivier@redhat.com, quintela@redhat.com, ash.billore@samsung.com, f4bug@amsat.org, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marek Vasut <marex@denx.de>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, qemu-devel@nongnu.org, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>, Oliver Hartkopp <socketcan@hartkopp.net>, =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0GPnLwJtwBNY2rOzLsBW4dieSoxa6o27w
-From: Eric Blake <eblake@redhat.com>
-To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org,
- dgilbert@redhat.com
-Cc: lvivier@redhat.com, quintela@redhat.com, ash.billore@samsung.com,
- f4bug@amsat.org, peterx@redhat.com
-Message-ID: <1dbf8f1d-2b4a-6ad3-9c84-619d42f2be33@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1] migration: change blocktime type to
- uint32_t
-References: <1516898620-9486-1-git-send-email-a.perevalov@samsung.com>
- <CGME20180125164415eucas1p11691d02bf89c112ff25cfc43c400b5b2@eucas1p1.samsung.com>
- <1516898620-9486-2-git-send-email-a.perevalov@samsung.com>
-In-Reply-To: <1516898620-9486-2-git-send-email-a.perevalov@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello Paolo,
 
-On 01/25/2018 10:43 AM, Alexey Perevalov wrote:
-> Initially int64_t was used, but on PowerPC architecture,
-> clang doesn't have atomic_*_8 function, so it produces
-> link time error.
->=20
-> QEMU is working with time as with 64bit value, but by
-> fact 32 bit is enough with CLOCK_REALTIME. In this case
-> blocktime will keep only 1200 hours time interval.
->=20
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> ---
+thanks for suggestions. I understand and fully agree with your
+request to switch to QOM. I have succeed with that for CAN devices
+some time ago. It worth to be done for the rest of the objects
+but I fear that I do not find time to complete QOMification
+in reasonable future. Contributions/suggestions from other
+are welcomed. I can look for students for GSoC at our university
+or under other funding.
 
-> +++ b/qapi/migration.json
-> @@ -175,8 +175,8 @@
->             '*setup-time': 'int',
->             '*cpu-throttle-percentage': 'int',
->             '*error-desc': 'str',
-> -           '*postcopy-blocktime' : 'int64',
-> -           '*postcopy-vcpu-blocktime': ['int64']} }
-> +           '*postcopy-blocktime' : 'uint32',
-> +           '*postcopy-vcpu-blocktime': ['uint32']} }
+On Thursday 25 of January 2018 14:58:41 Paolo Bonzini wrote:
+> On 23/01/2018 22:42, Pavel Pisa wrote:
+> > Do you think QOM based? I would like it to be implemented
+> > that way but I need some assistance where to look how this
+> > object kind should be implemented and from which base object
+> > inherit from. But I prefer to left that for later work.
+> >
+> > I would definitely like to use some mechanism which allows
+> > to get rid of externally visible pointer and need to assign
+> > it in the stub. It has been my initial idea and your review
+> > sumbled across this hack as well. But I need suggestion what
+> > is the preferred way for QEMU.
+>
+> The best way would be a QOM object.  That is, you would do
+>
+>    -object can-bus,id=canbus0
+>    -object can-host-socketcan,id=can0-host,canbus=canbus0,if=can0
+>    -device kvaser_pci,canbus=canbus0
 
-Questionable to change types if this had been released already - but
-these fields are marked 'since 2.12' so you can change them at will up
-until the release.
+I would prefer to allow CAN emulation to be used without
+explicit can-bus object creation specified on the command line.
+The bus object could be created when requested by
+can-host-socketcan or device (kvaser_pci) automatically.
 
-Acked-by: Eric Blake <eblake@redhat.com>
+When multiple QOM object are put on the list then the list content
+should be preserved over save+restore (mostly hypothetical question
+for now). There should be probably used some other construct instead
+of
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  QTAILQ_HEAD(, CanBusClientState) clients;
+  QTAILQ_ENTRY(CanBusState) next;
 
+> In the current version, it's not clear to me:
+>
+> * what it means if multiple controllers have the same canbus
 
---0GPnLwJtwBNY2rOzLsBW4dieSoxa6o27w
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+That is fully supported and sane configuration.
+CAN is publis/subscribe network in principle
+so sending message from one controller to another
+one on the host side is intended and can be used
+to test drivers even if host connection is
+not available/supported on given OS/setup.
+Interconnection of multiple controllers with
+host CAN bus is functional as well.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> * what it means if multiple controllers with the same canbus have
+> different host interfaces
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpqQA0ACgkQp6FrSiUn
-Q2pXNAf/ax9QbRkXPFujEU+1/CIDFMTs7A3MR0HGcSpvUQNAxgiuPjc/dL+U4bsH
-mWo7kJCgSrOqWGh4kaRJU/b9G29YTe8OING8JGAe19o2xpVVYW09Ez4jKNm9lLEm
-CUc0ALTyI5evbgCbIGpjdlREPxlHv5uGR6yshJTWxlL2ce++1zm8a1KlFnOMrW6J
-krDxnoYMJRhhVRmSVXww8KTysyX0vo/Ln1AWl+y7erS+/fGoL3j3P1K11Ck8jfp0
-GKvN2O8Zo3l3L1zLieZI1Lwfj0JxQnMuHN1IjS4JY9Wp+9bl9jOymlHlyBnEPtee
-2fvEIN1waLITsWi+5Wh9zCNBsArRmA==
-=vKSO
------END PGP SIGNATURE-----
+It is legitimate but probably not much usesfull/intended setup.
+It would result is bridging two host CAN busses
+together. It would work because SocketCAN does not
+deliver message back to the socket which has been used to send
+it by default. Connecting twice to the same SocketCAN bus
+would lead to infinite message loop.
 
---0GPnLwJtwBNY2rOzLsBW4dieSoxa6o27w--
+Connection of given can bus to the host twice can be prevented
+if host connection flag is included in CanBusState and if it is
+already set then next host connection attempt would be reported
+as error.
+
+> Separating the QOM objects is a bit more work, but it makes the
+> semantics clearer.  The classes would be:
+>
+> - can-bus and an abstract class can-host, which would inherit directly
+> from TYPE_OBJECT and implement TYPE_USER_CREATABLE
+>
+> - can-host-socketcan, which would inherit from can-host (and take the
+> TYPE_USER_CREATABLE implementation from there)
+>
+> while CanBusClientState and CanBusClientInfo need not be QOMified.
+
+May it be, can-host-socketcan can be based directly on TYPE_OBJECT,
+because only QEMU CAN bus specific part is CanBusClientState which
+allows it to connect to the CAN bus same way as other CAN controllers
+connect to the bus.
+
+> can-host's class structure would define a function pointer corresponding
+> to what you have now for the function pointer, more or less---except
+> that allocation is handled by QOM and the method only has to do the
+> connection.  You would have something like this:
+>
+> static void can_host_disconnect(CANHost *ch, Error **errp)
+> {
+>     CANHostClass *chc = CAN_HOST_GET_CLASS(ch);
+>
+>     chc->disconnect(ch);
+> }
+>
+> static void can_host_connect(CANHost *ch, Error **errp)
+> {
+>     CANHostClass *chc = CAN_HOST_GET_CLASS(ch);
+>     Error *local_err = NULL;
+>
+>     chc->connect(ch, &local_err);
+>     if (local_err) {
+>         error_propagate(errp, local_err);
+>         return;
+>     }
+>
+>     can_bus_insert_client(ch->bus, &ch->bus_client, local_err);
+>     if (local_err) {
+>         can_host_disconnect(ch);
+>         error_propagate(errp, local_err);
+>         return;
+>     }
+> }
+>
+> and TYPE_USER_CREATABLE's "complete" method would simply invoke
+> can_host_connect.  For can-host-socketcan, chc->connect would be
+> assigned something like this:
+>
+> static void can_host_socketcan_connect(CANHost *ch, Error **errp)
+> {
+>     CANHostSocketCAN *chs = CAN_HOST_SOCKETCAN(ch);
+>
+>     s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+>     if (s < 0) {
+>         error_setg_errno(errp, errno "CAN_RAW socket create failed");
+>         return;
+>     }
+>
+>     addr.can_family = AF_CAN;
+>     memset(&ifr.ifr_name, 0, sizeof(ifr.ifr_name));
+>     strcpy(ifr.ifr_name, chs->host_dev_name);
+>     if (ioctl(s, SIOCGIFINDEX, &ifr) < 0) {
+>         error_setg_errno(errp, "host interface %s not available",
+>                          chs->host_dev_name);
+>         goto fail;
+>     }
+>     addr.can_ifindex = ifr.ifr_ifindex;
+>     ....
+> }
+
+Thanks for providing ideas for future development directions.
+
+> In particular, note the difference in error reporting with
+> error_report/exit vs. error_setg/error_propagate.  Any call to "exit" is
+> probably grounds for instant rejection of your patch. :)
+
+It seems that it is necessary to switch to use realize()
+method instead of init() to have initial **errp pointer
+in the call chain.
+
+> This also means that you have to check for leaks in the failure paths,
+> such as  forgetting to close the PF_CAN socket.
+
+The socket is closed in can_bus_socketcan_cleanup()
+in the failure case. g_free(c->rfilter); is there
+as well.
+
+Thanks for ideas and review,
+
+Pavel
