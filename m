@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eeiZn-0005Tc-6W
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:29 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eeiZp-0005U6-AU
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eeiZl-0006th-D5
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43038)
+	(envelope-from <kraxel@redhat.com>) id 1eeiZl-0006t2-5r
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eeiZl-0006sB-6B
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eeiZl-0006s0-12
 	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:32:25 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7C96F78257
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D93212E4FC
 	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 14:32:24 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 25 Jan 2018 15:32:18 +0100
-Message-Id: <20180125143218.29528-9-kraxel@redhat.com>
+Date: Thu, 25 Jan 2018 15:32:16 +0100
+Message-Id: <20180125143218.29528-7-kraxel@redhat.com>
 In-Reply-To: <20180125143218.29528-1-kraxel@redhat.com>
 References: <20180125143218.29528-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] sdl: reorganize -no-frame support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 6/8] ui: deprecate use of SDL 1.2 in favour of
+ 2.0 series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,155 +34,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Drop no_frame flag from sdl_display_init argument list, use a global
-variable instead.  This is temporary until -no-frame support is dropped
-altogether when we remove sdl1 support.
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Remove any traces of noframe from sdl2 code.  It is just dead code as
-sdl2 doesn't support the SDL_NOFRAME window flag any more.
+The SDL 2.0 release was made in Aug, 2013:
 
+  https://www.libsdl.org/release/
+
+That will soon be 4 + 1/2 years ago, which is enough time to consider
+the 2.0 series widely supported.
+
+Thus we deprecate the SDL 1.2 support, which will allow us to delete it
+in the last release of 2018. By this time, SDL 2.0 will be more than 5
+years old.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20180115142533.24585-1-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180115154855.30850-3-kraxel@redhat.com
 ---
- include/sysemu/sysemu.h | 1 +
- include/ui/console.h    | 5 ++---
- ui/sdl.c                | 9 +++------
- ui/sdl2.c               | 7 +------
- vl.c                    | 4 ++--
- 5 files changed, 9 insertions(+), 17 deletions(-)
+ configure     | 6 ++++++
+ ui/sdl.c      | 3 +++
+ qemu-doc.texi | 7 +++++++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 31612caf10..1c925309e3 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -112,6 +112,7 @@ extern const char *keyboard_layout;
- extern int win2k_install_hack;
- extern int alt_grab;
- extern int ctrl_grab;
-+extern int no_frame;
- extern int smp_cpus;
- extern unsigned int max_cpus;
- extern int cursor_hide;
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 580dfc57ee..7b35778444 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -436,7 +436,7 @@ void surface_gl_setup_viewport(QemuGLShader *gls,
- /* sdl.c */
- #ifdef CONFIG_SDL
- void sdl_display_early_init(int opengl);
--void sdl_display_init(DisplayState *ds, int full_screen, int no_frame);
-+void sdl_display_init(DisplayState *ds, int full_screen);
- #else
- static inline void sdl_display_early_init(int opengl)
- {
-@@ -444,8 +444,7 @@ static inline void sdl_display_early_init(int opengl)
-     error_report("SDL support is disabled");
-     abort();
- }
--static inline void sdl_display_init(DisplayState *ds, int full_screen,
--                                    int no_frame)
-+static inline void sdl_display_init(DisplayState *ds, int full_screen)
- {
-     /* This must never be called if CONFIG_SDL is disabled */
-     error_report("SDL support is disabled");
+diff --git a/configure b/configure
+index 044c6fafe2..96dee6572c 100755
+--- a/configure
++++ b/configure
+@@ -5668,6 +5668,12 @@ if test "$gtkabi" =3D "2.0"; then
+     echo "WARNING: future releases. Please switch to using GTK 3.0"
+ fi
+=20
++if test "$sdlabi" =3D "1.2"; then
++    echo
++    echo "WARNING: Use of SDL 1.2 is deprecated and will be removed in"
++    echo "WARNING: future releases. Please switch to using SDL 2.0"
++fi
++
+ if test "$supported_cpu" =3D "no"; then
+     echo
+     echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELE=
+ASES!"
 diff --git a/ui/sdl.c b/ui/sdl.c
-index 0017b4a912..c8f102bb9f 100644
+index afb4992da2..f26048d3a2 100644
 --- a/ui/sdl.c
 +++ b/ui/sdl.c
-@@ -50,7 +50,6 @@ static int gui_saved_width;
- static int gui_saved_height;
- static int gui_saved_grab;
- static int gui_fullscreen;
--static int gui_noframe;
- static int gui_key_modifier_pressed;
- static int gui_keysym;
- static int gui_grab_code = KMOD_LALT | KMOD_LCTRL;
-@@ -118,8 +117,9 @@ static void do_sdl_resize(int width, int height, int bpp)
-     } else {
-         flags |= SDL_RESIZABLE;
+@@ -918,6 +918,9 @@ void sdl_display_init(DisplayState *ds, int full_scre=
+en, int no_frame)
+             exit(1);
      }
--    if (gui_noframe)
-+    if (no_frame) {
-         flags |= SDL_NOFRAME;
-+    }
- 
-     tmp_screen = SDL_SetVideoMode(width, height, bpp, flags);
-     if (!real_screen) {
-@@ -895,7 +895,7 @@ void sdl_display_early_init(int opengl)
-     }
- }
- 
--void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-+void sdl_display_init(DisplayState *ds, int full_screen)
- {
-     int flags;
-     uint8_t data = 0;
-@@ -917,9 +917,6 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-     g_printerr("Running QEMU with SDL 1.2 is deprecated, and will be removed\n"
-                "in a future release. Please switch to SDL 2.0 instead\n");
- 
--    if (no_frame)
--        gui_noframe = 1;
--
-     if (!full_screen) {
-         setenv("SDL_VIDEO_ALLOW_SCREENSAVER", "1", 0);
-     }
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 1db5dd6f5f..812c315891 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -38,7 +38,6 @@ static int gui_grab; /* if true, all keyboard/mouse events are grabbed */
- 
- static int gui_saved_grab;
- static int gui_fullscreen;
--static int gui_noframe;
- static int gui_key_modifier_pressed;
- static int gui_keysym;
- static int gui_grab_code = KMOD_LALT | KMOD_LCTRL;
-@@ -767,7 +766,7 @@ void sdl_display_early_init(int opengl)
-     }
- }
- 
--void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-+void sdl_display_init(DisplayState *ds, int full_screen)
- {
-     int flags;
-     uint8_t data = 0;
-@@ -775,10 +774,6 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-     int i;
-     SDL_SysWMinfo info;
- 
--    if (no_frame) {
--        gui_noframe = 1;
--    }
--
- #ifdef __linux__
-     /* on Linux, SDL may use fbcon|directfb|svgalib when run without
-      * accessible $DISPLAY to open X11 window.  This is often the case
-diff --git a/vl.c b/vl.c
-index e725ecbc08..6ab232095c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -150,7 +150,7 @@ static int rtc_date_offset = -1; /* -1 means no change */
- QEMUClockType rtc_clock;
- int vga_interface_type = VGA_NONE;
- static int full_screen = 0;
--static int no_frame = 0;
-+int no_frame;
- int no_quit = 0;
- static bool grab_on_hover;
- Chardev *serial_hds[MAX_SERIAL_PORTS];
-@@ -4694,7 +4694,7 @@ int main(int argc, char **argv, char **envp)
-         curses_display_init(ds, full_screen);
-         break;
-     case DT_SDL:
--        sdl_display_init(ds, full_screen, no_frame);
-+        sdl_display_init(ds, full_screen);
-         break;
-     case DT_COCOA:
-         cocoa_display_init(ds, full_screen);
--- 
+=20
++    g_printerr("Running QEMU with SDL 1.2 is deprecated, and will be rem=
+oved\n"
++               "in a future release. Please switch to SDL 2.0 instead\n"=
+);
++
+     if (no_frame)
+         gui_noframe =3D 1;
+=20
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 3e9eb819a6..79d08b3f04 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2596,6 +2596,13 @@ and 3.x series APIs. Support for the GTK 2.x build=
+s will be
+ discontinued, so maintainers should switch to using GTK 3.x,
+ which is the default.
+=20
++@subsection SDL 1.2
++
++Previously QEMU has supported building against both SDL 1.2
++and 2.0 series APIs. Support for the SDL 1.2 builds will be
++discontinued, so maintainers should switch to using SDL 2.0,
++which is the default.
++
+ @section System emulator command line arguments
+=20
+ @subsection -tdf (since 1.3.0)
+--=20
 2.9.3
