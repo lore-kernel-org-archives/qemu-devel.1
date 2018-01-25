@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eejFi-0006Ej-5t
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:52 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eejGO-0006rH-Iy
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eejFd-0000jv-Sl
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:46 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:56604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eejFd-0000jH-IH
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:15:41 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 25 Jan 2018 16:15:31 +0100
-Message-Id: <20180125151535.25256-5-laurent@vivier.eu>
-In-Reply-To: <20180125151535.25256-1-laurent@vivier.eu>
-References: <20180125151535.25256-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 4/8] target/m68k: add Transparent Translation
+	(envelope-from <kraxel@redhat.com>) id 1eejGJ-00017q-TO
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:16:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eejGJ-00016y-NZ
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 10:16:23 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0866E780F0
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 15:16:23 +0000 (UTC)
+Date: Thu, 25 Jan 2018 16:16:19 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180125151619.mywrqtexyvqqlcxj@sirius.home.kraxel.org>
+References: <20180117164118.8510-1-berrange@redhat.com>
+	<20180117164118.8510-5-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180117164118.8510-5-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 4/4] hw: convert virtio-input-hid device
+ to keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,203 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Add ittr0, ittr1, dttr0, dttr1 and manage Transparent Translations
+  Hi,
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180118193846.24953-4-laurent@vivier.eu>
----
- target/m68k/cpu.h       | 18 +++++++++++
- target/m68k/helper.c    | 79 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/m68k/monitor.c   |  4 +++
- target/m68k/translate.c |  3 ++
- 4 files changed, 104 insertions(+)
+> If the guest OS reboots, or otherwise re-initializes the virt-input device,
+> it will read the new keycode bitmap. No matter how many keys are defined,
+> the config space has a fixed 128 byte bitmap. There is, however, a size
+> field defiend which says how many bytes in the bitmap are used.
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 38a74476ee..1c2bbac56d 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -76,6 +76,14 @@
- #define EXCP_RTE            0x100
- #define EXCP_HALT_INSN      0x101
- 
-+#define M68K_DTTR0   0
-+#define M68K_DTTR1   1
-+#define M68K_ITTR0   2
-+#define M68K_ITTR1   3
-+
-+#define M68K_MAX_TTR 2
-+#define TTR(type, index) ttr[((type & ACCESS_CODE) == ACCESS_CODE) * 2 + index]
-+
- #define NB_MMU_MODES 2
- #define TARGET_INSN_START_EXTRA_WORDS 1
- 
-@@ -122,6 +130,7 @@ typedef struct CPUM68KState {
-         uint32_t urp;
-         uint32_t srp;
-         bool fault;
-+        uint32_t ttr[4];
-     } mmu;
- 
-     /* Control registers.  */
-@@ -318,6 +327,15 @@ typedef enum {
- #define M68K_PDT_INDIRECT(entry)    ((entry & 3) == 2)
- #define M68K_INDIRECT_POINTER(addr) (addr & ~3)
- 
-+/* bits for 68040 MMU Transparent Translation Registers */
-+#define M68K_TTR_ADDR_BASE 0xff000000
-+#define M68K_TTR_ADDR_MASK 0x00ff0000
-+#define M68K_TTR_ADDR_MASK_SHIFT    8
-+#define M68K_TTR_ENABLED   0x00008000
-+#define M68K_TTR_SFIELD    0x00006000
-+#define M68K_TTR_SFIELD_USER   0x0000
-+#define M68K_TTR_SFIELD_SUPER  0x2000
-+
- /* m68k Control Registers */
- 
- /* ColdFire */
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index f1d3c8c7dd..58528f64ff 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -230,6 +230,19 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
-     case M68K_CR_ISP:
-         env->sp[M68K_ISP] = val;
-         return;
-+    /* MC68040/MC68LC040 */
-+    case M68K_CR_ITT0:
-+        env->mmu.ttr[M68K_ITTR0] = val;
-+        return;
-+    case M68K_CR_ITT1:
-+         env->mmu.ttr[M68K_ITTR1] = val;
-+        return;
-+    case M68K_CR_DTT0:
-+        env->mmu.ttr[M68K_DTTR0] = val;
-+        return;
-+    case M68K_CR_DTT1:
-+        env->mmu.ttr[M68K_DTTR1] = val;
-+        return;
+No.  There is a size field saying how big the bitmap is.  config space
+(as in: virtio device config space) is only as big as is actually
+needed, i.e. basically the highest set bit of the bitmap determines the
+config space size.
+
+
+Debug patch ...
+
+--- a/hw/input/virtio-input.c
++++ b/hw/input/virtio-input.c
+@@ -255,6 +255,8 @@ static void virtio_input_device_realize(DeviceState
+*dev, Error **errp)
      }
-     cpu_abort(CPU(cpu), "Unimplemented control register write 0x%x = 0x%x\n",
-               reg, val);
-@@ -260,6 +273,14 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
-     /* MC68040/MC68LC040 */
-     case M68K_CR_URP:
-         return env->mmu.urp;
-+    case M68K_CR_ITT0:
-+        return env->mmu.ttr[M68K_ITTR0];
-+    case M68K_CR_ITT1:
-+        return env->mmu.ttr[M68K_ITTR1];
-+    case M68K_CR_DTT0:
-+        return env->mmu.ttr[M68K_DTTR0];
-+    case M68K_CR_DTT1:
-+        return env->mmu.ttr[M68K_DTTR1];
-     }
-     cpu_abort(CPU(cpu), "Unimplemented control register read 0x%x\n",
-               reg);
-@@ -338,6 +359,53 @@ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+     vinput->cfg_size += 8;
+     assert(vinput->cfg_size <= sizeof(virtio_input_config));
++    fprintf(stderr, "%s: %s: %d bytes cfg space\n", __func__,
++            object_get_typename(OBJECT(dev)), vinput->cfg_size);
  
- /* MMU: 68040 only */
- 
-+static int check_TTR(uint32_t ttr, int *prot, target_ulong addr,
-+                     int access_type)
-+{
-+    uint32_t base, mask;
-+
-+    /* check if transparent translation is enabled */
-+    if ((ttr & M68K_TTR_ENABLED) == 0) {
-+        return 0;
-+    }
-+
-+    /* check mode access */
-+    switch (ttr & M68K_TTR_SFIELD) {
-+    case M68K_TTR_SFIELD_USER:
-+        /* match only if user */
-+        if ((access_type & ACCESS_SUPER) != 0) {
-+            return 0;
-+        }
-+        break;
-+    case M68K_TTR_SFIELD_SUPER:
-+        /* match only if supervisor */
-+        if ((access_type & ACCESS_SUPER) == 0) {
-+            return 0;
-+        }
-+        break;
-+    default:
-+        /* all other values disable mode matching (FC2) */
-+        break;
-+    }
-+
-+    /* check address matching */
-+
-+    base = ttr & M68K_TTR_ADDR_BASE;
-+    mask = (ttr & M68K_TTR_ADDR_MASK) ^ M68K_TTR_ADDR_MASK;
-+    mask <<= M68K_TTR_ADDR_MASK_SHIFT;
-+
-+    if ((addr & mask) != (base & mask)) {
-+        return 0;
-+    }
-+
-+    *prot = PAGE_READ | PAGE_EXEC;
-+    if ((ttr & M68K_DESC_WRITEPROT) == 0) {
-+        *prot |= PAGE_WRITE;
-+    }
-+
-+    return 1;
-+}
-+
- static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-                                 int *prot, target_ulong address,
-                                 int access_type, target_ulong *page_size)
-@@ -349,6 +417,17 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-     target_ulong page_mask;
-     bool debug = access_type & ACCESS_DEBUG;
-     int page_bits;
-+    int i;
-+
-+    /* Transparent Translation (physical = logical) */
-+    for (i = 0; i < M68K_MAX_TTR; i++) {
-+        if (check_TTR(env->mmu.TTR(access_type, i),
-+                      prot, address, access_type)) {
-+            *physical = address & TARGET_PAGE_MASK;
-+            *page_size = TARGET_PAGE_SIZE;
-+            return 0;
-+        }
-+    }
- 
-     /* Page Table Root Pointer */
-     *prot = PAGE_READ | PAGE_WRITE;
-diff --git a/target/m68k/monitor.c b/target/m68k/monitor.c
-index 2b83e3bc0d..a20af6b09c 100644
---- a/target/m68k/monitor.c
-+++ b/target/m68k/monitor.c
-@@ -33,6 +33,10 @@ static const MonitorDef monitor_defs[] = {
-     { "isp", offsetof(CPUM68KState, sp[2]) },
-     { "urp", offsetof(CPUM68KState, mmu.urp) },
-     { "srp", offsetof(CPUM68KState, mmu.srp) },
-+    { "dttr0", offsetof(CPUM68KState, mmu.ttr[M68K_DTTR0]) },
-+    { "dttr1", offsetof(CPUM68KState, mmu.ttr[M68K_DTTR1]) },
-+    { "ittr0", offsetof(CPUM68KState, mmu.ttr[M68K_ITTR0]) },
-+    { "ittr1", offsetof(CPUM68KState, mmu.ttr[M68K_ITTR1]) },
-     { NULL },
- };
- 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index fd6db3e1fc..b33b3c6828 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -5982,6 +5982,9 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     cpu_fprintf(f, "VBR = 0x%08x\n", env->vbr);
-     cpu_fprintf(f, "SSW %08x TCR %08x URP %08x SRP %08x\n",
-                 env->mmu.ssw, env->mmu.tcr, env->mmu.urp, env->mmu.srp);
-+    cpu_fprintf(f, "DTTR0/1: %08x/%08x ITTR0/1: %08x/%08x\n",
-+                env->mmu.ttr[M68K_DTTR0], env->mmu.ttr[M68K_DTTR1],
-+                env->mmu.ttr[M68K_ITTR0], env->mmu.ttr[M68K_ITTR1]);
- #endif
- }
- 
--- 
-2.14.3
+     virtio_init(vdev, "virtio-input", VIRTIO_ID_INPUT,
+                 vinput->cfg_size);
+
+... prints this without the patch ...
+
+  virtio_input_device_realize: virtio-keyboard-device: 29 bytes cfg space
+
+... and this with the patch:
+
+  virtio_input_device_realize: virtio-keyboard-device: 37 bytes cfg space
+
+
+That seems to not have any bad side effects on live migration though.
+I can vmsave with unpatched qemu and vmload with patched qemu (and visa
+versa).
+
+Agreeing with the analysis that guests should cope with the change just
+fine, worst case being that the newly added keys are not working on
+updated qemu without guest reboot.
+
+So I think we can go forward with this one without breaking anything.
+
+thanks,
+  Gerd
