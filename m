@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eekKf-0008H4-TE
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:24:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eekKl-0008KN-IB
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:25:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eekKa-0007bT-8o
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:24:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eekKa-0007b1-3I
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:24:52 -0500
-Date: Thu, 25 Jan 2018 17:24:50 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180125162450.4dguzk5ifvo3njcb@sirius.home.kraxel.org>
-References: <20180125091643.26195-1-kraxel@redhat.com>
-	<CAFEAcA_U7Dw4m+wLeqHRij5YUO9eFkkpwwRjTWKr099Ux12+cw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eekKk-0007hU-K6
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:25:03 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39318)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eekKk-0007gs-EE
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 11:25:02 -0500
+Received: by mail-oi0-x242.google.com with SMTP id t8so5595941oie.6
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 08:25:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_U7Dw4m+wLeqHRij5YUO9eFkkpwwRjTWKr099Ux12+cw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/3] Usb 20180125 patches
+In-Reply-To: <20180125093455.6356-1-kraxel@redhat.com>
+References: <20180125093455.6356-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jan 2018 16:24:41 +0000
+Message-ID: <CAFEAcA_-9Q_kK=AzWey=LwouoNZNeiyWpX_A2P87q69PNa4=jQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Vga 20180125 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jan 25, 2018 at 03:28:38PM +0000, Peter Maydell wrote:
-> On 25 January 2018 at 09:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > Thomas Huth (1):
-> >   usb: Remove legacy -usbdevice options (host, serial, disk and net)
-> 
-> Hi. This fails to build on FreeBSD:
-> 
->   LINK    arm-softmmu/qemu-system-arm
-> ../vl.o: In function `usb_device_add':
-> /root/qemu/vl.c:1471: undefined reference to `usb_host_device_open'
-> 
-> There's still a call to that function in vl.c inside an
-> ifndef CONFIG_LINUX...
-> 
-> If we can really remove the function we should get rid of the
-> stub in hw/usb/host-stub.c and the prototype in usb.h too.
+On 25 January 2018 at 09:34, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 834a336eb911db8a8ca00e760ee6a85faca19414:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-01-24 19:24:26 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/vga-20180125-pull-request
+>
+> for you to fetch changes up to 191f59dc17396bb5a8da50f8c59b6e0a430711a4:
+>
+>   vga: check the validation of memory addr when draw text (2018-01-25 10:18:39 +0100)
+>
+> ----------------------------------------------------------------
+> vga: fix for CVE-2018-5683
+>
+> ----------------------------------------------------------------
+>
+> linzhecheng (1):
+>   vga: check the validation of memory addr when draw text
+>
+>  hw/display/vga.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Indeed.  I'll fix it up.
+Applied, thanks.
 
-The lines in vl.c dead code anyway since we switched to libusb and
-dropped the linux/bsd specific usb-host code, so it all can simply be
-deleted.
-
-cheers,
-  Gerd
+-- PMM
