@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eeijE-0004et-V8
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:42:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1eein4-00072i-Hx
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:46:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eeijD-00007w-JC
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:42:12 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:40849)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eeijD-00007T-EI
-	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:42:11 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id x4so6872106otg.7
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 06:42:11 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180122183301.GA31237@localhost.localdomain>
-References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
-	<20171209010811.GJ3037@localhost.localdomain>
-	<CAFEAcA9oG=+mJ+jSGTM_z54S09gjHoFowDkOvofdkhJd+g3=Cw@mail.gmail.com>
-	<20180122183301.GA31237@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jan 2018 14:41:50 +0000
-Message-ID: <CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
- gic-version=max)
+	(envelope-from <eblake@redhat.com>) id 1eein3-0003R0-GJ
+	for qemu-devel@nongnu.org; Thu, 25 Jan 2018 09:46:10 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 25 Jan 2018 08:45:57 -0600
+Message-Id: <20180125144557.25502-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] hmp: Add nbd_server_remove to mirror QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +18,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, dgilbert@redhat.com
 
-On 22 January 2018 at 18:33, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> About QOM type names:
->
-> On x86, all CPU models are resolved to "<model>-<suffix>", and
-> i386 and x86_64 have different suffixes.  So the QOM type name is
-> "max-x86_64-cpu" on qemu-system-x86_64, and "max-i386-cpu" on
-> qemu-system-i386.
+Since everything else about the nbd-server-* QMP commands is
+accessible from HMP, we might as well make removing an export
+available as well.  For now, I went with a bool flag rather
+than a mode string for choosing between safe (default) and
+hard modes.
 
-OK. Looking at the target/arm code we do a similar suffix
-trick, but we seem to have cut-n-pasted the handling in
-aarch64_cpu_register(), so it uses the TYPE_ARM_CPU as the
-suffix, rather the TYPE_AARCH64_CPU.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-Am I right in thinking that we can fix this (changing the
-QOM type names for all the aarch64 CPUs) without breaking
-migration? (I guess I can just test this easily enough.)
+Based-on: <20180119135719.24745-1-vsementsov@virtuozzo.com>
+([PATCH v3 0/5] nbd export qmp interface)
 
-If we did that then we'd have, like x86, "max-arm-cpu" in
-the qemu-system-arm binary, and "max-aarch64-cpu" in
-the qemu-system-aarch64 binary.
+ hmp.h           |  1 +
+ hmp.c           | 14 +++++++++++---
+ hmp-commands.hx | 17 +++++++++++++++++
+ 3 files changed, 29 insertions(+), 3 deletions(-)
 
-Does x86 provide a way to say "give me the max-i386-cpu"
-in the qemu-system-x86_64 binary ?
+diff --git a/hmp.h b/hmp.h
+index a6f56b1f29e..536cb91caa4 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -101,6 +101,7 @@ void hmp_sendkey(Monitor *mon, const QDict *qdict);
+ void hmp_screendump(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
++void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_add(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_change(Monitor *mon, const QDict *qdict);
+diff --git a/hmp.c b/hmp.c
+index 7a64dd59c5c..b3de32d219b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2226,10 +2226,18 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+     Error *local_err = NULL;
 
-> About how it should behave:
->
-> An important expectation about "max" is about the
-> query-cpu-model-expansion return value.  Having a property set to
-> true on the return value of "query-cpu-model-expansion model=max"
-> means the corresponding feature is supported on the current host
-> and can be enabled on the command-line.
+     qmp_nbd_server_add(device, !!name, name, true, writable, &local_err);
++    hmp_handle_error(mon, &local_err);
++}
 
-On Arm when I try to use this I get:
-{ "execute": "query-cpu-model-expansion", "arguments": { "type":
-"static", "model": { "model": { "name": "max" } } } }
-{
-    "error": {
-        "class": "CommandNotFound",
-        "desc": "The command query-cpu-model-expansion has not been found"
-    }
-}
+-    if (local_err != NULL) {
+-        hmp_handle_error(mon, &local_err);
+-    }
++void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
++{
++    const char *name = qdict_get_str(qdict, "name");
++    bool force = qdict_get_try_bool(qdict, "force", false);
++    Error *err = NULL;
++
++    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
++    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
++    hmp_handle_error(mon, &err);
+ }
 
-It looks like we only implement this QMP API for x86 and S390
-(via #ifdeffery in monitor.c).
+ void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index b8b6fb91848..8a59338bc20 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1565,6 +1565,23 @@ Export a block device through QEMU's NBD server, which must be started
+ beforehand with @command{nbd_server_start}.  The @option{-w} option makes the
+ exported device writable too.  The export name is controlled by @var{name},
+ defaulting to @var{device}.
++ETEXI
++
++    {
++        .name       = "nbd_server_remove",
++        .args_type  = "force:-f,name:s",
++        .params     = "nbd_server_remove [-f] name",
++        .help       = "remove an export previously exposed via NBD",
++        .cmd        = hmp_nbd_server_remove,
++    },
++STEXI
++@item nbd_server_remove [-f] @var{name}
++@findex nbd_server_remove
++Stop exporting a block device through QEMU's NBD server, which was
++previously started with @command{nbd_server_add}.  The @option{-f}
++option forces the server to drop the export immediately even if
++clients are connected; otherwise the command fails unless there are no
++clients.
+ ETEXI
 
-I'm not sure if we actually support command line setting/unsetting
-of features for Arm CPUs -- is there a command line option to
-get QEMU to print the features it thinks can be set this way?
-
->> (The code in this patchset makes '-cpu max' give the same
->> QOM type name for both qemu-system-arm and qemu-system-aarch64,
->> with different behaviour depending on the binary. If that means
->> we don't provide the same behaviour as x86 then I can change that,
->> but I'm not sure where the difference is exposed to the user?)
->
-> This is not how the QOM names work on x86, but I don't think QOM
-> type names choices have important user-visible side-effects
-> today.  Choosing unique QOM type names is more important to make
-> the code future-proof for when we merge QEMU binaries, than to
-> make user-visible behavior consistent.
-
-Good point -- assuming it doesn't break migration I can fix
-the aarch64 types to use the right suffix string and then they'll
-have different QOM type names.
-
-thanks
--- PMM
+     {
+-- 
+2.14.3
