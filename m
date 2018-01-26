@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1eexBY-00030Y-OM
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:08:25 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eexLc-0008Oc-EG
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1eexBT-00089Y-IU
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:08:24 -0500
-Received: from mga06.intel.com ([134.134.136.31]:7977)
+	(envelope-from <jasowang@redhat.com>) id 1eexLZ-0007If-3Q
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:18:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1eexBT-00087v-Al
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:08:19 -0500
-Date: Fri, 26 Jan 2018 13:57:59 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-Message-ID: <20180126055759.vu4qwdpjbzf4mg4j@debian-xvivbkq.sh.intel.com>
-References: <20180125040328.22867-1-tiwei.bie@intel.com>
-	<20180125040328.22867-7-tiwei.bie@intel.com>
-	<20180126015553-mutt-send-email-mst@kernel.org>
-	<28ab37d5-6cf6-866d-9167-e14e7441415f@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eexLY-0007HR-VC
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:18:45 -0500
+References: <20180119130653.24044-1-stefanha@redhat.com>
+	<9048a120-a3be-404d-e977-39f40b4d4561@redhat.com>
+	<20180122121751.GD31621@stefanha-x1.localdomain>
+	<20180122215348-mutt-send-email-mst@kernel.org>
+	<b0568f2d-928c-5124-757e-fe5b706c4df7@redhat.com>
+	<20180123180515-mutt-send-email-mst@kernel.org>
+	<514b4874-802a-3405-485e-1f84d760ec67@redhat.com>
+	<20180125160916-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <97c35b6a-42da-6e8b-0815-00f181eb1bcf@redhat.com>
+Date: Fri, 26 Jan 2018 11:49:43 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <28ab37d5-6cf6-866d-9167-e14e7441415f@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1 6/6] vhost-user: add
- VFIO based accelerators support
+In-Reply-To: <20180125160916-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +35,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: zhiyong.yang@intel.com, Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-devel@nongnu.org, Wei Wang <wei.w.wang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Jan 26, 2018 at 11:41:27AM +0800, Jason Wang wrote:
-> On 2018年01月26日 07:59, Michael S. Tsirkin wrote:
-> > > The virtual IOMMU isn't supported by the accelerators for now.
-> > > Because vhost-user currently lacks of an efficient way to share
-> > > the IOMMU table in VM to vhost backend. That's why the software
-> > > implementation of virtual IOMMU support in vhost-user backend
-> > > can't support dynamic mapping well.
-> > What exactly is meant by that? vIOMMU seems to work for people,
-> > it's not that fast if you change mappings all the time,
-> > but e.g. dpdk within guest doesn't.
-> 
-> Yes, software implementation support dynamic mapping for sure. I think the
-> point is, current vhost-user backend can not program hardware IOMMU. So it
-> can not let hardware accelerator to cowork with software vIOMMU.
 
-Vhost-user backend can program hardware IOMMU. Currently
-vhost-user backend (or more precisely the vDPA driver in
-vhost-user backend) will use the memory table (delivered
-by the VHOST_USER_SET_MEM_TABLE message) to program the
-IOMMU via vfio, and that's why accelerators can use the
-GPA (guest physical address) in descriptors directly.
 
-Theoretically, we can use the IOVA mapping info (delivered
-by the VHOST_USER_IOTLB_MSG message) to program the IOMMU,
-and accelerators will be able to use IOVA. But the problem
-is that in vhost-user QEMU won't push all the IOVA mappings
-to backend directly. Backend needs to ask for those info
-when it meets a new IOVA. Such design and implementation
-won't work well for dynamic mappings anyway and couldn't
-be supported by hardware accelerators.
+On 2018=E5=B9=B401=E6=9C=8825=E6=97=A5 22:48, Michael S. Tsirkin wrote:
+> On Thu, Jan 25, 2018 at 03:07:23PM +0100, Paolo Bonzini wrote:
+>> On 23/01/2018 17:07, Michael S. Tsirkin wrote:
+>>>> It's not clear to me how to do this. E.g need a way to report failur=
+e to VM2
+>>>> or #PF?
+>>> Why would there be a failure? qemu running vm1 would be responsible f=
+or
+>>> preventing access to vm2's memory not mapped through an IOMMU.
+>>> Basically munmap these.
+>> Access to VM2's memory would use VM2's configured IOVAs for VM1's
+>> requester id.  VM2's QEMU send device IOTLB messages to VM1's QEMU,
+>> which would remap VM2's memory on the fly into VM1's BAR2.
+> Right. Almost.
 
-> I think
-> that's another call to implement the offloaded path inside qemu which has
-> complete support for vIOMMU co-operated VFIO.
+That would be extremely slow for dynamic mappings.
 
-Yes, that's exactly what we want. After revisiting the
-last paragraph in the commit message, I found it's not
-really accurate. The practicability of dynamic mappings
-support is a common issue for QEMU. It also exists for
-vfio (hw/vfio in QEMU). If QEMU needs to trap all the
-map/unmap events, the data path performance couldn't be
-high. If we want to thoroughly fix this issue especially
-for vfio (hw/vfio in QEMU), we need to have the offload
-path Jason mentioned in QEMU. And I think accelerators
-could use it too.
+>
+> One problem is that IOVA range is bigger than RAM range,
+> so you will have trouble making arbitrary virtual addresses
+> fit in a BAR.
+>
+> This is why I suggested a hybrid approach where
+> translation happens within guest, qemu only does protection.
+>
+> Another problem with it is that IOMMU has page granularity
+> while with hugetlbfs we might not be able to remap at that
+> granularity.
+>
+> Not sure what to do about it - teach host to break
+> up pages? Pass limitation to guest through virtio-iommu?
 
-Best regards,
-Tiwei Bie
+If we decide to go virtio IOMMU, maybe device can limit its IOVA range to=
+o.
 
-> 
-> Thanks
-> 
-> > 
-> > > Once this problem is solved
-> > > in vhost-user, virtual IOMMU can be supported by accelerators
-> > > too, and the IOMMU feature bit checking in this patch can be
-> > > removed.
-> > Given it works with software backends right now, I suspect
-> > this will be up to you guys to address.
-> > 
-> 
+Thanks
+
+>
+> Ideas?
+>
+>> It's not trivial to do it efficiently, but it's possible.  The importa=
+nt
+>> thing is that, if VM2 has an IOMMU, QEMU must *not* connect to a
+>> virtio-vhost-user device that lacks IOTLB support.  But that would be =
+a
+>> vhost-user bug, not a virtio-vhost-user bug---and that's the beauty of
+>> Stefan's approach. :)
+>>
+>> Paolo
