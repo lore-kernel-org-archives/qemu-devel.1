@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef9wx-00007M-2f
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef9xE-0000JM-Fv
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef9wu-0006bE-0Y
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ef9wt-0006af-Qb
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:07 -0500
-Date: Fri, 26 Jan 2018 19:46:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180126194559.GI2610@work-vm>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1ef9xD-0006t4-3g
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:28 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<7d8d80bfde60d29e8a0abe04db8241b754714329.1516978645.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1e32b96c-b65a-eba3-9d8e-7d0ec9bad741@redhat.com>
+Date: Fri, 26 Jan 2018 13:46:19 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+In-Reply-To: <7d8d80bfde60d29e8a0abe04db8241b754714329.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NM0AFh1BtFQK39pwreymF6hbGfWzaw8Db"
+Subject: Re: [Qemu-devel] [PATCH v3 30/39] qcow2: Update
+ expand_zero_clusters_in_l1() to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +25,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 26 January 2018 at 15:47, Wei Huang <wei@redhat.com> wrote:
-> >
-> >
-> > On 01/25/2018 02:05 PM, Dr. David Alan Gilbert wrote:
-> >> * Wei Huang (wei@redhat.com) wrote:
-> >>> innerloop:
-> >>>         /* clean cache because el2 might still cache guest data under KVM */
-> >>>         dc      civac, x2
-> >>
-> >> Can you explain a bit more about that please;  if it's guest
-> >> visible acorss migration, doesn't that suggest we need the cache clear
-> >> in KVM or QEMU?
-> >
-> > I think this is ARM specific. This is caused by the inconsistency
-> > between guest VM's data accesses and userspace's accesses (in
-> > check_guest_ram) at the destination:
-> >
-> > 1) Because uncacheable (guest) + cacheable (host) ==> uncacheable. So
-> > the data accesses from guest VM go directly into memory.
-> > 2) QEMU user space will use the cacheable version. So it is possible
-> > that data can come from cache, instead of RAM. The difference between
-> > (1) and (2) obviously can cause check_guest_ram() to fail sometimes.
-> 
-> I think the correct fix here is that your test code should turn
-> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
-> for Arm KVM guests (for the same reason that VGA device video memory
-> doesn't work). If it's RAM your guest has to arrange to map it as
-> Normal Cacheable, and then everything should work fine.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NM0AFh1BtFQK39pwreymF6hbGfWzaw8Db
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <1e32b96c-b65a-eba3-9d8e-7d0ec9bad741@redhat.com>
+Subject: Re: [PATCH v3 30/39] qcow2: Update expand_zero_clusters_in_l1() to
+ support L2 slices
+References: <cover.1516978645.git.berto@igalia.com>
+ <7d8d80bfde60d29e8a0abe04db8241b754714329.1516978645.git.berto@igalia.com>
+In-Reply-To: <7d8d80bfde60d29e8a0abe04db8241b754714329.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Does this cause problems with migrating at just the wrong point during
-a VM boot?
+On 01/26/2018 08:59 AM, Alberto Garcia wrote:
+> expand_zero_clusters_in_l1() expands zero clusters as a necessary step
+> to downgrade qcow2 images to a version that doesn't support metadata
+> zero clusters. This function takes an L1 table (which may or may not
+> be active) and iterates over all its L2 tables looking for zero
+> clusters.
+>=20
+> Since we'll be loading L2 slices instead of full tables we need to add
+> an extra loop that iterates over all slices of each L2 table, and we
+> should also use the slice size when allocating the buffer used when
+> the L1 table is not active.
+>=20
+> This function doesn't need any additional changes so apart from that
+> this patch simply updates the variable name from l2_table to l2_slice.
+>=20
+> Finally, and since we have to touch the bdrv_read() / bdrv_write()
+> calls anyway, this patch takes the opportunity to replace them with
+> the byte-based bdrv_pread() / bdrv_pwrite().
 
-Dave
+This last paragraph could perhaps be split to a separate patch, but
+that's more churn so I'm also fine leaving it here.
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 52 ++++++++++++++++++++++++++++---------------=
+--------
+>  1 file changed, 29 insertions(+), 23 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> @@ -1905,22 +1908,24 @@ static int expand_zero_clusters_in_l1(BlockDriv=
+erState *bs, uint64_t *l1_table,
+>              goto fail;
+>          }
+> =20
+> -        {
+> +        for (slice =3D 0; slice < n_slices; slice++) {
+> +            uint64_t slice_offset =3D l2_offset + slice * slice_size2;=
+
+> +            bool l2_dirty =3D false;
+>              if (is_active_l1) {
+>                  /* get active L2 tables from cache */
+> -                ret =3D qcow2_cache_get(bs, s->l2_table_cache, l2_offs=
+et,
+> -                                      (void **)&l2_table);
+> +                ret =3D qcow2_cache_get(bs, s->l2_table_cache, slice_o=
+ffset,
+> +                                      (void **)&l2_slice);
+
+The (void **) cast is probably still necessary (anything can go to
+void*, but C gets pickier when going to void**), but...
+
+>              } else {
+>                  /* load inactive L2 tables from disk */
+> -                ret =3D bdrv_read(bs->file, l2_offset / BDRV_SECTOR_SI=
+ZE,
+> -                                (void *)l2_table, s->cluster_sectors);=
+
+> +                ret =3D bdrv_pread(bs->file, slice_offset,
+> +                                 (void *)l2_slice, slice_size2);
+
+=2E..do we still need this cast to void*?
+
+
+> =20
+> -                    ret =3D bdrv_write(bs->file, l2_offset / BDRV_SECT=
+OR_SIZE,
+> -                                     (void *)l2_table, s->cluster_sect=
+ors);
+> +                    ret =3D bdrv_pwrite(bs->file, slice_offset,
+> +                                      (void *)l2_slice, slice_size2);
+
+and again here
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--NM0AFh1BtFQK39pwreymF6hbGfWzaw8Db
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprhYsACgkQp6FrSiUn
+Q2qyWwgAoE9nV1A3H73G5Z51e7kCiznUYPSbq81gSDQUCnXzCIpT9dXqrJmtZb1o
+R1l04BpFwpqDjAkkAa2UUAEQcwJ2AaTcBTQzgFRfGWt/C9OVtze3hxoC7lxWuO8X
+CErmtI70AzV+L1xx4m2A8dL/topz/Rq0079u9hrKvyQRuyhcpQVSQ94U9Js8MB4p
+uPb119Cs+YR8Cgm15MSH7vMjFH0I70TTlAlQZCvqqVSGML/GdF0LCnfM73JuQOx6
+PQdQDD81c5bdxNawnZokjxA/PFHPvVVqOkKA9uZzyBJTKA6TxU+OOQZ3xWHwfVaL
+GKPGL3LFjunVBzvg12AQp1Az9AKd4A==
+=y66d
+-----END PGP SIGNATURE-----
+
+--NM0AFh1BtFQK39pwreymF6hbGfWzaw8Db--
