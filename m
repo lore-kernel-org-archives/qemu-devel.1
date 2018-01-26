@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef5Ow-0008Lg-UH
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:54:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ef5Ro-0001Qp-M2
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef5Ow-0001Pl-2i
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:54:47 -0500
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:41823)
+	(envelope-from <peter.maydell@linaro.org>) id 1ef5Ro-0003TT-1B
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:57:44 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43877)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ef5Ov-0001Or-Un
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:54:46 -0500
-Received: by mail-oi0-x22e.google.com with SMTP id m83so459430oik.8
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 06:54:45 -0800 (PST)
+	id 1ef5Rh-0003P1-1T
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:57:43 -0500
+Received: by mail-ot0-x241.google.com with SMTP id p36so611596otd.10
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 06:57:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180126081647.72sxtshbfbfrb426@kentang.home>
-References: <20180126081647.72sxtshbfbfrb426@kentang.home>
+In-Reply-To: <3d73ed91-c1be-4d32-e3de-b945dea52ae5@amsat.org>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<1512670493-18114-2-git-send-email-peter.maydell@linaro.org>
+	<3d73ed91-c1be-4d32-e3de-b945dea52ae5@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jan 2018 13:29:16 +0000
-Message-ID: <CAFEAcA_=20Kh=TfLZSCimthixz_3wPXExpctfaFkU_MZUpv+AQ@mail.gmail.com>
+Date: Fri, 26 Jan 2018 14:34:04 +0000
+Message-ID: <CAFEAcA_9H6UROaz=H91pyeSa_X11=YJHGpgnhp2H-4hujrAs7Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] Update OpenBIOS images
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/6] hw/arm/virt: Check that the
+ CPU realize method succeeded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 26 January 2018 at 08:16, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> Hi Peter,
+On 26 January 2018 at 14:32, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> On 12/07/2017 03:14 PM, Peter Maydell wrote:
+>> We were passing a NULL error pointer to the object_property_set_bool()
+>> call that realizes the CPU object. This meant that we wouldn't detect
+>> failure, and would plough blindly on to crash later trying to use a
+>> NULL CPU object pointer. Detect errors and fail instead.
+>>
+>> In particular, this will be necessary to detect the user error
+>> of using "-cpu host" without "-enable-kvm" once we make the host
+>> CPU type be registered unconditionally rather than only in
+>> kvm_arch_init().
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> Here are the latest OpenBIOS updates (mainly the power support for SPARC). Please pull.
->
->
-> ATB,
->
-> Mark.
->
->
-> The following changes since commit 2077fef91d5eb8e3745a84fabd87a5ee7d2b535d:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180125' into staging (2018-01-25 17:04:47 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
->
-> for you to fetch changes up to bbb596054e480ee30c248ff5b2bf8a1f2a205454:
->
->   Update OpenBIOS images to b5c93acd14 built from submodule. (2018-01-26 07:59:25 +0000)
->
-> ----------------------------------------------------------------
-> Update OpenBIOS images
->
-> ----------------------------------------------------------------
-> Mark Cave-Ayland (1):
->       Update OpenBIOS images to b5c93acd14 built from submodule.
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Applied, thanks.
+Thanks; I already put this patch in master (commit c88bc3e0dbe7), though.
 
 -- PMM
