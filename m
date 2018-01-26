@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef7gY-0008P3-LJ
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:21:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ef7hX-0000no-IY
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef7gV-0001P5-VZ
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:21:06 -0500
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:43360)
+	(envelope-from <peter.maydell@linaro.org>) id 1ef7hW-0002q1-AX
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:07 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34973)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ef7gV-0001OD-O8
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:21:03 -0500
-Received: by mail-oi0-x22b.google.com with SMTP id 4so768515ois.10
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:21:03 -0800 (PST)
+	id 1ef7hW-0002pE-6u
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:06 -0500
+Received: by mail-oi0-x244.google.com with SMTP id b11so786791oif.2
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:22:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180126104247.GF25150@localhost.localdomain>
-References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
-	<20171209010811.GJ3037@localhost.localdomain>
-	<CAFEAcA9oG=+mJ+jSGTM_z54S09gjHoFowDkOvofdkhJd+g3=Cw@mail.gmail.com>
-	<20180122183301.GA31237@localhost.localdomain>
-	<CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
-	<20180126104247.GF25150@localhost.localdomain>
+In-Reply-To: <5A6B5FCA.2080009@hisilicon.com>
+References: <5A6B5091.8030601@hisilicon.com>
+	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
+	<5A6B5FCA.2080009@hisilicon.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jan 2018 11:02:24 +0000
-Message-ID: <CAFEAcA_zU+tAMvcqNHQAaVOEaJrrGOEWPS8RpUi+eZQ3tf1yiQ@mail.gmail.com>
+Date: Fri, 26 Jan 2018 17:15:16 +0000
+Message-ID: <CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
- gic-version=max)
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
+ before enabled the interruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,61 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: Wei Xu <xuwei5@hisilicon.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Rob Herring <rob.herring@linaro.org>, Daode Huang <huangdaode@hisilicon.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, Zhangyi ac <zhangyi.ac@huawei.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, tiantao6@huawei.com, Marc Zyngier <marc.zyngier@arm.com>
 
-On 26 January 2018 at 10:42, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Thu, Jan 25, 2018 at 02:41:50PM +0000, Peter Maydell wrote:
->> I'm not sure if we actually support command line setting/unsetting
->> of features for Arm CPUs -- is there a command line option to
->> get QEMU to print the features it thinks can be set this way?
+On 26 January 2018 at 17:05, Wei Xu <xuwei5@hisilicon.com> wrote:
+> On 2018/1/26 16:36, Peter Maydell wrote:
+>> If the user presses keys before interrupts are enabled,
+>> what ought to happen is:
+>>  * we put the key in the FIFO, and update the int_level flags
+>>  * when the FIFO is full, can_receive starts returning 0 and
+>>    QEMU stops passing us new characters
+>>  * when the guest driver for the pl011 initializes the
+>>    device and enables interrupts then either:
+>>     (a) it does something that clears the FIFO, which will
+>>     mean can_receive starts allowing new chars again, or
+>>     (b) it leaves the FIFO as it is, and we should thus
+>>     immediately raise an interrupt for the characters still
+>>     in the FIFO; when the guest handles this interrupt and
+>>     gets the characters, can_receive will permit new ones
+>>
 >
-> Unfortunately -cpu command-line parsing is still a mess (we
-> currently have lots of arch-specific parsing hooks).  Once we
-> make this uniform across targets, we could make "-cpu ?" print
-> all known properties.
+> Yes, now it is handled like b.
 >
-> But you can look at the list of QOM properties for your CPU
-> classes (-cpu options are simply translated to QOM properties).
-> e.g.:
+>> What is happening in your situation that means this is not
+>> working as expected ?
 >
->   (QEMU) device-list-properties typename=3Dpxa270-a0-arm-cpu
->   {"return": [{"type": "uint32", "name": "midr"}, {"type": "uint64", "nam=
-e": "mp-affinity"}, {"type": "child<irq>", "name": "unnamed-gpio-in[0]"}, {=
-"type": "uint32", "name": "psci-conduit"}, {"type": "bool", "name": "reset-=
-hivecs"}, {"type": "link<qemu:memory-region>", "name": "memory"}, {"type": =
-"link<irq>", "name": "unnamed-gpio-out[2]"}, {"type": "link<irq>", "name": =
-"unnamed-gpio-out[3]"}, {"type": "int32", "name": "node-id"}, {"type": "boo=
-l", "name": "start-powered-off"}, {"type": "link<irq>", "name": "unnamed-gp=
-io-out[1]"}, {"type": "link<irq>", "name": "unnamed-gpio-out[0]"}, {"type":=
- "link<irq>", "name": "gicv3-maintenance-interrupt[0]"}, {"type": "bool", "=
-name": "cfgend"}, {"type": "child<irq>", "name": "unnamed-gpio-in[2]"}, {"t=
-ype": "child<irq>", "name": "unnamed-gpio-in[3]"}, {"type": "child<irq>", "=
-name": "unnamed-gpio-in[1]"}]}
-
-None of those are things we'd want to expose to the user, really
-(except maybe 'cfgend'): they're all intended for the QEMU board
-or SoC code that needs to configure and wire the CPU up. Ideally
-there'd be a mechanism for screening them out of the -cpu option
-list.
-
-There are some things that we could in theory have as user
-settable properties (like "does this CPU have an FPU"), but
-we don't currently have QOM properties for them (each CPU
-just hardcodes which ARM_FEATURE_* flags it has).
-
-In your other email you write:
-> I wrote:
->> Given that the type names don't appear to the user, I think
->> we can go ahead with implementing "-cpu max" for Arm without
->> having to first disentangle this? "max" isn't in any worse
->> a position than the existing "host" and "any" types.
+> But in the kernel side, the pll011 is triggered as a level interruption.
+> During the booting, if any key is pressed ,the call stack is as below:
+> QEMU side:
+> pl011_update
+> -->qemu_set_irq(level as 0)
+> ---->kvm_arm_gic_set_irq
 >
->Sounds reasonable to me.
+> Kernel side:
+> kvm_vm_ioctl_irq_line
+> -->kvm_vgic_inject_irq
+> ---->vgic_validate_injection (if level did not change, return)
+> ---->vgic_queue_irq_unlock
+>
+> Without above changes, in the vgic_validate_injection, because the
+> interruption level is always 0, this irq will not be queued into vgic.
+> And the guest will not read the pl011 fifo.
 
-Cool. I think that means that patches 2-6 here don't need
-any changes, but I'll rebase, retest and resend just to
-avoid confusion.
+The pl011 code should call qemu_set_irq(..., 1) when the
+guest enables interrupts on the device by writing to the int_enabled
+(UARTIMSC) register. That will be a 0-to-1 level change and the KVM
+VGIC should report the interrupt to the guest.
 
 thanks
 -- PMM
