@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef5nk-0007Pg-5S
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:20:25 -0500
+	(envelope-from <berto@igalia.com>) id 1ef5no-0007VQ-49
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:20:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef5nf-0000lp-UR
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:20:23 -0500
+	(envelope-from <berto@igalia.com>) id 1ef5nn-0000tA-37
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:20:28 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 26 Jan 2018 16:59:54 +0200
-Message-Id: <0c07738db12f556285f8db01d68c5d6b4304bde9.1516978645.git.berto@igalia.com>
+Date: Fri, 26 Jan 2018 16:59:31 +0200
+Message-Id: <bf5887438d46eec45729adb4d05ee06e58b8d40b.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 27/39] qcow2: Update
- qcow2_update_snapshot_refcount() to support L2 slices
+Subject: [Qemu-devel] [PATCH v3 04/39] qcow2: Remove BDS parameter from
+ qcow2_cache_get_table_idx()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +25,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-qcow2_update_snapshot_refcount() increases the refcount of all
-clusters of a given snapshot. In order to do that it needs to load all
-its L2 tables and iterate over their entries. Since we'll be loading
-L2 slices instead of full tables we need to add an extra loop that
-iterates over all slices of each L2 table.
-
-This function doesn't need any additional changes so apart from that
-this patch simply updates the variable name from l2_table to l2_slice.
+This function was only using the BlockDriverState parameter to get the
+cache table size (since it was equal to the cluster size). This is no
+longer necessary so this parameter can be removed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-refcount.c | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
+ block/qcow2-cache.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index dfa28301c4..60b521cb89 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1183,17 +1183,20 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-     int64_t l1_table_offset, int l1_size, int addend)
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index a481ef499a..3749d55595 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -51,8 +51,7 @@ static inline void *qcow2_cache_get_table_addr(Qcow2Cache *c, int table)
+     return (uint8_t *) c->table_array + (size_t) table * c->table_size;
+ }
+ 
+-static inline int qcow2_cache_get_table_idx(BlockDriverState *bs,
+-                  Qcow2Cache *c, void *table)
++static inline int qcow2_cache_get_table_idx(Qcow2Cache *c, void *table)
  {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t *l1_table, *l2_table, l2_offset, entry, l1_size2, refcount;
-+    uint64_t *l1_table, *l2_slice, l2_offset, entry, l1_size2, refcount;
-     bool l1_allocated = false;
-     int64_t old_entry, old_l2_offset;
-+    unsigned slice, slice_size2, n_slices;
-     int i, j, l1_modified = 0, nb_csectors;
-     int ret;
+     ptrdiff_t table_offset = (uint8_t *) table - (uint8_t *) c->table_array;
+     int idx = table_offset / c->table_size;
+@@ -411,7 +410,7 @@ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
  
-     assert(addend >= -1 && addend <= 1);
+ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table)
+ {
+-    int i = qcow2_cache_get_table_idx(bs, c, *table);
++    int i = qcow2_cache_get_table_idx(c, *table);
  
--    l2_table = NULL;
-+    l2_slice = NULL;
-     l1_table = NULL;
-     l1_size2 = l1_size * sizeof(uint64_t);
-+    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
-+    n_slices = s->cluster_size / slice_size2;
+     c->entries[i].ref--;
+     *table = NULL;
+@@ -426,7 +425,7 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table)
+ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
+      void *table)
+ {
+-    int i = qcow2_cache_get_table_idx(bs, c, table);
++    int i = qcow2_cache_get_table_idx(c, table);
+     assert(c->entries[i].offset != 0);
+     c->entries[i].dirty = true;
+ }
+@@ -446,7 +445,7 @@ void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
  
-     s->cache_discards = true;
+ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
+ {
+-    int i = qcow2_cache_get_table_idx(bs, c, table);
++    int i = qcow2_cache_get_table_idx(c, table);
  
-@@ -1236,19 +1239,19 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                 goto fail;
-             }
+     assert(c->entries[i].ref == 0);
  
--            {
-+            for (slice = 0; slice < n_slices; slice++) {
-                 ret = qcow2_cache_get(bs, s->l2_table_cache,
--                                      l2_offset,
--                                      (void **) &l2_table);
-+                                      l2_offset + slice * slice_size2,
-+                                      (void **) &l2_slice);
-                 if (ret < 0) {
-                     goto fail;
-                 }
- 
--                for (j = 0; j < s->l2_size; j++) {
-+                for (j = 0; j < s->l2_slice_size; j++) {
-                     uint64_t cluster_index;
-                     uint64_t offset;
- 
--                    entry = be64_to_cpu(l2_table[j]);
-+                    entry = be64_to_cpu(l2_slice[j]);
-                     old_entry = entry;
-                     entry &= ~QCOW_OFLAG_COPIED;
-                     offset = entry & L2E_OFFSET_MASK;
-@@ -1273,12 +1276,13 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                     case QCOW2_CLUSTER_NORMAL:
-                     case QCOW2_CLUSTER_ZERO_ALLOC:
-                         if (offset_into_cluster(s, offset)) {
-+                            int l2_index = slice * s->l2_slice_size + j;
-                             qcow2_signal_corruption(
-                                 bs, true, -1, -1, "Cluster "
-                                 "allocation offset %#" PRIx64
-                                 " unaligned (L2 offset: %#"
-                                 PRIx64 ", L2 index: %#x)",
--                                offset, l2_offset, j);
-+                                offset, l2_offset, l2_index);
-                             ret = -EIO;
-                             goto fail;
-                         }
-@@ -1317,14 +1321,13 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                             qcow2_cache_set_dependency(bs, s->l2_table_cache,
-                                                        s->refcount_block_cache);
-                         }
--                        l2_table[j] = cpu_to_be64(entry);
-+                        l2_slice[j] = cpu_to_be64(entry);
-                         qcow2_cache_entry_mark_dirty(s->l2_table_cache,
--                                                     l2_table);
-+                                                     l2_slice);
-                     }
-                 }
- 
--                qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
--
-+                qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-             }
- 
-             if (addend != 0) {
-@@ -1352,8 +1355,8 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
- 
-     ret = bdrv_flush(bs);
- fail:
--    if (l2_table) {
--        qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
-+    if (l2_slice) {
-+        qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-     }
- 
-     s->cache_discards = false;
 -- 
 2.11.0
