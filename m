@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ef0gK-0001dF-1T
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:52:25 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ef0ix-0004Hg-Us
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:55:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ef0gJ-0003Y5-4B
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:52:24 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:51041)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ef0gI-0003Xo-UN
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:52:23 -0500
-Received: by mail-wm0-x235.google.com with SMTP id f71so106204wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 01:52:22 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1ef0it-0005bF-3T
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:55:08 -0500
+References: <1513700253-10045-1-git-send-email-thuth@redhat.com>
+	<20180122193504.GB2628@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7495eb49-ed1e-2dbb-866e-c65b7e4147a8@redhat.com>
+Date: Fri, 26 Jan 2018 10:37:14 +0100
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 26 Jan 2018 09:52:21 +0000
-Message-ID: <CAJSP0QWfwAbQwDUH3-e87+fB+FLPjJT3tXjQcDpPrxf7Rk-0cw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] QEMU related blogs, all in once place
+In-Reply-To: <20180122193504.GB2628@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] monitor: Remove legacy "-mon default=on"
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-If you want to follow blogs from QEMU contributors check out:
+On 22/01/2018 20:35, Dr. David Alan Gilbert wrote:
+> * Thomas Huth (thuth@redhat.com) wrote:
+>> The "default" parameter of the "-mon" option is useless since
+>> QEMU v2.4.0, and marked as deprecated since QEMU v2.8.0. That
+>> should have been long enough to let people update their scripts,
+>> so time to remove it now.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> 
+> Seems reasonable.
+> 
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-https://planet.virt-tools.org/
+Are you also queuing it yourself?
 
-Daniel Berrange has provided the following steps for adding your own
-blog to planet.virt-tools.org:
+Thanks,
 
-  $ git clone git://libvirt.org/virttools-planet.git
+Paolo
 
-and add your blog info to updater/virt-tools/config.ini.
-
-Optionally add a icon in updater/virt-tools/images/.
-
-Then send the changes as a patch to libvir-list@redhat.com with git send-email.
-
-Stefan
+>> ---
+>>  monitor.c     | 3 ---
+>>  qemu-doc.texi | 9 ---------
+>>  vl.c          | 4 ----
+>>  3 files changed, 16 deletions(-)
+>>
+>> diff --git a/monitor.c b/monitor.c
+>> index e36fb53..e53c6e1 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -4141,9 +4141,6 @@ QemuOptsList qemu_mon_opts = {
+>>              .name = "chardev",
+>>              .type = QEMU_OPT_STRING,
+>>          },{
+>> -            .name = "default",  /* deprecated */
+>> -            .type = QEMU_OPT_BOOL,
+>> -        },{
+>>              .name = "pretty",
+>>              .type = QEMU_OPT_BOOL,
+>>          },
+>> diff --git a/qemu-doc.texi b/qemu-doc.texi
+>> index d9861b3..6913b32 100644
+>> --- a/qemu-doc.texi
+>> +++ b/qemu-doc.texi
+>> @@ -2401,15 +2401,6 @@ setting ``-machine kernel_irqchip=off''.
+>>  The ``-no-kvm'' argument is now a synonym for setting
+>>  ``-machine accel=tcg''.
+>>  
+>> -@subsection -mon default=on (since 2.4.0)
+>> -
+>> -The ``default'' option to the ``-mon'' argument is
+>> -now ignored. When multiple monitors were enabled, it
+>> -indicated which monitor would receive log messages
+>> -from the various subsystems. This feature is no longer
+>> -required as messages are now only sent to the monitor
+>> -in response to explicitly monitor commands.
+>> -
+>>  @subsection -vnc tls (since 2.5.0)
+>>  
+>>  The ``-vnc tls'' argument is now a synonym for setting
+>> diff --git a/vl.c b/vl.c
+>> index 2644400..4e7a7e4 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -2438,10 +2438,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+>>      if (qemu_opt_get_bool(opts, "pretty", 0))
+>>          flags |= MONITOR_USE_PRETTY;
+>>  
+>> -    if (qemu_opt_get_bool(opts, "default", 0)) {
+>> -        error_report("option 'default' does nothing and is deprecated");
+>> -    }
+>> -
+>>      chardev = qemu_opt_get(opts, "chardev");
+>>      chr = qemu_chr_find(chardev);
+>>      if (chr == NULL) {
+>> -- 
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
