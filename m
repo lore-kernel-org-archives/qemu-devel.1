@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef9s9-0006Ds-7i
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:41:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef9tG-0006zn-2j
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:42:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef9s8-0002Kh-Cx
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:41:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef9tF-0003Pm-61
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:42:22 -0500
 References: <cover.1516978645.git.berto@igalia.com>
-	<4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
+	<4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3204fa8a-0bb6-6116-2f9b-635838803fef@redhat.com>
-Date: Fri, 26 Jan 2018 13:41:04 -0600
+Message-ID: <b3d8c283-91ff-0c8e-e4be-6151fb054452@redhat.com>
+Date: Fri, 26 Jan 2018 13:42:15 -0600
 MIME-Version: 1.0
-In-Reply-To: <4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
+In-Reply-To: <4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="MDhwZJ1iMdd0po4Stm8utpP6lI3A8h2J9"
-Subject: Re: [Qemu-devel] [PATCH v3 28/39] qcow2: Read refcount before L2
- table in expand_zero_clusters_in_l1()
+	boundary="2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY"
+Subject: Re: [Qemu-devel] [PATCH v3 29/39] qcow2: Prepare
+ expand_zero_clusters_in_l1() for adding L2 slice support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +29,40 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MDhwZJ1iMdd0po4Stm8utpP6lI3A8h2J9
+--2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY
 From: Eric Blake <eblake@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
  Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
  "Denis V . Lunev" <den@openvz.org>
-Message-ID: <3204fa8a-0bb6-6116-2f9b-635838803fef@redhat.com>
-Subject: Re: [PATCH v3 28/39] qcow2: Read refcount before L2 table in
- expand_zero_clusters_in_l1()
+Message-ID: <b3d8c283-91ff-0c8e-e4be-6151fb054452@redhat.com>
+Subject: Re: [PATCH v3 29/39] qcow2: Prepare expand_zero_clusters_in_l1() for
+ adding L2 slice support
 References: <cover.1516978645.git.berto@igalia.com>
- <4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
-In-Reply-To: <4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
+ <4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
+In-Reply-To: <4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 01/26/2018 08:59 AM, Alberto Garcia wrote:
-> At the moment it doesn't really make a difference whether we call
-> qcow2_get_refcount() before of after reading the L2 table, but if we
-> want to support L2 slices we'll need to read the refcount first.
+> Adding support for L2 slices to expand_zero_clusters_in_l1() needs
+> (among other things) an extra loop that iterates over all slices of
+> each L2 table.
 >=20
-> This patch simply changes the order of those two operations to prepare
-> for that. The patch with the actual semantic changes will be easier to
-> read because of this.
+> Putting all changes in one patch would make it hard to read because
+> all semantic changes would be mixed with pure indentation changes.
+>=20
+> To make things easier this patch simply creates a new block and
+> changes the indentation of all lines of code inside it. Thus, all
+> modifications in this patch are cosmetic. There are no semantic
+> changes and no variables are renamed yet. The next patch will take
+> care of that.
 >=20
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/qcow2-cluster.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  block/qcow2-cluster.c | 187 ++++++++++++++++++++++++++----------------=
+--------
+>  1 file changed, 96 insertions(+), 91 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -66,7 +72,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---MDhwZJ1iMdd0po4Stm8utpP6lI3A8h2J9
+--2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -75,14 +81,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprhFAACgkQp6FrSiUn
-Q2rGTQgAk+U8w2saL1nD16ljbCgO5WDlovZef08v72gDImRjKDmUsOpd9qrGegmf
-IvpTh0LvZOaD6AIU+EwkN8oQ2LxHn6t2sa9qKhYXLihpn8FLXDkP1nvs9PWA10Uy
-eSXAB27SP9uCmdlKuIyE3VjJ8AH+nWh04vuMUamJZTHuAHNy7UuE6nCgs3o4g3KQ
-OPGdQ1jSrKNQ2gpJNes41B0JhO4JoCwA1BcDu18hJeRz7DwC9dKjuA9OH9fjnRlf
-fItCKr/bR7kC1XypNkoMsebCZ11oQYKQskAGy/zeqVhJpXKuuqXdRavc1kOkzv7F
-STbUhyz3+D9Ik3OdgfYvz5IwxAV9lA==
-=lsac
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprhJcACgkQp6FrSiUn
+Q2pffAf/WS+ipOvVIOhhEGQQYUkghJ6apXj53FNQ0Xk19mKEjD/oCDgZnLtQD41a
+I2jDWVaXYqcP3bjBkpfrnnrg8mSGIj/wpJomCOeuT5TpywK1VbowZRqTBj9Dp3jQ
+b2YYrpnTqNhwzfEIzOGaGtOyqUoBQRQVZeU4i624rHG5lWWLeotKTfPhset/+4iw
+UKnq9ikMBlI6X9Ppfi9ZwNBAytpw3zbizURo+ZAi5gAmE3v9xGoBc1WFy7nczbPr
+wgSis+bk64CbJOI+o2SsklDvqK2BCxmKvC2AX2b5L7zf+Y1pWB4KhVYGmi6x4Uwl
++zwXe72IJOVs9XyVp94DPXsrrLrPIg==
+=2c05
 -----END PGP SIGNATURE-----
 
---MDhwZJ1iMdd0po4Stm8utpP6lI3A8h2J9--
+--2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY--
