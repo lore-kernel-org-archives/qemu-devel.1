@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eewtT-0004IT-Qa
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 00:49:47 -0500
+	(envelope-from <tiwei.bie@intel.com>) id 1eexBY-00030Y-OM
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:08:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eewtQ-0003BZ-N7
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 00:49:43 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:39504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eewtQ-0003BO-Fd
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 00:49:40 -0500
-Received: by mail-pg0-x243.google.com with SMTP id w17so6599455pgv.6
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 21:49:40 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 25 Jan 2018 20:57:38 -0800
-Message-Id: <20180126045742.5487-17-richard.henderson@linaro.org>
-In-Reply-To: <20180126045742.5487-1-richard.henderson@linaro.org>
-References: <20180126045742.5487-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v11 16/20] target/arm: Use vector
- infrastructure for aa64 compares
+	(envelope-from <tiwei.bie@intel.com>) id 1eexBT-00089Y-IU
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:08:24 -0500
+Received: from mga06.intel.com ([134.134.136.31]:7977)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1eexBT-00087v-Al
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 01:08:19 -0500
+Date: Fri, 26 Jan 2018 13:57:59 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180126055759.vu4qwdpjbzf4mg4j@debian-xvivbkq.sh.intel.com>
+References: <20180125040328.22867-1-tiwei.bie@intel.com>
+	<20180125040328.22867-7-tiwei.bie@intel.com>
+	<20180126015553-mutt-send-email-mst@kernel.org>
+	<28ab37d5-6cf6-866d-9167-e14e7441415f@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <28ab37d5-6cf6-866d-9167-e14e7441415f@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v1 6/6] vhost-user: add
+ VFIO based accelerators support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,160 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-a64.c | 93 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 59 insertions(+), 34 deletions(-)
+On Fri, Jan 26, 2018 at 11:41:27AM +0800, Jason Wang wrote:
+> On 2018年01月26日 07:59, Michael S. Tsirkin wrote:
+> > > The virtual IOMMU isn't supported by the accelerators for now.
+> > > Because vhost-user currently lacks of an efficient way to share
+> > > the IOMMU table in VM to vhost backend. That's why the software
+> > > implementation of virtual IOMMU support in vhost-user backend
+> > > can't support dynamic mapping well.
+> > What exactly is meant by that? vIOMMU seems to work for people,
+> > it's not that fast if you change mappings all the time,
+> > but e.g. dpdk within guest doesn't.
+> 
+> Yes, software implementation support dynamic mapping for sure. I think the
+> point is, current vhost-user backend can not program hardware IOMMU. So it
+> can not let hardware accelerator to cowork with software vIOMMU.
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 38400560db..c928c4787c 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -7209,6 +7209,28 @@ static void disas_simd_scalar_three_reg_diff(DisasContext *s, uint32_t insn)
-     }
- }
- 
-+/* CMTST : test is "if (X & Y != 0)". */
-+static void gen_cmtst_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-+{
-+    tcg_gen_and_i32(d, a, b);
-+    tcg_gen_setcondi_i32(TCG_COND_NE, d, d, 0);
-+    tcg_gen_neg_i32(d, d);
-+}
-+
-+static void gen_cmtst_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    tcg_gen_and_i64(d, a, b);
-+    tcg_gen_setcondi_i64(TCG_COND_NE, d, d, 0);
-+    tcg_gen_neg_i64(d, d);
-+}
-+
-+static void gen_cmtst_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
-+{
-+    tcg_gen_and_vec(vece, d, a, b);
-+    tcg_gen_dupi_vec(vece, a, 0);
-+    tcg_gen_cmp_vec(TCG_COND_NE, vece, d, d, a);
-+}
-+
- static void handle_3same_64(DisasContext *s, int opcode, bool u,
-                             TCGv_i64 tcg_rd, TCGv_i64 tcg_rn, TCGv_i64 tcg_rm)
- {
-@@ -7252,10 +7274,7 @@ static void handle_3same_64(DisasContext *s, int opcode, bool u,
-             cond = TCG_COND_EQ;
-             goto do_cmop;
-         }
--        /* CMTST : test is "if (X & Y != 0)". */
--        tcg_gen_and_i64(tcg_rd, tcg_rn, tcg_rm);
--        tcg_gen_setcondi_i64(TCG_COND_NE, tcg_rd, tcg_rd, 0);
--        tcg_gen_neg_i64(tcg_rd, tcg_rd);
-+        gen_cmtst_i64(tcg_rd, tcg_rn, tcg_rm);
-         break;
-     case 0x8: /* SSHL, USHL */
-         if (u) {
-@@ -9737,6 +9756,22 @@ static void disas_simd_3same_float(DisasContext *s, uint32_t insn)
- /* Integer op subgroup of C3.6.16. */
- static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
- {
-+    static const GVecGen3 cmtst_op[4] = {
-+        { .fni4 = gen_helper_neon_tst_u8,
-+          .fniv = gen_cmtst_vec,
-+          .vece = MO_8 },
-+        { .fni4 = gen_helper_neon_tst_u16,
-+          .fniv = gen_cmtst_vec,
-+          .vece = MO_16 },
-+        { .fni4 = gen_cmtst_i32,
-+          .fniv = gen_cmtst_vec,
-+          .vece = MO_32 },
-+        { .fni8 = gen_cmtst_i64,
-+          .fniv = gen_cmtst_vec,
-+          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+          .vece = MO_64 },
-+    };
-+
-     int is_q = extract32(insn, 30, 1);
-     int u = extract32(insn, 29, 1);
-     int size = extract32(insn, 22, 2);
-@@ -9745,6 +9780,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-     int rn = extract32(insn, 5, 5);
-     int rd = extract32(insn, 0, 5);
-     int pass;
-+    TCGCond cond;
- 
-     switch (opcode) {
-     case 0x13: /* MUL, PMUL */
-@@ -9792,6 +9828,25 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-             gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_add, size);
-         }
-         return;
-+    case 0x11:
-+        if (!u) { /* CMTST */
-+            gen_gvec_op3(s, is_q, rd, rn, rm, &cmtst_op[size]);
-+            return;
-+        }
-+        /* else CMEQ */
-+        cond = TCG_COND_EQ;
-+        goto do_gvec_cmp;
-+    case 0x06: /* CMGT, CMHI */
-+        cond = u ? TCG_COND_GTU : TCG_COND_GT;
-+        goto do_gvec_cmp;
-+    case 0x07: /* CMGE, CMHS */
-+        cond = u ? TCG_COND_GEU : TCG_COND_GE;
-+    do_gvec_cmp:
-+        tcg_gen_gvec_cmp(cond, size, vec_full_reg_offset(s, rd),
-+                         vec_full_reg_offset(s, rn),
-+                         vec_full_reg_offset(s, rm),
-+                         is_q ? 16 : 8, vec_full_reg_size(s));
-+        return;
-     }
- 
-     if (size == 3) {
-@@ -9874,26 +9929,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 genenvfn = fns[size][u];
-                 break;
-             }
--            case 0x6: /* CMGT, CMHI */
--            {
--                static NeonGenTwoOpFn * const fns[3][2] = {
--                    { gen_helper_neon_cgt_s8, gen_helper_neon_cgt_u8 },
--                    { gen_helper_neon_cgt_s16, gen_helper_neon_cgt_u16 },
--                    { gen_helper_neon_cgt_s32, gen_helper_neon_cgt_u32 },
--                };
--                genfn = fns[size][u];
--                break;
--            }
--            case 0x7: /* CMGE, CMHS */
--            {
--                static NeonGenTwoOpFn * const fns[3][2] = {
--                    { gen_helper_neon_cge_s8, gen_helper_neon_cge_u8 },
--                    { gen_helper_neon_cge_s16, gen_helper_neon_cge_u16 },
--                    { gen_helper_neon_cge_s32, gen_helper_neon_cge_u32 },
--                };
--                genfn = fns[size][u];
--                break;
--            }
-             case 0x8: /* SSHL, USHL */
-             {
-                 static NeonGenTwoOpFn * const fns[3][2] = {
-@@ -9966,16 +10001,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 genfn = fns[size][u];
-                 break;
-             }
--            case 0x11: /* CMTST, CMEQ */
--            {
--                static NeonGenTwoOpFn * const fns[3][2] = {
--                    { gen_helper_neon_tst_u8, gen_helper_neon_ceq_u8 },
--                    { gen_helper_neon_tst_u16, gen_helper_neon_ceq_u16 },
--                    { gen_helper_neon_tst_u32, gen_helper_neon_ceq_u32 },
--                };
--                genfn = fns[size][u];
--                break;
--            }
-             case 0x13: /* MUL, PMUL */
-                 if (u) {
-                     /* PMUL */
--- 
-2.14.3
+Vhost-user backend can program hardware IOMMU. Currently
+vhost-user backend (or more precisely the vDPA driver in
+vhost-user backend) will use the memory table (delivered
+by the VHOST_USER_SET_MEM_TABLE message) to program the
+IOMMU via vfio, and that's why accelerators can use the
+GPA (guest physical address) in descriptors directly.
+
+Theoretically, we can use the IOVA mapping info (delivered
+by the VHOST_USER_IOTLB_MSG message) to program the IOMMU,
+and accelerators will be able to use IOVA. But the problem
+is that in vhost-user QEMU won't push all the IOVA mappings
+to backend directly. Backend needs to ask for those info
+when it meets a new IOVA. Such design and implementation
+won't work well for dynamic mappings anyway and couldn't
+be supported by hardware accelerators.
+
+> I think
+> that's another call to implement the offloaded path inside qemu which has
+> complete support for vIOMMU co-operated VFIO.
+
+Yes, that's exactly what we want. After revisiting the
+last paragraph in the commit message, I found it's not
+really accurate. The practicability of dynamic mappings
+support is a common issue for QEMU. It also exists for
+vfio (hw/vfio in QEMU). If QEMU needs to trap all the
+map/unmap events, the data path performance couldn't be
+high. If we want to thoroughly fix this issue especially
+for vfio (hw/vfio in QEMU), we need to have the offload
+path Jason mentioned in QEMU. And I think accelerators
+could use it too.
+
+Best regards,
+Tiwei Bie
+
+> 
+> Thanks
+> 
+> > 
+> > > Once this problem is solved
+> > > in vhost-user, virtual IOMMU can be supported by accelerators
+> > > too, and the IOMMU feature bit checking in this patch can be
+> > > removed.
+> > Given it works with software backends right now, I suspect
+> > this will be up to you guys to address.
+> > 
+> 
