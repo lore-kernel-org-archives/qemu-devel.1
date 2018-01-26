@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ef6N1-0007Gi-FG
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:56:52 -0500
+	(envelope-from <wei@redhat.com>) id 1ef6NS-0007eA-1f
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:57:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ef6Mx-0004qW-F1
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:56:51 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d8c2c2ca-5046-f19b-9514-d3cbef3b7c3a@amsat.org>
-Date: Fri, 26 Jan 2018 11:29:33 -0300
+	(envelope-from <wei@redhat.com>) id 1ef6NO-0005Dh-2F
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:57:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1ef6NN-0005Cv-RL
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:57:13 -0500
+References: <20180124212246.2352-1-wei@redhat.com>
+	<20180125200525.GC2442@work-vm>
+From: Wei Huang <wei@redhat.com>
+Message-ID: <6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
+Date: Fri, 26 Jan 2018 09:47:32 -0600
 MIME-Version: 1.0
-In-Reply-To: <1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <20180125200525.GC2442@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] target/arm: Add "-cpu max" support
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +29,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, patches@linaro.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
 
-Hi Peter,
 
-On 12/07/2017 03:14 PM, Peter Maydell wrote:
-> Add support for "-cpu max" for ARM guests. This CPU type behaves
-> like "-cpu host" when KVM is enabled, and like a system CPU with
-> the maximum possible feature set otherwise. (Note that this means
-> it won't be migratable across versions, as we will likely add
-> features to it in future.)
+
+On 01/25/2018 02:05 PM, Dr. David Alan Gilbert wrote:
+> * Wei Huang (wei@redhat.com) wrote:
+>> This patch adds the migration test support for aarch64. The test code,
+>> which implements the same functionality as x86, is compiled into a binary
+>> and booted as a kernel in qemu. Here are the design ideas:
+>>
+>>  * We choose this -kernel design because aarch64 QEMU doesn't provide a
+>>    built-in fw like x86 does. So instead of relying on a boot loader, we
+>>    use -kernel approach for aarch64.
+>>  * The serial output is sent to PL011 directly.
+>>  * The physical memory base for mach-virt machine is 0x40000000. We change
+>>    the start_address and end_address for aarch64.
+>>
+>> RFC->V1:
+>>  * aarch64 kernel blob is defined as an uint32_t array
+>>  * The test code is re-written to address a data caching issue under KVM.
+>>    Tests passed under both x86 and aarch64.
+>>  * Re-use init_bootfile_x86() for both x86 and aarch64
+>>  * Other minor fixes
+>>
+>> Note that the test code is as the following:
+>>
+>> .section .text
+>>
+>>         .globl  start
+>>         
+>> start:
+>>         /* disable MMU to use phys mem address */
+>>         mrs     x0, sctlr_el1
+>>         bic     x0, x0, #(1<<0)
+>>         msr     sctlr_el1, x0
+>>         isb
+>>
+>>         /* output char 'A' to PL011 */
+>>         mov     w4, #65
+>>         mov     x5, #0x9000000
+>>         strb    w4, [x5]
+>>
+>>         /* w6 keeps a counter so we can limit the output speed */
+>>         mov     w6, #0
+>>
+>>         /* phys mem base addr = 0x40000000 */
+>>         mov     x3, #(0x40000000 + 100 *1024*1024) /* traverse 1M-100M */
+>>         mov     x2, #(0x40000000 + 1 * 1024*1024)
+>>
+>>         /* clean up memory first */
+>>         mov     w1, #0  
+>> clean:
+>>         strb    w1, [x2]
+>>         add     x2, x2, #(4096)
+>>         cmp     x2, x3
+>>         ble     clean
+>>
+>>         /* main body */
+>> mainloop:
+>>         mov     x2, #(0x40000000 + 1 * 1024*1024)
+>>         
+>> innerloop:
+>>         /* clean cache because el2 might still cache guest data under KVM */
+>>         dc      civac, x2
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/cpu-qom.h |  2 ++
->  target/arm/cpu.c     | 24 ++++++++++++++++++++++++
->  target/arm/cpu64.c   | 21 +++++++++++++++++++++
->  3 files changed, 47 insertions(+)
+> Can you explain a bit more about that please;  if it's guest
+> visible acorss migration, doesn't that suggest we need the cache clear
+> in KVM or QEMU?
+
+I think this is ARM specific. This is caused by the inconsistency
+between guest VM's data accesses and userspace's accesses (in
+check_guest_ram) at the destination:
+
+1) Because uncacheable (guest) + cacheable (host) ==> uncacheable. So
+the data accesses from guest VM go directly into memory.
+2) QEMU user space will use the cacheable version. So it is possible
+that data can come from cache, instead of RAM. The difference between
+(1) and (2) obviously can cause check_guest_ram() to fail sometimes.
+
+x86's EPT has the capability to ignore guest-provided memory type. So it
+is possible to have consistent data views between guest and QEMU user-space.
+
+
 > 
-> diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
-> index a42495b..d135ff8 100644
-> --- a/target/arm/cpu-qom.h
-> +++ b/target/arm/cpu-qom.h
-> @@ -33,6 +33,8 @@ struct arm_boot_info;
->  #define ARM_CPU_GET_CLASS(obj) \
->      OBJECT_GET_CLASS(ARMCPUClass, (obj), TYPE_ARM_CPU)
->  
-> +#define TYPE_ARM_MAX_CPU "max-" TYPE_ARM_CPU
-> +
->  /**
->   * ARMCPUClass:
->   * @parent_realize: The parent class' realize handler.
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 9304277..190da97 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1628,6 +1628,27 @@ static void pxa270c5_initfn(Object *obj)
->      cpu->reset_sctlr = 0x00000078;
->  }
->  
-> +#ifndef TARGET_AARCH64
-> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-> + * otherwise, a CPU with as many features enabled as our emulation supports.
-> + * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu64.c;
-> + * this only needs to handle 32 bits.
-> + */
-> +static void arm_max_initfn(Object *obj)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +
-> +    if (kvm_enabled()) {
-> +        kvm_arm_set_cpu_features_from_host(cpu);
-> +    } else {
-> +        cortex_a15_initfn(obj);> +        /* In future we might add feature bits here even if the
-> +         * real-world A15 doesn't implement them.
-> +         */
-
-Why not use arm_any_initfn() here?
-
-Actually what seems cleaner is to move "any" features here, and kill the
-"any" cpu, using "max" for this purpose.
-
-> +    }
-> +}
-> +#endif
-> +
->  #ifdef CONFIG_USER_ONLY
->  static void arm_any_initfn(Object *obj)
->  {
-> @@ -1691,6 +1712,9 @@ static const ARMCPUInfo arm_cpus[] = {
->      { .name = "pxa270-b1",   .initfn = pxa270b1_initfn },
->      { .name = "pxa270-c0",   .initfn = pxa270c0_initfn },
->      { .name = "pxa270-c5",   .initfn = pxa270c5_initfn },
-> +#ifndef TARGET_AARCH64
-> +    { .name = "max",         .initfn = arm_max_initfn },
-> +#endif
-
->  #ifdef CONFIG_USER_ONLY
->      { .name = "any",         .initfn = arm_any_initfn },
->  #endif
-
-and we can remove the last 3 lines.
-
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 670c07a..38dcf32 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -28,6 +28,7 @@
->  #include "hw/arm/arm.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/kvm.h"
-> +#include "kvm_arm.h"
->  
->  static inline void set_feature(CPUARMState *env, int feature)
->  {
-> @@ -212,6 +213,25 @@ static void aarch64_a53_initfn(Object *obj)
->      define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
->  }
->  
-> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-> + * otherwise, a CPU with as many features enabled as our emulation supports.
-> + * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-> + * this only needs to handle 64 bits.
-> + */
-> +static void aarch64_max_initfn(Object *obj)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +
-> +    if (kvm_enabled()) {
-> +        kvm_arm_set_cpu_features_from_host(cpu);
-> +    } else {
-> +        aarch64_a57_initfn(obj);
-> +        /* In future we might add feature bits here even if the
-> +         * real-world A57 doesn't implement them.
-> +         */
-> +    }
-> +}
-> +
->  #ifdef CONFIG_USER_ONLY
->  static void aarch64_any_initfn(Object *obj)
->  {
-> @@ -240,6 +260,7 @@ typedef struct ARMCPUInfo {
->  static const ARMCPUInfo aarch64_cpus[] = {
->      { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
->      { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
-> +    { .name = "max",                .initfn = aarch64_max_initfn },
->  #ifdef CONFIG_USER_ONLY
->      { .name = "any",         .initfn = aarch64_any_initfn },
->  #endif
+> Dave
+> 
+>>         ldrb    w1, [x2]
+>>         add     w1, w1, #1
+>>         and     w1, w1, #(0xff)
+>>         strb    w1, [x2]
+>>
+>>         add     x2, x2, #(4096)
+>>         cmp     x2, x3
+>>         blt     innerloop
+>>
+>>         add     w6, w6, #1
+>>         and     w6, w6, #(0xff)
+>>         cmp     w6, #0
+>>         bne     mainloop
+>>         
+>>         /* output char 'B' to PL011 */
+>>         mov     w4, #66
+>>         mov     x5, #0x9000000
+>>         strb    w4, [x5]
+>>
+>>         bl      mainloop
+>>
+>> The code is compiled with the following commands:
+>>  > gcc -c -o fill.o fill.s
+>>  > gcc -O2 -o fill.elf -Wl,-T,/tmp/flat.lds,--build-id=none,-Ttext=40080000 \
+>>    -nostdlib fill.o
+>>  > objcopy -O binary fill.elf fill.flat
+>>  > truncate -c -s 144 ./fill.flat
+>>  > xxd -g 4 -c 24 -e fill.flat | awk '{print "0x"$2 ", " "0x"$3 ", " "0x"C$4 ", " "0x"C$5 ", " "0x"$6 ", " "0x"C$7 "," }'
+>>
+>> The linker file (borrowed from KVM unit test) is defined as:
+>>
+>> SECTIONS
+>> {
+>>     .text : { *(.init) *(.text) *(.text.*) }
+>>     . = ALIGN(64K);
+>>     etext = .;
+>>     .data : {
+>>         *(.data)
+>>     }
+>>     . = ALIGN(16);
+>>     .rodata : { *(.rodata) }
+>>     . = ALIGN(16);
+>>     .bss : { *(.bss) }
+>>     . = ALIGN(64K);
+>>     edata = .;
+>>     . += 64K;
+>>     . = ALIGN(64K);
+>>     /*
+>>      * stack depth is 16K for arm and PAGE_SIZE for arm64, see THREAD_SIZE
+>>      * sp must be 16 byte aligned for arm64, and 8 byte aligned for arm
+>>      * sp must always be strictly less than the true stacktop
+>>      */
+>>     stackptr = . - 16;
+>>     stacktop = .;
+>> }
+>>
+>> ENTRY(start)
+>>
+>> Signed-off-by: Wei Huang <wei@redhat.com>
+>> ---
+>>  tests/Makefile.include |  1 +
+>>  tests/migration-test.c | 37 +++++++++++++++++++++++++++++++------
+>>  2 files changed, 32 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index b4bcc872f2..2a520e53ab 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -357,6 +357,7 @@ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+>>  gcov-files-arm-y += hw/timer/arm_mptimer.c
+>>  
+>>  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+>> +check-qtest-aarch64-y += tests/migration-test$(EXESUF)
+>>  
+>>  check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
+>>  
+>> diff --git a/tests/migration-test.c b/tests/migration-test.c
+>> index be598d3257..3237fe93b2 100644
+>> --- a/tests/migration-test.c
+>> +++ b/tests/migration-test.c
+>> @@ -22,8 +22,8 @@
+>>  
+>>  #define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
+>>  
+>> -const unsigned start_address = 1024 * 1024;
+>> -const unsigned end_address = 100 * 1024 * 1024;
+>> +unsigned start_address = 1024 * 1024;
+>> +unsigned end_address = 100 * 1024 * 1024;
+>>  bool got_stop;
+>>  
+>>  #if defined(__linux__)
+>> @@ -79,7 +79,7 @@ static const char *tmpfs;
+>>  /* A simple PC boot sector that modifies memory (1-100MB) quickly
+>>   * outputing a 'B' every so often if it's still running.
+>>   */
+>> -unsigned char bootsect[] = {
+>> +unsigned char x86_bootsect[] = {
+>>    0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
+>>    0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
+>>    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
+>> @@ -125,11 +125,20 @@ unsigned char bootsect[] = {
+>>    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
+>>  };
+>>  
+>> -static void init_bootfile_x86(const char *bootpath)
+>> +uint32_t aarch64_kernel[] = {
+>> +    0xd5381000, 0x927ff800, 0xd5181000, 0xd5033fdf, 0x52800824, 0xd2a12005,
+>> +    0x390000a4, 0x52800006, 0xd2a8c803, 0xd2a80202, 0x52800001, 0x39000041,
+>> +    0x91400442, 0xeb03005f, 0x54ffffad, 0xd2a80202, 0xd50b7e22, 0x39400041,
+>> +    0x11000421, 0x12001c21, 0x39000041, 0x91400442, 0xeb03005f, 0x54ffff2b,
+>> +    0x110004c6, 0x12001cc6, 0x710000df, 0x54fffe81, 0x52800844, 0xd2a12005,
+>> +    0x390000a4, 0x97fffff0, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+>> +};
+>> +
+>> +static void init_bootfile(const char *bootpath, void *content)
+>>  {
+>>      FILE *bootfile = fopen(bootpath, "wb");
+>>  
+>> -    g_assert_cmpint(fwrite(bootsect, 512, 1, bootfile), ==, 1);
+>> +    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
+>>      fclose(bootfile);
+>>  }
+>>  
+>> @@ -442,7 +451,7 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>>      got_stop = false;
+>>  
+>>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+>> -        init_bootfile_x86(bootpath);
+>> +        init_bootfile(bootpath, x86_bootsect);
+>>          cmd_src = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
+>>                                    " -name pcsource,debug-threads=on"
+>>                                    " -serial file:%s/src_serial"
+>> @@ -470,6 +479,22 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>>                                    " -serial file:%s/dest_serial"
+>>                                    " -incoming %s",
+>>                                    accel, tmpfs, uri);
+>> +    } else if (strcmp(arch, "aarch64") == 0) {
+>> +        init_bootfile(bootpath, aarch64_kernel);
+>> +        cmd_src = g_strdup_printf("-machine virt,accel=kvm:tcg -m 150M "
+>> +                                  "-name vmsource,debug-threads=on -cpu host "
+>> +                                  "-serial file:%s/src_serial "
+>> +                                  "-kernel %s ",
+>> +                                  tmpfs, bootpath);
+>> +        cmd_dst = g_strdup_printf("-machine virt,accel=kvm:tcg -m 150M "
+>> +                                  "-name vmdest,debug-threads=on -cpu host "
+>> +                                  "-serial file:%s/dest_serial "
+>> +                                  "-kernel %s "
+>> +                                  "-incoming %s ",
+>> +                                  tmpfs, bootpath, uri);
+>> +        /* aarch64 virt machine physical mem started from 0x40000000 */
+>> +        start_address += 0x40000000;
+>> +        end_address += 0x40000000;
+>>      } else {
+>>          g_assert_not_reached();
+>>      }
+>> -- 
+>> 2.14.3
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 > 
