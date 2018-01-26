@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1efCRQ-0004QB-6n
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 17:25:49 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1efCtd-0001ta-By
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 17:54:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1efCRM-0008P1-SU
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 17:25:48 -0500
-Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:51122)
+	(envelope-from <sstabellini@kernel.org>) id 1efCta-0004qa-7I
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 17:54:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1efCRM-0008KH-Ig
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 17:25:44 -0500
-Received: from player699.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5776B5529B
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 23:25:35 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 26 Jan 2018 23:25:24 +0100
-Message-ID: <151700552398.7196.2573848773899364520.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1efCtZ-0004oz-U0
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 17:54:54 -0500
+Date: Fri, 26 Jan 2018 14:54:50 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <151670719721.7533.6287116389556641300.stgit@bahia>
+Message-ID: <alpine.DEB.2.10.1801261451590.11958@sstabellini-ThinkPad-X260>
+References: <151670719721.7533.6287116389556641300.stgit@bahia>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spapr_pci: fix MSI/MSIX selection
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: Correctly handle cancelled requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,173 +26,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Keno Fischer <keno@juliacomputing.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-In various place we don't correctly check if the device supports MSI or
-MSI-X. This can cause devices to be advertised with MSI support, even
-if they only support MSI-X (like virtio-pci-* devices for example):
+On Tue, 23 Jan 2018, Greg Kurz wrote:
+> From: Keno Fischer <keno@juliacomputing.com>
+> 
+> # Background
+> 
+> I was investigating spurious non-deterministic EINTR returns from
+> various 9p file system operations in a Linux guest served from the
+> qemu 9p server.
+> 
+>  ## EINTR, ERESTARTSYS and the linux kernel
+> 
+> When a signal arrives that the Linux kernel needs to deliver to user-space
+> while a given thread is blocked (in the 9p case waiting for a reply to its
+> request in 9p_client_rpc -> wait_event_interruptible), it asks whatever
+> driver is currently running to abort its current operation (in the 9p case
+> causing the submission of a TFLUSH message) and return to user space.
+> In these situations, the error message reported is generally ERESTARTSYS.
+> If the userspace processes specified SA_RESTART, this means that the
+> system call will get restarted upon completion of the signal handler
+> delivery (assuming the signal handler doesn't modify the process state
+> in complicated ways not relevant here). If SA_RESTART is not specified,
+> ERESTARTSYS gets translated to EINTR and user space is expected to handle
+> the restart itself.
+> 
+>  ## The 9p TFLUSH command
+> 
+> The 9p TFLUSH commands requests that the server abort an ongoing operation.
+> The man page [1] specifies:
+> 
+> ```
+> If it recognizes oldtag as the tag of a pending transaction, it should abort any
+> pending response and discard that tag.
+> [...]
+> When the client sends a Tflush, it must wait to receive the corresponding Rflush
+> before reusing oldtag for subsequent messages. If a response to the flushed request
+> is received before the Rflush, the client must honor the response as if it had not
+> been flushed, since the completed request may signify a state change in the server
+> ```
+> 
+> In particular, this means that the server must not send a reply with the orignal
+> tag in response to the cancellation request, because the client is obligated
+> to interpret such a reply as a coincidental reply to the original request.
+> 
+>  # The bug
+> 
+> When qemu receives a TFlush request, it sets the `cancelled` flag on the relevant
+> pdu. This flag is periodically checked, e.g. in `v9fs_co_name_to_path`, and if
+> set, the operation is aborted and the error is set to EINTR. However, the server
+> then violates the spec, by returning to the client an Rerror response, rather
+> than discarding the message entirely. As a result, the client is required
+> to assume that said Rerror response is a result of the original request, not
+> a result of the cancellation and thus passes the EINTR error back to user space.
+> This is not the worst thing it could do, however as discussed above, the correct
+> error code would have been ERESTARTSYS, such that user space programs with
+> SA_RESTART set get correctly restarted upon completion of the signal handler.
+> Instead, such programs get spurious EINTR results that they were not expecting
+> to handle.
+> 
+> It should be noted that there are plenty of user space programs that do not
+> set SA_RESTART and do not correctly handle EINTR either. However, that is then
+> a userspace bug. It should also be noted that this bug has been mitigated by
+> a recent commit to the Linux kernel [2], which essentially prevents the kernel
+> from sending Tflush requests unless the process is about to die (in which case
+> the process likely doesn't care about the response). Nevertheless, for older
+> kernels and to comply with the spec, I believe this change is beneficial.
+> 
+>  # Implementation
+> 
+> The fix is fairly simple, just skipping notification of a reply if
+> the pdu was previously cancelled. We do however, also notify the transport
+> layer that we're doing this, so it can clean up any resources it may be
+> holding. I also added a new trace event to distinguish
+> operations that caused an error reply from those that were cancelled.
+> 
+> One complication is that we only omit sending the message on EINTR errors in
+> order to avoid confusing the rest of the code (which may assume that a
+> client knows about a fid if it sucessfully passed it off to pud_complete
+> without checking for cancellation status). This does mean that if the server
+> acts upon the cancellation flag, it always needs to set err to EINTR. I believe
+> this is true of the current code.
+> 
+> [1] https://9fans.github.io/plan9port/man/man9/flush.html
+> [2] https://github.com/torvalds/linux/commit/9523feac272ccad2ad8186ba4fcc89103754de52
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> [groug, send a zero-sized reply instead of detaching the buffer]
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> 
+> To be effective, a patch is needed for the 9pnet_virtio driver in Linux as
+> well:
+> 
+> https://sourceforge.net/p/v9fs/mailman/message/36200555/
+> 
+> 
+> Stefano,
+> 
+> As you suggested, the right thing to do is indeed to inform the transport
+> layer that the request was consumed, even if we don't send a 9p reply to
+> the client (MST suggested the same for the kernel-side patches I had sent
+> a month ago on the v9fs-developper list).
+> 
+> So in the end the following patch is not needed:
+> 
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg00175.html
+> 
+> Zeroing the PDU size before pushing it back does job for virtio, and
+> it seems it will also work for Xen (at least that's my impression
+> after reading the code in QEMU and Linux). But before merging that,
+> I'd appreciate an ack from you.
 
-                ethernet@0 {
-                        ibm,req#msi =3D <0x1>; <--- wrong!
-			.
-			ibm,loc-code =3D "qemu_virtio-net-pci:0000:00:00.0";
-			.
-			ibm,req#msi-x =3D <0x3>;
-                };
+Sounds good
 
-Worse, this can also cause the "ibm,change-msi" RTAS call to corrupt the
-PCI status and cause migration to fail:
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 
-  qemu-system-ppc64: get_pci_config_device: Bad config data: i=3D0x6
-    read: 0 device: 10 cmask: 10 wmask: 0 w1cmask:0
-                              ^^
-           PCI_STATUS_CAP_LIST bit which is assumed to be constant
 
-This patch changes spapr_populate_pci_child_dt() to properly check for
-MSI support using msi_present(): this ensures that PCIDevice::msi_cap
-was set by msi_init() and that msi_nr_vectors_allocated() will look at
-the right place in the config space.
-
-Checking PCIDevice::msix_entries_nr is enough for MSI-X but let's add
-a call to msix_present() there as well for consistency.
-
-It also changes rtas_ibm_change_msi() to select the appropriate MSI
-type in Function 1 instead of always selecting plain MSI. This new
-behaviour is compliant with LoPAPR 1.1, as described in "Table 71.
-ibm,change-msi Argument Call Buffer":
-
-  Function 1: If Number Outputs is equal to 3, request to set to a new
-           number of MSIs (including set to 0).
-           If the =E2=80=9Cibm,change-msix-capable=E2=80=9D property exis=
-ts and Number
-           Outputs is equal to 4, request is to set to a new number of
-           MSI or MSI-X (platform choice) interrupts (including set to
-           0).
-
-Since MSI is the the platform default (LoPAPR 6.2.3 MSI Option), let's
-check for MSI support first.
-
-And finally, it checks the input parameters are valid, as described in
-LoPAPR 1.1 "R1=E2=80=937.3.10.5.1=E2=80=933":
-
-  For the MSI option: The platform must return a Status of -3 (Parameter
-  error) from ibm,change-msi, with no change in interrupt assignments if
-  the PCI configuration address does not support MSI and Function 3 was
-  requested (that is, the =E2=80=9Cibm,req#msi=E2=80=9D property must exi=
-st for the PCI
-  configuration address in order to use Function 3), or does not support
-  MSI-X and Function 4 is requested (that is, the =E2=80=9Cibm,req#msi-x=E2=
-=80=9D property
-  must exist for the PCI configuration address in order to use Function 4=
-),
-  or if neither MSIs nor MSI-Xs are supported and Function 1 is requested=
-.
-
-This ensures that the ret_intr_type variable contains a valid MSI type
-for this device, and that spapr_msi_setmsg() won't corrupt the PCI status=
-.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_pci.c |   61 ++++++++++++++++++++++++++++++++++++----------=
-------
- 1 file changed, 42 insertions(+), 19 deletions(-)
-
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 37f18b3d3235..39a14980d397 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -280,13 +280,42 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sP=
-APRMachineState *spapr,
-     int *config_addr_key;
-     Error *err =3D NULL;
-=20
-+    /* Fins sPAPRPHBState */
-+    phb =3D spapr_pci_find_phb(spapr, buid);
-+    if (phb) {
-+        pdev =3D spapr_pci_find_dev(spapr, buid, config_addr);
-+    }
-+    if (!phb || !pdev) {
-+        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+        return;
-+    }
-+
-     switch (func) {
--    case RTAS_CHANGE_MSI_FN:
-     case RTAS_CHANGE_FN:
--        ret_intr_type =3D RTAS_TYPE_MSI;
-+        if (msi_present(pdev)) {
-+            ret_intr_type =3D RTAS_TYPE_MSI;
-+        } else if (msix_present(pdev)) {
-+            ret_intr_type =3D RTAS_TYPE_MSIX;
-+        } else {
-+            rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+            return;
-+        }
-+        break;
-+    case RTAS_CHANGE_MSI_FN:
-+        if (msi_present(pdev)) {
-+            ret_intr_type =3D RTAS_TYPE_MSI;
-+        } else {
-+            rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+            return;
-+        }
-         break;
-     case RTAS_CHANGE_MSIX_FN:
--        ret_intr_type =3D RTAS_TYPE_MSIX;
-+        if (msix_present(pdev)) {
-+            ret_intr_type =3D RTAS_TYPE_MSIX;
-+        } else {
-+            rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+            return;
-+        }
-         break;
-     default:
-         error_report("rtas_ibm_change_msi(%u) is not implemented", func)=
-;
-@@ -294,16 +323,6 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-         return;
-     }
-=20
--    /* Fins sPAPRPHBState */
--    phb =3D spapr_pci_find_phb(spapr, buid);
--    if (phb) {
--        pdev =3D spapr_pci_find_dev(spapr, buid, config_addr);
--    }
--    if (!phb || !pdev) {
--        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
--        return;
--    }
--
-     msi =3D (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_addr=
-);
-=20
-     /* Releasing MSIs */
-@@ -1286,13 +1305,17 @@ static void spapr_populate_pci_child_dt(PCIDevice=
- *dev, void *fdt, int offset,
-     _FDT(fdt_setprop_cell(fdt, offset, "#size-cells",
-                           RESOURCE_CELLS_SIZE));
-=20
--    max_msi =3D msi_nr_vectors_allocated(dev);
--    if (max_msi) {
--        _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi", max_msi));
-+    if (msi_present(dev)) {
-+        max_msi =3D msi_nr_vectors_allocated(dev);
-+        if (max_msi) {
-+            _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi", max_msi));
-+        }
-     }
--    max_msix =3D dev->msix_entries_nr;
--    if (max_msix) {
--        _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi-x", max_msix));
-+    if (msix_present(dev)) {
-+        max_msix =3D dev->msix_entries_nr;
-+        if (max_msix) {
-+            _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi-x", max_msix=
-));
-+        }
-     }
-=20
-     populate_resource_props(dev, &rp);
+> Cheers,
+> 
+> --
+> Greg
+> ---
+>  hw/9pfs/9p.c         |   18 ++++++++++++++++++
+>  hw/9pfs/trace-events |    1 +
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 909a61139405..73dafffe239f 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -630,6 +630,24 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+>      V9fsState *s = pdu->s;
+>      int ret;
+>  
+> +    /*
+> +     * The 9p spec requires that successfully cancelled pdus receive no reply.
+> +     * Sending a reply would confuse clients because they would
+> +     * assume that any EINTR is the actual result of the operation,
+> +     * rather than a consequence of the cancellation. However, if
+> +     * the operation completed (succesfully or with an error other
+> +     * than caused be cancellation), we do send out that reply, both
+> +     * for efficiency and to avoid confusing the rest of the state machine
+> +     * that assumes passing a non-error here will mean a successful
+> +     * transmission of the reply.
+> +     */
+> +    bool discard = pdu->cancelled && len == -EINTR;
+> +    if (discard) {
+> +        trace_v9fs_rcancel(pdu->tag, pdu->id);
+> +        pdu->size = 0;
+> +        goto out_notify;
+> +    }
+> +
+>      if (len < 0) {
+>          int err = -len;
+>          len = 7;
+> diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
+> index 08a4abf22ea4..1aee350c42f1 100644
+> --- a/hw/9pfs/trace-events
+> +++ b/hw/9pfs/trace-events
+> @@ -1,6 +1,7 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>  
+>  # hw/9pfs/virtio-9p.c
+> +v9fs_rcancel(uint16_t tag, uint8_t id) "tag %d id %d"
+>  v9fs_rerror(uint16_t tag, uint8_t id, int err) "tag %d id %d err %d"
+>  v9fs_version(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+>  v9fs_version_return(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+> 
+> 
