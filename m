@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7hk-0000zo-8j
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:21 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ef7jO-0002OB-7b
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:24:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7hj-00039K-Bs
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:20 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 26 Jan 2018 10:04:11 -0600
-Message-Id: <20180126160411.4033-9-eblake@redhat.com>
-In-Reply-To: <20180126160411.4033-1-eblake@redhat.com>
-References: <20180126160411.4033-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] nbd: implement bdrv_get_info callback
+	(envelope-from <jsnow@redhat.com>) id 1ef7jN-0004zU-9U
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:24:02 -0500
+References: <20180124061728.GA99621@localhost>
+	<d49dfbf5-b6e4-43d2-c24d-5c493aa5bfe5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d443efbe-d5fb-c619-7c9d-ea70bf79a153@redhat.com>
+Date: Fri, 26 Jan 2018 12:23:52 -0500
+MIME-Version: 1.0
+In-Reply-To: <d49dfbf5-b6e4-43d2-c24d-5c493aa5bfe5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/mirror: fix fail to
+ cancel when VM has heavy BLK IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,66 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Huaitong Han <hanhuaitong@didichuxing.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 
-Since mirror job supports efficient zero out target mechanism (see
-in mirror_dirty_init()), implement bdrv_get_info to make it work
-over NBD. Such improvement will allow using the largest chunk possible
-and will decrease the number of NBD_CMD_WRITE_ZEROES requests on the wire.
 
-Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Message-Id: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/nbd.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+On 01/24/2018 02:16 PM, Eric Blake wrote:
+> On 01/24/2018 12:17 AM, Liang Li wrote:
+>> We found that when doing drive mirror to a low speed shared storage,
+>> if there was heavy BLK IO write workload in VM after the 'ready' event,
+>> drive mirror block job can't be canceled immediately, it would keep
+>> running until the heavy BLK IO workload stopped in the VM. This patch
+>> fixed this issue.
+> 
+> I think you are breaking semantics here.  Libvirt relies on
+> 'block-job-cancel' after the 'ready' event to be a clean point-in-time
+> snapshot, but that is only possible if there is no out-of-order pending
+> I/O at the time the action takes place.  Breaking in the middle of the
+> loop, without using bdrv_drain(), risks leaving an inconsistent copy of
+> data in the mirror not corresponding to any point-in-time on the source.
+> 
+> There's ongoing work on adding async mirroring; this may be a better
+> solution to the issue you are seeing.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg05419.html
+> 
 
-diff --git a/block/nbd.c b/block/nbd.c
-index 8b8ba56cdd0..94220f6d143 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -566,6 +566,14 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
-     bs->full_open_options = opts;
- }
+Sounds like another point for the idea of using a "completion mode" in a
+2.0 API instead of treating "cancel" like a valid way of completing a job.
 
-+static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-+{
-+    if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP) {
-+        bdi->can_write_zeroes_with_unmap = true;
-+    }
-+    return 0;
-+}
-+
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -583,6 +591,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_get_info              = nbd_get_info,
- };
+(Kevin: If you're taking this up, it would be *very* nice to have jobs
+have an option via job-set-property or some such command that allows us
+to change our desired completion mode on the fly, which frees up cancel
+to be simply a cancel.)
 
- static BlockDriver bdrv_nbd_tcp = {
-@@ -602,6 +611,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_get_info              = nbd_get_info,
- };
-
- static BlockDriver bdrv_nbd_unix = {
-@@ -621,6 +631,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_get_info              = nbd_get_info,
- };
-
- static void bdrv_nbd_init(void)
--- 
-2.14.3
+--js
