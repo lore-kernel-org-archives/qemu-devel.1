@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef6qt-00078R-4A
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:43 -0500
+	(envelope-from <berto@igalia.com>) id 1ef6qv-0007Ba-Un
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef6qo-00048U-7p
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:43 -0500
+	(envelope-from <berto@igalia.com>) id 1ef6qv-0004Jl-09
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:45 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 26 Jan 2018 16:59:41 +0200
-Message-Id: <1bf8f7ede9cfebffd11fb9e30c6e497d441b89cf.1516978645.git.berto@igalia.com>
+Date: Fri, 26 Jan 2018 17:00:00 +0200
+Message-Id: <8ad7c315825732f819cae7d1460e856a04d095a5.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 14/39] qcow2: Add offset_to_l2_slice_index()
+Subject: [Qemu-devel] [PATCH v3 33/39] qcow2: Rename l2_table in
+ count_contiguous_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +25,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-Similar to offset_to_l2_index(), this function takes a guest offset
-and returns the index in the L2 slice that contains its L2 entry.
-
-An L2 slice has currently the same size as an L2 table (one cluster),
-so both functions return the same value for now.
+This function doesn't need any changes to support L2 slices, but since
+it's now dealing with slices intead of full tables, the l2_table
+variable is renamed for clarity.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/qcow2-cluster.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index e0aee88811..87b5c4063e 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -474,6 +474,11 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
-     return (offset >> s->cluster_bits) & (s->l2_size - 1);
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 2d46927dc5..60c38a71f1 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -371,19 +371,19 @@ fail:
  }
  
-+static inline int offset_to_l2_slice_index(BDRVQcow2State *s, int64_t offset)
-+{
-+    return (offset >> s->cluster_bits) & (s->l2_slice_size - 1);
-+}
-+
- static inline int64_t align_offset(int64_t offset, int n)
+ /*
+- * Checks how many clusters in a given L2 table are contiguous in the image
++ * Checks how many clusters in a given L2 slice are contiguous in the image
+  * file. As soon as one of the flags in the bitmask stop_flags changes compared
+  * to the first cluster, the search is stopped and the cluster is not counted
+  * as contiguous. (This allows it, for example, to stop at the first compressed
+  * cluster which may require a different handling)
+  */
+ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+-        uint64_t *l2_table, uint64_t stop_flags)
++        uint64_t *l2_slice, uint64_t stop_flags)
  {
-     offset = (offset + n - 1) & ~(n - 1);
+     int i;
+     QCow2ClusterType first_cluster_type;
+     uint64_t mask = stop_flags | L2E_OFFSET_MASK | QCOW_OFLAG_COMPRESSED;
+-    uint64_t first_entry = be64_to_cpu(l2_table[0]);
++    uint64_t first_entry = be64_to_cpu(l2_slice[0]);
+     uint64_t offset = first_entry & mask;
+ 
+     if (!offset) {
+@@ -396,7 +396,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+            first_cluster_type == QCOW2_CLUSTER_ZERO_ALLOC);
+ 
+     for (i = 0; i < nb_clusters; i++) {
+-        uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
++        uint64_t l2_entry = be64_to_cpu(l2_slice[i]) & mask;
+         if (offset + (uint64_t) i * cluster_size != l2_entry) {
+             break;
+         }
 -- 
 2.11.0
