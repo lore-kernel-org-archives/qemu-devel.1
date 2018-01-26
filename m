@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1ef754-0001aZ-Pw
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:42:23 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ef77y-0003vc-7x
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:45:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1ef750-0005fG-M5
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:42:22 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:38045)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1ef750-0005dn-G4
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:42:18 -0500
-MIME-version: 1.0
-Content-type: text/plain; charset="UTF-8"
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Fri, 26 Jan 2018 19:05:19 +0300
-Message-id: <1516982720-26501-1-git-send-email-a.perevalov@samsung.com>
-References: <CGME20180126160530eucas1p2cd5b7dddee39500ab119fb83894cabd4@eucas1p2.samsung.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] Fix build on ppc platform in
- migration/postcopy-ram.c
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ef77u-0008MI-8l
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:45:22 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:37223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1ef77u-0008L1-0U
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:45:18 -0500
+Received: by mail-lf0-x243.google.com with SMTP id 63so1460437lfv.4
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 08:45:17 -0800 (PST)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Fri, 26 Jan 2018 11:22:35 +0100
+Message-Id: <1516962162-25680-3-git-send-email-edgar.iglesias@gmail.com>
+In-Reply-To: <1516962162-25680-1-git-send-email-edgar.iglesias@gmail.com>
+References: <1516962162-25680-1-git-send-email-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PULL v2 2/9] xlnx-zynqmp-pmu: Initial commit of the
+ ZynqMP PMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, lvivier@redhat.com, peterx@redhat.com, quintela@redhat.com, f4bug@amsat.org, ash.billore@samsung.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-This is a second version:
-    - comment from David about casting
-David was right, I tried to find it in standard, but it was implicitly
-described for me, so part of standard:
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-   1. When a value with integer type is converted to another integer
-type other than _Bool, if the value can be represented by the new
-type, it is unchanged.
-   2. Otherwise, if the new type is unsigned, the value is converted
-by repeatedly adding or subtracting one more than the maximum value
-that can be represented in the new type until the value is in the
-range of the new type.
+The Xilinx ZynqMP SoC has two main processing systems in it. The ARM
+processing system (which is already modeled in QEMU) and the MicroBlaze
+Power Management Unit (PMU). This is the inital work for adding support
+for the PMU.
 
+The PMU susbsystem runs along side the ARM system on hardware, but due
+to architecture limitations in QEMU the two instances are seperate for
+the time being.
 
+Let's follow the same setup we do with the ARM system, where there is an
+SoC device and a ZCU102 board. Although the PMU is less board specific
+we are still going to follow the same split as maybe in future we can
+connect the PMU device to the ARM ZCU102 board. As the machine will be
+fairly small let's keep them both together in one file.
 
-Initial message:
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/microblaze/Makefile.objs     |  1 +
+ hw/microblaze/xlnx-zynqmp-pmu.c | 83 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
+ create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
 
-It was a problem with 64 atomics on ppc in migration/postcopy-ram.c repor=
-ted by
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>.
-
-Tested in Debian on qemu-system-ppc and in Ubuntu16.04 on i386.
-
-This commit is based on commit ee264eb32c14f076c964fc34ee66f6f95cce2080
-"Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.12-20180121=
-' into staging"
-
-Alexey Perevalov (1):
-  migration: change blocktime type to uint32_t
-
- hmp.c                    |  4 ++--
- migration/postcopy-ram.c | 37 ++++++++++++++++++++-----------------
- migration/trace-events   |  4 ++--
- qapi/migration.json      |  4 ++--
- 4 files changed, 26 insertions(+), 23 deletions(-)
-
---=20
+diff --git a/hw/microblaze/Makefile.objs b/hw/microblaze/Makefile.objs
+index b2517d8..ae9fd40 100644
+--- a/hw/microblaze/Makefile.objs
++++ b/hw/microblaze/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-y += petalogix_s3adsp1800_mmu.o
+ obj-y += petalogix_ml605_mmu.o
++obj-y += xlnx-zynqmp-pmu.o
+ obj-y += boot.o
+diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+new file mode 100644
+index 0000000..ac0f789
+--- /dev/null
++++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+@@ -0,0 +1,83 @@
++/*
++ * Xilinx Zynq MPSoC PMU (Power Management Unit) emulation
++ *
++ * Copyright (C) 2017 Xilinx Inc
++ * Written by Alistair Francis <alistair.francis@xilinx.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "hw/boards.h"
++#include "cpu.h"
++
++/* Define the PMU device */
++
++#define TYPE_XLNX_ZYNQMP_PMU_SOC "xlnx,zynqmp-pmu-soc"
++#define XLNX_ZYNQMP_PMU_SOC(obj) OBJECT_CHECK(XlnxZynqMPPMUSoCState, (obj), \
++                                              TYPE_XLNX_ZYNQMP_PMU_SOC)
++
++typedef struct XlnxZynqMPPMUSoCState {
++    /*< private >*/
++    DeviceState parent_obj;
++
++    /*< public >*/
++}  XlnxZynqMPPMUSoCState;
++
++static void xlnx_zynqmp_pmu_soc_init(Object *obj)
++{
++
++}
++
++static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
++{
++
++}
++
++static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = xlnx_zynqmp_pmu_soc_realize;
++}
++
++static const TypeInfo xlnx_zynqmp_pmu_soc_type_info = {
++    .name = TYPE_XLNX_ZYNQMP_PMU_SOC,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(XlnxZynqMPPMUSoCState),
++    .instance_init = xlnx_zynqmp_pmu_soc_init,
++    .class_init = xlnx_zynqmp_pmu_soc_class_init,
++};
++
++static void xlnx_zynqmp_pmu_soc_register_types(void)
++{
++    type_register_static(&xlnx_zynqmp_pmu_soc_type_info);
++}
++
++type_init(xlnx_zynqmp_pmu_soc_register_types)
++
++/* Define the PMU Machine */
++
++static void xlnx_zynqmp_pmu_init(MachineState *machine)
++{
++
++}
++
++static void xlnx_zynqmp_pmu_machine_init(MachineClass *mc)
++{
++    mc->desc = "Xilinx ZynqMP PMU machine";
++    mc->init = xlnx_zynqmp_pmu_init;
++}
++
++DEFINE_MACHINE("xlnx-zynqmp-pmu", xlnx_zynqmp_pmu_machine_init)
++
+-- 
 2.7.4
