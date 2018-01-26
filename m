@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef8PR-0001fh-Df
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 13:07:30 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ef8QK-0002Kh-0U
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 13:08:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef8PQ-0008DR-Fq
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 13:07:29 -0500
-References: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
-	<1b55edad-f820-6898-1630-ccc76e6c4845@redhat.com>
-	<5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b87f82d-2a90-d6cf-0fc4-aee0d704a403@redhat.com>
-Date: Fri, 26 Jan 2018 08:28:21 -0600
+	(envelope-from <ehabkost@redhat.com>) id 1ef8QG-0000S9-5u
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 13:08:23 -0500
+Date: Fri, 26 Jan 2018 16:08:16 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180126180816.GI25150@localhost.localdomain>
+References: <20180118020157.25401-1-ehabkost@redhat.com>
+	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
+	<CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
+	<1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
+	<151673132716.4211.15090159170244596259@sif>
+	<20180123193118.GA4298@localhost.localdomain>
+	<151674323649.4211.10355855473647907818@sif>
+	<20180126012950.GA25150@localhost.localdomain>
+	<151698413254.4211.16734336801467103275@sif>
 MIME-Version: 1.0
-In-Reply-To: <5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa"
-Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: implement bdrv_get_info callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <151698413254.4211.16734336801467103275@sif>
+Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-01-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +30,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-ppc@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa
-From: Eric Blake <eblake@redhat.com>
-To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- den@openvz.org, vsementsov@virtuozzo.com
-Message-ID: <8b87f82d-2a90-d6cf-0fc4-aee0d704a403@redhat.com>
-Subject: Re: [PATCH 1/1] nbd: implement bdrv_get_info callback
-References: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
- <1b55edad-f820-6898-1630-ccc76e6c4845@redhat.com>
- <5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
-In-Reply-To: <5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jan 26, 2018 at 10:28:52AM -0600, Michael Roth wrote:
+> Quoting Eduardo Habkost (2018-01-25 19:29:50)
+> > On Tue, Jan 23, 2018 at 03:33:56PM -0600, Michael Roth wrote:
+> > > Quoting Eduardo Habkost (2018-01-23 13:31:18)
+> > > > On Tue, Jan 23, 2018 at 12:15:27PM -0600, Michael Roth wrote:
+> > > > > Quoting Christian Borntraeger (2018-01-23 03:59:39)
+> > > > > > 
+> > > > > > 
+> > > > > > On 01/23/2018 09:40 AM, Christian Ehrhardt wrote:
+> > > > > > > On Thu, Jan 18, 2018 at 2:51 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > > > > >> On 18 January 2018 at 02:01, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > > > >>> The following changes since commit 8e5dc9ba49743b46d955ec7dacb04e42ae7ada7c:
+> > > > > > >>>
+> > > > > > >>>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180116' into staging (2018-01-16 17:36:39 +0000)
+> > > > > > >>>
+> > > > > > >>> are available in the Git repository at:
+> > > > > > >>>
+> > > > > > >>>   git://github.com/ehabkost/qemu.git tags/x86-pull-request
+> > > > > > >>>
+> > > > > > >>> for you to fetch changes up to 6cfbc54e8903a9bcc0346119949162d040c144c1:
+> > > > > > >>>
+> > > > > > >>>   i386: Add EPYC-IBPB CPU model (2018-01-17 23:54:39 -0200)
+> > > > > > >>>
+> > > > > > >>> ----------------------------------------------------------------
+> > > > > > >>> x86 queue, 2018-01-17
+> > > > > > >>>
+> > > > > > >>> Highlight: new CPU models that expose CPU features that guests
+> > > > > > >>> can use to mitigate CVE-2017-5715 (Spectre variant #2).
+> > > > > > >>>
+> > > > > > >>
+> > > > > > >> Applied, thanks.
+> > > > > > >>
+> > > > > > >> -- PMM
+> > > > > > >>
+> > > > > > > 
+> > > > > > > Hi,
+> > > > > > > I was kind of clinging to [1] so far and had the expectation that all
+> > > > > > > those would be wrapped up in 2.11.1 once ready.
+> > > > > > > I see that the s390x changes are targeted to qemu-stable (well to
+> > > > > > > admit I suggested so referring the article above).
+> > > > > > > So I'd expected to see this series to show up on qemu-stable as well
+> > > > > > > but haven't seen it so far.
+> > > > > > > 
+> > > > > > > Therefore I wanted to ask if there was a change of plans in that
+> > > > > > > regard or if it needs just a few days more to see (part of) this
+> > > > > > > series on qemu-stable and on its way into 2.11.1?
+> > > > > > > 
+> > > > > > > [1]: https://www.qemu.org/2018/01/04/spectre/
+> > > > > > 
+> > > > > > Adding Michael,
+> > > > > > 
+> > > > > > Yes, I think it makes sense to have the guest enablement for the spectre 
+> > > > > > mitigations available in 2.11.1 for all architectures that provide it. 
+> > > > > > (this queue for x86, Connies pending S390 patches, whatever Power
+> > > > > > and arm will do).
+> > > > > 
+> > > > > That's my plan as well, but IIUC the QEMU side of these patches rely on
+> > > > > a KVM flag that in turn relies on this series:
+> > > > > 
+> > > > >   https://lkml.org/lkml/2018/1/20/158
+> > > > 
+> > > > Actually it depends on:
+> > > > https://lkml.org/lkml/2018/1/9/329
+> > > > ([PATCH v2 0/8] KVM: x86: expose CVE-2017-5715 ("Spectre variant 2") mitigations to guest)
+> > > > 
+> > > > The ability to expose IBRS to guests doesn't seem to depend on
+> > > > the host kernel using IBRS to protect itself.  But I guess it
+> > > > will be easier to merge that code after Linux developers decide
+> > > > what they'll do.  Paolo, what's your take on this?
+> > > > 
+> > > > Note that there are released OSes that use IBRS (Windows and
+> > > > RHEL), so even if upstream Linux decide to not rely on IBRS,
+> > > > users will probably want to expose IBRS to VMs as soon as KVM
+> > > > becomes able to do that.
+> > > 
+> > > I didn't really consider that angle, but I think anyone supporting such
+> > > guests will tend to be relying on their host distros for the fixes, and
+> > > distros will want their own guest types covered as well (looks like RHEL
+> > > already has its bases covered in this regard, maybe Hyper-V too WRT to
+> > > Windows guests..)
+> > 
+> > Well, who exactly is the audience for -stable?  Doesn't it
+> > include people who run (or let their users run) Windows or RHEL
+> > guests?
+> 
+> Yes, I just think in most cases they'll likely be expecting an updated
+> QEMU through their distro, and distros, outside of their own guest types
+> (and even then), would probably prefer to roll it out once for everyone
+> based on what will be landing upstream.
+> 
+> > 
+> > 
+> > > 
+> > > > 
+> > > > BUT:
+> > > > 
+> > > > > 
+> > > > > But that's still in RFC and Linus seems to have reservations with the
+> > > > > current code. Since coordinating these all this to users/downstreams is
+> > > > > somewhat of a mess I was thinking we should accompany the 2.11.1 release
+> > > > > with a blog post on the various options/backports/microcode needed throughout
+> > > > > the stack to enable the fixes, but until there's a stable patchset on
+> > > > > the linux side I'm not sure there's much worth in putting out the 2.11.1
+> > > > > release (if I'm missing something here please let me know).
+> > > > 
+> > > > I'm inclined to agree.  I merged the -IBRS CPU models expecting
+> > > > that the fixes would be included quickly in upstream Linux too,
+> > > > but it was not the case.
+> > > > 
+> > > > To be honest, I don't think adding new CPU models are the proper
+> > > > solution for the problem.  They are just a quick solution that
+> > > > doesn't require intrusive changes in the management stack.
+> > > > 
+> > > > Meltdown & Spectre made us painfully aware of limitations of
+> > > > management stacks out there (esp. OpenStack): they normally don't
+> > > > have an easy mechanism to enable CPU features that are not part
+> > > > of an existing CPU model name.  A good management stack would be
+> > > > able to use, e.g., "-cpu Westmere,+spec-ctrl" instead of
+> > > > "Westmere-IBRS" if it knows all the hosts on a given
+> > > > cluster/migration-set/whatever-it-is-called support the feature.
+> > > > The same applies to other flags like ibpb and pcid.
+> > > > 
+> > > > There's work being done on OpenStack to fix this,
+> > > > e.g.: https://review.openstack.org/#/c/534384/
+> > > > 
+> > > > 
+> > > > That said, we will probably want to include MSR code and the CPU
+> > > > feature flag names (spec-ctrl and ibpb) on the stable branch as
+> > > > soon as possible.  This way, people will have the option to
+> > > > manually enable those features (or make them automatically
+> > > > available using "-cpu host") before a decision is made regarding
+> > > > CPU model names.
+> > > > 
+> > > > I can send a patch series to -stable including only those
+> > > > patches, if it makes the work easier.
+> > > 
+> > > Will these proposed patches be dropping the model names introduced here
+> > > in favor of those flags, or introducing them alongside?
+> > 
+> > The flag names and MSR code (included in this pull request) are a
+> > requirement of the new CPU models.  So it's possible to have just
+> > the flag names, or have both the flag names and the new CPU
+> > models.
+> > 
+> > If people are able to edit the QEMU command-line or libvirt
+> > domain XML, they can enable the flags manually and this will be
+> > enough for them (so the new CPU models won't be a requirement).
+> > The difference is that picking a CPU model is easier than
+> > enabling CPU flags manually, and some management systems don't
+> > even allow users to configure individual CPU flags (that's why I
+> > included the -IBRS CPU models in the tree).
+> 
+> Ok, makes sense. From a stable perspective it seems reasonable to have
+> both then. Is that where you're leaning on the upstream side?
 
-On 01/26/2018 06:39 AM, Edgar Kaziakhmedov wrote:
-> PIng
->=20
-> So, let me know if I need to make any changes in patch
->=20
-> On 1/18/18 1:09 PM, Paolo Bonzini wrote:
->> On 18/01/2018 12:51, Edgar Kaziakhmedov wrote:
->>> +static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP=
-) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdi->can_write_zeroes_wit=
-h_unmap =3D true;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 return 0;
->>> +}
->>> +
->> Other drivers set the flag always, while NBD only sets it if the serve=
-r
->> knows the flag.
-
-Well, other drivers may be able to always implement it (NBD can only
-implement it if the server supports WRITE_ZEROES - and I'm even in the
-middle of working up an nbdkit patch [1] that makes it easier to write
-an NBD server that specifically does not support WRITE_ZEROES to make
-code paths like this easier to test)
-
-[1]
-
->>
->> I think NBD is more correct, so:
->>
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Agreed; I'm fine queueing this on my NBD queue, except I'd first like to
-hear Kevin's opinion:
-
->>
->> However, it would be nice to remove can_write_zeroes_with_unmap from
->> BlockDriverInfo, and make bdrv_can_write_zeroes_with_unmap just return=
-
->> !!(bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP).=C2=A0 Kevin, what d=
-o you
->> think?
-
-Actually, I may even just give a shot at writing this alternative patch,
-to make Kevin's decision easier.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Yes.  The -IBRS CPU models are nice to have even if it's just to
+avoid user confusion.
 
 
---TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> 
+> If so I'll go ahead and pull these in for stable and pull in your
+> proposed changes when they become available (FWIW this series applies
+> cleanly to current stable tree so not expecting much extra work there).
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+It looks like there's some confusion here: I don't have
+additional proposed changes; the flag names and MSR code I
+mentioned are already merged on master (through this pull
+request).
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprOwUACgkQp6FrSiUn
-Q2rpOwgAkb9tE+uf5q40HuP+gofCTezurWgUq+ASt9UqoPZ2UFzgVPT7o375X/i1
-/OXMeEQBkbVm21sTW9Gbu+Jg7E/0ye/Sx+OW4mXP7sR6xWljmGgXbhs5rgOBM29I
-SL4jKU7RYYplNJhhiW3jGo5msrfFv/Wk5NSMUuUWS8SauG03PKScQhEknMgvDujk
-nSfUzPgYexQK1SFlDoprwtYRvCRxsG5kMqSJf6H8vqJzu1cj44d49Whgz+Uo9zHq
-N4skRjrmkPHIrUdNTcgkd8KAZIrLJzEwMbKrnixM95b0e6/5biw1qwhCtmjPzsgY
-oiz9A99xfeQRdrBB49ATf2eaEsodbA==
-=dKEs
------END PGP SIGNATURE-----
 
---TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa--
+> 
+> > 
+> > 
+> > > 
+> > > > 
+> > > > 
+> > > > > 
+> > > > > There's also the testing aspect of this, which I'd at least like to cover
+> > > > > on the x86 side. I've be doing some basic testing on top of early versions
+> > > > > of the IBRS patches and KVM patches, but I'd really like to make sure
+> > > > > everything is working on top of what's ultimately going upstream before
+> > > > > I commit the release.
+> > > > > 
+> > > > > In the meantime I've started a staging tree for 2.11.1 here:
+> > > > > 
+> > > > >   https://github.com/mdroth/qemu/commits/stable-2.11-staging
+> > > > > 
+> > > > > it doesn't have these patches yet, and given the above I'm not sure it
+> > > > > makes sense to try to set a release date yet, but I'll update the tree
+> > > > > as we go and post a call-for-patches within a day or so where we can
+> > > > > coordinate what else should go in for other archs.
+> > > > > 
+> > > > > > 
+> > > > > > Not sure about a 2.10.3?
+> > > > > > 
+> > > > > 
+> > > > > Out of support as far as stable releases go; will have to leave that one
+> > > > > up to the downstreams.
+> > > > 
+> > > > -- 
+> > > > Eduardo
+> > > > 
+> > > 
+> > 
+> > -- 
+> > Eduardo
+> > 
+
+-- 
+Eduardo
