@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef6LL-0005vh-4P
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:55:09 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ef6N1-0007Gi-FG
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef6LK-00035d-3w
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:55:07 -0500
-Date: Fri, 26 Jan 2018 12:16:38 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180126121637.GC2610@work-vm>
-References: <20180125144557.25502-1-eblake@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ef6Mx-0004qW-F1
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:56:51 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d8c2c2ca-5046-f19b-9514-d3cbef3b7c3a@amsat.org>
+Date: Fri, 26 Jan 2018 11:29:33 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180125144557.25502-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hmp: Add nbd_server_remove to mirror QMP
- command
+In-Reply-To: <1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/6] target/arm: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +28,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, patches@linaro.org
 
-* Eric Blake (eblake@redhat.com) wrote:
-> Since everything else about the nbd-server-* QMP commands is
-> accessible from HMP, we might as well make removing an export
-> available as well.  For now, I went with a bool flag rather
-> than a mode string for choosing between safe (default) and
-> hard modes.
+Hi Peter,
+
+On 12/07/2017 03:14 PM, Peter Maydell wrote:
+> Add support for "-cpu max" for ARM guests. This CPU type behaves
+> like "-cpu host" when KVM is enabled, and like a system CPU with
+> the maximum possible feature set otherwise. (Note that this means
+> it won't be migratable across versions, as we will likely add
+> features to it in future.)
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-
-For the HMP side of things:
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-and yes, if you've already got the rest of it on your NBD queue
-just add this one into your queue.
-
-Dave
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
+>  target/arm/cpu-qom.h |  2 ++
+>  target/arm/cpu.c     | 24 ++++++++++++++++++++++++
+>  target/arm/cpu64.c   | 21 +++++++++++++++++++++
+>  3 files changed, 47 insertions(+)
 > 
-> Based-on: <20180119135719.24745-1-vsementsov@virtuozzo.com>
-> ([PATCH v3 0/5] nbd export qmp interface)
-> 
->  hmp.h           |  1 +
->  hmp.c           | 14 +++++++++++---
->  hmp-commands.hx | 17 +++++++++++++++++
->  3 files changed, 29 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hmp.h b/hmp.h
-> index a6f56b1f29e..536cb91caa4 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -101,6 +101,7 @@ void hmp_sendkey(Monitor *mon, const QDict *qdict);
->  void hmp_screendump(Monitor *mon, const QDict *qdict);
->  void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
->  void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
-> +void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
->  void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
->  void hmp_chardev_add(Monitor *mon, const QDict *qdict);
->  void hmp_chardev_change(Monitor *mon, const QDict *qdict);
-> diff --git a/hmp.c b/hmp.c
-> index 7a64dd59c5c..b3de32d219b 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2226,10 +2226,18 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
->      Error *local_err = NULL;
-> 
->      qmp_nbd_server_add(device, !!name, name, true, writable, &local_err);
-> +    hmp_handle_error(mon, &local_err);
-> +}
-> 
-> -    if (local_err != NULL) {
-> -        hmp_handle_error(mon, &local_err);
-> -    }
-> +void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
-> +{
-> +    const char *name = qdict_get_str(qdict, "name");
-> +    bool force = qdict_get_try_bool(qdict, "force", false);
-> +    Error *err = NULL;
+> diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
+> index a42495b..d135ff8 100644
+> --- a/target/arm/cpu-qom.h
+> +++ b/target/arm/cpu-qom.h
+> @@ -33,6 +33,8 @@ struct arm_boot_info;
+>  #define ARM_CPU_GET_CLASS(obj) \
+>      OBJECT_GET_CLASS(ARMCPUClass, (obj), TYPE_ARM_CPU)
+>  
+> +#define TYPE_ARM_MAX_CPU "max-" TYPE_ARM_CPU
 > +
-> +    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
-> +    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
-> +    hmp_handle_error(mon, &err);
+>  /**
+>   * ARMCPUClass:
+>   * @parent_realize: The parent class' realize handler.
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 9304277..190da97 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1628,6 +1628,27 @@ static void pxa270c5_initfn(Object *obj)
+>      cpu->reset_sctlr = 0x00000078;
 >  }
-> 
->  void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index b8b6fb91848..8a59338bc20 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1565,6 +1565,23 @@ Export a block device through QEMU's NBD server, which must be started
->  beforehand with @command{nbd_server_start}.  The @option{-w} option makes the
->  exported device writable too.  The export name is controlled by @var{name},
->  defaulting to @var{device}.
-> +ETEXI
+>  
+> +#ifndef TARGET_AARCH64
+> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+> + * otherwise, a CPU with as many features enabled as our emulation supports.
+> + * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu64.c;
+> + * this only needs to handle 32 bits.
+> + */
+> +static void arm_max_initfn(Object *obj)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
 > +
-> +    {
-> +        .name       = "nbd_server_remove",
-> +        .args_type  = "force:-f,name:s",
-> +        .params     = "nbd_server_remove [-f] name",
-> +        .help       = "remove an export previously exposed via NBD",
-> +        .cmd        = hmp_nbd_server_remove,
-> +    },
-> +STEXI
-> +@item nbd_server_remove [-f] @var{name}
-> +@findex nbd_server_remove
-> +Stop exporting a block device through QEMU's NBD server, which was
-> +previously started with @command{nbd_server_add}.  The @option{-f}
-> +option forces the server to drop the export immediately even if
-> +clients are connected; otherwise the command fails unless there are no
-> +clients.
->  ETEXI
+> +    if (kvm_enabled()) {
+> +        kvm_arm_set_cpu_features_from_host(cpu);
+> +    } else {
+> +        cortex_a15_initfn(obj);> +        /* In future we might add feature bits here even if the
+> +         * real-world A15 doesn't implement them.
+> +         */
+
+Why not use arm_any_initfn() here?
+
+Actually what seems cleaner is to move "any" features here, and kill the
+"any" cpu, using "max" for this purpose.
+
+> +    }
+> +}
+> +#endif
+> +
+>  #ifdef CONFIG_USER_ONLY
+>  static void arm_any_initfn(Object *obj)
+>  {
+> @@ -1691,6 +1712,9 @@ static const ARMCPUInfo arm_cpus[] = {
+>      { .name = "pxa270-b1",   .initfn = pxa270b1_initfn },
+>      { .name = "pxa270-c0",   .initfn = pxa270c0_initfn },
+>      { .name = "pxa270-c5",   .initfn = pxa270c5_initfn },
+> +#ifndef TARGET_AARCH64
+> +    { .name = "max",         .initfn = arm_max_initfn },
+> +#endif
+
+>  #ifdef CONFIG_USER_ONLY
+>      { .name = "any",         .initfn = arm_any_initfn },
+>  #endif
+
+and we can remove the last 3 lines.
+
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 670c07a..38dcf32 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -28,6 +28,7 @@
+>  #include "hw/arm/arm.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/kvm.h"
+> +#include "kvm_arm.h"
+>  
+>  static inline void set_feature(CPUARMState *env, int feature)
+>  {
+> @@ -212,6 +213,25 @@ static void aarch64_a53_initfn(Object *obj)
+>      define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
+>  }
+>  
+> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+> + * otherwise, a CPU with as many features enabled as our emulation supports.
+> + * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+> + * this only needs to handle 64 bits.
+> + */
+> +static void aarch64_max_initfn(Object *obj)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +
+> +    if (kvm_enabled()) {
+> +        kvm_arm_set_cpu_features_from_host(cpu);
+> +    } else {
+> +        aarch64_a57_initfn(obj);
+> +        /* In future we might add feature bits here even if the
+> +         * real-world A57 doesn't implement them.
+> +         */
+> +    }
+> +}
+> +
+>  #ifdef CONFIG_USER_ONLY
+>  static void aarch64_any_initfn(Object *obj)
+>  {
+> @@ -240,6 +260,7 @@ typedef struct ARMCPUInfo {
+>  static const ARMCPUInfo aarch64_cpus[] = {
+>      { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
+>      { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
+> +    { .name = "max",                .initfn = aarch64_max_initfn },
+>  #ifdef CONFIG_USER_ONLY
+>      { .name = "any",         .initfn = aarch64_any_initfn },
+>  #endif
 > 
->      {
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
