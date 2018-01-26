@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ef0eP-0007Py-Ci
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:50:27 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ef0gK-0001dF-1T
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:52:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ef0eK-0001wu-2i
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:50:25 -0500
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-8-git-send-email-walling@linux.vnet.ibm.com>
-	<6d81c288-2b93-35b4-fb27-24276342089d@redhat.com>
-	<994e3f5e-24e1-834a-5519-775a819d73c8@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1fb0b863-0b5b-120e-7f19-093ecdb3a93c@redhat.com>
-Date: Fri, 26 Jan 2018 10:50:12 +0100
+	(envelope-from <stefanha@gmail.com>) id 1ef0gJ-0003Y5-4B
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:52:24 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:51041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ef0gI-0003Xo-UN
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:52:23 -0500
+Received: by mail-wm0-x235.google.com with SMTP id f71so106204wmf.0
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 01:52:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <994e3f5e-24e1-834a-5519-775a819d73c8@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 07/10] s390-ccw: read
- stage2 boot loader data to find menu
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 26 Jan 2018 09:52:21 +0000
+Message-ID: <CAJSP0QWfwAbQwDUH3-e87+fB+FLPjJT3tXjQcDpPrxf7Rk-0cw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] QEMU related blogs, all in once place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +25,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, borntraeger@de.ibm.com, alifm@linux.vnet.ibm.com, david@redhat.com, cohuck@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
 
-On 25.01.2018 16:49, Collin L. Walling wrote:
-> On 01/25/2018 10:25 AM, Thomas Huth wrote:
->> On 23.01.2018 19:26, Collin L. Walling wrote:
->>> Read the stage2 boot loader data block-by-block. We scan the
->>> current block for the string "zIPL" to detect the start of the
->>> boot menu banner. We then load the adjacent blocks (previous
->>> block and next block) to account for the possibility of menu
->>> data spanning multiple blocks.
->>>
->>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->>> ---
->>> =C2=A0 pc-bios/s390-ccw/bootmap.c | 94
->>> +++++++++++++++++++++++++++++++++++++++++++---
->>> =C2=A0 pc-bios/s390-ccw/bootmap.h |=C2=A0 1 +
->>> =C2=A0 pc-bios/s390-ccw/menu.c=C2=A0=C2=A0=C2=A0 |=C2=A0 5 +++
->>> =C2=A0 pc-bios/s390-ccw/menu.h=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
->>> =C2=A0 4 files changed, 96 insertions(+), 5 deletions(-)
->> Looks good to me now!
->>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>
-> Thanks! The only change I plan on is moving the Stage1b struct declarat=
-ion
-> to this patch, as per your suggestion on another patch review.
+If you want to follow blogs from QEMU contributors check out:
 
-Sure, feel free to keep my R-b in that case, too.
+https://planet.virt-tools.org/
 
- Thomas
+Daniel Berrange has provided the following steps for adding your own
+blog to planet.virt-tools.org:
+
+  $ git clone git://libvirt.org/virttools-planet.git
+
+and add your blog info to updater/virt-tools/config.ini.
+
+Optionally add a icon in updater/virt-tools/images/.
+
+Then send the changes as a patch to libvir-list@redhat.com with git send-email.
+
+Stefan
