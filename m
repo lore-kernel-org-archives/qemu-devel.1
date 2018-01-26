@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef710-0006nD-Be
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:38:11 -0500
+	(envelope-from <a.perevalov@samsung.com>) id 1ef754-0001aZ-Pw
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:42:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef70z-0002Ox-G4
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:38:10 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <eb3ea998-c9c9-d231-0f9e-dfb307c05558@redhat.com>
-Date: Fri, 26 Jan 2018 10:37:59 -0600
-MIME-Version: 1.0
-In-Reply-To: <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3QkVc67I6RN0wVzqkg1NoBtN0RvVVaOY6"
-Subject: Re: [Qemu-devel] [PATCH v3 18/39] qcow2: Refactor
- get_cluster_table()
+	(envelope-from <a.perevalov@samsung.com>) id 1ef750-0005fG-M5
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:42:22 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:38045)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1ef750-0005dn-G4
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:42:18 -0500
+MIME-version: 1.0
+Content-type: text/plain; charset="UTF-8"
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Fri, 26 Jan 2018 19:05:19 +0300
+Message-id: <1516982720-26501-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20180126160530eucas1p2cd5b7dddee39500ab119fb83894cabd4@eucas1p2.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] Fix build on ppc platform in
+ migration/postcopy-ram.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, lvivier@redhat.com, peterx@redhat.com, quintela@redhat.com, f4bug@amsat.org, ash.billore@samsung.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3QkVc67I6RN0wVzqkg1NoBtN0RvVVaOY6
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <eb3ea998-c9c9-d231-0f9e-dfb307c05558@redhat.com>
-Subject: Re: [PATCH v3 18/39] qcow2: Refactor get_cluster_table()
-References: <cover.1516978645.git.berto@igalia.com>
- <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
-In-Reply-To: <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This is a second version:
+    - comment from David about casting
+David was right, I tried to find it in standard, but it was implicitly
+described for me, so part of standard:
 
-On 01/26/2018 08:59 AM, Alberto Garcia wrote:
-> After the previous patch we're now always using l2_load() in
-> get_cluster_table() regardless of whether a new L2 table has to be
-> allocated or not.
->=20
-> This patch refactors that part of the code to use one single l2_load()
-> call.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 21 +++++++--------------
->  1 file changed, 7 insertions(+), 14 deletions(-)
->=20
+   1. When a value with integer type is converted to another integer
+type other than _Bool, if the value can be represented by the new
+type, it is unchanged.
+   2. Otherwise, if the new type is unsigned, the value is converted
+by repeatedly adding or subtracting one more than the maximum value
+that can be represented in the new type until the value is in the
+range of the new type.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+
+
+Initial message:
+
+It was a problem with 64 atomics on ppc in migration/postcopy-ram.c repor=
+ted by
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>.
+
+Tested in Debian on qemu-system-ppc and in Ubuntu16.04 on i386.
+
+This commit is based on commit ee264eb32c14f076c964fc34ee66f6f95cce2080
+"Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.12-20180121=
+' into staging"
+
+Alexey Perevalov (1):
+  migration: change blocktime type to uint32_t
+
+ hmp.c                    |  4 ++--
+ migration/postcopy-ram.c | 37 ++++++++++++++++++++-----------------
+ migration/trace-events   |  4 ++--
+ qapi/migration.json      |  4 ++--
+ 4 files changed, 26 insertions(+), 23 deletions(-)
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---3QkVc67I6RN0wVzqkg1NoBtN0RvVVaOY6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprWWcACgkQp6FrSiUn
-Q2pRFAgAlmkWqxukHdh5ydXIP2nDXpA11+nncMMxc9czyfOAzoOEL8aGJwbSIXLy
-gCrb/PlscoFUlTZSmw4DZqEDdQoZ6WPlhb5jECUsjWa1JBSG3j0uAxfRi8l7ODsC
-ZHY0rEWzwlKg6SyUcBNuKqUHp1DcICH+VAsrWTxqelgUEq6/X7c8Zrq0oAg5HfZH
-iQ3IgFYbh24uSkUgmRnk/3YoQXj09fUVWz1E8dj3xmSGGWDWIZaQ7DF02KTCEAs0
-8xNiEPYGfaG1rVEZswhVwCLxOMAKQ8Vis1relO1Lo9jTQmRrmTRruGdmSUm2OljK
-Fdks0ZQfw6aNMOlQhHXnP9MKohusdw==
-=7ieV
------END PGP SIGNATURE-----
-
---3QkVc67I6RN0wVzqkg1NoBtN0RvVVaOY6--
+2.7.4
