@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eeyGc-0000H7-AN
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 02:17:43 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eeyMZ-0004zm-Um
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 02:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eeyGb-0005Xp-8B
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 02:17:42 -0500
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:45940)
+	(envelope-from <richard.henderson@linaro.org>) id 1eeyMW-0008JD-QO
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 02:23:51 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33816)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eeyGb-0005Xb-1c
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 02:17:41 -0500
-Received: by mail-wr0-x22a.google.com with SMTP id 16so9898693wry.12
-	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 23:17:40 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eeyMW-0008IY-LL
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 02:23:48 -0500
+Received: by mail-pf0-x244.google.com with SMTP id e76so7732845pfk.1
+	for <qemu-devel@nongnu.org>; Thu, 25 Jan 2018 23:23:48 -0800 (PST)
+References: <20171218172425.18200-1-richard.henderson@linaro.org>
+	<20171218172425.18200-7-richard.henderson@linaro.org>
+	<CAFEAcA9XeA6Osy90-NH6rzPH5o7DdPvAwz9iHWxVOORy9KRU0w@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <80dfd9f6-e104-918e-9a31-bd22e9990f4f@linaro.org>
+Date: Thu, 25 Jan 2018 23:18:25 -0800
 MIME-Version: 1.0
-In-Reply-To: <D0158A423229094DA7ABF71CF2FA0DA34E860786@SHSMSX104.ccr.corp.intel.com>
-References: <20180125040328.22867-1-tiwei.bie@intel.com>
-	<20180125142220.GD28396@stefanha-x1.localdomain>
-	<D0158A423229094DA7ABF71CF2FA0DA34E860786@SHSMSX104.ccr.corp.intel.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 26 Jan 2018 07:17:39 +0000
-Message-ID: <CAJSP0QXNp7DxVbnmw1OjZWcuY=u-57BSseR78RciiJzUyCqELg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 0/6] Extend vhost-user to support VFIO
- based accelerators
+In-Reply-To: <CAFEAcA9XeA6Osy90-NH6rzPH5o7DdPvAwz9iHWxVOORy9KRU0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 06/11] target/arm: Decode aa32 armv8.1
+ two reg and a scalar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liang, Cunming" <cunming.liang@intel.com>
-Cc: "Bie, Tiwei" <tiwei.bie@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>, "Wang,
-	Xiao W" <xiao.w.wang@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Daly, Dan" <dan.daly@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Jan 25, 2018 at 4:10 PM, Liang, Cunming <cunming.liang@intel.com> wrote:
->> -----Original Message-----
->> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
->> Sent: Thursday, January 25, 2018 10:22 PM
->> To: Bie, Tiwei <tiwei.bie@intel.com>
->> Cc: qemu-devel@nongnu.org; virtio-dev@lists.oasis-open.org;
->> mst@redhat.com; alex.williamson@redhat.com; jasowang@redhat.com;
->> pbonzini@redhat.com; stefanha@redhat.com; Tan, Jianfeng
->> <jianfeng.tan@intel.com>; Liang, Cunming <cunming.liang@intel.com>;
->> Wang, Xiao W <xiao.w.wang@intel.com>; Wang, Zhihong
->> <zhihong.wang@intel.com>; Daly, Dan <dan.daly@intel.com>
->> Subject: Re: [Qemu-devel] [PATCH v1 0/6] Extend vhost-user to support
->> VFIO based accelerators
+On 01/15/2018 09:47 AM, Peter Maydell wrote:
+> On 18 December 2017 at 17:24, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/translate.c | 38 +++++++++++++++++++++++++++++++++++---
+>>  1 file changed, 35 insertions(+), 3 deletions(-)
 >>
->> On Thu, Jan 25, 2018 at 12:03:22PM +0800, Tiwei Bie wrote:
->> > Why extend vhost-user for vDPA
->> > ==============================
->> >
->> > We have already implemented various virtual switches (e.g. OVS-DPDK)
->> > based on vhost-user for VMs in the Cloud. They are purely software
->> > running on CPU cores. When we have accelerators for such NFVi
->> > applications, it's ideal if the applications could keep using the
->> > original interface (i.e. vhost-user netdev) with QEMU, and
->> > infrastructure is able to decide when and how to switch between CPU
->> > and
->> accelerators within the interface.
->> > And the switching (i.e. switch between CPU and accelerators) can be
->> > done flexibly and quickly inside the applications.
->> >
->> > More details about this can be found from the Cunming's discussions
->> > on the RFC patch set.
->> >
->> > The previous links:
->> > RFC:
->> > http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg04844.htm
->> > l
->>
->> Is vDPA also useful in the simpler use case where there is no NFVi application?
-> There're separate patches to have non-DPDK vDPA(aka. vhost-vfio, a new vhost backend proposed) support, which is the scope of stage-II as we mentioned in community call.
-> Stay tuned for the RFC patch. Main idea is that the virtio compatible device driver register as a mdev to talk with qemu vhost-vfio.
+>> diff --git a/target/arm/translate.c b/target/arm/translate.c
+>> index a9587ae242..1a0b0eaced 100644
+>> --- a/target/arm/translate.c
+>> +++ b/target/arm/translate.c
+>> @@ -6973,11 +6973,43 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+>>                          }
+>>                          neon_store_reg64(cpu_V0, rd + pass);
+>>                      }
+>> +                    break;
+>> +                case 14: /* VQRDMLAH scalar */
+>> +                case 15: /* VQRDMLSH scalar */
+>> +                    if (!arm_dc_feature(s, ARM_FEATURE_V8_1_SIMD)) {
+>> +                        return 1;
+>> +                    }
+>> +                    if (u && ((rd | rn) & 1)) {
+>> +                        return 1;
+>> +                    }
+> 
+> The pseudocode also has UNDEF if Q==1 && Vm<0> == 1 ....
 
-Thanks!
+Not for the indexed version, encoding A2.
 
-Stefan
+> 
+>> +                    tmp2 = neon_get_scalar(size, rm);
+>> +                    for (pass = 0; pass < (u ? 4 : 2); pass++) {
+>> +                        void (*fn)(TCGv_i32, TCGv_env, TCGv_i32,
+>> +                                   TCGv_i32, TCGv_i32);
+> 
+> Can we define a typedef for this, please ?
+
+What would you name it?
+
+
+r~
