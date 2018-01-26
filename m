@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1efAi7-0004eX-2d
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:34:55 -0500
+	(envelope-from <Babu.Moger@amd.com>) id 1efBjA-0004W0-0f
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 16:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1efAi3-0004BK-Tw
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:34:55 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:60999)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1efAi3-00047V-Jv
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:34:51 -0500
-References: <20180126183636.7586-1-samuel.thibault@ens-lyon.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <11f250c0-ce8e-3529-bbf2-d6275e0c1747@vivier.eu>
-Date: Fri, 26 Jan 2018 21:34:38 +0100
+	(envelope-from <Babu.Moger@amd.com>) id 1efBj7-00018o-At
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 16:40:04 -0500
+Received: from mail-by2nam01on0049.outbound.protection.outlook.com
+	([104.47.34.49]:61546
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1efBj7-00017B-3g
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 16:40:01 -0500
+From: Babu Moger <babu.moger@amd.com>
+Date: Fri, 26 Jan 2018 16:39:40 -0500
+Message-Id: <20180126213944.7594-2-babu.moger@amd.com>
+In-Reply-To: <20180126213944.7594-1-babu.moger@amd.com>
+References: <20180126213944.7594-1-babu.moger@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20180126183636.7586-1-samuel.thibault@ens-lyon.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix sched_getaffinity mask size
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 1/5] target/i386: Fix instruction cache
+ associativity for AMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, pixo@polepetko.eu
+Cc: mtosatti@redhat.com, babu.moger@amd.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-Le 26/01/2018 à 19:36, Samuel Thibault a écrit :
-> We properly computed the capped mask size to be put to the application
-> buffer, but didn't actually it. Also, we need to return the capped mask
-> size instead of 0 on success.
-> 
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> ---
->  linux-user/syscall.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 74378947f0..cf2369aac2 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -10496,10 +10496,15 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->                          ret = -TARGET_EINVAL;
->                          break;
->                      }
-> -                    ret = arg2;
-> +                } else if (arg2 > ret) {
-> +                    arg2 = ret;
->                  }
->  
->                  ret = host_to_target_cpu_mask(mask, mask_size, arg3, arg2);
-> +
-> +                if (ret == 0) {
-> +                    ret = arg2;
-> +                }
->              }
->          }
->          break;
-> 
+Per Processor Programming Reference, CPUID_Fn80000005_EDX should
+report L1 instruction cache associativity as 4(way) instead of 2(way).
 
-Modified code was:
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+ target/i386/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-    if (copy_to_user(arg3, mask, ret)) {
-        goto efault;
-    }
-
-so the change should only be:
-
-    if (host_to_target_cpu_mask(mask, mask_size, arg3, ret)) {
-        goto efault;
-    }
-
-Thanks,
-Laurent
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 3818d72831..cb055f5940 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -123,7 +123,7 @@
+ /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
+ #define L1I_LINES_PER_TAG      1
+ #define L1I_SIZE_KB_AMD       64
+-#define L1I_ASSOCIATIVITY_AMD  2
++#define L1I_ASSOCIATIVITY_AMD  4
+ 
+ /* Level 2 unified cache: */
+ #define L2_LINE_SIZE          64
+-- 
+2.16.0
