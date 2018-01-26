@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7fx-0007u9-Uq
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:20:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ef7gY-0008P3-LJ
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:21:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7ft-0000Fr-1X
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:20:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52860)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ef7fs-0000Eb-NL
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:20:24 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1492D5551
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 16:04:13 +0000 (UTC)
-Received: from red.redhat.com (ovpn-124-3.rdu2.redhat.com [10.10.124.3])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9027D5D720
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 16:04:13 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 26 Jan 2018 10:04:03 -0600
-Message-Id: <20180126160411.4033-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 0/8] NBD patches through 26 Jan
+	(envelope-from <peter.maydell@linaro.org>) id 1ef7gV-0001P5-VZ
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:21:06 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:43360)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ef7gV-0001OD-O8
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:21:03 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id 4so768515ois.10
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:21:03 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180126104247.GF25150@localhost.localdomain>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
+	<20171209010811.GJ3037@localhost.localdomain>
+	<CAFEAcA9oG=+mJ+jSGTM_z54S09gjHoFowDkOvofdkhJd+g3=Cw@mail.gmail.com>
+	<20180122183301.GA31237@localhost.localdomain>
+	<CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
+	<20180126104247.GF25150@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jan 2018 11:02:24 +0000
+Message-ID: <CAFEAcA_zU+tAMvcqNHQAaVOEaJrrGOEWPS8RpUi+eZQ3tf1yiQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
+ gic-version=max)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-The following changes since commit e607bbee553cfe73072870cef458cfa4e78133e2:
+On 26 January 2018 at 10:42, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Thu, Jan 25, 2018 at 02:41:50PM +0000, Peter Maydell wrote:
+>> I'm not sure if we actually support command line setting/unsetting
+>> of features for Arm CPUs -- is there a command line option to
+>> get QEMU to print the features it thinks can be set this way?
+>
+> Unfortunately -cpu command-line parsing is still a mess (we
+> currently have lots of arch-specific parsing hooks).  Once we
+> make this uniform across targets, we could make "-cpu ?" print
+> all known properties.
+>
+> But you can look at the list of QOM properties for your CPU
+> classes (-cpu options are simply translated to QOM properties).
+> e.g.:
+>
+>   (QEMU) device-list-properties typename=3Dpxa270-a0-arm-cpu
+>   {"return": [{"type": "uint32", "name": "midr"}, {"type": "uint64", "nam=
+e": "mp-affinity"}, {"type": "child<irq>", "name": "unnamed-gpio-in[0]"}, {=
+"type": "uint32", "name": "psci-conduit"}, {"type": "bool", "name": "reset-=
+hivecs"}, {"type": "link<qemu:memory-region>", "name": "memory"}, {"type": =
+"link<irq>", "name": "unnamed-gpio-out[2]"}, {"type": "link<irq>", "name": =
+"unnamed-gpio-out[3]"}, {"type": "int32", "name": "node-id"}, {"type": "boo=
+l", "name": "start-powered-off"}, {"type": "link<irq>", "name": "unnamed-gp=
+io-out[1]"}, {"type": "link<irq>", "name": "unnamed-gpio-out[0]"}, {"type":=
+ "link<irq>", "name": "gicv3-maintenance-interrupt[0]"}, {"type": "bool", "=
+name": "cfgend"}, {"type": "child<irq>", "name": "unnamed-gpio-in[2]"}, {"t=
+ype": "child<irq>", "name": "unnamed-gpio-in[3]"}, {"type": "child<irq>", "=
+name": "unnamed-gpio-in[1]"}]}
 
-  Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-2018-01-26.for-upstream' into staging (2018-01-26 14:24:25 +0000)
+None of those are things we'd want to expose to the user, really
+(except maybe 'cfgend'): they're all intended for the QEMU board
+or SoC code that needs to configure and wire the CPU up. Ideally
+there'd be a mechanism for screening them out of the -cpu option
+list.
 
-are available in the Git repository at:
+There are some things that we could in theory have as user
+settable properties (like "does this CPU have an FPU"), but
+we don't currently have QOM properties for them (each CPU
+just hardcodes which ARM_FEATURE_* flags it has).
 
-  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-01-26
+In your other email you write:
+> I wrote:
+>> Given that the type names don't appear to the user, I think
+>> we can go ahead with implementing "-cpu max" for Arm without
+>> having to first disentangle this? "max" isn't in any worse
+>> a position than the existing "host" and "any" types.
+>
+>Sounds reasonable to me.
 
-for you to fetch changes up to 9776f0db6a19a0510e89b7aae38190b4811c95ba:
+Cool. I think that means that patches 2-6 here don't need
+any changes, but I'll rebase, retest and resend just to
+avoid confusion.
 
-  nbd: implement bdrv_get_info callback (2018-01-26 09:58:46 -0600)
-
-----------------------------------------------------------------
-nbd patches for 2018-01-26
-
-- Vladimir Sementsov-Ogievskiy - nbd export qmp interface
-- Eric Blake - hmp: Add nbd_server_remove to mirror QMP command
-- Edgar Kaziakhmedov - nbd: implement bdrv_get_info callback
-
-----------------------------------------------------------------
-Edgar Kaziakhmedov (1):
-      nbd: implement bdrv_get_info callback
-
-Eric Blake (2):
-      hmp: Add name parameter to nbd_server_add
-      hmp: Add nbd_server_remove to mirror QMP command
-
-Vladimir Sementsov-Ogievskiy (5):
-      qapi: add name parameter to nbd-server-add
-      qapi: add nbd-server-remove
-      iotest 147: add cases to test new @name parameter of nbd-server-add
-      iotests: implement QemuIoInteractive class
-      iotest 205: new test for qmp nbd-server-remove
-
- qapi/block.json               |  50 +++++++++++++-
- hmp.h                         |   1 +
- include/block/nbd.h           |   1 +
- block/nbd.c                   |  11 +++
- blockdev-nbd.c                |  38 ++++++++--
- hmp.c                         |  20 ++++--
- nbd/server.c                  |  13 ++++
- hmp-commands.hx               |  26 +++++--
- tests/qemu-iotests/147        |  68 ++++++++++++++----
- tests/qemu-iotests/147.out    |   4 +-
- tests/qemu-iotests/205        | 156 ++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/205.out    |   5 ++
- tests/qemu-iotests/group      |   1 +
- tests/qemu-iotests/iotests.py |  38 ++++++++++
- 14 files changed, 401 insertions(+), 31 deletions(-)
- create mode 100644 tests/qemu-iotests/205
- create mode 100644 tests/qemu-iotests/205.out
-
--- 
-2.14.3
+thanks
+-- PMM
