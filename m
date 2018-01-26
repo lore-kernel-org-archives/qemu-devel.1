@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7f6-00073a-2s
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:19:37 -0500
+	(envelope-from <mst@redhat.com>) id 1ef7fZ-0007TF-33
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:20:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7f4-0007iX-Sh
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:19:36 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 26 Jan 2018 10:04:07 -0600
-Message-Id: <20180126160411.4033-5-eblake@redhat.com>
-In-Reply-To: <20180126160411.4033-1-eblake@redhat.com>
-References: <20180126160411.4033-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 4/8] iotest 147: add cases to test new @name
- parameter of nbd-server-add
+	(envelope-from <mst@redhat.com>) id 1ef7fU-00088Y-1J
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:20:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ef7fT-00087j-M4
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:19:59 -0500
+Date: Fri, 26 Jan 2018 18:44:25 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180126184359-mutt-send-email-mst@kernel.org>
+References: <20180122060244.29368-1-peterx@redhat.com>
+	<20180122060244.29368-2-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180122060244.29368-2-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] vhost: add traces for memory
+ listeners
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,150 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Mon, Jan 22, 2018 at 02:02:41PM +0800, Peter Xu wrote:
+> Trace these operations on two memory listeners.  It helps to verify the
+> new memory listener fix, and good to keep them there.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180119135719.24745-4-vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/147     | 68 +++++++++++++++++++++++++++++++++++++---------
- tests/qemu-iotests/147.out |  4 +--
- 2 files changed, 57 insertions(+), 15 deletions(-)
+I'm not sure what this have to do with vfio, but anyway:
 
-diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-index 90f40ed2457..d2081df84b0 100755
---- a/tests/qemu-iotests/147
-+++ b/tests/qemu-iotests/147
-@@ -38,8 +38,8 @@ def flatten_sock_addr(crumpled_address):
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-
- class NBDBlockdevAddBase(iotests.QMPTestCase):
--    def blockdev_add_options(self, address, export=None):
--        options = { 'node-name': 'nbd-blockdev',
-+    def blockdev_add_options(self, address, export, node_name):
-+        options = { 'node-name': node_name,
-                     'driver': 'raw',
-                     'file': {
-                         'driver': 'nbd',
-@@ -50,23 +50,28 @@ class NBDBlockdevAddBase(iotests.QMPTestCase):
-             options['file']['export'] = export
-         return options
-
--    def client_test(self, filename, address, export=None):
--        bao = self.blockdev_add_options(address, export)
-+    def client_test(self, filename, address, export=None,
-+                    node_name='nbd-blockdev', delete=True):
-+        bao = self.blockdev_add_options(address, export, node_name)
-         result = self.vm.qmp('blockdev-add', **bao)
-         self.assert_qmp(result, 'return', {})
-
-+        found = False
-         result = self.vm.qmp('query-named-block-nodes')
-         for node in result['return']:
--            if node['node-name'] == 'nbd-blockdev':
-+            if node['node-name'] == node_name:
-+                found = True
-                 if isinstance(filename, str):
-                     self.assert_qmp(node, 'image/filename', filename)
-                 else:
-                     self.assert_json_filename_equal(node['image']['filename'],
-                                                     filename)
-                 break
-+        self.assertTrue(found)
-
--        result = self.vm.qmp('blockdev-del', node_name='nbd-blockdev')
--        self.assert_qmp(result, 'return', {})
-+        if delete:
-+            result = self.vm.qmp('blockdev-del', node_name=node_name)
-+            self.assert_qmp(result, 'return', {})
-
-
- class QemuNBD(NBDBlockdevAddBase):
-@@ -125,26 +130,63 @@ class BuiltinNBD(NBDBlockdevAddBase):
-         except OSError:
-             pass
-
--    def _server_up(self, address):
-+    def _server_up(self, address, export_name=None, export_name2=None):
-         result = self.server.qmp('nbd-server-start', addr=address)
-         self.assert_qmp(result, 'return', {})
-
--        result = self.server.qmp('nbd-server-add', device='nbd-export')
-+        if export_name is None:
-+            result = self.server.qmp('nbd-server-add', device='nbd-export')
-+        else:
-+            result = self.server.qmp('nbd-server-add', device='nbd-export',
-+                                     name=export_name)
-         self.assert_qmp(result, 'return', {})
-
-+        if export_name2 is not None:
-+            result = self.server.qmp('nbd-server-add', device='nbd-export',
-+                                     name=export_name2)
-+            self.assert_qmp(result, 'return', {})
-+
-+
-     def _server_down(self):
-         result = self.server.qmp('nbd-server-stop')
-         self.assert_qmp(result, 'return', {})
-
--    def test_inet(self):
-+    def do_test_inet(self, export_name=None):
-         address = { 'type': 'inet',
-                     'data': {
-                         'host': 'localhost',
-                         'port': str(NBD_PORT)
-                     } }
--        self._server_up(address)
--        self.client_test('nbd://localhost:%i/nbd-export' % NBD_PORT,
--                         flatten_sock_addr(address), 'nbd-export')
-+        self._server_up(address, export_name)
-+        export_name = export_name or 'nbd-export'
-+        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, export_name),
-+                         flatten_sock_addr(address), export_name)
-+        self._server_down()
-+
-+    def test_inet_default_export_name(self):
-+        self.do_test_inet()
-+
-+    def test_inet_same_export_name(self):
-+        self.do_test_inet('nbd-export')
-+
-+    def test_inet_different_export_name(self):
-+        self.do_test_inet('shadow')
-+
-+    def test_inet_two_exports(self):
-+        address = { 'type': 'inet',
-+                    'data': {
-+                        'host': 'localhost',
-+                        'port': str(NBD_PORT)
-+                    } }
-+        self._server_up(address, 'exp1', 'exp2')
-+        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp1'),
-+                         flatten_sock_addr(address), 'exp1', 'node1', False)
-+        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp2'),
-+                         flatten_sock_addr(address), 'exp2', 'node2', False)
-+        result = self.vm.qmp('blockdev-del', node_name='node1')
-+        self.assert_qmp(result, 'return', {})
-+        result = self.vm.qmp('blockdev-del', node_name='node2')
-+        self.assert_qmp(result, 'return', {})
-         self._server_down()
-
-     def test_inet6(self):
-diff --git a/tests/qemu-iotests/147.out b/tests/qemu-iotests/147.out
-index 3f8a935a082..dae404e2786 100644
---- a/tests/qemu-iotests/147.out
-+++ b/tests/qemu-iotests/147.out
-@@ -1,5 +1,5 @@
--......
-+.........
- ----------------------------------------------------------------------
--Ran 6 tests
-+Ran 9 tests
-
- OK
--- 
-2.14.3
+> ---
+>  hw/virtio/trace-events | 6 ++++++
+>  hw/virtio/vhost.c      | 7 +++++++
+>  2 files changed, 13 insertions(+)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 775461ae98..2b8f81eb25 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -25,3 +25,9 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+>  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+>  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+>  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
+> +
+> +# hw/virtio/vhost.c
+> +vhost_region_add(void *p, const char *mr) "dev %p mr %s"
+> +vhost_region_del(void *p, const char *mr) "dev %p mr %s"
+> +vhost_iommu_region_add(void *p, const char *mr) "dev %p mr %s"
+> +vhost_iommu_region_del(void *p, const char *mr) "dev %p mr %s"
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index e4290ce93d..19a7a3cb37 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -27,6 +27,7 @@
+>  #include "hw/virtio/virtio-access.h"
+>  #include "migration/blocker.h"
+>  #include "sysemu/dma.h"
+> +#include "trace.h"
+>  
+>  /* enabled until disconnected backend stabilizes */
+>  #define _VHOST_DEBUG 1
+> @@ -687,6 +688,7 @@ static void vhost_region_add(MemoryListener *listener,
+>          return;
+>      }
+>  
+> +    trace_vhost_region_add(dev, section->mr->name ?: NULL);
+>      ++dev->n_mem_sections;
+>      dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
+>                                  dev->n_mem_sections);
+> @@ -706,6 +708,7 @@ static void vhost_region_del(MemoryListener *listener,
+>          return;
+>      }
+>  
+> +    trace_vhost_region_del(dev, section->mr->name ?: NULL);
+>      vhost_set_memory(listener, section, false);
+>      memory_region_unref(section->mr);
+>      for (i = 0; i < dev->n_mem_sections; ++i) {
+> @@ -743,6 +746,8 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+>          return;
+>      }
+>  
+> +    trace_vhost_iommu_region_add(dev, section->mr->name ?: NULL);
+> +
+>      iommu = g_malloc0(sizeof(*iommu));
+>      end = int128_add(int128_make64(section->offset_within_region),
+>                       section->size);
+> @@ -771,6 +776,8 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+>          return;
+>      }
+>  
+> +    trace_vhost_iommu_region_del(dev, section->mr->name ?: NULL);
+> +
+>      QLIST_FOREACH(iommu, &dev->iommu_list, iommu_next) {
+>          if (iommu->mr == section->mr &&
+>              iommu->n.start == section->offset_within_region) {
+> -- 
+> 2.14.3
