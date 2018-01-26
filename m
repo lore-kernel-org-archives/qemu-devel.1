@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef69D-00005Y-0h
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:42:36 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ef6Ap-0001BB-Cm
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:44:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef69C-0008Ql-2R
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:42:35 -0500
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:39559)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ef69B-0008QT-U7
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:42:33 -0500
-Received: by mail-oi0-x22e.google.com with SMTP id t8so565529oie.6
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 07:42:33 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ef6Ak-0000j0-OM
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:44:15 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
+	<d8c2c2ca-5046-f19b-9514-d3cbef3b7c3a@amsat.org>
+	<CAFEAcA9k2KKrXk+2LQd+X7-RFuDQO96bYSo8xi81zfb80+ApFg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fde1ca29-873b-5e5c-76d3-d620301c924b@amsat.org>
+Date: Fri, 26 Jan 2018 12:44:00 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180125151535.25256-1-laurent@vivier.eu>
-References: <20180125151535.25256-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jan 2018 11:55:17 +0000
-Message-ID: <CAFEAcA_9jiiq2hXegsuFXzszrdv54vpa85+LDYuo8n6AOsdkRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] M68k for 2.12 patches
+In-Reply-To: <CAFEAcA9k2KKrXk+2LQd+X7-RFuDQO96bYSo8xi81zfb80+ApFg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/6] target/arm: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 25 January 2018 at 15:15, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit 0f79bfe38a2cf0f43c7ea4959da7f8ebd7858f3d:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.12-pull-request' into staging (2018-01-25 09:53:53 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
->
-> for you to fetch changes up to 2097dca6d3a30b80ac5a6232f518548d5ae644a9:
->
->   target/m68k: add HMP command "info tlb" (2018-01-25 16:02:25 +0100)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
+On 01/26/2018 11:33 AM, Peter Maydell wrote:
+> On 26 January 2018 at 14:29, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Hi Peter,
+>>
+>> On 12/07/2017 03:14 PM, Peter Maydell wrote:
+>>> Add support for "-cpu max" for ARM guests. This CPU type behaves
+>>> like "-cpu host" when KVM is enabled, and like a system CPU with
+>>> the maximum possible feature set otherwise. (Note that this means
+>>> it won't be migratable across versions, as we will likely add
+>>> features to it in future.)
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+> 
+>>> +#ifndef TARGET_AARCH64
+>>> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+>>> + * otherwise, a CPU with as many features enabled as our emulation supports.
+>>> + * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu64.c;
+>>> + * this only needs to handle 32 bits.
+>>> + */
+>>> +static void arm_max_initfn(Object *obj)
+>>> +{
+>>> +    ARMCPU *cpu = ARM_CPU(obj);
+>>> +
+>>> +    if (kvm_enabled()) {
+>>> +        kvm_arm_set_cpu_features_from_host(cpu);
+>>> +    } else {
+>>> +        cortex_a15_initfn(obj);> +        /* In future we might add feature bits here even if the
+>>> +         * real-world A15 doesn't implement them.
+>>> +         */
+>>
+>> Why not use arm_any_initfn() here?
+> 
+> That function (and the 'any' cpu) are deliberately only
+> included in the linux-user binaries, not the system-emulation binaries.
 
-Applied, thanks.
+why not use the V8 features?
 
--- PMM
+> (Also arm_any_initfn() only initializes userspace-visible stuff, it
+> doesn't provide ID register values etc for kernel-visible things.)
+
+I'd still use an unique arm_max_initfn() such
+
+  // initializes userspace-visible stuff
+#ifndef CONFIG_USER_ONLY
+  // initializes kernel-visible things
+#endif
+
+> 
+>> Actually what seems cleaner is to move "any" features here, and kill the
+>> "any" cpu, using "max" for this purpose.
+> 
+> We can't kill 'any', that would break back-compatibility
+> of command lines.
+
+and use an alias for 'any' -> 'max' or just
+
+  { .name = "any", .initfn = arm_max_initfn }, /* backward compat */
+
+Anyway:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> 
+> thanks
+> -- PMM
+> 
