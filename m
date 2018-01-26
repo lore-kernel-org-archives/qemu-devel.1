@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef6Yh-0007bQ-UI
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:08:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef6Zq-0008QB-6J
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:10:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef6Yg-0005b9-VZ
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:08:55 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ef6Yg-0005b1-QV
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:08:54 -0500
-Received: by mail-oi0-x243.google.com with SMTP id l8so627967oig.0
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 08:08:54 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <d8c2c2ca-5046-f19b-9514-d3cbef3b7c3a@amsat.org>
-References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
-	<d8c2c2ca-5046-f19b-9514-d3cbef3b7c3a@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jan 2018 14:33:21 +0000
-Message-ID: <CAFEAcA9k2KKrXk+2LQd+X7-RFuDQO96bYSo8xi81zfb80+ApFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] target/arm: Add "-cpu max" support
+	(envelope-from <eblake@redhat.com>) id 1ef6Zm-0006Md-Vl
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:10:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40998)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ef6Zm-0006Ly-R1
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:10:02 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4E5CBC068382
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 16:04:19 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 26 Jan 2018 10:04:05 -0600
+Message-Id: <20180126160411.4033-3-eblake@redhat.com>
+In-Reply-To: <20180126160411.4033-1-eblake@redhat.com>
+References: <20180126160411.4033-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 2/8] hmp: Add name parameter to nbd_server_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 26 January 2018 at 14:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Hi Peter,
->
-> On 12/07/2017 03:14 PM, Peter Maydell wrote:
->> Add support for "-cpu max" for ARM guests. This CPU type behaves
->> like "-cpu host" when KVM is enabled, and like a system CPU with
->> the maximum possible feature set otherwise. (Note that this means
->> it won't be migratable across versions, as we will likely add
->> features to it in future.)
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
+Extend the flexibility of the previous QMP patch to also work
+in HMP.
 
->> +#ifndef TARGET_AARCH64
->> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this=
- host);
->> + * otherwise, a CPU with as many features enabled as our emulation supp=
-orts.
->> + * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu6=
-4.c;
->> + * this only needs to handle 32 bits.
->> + */
->> +static void arm_max_initfn(Object *obj)
->> +{
->> +    ARMCPU *cpu =3D ARM_CPU(obj);
->> +
->> +    if (kvm_enabled()) {
->> +        kvm_arm_set_cpu_features_from_host(cpu);
->> +    } else {
->> +        cortex_a15_initfn(obj);> +        /* In future we might add fea=
-ture bits here even if the
->> +         * real-world A15 doesn't implement them.
->> +         */
->
-> Why not use arm_any_initfn() here?
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20180109192802.17167-1-eblake@redhat.com>
+---
+ hmp.c           | 3 ++-
+ hmp-commands.hx | 9 +++++----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-That function (and the 'any' cpu) are deliberately only
-included in the linux-user binaries, not the system-emulation binaries.
-(Also arm_any_initfn() only initializes userspace-visible stuff, it
-doesn't provide ID register values etc for kernel-visible things.)
+diff --git a/hmp.c b/hmp.c
+index 5bcfc36de10..7a64dd59c5c 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2221,10 +2221,11 @@ exit:
+ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+ {
+     const char *device = qdict_get_str(qdict, "device");
++    const char *name = qdict_get_try_str(qdict, "name");
+     bool writable = qdict_get_try_bool(qdict, "writable", false);
+     Error *local_err = NULL;
 
-> Actually what seems cleaner is to move "any" features here, and kill the
-> "any" cpu, using "max" for this purpose.
+-    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
++    qmp_nbd_server_add(device, !!name, name, true, writable, &local_err);
 
-We can't kill 'any', that would break back-compatibility
-of command lines.
+     if (local_err != NULL) {
+         hmp_handle_error(mon, &local_err);
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 6d5ebdf6ab1..b8b6fb91848 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1553,17 +1553,18 @@ ETEXI
 
-thanks
--- PMM
+     {
+         .name       = "nbd_server_add",
+-        .args_type  = "writable:-w,device:B",
+-        .params     = "nbd_server_add [-w] device",
++        .args_type  = "writable:-w,device:B,name:s?",
++        .params     = "nbd_server_add [-w] device [name]",
+         .help       = "export a block device via NBD",
+         .cmd        = hmp_nbd_server_add,
+     },
+ STEXI
+-@item nbd_server_add @var{device}
++@item nbd_server_add @var{device} [ @var{name} ]
+ @findex nbd_server_add
+ Export a block device through QEMU's NBD server, which must be started
+ beforehand with @command{nbd_server_start}.  The @option{-w} option makes the
+-exported device writable too.
++exported device writable too.  The export name is controlled by @var{name},
++defaulting to @var{device}.
+ ETEXI
+
+     {
+-- 
+2.14.3
