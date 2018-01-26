@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef9kB-0002XT-Aq
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:33:00 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef9m4-0003OR-19
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef9kA-00046S-Cj
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:32:59 -0500
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:35420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ef9kA-000469-6z
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:32:58 -0500
-Received: by mail-ot0-x236.google.com with SMTP id w26so1360913otj.2
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 11:32:58 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <707306d7-8ee4-ab6b-2154-290647a72779@linaro.org>
-References: <20171218172425.18200-1-richard.henderson@linaro.org>
-	<20171218172425.18200-10-richard.henderson@linaro.org>
-	<CAFEAcA9Dmdh+u7AZHhjEkS3zc6i4yf+Eo1-NuksgVdo1cqmKFQ@mail.gmail.com>
-	<707306d7-8ee4-ab6b-2154-290647a72779@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jan 2018 10:07:14 +0000
-Message-ID: <CAFEAcA9PGHMPeATRHESeUEWaU17OpVw99p-+U9KzOPaitSgEGQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] target/arm: Decode aa64 armv8.3
- fcmla
+	(envelope-from <eblake@redhat.com>) id 1ef9m2-0005i7-E3
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:34:56 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 26 Jan 2018 13:34:39 -0600
+Message-Id: <20180126193439.20219-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: Simplify
+ bdrv_can_write_zeroes_with_unmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +18,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 26 January 2018 at 07:29, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 01/15/2018 10:18 AM, Peter Maydell wrote:
->>> +void HELPER(gvec_fcmlah)(void *vd, void *vn, void *vm,
->>> +                         void *vfpst, uint32_t desc)
->>> +{
->>> +    uintptr_t opr_sz = simd_oprsz(desc);
->>> +    float16 *d = vd;
->>> +    float16 *n = vn;
->>> +    float16 *m = vm;
->>> +    float_status *fpst = vfpst;
->>> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
->>> +    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
->>> +    uint32_t neg_real = flip ^ neg_imag;
->>> +    uintptr_t i;
->>> +
->>> +    neg_real <<= 15;
->>> +    neg_imag <<= 15;
->>> +
->>> +    for (i = 0; i < opr_sz / 2; i += 2) {
->>> +        float16 e0 = n[H2(i + flip)];
->>> +        float16 e1 = m[H2(i + flip)] ^ neg_real;
->>> +        float16 e2 = e0;
->>> +        float16 e3 = m[H2(i + 1 - flip)] ^ neg_imag;
->>
->> This is again rather confusing to compare against the pseudocode.
->> What order are your e0/e1/e2/e3 compared to the pseudocode's
->> element1/element2/element3/element4 ?
->
-> The SVE pseudocode for the same operation is clearer than that in the main ARM
-> ARM, and is nearer to what I used:
->
->   for e = 0 to elements-1
->     if ElemP[mask, e, esize] == '1' then
->         pair = e - (e MOD 2);  // index of first element in pair
->         addend = Elem[result, e, esize];
->         if IsEven(e) then  // real part
->             // realD = realA [+-] flip ? (imagN * imagM) : (realN * realM)
->             element1 = Elem[operand1, pair + flip, esize];
->             element2 = Elem[operand2, pair + flip, esize];
->             if neg_real then element2 = FPNeg(element2);
->         else  // imaginary part
->             // imagD = imagA [+-] flip ? (imagN * realM) : (realN * imagM)
->             element1 = Elem[operand1, pair + flip, esize];
->             element2 = Elem[operand2, pair + (1 - flip), esize];
->             if neg_imag then element2 = FPNeg(element2);
->         Elem[result, e, esize] = FPMulAdd(addend, element1, element2, FPCR);
->
-> In my version, e0/e1 are element1/element2 (real) and e2/e3 are
-> element1/element2 (imag).
+We don't need the can_write_zeroes_with_unmap field in
+BlockDriverInfo, because it is redundant information with
+supported_zero_flags & BDRV_REQ_MAY_UNMAP.  Note that
+BlockDriverInfo and supported_zero_flags are both per-device
+settings, rather than global state about the driver as a
+whole, which means one or both of these bits of information
+can already be conditional.  Let's audit how they were set:
 
-Thanks. Could we use the same indexing (1/2/3/4) as the final Arm ARM
-pseudocode?
+crypto: always setting can_write_ to false is pointless (the
+struct starts life zero-initialized), no use of supported_
 
-thanks
--- PMM
+nbd: just recently fixed to set can_write_ if supported_
+includes MAY_UNMAP (thus this commit effectively reverts
+bca80059e and solves the problem mentioned there in a more
+global way)
+
+file-posix, iscsi, qcow2: can_write_ is conditional, while
+supported_ was unconditional; but passing MAY_UNMAP would
+fail with ENOTSUP if the condition wasn't met
+
+qed: can_write_ is unconditional, but pwrite_zeroes lacks
+support for MAY_UNMAP and supported_ is not set. Perhaps
+support can be added later (since it would be similar to
+qcow2), but for now claiming false is no real loss
+
+all other drivers: can_write_ is not set, and supported_ is
+either unset or a passthrough
+
+Simplify the code by moving the conditional into
+supported_zero_flags for all drivers, then dropping the
+now-unused BDI field.  For callers that relied on
+bdrv_can_write_zeroes_with_unmap(), we return the same
+per-device settings for drivers that had conditions (no
+observable change in behavior there); and can now return
+true (instead of false) for drivers that support passthrough
+(for example, the commit driver) which gives those drivers
+the same fix as nbd just got in bca80059e.  For callers that
+relied on supported_zero_flags, we now have a few more places
+that can avoid a wasted call to pwrite_zeroes() that will
+just fail with ENOTSUP.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+
+---
+The commit id mentioned above is dependent on me not having to respin
+my latest NBD pull request:
+
+Based-on: <20180126160411.4033-1-eblake@redhat.com>
+([PULL 0/8] NBD patches through 26 Jan)
+---
+ include/block/block.h | 11 -----------
+ block.c               |  8 +-------
+ block/crypto.c        |  1 -
+ block/file-posix.c    |  3 +--
+ block/iscsi.c         |  6 ++++--
+ block/nbd.c           | 11 -----------
+ block/qcow2.c         |  3 +--
+ block/qed.c           |  1 -
+ 8 files changed, 7 insertions(+), 37 deletions(-)
+
+diff --git a/include/block/block.h b/include/block/block.h
+index 9b12774ddf2..d808849784c 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -28,17 +28,6 @@ typedef struct BlockDriverInfo {
+      * to the LBPRZ flag in the SCSI logical block provisioning page.
+      */
+     bool unallocated_blocks_are_zero;
+-    /*
+-     * True if the driver can optimize writing zeroes by unmapping
+-     * sectors. This is equivalent to the BLKDISCARDZEROES ioctl in Linux
+-     * with the difference that in qemu a discard is allowed to silently
+-     * fail. Therefore we have to use bdrv_pwrite_zeroes with the
+-     * BDRV_REQ_MAY_UNMAP flag for an optimized zero write with unmapping.
+-     * After this call the driver has to guarantee that the contents read
+-     * back as zero. It is additionally required that the block device is
+-     * opened with BDRV_O_UNMAP flag for this to work.
+-     */
+-    bool can_write_zeroes_with_unmap;
+     /*
+      * True if this block driver only supports compressed writes
+      */
+diff --git a/block.c b/block.c
+index a8da4f2b255..ebbb907b580 100644
+--- a/block.c
++++ b/block.c
+@@ -4007,17 +4007,11 @@ bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs)
+
+ bool bdrv_can_write_zeroes_with_unmap(BlockDriverState *bs)
+ {
+-    BlockDriverInfo bdi;
+-
+     if (!(bs->open_flags & BDRV_O_UNMAP)) {
+         return false;
+     }
+
+-    if (bdrv_get_info(bs, &bdi) == 0) {
+-        return bdi.can_write_zeroes_with_unmap;
+-    }
+-
+-    return false;
++    return bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP;
+ }
+
+ const char *bdrv_get_encrypted_filename(BlockDriverState *bs)
+diff --git a/block/crypto.c b/block/crypto.c
+index 60ddf8623ee..5d18f5dc98a 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -574,7 +574,6 @@ static int block_crypto_get_info_luks(BlockDriverState *bs,
+     }
+
+     bdi->unallocated_blocks_are_zero = false;
+-    bdi->can_write_zeroes_with_unmap = false;
+     bdi->cluster_size = subbdi.cluster_size;
+
+     return 0;
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 36ee89e9402..2ede2b0f392 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -546,7 +546,6 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+
+     s->has_discard = true;
+     s->has_write_zeroes = true;
+-    bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
+     if ((bs->open_flags & BDRV_O_NOCACHE) != 0) {
+         s->needs_alignment = true;
+     }
+@@ -596,6 +595,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     }
+ #endif
+
++    bs->supported_zero_flags = s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
+     ret = 0;
+ fail:
+     if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
+@@ -2220,7 +2220,6 @@ static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+     BDRVRawState *s = bs->opaque;
+
+     bdi->unallocated_blocks_are_zero = s->discard_zeroes;
+-    bdi->can_write_zeroes_with_unmap = s->discard_zeroes;
+     return 0;
+ }
+
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 6a1c53711a7..673196b87e5 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1875,7 +1875,6 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     if (iscsilun->dpofua) {
+         bs->supported_write_flags = BDRV_REQ_FUA;
+     }
+-    bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
+
+     /* Check the write protect flag of the LUN if we want to write */
+     if (iscsilun->type == TYPE_DISK && (flags & BDRV_O_RDWR) &&
+@@ -1959,6 +1958,10 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+         }
+     }
+
++    if (iscsilun->lbprz && iscsilun->lbp.lbpws) {
++        bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
++    }
++
+ out:
+     qemu_opts_del(opts);
+     g_free(initiator_name);
+@@ -2158,7 +2161,6 @@ static int iscsi_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+ {
+     IscsiLun *iscsilun = bs->opaque;
+     bdi->unallocated_blocks_are_zero = iscsilun->lbprz;
+-    bdi->can_write_zeroes_with_unmap = iscsilun->lbprz && iscsilun->lbp.lbpws;
+     bdi->cluster_size = iscsilun->cluster_sectors * BDRV_SECTOR_SIZE;
+     return 0;
+ }
+diff --git a/block/nbd.c b/block/nbd.c
+index 94220f6d143..8b8ba56cdd0 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -566,14 +566,6 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+     bs->full_open_options = opts;
+ }
+
+-static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+-{
+-    if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP) {
+-        bdi->can_write_zeroes_with_unmap = true;
+-    }
+-    return 0;
+-}
+-
+ static BlockDriver bdrv_nbd = {
+     .format_name                = "nbd",
+     .protocol_name              = "nbd",
+@@ -591,7 +583,6 @@ static BlockDriver bdrv_nbd = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
+-    .bdrv_get_info              = nbd_get_info,
+ };
+
+ static BlockDriver bdrv_nbd_tcp = {
+@@ -611,7 +602,6 @@ static BlockDriver bdrv_nbd_tcp = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
+-    .bdrv_get_info              = nbd_get_info,
+ };
+
+ static BlockDriver bdrv_nbd_unix = {
+@@ -631,7 +621,6 @@ static BlockDriver bdrv_nbd_unix = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
+-    .bdrv_get_info              = nbd_get_info,
+ };
+
+ static void bdrv_nbd_init(void)
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 1f80961e1b9..fe4b2135087 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1477,7 +1477,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+
+     /* Initialise locks */
+     qemu_co_mutex_init(&s->lock);
+-    bs->supported_zero_flags = BDRV_REQ_MAY_UNMAP;
++    bs->supported_zero_flags = header.version >= 3 ? BDRV_REQ_MAY_UNMAP : 0;
+
+     /* Repair image if dirty */
+     if (!(flags & (BDRV_O_CHECK | BDRV_O_INACTIVE)) && !bs->read_only &&
+@@ -3769,7 +3769,6 @@ static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     bdi->unallocated_blocks_are_zero = true;
+-    bdi->can_write_zeroes_with_unmap = (s->qcow_version >= 3);
+     bdi->cluster_size = s->cluster_size;
+     bdi->vm_state_offset = qcow2_vm_state_offset(s);
+     return 0;
+diff --git a/block/qed.c b/block/qed.c
+index 821dcaa0559..61acb87f2ab 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -1438,7 +1438,6 @@ static int bdrv_qed_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+     bdi->cluster_size = s->header.cluster_size;
+     bdi->is_dirty = s->header.features & QED_F_NEED_CHECK;
+     bdi->unallocated_blocks_are_zero = true;
+-    bdi->can_write_zeroes_with_unmap = true;
+     return 0;
+ }
+
+-- 
+2.14.3
