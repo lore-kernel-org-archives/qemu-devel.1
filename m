@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ef3m8-0001LZ-UB
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:10:38 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ef3nW-0002W5-Us
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ef3m3-0003lk-Rp
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:10:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59665)
+	(envelope-from <dgilbert@redhat.com>) id 1ef3nR-00050s-TS
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ef3m3-0003lM-Jg
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:10:31 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1ECEDEC0AA
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 12:53:13 +0000 (UTC)
-Date: Fri, 26 Jan 2018 13:53:09 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180126125309.euaviiu3x2cmgeu5@eukaryote>
-References: <20180125170930.20009-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ef3nR-00050I-Kc
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:11:57 -0500
+Date: Fri, 26 Jan 2018 13:11:51 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180126131150.GE2610@work-vm>
+References: <20180126124845.19257-1-danielhb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180125170930.20009-1-berrange@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] docs: update information for TLS
- certificate management
+In-Reply-To: <20180126124845.19257-1-danielhb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/savevm.c: do not fail when len >
+ MAX_VM_CMD_PACKAGED_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,141 +27,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-On Thu, Jan 25, 2018 at 05:09:30PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
+* Daniel Henrique Barboza (danielhb@linux.vnet.ibm.com) wrote:
+> MAX_VM_CMD_PACKAGED_SIZE is a constant used in qemu_savevm_send_packaged
+> and loadvm_handle_cmd_packaged to determine whether a package is too
+> big to be sent or received. qemu_savevm_send_packaged is called inside
+> postcopy_start (migration/migration.c) to send the MigrationState
+> in a single blob to the destination, using the MIG_CMD_PACKAGED subcommand,
+> which will read it up using loadvm_handle_cmd_packaged. If the blob is
+> larger than MAX_VM_CMD_PACKAGED_SIZE, an error is thrown and the postcopy
+> migration is aborted. Both MAX_VM_CMD_PACKAGED_SIZE and MIG_CMD_PACKAGED
+> were introduced by commit 11cf1d984b ("MIG_CMD_PACKAGED: Send a packaged
+> chunk ..."). The constant has its original value of 1ul << 24 (16MB).
+> 
+> The current MAX_VM_CMD_PACKAGED_SIZE value is not enough to support postcopy
+> migration of bigger pseries guests. The blob size for a postcopy migration of
+> a pseries guest with the following setup:
+> 
+> qemu-system-ppc64 --nographic -vga none -machine pseries,accel=kvm -m 64G \
+> -smp 1,maxcpus=32 -device virtio-blk-pci,drive=rootdisk \
+> -drive file=f27.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
+> -netdev user,id=u1 -net nic,netdev=u1
+> 
+> goes around 12MB. Bumping the RAM to 128G makes the blob sizes goes to 20MB.
+> With 256G the blob goes to 37MB - more than twice the current maximum size.
+> At this moment the pseries machine can handle guests with up to 1TB of RAM,
+> making this postcopy blob goes to 128MB of size approximately.
 
-[...]
+Ouch!  One problem with that is that the size of the blob translates
+into extra downtime on both precopy and postcopy; with a 10Gbps
+connection, 128MB is 128ms - and in precopy that will get sent as part
+of the device state as well.
+Which device is it that's creating that much data?
 
-> +@node vnc_setup_sasl
-> +
-> +@subsection Configuring SASL mechanisms
-> +
-> +The following documentation assumes use of the Cyrus SASL implementati=
-on on a
-> +Linux host, but the principals should apply to any other SASL implemen=
-tation
+> One solution is to bump MAX_VM_CMD_PACKAGED_SIZE up to bigger values. A value
+> of 1ul << 27 would be enough for pseries guests up to 1TB of RAM, but there
+> are 2 problems with this approach:
+> 
+> - we'll keep supporting bigger and bigger guests as time goes by. This constant
+> would be bumped from time to time;
+> 
+> - if we're willing to bump the constant every time we need a bigger blob, why
+> have the constant in the first place? Considering that its current value
+> is 16MB, bumping it to 128MB already makes it 'unreasonably large' considering
+> the original design of MIG_CMD_PACKAGED.
+> 
+> A better long term solution is to determine whether the design of
+> MIG_CMD_PACKAGED can be changed to send partial blobs of smaller sizes or
+> even get rid of the size limitation.
+> 
+> Until then, this patch changes both qemu_savevm_send_packaged and
+> loadvm_handle_cmd_packaged to not bail out if the blob len is greater than
+> MAX_VM_CMD_PACKAGED_SIZE. To not fully ignore the occurrence (something can go
+> wrong and the MigrationState can inadvertently grow beyond expected), we also
+> change the traces of both functions to report both the current blob size and the
+> current recommended maximum. This way we allow big guests to execute postcopy
+> migration while retaining the information for debug purposes.
 
-s/principals/principles/
+Given that the length is sent as a 32bit int, we need to have a limit at
+2^32 on the sending side, so we need to keep that.
+If you're saying the blob hits 128MB for a 1TB guest, then hmm that's
+1GB for an 8TB guest, and 4GB for a 32TB guest.   
+I suggest we limit to 4GB to avoid truncation, and then if anyone needs
+a 32TB guest, they come and ask.  But we should look at what that device
+is doing before then.
 
-[I can imagine how the typo could've come about -- as you talk about
-Kerberos principal(s) further below :-)]
+Dave
 
-> +or host. When SASL is enabled, the mechanism configuration will be loa=
-ded from
-> +system default SASL service config /etc/sasl2/qemu.conf. If running QE=
-MU as an
-> +unprivileged user, an environment variable SASL_CONF_PATH can be used =
-to make
-> +behaviour suddenly changedit search alternate locations for the servic=
-e config.
-
-The last part above reads odd, maybe you accidentally removed some
-words?
-
-[...]
-
-> +This says to use the 'GSSAPI' mechanism with the Kerberos v5 protocol,=
- with
-> +the server principal stored in /etc/qemu/krb5.tab. For this to work th=
-e
-> +administrator of your KDC must generate a Kerberos principal for the s=
-erver,
-> +with a name of 'qemu/somehost.example.com@@EXAMPLE.COM' replacing
-> +'somehost.example.com' with the fully qualified host name of the machi=
-ne
-> +running QEMU, and 'EXAMPLE.COM' with the Kerberos Realm.
-> +
-> +When using TLS, if username+password authentication is desired, then a
-> +reasonable configuration is
-> +
-> +@example
-> +mech_list: scram-sha-1
-> +sasldb_path: /etc/qemu/passwd.db
-> +@end example
-> +
-> +The saslpasswd2 program can be used to populate the passwd.db file wit=
-h
-> +accounts.
-
-Maybe: "saslpasswd2" --> "@code{saslpasswd2}"
-
-(Also helps with consistency, as I see you've used the @code{} attribute
-further below.)
-
-> +
-> +Other SASL configurations will be left as an exercise for the reader. =
-Note that
-> +all mechanisms except GSSAPI, should be combined with use of TLS to en=
-sure a
-
-Spurious comma above.
-
-> +secure data channel.
-
-[...]
-
-> +The GNUTLS package includes a command called @code{certtool} which can
-
-Super nit: s/GNUTLS/GnuTLS/
-
-[...]
-
-> +@node tls_creds_setup
-> +@subsection TLS x509 credential configuration
-> =20
-> -@node vnc_setup_sasl
-> +QEMU has a standard mechanism for loading x509 credentials that will b=
-e
-> +used for network services and clients. It requires specifying the
-> +@code{tls-creds-x509} class name to the @code{-object} command line
-> +argument for the system emulators. This also works for the helper tool=
-s
-> +like @code{qemu-nbd} and @code{qemu-img}, but is named @code{--object}=
-.
-
-The '-object' for QEMU command-line, and the double-dashed '--object'
-for external tools looks a tiny bit odd.  But not this patch's problem.
-
-(I just noticed Eric remarked on this too.)
-
- =20
-> -@subsection Configuring SASL mechanisms
-> +When specifying the object, the @code{dir} parameters specifies which
-> +directory contains the credential files. This directory is expected to
-> +contain files with the names mentioned previously, @code{ca-cert.pem},
-> +@code{server-key.pem}, @code{server-cert.pem}, @code{client-key.pem}
-> +and @code{client-cert.pem} as appropriate. It is also possible to
-> +include a set of pre-generated diffie-hellman parameters in a file
-
-Would be nice capitalize proper nouns: s/diffie-hellman/Diffie=E2=80=93He=
-llman
-(DH) --- 'DH' in brackets because you use that acronym two lines below,
-although it should be obvious to those setting up TLS.
-
-> +@code{dh-params.pem}, which can be created using the
-> +@code{certtool --generate-dh-params} command. If omitted, QEMU will
-> +dynamically generate DH parameters when loading the credentials.
-
-[...]
-
- =20
-> -The saslpasswd2 program can be used to populate the passwd.db file wit=
-h
-> -accounts.
-> +Network services which support TLS will all have a @code{tls-creds}
-> +parameter which expects the ID of the tls credentials object.=20
-
-s/tls/TLS
-
-[...]
-
-Whether you fix these minor nits or not, your write-up is a strict
-improvement, so:
-
-    Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
-
---=20
-/kashyap
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> ---
+>  migration/savevm.c     | 15 ++-------------
+>  migration/trace-events |  4 ++--
+>  2 files changed, 4 insertions(+), 15 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index b7908f62be..c7b9d69578 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -861,15 +861,9 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
+>  {
+>      uint32_t tmp;
+>  
+> -    if (len > MAX_VM_CMD_PACKAGED_SIZE) {
+> -        error_report("%s: Unreasonably large packaged state: %zu",
+> -                     __func__, len);
+> -        return -1;
+> -    }
+> -
+>      tmp = cpu_to_be32(len);
+>  
+> -    trace_qemu_savevm_send_packaged();
+> +    trace_qemu_savevm_send_packaged(len, MAX_VM_CMD_PACKAGED_SIZE);
+>      qemu_savevm_command_send(f, MIG_CMD_PACKAGED, 4, (uint8_t *)&tmp);
+>  
+>      qemu_put_buffer(f, buf, len);
+> @@ -1718,12 +1712,7 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)
+>      QIOChannelBuffer *bioc;
+>  
+>      length = qemu_get_be32(mis->from_src_file);
+> -    trace_loadvm_handle_cmd_packaged(length);
+> -
+> -    if (length > MAX_VM_CMD_PACKAGED_SIZE) {
+> -        error_report("Unreasonably large packaged state: %zu", length);
+> -        return -1;
+> -    }
+> +    trace_loadvm_handle_cmd_packaged(length, MAX_VM_CMD_PACKAGED_SIZE);
+>  
+>      bioc = qio_channel_buffer_new(length);
+>      qio_channel_set_name(QIO_CHANNEL(bioc), "migration-loadvm-buffer");
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 6f29fcc686..646963ffec 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -6,10 +6,10 @@ qemu_loadvm_state_section_command(int ret) "%d"
+>  qemu_loadvm_state_section_partend(uint32_t section_id) "%u"
+>  qemu_loadvm_state_post_main(int ret) "%d"
+>  qemu_loadvm_state_section_startfull(uint32_t section_id, const char *idstr, uint32_t instance_id, uint32_t version_id) "%u(%s) %u %u"
+> -qemu_savevm_send_packaged(void) ""
+> +qemu_savevm_send_packaged(size_t len, size_t max) "size=%zu, max recommended=%zu"
+>  loadvm_state_setup(void) ""
+>  loadvm_state_cleanup(void) ""
+> -loadvm_handle_cmd_packaged(unsigned int length) "%u"
+> +loadvm_handle_cmd_packaged(size_t len, size_t max) "size=%zu, max recommended=%zu"
+>  loadvm_handle_cmd_packaged_main(int ret) "%d"
+>  loadvm_handle_cmd_packaged_received(int ret) "%d"
+>  loadvm_postcopy_handle_advise(void) ""
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
