@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7eN-0006a6-Sw
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:18:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef7f6-00073a-2s
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:19:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef7eM-0006gQ-Vz
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:18:51 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1ef7f4-0007iX-Sh
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:19:36 -0500
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <1a072d58-8bec-b23a-4ac9-2f4c1ec866ce@redhat.com>
-Date: Fri, 26 Jan 2018 10:39:11 -0600
-MIME-Version: 1.0
-In-Reply-To: <9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ipHRGM55qzipOOeVJXiZQBwUgsSrlFSZe"
-Subject: Re: [Qemu-devel] [PATCH v3 19/39] qcow2: Update get_cluster_table()
- to support L2 slices
+Date: Fri, 26 Jan 2018 10:04:07 -0600
+Message-Id: <20180126160411.4033-5-eblake@redhat.com>
+In-Reply-To: <20180126160411.4033-1-eblake@redhat.com>
+References: <20180126160411.4033-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 4/8] iotest 147: add cases to test new @name
+ parameter of nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +20,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ipHRGM55qzipOOeVJXiZQBwUgsSrlFSZe
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <1a072d58-8bec-b23a-4ac9-2f4c1ec866ce@redhat.com>
-Subject: Re: [PATCH v3 19/39] qcow2: Update get_cluster_table() to support L2
- slices
-References: <cover.1516978645.git.berto@igalia.com>
- <9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
-In-Reply-To: <9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 01/26/2018 08:59 AM, Alberto Garcia wrote:
-> This patch updates get_cluster_table() to return L2 slices instead of
-> full L2 tables.
->=20
-> The code itself needs almost no changes, it only needs to call
-> offset_to_l2_slice_index() instead of offset_to_l2_index(). This patch
-> also renames all the relevant variables and the documentation.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->=20
-
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180119135719.24745-4-vsementsov@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ tests/qemu-iotests/147     | 68 +++++++++++++++++++++++++++++++++++++---------
+ tests/qemu-iotests/147.out |  4 +--
+ 2 files changed, 57 insertions(+), 15 deletions(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index 90f40ed2457..d2081df84b0 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -38,8 +38,8 @@ def flatten_sock_addr(crumpled_address):
 
 
---ipHRGM55qzipOOeVJXiZQBwUgsSrlFSZe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ class NBDBlockdevAddBase(iotests.QMPTestCase):
+-    def blockdev_add_options(self, address, export=None):
+-        options = { 'node-name': 'nbd-blockdev',
++    def blockdev_add_options(self, address, export, node_name):
++        options = { 'node-name': node_name,
+                     'driver': 'raw',
+                     'file': {
+                         'driver': 'nbd',
+@@ -50,23 +50,28 @@ class NBDBlockdevAddBase(iotests.QMPTestCase):
+             options['file']['export'] = export
+         return options
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+-    def client_test(self, filename, address, export=None):
+-        bao = self.blockdev_add_options(address, export)
++    def client_test(self, filename, address, export=None,
++                    node_name='nbd-blockdev', delete=True):
++        bao = self.blockdev_add_options(address, export, node_name)
+         result = self.vm.qmp('blockdev-add', **bao)
+         self.assert_qmp(result, 'return', {})
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprWa8ACgkQp6FrSiUn
-Q2r0RAf/b6uE8ei6cSxBItYW7Ql37pv/d36LnI4N+mh2sOHMtRHMOmrxhjrCeL6n
-RjwOLN6cvCRCcqQzwh0aF/aBOVNh6F9tq7wzfjqYGKcdpq46A57ut+Q8+3N8zDsQ
-fE55nSIn7oGN4HHfi4W4a70FclNsGlCLlJp4AONm+6gUVDOJ40nLBIGvLiCA7HJg
-K+Seek9i1nvB8zHCwiNXkwST9swEsdgJ3t74wjXCIWjzfijVqQQ7vPCay4sEKb77
-4v20psGYtI2HQetB5TLF1x27r40TAHLPRxITImC7fzwh2llWoaS+H8O4TaCmdGLH
-7D7GrZfYvetFLtONFa8d0F7WHRgUbg==
-=5x0W
------END PGP SIGNATURE-----
++        found = False
+         result = self.vm.qmp('query-named-block-nodes')
+         for node in result['return']:
+-            if node['node-name'] == 'nbd-blockdev':
++            if node['node-name'] == node_name:
++                found = True
+                 if isinstance(filename, str):
+                     self.assert_qmp(node, 'image/filename', filename)
+                 else:
+                     self.assert_json_filename_equal(node['image']['filename'],
+                                                     filename)
+                 break
++        self.assertTrue(found)
 
---ipHRGM55qzipOOeVJXiZQBwUgsSrlFSZe--
+-        result = self.vm.qmp('blockdev-del', node_name='nbd-blockdev')
+-        self.assert_qmp(result, 'return', {})
++        if delete:
++            result = self.vm.qmp('blockdev-del', node_name=node_name)
++            self.assert_qmp(result, 'return', {})
+
+
+ class QemuNBD(NBDBlockdevAddBase):
+@@ -125,26 +130,63 @@ class BuiltinNBD(NBDBlockdevAddBase):
+         except OSError:
+             pass
+
+-    def _server_up(self, address):
++    def _server_up(self, address, export_name=None, export_name2=None):
+         result = self.server.qmp('nbd-server-start', addr=address)
+         self.assert_qmp(result, 'return', {})
+
+-        result = self.server.qmp('nbd-server-add', device='nbd-export')
++        if export_name is None:
++            result = self.server.qmp('nbd-server-add', device='nbd-export')
++        else:
++            result = self.server.qmp('nbd-server-add', device='nbd-export',
++                                     name=export_name)
+         self.assert_qmp(result, 'return', {})
+
++        if export_name2 is not None:
++            result = self.server.qmp('nbd-server-add', device='nbd-export',
++                                     name=export_name2)
++            self.assert_qmp(result, 'return', {})
++
++
+     def _server_down(self):
+         result = self.server.qmp('nbd-server-stop')
+         self.assert_qmp(result, 'return', {})
+
+-    def test_inet(self):
++    def do_test_inet(self, export_name=None):
+         address = { 'type': 'inet',
+                     'data': {
+                         'host': 'localhost',
+                         'port': str(NBD_PORT)
+                     } }
+-        self._server_up(address)
+-        self.client_test('nbd://localhost:%i/nbd-export' % NBD_PORT,
+-                         flatten_sock_addr(address), 'nbd-export')
++        self._server_up(address, export_name)
++        export_name = export_name or 'nbd-export'
++        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, export_name),
++                         flatten_sock_addr(address), export_name)
++        self._server_down()
++
++    def test_inet_default_export_name(self):
++        self.do_test_inet()
++
++    def test_inet_same_export_name(self):
++        self.do_test_inet('nbd-export')
++
++    def test_inet_different_export_name(self):
++        self.do_test_inet('shadow')
++
++    def test_inet_two_exports(self):
++        address = { 'type': 'inet',
++                    'data': {
++                        'host': 'localhost',
++                        'port': str(NBD_PORT)
++                    } }
++        self._server_up(address, 'exp1', 'exp2')
++        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp1'),
++                         flatten_sock_addr(address), 'exp1', 'node1', False)
++        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp2'),
++                         flatten_sock_addr(address), 'exp2', 'node2', False)
++        result = self.vm.qmp('blockdev-del', node_name='node1')
++        self.assert_qmp(result, 'return', {})
++        result = self.vm.qmp('blockdev-del', node_name='node2')
++        self.assert_qmp(result, 'return', {})
+         self._server_down()
+
+     def test_inet6(self):
+diff --git a/tests/qemu-iotests/147.out b/tests/qemu-iotests/147.out
+index 3f8a935a082..dae404e2786 100644
+--- a/tests/qemu-iotests/147.out
++++ b/tests/qemu-iotests/147.out
+@@ -1,5 +1,5 @@
+-......
++.........
+ ----------------------------------------------------------------------
+-Ran 6 tests
++Ran 9 tests
+
+ OK
+-- 
+2.14.3
