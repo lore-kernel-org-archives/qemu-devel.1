@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef3nW-0002W5-Us
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:06 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ef3nn-0002kX-4c
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef3nR-00050s-TS
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ef3nR-00050I-Kc
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:11:57 -0500
-Date: Fri, 26 Jan 2018 13:11:51 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180126131150.GE2610@work-vm>
-References: <20180126124845.19257-1-danielhb@linux.vnet.ibm.com>
+	(envelope-from <ehabkost@redhat.com>) id 1ef3nl-0005KV-LT
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:19 -0500
+Date: Fri, 26 Jan 2018 08:42:47 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180126104247.GF25150@localhost.localdomain>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
+	<20171209010811.GJ3037@localhost.localdomain>
+	<CAFEAcA9oG=+mJ+jSGTM_z54S09gjHoFowDkOvofdkhJd+g3=Cw@mail.gmail.com>
+	<20180122183301.GA31237@localhost.localdomain>
+	<CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180126124845.19257-1-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/savevm.c: do not fail when len >
- MAX_VM_CMD_PACKAGED_SIZE
+In-Reply-To: <CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
+ gic-version=max)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,136 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-* Daniel Henrique Barboza (danielhb@linux.vnet.ibm.com) wrote:
-> MAX_VM_CMD_PACKAGED_SIZE is a constant used in qemu_savevm_send_packaged
-> and loadvm_handle_cmd_packaged to determine whether a package is too
-> big to be sent or received. qemu_savevm_send_packaged is called inside
-> postcopy_start (migration/migration.c) to send the MigrationState
-> in a single blob to the destination, using the MIG_CMD_PACKAGED subcommand,
-> which will read it up using loadvm_handle_cmd_packaged. If the blob is
-> larger than MAX_VM_CMD_PACKAGED_SIZE, an error is thrown and the postcopy
-> migration is aborted. Both MAX_VM_CMD_PACKAGED_SIZE and MIG_CMD_PACKAGED
-> were introduced by commit 11cf1d984b ("MIG_CMD_PACKAGED: Send a packaged
-> chunk ..."). The constant has its original value of 1ul << 24 (16MB).
+On Thu, Jan 25, 2018 at 02:41:50PM +0000, Peter Maydell wrote:
+> On 22 January 2018 at 18:33, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > About QOM type names:
+> >
+> > On x86, all CPU models are resolved to "<model>-<suffix>", and
+> > i386 and x86_64 have different suffixes.  So the QOM type name is
+> > "max-x86_64-cpu" on qemu-system-x86_64, and "max-i386-cpu" on
+> > qemu-system-i386.
 > 
-> The current MAX_VM_CMD_PACKAGED_SIZE value is not enough to support postcopy
-> migration of bigger pseries guests. The blob size for a postcopy migration of
-> a pseries guest with the following setup:
+> OK. Looking at the target/arm code we do a similar suffix
+> trick, but we seem to have cut-n-pasted the handling in
+> aarch64_cpu_register(), so it uses the TYPE_ARM_CPU as the
+> suffix, rather the TYPE_AARCH64_CPU.
 > 
-> qemu-system-ppc64 --nographic -vga none -machine pseries,accel=kvm -m 64G \
-> -smp 1,maxcpus=32 -device virtio-blk-pci,drive=rootdisk \
-> -drive file=f27.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
-> -netdev user,id=u1 -net nic,netdev=u1
-> 
-> goes around 12MB. Bumping the RAM to 128G makes the blob sizes goes to 20MB.
-> With 256G the blob goes to 37MB - more than twice the current maximum size.
-> At this moment the pseries machine can handle guests with up to 1TB of RAM,
-> making this postcopy blob goes to 128MB of size approximately.
+> Am I right in thinking that we can fix this (changing the
+> QOM type names for all the aarch64 CPUs) without breaking
+> migration? (I guess I can just test this easily enough.)
 
-Ouch!  One problem with that is that the size of the blob translates
-into extra downtime on both precopy and postcopy; with a 10Gbps
-connection, 128MB is 128ms - and in precopy that will get sent as part
-of the device state as well.
-Which device is it that's creating that much data?
+This is not supposed to affect migration (at least it didn't when
+we introduced per-cpu-model subclasses), but it's a good idea to
+test it anyway.  It might break other code that tries to extract
+info from the class names.
 
-> One solution is to bump MAX_VM_CMD_PACKAGED_SIZE up to bigger values. A value
-> of 1ul << 27 would be enough for pseries guests up to 1TB of RAM, but there
-> are 2 problems with this approach:
-> 
-> - we'll keep supporting bigger and bigger guests as time goes by. This constant
-> would be bumped from time to time;
-> 
-> - if we're willing to bump the constant every time we need a bigger blob, why
-> have the constant in the first place? Considering that its current value
-> is 16MB, bumping it to 128MB already makes it 'unreasonably large' considering
-> the original design of MIG_CMD_PACKAGED.
-> 
-> A better long term solution is to determine whether the design of
-> MIG_CMD_PACKAGED can be changed to send partial blobs of smaller sizes or
-> even get rid of the size limitation.
-> 
-> Until then, this patch changes both qemu_savevm_send_packaged and
-> loadvm_handle_cmd_packaged to not bail out if the blob len is greater than
-> MAX_VM_CMD_PACKAGED_SIZE. To not fully ignore the occurrence (something can go
-> wrong and the MigrationState can inadvertently grow beyond expected), we also
-> change the traces of both functions to report both the current blob size and the
-> current recommended maximum. This way we allow big guests to execute postcopy
-> migration while retaining the information for debug purposes.
 
-Given that the length is sent as a 32bit int, we need to have a limit at
-2^32 on the sending side, so we need to keep that.
-If you're saying the blob hits 128MB for a 1TB guest, then hmm that's
-1GB for an 8TB guest, and 4GB for a 32TB guest.   
-I suggest we limit to 4GB to avoid truncation, and then if anyone needs
-a 32TB guest, they come and ask.  But we should look at what that device
-is doing before then.
-
-Dave
-
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> ---
->  migration/savevm.c     | 15 ++-------------
->  migration/trace-events |  4 ++--
->  2 files changed, 4 insertions(+), 15 deletions(-)
 > 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index b7908f62be..c7b9d69578 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -861,15 +861,9 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
->  {
->      uint32_t tmp;
->  
-> -    if (len > MAX_VM_CMD_PACKAGED_SIZE) {
-> -        error_report("%s: Unreasonably large packaged state: %zu",
-> -                     __func__, len);
-> -        return -1;
-> -    }
-> -
->      tmp = cpu_to_be32(len);
->  
-> -    trace_qemu_savevm_send_packaged();
-> +    trace_qemu_savevm_send_packaged(len, MAX_VM_CMD_PACKAGED_SIZE);
->      qemu_savevm_command_send(f, MIG_CMD_PACKAGED, 4, (uint8_t *)&tmp);
->  
->      qemu_put_buffer(f, buf, len);
-> @@ -1718,12 +1712,7 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)
->      QIOChannelBuffer *bioc;
->  
->      length = qemu_get_be32(mis->from_src_file);
-> -    trace_loadvm_handle_cmd_packaged(length);
-> -
-> -    if (length > MAX_VM_CMD_PACKAGED_SIZE) {
-> -        error_report("Unreasonably large packaged state: %zu", length);
-> -        return -1;
-> -    }
-> +    trace_loadvm_handle_cmd_packaged(length, MAX_VM_CMD_PACKAGED_SIZE);
->  
->      bioc = qio_channel_buffer_new(length);
->      qio_channel_set_name(QIO_CHANNEL(bioc), "migration-loadvm-buffer");
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 6f29fcc686..646963ffec 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -6,10 +6,10 @@ qemu_loadvm_state_section_command(int ret) "%d"
->  qemu_loadvm_state_section_partend(uint32_t section_id) "%u"
->  qemu_loadvm_state_post_main(int ret) "%d"
->  qemu_loadvm_state_section_startfull(uint32_t section_id, const char *idstr, uint32_t instance_id, uint32_t version_id) "%u(%s) %u %u"
-> -qemu_savevm_send_packaged(void) ""
-> +qemu_savevm_send_packaged(size_t len, size_t max) "size=%zu, max recommended=%zu"
->  loadvm_state_setup(void) ""
->  loadvm_state_cleanup(void) ""
-> -loadvm_handle_cmd_packaged(unsigned int length) "%u"
-> +loadvm_handle_cmd_packaged(size_t len, size_t max) "size=%zu, max recommended=%zu"
->  loadvm_handle_cmd_packaged_main(int ret) "%d"
->  loadvm_handle_cmd_packaged_received(int ret) "%d"
->  loadvm_postcopy_handle_advise(void) ""
-> -- 
-> 2.14.3
+> If we did that then we'd have, like x86, "max-arm-cpu" in
+> the qemu-system-arm binary, and "max-aarch64-cpu" in
+> the qemu-system-aarch64 binary.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Does x86 provide a way to say "give me the max-i386-cpu"
+> in the qemu-system-x86_64 binary ?
+
+No, the *-i386-cpu classes aren't even compiled in on
+qemu-system-x86_64.
+
+> 
+> > About how it should behave:
+> >
+> > An important expectation about "max" is about the
+> > query-cpu-model-expansion return value.  Having a property set to
+> > true on the return value of "query-cpu-model-expansion model=max"
+> > means the corresponding feature is supported on the current host
+> > and can be enabled on the command-line.
+> 
+> On Arm when I try to use this I get:
+> { "execute": "query-cpu-model-expansion", "arguments": { "type":
+> "static", "model": { "model": { "name": "max" } } } }
+> {
+>     "error": {
+>         "class": "CommandNotFound",
+>         "desc": "The command query-cpu-model-expansion has not been found"
+>     }
+> }
+> 
+> It looks like we only implement this QMP API for x86 and S390
+> (via #ifdeffery in monitor.c).
+> 
+> I'm not sure if we actually support command line setting/unsetting
+> of features for Arm CPUs -- is there a command line option to
+> get QEMU to print the features it thinks can be set this way?
+
+Unfortunately -cpu command-line parsing is still a mess (we
+currently have lots of arch-specific parsing hooks).  Once we
+make this uniform across targets, we could make "-cpu ?" print
+all known properties.
+
+But you can look at the list of QOM properties for your CPU
+classes (-cpu options are simply translated to QOM properties).
+e.g.:
+
+  (QEMU) device-list-properties typename=pxa270-a0-arm-cpu
+  {"return": [{"type": "uint32", "name": "midr"}, {"type": "uint64", "name": "mp-affinity"}, {"type": "child<irq>", "name": "unnamed-gpio-in[0]"}, {"type": "uint32", "name": "psci-conduit"}, {"type": "bool", "name": "reset-hivecs"}, {"type": "link<qemu:memory-region>", "name": "memory"}, {"type": "link<irq>", "name": "unnamed-gpio-out[2]"}, {"type": "link<irq>", "name": "unnamed-gpio-out[3]"}, {"type": "int32", "name": "node-id"}, {"type": "bool", "name": "start-powered-off"}, {"type": "link<irq>", "name": "unnamed-gpio-out[1]"}, {"type": "link<irq>", "name": "unnamed-gpio-out[0]"}, {"type": "link<irq>", "name": "gicv3-maintenance-interrupt[0]"}, {"type": "bool", "name": "cfgend"}, {"type": "child<irq>", "name": "unnamed-gpio-in[2]"}, {"type": "child<irq>", "name": "unnamed-gpio-in[3]"}, {"type": "child<irq>", "name": "unnamed-gpio-in[1]"}]}
+
+
+
+> 
+> >> (The code in this patchset makes '-cpu max' give the same
+> >> QOM type name for both qemu-system-arm and qemu-system-aarch64,
+> >> with different behaviour depending on the binary. If that means
+> >> we don't provide the same behaviour as x86 then I can change that,
+> >> but I'm not sure where the difference is exposed to the user?)
+> >
+> > This is not how the QOM names work on x86, but I don't think QOM
+> > type names choices have important user-visible side-effects
+> > today.  Choosing unique QOM type names is more important to make
+> > the code future-proof for when we merge QEMU binaries, than to
+> > make user-visible behavior consistent.
+> 
+> Good point -- assuming it doesn't break migration I can fix
+> the aarch64 types to use the right suffix string and then they'll
+> have different QOM type names.
+> 
+> thanks
+> -- PMM
+
+-- 
+Eduardo
