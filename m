@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ef85Z-0000Oa-4V
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:46:58 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ef8Cp-0003Y3-Am
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:54:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ef85V-0002Jl-PX
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:46:57 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:46518)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1ef85V-0002Iw-H1
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:46:53 -0500
-Received: by mail-lf0-x244.google.com with SMTP id q194so1652768lfe.13
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:46:53 -0800 (PST)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Fri, 26 Jan 2018 11:22:33 +0100
-Message-Id: <1516962162-25680-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v2 0/9] Xilinx queue
+	(envelope-from <ehabkost@redhat.com>) id 1ef8Co-0007Zy-Cm
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:54:27 -0500
+Date: Fri, 26 Jan 2018 15:54:18 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180126175418.GH25150@localhost.localdomain>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
+	<20171209010811.GJ3037@localhost.localdomain>
+	<CAFEAcA9oG=+mJ+jSGTM_z54S09gjHoFowDkOvofdkhJd+g3=Cw@mail.gmail.com>
+	<20180122183301.GA31237@localhost.localdomain>
+	<CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
+	<20180126104247.GF25150@localhost.localdomain>
+	<CAFEAcA_zU+tAMvcqNHQAaVOEaJrrGOEWPS8RpUi+eZQ3tf1yiQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_zU+tAMvcqNHQAaVOEaJrrGOEWPS8RpUi+eZQ3tf1yiQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
+ gic-version=max)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On Fri, Jan 26, 2018 at 11:02:24AM +0000, Peter Maydell wrote:
+> On 26 January 2018 at 10:42, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > On Thu, Jan 25, 2018 at 02:41:50PM +0000, Peter Maydell wrote:
+> >> I'm not sure if we actually support command line setting/unsetting
+> >> of features for Arm CPUs -- is there a command line option to
+> >> get QEMU to print the features it thinks can be set this way?
+> >
+> > Unfortunately -cpu command-line parsing is still a mess (we
+> > currently have lots of arch-specific parsing hooks).  Once we
+> > make this uniform across targets, we could make "-cpu ?" print
+> > all known properties.
+> >
+> > But you can look at the list of QOM properties for your CPU
+> > classes (-cpu options are simply translated to QOM properties).
+> > e.g.:
+> >
+> >   (QEMU) device-list-properties typename=pxa270-a0-arm-cpu
+> >   {"return": [{"type": "uint32", "name": "midr"}, {"type": "uint64", "name": "mp-affinity"}, {"type": "child<irq>", "name": "unnamed-gpio-in[0]"}, {"type": "uint32", "name": "psci-conduit"}, {"type": "bool", "name": "reset-hivecs"}, {"type": "link<qemu:memory-region>", "name": "memory"}, {"type": "link<irq>", "name": "unnamed-gpio-out[2]"}, {"type": "link<irq>", "name": "unnamed-gpio-out[3]"}, {"type": "int32", "name": "node-id"}, {"type": "bool", "name": "start-powered-off"}, {"type": "link<irq>", "name": "unnamed-gpio-out[1]"}, {"type": "link<irq>", "name": "unnamed-gpio-out[0]"}, {"type": "link<irq>", "name": "gicv3-maintenance-interrupt[0]"}, {"type": "bool", "name": "cfgend"}, {"type": "child<irq>", "name": "unnamed-gpio-in[2]"}, {"type": "child<irq>", "name": "unnamed-gpio-in[3]"}, {"type": "child<irq>", "name": "unnamed-gpio-in[1]"}]}
+> 
+> None of those are things we'd want to expose to the user, really
+> (except maybe 'cfgend'): they're all intended for the QEMU board
+> or SoC code that needs to configure and wire the CPU up. Ideally
+> there'd be a mechanism for screening them out of the -cpu option
+> list.
+> 
 
-The following changes since commit 2077fef91d5eb8e3745a84fabd87a5ee7d2b535d:
+Yeah, it's becoming clearer to me that we need to address this
+better than with a simple "x-" prefix convention.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180125' into staging (2018-01-25 17:04:47 +0000)
+If we remove the link and child properties, we have:
 
-are available in the git repository at:
+midr (uint32)
+mp-affinity (uint64)
+psci-conduit (uint32)
+reset-hivecs (bool)
+node-id (int32)
+start-powered-off (bool)
+cfgend (bool)
 
-  git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next-2018-01-26.for-upstream
+I wonder how many of them aren't useful with -cpu but might be
+useful with -device in the future.
 
-for you to fetch changes up to 0ab7bbc75bc167f06a74379e8a8d2d6f9a78888b:
 
-  xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC (2018-01-26 11:09:09 +0100)
-
-----------------------------------------------------------------
-Xilinx queue
-
-----------------------------------------------------------------
-Alistair Francis (9):
-      microblaze: boot.c: Don't try to find NULL file
-      xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
-      xlnx-zynqmp-pmu: Add the CPU and memory
-      aarch64-softmmu.mak: Use an ARM specific config
-      xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
-      xlnx-zynqmp-pmu: Connect the PMU interrupt controller
-      xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
-      xlnx-zynqmp-pmu: Connect the IPI device to the PMU
-      xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
-
- default-configs/aarch64-softmmu.mak    |   1 +
- default-configs/microblaze-softmmu.mak |   1 +
- hw/arm/Makefile.objs                   |   2 +-
- hw/arm/xlnx-zynqmp.c                   |  14 +
- hw/display/Makefile.objs               |   2 +-
- hw/dma/Makefile.objs                   |   1 +
- hw/intc/Makefile.objs                  |   2 +
- hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
- hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
- hw/microblaze/Makefile.objs            |   1 +
- hw/microblaze/boot.c                   |   2 +-
- hw/microblaze/xlnx-zynqmp-pmu.c        | 204 ++++++++++++
- include/hw/arm/xlnx-zynqmp.h           |   2 +
- include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
- include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
- 15 files changed, 1275 insertions(+), 3 deletions(-)
- create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
- create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
- create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
- create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
- create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
-
-Alistair Francis (9):
-  microblaze: boot.c: Don't try to find NULL file
-  xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
-  xlnx-zynqmp-pmu: Add the CPU and memory
-  aarch64-softmmu.mak: Use an ARM specific config
-  xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
-  xlnx-zynqmp-pmu: Connect the PMU interrupt controller
-  xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
-  xlnx-zynqmp-pmu: Connect the IPI device to the PMU
-  xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
-
- default-configs/aarch64-softmmu.mak    |   1 +
- default-configs/microblaze-softmmu.mak |   1 +
- hw/arm/Makefile.objs                   |   2 +-
- hw/arm/xlnx-zynqmp.c                   |  14 +
- hw/display/Makefile.objs               |   2 +-
- hw/dma/Makefile.objs                   |   1 +
- hw/intc/Makefile.objs                  |   2 +
- hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
- hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
- hw/microblaze/Makefile.objs            |   1 +
- hw/microblaze/boot.c                   |   2 +-
- hw/microblaze/xlnx-zynqmp-pmu.c        | 204 ++++++++++++
- include/hw/arm/xlnx-zynqmp.h           |   2 +
- include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
- include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
- 15 files changed, 1275 insertions(+), 3 deletions(-)
- create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
- create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
- create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
- create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
- create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
+> There are some things that we could in theory have as user
+> settable properties (like "does this CPU have an FPU"), but
+> we don't currently have QOM properties for them (each CPU
+> just hardcodes which ARM_FEATURE_* flags it has).
+> 
+> In your other email you write:
+> > I wrote:
+> >> Given that the type names don't appear to the user, I think
+> >> we can go ahead with implementing "-cpu max" for Arm without
+> >> having to first disentangle this? "max" isn't in any worse
+> >> a position than the existing "host" and "any" types.
+> >
+> >Sounds reasonable to me.
+> 
+> Cool. I think that means that patches 2-6 here don't need
+> any changes, but I'll rebase, retest and resend just to
+> avoid confusion.
+> 
+> thanks
+> -- PMM
 
 -- 
-2.7.4
+Eduardo
