@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef6Nw-00086L-PJ
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:57:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef6UM-0002zg-Hk
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:04:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef6Nv-0005hP-Kk
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:57:48 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 26 Jan 2018 16:59:57 +0200
-Message-Id: <7d8d80bfde60d29e8a0abe04db8241b754714329.1516978645.git.berto@igalia.com>
-In-Reply-To: <cover.1516978645.git.berto@igalia.com>
-References: <cover.1516978645.git.berto@igalia.com>
-In-Reply-To: <cover.1516978645.git.berto@igalia.com>
-References: <cover.1516978645.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 30/39] qcow2: Update
- expand_zero_clusters_in_l1() to support L2 slices
+	(envelope-from <eblake@redhat.com>) id 1ef6UL-0002aT-HW
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:04:26 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 26 Jan 2018 10:04:04 -0600
+Message-Id: <20180126160411.4033-2-eblake@redhat.com>
+In-Reply-To: <20180126160411.4033-1-eblake@redhat.com>
+References: <20180126160411.4033-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 1/8] qapi: add name parameter to nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,173 +20,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-expand_zero_clusters_in_l1() expands zero clusters as a necessary step
-to downgrade qcow2 images to a version that doesn't support metadata
-zero clusters. This function takes an L1 table (which may or may not
-be active) and iterates over all its L2 tables looking for zero
-clusters.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Since we'll be loading L2 slices instead of full tables we need to add
-an extra loop that iterates over all slices of each L2 table, and we
-should also use the slice size when allocating the buffer used when
-the L1 table is not active.
+Allow user to specify name for new export, to not reuse internal
+node name and to not show it to clients.
 
-This function doesn't need any additional changes so apart from that
-this patch simply updates the variable name from l2_table to l2_slice.
+This also allows creating several exports per device.
 
-Finally, and since we have to touch the bdrv_read() / bdrv_write()
-calls anyway, this patch takes the opportunity to replace them with
-the byte-based bdrv_pread() / bdrv_pwrite().
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180119135719.24745-2-vsementsov@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-cluster.c | 52 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 29 insertions(+), 23 deletions(-)
+ qapi/block.json |  9 +++++++--
+ blockdev-nbd.c  | 14 +++++++++-----
+ hmp.c           |  5 +++--
+ 3 files changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 6042ec69e3..659830ad4d 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1864,22 +1864,25 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
+diff --git a/qapi/block.json b/qapi/block.json
+index f093fa3f276..353e3a45bdf 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -213,14 +213,19 @@
+ #
+ # @device: The device name or node name of the node to be exported
+ #
++# @name: Export name. If unspecified, the @device parameter is used as the
++#        export name. (Since 2.12)
++#
+ # @writable: Whether clients should be able to write to the device via the
+ #     NBD connection (default false).
+ #
+-# Returns: error if the device is already marked for export.
++# Returns: error if the server is not running, or export with the same name
++#          already exists.
+ #
+ # Since: 1.3.0
+ ##
+-{ 'command': 'nbd-server-add', 'data': {'device': 'str', '*writable': 'bool'} }
++{ 'command': 'nbd-server-add',
++  'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
+
+ ##
+ # @nbd-server-stop:
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 9e3c22109c6..104789e521c 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -140,8 +140,8 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
+     qapi_free_SocketAddress(addr_flat);
+ }
+
+-void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+-                        Error **errp)
++void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
++                        bool has_writable, bool writable, Error **errp)
  {
-     BDRVQcow2State *s = bs->opaque;
-     bool is_active_l1 = (l1_table == s->l1_table);
--    uint64_t *l2_table = NULL;
-+    uint64_t *l2_slice = NULL;
-+    unsigned slice, slice_size2, n_slices;
-     int ret;
-     int i, j;
- 
-+    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
-+    n_slices = s->cluster_size / slice_size2;
+     BlockDriverState *bs = NULL;
+     BlockBackend *on_eject_blk;
+@@ -152,8 +152,12 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+         return;
+     }
+
+-    if (nbd_export_find(device)) {
+-        error_setg(errp, "NBD server already exporting device '%s'", device);
++    if (!has_name) {
++        name = device;
++    }
 +
-     if (!is_active_l1) {
-         /* inactive L2 tables require a buffer to be stored in when loading
-          * them from disk */
--        l2_table = qemu_try_blockalign(bs->file->bs, s->cluster_size);
--        if (l2_table == NULL) {
-+        l2_slice = qemu_try_blockalign(bs->file->bs, slice_size2);
-+        if (l2_slice == NULL) {
-             return -ENOMEM;
-         }
++    if (nbd_export_find(name)) {
++        error_setg(errp, "NBD server already has export named '%s'", name);
+         return;
      }
- 
-     for (i = 0; i < l1_size; i++) {
-         uint64_t l2_offset = l1_table[i] & L1E_OFFSET_MASK;
--        bool l2_dirty = false;
-         uint64_t l2_refcount;
- 
-         if (!l2_offset) {
-@@ -1905,22 +1908,24 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-             goto fail;
-         }
- 
--        {
-+        for (slice = 0; slice < n_slices; slice++) {
-+            uint64_t slice_offset = l2_offset + slice * slice_size2;
-+            bool l2_dirty = false;
-             if (is_active_l1) {
-                 /* get active L2 tables from cache */
--                ret = qcow2_cache_get(bs, s->l2_table_cache, l2_offset,
--                                      (void **)&l2_table);
-+                ret = qcow2_cache_get(bs, s->l2_table_cache, slice_offset,
-+                                      (void **)&l2_slice);
-             } else {
-                 /* load inactive L2 tables from disk */
--                ret = bdrv_read(bs->file, l2_offset / BDRV_SECTOR_SIZE,
--                                (void *)l2_table, s->cluster_sectors);
-+                ret = bdrv_pread(bs->file, slice_offset,
-+                                 (void *)l2_slice, slice_size2);
-             }
-             if (ret < 0) {
-                 goto fail;
-             }
- 
--            for (j = 0; j < s->l2_size; j++) {
--                uint64_t l2_entry = be64_to_cpu(l2_table[j]);
-+            for (j = 0; j < s->l2_slice_size; j++) {
-+                uint64_t l2_entry = be64_to_cpu(l2_slice[j]);
-                 int64_t offset = l2_entry & L2E_OFFSET_MASK;
-                 QCow2ClusterType cluster_type =
-                     qcow2_get_cluster_type(l2_entry);
-@@ -1934,7 +1939,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                     if (!bs->backing) {
-                         /* not backed; therefore we can simply deallocate the
-                          * cluster */
--                        l2_table[j] = 0;
-+                        l2_slice[j] = 0;
-                         l2_dirty = true;
-                         continue;
-                     }
-@@ -1961,12 +1966,13 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                 }
- 
-                 if (offset_into_cluster(s, offset)) {
-+                    int l2_index = slice * s->l2_slice_size + j;
-                     qcow2_signal_corruption(
-                         bs, true, -1, -1,
-                         "Cluster allocation offset "
-                         "%#" PRIx64 " unaligned (L2 offset: %#"
-                         PRIx64 ", L2 index: %#x)", offset,
--                        l2_offset, j);
-+                        l2_offset, l2_index);
-                     if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN) {
-                         qcow2_free_clusters(bs, offset, s->cluster_size,
-                                             QCOW2_DISCARD_ALWAYS);
-@@ -1995,30 +2001,30 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                 }
- 
-                 if (l2_refcount == 1) {
--                    l2_table[j] = cpu_to_be64(offset | QCOW_OFLAG_COPIED);
-+                    l2_slice[j] = cpu_to_be64(offset | QCOW_OFLAG_COPIED);
-                 } else {
--                    l2_table[j] = cpu_to_be64(offset);
-+                    l2_slice[j] = cpu_to_be64(offset);
-                 }
-                 l2_dirty = true;
-             }
- 
-             if (is_active_l1) {
-                 if (l2_dirty) {
--                    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-+                    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
-                     qcow2_cache_depends_on_flush(s->l2_table_cache);
-                 }
--                qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
-+                qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-             } else {
-                 if (l2_dirty) {
-                     ret = qcow2_pre_write_overlap_check(
-                         bs, QCOW2_OL_INACTIVE_L2 | QCOW2_OL_ACTIVE_L2,
--                        l2_offset, s->cluster_size);
-+                        slice_offset, slice_size2);
-                     if (ret < 0) {
-                         goto fail;
-                     }
- 
--                    ret = bdrv_write(bs->file, l2_offset / BDRV_SECTOR_SIZE,
--                                     (void *)l2_table, s->cluster_sectors);
-+                    ret = bdrv_pwrite(bs->file, slice_offset,
-+                                      (void *)l2_slice, slice_size2);
-                     if (ret < 0) {
-                         goto fail;
-                     }
-@@ -2035,11 +2041,11 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-     ret = 0;
- 
- fail:
--    if (l2_table) {
-+    if (l2_slice) {
-         if (!is_active_l1) {
--            qemu_vfree(l2_table);
-+            qemu_vfree(l2_slice);
-         } else {
--            qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
-+            qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-         }
+
+@@ -177,7 +181,7 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+         return;
      }
-     return ret;
+
+-    nbd_export_set_name(exp, device);
++    nbd_export_set_name(exp, name);
+
+     /* The list of named exports has a strong reference to this export now and
+      * our only way of accessing it is through nbd_export_find(), so we can drop
+diff --git a/hmp.c b/hmp.c
+index 056bf70cf1e..5bcfc36de10 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2203,7 +2203,8 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+             continue;
+         }
+
+-        qmp_nbd_server_add(info->value->device, true, writable, &local_err);
++        qmp_nbd_server_add(info->value->device, false, NULL,
++                           true, writable, &local_err);
+
+         if (local_err != NULL) {
+             qmp_nbd_server_stop(NULL);
+@@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+     bool writable = qdict_get_try_bool(qdict, "writable", false);
+     Error *local_err = NULL;
+
+-    qmp_nbd_server_add(device, true, writable, &local_err);
++    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
+
+     if (local_err != NULL) {
+         hmp_handle_error(mon, &local_err);
 -- 
-2.11.0
+2.14.3
