@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ef6xN-00040K-D6
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:34:26 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ef6xk-0004Hi-PK
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:34:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1ef6xI-0008Eh-FD
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:34:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49776)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1ef6xH-0008E8-Ut
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:34:20 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0QCn4Fr071247
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 07:49:06 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fr2ymur67-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 07:49:05 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Fri, 26 Jan 2018 05:48:57 -0700
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Fri, 26 Jan 2018 10:48:45 -0200
-Message-Id: <20180126124845.19257-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] migration/savevm.c: do not fail when len >
- MAX_VM_CMD_PACKAGED_SIZE
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ef6xf-0008U9-QK
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:34:48 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:47040)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ef6xf-0008Tv-LD
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:34:43 -0500
+Received: by mail-qt0-x241.google.com with SMTP id o35so2635220qtj.13
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 08:34:43 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1516982720-26501-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20180126160531eucas1p2e972758feaca9f6d174e6399aca78c81@eucas1p2.samsung.com>
+	<1516982720-26501-2-git-send-email-a.perevalov@samsung.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <73901dff-4a71-bb97-6769-70a54f03aa5a@amsat.org>
+Date: Fri, 26 Jan 2018 13:13:12 -0300
+MIME-Version: 1.0
+In-Reply-To: <1516982720-26501-2-git-send-email-a.perevalov@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] migration: change blocktime type to
+ uint32_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,116 +37,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: lvivier@redhat.com, peterx@redhat.com, quintela@redhat.com, ash.billore@samsung.com
 
-MAX_VM_CMD_PACKAGED_SIZE is a constant used in qemu_savevm_send_packaged
-and loadvm_handle_cmd_packaged to determine whether a package is too
-big to be sent or received. qemu_savevm_send_packaged is called inside
-postcopy_start (migration/migration.c) to send the MigrationState
-in a single blob to the destination, using the MIG_CMD_PACKAGED subcommand,
-which will read it up using loadvm_handle_cmd_packaged. If the blob is
-larger than MAX_VM_CMD_PACKAGED_SIZE, an error is thrown and the postcopy
-migration is aborted. Both MAX_VM_CMD_PACKAGED_SIZE and MIG_CMD_PACKAGED
-were introduced by commit 11cf1d984b ("MIG_CMD_PACKAGED: Send a packaged
-chunk ..."). The constant has its original value of 1ul << 24 (16MB).
+Hi Alexey,
 
-The current MAX_VM_CMD_PACKAGED_SIZE value is not enough to support postcopy
-migration of bigger pseries guests. The blob size for a postcopy migration of
-a pseries guest with the following setup:
+On 01/26/2018 01:05 PM, Alexey Perevalov wrote:
+> Initially int64_t was used, but on PowerPC architecture,
+> clang doesn't have atomic_*_8 function, so it produces
+> link time error.
+> 
+> QEMU is working with time as with 64bit value, but by
+> fact 32 bit is enough with CLOCK_REALTIME. In this case
+> blocktime will keep only 1200 hours time interval.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> Acked-by: Eric Blake <eblake@redhat.com>
+> ---
+>  hmp.c                    |  4 ++--
+>  migration/postcopy-ram.c | 37 ++++++++++++++++++++-----------------
+>  migration/trace-events   |  4 ++--
+>  qapi/migration.json      |  4 ++--
+>  4 files changed, 26 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index c6bab53..3c376b3 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -265,7 +265,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>      }
+>  
+>      if (info->has_postcopy_blocktime) {
+> -        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
+> +        monitor_printf(mon, "postcopy blocktime: %u\n",
+>                         info->postcopy_blocktime);
+>      }
+>  
+> @@ -273,7 +273,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>          Visitor *v;
+>          char *str;
+>          v = string_output_visitor_new(false, &str);
+> -        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+> +        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>          visit_complete(v, &str);
+>          monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
+>          g_free(str);
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 7814da5..bd08c24 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -63,14 +63,14 @@ struct PostcopyDiscardState {
+>  
+>  typedef struct PostcopyBlocktimeContext {
+>      /* time when page fault initiated per vCPU */
+> -    int64_t *page_fault_vcpu_time;
+> +    uint32_t *page_fault_vcpu_time;
+>      /* page address per vCPU */
+>      uintptr_t *vcpu_addr;
+> -    int64_t total_blocktime;
+> +    uint32_t total_blocktime;
+>      /* blocktime per vCPU */
+> -    int64_t *vcpu_blocktime;
+> +    uint32_t *vcpu_blocktime;
+>      /* point in time when last page fault was initiated */
+> -    int64_t last_begin;
+> +    uint32_t last_begin;
+>      /* number of vCPU are suspended */
+>      int smp_cpus_down;
+>  
+> @@ -99,22 +99,22 @@ static void migration_exit_cb(Notifier *n, void *data)
+>  static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>  {
+>      PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+> -    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
+> +    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
+>      ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
+> -    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
+> +    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
+>  
+>      ctx->exit_notifier.notify = migration_exit_cb;
+>      qemu_add_exit_notifier(&ctx->exit_notifier);
+>      return ctx;
+>  }
+>  
+> -static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+> +static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>  {
+> -    int64List *list = NULL, *entry = NULL;
+> +    uint32List *list = NULL, *entry = NULL;
+>      int i;
+>  
+>      for (i = smp_cpus - 1; i >= 0; i--) {
+> -        entry = g_new0(int64List, 1);
+> +        entry = g_new0(uint32List, 1);
+>          entry->value = ctx->vcpu_blocktime[i];
+>          entry->next = list;
+>          list = entry;
+> @@ -145,7 +145,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
+>      info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
+>  }
+>  
+> -static uint64_t get_postcopy_total_blocktime(void)
+> +static uint32_t get_postcopy_total_blocktime(void)
+>  {
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
+> @@ -634,6 +634,7 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+>      int64_t now_ms;
+> +    uint32_t least_now;
+>  
+>      if (!dc || ptid == 0) {
+>          return;
+> @@ -644,13 +645,14 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>      }
+>  
+>      now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    least_now = (uint32_t)now_ms;
+>      if (dc->vcpu_addr[cpu] == 0) {
+>          atomic_inc(&dc->smp_cpus_down);
+>      }
+>  
+> -    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+> -    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+> -    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+> +    atomic_xchg(&dc->last_begin, least_now);
+> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], least_now);
+> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
+>  
+>      /* check it here, not at the begining of the function,
+>       * due to, check could accur early than bitmap_set in
+> @@ -699,20 +701,21 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>      int i, affected_cpu = 0;
+>      int64_t now_ms;
+>      bool vcpu_total_blocktime = false;
+> -    int64_t read_vcpu_time;
+> +    uint32_t read_vcpu_time, least_now;
+>  
+>      if (!dc) {
+>          return;
+>      }
+>  
+>      now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    least_now = now_ms & 0xffffffff;
 
-qemu-system-ppc64 --nographic -vga none -machine pseries,accel=kvm -m 64G \
--smp 1,maxcpus=32 -device virtio-blk-pci,drive=rootdisk \
--drive file=f27.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
--netdev user,id=u1 -net nic,netdev=u1
+This might deserve a comment.
 
-goes around 12MB. Bumping the RAM to 128G makes the blob sizes goes to 20MB.
-With 256G the blob goes to 37MB - more than twice the current maximum size.
-At this moment the pseries machine can handle guests with up to 1TB of RAM,
-making this postcopy blob goes to 128MB of size approximately.
+I also find using UINT32_MAX clearer.
 
-One solution is to bump MAX_VM_CMD_PACKAGED_SIZE up to bigger values. A value
-of 1ul << 27 would be enough for pseries guests up to 1TB of RAM, but there
-are 2 problems with this approach:
-
-- we'll keep supporting bigger and bigger guests as time goes by. This constant
-would be bumped from time to time;
-
-- if we're willing to bump the constant every time we need a bigger blob, why
-have the constant in the first place? Considering that its current value
-is 16MB, bumping it to 128MB already makes it 'unreasonably large' considering
-the original design of MIG_CMD_PACKAGED.
-
-A better long term solution is to determine whether the design of
-MIG_CMD_PACKAGED can be changed to send partial blobs of smaller sizes or
-even get rid of the size limitation.
-
-Until then, this patch changes both qemu_savevm_send_packaged and
-loadvm_handle_cmd_packaged to not bail out if the blob len is greater than
-MAX_VM_CMD_PACKAGED_SIZE. To not fully ignore the occurrence (something can go
-wrong and the MigrationState can inadvertently grow beyond expected), we also
-change the traces of both functions to report both the current blob size and the
-current recommended maximum. This way we allow big guests to execute postcopy
-migration while retaining the information for debug purposes.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
----
- migration/savevm.c     | 15 ++-------------
- migration/trace-events |  4 ++--
- 2 files changed, 4 insertions(+), 15 deletions(-)
-
-diff --git a/migration/savevm.c b/migration/savevm.c
-index b7908f62be..c7b9d69578 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -861,15 +861,9 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
- {
-     uint32_t tmp;
- 
--    if (len > MAX_VM_CMD_PACKAGED_SIZE) {
--        error_report("%s: Unreasonably large packaged state: %zu",
--                     __func__, len);
--        return -1;
--    }
--
-     tmp = cpu_to_be32(len);
- 
--    trace_qemu_savevm_send_packaged();
-+    trace_qemu_savevm_send_packaged(len, MAX_VM_CMD_PACKAGED_SIZE);
-     qemu_savevm_command_send(f, MIG_CMD_PACKAGED, 4, (uint8_t *)&tmp);
- 
-     qemu_put_buffer(f, buf, len);
-@@ -1718,12 +1712,7 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)
-     QIOChannelBuffer *bioc;
- 
-     length = qemu_get_be32(mis->from_src_file);
--    trace_loadvm_handle_cmd_packaged(length);
--
--    if (length > MAX_VM_CMD_PACKAGED_SIZE) {
--        error_report("Unreasonably large packaged state: %zu", length);
--        return -1;
--    }
-+    trace_loadvm_handle_cmd_packaged(length, MAX_VM_CMD_PACKAGED_SIZE);
- 
-     bioc = qio_channel_buffer_new(length);
-     qio_channel_set_name(QIO_CHANNEL(bioc), "migration-loadvm-buffer");
-diff --git a/migration/trace-events b/migration/trace-events
-index 6f29fcc686..646963ffec 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -6,10 +6,10 @@ qemu_loadvm_state_section_command(int ret) "%d"
- qemu_loadvm_state_section_partend(uint32_t section_id) "%u"
- qemu_loadvm_state_post_main(int ret) "%d"
- qemu_loadvm_state_section_startfull(uint32_t section_id, const char *idstr, uint32_t instance_id, uint32_t version_id) "%u(%s) %u %u"
--qemu_savevm_send_packaged(void) ""
-+qemu_savevm_send_packaged(size_t len, size_t max) "size=%zu, max recommended=%zu"
- loadvm_state_setup(void) ""
- loadvm_state_cleanup(void) ""
--loadvm_handle_cmd_packaged(unsigned int length) "%u"
-+loadvm_handle_cmd_packaged(size_t len, size_t max) "size=%zu, max recommended=%zu"
- loadvm_handle_cmd_packaged_main(int ret) "%d"
- loadvm_handle_cmd_packaged_received(int ret) "%d"
- loadvm_postcopy_handle_advise(void) ""
--- 
-2.14.3
+>  
+>      /* lookup cpu, to clear it,
+>       * that algorithm looks straighforward, but it's not
+>       * optimal, more optimal algorithm is keeping tree or hash
+>       * where key is address value is a list of  */
+>      for (i = 0; i < smp_cpus; i++) {
+> -        uint64_t vcpu_blocktime = 0;
+> +        uint32_t vcpu_blocktime = 0;
+>  
+>          read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+>          if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
+> @@ -720,7 +723,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>              continue;
+>          }
+>          atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+> -        vcpu_blocktime = now_ms - read_vcpu_time;
+> +        vcpu_blocktime = least_now - read_vcpu_time;
+>          affected_cpu += 1;
+>          /* we need to know is that mark_postcopy_end was due to
+>           * faulted page, another possible case it's prefetched
+> @@ -735,7 +738,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>  
+>      atomic_sub(&dc->smp_cpus_down, affected_cpu);
+>      if (vcpu_total_blocktime) {
+> -        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+> +        dc->total_blocktime += least_now - atomic_fetch_add(&dc->last_begin, 0);
+>      }
+>      trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
+>                                        affected_cpu);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 141e773..0defbc3 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> -mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
+> -mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
+> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
+> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 70e7b67..ee55d7c 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -175,8 +175,8 @@
+>             '*setup-time': 'int',
+>             '*cpu-throttle-percentage': 'int',
+>             '*error-desc': 'str',
+> -           '*postcopy-blocktime' : 'int64',
+> -           '*postcopy-vcpu-blocktime': ['int64']} }
+> +           '*postcopy-blocktime' : 'uint32',
+> +           '*postcopy-vcpu-blocktime': ['uint32']} }
+>  
+>  ##
+>  # @query-migrate:
+> 
