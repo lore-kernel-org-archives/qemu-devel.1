@@ -1,28 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef7hX-0000no-IY
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef7hk-0000zo-8j
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef7hW-0002q1-AX
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:07 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34973)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ef7hW-0002pE-6u
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:06 -0500
-Received: by mail-oi0-x244.google.com with SMTP id b11so786791oif.2
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:22:06 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <5A6B5FCA.2080009@hisilicon.com>
-References: <5A6B5091.8030601@hisilicon.com>
-	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
-	<5A6B5FCA.2080009@hisilicon.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jan 2018 17:15:16 +0000
-Message-ID: <CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
- before enabled the interruption
+	(envelope-from <eblake@redhat.com>) id 1ef7hj-00039K-Bs
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:22:20 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 26 Jan 2018 10:04:11 -0600
+Message-Id: <20180126160411.4033-9-eblake@redhat.com>
+In-Reply-To: <20180126160411.4033-1-eblake@redhat.com>
+References: <20180126160411.4033-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 8/8] nbd: implement bdrv_get_info callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +19,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Xu <xuwei5@hisilicon.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Rob Herring <rob.herring@linaro.org>, Daode Huang <huangdaode@hisilicon.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, Zhangyi ac <zhangyi.ac@huawei.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, tiantao6@huawei.com, Marc Zyngier <marc.zyngier@arm.com>
+To: qemu-devel@nongnu.org
+Cc: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On 26 January 2018 at 17:05, Wei Xu <xuwei5@hisilicon.com> wrote:
-> On 2018/1/26 16:36, Peter Maydell wrote:
->> If the user presses keys before interrupts are enabled,
->> what ought to happen is:
->>  * we put the key in the FIFO, and update the int_level flags
->>  * when the FIFO is full, can_receive starts returning 0 and
->>    QEMU stops passing us new characters
->>  * when the guest driver for the pl011 initializes the
->>    device and enables interrupts then either:
->>     (a) it does something that clears the FIFO, which will
->>     mean can_receive starts allowing new chars again, or
->>     (b) it leaves the FIFO as it is, and we should thus
->>     immediately raise an interrupt for the characters still
->>     in the FIFO; when the guest handles this interrupt and
->>     gets the characters, can_receive will permit new ones
->>
->
-> Yes, now it is handled like b.
->
->> What is happening in your situation that means this is not
->> working as expected ?
->
-> But in the kernel side, the pll011 is triggered as a level interruption.
-> During the booting, if any key is pressed ,the call stack is as below:
-> QEMU side:
-> pl011_update
-> -->qemu_set_irq(level as 0)
-> ---->kvm_arm_gic_set_irq
->
-> Kernel side:
-> kvm_vm_ioctl_irq_line
-> -->kvm_vgic_inject_irq
-> ---->vgic_validate_injection (if level did not change, return)
-> ---->vgic_queue_irq_unlock
->
-> Without above changes, in the vgic_validate_injection, because the
-> interruption level is always 0, this irq will not be queued into vgic.
-> And the guest will not read the pl011 fifo.
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 
-The pl011 code should call qemu_set_irq(..., 1) when the
-guest enables interrupts on the device by writing to the int_enabled
-(UARTIMSC) register. That will be a 0-to-1 level change and the KVM
-VGIC should report the interrupt to the guest.
+Since mirror job supports efficient zero out target mechanism (see
+in mirror_dirty_init()), implement bdrv_get_info to make it work
+over NBD. Such improvement will allow using the largest chunk possible
+and will decrease the number of NBD_CMD_WRITE_ZEROES requests on the wire.
 
-thanks
--- PMM
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Message-Id: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/nbd.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/block/nbd.c b/block/nbd.c
+index 8b8ba56cdd0..94220f6d143 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -566,6 +566,14 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+     bs->full_open_options = opts;
+ }
+
++static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
++{
++    if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP) {
++        bdi->can_write_zeroes_with_unmap = true;
++    }
++    return 0;
++}
++
+ static BlockDriver bdrv_nbd = {
+     .format_name                = "nbd",
+     .protocol_name              = "nbd",
+@@ -583,6 +591,7 @@ static BlockDriver bdrv_nbd = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
++    .bdrv_get_info              = nbd_get_info,
+ };
+
+ static BlockDriver bdrv_nbd_tcp = {
+@@ -602,6 +611,7 @@ static BlockDriver bdrv_nbd_tcp = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
++    .bdrv_get_info              = nbd_get_info,
+ };
+
+ static BlockDriver bdrv_nbd_unix = {
+@@ -621,6 +631,7 @@ static BlockDriver bdrv_nbd_unix = {
+     .bdrv_detach_aio_context    = nbd_detach_aio_context,
+     .bdrv_attach_aio_context    = nbd_attach_aio_context,
+     .bdrv_refresh_filename      = nbd_refresh_filename,
++    .bdrv_get_info              = nbd_get_info,
+ };
+
+ static void bdrv_nbd_init(void)
+-- 
+2.14.3
