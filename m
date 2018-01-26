@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1efAB7-0004Zo-2u
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:00:50 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1efAQJ-0000aM-Jb
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1efAB2-0003NI-8f
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:00:49 -0500
-Date: Fri, 26 Jan 2018 20:00:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180126200035.GJ2610@work-vm>
-References: <1513700253-10045-1-git-send-email-thuth@redhat.com>
-	<20180122193504.GB2628@work-vm>
-	<7495eb49-ed1e-2dbb-866e-c65b7e4147a8@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7495eb49-ed1e-2dbb-866e-c65b7e4147a8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] monitor: Remove legacy "-mon default=on"
- parameter
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1efAQF-00006z-6X
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:16:31 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:59492
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1efAQE-000057-Ug
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:16:27 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 26 Jan 2018 09:20:27 +0000
+Message-Id: <20180126092029.20737-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180126092029.20737-1-mark.cave-ayland@ilande.co.uk>
+References: <20180126092029.20737-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 1/3] grackle: convert to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 22/01/2018 20:35, Dr. David Alan Gilbert wrote:
-> > * Thomas Huth (thuth@redhat.com) wrote:
-> >> The "default" parameter of the "-mon" option is useless since
-> >> QEMU v2.4.0, and marked as deprecated since QEMU v2.8.0. That
-> >> should have been long enough to let people update their scripts,
-> >> so time to remove it now.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > 
-> > Seems reasonable.
-> > 
-> > 
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> Are you also queuing it yourself?
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/pci-host/grackle.c    | 13 ++-----------
+ hw/pci-host/trace-events |  3 +++
+ 2 files changed, 5 insertions(+), 11 deletions(-)
 
-Yes I will do; I was just watching out for another HMP patch or two
-so it doesn't feel lonely.
-
-Dave
-
-> Thanks,
-> 
-> Paolo
-> 
-> >> ---
-> >>  monitor.c     | 3 ---
-> >>  qemu-doc.texi | 9 ---------
-> >>  vl.c          | 4 ----
-> >>  3 files changed, 16 deletions(-)
-> >>
-> >> diff --git a/monitor.c b/monitor.c
-> >> index e36fb53..e53c6e1 100644
-> >> --- a/monitor.c
-> >> +++ b/monitor.c
-> >> @@ -4141,9 +4141,6 @@ QemuOptsList qemu_mon_opts = {
-> >>              .name = "chardev",
-> >>              .type = QEMU_OPT_STRING,
-> >>          },{
-> >> -            .name = "default",  /* deprecated */
-> >> -            .type = QEMU_OPT_BOOL,
-> >> -        },{
-> >>              .name = "pretty",
-> >>              .type = QEMU_OPT_BOOL,
-> >>          },
-> >> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> >> index d9861b3..6913b32 100644
-> >> --- a/qemu-doc.texi
-> >> +++ b/qemu-doc.texi
-> >> @@ -2401,15 +2401,6 @@ setting ``-machine kernel_irqchip=off''.
-> >>  The ``-no-kvm'' argument is now a synonym for setting
-> >>  ``-machine accel=tcg''.
-> >>  
-> >> -@subsection -mon default=on (since 2.4.0)
-> >> -
-> >> -The ``default'' option to the ``-mon'' argument is
-> >> -now ignored. When multiple monitors were enabled, it
-> >> -indicated which monitor would receive log messages
-> >> -from the various subsystems. This feature is no longer
-> >> -required as messages are now only sent to the monitor
-> >> -in response to explicitly monitor commands.
-> >> -
-> >>  @subsection -vnc tls (since 2.5.0)
-> >>  
-> >>  The ``-vnc tls'' argument is now a synonym for setting
-> >> diff --git a/vl.c b/vl.c
-> >> index 2644400..4e7a7e4 100644
-> >> --- a/vl.c
-> >> +++ b/vl.c
-> >> @@ -2438,10 +2438,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
-> >>      if (qemu_opt_get_bool(opts, "pretty", 0))
-> >>          flags |= MONITOR_USE_PRETTY;
-> >>  
-> >> -    if (qemu_opt_get_bool(opts, "default", 0)) {
-> >> -        error_report("option 'default' does nothing and is deprecated");
-> >> -    }
-> >> -
-> >>      chardev = qemu_opt_get(opts, "chardev");
-> >>      chr = qemu_chr_find(chardev);
-> >>      if (chr == NULL) {
-> >> -- 
-> >> 1.8.3.1
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
+index 3caf1ccb37..033588b7d2 100644
+--- a/hw/pci-host/grackle.c
++++ b/hw/pci-host/grackle.c
+@@ -27,16 +27,7 @@
+ #include "hw/pci/pci_host.h"
+ #include "hw/ppc/mac.h"
+ #include "hw/pci/pci.h"
+-
+-/* debug Grackle */
+-//#define DEBUG_GRACKLE
+-
+-#ifdef DEBUG_GRACKLE
+-#define GRACKLE_DPRINTF(fmt, ...)                               \
+-    do { printf("GRACKLE: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define GRACKLE_DPRINTF(fmt, ...)
+-#endif
++#include "trace.h"
+ 
+ #define GRACKLE_PCI_HOST_BRIDGE(obj) \
+     OBJECT_CHECK(GrackleState, (obj), TYPE_GRACKLE_PCI_HOST_BRIDGE)
+@@ -58,7 +49,7 @@ static void pci_grackle_set_irq(void *opaque, int irq_num, int level)
+ {
+     qemu_irq *pic = opaque;
+ 
+-    GRACKLE_DPRINTF("set_irq num %d level %d\n", irq_num, level);
++    trace_grackle_set_irq(irq_num, level);
+     qemu_set_irq(pic[irq_num + 0x15], level);
+ }
+ 
+diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
+index 32dfc84692..5b8fcc228b 100644
+--- a/hw/pci-host/trace-events
++++ b/hw/pci-host/trace-events
+@@ -1,5 +1,8 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
++# hw/pci-host/grackle.c
++grackle_set_irq(int irq_num, int level) "set_irq num %d level %d"
++
+ # hw/pci-host/sabre.c
+ sabre_set_request(int irq_num) "request irq %d"
+ sabre_clear_request(int irq_num) "clear request irq %d"
+-- 
+2.11.0
