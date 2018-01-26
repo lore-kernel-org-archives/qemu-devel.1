@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ef6Ap-0001BB-Cm
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:44:16 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ef6IJ-0003x5-5W
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:52:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ef6Ak-0000j0-OM
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:44:15 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
-	<d8c2c2ca-5046-f19b-9514-d3cbef3b7c3a@amsat.org>
-	<CAFEAcA9k2KKrXk+2LQd+X7-RFuDQO96bYSo8xi81zfb80+ApFg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fde1ca29-873b-5e5c-76d3-d620301c924b@amsat.org>
-Date: Fri, 26 Jan 2018 12:44:00 -0300
+	(envelope-from <alex.bennee@linaro.org>) id 1ef6IF-00007v-1P
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:51:59 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ef6IE-00006H-3O
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:51:54 -0500
+Received: by mail-wm0-x244.google.com with SMTP id 143so2150995wma.5
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 07:51:53 -0800 (PST)
+References: <20180117161435.28981-1-richard.henderson@linaro.org>
+	<20180117161435.28981-5-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180117161435.28981-5-richard.henderson@linaro.org>
+Date: Fri, 26 Jan 2018 12:17:42 +0000
+Message-ID: <87607o7r15.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9k2KKrXk+2LQd+X7-RFuDQO96bYSo8xi81zfb80+ApFg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] target/arm: Add "-cpu max" support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v10.5 04/20] tcg: Add generic vector
+ expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 01/26/2018 11:33 AM, Peter Maydell wrote:
-> On 26 January 2018 at 14:29, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Hi Peter,
->>
->> On 12/07/2017 03:14 PM, Peter Maydell wrote:
->>> Add support for "-cpu max" for ARM guests. This CPU type behaves
->>> like "-cpu host" when KVM is enabled, and like a system CPU with
->>> the maximum possible feature set otherwise. (Note that this means
->>> it won't be migratable across versions, as we will likely add
->>> features to it in future.)
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>> ---
-> 
->>> +#ifndef TARGET_AARCH64
->>> +/* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
->>> + * otherwise, a CPU with as many features enabled as our emulation supports.
->>> + * The version of '-cpu max' for qemu-system-aarch64 is defined in cpu64.c;
->>> + * this only needs to handle 32 bits.
->>> + */
->>> +static void arm_max_initfn(Object *obj)
->>> +{
->>> +    ARMCPU *cpu = ARM_CPU(obj);
->>> +
->>> +    if (kvm_enabled()) {
->>> +        kvm_arm_set_cpu_features_from_host(cpu);
->>> +    } else {
->>> +        cortex_a15_initfn(obj);> +        /* In future we might add feature bits here even if the
->>> +         * real-world A15 doesn't implement them.
->>> +         */
->>
->> Why not use arm_any_initfn() here?
-> 
-> That function (and the 'any' cpu) are deliberately only
-> included in the linux-user binaries, not the system-emulation binaries.
 
-why not use the V8 features?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> (Also arm_any_initfn() only initializes userspace-visible stuff, it
-> doesn't provide ID register values etc for kernel-visible things.)
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-I'd still use an unique arm_max_initfn() such
+I'm slightly confused by the fact some previously added functions in
+this series are seeing changes. Is this just of an artefact of building
+up the TCG API in stages or should the changes be rolled into the
+original patches?
 
-  // initializes userspace-visible stuff
-#ifndef CONFIG_USER_ONLY
-  // initializes kernel-visible things
-#endif
+Also there are still some ??? comments which should probably be
+solidified before merging. Other than that:
 
-> 
->> Actually what seems cleaner is to move "any" features here, and kill the
->> "any" cpu, using "max" for this purpose.
-> 
-> We can't kill 'any', that would break back-compatibility
-> of command lines.
 
-and use an alias for 'any' -> 'max' or just
+<snip>
+> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+> index df2eabaa67..09fec5693f 100644
+> --- a/tcg/tcg-op.h
+> +++ b/tcg/tcg-op.h
+> @@ -914,6 +914,7 @@ void tcg_gen_dup8i_vec(TCGv_vec, uint32_t);
+>  void tcg_gen_dup16i_vec(TCGv_vec, uint32_t);
+>  void tcg_gen_dup32i_vec(TCGv_vec, uint32_t);
+>  void tcg_gen_dup64i_vec(TCGv_vec, uint64_t);
+> +void tcg_gen_dupi_vec(unsigned vece, TCGv_vec, uint64_t);
 
-  { .name = "any", .initfn = arm_max_initfn }, /* backward compat */
+Odd that we add this one at a different time to the others.
 
-Anyway:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>  void tcg_gen_movi_v64(TCGv_vec, uint64_t);
+>  void tcg_gen_movi_v128(TCGv_vec, uint64_t, uint64_t);
+>  void tcg_gen_movi_v256(TCGv_vec, uint64_t, uint64_t, uint64_t, uint64_t);
+> diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+> index 4e62eda14b..b4e16cfbc3 100644
+> --- a/tcg/tcg-opc.h
+> +++ b/tcg/tcg-opc.h
+> @@ -229,6 +229,12 @@ DEF(andc_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS=
+_andc_vec))
+<snip>
+> +
+> +/* Expand the tuple (opc, type, vece) on the given arguments.  */
+> +void tcg_expand_vec_op(TCGOpcode, TCGType, unsigned, TCGArg, ...);
+> +
+> +/* Replicate a constant C accoring to the log2 of the element size.
+> */
 
-> 
-> thanks
-> -- PMM
-> 
+nit: according
+
+<snip>
+--
+Alex Benn=C3=A9e
