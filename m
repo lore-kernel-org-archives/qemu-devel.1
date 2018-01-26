@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ef7w7-0003Zx-FE
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:37:12 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ef7yS-0004g8-FZ
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:39:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ef7w4-0001iZ-80
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:37:11 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51527)
+	(envelope-from <alex.bennee@linaro.org>) id 1ef7yP-0003ys-9A
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:39:36 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36276)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ef7w3-0001hu-W7
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:37:08 -0500
-Received: by mail-wm0-x243.google.com with SMTP id r71so2799459wmd.1
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:37:07 -0800 (PST)
-References: <20180123035349.24538-1-richard.henderson@linaro.org>
-	<20180123035349.24538-4-richard.henderson@linaro.org>
+	id 1ef7yP-0003yI-1M
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:39:33 -0500
+Received: by mail-wm0-x243.google.com with SMTP id f3so22754307wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:39:32 -0800 (PST)
+References: <20180117161435.28981-1-richard.henderson@linaro.org>
+	<20180117161435.28981-12-richard.henderson@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180123035349.24538-4-richard.henderson@linaro.org>
-Date: Fri, 26 Jan 2018 15:05:24 +0000
-Message-ID: <871sic7j9n.fsf@linaro.org>
+In-reply-to: <20180117161435.28981-12-richard.henderson@linaro.org>
+Date: Fri, 26 Jan 2018 09:52:47 +0000
+Message-ID: <878tcl6j68.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] target/arm: Add SVE to migration
- state
+Subject: Re: [Qemu-devel] [PATCH v10.5 11/20] target/arm: Align vector
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,89 +37,30 @@ Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Save the high parts of the Zregs and all of the Pregs.
-> The ZCR_ELx registers are migrated via the CP mechanism.
->
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
 > ---
->  target/arm/machine.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 53 insertions(+)
+>  target/arm/cpu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/target/arm/machine.c b/target/arm/machine.c
-> index cb0e1c92bb..2c8b43062f 100644
-> --- a/target/arm/machine.c
-> +++ b/target/arm/machine.c
-> @@ -122,6 +122,56 @@ static const VMStateDescription vmstate_iwmmxt =3D {
->      }
->  };
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 96316700dd..3ff4dea6b8 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -492,7 +492,7 @@ typedef struct CPUARMState {
+>           * the two execution states, and means we do not need to explici=
+tly
+>           * map these registers when changing states.
+>           */
+> -        float64 regs[64];
+> +        float64 regs[64] QEMU_ALIGNED(16);
+
+There is a minor conflict that needs to be fixed with the now merged: 3f68b=
+8a5a6862f856524bb347bf348ae364dd43c
 >
-> +#ifdef TARGET_AARCH64
-> +/* The expression ARM_MAX_VQ - 2 is 0 for pure AArch32 build,
-> + * and ARMPredicateReg is actively empty.  This triggers errors
-> + * in the expansion of the VMSTATE macros.
-> + */
-> +
-> +static bool sve_needed(void *opaque)
-> +{
-> +    ARMCPU *cpu =3D opaque;
-> +    CPUARMState *env =3D &cpu->env;
-> +
-> +    return arm_feature(env, ARM_FEATURE_SVE);
-> +}
-> +
-> +/* The first two words of each Zreg is stored in VFP state.  */
-> +static const VMStateDescription vmstate_zreg_hi_reg =3D {
-> +    .name =3D "cpu/sve/zreg_hi",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT64_SUB_ARRAY(d, ARMVectorReg, 2, ARM_MAX_VQ - 2),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_preg_reg =3D {
-> +    .name =3D "cpu/sve/preg",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT64_ARRAY(p, ARMPredicateReg, 2 * ARM_MAX_VQ / 8),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_sve =3D {
-> +    .name =3D "cpu/sve",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D sve_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_STRUCT_ARRAY(env.vfp.zregs, ARMCPU, 32, 0,
-> +                             vmstate_zreg_hi_reg, ARMVectorReg),
-> +        VMSTATE_STRUCT_ARRAY(env.vfp.pregs, ARMCPU, 17, 0,
-> +                             vmstate_preg_reg, ARMPredicateReg),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +#endif /* AARCH64 */
-> +
->  static bool m_needed(void *opaque)
->  {
->      ARMCPU *cpu =3D opaque;
-> @@ -586,6 +636,9 @@ const VMStateDescription vmstate_arm_cpu =3D {
->          &vmstate_pmsav7,
->          &vmstate_pmsav8,
->          &vmstate_m_security,
-> +#ifdef TARGET_AARCH64
-> +        &vmstate_sve,
-> +#endif
->          NULL
->      }
->  };
+>          uint32_t xregs[16];
+>          /* We store these fpcsr fields separately for convenience.  */
 
 
 --
