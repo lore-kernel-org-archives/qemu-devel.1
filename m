@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef5pz-0000w3-R9
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:22:45 -0500
+	(envelope-from <berto@igalia.com>) id 1ef5q4-0000zl-Ob
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef5pw-00032C-L4
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:22:43 -0500
+	(envelope-from <berto@igalia.com>) id 1ef5q3-00034p-KT
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:22:48 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 26 Jan 2018 16:59:33 +0200
-Message-Id: <97a2e764d1fb53ce7a25e1d0699114c01d8042d2.1516978645.git.berto@igalia.com>
+Date: Fri, 26 Jan 2018 17:00:05 +0200
+Message-Id: <f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 06/39] qcow2: Remove BDS parameter from
- qcow2_cache_entry_mark_dirty()
+Subject: [Qemu-devel] [PATCH v3 38/39] iotests: Test downgrading an image
+ using a small L2 slice size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,164 +25,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-This function was only using the BlockDriverState parameter to pass it
-to qcow2_cache_get_table_idx(). This is no longer necessary so this
-parameter can be removed.
+expand_zero_clusters_in_l1() is used when downgrading qcow2 images
+from v3 to v2 (compat=0.10). This is one of the functions that needed
+more changes to support L2 slices, so this patch extends iotest 061 to
+test downgrading a qcow2 image using a smaller slice size.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-cache.c    |  3 +--
- block/qcow2-cluster.c  | 12 ++++++------
- block/qcow2-refcount.c | 14 ++++++--------
- block/qcow2.h          |  3 +--
- 4 files changed, 14 insertions(+), 18 deletions(-)
+ tests/qemu-iotests/061     | 16 ++++++++++++
+ tests/qemu-iotests/061.out | 61 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 77 insertions(+)
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 5ff2cbf5c5..07603e6b15 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -421,8 +421,7 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table)
-     assert(c->entries[i].ref >= 0);
- }
+diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
+index f5678b10c9..911b6f2894 100755
+--- a/tests/qemu-iotests/061
++++ b/tests/qemu-iotests/061
+@@ -54,6 +54,22 @@ $QEMU_IO -c "read -P 0 0 128k" "$TEST_IMG" | _filter_qemu_io
+ _check_test_img
  
--void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
--     void *table)
-+void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table)
- {
-     int i = qcow2_cache_get_table_idx(c, table);
-     assert(c->entries[i].offset != 0);
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 8163983d28..1f279a9151 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -325,7 +325,7 @@ static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
-     BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_WRITE);
+ echo
++echo "=== Testing version downgrade with zero expansion and 4K cache entries ==="
++echo
++IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
++$QEMU_IO -c "write -z 0 128k" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z 32M 128k" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c map "$TEST_IMG" | _filter_qemu_io
++$PYTHON qcow2.py "$TEST_IMG" dump-header
++$QEMU_IMG amend -o "compat=0.10" --image-opts \
++          driver=qcow2,file.filename=$TEST_IMG,l2-cache-entry-size=4096
++$PYTHON qcow2.py "$TEST_IMG" dump-header
++$QEMU_IO -c "read -P 0 0 128k" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 32M 128k" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c map "$TEST_IMG" | _filter_qemu_io
++_check_test_img
++
++echo
+ echo "=== Testing dirty version downgrade ==="
+ echo
+ IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index 942485de99..e857ef9a7d 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -52,6 +52,67 @@ read 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ No errors were found on the image.
  
-     trace_qcow2_l2_allocate_write_l2(bs, l1_index);
--    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
-+    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-     ret = qcow2_cache_flush(bs, s->l2_table_cache);
-     if (ret < 0) {
-         goto fail;
-@@ -766,7 +766,7 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-     /* compressed clusters never have the copied flag */
++=== Testing version downgrade with zero expansion and 4K cache entries ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 33554432
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++128 KiB (0x20000) bytes     allocated at offset 0 bytes (0x0)
++31.875 MiB (0x1fe0000) bytes not allocated at offset 128 KiB (0x20000)
++128 KiB (0x20000) bytes     allocated at offset 32 MiB (0x2000000)
++31.875 MiB (0x1fe0000) bytes not allocated at offset 32.125 MiB (0x2020000)
++magic                     0x514649fb
++version                   3
++backing_file_offset       0x0
++backing_file_size         0x0
++cluster_bits              16
++size                      67108864
++crypt_method              0
++l1_size                   1
++l1_table_offset           0x30000
++refcount_table_offset     0x10000
++refcount_table_clusters   1
++nb_snapshots              0
++snapshot_offset           0x0
++incompatible_features     0x0
++compatible_features       0x1
++autoclear_features        0x0
++refcount_order            4
++header_length             104
++
++Header extension:
++magic                     0x6803f857
++length                    144
++data                      <binary>
++
++magic                     0x514649fb
++version                   2
++backing_file_offset       0x0
++backing_file_size         0x0
++cluster_bits              16
++size                      67108864
++crypt_method              0
++l1_size                   1
++l1_table_offset           0x30000
++refcount_table_offset     0x10000
++refcount_table_clusters   1
++nb_snapshots              0
++snapshot_offset           0x0
++incompatible_features     0x0
++compatible_features       0x0
++autoclear_features        0x0
++refcount_order            4
++header_length             72
++
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 33554432
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++64 MiB (0x4000000) bytes not allocated at offset 0 bytes (0x0)
++No errors were found on the image.
++
+ === Testing dirty version downgrade ===
  
-     BLKDBG_EVENT(bs->file, BLKDBG_L2_UPDATE_COMPRESSED);
--    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
-+    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-     l2_table[l2_index] = cpu_to_be64(cluster_offset);
-     qcow2_cache_put(bs, s->l2_table_cache, (void **) &l2_table);
- 
-@@ -938,7 +938,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-     if (ret < 0) {
-         goto err;
-     }
--    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
-+    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
- 
-     assert(l2_index + m->nb_clusters <= s->l2_size);
-     for (i = 0; i < m->nb_clusters; i++) {
-@@ -1679,7 +1679,7 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
-         }
- 
-         /* First remove L2 entries */
--        qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
-+        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-         if (!full_discard && s->qcow_version >= 3) {
-             l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
-         } else {
-@@ -1775,7 +1775,7 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
-             continue;
-         }
- 
--        qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
-+        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-         if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
-             l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
-             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
-@@ -1984,7 +1984,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
- 
-         if (is_active_l1) {
-             if (l2_dirty) {
--                qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
-+                qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-                 qcow2_cache_depends_on_flush(s->l2_table_cache);
-             }
-             qcow2_cache_put(bs, s->l2_table_cache, (void **) &l2_table);
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 92701ab7af..5434e7d4c8 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -421,7 +421,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
- 
-     /* Now the new refcount block needs to be written to disk */
-     BLKDBG_EVENT(bs->file, BLKDBG_REFBLOCK_ALLOC_WRITE);
--    qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache, *refcount_block);
-+    qcow2_cache_entry_mark_dirty(s->refcount_block_cache, *refcount_block);
-     ret = qcow2_cache_flush(bs, s->refcount_block_cache);
-     if (ret < 0) {
-         goto fail;
-@@ -623,7 +623,7 @@ int64_t qcow2_refcount_area(BlockDriverState *bs, uint64_t start_offset,
-                 goto fail;
-             }
-             memset(refblock_data, 0, s->cluster_size);
--            qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache,
-+            qcow2_cache_entry_mark_dirty(s->refcount_block_cache,
-                                          refblock_data);
- 
-             new_table[i] = block_offset;
-@@ -656,7 +656,7 @@ int64_t qcow2_refcount_area(BlockDriverState *bs, uint64_t start_offset,
-                 s->set_refcount(refblock_data, j, 1);
-             }
- 
--            qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache,
-+            qcow2_cache_entry_mark_dirty(s->refcount_block_cache,
-                                          refblock_data);
-         }
- 
-@@ -845,8 +845,7 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
-         }
-         old_table_index = table_index;
- 
--        qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache,
--                                     refcount_block);
-+        qcow2_cache_entry_mark_dirty(s->refcount_block_cache, refcount_block);
- 
-         /* we can update the count and save it */
-         block_index = cluster_index & (s->refcount_block_size - 1);
-@@ -1316,8 +1315,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                             s->refcount_block_cache);
-                     }
-                     l2_table[j] = cpu_to_be64(entry);
--                    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache,
--                                                 l2_table);
-+                    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-                 }
-             }
- 
-@@ -3180,7 +3178,7 @@ static int qcow2_discard_refcount_block(BlockDriverState *bs,
-     }
-     s->set_refcount(refblock, block_index, 0);
- 
--    qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache, refblock);
-+    qcow2_cache_entry_mark_dirty(s->refcount_block_cache, refblock);
- 
-     qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
- 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 46c8cf44ec..ad332ed380 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -639,8 +639,7 @@ int qcow2_read_snapshots(BlockDriverState *bs);
- Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables);
- int qcow2_cache_destroy(BlockDriverState* bs, Qcow2Cache *c);
- 
--void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
--     void *table);
-+void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table);
- int qcow2_cache_flush(BlockDriverState *bs, Qcow2Cache *c);
- int qcow2_cache_write(BlockDriverState *bs, Qcow2Cache *c);
- int qcow2_cache_set_dependency(BlockDriverState *bs, Qcow2Cache *c,
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
 -- 
 2.11.0
