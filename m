@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1efAQJ-0000aM-Jb
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:16:33 -0500
+	(envelope-from <laurent@vivier.eu>) id 1efAi7-0004eX-2d
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:34:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1efAQF-00006z-6X
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:16:31 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:59492
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1efAQE-000057-Ug
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:16:27 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 26 Jan 2018 09:20:27 +0000
-Message-Id: <20180126092029.20737-2-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180126092029.20737-1-mark.cave-ayland@ilande.co.uk>
-References: <20180126092029.20737-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/3] grackle: convert to trace-events
+	(envelope-from <laurent@vivier.eu>) id 1efAi3-0004BK-Tw
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:34:55 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:60999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1efAi3-00047V-Jv
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 15:34:51 -0500
+References: <20180126183636.7586-1-samuel.thibault@ens-lyon.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <11f250c0-ce8e-3529-bbf2-d6275e0c1747@vivier.eu>
+Date: Fri, 26 Jan 2018 21:34:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180126183636.7586-1-samuel.thibault@ens-lyon.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix sched_getaffinity mask size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/pci-host/grackle.c    | 13 ++-----------
- hw/pci-host/trace-events |  3 +++
- 2 files changed, 5 insertions(+), 11 deletions(-)
+Le 26/01/2018 à 19:36, Samuel Thibault a écrit :
+> We properly computed the capped mask size to be put to the application
+> buffer, but didn't actually it. Also, we need to return the capped mask
+> size instead of 0 on success.
+> 
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>  linux-user/syscall.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 74378947f0..cf2369aac2 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -10496,10 +10496,15 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>                          ret = -TARGET_EINVAL;
+>                          break;
+>                      }
+> -                    ret = arg2;
+> +                } else if (arg2 > ret) {
+> +                    arg2 = ret;
+>                  }
+>  
+>                  ret = host_to_target_cpu_mask(mask, mask_size, arg3, arg2);
+> +
+> +                if (ret == 0) {
+> +                    ret = arg2;
+> +                }
+>              }
+>          }
+>          break;
+> 
 
-diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
-index 3caf1ccb37..033588b7d2 100644
---- a/hw/pci-host/grackle.c
-+++ b/hw/pci-host/grackle.c
-@@ -27,16 +27,7 @@
- #include "hw/pci/pci_host.h"
- #include "hw/ppc/mac.h"
- #include "hw/pci/pci.h"
--
--/* debug Grackle */
--//#define DEBUG_GRACKLE
--
--#ifdef DEBUG_GRACKLE
--#define GRACKLE_DPRINTF(fmt, ...)                               \
--    do { printf("GRACKLE: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define GRACKLE_DPRINTF(fmt, ...)
--#endif
-+#include "trace.h"
- 
- #define GRACKLE_PCI_HOST_BRIDGE(obj) \
-     OBJECT_CHECK(GrackleState, (obj), TYPE_GRACKLE_PCI_HOST_BRIDGE)
-@@ -58,7 +49,7 @@ static void pci_grackle_set_irq(void *opaque, int irq_num, int level)
- {
-     qemu_irq *pic = opaque;
- 
--    GRACKLE_DPRINTF("set_irq num %d level %d\n", irq_num, level);
-+    trace_grackle_set_irq(irq_num, level);
-     qemu_set_irq(pic[irq_num + 0x15], level);
- }
- 
-diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-index 32dfc84692..5b8fcc228b 100644
---- a/hw/pci-host/trace-events
-+++ b/hw/pci-host/trace-events
-@@ -1,5 +1,8 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# hw/pci-host/grackle.c
-+grackle_set_irq(int irq_num, int level) "set_irq num %d level %d"
-+
- # hw/pci-host/sabre.c
- sabre_set_request(int irq_num) "request irq %d"
- sabre_clear_request(int irq_num) "clear request irq %d"
--- 
-2.11.0
+Modified code was:
+
+    if (copy_to_user(arg3, mask, ret)) {
+        goto efault;
+    }
+
+so the change should only be:
+
+    if (host_to_target_cpu_mask(mask, mask_size, arg3, ret)) {
+        goto efault;
+    }
+
+Thanks,
+Laurent
