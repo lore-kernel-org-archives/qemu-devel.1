@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef6qu-00079p-Dw
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:45 -0500
+	(envelope-from <berto@igalia.com>) id 1ef6qt-00078R-4A
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef6qt-0004GN-FG
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:44 -0500
+	(envelope-from <berto@igalia.com>) id 1ef6qo-00048U-7p
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:27:43 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 26 Jan 2018 16:59:32 +0200
-Message-Id: <a2987bf9dffd69a7cc962a1e443618c9bad5f589.1516978645.git.berto@igalia.com>
+Date: Fri, 26 Jan 2018 16:59:41 +0200
+Message-Id: <1bf8f7ede9cfebffd11fb9e30c6e497d441b89cf.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
 In-Reply-To: <cover.1516978645.git.berto@igalia.com>
 References: <cover.1516978645.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 05/39] qcow2: Remove BDS parameter from
- qcow2_cache_table_release()
+Subject: [Qemu-devel] [PATCH v3 14/39] qcow2: Add offset_to_l2_slice_index()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +24,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-This function was only using the BlockDriverState parameter to get the
-cache table size (since it was equal to the cluster size). This is no
-longer necessary so this parameter can be removed.
+Similar to offset_to_l2_index(), this function takes a guest offset
+and returns the index in the L2 slice that contains its L2 entry.
+
+An L2 slice has currently the same size as an L2 table (one cluster),
+so both functions return the same value for now.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-cache.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ block/qcow2.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 3749d55595..5ff2cbf5c5 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -71,8 +71,7 @@ static inline const char *qcow2_cache_get_name(BDRVQcow2State *s, Qcow2Cache *c)
-     }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index e0aee88811..87b5c4063e 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -474,6 +474,11 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
+     return (offset >> s->cluster_bits) & (s->l2_size - 1);
  }
  
--static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
--                                      int i, int num_tables)
-+static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
++static inline int offset_to_l2_slice_index(BDRVQcow2State *s, int64_t offset)
++{
++    return (offset >> s->cluster_bits) & (s->l2_slice_size - 1);
++}
++
+ static inline int64_t align_offset(int64_t offset, int n)
  {
- /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
- #ifdef CONFIG_LINUX
-@@ -114,7 +113,7 @@ void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
-         }
- 
-         if (to_clean > 0) {
--            qcow2_cache_table_release(bs, c, i - to_clean, to_clean);
-+            qcow2_cache_table_release(c, i - to_clean, to_clean);
-         }
-     }
- 
-@@ -306,7 +305,7 @@ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c)
-         c->entries[i].lru_counter = 0;
-     }
- 
--    qcow2_cache_table_release(bs, c, 0, c->size);
-+    qcow2_cache_table_release(c, 0, c->size);
- 
-     c->lru_counter = 0;
- 
-@@ -453,5 +452,5 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
-     c->entries[i].lru_counter = 0;
-     c->entries[i].dirty = false;
- 
--    qcow2_cache_table_release(bs, c, i, 1);
-+    qcow2_cache_table_release(c, i, 1);
- }
+     offset = (offset + n - 1) & ~(n - 1);
 -- 
 2.11.0
