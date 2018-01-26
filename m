@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef5Ro-0001Qp-M2
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:57:45 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ef5UW-00039D-Hq
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:00:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ef5Ro-0003TT-1B
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:57:44 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43877)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ef5US-00053Q-AC
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:00:32 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37358)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ef5Rh-0003P1-1T
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 09:57:43 -0500
-Received: by mail-ot0-x241.google.com with SMTP id p36so611596otd.10
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 06:57:36 -0800 (PST)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1ef5US-000533-37
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:00:28 -0500
+Received: by mail-lf0-x244.google.com with SMTP id 63so1046270lfv.4
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 07:00:27 -0800 (PST)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Fri, 26 Jan 2018 11:22:34 +0100
+Message-Id: <1516962162-25680-2-git-send-email-edgar.iglesias@gmail.com>
+In-Reply-To: <1516962162-25680-1-git-send-email-edgar.iglesias@gmail.com>
+References: <1516962162-25680-1-git-send-email-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <3d73ed91-c1be-4d32-e3de-b945dea52ae5@amsat.org>
-References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<1512670493-18114-2-git-send-email-peter.maydell@linaro.org>
-	<3d73ed91-c1be-4d32-e3de-b945dea52ae5@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jan 2018 14:34:04 +0000
-Message-ID: <CAFEAcA_9H6UROaz=H91pyeSa_X11=YJHGpgnhp2H-4hujrAs7Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/6] hw/arm/virt: Check that the
- CPU realize method succeeded
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 1/9] microblaze: boot.c: Don't try to find
+ NULL file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-On 26 January 2018 at 14:32, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> On 12/07/2017 03:14 PM, Peter Maydell wrote:
->> We were passing a NULL error pointer to the object_property_set_bool()
->> call that realizes the CPU object. This meant that we wouldn't detect
->> failure, and would plough blindly on to crash later trying to use a
->> NULL CPU object pointer. Detect errors and fail instead.
->>
->> In particular, this will be necessary to detect the user error
->> of using "-cpu host" without "-enable-kvm" once we make the host
->> CPU type be registered unconditionally rather than only in
->> kvm_arch_init().
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-Thanks; I already put this patch in master (commit c88bc3e0dbe7), though.
+Previously if no device tree was passed to microblaze_load_kernel() then
+qemu_find_file() would try to find a NULL pointer. To avoid this put a
+check around qemu_find_file().
 
--- PMM
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/microblaze/boot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+index 457a08a..35bfeda 100644
+--- a/hw/microblaze/boot.c
++++ b/hw/microblaze/boot.c
+@@ -124,7 +124,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
+     kernel_cmdline = qemu_opt_get(machine_opts, "append");
+     dtb_arg = qemu_opt_get(machine_opts, "dtb");
+     /* default to pcbios dtb as passed by machine_init */
+-    if (!dtb_arg) {
++    if (!dtb_arg && dtb_filename) {
+         filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, dtb_filename);
+     }
+ 
+-- 
+2.7.4
