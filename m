@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef5zf-0000tO-Fn
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:32:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ef69D-00005Y-0h
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ef5ze-0002E3-Dz
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:32:43 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 26 Jan 2018 16:59:38 +0200
-Message-Id: <245ecc9693e29fa6398d20ac5a90ef8dcdc23cda.1516978645.git.berto@igalia.com>
-In-Reply-To: <cover.1516978645.git.berto@igalia.com>
-References: <cover.1516978645.git.berto@igalia.com>
-In-Reply-To: <cover.1516978645.git.berto@igalia.com>
-References: <cover.1516978645.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 11/39] qcow2: Remove BDS parameter from
- qcow2_cache_is_table_offset()
+	(envelope-from <peter.maydell@linaro.org>) id 1ef69C-0008Ql-2R
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:42:35 -0500
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:39559)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ef69B-0008QT-U7
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 10:42:33 -0500
+Received: by mail-oi0-x22e.google.com with SMTP id t8so565529oie.6
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 07:42:33 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180125151535.25256-1-laurent@vivier.eu>
+References: <20180125151535.25256-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jan 2018 11:55:17 +0000
+Message-ID: <CAFEAcA_9jiiq2hXegsuFXzszrdv54vpa85+LDYuo8n6AOsdkRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/8] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This function was only using the BlockDriverState parameter to pass it
-to qcow2_cache_get_table_addr(). This is no longer necessary so this
-parameter can be removed.
+On 25 January 2018 at 15:15, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 0f79bfe38a2cf0f43c7ea4959da7f8ebd7858f3d:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.12-pull-request' into staging (2018-01-25 09:53:53 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
+>
+> for you to fetch changes up to 2097dca6d3a30b80ac5a6232f518548d5ae644a9:
+>
+>   target/m68k: add HMP command "info tlb" (2018-01-25 16:02:25 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- block/qcow2-cache.c    | 3 +--
- block/qcow2-refcount.c | 6 +++---
- block/qcow2.h          | 3 +--
- 3 files changed, 5 insertions(+), 7 deletions(-)
+Applied, thanks.
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 8d0b65e671..b1aa42477e 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -428,8 +428,7 @@ void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table)
-     c->entries[i].dirty = true;
- }
- 
--void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
--                                  uint64_t offset)
-+void *qcow2_cache_is_table_offset(Qcow2Cache *c, uint64_t offset)
- {
-     int i;
- 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 361b39d5cc..9df380d52c 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -871,14 +871,14 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
-         if (refcount == 0) {
-             void *table;
- 
--            table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
-+            table = qcow2_cache_is_table_offset(s->refcount_block_cache,
-                                                 offset);
-             if (table != NULL) {
-                 qcow2_cache_put(s->refcount_block_cache, &refcount_block);
-                 qcow2_cache_discard(s->refcount_block_cache, table);
-             }
- 
--            table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
-+            table = qcow2_cache_is_table_offset(s->l2_table_cache, offset);
-             if (table != NULL) {
-                 qcow2_cache_discard(s->l2_table_cache, table);
-             }
-@@ -3186,7 +3186,7 @@ static int qcow2_discard_refcount_block(BlockDriverState *bs,
-         s->free_cluster_index = cluster_index;
-     }
- 
--    refblock = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
-+    refblock = qcow2_cache_is_table_offset(s->refcount_block_cache,
-                                            discard_block_offs);
-     if (refblock) {
-         /* discard refblock from the cache if refblock is cached */
-diff --git a/block/qcow2.h b/block/qcow2.h
-index f6552fe9c3..cb8dd784fa 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -654,8 +654,7 @@ int qcow2_cache_get(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
- int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
-     void **table);
- void qcow2_cache_put(Qcow2Cache *c, void **table);
--void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
--                                  uint64_t offset);
-+void *qcow2_cache_is_table_offset(Qcow2Cache *c, uint64_t offset);
- void qcow2_cache_discard(Qcow2Cache *c, void *table);
- 
- /* qcow2-bitmap.c functions */
--- 
-2.11.0
+-- PMM
