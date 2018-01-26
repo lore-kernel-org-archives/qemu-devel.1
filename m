@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1ef879-0001R0-Qd
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:48:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1ef8PR-0001fh-Df
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 13:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1ef879-0003o5-50
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:48:35 -0500
-From: Wei Xu <xuwei5@hisilicon.com>
-Message-ID: <5A6B5091.8030601@hisilicon.com>
-Date: Fri, 26 Jan 2018 16:00:17 +0000
+	(envelope-from <eblake@redhat.com>) id 1ef8PQ-0008DR-Fq
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 13:07:29 -0500
+References: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
+	<1b55edad-f820-6898-1630-ccc76e6c4845@redhat.com>
+	<5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8b87f82d-2a90-d6cf-0fc4-aee0d704a403@redhat.com>
+Date: Fri, 26 Jan 2018 08:28:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo before
- enabled the interruption
+In-Reply-To: <5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa"
+Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: implement bdrv_get_info callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,36 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, pbonzini@redhat.com
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Linuxarm <linuxarm@huawei.com>, Rob Herring <rob.herring@linaro.org>, Daode Huang <huangdaode@hisilicon.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, Zhangyi ac <zhangyi.ac@huawei.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, tiantao6@huawei.com
+To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-If the user pressed some keys in the console during the guest booting,
-the console will be hanged after entering the shell.
-Because in the above case the pl011_can_receive will return 0 that
-the pl011_receive will not be called. That means no interruption will
-be injected in to the kernel and the pl011 state could not be driven
-further.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa
+From: Eric Blake <eblake@redhat.com>
+To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <8b87f82d-2a90-d6cf-0fc4-aee0d704a403@redhat.com>
+Subject: Re: [PATCH 1/1] nbd: implement bdrv_get_info callback
+References: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
+ <1b55edad-f820-6898-1630-ccc76e6c4845@redhat.com>
+ <5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
+In-Reply-To: <5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This patch fixed that issue by checking the interruption is enabled or
-not before putting into the fifo.
+On 01/26/2018 06:39 AM, Edgar Kaziakhmedov wrote:
+> PIng
+>=20
+> So, let me know if I need to make any changes in patch
+>=20
+> On 1/18/18 1:09 PM, Paolo Bonzini wrote:
+>> On 18/01/2018 12:51, Edgar Kaziakhmedov wrote:
+>>> +static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP=
+) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdi->can_write_zeroes_wit=
+h_unmap =3D true;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>> Other drivers set the flag always, while NBD only sets it if the serve=
+r
+>> knows the flag.
 
-Signed-off-by: Wei Xu <xuwei5@hisilicon.com>
----
- hw/char/pl011.c | 2 ++
- 1 file changed, 2 insertions(+)
+Well, other drivers may be able to always implement it (NBD can only
+implement it if the server supports WRITE_ZEROES - and I'm even in the
+middle of working up an nbdkit patch [1] that makes it easier to write
+an NBD server that specifically does not support WRITE_ZEROES to make
+code paths like this easier to test)
 
-diff --git a/hw/char/pl011.c b/hw/char/pl011.c
-index 2aa277fc4f..6296de9527 100644
---- a/hw/char/pl011.c
-+++ b/hw/char/pl011.c
-@@ -229,6 +229,8 @@ static int pl011_can_receive(void *opaque)
-     PL011State *s = (PL011State *)opaque;
-     int r;
+[1]
 
-+    if (!s->int_enabled)
-+	return 0;
-     if (s->lcr & 0x10) {
-         r = s->read_count < 16;
-     } else {
--- 
-2.11.0
+>>
+>> I think NBD is more correct, so:
+>>
+>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Agreed; I'm fine queueing this on my NBD queue, except I'd first like to
+hear Kevin's opinion:
+
+>>
+>> However, it would be nice to remove can_write_zeroes_with_unmap from
+>> BlockDriverInfo, and make bdrv_can_write_zeroes_with_unmap just return=
+
+>> !!(bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP).=C2=A0 Kevin, what d=
+o you
+>> think?
+
+Actually, I may even just give a shot at writing this alternative patch,
+to make Kevin's decision easier.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprOwUACgkQp6FrSiUn
+Q2rpOwgAkb9tE+uf5q40HuP+gofCTezurWgUq+ASt9UqoPZ2UFzgVPT7o375X/i1
+/OXMeEQBkbVm21sTW9Gbu+Jg7E/0ye/Sx+OW4mXP7sR6xWljmGgXbhs5rgOBM29I
+SL4jKU7RYYplNJhhiW3jGo5msrfFv/Wk5NSMUuUWS8SauG03PKScQhEknMgvDujk
+nSfUzPgYexQK1SFlDoprwtYRvCRxsG5kMqSJf6H8vqJzu1cj44d49Whgz+Uo9zHq
+N4skRjrmkPHIrUdNTcgkd8KAZIrLJzEwMbKrnixM95b0e6/5biw1qwhCtmjPzsgY
+oiz9A99xfeQRdrBB49ATf2eaEsodbA==
+=dKEs
+-----END PGP SIGNATURE-----
+
+--TQRq5f9XZpG7zhcHcJCEQb6DajP787fIa--
