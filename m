@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ef3l2-0000OK-RC
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:09:34 -0500
+	(envelope-from <kchamart@redhat.com>) id 1ef3m8-0001LZ-UB
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:10:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ef3l1-0002vn-Qz
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:09:28 -0500
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-10-git-send-email-walling@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <23ff4a42-e0e7-9a33-d516-5c40cbd61c3b@redhat.com>
-Date: Fri, 26 Jan 2018 11:44:02 +0100
+	(envelope-from <kchamart@redhat.com>) id 1ef3m3-0003lk-Rp
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:10:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59665)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ef3m3-0003lM-Jg
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:10:31 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1ECEDEC0AA
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 12:53:13 +0000 (UTC)
+Date: Fri, 26 Jan 2018 13:53:09 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180126125309.euaviiu3x2cmgeu5@eukaryote>
+References: <20180125170930.20009-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1516732013-18272-10-git-send-email-walling@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180125170930.20009-1-berrange@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 09/10] s390-ccw: read user input for
- boot index via the SCLP console
+Subject: Re: [Qemu-devel] [PATCH v2] docs: update information for TLS
+ certificate management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +34,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 23.01.2018 19:26, Collin L. Walling wrote:
-> Implements an sclp_read function to capture input from the
-> console and a wrapper function that handles parsing certain
-> characters and adding input to a buffer. The input is checked
-> for any erroneous values and is handled appropriately.
->=20
-> A prompt will persist until input is entered or the timeout
-> expires (if one was set). Example:
->=20
->     Please choose (default will boot in 10 seconds):
->=20
-> Correct input will boot the respective boot index. If the
-> user's input is empty, 0, or if the timeout expires, then
-> the default zipl entry will be chosen. If the input is
-> within the range of available boot entries, then the
-> selection will be booted. Any erroneous input will cancel
-> the timeout and re-prompt the user.
->=20
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> ---
->  pc-bios/s390-ccw/menu.c     | 152 ++++++++++++++++++++++++++++++++++++=
-+++++++-
->  pc-bios/s390-ccw/s390-ccw.h |   2 +
->  pc-bios/s390-ccw/sclp.c     |  20 ++++++
->  pc-bios/s390-ccw/virtio.c   |   2 +-
->  4 files changed, 172 insertions(+), 4 deletions(-)
+On Thu, Jan 25, 2018 at 05:09:30PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+
 [...]
-> +static int read_prompt(char *buf, size_t len)
-> +{
-> +    char inp[2] =3D {};
-> +    uint8_t idx =3D 0;
-> +    uint64_t time;
+
+> +@node vnc_setup_sasl
 > +
-> +    if (timeout) {
-> +        time =3D get_clock() + (timeout * TOD_CLOCK_SECOND);
+> +@subsection Configuring SASL mechanisms
+> +
+> +The following documentation assumes use of the Cyrus SASL implementati=
+on on a
+> +Linux host, but the principals should apply to any other SASL implemen=
+tation
 
-Nit: Parentheses around "timeout * TOD_CLOCK_SECOND" are not required.
+s/principals/principles/
 
-Apart from that, patch looks fine to me now.
+[I can imagine how the typo could've come about -- as you talk about
+Kerberos principal(s) further below :-)]
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> +or host. When SASL is enabled, the mechanism configuration will be loa=
+ded from
+> +system default SASL service config /etc/sasl2/qemu.conf. If running QE=
+MU as an
+> +unprivileged user, an environment variable SASL_CONF_PATH can be used =
+to make
+> +behaviour suddenly changedit search alternate locations for the servic=
+e config.
+
+The last part above reads odd, maybe you accidentally removed some
+words?
+
+[...]
+
+> +This says to use the 'GSSAPI' mechanism with the Kerberos v5 protocol,=
+ with
+> +the server principal stored in /etc/qemu/krb5.tab. For this to work th=
+e
+> +administrator of your KDC must generate a Kerberos principal for the s=
+erver,
+> +with a name of 'qemu/somehost.example.com@@EXAMPLE.COM' replacing
+> +'somehost.example.com' with the fully qualified host name of the machi=
+ne
+> +running QEMU, and 'EXAMPLE.COM' with the Kerberos Realm.
+> +
+> +When using TLS, if username+password authentication is desired, then a
+> +reasonable configuration is
+> +
+> +@example
+> +mech_list: scram-sha-1
+> +sasldb_path: /etc/qemu/passwd.db
+> +@end example
+> +
+> +The saslpasswd2 program can be used to populate the passwd.db file wit=
+h
+> +accounts.
+
+Maybe: "saslpasswd2" --> "@code{saslpasswd2}"
+
+(Also helps with consistency, as I see you've used the @code{} attribute
+further below.)
+
+> +
+> +Other SASL configurations will be left as an exercise for the reader. =
+Note that
+> +all mechanisms except GSSAPI, should be combined with use of TLS to en=
+sure a
+
+Spurious comma above.
+
+> +secure data channel.
+
+[...]
+
+> +The GNUTLS package includes a command called @code{certtool} which can
+
+Super nit: s/GNUTLS/GnuTLS/
+
+[...]
+
+> +@node tls_creds_setup
+> +@subsection TLS x509 credential configuration
+> =20
+> -@node vnc_setup_sasl
+> +QEMU has a standard mechanism for loading x509 credentials that will b=
+e
+> +used for network services and clients. It requires specifying the
+> +@code{tls-creds-x509} class name to the @code{-object} command line
+> +argument for the system emulators. This also works for the helper tool=
+s
+> +like @code{qemu-nbd} and @code{qemu-img}, but is named @code{--object}=
+.
+
+The '-object' for QEMU command-line, and the double-dashed '--object'
+for external tools looks a tiny bit odd.  But not this patch's problem.
+
+(I just noticed Eric remarked on this too.)
+
+ =20
+> -@subsection Configuring SASL mechanisms
+> +When specifying the object, the @code{dir} parameters specifies which
+> +directory contains the credential files. This directory is expected to
+> +contain files with the names mentioned previously, @code{ca-cert.pem},
+> +@code{server-key.pem}, @code{server-cert.pem}, @code{client-key.pem}
+> +and @code{client-cert.pem} as appropriate. It is also possible to
+> +include a set of pre-generated diffie-hellman parameters in a file
+
+Would be nice capitalize proper nouns: s/diffie-hellman/Diffie=E2=80=93He=
+llman
+(DH) --- 'DH' in brackets because you use that acronym two lines below,
+although it should be obvious to those setting up TLS.
+
+> +@code{dh-params.pem}, which can be created using the
+> +@code{certtool --generate-dh-params} command. If omitted, QEMU will
+> +dynamically generate DH parameters when loading the credentials.
+
+[...]
+
+ =20
+> -The saslpasswd2 program can be used to populate the passwd.db file wit=
+h
+> -accounts.
+> +Network services which support TLS will all have a @code{tls-creds}
+> +parameter which expects the ID of the tls credentials object.=20
+
+s/tls/TLS
+
+[...]
+
+Whether you fix these minor nits or not, your write-up is a strict
+improvement, so:
+
+    Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+
+--=20
+/kashyap
