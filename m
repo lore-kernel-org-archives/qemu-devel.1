@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef7ra-0000eP-1q
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:32:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ef7w7-0003Zx-FE
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:37:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ef7rY-0005Og-Ux
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:32:30 -0500
-Date: Fri, 26 Jan 2018 15:05:11 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180126150511.GG2610@work-vm>
-References: <20171207155102.66622-4-vsementsov@virtuozzo.com>
-	<74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
-	<7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-	<d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
-	<4e97de9a-bcdd-5e5d-275f-e6cac9473f0d@virtuozzo.com>
-	<79e5851b-f35e-23ea-4842-cc3b1d1e30ee@virtuozzo.com>
-	<1e2fd96e-5d07-3c52-33df-cf31490eb6ca@redhat.com>
-	<eccba06f-3a5f-7926-7fb5-ce56f01e94c7@virtuozzo.com>
-	<1298bc3d-c2bd-6fd5-5d3d-dabcae434874@redhat.com>
-	<2e145d8b-855f-9060-1b81-feb515067293@virtuozzo.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ef7w4-0001iZ-80
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:37:11 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51527)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ef7w3-0001hu-W7
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 12:37:08 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r71so2799459wmd.1
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:37:07 -0800 (PST)
+References: <20180123035349.24538-1-richard.henderson@linaro.org>
+	<20180123035349.24538-4-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180123035349.24538-4-richard.henderson@linaro.org>
+Date: Fri, 26 Jan 2018 15:05:24 +0000
+Message-ID: <871sic7j9n.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2e145d8b-855f-9060-1b81-feb515067293@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] target/arm: Add SVE to migration
+ state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> 17.01.2018 19:03, Eric Blake wrote:
-> > On 01/17/2018 09:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > 
-> > > > > I have a script (for managing libvirt guest, but it can be adopted for
-> > > > > qemu or even used for qemu monitor), which allows
-> > > > > me run qmp commands on vms as easy as:
-> > > > > 
-> > > > > |qmp VMNAME query-block-jobs or qmp VMNAME nbd-server-remove name exp1
-> > > > > mode hard or even |
-> > > > > 
-> > > > > |qmp VMNAME blockdev-add id disk driver qcow2 cache {writeback true
-> > > > > direct true} aio native discard unmap file {driver file filename
-> > > > > /tmp/somedisk} |||
-> > > > Yeah, there are various scripting solutions around QMP that can make it
-> > > > easier; but HMP is often still an easy front-line interface for
-> > > > experiments.
-> > > > 
-> > > isn't it because these solutions are not available directly in monitor,
-> > > when HMP is?
-> > QMP can be directly accessed in a monitor; it just requires more typing.
-> >   If you are developing QMP commands, it may be easier to use
-> > ./scripts/qmp/qmp-shell (couple it with a readline wrapper, and you can
-> > even get tab-completion and history across sessions).  There's also
-> > things like libvirt's 'virsh qmp-monitor-command' for shell-scripting
-> > access to arbitrary QMP commands, provided your guest is run by libvirt.
-> > 
-> > > may be, we need third type of monitor HQMP which is QMP with simplified
-> > > syntax? Or
-> > > allow qmp commands in simplified syntax directly in HMP?
-> > No, I don't think we need either thing.  Wrappers around existing
-> > monitors is better than bloating qemu proper with a third flavor of
-> > monitor.  And HMP is for humans, with no restrictions on back-compat
-> > changes, so if it doesn't do something you want for quick-and-dirty
-> > testing, you can either add a new HMP command, or just use QMP (or one
-> > of its wrappers, like qmp-shell) in the first place.  Ultimately, our
-> > long-term concern is only about the QMP interface; HMP is supposed to be
-> > convenient.  So if it starts costing too much time to port a QMP
-> > interface to HMP, then don't worry about it.
-> > 
-> 
-> most of commands, ported to hmp are done in same style: they just call
-> corresponding qmp command.
-> Isn't it better to provide common interface for calling qmp commands through
-> HMP monitor, to never
-> create hmp versions of new commands? they will be available automatically.
 
-It would be nice to do that, but they're not that consistent in how they
-convert parameters and options, but I occasionally wonder if we could
-automate more of it.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Dave
+> Save the high parts of the Zregs and all of the Pregs.
+> The ZCR_ELx registers are migrated via the CP mechanism.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-> -- 
-> Best regards,
-> Vladimir
-> 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/machine.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 53 insertions(+)
+>
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index cb0e1c92bb..2c8b43062f 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -122,6 +122,56 @@ static const VMStateDescription vmstate_iwmmxt =3D {
+>      }
+>  };
+>
+> +#ifdef TARGET_AARCH64
+> +/* The expression ARM_MAX_VQ - 2 is 0 for pure AArch32 build,
+> + * and ARMPredicateReg is actively empty.  This triggers errors
+> + * in the expansion of the VMSTATE macros.
+> + */
+> +
+> +static bool sve_needed(void *opaque)
+> +{
+> +    ARMCPU *cpu =3D opaque;
+> +    CPUARMState *env =3D &cpu->env;
+> +
+> +    return arm_feature(env, ARM_FEATURE_SVE);
+> +}
+> +
+> +/* The first two words of each Zreg is stored in VFP state.  */
+> +static const VMStateDescription vmstate_zreg_hi_reg =3D {
+> +    .name =3D "cpu/sve/zreg_hi",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64_SUB_ARRAY(d, ARMVectorReg, 2, ARM_MAX_VQ - 2),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_preg_reg =3D {
+> +    .name =3D "cpu/sve/preg",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64_ARRAY(p, ARMPredicateReg, 2 * ARM_MAX_VQ / 8),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_sve =3D {
+> +    .name =3D "cpu/sve",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D sve_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_STRUCT_ARRAY(env.vfp.zregs, ARMCPU, 32, 0,
+> +                             vmstate_zreg_hi_reg, ARMVectorReg),
+> +        VMSTATE_STRUCT_ARRAY(env.vfp.pregs, ARMCPU, 17, 0,
+> +                             vmstate_preg_reg, ARMPredicateReg),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +#endif /* AARCH64 */
+> +
+>  static bool m_needed(void *opaque)
+>  {
+>      ARMCPU *cpu =3D opaque;
+> @@ -586,6 +636,9 @@ const VMStateDescription vmstate_arm_cpu =3D {
+>          &vmstate_pmsav7,
+>          &vmstate_pmsav8,
+>          &vmstate_m_security,
+> +#ifdef TARGET_AARCH64
+> +        &vmstate_sve,
+> +#endif
+>          NULL
+>      }
+>  };
+
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
