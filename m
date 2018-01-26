@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ef0DJ-0001lm-TM
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:22:26 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ef0LD-0007Rw-HF
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:30:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ef0DG-0005Tm-Py
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:22:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46930)
+	(envelope-from <kraxel@redhat.com>) id 1ef0LA-0001hs-3E
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:30:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ef0DG-0005TW-L1
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:22:22 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ef0L9-0001gy-QU
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 04:30:31 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB6D2394C5B
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 08:05:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9436306006
+	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 09:13:42 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 26 Jan 2018 09:05:10 +0100
-Message-Id: <20180126080515.26108-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/5] Usb 20180126 v3 patches
+Date: Fri, 26 Jan 2018 10:13:35 +0100
+Message-Id: <20180126091338.13708-5-kraxel@redhat.com>
+In-Reply-To: <20180126091338.13708-1-kraxel@redhat.com>
+References: <20180126091338.13708-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 4/7] hw: convert ps2 device to keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +30,593 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-The following changes since commit 2077fef91d5eb8e3745a84fabd87a5ee7d2b53=
-5d:
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-80125' into staging (2018-01-25 17:04:47 +0000)
+Replace the qcode_to_keycode_set1, qcode_to_keycode_set2,
+and qcode_to_keycode_set3 tables with automatically
+generated tables.
 
-are available in the git repository at:
+Missing entries in qcode_to_keycode_set1 now fixed:
 
-  git://git.kraxel.org/qemu tags/usb-20180126-v3-pull-request
+ - Q_KEY_CODE_SYSRQ -> 0x54
+ - Q_KEY_CODE_PRINT -> 0x54 (NB ignored due to special case)
+ - Q_KEY_CODE_AGAIN -> 0xe005
+ - Q_KEY_CODE_PROPS -> 0xe006
+ - Q_KEY_CODE_UNDO -> 0xe007
+ - Q_KEY_CODE_FRONT -> 0xe00c
+ - Q_KEY_CODE_COPY -> 0xe078
+ - Q_KEY_CODE_OPEN -> 0x64
+ - Q_KEY_CODE_PASTE -> 0x65
+ - Q_KEY_CODE_CUT -> 0xe03c
+ - Q_KEY_CODE_LF -> 0x5b
+ - Q_KEY_CODE_HELP -> 0xe075
+ - Q_KEY_CODE_COMPOSE -> 0xe05d
+ - Q_KEY_CODE_PAUSE -> 0xe046
+ - Q_KEY_CODE_KP_EQUALS -> 0x59
 
-for you to fetch changes up to 80ae865468bde918363a123aa26c6fc4385023ac:
+And some mistakes corrected:
 
-  usb-ccid: convert CCIDCardClass::exitfn() -> unrealize() (2018-01-26 07=
-:59:33 +0100)
+ - Q_KEY_CODE_HIRAGANA was mapped to 0x70 (Katakanahiragana)
+   instead of of 0x77 (Hirigana)
+ - Q_KEY_CODE_MENU was incorrectly mapped to the compose
+   scancode (0xe05d) and is now mapped to 0xe01e
+ - Q_KEY_CODE_FIND was mapped to 0xe065 (Search) instead
+   of to 0xe041 (Find)
+ - Q_KEY_CODE_POWER, SLEEP & WAKE had 0x0e instead of 0xe0
+   as the prefix
 
-----------------------------------------------------------------
-usb: -usbdevice cleanups, storage fix, QOMify ccid.
+Missing entries in qcode_to_keycode_set2 now fixed:
 
-----------------------------------------------------------------
+ - Q_KEY_CODE_PRINT -> 0x7f (NB ignored due to special case)
+ - Q_KEY_CODE_COMPOSE -> 0xe02f
+ - Q_KEY_CODE_PAUSE -> 0xe077
+ - Q_KEY_CODE_KP_EQUALS -> 0x0f
 
-Fam Zheng (1):
-  usb-storage: Fix share-rw option parsing
+And some mistakes corrected:
 
-Mao Zhongyi (1):
-  hw/usb/ccid: Make ccid_card_init() take an error parameter
+ - Q_KEY_CODE_HIRAGANA was mapped to 0x13 (Katakanahiragana)
+   instead of of 0x62 (Hirigana)
+ - Q_KEY_CODE_MENU was incorrectly mapped to the compose
+   scancode (0xe02f) and is now not mapped
+ - Q_KEY_CODE_FIND was mapped to 0xe010 (Search) and is now
+   not mapped.
+ - Q_KEY_CODE_POWER, SLEEP & WAKE had 0x0e instead of 0xe0
+   as the prefix
 
-Philippe Mathieu-Daud=C3=A9 (2):
-  usb-ccid: inline ccid_card_initfn() in ccid_card_realize()
-  usb-ccid: convert CCIDCardClass::exitfn() -> unrealize()
+Missing entries in qcode_to_keycode_set3 now fixed:
 
-Thomas Huth (1):
-  usb: Remove legacy -usbdevice options (host, serial, disk and net)
+ - Q_KEY_CODE_ASTERISK -> 0x7e
+ - Q_KEY_CODE_SYSRQ -> 0x57
+ - Q_KEY_CODE_LESS -> 0x13
+ - Q_KEY_CODE_STOP -> 0x0a
+ - Q_KEY_CODE_AGAIN -> 0x0b
+ - Q_KEY_CODE_PROPS -> 0x0c
+ - Q_KEY_CODE_UNDO -> 0x10
+ - Q_KEY_CODE_COPY -> 0x18
+ - Q_KEY_CODE_OPEN -> 0x20
+ - Q_KEY_CODE_PASTE -> 0x28
+ - Q_KEY_CODE_FIND -> 0x30
+ - Q_KEY_CODE_CUT -> 0x38
+ - Q_KEY_CODE_HELP -> 0x09
+ - Q_KEY_CODE_COMPOSE -> 0x8d
+ - Q_KEY_CODE_AUDIONEXT -> 0x93
+ - Q_KEY_CODE_AUDIOPREV -> 0x94
+ - Q_KEY_CODE_AUDIOSTOP -> 0x98
+ - Q_KEY_CODE_AUDIOMUTE -> 0x9c
+ - Q_KEY_CODE_VOLUMEUP -> 0x95
+ - Q_KEY_CODE_VOLUMEDOWN -> 0x9d
+ - Q_KEY_CODE_CALCULATOR -> 0xa3
+ - Q_KEY_CODE_AC_HOME -> 0x97
 
- hw/usb/ccid.h                 |   6 +-
- include/hw/scsi/scsi.h        |   1 +
- include/hw/usb.h              |   1 -
- hw/scsi/scsi-bus.c            |   9 ++-
- hw/usb/ccid-card-emulated.c   |  48 +++++++-------
- hw/usb/ccid-card-passthru.c   |  13 ++--
- hw/usb/dev-network.c          |  26 --------
- hw/usb/dev-serial.c           |  30 ---------
- hw/usb/dev-smartcard-reader.c |  63 ++++++++----------
- hw/usb/dev-storage.c          |  61 +-----------------
- hw/usb/host-legacy.c          | 144 ------------------------------------=
-------
- hw/usb/host-stub.c            |   6 --
- vl.c                          |  15 -----
- hw/usb/Makefile.objs          |   2 +-
- qemu-options.hx               |  19 ------
- 15 files changed, 74 insertions(+), 370 deletions(-)
- delete mode 100644 hw/usb/host-legacy.c
+And some mistakes corrected:
 
---=20
+ - Q_KEY_CODE_MENU was incorrectly mapped to the compose
+   scancode (0x8d) and is now 0x91
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20180117164118.8510-2-berrange@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ Makefile           |   3 +
+ include/ui/input.h |   9 ++
+ hw/input/ps2.c     | 406 +----------------------------------------------------
+ ui/input-keymap.c  |   3 +
+ 4 files changed, 22 insertions(+), 399 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index d835bb92e7..7aaca74e44 100644
+--- a/Makefile
++++ b/Makefile
+@@ -233,6 +233,9 @@ KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
+ 
+ KEYCODEMAP_FILES = \
+ 		 ui/input-keymap-linux-to-qcode.c \
++		 ui/input-keymap-qcode-to-atset1.c \
++		 ui/input-keymap-qcode-to-atset2.c \
++		 ui/input-keymap-qcode-to-atset3.c \
+ 		 ui/input-keymap-qcode-to-qnum.c \
+ 		 ui/input-keymap-qnum-to-qcode.c \
+ 		 ui/input-keymap-qcode-to-linux.c \
+diff --git a/include/ui/input.h b/include/ui/input.h
+index 5cc76d6e41..132659f734 100644
+--- a/include/ui/input.h
++++ b/include/ui/input.h
+@@ -71,6 +71,15 @@ void qemu_remove_mouse_mode_change_notifier(Notifier *notify);
+ extern const guint qemu_input_map_linux_to_qcode_len;
+ extern const guint16 qemu_input_map_linux_to_qcode[];
+ 
++extern const guint qemu_input_map_qcode_to_atset1_len;
++extern const guint16 qemu_input_map_qcode_to_atset1[];
++
++extern const guint qemu_input_map_qcode_to_atset2_len;
++extern const guint16 qemu_input_map_qcode_to_atset2[];
++
++extern const guint qemu_input_map_qcode_to_atset3_len;
++extern const guint16 qemu_input_map_qcode_to_atset3[];
++
+ extern const guint qemu_input_map_qcode_to_qnum_len;
+ extern const guint16 qemu_input_map_qcode_to_qnum[];
+ 
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index de171a28dd..06f5d2ac4a 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -124,401 +124,6 @@ typedef struct {
+     uint8_t mouse_buttons;
+ } PS2MouseState;
+ 
+-/* Table to convert from QEMU codes to scancodes.  */
+-static const uint16_t qcode_to_keycode_set1[Q_KEY_CODE__MAX] = {
+-    [0 ... Q_KEY_CODE__MAX - 1] = 0,
+-
+-    [Q_KEY_CODE_A] = 0x1e,
+-    [Q_KEY_CODE_B] = 0x30,
+-    [Q_KEY_CODE_C] = 0x2e,
+-    [Q_KEY_CODE_D] = 0x20,
+-    [Q_KEY_CODE_E] = 0x12,
+-    [Q_KEY_CODE_F] = 0x21,
+-    [Q_KEY_CODE_G] = 0x22,
+-    [Q_KEY_CODE_H] = 0x23,
+-    [Q_KEY_CODE_I] = 0x17,
+-    [Q_KEY_CODE_J] = 0x24,
+-    [Q_KEY_CODE_K] = 0x25,
+-    [Q_KEY_CODE_L] = 0x26,
+-    [Q_KEY_CODE_M] = 0x32,
+-    [Q_KEY_CODE_N] = 0x31,
+-    [Q_KEY_CODE_O] = 0x18,
+-    [Q_KEY_CODE_P] = 0x19,
+-    [Q_KEY_CODE_Q] = 0x10,
+-    [Q_KEY_CODE_R] = 0x13,
+-    [Q_KEY_CODE_S] = 0x1f,
+-    [Q_KEY_CODE_T] = 0x14,
+-    [Q_KEY_CODE_U] = 0x16,
+-    [Q_KEY_CODE_V] = 0x2f,
+-    [Q_KEY_CODE_W] = 0x11,
+-    [Q_KEY_CODE_X] = 0x2d,
+-    [Q_KEY_CODE_Y] = 0x15,
+-    [Q_KEY_CODE_Z] = 0x2c,
+-    [Q_KEY_CODE_0] = 0x0b,
+-    [Q_KEY_CODE_1] = 0x02,
+-    [Q_KEY_CODE_2] = 0x03,
+-    [Q_KEY_CODE_3] = 0x04,
+-    [Q_KEY_CODE_4] = 0x05,
+-    [Q_KEY_CODE_5] = 0x06,
+-    [Q_KEY_CODE_6] = 0x07,
+-    [Q_KEY_CODE_7] = 0x08,
+-    [Q_KEY_CODE_8] = 0x09,
+-    [Q_KEY_CODE_9] = 0x0a,
+-    [Q_KEY_CODE_GRAVE_ACCENT] = 0x29,
+-    [Q_KEY_CODE_MINUS] = 0x0c,
+-    [Q_KEY_CODE_EQUAL] = 0x0d,
+-    [Q_KEY_CODE_BACKSLASH] = 0x2b,
+-    [Q_KEY_CODE_BACKSPACE] = 0x0e,
+-    [Q_KEY_CODE_SPC] = 0x39,
+-    [Q_KEY_CODE_TAB] = 0x0f,
+-    [Q_KEY_CODE_CAPS_LOCK] = 0x3a,
+-    [Q_KEY_CODE_SHIFT] = 0x2a,
+-    [Q_KEY_CODE_CTRL] = 0x1d,
+-    [Q_KEY_CODE_META_L] = 0xe05b,
+-    [Q_KEY_CODE_ALT] = 0x38,
+-    [Q_KEY_CODE_SHIFT_R] = 0x36,
+-    [Q_KEY_CODE_CTRL_R] = 0xe01d,
+-    [Q_KEY_CODE_META_R] = 0xe05c,
+-    [Q_KEY_CODE_ALT_R] = 0xe038,
+-    [Q_KEY_CODE_MENU] = 0xe05d,
+-    [Q_KEY_CODE_RET] = 0x1c,
+-    [Q_KEY_CODE_ESC] = 0x01,
+-    [Q_KEY_CODE_F1] = 0x3b,
+-    [Q_KEY_CODE_F2] = 0x3c,
+-    [Q_KEY_CODE_F3] = 0x3d,
+-    [Q_KEY_CODE_F4] = 0x3e,
+-    [Q_KEY_CODE_F5] = 0x3f,
+-    [Q_KEY_CODE_F6] = 0x40,
+-    [Q_KEY_CODE_F7] = 0x41,
+-    [Q_KEY_CODE_F8] = 0x42,
+-    [Q_KEY_CODE_F9] = 0x43,
+-    [Q_KEY_CODE_F10] = 0x44,
+-    [Q_KEY_CODE_F11] = 0x57,
+-    [Q_KEY_CODE_F12] = 0x58,
+-    /* special handling for Q_KEY_CODE_PRINT */
+-    [Q_KEY_CODE_SCROLL_LOCK] = 0x46,
+-    /* special handling for Q_KEY_CODE_PAUSE */
+-    [Q_KEY_CODE_BRACKET_LEFT] = 0x1a,
+-    [Q_KEY_CODE_INSERT] = 0xe052,
+-    [Q_KEY_CODE_HOME] = 0xe047,
+-    [Q_KEY_CODE_PGUP] = 0xe049,
+-    [Q_KEY_CODE_DELETE] = 0xe053,
+-    [Q_KEY_CODE_END] = 0xe04f,
+-    [Q_KEY_CODE_PGDN] = 0xe051,
+-    [Q_KEY_CODE_UP] = 0xe048,
+-    [Q_KEY_CODE_LEFT] = 0xe04b,
+-    [Q_KEY_CODE_DOWN] = 0xe050,
+-    [Q_KEY_CODE_RIGHT] = 0xe04d,
+-    [Q_KEY_CODE_NUM_LOCK] = 0x45,
+-    [Q_KEY_CODE_KP_DIVIDE] = 0xe035,
+-    [Q_KEY_CODE_KP_MULTIPLY] = 0x37,
+-    [Q_KEY_CODE_KP_SUBTRACT] = 0x4a,
+-    [Q_KEY_CODE_KP_ADD] = 0x4e,
+-    [Q_KEY_CODE_KP_ENTER] = 0xe01c,
+-    [Q_KEY_CODE_KP_DECIMAL] = 0x53,
+-    [Q_KEY_CODE_KP_0] = 0x52,
+-    [Q_KEY_CODE_KP_1] = 0x4f,
+-    [Q_KEY_CODE_KP_2] = 0x50,
+-    [Q_KEY_CODE_KP_3] = 0x51,
+-    [Q_KEY_CODE_KP_4] = 0x4b,
+-    [Q_KEY_CODE_KP_5] = 0x4c,
+-    [Q_KEY_CODE_KP_6] = 0x4d,
+-    [Q_KEY_CODE_KP_7] = 0x47,
+-    [Q_KEY_CODE_KP_8] = 0x48,
+-    [Q_KEY_CODE_KP_9] = 0x49,
+-    [Q_KEY_CODE_BRACKET_RIGHT] = 0x1b,
+-    [Q_KEY_CODE_SEMICOLON] = 0x27,
+-    [Q_KEY_CODE_APOSTROPHE] = 0x28,
+-    [Q_KEY_CODE_COMMA] = 0x33,
+-    [Q_KEY_CODE_DOT] = 0x34,
+-    [Q_KEY_CODE_SLASH] = 0x35,
+-
+-    [Q_KEY_CODE_POWER] = 0x0e5e,
+-    [Q_KEY_CODE_SLEEP] = 0x0e5f,
+-    [Q_KEY_CODE_WAKE] = 0x0e63,
+-
+-    [Q_KEY_CODE_AUDIONEXT] = 0xe019,
+-    [Q_KEY_CODE_AUDIOPREV] = 0xe010,
+-    [Q_KEY_CODE_AUDIOSTOP] = 0xe024,
+-    [Q_KEY_CODE_AUDIOPLAY] = 0xe022,
+-    [Q_KEY_CODE_AUDIOMUTE] = 0xe020,
+-    [Q_KEY_CODE_VOLUMEUP] = 0xe030,
+-    [Q_KEY_CODE_VOLUMEDOWN] = 0xe02e,
+-    [Q_KEY_CODE_MEDIASELECT] = 0xe06d,
+-    [Q_KEY_CODE_MAIL] = 0xe06c,
+-    [Q_KEY_CODE_CALCULATOR] = 0xe021,
+-    [Q_KEY_CODE_COMPUTER] = 0xe06b,
+-    [Q_KEY_CODE_FIND] = 0xe065,
+-    [Q_KEY_CODE_AC_HOME] = 0xe032,
+-    [Q_KEY_CODE_AC_BACK] = 0xe06a,
+-    [Q_KEY_CODE_AC_FORWARD] = 0xe069,
+-    [Q_KEY_CODE_STOP] = 0xe068,
+-    [Q_KEY_CODE_AC_REFRESH] = 0xe067,
+-    [Q_KEY_CODE_AC_BOOKMARKS] = 0xe066,
+-
+-    [Q_KEY_CODE_ASTERISK] = 0x37,
+-    [Q_KEY_CODE_LESS] = 0x56,
+-    [Q_KEY_CODE_RO] = 0x73,
+-    [Q_KEY_CODE_HIRAGANA] = 0x70,
+-    [Q_KEY_CODE_HENKAN] = 0x79,
+-    [Q_KEY_CODE_YEN] = 0x7d,
+-    [Q_KEY_CODE_KP_COMMA] = 0x7e,
+-};
+-
+-static const uint16_t qcode_to_keycode_set2[Q_KEY_CODE__MAX] = {
+-    [0 ... Q_KEY_CODE__MAX - 1] = 0,
+-
+-    [Q_KEY_CODE_A] = 0x1c,
+-    [Q_KEY_CODE_B] = 0x32,
+-    [Q_KEY_CODE_C] = 0x21,
+-    [Q_KEY_CODE_D] = 0x23,
+-    [Q_KEY_CODE_E] = 0x24,
+-    [Q_KEY_CODE_F] = 0x2b,
+-    [Q_KEY_CODE_G] = 0x34,
+-    [Q_KEY_CODE_H] = 0x33,
+-    [Q_KEY_CODE_I] = 0x43,
+-    [Q_KEY_CODE_J] = 0x3b,
+-    [Q_KEY_CODE_K] = 0x42,
+-    [Q_KEY_CODE_L] = 0x4b,
+-    [Q_KEY_CODE_M] = 0x3a,
+-    [Q_KEY_CODE_N] = 0x31,
+-    [Q_KEY_CODE_O] = 0x44,
+-    [Q_KEY_CODE_P] = 0x4d,
+-    [Q_KEY_CODE_Q] = 0x15,
+-    [Q_KEY_CODE_R] = 0x2d,
+-    [Q_KEY_CODE_S] = 0x1b,
+-    [Q_KEY_CODE_T] = 0x2c,
+-    [Q_KEY_CODE_U] = 0x3c,
+-    [Q_KEY_CODE_V] = 0x2a,
+-    [Q_KEY_CODE_W] = 0x1d,
+-    [Q_KEY_CODE_X] = 0x22,
+-    [Q_KEY_CODE_Y] = 0x35,
+-    [Q_KEY_CODE_Z] = 0x1a,
+-    [Q_KEY_CODE_0] = 0x45,
+-    [Q_KEY_CODE_1] = 0x16,
+-    [Q_KEY_CODE_2] = 0x1e,
+-    [Q_KEY_CODE_3] = 0x26,
+-    [Q_KEY_CODE_4] = 0x25,
+-    [Q_KEY_CODE_5] = 0x2e,
+-    [Q_KEY_CODE_6] = 0x36,
+-    [Q_KEY_CODE_7] = 0x3d,
+-    [Q_KEY_CODE_8] = 0x3e,
+-    [Q_KEY_CODE_9] = 0x46,
+-    [Q_KEY_CODE_GRAVE_ACCENT] = 0x0e,
+-    [Q_KEY_CODE_MINUS] = 0x4e,
+-    [Q_KEY_CODE_EQUAL] = 0x55,
+-    [Q_KEY_CODE_BACKSLASH] = 0x5d,
+-    [Q_KEY_CODE_BACKSPACE] = 0x66,
+-    [Q_KEY_CODE_SPC] = 0x29,
+-    [Q_KEY_CODE_TAB] = 0x0d,
+-    [Q_KEY_CODE_CAPS_LOCK] = 0x58,
+-    [Q_KEY_CODE_SHIFT] = 0x12,
+-    [Q_KEY_CODE_CTRL] = 0x14,
+-    [Q_KEY_CODE_META_L] = 0xe01f,
+-    [Q_KEY_CODE_ALT] = 0x11,
+-    [Q_KEY_CODE_SHIFT_R] = 0x59,
+-    [Q_KEY_CODE_CTRL_R] = 0xe014,
+-    [Q_KEY_CODE_META_R] = 0xe027,
+-    [Q_KEY_CODE_ALT_R] = 0xe011,
+-    [Q_KEY_CODE_MENU] = 0xe02f,
+-    [Q_KEY_CODE_RET] = 0x5a,
+-    [Q_KEY_CODE_ESC] = 0x76,
+-    [Q_KEY_CODE_F1] = 0x05,
+-    [Q_KEY_CODE_F2] = 0x06,
+-    [Q_KEY_CODE_F3] = 0x04,
+-    [Q_KEY_CODE_F4] = 0x0c,
+-    [Q_KEY_CODE_F5] = 0x03,
+-    [Q_KEY_CODE_F6] = 0x0b,
+-    [Q_KEY_CODE_F7] = 0x83,
+-    [Q_KEY_CODE_F8] = 0x0a,
+-    [Q_KEY_CODE_F9] = 0x01,
+-    [Q_KEY_CODE_F10] = 0x09,
+-    [Q_KEY_CODE_F11] = 0x78,
+-    [Q_KEY_CODE_F12] = 0x07,
+-    /* special handling for Q_KEY_CODE_PRINT */
+-    [Q_KEY_CODE_SCROLL_LOCK] = 0x7e,
+-    /* special handling for Q_KEY_CODE_PAUSE */
+-    [Q_KEY_CODE_BRACKET_LEFT] = 0x54,
+-    [Q_KEY_CODE_INSERT] = 0xe070,
+-    [Q_KEY_CODE_HOME] = 0xe06c,
+-    [Q_KEY_CODE_PGUP] = 0xe07d,
+-    [Q_KEY_CODE_DELETE] = 0xe071,
+-    [Q_KEY_CODE_END] = 0xe069,
+-    [Q_KEY_CODE_PGDN] = 0xe07a,
+-    [Q_KEY_CODE_UP] = 0xe075,
+-    [Q_KEY_CODE_LEFT] = 0xe06b,
+-    [Q_KEY_CODE_DOWN] = 0xe072,
+-    [Q_KEY_CODE_RIGHT] = 0xe074,
+-    [Q_KEY_CODE_NUM_LOCK] = 0x77,
+-    [Q_KEY_CODE_KP_DIVIDE] = 0xe04a,
+-    [Q_KEY_CODE_KP_MULTIPLY] = 0x7c,
+-    [Q_KEY_CODE_KP_SUBTRACT] = 0x7b,
+-    [Q_KEY_CODE_KP_ADD] = 0x79,
+-    [Q_KEY_CODE_KP_ENTER] = 0xe05a,
+-    [Q_KEY_CODE_KP_DECIMAL] = 0x71,
+-    [Q_KEY_CODE_KP_0] = 0x70,
+-    [Q_KEY_CODE_KP_1] = 0x69,
+-    [Q_KEY_CODE_KP_2] = 0x72,
+-    [Q_KEY_CODE_KP_3] = 0x7a,
+-    [Q_KEY_CODE_KP_4] = 0x6b,
+-    [Q_KEY_CODE_KP_5] = 0x73,
+-    [Q_KEY_CODE_KP_6] = 0x74,
+-    [Q_KEY_CODE_KP_7] = 0x6c,
+-    [Q_KEY_CODE_KP_8] = 0x75,
+-    [Q_KEY_CODE_KP_9] = 0x7d,
+-    [Q_KEY_CODE_BRACKET_RIGHT] = 0x5b,
+-    [Q_KEY_CODE_SEMICOLON] = 0x4c,
+-    [Q_KEY_CODE_APOSTROPHE] = 0x52,
+-    [Q_KEY_CODE_COMMA] = 0x41,
+-    [Q_KEY_CODE_DOT] = 0x49,
+-    [Q_KEY_CODE_SLASH] = 0x4a,
+-
+-    [Q_KEY_CODE_POWER] = 0x0e37,
+-    [Q_KEY_CODE_SLEEP] = 0x0e3f,
+-    [Q_KEY_CODE_WAKE] = 0x0e5e,
+-
+-    [Q_KEY_CODE_AUDIONEXT] = 0xe04d,
+-    [Q_KEY_CODE_AUDIOPREV] = 0xe015,
+-    [Q_KEY_CODE_AUDIOSTOP] = 0xe03b,
+-    [Q_KEY_CODE_AUDIOPLAY] = 0xe034,
+-    [Q_KEY_CODE_AUDIOMUTE] = 0xe023,
+-    [Q_KEY_CODE_VOLUMEUP] = 0xe032,
+-    [Q_KEY_CODE_VOLUMEDOWN] = 0xe021,
+-    [Q_KEY_CODE_MEDIASELECT] = 0xe050,
+-    [Q_KEY_CODE_MAIL] = 0xe048,
+-    [Q_KEY_CODE_CALCULATOR] = 0xe02b,
+-    [Q_KEY_CODE_COMPUTER] = 0xe040,
+-    [Q_KEY_CODE_FIND] = 0xe010,
+-    [Q_KEY_CODE_AC_HOME] = 0xe03a,
+-    [Q_KEY_CODE_AC_BACK] = 0xe038,
+-    [Q_KEY_CODE_AC_FORWARD] = 0xe030,
+-    [Q_KEY_CODE_STOP] = 0xe028,
+-    [Q_KEY_CODE_AC_REFRESH] = 0xe020,
+-    [Q_KEY_CODE_AC_BOOKMARKS] = 0xe018,
+-
+-    [Q_KEY_CODE_ASTERISK] = 0x7c,
+-    [Q_KEY_CODE_LESS] = 0x61,
+-    [Q_KEY_CODE_SYSRQ] = 0x7f,
+-    [Q_KEY_CODE_RO] = 0x51,
+-    [Q_KEY_CODE_HIRAGANA] = 0x13,
+-    [Q_KEY_CODE_HENKAN] = 0x64,
+-    [Q_KEY_CODE_YEN] = 0x6a,
+-    [Q_KEY_CODE_KP_COMMA] = 0x6d,
+-};
+-
+-static const uint16_t qcode_to_keycode_set3[Q_KEY_CODE__MAX] = {
+-    [0 ... Q_KEY_CODE__MAX - 1] = 0,
+-
+-    [Q_KEY_CODE_A] = 0x1c,
+-    [Q_KEY_CODE_B] = 0x32,
+-    [Q_KEY_CODE_C] = 0x21,
+-    [Q_KEY_CODE_D] = 0x23,
+-    [Q_KEY_CODE_E] = 0x24,
+-    [Q_KEY_CODE_F] = 0x2b,
+-    [Q_KEY_CODE_G] = 0x34,
+-    [Q_KEY_CODE_H] = 0x33,
+-    [Q_KEY_CODE_I] = 0x43,
+-    [Q_KEY_CODE_J] = 0x3b,
+-    [Q_KEY_CODE_K] = 0x42,
+-    [Q_KEY_CODE_L] = 0x4b,
+-    [Q_KEY_CODE_M] = 0x3a,
+-    [Q_KEY_CODE_N] = 0x31,
+-    [Q_KEY_CODE_O] = 0x44,
+-    [Q_KEY_CODE_P] = 0x4d,
+-    [Q_KEY_CODE_Q] = 0x15,
+-    [Q_KEY_CODE_R] = 0x2d,
+-    [Q_KEY_CODE_S] = 0x1b,
+-    [Q_KEY_CODE_T] = 0x2c,
+-    [Q_KEY_CODE_U] = 0x3c,
+-    [Q_KEY_CODE_V] = 0x2a,
+-    [Q_KEY_CODE_W] = 0x1d,
+-    [Q_KEY_CODE_X] = 0x22,
+-    [Q_KEY_CODE_Y] = 0x35,
+-    [Q_KEY_CODE_Z] = 0x1a,
+-    [Q_KEY_CODE_0] = 0x45,
+-    [Q_KEY_CODE_1] = 0x16,
+-    [Q_KEY_CODE_2] = 0x1e,
+-    [Q_KEY_CODE_3] = 0x26,
+-    [Q_KEY_CODE_4] = 0x25,
+-    [Q_KEY_CODE_5] = 0x2e,
+-    [Q_KEY_CODE_6] = 0x36,
+-    [Q_KEY_CODE_7] = 0x3d,
+-    [Q_KEY_CODE_8] = 0x3e,
+-    [Q_KEY_CODE_9] = 0x46,
+-    [Q_KEY_CODE_GRAVE_ACCENT] = 0x0e,
+-    [Q_KEY_CODE_MINUS] = 0x4e,
+-    [Q_KEY_CODE_EQUAL] = 0x55,
+-    [Q_KEY_CODE_BACKSLASH] = 0x5c,
+-    [Q_KEY_CODE_BACKSPACE] = 0x66,
+-    [Q_KEY_CODE_SPC] = 0x29,
+-    [Q_KEY_CODE_TAB] = 0x0d,
+-    [Q_KEY_CODE_CAPS_LOCK] = 0x14,
+-    [Q_KEY_CODE_SHIFT] = 0x12,
+-    [Q_KEY_CODE_CTRL] = 0x11,
+-    [Q_KEY_CODE_META_L] = 0x8b,
+-    [Q_KEY_CODE_ALT] = 0x19,
+-    [Q_KEY_CODE_SHIFT_R] = 0x59,
+-    [Q_KEY_CODE_CTRL_R] = 0x58,
+-    [Q_KEY_CODE_META_R] = 0x8c,
+-    [Q_KEY_CODE_ALT_R] = 0x39,
+-    [Q_KEY_CODE_MENU] = 0x8d,
+-    [Q_KEY_CODE_RET] = 0x5a,
+-    [Q_KEY_CODE_ESC] = 0x08,
+-    [Q_KEY_CODE_F1] = 0x07,
+-    [Q_KEY_CODE_F2] = 0x0f,
+-    [Q_KEY_CODE_F3] = 0x17,
+-    [Q_KEY_CODE_F4] = 0x1f,
+-    [Q_KEY_CODE_F5] = 0x27,
+-    [Q_KEY_CODE_F6] = 0x2f,
+-    [Q_KEY_CODE_F7] = 0x37,
+-    [Q_KEY_CODE_F8] = 0x3f,
+-    [Q_KEY_CODE_F9] = 0x47,
+-    [Q_KEY_CODE_F10] = 0x4f,
+-    [Q_KEY_CODE_F11] = 0x56,
+-    [Q_KEY_CODE_F12] = 0x5e,
+-    [Q_KEY_CODE_PRINT] = 0x57,
+-    [Q_KEY_CODE_SCROLL_LOCK] = 0x5f,
+-    [Q_KEY_CODE_PAUSE] = 0x62,
+-    [Q_KEY_CODE_BRACKET_LEFT] = 0x54,
+-    [Q_KEY_CODE_INSERT] = 0x67,
+-    [Q_KEY_CODE_HOME] = 0x6e,
+-    [Q_KEY_CODE_PGUP] = 0x6f,
+-    [Q_KEY_CODE_DELETE] = 0x64,
+-    [Q_KEY_CODE_END] = 0x65,
+-    [Q_KEY_CODE_PGDN] = 0x6d,
+-    [Q_KEY_CODE_UP] = 0x63,
+-    [Q_KEY_CODE_LEFT] = 0x61,
+-    [Q_KEY_CODE_DOWN] = 0x60,
+-    [Q_KEY_CODE_RIGHT] = 0x6a,
+-    [Q_KEY_CODE_NUM_LOCK] = 0x76,
+-    [Q_KEY_CODE_KP_DIVIDE] = 0x4a,
+-    [Q_KEY_CODE_KP_MULTIPLY] = 0x7e,
+-    [Q_KEY_CODE_KP_SUBTRACT] = 0x4e,
+-    [Q_KEY_CODE_KP_ADD] = 0x7c,
+-    [Q_KEY_CODE_KP_ENTER] = 0x79,
+-    [Q_KEY_CODE_KP_DECIMAL] = 0x71,
+-    [Q_KEY_CODE_KP_0] = 0x70,
+-    [Q_KEY_CODE_KP_1] = 0x69,
+-    [Q_KEY_CODE_KP_2] = 0x72,
+-    [Q_KEY_CODE_KP_3] = 0x7a,
+-    [Q_KEY_CODE_KP_4] = 0x6b,
+-    [Q_KEY_CODE_KP_5] = 0x73,
+-    [Q_KEY_CODE_KP_6] = 0x74,
+-    [Q_KEY_CODE_KP_7] = 0x6c,
+-    [Q_KEY_CODE_KP_8] = 0x75,
+-    [Q_KEY_CODE_KP_9] = 0x7d,
+-    [Q_KEY_CODE_BRACKET_RIGHT] = 0x5b,
+-    [Q_KEY_CODE_SEMICOLON] = 0x4c,
+-    [Q_KEY_CODE_APOSTROPHE] = 0x52,
+-    [Q_KEY_CODE_COMMA] = 0x41,
+-    [Q_KEY_CODE_DOT] = 0x49,
+-    [Q_KEY_CODE_SLASH] = 0x4a,
+-
+-    [Q_KEY_CODE_HIRAGANA] = 0x87,
+-    [Q_KEY_CODE_HENKAN] = 0x86,
+-    [Q_KEY_CODE_YEN] = 0x5d,
+-};
+-
+ static uint8_t translate_table[256] = {
+     0xff, 0x43, 0x41, 0x3f, 0x3d, 0x3b, 0x3c, 0x58,
+     0x64, 0x44, 0x42, 0x40, 0x3e, 0x0f, 0x29, 0x59,
+@@ -624,7 +229,7 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+     PS2KbdState *s = (PS2KbdState *)dev;
+     InputKeyEvent *key = evt->u.key.data;
+     int qcode;
+-    uint16_t keycode;
++    uint16_t keycode = 0;
+     int mod;
+ 
+     qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
+@@ -706,7 +311,8 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+                 }
+             }
+         } else {
+-            keycode = qcode_to_keycode_set1[qcode];
++            if (qcode < qemu_input_map_qcode_to_atset1_len)
++                keycode = qemu_input_map_qcode_to_atset1[qcode];
+             if (keycode) {
+                 if (keycode & 0xff00) {
+                     ps2_put_keycode(s, keycode >> 8);
+@@ -799,7 +405,8 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+                 }
+             }
+         } else {
+-            keycode = qcode_to_keycode_set2[qcode];
++            if (qcode < qemu_input_map_qcode_to_atset2_len)
++                keycode = qemu_input_map_qcode_to_atset2[qcode];
+             if (keycode) {
+                 if (keycode & 0xff00) {
+                     ps2_put_keycode(s, keycode >> 8);
+@@ -814,7 +421,8 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+             }
+         }
+     } else if (s->scancode_set == 3) {
+-        keycode = qcode_to_keycode_set3[qcode];
++        if (qcode < qemu_input_map_qcode_to_atset3_len)
++            keycode = qemu_input_map_qcode_to_atset3[qcode];
+         if (keycode) {
+             /* FIXME: break code should be configured on a key by key basis */
+             if (!key->down) {
+diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+index 663986a17b..622c0483cd 100644
+--- a/ui/input-keymap.c
++++ b/ui/input-keymap.c
+@@ -6,6 +6,9 @@
+ #include "standard-headers/linux/input.h"
+ 
+ #include "ui/input-keymap-linux-to-qcode.c"
++#include "ui/input-keymap-qcode-to-atset1.c"
++#include "ui/input-keymap-qcode-to-atset2.c"
++#include "ui/input-keymap-qcode-to-atset3.c"
+ #include "ui/input-keymap-qcode-to-qnum.c"
+ #include "ui/input-keymap-qnum-to-qcode.c"
+ #include "ui/input-keymap-qcode-to-linux.c"
+-- 
 2.9.3
