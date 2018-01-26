@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ef3ny-000306-Io
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:32 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ef3qY-0005bI-9h
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:15:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ef3nx-0005XH-1q
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:12:30 -0500
-Date: Fri, 26 Jan 2018 08:45:50 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180126104550.GG25150@localhost.localdomain>
-References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
-	<20171209010811.GJ3037@localhost.localdomain>
-	<CAFEAcA9oG=+mJ+jSGTM_z54S09gjHoFowDkOvofdkhJd+g3=Cw@mail.gmail.com>
-	<20180122183301.GA31237@localhost.localdomain>
-	<CAFEAcA8pGXMs3hMxSs-t7qGfeR__H-CQ1roRVe5NFMCP8R2vjw@mail.gmail.com>
-	<CAFEAcA96N1Nuh9rXVtWnmnmm_+xQRFiesdSLbTx4yJBGYEVJaQ@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ef3qS-0007kz-8K
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:15:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40838)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ef3qQ-0007ja-Py
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 08:15:04 -0500
+References: <20180123123639.35255-1-izik@veertu.com>
+	<20180123123639.35255-3-izik@veertu.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <74335d27-da55-fe29-1275-e20bb2409e32@redhat.com>
+Date: Fri, 26 Jan 2018 10:39:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA96N1Nuh9rXVtWnmnmm_+xQRFiesdSLbTx4yJBGYEVJaQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
- gic-version=max)
+In-Reply-To: <20180123123639.35255-3-izik@veertu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] ept_emulation_fault() need NetApp BSD
+ attribution:
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +29,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: Izik Eidus <izik@veertu.com>, qemu-devel@nongnu.org
 
-On Thu, Jan 25, 2018 at 03:10:31PM +0000, Peter Maydell wrote:
-> On 25 January 2018 at 14:41, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > On 22 January 2018 at 18:33, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >> About QOM type names:
-> >>
-> >> On x86, all CPU models are resolved to "<model>-<suffix>", and
-> >> i386 and x86_64 have different suffixes.  So the QOM type name is
-> >> "max-x86_64-cpu" on qemu-system-x86_64, and "max-i386-cpu" on
-> >> qemu-system-i386.
-> >
-> > OK. Looking at the target/arm code we do a similar suffix
-> > trick, but we seem to have cut-n-pasted the handling in
-> > aarch64_cpu_register(), so it uses the TYPE_ARM_CPU as the
-> > suffix, rather the TYPE_AARCH64_CPU.
+On 23/01/2018 13:36, Izik Eidus wrote:
+> Moving it to a new file and add the BSD license there.
 > 
-> ...and that's not as simple a fix as I thought, because the
-> code in helper.c for implementing arch_query_cpu_definitions() and
-> arm_cpu_list() assumes it can create the QOM type name by appending
-> TYPE_ARM_CPU. The ARM_CPU_TYPE_NAME() macro which we use pretty
-> extensively also assumes the suffix is the same regardless of
-> what CPU type it's being applied to.
+> Signed-off-by: Izik Eidus <izik@veertu.com>
+
+Since it's compatible, I'm just adding the NetApp BSD license to the file.
+
+What is the original source?  xhyve or something like that?
+
+Paolo
+
+> ---
+>  target/i386/hvf/ept_fault.h | 70 +++++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/hvf/hvf.c       | 38 +-----------------------
+>  2 files changed, 71 insertions(+), 37 deletions(-)
+>  create mode 100644 target/i386/hvf/ept_fault.h
 > 
-> Looking at x86 it seems that TYPE_X86_CPU expands to a different
-> string for qemu-system-x86_64 and qemu-system-i386. I could do
-> that, but it seems very confusing: I would expect a QOM type
-> name like TYPE_FOO to always mean the same QOM type.
-
-Yeah, I don't like the way TYPE_x86_CPU works, and I don't
-recommend doing the same elsewhere.
-
+> diff --git a/target/i386/hvf/ept_fault.h b/target/i386/hvf/ept_fault.h
+> new file mode 100644
+> index 0000000000..c2938d2bd4
+> --- /dev/null
+> +++ b/target/i386/hvf/ept_fault.h
+> @@ -0,0 +1,70 @@
+> +/*-
+> + * Copyright (c) 2011 NetApp, Inc.
+> + * All rights reserved.
+> + *
+> + * Redistribution and use in source and binary forms, with or without
+> + * modification, are permitted provided that the following conditions
+> + * are met:
+> + * 1. Redistributions of source code must retain the above copyright
+> + *    notice, this list of conditions and the following disclaimer.
+> + * 2. Redistributions in binary form must reproduce the above copyright
+> + *    notice, this list of conditions and the following disclaimer in the
+> + *    documentation and/or other materials provided with the distribution.
+> + *
+> + * THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
+> + * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> + * ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
+> + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+> + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+> + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+> + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+> + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+> + * SUCH DAMAGE.
+> + */
+> +
+> +#ifndef EPT_FAULT_H
+> +#define EPT_FAULT_H
+> +
+> +#include "hvf-i386.h"
+> +
+> +static inline bool ept_emulation_fault(hvf_slot *slot, uint64_t gpa, uint64_t ept_qual)
+> +{
+> +    int read, write;
+> +
+> +    /* EPT fault on an instruction fetch doesn't make sense here */
+> +    if (ept_qual & EPT_VIOLATION_INST_FETCH) {
+> +        return false;
+> +    }
+> +
+> +    /* EPT fault must be a read fault or a write fault */
+> +    read = ept_qual & EPT_VIOLATION_DATA_READ ? 1 : 0;
+> +    write = ept_qual & EPT_VIOLATION_DATA_WRITE ? 1 : 0;
+> +    if ((read | write) == 0) {
+> +        return false;
+> +    }
+> +
+> +    if (write && slot) {
+> +        if (slot->flags & HVF_SLOT_LOG) {
+> +            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
+> +            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
+> +                          HV_MEMORY_READ | HV_MEMORY_WRITE);
+> +        }
+> +    }
+> +
+> +    /*
+> +     * The EPT violation must have been caused by accessing a
+> +     * guest-physical address that is a translation of a guest-linear
+> +     * address.
+> +     */
+> +    if ((ept_qual & EPT_VIOLATION_GLA_VALID) == 0 ||
+> +        (ept_qual & EPT_VIOLATION_XLAT_VALID) == 0) {
+> +        return false;
+> +    }
+> +
+> +    return !slot;
+> +}
+> +
+> +
+> +#endif
+> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+> index ab4820c3f5..94d8d119d5 100644
+> --- a/target/i386/hvf/hvf.c
+> +++ b/target/i386/hvf/hvf.c
+> @@ -36,6 +36,7 @@
+>  #include "x86_emu.h"
+>  #include "x86_task.h"
+>  #include "x86hvf.h"
+> +#include "ept_fault.h"
+>  
+>  #include <Hypervisor/hv.h>
+>  #include <Hypervisor/hv_vmx.h>
+> @@ -292,43 +293,6 @@ void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
+>      run_on_cpu(cpu_state, _hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+>  }
+>  
+> -static bool ept_emulation_fault(hvf_slot *slot, uint64_t gpa, uint64_t ept_qual)
+> -{
+> -    int read, write;
+> -
+> -    /* EPT fault on an instruction fetch doesn't make sense here */
+> -    if (ept_qual & EPT_VIOLATION_INST_FETCH) {
+> -        return false;
+> -    }
+> -
+> -    /* EPT fault must be a read fault or a write fault */
+> -    read = ept_qual & EPT_VIOLATION_DATA_READ ? 1 : 0;
+> -    write = ept_qual & EPT_VIOLATION_DATA_WRITE ? 1 : 0;
+> -    if ((read | write) == 0) {
+> -        return false;
+> -    }
+> -
+> -    if (write && slot) {
+> -        if (slot->flags & HVF_SLOT_LOG) {
+> -            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
+> -            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
+> -                          HV_MEMORY_READ | HV_MEMORY_WRITE);
+> -        }
+> -    }
+> -
+> -    /*
+> -     * The EPT violation must have been caused by accessing a
+> -     * guest-physical address that is a translation of a guest-linear
+> -     * address.
+> -     */
+> -    if ((ept_qual & EPT_VIOLATION_GLA_VALID) == 0 ||
+> -        (ept_qual & EPT_VIOLATION_XLAT_VALID) == 0) {
+> -        return false;
+> -    }
+> -
+> -    return !slot;
+> -}
+> -
+>  static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
+>  {
+>      hvf_slot *slot;
 > 
-> Given that the type names don't appear to the user, I think
-> we can go ahead with implementing "-cpu max" for Arm without
-> having to first disentangle this? "max" isn't in any worse
-> a position than the existing "host" and "any" types.
-
-Sounds reasonable to me.
-
--- 
-Eduardo
