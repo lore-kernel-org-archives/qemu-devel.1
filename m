@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ef77y-0003vc-7x
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:45:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ef794-0004rv-BJ
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:46:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ef77u-0008MI-8l
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:45:22 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:37223)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1ef77u-0008L1-0U
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:45:18 -0500
-Received: by mail-lf0-x243.google.com with SMTP id 63so1460437lfv.4
-	for <qemu-devel@nongnu.org>; Fri, 26 Jan 2018 08:45:17 -0800 (PST)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Fri, 26 Jan 2018 11:22:35 +0100
-Message-Id: <1516962162-25680-3-git-send-email-edgar.iglesias@gmail.com>
-In-Reply-To: <1516962162-25680-1-git-send-email-edgar.iglesias@gmail.com>
-References: <1516962162-25680-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v2 2/9] xlnx-zynqmp-pmu: Initial commit of the
- ZynqMP PMU
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ef790-0001Tq-ER
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:46:30 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:59220
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ef790-0001SX-8H
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 11:46:26 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 26 Jan 2018 09:20:28 +0000
+Message-Id: <20180126092029.20737-3-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180126092029.20737-1-mark.cave-ayland@ilande.co.uk>
+References: <20180126092029.20737-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 2/3] uninorth: convert to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
+To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-From: Alistair Francis <alistair.francis@xilinx.com>
-
-The Xilinx ZynqMP SoC has two main processing systems in it. The ARM
-processing system (which is already modeled in QEMU) and the MicroBlaze
-Power Management Unit (PMU). This is the inital work for adding support
-for the PMU.
-
-The PMU susbsystem runs along side the ARM system on hardware, but due
-to architecture limitations in QEMU the two instances are seperate for
-the time being.
-
-Let's follow the same setup we do with the ARM system, where there is an
-SoC device and a ZCU102 board. Although the PMU is less board specific
-we are still going to follow the same split as maybe in future we can
-connect the PMU device to the ARM ZCU102 board. As the machine will be
-fairly small let's keep them both together in one file.
-
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/microblaze/Makefile.objs     |  1 +
- hw/microblaze/xlnx-zynqmp-pmu.c | 83 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
- create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
+ hw/pci-host/trace-events |  6 ++++++
+ hw/pci-host/uninorth.c   | 24 +++++-------------------
+ 2 files changed, 11 insertions(+), 19 deletions(-)
 
-diff --git a/hw/microblaze/Makefile.objs b/hw/microblaze/Makefile.objs
-index b2517d8..ae9fd40 100644
---- a/hw/microblaze/Makefile.objs
-+++ b/hw/microblaze/Makefile.objs
-@@ -1,3 +1,4 @@
- obj-y += petalogix_s3adsp1800_mmu.o
- obj-y += petalogix_ml605_mmu.o
-+obj-y += xlnx-zynqmp-pmu.o
- obj-y += boot.o
-diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-new file mode 100644
-index 0000000..ac0f789
---- /dev/null
-+++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -0,0 +1,83 @@
-+/*
-+ * Xilinx Zynq MPSoC PMU (Power Management Unit) emulation
-+ *
-+ * Copyright (C) 2017 Xilinx Inc
-+ * Written by Alistair Francis <alistair.francis@xilinx.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
+diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
+index 5b8fcc228b..341a87a702 100644
+--- a/hw/pci-host/trace-events
++++ b/hw/pci-host/trace-events
+@@ -12,3 +12,9 @@ sabre_pci_config_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PR
+ sabre_pci_config_read(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
+ sabre_pci_set_irq(int irq_num, int level) "set irq_in %d level %d"
+ sabre_pci_set_obio_irq(int irq_num, int level) "set irq %d level %d"
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "hw/boards.h"
-+#include "cpu.h"
-+
-+/* Define the PMU device */
-+
-+#define TYPE_XLNX_ZYNQMP_PMU_SOC "xlnx,zynqmp-pmu-soc"
-+#define XLNX_ZYNQMP_PMU_SOC(obj) OBJECT_CHECK(XlnxZynqMPPMUSoCState, (obj), \
-+                                              TYPE_XLNX_ZYNQMP_PMU_SOC)
-+
-+typedef struct XlnxZynqMPPMUSoCState {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+
-+    /*< public >*/
-+}  XlnxZynqMPPMUSoCState;
-+
-+static void xlnx_zynqmp_pmu_soc_init(Object *obj)
-+{
-+
-+}
-+
-+static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
-+{
-+
-+}
-+
-+static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = xlnx_zynqmp_pmu_soc_realize;
-+}
-+
-+static const TypeInfo xlnx_zynqmp_pmu_soc_type_info = {
-+    .name = TYPE_XLNX_ZYNQMP_PMU_SOC,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(XlnxZynqMPPMUSoCState),
-+    .instance_init = xlnx_zynqmp_pmu_soc_init,
-+    .class_init = xlnx_zynqmp_pmu_soc_class_init,
-+};
-+
-+static void xlnx_zynqmp_pmu_soc_register_types(void)
-+{
-+    type_register_static(&xlnx_zynqmp_pmu_soc_type_info);
-+}
-+
-+type_init(xlnx_zynqmp_pmu_soc_register_types)
-+
-+/* Define the PMU Machine */
-+
-+static void xlnx_zynqmp_pmu_init(MachineState *machine)
-+{
-+
-+}
-+
-+static void xlnx_zynqmp_pmu_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "Xilinx ZynqMP PMU machine";
-+    mc->init = xlnx_zynqmp_pmu_init;
-+}
-+
-+DEFINE_MACHINE("xlnx-zynqmp-pmu", xlnx_zynqmp_pmu_machine_init)
-+
++# hw/pci-host/uninorth.c
++unin_set_irq(int irq_num, int level) "setting INT %d = %d"
++unin_get_config_reg(uint32_t reg, uint32_t addr, uint32_t retval) "converted config space accessor 0x%"PRIx32 "/0x%"PRIx32 " -> 0x%"PRIx32
++unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0x%"PRIx64 " len %d val 0x%"PRIx64
++unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%"PRIx64 " len %d val 0x%"PRIx64
+diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+index 5d8ccaa711..66991da975 100644
+--- a/hw/pci-host/uninorth.c
++++ b/hw/pci-host/uninorth.c
+@@ -26,16 +26,7 @@
+ #include "hw/ppc/mac.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+-
+-/* debug UniNorth */
+-//#define DEBUG_UNIN
+-
+-#ifdef DEBUG_UNIN
+-#define UNIN_DPRINTF(fmt, ...)                                  \
+-    do { printf("UNIN: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define UNIN_DPRINTF(fmt, ...)
+-#endif
++#include "trace.h"
+ 
+ static const int unin_irq_line[] = { 0x1b, 0x1c, 0x1d, 0x1e };
+ 
+@@ -69,8 +60,7 @@ static void pci_unin_set_irq(void *opaque, int irq_num, int level)
+ {
+     qemu_irq *pic = opaque;
+ 
+-    UNIN_DPRINTF("%s: setting INT %d = %d\n", __func__,
+-                 unin_irq_line[irq_num], level);
++    trace_unin_set_irq(unin_irq_line[irq_num], level);
+     qemu_set_irq(pic[unin_irq_line[irq_num]], level);
+ }
+ 
+@@ -103,9 +93,7 @@ static uint32_t unin_get_config_reg(uint32_t reg, uint32_t addr)
+         retval |= func << 8;
+     }
+ 
+-
+-    UNIN_DPRINTF("Converted config space accessor %08x/%08x -> %08x\n",
+-                 reg, addr, retval);
++    trace_unin_get_config_reg(reg, addr, retval);
+ 
+     return retval;
+ }
+@@ -115,8 +103,7 @@ static void unin_data_write(void *opaque, hwaddr addr,
+ {
+     UNINState *s = opaque;
+     PCIHostState *phb = PCI_HOST_BRIDGE(s);
+-    UNIN_DPRINTF("write addr " TARGET_FMT_plx " len %d val %"PRIx64"\n",
+-                 addr, len, val);
++    trace_unin_data_write(addr, len, val);
+     pci_data_write(phb->bus,
+                    unin_get_config_reg(phb->config_reg, addr),
+                    val, len);
+@@ -132,8 +119,7 @@ static uint64_t unin_data_read(void *opaque, hwaddr addr,
+     val = pci_data_read(phb->bus,
+                         unin_get_config_reg(phb->config_reg, addr),
+                         len);
+-    UNIN_DPRINTF("read addr " TARGET_FMT_plx " len %d val %x\n",
+-                 addr, len, val);
++    trace_unin_data_read(addr, len, val);
+     return val;
+ }
+ 
 -- 
-2.7.4
+2.11.0
