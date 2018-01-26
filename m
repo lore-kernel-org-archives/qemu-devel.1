@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef9tG-0006zn-2j
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:42:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ef9wx-00007M-2f
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ef9tF-0003Pm-61
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:42:22 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b3d8c283-91ff-0c8e-e4be-6151fb054452@redhat.com>
-Date: Fri, 26 Jan 2018 13:42:15 -0600
+	(envelope-from <dgilbert@redhat.com>) id 1ef9wu-0006bE-0Y
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ef9wt-0006af-Qb
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 14:46:07 -0500
+Date: Fri, 26 Jan 2018 19:46:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180126194559.GI2610@work-vm>
+References: <20180124212246.2352-1-wei@redhat.com>
+	<20180125200525.GC2442@work-vm>
+	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
+	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY"
-Subject: Re: [Qemu-devel] [PATCH v3 29/39] qcow2: Prepare
- expand_zero_clusters_in_l1() for adding L2 slice support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <b3d8c283-91ff-0c8e-e4be-6151fb054452@redhat.com>
-Subject: Re: [PATCH v3 29/39] qcow2: Prepare expand_zero_clusters_in_l1() for
- adding L2 slice support
-References: <cover.1516978645.git.berto@igalia.com>
- <4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
-In-Reply-To: <4a4cf18c47fbbd1147fb8e425d23157bb205e0fe.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 26 January 2018 at 15:47, Wei Huang <wei@redhat.com> wrote:
+> >
+> >
+> > On 01/25/2018 02:05 PM, Dr. David Alan Gilbert wrote:
+> >> * Wei Huang (wei@redhat.com) wrote:
+> >>> innerloop:
+> >>>         /* clean cache because el2 might still cache guest data under KVM */
+> >>>         dc      civac, x2
+> >>
+> >> Can you explain a bit more about that please;  if it's guest
+> >> visible acorss migration, doesn't that suggest we need the cache clear
+> >> in KVM or QEMU?
+> >
+> > I think this is ARM specific. This is caused by the inconsistency
+> > between guest VM's data accesses and userspace's accesses (in
+> > check_guest_ram) at the destination:
+> >
+> > 1) Because uncacheable (guest) + cacheable (host) ==> uncacheable. So
+> > the data accesses from guest VM go directly into memory.
+> > 2) QEMU user space will use the cacheable version. So it is possible
+> > that data can come from cache, instead of RAM. The difference between
+> > (1) and (2) obviously can cause check_guest_ram() to fail sometimes.
+> 
+> I think the correct fix here is that your test code should turn
+> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
+> for Arm KVM guests (for the same reason that VGA device video memory
+> doesn't work). If it's RAM your guest has to arrange to map it as
+> Normal Cacheable, and then everything should work fine.
 
-On 01/26/2018 08:59 AM, Alberto Garcia wrote:
-> Adding support for L2 slices to expand_zero_clusters_in_l1() needs
-> (among other things) an extra loop that iterates over all slices of
-> each L2 table.
->=20
-> Putting all changes in one patch would make it hard to read because
-> all semantic changes would be mixed with pure indentation changes.
->=20
-> To make things easier this patch simply creates a new block and
-> changes the indentation of all lines of code inside it. Thus, all
-> modifications in this patch are cosmetic. There are no semantic
-> changes and no variables are renamed yet. The next patch will take
-> care of that.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 187 ++++++++++++++++++++++++++----------------=
---------
->  1 file changed, 96 insertions(+), 91 deletions(-)
+Does this cause problems with migrating at just the wrong point during
+a VM boot?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Dave
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlprhJcACgkQp6FrSiUn
-Q2pffAf/WS+ipOvVIOhhEGQQYUkghJ6apXj53FNQ0Xk19mKEjD/oCDgZnLtQD41a
-I2jDWVaXYqcP3bjBkpfrnnrg8mSGIj/wpJomCOeuT5TpywK1VbowZRqTBj9Dp3jQ
-b2YYrpnTqNhwzfEIzOGaGtOyqUoBQRQVZeU4i624rHG5lWWLeotKTfPhset/+4iw
-UKnq9ikMBlI6X9Ppfi9ZwNBAytpw3zbizURo+ZAi5gAmE3v9xGoBc1WFy7nczbPr
-wgSis+bk64CbJOI+o2SsklDvqK2BCxmKvC2AX2b5L7zf+Y1pWB4KhVYGmi6x4Uwl
-+zwXe72IJOVs9XyVp94DPXsrrLrPIg==
-=2c05
------END PGP SIGNATURE-----
-
---2dPKUZnSKTfdVNcydL1pyxhdvtkMb3iqY--
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
