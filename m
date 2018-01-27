@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1efG1d-0003YX-7a
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:15:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1efIDC-0007ae-GC
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 23:35:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1efG1c-0006SW-0s
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:15:25 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:35978)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1efG1b-0006R6-Gz
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:15:23 -0500
-Date: Sat, 27 Jan 2018 03:15:19 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180127021519.owj7hsn43zzt4jst@var.youpi.perso.aquilenet.fr>
-References: <20180126183636.7586-1-samuel.thibault@ens-lyon.org>
-	<11f250c0-ce8e-3529-bbf2-d6275e0c1747@vivier.eu>
+	(envelope-from <bounces@canonical.com>) id 1efID9-0007Ja-C7
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 23:35:30 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41634)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1efID9-0007Ij-0Z
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 23:35:27 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1efID7-0007z8-Nc
+	for <qemu-devel@nongnu.org>; Sat, 27 Jan 2018 04:35:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A6D762E8025
+	for <qemu-devel@nongnu.org>; Sat, 27 Jan 2018 04:35:25 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <11f250c0-ce8e-3529-bbf2-d6275e0c1747@vivier.eu>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix sched_getaffinity mask size
+Date: Sat, 27 Jan 2018 04:17:21 -0000
+From: Launchpad Bug Tracker <1399191@bugs.launchpad.net>
+Reply-To: Bug 1399191 <1399191@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141204133138.26031.92640.malonedeb@wampee.canonical.com>
+Message-Id: <151702664205.1693.15215830077423672546.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1399191] Re: Large VHDX image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
 
-Laurent Vivier, on ven. 26 janv. 2018 21:34:38 +0100, wrote:
-> Le 26/01/2018 =C3=A0 19:36, Samuel Thibault a =C3=A9crit=C2=A0:
-> > We properly computed the capped mask size to be put to the applicatio=
-n
-> > buffer, but didn't actually it. Also, we need to return the capped ma=
-sk
-> > size instead of 0 on success.
-> >=20
-> > Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> > ---
-> >  linux-user/syscall.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> > index 74378947f0..cf2369aac2 100644
-> > --- a/linux-user/syscall.c
-> > +++ b/linux-user/syscall.c
-> > @@ -10496,10 +10496,15 @@ abi_long do_syscall(void *cpu_env, int num,=
- abi_long arg1,
-> >                          ret =3D -TARGET_EINVAL;
-> >                          break;
-> >                      }
-> > -                    ret =3D arg2;
-> > +                } else if (arg2 > ret) {
-> > +                    arg2 =3D ret;
-> >                  }
-> > =20
-> >                  ret =3D host_to_target_cpu_mask(mask, mask_size, arg=
-3, arg2);
-> > +
-> > +                if (ret =3D=3D 0) {
-> > +                    ret =3D arg2;
-> > +                }
-> >              }
-> >          }
-> >          break;
-> >=20
->=20
-> Modified code was:
->=20
->     if (copy_to_user(arg3, mask, ret)) {
->         goto efault;
->     }
->=20
-> so the change should only be:
->=20
->     if (host_to_target_cpu_mask(mask, mask_size, arg3, ret)) {
->         goto efault;
->     }
+[Expired for QEMU because there has been no activity for 60 days.]
 
-That depends whether host_to_target_cpu_mask wants to return something
-else than -TARGET_EFAULT, but at some point I don't care about
-bikeshedding.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Samuel
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1399191
+
+Title:
+  Large VHDX image size
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  We are trying to convert a VMDK image to VHDX image for deploy to HyperV =
+Server ( SCVMM 2012 SP1) using qemu-img.
+  We tried converting the image using both 'fixed' as well as 'dynamic' for=
+mat. We found that both the disks occupy the same size of 50GB. When the sa=
+me is done with VHD image, we found that the dynamic disks are much lesser =
+in size (5 GB) than the fixed disk (50GB). =
+
+
+  Why is that the VHDX generates large sized images for both the
+  formats?
+
+  The following commands were used to convert the vmdk image to VHDX
+  format
+
+  1. qemu-img convert -p -o subformat=3Dfixed  -f vmdk -O vhdx Test.vmdk
+  Test-fixed.vhdx
+
+  qemu-img info Test-fixed.vhdx
+  image: Test-fixed.vhdx
+  file format: vhdx
+  virtual size: 50G (53687091200 bytes)
+  disk size: 50G
+  cluster_size: 16777216
+
+
+  =
+
+  2. qemu-img convert -p -o subformat=3Ddynamic  -f vmdk -O vhdx Test.vmdk =
+Test-dynamic.vhdx
+
+  qemu-img info Test-dynamic.vhdx
+  image: Test-dynamic.vhdx
+  file format: vhdx
+  virtual size: 50G (53687091200 bytes)
+  disk size: 50G
+  cluster_size: 16777216
+
+  =
+
+  We tried this with the following version of qemu
+  1. qemu-2.0.0
+  2. qemu-2.1.2
+  3. qemu-2.2.0-rc4
+
+  =
+
+  Please let us know how to create compact VHDX images using qemu-img.
+  Thank you
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1399191/+subscriptions
