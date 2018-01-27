@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFsA-00019t-DU
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1efFsD-0001CG-Av
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFs9-0008U8-0z
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:38 -0500
+	(envelope-from <jsnow@redhat.com>) id 1efFsB-0008WO-OA
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:41 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 26 Jan 2018 21:05:11 -0500
-Message-Id: <20180127020515.27137-11-jsnow@redhat.com>
+Date: Fri, 26 Jan 2018 21:05:15 -0500
+Message-Id: <20180127020515.27137-15-jsnow@redhat.com>
 In-Reply-To: <20180127020515.27137-1-jsnow@redhat.com>
 References: <20180127020515.27137-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v3 10/14] blockjobs: Add waiting event
+Subject: [Qemu-devel] [RFC v3 14/14] iotests: test manual job dismissal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,149 +22,285 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-For jobs that are stuck waiting on others in a transaction, it would
-be nice to know that they are no longer "running" in that sense, but
-instead are waiting on other jobs in the transaction.
-
-Jobs that are "waiting" in this sense cannot be meaningfully altered
-any longer as they have left their running loop. The only meaningful
-user verb for jobs in this state is "cancel," which will cancel the
-whole transaction, too.
-
-Valid transitions:
-Running -> Waiting (transactional, non-mirror jobs upon completion)
-Ready -> Waiting (hypothetically: transactional mirror jobs upon
-                  block-job-complete)
-Waiting -> Concluded (transactional jobs of any kind upon convergence)
-
-Valid verbs:
-Cancel: A waiting job may still be canceled.
+RFC: The error returned by a job creation command when that device
+already has a job attached has become misleading; "Someone should
+do something about that!"
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c           | 45 +++++++++++++++++++++++++++++++--------------
- qapi/block-core.json | 25 ++++++++++++++++++++++++-
- 2 files changed, 55 insertions(+), 15 deletions(-)
+ tests/qemu-iotests/056     | 241 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/056.out |   4 +-
+ 2 files changed, 243 insertions(+), 2 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index e52b4c4ce0..6a3a630517 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -44,13 +44,14 @@ static QemuMutex block_job_mutex;
+diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+index 04f2c3c841..846e0419d0 100755
+--- a/tests/qemu-iotests/056
++++ b/tests/qemu-iotests/056
+@@ -29,6 +29,26 @@ backing_img = os.path.join(iotests.test_dir, 'backing.img')
+ test_img = os.path.join(iotests.test_dir, 'test.img')
+ target_img = os.path.join(iotests.test_dir, 'target.img')
  
- /* BlockJob State Transition Table */
- bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, E */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 1},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 1, 1},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 1, 0, 1},
--    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {1, 0, 0, 0, 0, 0},
-+                                          /* U, C, R, P, Y, W, E */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 1, 1},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 1, 0, 1},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 1, 0, 1, 1},
-+    /* W: */ [BLOCK_JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 1},
-+    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {1, 0, 0, 0, 0, 0, 0},
- };
- 
- enum BlockJobVerb {
-@@ -64,13 +65,13 @@ enum BlockJobVerb {
- };
- 
- bool BlockJobVerb[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, E */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 0, 0, 1, 0, 0},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 0},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0},
--    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 1},
-+                                          /* U, C, R, P, Y, W, E */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 0},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 0, 0, 1, 0, 0, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 0, 0},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0},
-+    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 1},
- };
- 
- static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-@@ -789,6 +790,21 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
-                                         &error_abort);
- }
- 
-+static void block_job_event_waiting(BlockJob *job)
-+{
-+    if (!job->manual) {
-+        return;
-+    }
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_WAITING);
-+    if (block_job_is_internal(job)) {
-+        return;
-+    }
++def img_create(img, fmt=iotests.imgfmt, size='64M', **kwargs):
++    fullname = os.path.join(iotests.test_dir, '%s.%s' % (img, fmt))
++    optargs = []
++    for k,v in kwargs.iteritems():
++        optargs = optargs + ['-o', '%s=%s' % (k,v)]
++    args = ['create', '-f', fmt] + optargs + [fullname, size]
++    iotests.qemu_img(*args)
++    return fullname
 +
-+    qapi_event_send_block_job_waiting(job->driver->job_type,
-+                                      job->id,
-+                                      &error_abort);
-+}
++def try_remove(img):
++    try:
++        os.remove(img)
++    except OSError:
++        pass
 +
- static void block_job_event_concluded(BlockJob *job)
- {
-     if (block_job_is_internal(job) || !job->manual) {
-@@ -925,6 +941,7 @@ void block_job_completed(BlockJob *job, int ret)
-     } else if (ret < 0 || block_job_is_cancelled(job)) {
-         block_job_completed_txn_abort(job);
-     } else {
-+        block_job_event_waiting(job);
-         block_job_completed_txn_success(job);
-     }
- }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index f27c7054d2..f26fd1d8fd 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -966,7 +966,7 @@
- ##
- { 'enum': 'BlockJobStatus',
-   'data': ['undefined', 'created', 'running', 'paused', 'ready',
--           'concluded' ] }
-+           'waiting', 'concluded' ] }
- 
- ##
- # @BlockJobInfo:
-@@ -3867,6 +3867,29 @@
-             'offset': 'int',
-             'speed' : 'int' } }
- 
-+##
-+# @BLOCK_JOB_WAITING:
-+#
-+# Emitted when a block job that is part of a transction has stopped work and is
-+# waiting for other jobs in the transaction to reach the same state.
-+#
-+# @type: job type
-+#
-+# @id: The job identifier.
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# <- { "event": "BLOCK_JOB_WAITING",
-+#      "data": { "id": "drive0", "type": "mirror" },
-+#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
-+#
-+##
-+{ 'event': 'BLOCK_JOB_WAITING',
-+  'data': { 'type'  : 'BlockJobType',
-+            'id'    : 'str' } }
++def io_write_patterns(img, patterns):
++    for pattern in patterns:
++        iotests.qemu_io('-c', 'write -P%s %s %s' % pattern, img)
 +
- ##
- # @PreallocMode:
- #
++
+ class TestSyncModesNoneAndTop(iotests.QMPTestCase):
+     image_len = 64 * 1024 * 1024 # MB
+ 
+@@ -108,5 +128,226 @@ class TestBeforeWriteNotifier(iotests.QMPTestCase):
+         event = self.cancel_and_wait()
+         self.assert_qmp(event, 'data/type', 'backup')
+ 
++class BackupTest(iotests.QMPTestCase):
++    def setUp(self):
++        self.vm = iotests.VM()
++        self.test_img = img_create('test')
++        self.dest_img = img_create('dest')
++        self.vm.add_drive(self.test_img)
++        self.vm.launch()
++
++    def tearDown(self):
++        self.vm.shutdown()
++        try_remove(self.test_img)
++        try_remove(self.dest_img)
++
++    def hmp_io_writes(self, drive, patterns):
++        for pattern in patterns:
++            self.vm.hmp_qemu_io(drive, 'write -P%s %s %s' % pattern)
++        self.vm.hmp_qemu_io(drive, 'flush')
++
++    def qmp_job_pending_wait(self, device):
++        event = self.vm.event_wait(name="BLOCK_JOB_PENDING",
++                                   match={'data': {'id': device}})
++        self.assertNotEqual(event, None)
++        res = self.vm.qmp("block-job-finalize", id=device)
++        self.assert_qmp(res, 'return', {})
++
++    def qmp_backup_and_wait(self, cmd='drive-backup', serror=None,
++                            aerror=None, **kwargs):
++        if not self.qmp_backup(cmd, serror, **kwargs):
++            return False
++        if 'manual' in kwargs and kwargs['manual']:
++                self.qmp_job_pending_wait(kwargs['device'])
++        return self.qmp_backup_wait(kwargs['device'], aerror)
++
++    def qmp_backup(self, cmd='drive-backup',
++                   error=None, **kwargs):
++        self.assertTrue('device' in kwargs)
++        res = self.vm.qmp(cmd, **kwargs)
++        if error:
++            self.assert_qmp(res, 'error/desc', error)
++            return False
++        self.assert_qmp(res, 'return', {})
++        return True
++
++    def qmp_backup_wait(self, device, error=None):
++        event = self.vm.event_wait(name="BLOCK_JOB_COMPLETED",
++                                   match={'data': {'device': device}})
++        self.assertNotEqual(event, None)
++        try:
++            failure = self.dictpath(event, 'data/error')
++        except AssertionError:
++            # Backup succeeded.
++            self.assert_qmp(event, 'data/offset', event['data']['len'])
++            return True
++        else:
++            # Failure.
++            self.assert_qmp(event, 'data/error', qerror)
++            return False
++
++    def test_dismiss_false(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, manual=False)
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
++    def test_dismiss_true(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, manual=True)
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/status', 'concluded')
++        res = self.vm.qmp('block-job-dismiss', id='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
++    def test_dismiss_bad_id(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        res = self.vm.qmp('block-job-dismiss', id='foobar')
++        self.assert_qmp(res, 'error/class', 'DeviceNotActive')
++
++    def test_dismiss_collision(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, manual=True)
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/status', 'concluded')
++        # Leave zombie job un-dismissed, observe a failure:
++        res = self.qmp_backup_and_wait(serror='Need a root block node',
++                                       device='drive0', format=iotests.imgfmt,
++                                       sync='full', target=self.dest_img,
++                                       manual=True)
++        self.assertEqual(res, False)
++        # OK, dismiss the zombie.
++        res = self.vm.qmp('block-job-dismiss', id='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        # Ensure it's really gone.
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, manual=True)
++
++    def test_dismiss_premature(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        # Give blkdebug something to chew on
++        self.hmp_io_writes('drive0',
++                           (('0x9a', 0, 512),
++                           ('0x55', '8M', '352k'),
++                           ('0x78', '15872k', '1M')))
++        # Add destination node via blkdebug
++        res = self.vm.qmp('blockdev-add',
++                          node_name='target0',
++                          driver=iotests.imgfmt,
++                          file={
++                              'driver': 'blkdebug',
++                              'image': {
++                                  'driver': 'file',
++                                  'filename': self.dest_img
++                              },
++                              'inject-error': [{
++                                  'event': 'write_aio',
++                                  'errno': 5,
++                                  'immediately': False,
++                                  'once': True
++                              }],
++                          })
++        self.assert_qmp(res, 'return', {})
++
++        res = self.qmp_backup(cmd='blockdev-backup',
++                              device='drive0', target='target0',
++                              on_target_error='stop',
++                              sync='full',
++                              manual=True)
++        self.assertTrue(res)
++        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
++                                   match={'data': {'device': 'drive0'}})
++        self.assertNotEqual(event, None)
++        # OK, job should be wedged
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/status', 'paused')
++        res = self.vm.qmp('block-job-dismiss', id='drive0')
++        self.assert_qmp(res, 'error/desc',
++                        "The active block job 'drive0', status: 'paused', has not yet concluded, and cannot be dismissed yet")
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/status', 'paused')
++        # OK, unstick job and move forward.
++        res = self.vm.qmp('block-job-resume', device='drive0')
++        self.assert_qmp(res, 'return', {})
++        # Job should now be pending...
++        self.qmp_job_pending_wait('drive0')
++        # And now we need to wait for it to conclude;
++        res = self.qmp_backup_wait(device='drive0')
++        self.assertTrue(res)
++        # Job should now be languishing:
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/status', 'concluded')
++        res = self.vm.qmp('block-job-dismiss', id='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
++    def test_dismiss_erroneous(self):
++        '''Same as above test, but manual is set to False.'''
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        # Give blkdebug something to chew on
++        self.hmp_io_writes('drive0',
++                           (('0x9a', 0, 512),
++                           ('0x55', '8M', '352k'),
++                           ('0x78', '15872k', '1M')))
++        # Add destination node via blkdebug
++        res = self.vm.qmp('blockdev-add',
++                          node_name='target0',
++                          driver=iotests.imgfmt,
++                          file={
++                              'driver': 'blkdebug',
++                              'image': {
++                                  'driver': 'file',
++                                  'filename': self.dest_img
++                              },
++                              'inject-error': [{
++                                  'event': 'write_aio',
++                                  'errno': 5,
++                                  'immediately': False,
++                                  'once': True
++                              }],
++                          })
++        self.assert_qmp(res, 'return', {})
++
++        res = self.qmp_backup(cmd='blockdev-backup',
++                              device='drive0', target='target0',
++                              on_target_error='stop',
++                              sync='full',
++                              manual=False)
++        self.assertTrue(res)
++        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
++                                   match={'data': {'device': 'drive0'}})
++        self.assertNotEqual(event, None)
++        # OK, job should be wedged
++        res = self.vm.qmp('query-block-jobs')
++        # NB: No 'status' field when manual = false.
++        self.assert_qmp(res, 'return[0]/paused', True)
++        res = self.vm.qmp('block-job-dismiss', id='drive0')
++        self.assert_qmp(res, 'error/desc',
++                        "The active block job 'drive0' was not started with 'manual': true, and so cannot be dismissed as it will clean up after itself automatically")
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/paused', True)
++        # OK, unstick job and move forward.
++        res = self.vm.qmp('block-job-resume', device='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.qmp_backup_wait(device='drive0')
++        self.assertTrue(res)
++        # Job should now be gone:
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'])
+diff --git a/tests/qemu-iotests/056.out b/tests/qemu-iotests/056.out
+index 8d7e996700..dae404e278 100644
+--- a/tests/qemu-iotests/056.out
++++ b/tests/qemu-iotests/056.out
+@@ -1,5 +1,5 @@
+-...
++.........
+ ----------------------------------------------------------------------
+-Ran 3 tests
++Ran 9 tests
+ 
+ OK
 -- 
 2.14.3
