@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFs3-0000oz-2E
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:32 -0500
+	(envelope-from <jsnow@redhat.com>) id 1efFs1-0000k5-Vt
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFs1-0008Mj-Oh
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:30 -0500
+	(envelope-from <jsnow@redhat.com>) id 1efFs0-0008LI-FS
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:29 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 26 Jan 2018 21:05:05 -0500
-Message-Id: <20180127020515.27137-5-jsnow@redhat.com>
+Date: Fri, 26 Jan 2018 21:05:03 -0500
+Message-Id: <20180127020515.27137-3-jsnow@redhat.com>
 In-Reply-To: <20180127020515.27137-1-jsnow@redhat.com>
 References: <20180127020515.27137-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v3 04/14] blockjobs: RFC add block_job_verb
- permission table
+Subject: [Qemu-devel] [RFC v3 02/14] blockjobs: Add status enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +22,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Which commands are appropriate for jobs in which state is also somewhat
-burdensome to keep track of. Introduce a verbs table that, as of this RFC
-patch, does nothing but serve as a declaration of intent.
+We're about to add several new states, and booleans are becoming
+unwieldly and difficult to reason about. To this end, add a new "status"
+field and add our existing states in a redundant manner alongside the
+bools they are replacing:
 
-(At the very least, it forced me to consider all of the possibilities.)
+UNDEFINED: Placeholder, default state.
+CREATED:   replaces (paused && !busy)
+RUNNING:   replaces effectively (!paused && busy)
+PAUSED:    Nearly redundant with info->paused, which shows pause_count.
+           This reports the actual status of the job, which almost always
+           matches the paused request status. It differs in that it is
+           strictly only true when the job has actually gone dormant.
+READY:     replaces job->ready.
 
-If this idea seems appealing, I can expand the verbs concept into a list
-of interfaces to consult the table and refuse inappropriate commands,
-mostly serving as new errors for the QMP interface.
+New state additions in coming commits will not be quite so redundant:
 
-
-cancel: can apply to any created, running, paused or ready job.
-pause: can apply to any created, running, or ready job. Addition pauses
-       can and do stack, so a paused job can also be paused.
-       Note that a pause from the QMP context is treated separately and
-       does not stack.
-resume: Only a paused job can be resumed. Only a job that has been paused
-        via QMP can be resumed via QMP.
-set-speed: Any created, running, paused or ready job can tolerate a
-           set-speed request.
-complete: Only a ready job may accept a complete request.
+WAITING:   Waiting on Transaction. This job has finished all the work
+           it can until the transaction converges, fails, or is canceled.
+           This status does not feature for non-transactional jobs.
+PENDING:   Pending authorization from user. This job has finished all the
+           work it can until the job or transaction is finalized via
+           block_job_finalize. If this job is in a transaction, it has
+           already left the WAITING status.
+CONCLUDED: Job has ceased all operations and has a return code available
+           for query and may be dismissed via block_job_dismiss.
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ blockjob.c               | 10 ++++++++++
+ include/block/blockjob.h |  4 ++++
+ qapi/block-core.json     | 17 ++++++++++++++++-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
 diff --git a/blockjob.c b/blockjob.c
-index d084a1e318..ea216aca5e 100644
+index 9850d70cb0..6eb783a354 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -52,6 +52,24 @@ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
-     /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 1, 0},
- };
+@@ -321,6 +321,7 @@ void block_job_start(BlockJob *job)
+     job->pause_count--;
+     job->busy = true;
+     job->paused = false;
++    job->status = BLOCK_JOB_STATUS_RUNNING;
+     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+ }
  
-+enum BlockJobVerb {
-+    BLOCK_JOB_VERB_CANCEL,
-+    BLOCK_JOB_VERB_PAUSE,
-+    BLOCK_JOB_VERB_RESUME,
-+    BLOCK_JOB_VERB_SET_SPEED,
-+    BLOCK_JOB_VERB_COMPLETE,
-+    BLOCK_JOB_VERB__MAX
-+};
-+
-+bool BlockJobVerb[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
-+                                          /* U, C, R, P, Y */
-+    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1},
-+    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1},
-+    [BLOCK_JOB_VERB_RESUME]               = {0, 0, 0, 1, 0},
-+    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1},
-+    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1},
-+};
-+
- static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+@@ -601,6 +602,10 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
+     info->speed     = job->speed;
+     info->io_status = job->iostatus;
+     info->ready     = job->ready;
++    if (job->manual) {
++        info->has_status = true;
++        info->status = job->status;
++    }
+     return info;
+ }
+ 
+@@ -704,6 +709,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     job->pause_count   = 1;
+     job->refcnt        = 1;
+     job->manual        = manual;
++    job->status        = BLOCK_JOB_STATUS_CREATED;
+     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
+                    QEMU_CLOCK_REALTIME, SCALE_NS,
+                    block_job_sleep_timer_cb, job);
+@@ -808,9 +814,12 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+     }
+ 
+     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
++        BlockJobStatus status = job->status;
++        job->status = BLOCK_JOB_STATUS_PAUSED;
+         job->paused = true;
+         block_job_do_yield(job, -1);
+         job->paused = false;
++        job->status = status;
+     }
+ 
+     if (job->driver->resume) {
+@@ -916,6 +925,7 @@ void block_job_iostatus_reset(BlockJob *job)
+ 
+ void block_job_event_ready(BlockJob *job)
  {
-     BlockJobStatus s0 = job->status;
++    job->status = BLOCK_JOB_STATUS_READY;
+     job->ready = true;
+ 
+     if (block_job_is_internal(job)) {
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index b94d0c9fa6..d8e7df7e6e 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -146,6 +146,10 @@ typedef struct BlockJob {
+      */
+     bool manual;
+ 
++    /* Current state, using 2.12+ state names
++     */
++    BlockJobStatus status;
++
+     /** Non-NULL if this job is part of a transaction */
+     BlockJobTxn *txn;
+     QLIST_ENTRY(BlockJob) txn_list;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 8225308904..eac89754c1 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -955,6 +955,18 @@
+ { 'enum': 'BlockJobType',
+   'data': ['commit', 'stream', 'mirror', 'backup'] }
+ 
++##
++# @BlockJobStatus:
++#
++# Block Job State
++#
++#
++#
++# Since: 2.12
++##
++{ 'enum': 'BlockJobStatus',
++  'data': ['undefined', 'created', 'running', 'paused', 'ready'] }
++
+ ##
+ # @BlockJobInfo:
+ #
+@@ -981,12 +993,15 @@
+ #
+ # @ready: true if the job may be completed (since 2.2)
+ #
++# @status: Current job state/status (since 2.12)
++#
+ # Since: 1.1
+ ##
+ { 'struct': 'BlockJobInfo',
+   'data': {'type': 'str', 'device': 'str', 'len': 'int',
+            'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
+-           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool'} }
++           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
++           '*status': 'BlockJobStatus' } }
+ 
+ ##
+ # @query-block-jobs:
 -- 
 2.14.3
