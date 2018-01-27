@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFs1-0000jP-TP
+	(envelope-from <jsnow@redhat.com>) id 1efFs1-0000je-Ua
 	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFs0-0008Li-Ma
+	(envelope-from <jsnow@redhat.com>) id 1efFs0-0008LY-Jb
 	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:29 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 26 Jan 2018 21:05:04 -0500
-Message-Id: <20180127020515.27137-4-jsnow@redhat.com>
-In-Reply-To: <20180127020515.27137-1-jsnow@redhat.com>
-References: <20180127020515.27137-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v3 03/14] blockjobs: add state transition table
+Date: Fri, 26 Jan 2018 21:05:01 -0500
+Message-Id: <20180127020515.27137-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [RFC v3 00/14] blockjobs: add explicit job management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,108 +20,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-The state transition table has mostly been implied. We're about to make
-it a bit more complex, so let's make the STM explicit instead.
+For jobs that complete when a monitor isn't looking, there's no way to
+tell what the job's final return code was. We need to allow jobs to
+remain in the list until queried for reliable management.
 
-Perform state transitions with a function that for now just asserts the
-transition is appropriate.
+Furthermore, it's not viable to have graph changes when the monitor
+isn't looking either. We need at least another event for that.
 
-undefined: May only transition to 'created'.
-created: May only transition to 'running'.
-         It cannot transition to pause directly, but if a created job
-         is requested to pause prior to starting, it will transition
-         synchronously to 'running' and then to 'paused'.
-running: May transition either to 'paused' or 'ready'.
-paused: May transition to either 'running' or 'ready', but only in
-        terms of returning to that prior state.
-        p->r->y is not possible, but this is not encapsulated by the
-        STM table.
-ready: May transition to paused.
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- blockjob.c | 39 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
+This series is a rough sketch for the WAITING, PENDING and CONCLUDED
+events that accompany an expanded job management scheme that a management
+client can opt-in to.
 
-diff --git a/blockjob.c b/blockjob.c
-index 6eb783a354..d084a1e318 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -42,6 +42,35 @@
-  * block_job_enter. */
- static QemuMutex block_job_mutex;
- 
-+/* BlockJob State Transition Table */
-+bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
-+                                          /* U, C, R, P, Y */
-+    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0},
-+    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0},
-+    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1},
-+    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 1},
-+    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 1, 0},
-+};
-+
-+static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-+{
-+    BlockJobStatus s0 = job->status;
-+    if (s0 == s1) {
-+        return;
-+    }
-+    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
-+    assert(BlockJobSTT[s0][s1]);
-+    switch (s1) {
-+    case BLOCK_JOB_STATUS_WAITING:
-+    case BLOCK_JOB_STATUS_PENDING:
-+    case BLOCK_JOB_STATUS_CONCLUDED:
-+        assert(job->manual);
-+    default:
-+        break;
-+    }
-+    job->status = s1;
-+}
-+
- static void block_job_lock(void)
- {
-     qemu_mutex_lock(&block_job_mutex);
-@@ -321,7 +350,7 @@ void block_job_start(BlockJob *job)
-     job->pause_count--;
-     job->busy = true;
-     job->paused = false;
--    job->status = BLOCK_JOB_STATUS_RUNNING;
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
-     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
- }
- 
-@@ -709,7 +738,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->pause_count   = 1;
-     job->refcnt        = 1;
-     job->manual        = manual;
--    job->status        = BLOCK_JOB_STATUS_CREATED;
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
-     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-                    QEMU_CLOCK_REALTIME, SCALE_NS,
-                    block_job_sleep_timer_cb, job);
-@@ -815,11 +844,11 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
- 
-     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
-         BlockJobStatus status = job->status;
--        job->status = BLOCK_JOB_STATUS_PAUSED;
-+        block_job_state_transition(job, BLOCK_JOB_STATUS_PAUSED);
-         job->paused = true;
-         block_job_do_yield(job, -1);
-         job->paused = false;
--        job->status = status;
-+        block_job_state_transition(job, status);
-     }
- 
-     if (job->driver->resume) {
-@@ -925,7 +954,7 @@ void block_job_iostatus_reset(BlockJob *job)
- 
- void block_job_event_ready(BlockJob *job)
- {
--    job->status = BLOCK_JOB_STATUS_READY;
-+    block_job_state_transition(job, BLOCK_JOB_STATUS_READY);
-     job->ready = true;
- 
-     if (block_job_is_internal(job)) {
+V3:
+ - Added WAITING and PENDING events
+ - Added block_job_finalize verb
+ - Added .pending() callback for jobs
+ - Tweaked how .commit/.abort work
+
+V2:
+ - Added tests!
+ - Changed property name (Jeff, Paolo)
+
+RFC / Known problems:
+- I need a lot more tests.
+- Jobs need to actually implement their .pending callback for this to be of any
+  actual use.
+- Mirror needs to be refactored to use the commit/abort/pending/clean callbacks
+  to fulfill the promise made by "no graph changes without user authorization"
+  that PENDING is supposed to offer
+- Jobs beyond backup will be able to opt-in to the new management scheme in the
+  next version.
+- V4 will include a forced synchronicity for jobs in a transaction; i.e. all
+  jobs will be forced to use either the old or new styles, but not a mix.
+
+Please take a look and shout loudly if I'm wandering in the wrong direction.
+
+________________________________________________________________________________
+
+For convenience, this branch is available at:
+https://github.com/jnsnow/qemu.git branch block-job-reap
+https://github.com/jnsnow/qemu/tree/block-job-reap
+
+This version is tagged block-job-reap-v3:
+https://github.com/jnsnow/qemu/releases/tag/block-job-reap-v3
+
+John Snow (14):
+  blockjobs: add manual property
+  blockjobs: Add status enum
+  blockjobs: add state transition table
+  blockjobs: RFC add block_job_verb permission table
+  blockjobs: add block_job_dismiss
+  blockjobs: add CONCLUDED state
+  blockjobs: ensure abort is called for cancelled jobs
+  blockjobs: add commit, abort, clean helpers
+  blockjobs: add prepare callback
+  blockjobs: Add waiting event
+  blockjobs: add PENDING status and event
+  blockjobs: add block-job-finalize
+  blockjobs: Expose manual property
+  iotests: test manual job dismissal
+
+ block/backup.c               |  22 ++--
+ block/commit.c               |   2 +-
+ block/mirror.c               |   2 +-
+ block/replication.c          |   5 +-
+ block/stream.c               |   2 +-
+ block/trace-events           |   2 +
+ blockdev.c                   |  42 ++++++-
+ blockjob.c                   | 279 ++++++++++++++++++++++++++++++++++++++++---
+ include/block/block_int.h    |   9 +-
+ include/block/blockjob.h     |  38 ++++++
+ include/block/blockjob_int.h |  12 +-
+ qapi/block-core.json         | 135 +++++++++++++++++++--
+ tests/qemu-iotests/056       | 241 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/056.out   |   4 +-
+ tests/test-bdrv-drain.c      |   4 +-
+ tests/test-blockjob-txn.c    |   2 +-
+ tests/test-blockjob.c        |   4 +-
+ 17 files changed, 750 insertions(+), 55 deletions(-)
+
 -- 
 2.14.3
