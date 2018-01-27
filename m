@@ -1,36 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1efEco-0001qq-Em
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 19:45:43 -0500
+	(envelope-from <jsnow@redhat.com>) id 1efFs1-0000jP-TP
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1efEcl-0006Oh-4T
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 19:45:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1efEck-0006Ne-Tw
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 19:45:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1efEcj-0004Xd-JA
-	for <qemu-devel@nongnu.org>; Sat, 27 Jan 2018 00:45:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8E7152E8551
-	for <qemu-devel@nongnu.org>; Sat, 27 Jan 2018 00:45:37 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 27 Jan 2018 00:39:08 -0000
-From: John Arbuckle <programmingkidx@gmail.com>
-Reply-To: Bug 1737194 <1737194@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151274735709.11243.12332071284435970530.malonedeb@soybean.canonical.com>
-	<151697829435.7573.12786947158980567417.malone@soybean.canonical.com>
-	<A7EAECCF-80AF-4075-845E-420018361DD8@gmail.com>
-Message-Id: <42430D14-86E9-4F5F-AE59-DCEA2E89B84F@gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1737194] Windows NT 4.0 fails to boot from
- qcow2 installation
+	(envelope-from <jsnow@redhat.com>) id 1efFs0-0008Li-Ma
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:29 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Fri, 26 Jan 2018 21:05:04 -0500
+Message-Id: <20180127020515.27137-4-jsnow@redhat.com>
+In-Reply-To: <20180127020515.27137-1-jsnow@redhat.com>
+References: <20180127020515.27137-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [RFC v3 03/14] blockjobs: add state transition table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,96 +19,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-I have installed Windows 95 OSR 2.5 in QEMU using the qcow2 format. So
-far there hasn't been any major problems that prevent Windows from
-booting.
+The state transition table has mostly been implied. We're about to make
+it a bit more complex, so let's make the STM explicit instead.
 
-I downloaded the ISO file from here:
-https://winworldpc.com/product/windows-95/osr-3
+Perform state transitions with a function that for now just asserts the
+transition is appropriate.
 
-Used this floppy boot image to boot QEMU: https://winworldpc.com/product
-/microsoft-windows-boot-disk/95-osr2x
+undefined: May only transition to 'created'.
+created: May only transition to 'running'.
+         It cannot transition to pause directly, but if a created job
+         is requested to pause prior to starting, it will transition
+         synchronously to 'running' and then to 'paused'.
+running: May transition either to 'paused' or 'ready'.
+paused: May transition to either 'running' or 'ready', but only in
+        terms of returning to that prior state.
+        p->r->y is not possible, but this is not encapsulated by the
+        STM table.
+ready: May transition to paused.
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ blockjob.c | 39 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
 
-Created the hard drive image file like this: qemu-img create -f qcow2
-~/windows95.qcow2 2G
-
-I used my Windows XP VM to format this qcow2 file to the FAT format.
-
-My first attempt to boot the hard drive image file failed probably
-because the CPU was set to something Windows 95 couldn't handle
-properly. Changing the cpu to a pentium removed the booting problem.
-
-This is the command-line I used to boot Windows 95:
-qemu-system-i386 -hda windows95.qcow2 -boot c -netdev user,id=3Dmynet0 -dev=
-ice ne2k_isa,netdev=3Dmynet0 -soundhw sb16 -m 32 -cpu pentium -vga cirrus -=
-localtime =
-
-
-The version of QEMU I used is today's git version (commit
-e607bbee553cfe73072870cef458cfa4e78133e2).
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1737194
-
-Title:
-  Windows NT 4.0 fails to boot from qcow2 installation
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows NT 4.0 will not boot from an installation more than once if
-  installed in a qcow2 image file. A quick fix to this problem is to use
-  the qcow format instead.
-
-  Steps to reproduce this issue:
-
-  Create the image file:
-  qemu-img create -f qcow2 winnt4.qcow2 1G
-
-  Boot from a Windows NT 4.0 Workstation CD:
-  qemu-system-i386 -hda winnt4.qcow2 -cdrom /dev/cdrom -boot d -m 128 -cpu =
-pentium -vga cirrus
-
-  During the installation process you have the choise between FAT and
-  NTFS. You can pick anyone.
-
-  After finishing the installation the guest will reboot to install
-  additional items. Once this is done the guest will be bootable. Eject
-  any CD media from QEMU and reboot. You will then see Windows NT 4.0
-  booting up to the desktop. Go to "Start->Shut down" to shut down. Then
-  when Windows is ready quit QEMU.
-
-  Now try to boot using this command:
-  qemu-system-i386 -hda winnt4.qcow2 -boot c -m 128 -cpu pentium -vga cirru=
-s =
-
-   =
-
-  The BIOS screen will display an error message:
-
-  For NTFS: =
-
-  Booting from Hard Disk...
-  A disk read error occurred.
-  Insert a system diskette and restart
-  the system.
-
-  For FAT:
-  No bootable device.
-
-  Additional information:
-  qemu-system-i386 version: 2.10.1
-  qemu-img version: 2.10.92 (v2.11.0-rc4-dirty)
-
-  If you don't have a Windows NT 4.0 Workstation installation CD, you may d=
-ownload one from here:
-  https://winworldpc.com/product/windows-nt-40/40
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1737194/+subscriptions
+diff --git a/blockjob.c b/blockjob.c
+index 6eb783a354..d084a1e318 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -42,6 +42,35 @@
+  * block_job_enter. */
+ static QemuMutex block_job_mutex;
+ 
++/* BlockJob State Transition Table */
++bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
++                                          /* U, C, R, P, Y */
++    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0},
++    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0},
++    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1},
++    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 1},
++    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 1, 0},
++};
++
++static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
++{
++    BlockJobStatus s0 = job->status;
++    if (s0 == s1) {
++        return;
++    }
++    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
++    assert(BlockJobSTT[s0][s1]);
++    switch (s1) {
++    case BLOCK_JOB_STATUS_WAITING:
++    case BLOCK_JOB_STATUS_PENDING:
++    case BLOCK_JOB_STATUS_CONCLUDED:
++        assert(job->manual);
++    default:
++        break;
++    }
++    job->status = s1;
++}
++
+ static void block_job_lock(void)
+ {
+     qemu_mutex_lock(&block_job_mutex);
+@@ -321,7 +350,7 @@ void block_job_start(BlockJob *job)
+     job->pause_count--;
+     job->busy = true;
+     job->paused = false;
+-    job->status = BLOCK_JOB_STATUS_RUNNING;
++    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
+     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+ }
+ 
+@@ -709,7 +738,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     job->pause_count   = 1;
+     job->refcnt        = 1;
+     job->manual        = manual;
+-    job->status        = BLOCK_JOB_STATUS_CREATED;
++    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
+     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
+                    QEMU_CLOCK_REALTIME, SCALE_NS,
+                    block_job_sleep_timer_cb, job);
+@@ -815,11 +844,11 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+ 
+     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
+         BlockJobStatus status = job->status;
+-        job->status = BLOCK_JOB_STATUS_PAUSED;
++        block_job_state_transition(job, BLOCK_JOB_STATUS_PAUSED);
+         job->paused = true;
+         block_job_do_yield(job, -1);
+         job->paused = false;
+-        job->status = status;
++        block_job_state_transition(job, status);
+     }
+ 
+     if (job->driver->resume) {
+@@ -925,7 +954,7 @@ void block_job_iostatus_reset(BlockJob *job)
+ 
+ void block_job_event_ready(BlockJob *job)
+ {
+-    job->status = BLOCK_JOB_STATUS_READY;
++    block_job_state_transition(job, BLOCK_JOB_STATUS_READY);
+     job->ready = true;
+ 
+     if (block_job_is_internal(job)) {
+-- 
+2.14.3
