@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatoly.trosinenko@gmail.com>) id 1efQrb-0001KH-AZ
-	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 08:49:48 -0500
+	(envelope-from <sw@weilnetz.de>) id 1efTUq-00050e-Fj
+	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 11:38:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatoly.trosinenko@gmail.com>) id 1efQrW-0001mF-Ed
-	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 08:49:47 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:46046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anatoly.trosinenko@gmail.com>)
-	id 1efQrW-0001lc-77
-	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 08:49:42 -0500
-Received: by mail-lf0-x242.google.com with SMTP id x196so4009300lfd.12
-	for <qemu-devel@nongnu.org>; Sat, 27 Jan 2018 05:49:41 -0800 (PST)
-From: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
-Date: Sat, 27 Jan 2018 16:49:07 +0300
-Message-Id: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
-Subject: [Qemu-devel] [PATCH 0/1] Fix unaligned reads in the tcg/tci.c
+	(envelope-from <sw@weilnetz.de>) id 1efTUn-0007Yj-CI
+	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 11:38:28 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:45994
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1efTUn-0007XA-4x
+	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 11:38:25 -0500
+References: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
+	<20180127134908.24095-2-anatoly.trosinenko@gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <aab013fb-5ada-6ee5-d038-0277d8ef0b24@weilnetz.de>
+Date: Sat, 27 Jan 2018 17:38:21 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180127134908.24095-2-anatoly.trosinenko@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nwVuBVUcVC2aqOoGCisBCRFOyIk2lgffa"
+Subject: Re: [Qemu-devel] [PATCH 1/1] tci: eliminate UB due to unaligned
+ reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+To: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>, qemu-devel@nongnu.org
 
-The code in tcg/tci.c reads some data from TCI bytecode through
-pointer dereferencing. As far as I know unaligned reads in such a way are
-undefined behavior and compiling with -fsanitize=undefined enumerated
-them as such at run-time.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nwVuBVUcVC2aqOoGCisBCRFOyIk2lgffa
+From: Stefan Weil <sw@weilnetz.de>
+To: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>, qemu-devel@nongnu.org
+Message-ID: <aab013fb-5ada-6ee5-d038-0277d8ef0b24@weilnetz.de>
+Subject: Re: [PATCH 1/1] tci: eliminate UB due to unaligned reads
+References: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
+ <20180127134908.24095-2-anatoly.trosinenko@gmail.com>
+In-Reply-To: <20180127134908.24095-2-anatoly.trosinenko@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I have replaced such reads with invocations of ld{l,q}_he_p.
-A comment in include/qemu/bswap.h:310 suggests they should be properly
-translated by the compiler. I didn't added signed/unsigned casts
-since bswap.h does contain separate signed/unsigned versions
-for 16-bit integers but does not for 32- and 64-bit ones, so I supposed
-the developers of the bswap.h already arranged everything so
-integer promotions don't mess things up. I can add casts in case I'm
-not right about it.
+Am 27.01.2018 um 14:49 schrieb Anatoly Trosinenko:
+> Use ldl_he_p / ldq_he_p functions instead of a plain memory access
+> through pointer.
+>=20
+> Signed-off-by: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+> ---
+>  tcg/tci.c | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
 
-Anatoly Trosinenko (1):
-  tci: eliminate UB due to unaligned reads
+A better alternative might be aligning the relevant data when generating
+the bytecode. See also my comment on alignment in tcg/tci/README.
 
- tcg/tci.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+Stefan
 
--- 
-2.14.1
+
+--nwVuBVUcVC2aqOoGCisBCRFOyIk2lgffa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEESSNv6nXJXWmOwreK4Iwh1Wd0UK0FAlpsqv0ACgkQ4Iwh1Wd0
+UK2IDQ/9FFCG5Vbcd+QrtUXEuZzBxuXp+Pso34/VCMdUP3m5YahicmdXb/qGl10L
+k1mG2Y0d4/jU84NT0bL87WH9VMz1B2CGT56up5PyFEt8peabZmTi55Pv/F2/yzvF
+CH7oiu5Z1JcPkKD4hjOUNIjcf3iFjBe/nGBvJ6E5Uv2WlTQkrmZLWAHjFJL88iXr
+SHBHs5WS3SPz0v1dN0hz3PYV6Ws6VGor7WgKYPksQvNmaymhAGRloDOtI1ObgND5
+fJJcyD+l1zpHqPeG2HlN2RJBX5DhNUDt7euTKy0VZxqYyuaQzSnh0/BZlqdkwNFL
+3ZOo8umwUVSSjgleb0RTctv94ToDziID+ZMlGXc6Jd13J6/LJXrkNSJzU4RA3IEF
+T6dc+enEtZHk/xE2u4PTbfy3rS7RfrG4y6nJ0DDeNaUU+tA3i8GDLqrYe2fqY0+Q
+q+qSmurpIaYVq1bcfdJN8OAPMqyY1eseQufO+zy7y6Y4Az2nlRVROOIZsTGsusks
+X0DAm1es/DZxjEFayKsu6mAVUMSape61FwIMCxSsokPCNcgzFXcbINOdUMUU/SDL
+F5PDT7Bk4+NKxszXgWf7P4weAv4h5Tajo2Ua8KZd6f6YgLiyESN+UJ6IL71v+mS2
+bvJSqKd91XjFV+bukhhTxmka4QRIlh4FfbBolLoldjJU2P7CagQ=
+=boyq
+-----END PGP SIGNATURE-----
+
+--nwVuBVUcVC2aqOoGCisBCRFOyIk2lgffa--
