@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFs1-0000je-Ua
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:31 -0500
+	(envelope-from <jsnow@redhat.com>) id 1efFs3-0000oz-2E
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1efFs0-0008LY-Jb
-	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:29 -0500
+	(envelope-from <jsnow@redhat.com>) id 1efFs1-0008Mj-Oh
+	for qemu-devel@nongnu.org; Fri, 26 Jan 2018 21:05:30 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 26 Jan 2018 21:05:01 -0500
-Message-Id: <20180127020515.27137-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC v3 00/14] blockjobs: add explicit job management
+Date: Fri, 26 Jan 2018 21:05:05 -0500
+Message-Id: <20180127020515.27137-5-jsnow@redhat.com>
+In-Reply-To: <20180127020515.27137-1-jsnow@redhat.com>
+References: <20180127020515.27137-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [RFC v3 04/14] blockjobs: RFC add block_job_verb
+ permission table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,84 +23,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-For jobs that complete when a monitor isn't looking, there's no way to
-tell what the job's final return code was. We need to allow jobs to
-remain in the list until queried for reliable management.
+Which commands are appropriate for jobs in which state is also somewhat
+burdensome to keep track of. Introduce a verbs table that, as of this RFC
+patch, does nothing but serve as a declaration of intent.
 
-Furthermore, it's not viable to have graph changes when the monitor
-isn't looking either. We need at least another event for that.
+(At the very least, it forced me to consider all of the possibilities.)
 
-This series is a rough sketch for the WAITING, PENDING and CONCLUDED
-events that accompany an expanded job management scheme that a management
-client can opt-in to.
+If this idea seems appealing, I can expand the verbs concept into a list
+of interfaces to consult the table and refuse inappropriate commands,
+mostly serving as new errors for the QMP interface.
 
-V3:
- - Added WAITING and PENDING events
- - Added block_job_finalize verb
- - Added .pending() callback for jobs
- - Tweaked how .commit/.abort work
 
-V2:
- - Added tests!
- - Changed property name (Jeff, Paolo)
+cancel: can apply to any created, running, paused or ready job.
+pause: can apply to any created, running, or ready job. Addition pauses
+       can and do stack, so a paused job can also be paused.
+       Note that a pause from the QMP context is treated separately and
+       does not stack.
+resume: Only a paused job can be resumed. Only a job that has been paused
+        via QMP can be resumed via QMP.
+set-speed: Any created, running, paused or ready job can tolerate a
+           set-speed request.
+complete: Only a ready job may accept a complete request.
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ blockjob.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-RFC / Known problems:
-- I need a lot more tests.
-- Jobs need to actually implement their .pending callback for this to be of any
-  actual use.
-- Mirror needs to be refactored to use the commit/abort/pending/clean callbacks
-  to fulfill the promise made by "no graph changes without user authorization"
-  that PENDING is supposed to offer
-- Jobs beyond backup will be able to opt-in to the new management scheme in the
-  next version.
-- V4 will include a forced synchronicity for jobs in a transaction; i.e. all
-  jobs will be forced to use either the old or new styles, but not a mix.
-
-Please take a look and shout loudly if I'm wandering in the wrong direction.
-
-________________________________________________________________________________
-
-For convenience, this branch is available at:
-https://github.com/jnsnow/qemu.git branch block-job-reap
-https://github.com/jnsnow/qemu/tree/block-job-reap
-
-This version is tagged block-job-reap-v3:
-https://github.com/jnsnow/qemu/releases/tag/block-job-reap-v3
-
-John Snow (14):
-  blockjobs: add manual property
-  blockjobs: Add status enum
-  blockjobs: add state transition table
-  blockjobs: RFC add block_job_verb permission table
-  blockjobs: add block_job_dismiss
-  blockjobs: add CONCLUDED state
-  blockjobs: ensure abort is called for cancelled jobs
-  blockjobs: add commit, abort, clean helpers
-  blockjobs: add prepare callback
-  blockjobs: Add waiting event
-  blockjobs: add PENDING status and event
-  blockjobs: add block-job-finalize
-  blockjobs: Expose manual property
-  iotests: test manual job dismissal
-
- block/backup.c               |  22 ++--
- block/commit.c               |   2 +-
- block/mirror.c               |   2 +-
- block/replication.c          |   5 +-
- block/stream.c               |   2 +-
- block/trace-events           |   2 +
- blockdev.c                   |  42 ++++++-
- blockjob.c                   | 279 ++++++++++++++++++++++++++++++++++++++++---
- include/block/block_int.h    |   9 +-
- include/block/blockjob.h     |  38 ++++++
- include/block/blockjob_int.h |  12 +-
- qapi/block-core.json         | 135 +++++++++++++++++++--
- tests/qemu-iotests/056       | 241 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/056.out   |   4 +-
- tests/test-bdrv-drain.c      |   4 +-
- tests/test-blockjob-txn.c    |   2 +-
- tests/test-blockjob.c        |   4 +-
- 17 files changed, 750 insertions(+), 55 deletions(-)
-
+diff --git a/blockjob.c b/blockjob.c
+index d084a1e318..ea216aca5e 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -52,6 +52,24 @@ bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
+     /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 1, 0},
+ };
+ 
++enum BlockJobVerb {
++    BLOCK_JOB_VERB_CANCEL,
++    BLOCK_JOB_VERB_PAUSE,
++    BLOCK_JOB_VERB_RESUME,
++    BLOCK_JOB_VERB_SET_SPEED,
++    BLOCK_JOB_VERB_COMPLETE,
++    BLOCK_JOB_VERB__MAX
++};
++
++bool BlockJobVerb[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
++                                          /* U, C, R, P, Y */
++    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1},
++    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1},
++    [BLOCK_JOB_VERB_RESUME]               = {0, 0, 0, 1, 0},
++    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1},
++    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1},
++};
++
+ static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
+ {
+     BlockJobStatus s0 = job->status;
 -- 
 2.14.3
