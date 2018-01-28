@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAj-0002TH-QC
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:40 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1efwAn-0002UW-DC
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAf-00083w-GC
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:37 -0500
-Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:38496)
+	(envelope-from <richard.henderson@linaro.org>) id 1efwAl-00089E-Ss
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:41 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:45531)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwAf-00083G-76
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:33 -0500
-Received: by mail-pf0-x232.google.com with SMTP id k19so3260497pfj.5
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:33 -0800 (PST)
+	id 1efwAl-00088P-KZ
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:39 -0500
+Received: by mail-pf0-x241.google.com with SMTP id a88so3250187pfe.12
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:39 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:14:45 -0800
-Message-Id: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 00/43] hppa-softmmu
+Date: Sun, 28 Jan 2018 15:14:49 -0800
+Message-Id: <20180128231528.22719-5-richard.henderson@linaro.org>
+In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
+References: <20180128231528.22719-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL v4 04/43] target/hppa: Define hardware exception
+ types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,118 +30,273 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Changes since patch v3:
-  * Drop MMU_DEBUG_LOAD, which obviates the sh4 changes.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/hppa/cpu.h        | 39 +++++++++++++++++++++++++++----
+ linux-user/main.c        | 26 ++++++++++++++++++---
+ target/hppa/helper.c     | 61 ++++++++++++++++++++++++++++++++++--------------
+ target/hppa/mem_helper.c |  4 +++-
+ target/hppa/op_helper.c  |  6 ++---
+ target/hppa/translate.c  |  8 +++----
+ 6 files changed, 111 insertions(+), 33 deletions(-)
 
-
-r~
-
-
-The following changes since commit e607bbee553cfe73072870cef458cfa4e78133e2:
-
-  Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-2018-01-26.for-upstream' into staging (2018-01-26 14:24:25 +0000)
-
-are available in the Git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-hppa-20180128
-
-for you to fetch changes up to 129ffd7265832fb748dc04e48dc761bfcd8508d3:
-
-  target/hppa: Implement PROBE for system mode (2018-01-28 14:15:40 -0800)
-
-----------------------------------------------------------------
-Implement hppa-softmmu
-
-----------------------------------------------------------------
-Helge Deller (5):
-      target/hppa: Skeleton support for hppa-softmmu
-      target/hppa: Implement halt and reset instructions
-      target/hppa: Fix comment
-      target/hppa: Implement LDSID for system mode
-      hw/hppa: Implement DINO system board
-
-Richard Henderson (38):
-      target/hppa: Define the rest of the PSW
-      target/hppa: Disable gateway page emulation for system mode
-      target/hppa: Define hardware exception types
-      target/hppa: Split address size from register size
-      target/hppa: Implement mmu_idx from IA privilege level
-      target/hppa: Implement the system mask instructions
-      target/hppa: Add space registers
-      target/hppa: Add control registers
-      target/hppa: Adjust insn mask for mfctl,w
-      target/hppa: Implement rfi
-      target/hppa: Fill in hppa_cpu_do_interrupt/hppa_cpu_exec_interrupt
-      target/hppa: Implement unaligned access trap
-      target/hppa: Use space registers in data operations
-      target/hppa: Avoid privilege level decrease during branches
-      target/hppa: Implement IASQ
-      target/hppa: Implement tlb_fill
-      target/hppa: Implement external interrupts
-      target/hppa: Implement the interval timer
-      target/hppa: Log unimplemented instructions
-      target/hppa: Implement I*TLBA and I*TLBP insns
-      target/hppa: Implement P*TLB and P*TLBE insns
-      target/hppa: Implement LDWA
-      target/hppa: Implement LPA
-      target/hppa: Implement LCI
-      target/hppa: Implement SYNCDMA insn
-      target/hppa: Optimize for flat addressing space
-      target/hppa: Add system registers to gdbstub
-      target/hppa: Add migration for the cpu
-      target/hppa: Implement B,GATE insn
-      target/hppa: Only use EXCP_DTLB_MISS
-      target/hppa: Increase number of temp regs
-      target/hppa: Implement a pause instruction
-      target/hppa: Implement STWA
-      target/hppa: Enable MTTCG
-      pc-bios: Add hppa-firmware.img and git submodule
-      hw/hppa: Add MAINTAINERS entry
-      target/hppa: Fix 32-bit operand masks for 0E FCVT
-      target/hppa: Implement PROBE for system mode
-
- Makefile                         |    3 +-
- Makefile.objs                    |    1 +
- hw/hppa/hppa_hardware.h          |   40 +
- hw/hppa/hppa_sys.h               |   24 +
- include/sysemu/arch_init.h       |    1 +
- linux-user/hppa/target_cpu.h     |    2 +-
- target/hppa/cpu.h                |  284 ++++-
- target/hppa/helper.h             |   43 +-
- arch_init.c                      |    2 +
- hw/hppa/dino.c                   |  518 ++++++++++
- hw/hppa/machine.c                |  282 +++++
- hw/hppa/pci.c                    |   90 ++
- linux-user/main.c                |   28 +-
- linux-user/signal.c              |    4 +-
- target/hppa/cpu.c                |   56 +-
- target/hppa/gdbstub.c            |  187 +++-
- target/hppa/helper.c             |  120 +--
- target/hppa/int_helper.c         |  263 +++++
- target/hppa/machine.c            |  181 ++++
- target/hppa/mem_helper.c         |  348 +++++++
- target/hppa/op_helper.c          |  152 ++-
- target/hppa/translate.c          | 2108 ++++++++++++++++++++++++++++----------
- .gitmodules                      |    3 +
- MAINTAINERS                      |    1 +
- configure                        |    1 +
- default-configs/hppa-softmmu.mak |   14 +
- hw/hppa/Makefile.objs            |    1 +
- hw/hppa/trace-events             |    4 +
- pc-bios/hppa-firmware.img        |  Bin 0 -> 461352 bytes
- roms/seabios-hppa                |    1 +
- target/hppa/Makefile.objs        |    4 +-
- 31 files changed, 4061 insertions(+), 705 deletions(-)
- create mode 100644 hw/hppa/hppa_hardware.h
- create mode 100644 hw/hppa/hppa_sys.h
- create mode 100644 hw/hppa/dino.c
- create mode 100644 hw/hppa/machine.c
- create mode 100644 hw/hppa/pci.c
- create mode 100644 target/hppa/int_helper.c
- create mode 100644 target/hppa/machine.c
- create mode 100644 target/hppa/mem_helper.c
- create mode 100644 default-configs/hppa-softmmu.mak
- create mode 100644 hw/hppa/Makefile.objs
- create mode 100644 hw/hppa/trace-events
- create mode 100755 pc-bios/hppa-firmware.img
- create mode 160000 roms/seabios-hppa
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index d703e99bf9..4fc23fb255 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -40,11 +40,40 @@
+ #define MMU_USER_IDX     0
+ #define TARGET_INSN_START_EXTRA_WORDS 1
+ 
+-#define EXCP_SYSCALL     1
+-#define EXCP_SYSCALL_LWS 2
+-#define EXCP_SIGSEGV     3
+-#define EXCP_SIGILL      4
+-#define EXCP_SIGFPE      5
++/* Hardware exceptions, interupts, faults, and traps.  */
++#define EXCP_HPMC                1  /* high priority machine check */
++#define EXCP_POWER_FAIL          2
++#define EXCP_RC                  3  /* recovery counter */
++#define EXCP_EXT_INTERRUPT       4  /* external interrupt */
++#define EXCP_LPMC                5  /* low priority machine check */
++#define EXCP_ITLB_MISS           6  /* itlb miss / instruction page fault */
++#define EXCP_IMP                 7  /* instruction memory protection trap */
++#define EXCP_ILL                 8  /* illegal instruction trap */
++#define EXCP_BREAK               9  /* break instruction */
++#define EXCP_PRIV_OPR            10 /* privileged operation trap */
++#define EXCP_PRIV_REG            11 /* privileged register trap */
++#define EXCP_OVERFLOW            12 /* signed overflow trap */
++#define EXCP_COND                13 /* trap-on-condition */
++#define EXCP_ASSIST              14 /* assist exception trap */
++#define EXCP_DTLB_MISS           15 /* dtlb miss / data page fault */
++#define EXCP_NA_ITLB_MISS        16 /* non-access itlb miss */
++#define EXCP_NA_DTLB_MISS        17 /* non-access dtlb miss */
++#define EXCP_DMP                 18 /* data memory protection trap */
++#define EXCP_DMB                 19 /* data memory break trap */
++#define EXCP_TLB_DIRTY           20 /* tlb dirty bit trap */
++#define EXCP_PAGE_REF            21 /* page reference trap */
++#define EXCP_ASSIST_EMU          22 /* assist emulation trap */
++#define EXCP_HPT                 23 /* high-privilege transfer trap */
++#define EXCP_LPT                 24 /* low-privilege transfer trap */
++#define EXCP_TB                  25 /* taken branch trap */
++#define EXCP_DMAR                26 /* data memory access rights trap */
++#define EXCP_DMPI                27 /* data memory protection id trap */
++#define EXCP_UNALIGN             28 /* unaligned data reference trap */
++#define EXCP_PER_INTERRUPT       29 /* performance monitor interrupt */
++
++/* Exceptions for linux-user emulation.  */
++#define EXCP_SYSCALL             30
++#define EXCP_SYSCALL_LWS         31
+ 
+ /* Taken from Linux kernel: arch/parisc/include/asm/psw.h */
+ #define PSW_I            0x00000001
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 2140465709..fee0b24ee6 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -3773,21 +3773,41 @@ void cpu_loop(CPUHPPAState *env)
+             env->iaoq_f = env->gr[31];
+             env->iaoq_b = env->gr[31] + 4;
+             break;
+-        case EXCP_SIGSEGV:
++        case EXCP_ITLB_MISS:
++        case EXCP_DTLB_MISS:
++        case EXCP_NA_ITLB_MISS:
++        case EXCP_NA_DTLB_MISS:
++        case EXCP_IMP:
++        case EXCP_DMP:
++        case EXCP_DMB:
++        case EXCP_PAGE_REF:
++        case EXCP_DMAR:
++        case EXCP_DMPI:
+             info.si_signo = TARGET_SIGSEGV;
+             info.si_errno = 0;
+             info.si_code = TARGET_SEGV_ACCERR;
+             info._sifields._sigfault._addr = env->ior;
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+             break;
+-        case EXCP_SIGILL:
++        case EXCP_UNALIGN:
++            info.si_signo = TARGET_SIGBUS;
++            info.si_errno = 0;
++            info.si_code = 0;
++            info._sifields._sigfault._addr = env->ior;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_ILL:
++        case EXCP_PRIV_OPR:
++        case EXCP_PRIV_REG:
+             info.si_signo = TARGET_SIGILL;
+             info.si_errno = 0;
+             info.si_code = TARGET_ILL_ILLOPN;
+             info._sifields._sigfault._addr = env->iaoq_f;
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+             break;
+-        case EXCP_SIGFPE:
++        case EXCP_OVERFLOW:
++        case EXCP_COND:
++        case EXCP_ASSIST:
+             info.si_signo = TARGET_SIGFPE;
+             info.si_errno = 0;
+             info.si_code = 0;
+diff --git a/target/hppa/helper.c b/target/hppa/helper.c
+index 4231ef3bff..6439179a0e 100644
+--- a/target/hppa/helper.c
++++ b/target/hppa/helper.c
+@@ -74,25 +74,52 @@ void hppa_cpu_do_interrupt(CPUState *cs)
+     int i = cs->exception_index;
+ 
+     if (qemu_loglevel_mask(CPU_LOG_INT)) {
++        static const char * const names[] = {
++            [EXCP_HPMC]          = "high priority machine check",
++            [EXCP_POWER_FAIL]    = "power fail interrupt",
++            [EXCP_RC]            = "recovery counter trap",
++            [EXCP_EXT_INTERRUPT] = "external interrupt",
++            [EXCP_LPMC]          = "low priority machine check",
++            [EXCP_ITLB_MISS]     = "instruction tlb miss fault",
++            [EXCP_IMP]           = "instruction memory protection trap",
++            [EXCP_ILL]           = "illegal instruction trap",
++            [EXCP_BREAK]         = "break instruction trap",
++            [EXCP_PRIV_OPR]      = "privileged operation trap",
++            [EXCP_PRIV_REG]      = "privileged register trap",
++            [EXCP_OVERFLOW]      = "overflow trap",
++            [EXCP_COND]          = "conditional trap",
++            [EXCP_ASSIST]        = "assist exception trap",
++            [EXCP_DTLB_MISS]     = "data tlb miss fault",
++            [EXCP_NA_ITLB_MISS]  = "non-access instruction tlb miss",
++            [EXCP_NA_DTLB_MISS]  = "non-access data tlb miss",
++            [EXCP_DMP]           = "data memory protection trap",
++            [EXCP_DMB]           = "data memory break trap",
++            [EXCP_TLB_DIRTY]     = "tlb dirty bit trap",
++            [EXCP_PAGE_REF]      = "page reference trap",
++            [EXCP_ASSIST_EMU]    = "assist emulation trap",
++            [EXCP_HPT]           = "high-privilege transfer trap",
++            [EXCP_LPT]           = "low-privilege transfer trap",
++            [EXCP_TB]            = "taken branch trap",
++            [EXCP_DMAR]          = "data memory access rights trap",
++            [EXCP_DMPI]          = "data memory protection id trap",
++            [EXCP_UNALIGN]       = "unaligned data reference trap",
++            [EXCP_PER_INTERRUPT] = "performance monitor interrupt",
++            [EXCP_SYSCALL]       = "syscall",
++            [EXCP_SYSCALL_LWS]   = "syscall-lws",
++        };
+         static int count;
+-        const char *name = "<unknown>";
+-
+-        switch (i) {
+-        case EXCP_SYSCALL:
+-            name = "syscall";
+-            break;
+-        case EXCP_SIGSEGV:
+-            name = "sigsegv";
+-            break;
+-        case EXCP_SIGILL:
+-            name = "sigill";
+-            break;
+-        case EXCP_SIGFPE:
+-            name = "sigfpe";
+-            break;
++        const char *name = NULL;
++
++        if (i >= 0 && i < ARRAY_SIZE(names)) {
++            name = names[i];
++        }
++        if (name) {
++            qemu_log("INT %6d: %s ia_f=" TARGET_FMT_lx "\n",
++                     ++count, name, env->iaoq_f);
++        } else {
++            qemu_log("INT %6d: unknown %d ia_f=" TARGET_FMT_lx "\n",
++                     ++count, i, env->iaoq_f);
+         }
+-        qemu_log("INT %6d: %s ia_f=" TARGET_FMT_lx "\n",
+-                 ++count, name, env->iaoq_f);
+     }
+     cs->exception_index = -1;
+ }
+diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
+index a3e576f119..bd116d6bc6 100644
+--- a/target/hppa/mem_helper.c
++++ b/target/hppa/mem_helper.c
+@@ -29,7 +29,9 @@ int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+ {
+     HPPACPU *cpu = HPPA_CPU(cs);
+ 
+-    cs->exception_index = EXCP_SIGSEGV;
++    /* ??? Test between data page fault and data memory protection trap,
++       which would affect si_code.  */
++    cs->exception_index = EXCP_DMP;
+     cpu->env.ior = address;
+     return 1;
+ }
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 9076ee998d..ecf5824074 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -44,14 +44,14 @@ static void QEMU_NORETURN dynexcp(CPUHPPAState *env, int excp, uintptr_t ra)
+ void HELPER(tsv)(CPUHPPAState *env, target_ulong cond)
+ {
+     if (unlikely((target_long)cond < 0)) {
+-        dynexcp(env, EXCP_SIGFPE, GETPC());
++        dynexcp(env, EXCP_OVERFLOW, GETPC());
+     }
+ }
+ 
+ void HELPER(tcond)(CPUHPPAState *env, target_ulong cond)
+ {
+     if (unlikely(cond)) {
+-        dynexcp(env, EXCP_SIGFPE, GETPC());
++        dynexcp(env, EXCP_COND, GETPC());
+     }
+ }
+ 
+@@ -235,7 +235,7 @@ static void update_fr0_op(CPUHPPAState *env, uintptr_t ra)
+     env->fr[0] = (uint64_t)shadow << 32;
+ 
+     if (hard_exp & shadow) {
+-        dynexcp(env, EXCP_SIGFPE, ra);
++        dynexcp(env, EXCP_ASSIST, ra);
+     }
+ }
+ 
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 8e357cc60c..8d85ed9df3 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -462,7 +462,7 @@ static DisasJumpType gen_excp(DisasContext *ctx, int exception)
+ static DisasJumpType gen_illegal(DisasContext *ctx)
+ {
+     nullify_over(ctx);
+-    return nullify_end(ctx, gen_excp(ctx, EXCP_SIGILL));
++    return nullify_end(ctx, gen_excp(ctx, EXCP_ILL));
+ }
+ 
+ static bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+@@ -1578,7 +1578,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
+ 
+     switch (ctx->iaoq_f) {
+     case 0x00: /* Null pointer call */
+-        gen_excp_1(EXCP_SIGSEGV);
++        gen_excp_1(EXCP_IMP);
+         return DISAS_NORETURN;
+ 
+     case 0xb0: /* LWS */
+@@ -1597,7 +1597,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
+ 
+     default:
+     do_sigill:
+-        gen_excp_1(EXCP_SIGILL);
++        gen_excp_1(EXCP_ILL);
+         return DISAS_NORETURN;
+     }
+ }
+@@ -1614,7 +1614,7 @@ static DisasJumpType trans_break(DisasContext *ctx, uint32_t insn,
+                                  const DisasInsn *di)
+ {
+     nullify_over(ctx);
+-    return nullify_end(ctx, gen_excp(ctx, EXCP_DEBUG));
++    return nullify_end(ctx, gen_excp(ctx, EXCP_BREAK));
+ }
+ 
+ static DisasJumpType trans_sync(DisasContext *ctx, uint32_t insn,
+-- 
+2.14.3
