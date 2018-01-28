@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzc@zju.edu.cn>) id 1efeN4-0000za-JS
-	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 23:15:14 -0500
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1efgfY-0006VR-Vf
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 01:42:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzc@zju.edu.cn>) id 1efeN1-0003Vg-Dr
-	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 23:15:10 -0500
-Received: from mail.zju.edu.cn ([61.164.42.155]:36482 helo=zju.edu.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzc@zju.edu.cn>) id 1efeN0-0003U0-MC
-	for qemu-devel@nongnu.org; Sat, 27 Jan 2018 23:15:07 -0500
-Date: Sun, 28 Jan 2018 12:14:59 +0800 (GMT+08:00)
-From: CheneyLin <linzc@zju.edu.cn>
-In-Reply-To: <3c212a49-6b50-4753-58f5-25837f583a9d@redhat.com>
-References: <1516434868-24776-1-git-send-email-linzc@zju.edu.cn>
-	<3c212a49-6b50-4753-58f5-25837f583a9d@redhat.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1efgfX-0008Qd-Nd
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 01:42:25 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anatoly.trosinenko@gmail.com>)
+	id 1efgfX-0008Q5-G5
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 01:42:23 -0500
+Received: by mail-oi0-x244.google.com with SMTP id t78so2915933oih.4
+	for <qemu-devel@nongnu.org>; Sat, 27 Jan 2018 22:42:23 -0800 (PST)
 MIME-Version: 1.0
-Message-ID: <2a533022.52227.1613af9b851.Coremail.linzc@zju.edu.cn>
-Subject: Re: [Qemu-devel] [PATCH] vcpu: create vcpu thread with
- QEMU_THREAD_DETACHED mode
+In-Reply-To: <aab013fb-5ada-6ee5-d038-0277d8ef0b24@weilnetz.de>
+References: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
+	<20180127134908.24095-2-anatoly.trosinenko@gmail.com>
+	<aab013fb-5ada-6ee5-d038-0277d8ef0b24@weilnetz.de>
+From: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Date: Sun, 28 Jan 2018 09:42:22 +0300
+Message-ID: <CAE5jQCfxjM9ykBCes0oDhrc0B6g8AC5Se39sXBsbZo=-dKQpyg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] tci: eliminate UB due to unaligned
+ reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: paolo bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, crosthwaite.peter@gmail.com, rth@twiddle.net
+To: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel@nongnu.org
 
-CgoKPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiUGFvbG8gQm9uemluaSIg
-PHBib256aW5pQHJlZGhhdC5jb20+Cj4g5Y+R6YCB5pe26Ze0OiAyMDE4LTAxLTI1IDE3OjU5OjAz
-ICjmmJ/mnJ/lm5spCj4g5pS25Lu25Lq6OiBsaW56aGVjaGVuZyA8bGluemNAemp1LmVkdS5jbj4s
-IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZwo+IOaKhOmAgTogY3Jvc3Rod2FpdGUucGV0ZXJAZ21haWwu
-Y29tLCBydGhAdHdpZGRsZS5uZXQKPiDkuLvpopg6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENIXSB2
-Y3B1OiBjcmVhdGUgdmNwdSB0aHJlYWQgd2l0aCBRRU1VX1RIUkVBRF9ERVRBQ0hFRCBtb2RlCj4g
-Cj4gT24gMjAvMDEvMjAxOCAwODo1NCwgbGluemhlY2hlbmcgd3JvdGU6Cj4gPiAxLiBJZiB3ZSBj
-cmVhdGUgdmNwdSB0aHJlYWQgd2l0aCBRRU1VX1RIUkVBRF9KT0lOQUJMRSBtb2RlLAo+ID4gd2Ug
-d2lsbCBnZXQgbWVtb3J5IGxlYWsgd2hlbiB2Y3B1IHRocmVhZCBleGl0cywgd2hpY2ggd2lsbCBo
-YXBwZW4KPiA+IHdoZW4gaG90LXVucGx1ZyB2Y3B1cy4KPiA+IDIuIFdlIHNob3VsZCB1c2UgUUxJ
-U1RfRk9SRUFDSF9TQUZFIGluc3RlYWQgb2YgUUxJU1RfRk9SRUFDSAo+ID4gaWYgd2UgbmVlZCB0
-byByZW1vdmUgdGhlIGVudHJ5IGluIFFMSVNULgo+ID4gCj4gPiBTaWduZWQtb2ZmLWJ5OiBsaW56
-aGVjaGVuZyA8bGluemNAemp1LmVkdS5jbj4KPiA+IAo+ID4gZGlmZiAtLWdpdCBhL2FjY2VsL2t2
-bS9rdm0tYWxsLmMgYi9hY2NlbC9rdm0va3ZtLWFsbC5jCj4gPiBpbmRleCAwNzFmNGY1Li5mZDk1
-YjE4IDEwMDY0NAo+ID4gLS0tIGEvYWNjZWwva3ZtL2t2bS1hbGwuYwo+ID4gKysrIGIvYWNjZWwv
-a3ZtL2t2bS1hbGwuYwo+ID4gQEAgLTI4Miw5ICsyODIsOSBAQCBlcnI6Cj4gPiAgCj4gPiAgc3Rh
-dGljIGludCBrdm1fZ2V0X3ZjcHUoS1ZNU3RhdGUgKnMsIHVuc2lnbmVkIGxvbmcgdmNwdV9pZCkK
-PiA+ICB7Cj4gPiAtICAgIHN0cnVjdCBLVk1QYXJrZWRWY3B1ICpjcHU7Cj4gPiArICAgIHN0cnVj
-dCBLVk1QYXJrZWRWY3B1ICpjcHUsICpuZXh0X2NwdTsKPiA+ICAKPiA+IC0gICAgUUxJU1RfRk9S
-RUFDSChjcHUsICZzLT5rdm1fcGFya2VkX3ZjcHVzLCBub2RlKSB7Cj4gPiArICAgIFFMSVNUX0ZP
-UkVBQ0hfU0FGRShjcHUsICZzLT5rdm1fcGFya2VkX3ZjcHVzLCBub2RlLCBuZXh0X2NwdSkgewo+
-ID4gICAgICAgICAgaWYgKGNwdS0+dmNwdV9pZCA9PSB2Y3B1X2lkKSB7Cj4gPiAgICAgICAgICAg
-ICAgaW50IGt2bV9mZDsKPiA+ICAKPiA+IGRpZmYgLS1naXQgYS9jcHVzLmMgYi9jcHVzLmMKPiA+
-IGluZGV4IDJjYjBhZjkuLmRlM2E5NmIgMTAwNjQ0Cj4gPiAtLS0gYS9jcHVzLmMKPiA+ICsrKyBi
-L2NwdXMuYwo+ID4gQEAgLTExMTMsNiArMTExMyw5IEBAIHN0YXRpYyB2b2lkIHFlbXVfa3ZtX2Rl
-c3Ryb3lfdmNwdShDUFVTdGF0ZSAqY3B1KQo+ID4gICAgICAgICAgZXJyb3JfcmVwb3J0KCJrdm1f
-ZGVzdHJveV92Y3B1IGZhaWxlZCIpOwo+ID4gICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOwo+
-ID4gICAgICB9Cj4gPiArICAgIGdfZnJlZShjcHUtPnRocmVhZCk7Cj4gPiArICAgIGdfZnJlZShj
-cHUtPmhhbHRfY29uZCk7Cj4gPiArICAgIGdfZnJlZShjcHUtPmNwdV9hc2VzKTsKPiA+ICB9Cj4g
-PiAgCj4gPiAgc3RhdGljIHZvaWQgcWVtdV90Y2dfZGVzdHJveV92Y3B1KENQVVN0YXRlICpjcHUp
-Cj4gPiBAQCAtMTIwNSw2ICsxMjA4LDcgQEAgc3RhdGljIHZvaWQgKnFlbXVfa3ZtX2NwdV90aHJl
-YWRfZm4odm9pZCAqYXJnKQo+ID4gICAgICBjcHUtPmNyZWF0ZWQgPSBmYWxzZTsKPiA+ICAgICAg
-cWVtdV9jb25kX3NpZ25hbCgmcWVtdV9jcHVfY29uZCk7Cj4gPiAgICAgIHFlbXVfbXV0ZXhfdW5s
-b2NrX2lvdGhyZWFkKCk7Cj4gPiArICAgIHJjdV91bnJlZ2lzdGVyX3RocmVhZCgpOwo+ID4gICAg
-ICByZXR1cm4gTlVMTDsKPiA+ICB9Cj4gPiAgCj4gPiBAQCAtMTg1MCw3ICsxODU0LDcgQEAgc3Rh
-dGljIHZvaWQgcWVtdV9rdm1fc3RhcnRfdmNwdShDUFVTdGF0ZSAqY3B1KQo+ID4gICAgICBzbnBy
-aW50Zih0aHJlYWRfbmFtZSwgVkNQVV9USFJFQURfTkFNRV9TSVpFLCAiQ1BVICVkL0tWTSIsCj4g
-PiAgICAgICAgICAgICAgIGNwdS0+Y3B1X2luZGV4KTsKPiA+ICAgICAgcWVtdV90aHJlYWRfY3Jl
-YXRlKGNwdS0+dGhyZWFkLCB0aHJlYWRfbmFtZSwgcWVtdV9rdm1fY3B1X3RocmVhZF9mbiwKPiA+
-IC0gICAgICAgICAgICAgICAgICAgICAgIGNwdSwgUUVNVV9USFJFQURfSk9JTkFCTEUpOwo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgICAgY3B1LCBRRU1VX1RIUkVBRF9ERVRBQ0hFRCk7Cj4gPiAg
-ICAgIHdoaWxlICghY3B1LT5jcmVhdGVkKSB7Cj4gPiAgICAgICAgICBxZW11X2NvbmRfd2FpdCgm
-cWVtdV9jcHVfY29uZCwgJnFlbXVfZ2xvYmFsX211dGV4KTsKPiA+ICAgICAgfQo+ID4gCj4gCj4g
-VGhpcyBpcyBkYW5nZXJvdXMsIGl0IHJpc2tzIGludHJvZHVjaW5nIHVzZS1hZnRlci1mcmVlIGJ1
-Z3MgaW4gdGhlIHZDUFUKPiB0aHJlYWQuICBDYW4geW91IGluc3RlYWQgYWRkIGEgcWVtdV90aHJl
-YWRfam9pbiBjYWxsIHdoZXJlIHRoZSB2Q1BVIGdvZXMKPiBhd2F5IChlLmcuIHVucmVhbGl6ZSwg
-SSdtIG5vdCBzdXJlKT8KPiAKPiBUaGFua3MsCj4gCj4gUGFvbG8KCjEuIElmIGFub3RoZXIgdGhy
-ZWFkIGNhbGxzIHFlbXVfdGhyZWFkX2pvaW4sIGl0IHdpbGwgYmxvY2sgdW50aWwgdmNwdSB0aHJl
-YWQgZXhpdC4KMi4gQXMgdmNwdSBleGl0cywgaXRzIHJlc291cmNlcyBzaG91bGQgYmUgZnJlZWQg
-LHdoaWNoIHdpbGwgbm90IGJlIHVzZWQgYW55IG1vcmUoZS5nLiB1c2VyIHNwYWNlIHN0YWNrKSwg
-aG93IGNhbiB3ZSBnZXQgdXNlLWFmdGVyLWZyZWUgYnVncz8K
+My patch is kind of trivial quick fix that just eliminates these unaligned
+reads and doesn't seem to require complicated testing supposing my code
+properly handles integer promotion (and hope it will not slow the
+interpreter down).
+
+Aligning everything, on the other hand, can not only remove the UB but also
+speed things up, but if I get it right, requires O(opcode count) manual
+work and subsequent less trivial testing that every opcode's argument
+layout match on generation and interpretation side (errors should be
+significantly localized due to present assertion on operation size,
+though). So my patch may be considered as temporary solution.
+
+In fact, I had to similarly make these unaligned reads explicit when
+porting QEMU to JavaScript because Emscripten hugely relies on absence of
+some kinds of UB such as "implicit" unaligned accesses, and such fix seemed
+to resolve this issue for me on "host with special alignment requirement".
+
+
+2018-01-27 19:38 GMT+03:00 Stefan Weil <sw@weilnetz.de>:
+
+> Am 27.01.2018 um 14:49 schrieb Anatoly Trosinenko:
+> > Use ldl_he_p / ldq_he_p functions instead of a plain memory access
+> > through pointer.
+> >
+> > Signed-off-by: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+> > ---
+> >  tcg/tci.c | 16 +++++++++++-----
+> >  1 file changed, 11 insertions(+), 5 deletions(-)
+>
+> A better alternative might be aligning the relevant data when generating
+> the bytecode. See also my comment on alignment in tcg/tci/README.
+>
+> Stefan
+>
+>
+
+
+--=20
+=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+=D0=90=D0=BD=D0=B0=D1=82=D0=BE=D0=BB=D0=B8=D0=B9 =D0=A2=D1=80=D0=BE=D1=81=
+=D0=B8=D0=BD=D0=B5=D0=BD=D0=BA=D0=BE
+e-mail: anatoly.trosinenko@gmail.com
