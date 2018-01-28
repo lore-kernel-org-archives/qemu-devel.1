@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efvEM-0004NU-J4
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 17:15:20 -0500
+	(envelope-from <no-reply@patchew.org>) id 1efvJV-00069u-T5
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 17:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efvEJ-0003bO-Bb
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 17:15:18 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34892)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efvEI-0003aZ-SQ
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 17:15:15 -0500
-Received: by mail-pf0-x241.google.com with SMTP id t12so3179941pfg.2
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 14:15:14 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 14:15:10 -0800
-Message-Id: <20180128221510.13722-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] linux-user: Use *at functions to implement
+	(envelope-from <no-reply@patchew.org>) id 1efvJS-0006JR-NG
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 17:20:37 -0500
+Resent-Message-Id: <E1efvJS-0006JR-NG@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21061)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1efvJS-0006IS-F6
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 17:20:34 -0500
+In-Reply-To: <20180128221510.13722-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151717800988.776.10619305339214024907@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 28 Jan 2018 14:20:10 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Use *at functions to implement
  interp_prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,428 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net
 
-From: Richard Henderson <rth@twiddle.net>
-
-If the interp_prefix is a complete chroot, it may have a *lot* of files.
-Setting up the cache for this is quite expensive.
-
-For the most part, we can use the *at versions of various syscalls to
-attempt the operation in the prefix.  For the few cases that remain,
-use faccessat and create the full path on demand.
-
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
-
-Changes since v3 (Dec 29 2017):
-  * Use DO/WHILE as the control construct; wrap it in a macro.
-  * Introduce linux_user_path to handle the cases *at syscalls
-    do not cover.
-
-Changes since v2 (Dec 4 2017):
-  * Use IF as the control construct instead of SWITCH.
-
-Changes since v1 (Nov 2016):
-  * Require interp_dirfd set before trying the *at path.
-
-
-r~
-
----
- linux-user/qemu.h    |  15 ++++++
- linux-user/elfload.c |   5 +-
- linux-user/main.c    |  36 +++++++++++++-
- linux-user/syscall.c | 130 +++++++++++++++++++++++++++++++++++----------------
- 4 files changed, 141 insertions(+), 45 deletions(-)
-
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 4edd7d0c08..5b621f26e0 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -437,8 +437,23 @@ void mmap_fork_start(void);
- void mmap_fork_end(int child);
- 
- /* main.c */
-+extern int interp_dirfd;
- extern unsigned long guest_stack_size;
- 
-+#define CHOOSE_INTERP(RET, PATH, OPENAT_EXPR, NORMAL_EXPR)  \
-+    do {                                                    \
-+        if (interp_dirfd >= 0 && PATH[0] == '/') {          \
-+            RET = OPENAT_EXPR;                              \
-+            if (!(RET < 0 && errno == ENOENT)) {            \
-+                break;                                      \
-+            }                                               \
-+        }                                                   \
-+        RET = NORMAL_EXPR;                                  \
-+    } while (0)
-+
-+const char *linux_user_path(const char *);
-+#define path(x)  linux_user_path(x)
-+
- /* user access */
- 
- #define VERIFY_READ 0
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 32a47674e6..1fb097e30d 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -6,7 +6,6 @@
- 
- #include "qemu.h"
- #include "disas/disas.h"
--#include "qemu/path.h"
- 
- #ifdef _ARCH_PPC64
- #undef ARCH_DLINFO
-@@ -2204,7 +2203,9 @@ static void load_elf_interp(const char *filename, struct image_info *info,
- {
-     int fd, retval;
- 
--    fd = open(path(filename), O_RDONLY);
-+    CHOOSE_INTERP(fd, filename,
-+                  openat(interp_dirfd, filename + 1, O_RDONLY),
-+                  open(filename, O_RDONLY));
-     if (fd < 0) {
-         goto exit_perror;
-     }
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 2140465709..8f4087d508 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -23,7 +23,6 @@
- 
- #include "qapi/error.h"
- #include "qemu.h"
--#include "qemu/path.h"
- #include "qemu/config-file.h"
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
-@@ -98,8 +97,41 @@ unsigned long reserved_va;
- static void usage(int exitcode);
- 
- static const char *interp_prefix = CONFIG_QEMU_INTERP_PREFIX;
-+int interp_dirfd;
- const char *qemu_uname_release;
- 
-+const char *linux_user_path(const char *pathname)
-+{
-+    static THREAD size_t save_len;
-+    static THREAD char *save_buf;
-+    size_t len, prefix_len, path_len;
-+    int e;
-+
-+    /* Only consider absolute paths.  */
-+    if (pathname[0] != '/' || interp_dirfd < 0) {
-+        return pathname;
-+    }
-+
-+    /* Test if the path within interp_dir exists.  */
-+    e = faccessat(interp_dirfd, pathname + 1, F_OK, AT_SYMLINK_NOFOLLOW);
-+    if (e < 0 && errno != ENOENT) {
-+        return pathname;
-+    }
-+
-+    /* It does -- form the new absolute path.  */
-+    prefix_len = strlen(interp_prefix);
-+    path_len = strlen(pathname) + 1;
-+    len = prefix_len + path_len;
-+    if (len <= save_len) {
-+        save_len = len;
-+        save_buf = realloc(save_buf, len);
-+    }
-+    memcpy(save_buf, interp_prefix, prefix_len);
-+    memcpy(save_buf + prefix_len, pathname, path_len);
-+
-+    return save_buf;
-+}
-+
- /* XXX: on x86 MAP_GROWSDOWN only works if ESP <= address + 32, so
-    we allocate a bigger stack. Need a better solution, for example
-    by remapping the process stack directly at the right place */
-@@ -4319,7 +4351,7 @@ int main(int argc, char **argv, char **envp)
-     memset(&bprm, 0, sizeof (bprm));
- 
-     /* Scan interp_prefix dir for replacement files. */
--    init_paths(interp_prefix);
-+    interp_dirfd = open(interp_prefix, O_CLOEXEC | O_DIRECTORY | O_PATH);
- 
-     init_qemu_uname_release();
- 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 74378947f0..ebd41fcab4 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -19,7 +19,6 @@
- #define _ATFILE_SOURCE
- #include "qemu/osdep.h"
- #include "qemu/cutils.h"
--#include "qemu/path.h"
- #include <elf.h>
- #include <endian.h>
- #include <grp.h>
-@@ -7263,7 +7262,10 @@ static abi_long do_name_to_handle_at(abi_long dirfd, abi_long pathname,
-     fh = g_malloc0(total_size);
-     fh->handle_bytes = size;
- 
--    ret = get_errno(name_to_handle_at(dirfd, path(name), fh, &mid, flags));
-+    CHOOSE_INTERP(ret, name,
-+                  name_to_handle_at(interp_dirfd, name + 1, fh, &mid, flags),
-+                  name_to_handle_at(dirfd, name, fh, &mid, flags));
-+    ret = get_errno(ret);
-     unlock_user(name, pathname, 0);
- 
-     /* man name_to_handle_at(2):
-@@ -7639,6 +7641,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
- #endif
-         { NULL, NULL, NULL }
-     };
-+    int ret;
- 
-     if (is_proc_myself(pathname, "exe")) {
-         int execfd = qemu_getauxval(AT_EXECFD);
-@@ -7678,7 +7681,10 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
-         return fd;
-     }
- 
--    return safe_openat(dirfd, path(pathname), flags, mode);
-+    CHOOSE_INTERP(ret, pathname,
-+                  safe_openat(interp_dirfd, pathname + 1, flags, mode),
-+                  safe_openat(dirfd, pathname, flags, mode));
-+    return ret;
- }
- 
- #define TIMER_MAGIC 0x0caf0000
-@@ -7831,6 +7837,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-     struct stat st;
-     struct statfs stfs;
-     void *p;
-+    char *fn;
- 
- #if defined(DEBUG_ERESTARTSYS)
-     /* Debug-only code for exercising the syscall-restart code paths
-@@ -8362,10 +8369,14 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-             } else {
-                 tvp = NULL;
-             }
--            if (!(p = lock_user_string(arg2)))
-+            if (!(fn = lock_user_string(arg2))) {
-                 goto efault;
--            ret = get_errno(futimesat(arg1, path(p), tvp));
--            unlock_user(p, arg2, 0);
-+            }
-+            CHOOSE_INTERP(ret, fn,
-+                          futimesat(interp_dirfd, fn + 1, tvp),
-+                          futimesat(arg1, fn, tvp));
-+            ret = get_errno(ret);
-+            unlock_user(fn, arg2, 0);
-         }
-         break;
- #endif
-@@ -8379,18 +8390,26 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
- #endif
- #ifdef TARGET_NR_access
-     case TARGET_NR_access:
--        if (!(p = lock_user_string(arg1)))
-+        if (!(fn = lock_user_string(arg1))) {
-             goto efault;
--        ret = get_errno(access(path(p), arg2));
--        unlock_user(p, arg1, 0);
-+        }
-+        CHOOSE_INTERP(ret, fn,
-+                      faccessat(interp_dirfd, fn + 1, arg2, 0),
-+                      access(fn, arg2));
-+        ret = get_errno(ret);
-+        unlock_user(fn, arg1, 0);
-         break;
- #endif
- #if defined(TARGET_NR_faccessat) && defined(__NR_faccessat)
-     case TARGET_NR_faccessat:
--        if (!(p = lock_user_string(arg2)))
-+        if (!(fn = lock_user_string(arg2))) {
-             goto efault;
--        ret = get_errno(faccessat(arg1, p, arg3, 0));
--        unlock_user(p, arg2, 0);
-+        }
-+        CHOOSE_INTERP(ret, fn,
-+                      faccessat(interp_dirfd, fn + 1, arg3, 0),
-+                      faccessat(arg1, fn, arg3, 0));
-+        ret = get_errno(ret);
-+        unlock_user(fn, arg2, 0);
-         break;
- #endif
- #ifdef TARGET_NR_nice /* not on alpha */
-@@ -9307,14 +9326,14 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_readlink:
-         {
-             void *p2;
--            p = lock_user_string(arg1);
-+            fn = lock_user_string(arg1);
-             p2 = lock_user(VERIFY_WRITE, arg2, arg3, 0);
--            if (!p || !p2) {
-+            if (!fn || !p2) {
-                 ret = -TARGET_EFAULT;
-             } else if (!arg3) {
-                 /* Short circuit this for the magic exe check. */
-                 ret = -TARGET_EINVAL;
--            } else if (is_proc_myself((const char *)p, "exe")) {
-+            } else if (is_proc_myself(fn, "exe")) {
-                 char real[PATH_MAX], *temp;
-                 temp = realpath(exec_path, real);
-                 /* Return value is # of bytes that we wrote to the buffer. */
-@@ -9328,10 +9347,13 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                     memcpy(p2, real, ret);
-                 }
-             } else {
--                ret = get_errno(readlink(path(p), p2, arg3));
-+                CHOOSE_INTERP(ret, fn,
-+                              readlinkat(interp_dirfd, fn + 1, p2, arg3),
-+                              readlink(fn, p2, arg3));
-+                ret = get_errno(ret);
-             }
-             unlock_user(p2, arg2, ret);
--            unlock_user(p, arg1, 0);
-+            unlock_user(fn, arg1, 0);
-         }
-         break;
- #endif
-@@ -9339,20 +9361,23 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_readlinkat:
-         {
-             void *p2;
--            p  = lock_user_string(arg2);
-+            fn = lock_user_string(arg2);
-             p2 = lock_user(VERIFY_WRITE, arg3, arg4, 0);
--            if (!p || !p2) {
-+            if (!fn || !p2) {
-                 ret = -TARGET_EFAULT;
--            } else if (is_proc_myself((const char *)p, "exe")) {
-+            } else if (is_proc_myself(fn, "exe")) {
-                 char real[PATH_MAX], *temp;
-                 temp = realpath(exec_path, real);
-                 ret = temp == NULL ? get_errno(-1) : strlen(real) ;
-                 snprintf((char *)p2, arg4, "%s", real);
-             } else {
--                ret = get_errno(readlinkat(arg1, path(p), p2, arg4));
-+                CHOOSE_INTERP(ret, fn,
-+                              readlinkat(interp_dirfd, fn + 1, p2, arg4),
-+                              readlinkat(arg1, fn, p2, arg4));
-+                ret = get_errno(ret);
-             }
-             unlock_user(p2, arg3, ret);
--            unlock_user(p, arg2, 0);
-+            unlock_user(fn, arg2, 0);
-         }
-         break;
- #endif
-@@ -9780,18 +9805,26 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-         break;
- #ifdef TARGET_NR_stat
-     case TARGET_NR_stat:
--        if (!(p = lock_user_string(arg1)))
-+        if (!(fn = lock_user_string(arg1))) {
-             goto efault;
--        ret = get_errno(stat(path(p), &st));
--        unlock_user(p, arg1, 0);
-+        }
-+        CHOOSE_INTERP(ret, fn,
-+                      fstatat(interp_dirfd, fn + 1, &st, 0),
-+                      stat(fn, &st));
-+        ret = get_errno(ret);
-+        unlock_user(fn, arg1, 0);
-         goto do_stat;
- #endif
- #ifdef TARGET_NR_lstat
-     case TARGET_NR_lstat:
--        if (!(p = lock_user_string(arg1)))
-+        if (!(fn = lock_user_string(arg1))) {
-             goto efault;
--        ret = get_errno(lstat(path(p), &st));
--        unlock_user(p, arg1, 0);
-+        }
-+        CHOOSE_INTERP(ret, fn,
-+                      fstatat(interp_dirfd, fn + 1, &st, AT_SYMLINK_NOFOLLOW),
-+                      lstat(fn, &st));
-+        ret = get_errno(ret);
-+        unlock_user(fn, arg1, 0);
-         goto do_stat;
- #endif
-     case TARGET_NR_fstat:
-@@ -10886,20 +10919,28 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
- #endif
- #ifdef TARGET_NR_stat64
-     case TARGET_NR_stat64:
--        if (!(p = lock_user_string(arg1)))
-+        if (!(fn = lock_user_string(arg1))) {
-             goto efault;
--        ret = get_errno(stat(path(p), &st));
--        unlock_user(p, arg1, 0);
-+        }
-+        CHOOSE_INTERP(ret, fn,
-+                      fstatat(interp_dirfd, fn + 1, &st, 0),
-+                      stat(fn, &st));
-+        ret = get_errno(ret);
-+        unlock_user(fn, arg1, 0);
-         if (!is_error(ret))
-             ret = host_to_target_stat64(cpu_env, arg2, &st);
-         break;
- #endif
- #ifdef TARGET_NR_lstat64
-     case TARGET_NR_lstat64:
--        if (!(p = lock_user_string(arg1)))
-+        if (!(fn = lock_user_string(arg1))) {
-             goto efault;
--        ret = get_errno(lstat(path(p), &st));
--        unlock_user(p, arg1, 0);
-+        }
-+        CHOOSE_INTERP(ret, fn,
-+                      fstatat(interp_dirfd, fn + 1, &st, AT_SYMLINK_NOFOLLOW),
-+                      lstat(fn, &st));
-+        ret = get_errno(ret);
-+        unlock_user(fn, arg1, 0);
-         if (!is_error(ret))
-             ret = host_to_target_stat64(cpu_env, arg2, &st);
-         break;
-@@ -10918,9 +10959,14 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
- #ifdef TARGET_NR_newfstatat
-     case TARGET_NR_newfstatat:
- #endif
--        if (!(p = lock_user_string(arg2)))
-+        if (!(fn = lock_user_string(arg2))) {
-             goto efault;
--        ret = get_errno(fstatat(arg1, path(p), &st, arg4));
-+        }
-+        CHOOSE_INTERP(ret, fn,
-+                      fstatat(interp_dirfd, fn + 1, &st, arg4),
-+                      fstatat(arg1, fn, &st, arg4));
-+        ret = get_errno(ret);
-+        unlock_user(fn, arg2, 0);
-         if (!is_error(ret))
-             ret = host_to_target_stat64(cpu_env, arg3, &st);
-         break;
-@@ -11917,12 +11963,14 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-             if (!arg2)
-                 ret = get_errno(sys_utimensat(arg1, NULL, tsp, arg4));
-             else {
--                if (!(p = lock_user_string(arg2))) {
--                    ret = -TARGET_EFAULT;
--                    goto fail;
-+                if (!(fn = lock_user_string(arg2))) {
-+                    goto efault;
-                 }
--                ret = get_errno(sys_utimensat(arg1, path(p), tsp, arg4));
--                unlock_user(p, arg2, 0);
-+                CHOOSE_INTERP(ret, fn,
-+                              sys_utimensat(interp_dirfd, fn + 1, tsp, arg4),
-+                              sys_utimensat(arg1, fn, tsp, arg4));
-+                ret = get_errno(ret);
-+                unlock_user(fn, arg2, 0);
-             }
-         }
- 	break;
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTI4MjIxNTEwLjEzNzIyLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBsaW51eC11c2VyOiBVc2UgKmF0IGZ1
+bmN0aW9ucyB0byBpbXBsZW1lbnQgaW50ZXJwX3ByZWZpeAoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUxNjYyMDk5OS0yNTY2
+OS0xLWdpdC1zZW5kLWVtYWlsLXdlaS53LndhbmdAaW50ZWwuY29tIC0+IHBhdGNoZXcvMTUxNjYy
+MDk5OS0yNTY2OS0xLWdpdC1zZW5kLWVtYWlsLXdlaS53LndhbmdAaW50ZWwuY29tCiB0IFt0YWcg
+dXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxNzEyMTUxNzE2NTUuNzgxOC0xLWRnaWxiZXJ0
+QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MTIxNTE3MTY1NS43ODE4LTEtZGdpbGJlcnRAcmVk
+aGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwMTI0MTMwMTI2
+LjIwODcxLTEtZjRidWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAxODAxMjQxMzAxMjYuMjA4NzEt
+MS1mNGJ1Z0BhbXNhdC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4
+MDEyODIyMTUxMC4xMzcyMi0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hl
+dy8yMDE4MDEyODIyMTUxMC4xMzcyMi0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkZjUzNjZhNmJhIGxpbnV4LXVzZXI6IFVzZSAq
+YXQgZnVuY3Rpb25zIHRvIGltcGxlbWVudCBpbnRlcnBfcHJlZml4Cgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGxpbnV4LXVzZXI6IFVzZSAqYXQgZnVuY3Rpb25zIHRv
+IGltcGxlbWVudCBpbnRlcnBfcHJlZml4Li4uCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQg
+aW4gaWYgY29uZGl0aW9uCiMxODk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjgzNzI6Cisg
+ICAgICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJnMikpKSB7CgpFUlJPUjog
+ZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMjA3OiBGSUxFOiBsaW51eC11
+c2VyL3N5c2NhbGwuYzo4MzkzOgorICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmco
+YXJnMSkpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgoj
+MjIyOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4NDA1OgorICAgICAgICBpZiAoIShmbiA9
+IGxvY2tfdXNlcl9zdHJpbmcoYXJnMikpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50
+IGluIGlmIGNvbmRpdGlvbgojMzAzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo5ODA4Ogor
+ICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJnMSkpKSB7CgpFUlJPUjogZG8g
+bm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMzE4OiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGwuYzo5ODIwOgorICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJn
+MSkpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMzM2
+OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMDkyMjoKKyAgICAgICAgaWYgKCEoZm4gPSBs
+b2NrX3VzZXJfc3RyaW5nKGFyZzEpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBp
+biBpZiBjb25kaXRpb24KIzM1MzogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTA5MzY6Cisg
+ICAgICAgIGlmICghKGZuID0gbG9ja191c2VyX3N0cmluZyhhcmcxKSkpIHsKCkVSUk9SOiBkbyBu
+b3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiMzNzE6IEZJTEU6IGxpbnV4LXVzZXIv
+c3lzY2FsbC5jOjEwOTYyOgorICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJn
+MikpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMzkw
+OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMTk2NjoKKyAgICAgICAgICAgICAgICBpZiAo
+IShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJnMikpKSB7Cgp0b3RhbDogOSBlcnJvcnMsIDAgd2Fy
+bmluZ3MsIDM0OSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAZnJlZWxpc3RzLm9yZw==
