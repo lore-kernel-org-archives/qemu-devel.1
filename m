@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAk-0002TQ-Fr
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1efwAk-0002TP-Ft
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAi-00086N-OF
+	(envelope-from <richard.henderson@linaro.org>) id 1efwAh-000856-2M
 	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:38 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42889)
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:42887)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwAi-00085m-GQ
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:36 -0500
-Received: by mail-pf0-x243.google.com with SMTP id b25so3256047pfd.9
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:36 -0800 (PST)
+	id 1efwAg-00084S-PX
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:34 -0500
+Received: by mail-pf0-x241.google.com with SMTP id b25so3256002pfd.9
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:34 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:14:47 -0800
-Message-Id: <20180128231528.22719-3-richard.henderson@linaro.org>
+Date: Sun, 28 Jan 2018 15:14:46 -0800
+Message-Id: <20180128231528.22719-2-richard.henderson@linaro.org>
 In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
 References: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 02/43] target/hppa: Define the rest of the PSW
+Subject: [Qemu-devel] [PULL v4 01/43] target/hppa: Skeleton support for
+ hppa-softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,168 +28,269 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Helge Deller <deller@gmx.de>
 
-We don't actually do anything with most of the bits yet,
-but at least they have names and we have somewhere to
-store them.
+From: Helge Deller <deller@gmx.de>
 
+With the addition of default-configs/hppa-softmmu.mak, this
+will compile.  It is not enabled with this patch, however.
+
+Signed-off-by: Helge Deller <deller@gmx.de>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h    | 47 ++++++++++++++++++++++++++++++++++++++++++++++
- target/hppa/helper.c | 53 ++++++++++++++++++++++++++++++++++++++--------------
- 2 files changed, 86 insertions(+), 14 deletions(-)
+ include/sysemu/arch_init.h |  1 +
+ target/hppa/cpu.h          |  1 +
+ arch_init.c                |  2 ++
+ hw/hppa/machine.c          | 38 ++++++++++++++++++++++++++++++++
+ target/hppa/cpu.c          |  5 +++++
+ target/hppa/helper.c       | 10 ---------
+ target/hppa/mem_helper.c   | 54 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/hppa/op_helper.c    | 13 +++++++++--
+ hw/hppa/Makefile.objs      |  1 +
+ target/hppa/Makefile.objs  |  2 +-
+ 10 files changed, 114 insertions(+), 13 deletions(-)
+ create mode 100644 hw/hppa/machine.c
+ create mode 100644 target/hppa/mem_helper.c
+ create mode 100644 hw/hppa/Makefile.objs
 
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 8751c468ed..f999bfd3be 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -24,6 +24,7 @@ enum {
+     QEMU_ARCH_MOXIE = (1 << 15),
+     QEMU_ARCH_TRICORE = (1 << 16),
+     QEMU_ARCH_NIOS2 = (1 << 17),
++    QEMU_ARCH_HPPA = (1 << 18),
+ };
+ 
+ extern const uint32_t arch_type;
 diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index 3d170c3cf7..d703e99bf9 100644
+index 1a35eae1fa..3d170c3cf7 100644
 --- a/target/hppa/cpu.h
 +++ b/target/hppa/cpu.h
-@@ -46,6 +46,52 @@
- #define EXCP_SIGILL      4
- #define EXCP_SIGFPE      5
- 
-+/* Taken from Linux kernel: arch/parisc/include/asm/psw.h */
-+#define PSW_I            0x00000001
-+#define PSW_D            0x00000002
-+#define PSW_P            0x00000004
-+#define PSW_Q            0x00000008
-+#define PSW_R            0x00000010
-+#define PSW_F            0x00000020
-+#define PSW_G            0x00000040 /* PA1.x only */
-+#define PSW_O            0x00000080 /* PA2.0 only */
-+#define PSW_CB           0x0000ff00
-+#define PSW_M            0x00010000
-+#define PSW_V            0x00020000
-+#define PSW_C            0x00040000
-+#define PSW_B            0x00080000
-+#define PSW_X            0x00100000
-+#define PSW_N            0x00200000
-+#define PSW_L            0x00400000
-+#define PSW_H            0x00800000
-+#define PSW_T            0x01000000
-+#define PSW_S            0x02000000
-+#define PSW_E            0x04000000
-+#ifdef TARGET_HPPA64
-+#define PSW_W            0x08000000 /* PA2.0 only */
+@@ -134,6 +134,7 @@ void cpu_hppa_loaded_fr0(CPUHPPAState *env);
+ int cpu_hppa_signal_handler(int host_signum, void *pinfo, void *puc);
+ int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
+                               int rw, int midx);
++hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr);
+ int hppa_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+ int hppa_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ void hppa_cpu_do_interrupt(CPUState *cpu);
+diff --git a/arch_init.c b/arch_init.c
+index a0b8ed6167..4c36f2b076 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -53,6 +53,8 @@ int graphic_depth = 32;
+ #define QEMU_ARCH QEMU_ARCH_CRIS
+ #elif defined(TARGET_I386)
+ #define QEMU_ARCH QEMU_ARCH_I386
++#elif defined(TARGET_HPPA)
++#define QEMU_ARCH QEMU_ARCH_HPPA
+ #elif defined(TARGET_M68K)
+ #define QEMU_ARCH QEMU_ARCH_M68K
+ #elif defined(TARGET_LM32)
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+new file mode 100644
+index 0000000000..79958da18f
+--- /dev/null
++++ b/hw/hppa/machine.c
+@@ -0,0 +1,38 @@
++/*
++ * QEMU HPPA hardware system emulator.
++ * Copyright 2018 Helge Deller <deller@gmx.de>
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "elf.h"
++#include "hw/loader.h"
++#include "hw/boards.h"
++#include "qemu/error-report.h"
++#include "sysemu/sysemu.h"
++#include "hw/timer/mc146818rtc.h"
++#include "hw/ide.h"
++#include "hw/timer/i8254.h"
++#include "hw/char/serial.h"
++#include "qemu/cutils.h"
++#include "qapi/error.h"
++
++
++static void machine_hppa_init(MachineState *machine)
++{
++}
++
++static void machine_hppa_machine_init(MachineClass *mc)
++{
++    mc->desc = "HPPA generic machine";
++    mc->init = machine_hppa_init;
++    mc->block_default_type = IF_SCSI;
++    mc->max_cpus = 1;
++    mc->is_default = 1;
++    mc->default_ram_size = 512 * M_BYTE;
++    mc->default_boot_order = "cd";
++}
++
++DEFINE_MACHINE("hppa", machine_hppa_machine_init)
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 9e7b0d4ccb..f6d92de972 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -132,7 +132,12 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
+     cc->synchronize_from_tb = hppa_cpu_synchronize_from_tb;
+     cc->gdb_read_register = hppa_cpu_gdb_read_register;
+     cc->gdb_write_register = hppa_cpu_gdb_write_register;
++#ifdef CONFIG_USER_ONLY
+     cc->handle_mmu_fault = hppa_cpu_handle_mmu_fault;
 +#else
-+#define PSW_W            0
-+#endif
-+#define PSW_Z            0x40000000 /* PA1.x only */
-+#define PSW_Y            0x80000000 /* PA1.x only */
-+
-+#define PSW_SM (PSW_W | PSW_E | PSW_O | PSW_G | PSW_F \
-+               | PSW_R | PSW_Q | PSW_P | PSW_D | PSW_I)
-+
-+/* ssm/rsm instructions number PSW_W and PSW_E differently */
-+#define PSW_SM_I         PSW_I      /* Enable External Interrupts */
-+#define PSW_SM_D         PSW_D
-+#define PSW_SM_P         PSW_P
-+#define PSW_SM_Q         PSW_Q      /* Enable Interrupt State Collection */
-+#define PSW_SM_R         PSW_R      /* Enable Recover Counter Trap */
-+#ifdef TARGET_HPPA64
-+#define PSW_SM_E         0x100
-+#define PSW_SM_W         0x200      /* PA2.0 only : Enable Wide Mode */
-+#else
-+#define PSW_SM_E         0
-+#define PSW_SM_W         0
++    cc->get_phys_page_debug = hppa_cpu_get_phys_page_debug;
 +#endif
 +
- typedef struct CPUHPPAState CPUHPPAState;
- 
- struct CPUHPPAState {
-@@ -56,6 +102,7 @@ struct CPUHPPAState {
-     target_ulong cr26;
-     target_ulong cr27;
- 
-+    target_long  psw;        /* All psw bits except the following:  */
-     target_ulong psw_n;      /* boolean */
-     target_long  psw_v;      /* in most significant bit */
+     cc->disas_set_info = hppa_cpu_disas_set_info;
+     cc->tcg_initialize = hppa_translate_init;
  
 diff --git a/target/hppa/helper.c b/target/hppa/helper.c
-index d6d6f06cb0..4231ef3bff 100644
+index 23f7af7018..d6d6f06cb0 100644
 --- a/target/hppa/helper.c
 +++ b/target/hppa/helper.c
-@@ -39,10 +39,11 @@ target_ulong cpu_hppa_get_psw(CPUHPPAState *env)
-     /* .........................bcdefgh */
-     psw |= (psw >> 12) & 0xf;
-     psw |= env->psw_cb_msb << 7;
--    psw <<= 8;
-+    psw = (psw & 0xff) << 8;
- 
--    psw |= env->psw_n << 21;
--    psw |= (env->psw_v < 0) << 17;
-+    psw |= env->psw_n * PSW_N;
-+    psw |= (env->psw_v < 0) * PSW_V;
-+    psw |= env->psw;
- 
-     return psw;
+@@ -65,16 +65,6 @@ void cpu_hppa_put_psw(CPUHPPAState *env, target_ulong psw)
+     env->psw_cb = cb;
  }
-@@ -51,8 +52,9 @@ void cpu_hppa_put_psw(CPUHPPAState *env, target_ulong psw)
- {
-     target_ulong cb = 0;
  
--    env->psw_n = (psw >> 21) & 1;
--    env->psw_v = -((psw >> 17) & 1);
-+    env->psw = psw & ~(PSW_N | PSW_V | PSW_CB);
-+    env->psw_n = (psw / PSW_N) & 1;
-+    env->psw_v = -((psw / PSW_V) & 1);
-     env->psw_cb_msb = (psw >> 15) & 1;
- 
-     cb |= ((psw >> 14) & 1) << 28;
-@@ -106,22 +108,45 @@ void hppa_cpu_dump_state(CPUState *cs, FILE *f,
+-int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-                              int rw, int mmu_idx)
+-{
+-    HPPACPU *cpu = HPPA_CPU(cs);
+-
+-    cs->exception_index = EXCP_SIGSEGV;
+-    cpu->env.ior = address;
+-    return 1;
+-}
+-
+ void hppa_cpu_do_interrupt(CPUState *cs)
  {
      HPPACPU *cpu = HPPA_CPU(cs);
-     CPUHPPAState *env = &cpu->env;
-+    target_ulong psw = cpu_hppa_get_psw(env);
-+    target_ulong psw_cb;
-+    char psw_c[20];
-     int i;
+diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
+new file mode 100644
+index 0000000000..a3e576f119
+--- /dev/null
++++ b/target/hppa/mem_helper.c
+@@ -0,0 +1,54 @@
++/*
++ *  HPPA memory access helper routines
++ *
++ *  Copyright (c) 2017 Helge Deller
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "exec/helper-proto.h"
++#include "qom/cpu.h"
++
++#ifdef CONFIG_USER_ONLY
++int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
++                              int size, int rw, int mmu_idx)
++{
++    HPPACPU *cpu = HPPA_CPU(cs);
++
++    cs->exception_index = EXCP_SIGSEGV;
++    cpu->env.ior = address;
++    return 1;
++}
++#else
++hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    /* Stub */
++    return addr;
++}
++
++void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType type,
++              int mmu_idx, uintptr_t retaddr)
++{
++    /* Stub */
++    int prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++    hwaddr phys = addr;
++
++    /* Success!  Store the translation into the QEMU TLB.  */
++    tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
++                 prot, mmu_idx, TARGET_PAGE_SIZE);
++}
++#endif /* CONFIG_USER_ONLY */
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index fdbf64ae3c..9076ee998d 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -58,9 +58,9 @@ void HELPER(tcond)(CPUHPPAState *env, target_ulong cond)
+ static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
+                            uint32_t mask, uintptr_t ra)
+ {
++#ifdef CONFIG_USER_ONLY
+     uint32_t old, new, cmp;
  
--    cpu_fprintf(f, "IA_F " TARGET_FMT_lx
--                   " IA_B " TARGET_FMT_lx
--                   " PSW  " TARGET_FMT_lx
--                   " [N:" TARGET_FMT_ld " V:%d"
--                   " CB:" TARGET_FMT_lx "]\n              ",
--                env->iaoq_f, env->iaoq_b, cpu_hppa_get_psw(env),
--                env->psw_n, env->psw_v < 0,
--                ((env->psw_cb >> 4) & 0x01111111) | (env->psw_cb_msb << 28));
--    for (i = 1; i < 32; i++) {
-+    cpu_fprintf(f, "IA_F " TARGET_FMT_lx " IA_B " TARGET_FMT_lx "\n",
-+                env->iaoq_f, env->iaoq_b);
-+
-+    psw_c[0]  = (psw & PSW_W ? 'W' : '-');
-+    psw_c[1]  = (psw & PSW_E ? 'E' : '-');
-+    psw_c[2]  = (psw & PSW_S ? 'S' : '-');
-+    psw_c[3]  = (psw & PSW_T ? 'T' : '-');
-+    psw_c[4]  = (psw & PSW_H ? 'H' : '-');
-+    psw_c[5]  = (psw & PSW_L ? 'L' : '-');
-+    psw_c[6]  = (psw & PSW_N ? 'N' : '-');
-+    psw_c[7]  = (psw & PSW_X ? 'X' : '-');
-+    psw_c[8]  = (psw & PSW_B ? 'B' : '-');
-+    psw_c[9]  = (psw & PSW_C ? 'C' : '-');
-+    psw_c[10] = (psw & PSW_V ? 'V' : '-');
-+    psw_c[11] = (psw & PSW_M ? 'M' : '-');
-+    psw_c[12] = (psw & PSW_F ? 'F' : '-');
-+    psw_c[13] = (psw & PSW_R ? 'R' : '-');
-+    psw_c[14] = (psw & PSW_Q ? 'Q' : '-');
-+    psw_c[15] = (psw & PSW_P ? 'P' : '-');
-+    psw_c[16] = (psw & PSW_D ? 'D' : '-');
-+    psw_c[17] = (psw & PSW_I ? 'I' : '-');
-+    psw_c[18] = '\0';
-+    psw_cb = ((env->psw_cb >> 4) & 0x01111111) | (env->psw_cb_msb << 28);
-+
-+    cpu_fprintf(f, "PSW  " TARGET_FMT_lx " CB   " TARGET_FMT_lx " %s\n",
-+                psw, psw_cb, psw_c);
-+
-+    for (i = 0; i < 32; i++) {
-         cpu_fprintf(f, "GR%02d " TARGET_FMT_lx " ", i, env->gr[i]);
-         if ((i % 4) == 3) {
-             cpu_fprintf(f, "\n");
-         }
+-#ifdef CONFIG_USER_ONLY
+     uint32_t *haddr = g2h(addr - 1);
+     old = *haddr;
+     while (1) {
+@@ -72,7 +72,8 @@ static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
+         old = cmp;
      }
-+    cpu_fprintf(f, "\n");
- 
-     /* ??? FR */
+ #else
+-#error "Not implemented."
++    /* FIXME -- we can do better.  */
++    cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+ #endif
  }
+ 
+@@ -158,12 +159,20 @@ void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
+ 
+ target_ulong HELPER(probe_r)(target_ulong addr)
+ {
++#ifdef CONFIG_USER_ONLY
+     return page_check_range(addr, 1, PAGE_READ);
++#else
++    return 1; /* FIXME */
++#endif
+ }
+ 
+ target_ulong HELPER(probe_w)(target_ulong addr)
+ {
++#ifdef CONFIG_USER_ONLY
+     return page_check_range(addr, 1, PAGE_WRITE);
++#else
++    return 1; /* FIXME */
++#endif
+ }
+ 
+ void HELPER(loaded_fr0)(CPUHPPAState *env)
+diff --git a/hw/hppa/Makefile.objs b/hw/hppa/Makefile.objs
+new file mode 100644
+index 0000000000..46b2ae18de
+--- /dev/null
++++ b/hw/hppa/Makefile.objs
+@@ -0,0 +1 @@
++obj-y += machine.o
+diff --git a/target/hppa/Makefile.objs b/target/hppa/Makefile.objs
+index 263446fa0b..d89285307b 100644
+--- a/target/hppa/Makefile.objs
++++ b/target/hppa/Makefile.objs
+@@ -1 +1 @@
+-obj-y += translate.o helper.o cpu.o op_helper.o gdbstub.o
++obj-y += translate.o helper.o cpu.o op_helper.o gdbstub.o mem_helper.o
 -- 
 2.14.3
