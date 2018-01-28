@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1efwbz-0007pn-L0
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:43:48 -0500
+	(envelope-from <no-reply@patchew.org>) id 1efws9-0004g5-5q
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 19:00:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1efwby-00078v-E8
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:43:47 -0500
-Message-ID: <1517183014.2332.0.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon, 29 Jan 2018 10:43:34 +1100
-In-Reply-To: <59acc32f-94e9-42b6-a8aa-4eddd504c8c8@ozlabs.ru>
-References: <20180119050005.29392-1-sjitindarsingh@gmail.com>
-	<20180119050005.29392-3-sjitindarsingh@gmail.com>
-	<59acc32f-94e9-42b6-a8aa-4eddd504c8c8@ozlabs.ru>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V5 2/7] target/ppc/spapr_caps:
- Add macro to generate spapr_caps migration vmstate
+	(envelope-from <no-reply@patchew.org>) id 1efws5-0001lM-1k
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 19:00:29 -0500
+Resent-Message-Id: <E1efws5-0001lM-1k@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1efws4-0001ko-Q6
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 19:00:24 -0500
+In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151718399881.776.2744590772685801398@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 28 Jan 2018 15:59:59 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL v4 00/43] hppa-softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,149 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org
-Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Fri, 2018-01-19 at 16:18 +1100, Alexey Kardashevskiy wrote:
-> On 19/01/18 16:00, Suraj Jitindar Singh wrote:
-> > The vmstate description and the contained needed function for
-> > migration
-> > of spapr_caps is the same for each cap, with the name of the cap
-> > substituted. As such introduce a macro to allow for easier
-> > generation of
-> > these.
-> > 
-> > Convert the three existing spapr_caps (htm, vsx, and dfp) to use
-> > this
-> > macro.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > 
-> > ---
-> > 
-> > V5:
-> >  - Patch added to series
-> > ---
-> >  hw/ppc/spapr_caps.c | 78 +++++++++++++++++----------------------
-> > --------------
-> >  1 file changed, 24 insertions(+), 54 deletions(-)
-> > 
-> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > index d5c9ce774a..5d52969bd5 100644
-> > --- a/hw/ppc/spapr_caps.c
-> > +++ b/hw/ppc/spapr_caps.c
-> > @@ -228,62 +228,32 @@ int
-> > spapr_caps_post_migration(sPAPRMachineState *spapr)
-> >      return ok ? 0 : -EINVAL;
-> >  }
-> >  
-> > -static bool spapr_cap_htm_needed(void *opaque)
-> > -{
-> > -    sPAPRMachineState *spapr = opaque;
-> > -
-> > -    return spapr->cmd_line_caps[SPAPR_CAP_HTM] &&
-> > -           (spapr->eff.caps[SPAPR_CAP_HTM] != spapr-
-> > >def.caps[SPAPR_CAP_HTM]);
-> > -}
-> > -
-> > -const VMStateDescription vmstate_spapr_cap_htm = {
-> > -    .name = "spapr/cap/htm",
-> > -    .version_id = 1,
-> > -    .minimum_version_id = 1,
-> > -    .needed = spapr_cap_htm_needed,
-> > -    .fields = (VMStateField[]) {
-> > -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_HTM], sPAPRMachineState),
-> > -        VMSTATE_END_OF_LIST()
-> > -    },
-> > -};
-> > -
-> > -static bool spapr_cap_vsx_needed(void *opaque)
-> > -{
-> > -    sPAPRMachineState *spapr = opaque;
-> > -
-> > -    return spapr->cmd_line_caps[SPAPR_CAP_VSX] &&
-> > -           (spapr->eff.caps[SPAPR_CAP_VSX] != spapr-
-> > >def.caps[SPAPR_CAP_VSX]);
-> > +/* Used to generate the migration field and needed function for a
-> > spapr cap */
-> > +#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
-> > +static bool spapr_cap_##cap##_needed(void *opaque)      \
-> > +{                                                       \
-> > +    sPAPRMachineState *spapr = opaque;                  \
-> > +                                                        \
-> > +    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
-> > +           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
-> > +            spapr->def.caps[SPAPR_CAP_##ccap]);         \
-> > +}                                                       \
-> > +                                                        \
-> > +const VMStateDescription vmstate_spapr_cap_##cap = {    \
-> > +    .name = "spapr/cap/" #cap,                          \
-> > +    .version_id = 1,                                    \
-> > +    .minimum_version_id = 1,                            \
-> > +    .needed = spapr_cap_##cap##_needed,                 \
-> > +    .fields = (VMStateField[]) {                        \
-> > +        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
-> > +                      sPAPRMachineState),               \
-> > +        VMSTATE_END_OF_LIST()                           \
-> > +    },                                                  \
-> >  }
-> >  
-> > -const VMStateDescription vmstate_spapr_cap_vsx = {
-> > -    .name = "spapr/cap/vsx",
-> > -    .version_id = 1,
-> > -    .minimum_version_id = 1,
-> > -    .needed = spapr_cap_vsx_needed,
-> > -    .fields = (VMStateField[]) {
-> > -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_VSX], sPAPRMachineState),
-> > -        VMSTATE_END_OF_LIST()
-> > -    },
-> > -};
-> > -
-> > -static bool spapr_cap_dfp_needed(void *opaque)
-> > -{
-> > -    sPAPRMachineState *spapr = opaque;
-> > -
-> > -    return spapr->cmd_line_caps[SPAPR_CAP_DFP] &&
-> > -           (spapr->eff.caps[SPAPR_CAP_DFP] != spapr-
-> > >def.caps[SPAPR_CAP_DFP]);
-> > -}
-> > -
-> > -const VMStateDescription vmstate_spapr_cap_dfp = {
-> > -    .name = "spapr/cap/dfp",
-> > -    .version_id = 1,
-> > -    .minimum_version_id = 1,
-> > -    .needed = spapr_cap_dfp_needed,
-> > -    .fields = (VMStateField[]) {
-> > -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_DFP], sPAPRMachineState),
-> > -        VMSTATE_END_OF_LIST()
-> > -    },
-> > -};
-> > +SPAPR_CAP_MIG_STATE(htm, HTM);
-> > +SPAPR_CAP_MIG_STATE(vsx, VSX);
-> > +SPAPR_CAP_MIG_STATE(dfp, DFP);
-> 
-> 
-> A nit: I really dislike this kind of parameters which you cannot
-> really
-> cscope/ctags for because they are joined to some other things.
-> 
-> "no matches found for cscope query g HTM of HTM" says vim's cscope
-> when I
-> search for "HTM".
-
-Would something like:
-SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_HTM);
-SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_VSX);
-SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_DFP);
-
-be better?
-I could send a follow up
-
-> 
-> 
-> >  
-> >  void spapr_caps_reset(sPAPRMachineState *spapr)
-> >  {
-> > 
-> 
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTI4MjMxNTI4LjIyNzE5LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgdjQgMDAvNDNdIGhwcGEtc29mdG1tdQoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
+bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
+Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
+b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
+dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
+KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
+YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
+dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBh
+dGNoZXcvMjAxODAxMjgyMzE1MjguMjI3MTktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3Jn
+IC0+IHBhdGNoZXcvMjAxODAxMjgyMzE1MjguMjI3MTktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
+cm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGIxOWY0NzJjMyB0YXJnZXQv
+aHBwYTogSW1wbGVtZW50IFBST0JFIGZvciBzeXN0ZW0gbW9kZQpmOGIwZGMyNWU3IHRhcmdldC9o
+cHBhOiBGaXggMzItYml0IG9wZXJhbmQgbWFza3MgZm9yIDBFIEZDVlQKNGYzMzhlM2E2ZCBody9o
+cHBhOiBBZGQgTUFJTlRBSU5FUlMgZW50cnkKZmIyZjY5NmM5OCBwYy1iaW9zOiBBZGQgaHBwYS1m
+aXJtd2FyZS5pbWcgYW5kIGdpdCBzdWJtb2R1bGUKOWU0M2JiYjhhNSBody9ocHBhOiBJbXBsZW1l
+bnQgRElOTyBzeXN0ZW0gYm9hcmQKNWI1YjkxMTRjYyB0YXJnZXQvaHBwYTogRW5hYmxlIE1UVENH
+CjYzNDQxYjQxMzQgdGFyZ2V0L2hwcGE6IEltcGxlbWVudCBTVFdBCmVlNzhhMjNlY2IgdGFyZ2V0
+L2hwcGE6IEltcGxlbWVudCBhIHBhdXNlIGluc3RydWN0aW9uCjkwYTUyYjRhYmIgdGFyZ2V0L2hw
+cGE6IEltcGxlbWVudCBMRFNJRCBmb3Igc3lzdGVtIG1vZGUKYjAxNDI4MzI4MCB0YXJnZXQvaHBw
+YTogRml4IGNvbW1lbnQKZmE0NjYyODRiNSB0YXJnZXQvaHBwYTogSW5jcmVhc2UgbnVtYmVyIG9m
+IHRlbXAgcmVncwoyMDAwMWNmZWVmIHRhcmdldC9ocHBhOiBPbmx5IHVzZSBFWENQX0RUTEJfTUlT
+Uwo1YjQ0NTVjNDllIHRhcmdldC9ocHBhOiBJbXBsZW1lbnQgQixHQVRFIGluc24KYWVjOWIwNjg4
+YyB0YXJnZXQvaHBwYTogQWRkIG1pZ3JhdGlvbiBmb3IgdGhlIGNwdQphNDczZDc4MGU4IHRhcmdl
+dC9ocHBhOiBBZGQgc3lzdGVtIHJlZ2lzdGVycyB0byBnZGJzdHViCjY5MjgzODM2NDcgdGFyZ2V0
+L2hwcGE6IE9wdGltaXplIGZvciBmbGF0IGFkZHJlc3Npbmcgc3BhY2UKZjhmMDk3NGIzZCB0YXJn
+ZXQvaHBwYTogSW1wbGVtZW50IGhhbHQgYW5kIHJlc2V0IGluc3RydWN0aW9ucwowOTJmZTEwMTUz
+IHRhcmdldC9ocHBhOiBJbXBsZW1lbnQgU1lOQ0RNQSBpbnNuCjkwZmQ2YmU2NWYgdGFyZ2V0L2hw
+cGE6IEltcGxlbWVudCBMQ0kKN2Y4NDZkZmEzMiB0YXJnZXQvaHBwYTogSW1wbGVtZW50IExQQQoy
+ZGI5NDU5ZmZjIHRhcmdldC9ocHBhOiBJbXBsZW1lbnQgTERXQQpmZWE3YmQ1YzM3IHRhcmdldC9o
+cHBhOiBJbXBsZW1lbnQgUCpUTEIgYW5kIFAqVExCRSBpbnNucwpkYTg3MmE3ZjhkIHRhcmdldC9o
+cHBhOiBJbXBsZW1lbnQgSSpUTEJBIGFuZCBJKlRMQlAgaW5zbnMKZjY3MTZlNWI4YiB0YXJnZXQv
+aHBwYTogTG9nIHVuaW1wbGVtZW50ZWQgaW5zdHJ1Y3Rpb25zCmUwYWM0MmYwNTAgdGFyZ2V0L2hw
+cGE6IEltcGxlbWVudCB0aGUgaW50ZXJ2YWwgdGltZXIKNmQ0NjIxNWUyNSB0YXJnZXQvaHBwYTog
+SW1wbGVtZW50IGV4dGVybmFsIGludGVycnVwdHMKMzdjYWUzODRmNyB0YXJnZXQvaHBwYTogSW1w
+bGVtZW50IHRsYl9maWxsCjgzNTRiNTdlZDEgdGFyZ2V0L2hwcGE6IEltcGxlbWVudCBJQVNRCjc5
+YmU4MGViMDYgdGFyZ2V0L2hwcGE6IEF2b2lkIHByaXZpbGVnZSBsZXZlbCBkZWNyZWFzZSBkdXJp
+bmcgYnJhbmNoZXMKMDNmM2YwMWNmMyB0YXJnZXQvaHBwYTogVXNlIHNwYWNlIHJlZ2lzdGVycyBp
+biBkYXRhIG9wZXJhdGlvbnMKZDJjNDQ1NWI3YiB0YXJnZXQvaHBwYTogSW1wbGVtZW50IHVuYWxp
+Z25lZCBhY2Nlc3MgdHJhcAo2YTZkZTY1YTlmIHRhcmdldC9ocHBhOiBGaWxsIGluIGhwcGFfY3B1
+X2RvX2ludGVycnVwdC9ocHBhX2NwdV9leGVjX2ludGVycnVwdAo4MmNjMDIzNjgyIHRhcmdldC9o
+cHBhOiBJbXBsZW1lbnQgcmZpCjhlMmVhZjg1Y2EgdGFyZ2V0L2hwcGE6IEFkanVzdCBpbnNuIG1h
+c2sgZm9yIG1mY3RsLCB3CmQwNmY4NDIxYTYgdGFyZ2V0L2hwcGE6IEFkZCBjb250cm9sIHJlZ2lz
+dGVycwpiOTVhZTkwZGI3IHRhcmdldC9ocHBhOiBBZGQgc3BhY2UgcmVnaXN0ZXJzCmJjNmNlZDZm
+MzIgdGFyZ2V0L2hwcGE6IEltcGxlbWVudCB0aGUgc3lzdGVtIG1hc2sgaW5zdHJ1Y3Rpb25zCmZk
+NTQzZDY3ZTQgdGFyZ2V0L2hwcGE6IEltcGxlbWVudCBtbXVfaWR4IGZyb20gSUEgcHJpdmlsZWdl
+IGxldmVsCmI1NTdkYTRmNTAgdGFyZ2V0L2hwcGE6IFNwbGl0IGFkZHJlc3Mgc2l6ZSBmcm9tIHJl
+Z2lzdGVyIHNpemUKZTEwNTZjMWMzYyB0YXJnZXQvaHBwYTogRGVmaW5lIGhhcmR3YXJlIGV4Y2Vw
+dGlvbiB0eXBlcwoxMjk4ODc2YWNjIHRhcmdldC9ocHBhOiBEaXNhYmxlIGdhdGV3YXkgcGFnZSBl
+bXVsYXRpb24gZm9yIHN5c3RlbSBtb2RlCmRkMWNlMTdlZjAgdGFyZ2V0L2hwcGE6IERlZmluZSB0
+aGUgcmVzdCBvZiB0aGUgUFNXCmE5YjU5Y2RkN2YgdGFyZ2V0L2hwcGE6IFNrZWxldG9uIHN1cHBv
+cnQgZm9yIGhwcGEtc29mdG1tdQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
+MS80MzogdGFyZ2V0L2hwcGE6IFNrZWxldG9uIHN1cHBvcnQgZm9yIGhwcGEtc29mdG1tdS4uLgpD
+aGVja2luZyBQQVRDSCAyLzQzOiB0YXJnZXQvaHBwYTogRGVmaW5lIHRoZSByZXN0IG9mIHRoZSBQ
+U1cuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80MzogdGFyZ2V0L2hwcGE6IERpc2FibGUgZ2F0ZXdheSBw
+YWdlIGVtdWxhdGlvbiBmb3Igc3lzdGVtIG1vZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC80MzogdGFy
+Z2V0L2hwcGE6IERlZmluZSBoYXJkd2FyZSBleGNlcHRpb24gdHlwZXMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNS80MzogdGFyZ2V0L2hwcGE6IFNwbGl0IGFkZHJlc3Mgc2l6ZSBmcm9tIHJlZ2lzdGVyIHNp
+emUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi80MzogdGFyZ2V0L2hwcGE6IEltcGxlbWVudCBtbXVfaWR4
+IGZyb20gSUEgcHJpdmlsZWdlIGxldmVsLi4uCkNoZWNraW5nIFBBVENIIDcvNDM6IHRhcmdldC9o
+cHBhOiBJbXBsZW1lbnQgdGhlIHN5c3RlbSBtYXNrIGluc3RydWN0aW9ucy4uLgpDaGVja2luZyBQ
+QVRDSCA4LzQzOiB0YXJnZXQvaHBwYTogQWRkIHNwYWNlIHJlZ2lzdGVycy4uLgpDaGVja2luZyBQ
+QVRDSCA5LzQzOiB0YXJnZXQvaHBwYTogQWRkIGNvbnRyb2wgcmVnaXN0ZXJzLi4uCkNoZWNraW5n
+IFBBVENIIDEwLzQzOiB0YXJnZXQvaHBwYTogQWRqdXN0IGluc24gbWFzayBmb3IgbWZjdGwsIHcu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTEvNDM6IHRhcmdldC9ocHBhOiBJbXBsZW1lbnQgcmZpLi4uCkNo
+ZWNraW5nIFBBVENIIDEyLzQzOiB0YXJnZXQvaHBwYTogRmlsbCBpbiBocHBhX2NwdV9kb19pbnRl
+cnJ1cHQvaHBwYV9jcHVfZXhlY19pbnRlcnJ1cHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvNDM6IHRh
+cmdldC9ocHBhOiBJbXBsZW1lbnQgdW5hbGlnbmVkIGFjY2VzcyB0cmFwLi4uCkNoZWNraW5nIFBB
+VENIIDE0LzQzOiB0YXJnZXQvaHBwYTogVXNlIHNwYWNlIHJlZ2lzdGVycyBpbiBkYXRhIG9wZXJh
+dGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvNDM6IHRhcmdldC9ocHBhOiBBdm9pZCBwcml2aWxl
+Z2UgbGV2ZWwgZGVjcmVhc2UgZHVyaW5nIGJyYW5jaGVzLi4uCkNoZWNraW5nIFBBVENIIDE2LzQz
+OiB0YXJnZXQvaHBwYTogSW1wbGVtZW50IElBU1EuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvNDM6IHRh
+cmdldC9ocHBhOiBJbXBsZW1lbnQgdGxiX2ZpbGwuLi4KRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVk
+IGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzI1OiBGSUxFOiB0YXJnZXQvaHBwYS9jcHUuaDox
+NzI6CisgICAgdW5zaWduZWQgdSA6IDE7CiAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Vz
+IHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojMjY6IEZJTEU6IHRhcmdldC9o
+cHBhL2NwdS5oOjE3MzoKKyAgICB1bnNpZ25lZCB0IDogMTsKICAgICAgICAgICAgICAgIF4KCkVS
+Uk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiMyNzogRklM
+RTogdGFyZ2V0L2hwcGEvY3B1Lmg6MTc0OgorICAgIHVuc2lnbmVkIGQgOiAxOwogICAgICAgICAg
+ICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4
+VykKIzI4OiBGSUxFOiB0YXJnZXQvaHBwYS9jcHUuaDoxNzU6CisgICAgdW5zaWduZWQgYiA6IDE7
+CiAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQg
+JzonIChjdHg6V3hXKQojMjk6IEZJTEU6IHRhcmdldC9ocHBhL2NwdS5oOjE3NjoKKyAgICB1bnNp
+Z25lZCBwYWdlX3NpemUgOiA0OwogICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3Bh
+Y2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojMzA6IEZJTEU6IHRhcmdl
+dC9ocHBhL2NwdS5oOjE3NzoKKyAgICB1bnNpZ25lZCBhcl90eXBlIDogMzsKICAgICAgICAgICAg
+ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0
+eDpXeFcpCiMzMTogRklMRTogdGFyZ2V0L2hwcGEvY3B1Lmg6MTc4OgorICAgIHVuc2lnbmVkIGFy
+X3BsMSA6IDI7CiAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRl
+ZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiMzMjogRklMRTogdGFyZ2V0L2hwcGEvY3B1Lmg6
+MTc5OgorICAgIHVuc2lnbmVkIGFyX3BsMiA6IDI7CiAgICAgICAgICAgICAgICAgICAgIF4KCkVS
+Uk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiMzMzogRklM
+RTogdGFyZ2V0L2hwcGEvY3B1Lmg6MTgwOgorICAgIHVuc2lnbmVkIGVudHJ5X3ZhbGlkIDogMTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJv
+dW5kIHRoYXQgJzonIChjdHg6V3hXKQojMzQ6IEZJTEU6IHRhcmdldC9ocHBhL2NwdS5oOjE4MToK
+KyAgICB1bnNpZ25lZCBhY2Nlc3NfaWQgOiAxNjsKICAgICAgICAgICAgICAgICAgICAgICAgXgoK
+dG90YWw6IDEwIGVycm9ycywgMCB3YXJuaW5ncywgMjUyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE4LzQzOiB0YXJn
+ZXQvaHBwYTogSW1wbGVtZW50IGV4dGVybmFsIGludGVycnVwdHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTkvNDM6IHRhcmdldC9ocHBhOiBJbXBsZW1lbnQgdGhlIGludGVydmFsIHRpbWVyLi4uCkNoZWNr
+aW5nIFBBVENIIDIwLzQzOiB0YXJnZXQvaHBwYTogTG9nIHVuaW1wbGVtZW50ZWQgaW5zdHJ1Y3Rp
+b25zLi4uCkNoZWNraW5nIFBBVENIIDIxLzQzOiB0YXJnZXQvaHBwYTogSW1wbGVtZW50IEkqVExC
+QSBhbmQgSSpUTEJQIGluc25zLi4uCkNoZWNraW5nIFBBVENIIDIyLzQzOiB0YXJnZXQvaHBwYTog
+SW1wbGVtZW50IFAqVExCIGFuZCBQKlRMQkUgaW5zbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvNDM6
+IHRhcmdldC9ocHBhOiBJbXBsZW1lbnQgTERXQS4uLgpDaGVja2luZyBQQVRDSCAyNC80MzogdGFy
+Z2V0L2hwcGE6IEltcGxlbWVudCBMUEEuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvNDM6IHRhcmdldC9o
+cHBhOiBJbXBsZW1lbnQgTENJLi4uCkNoZWNraW5nIFBBVENIIDI2LzQzOiB0YXJnZXQvaHBwYTog
+SW1wbGVtZW50IFNZTkNETUEgaW5zbi4uLgpDaGVja2luZyBQQVRDSCAyNy80MzogdGFyZ2V0L2hw
+cGE6IEltcGxlbWVudCBoYWx0IGFuZCByZXNldCBpbnN0cnVjdGlvbnMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMjgvNDM6IHRhcmdldC9ocHBhOiBPcHRpbWl6ZSBmb3IgZmxhdCBhZGRyZXNzaW5nIHNwYWNl
+Li4uCkNoZWNraW5nIFBBVENIIDI5LzQzOiB0YXJnZXQvaHBwYTogQWRkIHN5c3RlbSByZWdpc3Rl
+cnMgdG8gZ2Ric3R1Yi4uLgpDaGVja2luZyBQQVRDSCAzMC80MzogdGFyZ2V0L2hwcGE6IEFkZCBt
+aWdyYXRpb24gZm9yIHRoZSBjcHUuLi4KQ2hlY2tpbmcgUEFUQ0ggMzEvNDM6IHRhcmdldC9ocHBh
+OiBJbXBsZW1lbnQgQixHQVRFIGluc24uLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvNDM6IHRhcmdldC9o
+cHBhOiBPbmx5IHVzZSBFWENQX0RUTEJfTUlTUy4uLgpDaGVja2luZyBQQVRDSCAzMy80MzogdGFy
+Z2V0L2hwcGE6IEluY3JlYXNlIG51bWJlciBvZiB0ZW1wIHJlZ3MuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MzQvNDM6IHRhcmdldC9ocHBhOiBGaXggY29tbWVudC4uLgpDaGVja2luZyBQQVRDSCAzNS80Mzog
+dGFyZ2V0L2hwcGE6IEltcGxlbWVudCBMRFNJRCBmb3Igc3lzdGVtIG1vZGUuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMzYvNDM6IHRhcmdldC9ocHBhOiBJbXBsZW1lbnQgYSBwYXVzZSBpbnN0cnVjdGlvbi4u
+LgpDaGVja2luZyBQQVRDSCAzNy80MzogdGFyZ2V0L2hwcGE6IEltcGxlbWVudCBTVFdBLi4uCkNo
+ZWNraW5nIFBBVENIIDM4LzQzOiB0YXJnZXQvaHBwYTogRW5hYmxlIE1UVENHLi4uCkNoZWNraW5n
+IFBBVENIIDM5LzQzOiBody9ocHBhOiBJbXBsZW1lbnQgRElOTyBzeXN0ZW0gYm9hcmQuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNDAvNDM6IHBjLWJpb3M6IEFkZCBocHBhLWZpcm13YXJlLmltZyBhbmQgZ2l0
+IHN1Ym1vZHVsZS4uLgpDaGVja2luZyBQQVRDSCA0MS80MzogaHcvaHBwYTogQWRkIE1BSU5UQUlO
+RVJTIGVudHJ5Li4uCkNoZWNraW5nIFBBVENIIDQyLzQzOiB0YXJnZXQvaHBwYTogRml4IDMyLWJp
+dCBvcGVyYW5kIG1hc2tzIGZvciAwRSBGQ1ZULi4uCkNoZWNraW5nIFBBVENIIDQzLzQzOiB0YXJn
+ZXQvaHBwYTogSW1wbGVtZW50IFBST0JFIGZvciBzeXN0ZW0gbW9kZS4uLgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
