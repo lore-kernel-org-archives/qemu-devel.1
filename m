@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwBj-0003Hg-Od
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:40 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwBi-0000pI-NW
+	(envelope-from <richard.henderson@linaro.org>) id 1efwBi-0003Fz-7v
 	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:39 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:45539)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1efwBh-0000l5-8r
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:38 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:40458)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwBi-0000nX-HV
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:38 -0500
-Received: by mail-pf0-x244.google.com with SMTP id a88so3251746pfe.12
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:16:38 -0800 (PST)
+	id 1efwBh-0000jd-2U
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:37 -0500
+Received: by mail-pg0-x242.google.com with SMTP id g16so3004902pgn.7
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:16:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:15:28 -0800
-Message-Id: <20180128231528.22719-44-richard.henderson@linaro.org>
+Date: Sun, 28 Jan 2018 15:15:27 -0800
+Message-Id: <20180128231528.22719-43-richard.henderson@linaro.org>
 In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
 References: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 43/43] target/hppa: Implement PROBE for
- system mode
+Subject: [Qemu-devel] [PULL v4 42/43] target/hppa: Fix 32-bit operand masks
+ for 0E FCVT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +30,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+We masked the wrong bits, which prevented some of the
+32-bit R registers.  E.g. "fcnvxf,sgl,sgl fr22R,fr6R".
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/helper.h    |  3 +--
- target/hppa/op_helper.c | 34 +++++++++++++++++++++++-----------
- target/hppa/translate.c | 20 ++++++++++++++++----
- 3 files changed, 40 insertions(+), 17 deletions(-)
+ target/hppa/translate.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 31320740da..51dc3f8b09 100644
---- a/target/hppa/helper.h
-+++ b/target/hppa/helper.h
-@@ -17,8 +17,7 @@ DEF_HELPER_FLAGS_3(stby_b_parallel, TCG_CALL_NO_WG, void, env, tl, tr)
- DEF_HELPER_FLAGS_3(stby_e, TCG_CALL_NO_WG, void, env, tl, tr)
- DEF_HELPER_FLAGS_3(stby_e_parallel, TCG_CALL_NO_WG, void, env, tl, tr)
- 
--DEF_HELPER_FLAGS_1(probe_r, TCG_CALL_NO_RWG_SE, tr, tl)
--DEF_HELPER_FLAGS_1(probe_w, TCG_CALL_NO_RWG_SE, tr, tl)
-+DEF_HELPER_FLAGS_4(probe, TCG_CALL_NO_WG, tr, env, tl, i32, i32)
- 
- DEF_HELPER_FLAGS_1(loaded_fr0, TCG_CALL_NO_RWG, void, env)
- 
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index 37160f0d91..4c00d15213 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -160,21 +160,33 @@ void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
-     do_stby_e(env, addr, val, true);
- }
- 
--target_ureg HELPER(probe_r)(target_ulong addr)
-+target_ureg HELPER(probe)(CPUHPPAState *env, target_ulong addr,
-+                          uint32_t level, uint32_t want)
- {
- #ifdef CONFIG_USER_ONLY
--    return page_check_range(addr, 1, PAGE_READ);
-+    return page_check_range(addr, 1, want);
- #else
--    return 1; /* FIXME */
--#endif
--}
-+    int prot, excp;
-+    hwaddr phys;
- 
--target_ureg HELPER(probe_w)(target_ulong addr)
--{
--#ifdef CONFIG_USER_ONLY
--    return page_check_range(addr, 1, PAGE_WRITE);
--#else
--    return 1; /* FIXME */
-+    /* Fail if the requested privilege level is higher than current.  */
-+    if (level < (env->iaoq_f & 3)) {
-+        return 0;
-+    }
-+
-+    excp = hppa_get_physical_address(env, addr, level, 0, &phys, &prot);
-+    if (excp >= 0) {
-+        if (env->psw & PSW_Q) {
-+            /* ??? Needs tweaking for hppa64.  */
-+            env->cr[CR_IOR] = addr;
-+            env->cr[CR_ISR] = addr >> 32;
-+        }
-+        if (excp == EXCP_DTLB_MISS) {
-+            excp = EXCP_NA_DTLB_MISS;
-+        }
-+        hppa_dynamic_excp(env, excp, GETPC());
-+    }
-+    return (want & prot) != 0;
- #endif
- }
- 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index c62ee72615..7c45b1706c 100644
+index b9b097acc9..c62ee72615 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2380,21 +2380,33 @@ static DisasJumpType trans_probe(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned sp = extract32(insn, 14, 2);
-+    unsigned rr = extract32(insn, 16, 5);
-     unsigned rb = extract32(insn, 21, 5);
-     unsigned is_write = extract32(insn, 6, 1);
-+    unsigned is_imm = extract32(insn, 13, 1);
-     TCGv_reg dest, ofs;
-+    TCGv_i32 level, want;
-     TCGv_tl addr;
- 
-     nullify_over(ctx);
- 
--    /* ??? Do something with priv level operand.  */
-     dest = dest_gpr(ctx, rt);
-     form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
--    if (is_write) {
--        gen_helper_probe_w(dest, addr);
-+
-+    if (is_imm) {
-+        level = tcg_const_i32(extract32(insn, 16, 2));
-     } else {
--        gen_helper_probe_r(dest, addr);
-+        level = tcg_temp_new_i32();
-+        tcg_gen_trunc_reg_i32(level, load_gpr(ctx, rr));
-+        tcg_gen_andi_i32(level, level, 3);
-     }
-+    want = tcg_const_i32(is_write ? PROT_WRITE : PROT_READ);
-+
-+    gen_helper_probe(dest, cpu_env, addr, level, want);
-+
-+    tcg_temp_free_i32(want);
-+    tcg_temp_free_i32(level);
-+
-     save_gpr(ctx, rt, dest);
-     return nullify_end(ctx, DISAS_NEXT);
- }
+@@ -4381,34 +4381,34 @@ static const DisasInsn table_float_0e[] = {
+     /* floating point class one */
+     /* float/float */
+     { 0x38000a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_d_s },
+-    { 0x38002200, 0xfc1fffc0, FOP_DEW = gen_helper_fcnv_s_d },
++    { 0x38002200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_s_d },
+     /* int/float */
+-    { 0x38008200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_w_s },
++    { 0x38008200, 0xfc1ffe20, FOP_WEW = gen_helper_fcnv_w_s },
+     { 0x38008a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_dw_s },
+     { 0x3800a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_w_d },
+     { 0x3800aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_dw_d },
+     /* float/int */
+-    { 0x38010200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_s_w },
++    { 0x38010200, 0xfc1ffe20, FOP_WEW = gen_helper_fcnv_s_w },
+     { 0x38010a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_d_w },
+     { 0x38012200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_s_dw },
+     { 0x38012a00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_d_dw },
+     /* float/int truncate */
+-    { 0x38018200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_t_s_w },
++    { 0x38018200, 0xfc1ffe20, FOP_WEW = gen_helper_fcnv_t_s_w },
+     { 0x38018a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_t_d_w },
+     { 0x3801a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_t_s_dw },
+     { 0x3801aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_t_d_dw },
+     /* uint/float */
+-    { 0x38028200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_uw_s },
++    { 0x38028200, 0xfc1ffe20, FOP_WEW = gen_helper_fcnv_uw_s },
+     { 0x38028a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_udw_s },
+     { 0x3802a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_uw_d },
+     { 0x3802aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_udw_d },
+     /* float/uint */
+-    { 0x38030200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_s_uw },
++    { 0x38030200, 0xfc1ffe20, FOP_WEW = gen_helper_fcnv_s_uw },
+     { 0x38030a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_d_uw },
+     { 0x38032200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_s_udw },
+     { 0x38032a00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_d_udw },
+     /* float/uint truncate */
+-    { 0x38038200, 0xfc1ffe60, FOP_WEW = gen_helper_fcnv_t_s_uw },
++    { 0x38038200, 0xfc1ffe20, FOP_WEW = gen_helper_fcnv_t_s_uw },
+     { 0x38038a00, 0xfc1fffa0, FOP_WED = gen_helper_fcnv_t_d_uw },
+     { 0x3803a200, 0xfc1fff60, FOP_DEW = gen_helper_fcnv_t_s_udw },
+     { 0x3803aa00, 0xfc1fffe0, FOP_DED = gen_helper_fcnv_t_d_udw },
 -- 
 2.14.3
