@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwBI-0002xX-2U
+	(envelope-from <richard.henderson@linaro.org>) id 1efwBI-0002xZ-2x
 	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwBD-00006e-3u
+	(envelope-from <richard.henderson@linaro.org>) id 1efwBG-000094-11
 	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:12 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36869)
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:40456)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwBC-00005y-Td
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:07 -0500
-Received: by mail-pg0-x244.google.com with SMTP id z17so3006742pgc.4
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:16:06 -0800 (PST)
+	id 1efwBF-00008U-Oh
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:09 -0500
+Received: by mail-pg0-x242.google.com with SMTP id g16so3004332pgn.7
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:16:09 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:15:07 -0800
-Message-Id: <20180128231528.22719-23-richard.henderson@linaro.org>
+Date: Sun, 28 Jan 2018 15:15:09 -0800
+Message-Id: <20180128231528.22719-25-richard.henderson@linaro.org>
 In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
 References: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 22/43] target/hppa: Implement P*TLB and
- P*TLBE insns
+Subject: [Qemu-devel] [PULL v4 24/43] target/hppa: Implement LPA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +29,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-We now have all of the TLB manipulation instructions.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/helper.h     |  2 ++
- target/hppa/mem_helper.c | 37 +++++++++++++++++++++++++++++++++++++
- target/hppa/translate.c  | 40 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 79 insertions(+)
+ target/hppa/cpu.h        |  1 +
+ target/hppa/helper.h     |  1 +
+ target/hppa/mem_helper.c | 21 +++++++++++++++++++++
+ target/hppa/op_helper.c  | 10 +++++-----
+ target/hppa/translate.c  | 30 ++++++++++++++++++++++++++++++
+ 5 files changed, 58 insertions(+), 5 deletions(-)
 
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 3782e1d834..54f11d4e18 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -345,5 +345,6 @@ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
+ extern const MemoryRegionOps hppa_io_eir_ops;
+ void hppa_cpu_alarm_timer(void *);
+ #endif
++void QEMU_NORETURN hppa_dynamic_excp(CPUHPPAState *env, int excp, uintptr_t ra);
+ 
+ #endif /* HPPA_CPU_H */
 diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index d412093914..f059ddf3b9 100644
+index f059ddf3b9..1e733b7926 100644
 --- a/target/hppa/helper.h
 +++ b/target/hppa/helper.h
-@@ -88,4 +88,6 @@ DEF_HELPER_FLAGS_2(write_eiem, TCG_CALL_NO_RWG, void, env, tr)
- DEF_HELPER_FLAGS_2(swap_system_mask, TCG_CALL_NO_RWG, tr, env, tr)
- DEF_HELPER_FLAGS_3(itlba, TCG_CALL_NO_RWG, void, env, tl, tr)
+@@ -90,4 +90,5 @@ DEF_HELPER_FLAGS_3(itlba, TCG_CALL_NO_RWG, void, env, tl, tr)
  DEF_HELPER_FLAGS_3(itlbp, TCG_CALL_NO_RWG, void, env, tl, tr)
-+DEF_HELPER_FLAGS_2(ptlb, TCG_CALL_NO_RWG, void, env, tl)
-+DEF_HELPER_FLAGS_1(ptlbe, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_FLAGS_2(ptlb, TCG_CALL_NO_RWG, void, env, tl)
+ DEF_HELPER_FLAGS_1(ptlbe, TCG_CALL_NO_RWG, void, env)
++DEF_HELPER_FLAGS_2(lpa, TCG_CALL_NO_WG, tr, env, tl)
  #endif
 diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index 47f630d268..df245533e4 100644
+index df245533e4..c2b2705869 100644
 --- a/target/hppa/mem_helper.c
 +++ b/target/hppa/mem_helper.c
-@@ -277,4 +277,41 @@ void HELPER(itlbp)(CPUHPPAState *env, target_ulong addr, target_ureg reg)
-     ent->t = extract32(reg, 29, 1);
-     ent->entry_valid = 1;
+@@ -314,4 +314,25 @@ void HELPER(ptlbe)(CPUHPPAState *env)
+     memset(env->tlb, 0, sizeof(env->tlb));
+     tlb_flush_by_mmuidx(src, 0xf);
  }
 +
-+/* Purge (Insn/Data) TLB.  This is explicitly page-based, and is
-+   synchronous across all processors.  */
-+static void ptlb_work(CPUState *cpu, run_on_cpu_data data)
++target_ureg HELPER(lpa)(CPUHPPAState *env, target_ulong addr)
 +{
-+    CPUHPPAState *env = cpu->env_ptr;
-+    target_ulong addr = (target_ulong) data.target_ptr;
-+    hppa_tlb_entry *ent = hppa_find_tlb(env, addr);
++    hwaddr phys;
++    int prot, excp;
 +
-+    if (ent && ent->entry_valid) {
-+        hppa_flush_tlb_ent(env, ent);
-+    }
-+}
-+
-+void HELPER(ptlb)(CPUHPPAState *env, target_ulong addr)
-+{
-+    CPUState *src = CPU(hppa_env_get_cpu(env));
-+    CPUState *cpu;
-+    run_on_cpu_data data = RUN_ON_CPU_TARGET_PTR(addr);
-+
-+    CPU_FOREACH(cpu) {
-+        if (cpu != src) {
-+            async_run_on_cpu(cpu, ptlb_work, data);
++    excp = hppa_get_physical_address(env, addr, MMU_KERNEL_IDX, 0,
++                                     &phys, &prot);
++    if (excp >= 0) {
++        if (env->psw & PSW_Q) {
++            /* ??? Needs tweaking for hppa64.  */
++            env->cr[CR_IOR] = addr;
++            env->cr[CR_ISR] = addr >> 32;
 +        }
++        if (excp == EXCP_DTLB_MISS) {
++            excp = EXCP_NA_DTLB_MISS;
++        }
++        hppa_dynamic_excp(env, excp, GETPC());
 +    }
-+    async_safe_run_on_cpu(src, ptlb_work, data);
-+}
-+
-+/* Purge (Insn/Data) TLB entry.  This affects an implementation-defined
-+   number of pages/entries (we choose all), and is local to the cpu.  */
-+void HELPER(ptlbe)(CPUHPPAState *env)
-+{
-+    CPUState *src = CPU(hppa_env_get_cpu(env));
-+
-+    memset(env->tlb, 0, sizeof(env->tlb));
-+    tlb_flush_by_mmuidx(src, 0xf);
++    return phys;
 +}
  #endif /* CONFIG_USER_ONLY */
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 8c546f4882..ef2951386c 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -34,7 +34,7 @@ void QEMU_NORETURN HELPER(excp)(CPUHPPAState *env, int excp)
+     cpu_loop_exit(cs);
+ }
+ 
+-static void QEMU_NORETURN dynexcp(CPUHPPAState *env, int excp, uintptr_t ra)
++void QEMU_NORETURN hppa_dynamic_excp(CPUHPPAState *env, int excp, uintptr_t ra)
+ {
+     HPPACPU *cpu = hppa_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+@@ -46,14 +46,14 @@ static void QEMU_NORETURN dynexcp(CPUHPPAState *env, int excp, uintptr_t ra)
+ void HELPER(tsv)(CPUHPPAState *env, target_ureg cond)
+ {
+     if (unlikely((target_sreg)cond < 0)) {
+-        dynexcp(env, EXCP_OVERFLOW, GETPC());
++        hppa_dynamic_excp(env, EXCP_OVERFLOW, GETPC());
+     }
+ }
+ 
+ void HELPER(tcond)(CPUHPPAState *env, target_ureg cond)
+ {
+     if (unlikely(cond)) {
+-        dynexcp(env, EXCP_COND, GETPC());
++        hppa_dynamic_excp(env, EXCP_COND, GETPC());
+     }
+ }
+ 
+@@ -237,7 +237,7 @@ static void update_fr0_op(CPUHPPAState *env, uintptr_t ra)
+     env->fr[0] = (uint64_t)shadow << 32;
+ 
+     if (hard_exp & shadow) {
+-        dynexcp(env, EXCP_ASSIST, ra);
++        hppa_dynamic_excp(env, EXCP_ASSIST, ra);
+     }
+ }
+ 
+@@ -645,7 +645,7 @@ target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
+     /* ??? On second reading this condition simply seems
+        to be undefined rather than a diagnosed trap.  */
+     if (nsm & ~psw & PSW_Q) {
+-        dynexcp(env, EXCP_ILL, GETPC());
++        hppa_dynamic_excp(env, EXCP_ILL, GETPC());
+     }
+     env->psw = (psw & ~PSW_SM) | (nsm & PSW_SM);
+     return psw & PSW_SM;
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index c02d107041..5b77688fc0 100644
+index 3d441ef4ac..082221f450 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2397,6 +2397,42 @@ static DisasJumpType trans_ixtlbx(DisasContext *ctx, uint32_t insn,
+@@ -2433,6 +2433,35 @@ static DisasJumpType trans_pxtlbx(DisasContext *ctx, uint32_t insn,
      return nullify_end(ctx, !is_data && (ctx->base.tb->flags & PSW_C)
                         ? DISAS_IAQ_N_STALE : DISAS_NEXT);
  }
 +
-+static DisasJumpType trans_pxtlbx(DisasContext *ctx, uint32_t insn,
-+                                  const DisasInsn *di)
++static DisasJumpType trans_lpa(DisasContext *ctx, uint32_t insn,
++                               const DisasInsn *di)
 +{
++    unsigned rt = extract32(insn, 0, 5);
 +    unsigned m = extract32(insn, 5, 1);
-+    unsigned sp;
++    unsigned sp = extract32(insn, 14, 2);
 +    unsigned rx = extract32(insn, 16, 5);
 +    unsigned rb = extract32(insn, 21, 5);
-+    unsigned is_data = insn & 0x1000;
-+    unsigned is_local = insn & 0x40;
-+    TCGv_tl addr;
-+    TCGv_reg ofs;
-+
-+    if (is_data) {
-+        sp = extract32(insn, 14, 2);
-+    } else {
-+        sp = ~assemble_sr3(insn);
-+    }
++    TCGv_tl vaddr;
++    TCGv_reg ofs, paddr;
 +
 +    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
 +    nullify_over(ctx);
 +
-+    form_gva(ctx, &addr, &ofs, rb, rx, 0, 0, sp, m, false);
++    form_gva(ctx, &vaddr, &ofs, rb, rx, 0, 0, sp, m, false);
++
++    paddr = tcg_temp_new();
++    gen_helper_lpa(paddr, cpu_env, vaddr);
++
++    /* Note that physical address result overrides base modification.  */
 +    if (m) {
 +        save_gpr(ctx, rb, ofs);
 +    }
-+    if (is_local) {
-+        gen_helper_ptlbe(cpu_env);
-+    } else {
-+        gen_helper_ptlb(cpu_env, addr);
-+    }
++    save_gpr(ctx, rt, paddr);
++    tcg_temp_free(paddr);
 +
-+    /* Exit TB for TLB change if mmu is enabled.  */
-+    return nullify_end(ctx, !is_data && (ctx->base.tb->flags & PSW_C)
-+                       ? DISAS_IAQ_N_STALE : DISAS_NEXT);
++    return nullify_end(ctx, DISAS_NEXT);
 +}
  #endif /* !CONFIG_USER_ONLY */
  
  static const DisasInsn table_mem_mgmt[] = {
-@@ -2420,6 +2456,10 @@ static const DisasInsn table_mem_mgmt[] = {
-     { 0x04000040u, 0xfc001fffu, trans_ixtlbx },       /* iitlba */
-     { 0x04001000u, 0xfc001fffu, trans_ixtlbx },       /* idtlbp */
-     { 0x04001040u, 0xfc001fffu, trans_ixtlbx },       /* idtlba */
-+    { 0x04000200u, 0xfc001fdfu, trans_pxtlbx },       /* pitlb */
-+    { 0x04000240u, 0xfc001fdfu, trans_pxtlbx },       /* pitlbe */
-+    { 0x04001200u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlb */
-+    { 0x04001240u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlbe */
+@@ -2460,6 +2489,7 @@ static const DisasInsn table_mem_mgmt[] = {
+     { 0x04000240u, 0xfc001fdfu, trans_pxtlbx },       /* pitlbe */
+     { 0x04001200u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlb */
+     { 0x04001240u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlbe */
++    { 0x04001340u, 0xfc003fc0u, trans_lpa },
  #endif
  };
  
