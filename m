@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAv-0002cu-KQ
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:51 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1efwB0-0002hF-9q
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAt-0008Hf-U1
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:49 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42890)
+	(envelope-from <richard.henderson@linaro.org>) id 1efwAz-0008Mc-IO
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:54 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:45219)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwAt-0008H9-LU
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:47 -0500
-Received: by mail-pf0-x243.google.com with SMTP id b25so3256369pfd.9
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:47 -0800 (PST)
+	id 1efwAz-0008M4-DI
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:53 -0500
+Received: by mail-pg0-x241.google.com with SMTP id m136so2995106pga.12
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:53 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:14:54 -0800
-Message-Id: <20180128231528.22719-10-richard.henderson@linaro.org>
+Date: Sun, 28 Jan 2018 15:14:58 -0800
+Message-Id: <20180128231528.22719-14-richard.henderson@linaro.org>
 In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
 References: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 09/43] target/hppa: Add control registers
+Subject: [Qemu-devel] [PULL v4 13/43] target/hppa: Implement unaligned
+ access trap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,317 +32,45 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/hppa/target_cpu.h |  2 +-
- target/hppa/cpu.h            | 23 +++++++++++----
- linux-user/main.c            |  4 +--
- linux-user/signal.c          |  4 +--
- target/hppa/gdbstub.c        | 12 ++++----
- target/hppa/mem_helper.c     |  2 +-
- target/hppa/translate.c      | 70 ++++++++++++++++++++++++++++++--------------
- 7 files changed, 77 insertions(+), 40 deletions(-)
+ target/hppa/cpu.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/hppa/target_cpu.h b/linux-user/hppa/target_cpu.h
-index e50522eae9..7b78bbea80 100644
---- a/linux-user/hppa/target_cpu.h
-+++ b/linux-user/hppa/target_cpu.h
-@@ -33,7 +33,7 @@ static inline void cpu_clone_regs(CPUHPPAState *env, target_ulong newsp)
- 
- static inline void cpu_set_tls(CPUHPPAState *env, target_ulong newtls)
- {
--    env->cr27 = newtls;
-+    env->cr[27] = newtls;
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index ca619578dd..4d0b760baa 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -48,6 +48,23 @@ static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
+     info->print_insn = print_insn_hppa;
  }
  
- #endif
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index e3da05e5d3..7524cf8aa6 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -123,6 +123,20 @@
- #define PSW_SM_W         0
- #endif
- 
-+#define CR_RC            0
-+#define CR_SCRCCR        10
-+#define CR_SAR           11
-+#define CR_IVA           14
-+#define CR_EIEM          15
-+#define CR_IT            16
-+#define CR_IIASQ         17
-+#define CR_IIAOQ         18
-+#define CR_IIR           19
-+#define CR_ISR           20
-+#define CR_IOR           21
-+#define CR_IPSW          22
-+#define CR_EIRR          23
++static void hppa_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
++                                         MMUAccessType access_type,
++                                         int mmu_idx, uintptr_t retaddr)
++{
++    HPPACPU *cpu = HPPA_CPU(cs);
++    CPUHPPAState *env = &cpu->env;
 +
- typedef struct CPUHPPAState CPUHPPAState;
- 
- #if TARGET_REGISTER_BITS == 32
-@@ -142,10 +156,6 @@ struct CPUHPPAState {
-     uint64_t fr[32];
-     uint64_t sr[8];          /* stored shifted into place for gva */
- 
--    target_ureg sar;
--    target_ureg cr26;
--    target_ureg cr27;
--
-     target_ureg psw;         /* All psw bits except the following:  */
-     target_ureg psw_n;       /* boolean */
-     target_sreg psw_v;       /* in most significant bit */
-@@ -163,11 +173,12 @@ struct CPUHPPAState {
-     target_ureg iaoq_f;      /* front */
-     target_ureg iaoq_b;      /* back, aka next instruction */
- 
--    target_ureg ior;         /* interrupt offset register */
--
-     uint32_t fr0_shadow;     /* flags, c, ca/cq, rm, d, enables */
-     float_status fp_status;
- 
-+    target_ureg cr[32];      /* control registers */
-+    target_ureg cr_back[2];  /* back of cr17/cr18 */
-+
-     /* Those resources are used only in QEMU core */
-     CPU_COMMON
- };
-diff --git a/linux-user/main.c b/linux-user/main.c
-index fee0b24ee6..7de0e02487 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -3786,14 +3786,14 @@ void cpu_loop(CPUHPPAState *env)
-             info.si_signo = TARGET_SIGSEGV;
-             info.si_errno = 0;
-             info.si_code = TARGET_SEGV_ACCERR;
--            info._sifields._sigfault._addr = env->ior;
-+            info._sifields._sigfault._addr = env->cr[CR_IOR];
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_UNALIGN:
-             info.si_signo = TARGET_SIGBUS;
-             info.si_errno = 0;
-             info.si_code = 0;
--            info._sifields._sigfault._addr = env->ior;
-+            info._sifields._sigfault._addr = env->cr[CR_IOR];
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_ILL:
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 5321f9e795..73100c9479 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -6442,7 +6442,7 @@ static void setup_sigcontext(struct target_sigcontext *sc, CPUArchState *env)
-         __put_user(env->fr[i], &sc->sc_fr[i]);
-     }
- 
--    __put_user(env->sar, &sc->sc_sar);
-+    __put_user(env->cr[CR_SAR], &sc->sc_sar);
- }
- 
- static void restore_sigcontext(CPUArchState *env, struct target_sigcontext *sc)
-@@ -6463,7 +6463,7 @@ static void restore_sigcontext(CPUArchState *env, struct target_sigcontext *sc)
- 
-     __get_user(env->iaoq_f, &sc->sc_iaoq[0]);
-     __get_user(env->iaoq_b, &sc->sc_iaoq[1]);
--    __get_user(env->sar, &sc->sc_sar);
-+    __get_user(env->cr[CR_SAR], &sc->sc_sar);
- }
- 
- /* No, this doesn't look right, but it's copied straight from the kernel.  */
-diff --git a/target/hppa/gdbstub.c b/target/hppa/gdbstub.c
-index 228d282fe9..fc27aec073 100644
---- a/target/hppa/gdbstub.c
-+++ b/target/hppa/gdbstub.c
-@@ -36,7 +36,7 @@ int hppa_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-         val = env->gr[n];
-         break;
-     case 32:
--        val = env->sar;
-+        val = env->cr[CR_SAR];
-         break;
-     case 33:
-         val = env->iaoq_f;
-@@ -45,10 +45,10 @@ int hppa_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-         val = env->iaoq_b;
-         break;
-     case 59:
--        val = env->cr26;
-+        val = env->cr[26];
-         break;
-     case 60:
--        val = env->cr27;
-+        val = env->cr[27];
-         break;
-     case 64 ... 127:
-         val = extract64(env->fr[(n - 64) / 2], (n & 1 ? 0 : 32), 32);
-@@ -89,7 +89,7 @@ int hppa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-         env->gr[n] = val;
-         break;
-     case 32:
--        env->sar = val;
-+        env->cr[CR_SAR] = val;
-         break;
-     case 33:
-         env->iaoq_f = val;
-@@ -98,10 +98,10 @@ int hppa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-         env->iaoq_b = val;
-         break;
-     case 59:
--        env->cr26 = val;
-+        env->cr[26] = val;
-         break;
-     case 60:
--        env->cr27 = val;
-+        env->cr[27] = val;
-         break;
-     case 64:
-         env->fr[0] = deposit64(env->fr[0], 32, 32, val);
-diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index bd116d6bc6..65e2c95b78 100644
---- a/target/hppa/mem_helper.c
-+++ b/target/hppa/mem_helper.c
-@@ -32,7 +32,7 @@ int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
-     /* ??? Test between data page fault and data memory protection trap,
-        which would affect si_code.  */
-     cs->exception_index = EXCP_DMP;
--    cpu->env.ior = address;
-+    cpu->env.cr[CR_IOR] = address;
-     return 1;
- }
- #else
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 50d41b0c63..89b336c2c4 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -328,8 +328,6 @@ static TCGv_reg cpu_psw_n;
- static TCGv_reg cpu_psw_v;
- static TCGv_reg cpu_psw_cb;
- static TCGv_reg cpu_psw_cb_msb;
--static TCGv_reg cpu_cr26;
--static TCGv_reg cpu_cr27;
- 
- #include "exec/gen-icount.h"
- 
-@@ -339,9 +337,7 @@ void hppa_translate_init(void)
- 
-     typedef struct { TCGv_reg *var; const char *name; int ofs; } GlobalVar;
-     static const GlobalVar vars[] = {
--        DEF_VAR(sar),
--        DEF_VAR(cr26),
--        DEF_VAR(cr27),
-+        { &cpu_sar, "sar", offsetof(CPUHPPAState, cr[CR_SAR]) },
-         DEF_VAR(psw_n),
-         DEF_VAR(psw_v),
-         DEF_VAR(psw_cb),
-@@ -1867,7 +1863,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
-         return DISAS_NORETURN;
- 
-     case 0xe0: /* SET_THREAD_POINTER */
--        tcg_gen_mov_reg(cpu_cr27, cpu_gr[26]);
-+        tcg_gen_st_reg(cpu_gr[26], cpu_env, offsetof(CPUHPPAState, cr[27]));
-         tcg_gen_mov_reg(cpu_iaoq_f, cpu_gr[31]);
-         tcg_gen_addi_reg(cpu_iaoq_b, cpu_iaoq_f, 4);
-         return DISAS_IAQ_N_UPDATED;
-@@ -1948,34 +1944,39 @@ static DisasJumpType trans_mfctl(DisasContext *ctx, uint32_t insn,
-     TCGv_reg tmp;
- 
-     switch (ctl) {
--    case 11: /* SAR */
-+    case CR_SAR:
- #ifdef TARGET_HPPA64
-         if (extract32(insn, 14, 1) == 0) {
-             /* MFSAR without ,W masks low 5 bits.  */
-             tmp = dest_gpr(ctx, rt);
-             tcg_gen_andi_reg(tmp, cpu_sar, 31);
-             save_gpr(ctx, rt, tmp);
--            break;
-+            goto done;
-         }
- #endif
-         save_gpr(ctx, rt, cpu_sar);
--        break;
--    case 16: /* Interval Timer */
-+        goto done;
-+    case CR_IT: /* Interval Timer */
-+        /* FIXME: Respect PSW_S bit.  */
-+        nullify_over(ctx);
-         tmp = dest_gpr(ctx, rt);
--        tcg_gen_movi_tl(tmp, 0); /* FIXME */
-+        tcg_gen_movi_reg(tmp, 0); /* FIXME */
-         save_gpr(ctx, rt, tmp);
-         break;
-     case 26:
--        save_gpr(ctx, rt, cpu_cr26);
--        break;
-     case 27:
--        save_gpr(ctx, rt, cpu_cr27);
-         break;
-     default:
-         /* All other control registers are privileged.  */
--        return gen_illegal(ctx);
-+        CHECK_MOST_PRIVILEGED(EXCP_PRIV_REG);
-+        break;
-     }
- 
-+    tmp = get_temp(ctx);
-+    tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
-+    save_gpr(ctx, rt, tmp);
-+
-+ done:
-     cond_free(&ctx->null_cond);
-     return DISAS_NEXT;
- }
-@@ -2011,20 +2012,45 @@ static DisasJumpType trans_mtctl(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rin = extract32(insn, 16, 5);
-     unsigned ctl = extract32(insn, 21, 5);
-+    TCGv_reg reg = load_gpr(ctx, rin);
-     TCGv_reg tmp;
- 
--    if (ctl == 11) { /* SAR */
-+    if (ctl == CR_SAR) {
-         tmp = tcg_temp_new();
--        tcg_gen_andi_reg(tmp, load_gpr(ctx, rin), TARGET_REGISTER_BITS - 1);
-+        tcg_gen_andi_reg(tmp, reg, TARGET_REGISTER_BITS - 1);
-         save_or_nullify(ctx, cpu_sar, tmp);
-         tcg_temp_free(tmp);
--    } else {
--        /* All other control registers are privileged or read-only.  */
--        return gen_illegal(ctx);
-+
-+        cond_free(&ctx->null_cond);
-+        return DISAS_NEXT;
-     }
- 
--    cond_free(&ctx->null_cond);
--    return DISAS_NEXT;
-+    /* All other control registers are privileged or read-only.  */
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_REG);
-+
-+    nullify_over(ctx);
-+    switch (ctl) {
-+    case CR_IT:
-+        /* ??? modify interval timer offset */
-+        break;
-+
-+    case CR_IIASQ:
-+    case CR_IIAOQ:
-+        /* FIXME: Respect PSW_Q bit */
-+        /* The write advances the queue and stores to the back element.  */
-+        tmp = get_temp(ctx);
-+        tcg_gen_ld_reg(tmp, cpu_env,
-+                       offsetof(CPUHPPAState, cr_back[ctl - CR_IIASQ]));
-+        tcg_gen_st_reg(tmp, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
-+        tcg_gen_st_reg(reg, cpu_env,
-+                       offsetof(CPUHPPAState, cr_back[ctl - CR_IIASQ]));
-+        break;
-+
-+    default:
-+        tcg_gen_st_reg(reg, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
-+        break;
++    cs->exception_index = EXCP_UNALIGN;
++    if (env->psw & PSW_Q) {
++        /* ??? Needs tweaking for hppa64.  */
++        env->cr[CR_IOR] = addr;
++        env->cr[CR_ISR] = addr >> 32;
 +    }
-+    return nullify_end(ctx, DISAS_NEXT);
- }
++
++    cpu_loop_exit_restore(cs, retaddr);
++}
++
+ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs = CPU(dev);
+@@ -139,7 +156,7 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
+ #else
+     cc->get_phys_page_debug = hppa_cpu_get_phys_page_debug;
+ #endif
+-
++    cc->do_unaligned_access = hppa_cpu_do_unaligned_access;
+     cc->disas_set_info = hppa_cpu_disas_set_info;
+     cc->tcg_initialize = hppa_translate_init;
  
- static DisasJumpType trans_mtsarcm(DisasContext *ctx, uint32_t insn,
 -- 
 2.14.3
