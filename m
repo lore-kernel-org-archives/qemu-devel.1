@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ghammer@redhat.com>) id 1efncM-0007Nv-W9
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 09:07:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1efoZz-0003r6-Sc
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 10:09:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ghammer@redhat.com>) id 1efncJ-0000G0-OS
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 09:07:34 -0500
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:35747)
+	(envelope-from <peter.maydell@linaro.org>) id 1efoZy-0007v4-UZ
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 10:09:11 -0500
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:32918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ghammer@redhat.com>) id 1efncJ-0000FP-II
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 09:07:31 -0500
-Received: by mail-oi0-f68.google.com with SMTP id b11so3279197oif.2
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 06:07:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1efoZy-0007uS-Ou
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 10:09:10 -0500
+Received: by mail-ot0-x232.google.com with SMTP id d7so4347535oti.0
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 07:09:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180124190820-mutt-send-email-mst@kernel.org>
-References: <1516747387-31760-1-git-send-email-mst@redhat.com>
-	<1516747387-31760-2-git-send-email-mst@redhat.com>
-	<20180124094621.46ff2f43@bahia.lan>
-	<20180124100500.1f9bf54a@bahia.lan>
-	<d0698024-65ae-fb6b-397d-cccdc1fb36f4@redhat.com>
-	<20180124103402.6ef42523@bahia.lan>
-	<20180124190820-mutt-send-email-mst@kernel.org>
-From: Gal Hammer <ghammer@redhat.com>
-Date: Sun, 28 Jan 2018 16:07:27 +0200
-Message-ID: <CAA2ifQybqzCYC48fjzT9mztn=3iTS+3uO0DUF8bxAF5jt3u-Vg@mail.gmail.com>
+In-Reply-To: <20180126194559.GI2610@work-vm>
+References: <20180124212246.2352-1-wei@redhat.com>
+	<20180125200525.GC2442@work-vm>
+	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
+	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
+	<20180126194559.GI2610@work-vm>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 28 Jan 2018 15:08:49 +0000
+Message-ID: <CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 1/1] kvm-all: Partially reverts 4fe6d78b2e
- to remove the cleanup call
+Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,154 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Anton Blanchard <anton@samba.org>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-Hi,
-
-Sorry for a bad patch and the problems it may have caused.
-
-On Wed, Jan 24, 2018 at 7:08 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Wed, Jan 24, 2018 at 10:34:02AM +0100, Greg Kurz wrote:
->> On Wed, 24 Jan 2018 10:14:57 +0100
->> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> > On 24/01/2018 10:05, Greg Kurz wrote:
->> > > On Wed, 24 Jan 2018 09:46:21 +0100
->> > > Greg Kurz <groug@kaod.org> wrote:
->> > >
->> > >> Please note that Peter usually doesn't work on Wednesdays. The master branch
->> > >> might remain broken for everyone until tomorrow... :-\
->> > >>
->> > >> And I don't think this is the right fix anyway. See below.
->> > >>
->> > >> On Wed, 24 Jan 2018 00:44:14 +0200
->> > >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->> > >>
->> > >>> From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
->> > >>>
->> > >>> This commit partially reverts the commit 4fe6d78b2e because of issues
->> > >>> reported in the virtio.
->> > >>>
->> > >>> Examples:
->> > >>>
->> > >>> $ qemu-system-ppc64 -cpu POWER8 -nographic -vga none -m 4G \
->> > >>>   -M pseries,accel=kvm -netdev type=user,id=net0 \
->> > >>>   -device virtio-net-pci,netdev=net0 -drive file=../disk.qcow2,if=virtio
->> > >>>
->> > >>> Populating /vdevice/nvram@71000001
->> > >>> Populating /vdevice/v-scsi@71000002
->> > >>>        SCSI: Looking for devices
->> > >>>           8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
->> > >>> Populating /pci@800000020000000
->> > >>>                      00 0000 (D) : 1af4 1000    virtio [ net ]
->> > >>> Aborted
->> > >>>
->> > >>> $ qemu-system-x86_64 -m 4G -enable-kvm -drive file=util.qcow2,if=virtio
->> > >>>
->> > >>> Running QEMU with GTK 2.x is deprecated, and will be removed
->> > >>> in a future release. Please switch to GTK 3.x instead
->> > >>> [1]    5282 abort
->> > >>>
->> > >>> Reference http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05457.html
->> > >>>
->> > >>> Reported-by: Anton Blanchard <anton@samba.org>
->> > >>> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
->> > >>> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->> > >>> Tested-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->> > >>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> > >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> > >>> ---
->> > >>>  accel/kvm/kvm-all.c | 4 ----
->> > >>>  1 file changed, 4 deletions(-)
->> > >>>
->> > >>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> > >>> index 071f4f5..f290f48 100644
->> > >>> --- a/accel/kvm/kvm-all.c
->> > >>> +++ b/accel/kvm/kvm-all.c
->> > >>> @@ -812,10 +812,6 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
->> > >>>      if (r < 0) {
->> > >>>          abort();
->> > >>>      }
->> > >>> -
->> > >>> -    if (e->cleanup) {
->> > >>> -        e->cleanup(e);
->> > >>> -    }
->> > >>
->> > >> This looks wrong as the cleanup is expected to do things like closing fds:
->> > >>
->> > >> static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
->> > >> {
->> > >>     /* Test and clear notifier after disabling event,
->> > >>      * in case poll callback didn't have time to run.
->> > >>      */
->> > >>     virtio_queue_host_notifier_read(notifier);
->> > >>     event_notifier_cleanup(notifier);
->> > >> }
->> > >>
->> > >> void event_notifier_cleanup(EventNotifier *e)
->> > >> {
->> > >>     if (e->rfd != e->wfd) {
->> > >>         close(e->rfd);
->> > >>     }
->> > >>     close(e->wfd);
->> > >>     e->rfd = -1;
->> > >>     e->wfd = -1;
->> > >>     e->cleanup = NULL;
->> > >> }
->> > >>
->> > >> And indeed, with this patch applied, QEMU leaks eventfds on every machine
->> > >> reset.
->> > >>
->> > >
->> > > Reverting 4fe6d78b2e entirely isn't even enough and QEMU aborts at the
->> > > next machine reset. The following commit must be reverted as well:
->> > >
->> > > commit 6f0bb230722931d17fb284eee8efd40b9d653822
->> > > Author: Gal Hammer <ghammer@redhat.com>
->> > > Date:   Sun Jan 14 12:06:56 2018 +0200
->> > >
->> > >     virtio: improve virtio devices initialization time
->> >
->> > I'm a bit confused by this patch.  The basic idea of wrapping with
->> > transaction_begin/commit is clear (without it you have quadratic
->> > behavior from removing one ioeventfd at a time), but I don't understand
->> > why the new ->cleanup member is needed.
->> >
-
-Like the cover letter tried to explain, the reason I added the cleanup
-call back was to a try to close the event fd after the memory
-transaction is committed. Without it, the code in the
-virtio_bus_set_host_notifier function is calling
-event_notifier_cleanup (which results in a closed fd) before the
-ioeventfd is removed from kvm. A call to kvm_set_ioeventfd_* on a
-closed fd would fail and cause qemu to abort. So the idea was to add a
-way to run a cleanup code after the transaction is committed.
-
-The reason for the bug is something that I didn't see on the
-virtio-serial-pci device. With virtio-net-pci device, the vq's
-MemoryRegion is registered with the same EventNotifier's fd twice,
-both with kvm_set_ioeventfd_mmio and kvm_set_ioeventfd_pio. I'm not
-sure if this is the right behavior and maybe one of you can help here.
-
-That double registration causes the cleanup function to execute twice,
-and the second call that is using a closed fd, results in the
-described failure.
-
->>
->> I don't understand either... the cover letter of the series says:
->>
->> "The patch wraps all the changes made to the Memory Regions during the
->> eventfd registrations in a memory regions transaction. I had to add a
->> cleanup callback function to the EventNotifier struct, so it will be
->> possible to use a transaction in the shutdown code path as well."
->>
->> Until this is sorted out, maybe best to revert both commits or even
->> the full series (ie, f87d72f5c5bf as well), no ?
+On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>> I think the correct fix here is that your test code should turn
+>> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
+>> for Arm KVM guests (for the same reason that VGA device video memory
+>> doesn't work). If it's RAM your guest has to arrange to map it as
+>> Normal Cacheable, and then everything should work fine.
 >
-> OK I guess that's best.
->
->> > Paolo
->
+> Does this cause problems with migrating at just the wrong point during
+> a VM boot?
 
-    Gal.
+It wouldn't surprise me if it did, but I don't think I've ever
+tried to provoke that problem...
+
+thanks
+-- PMM
