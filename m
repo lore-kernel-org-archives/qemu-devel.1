@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwBT-00036h-TJ
+	(envelope-from <richard.henderson@linaro.org>) id 1efwBT-00036p-Ub
 	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwBR-0000J4-Fi
+	(envelope-from <richard.henderson@linaro.org>) id 1efwBT-0000Lr-0c
 	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:23 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:45535)
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:43528)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwBR-0000IC-96
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:21 -0500
-Received: by mail-pf0-x242.google.com with SMTP id a88so3251278pfe.12
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:16:21 -0800 (PST)
+	id 1efwBS-0000KT-Pa
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:22 -0500
+Received: by mail-pg0-x242.google.com with SMTP id n17so2997813pgf.10
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:16:22 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:15:17 -0800
-Message-Id: <20180128231528.22719-33-richard.henderson@linaro.org>
+Date: Sun, 28 Jan 2018 15:15:18 -0800
+Message-Id: <20180128231528.22719-34-richard.henderson@linaro.org>
 In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
 References: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 32/43] target/hppa: Only use EXCP_DTLB_MISS
+Subject: [Qemu-devel] [PULL v4 33/43] target/hppa: Increase number of temp
+ regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +30,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Unknown why this works, but if we return EXCP_ITLB_MISS we
-will triple-fault the first userland instruction fetch.
-Is it something to do with having a combined I/DTLB?
+HP-UX 10.20 CD contains "add r0, r0, r27" in a delay slot,
+which uses at least 5 temps.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/mem_helper.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/hppa/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index a34c64cc4a..08a4eb2480 100644
---- a/target/hppa/mem_helper.c
-+++ b/target/hppa/mem_helper.c
-@@ -96,7 +96,9 @@ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-     if (ent == NULL || !ent->entry_valid) {
-         phys = 0;
-         prot = 0;
--        ret = (type & PAGE_EXEC ? EXCP_ITLB_MISS : EXCP_DTLB_MISS);
-+        /* ??? Unconditionally report data tlb miss,
-+           even if this is an instruction fetch.  */
-+        ret = EXCP_DTLB_MISS;
-         goto egress;
-     }
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 5b7824f065..a93e86c9e3 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -277,7 +277,7 @@ typedef struct DisasContext {
+     TCGv_reg iaoq_n_var;
  
+     int ntempr, ntempl;
+-    TCGv_reg tempr[4];
++    TCGv_reg tempr[8];
+     TCGv_tl  templ[4];
+ 
+     DisasCond null_cond;
 -- 
 2.14.3
