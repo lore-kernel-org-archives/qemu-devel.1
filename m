@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAl-0002Tc-8k
+	(envelope-from <richard.henderson@linaro.org>) id 1efwAj-0002TH-QC
 	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwAk-00087e-BW
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:39 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33768)
+	(envelope-from <richard.henderson@linaro.org>) id 1efwAf-00083w-GC
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:37 -0500
+Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:38496)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwAk-000875-54
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:38 -0500
-Received: by mail-pg0-x241.google.com with SMTP id u1so3011557pgr.0
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:38 -0800 (PST)
+	id 1efwAf-00083G-76
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:33 -0500
+Received: by mail-pf0-x232.google.com with SMTP id k19so3260497pfj.5
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:33 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:14:48 -0800
-Message-Id: <20180128231528.22719-4-richard.henderson@linaro.org>
-In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
-References: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 03/43] target/hppa: Disable gateway page
- emulation for system mode
+Date: Sun, 28 Jan 2018 15:14:45 -0800
+Message-Id: <20180128231528.22719-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL v4 00/43] hppa-softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +27,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/hppa/translate.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+Changes since patch v3:
+  * Drop MMU_DEBUG_LOAD, which obviates the sh4 changes.
 
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 31d9a2a31b..8e357cc60c 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -1543,6 +1543,7 @@ static DisasJumpType do_ibranch(DisasContext *ctx, TCGv dest,
-     return DISAS_NEXT;
- }
- 
-+#ifdef CONFIG_USER_ONLY
- /* On Linux, page zero is normally marked execute only + gateway.
-    Therefore normal read or write is supposed to fail, but specific
-    offsets have kernel code mapped to raise permissions to implement
-@@ -1600,6 +1601,7 @@ static DisasJumpType do_page_zero(DisasContext *ctx)
-         return DISAS_NORETURN;
-     }
- }
-+#endif
- 
- static DisasJumpType trans_nop(DisasContext *ctx, uint32_t insn,
-                                const DisasInsn *di)
-@@ -3787,10 +3789,13 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     int i, n;
- 
-     /* Execute one insn.  */
-+#ifdef CONFIG_USER_ONLY
-     if (ctx->iaoq_f < TARGET_PAGE_SIZE) {
-         ret = do_page_zero(ctx);
-         assert(ret != DISAS_NEXT);
--    } else {
-+    } else
-+#endif
-+    {
-         /* Always fetch the insn, even if nullified, so that we check
-            the page permissions for execute.  */
-         uint32_t insn = cpu_ldl_code(env, ctx->iaoq_f);
-@@ -3885,25 +3890,27 @@ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
- static void hppa_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
- {
-     TranslationBlock *tb = dcbase->tb;
-+    target_ulong pc = tb->pc;
- 
--    switch (tb->pc) {
-+#ifdef CONFIG_USER_ONLY
-+    switch (pc) {
-     case 0x00:
-         qemu_log("IN:\n0x00000000:  (null)\n");
--        break;
-+        return;
-     case 0xb0:
-         qemu_log("IN:\n0x000000b0:  light-weight-syscall\n");
--        break;
-+        return;
-     case 0xe0:
-         qemu_log("IN:\n0x000000e0:  set-thread-pointer-syscall\n");
--        break;
-+        return;
-     case 0x100:
-         qemu_log("IN:\n0x00000100:  syscall\n");
--        break;
--    default:
--        qemu_log("IN: %s\n", lookup_symbol(tb->pc));
--        log_target_disas(cs, tb->pc, tb->size);
--        break;
-+        return;
-     }
-+#endif
-+
-+    qemu_log("IN: %s\n", lookup_symbol(pc));
-+    log_target_disas(cs, pc, tb->size);
- }
- 
- static const TranslatorOps hppa_tr_ops = {
--- 
-2.14.3
+
+r~
+
+
+The following changes since commit e607bbee553cfe73072870cef458cfa4e78133e2:
+
+  Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-2018-01-26.for-upstream' into staging (2018-01-26 14:24:25 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-hppa-20180128
+
+for you to fetch changes up to 129ffd7265832fb748dc04e48dc761bfcd8508d3:
+
+  target/hppa: Implement PROBE for system mode (2018-01-28 14:15:40 -0800)
+
+----------------------------------------------------------------
+Implement hppa-softmmu
+
+----------------------------------------------------------------
+Helge Deller (5):
+      target/hppa: Skeleton support for hppa-softmmu
+      target/hppa: Implement halt and reset instructions
+      target/hppa: Fix comment
+      target/hppa: Implement LDSID for system mode
+      hw/hppa: Implement DINO system board
+
+Richard Henderson (38):
+      target/hppa: Define the rest of the PSW
+      target/hppa: Disable gateway page emulation for system mode
+      target/hppa: Define hardware exception types
+      target/hppa: Split address size from register size
+      target/hppa: Implement mmu_idx from IA privilege level
+      target/hppa: Implement the system mask instructions
+      target/hppa: Add space registers
+      target/hppa: Add control registers
+      target/hppa: Adjust insn mask for mfctl,w
+      target/hppa: Implement rfi
+      target/hppa: Fill in hppa_cpu_do_interrupt/hppa_cpu_exec_interrupt
+      target/hppa: Implement unaligned access trap
+      target/hppa: Use space registers in data operations
+      target/hppa: Avoid privilege level decrease during branches
+      target/hppa: Implement IASQ
+      target/hppa: Implement tlb_fill
+      target/hppa: Implement external interrupts
+      target/hppa: Implement the interval timer
+      target/hppa: Log unimplemented instructions
+      target/hppa: Implement I*TLBA and I*TLBP insns
+      target/hppa: Implement P*TLB and P*TLBE insns
+      target/hppa: Implement LDWA
+      target/hppa: Implement LPA
+      target/hppa: Implement LCI
+      target/hppa: Implement SYNCDMA insn
+      target/hppa: Optimize for flat addressing space
+      target/hppa: Add system registers to gdbstub
+      target/hppa: Add migration for the cpu
+      target/hppa: Implement B,GATE insn
+      target/hppa: Only use EXCP_DTLB_MISS
+      target/hppa: Increase number of temp regs
+      target/hppa: Implement a pause instruction
+      target/hppa: Implement STWA
+      target/hppa: Enable MTTCG
+      pc-bios: Add hppa-firmware.img and git submodule
+      hw/hppa: Add MAINTAINERS entry
+      target/hppa: Fix 32-bit operand masks for 0E FCVT
+      target/hppa: Implement PROBE for system mode
+
+ Makefile                         |    3 +-
+ Makefile.objs                    |    1 +
+ hw/hppa/hppa_hardware.h          |   40 +
+ hw/hppa/hppa_sys.h               |   24 +
+ include/sysemu/arch_init.h       |    1 +
+ linux-user/hppa/target_cpu.h     |    2 +-
+ target/hppa/cpu.h                |  284 ++++-
+ target/hppa/helper.h             |   43 +-
+ arch_init.c                      |    2 +
+ hw/hppa/dino.c                   |  518 ++++++++++
+ hw/hppa/machine.c                |  282 +++++
+ hw/hppa/pci.c                    |   90 ++
+ linux-user/main.c                |   28 +-
+ linux-user/signal.c              |    4 +-
+ target/hppa/cpu.c                |   56 +-
+ target/hppa/gdbstub.c            |  187 +++-
+ target/hppa/helper.c             |  120 +--
+ target/hppa/int_helper.c         |  263 +++++
+ target/hppa/machine.c            |  181 ++++
+ target/hppa/mem_helper.c         |  348 +++++++
+ target/hppa/op_helper.c          |  152 ++-
+ target/hppa/translate.c          | 2108 ++++++++++++++++++++++++++++----------
+ .gitmodules                      |    3 +
+ MAINTAINERS                      |    1 +
+ configure                        |    1 +
+ default-configs/hppa-softmmu.mak |   14 +
+ hw/hppa/Makefile.objs            |    1 +
+ hw/hppa/trace-events             |    4 +
+ pc-bios/hppa-firmware.img        |  Bin 0 -> 461352 bytes
+ roms/seabios-hppa                |    1 +
+ target/hppa/Makefile.objs        |    4 +-
+ 31 files changed, 4061 insertions(+), 705 deletions(-)
+ create mode 100644 hw/hppa/hppa_hardware.h
+ create mode 100644 hw/hppa/hppa_sys.h
+ create mode 100644 hw/hppa/dino.c
+ create mode 100644 hw/hppa/machine.c
+ create mode 100644 hw/hppa/pci.c
+ create mode 100644 target/hppa/int_helper.c
+ create mode 100644 target/hppa/machine.c
+ create mode 100644 target/hppa/mem_helper.c
+ create mode 100644 default-configs/hppa-softmmu.mak
+ create mode 100644 hw/hppa/Makefile.objs
+ create mode 100644 hw/hppa/trace-events
+ create mode 100755 pc-bios/hppa-firmware.img
+ create mode 160000 roms/seabios-hppa
