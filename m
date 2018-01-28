@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwB8-0002n8-CV
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:03 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1efwB6-0002m7-II
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1efwB7-0008Sv-0C
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:02 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:43758)
+	(envelope-from <richard.henderson@linaro.org>) id 1efwB2-0008PA-AA
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:00 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:38395)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1efwB6-0008SE-PK
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:16:00 -0500
-Received: by mail-pf0-x243.google.com with SMTP id y26so3252579pfi.10
-	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:16:00 -0800 (PST)
+	id 1efwB2-0008OM-41
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 18:15:56 -0500
+Received: by mail-pf0-x243.google.com with SMTP id k19so3261076pfj.5
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 15:15:56 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 28 Jan 2018 15:15:03 -0800
-Message-Id: <20180128231528.22719-19-richard.henderson@linaro.org>
+Date: Sun, 28 Jan 2018 15:15:00 -0800
+Message-Id: <20180128231528.22719-16-richard.henderson@linaro.org>
 In-Reply-To: <20180128231528.22719-1-richard.henderson@linaro.org>
 References: <20180128231528.22719-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v4 18/43] target/hppa: Implement external
- interrupts
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v4 15/43] target/hppa: Avoid privilege level
+ decrease during branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,172 +33,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+These instructions force the destination privilege level
+of the branch destination to be no higher than current.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h        |  1 +
- target/hppa/helper.h     |  2 ++
- target/hppa/cpu.c        |  6 +++++
- target/hppa/int_helper.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/hppa/translate.c  | 16 ++++++++++++-
- 5 files changed, 83 insertions(+), 1 deletion(-)
+ target/hppa/translate.c | 52 ++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 47 insertions(+), 5 deletions(-)
 
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index bd8fe6af78..586ea1e555 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -341,6 +341,7 @@ int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
- #else
- int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-                               int type, hwaddr *pphys, int *pprot);
-+extern const MemoryRegionOps hppa_io_eir_ops;
- #endif
- 
- #endif /* HPPA_CPU_H */
-diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 79d22ae486..535f086ab4 100644
---- a/target/hppa/helper.h
-+++ b/target/hppa/helper.h
-@@ -80,5 +80,7 @@ DEF_HELPER_FLAGS_4(fmpynfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_1(rfi, void, env)
- DEF_HELPER_1(rfi_r, void, env)
-+DEF_HELPER_FLAGS_2(write_eirr, TCG_CALL_NO_RWG, void, env, tr)
-+DEF_HELPER_FLAGS_2(write_eiem, TCG_CALL_NO_RWG, void, env, tr)
- DEF_HELPER_FLAGS_2(swap_system_mask, TCG_CALL_NO_RWG, tr, env, tr)
- #endif
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index 2970afd58d..888a48f16d 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -57,6 +57,11 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-     cpu->env.psw_n = (tb->flags & PSW_N) != 0;
- }
- 
-+static bool hppa_cpu_has_work(CPUState *cs)
-+{
-+    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+}
-+
- static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
- {
-     info->mach = bfd_mach_hppa20;
-@@ -159,6 +164,7 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
-     dc->realize = hppa_cpu_realizefn;
- 
-     cc->class_by_name = hppa_cpu_class_by_name;
-+    cc->has_work = hppa_cpu_has_work;
-     cc->do_interrupt = hppa_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = hppa_cpu_exec_interrupt;
-     cc->dump_state = hppa_cpu_dump_state;
-diff --git a/target/hppa/int_helper.c b/target/hppa/int_helper.c
-index 3d668a3a4f..c468b12e73 100644
---- a/target/hppa/int_helper.c
-+++ b/target/hppa/int_helper.c
-@@ -24,6 +24,65 @@
- #include "exec/helper-proto.h"
- #include "qom/cpu.h"
- 
-+#ifndef CONFIG_USER_ONLY
-+static void eval_interrupt(HPPACPU *cpu)
-+{
-+    CPUState *cs = CPU(cpu);
-+    if (cpu->env.cr[CR_EIRR] & cpu->env.cr[CR_EIEM]) {
-+        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+    } else {
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-+    }
-+}
-+
-+/* Each CPU has a word mapped into the GSC bus.  Anything on the GSC bus
-+ * can write to this word to raise an external interrupt on the target CPU.
-+ * This includes the system controler (DINO) for regular devices, or
-+ * another CPU for SMP interprocessor interrupts.
-+ */
-+static uint64_t io_eir_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    HPPACPU *cpu = opaque;
-+
-+    /* ??? What does a read of this register over the GSC bus do?  */
-+    return cpu->env.cr[CR_EIRR];
-+}
-+
-+static void io_eir_write(void *opaque, hwaddr addr,
-+                         uint64_t data, unsigned size)
-+{
-+    HPPACPU *cpu = opaque;
-+    int le_bit = ~data & (TARGET_REGISTER_BITS - 1);
-+
-+    cpu->env.cr[CR_EIRR] |= (target_ureg)1 << le_bit;
-+    eval_interrupt(cpu);
-+}
-+
-+const MemoryRegionOps hppa_io_eir_ops = {
-+    .read = io_eir_read,
-+    .write = io_eir_write,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+};
-+
-+void HELPER(write_eirr)(CPUHPPAState *env, target_ureg val)
-+{
-+    env->cr[CR_EIRR] &= ~val;
-+    qemu_mutex_lock_iothread();
-+    eval_interrupt(hppa_env_get_cpu(env));
-+    qemu_mutex_unlock_iothread();
-+}
-+
-+void HELPER(write_eiem)(CPUHPPAState *env, target_ureg val)
-+{
-+    env->cr[CR_EIEM] = val;
-+    qemu_mutex_lock_iothread();
-+    eval_interrupt(hppa_env_get_cpu(env));
-+    qemu_mutex_unlock_iothread();
-+}
-+#endif /* !CONFIG_USER_ONLY */
- 
- void hppa_cpu_do_interrupt(CPUState *cs)
- {
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 44abc9006b..d6c65f314b 100644
+index 6be9e0c3ff..4a69f05a91 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2124,12 +2124,25 @@ static DisasJumpType trans_mtctl(DisasContext *ctx, uint32_t insn,
-     /* All other control registers are privileged or read-only.  */
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_REG);
- 
-+#ifdef CONFIG_USER_ONLY
-+    g_assert_not_reached();
-+#else
-+    DisasJumpType ret = DISAS_NEXT;
-+
-     nullify_over(ctx);
-     switch (ctl) {
-     case CR_IT:
-         /* ??? modify interval timer offset */
-         break;
- 
-+    case CR_EIRR:
-+        gen_helper_write_eirr(cpu_env, reg);
-+        break;
-+    case CR_EIEM:
-+        gen_helper_write_eiem(cpu_env, reg);
-+        ret = DISAS_IAQ_N_STALE_EXIT;
-+        break;
-+
-     case CR_IIASQ:
-     case CR_IIAOQ:
-         /* FIXME: Respect PSW_Q bit */
-@@ -2146,7 +2159,8 @@ static DisasJumpType trans_mtctl(DisasContext *ctx, uint32_t insn,
-         tcg_gen_st_reg(reg, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
-         break;
-     }
--    return nullify_end(ctx, DISAS_NEXT);
-+    return nullify_end(ctx, ret);
-+#endif
+@@ -1862,6 +1862,40 @@ static DisasJumpType do_ibranch(DisasContext *ctx, TCGv_reg dest,
+     return DISAS_NEXT;
  }
  
- static DisasJumpType trans_mtsarcm(DisasContext *ctx, uint32_t insn,
++/* Implement
++ *    if (IAOQ_Front{30..31} < GR[b]{30..31})
++ *      IAOQ_Next{30..31} ← GR[b]{30..31};
++ *    else
++ *      IAOQ_Next{30..31} ← IAOQ_Front{30..31};
++ * which keeps the privilege level from being increased.
++ */
++static TCGv_reg do_ibranch_priv(DisasContext *ctx, TCGv_reg offset)
++{
++#ifdef CONFIG_USER_ONLY
++    return offset;
++#else
++    TCGv_reg dest;
++    switch (ctx->privilege) {
++    case 0:
++        /* Privilege 0 is maximum and is allowed to decrease.  */
++        return offset;
++    case 3:
++        /* Privilege 3 is minimum and is never allowed increase.  */
++        dest = get_temp(ctx);
++        tcg_gen_ori_reg(dest, offset, 3);
++        break;
++    default:
++        dest = tcg_temp_new();
++        tcg_gen_andi_reg(dest, offset, -4);
++        tcg_gen_ori_reg(dest, dest, ctx->privilege);
++        tcg_gen_movcond_reg(TCG_COND_GTU, dest, dest, offset, dest, offset);
++        tcg_temp_free(dest);
++        break;
++    }
++    return dest;
++#endif
++}
++
+ #ifdef CONFIG_USER_ONLY
+ /* On Linux, page zero is normally marked execute only + gateway.
+    Therefore normal read or write is supposed to fail, but specific
+@@ -3441,6 +3475,7 @@ static DisasJumpType trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
+     unsigned n = extract32(insn, 1, 1);
+     unsigned b = extract32(insn, 21, 5);
+     target_sreg disp = assemble_17(insn);
++    TCGv_reg tmp;
+ 
+     /* unsigned s = low_uextract(insn, 13, 3); */
+     /* ??? It seems like there should be a good way of using
+@@ -3449,16 +3484,19 @@ static DisasJumpType trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
+        manage along side branch delay slots.  Therefore we handle
+        entry into the gateway page via absolute address.  */
+ 
++#ifdef CONFIG_USER_ONLY
+     /* Since we don't implement spaces, just branch.  Do notice the special
+        case of "be disp(*,r0)" using a direct branch to disp, so that we can
+        goto_tb to the TB containing the syscall.  */
+     if (b == 0) {
+         return do_dbranch(ctx, disp, is_l ? 31 : 0, n);
+-    } else {
+-        TCGv_reg tmp = get_temp(ctx);
+-        tcg_gen_addi_reg(tmp, load_gpr(ctx, b), disp);
+-        return do_ibranch(ctx, tmp, is_l ? 31 : 0, n);
+     }
++#endif
++
++    tmp = get_temp(ctx);
++    tcg_gen_addi_reg(tmp, load_gpr(ctx, b), disp);
++    tmp = do_ibranch_priv(ctx, tmp);
++    return do_ibranch(ctx, tmp, is_l ? 31 : 0, n);
+ }
+ 
+ static DisasJumpType trans_bl(DisasContext *ctx, uint32_t insn,
+@@ -3490,6 +3528,7 @@ static DisasJumpType trans_blr(DisasContext *ctx, uint32_t insn,
+ 
+     tcg_gen_shli_reg(tmp, load_gpr(ctx, rx), 3);
+     tcg_gen_addi_reg(tmp, tmp, ctx->iaoq_f + 8);
++    /* The computation here never changes privilege level.  */
+     return do_ibranch(ctx, tmp, link, n);
+ }
+ 
+@@ -3508,6 +3547,7 @@ static DisasJumpType trans_bv(DisasContext *ctx, uint32_t insn,
+         tcg_gen_shli_reg(dest, load_gpr(ctx, rx), 3);
+         tcg_gen_add_reg(dest, dest, load_gpr(ctx, rb));
+     }
++    dest = do_ibranch_priv(ctx, dest);
+     return do_ibranch(ctx, dest, 0, n);
+ }
+ 
+@@ -3517,8 +3557,10 @@ static DisasJumpType trans_bve(DisasContext *ctx, uint32_t insn,
+     unsigned n = extract32(insn, 1, 1);
+     unsigned rb = extract32(insn, 21, 5);
+     unsigned link = extract32(insn, 13, 1) ? 2 : 0;
++    TCGv_reg dest;
+ 
+-    return do_ibranch(ctx, load_gpr(ctx, rb), link, n);
++    dest = do_ibranch_priv(ctx, load_gpr(ctx, rb));
++    return do_ibranch(ctx, dest, link, n);
+ }
+ 
+ static const DisasInsn table_branch[] = {
 -- 
 2.14.3
