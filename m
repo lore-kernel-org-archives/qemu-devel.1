@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eg8aL-0006JI-1e
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:30:54 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eg8c6-00078n-0D
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:32:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eg8aJ-0002R2-PL
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:30:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36234)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eg8c2-0004WA-PS
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:32:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eg8aJ-0002QA-Gz
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:30:51 -0500
-References: <151721435440.776.955566177382694120@5adcb62bf0d6>
-	<0a17662c-b713-5d96-a6dd-e7b84593f98b@redhat.com>
-	<6e79281d-6f87-480e-b1ea-b628055bf8fa@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <847db803-9b7e-c090-eae8-3ab34cac31a6@redhat.com>
-Date: Mon, 29 Jan 2018 20:30:43 +0800
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1eg8c2-0004UQ-HE
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:32:38 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 29 Jan 2018 13:32:27 +0100
+Message-Id: <20180129123227.15778-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6e79281d-6f87-480e-b1ea-b628055bf8fa@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/6] Net patches
+Subject: [Qemu-devel] [PATCH] tpm: fix alignment issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +25,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, famz@redhat.com
+To: qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+The new tpm-crb-test fails on sparc host:
 
+TEST: tests/tpm-crb-test... (pid=3D230409)
+  /i386/tpm-crb/test:
+Broken pipe
+FAIL
+GTester: last random seed: R02S29cea50247fe1efa59ee885a26d51a85
+(pid=3D230423)
+FAIL: tests/tpm-crb-test
 
-On 2018=E5=B9=B401=E6=9C=8829=E6=97=A5 18:58, Thomas Huth wrote:
-> On 29.01.2018 11:02, Jason Wang wrote:
->>
->> On 2018=E5=B9=B401=E6=9C=8829=E6=97=A5 16:25, no-reply@patchew.org wro=
-te:
->>> Hi,
->>>
->>> This series seems to have some coding style problems. See output belo=
-w
->>> for
->>> more information:
->>>
->>> Type: series
->>> Message-id: 1517213825-24085-1-git-send-email-jasowang@redhat.com
->>> Subject: [Qemu-devel] [PULL 0/6] Net patches
->>>
->>> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
->>> #!/bin/bash
->>>
->>> BASE=3Dbase
->>> n=3D1
->>> total=3D$(git log --oneline $BASE.. | wc -l)
->>> failed=3D0
->>>
->>> git config --local diff.renamelimit 0
->>> git config --local diff.renames True
->>>
->>> commits=3D"$(git log --format=3D%H --reverse $BASE..)"
->>> for c in $commits; do
->>>  =C2=A0=C2=A0=C2=A0=C2=A0 echo "Checking PATCH $n/$total: $(git log -=
-n 1 --format=3D%s $c)..."
->>>  =C2=A0=C2=A0=C2=A0=C2=A0 if ! git show $c --format=3Demail | ./scrip=
-ts/checkpatch.pl
->>> --mailback -; then
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 failed=3D1
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 echo
->>>  =C2=A0=C2=A0=C2=A0=C2=A0 fi
->>>  =C2=A0=C2=A0=C2=A0=C2=A0 n=3D$((n+1))
->>> done
->>>
->>> exit $failed
->>> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->>>
->>> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
->>>  =C2=A0From https://github.com/patchew-project/qemu
->>>  =C2=A0 * [new tag]
->>> patchew/1517213825-24085-1-git-send-email-jasowang@redhat.com ->
->>> patchew/1517213825-24085-1-git-send-email-jasowang@redhat.com
->>> Switched to a new branch 'test'
->>> f599bb830a MAINTAINERS: update Dmitry Fleytman email
->>> d7e337961c qemu-doc: Get rid of "vlan=3DX" example in the documentati=
-on
->>> b7bc06c0f4 net: Allow netdevs to be used with 'hostfwd_add' and
->>> 'hostfwd_remove'
->>> 85b4cac4ac net: Allow hubports to connect to other netdevs
->>> b4a35413c4 colo: compare the packet based on the tcp sequence number
->>> f6781da302 colo: modified the payload compare function
->>>
->>> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
->>> Checking PATCH 1/6: colo: modified the payload compare function...
->>> Checking PATCH 2/6: colo: compare the packet based on the tcp sequenc=
-e
->>> number...
->>> Checking PATCH 3/6: net: Allow hubports to connect to other netdevs..=
-.
->>> Checking PATCH 4/6: net: Allow netdevs to be used with 'hostfwd_add'
->>> and 'hostfwd_remove'...
->>> ERROR: consider using qemu_strtol in preference to strtol
->>> #72: FILE: net/slirp.c:414:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 n=
-c =3D net_hub_find_client_by_name(strtol(hub_id, NULL, 0),
->>> name);
->>>
->>> total: 1 errors, 0 warnings, 73 lines checked
->>>
->>> Your patch has style problems, please review.=C2=A0 If any of these e=
-rrors
->>> are false positives report them to the maintainer, see
->>> CHECKPATCH in MAINTAINERS.
->>>
->>> Checking PATCH 5/6: qemu-doc: Get rid of "vlan=3DX" example in the
->>> documentation...
->>> Checking PATCH 6/6: MAINTAINERS: update Dmitry Fleytman email...
->>> =3D=3D=3D OUTPUT END =3D=3D=3D
->>>
->>> Test command exited with code: 1
->> Thomas, want to send a v2 for this patch?
-> No, that strtol was already there in the code before my patch, I just
-> changed the indentation. If we decide that we want to replace it, this
-> should be done by a separate patch instead. Question is: Do we really
-> want to replace it here? (the error message is saying "consider ..." -
-> so maybe that should also rather be a warning instead of an error messa=
-ge?)
->
->   Thomas
->
+and generates a new clang sanitizer runtime warning:
 
-I see, then I'm fine to keep it as is. Any changes could be done on top.
+/home/petmay01/linaro/qemu-for-merges/hw/tpm/tpm_util.h:36:24: runtime
+error: load of misaligned address 0x7fdc24c00002 for type 'const
+uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
+0x7fdc24c00002: note: pointer points here
+<memory cannot be printed>
 
-Thanks
+The sparc architecture does not allow misaligned loads and will
+segfault if you try them.  For example, this function:
+
+static inline uint32_t tpm_cmd_get_size(const void *b)
+{
+    return be32_to_cpu(*(const uint32_t *)(b + 2));
+}
+
+Should read,
+    return ldl_be_p(b + 2);
+
+As a general rule you can't take an arbitrary pointer into a byte
+buffer and try to interpret it as a structure or a pointer to a
+larger-than-bytesize-data simply by casting the pointer.
+
+Use this clean up as an opportunity to remove unnecessary temporary
+buffers and casts.
+
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/tpm/tpm_util.h        | 17 ++++++++++-
+ hw/tpm/tpm_emulator.c    | 14 ++++-----
+ hw/tpm/tpm_passthrough.c |  6 ++--
+ hw/tpm/tpm_util.c        | 75 ++++++++++++++++++++++--------------------=
+------
+ 4 files changed, 58 insertions(+), 54 deletions(-)
+
+diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+index 19b28474ae..c562140e52 100644
+--- a/hw/tpm/tpm_util.h
++++ b/hw/tpm/tpm_util.h
+@@ -31,9 +31,24 @@ bool tpm_util_is_selftest(const uint8_t *in, uint32_t =
+in_len);
+=20
+ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
+=20
++static inline uint16_t tpm_cmd_get_tag(const void *b)
++{
++    return lduw_be_p(b);;
++}
++
+ static inline uint32_t tpm_cmd_get_size(const void *b)
+ {
+-    return be32_to_cpu(*(const uint32_t *)(b + 2));
++    return ldl_be_p(b + 2);;
++}
++
++static inline uint32_t tpm_cmd_get_ordinal(const void *b)
++{
++    return ldl_be_p(b + 6);;
++}
++
++static inline uint32_t tpm_cmd_get_errcode(const void *b)
++{
++    return ldl_be_p(b + 6);;
+ }
+=20
+ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+index 35c78de5a9..a34a18ac7a 100644
+--- a/hw/tpm/tpm_emulator.c
++++ b/hw/tpm/tpm_emulator.c
+@@ -120,7 +120,6 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm=
+_emu,
+ {
+     ssize_t ret;
+     bool is_selftest =3D false;
+-    const struct tpm_resp_hdr *hdr =3D NULL;
+=20
+     if (selftest_done) {
+         *selftest_done =3D false;
+@@ -132,22 +131,21 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *t=
+pm_emu,
+         return -1;
+     }
+=20
+-    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out, sizeof(=
+*hdr),
+-                               err);
++    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
++              sizeof(struct tpm_resp_hdr), err);
+     if (ret !=3D 0) {
+         return -1;
+     }
+=20
+-    hdr =3D (struct tpm_resp_hdr *)out;
+-    out +=3D sizeof(*hdr);
+-    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+-                               be32_to_cpu(hdr->len) - sizeof(*hdr) , er=
+r);
++    ret =3D qio_channel_read_all(tpm_emu->data_ioc,
++              (char *)out + sizeof(struct tpm_resp_hdr),
++              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err);
+     if (ret !=3D 0) {
+         return -1;
+     }
+=20
+     if (is_selftest) {
+-        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
++        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+     }
+=20
+     return 0;
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 29142f38bb..537e11a3f9 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -87,7 +87,6 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruStat=
+e *tpm_pt,
+ {
+     ssize_t ret;
+     bool is_selftest;
+-    const struct tpm_resp_hdr *hdr;
+=20
+     /* FIXME: protect shared variables or use other sync mechanism */
+     tpm_pt->tpm_op_canceled =3D false;
+@@ -116,15 +115,14 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthru=
+State *tpm_pt,
+                          strerror(errno), errno);
+         }
+     } else if (ret < sizeof(struct tpm_resp_hdr) ||
+-               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D ret) =
+{
++               tpm_cmd_get_size(out) !=3D ret) {
+         ret =3D -1;
+         error_report("tpm_passthrough: received invalid response "
+                      "packet from TPM");
+     }
+=20
+     if (is_selftest && (ret >=3D sizeof(struct tpm_resp_hdr))) {
+-        hdr =3D (struct tpm_resp_hdr *)out;
+-        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
++        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+     }
+=20
+ err_exit:
+diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+index 747075e244..8abde59915 100644
+--- a/hw/tpm/tpm_util.c
++++ b/hw/tpm/tpm_util.c
+@@ -106,20 +106,16 @@ const PropertyInfo qdev_prop_tpm =3D {
+ void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
+ {
+     if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+-        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
+-
+-        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
+-        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
+-        resp->errcode =3D cpu_to_be32(TPM_FAIL);
++        stw_be_p(out, TPM_TAG_RSP_COMMAND);
++        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
++        stl_be_p(out + 6, TPM_FAIL);
+     }
+ }
+=20
+ bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
+ {
+-    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
+-
+-    if (in_len >=3D sizeof(*hdr)) {
+-        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
+t);
++    if (in_len >=3D sizeof(struct tpm_req_hdr)) {
++        return tpm_cmd_get_ordinal(in) =3D=3D TPM_ORD_ContinueSelfTest;
+     }
+=20
+     return false;
+@@ -129,12 +125,11 @@ bool tpm_util_is_selftest(const uint8_t *in, uint32=
+_t in_len)
+  * Send request to a TPM device. We expect a response within one second.
+  */
+ static int tpm_util_request(int fd,
+-                            unsigned char *request,
++                            const void *request,
+                             size_t requestlen,
+-                            unsigned char *response,
++                            void *response,
+                             size_t responselen)
+ {
+-    struct tpm_resp_hdr *resp;
+     fd_set readfds;
+     int n;
+     struct timeval tv =3D {
+@@ -164,9 +159,8 @@ static int tpm_util_request(int fd,
+         return -EFAULT;
+     }
+=20
+-    resp =3D (struct tpm_resp_hdr *)response;
+     /* check the header */
+-    if (be32_to_cpu(resp->len) !=3D n) {
++    if (tpm_cmd_get_size(response) !=3D n) {
+         return -EMSGSIZE;
+     }
+=20
+@@ -178,12 +172,11 @@ static int tpm_util_request(int fd,
+  * (error response is fine).
+  */
+ static int tpm_util_test(int fd,
+-                         unsigned char *request,
++                         const void *request,
+                          size_t requestlen,
+                          uint16_t *return_tag)
+ {
+-    struct tpm_resp_hdr *resp;
+-    unsigned char buf[1024];
++    char buf[1024];
+     ssize_t ret;
+=20
+     ret =3D tpm_util_request(fd, request, requestlen,
+@@ -192,8 +185,7 @@ static int tpm_util_test(int fd,
+         return ret;
+     }
+=20
+-    resp =3D (struct tpm_resp_hdr *)buf;
+-    *return_tag =3D be16_to_cpu(resp->tag);
++    *return_tag =3D tpm_cmd_get_tag(buf);
+=20
+     return 0;
+ }
+@@ -228,7 +220,7 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_=
+version)
+     int ret;
+=20
+     /* Send TPM 2 command */
+-    ret =3D tpm_util_test(tpm_fd, (unsigned char *)&test_req_tpm2,
++    ret =3D tpm_util_test(tpm_fd, &test_req_tpm2,
+                         sizeof(test_req_tpm2), &return_tag);
+     /* TPM 2 would respond with a tag of TPM2_ST_NO_SESSIONS */
+     if (!ret && return_tag =3D=3D TPM2_ST_NO_SESSIONS) {
+@@ -237,7 +229,7 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_=
+version)
+     }
+=20
+     /* Send TPM 1.2 command */
+-    ret =3D tpm_util_test(tpm_fd, (unsigned char *)&test_req,
++    ret =3D tpm_util_test(tpm_fd, &test_req,
+                         sizeof(test_req), &return_tag);
+     if (!ret && return_tag =3D=3D TPM_TAG_RSP_COMMAND) {
+         *tpm_version =3D TPM_VERSION_1_2;
+@@ -253,7 +245,6 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_=
+version)
+ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+                              size_t *buffersize)
+ {
+-    unsigned char buf[1024];
+     int ret;
+=20
+     switch (tpm_version) {
+@@ -277,26 +268,27 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion=
+ tpm_version,
+             struct tpm_resp_hdr hdr;
+             uint32_t len;
+             uint32_t buffersize;
+-        } QEMU_PACKED *tpm_resp =3D (struct tpm_resp_get_buffer_size *)b=
+uf;
++        } QEMU_PACKED tpm_resp;
+=20
+-        ret =3D tpm_util_request(tpm_fd, (unsigned char *)&tpm_get_buffe=
+r_size,
+-                               sizeof(tpm_get_buffer_size), buf, sizeof(=
+buf));
++        ret =3D tpm_util_request(tpm_fd, &tpm_get_buffer_size,
++                               sizeof(tpm_get_buffer_size),
++                               &tpm_resp, sizeof(tpm_resp));
+         if (ret < 0) {
+             return ret;
+         }
+=20
+-        if (be32_to_cpu(tpm_resp->hdr.len) !=3D sizeof(*tpm_resp) ||
+-            be32_to_cpu(tpm_resp->len) !=3D sizeof(uint32_t)) {
++        if (be32_to_cpu(tpm_resp.hdr.len) !=3D sizeof(tpm_resp) ||
++            be32_to_cpu(tpm_resp.len) !=3D sizeof(uint32_t)) {
+             DPRINTF("tpm_resp->hdr.len =3D %u, expected =3D %zu\n",
+-                    be32_to_cpu(tpm_resp->hdr.len), sizeof(*tpm_resp));
++                    be32_to_cpu(tpm_resp.hdr.len), sizeof(tpm_resp));
+             DPRINTF("tpm_resp->len =3D %u, expected =3D %zu\n",
+-                    be32_to_cpu(tpm_resp->len), sizeof(uint32_t));
++                    be32_to_cpu(tpm_resp.len), sizeof(uint32_t));
+             error_report("tpm_util: Got unexpected response to "
+                          "TPM_GetCapability; errcode: 0x%x",
+-                         be32_to_cpu(tpm_resp->hdr.errcode));
++                         be32_to_cpu(tpm_resp.hdr.errcode));
+             return -EFAULT;
+         }
+-        *buffersize =3D be32_to_cpu(tpm_resp->buffersize);
++        *buffersize =3D be32_to_cpu(tpm_resp.buffersize);
+         break;
+     }
+     case TPM_VERSION_2_0: {
+@@ -324,27 +316,28 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion=
+ tpm_version,
+             uint32_t value1;
+             uint32_t property2;
+             uint32_t value2;
+-        } QEMU_PACKED *tpm2_resp =3D (struct tpm2_resp_get_buffer_size *=
+)buf;
++        } QEMU_PACKED tpm2_resp;
+=20
+-        ret =3D tpm_util_request(tpm_fd, (unsigned char *)&tpm2_get_buff=
+er_size,
+-                               sizeof(tpm2_get_buffer_size), buf, sizeof=
+(buf));
++        ret =3D tpm_util_request(tpm_fd, &tpm2_get_buffer_size,
++                               sizeof(tpm2_get_buffer_size),
++                               &tpm2_resp, sizeof(tpm2_resp));
+         if (ret < 0) {
+             return ret;
+         }
+=20
+-        if (be32_to_cpu(tpm2_resp->hdr.len) !=3D sizeof(*tpm2_resp) ||
+-            be32_to_cpu(tpm2_resp->count) !=3D 2) {
++        if (be32_to_cpu(tpm2_resp.hdr.len) !=3D sizeof(tpm2_resp) ||
++            be32_to_cpu(tpm2_resp.count) !=3D 2) {
+             DPRINTF("tpm2_resp->hdr.len =3D %u, expected =3D %zu\n",
+-                    be32_to_cpu(tpm2_resp->hdr.len), sizeof(*tpm2_resp))=
+;
++                    be32_to_cpu(tpm2_resp.hdr.len), sizeof(tpm2_resp));
+             DPRINTF("tpm2_resp->len =3D %u, expected =3D %u\n",
+-                    be32_to_cpu(tpm2_resp->count), 2);
++                    be32_to_cpu(tpm2_resp.count), 2);
+             error_report("tpm_util: Got unexpected response to "
+                          "TPM2_GetCapability; errcode: 0x%x",
+-                         be32_to_cpu(tpm2_resp->hdr.errcode));
++                         be32_to_cpu(tpm2_resp.hdr.errcode));
+             return -EFAULT;
+         }
+-        *buffersize =3D MAX(be32_to_cpu(tpm2_resp->value1),
+-                          be32_to_cpu(tpm2_resp->value2));
++        *buffersize =3D MAX(be32_to_cpu(tpm2_resp.value1),
++                          be32_to_cpu(tpm2_resp.value2));
+         break;
+     }
+     case TPM_VERSION_UNSPEC:
+--=20
+2.16.0.rc1.1.gef27df75a1
