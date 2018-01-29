@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eg7Kv-0004in-2w
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:10:58 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eg7Lm-0005Cg-Ms
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:11:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eg7Kt-0004Ir-R3
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:10:53 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33711)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eg7Kt-0004Hv-LK
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:10:51 -0500
-Received: by mail-ot0-x242.google.com with SMTP id d7so6171910oti.0
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 03:10:51 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1eg7Lj-0005Hx-Cq
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:11:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eg7Lj-0005GC-4H
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:11:43 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9C69BC0568E3
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 11:11:41 +0000 (UTC)
+References: <1516958370-3955-1-git-send-email-thuth@redhat.com>
+	<7b6392e6-6ff7-9f18-9bdf-eb8b27e72117@redhat.com>
+	<64c6c821-f007-16ea-c500-0d0ce48f6bac@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <77de61ce-ec1c-3f37-747b-7d0e1c61eb68@redhat.com>
+Date: Mon, 29 Jan 2018 12:11:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180129102917.3olxduibcwdqgqls@hawk.localdomain>
-References: <5A6B5091.8030601@hisilicon.com>
-	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
-	<5A6B5FCA.2080009@hisilicon.com>
-	<CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
-	<5A6B6671.8070408@hisilicon.com>
-	<CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
-	<20180129102917.3olxduibcwdqgqls@hawk.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jan 2018 11:10:30 +0000
-Message-ID: <CAFEAcA9y=T0Pd_Zv5zSjT0ZhiKmD__zrS+fP7AU0AC5j_v6c+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
- before enabled the interruption
+In-Reply-To: <64c6c821-f007-16ea-c500-0d0ce48f6bac@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add "Understanding QEMU devices"
+ blog post
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +36,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Wei Xu <xuwei5@hisilicon.com>, Rob Herring <rob.herring@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, tiantao6@huawei.com, QEMU Developers <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, qemu-arm <qemu-arm@nongnu.org>, Daode Huang <huangdaode@hisilicon.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Zhangyi ac <zhangyi.ac@huawei.com>
+To: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On 29 January 2018 at 10:29, Andrew Jones <drjones@redhat.com> wrote:
-> On Fri, Jan 26, 2018 at 06:01:33PM +0000, Peter Maydell wrote:
->> On 26 January 2018 at 17:33, Wei Xu <xuwei5@hisilicon.com> wrote:
->> > On 2018/1/26 17:15, Peter Maydell wrote:
->> >> The pl011 code should call qemu_set_irq(..., 1) when the
->> >> guest enables interrupts on the device by writing to the int_enabled
->> >> (UARTIMSC) register. That will be a 0-to-1 level change and the KVM
->> >> VGIC should report the interrupt to the guest.
->> >>
->> >
->> > Yes.
->> > And in the pl011_update, the irq level is set by s->int_level & s->int_enabled.
->> > When writing to the int_enabled, not sure why the int_level is set to
->> > 0x20(PL011_INT_TX) but int_enabled is 0x50.
->> >
->> > It still call qemu_set_irq(..., 0).
->> >
->> > I added "s->int_level |= PL011_INT_RX" before calling pl011_update
->> > when writing to the int_enabled and tested it also works.
+On 26/01/2018 15:46, Eric Blake wrote:
+> On 01/26/2018 06:40 AM, Paolo Bonzini wrote:
+>> On 26/01/2018 10:19, Thomas Huth wrote:
+>>> Last July, Eric Blake wrote a nice summary for newcomers about what
+>>> QEMU has to do to emulate devices for the guests. So far, we missed
+>>> to integrate this somewhere into the QEM web site or wiki, so let's
+>>> publish this now as a nice blog post for the users.
 >>
->> No, that's not right either. int_level should already have the
->> RX bit set, because pl011_put_fifo() sets that bit when it gets a
->> character from QEMU and puts it into the FIFO.
+>> It's very nice!  Some proofreading and corrections follow.
+> 
+> Thanks for digging up my original email, and enhancing it (I guess the
+> fact that I don't blog very often, and stick to email, means that I rely
+> on others helping to polish my gems for the masses).
+> 
+>>> +++ b/_posts/2018-01-26-understanding-qemu-devices.md
+>>> @@ -0,0 +1,139 @@
+>>> +---
+>>> +layout: post
+>>> +title:  "Understanding QEMU devices"
+>>> +date:   2018-01-26 10:00:00 +0100
+> 
+> That's when you're posting it online, but should it also mention when I
+> first started these thoughts in email form?
+> 
+>>> +author: Eric Blake
+>>> +categories: blog
+>>> +---
+>>> +Here are some notes that may help newcomers understand what is actually
+>>> +happening with QEMU devices:
+>>> +
+>>> +With QEMU, one thing to remember is that we are trying to emulate what
+>>> +an OS would see on bare-metal hardware.  All bare-metal machines are
 >>
->> Does something else clear the int_level between the character
->> going into the FIFO from QEMU and the guest enabling
->> interrupts?
->
-> As part of the boot process Linux restarts the UART a few times. When
-> Linux drives the PL011 with the SBSA driver then the FIFO doesn't get
-> reset prior to being used again, as the SBSA doesn't specify a way to
-> do that.
+>> s/All/Most/ (s390 anyone? :))
+> 
+> Also, s/OS/Operating System (OS)/ to make the acronym easier to follow
+> in the rest of the document.
+> 
+>>
+>>> +basically giant memory maps, where software poking at a particular
+>>> +address will have a particular side effect (the most common side effect
+>>> +is, of course, accessing memory; but other common regions in memory
+>>> +include the register banks for controlling particular pieces of
+>>> +hardware, like the hard drive or a network card, or even the CPU
+>>> +itself).  The end-goal of emulation is to allow a user-space program,
+>>> +using only normal memory accesses, to manage all of the side-effects
+>>> +that a guest OS is expecting.
+>>> +
+>>> +As an implementation detail, some hardware, like x86, actually has two
+>>> +memory spaces, where I/O space uses different assembly codes than
+>>> +normal; QEMU has to emulate these alternative accesses.  Similarly, many
+>>> +modern hardware is so complex that the CPU itself provides both
+>>> +specialized assembly instructions and a bank of registers within the
+>>> +memory map (a classic example being the management of the MMU, or
+>>> +separation between Ring 0 kernel code and Ring 3 userspace code - if
+>>> +that's not crazy enough, there's nested virtualization).
+>>
+>> I'd say the interrupt controllers are a better example so:
+>>
+>> Similarly, many modern CPUs provide themselves a bank of CPU-local
+>> registers within the memory map, such as for an interrupt controller.
+> 
+> Is it still worth a mention of nested virtualization?
 
-Right, but the FIFO not being cleared shouldn't be a problem --
-if the FIFO is still full then the int_level should still
-indicate that so that when the Linux driver enables interrupts
-it takes an interrupt (and the handler should then drain the
-FIFO by reading characters from it).
+No, nested virtualization is just two layers of doing the same thing. :)
 
-It seems likely that there's a bug in QEMU's pl011 model (this doesn't
-happen with real hardware PL011s, I assume) -- but we need to find
-out what the divergence from the hardware is, rather than making
-changes which happen to fix the symptoms without having first
-nailed down what the underlying cause is.
-
-thanks
--- PMM
+Paolo
