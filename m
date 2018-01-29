@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eg07c-0004Va-JE
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:42 -0500
+	(envelope-from <famz@redhat.com>) id 1eg0Ai-0007Gt-JQ
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eg07b-0001ga-Hv
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:40 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 29 Jan 2018 14:28:25 +1100
-Message-Id: <20180129032826.16876-12-david@gibson.dropbear.id.au>
-In-Reply-To: <20180129032826.16876-1-david@gibson.dropbear.id.au>
-References: <20180129032826.16876-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/12] target/ppc/spapr_caps: Add new tristate
- cap safe_indirect_branch
+	(envelope-from <famz@redhat.com>) id 1eg0Af-0003uT-EF
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:31:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42666)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eg0Af-0003u2-5W
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:31:49 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 29 Jan 2018 11:31:33 +0800
+Message-Id: <20180129033133.31288-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] docs: Add docs/devel/testing.rst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +21,485 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, groug@kaod.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, alex.bennee@linaro.org, f4bug@amsat.org, mreitz@redhat.com, berrange@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, eblake@redhat.com, armbru@redhat.com
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To make our efforts on QEMU testing easier to consume by contributors,
+let's add a document. For example, Patchew reports build errors on
+patches that should be relativly easy to reproduce with a few steps, and
+it is much nicer if there is such a documentation that it can refer to.
 
-Add new tristate cap cap-ibs to represent the indirect branch
-serialisation capability.
+This focues on how to run existing tests and how to write new test
+cases, without going into the frameworks themselves.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+
 ---
- hw/ppc/spapr.c         |  2 ++
- hw/ppc/spapr_caps.c    | 21 +++++++++++++++++++++
- include/hw/ppc/spapr.h |  5 ++++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 57433e7a6e..32a876be56 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1793,6 +1793,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_cap_dfp,
-         &vmstate_spapr_cap_cfpc,
-         &vmstate_spapr_cap_sbbc,
-+        &vmstate_spapr_cap_ibs,
-         NULL
-     }
- };
-@@ -3885,6 +3886,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-     spapr_caps_add_properties(smc, &error_abort);
- }
- 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index ce1f74f26d..62efdaee38 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -202,6 +202,17 @@ static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
-     }
- }
- 
-+static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
-+                                           uint8_t val, Error **errp)
-+{
-+    if (tcg_enabled() && val) {
-+        /* TODO - for now only allow broken for TCG */
-+        error_setg(errp, "Requested safe indirect branch capability level not supported by tcg, try a different value for cap-ibs");
-+    } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
-+        error_setg(errp, "Requested safe indirect branch capability level not supported by kvm, try a different value for cap-ibs");
-+    }
-+}
+To reviewers: though we don't have dedicate maintainers on tests or
+docs, there are a few sections that are closely related to maintained
+areas, such as block layer, QAPI, docker/vm based testings and image
+fuzzer (would fuzzier be more correct?). It is perfect if you review
+only the part you maintain or are interested in.
+---
+ docs/devel/testing.rst | 449 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 449 insertions(+)
+ create mode 100644 docs/devel/testing.rst
+
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+new file mode 100644
+index 0000000000..16217e4fa2
+--- /dev/null
++++ b/docs/devel/testing.rst
+@@ -0,0 +1,449 @@
++===============
++Testing in QEMU
++===============
 +
- #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
- 
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-@@ -250,6 +261,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .type = "string",
-         .apply = cap_safe_bounds_check_apply,
-     },
-+    [SPAPR_CAP_IBS] = {
-+        .name = "ibs",
-+        .description = "Indirect Branch Serialisation" VALUE_DESC_TRISTATE,
-+        .index = SPAPR_CAP_IBS,
-+        .get = spapr_cap_get_tristate,
-+        .set = spapr_cap_set_tristate,
-+        .type = "string",
-+        .apply = cap_safe_indirect_branch_apply,
-+    },
- };
- 
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-@@ -357,6 +377,7 @@ SPAPR_CAP_MIG_STATE(vsx, VSX);
- SPAPR_CAP_MIG_STATE(dfp, DFP);
- SPAPR_CAP_MIG_STATE(cfpc, CFPC);
- SPAPR_CAP_MIG_STATE(sbbc, SBBC);
-+SPAPR_CAP_MIG_STATE(ibs, IBS);
- 
- void spapr_caps_reset(sPAPRMachineState *spapr)
- {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index c65be62e92..549d7a4134 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -64,8 +64,10 @@ typedef enum {
- #define SPAPR_CAP_CFPC                  0x03
- /* Speculation Barrier Bounds Checking */
- #define SPAPR_CAP_SBBC                  0x04
-+/* Indirect Branch Serialisation */
-+#define SPAPR_CAP_IBS                   0x05
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_SBBC + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
- 
- /*
-  * Capability Values
-@@ -785,6 +787,7 @@ extern const VMStateDescription vmstate_spapr_cap_vsx;
- extern const VMStateDescription vmstate_spapr_cap_dfp;
- extern const VMStateDescription vmstate_spapr_cap_cfpc;
- extern const VMStateDescription vmstate_spapr_cap_sbbc;
-+extern const VMStateDescription vmstate_spapr_cap_ibs;
- 
- static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
- {
++This document describes the testing infrastructure in QEMU.
++
++"Make check" testings
++=====================
++
++The "make check" testing family includes most of the C based tests in QEMU. For
++a quick help, run ``make check-help`` from the source tree.
++
++The usual way to run these tests is:
++
++.. code::
++
++  make check
++
++which includes QAPI schema tests, unit tests, and QTests. Different sub-types
++of "make check" testings will be explained below.
++
++Before running tests, it is best to build QEMU programs first. Some tests
++expect the executables to exist and will fail with obscure messages if cannot
++find them.
++
++Unit tests
++----------
++
++Unit tests, which can be invoked with ``make check-unit``, are simple C tests
++that typically link to individual QEMU objects and exercise them by calling
++into the modules.
++
++If you are writing new code in QEMU, consider adding a unit test, especially
++for utility modules that are relatively stateless or have few dependencies. To
++add a new unit test:
++
++1. Create a new source file. For example, ``tests/test-foo.c``.
++
++2. Write the test. Normally you would include the headers file which exports
++   the module API, then verify the interface behaves as expected from your
++   test. The test code should be organized with the glib testing framework.
++   Copy and modify an existing test is usually a good idea.
++
++3. Add the test to ``tests/Makefile.include``. First, name the unit test
++   program and add it to ``$(check-unit-y)``; then add a rule to build the
++   executable. Optionally, you can add a magical variable to support ``gcov``.
++   For example:
++
++.. code::
++
++  check-unit-y += tests/test-foo$(EXESUF)
++  tests/test-foo$(EXESUF): tests/test-foo.o $(test-util-obj-y)
++  ...
++  gcov-files-test-foo-y = util/foo.c
++
++QTest
++-----
++
++QTest is a testing framework that simplifies starting QEMU and interacting with
++the virtual machine just like a guest kernel does. It can be very useful to
++test hardware emulation, for example; it could also control certain aspects of
++QEMU (such as virtual clock stepping), with a specially purposed "qtest"
++protocol. Refer to the documentation in ``qtest.c`` file for more details of
++the protocol.
++
++QTest cases can be executed with
++
++.. code::
++
++   make check-qtest
++
++The QTest library is implemented by ``tests/libqtest.c`` and the API is defined
++in ``tests/libqtest.h``.
++
++Consider adding a new QTest case when you are introducing a new virtual
++hardware, or extending one if you are adding functionalities to an existing
++virtual device.
++
++On top of libqtest, a higher level library, ``libqos``, was created to
++encapsulate common tasks of device drivers, such as memory management and
++communicating with system buses or devices. Many virtual device tests use
++libqos instead of directly calling into libqos.
++
++Steps to add a new QTest case are:
++
++1. Create a new source file for the test. (More than one file can be added as
++   necessary.) For example, ``tests/test-foo-device.c``.  2. Write the test
++   code with the glib and libqtest/libqos API. See also existing tests and the
++   library headers for reference.
++
++3. Register the new test in ``tests/Makefile.include``. Add the test executable
++   name to an appropriate ``check-qtest-*-y`` variable. For example:
++
++   ``check-qtest-generic-y = tests/test-foo-device$(EXESUF)``
++
++4. Add object dependencies of the executable in the Makefile, including the
++   test source file(s) and other interesting objects. For example:
++
++   ``tests/test-foo-device$(EXESUF): tests/test-foo-device.o $(libqos-obj-y)``
++
++QAPI schema tests
++-----------------
++
++The QAPI schema tests validate the QAPI parser used by QMP, by feeding
++predefined input to the parser and compare the result with the reference
++output.
++
++The input/output data is managed under the ``tests/qapi-schema`` directory.
++Each test case includes four files that have a common base name:
++
++  * ``${casename}.json`` - the file contains the JSON input for feeding the
++    parser
++  * ``${casename}.out`` - the file contains the expected stdout from the parser
++  * ``${casename}.err`` - the file contains the expected stderr from the parser
++  * ``${casename}.exit`` - the expected error code
++
++Consider adding a new QAPI schema test when you are making a change on the QAPI
++parser (either fixing a bug or extending/modifying the syntax). To do this:
++
++1. Add four files for the new case as explained above. For example:
++
++  ``$EDITOR tests/qapi-schema/foo.{json,out,err,exit}``.
++
++2. Add the new test in ``tests/Makefile.include``. For example:
++
++  ``qapi-schema += foo.json``
++
++check-block
++-----------
++
++``make check-block`` is a legacy command to invoke block layer iotests and is
++rarely used. See "QEMU iotests" section below for more information.
++
++GCC gcov support
++----------------
++
++``gcov`` is a GCC tool to analyze the testing coverage by instrumenting the
++tested code. To use it, configure QEMU with ``--enable-gcov`` option and build.
++Then run ``make check`` as usual. There will be additional ``gcov`` output as
++the testing goes on, showing the test coverage percentage numbers per analyzed
++source file. More detailed reports can be obtained by running ``gcov`` command
++on the output files under ``$build_dir/tests/``, please read the ``gcov``
++documentation for more information.
++
++QEMU iotests
++============
++
++QEMU iotests, under the directory ``tests/qemu-iotests``, is the testing
++framework widely used to test block layer related features. It is higher level
++than "make check" tests and 99% of the code is written in bash or Python
++scripts.  The testing success criteria is golden output comparison, and the
++test files are named with numbers.
++
++To run iotests, make sure QEMU is built successfully, then switch to the
++``tests/qemu-iotests`` directory under the build directory, and run ``./check``
++with desired arguments from there.
++
++By default, "raw" format and "file" protocol is used; all tests will be
++executed, except the unsupported ones. You can override the format and protocol
++with arguments:
++
++.. code::
++
++  # test with qcow2 format
++  ./check -qcow2
++  # or test a different protocol
++  ./check -nbd 
++
++It's also possible to list test numbers explicitly:
++
++.. code::
++
++  # run selected cases with qcow2 format
++  ./check -qcow2 001 030 153
++
++Cache mode can be selected with the "-c" option, which may help reveal bugs
++that are specific to certain cache mode.
++
++More options are supported by the ``./check`` script, run ``./check -h`` for
++help.
++
++Writing a new test case
++-----------------------
++
++Consider writing a tests case when you are making any changes to the block
++layer. An iotest case is usually the choice for that. There are already many
++test cases, so it is possible that extending one of them may achieve the goal
++and save the boilerplate to create one.  (Unfortunately, there isn't a 100%
++reliable way to find a related one out of hundreds of tests.  One approach is
++using ``git grep``.)
++
++Usually an iotest case consists of two files. One is an executable that
++produces output to stdout and stderr, the other is the expected reference
++output. They are given the same number in file names. E.g. Test script ``055``
++and reference output ``055.out``.
++
++In rare cases, when outputs differ between cache mode ``none`` and others, a
++``.out.nocache`` file is added. In other cases, when outputs differ between
++image formats, more than one ``.out`` files are created ending with the
++respective format names, e.g. ``178.out.qcow2`` and ``178.out.raw``.
++
++There isn't a hard rule about how to write a test script, but a new test is
++usually a (copy and) modification of an existing case.  There are a few
++commonly used ways to create a test:
++
++* A Bash script. It will make use of several environmental variables related
++  to the testing procedure, and could source a group of ``common.*`` libraries
++  for some common helper routines.
++
++* A Python unittest script. Import ``iotests`` and create a subclass of
++  ``iotests.QMPTestCase``, then call ``iotests.main`` method. The downside of
++  this approach is that the output is too scarce, and the script is considered
++  harder to debug.
++
++* A simple Python script without using unittest module. This could also import
++  ``iotests`` for launching QEMU and utilities etc, but it doesn't inherit
++  from ``iotests.QMPTestCase`` therefore doesn't use the Python unittest
++  execution. This is a combination of 1 and 2.
++
++Pick the language per your preference since both Bash and Python have
++comparable library support for invoking and interacting with QEMU programs. If
++you opt for Python, it is strongly recommended to write Python 3 compatible
++code.
++
++Docker based testing
++====================
++
++Introduction
++------------
++
++Docker testing framework in QEMU utilizes the public Docker images to build and
++test QEMU in predefined and widely accessible Linux environments.  This makes
++it possible to expand the test coverage across distros, toolchain flavors and
++library versions.
++
++Prerequisites
++-------------
++
++Install "docker" with the system package manager and start the Docker service
++on your development machine, then make sure you have the privilege to run
++Docker commands. Typically it means setting up passwordless ``sudo docker``
++command or login as root. For example:
++
++.. code::
++
++  $ sudo yum install docker
++  $ # or `apt-get install docker` for Ubuntu, etc.
++  $ sudo systemctl start docker
++  $ sudo docker ps
++
++The last command should print an empty table, to verify the system is ready.
++
++Quickstart
++----------
++
++From source tree, type ``make docker`` to see the help. A typical Docker
++testing can be started without configuring or building QEMU (``configure`` and
++``make`` are done in the container, with parameters defined by the make
++target):
++
++.. code::
++
++  make docker-test-build@min-glib
++
++This will create a container instance using the ``min-glib`` image (the image
++is downloaded and initialized automatically), in which the ``test-build`` job
++is executed.
++
++Images
++------
++
++Along with many other images, the ``min-glib`` image is defined in a Dockerfile
++in ``tests/docker/dockefiles/``, called ``min-glib.docker``. ``make docker``
++command will list all the available images.
++
++To add a new image, simply create a new ``.docker`` file under the
++``tests/docker/dockerfiles/`` directory.
++
++A ``.pre`` script can be added beside the ``.docker`` file, which will be
++executed before building the image under the build context directory. This is
++mainly used to do necessary host side setup. One such setup is ``binfmt_misc``,
++for example, to make qemu-user powered cross build containers work.
++
++Tests
++-----
++
++Different tests are added to cover various configurations to build and test
++QEMU.  Docker tests are the executables under ``tests/docker`` named
++``test-*``. They are typically shell scripts and are built on top of a shell
++library, ``tests/docker/common.rc``, which provides helpers to find the QEMU
++source and build it.
++
++The full list of tests is printed in the ``make docker`` help.
++
++Tools
++-----
++
++There are executables that are created to run in a specific Docker environment.
++This makes it easy to write scripts that have heavy or special dependencies,
++but are still very easy to use.
++
++Currently the only tool is ``travis``, which mimics the Travis-CI testings in a
++container. It runs in the ``travis`` image:
++
++.. code::
++
++  make docker-travis@travis
++
++Debugging a Docker test failure
++-------------------------------
++
++When CI tasks, maintainers or yourself report a Docker test failure, follow the
++below steps to debug it:
++
++1. Locally reproduce the failure with the reported command line. E.g. run
++   ``make docker-test-mingw@fedora J=8``.
++2. Add "V=1" to the command line, try again, to see the verbose output.
++3. Further add "DEBUG=1" to the command line. This will pause in a shell prompt
++   in the container right before testing starts. You could either manually
++   build QEMU and run tests from there, or press Ctrl-D to let the Docker
++   testing continue.
++4. If you press Ctrl-D, the same building and testing procedure will begin, and
++   will hopefully run into the error again. After that, you will be dropped to
++   the prompt for debug.
++
++Options
++-------
++
++Various options can be used to affect how Docker testings are done. The full
++list is in the ``make docker`` help text. The frequently used ones are:
++
++* ``V=1``: the same as in top level ``make``. It will be propagated to the
++  container and enable verbose output.
++* ``J=$N``: the number of parallel tasks in make commands in the container,
++  similar to the ``-j $N`` option in top level ``make``. (The ``-j`` option in
++  top level ``make`` will not be propagated into the container.)
++* ``DEBUG=1``: enables debug. See the previous "Debugging a Docker test
++  failure" section.
++
++VM testing
++==========
++
++This test suite contains scripts that bootstrap various guest images that have
++necessary packages to build QEMU. The basic usage is documented in ``Makefile``
++help which is displayed with ``make vm-test``.
++
++Quick start
++-----------
++
++Run ``make vm-test`` to list available make targets. Invoke a specific make
++command to run build test in an image. For example, ``make vm-build-freebsd``
++will build the source tree in the FreeBSD image. The command can be executed
++from either the source tree or the build dir; if the former, ``./configure`` is
++not needed. The command will then generate the test image in ``./tests/vm/``
++under the working directory.
++
++Note: images created by the scripts accept a well-known RSA key pair for SSH
++access, so they SHOULD NOT be exposed to external interfaces if you are
++concerned about attackers taking control of the guest and potentially
++exploiting a QEMU security bug to compromise the host.
++
++QEMU binary
++-----------
++
++By default, qemu-system-x86_64 is searched in $PATH to run the guest. If there
++isn't one, or if it is older than 2.10, the test won't work. In this case,
++provide the QEMU binary in env var: ``QEMU=/path/to/qemu-2.10+``.
++
++Make jobs
++---------
++
++The ``-j$X`` option in the make command line is not propagated into the VM,
++specify ``J=$X`` to control the make jobs in the guest.
++
++Debugging
++---------
++
++Add ``DEBUG=1`` and/or ``V=1`` to the make command to allow interactive
++debugging and verbose output. If this is not enough, see the next section.
++
++Manual invocation
++-----------------
++
++Each guest script is an executable script with the same command line options.
++For example to work with the netbsd guest, use ``$QEMU_SRC/tests/vm/netbsd``:
++
++.. code::
++
++    $ cd $QEMU_SRC/tests/vm
++
++    # To bootstrap the image
++    $ ./netbsd --build-image --image /var/tmp/netbsd.img
++    <...>
++
++    # To run an arbitrary command in guest (the output will not be echoed unless
++    # --debug is added)
++    $ ./netbsd --debug --image /var/tmp/netbsd.img uname -a
++
++    # To build QEMU in guest
++    $ ./netbsd --debug --image /var/tmp/netbsd.img --build-qemu $QEMU_SRC
++
++    # To get to an interactive shell
++    $ ./netbsd --interactive --image /var/tmp/netbsd.img sh
++
++Adding new guests
++-----------------
++
++Please look at existing guest scripts for how to add new guests.
++
++Most importantly, create a subclass of BaseVM and implement ``build_image()``
++method and define ``BUILD_SCRIPT``, then finally call ``basevm.main()`` from
++the script's ``main()``.
++
++* Usually in ``build_image()``, a template image is downloaded from a
++  predefined URL. ``BaseVM._download_with_cache()`` takes care of the cache and
++  the checksum, so consider using it.
++
++* Once the image is downloaded, users, SSH server and QEMU build deps should
++  be set up:
++
++  - Root password set to ``BaseVM.ROOT_PASS``
++  - User ``BaseVM.GUEST_USER`` is created, and password set to
++    ``BaseVM.GUEST_PASS``
++  - SSH service is enabled and started on boot,
++    ``$QEMU_SRC/tests/keys/id_rsa.pub`` is added to ssh's ``authorized_keys``
++    file of both root and the normal user
++  - DHCP client service is enabled and started on boot, so that it can
++    automatically configure the virtio-net-pci NIC and communicate with QEMU
++    user net (10.0.2.2)
++  - Necessary packages are installed to untar the source tarball and build
++    QEMU
++
++* Write a proper ``BUILD_SCRIPT`` template, which should be a shell script that
++  untars a raw virtio-blk block device, which is the tarball data blob of the
++  QEMU source tree, then configure/build it. Running "make check" is also
++  recommended.
++
++Image fuzzier testing
++=====================
++
++An image fuzzier was added to exercise format drivers. Currently only qcow2 is
++supported. To start the fuzzier, run
++
++.. code::
++
++  tests/image-fuzzer/runner.py -c '[["qemu-img", "info", "$test_img"]]' /tmp/test qcow2
++
++Alternatively, some command different from "qemu-img info" can be tested, by
++changing the ``-c`` option.
 -- 
 2.14.3
