@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1eg3TS-0006dN-Ar
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 02:03:27 -0500
+	(envelope-from <a.perevalov@samsung.com>) id 1eg3wq-0005Wb-T6
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 02:33:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1eg3TM-0000SL-2Y
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 02:03:26 -0500
-Received: from mga02.intel.com ([134.134.136.20]:52191)
+	(envelope-from <a.perevalov@samsung.com>) id 1eg3wn-0007Po-NR
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 02:33:48 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:47860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1eg3TL-0000RY-Mg
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 02:03:20 -0500
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Mon, 29 Jan 2018 07:03:13 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E9614F@SHSMSX101.ccr.corp.intel.com>
-References: <1516904751-10248-1-git-send-email-luwei.kang@intel.com>
-	<20180126191410.GJ25150@localhost.localdomain>
-In-Reply-To: <20180126191410.GJ25150@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] i386: Add Intel Processor Trace
- feature support
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1eg3wn-0007Ml-5E
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 02:33:45 -0500
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <c35dba2f-7708-533a-1b44-b50a580f8dad@samsung.com>
+Date: Mon, 29 Jan 2018 10:33:36 +0300
+MIME-version: 1.0
+In-reply-to: <20180126181437.GH2610@work-vm>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1516982720-26501-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20180126160531eucas1p2e972758feaca9f6d174e6399aca78c81@eucas1p2.samsung.com>
+	<1516982720-26501-2-git-send-email-a.perevalov@samsung.com>
+	<20180126181437.GH2610@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2] migration: change blocktime type to
+ uint32_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,201 +32,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, quintela@redhat.com, f4bug@amsat.org, ash.billore@samsung.com
 
-> > From: Chao Peng <chao.p.peng@linux.intel.com>
-> >
-> > Expose Intel Processor Trace feature to guest.
-> >
-> > In order to make this feature migration-safe, new feature word
-> > information "FEAT_INTEL_PT_EBX" and "FEAT_INTEL_PT_ECX" be added.
-> > Some constant value initialized in CPUID[0x14].0x01 to guarantee get
-> > same result in diffrent hardware when this feature is enabled.
-> >
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-> > ---
-> > v1->v2:
-> >  - In order to make this feature migration-safe, new feature word
-> >    information "FEAT_INTEL_PT_EBX" and "FEAT_INTEL_PT_ECX" be added.
-> >    Some constant value initialized in CPUID[0x14].0x01 to guarantee
-> >    get same result in diffrent hardware when this feature is enabled.
-> >
-> > ---
-> >  target/i386/cpu.c | 68
-> > +++++++++++++++++++++++++++++++++++++++++++++++++++++--
-> >  target/i386/cpu.h |  6 +++++
-> >  target/i386/kvm.c | 23 +++++++++++++++++++
-> >  3 files changed, 95 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
-> > a49d222..ee8c6e6 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -172,7 +172,11 @@
-> >  #define L2_ITLB_4K_ASSOC       4
-> >  #define L2_ITLB_4K_ENTRIES   512
-> >
-> > -
-> > +/* CPUID Leaf 0x14 constants: */
-> > +#define INTLE_PT_ADDR_RANGES_NUM 2
-> > +#define INTEL_PT_MTC_BITMAP      (0x0249 << 16) /* Support ART(0,3,6,9=
-) */
-> > +#define INTEL_PT_CYCLE_BITMAP    0x3fff         /* Support 0,2^(0~12) =
-*/
-> > +#define INTEL_PT_PSB_BITMAP      (0x003f << 16) /* Support 2K,4K,8K,16=
-K,32K,64K */
-> >
-> >  static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
-> >                                       uint32_t vendor2, uint32_t
-> > vendor3) @@ -427,7 +431,7 @@ static FeatureWordInfo feature_word_info[F=
-EATURE_WORDS] =3D {
-> >              NULL, NULL, "mpx", NULL,
-> >              "avx512f", "avx512dq", "rdseed", "adx",
-> >              "smap", "avx512ifma", "pcommit", "clflushopt",
-> > -            "clwb", NULL, "avx512pf", "avx512er",
-> > +            "clwb", "intel-pt", "avx512pf", "avx512er",
-> >              "avx512cd", "sha-ni", "avx512bw", "avx512vl",
-> >          },
-> >          .cpuid_eax =3D 7,
-> > @@ -545,6 +549,38 @@ static FeatureWordInfo feature_word_info[FEATURE_W=
-ORDS] =3D {
-> >          .cpuid_reg =3D R_EDX,
-> >          .tcg_features =3D ~0U,
-> >      },
-> > +    [FEAT_INTEL_PT_EBX] =3D {
-> > +        .feat_names =3D {
-> > +            "cr3-filter", "psb-cycle", "filtering", "mtc-cofi",
-> > +            "ptwrite", "power-evt", NULL, NULL,
->=20
-> Note that this will make all those bits configurable on the command-line.=
-  You don't really need to do this in the first version, if you
-> don't really want to.
->=20
-> Also, if we want to make this configurable, we will need to choose carefu=
-lly the property names, because changing them later would
-> be more difficult.
->=20
-> Note that the feature names live in a single QOM property namespace, so "=
-filtering", "any-entries" and "transport" are probably too
-> generic.  Maybe we could prefix all names here with "intel-pt-" or "pt-"?
->=20
-> If you don't want to make all bits configurable on the first version, you=
- can fill the CPUID[14h] bits with constant default values just
-> like you did with the INTEL_PT_* constants below.
->=20
+On 01/26/2018 09:14 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> Initially int64_t was used, but on PowerPC architecture,
+>> clang doesn't have atomic_*_8 function, so it produces
+>> link time error.
+>>
+>> QEMU is working with time as with 64bit value, but by
+>> fact 32 bit is enough with CLOCK_REALTIME. In this case
+>> blocktime will keep only 1200 hours time interval.
+>>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> Acked-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   hmp.c                    |  4 ++--
+>>   migration/postcopy-ram.c | 37 ++++++++++++++++++++-----------------
+>>   migration/trace-events   |  4 ++--
+>>   qapi/migration.json      |  4 ++--
+>>   4 files changed, 26 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index c6bab53..3c376b3 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -265,7 +265,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>       }
+>>   
+>>       if (info->has_postcopy_blocktime) {
+>> -        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
+>> +        monitor_printf(mon, "postcopy blocktime: %u\n",
+>>                          info->postcopy_blocktime);
+>>       }
+>>   
+>> @@ -273,7 +273,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>           Visitor *v;
+>>           char *str;
+>>           v = string_output_visitor_new(false, &str);
+>> -        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>> +        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>>           visit_complete(v, &str);
+>>           monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
+>>           g_free(str);
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index 7814da5..bd08c24 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -63,14 +63,14 @@ struct PostcopyDiscardState {
+>>   
+>>   typedef struct PostcopyBlocktimeContext {
+>>       /* time when page fault initiated per vCPU */
+>> -    int64_t *page_fault_vcpu_time;
+>> +    uint32_t *page_fault_vcpu_time;
+>>       /* page address per vCPU */
+>>       uintptr_t *vcpu_addr;
+>> -    int64_t total_blocktime;
+>> +    uint32_t total_blocktime;
+>>       /* blocktime per vCPU */
+>> -    int64_t *vcpu_blocktime;
+>> +    uint32_t *vcpu_blocktime;
+>>       /* point in time when last page fault was initiated */
+>> -    int64_t last_begin;
+>> +    uint32_t last_begin;
+>>       /* number of vCPU are suspended */
+>>       int smp_cpus_down;
+>>   
+>> @@ -99,22 +99,22 @@ static void migration_exit_cb(Notifier *n, void *data)
+>>   static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>>   {
+>>       PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+>> -    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
+>> +    ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
+>>       ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
+>> -    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
+>> +    ctx->vcpu_blocktime = g_new0(uint32_t, smp_cpus);
+>>   
+>>       ctx->exit_notifier.notify = migration_exit_cb;
+>>       qemu_add_exit_notifier(&ctx->exit_notifier);
+>>       return ctx;
+>>   }
+>>   
+>> -static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>> +static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>>   {
+>> -    int64List *list = NULL, *entry = NULL;
+>> +    uint32List *list = NULL, *entry = NULL;
+>>       int i;
+>>   
+>>       for (i = smp_cpus - 1; i >= 0; i--) {
+>> -        entry = g_new0(int64List, 1);
+>> +        entry = g_new0(uint32List, 1);
+>>           entry->value = ctx->vcpu_blocktime[i];
+>>           entry->next = list;
+>>           list = entry;
+>> @@ -145,7 +145,7 @@ void fill_destination_postcopy_migration_info(MigrationInfo *info)
+>>       info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
+>>   }
+>>   
+>> -static uint64_t get_postcopy_total_blocktime(void)
+>> +static uint32_t get_postcopy_total_blocktime(void)
+>>   {
+>>       MigrationIncomingState *mis = migration_incoming_get_current();
+>>       PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
+>> @@ -634,6 +634,7 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>>       MigrationIncomingState *mis = migration_incoming_get_current();
+>>       PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+>>       int64_t now_ms;
+>> +    uint32_t least_now;
+>>   
+>>       if (!dc || ptid == 0) {
+>>           return;
+>> @@ -644,13 +645,14 @@ static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
+>>       }
+>>   
+>>       now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> +    least_now = (uint32_t)now_ms;
+>>       if (dc->vcpu_addr[cpu] == 0) {
+>>           atomic_inc(&dc->smp_cpus_down);
+>>       }
+>>   
+>> -    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+>> -    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+>> -    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+>> +    atomic_xchg(&dc->last_begin, least_now);
+>> +    atomic_xchg(&dc->page_fault_vcpu_time[cpu], least_now);
+>> +    atomic_xchg(&dc->vcpu_addr[cpu], addr);
+>>   
+>>       /* check it here, not at the begining of the function,
+>>        * due to, check could accur early than bitmap_set in
+>> @@ -699,20 +701,21 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>>       int i, affected_cpu = 0;
+>>       int64_t now_ms;
+>>       bool vcpu_total_blocktime = false;
+>> -    int64_t read_vcpu_time;
+>> +    uint32_t read_vcpu_time, least_now;
+>>   
+>>       if (!dc) {
+>>           return;
+>>       }
+>>   
+>>       now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> +    least_now = now_ms & 0xffffffff;
+> That doesn't solve the problem of wrap around that I pointed out.
+sorry, I didn't catch the idea,
+I'll continue in previous thread, due to I have some
+questions.
+>
+> Dave
+>
+>>       /* lookup cpu, to clear it,
+>>        * that algorithm looks straighforward, but it's not
+>>        * optimal, more optimal algorithm is keeping tree or hash
+>>        * where key is address value is a list of  */
+>>       for (i = 0; i < smp_cpus; i++) {
+>> -        uint64_t vcpu_blocktime = 0;
+>> +        uint32_t vcpu_blocktime = 0;
+>>   
+>>           read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+>>           if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
+>> @@ -720,7 +723,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>>               continue;
+>>           }
+>>           atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+>> -        vcpu_blocktime = now_ms - read_vcpu_time;
+>> +        vcpu_blocktime = least_now - read_vcpu_time;
+>>           affected_cpu += 1;
+>>           /* we need to know is that mark_postcopy_end was due to
+>>            * faulted page, another possible case it's prefetched
+>> @@ -735,7 +738,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+>>   
+>>       atomic_sub(&dc->smp_cpus_down, affected_cpu);
+>>       if (vcpu_total_blocktime) {
+>> -        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+>> +        dc->total_blocktime += least_now - atomic_fetch_add(&dc->last_begin, 0);
+>>       }
+>>       trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
+>>                                         affected_cpu);
+>> diff --git a/migration/trace-events b/migration/trace-events
+>> index 141e773..0defbc3 100644
+>> --- a/migration/trace-events
+>> +++ b/migration/trace-events
+>> @@ -115,8 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>>   process_incoming_migration_co_postcopy_end_main(void) ""
+>>   migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>>   migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+>> -mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", cpu: %d, already_received: %d"
+>> -mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected_cpu: %d"
+>> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
+>> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
+>>   
+>>   # migration/rdma.c
+>>   qemu_rdma_accept_incoming_migration(void) ""
+>> diff --git a/qapi/migration.json b/qapi/migration.json
+>> index 70e7b67..ee55d7c 100644
+>> --- a/qapi/migration.json
+>> +++ b/qapi/migration.json
+>> @@ -175,8 +175,8 @@
+>>              '*setup-time': 'int',
+>>              '*cpu-throttle-percentage': 'int',
+>>              '*error-desc': 'str',
+>> -           '*postcopy-blocktime' : 'int64',
+>> -           '*postcopy-vcpu-blocktime': ['int64']} }
+>> +           '*postcopy-blocktime' : 'uint32',
+>> +           '*postcopy-vcpu-blocktime': ['uint32']} }
+>>   
+>>   ##
+>>   # @query-migrate:
+>> -- 
+>> 2.7.4
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
 
-Agree, I think it is too complex to make all Intel PT sub-feature configura=
-ble in command line. We also need make some short and clear enough property=
- names for each sub-feature.
-
->=20
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +        },
-> > +        .cpuid_eax =3D 0x14,
-> > +        .cpuid_needs_ecx =3D true, .cpuid_ecx =3D 0,
-> > +        .cpuid_reg =3D R_EBX,
-> > +        .tcg_features =3D ~0U,
->=20
-> TCG doesn't implement this feature, so ~0U doesn't look right.
->=20
->=20
-> > +    },
-> > +    [FEAT_INTEL_PT_ECX] =3D {
-> > +        .feat_names =3D {
-> > +            "topa-output", "any-entries", "single-range", "transport",
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +            NULL, NULL, NULL, NULL,
-> > +        },
-> > +        .cpuid_eax =3D 0x14,
-> > +        .cpuid_needs_ecx =3D true, .cpuid_ecx =3D 0,
-> > +        .cpuid_reg =3D R_ECX,
-> > +        .tcg_features =3D ~0U,
->=20
-> Same as above.
->=20
-> > +    },
-> >  };
-> >
-> >  typedef struct X86RegisterInfo32 {
-> > @@ -3452,6 +3488,34 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t in=
-dex, uint32_t count,
-> >          }
-> >          break;
-> >      }
-> > +    case 0x14: {
-> > +	/* Intel Processor Trace Enumeration */
-> > +        *eax =3D 0;
-> > +        *ebx =3D 0;
-> > +        *ecx =3D 0;
-> > +        *edx =3D 0;
-> > +        if (!(env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) ||
-> > +             !kvm_enabled()) {
-> > +            break;
-> > +        }
-> > +
-> > +        if (count =3D=3D 0) {
-> > +            *eax =3D 1;
-> > +            *ebx =3D env->features[FEAT_INTEL_PT_EBX];
-> > +            *ecx =3D env->features[FEAT_INTEL_PT_ECX];
-> > +        } else if (count =3D=3D 1) {
-> > +            *eax =3D INTLE_PT_ADDR_RANGES_NUM;
-> > +            if (env->features[FEAT_INTEL_PT_EBX] &
-> > +                    CPUID_INTEL_PT_EBX_MTC_COFI) {
-> > +                *eax |=3D INTEL_PT_MTC_BITMAP;
-> > +            }
-> > +            if (env->features[FEAT_INTEL_PT_EBX] &
-> > +                    CPUID_INTEL_PT_EBX_PSB_CYCLE) {
-> > +                *ebx =3D INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP;
-> > +            }
->=20
-> We still need to validate the bitmaps and number of ranges against the ho=
-st capabilities (reported on GET_SUPPORTED_CPUID),
-> don't we?
-
-Yes, we need to validate the bitmaps and number of ranges against the host =
-capabilities. For example,  MSR_IA32_RTIT_CTL.MTCFreq only support the valu=
-e defined in bitmap or will cause #GP fault.
-
->=20
-> If you are going to set CPUID bits that are not already present on env->f=
-eatures[], you will want x86_cpu_filter_features() to
-> manually validate the constants against x86_cpu_get_supported_feature_wor=
-d(), to ensure we won't try to enable unsupported
-> bits.
->=20
-> (If doing that, we need to make sure CPUID_7_0_EBX_INTEL_PT will be set o=
-n xc->filtered_features[FEAT_7_0_EBX] if something is
-> unsupported, to tell the calling code that intel-pt can't be enabled on t=
-he current host)
->=20
-
-So, Can I make all the value in CPUID[14] as constant and make the CPUID in=
-formation get from IceLake hardware as default(minimal) value.
-CPUID[14] available only when Intel PT is supported and enabled.
-We also need to check the host value by kvm_arch_get_supported_cpuid().  If=
- something is unsupported in minimal value Intel PT can't be enabled.  I di=
-dn't use x86_cpu_get_supported_feature_word() because the value of CPUID[14=
-] will all be constant hence sub-leaf FEAT_INTEL_PT_EBX/ FEAT_INTEL_PT_ECX =
-are unnecessary(will remove in next version).
-Please help correct me if anything wrong.
-
-Thanks,
-Luwei Kang
-
-> In the future we could extend FeatureWordInfo to make it easier to handle=
- counter/bitmap fields like those, then we won't need
-> special cases inside x86_cpu_filter_features().
->=20
->=20
+-- 
+Best regards,
+Alexey Perevalov
