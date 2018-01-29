@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eg6TD-0002iN-Lc
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:15:24 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eg6XV-0003yz-4x
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eg6T8-0001rm-M1
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:15:23 -0500
-References: <1516732013-18272-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1516732013-18272-9-git-send-email-walling@linux.vnet.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <cc08c79e-a579-e833-c9a7-7476d7e5b328@redhat.com>
-Date: Mon, 29 Jan 2018 11:15:15 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1eg6XP-0006JL-FE
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:19:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eg6XP-0006HS-9P
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:19:43 -0500
+Date: Mon, 29 Jan 2018 10:19:36 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180129101935.GB2408@work-vm>
+References: <20180124212246.2352-1-wei@redhat.com>
+	<20180125200525.GC2442@work-vm>
+	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
+	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
+	<20180126194559.GI2610@work-vm>
+	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
+	<20180129095330.GA2408@work-vm>
+	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1516732013-18272-9-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 08/10] s390-ccw: print zipl
- boot menu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, thuth@redhat.com, cohuck@redhat.com, alifm@linux.vnet.ibm.com, borntraeger@de.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
 
-On 23.01.2018 19:26, Collin L. Walling wrote:
-> When the boot menu options are present and the guest's
-> disk has been configured by the zipl tool, then the user
-> will be presented with an interactive boot menu with
-> labeled entries. An example of what the menu might look
-> like:
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> > * Peter Maydell (peter.maydell@linaro.org) wrote:
+> >> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> >> > * Peter Maydell (peter.maydell@linaro.org) wrote:
+> >> >> I think the correct fix here is that your test code should turn
+> >> >> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
+> >> >> for Arm KVM guests (for the same reason that VGA device video memory
+> >> >> doesn't work). If it's RAM your guest has to arrange to map it as
+> >> >> Normal Cacheable, and then everything should work fine.
+> >> >
+> >> > Does this cause problems with migrating at just the wrong point during
+> >> > a VM boot?
+> >>
+> >> It wouldn't surprise me if it did, but I don't think I've ever
+> >> tried to provoke that problem...
+> >
+> > If you think it'll get the RAM contents wrong, it might be best to fail
+> > the migration if you can detect the cache is disabled in the guest.
 > 
-> zIPL v1.37.1-build-20170714 interactive boot menu.
+> I guess QEMU could look at the value of the "MMU disabled/enabled" bit
+> in the guest's system registers, and refuse migration if it's off...
 > 
->   0. default (linux-4.13.0)
-> 
->   1. linux-4.13.0
->   2. performance
->   3. kvm
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> ---
->  pc-bios/s390-ccw/menu.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 50 insertions(+), 1 deletion(-)
-> 
-> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-> index de12c73..174285e 100644
-> --- a/pc-bios/s390-ccw/menu.c
-> +++ b/pc-bios/s390-ccw/menu.c
-> @@ -10,13 +10,62 @@
->   */
->  
->  #include "menu.h"
-> +#include "s390-ccw.h"
->  
->  static uint8_t flags;
->  static uint64_t timeout;
->  
-> +/* Offsets from zipl fields to zipl banner start */
-> +#define ZIPL_TIMEOUT_OFFSET 138
-> +#define ZIPL_FLAG_OFFSET    140
-> +
-> +static int get_boot_index(int entries)
-> +{
-> +    return 0; /* Implemented next patch */
-> +}
-> +
-> +static void zipl_println(const char *data, size_t len)
-> +{
-> +    char buf[len + 2];
-> +
-> +    ebcdic_to_ascii(data, buf, len);
-> +    buf[len] = '\n';
-> +    buf[len + 1] = '\0';
-> +
-> +    sclp_print(buf);
-> +}
-> +
->  int menu_get_zipl_boot_index(const void *stage2, int offset)
->  {
-> -    return 0; /* implemented next patch */
-> +    const char *data = stage2 + offset;
-> +    uint16_t flag;
-> +    size_t len;
-> +    int ct;
-> +
-> +    flag = *(uint16_t *)(data - ZIPL_FLAG_OFFSET);
+> (cc'd Marc, Christoffer to check that I don't have the wrong end
+> of the stick about how thin the ice is in the period before the
+> guest turns on its MMU...)
 
-You could initialize this directly above or after you verified (flags &
-BOOT_MENU_FLAG_ZIPL_OPTS)
+OK; I mean it's not nice either way - but a failed migration is better
+than one with corrupt RAM.
 
-> +
-> +    if (flags & BOOT_MENU_FLAG_ZIPL_OPTS) {
-> +        if (flag) {
-> +            timeout = *(uint16_t *)(data - ZIPL_TIMEOUT_OFFSET);
-> +        } else {
+It's not pretty for cloud users; they do host-evacuations and the like
+fully automatically without any knowledge of the state of a VM and hope
+for migrations to work in any state.
 
-You can drop the else and return directly.
+Dave
 
-> +            return 0; /* Boot default */
-> +        }
-> +    }
-> +
-> +    /* Print and count all menu items, including the banner */
-> +    for (ct = 0; *data; ct++) {
-> +        len = strlen(data);
-> +        zipl_println(data, len);
-> +        data += len + 1;
-> +
-> +        if (ct < 2) {
-> +            sclp_print("\n");
-> +        }
-> +    }
-> +
-> +    sclp_print("\n");
-> +
-> +    return get_boot_index(ct - 1);
->  }
->  
->  void menu_set_parms(uint8_t boot_menu_flag, uint16_t boot_menu_timeout)
-> 
-
-Looks good to me!
-
--- 
-
-Thanks,
-
-David / dhildenb
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
