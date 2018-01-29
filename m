@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1egDRX-0005eL-Ov
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:11 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1egDRR-0003Py-O3
+	(envelope-from <brijesh.singh@amd.com>) id 1egDRR-0005YL-5E
 	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:07 -0500
-Received: from mail-dm3nam03on0065.outbound.protection.outlook.com
-	([104.47.41.65]:35224
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <brijesh.singh@amd.com>) id 1egDRN-0003L3-4L
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:01 -0500
+Received: from mail-dm3nam03on0061.outbound.protection.outlook.com
+	([104.47.41.61]:15872
 	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1egDRR-0003Ol-Ex
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:01 -0500
+	id 1egDRM-0003Je-Ub
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:41:57 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 29 Jan 2018 11:41:17 -0600
-Message-Id: <20180129174132.108925-9-brijesh.singh@amd.com>
+Date: Mon, 29 Jan 2018 11:41:14 -0600
+Message-Id: <20180129174132.108925-6-brijesh.singh@amd.com>
 In-Reply-To: <20180129174132.108925-1-brijesh.singh@amd.com>
 References: <20180129174132.108925-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 08/23] docs: add AMD Secure Encrypted
- Virtualization (SEV)
+Subject: [Qemu-devel] [PATCH v6 05/23] target/i386: add memory encryption
+ feature cpuid support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +30,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
 
-Create a documentation entry to describe the AMD Secure Encrypted
-Virtualization (SEV) feature.
+AMD EPYC processors support memory encryption feature. The feature
+is reported through CPUID 8000_001F[EAX].
+
+Fn8000_001F [EAX]:
+ Bit 0   Secure Memory Encryption (SME) supported
+ Bit 1   Secure Encrypted Virtualization (SEV) supported
+ Bit 2   Page flush MSR supported
+ Bit 3   Ecrypted State (SEV-ES) support
+
+when memory encryption feature is reported, CPUID 8000_001F[EBX] should
+provide additional information regarding the feature (such as which page
+table bit is used to mark pages as encrypted etc). The information in EBX
+and ECX may vary from one family to another hence we use the host cpuid
+to populate the EBX information.
+
+The details for memory encryption CPUID is available in AMD APM
+(http://support.amd.com/TechDocs/24593.pdf) Section 15.34.1
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- docs/amd-memory-encryption.txt | 92 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
- create mode 100644 docs/amd-memory-encryption.txt
+ target/i386/cpu.c | 36 ++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h |  6 ++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
-new file mode 100644
-index 000000000000..72a92b6c6353
---- /dev/null
-+++ b/docs/amd-memory-encryption.txt
-@@ -0,0 +1,92 @@
-+Secure Encrypted Virtualization (SEV) is a feature found on AMD processors.
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index a49d2221adc9..4147eb6e18a9 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -234,6 +234,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+ #define TCG_EXT4_FEATURES 0
+ #define TCG_SVM_FEATURES 0
+ #define TCG_KVM_FEATURES 0
++#define TCG_MEM_ENCRYPT_FEATURES 0
+ #define TCG_7_0_EBX_FEATURES (CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_SMAP | \
+           CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ADX | \
+           CPUID_7_0_EBX_PCOMMIT | CPUID_7_0_EBX_CLFLUSHOPT |            \
+@@ -545,6 +546,20 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .cpuid_reg = R_EDX,
+         .tcg_features = ~0U,
+     },
++    [FEAT_MEM_ENCRYPT] = {
++        .feat_names = {
++            "sme", "sev", "page-flush-msr", "sev-es",
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid_eax = 0x8000001F, .cpuid_reg = R_EAX,
++        .tcg_features = TCG_MEM_ENCRYPT_FEATURES,
++    }
+ };
+ 
+ typedef struct X86RegisterInfo32 {
+@@ -1965,6 +1980,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_XSAVE_XGETBV1,
+         .features[FEAT_6_EAX] =
+             CPUID_6_EAX_ARAT,
++        /* Missing: SEV_ES */
++        .features[FEAT_MEM_ENCRYPT] =
++            CPUID_8000_001F_EAX_SME | CPUID_8000_001F_EAX_SEV,
+         .xlevel = 0x8000000A,
+         .model_id = "AMD EPYC Processor",
+     },
+@@ -3589,6 +3607,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *edx = 0;
+         }
+         break;
++    case 0x8000001F:
++        if (env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_SEV) {
++            *eax = env->features[FEAT_MEM_ENCRYPT];
++            host_cpuid(0x8000001F, 0, NULL, ebx, NULL, NULL);
++            *ecx = 0;
++            *edx = 0;
++        } else {
++            *eax = 0;
++            *ebx = 0;
++            *ecx = 0;
++            *edx = 0;
++        }
++        break;
+     case 0xC0000000:
+         *eax = env->cpuid_xlevel2;
+         *ebx = 0;
+@@ -4036,10 +4067,15 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+         x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
++        x86_cpu_adjust_feat_level(cpu, FEAT_MEM_ENCRYPT);
+         /* SVM requires CPUID[0x8000000A] */
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+         }
++        /* SEV requires CPUID[0x8000001F] */
++        if ((env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_SEV)) {
++            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
++        }
+     }
+ 
+     /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index f91e37d25dea..f7a0ab20fdd1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -483,6 +483,7 @@ typedef enum FeatureWord {
+     FEAT_6_EAX,         /* CPUID[6].EAX */
+     FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
+     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
++    FEAT_MEM_ENCRYPT,   /* CPUID[8000_001F].EAX */
+     FEATURE_WORDS,
+ } FeatureWord;
+ 
+@@ -679,6 +680,11 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ 
+ #define CPUID_6_EAX_ARAT       (1U << 2)
+ 
++#define CPUID_8000_001F_EAX_SME             (1U << 0) /* SME */
++#define CPUID_8000_001F_EAX_SEV             (1U << 1) /* SEV */
++#define CPUID_8000_001F_EAX_PAGE_FLUSH_MSR  (1U << 2) /* Page flush MSR */
++#define CPUID_8000_001F_EAX_SEV_ES          (1U << 3) /* SEV-ES */
 +
-+SEV is an extension to the AMD-V architecture which supports running encrypted
-+virtual machine (VMs) under the control of KVM. Encrypted VMs have their pages
-+(code and data) secured such that only the guest itself has access to the
-+unencrypted version. Each encrypted VM is associated with a unique encryption
-+key; if its data is accessed to a different entity using a different key the
-+encrypted guests data will be incorrectly decrypted, leading to unintelligible
-+data.
-+
-+The key management of this feature is handled by separate processor known as
-+AMD secure processor (AMD-SP) which is present in AMD SOCs. Firmware running
-+inside the AMD-SP provide commands to support common VM lifecycle. This
-+includes commands for launching, snapshotting, migrating and debugging the
-+encrypted guest. Those SEV command can be issued via KVM_MEMORY_ENCRYPT_OP
-+ioctls.
-+
-+Launching
-+---------
-+Boot images (such as bios) must be encrypted before guest can be booted.
-+MEMORY_ENCRYPT_OP ioctl provides commands to encrypt the images :LAUNCH_START,
-+LAUNCH_UPDATE_DATA, LAUNCH_MEASURE and LAUNCH_FINISH. These four commands
-+together generate a fresh memory encryption key for the VM, encrypt the boot
-+images and provide a measurement than can be used as an attestation of the
-+successful launch.
-+
-+LAUNCH_START is called first to create a cryptographic launch context within
-+the firmware. To create this context, guest owner must provides guest policy,
-+its public Diffie-Hellman key (PDH) and session parameters. These inputs
-+should be treated as binary blob and must be passed as-is to the SEV firmware.
-+
-+The guest policy is passed as plaintext and hypervisor may able to read it
-+but should not modify it (any modification of the policy bits will result
-+in bad measurement). The guest policy is a 4-byte data structure containing
-+several flags that restricts what can be done on running SEV guest.
-+See KM Spec section 3 and 6.2 for more details.
-+
-+Guest owners provided DH certificate and session parameters will be used to
-+establish a cryptographic session with the guest owner to negotiate keys used
-+for the attestation.
-+
-+LAUNCH_UPDATE_DATA encrypts the memory region using the cryptographic context
-+created via LAUNCH_START command. If required, this command can be called
-+multiple times to encrypt different memory regions. The command also calculates
-+the measurement of the memory contents as it encrypts.
-+
-+LAUNCH_MEASURE command can be used to retrieve the measurement of encrypted
-+memory. This measurement is a signature of the memory contents that can be
-+sent to the guest owner as an attestation that the memory was encrypted
-+correctly by the firmware. The guest owner may wait to provide the guest
-+confidential information until it can verify the attestation measurement.
-+Since the guest owner knows the initial contents of the guest at boot, the
-+attestation measurement can be verified by comparing it to what the guest owner
-+expects.
-+
-+LAUNCH_FINISH command finalizes the guest launch and destroy's the cryptographic
-+context.
-+
-+See SEV KM API Spec [1] 'Launching a guest' usage flow (Appendix A) for the
-+complete flow chart.
-+
-+Debugging
-+-----------
-+Since memory contents of SEV guest is encrypted hence hypervisor access to the
-+guest memory will get a cipher text. If guest policy allows debugging, then
-+hypervisor can use DEBUG_DECRYPT and DEBUG_ENCRYPT commands access the guest
-+memory region for debug purposes.
-+
-+Snapshot/Restore
-+-----------------
-+TODO
-+
-+Live Migration
-+----------------
-+TODO
-+
-+References
-+-----------------
-+
-+AMD Memory Encryption whitepaper:
-+http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
-+
-+Secure Encrypted Virutualization Key Management:
-+[1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
-+
-+KVM Forum slides:
-+http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
-+
-+AMD64 Architecture Programmer's Manual:
-+   http://support.amd.com/TechDocs/24593.pdf
-+   SME is section 7.10
-+   SEV is section 15.34
+ /* CPUID[0x80000007].EDX flags: */
+ #define CPUID_APM_INVTSC       (1U << 8)
+ 
 -- 
 2.9.5
