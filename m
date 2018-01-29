@@ -1,26 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1egDRt-0005xQ-Ig
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:31 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egDS0-000640-SV
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1egDRp-0003mG-Ge
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:29 -0500
-Received: from mail-dm3nam03on0070.outbound.protection.outlook.com
-	([104.47.41.70]:22464
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egDRv-0003pu-TD
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1egDRp-0003ko-1Y
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:25 -0500
-From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 29 Jan 2018 11:41:31 -0600
-Message-Id: <20180129174132.108925-23-brijesh.singh@amd.com>
-In-Reply-To: <20180129174132.108925-1-brijesh.singh@amd.com>
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1egDRv-0003p1-99
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:42:31 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0THg3N6142713
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:42:27 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ft7j02rfn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:42:24 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 29 Jan 2018 12:41:09 -0500
+References: <20180129123227.15778-1-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 29 Jan 2018 12:41:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 22/23] target/i386: clear C-bit when walking
- SEV guest page table
+In-Reply-To: <20180129123227.15778-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <3c1355ed-57af-d023-8da3-21f1600ee018@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tpm: fix alignment issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,402 +40,371 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-In SEV-enabled guest the pte entry will have C-bit set, we need to
-clear the C-bit when walking the page table. The C-bit position should
-be available in cpuid Fn8000_001f[EBX]
+On 01/29/2018 07:32 AM, Marc-Andr=C3=A9 Lureau wrote:
+> The new tpm-crb-test fails on sparc host:
+>
+> TEST: tests/tpm-crb-test... (pid=3D230409)
+>    /i386/tpm-crb/test:
+> Broken pipe
+> FAIL
+> GTester: last random seed: R02S29cea50247fe1efa59ee885a26d51a85
+> (pid=3D230423)
+> FAIL: tests/tpm-crb-test
+>
+> and generates a new clang sanitizer runtime warning:
+>
+> /home/petmay01/linaro/qemu-for-merges/hw/tpm/tpm_util.h:36:24: runtime
+> error: load of misaligned address 0x7fdc24c00002 for type 'const
+> uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
+> 0x7fdc24c00002: note: pointer points here
+> <memory cannot be printed>
+>
+> The sparc architecture does not allow misaligned loads and will
+> segfault if you try them.  For example, this function:
+>
+> static inline uint32_t tpm_cmd_get_size(const void *b)
+> {
+>      return be32_to_cpu(*(const uint32_t *)(b + 2));
+> }
+>
+> Should read,
+>      return ldl_be_p(b + 2);
+>
+> As a general rule you can't take an arbitrary pointer into a byte
+> buffer and try to interpret it as a structure or a pointer to a
+> larger-than-bytesize-data simply by casting the pointer.
+>
+> Use this clean up as an opportunity to remove unnecessary temporary
+> buffers and casts.
+>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>   hw/tpm/tpm_util.h        | 17 ++++++++++-
+>   hw/tpm/tpm_emulator.c    | 14 ++++-----
+>   hw/tpm/tpm_passthrough.c |  6 ++--
+>   hw/tpm/tpm_util.c        | 75 ++++++++++++++++++++++-----------------=
+---------
+>   4 files changed, 58 insertions(+), 54 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+> index 19b28474ae..c562140e52 100644
+> --- a/hw/tpm/tpm_util.h
+> +++ b/hw/tpm/tpm_util.h
+> @@ -31,9 +31,24 @@ bool tpm_util_is_selftest(const uint8_t *in, uint32_=
+t in_len);
+>
+>   int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
+>
+> +static inline uint16_t tpm_cmd_get_tag(const void *b)
+> +{
+> +    return lduw_be_p(b);;
+> +}
+> +
+>   static inline uint32_t tpm_cmd_get_size(const void *b)
+>   {
+> -    return be32_to_cpu(*(const uint32_t *)(b + 2));
+> +    return ldl_be_p(b + 2);;
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- target/i386/helper.c  | 46 +++++++++++++++++++--------
- target/i386/monitor.c | 86 ++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 94 insertions(+), 38 deletions(-)
+Why are there these two ';;' ?
 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 5dc9e8839bc8..7dbbb9812950 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -723,6 +723,22 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
- }
- 
- #if !defined(CONFIG_USER_ONLY)
-+static uint64_t get_me_mask(void)
-+{
-+    uint64_t me_mask = 0;
-+
-+    /*
-+     * When SEV is active, Fn8000_001F[EBX] Bit 0:5 contains the C-bit position
-+     */
-+    if (kvm_memcrypt_enabled()) {
-+        uint32_t pos;
-+        pos = kvm_arch_get_supported_cpuid(kvm_state, 0x8000001f, 0, R_EBX);
-+        me_mask = (1UL << (pos & 0x3f));
-+    }
-+
-+    return ~me_mask;
-+}
-+
- hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- {
-     X86CPU *cpu = X86_CPU(cs);
-@@ -732,6 +748,9 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     int32_t a20_mask;
-     uint32_t page_offset;
-     int page_size;
-+    uint64_t me_mask;
-+
-+    me_mask = get_me_mask();
- 
-     a20_mask = x86_get_a20_mask(env);
-     if (!(env->cr[0] & CR0_PG_MASK)) {
-@@ -755,25 +774,25 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-             }
- 
-             if (la57) {
--                pml5e_addr = ((env->cr[3] & ~0xfff) +
-+                pml5e_addr = ((env->cr[3] & ~0xfff & me_mask) +
-                         (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
--                pml5e = ldq_phys_debug(cs, pml5e_addr);
-+                pml5e = ldq_phys_debug(cs, pml5e_addr) & me_mask;
-                 if (!(pml5e & PG_PRESENT_MASK)) {
-                     return -1;
-                 }
-             } else {
--                pml5e = env->cr[3];
-+                pml5e = env->cr[3] & me_mask;
-             }
- 
-             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
-                     (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
--            pml4e = ldq_phys_debug(cs, pml4e_addr);
-+            pml4e = ldq_phys_debug(cs, pml4e_addr) & me_mask;
-             if (!(pml4e & PG_PRESENT_MASK)) {
-                 return -1;
-             }
-             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) +
-                          (((addr >> 30) & 0x1ff) << 3)) & a20_mask;
--            pdpe = x86_ldq_phys(cs, pdpe_addr);
-+            pdpe = ldq_phys_debug(cs, pdpe_addr) & me_mask;
-             if (!(pdpe & PG_PRESENT_MASK)) {
-                 return -1;
-             }
-@@ -786,16 +805,16 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         } else
- #endif
-         {
--            pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
--                a20_mask;
--            pdpe = ldq_phys_debug(cs, pdpe_addr);
-+            pdpe_addr = ((env->cr[3] & ~0x1f & me_mask) + ((addr >> 27) & 0x18))
-+                          & a20_mask;
-+            pdpe = ldq_phys_debug(cs, pdpe_addr) & me_mask;
-             if (!(pdpe & PG_PRESENT_MASK))
-                 return -1;
-         }
- 
-         pde_addr = ((pdpe & PG_ADDRESS_MASK) +
-                     (((addr >> 21) & 0x1ff) << 3)) & a20_mask;
--        pde = ldq_phys_debug(cs, pde_addr);
-+        pde = ldq_phys_debug(cs, pde_addr) & me_mask;
-         if (!(pde & PG_PRESENT_MASK)) {
-             return -1;
-         }
-@@ -808,7 +827,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-             pte_addr = ((pde & PG_ADDRESS_MASK) +
-                         (((addr >> 12) & 0x1ff) << 3)) & a20_mask;
-             page_size = 4096;
--            pte = ldq_phys_debug(cs, pte_addr);
-+            pte = ldq_phys_debug(cs, pte_addr) & me_mask;
-         }
-         if (!(pte & PG_PRESENT_MASK)) {
-             return -1;
-@@ -817,8 +836,9 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         uint32_t pde;
- 
-         /* page directory entry */
--        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) & a20_mask;
--        pde = ldl_phys_debug(cs, pde_addr);
-+        pde_addr = ((env->cr[3] & ~0xfff & me_mask) + ((addr >> 20) & 0xffc))
-+                     & a20_mask;
-+        pde = ldl_phys_debug(cs, pde_addr) & me_mask;
-         if (!(pde & PG_PRESENT_MASK))
-             return -1;
-         if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
-@@ -827,7 +847,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         } else {
-             /* page directory entry */
-             pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) & a20_mask;
--            pte = ldl_phys_debug(cs, pte_addr);
-+            pte = ldl_phys_debug(cs, pte_addr) & me_mask;
-             if (!(pte & PG_PRESENT_MASK)) {
-                 return -1;
-             }
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 96890547f6b4..0b290f004a21 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -59,6 +59,22 @@ static void print_pte(Monitor *mon, CPUArchState *env, hwaddr addr,
-                    pte & PG_RW_MASK ? 'W' : '-');
- }
- 
-+static uint64_t get_me_mask(void)
-+{
-+    uint64_t me_mask = 0;
-+
-+    /*
-+     * When SEV is active, Fn8000_001F[EBX] Bit 0:5 contains the C-bit position
-+     */
-+    if (kvm_memcrypt_enabled()) {
-+        uint32_t pos;
-+        pos = kvm_arch_get_supported_cpuid(kvm_state, 0x8000001f, 0, R_EBX);
-+        me_mask = (1UL << (pos & 0x3f));
-+    }
-+
-+    return ~me_mask;
-+}
-+
- static void tlb_info_32(Monitor *mon, CPUArchState *env)
- {
-     unsigned int l1, l2;
-@@ -93,16 +109,20 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
-     unsigned int l1, l2, l3;
-     uint64_t pdpe, pde, pte;
-     uint64_t pdp_addr, pd_addr, pt_addr;
-+    uint64_t me_mask;
-+
-+    me_mask = get_me_mask();
- 
-     pdp_addr = env->cr[3] & ~0x1f;
-+    pdp_addr &= me_mask;
-     for (l1 = 0; l1 < 4; l1++) {
-         cpu_physical_memory_read_debug(pdp_addr + l1 * 8, &pdpe, 8);
--        pdpe = le64_to_cpu(pdpe);
-+        pdpe = le64_to_cpu(pdpe & me_mask);
-         if (pdpe & PG_PRESENT_MASK) {
-             pd_addr = pdpe & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pd_addr + l2 * 8, &pde, 8);
--                pde = le64_to_cpu(pde);
-+                pde = le64_to_cpu(pde & me_mask);
-                 if (pde & PG_PRESENT_MASK) {
-                     if (pde & PG_PSE_MASK) {
-                         /* 2M pages with PAE, CR4.PSE is ignored */
-@@ -113,7 +133,7 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
-                         for (l3 = 0; l3 < 512; l3++) {
-                             cpu_physical_memory_read_debug(pt_addr + l3 * 8,
-                                                            &pte, 8);
--                            pte = le64_to_cpu(pte);
-+                            pte = le64_to_cpu(pte & me_mask);
-                             if (pte & PG_PRESENT_MASK) {
-                                 print_pte(mon, env, (l1 << 30) + (l2 << 21)
-                                           + (l3 << 12),
-@@ -135,10 +155,13 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-     uint64_t l1, l2, l3, l4;
-     uint64_t pml4e, pdpe, pde, pte;
-     uint64_t pdp_addr, pd_addr, pt_addr;
-+    uint64_t me_mask;
-+
-+    me_mask = get_me_mask();
- 
-     for (l1 = 0; l1 < 512; l1++) {
-         cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
--        pml4e = le64_to_cpu(pml4e);
-+        pml4e = le64_to_cpu(pml4e & me_mask);
-         if (!(pml4e & PG_PRESENT_MASK)) {
-             continue;
-         }
-@@ -146,7 +169,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-         pdp_addr = pml4e & 0x3fffffffff000ULL;
-         for (l2 = 0; l2 < 512; l2++) {
-             cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
--            pdpe = le64_to_cpu(pdpe);
-+            pdpe = le64_to_cpu(pdpe & me_mask);
-             if (!(pdpe & PG_PRESENT_MASK)) {
-                 continue;
-             }
-@@ -161,7 +184,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-             pd_addr = pdpe & 0x3fffffffff000ULL;
-             for (l3 = 0; l3 < 512; l3++) {
-                 cpu_physical_memory_read_debug(pd_addr + l3 * 8, &pde, 8);
--                pde = le64_to_cpu(pde);
-+                pde = le64_to_cpu(pde & me_mask);
-                 if (!(pde & PG_PRESENT_MASK)) {
-                     continue;
-                 }
-@@ -176,7 +199,7 @@ static void tlb_info_la48(Monitor *mon, CPUArchState *env,
-                 pt_addr = pde & 0x3fffffffff000ULL;
-                 for (l4 = 0; l4 < 512; l4++) {
-                     cpu_physical_memory_read_debug(pt_addr + l4 * 8, &pte, 8);
--                    pte = le64_to_cpu(pte);
-+                    pte = le64_to_cpu(pte & me_mask);
-                     if (pte & PG_PRESENT_MASK) {
-                         print_pte(mon, env, (l0 << 48) + (l1 << 39) +
-                                 (l2 << 30) + (l3 << 21) + (l4 << 12),
-@@ -193,11 +216,14 @@ static void tlb_info_la57(Monitor *mon, CPUArchState *env)
-     uint64_t l0;
-     uint64_t pml5e;
-     uint64_t pml5_addr;
-+    uint64_t me_mask;
-+
-+    me_mask = get_me_mask();
- 
--    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
-+    pml5_addr = env->cr[3] & 0x3fffffffff000ULL & me_mask;
-     for (l0 = 0; l0 < 512; l0++) {
-         cpu_physical_memory_read_debug(pml5_addr + l0 * 8, &pml5e, 8);
--        pml5e = le64_to_cpu(pml5e);
-+        pml5e = le64_to_cpu(pml5e & me_mask);
-         if (pml5e & PG_PRESENT_MASK) {
-             tlb_info_la48(mon, env, l0, pml5e & 0x3fffffffff000ULL);
-         }
-@@ -225,7 +251,8 @@ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
-             if (env->cr[4] & CR4_LA57_MASK) {
-                 tlb_info_la57(mon, env);
-             } else {
--                tlb_info_la48(mon, env, 0, env->cr[3] & 0x3fffffffff000ULL);
-+                tlb_info_la48(mon, env, 0, env->cr[3] & 0x3fffffffff000ULL &
-+                              get_me_mask());
-             }
-         } else
- #endif
-@@ -309,19 +336,22 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
-     uint64_t pdpe, pde, pte;
-     uint64_t pdp_addr, pd_addr, pt_addr;
-     hwaddr start, end;
-+    uint64_t me_mask;
- 
--    pdp_addr = env->cr[3] & ~0x1f;
-+    me_mask = get_me_mask();
-+
-+    pdp_addr = env->cr[3] & ~0x1f & me_mask;
-     last_prot = 0;
-     start = -1;
-     for (l1 = 0; l1 < 4; l1++) {
-         cpu_physical_memory_read_debug(pdp_addr + l1 * 8, &pdpe, 8);
--        pdpe = le64_to_cpu(pdpe);
-+        pdpe = le64_to_cpu(pdpe & me_mask);
-         end = l1 << 30;
-         if (pdpe & PG_PRESENT_MASK) {
-             pd_addr = pdpe & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pd_addr + l2 * 8, &pde, 8);
--                pde = le64_to_cpu(pde);
-+                pde = le64_to_cpu(pde & me_mask);
-                 end = (l1 << 30) + (l2 << 21);
-                 if (pde & PG_PRESENT_MASK) {
-                     if (pde & PG_PSE_MASK) {
-@@ -333,7 +363,7 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
-                         for (l3 = 0; l3 < 512; l3++) {
-                             cpu_physical_memory_read_debug(pt_addr + l3 * 8,
-                                                            &pte, 8);
--                            pte = le64_to_cpu(pte);
-+                            pte = le64_to_cpu(pte & me_mask);
-                             end = (l1 << 30) + (l2 << 21) + (l3 << 12);
-                             if (pte & PG_PRESENT_MASK) {
-                                 prot = pte & pde & (PG_USER_MASK | PG_RW_MASK |
-@@ -366,19 +396,22 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
-     uint64_t l1, l2, l3, l4;
-     uint64_t pml4e, pdpe, pde, pte;
-     uint64_t pml4_addr, pdp_addr, pd_addr, pt_addr, start, end;
-+    uint64_t me_mask;
-+
-+    me_mask = get_me_mask();
- 
--    pml4_addr = env->cr[3] & 0x3fffffffff000ULL;
-+    pml4_addr = env->cr[3] & 0x3fffffffff000ULL & me_mask;
-     last_prot = 0;
-     start = -1;
-     for (l1 = 0; l1 < 512; l1++) {
-         cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
--        pml4e = le64_to_cpu(pml4e);
-+        pml4e = le64_to_cpu(pml4e & me_mask);
-         end = l1 << 39;
-         if (pml4e & PG_PRESENT_MASK) {
-             pdp_addr = pml4e & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
--                pdpe = le64_to_cpu(pdpe);
-+                pdpe = le64_to_cpu(pdpe & me_mask);
-                 end = (l1 << 39) + (l2 << 30);
-                 if (pdpe & PG_PRESENT_MASK) {
-                     if (pdpe & PG_PSE_MASK) {
-@@ -391,7 +424,7 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
-                         for (l3 = 0; l3 < 512; l3++) {
-                             cpu_physical_memory_read_debug(pd_addr + l3 * 8,
-                                                            &pde, 8);
--                            pde = le64_to_cpu(pde);
-+                            pde = le64_to_cpu(pde & me_mask);
-                             end = (l1 << 39) + (l2 << 30) + (l3 << 21);
-                             if (pde & PG_PRESENT_MASK) {
-                                 if (pde & PG_PSE_MASK) {
-@@ -405,7 +438,7 @@ static void mem_info_la48(Monitor *mon, CPUArchState *env)
-                                         cpu_physical_memory_read_debug(pt_addr
-                                                                   + l4 * 8,
-                                                                   &pte, 8);
--                                        pte = le64_to_cpu(pte);
-+                                        pte = le64_to_cpu(pte & me_mask);
-                                         end = (l1 << 39) + (l2 << 30) +
-                                             (l3 << 21) + (l4 << 12);
-                                         if (pte & PG_PRESENT_MASK) {
-@@ -444,13 +477,16 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-     uint64_t l0, l1, l2, l3, l4;
-     uint64_t pml5e, pml4e, pdpe, pde, pte;
-     uint64_t pml5_addr, pml4_addr, pdp_addr, pd_addr, pt_addr, start, end;
-+    uint64_t me_mask;
-+
-+    me_mask = get_me_mask();
- 
--    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
-+    pml5_addr = env->cr[3] & 0x3fffffffff000ULL & me_mask;
-     last_prot = 0;
-     start = -1;
-     for (l0 = 0; l0 < 512; l0++) {
-         cpu_physical_memory_read_debug(pml5_addr + l0 * 8, &pml5e, 8);
--        pml5e = le64_to_cpu(pml5e);
-+        pml5e = le64_to_cpu(pml5e & me_mask);
-         end = l0 << 48;
-         if (!(pml5e & PG_PRESENT_MASK)) {
-             prot = 0;
-@@ -461,7 +497,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-         pml4_addr = pml5e & 0x3fffffffff000ULL;
-         for (l1 = 0; l1 < 512; l1++) {
-             cpu_physical_memory_read_debug(pml4_addr + l1 * 8, &pml4e, 8);
--            pml4e = le64_to_cpu(pml4e);
-+            pml4e = le64_to_cpu(pml4e & me_mask);
-             end = (l0 << 48) + (l1 << 39);
-             if (!(pml4e & PG_PRESENT_MASK)) {
-                 prot = 0;
-@@ -472,7 +508,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-             pdp_addr = pml4e & 0x3fffffffff000ULL;
-             for (l2 = 0; l2 < 512; l2++) {
-                 cpu_physical_memory_read_debug(pdp_addr + l2 * 8, &pdpe, 8);
--                pdpe = le64_to_cpu(pdpe);
-+                pdpe = le64_to_cpu(pdpe & me_mask);
-                 end = (l0 << 48) + (l1 << 39) + (l2 << 30);
-                 if (pdpe & PG_PRESENT_MASK) {
-                     prot = 0;
-@@ -491,7 +527,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-                 pd_addr = pdpe & 0x3fffffffff000ULL;
-                 for (l3 = 0; l3 < 512; l3++) {
-                     cpu_physical_memory_read_debug(pd_addr + l3 * 8, &pde, 8);
--                    pde = le64_to_cpu(pde);
-+                    pde = le64_to_cpu(pde & me_mask);
-                     end = (l0 << 48) + (l1 << 39) + (l2 << 30) + (l3 << 21);
-                     if (pde & PG_PRESENT_MASK) {
-                         prot = 0;
-@@ -510,7 +546,7 @@ static void mem_info_la57(Monitor *mon, CPUArchState *env)
-                     pt_addr = pde & 0x3fffffffff000ULL;
-                     for (l4 = 0; l4 < 512; l4++) {
-                         cpu_physical_memory_read_debug(pt_addr + l4 * 8, &pte, 8);
--                        pte = le64_to_cpu(pte);
-+                        pte = le64_to_cpu(pte & me_mask);
-                         end = (l0 << 48) + (l1 << 39) + (l2 << 30) +
-                             (l3 << 21) + (l4 << 12);
-                         if (pte & PG_PRESENT_MASK) {
--- 
-2.9.5
+> +}
+> +
+> +static inline uint32_t tpm_cmd_get_ordinal(const void *b)
+> +{
+> +    return ldl_be_p(b + 6);;
+> +}
+> +
+> +static inline uint32_t tpm_cmd_get_errcode(const void *b)
+> +{
+> +    return ldl_be_p(b + 6);;
+>   }
+>
+>   int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> index 35c78de5a9..a34a18ac7a 100644
+> --- a/hw/tpm/tpm_emulator.c
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -120,7 +120,6 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *t=
+pm_emu,
+>   {
+>       ssize_t ret;
+>       bool is_selftest =3D false;
+> -    const struct tpm_resp_hdr *hdr =3D NULL;
+>
+>       if (selftest_done) {
+>           *selftest_done =3D false;
+> @@ -132,22 +131,21 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator =
+*tpm_emu,
+>           return -1;
+>       }
+>
+> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out, sizeo=
+f(*hdr),
+> -                               err);
+> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+> +              sizeof(struct tpm_resp_hdr), err);
+>       if (ret !=3D 0) {
+>           return -1;
+>       }
+>
+> -    hdr =3D (struct tpm_resp_hdr *)out;
+> -    out +=3D sizeof(*hdr);
+> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+> -                               be32_to_cpu(hdr->len) - sizeof(*hdr) , =
+err);
+> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc,
+> +              (char *)out + sizeof(struct tpm_resp_hdr),
+> +              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err=
+);
+>       if (ret !=3D 0) {
+>           return -1;
+>       }
+>
+>       if (is_selftest) {
+> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
+> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+>       }
+>
+>       return 0;
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index 29142f38bb..537e11a3f9 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -87,7 +87,6 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruSt=
+ate *tpm_pt,
+>   {
+>       ssize_t ret;
+>       bool is_selftest;
+> -    const struct tpm_resp_hdr *hdr;
+>
+>       /* FIXME: protect shared variables or use other sync mechanism */
+>       tpm_pt->tpm_op_canceled =3D false;
+> @@ -116,15 +115,14 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassth=
+ruState *tpm_pt,
+>                            strerror(errno), errno);
+>           }
+>       } else if (ret < sizeof(struct tpm_resp_hdr) ||
+> -               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D ret=
+) {
+> +               tpm_cmd_get_size(out) !=3D ret) {
+>           ret =3D -1;
+>           error_report("tpm_passthrough: received invalid response "
+>                        "packet from TPM");
+>       }
+>
+>       if (is_selftest && (ret >=3D sizeof(struct tpm_resp_hdr))) {
+> -        hdr =3D (struct tpm_resp_hdr *)out;
+> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
+> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+>       }
+>
+>   err_exit:
+> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+> index 747075e244..8abde59915 100644
+> --- a/hw/tpm/tpm_util.c
+> +++ b/hw/tpm/tpm_util.c
+> @@ -106,20 +106,16 @@ const PropertyInfo qdev_prop_tpm =3D {
+>   void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_l=
+en)
+>   {
+>       if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+> -        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
+> -
+> -        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
+> -        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
+> -        resp->errcode =3D cpu_to_be32(TPM_FAIL);
+> +        stw_be_p(out, TPM_TAG_RSP_COMMAND);
+> +        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
+> +        stl_be_p(out + 6, TPM_FAIL);
+
+Since we wrapped the getters we should wrap the setters as well.=20
+tpm_cmd_set_len(), tpm_cmd_set_errcode.
+
+>       }
+>   }
+>
+>   bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
+>   {
+> -    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
+> -
+> -    if (in_len >=3D sizeof(*hdr)) {
+> -        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfT=
+est);
+> +    if (in_len >=3D sizeof(struct tpm_req_hdr)) {
+> +        return tpm_cmd_get_ordinal(in) =3D=3D TPM_ORD_ContinueSelfTest=
+;
+>       }
+>
+>       return false;
+> @@ -129,12 +125,11 @@ bool tpm_util_is_selftest(const uint8_t *in, uint=
+32_t in_len)
+>    * Send request to a TPM device. We expect a response within one seco=
+nd.
+>    */
+>   static int tpm_util_request(int fd,
+> -                            unsigned char *request,
+> +                            const void *request,
+>                               size_t requestlen,
+> -                            unsigned char *response,
+> +                            void *response,
+>                               size_t responselen)
+>   {
+> -    struct tpm_resp_hdr *resp;
+>       fd_set readfds;
+>       int n;
+>       struct timeval tv =3D {
+> @@ -164,9 +159,8 @@ static int tpm_util_request(int fd,
+>           return -EFAULT;
+>       }
+>
+> -    resp =3D (struct tpm_resp_hdr *)response;
+>       /* check the header */
+> -    if (be32_to_cpu(resp->len) !=3D n) {
+> +    if (tpm_cmd_get_size(response) !=3D n) {
+>           return -EMSGSIZE;
+>       }
+>
+> @@ -178,12 +172,11 @@ static int tpm_util_request(int fd,
+>    * (error response is fine).
+>    */
+>   static int tpm_util_test(int fd,
+> -                         unsigned char *request,
+> +                         const void *request,
+>                            size_t requestlen,
+>                            uint16_t *return_tag)
+>   {
+> -    struct tpm_resp_hdr *resp;
+> -    unsigned char buf[1024];
+> +    char buf[1024];
+>       ssize_t ret;
+>
+>       ret =3D tpm_util_request(fd, request, requestlen,
+> @@ -192,8 +185,7 @@ static int tpm_util_test(int fd,
+>           return ret;
+>       }
+>
+> -    resp =3D (struct tpm_resp_hdr *)buf;
+> -    *return_tag =3D be16_to_cpu(resp->tag);
+> +    *return_tag =3D tpm_cmd_get_tag(buf);
+>
+>       return 0;
+>   }
+> @@ -228,7 +220,7 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tp=
+m_version)
+>       int ret;
+>
+>       /* Send TPM 2 command */
+> -    ret =3D tpm_util_test(tpm_fd, (unsigned char *)&test_req_tpm2,
+> +    ret =3D tpm_util_test(tpm_fd, &test_req_tpm2,
+>                           sizeof(test_req_tpm2), &return_tag);
+>       /* TPM 2 would respond with a tag of TPM2_ST_NO_SESSIONS */
+>       if (!ret && return_tag =3D=3D TPM2_ST_NO_SESSIONS) {
+> @@ -237,7 +229,7 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tp=
+m_version)
+>       }
+>
+>       /* Send TPM 1.2 command */
+> -    ret =3D tpm_util_test(tpm_fd, (unsigned char *)&test_req,
+> +    ret =3D tpm_util_test(tpm_fd, &test_req,
+>                           sizeof(test_req), &return_tag);
+>       if (!ret && return_tag =3D=3D TPM_TAG_RSP_COMMAND) {
+>           *tpm_version =3D TPM_VERSION_1_2;
+> @@ -253,7 +245,6 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tp=
+m_version)
+>   int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+>                                size_t *buffersize)
+>   {
+> -    unsigned char buf[1024];
+>       int ret;
+>
+>       switch (tpm_version) {
+> @@ -277,26 +268,27 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersi=
+on tpm_version,
+>               struct tpm_resp_hdr hdr;
+>               uint32_t len;
+>               uint32_t buffersize;
+> -        } QEMU_PACKED *tpm_resp =3D (struct tpm_resp_get_buffer_size *=
+)buf;
+> +        } QEMU_PACKED tpm_resp;
+>
+> -        ret =3D tpm_util_request(tpm_fd, (unsigned char *)&tpm_get_buf=
+fer_size,
+> -                               sizeof(tpm_get_buffer_size), buf, sizeo=
+f(buf));
+> +        ret =3D tpm_util_request(tpm_fd, &tpm_get_buffer_size,
+> +                               sizeof(tpm_get_buffer_size),
+> +                               &tpm_resp, sizeof(tpm_resp));
+>           if (ret < 0) {
+>               return ret;
+>           }
+>
+> -        if (be32_to_cpu(tpm_resp->hdr.len) !=3D sizeof(*tpm_resp) ||
+> -            be32_to_cpu(tpm_resp->len) !=3D sizeof(uint32_t)) {
+> +        if (be32_to_cpu(tpm_resp.hdr.len) !=3D sizeof(tpm_resp) ||
+> +            be32_to_cpu(tpm_resp.len) !=3D sizeof(uint32_t)) {
+>               DPRINTF("tpm_resp->hdr.len =3D %u, expected =3D %zu\n",
+> -                    be32_to_cpu(tpm_resp->hdr.len), sizeof(*tpm_resp))=
+;
+> +                    be32_to_cpu(tpm_resp.hdr.len), sizeof(tpm_resp));
+>               DPRINTF("tpm_resp->len =3D %u, expected =3D %zu\n",
+> -                    be32_to_cpu(tpm_resp->len), sizeof(uint32_t));
+> +                    be32_to_cpu(tpm_resp.len), sizeof(uint32_t));
+>               error_report("tpm_util: Got unexpected response to "
+>                            "TPM_GetCapability; errcode: 0x%x",
+> -                         be32_to_cpu(tpm_resp->hdr.errcode));
+> +                         be32_to_cpu(tpm_resp.hdr.errcode));
+>               return -EFAULT;
+>           }
+> -        *buffersize =3D be32_to_cpu(tpm_resp->buffersize);
+> +        *buffersize =3D be32_to_cpu(tpm_resp.buffersize);
+>           break;
+>       }
+>       case TPM_VERSION_2_0: {
+> @@ -324,27 +316,28 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersi=
+on tpm_version,
+>               uint32_t value1;
+>               uint32_t property2;
+>               uint32_t value2;
+> -        } QEMU_PACKED *tpm2_resp =3D (struct tpm2_resp_get_buffer_size=
+ *)buf;
+> +        } QEMU_PACKED tpm2_resp;
+>
+> -        ret =3D tpm_util_request(tpm_fd, (unsigned char *)&tpm2_get_bu=
+ffer_size,
+> -                               sizeof(tpm2_get_buffer_size), buf, size=
+of(buf));
+> +        ret =3D tpm_util_request(tpm_fd, &tpm2_get_buffer_size,
+> +                               sizeof(tpm2_get_buffer_size),
+> +                               &tpm2_resp, sizeof(tpm2_resp));
+>           if (ret < 0) {
+>               return ret;
+>           }
+>
+> -        if (be32_to_cpu(tpm2_resp->hdr.len) !=3D sizeof(*tpm2_resp) ||
+> -            be32_to_cpu(tpm2_resp->count) !=3D 2) {
+> +        if (be32_to_cpu(tpm2_resp.hdr.len) !=3D sizeof(tpm2_resp) ||
+> +            be32_to_cpu(tpm2_resp.count) !=3D 2) {
+>               DPRINTF("tpm2_resp->hdr.len =3D %u, expected =3D %zu\n",
+> -                    be32_to_cpu(tpm2_resp->hdr.len), sizeof(*tpm2_resp=
+));
+> +                    be32_to_cpu(tpm2_resp.hdr.len), sizeof(tpm2_resp))=
+;
+>               DPRINTF("tpm2_resp->len =3D %u, expected =3D %u\n",
+> -                    be32_to_cpu(tpm2_resp->count), 2);
+> +                    be32_to_cpu(tpm2_resp.count), 2);
+>               error_report("tpm_util: Got unexpected response to "
+>                            "TPM2_GetCapability; errcode: 0x%x",
+> -                         be32_to_cpu(tpm2_resp->hdr.errcode));
+> +                         be32_to_cpu(tpm2_resp.hdr.errcode));
+>               return -EFAULT;
+>           }
+> -        *buffersize =3D MAX(be32_to_cpu(tpm2_resp->value1),
+> -                          be32_to_cpu(tpm2_resp->value2));
+> +        *buffersize =3D MAX(be32_to_cpu(tpm2_resp.value1),
+> +                          be32_to_cpu(tpm2_resp.value2));
+>           break;
+>       }
+>       case TPM_VERSION_UNSPEC:
