@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eg5Gu-0001wI-FV
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:58:43 -0500
+	(envelope-from <groug@kaod.org>) id 1eg5ol-0003jw-Uy
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:33:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eg5Gq-0007A2-Ao
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:58:36 -0500
-References: <20180125042210.7012-1-aik@ozlabs.ru>
-	<03afc632-2c3e-ca7a-fa11-d58d97983cd4@redhat.com>
-	<026c88e9-25ef-5d9e-4572-616a9c854428@ozlabs.ru>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <c8c4a752-ab0b-d0ac-6fec-2f1a3c5353a0@redhat.com>
-Date: Mon, 29 Jan 2018 09:58:22 +0100
+	(envelope-from <groug@kaod.org>) id 1eg5oi-0000is-O4
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:33:35 -0500
+Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:60865)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eg5oi-0000bN-DY
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:33:32 -0500
+Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id A001F98805
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 10:33:22 +0100 (CET)
+Date: Mon, 29 Jan 2018 10:33:08 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180129103308.09657670@bahia.lan>
+In-Reply-To: <20180127091552.GC12900@umbus>
+References: <151700552398.7196.2573848773899364520.stgit@bahia.lan>
+	<20180127091552.GC12900@umbus>
 MIME-Version: 1.0
-In-Reply-To: <026c88e9-25ef-5d9e-4572-616a9c854428@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v4] RFC: vfio-pci: Allow mmap of MSIX
- BAR
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/A==.k4L3+IXFWdkW2EvzGGS";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] spapr_pci: fix MSI/MSIX selection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,240 +31,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Laurent Vivier <lvivier@redhat.com>, qemu-stable@nongnu.org
 
-Hi Alexey,
+--Sig_/A==.k4L3+IXFWdkW2EvzGGS
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 29/01/18 04:55, Alexey Kardashevskiy wrote:
-> On 26/01/18 00:56, Auger Eric wrote:
->> Hi Alexey,
->>
->> On 25/01/18 05:22, Alexey Kardashevskiy wrote:
->>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
->>> which tells that a region with MSIX data can be mapped entirely, i.e.
->>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
->>>
->>> With this change, all BARs are mapped in a single chunk and MSIX vectors
->>> are emulated on top unless the machine requests not to by defining and
->>> enabling a new "vfio-no-msix-emulation" property. At the moment only
->>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
->>> enabling it as it does not define the "set" callback for the new property;
->>> the new property also does not appear in "-machine pseries,help".
->>>
->>> If MSIX vectors section is not aligned to the page size, the KVM memory
->>> listener does not register it with the KVM as a memory slot and MSIX is
->>> emulated by QEMU as before. This may create MMIO RAM memory sections with
->>> an address or/and a size not aligned which will make vfio_dma_map() fail;
->>> to address this, this treats such failures as non-fatal and does not print
->>> an error. This adds a return value from vfio_dma_map() to the tracepoint
->>> and moves the latter further down to let the user have a clue why P2P
->>> might not work.
->>>
->>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
->>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> ---
->>> Changes:
->>> v4:
->>> * silenced dma map errors if unaligned mapping is attempted - they are going
->>> to fail anyway
->>>
->>> v3:
->>> * vfio_listener_region_add() won't make qemu exit if failed on MMIO MR
->>> ---
->>>  include/hw/vfio/vfio-common.h |  1 +
->>>  linux-headers/linux/vfio.h    |  5 +++++
->>>  hw/ppc/spapr.c                |  7 +++++++
->>>  hw/vfio/common.c              | 27 +++++++++++++++++++++++++--
->>>  hw/vfio/pci.c                 | 10 ++++++++++
->>>  hw/vfio/trace-events          |  2 +-
->>>  6 files changed, 49 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->>> index f3a2ac9..927d600 100644
->>> --- a/include/hw/vfio/vfio-common.h
->>> +++ b/include/hw/vfio/vfio-common.h
->>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
->>>                           struct vfio_region_info **info);
->>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
->>>                               uint32_t subtype, struct vfio_region_info **info);
->>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
->>>  #endif
->>>  extern const MemoryListener vfio_prereg_listener;
->>>  
->>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
->>> index 4312e96..b45182e 100644
->>> --- a/linux-headers/linux/vfio.h
->>> +++ b/linux-headers/linux/vfio.h
->>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
->>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
->>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
->>>  
->>> +/*
->>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
->>> + */
->>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
->>> +
->>>  /**
->>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
->>>   *				    struct vfio_irq_info)
->>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>> index d1acfe8..5ff43ce 100644
->>> --- a/hw/ppc/spapr.c
->>> +++ b/hw/ppc/spapr.c
->>> @@ -2789,6 +2789,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
->>>      spapr->use_hotplug_event_source = value;
->>>  }
->>>  
->>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
->>> +{
->>> +    return true;
->>> +}
->>> +
->>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
->>>  {
->>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
->>> @@ -2870,6 +2875,8 @@ static void spapr_instance_init(Object *obj)
->>>      object_property_set_description(obj, "vsmt",
->>>                                      "Virtual SMT: KVM behaves as if this were"
->>>                                      " the host's SMT mode", &error_abort);
->>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
->>> +                             spapr_get_msix_emulation, NULL, NULL);
->>>  }
->>>  
->>>  static void spapr_machine_finalizefn(Object *obj)
->>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->>> index 3d652c8..04a8280 100644
->>> --- a/hw/vfio/common.c
->>> +++ b/hw/vfio/common.c
->>> @@ -513,13 +513,21 @@ static void vfio_listener_region_add(MemoryListener *listener,
->>>              section->offset_within_region +
->>>              (iova - section->offset_within_address_space);
->>>  
->>> -    trace_vfio_listener_region_add_ram(iova, end, vaddr);
->>> -
->>>      llsize = int128_sub(llend, int128_make64(iova));
->>>  
->>>      ret = vfio_dma_map(container, iova, int128_get64(llsize),
->>>                         vaddr, section->readonly);
->>> +    trace_vfio_listener_region_add_ram(iova, end, vaddr, ret);
->>> +
->>>      if (ret) {
->>> +        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
->>> +
->>> +        if (memory_region_is_ram_device(section->mr) &&
->>> +            ((section->offset_within_region & pgmask) ||
->>> +             (int128_getlo(section->size) & pgmask))) {
->>> +            return;
->>> +        }
->>> +
->> Why not avoiding to call vfio_dma_map in this case and print a helpful
->> message for the end-user?
-> 
-> Avoiding is a good point, but I am not sure about the message though. I am
-> leaning towards disabling these regions from being dma mapped by default
-> and have a machine option for it, for example. We do not need this in most
-> cases but if we do, we actually want to see every failed dma map request. I
-> am just not sure about that property interface.
-> 
-> 
->> qemu-system-aarch64: VFIO_UNMAP_DMA: -22
-> 
-> 
-> Ah, missed this.
-> 
-> 
->> qemu-system-aarch64: vfio_dma_unmap(0xc0dab90, 0x8000000000, 0x2000) =
->> -22 (Invalid argument)
->>
->> is not self-explanatory I think.
-> 
-> What is missing?
-Would something like:
-"Region [start, end] cannot be DMA accessed by device <name>: start/size
-misaligned with host iommu page size (<size>). Check the region nature
-and size. If part of a BAR, check MSI-X table/PBA and think of
-relocating it." make sense?
+On Sat, 27 Jan 2018 20:15:52 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Thanks
+> On Fri, Jan 26, 2018 at 11:25:24PM +0100, Greg Kurz wrote:
+> > In various place we don't correctly check if the device supports MSI or
+> > MSI-X. This can cause devices to be advertised with MSI support, even
+> > if they only support MSI-X (like virtio-pci-* devices for example):
+> >=20
+> >                 ethernet@0 {
+> >                         ibm,req#msi =3D <0x1>; <--- wrong!
+> > 			.
+> > 			ibm,loc-code =3D "qemu_virtio-net-pci:0000:00:00.0";
+> > 			.
+> > 			ibm,req#msi-x =3D <0x3>;
+> >                 };
+> >=20
+> > Worse, this can also cause the "ibm,change-msi" RTAS call to corrupt the
+> > PCI status and cause migration to fail:
+> >=20
+> >   qemu-system-ppc64: get_pci_config_device: Bad config data: i=3D0x6
+> >     read: 0 device: 10 cmask: 10 wmask: 0 w1cmask:0
+> >                               ^^
+> >            PCI_STATUS_CAP_LIST bit which is assumed to be constant
+> >=20
+> > This patch changes spapr_populate_pci_child_dt() to properly check for
+> > MSI support using msi_present(): this ensures that PCIDevice::msi_cap
+> > was set by msi_init() and that msi_nr_vectors_allocated() will look at
+> > the right place in the config space.
+> >=20
+> > Checking PCIDevice::msix_entries_nr is enough for MSI-X but let's add
+> > a call to msix_present() there as well for consistency.
+> >=20
+> > It also changes rtas_ibm_change_msi() to select the appropriate MSI
+> > type in Function 1 instead of always selecting plain MSI. This new
+> > behaviour is compliant with LoPAPR 1.1, as described in "Table 71.
+> > ibm,change-msi Argument Call Buffer":
+> >=20
+> >   Function 1: If Number Outputs is equal to 3, request to set to a new
+> >            number of MSIs (including set to 0).
+> >            If the =E2=80=9Cibm,change-msix-capable=E2=80=9D property ex=
+ists and Number
+> >            Outputs is equal to 4, request is to set to a new number of
+> >            MSI or MSI-X (platform choice) interrupts (including set to
+> >            0).
+> >=20
+> > Since MSI is the the platform default (LoPAPR 6.2.3 MSI Option), let's
+> > check for MSI support first.
+> >=20
+> > And finally, it checks the input parameters are valid, as described in
+> > LoPAPR 1.1 "R1=E2=80=937.3.10.5.1=E2=80=933":
+> >=20
+> >   For the MSI option: The platform must return a Status of -3 (Parameter
+> >   error) from ibm,change-msi, with no change in interrupt assignments if
+> >   the PCI configuration address does not support MSI and Function 3 was
+> >   requested (that is, the =E2=80=9Cibm,req#msi=E2=80=9D property must e=
+xist for the PCI
+> >   configuration address in order to use Function 3), or does not support
+> >   MSI-X and Function 4 is requested (that is, the =E2=80=9Cibm,req#msi-=
+x=E2=80=9D property
+> >   must exist for the PCI configuration address in order to use Function=
+ 4),
+> >   or if neither MSIs nor MSI-Xs are supported and Function 1 is request=
+ed.
+> >=20
+> > This ensures that the ret_intr_type variable contains a valid MSI type
+> > for this device, and that spapr_msi_setmsg() won't corrupt the PCI stat=
+us.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+>=20
+> Applied, thanks.
+>=20
+> Alexey, is this the migration bug you were mentioning to me?
+>=20
+> +lvivier
+>=20
+> Laurent, could this cover any of the migration bugs you're looking at?
+> If not we should probably file a new downstream BZ for it.
+>=20
 
-Eric
-> 
-> 
-> 
-> 
->>
->> Thanks
->>
->> Eric
->>>          error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
->>>                       "0x%"HWADDR_PRIx", %p) = %d (%m)",
->>>                       container, iova, int128_get64(llsize), vaddr, ret);
->>> @@ -1386,6 +1394,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
->>>      return -ENODEV;
->>>  }
->>>  
->>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
->>> +{
->>> +    struct vfio_region_info *info = NULL;
->>> +    bool ret = false;
->>> +
->>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
->>> +        if (vfio_get_region_info_cap(info, cap_type)) {
->>> +            ret = true;
->>> +        }
->>> +        g_free(info);
->>> +    }
->>> +
->>> +    return ret;
->>> +}
->>> +
->>>  /*
->>>   * Interfaces for IBM EEH (Enhanced Error Handling)
->>>   */
->>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->>> index 359a8f1..a96ece6 100644
->>> --- a/hw/vfio/pci.c
->>> +++ b/hw/vfio/pci.c
->>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
->>>      off_t start, end;
->>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
->>>  
->>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
->>> +                            vdev->msix->table_bar)) {
->>> +        return;
->>> +    }
->>> +
->>>      /*
->>>       * We expect to find a single mmap covering the whole BAR, anything else
->>>       * means it's either unsupported or already setup.
->>> @@ -1569,6 +1574,11 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
->>>       */
->>>      memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
->>>  
->>> +    if (object_property_get_bool(OBJECT(qdev_get_machine()),
->>> +                                 "vfio-no-msix-emulation", NULL)) {
->>> +        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
->>> +    }
->>> +
->>>      return 0;
->>>  }
->>>  
->>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
->>> index 437ccdd..d747c11 100644
->>> --- a/hw/vfio/trace-events
->>> +++ b/hw/vfio/trace-events
->>> @@ -89,7 +89,7 @@ vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t d
->>>  vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "iommu %s @ 0x%"PRIx64" - 0x%"PRIx64
->>>  vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
->>>  vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
->>> -vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
->>> +vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr, int ret) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p] ret=%d"
->>>  vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
->>>  vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
->>>  vfio_disconnect_container(int fd) "close container->fd=%d"
->>>
-> 
-> 
+This bug has been around for a long time, but maybe worth pushing this to
+stable as well ?
+
+Cc'ing stable.
+
+> > ---
+> >  hw/ppc/spapr_pci.c |   61 ++++++++++++++++++++++++++++++++++++--------=
+--------
+> >  1 file changed, 42 insertions(+), 19 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 37f18b3d3235..39a14980d397 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -280,13 +280,42 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, =
+sPAPRMachineState *spapr,
+> >      int *config_addr_key;
+> >      Error *err =3D NULL;
+> > =20
+> > +    /* Fins sPAPRPHBState */
+> > +    phb =3D spapr_pci_find_phb(spapr, buid);
+> > +    if (phb) {
+> > +        pdev =3D spapr_pci_find_dev(spapr, buid, config_addr);
+> > +    }
+> > +    if (!phb || !pdev) {
+> > +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> > +        return;
+> > +    }
+> > +
+> >      switch (func) {
+> > -    case RTAS_CHANGE_MSI_FN:
+> >      case RTAS_CHANGE_FN:
+> > -        ret_intr_type =3D RTAS_TYPE_MSI;
+> > +        if (msi_present(pdev)) {
+> > +            ret_intr_type =3D RTAS_TYPE_MSI;
+> > +        } else if (msix_present(pdev)) {
+> > +            ret_intr_type =3D RTAS_TYPE_MSIX;
+> > +        } else {
+> > +            rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> > +            return;
+> > +        }
+> > +        break;
+> > +    case RTAS_CHANGE_MSI_FN:
+> > +        if (msi_present(pdev)) {
+> > +            ret_intr_type =3D RTAS_TYPE_MSI;
+> > +        } else {
+> > +            rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> > +            return;
+> > +        }
+> >          break;
+> >      case RTAS_CHANGE_MSIX_FN:
+> > -        ret_intr_type =3D RTAS_TYPE_MSIX;
+> > +        if (msix_present(pdev)) {
+> > +            ret_intr_type =3D RTAS_TYPE_MSIX;
+> > +        } else {
+> > +            rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> > +            return;
+> > +        }
+> >          break;
+> >      default:
+> >          error_report("rtas_ibm_change_msi(%u) is not implemented", fun=
+c);
+> > @@ -294,16 +323,6 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, s=
+PAPRMachineState *spapr,
+> >          return;
+> >      }
+> > =20
+> > -    /* Fins sPAPRPHBState */
+> > -    phb =3D spapr_pci_find_phb(spapr, buid);
+> > -    if (phb) {
+> > -        pdev =3D spapr_pci_find_dev(spapr, buid, config_addr);
+> > -    }
+> > -    if (!phb || !pdev) {
+> > -        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> > -        return;
+> > -    }
+> > -
+> >      msi =3D (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_ad=
+dr);
+> > =20
+> >      /* Releasing MSIs */
+> > @@ -1286,13 +1305,17 @@ static void spapr_populate_pci_child_dt(PCIDevi=
+ce *dev, void *fdt, int offset,
+> >      _FDT(fdt_setprop_cell(fdt, offset, "#size-cells",
+> >                            RESOURCE_CELLS_SIZE));
+> > =20
+> > -    max_msi =3D msi_nr_vectors_allocated(dev);
+> > -    if (max_msi) {
+> > -        _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi", max_msi));
+> > +    if (msi_present(dev)) {
+> > +        max_msi =3D msi_nr_vectors_allocated(dev);
+> > +        if (max_msi) {
+> > +            _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi", max_msi)=
+);
+> > +        }
+> >      }
+> > -    max_msix =3D dev->msix_entries_nr;
+> > -    if (max_msix) {
+> > -        _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi-x", max_msix));
+> > +    if (msix_present(dev)) {
+> > +        max_msix =3D dev->msix_entries_nr;
+> > +        if (max_msix) {
+> > +            _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi-x", max_ms=
+ix));
+> > +        }
+> >      }
+> > =20
+> >      populate_resource_props(dev, &rp);
+> >  =20
+>=20
+
+
+--Sig_/A==.k4L3+IXFWdkW2EvzGGS
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlpu6lQACgkQcdTV5YIv
+c9bwgA//W2Izt9yiXXAxU3JVikV0rwg028izvsoF2uyaEBfdWNU6sRJZg6b/5bJ7
+t7FAPPWM0bPKwtJscLXM514R/Vr6+8XO8q/ZO39MB8mGLd7mGByQ75hN93aeqc7H
+KL5hiSgpKm0ZAUhsUqhk2VC8V/+7eAyQB3WyklwV9bC4gVrl/7udR8f4q57ueUk9
+YqhZRz+9YooWLv2h3q4+YsaQxPmJ81OylEUTM3Q/zBwEEgO2Sr1FIn3zluje3cJj
+92tN2LPQow3mhshTlz3pdkj5CDfDR/4WxUTlx45DaVPXi3v5gWkFDIhF+6IjUp5X
+xO2/sxKYik659J66l/Tnq4BOvLdp8zcFVixVpHFI8Uf0EBZ7zGPnAuPokm1p2A+j
+6WS3f+QRZo8IEkYeuP+tMDFsW2WR8YC+Do1FFLhuDQGLn06X55936Wo40jzs2JmB
+Vb74MJh2Rfvnc2OzVvoDBviEpt5y+0Pd9/GiweCjq6rQijtFNOMNnfcHFtCEB3OP
+thByM1OzMCuw1bjvXZaKqKlOCMpekq0XQvgyP3o/QkOQjoTKYNhhuvC3FIaV4fbA
+z/L2wuv9WieENH5xKHsJYo3fYxI9p2y1IINVV9OyJsE7+Dq+QJU0Z8wk/f93KUd1
+bepsLmn8nRw/dX1rlbfxfKRMbQqFsDac0qonUqLi9KoO5zZd2l0=
+=G10J
+-----END PGP SIGNATURE-----
+
+--Sig_/A==.k4L3+IXFWdkW2EvzGGS--
