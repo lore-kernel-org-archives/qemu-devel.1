@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1egC4d-0003AQ-4I
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:14:29 -0500
+	(envelope-from <no-reply@patchew.org>) id 1egC5b-00044O-2e
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1egC4c-0002gf-09
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:14:23 -0500
-References: <1516633309-20803-1-git-send-email-mark.kanda@oracle.com>
-	<20180124113123.GB17193@stefanha-x1.localdomain>
-	<20180129154107.GI6141@localhost.localdomain>
-From: Mark Kanda <mark.kanda@oracle.com>
-Message-ID: <302cdbe4-e363-b9ee-f40a-cafb080a7a2a@oracle.com>
-Date: Mon, 29 Jan 2018 10:13:02 -0600
+	(envelope-from <no-reply@patchew.org>) id 1egC5W-0003WZ-Il
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:15:23 -0500
+Resent-Message-Id: <E1egC5W-0003WZ-Il@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21080)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1egC5W-0003Uz-6L
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:15:18 -0500
+In-Reply-To: <20180129160740.1195-1-stefanha@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151724248550.788.16657123948321508466@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <20180129154107.GI6141@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] virtio-blk: check for NULL
- BlockDriverState
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 29 Jan 2018 08:14:46 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/3] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, ameya.more@oracle.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: stefanha@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-
-
-On 1/29/2018 9:41 AM, Kevin Wolf wrote:
-> Am 24.01.2018 um 12:31 hat Stefan Hajnoczi geschrieben:
->> On Mon, Jan 22, 2018 at 09:01:49AM -0600, Mark Kanda wrote:
->>> Add a BlockDriverState NULL check to virtio_blk_handle_request()
->>> to prevent a segfault if the drive is forcibly removed using HMP
->>> 'drive_del' (without performing a hotplug 'device_del' first).
->>>
->>> Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
->>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
->>> Reviewed-by: Ameya More <ameya.more@oracle.com>
->>> ---
->>>   hw/block/virtio-blk.c | 7 +++++++
->>>   1 file changed, 7 insertions(+)
->>>
->>> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
->>> index b1532e4..76ddbbf 100644
->>> --- a/hw/block/virtio-blk.c
->>> +++ b/hw/block/virtio-blk.c
->>> @@ -507,6 +507,13 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
->>>           return -1;
->>>       }
->>>   
->>> +    /* If the drive was forcibly removed (e.g. HMP 'drive_del'), the block
->>> +     * driver state may be NULL and there is nothing left to do. */
->>> +    if (!blk_bs(req->dev->blk)) {
->>
->> Adding Markus Armbruster to check my understanding of drive_del:
->>
->> 1. If id is a node name (e.g. created via blockdev-add) then attempting
->>     to remove the root node produces the "Node %s is in use" error.  In
->>     that case this patch isn't needed.
->>
->> 2. If id is a BlockBackend (e.g. created via -drive) then removing the
->>     root node is allowed.  The BlockBackend stays in place but blk->root
->>     becomes NULL, hence this patch is needed.
->>
->> Markus: What are the valid use cases for #2?  If blk->bs becomes NULL I
->> would think a lot more code beyond virtio-blk can segfault.
-> 
-> blk->root = NULL is completely normal, it is what happens with removable
-> media when the drive is empty.
-> 
-> The problem, which was first reported during the 2.10 RC phase and was
-> worked around in IDE code then, is that Paolo's commit 99723548561 added
-> unconditional bdrv_inc/dec_in_flight() calls. I am pretty sure that any
-> segfaults that Mark is seeing have the same cause.
-
-That's correct. The segfault I encountered was the bdrv_inc_in_flight() 
-call in blk_aio_prwv().
-
-Thanks,
-
--Mark
-
-> We do need an in-flight counter even for those requests so that
-> blk_drain() works correctly, so just making the calls condition wouldn't
-> be right. However, this needs to become a separate counter in
-> BlockBackend, and the drain functions must be changed to make use of it.
-> 
-> I did post rough patches back then, but they weren't quite ready, and
-> since then they have fallen through the cracks.
-> 
-> Kevin
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTI5MTYwNzQwLjExOTUtMS1zdGVmYW5oYUByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzNdIFRyYWNpbmcgcGF0Y2hlcwoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cg
+LS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAgIGZjY2ZjYzYzMjguLjBkMTQ0MjkxMmIgIG1hc3RlciAgICAgLT4g
+bWFzdGVyCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxNzExMzAxNjQ3NTAu
+NDczMjAtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20gLT4gcGF0Y2hldy8yMDE3MTEzMDE2NDc1
+MC40NzMyMC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzIwMTgwMTI5MTYwNzQwLjExOTUtMS1zdGVmYW5oYUByZWRoYXQuY29tIC0+
+IHBhdGNoZXcvMjAxODAxMjkxNjA3NDAuMTE5NS0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4MjI0YzE5NWExIHRyYWNldG9vbDogcmVwb3J0IGVy
+cm9yIG9uIGZvbygpIGluc3RlYWQgb2YgZm9vKHZvaWQpCjUxMWFhZDRmNjMgdHJhY2V0b29sOiBj
+bGFyaWZ5IHRoYXQgImZvcm1hdHMiIG1lYW5zICJmb3JtYXQgc3RyaW5ncyIKY2RhMjFjNzY5YyB0
+cmFjZXRvb2w6IHByZWZpeCBwYXJzZSBlcnJvcnMgd2l0aCBsaW5lIG51bWJlcnMKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogdHJhY2V0b29sOiBwcmVmaXggcGFyc2Ug
+ZXJyb3JzIHdpdGggbGluZSBudW1iZXJzLi4uCkNoZWNraW5nIFBBVENIIDIvMzogdHJhY2V0b29s
+OiBjbGFyaWZ5IHRoYXQgImZvcm1hdHMiIG1lYW5zICJmb3JtYXQgc3RyaW5ncyIuLi4KRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzOTogRklMRTogc2NyaXB0cy90cmFjZXRvb2wvX19p
+bml0X18ucHk6MjQwOgorICAgICAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigiT25seSBldmVudHMg
+d2l0aCAndGNnJyBwcm9wZXJ0eSBjYW4gaGF2ZSB0d28gZm9ybWF0IHN0cmluZ3MiKQoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQyOiBGSUxFOiBzY3JpcHRzL3RyYWNldG9vbC9f
+X2luaXRfXy5weToyNDI6CisgICAgICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCJFdmVudHMgd2l0
+aCAndGNnJyBwcm9wZXJ0eSBtdXN0IGhhdmUgdHdvIGZvcm1hdCBzdHJpbmdzIikKCnRvdGFsOiAx
+IGVycm9ycywgMSB3YXJuaW5ncywgMjcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy8zOiB0cmFjZXRvb2w6IHJlcG9y
+dCBlcnJvciBvbiBmb28oKSBpbnN0ZWFkIG9mIGZvbyh2b2lkKS4uLgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojMjY6IEZJTEU6IHNjcmlwdHMvdHJhY2V0b29sL19faW5pdF9fLnB5
+Ojc5OgorICAgICAgICAgICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoIkVtcHR5IGFyZ3VtZW50IChk
+aWQgeW91IGZvcmdldCB0byB1c2UgJ3ZvaWQnPykiKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
+bmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
+ZWVsaXN0cy5vcmc=
