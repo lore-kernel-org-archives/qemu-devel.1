@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egDkk-0005QN-30
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:02:00 -0500
+	(envelope-from <mlureau@redhat.com>) id 1egDkx-0005a9-Ai
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:02:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egDkh-0003J0-W3
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:01:56 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:40865)
+	(envelope-from <mlureau@redhat.com>) id 1egDks-0003XP-0V
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:02:11 -0500
+Received: from mail-qk0-f195.google.com ([209.85.220.195]:37859)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1egDkh-0003IG-Ov
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:01:55 -0500
-Received: by mail-ot0-x244.google.com with SMTP id x4so7373044otg.7
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 10:01:55 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1egDkr-0003We-Qg
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:02:05 -0500
+Received: by mail-qk0-f195.google.com with SMTP id y80so6671150qkb.4
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 10:02:05 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180123035349.24538-6-richard.henderson@linaro.org>
-References: <20180123035349.24538-1-richard.henderson@linaro.org>
-	<20180123035349.24538-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jan 2018 18:01:34 +0000
-Message-ID: <CAFEAcA_HKrxOc9rwiZfbVBW4r14F5u-+y-AATH1yvs6bELZnVg@mail.gmail.com>
+In-Reply-To: <eb97942e-058f-2ba7-301e-9c7950693cd8@linux.vnet.ibm.com>
+References: <20180129123227.15778-1-marcandre.lureau@redhat.com>
+	<3c1355ed-57af-d023-8da3-21f1600ee018@linux.vnet.ibm.com>
+	<CAMxuvaytO_73rzEGduvD6AeT==B-=D-WsmDt5XgeaueQ_uds-A@mail.gmail.com>
+	<eb97942e-058f-2ba7-301e-9c7950693cd8@linux.vnet.ibm.com>
+From: Marc-Andre Lureau <mlureau@redhat.com>
+Date: Mon, 29 Jan 2018 19:02:04 +0100
+Message-ID: <CAMxuvax+v+VN5M_hQZb+mPWJKhV8c+WJZVLfKC3cZdXmwxH7yw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] target/arm: Add SVE state to
- TB->FLAGS
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tpm: fix alignment issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 23 January 2018 at 03:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Add both SVE exception state and vector length.
+Hi
+
+On Mon, Jan 29, 2018 at 6:57 PM, Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+> On 01/29/2018 12:51 PM, Marc-Andre Lureau wrote:
+>>
+>> Hi
+>>
+>> On Mon, Jan 29, 2018 at 6:41 PM, Stefan Berger
+>> <stefanb@linux.vnet.ibm.com> wrote:
+>>>
+>>> On 01/29/2018 07:32 AM, Marc-Andr=C3=A9 Lureau wrote:
+>>>>
+>>>> The new tpm-crb-test fails on sparc host:
+>>>>
+>>>> TEST: tests/tpm-crb-test... (pid=3D230409)
+>>>>     /i386/tpm-crb/test:
+>>>> Broken pipe
+>>>> FAIL
+>>>> GTester: last random seed: R02S29cea50247fe1efa59ee885a26d51a85
+>>>> (pid=3D230423)
+>>>> FAIL: tests/tpm-crb-test
+>>>>
+>>>> and generates a new clang sanitizer runtime warning:
+>>>>
+>>>> /home/petmay01/linaro/qemu-for-merges/hw/tpm/tpm_util.h:36:24: runtime
+>>>> error: load of misaligned address 0x7fdc24c00002 for type 'const
+>>>> uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
+>>>> 0x7fdc24c00002: note: pointer points here
+>>>> <memory cannot be printed>
+>>>>
+>>>> The sparc architecture does not allow misaligned loads and will
+>>>> segfault if you try them.  For example, this function:
+>>>>
+>>>> static inline uint32_t tpm_cmd_get_size(const void *b)
+>>>> {
+>>>>       return be32_to_cpu(*(const uint32_t *)(b + 2));
+>>>> }
+>>>>
+>>>> Should read,
+>>>>       return ldl_be_p(b + 2);
+>>>>
+>>>> As a general rule you can't take an arbitrary pointer into a byte
+>>>> buffer and try to interpret it as a structure or a pointer to a
+>>>> larger-than-bytesize-data simply by casting the pointer.
+>>>>
+>>>> Use this clean up as an opportunity to remove unnecessary temporary
+>>>> buffers and casts.
+>>>>
+>>>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>> ---
+>>>>    hw/tpm/tpm_util.h        | 17 ++++++++++-
+>>>>    hw/tpm/tpm_emulator.c    | 14 ++++-----
+>>>>    hw/tpm/tpm_passthrough.c |  6 ++--
+>>>>    hw/tpm/tpm_util.c        | 75
+>>>> ++++++++++++++++++++++--------------------------
+>>>>    4 files changed, 58 insertions(+), 54 deletions(-)
+>>>>
+>>>> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+>>>> index 19b28474ae..c562140e52 100644
+>>>> --- a/hw/tpm/tpm_util.h
+>>>> +++ b/hw/tpm/tpm_util.h
+>>>> @@ -31,9 +31,24 @@ bool tpm_util_is_selftest(const uint8_t *in, uint32=
+_t
+>>>> in_len);
+>>>>
+>>>>    int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
+>>>>
+>>>> +static inline uint16_t tpm_cmd_get_tag(const void *b)
+>>>> +{
+>>>> +    return lduw_be_p(b);;
+>>>> +}
+>>>> +
+>>>>    static inline uint32_t tpm_cmd_get_size(const void *b)
+>>>>    {
+>>>> -    return be32_to_cpu(*(const uint32_t *)(b + 2));
+>>>> +    return ldl_be_p(b + 2);;
+>>>
+>>>
+>>> Why are there these two ';;' ?
+>>>
+>> obvious typo (repeated..)
+>>
+>>>> +}
+>>>> +
+>>>> +static inline uint32_t tpm_cmd_get_ordinal(const void *b)
+>>>> +{
+>>>> +    return ldl_be_p(b + 6);;
+>>>> +}
+>>>> +
+>>>> +static inline uint32_t tpm_cmd_get_errcode(const void *b)
+>>>> +{
+>>>> +    return ldl_be_p(b + 6);;
+>>>>    }
+>>>>
+>>>>    int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+>>>> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+>>>> index 35c78de5a9..a34a18ac7a 100644
+>>>> --- a/hw/tpm/tpm_emulator.c
+>>>> +++ b/hw/tpm/tpm_emulator.c
+>>>> @@ -120,7 +120,6 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator
+>>>> *tpm_emu,
+>>>>    {
+>>>>        ssize_t ret;
+>>>>        bool is_selftest =3D false;
+>>>> -    const struct tpm_resp_hdr *hdr =3D NULL;
+>>>>
+>>>>        if (selftest_done) {
+>>>>            *selftest_done =3D false;
+>>>> @@ -132,22 +131,21 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator
+>>>> *tpm_emu,
+>>>>            return -1;
+>>>>        }
+>>>>
+>>>> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+>>>> sizeof(*hdr),
+>>>> -                               err);
+>>>> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+>>>> +              sizeof(struct tpm_resp_hdr), err);
+>>>>        if (ret !=3D 0) {
+>>>>            return -1;
+>>>>        }
+>>>>
+>>>> -    hdr =3D (struct tpm_resp_hdr *)out;
+>>>> -    out +=3D sizeof(*hdr);
+>>>> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+>>>> -                               be32_to_cpu(hdr->len) - sizeof(*hdr) ,
+>>>> err);
+>>>> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc,
+>>>> +              (char *)out + sizeof(struct tpm_resp_hdr),
+>>>> +              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr),
+>>>> err);
+>>>>        if (ret !=3D 0) {
+>>>>            return -1;
+>>>>        }
+>>>>
+>>>>        if (is_selftest) {
+>>>> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
+>>>> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+>>>>        }
+>>>>
+>>>>        return 0;
+>>>> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+>>>> index 29142f38bb..537e11a3f9 100644
+>>>> --- a/hw/tpm/tpm_passthrough.c
+>>>> +++ b/hw/tpm/tpm_passthrough.c
+>>>> @@ -87,7 +87,6 @@ static int
+>>>> tpm_passthrough_unix_tx_bufs(TPMPassthruState
+>>>> *tpm_pt,
+>>>>    {
+>>>>        ssize_t ret;
+>>>>        bool is_selftest;
+>>>> -    const struct tpm_resp_hdr *hdr;
+>>>>
+>>>>        /* FIXME: protect shared variables or use other sync mechanism =
+*/
+>>>>        tpm_pt->tpm_op_canceled =3D false;
+>>>> @@ -116,15 +115,14 @@ static int
+>>>> tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+>>>>                             strerror(errno), errno);
+>>>>            }
+>>>>        } else if (ret < sizeof(struct tpm_resp_hdr) ||
+>>>> -               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D re=
+t) {
+>>>> +               tpm_cmd_get_size(out) !=3D ret) {
+>>>>            ret =3D -1;
+>>>>            error_report("tpm_passthrough: received invalid response "
+>>>>                         "packet from TPM");
+>>>>        }
+>>>>
+>>>>        if (is_selftest && (ret >=3D sizeof(struct tpm_resp_hdr))) {
+>>>> -        hdr =3D (struct tpm_resp_hdr *)out;
+>>>> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
+>>>> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+>>>>        }
+>>>>
+>>>>    err_exit:
+>>>> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+>>>> index 747075e244..8abde59915 100644
+>>>> --- a/hw/tpm/tpm_util.c
+>>>> +++ b/hw/tpm/tpm_util.c
+>>>> @@ -106,20 +106,16 @@ const PropertyInfo qdev_prop_tpm =3D {
+>>>>    void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t
+>>>> out_len)
+>>>>    {
+>>>>        if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+>>>> -        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
+>>>> -
+>>>> -        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
+>>>> -        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
+>>>> -        resp->errcode =3D cpu_to_be32(TPM_FAIL);
+>>>> +        stw_be_p(out, TPM_TAG_RSP_COMMAND);
+>>>> +        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
+>>>> +        stl_be_p(out + 6, TPM_FAIL);
+>>>
+>>>
+>>> Since we wrapped the getters we should wrap the setters as well.
+>>> tpm_cmd_set_len(), tpm_cmd_set_errcode.
+>>
+>> They were not as widely used (there was only a getter so far), but
+>> that makes sense too. Could be done on top.
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> Also please rebase on top of your series of patches. I had some problems
+> with tpm_passthrough.c around line 115. Error reporting there has changed=
+.
+>
+>
 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 10eef870fe..4c1eca7062 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -11263,6 +11263,8 @@ static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
->      dc->user = (dc->current_el == 0);
->  #endif
->      dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
-> +    dc->sve_excp_el = ARM_TBFLAG_SVEEXC_EL(dc->base.tb->flags);
-> +    dc->sve_len = (ARM_TBFLAG_ZCR_LEN(dc->base.tb->flags) + 1) * 16;
+The patch is meant to be applied first on top of master, to avoid
+intermediary regressions (it passes patchew:
+http://patchew.org/QEMU/20180129123227.15778-1-marcandre.lureau@redhat.com/=
+)
 
-You've carefully arranged that the sve_excp checks are a superset
-of the fp_excp checks, which means that we get the correct
-exception prioritization by always doing the sve_excp check first
-and then the fp_excp check second, without having to look at
-whether fp_excp_el or sve_excp_el is larger to see which should
-take precedence. We could
-  assert(dc->sve_excp_el <= dc->fp_excp_el);
-and perhaps have a comment noting why this is useful...
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+There was no conflicts after a rebase of my series. If it helps, I can
+resend my pending tpm queue.
