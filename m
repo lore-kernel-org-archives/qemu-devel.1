@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8GF-0005ji-4L
+	(envelope-from <quintela@redhat.com>) id 1eg8GD-0005hy-76
 	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8G9-0001TM-0C
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37854)
+	(envelope-from <quintela@redhat.com>) id 1eg8G7-0001QE-8f
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8G8-0001SN-QV
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:00 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8G7-0001Pd-3T
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:09:59 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 333A74E05D
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:10:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 76F0F4E05D
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:09:58 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 29 Jan 2018 13:09:26 +0100
-Message-Id: <20180129120932.12874-8-quintela@redhat.com>
+Date: Mon, 29 Jan 2018 13:09:25 +0100
+Message-Id: <20180129120932.12874-7-quintela@redhat.com>
 In-Reply-To: <20180129120932.12874-1-quintela@redhat.com>
 References: <20180129120932.12874-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 07/13] tests: Consolidate accelerators
- declaration
+Subject: [Qemu-devel] [PULL 06/13] tests: Remove deprecated migration tests
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +33,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+We move to use migration_set_parameter() for everything.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- tests/migration-test.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ tests/migration-test.c | 33 ++++++++-------------------------
+ 1 file changed, 8 insertions(+), 25 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 0428d450df..3732682a29 100644
+index 799e24ebc6..0428d450df 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -422,27 +422,29 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-     gchar *cmd_src, *cmd_dst;
-     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
-     const char *arch = qtest_get_arch();
-+    const char *accel = "kvm:tcg";
+@@ -369,37 +369,20 @@ static void migrate_check_parameter(QTestState *who, const char *parameter,
+     QDECREF(rsp);
+ }
  
-     got_stop = false;
+-static void migrate_set_downtime(QTestState *who, const double value)
++static void migrate_set_parameter(QTestState *who, const char *parameter,
++                                  const char *value)
+ {
+     QDict *rsp;
+     gchar *cmd;
+-    char *expected;
+-    int64_t result_int;
  
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-         init_bootfile_x86(bootpath);
--        cmd_src = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
-+        cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
-                                   " -name pcsource,debug-threads=on"
-                                   " -serial file:%s/src_serial"
-                                   " -drive file=%s,format=raw",
--                                  tmpfs, bootpath);
--        cmd_dst = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
-+                                  accel, tmpfs, bootpath);
-+        cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
-                                   " -name pcdest,debug-threads=on"
-                                   " -serial file:%s/dest_serial"
-                                   " -drive file=%s,format=raw"
-                                   " -incoming %s",
--                                  tmpfs, bootpath, uri);
-+                                  accel, tmpfs, bootpath, uri);
-     } else if (strcmp(arch, "ppc64") == 0) {
--        const char *accel;
+-    cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
+-                          "'arguments': { 'value': %g } }", value);
++    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
++                          "'arguments': { '%s': %s } }",
++                          parameter, value);
+     rsp = qtest_qmp(who, cmd);
+     g_free(cmd);
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+-    result_int = value * 1000L;
+-    expected = g_strdup_printf("%" PRId64, result_int);
+-    migrate_check_parameter(who, "downtime-limit", expected);
+-    g_free(expected);
+-}
+-
+-static void migrate_set_speed(QTestState *who, const char *value)
+-{
+-    QDict *rsp;
+-    gchar *cmd;
+-
+-    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
+-                          "'arguments': { 'value': %s } }", value);
+-    rsp = qtest_qmp(who, cmd);
+-    g_free(cmd);
+-    g_assert(qdict_haskey(rsp, "return"));
+-    QDECREF(rsp);
+-    migrate_check_parameter(who, "max-bandwidth", value);
++    migrate_check_parameter(who, parameter, value);
+ }
  
-         /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
--        accel = access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
-+        if (access("/sys/module/kvm_hv", F_OK)) {
-+            accel = "tcg";
-+        }
-         init_bootfile_ppc(bootpath);
-         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
-                                   " -name pcsource,debug-threads=on"
+ static void migrate_set_capability(QTestState *who, const char *capability,
+@@ -530,8 +513,8 @@ static void test_migrate(void)
+      * quickly, but that it doesn't complete precopy even on a slow
+      * machine, so also set the downtime.
+      */
+-    migrate_set_speed(from, "100000000");
+-    migrate_set_downtime(from, 0.001);
++    migrate_set_parameter(from, "max-bandwidth", "100000000");
++    migrate_set_parameter(from, "downtime-limit", "1");
+ 
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
 -- 
 2.14.3
