@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1egBnd-0002F7-G4
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:56:50 -0500
+	(envelope-from <stefanha@gmail.com>) id 1egBru-0004N1-CI
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1egBna-0007aF-Ao
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:56:49 -0500
-Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:46662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1egBna-0007Zg-41
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:56:46 -0500
-Received: by mail-pf0-x229.google.com with SMTP id y5so5620976pff.13
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 07:56:45 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <20180124131315.30567-1-alex.bennee@linaro.org>
-	<20180124131315.30567-20-alex.bennee@linaro.org>
-	<57ab078a-049b-72e7-5bc5-f73a3c947b45@linaro.org>
-	<87vafkyiyg.fsf@linaro.org>
-	<85b5aa04-ec85-a2b6-3b79-2bb991824004@linaro.org>
-Message-ID: <841cd62e-1062-6997-10f6-272b55d1b612@linaro.org>
-Date: Mon, 29 Jan 2018 07:56:42 -0800
+	(envelope-from <stefanha@gmail.com>) id 1egBro-0001wj-Kx
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:01:14 -0500
+Date: Mon, 29 Jan 2018 16:01:04 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180129160104.GN20446@stefanha-x1.localdomain>
+References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	<20171211115634.GI13593@stefanha-x1.localdomain>
+	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	<20171213112345.GK16782@stefanha-x1.localdomain>
+	<VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-In-Reply-To: <85b5aa04-ec85-a2b6-3b79-2bb991824004@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 19/22] fpu/softfloat: re-factor scalbn
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="aSnC4ZPPfhCvD8sN"
+Content-Disposition: inline
+In-Reply-To: <VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+Subject: Re: [Qemu-devel] qemu process crash: Assertion failed:
+ QLIST_EMPTY(&bs->tracked_requests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
-
-On 01/29/2018 07:50 AM, Richard Henderson wrote:
-> On 01/29/2018 03:59 AM, Alex Bennée wrote:
->>
->> Richard Henderson <richard.henderson@linaro.org> writes:
->>
->>> On 01/24/2018 05:13 AM, Alex Bennée wrote:
->>>> +/* Multiply A by 2 raised to the power N.  */
->>>> +static FloatParts scalbn_decomposed(FloatParts a, int n,
->>>> +                                          float_status *s)
->>>> +{
->>>> +    if (a.cls == float_class_normal) {
->>>> +        a.exp += n;
->>>> +    }
->>>> +    return a;
->>>> +}
->>>
->>> ...
->>>
->>>> -    if ( aExp == 0x7FF ) {
->>>> -        if ( aSig ) {
->>>> -            return propagateFloat64NaN(a, a, status);
->>>
->>> This is where we used to raise inexact.
->>> In the new function we need to handle this as in round_to_int.
->>
->> Why is the handling in round_canonical not good enough for this?
-> 
-> This is scalbn -- you don't call round_canonical.
-
-Scratch that -- too early.  And I was trying to talk about invalid not inexact.
- What a cacophony of errors on my part.  No wonder we're not communicating.
-
-But you'll notice that round_canonical does not raise invalid for nans.
-Perhaps we could rearrange things so that it does, but at the moment it is the
-responsibility of prior code to have set invalid and msnan/dnan.
+To: Fernando Casas =?iso-8859-1?Q?Sch=F6ssow?= <casasfernando@hotmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>
 
 
-r~
+--aSnC4ZPPfhCvD8sN
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Dec 13, 2017 at 03:33:01PM +0000, Fernando Casas Sch=C3=B6ssow wrot=
+e:
+> Maybe I=E2=80=99m missing something here but, if I recall correctly, the =
+qemu process for the guest is terminated when this problem happens. So how =
+a debugger will be attached to a process that is gone?
+
+Sorry, this got lost in my inbox.
+
+assert(false) sends SIGABRT to the process.  The default behavior is to
+dump a core file that can be analyzed later with GDB.
+
+Your system must have core dumps enabled (i.e. ulimit -c unlimited).
+Also, various pieces of software like systemd's coredumpctl can
+influence where and how core dumps are stored.
+
+But in short, an assertion failure produces a core dump.
+
+Stefan
+
+--aSnC4ZPPfhCvD8sN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJab0VAAAoJEJykq7OBq3PIncEIAKqFw3BMEEzz3IVcT4XbIR+n
+kHrjH0/69OVFbBZHHaZ5AbWXn8vn3ku3O0+ammNE6PBH64OWzve9ga4KqJFBYcbS
+y+GYSx4DpN1aY8UM204HdbShlIxo+r1oNHN5/kzYUatGtJMDWILhJLIDBGM1JFSm
+S0FR+A1efVE8VJ1JY5vUrDqtd9Tf+znBCbdjpgjx7VdHf16td8sMiSG3gRty+n9/
+wNaeDeAAWxociZCWcCgZfyDSlGGcP97ds8W8CEDkTXCkGTNoNMptMtYBQUjJC2uy
+i1XoDxTizW4dxd50JTHKLNl4HeVPp7Y6H0fyY5uV9W30JokTqM2furomFzUGQxM=
+=TZhy
+-----END PGP SIGNATURE-----
+
+--aSnC4ZPPfhCvD8sN--
