@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eg90U-0005Lw-6h
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:57:59 -0500
+	(envelope-from <drjones@redhat.com>) id 1eg90k-0005ZN-ER
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:58:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eg90P-0003hW-6C
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:57:54 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 29 Jan 2018 13:56:23 +0100
-Message-Id: <20180129125623.21729-19-david@redhat.com>
-In-Reply-To: <20180129125623.21729-1-david@redhat.com>
-References: <20180129125623.21729-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 18/18] s390x/flic: cache the common flic
- class in a central function
+	(envelope-from <drjones@redhat.com>) id 1eg90j-00046o-Eq
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:58:10 -0500
+Date: Mon, 29 Jan 2018 13:57:52 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180129125752.4wgsmzb5uxtnsfq5@kamzik.brq.redhat.com>
+References: <5A6B5091.8030601@hisilicon.com>
+	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
+	<5A6B5FCA.2080009@hisilicon.com>
+	<CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
+	<5A6B6671.8070408@hisilicon.com>
+	<CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
+	<20180129102917.3olxduibcwdqgqls@hawk.localdomain>
+	<5A6F0761.2010305@hisilicon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5A6F0761.2010305@hisilicon.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
+ before enabled the interruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,164 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Wei Xu <xuwei5@hisilicon.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Rob Herring <rob.herring@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, qemu-arm <qemu-arm@nongnu.org>, Daode Huang <huangdaode@hisilicon.com>, tiantao6@huawei.com, Paolo Bonzini <pbonzini@redhat.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Zhangyi ac <zhangyi.ac@huawei.com>
 
-This avoids tons of conversions when handling interrupts.
+On Mon, Jan 29, 2018 at 11:37:05AM +0000, Wei Xu wrote:
+> Hi Andrew,
+> 
+> On 2018/1/29 10:29, Andrew Jones wrote:
+> > On Fri, Jan 26, 2018 at 06:01:33PM +0000, Peter Maydell wrote:
+> >> On 26 January 2018 at 17:33, Wei Xu <xuwei5@hisilicon.com> wrote:
+> >>> On 2018/1/26 17:15, Peter Maydell wrote:
+> >>>> The pl011 code should call qemu_set_irq(..., 1) when the
+> >>>> guest enables interrupts on the device by writing to the int_enabled
+> >>>> (UARTIMSC) register. That will be a 0-to-1 level change and the KVM
+> >>>> VGIC should report the interrupt to the guest.
+> >>>>
+> >>>
+> >>> Yes.
+> >>> And in the pl011_update, the irq level is set by s->int_level & s->int_enabled.
+> >>> When writing to the int_enabled, not sure why the int_level is set to
+> >>> 0x20(PL011_INT_TX) but int_enabled is 0x50.
+> >>>
+> >>> It still call qemu_set_irq(..., 0).
+> >>>
+> >>> I added "s->int_level |= PL011_INT_RX" before calling pl011_update
+> >>> when writing to the int_enabled and tested it also works.
+> >>
+> >> No, that's not right either. int_level should already have the
+> >> RX bit set, because pl011_put_fifo() sets that bit when it gets a
+> >> character from QEMU and puts it into the FIFO.
+> >>
+> >> Does something else clear the int_level between the character
+> >> going into the FIFO from QEMU and the guest enabling
+> >> interrupts?
+> > 
+> > As part of the boot process Linux restarts the UART a few times. When
+> > Linux drives the PL011 with the SBSA driver then the FIFO doesn't get
+> > reset prior to being used again, as the SBSA doesn't specify a way to
+> > do that. I'm not sure if this issue is due to the SBSA attempting to
+> > be overly simple, or something the Linux driver can deal with. See
+> > this thread for a discussion I started once.
+> > 
+> > https://www.spinics.net/lists/linux-serial/msg23163.html
+> 
+> I am not sure it is the same problem or not.
+> I will check that.
+> Thanks!
+> 
+> > 
+> > Wei,
+> > 
+> > I assume you're using UEFI/ACPI when booting, as I don't recall this
+> > problem occurring with the Linux PL011 driver which would be used
+> > when booting with DT.
+> >
+> 
+> I am using an ARM64 board, the guest is booted *without* UEFI but the
+> host is booted with UEFI/ACPI.
+> The command I am using is as below:
+> 	"qemu-system-aarch64 -enable-kvm -m 1024 -cpu host -M virt \
+> 	-nographic --kernel Image --initrd roofs.cpio.gz"
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/intc/s390_flic.c          | 13 ++++++++++++-
- hw/s390x/css.c               | 10 +++++-----
- hw/s390x/virtio-ccw.c        |  4 ++--
- include/hw/s390x/s390_flic.h |  1 +
- target/s390x/interrupt.c     |  6 +++---
- 5 files changed, 23 insertions(+), 11 deletions(-)
+Hmm. This means you're booting the guest with DT, which means the
+Linux driver is the PL011 driver, not the SBSA driver. I didn't
+recall that driver having the issue, but maybe something changed.
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index b46c0f1bb4..a85a149c6d 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -22,6 +22,17 @@
- #include "qapi/error.h"
- #include "hw/s390x/s390-virtio-ccw.h"
- 
-+S390FLICStateClass *s390_get_flic_class(S390FLICState *fs)
-+{
-+    static S390FLICStateClass *class;
-+
-+    if (!class) {
-+        /* we only have one flic device, so this is fine to cache */
-+        class = S390_FLIC_COMMON_GET_CLASS(fs);
-+    }
-+    return class;
-+}
-+
- QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs)
- {
-     static QEMUS390FLICState *flic;
-@@ -146,7 +157,7 @@ static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
-                                  uint8_t isc, uint8_t flags)
- {
-     QEMUS390FLICState *flic = s390_get_qemu_flic(fs);
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
-     bool flag = flags & S390_ADAPTER_SUPPRESSIBLE;
-     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
- 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 1c526fd7e2..301bf1772f 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -439,7 +439,7 @@ static int s390_io_adapter_map(AdapterInfo *adapter, uint64_t map_addr,
-                                bool do_map)
- {
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
- 
-     return fsc->io_adapter_map(fs, adapter->adapter_id, map_addr, do_map);
- }
-@@ -520,7 +520,7 @@ void css_register_io_adapters(CssIoAdapterType type, bool swap, bool maskable,
-     int ret, isc;
-     IoAdapter *adapter;
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
- 
-     /*
-      * Disallow multiple registrations for the same device type.
-@@ -566,7 +566,7 @@ static void css_clear_io_interrupt(uint16_t subchannel_id,
-     Error *err = NULL;
-     static bool no_clear_irq;
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
-     int r;
- 
-     if (unlikely(no_clear_irq)) {
-@@ -640,7 +640,7 @@ void css_conditional_io_interrupt(SubchDev *sch)
- int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode)
- {
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
-     int r;
- 
-     if (env->psw.mask & PSW_MASK_PSTATE) {
-@@ -666,7 +666,7 @@ out:
- void css_adapter_interrupt(CssIoAdapterType type, uint8_t isc)
- {
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
-     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
-     IoAdapter *adapter = channel_subsys.io_adapters[type][isc];
- 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 3d8f26949b..8f7fbc2ab7 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1111,7 +1111,7 @@ static int virtio_ccw_setup_irqroutes(VirtioCcwDevice *dev, int nvqs)
-     VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
-     int ret;
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
- 
-     ret = virtio_ccw_get_mappings(dev);
-     if (ret) {
-@@ -1129,7 +1129,7 @@ static int virtio_ccw_setup_irqroutes(VirtioCcwDevice *dev, int nvqs)
- static void virtio_ccw_release_irqroutes(VirtioCcwDevice *dev, int nvqs)
- {
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
- 
-     fsc->release_adapter_routes(fs, &dev->routes);
- }
-diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-index a636afce42..4687ecfe83 100644
---- a/include/hw/s390x/s390_flic.h
-+++ b/include/hw/s390x/s390_flic.h
-@@ -136,6 +136,7 @@ void s390_flic_init(void);
- 
- S390FLICState *s390_get_flic(void);
- QEMUS390FLICState *s390_get_qemu_flic(S390FLICState *fs);
-+S390FLICStateClass *s390_get_flic_class(S390FLICState *fs);
- bool ais_needed(void *opaque);
- 
- #endif /* HW_S390_FLIC_H */
-diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index 1947012b25..25cfb3eef8 100644
---- a/target/s390x/interrupt.c
-+++ b/target/s390x/interrupt.c
-@@ -134,7 +134,7 @@ void cpu_inject_stop(S390CPU *cpu)
- void s390_sclp_extint(uint32_t parm)
- {
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
- 
-     fsc->inject_service(fs, parm);
- }
-@@ -143,7 +143,7 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
-                        uint32_t io_int_parm, uint32_t io_int_word)
- {
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
- 
-     fsc->inject_io(fs, subchannel_id, subchannel_nr, io_int_parm, io_int_word);
- }
-@@ -151,7 +151,7 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
- void s390_crw_mchk(void)
- {
-     S390FLICState *fs = s390_get_flic();
--    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-+    S390FLICStateClass *fsc = s390_get_flic_class(fs);
- 
-     fsc->inject_crw_mchk(fs);
- }
--- 
-2.14.3
+Thanks,
+drew
+
+> 
+> Thanks!
+> 
+> Best Regards,
+> Wei
+> 
+> > Thanks,
+> > drew
+> > 
+> > .
+> > 
+> 
+> 
