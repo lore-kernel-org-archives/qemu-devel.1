@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1egF72-0007wc-FF
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:29:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egFFM-0002K6-GX
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:37:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1egF6y-0007hQ-GK
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:29:04 -0500
-Resent-Message-Id: <E1egF6y-0007hQ-GK@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21110)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1egF6y-0007h9-7T
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:29:00 -0500
-In-Reply-To: <20180129033133.31288-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151719735098.776.11041828881164845723@5adcb62bf0d6>
+	(envelope-from <mreitz@redhat.com>) id 1egFFL-0003xZ-5Q
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:37:40 -0500
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516297747-107232-4-git-send-email-anton.nefedov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ac354ca7-a569-42f4-1aab-0274b269b50b@redhat.com>
+Date: Mon, 29 Jan 2018 20:37:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 28 Jan 2018 19:42:32 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] docs: Add docs/devel/testing.rst
+In-Reply-To: <1516297747-107232-4-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kxcbX0LpKUnNCzb3QSwnDxLhUYm0tJcg5"
+Subject: Re: [Qemu-devel] [PATCH v7 3/9] block: introduce BDRV_REQ_ALLOCATE
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +25,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, f4bug@amsat.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, armbru@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTI5MDMzMTMzLjMxMjg4LTEtZmFtekByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0hdIGRvY3M6IEFkZCBkb2NzL2RldmVsL3Rlc3RpbmcucnN0Cgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFs
-PSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
-LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
-dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
-ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
-OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
-KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
-Y2hldy8xNTE3MDA1NTIzOTguNzE5Ni4yNTczODQ4NzczODk5MzY0NTIwLnN0Z2l0QGJhaGlhLmxh
-biAtPiBwYXRjaGV3LzE1MTcwMDU1MjM5OC43MTk2LjI1NzM4NDg3NzM4OTkzNjQ1MjAuc3RnaXRA
-YmFoaWEubGFuCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAxMjkwMzMx
-MzMuMzEyODgtMS1mYW16QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDEyOTAzMzEzMy4zMTI4
-OC0xLWZhbXpAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE0MzFm
-OWM3OTMgZG9jczogQWRkIGRvY3MvZGV2ZWwvdGVzdGluZy5yc3QKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvMTogZG9jczogQWRkIGRvY3MvZGV2ZWwvdGVzdGluZy5yc3Qu
-Li4KRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzE5MDogRklMRTogZG9jcy9kZXZlbC90ZXN0
-aW5nLnJzdDoxNjc6CisgIC4vY2hlY2sgLW5iZCAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
-Z3MsIDQ0OSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-ZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kxcbX0LpKUnNCzb3QSwnDxLhUYm0tJcg5
+From: Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
+ den@virtuozzo.com, berto@igalia.com
+Message-ID: <ac354ca7-a569-42f4-1aab-0274b269b50b@redhat.com>
+Subject: Re: [PATCH v7 3/9] block: introduce BDRV_REQ_ALLOCATE flag
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516297747-107232-4-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1516297747-107232-4-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-01-18 18:49, Anton Nefedov wrote:
+> The flag is supposed to indicate that the region of the disk image has
+> to be sufficiently allocated so it reads as zeroes.
+>=20
+> The call with the flag set must return -ENOTSUP if allocation cannot
+> be done efficiently.
+> This has to be made sure of by both
+>   - the drivers that support the flag
+>   - and the common block layer (so it will not fall back to any slowpat=
+h
+>     (like writing zero buffers) in case the driver does not support
+>     the flag).
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  include/block/block.h     |  6 +++++-
+>  include/block/block_int.h |  2 +-
+>  block/io.c                | 20 +++++++++++++++++---
+>  3 files changed, 23 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 9b12774..3e31b89 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -65,9 +65,13 @@ typedef enum {
+>      BDRV_REQ_NO_SERIALISING     =3D 0x8,
+>      BDRV_REQ_FUA                =3D 0x10,
+>      BDRV_REQ_WRITE_COMPRESSED   =3D 0x20,
+> +    /* The BDRV_REQ_ALLOCATE flag is used to indicate that the driver =
+has to
+> +     * efficiently allocate the space so it reads as zeroes, or return=
+ an error.
+
+What happens if you specify this for a normal write operation that does
+not write zeroes?
+
+(I suppose the answer is "don't do that", but that would need to be
+documented more clearly here.)
+
+> +     */
+> +    BDRV_REQ_ALLOCATE           =3D 0x40,
+> =20
+>      /* Mask of valid flags */
+> -    BDRV_REQ_MASK               =3D 0x3f,
+> +    BDRV_REQ_MASK               =3D 0x7f,
+>  } BdrvRequestFlags;
+> =20
+>  typedef struct BlockSizes {
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 29cafa4..b141710 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -632,7 +632,7 @@ struct BlockDriverState {
+>      /* Flags honored during pwrite (so far: BDRV_REQ_FUA) */
+>      unsigned int supported_write_flags;
+>      /* Flags honored during pwrite_zeroes (so far: BDRV_REQ_FUA,
+> -     * BDRV_REQ_MAY_UNMAP) */
+> +     * BDRV_REQ_MAY_UNMAP, BDRV_REQ_ALLOCATE) */
+>      unsigned int supported_zero_flags;
+> =20
+>      /* the following member gives a name to every node on the bs graph=
+=2E */
+> diff --git a/block/io.c b/block/io.c
+> index 7ea4023..cf2f84c 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1424,7 +1424,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(=
+BlockDriverState *bs,
+>              assert(!bs->supported_zero_flags);
+>          }
+> =20
+> -        if (ret =3D=3D -ENOTSUP) {
+> +        if (ret =3D=3D -ENOTSUP && !(flags & BDRV_REQ_ALLOCATE)) {
+>              /* Fall back to bounce buffer if write zeroes is unsupport=
+ed */
+>              BdrvRequestFlags write_flags =3D flags & ~BDRV_REQ_ZERO_WR=
+ITE;
+> =20
+> @@ -1514,8 +1514,8 @@ static int coroutine_fn bdrv_aligned_pwritev(Bdrv=
+Child *child,
+>      ret =3D notifier_with_return_list_notify(&bs->before_write_notifie=
+rs, req);
+> =20
+>      if (!ret && bs->detect_zeroes !=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_=
+OFF &&
+> -        !(flags & BDRV_REQ_ZERO_WRITE) && drv->bdrv_co_pwrite_zeroes &=
+&
+> -        qemu_iovec_is_zero(qiov)) {
+> +        !(flags & BDRV_REQ_ZERO_WRITE) && !(flags & BDRV_REQ_ALLOCATE)=
+ &&
+> +        drv->bdrv_co_pwrite_zeroes && qemu_iovec_is_zero(qiov)) {
+
+Do we really need to add the BDRV_REQ_ALLOCATE check here?  If the
+caller specifies that flag, then we won't invalidate it by adding the
+BDRV_REQ_ZERO_WRITE flag (as long as we don't add BDRV_REQ_MAY_UNMAP).
+
+>          flags |=3D BDRV_REQ_ZERO_WRITE;
+>          if (bs->detect_zeroes =3D=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_UN=
+MAP) {
+>              flags |=3D BDRV_REQ_MAY_UNMAP;
+> @@ -1593,6 +1593,9 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(B=
+drvChild *child,
+> =20
+>      assert(flags & BDRV_REQ_ZERO_WRITE);
+>      if (head_padding_bytes || tail_padding_bytes) {
+> +        if (flags & BDRV_REQ_ALLOCATE) {
+> +            return -ENOTSUP;
+> +        }
+>          buf =3D qemu_blockalign(bs, align);
+>          iov =3D (struct iovec) {
+>              .iov_base   =3D buf,
+> @@ -1693,6 +1696,9 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child=
+,
+>          return ret;
+>      }
+> =20
+> +    /* allocation request with qiov provided doesn't make much sense *=
+/
+> +    assert(!(qiov && (flags & BDRV_REQ_ALLOCATE)));
+> +
+
+So I suppose the use of BDRV_REQ_ALLOCATE necessitates the use of
+BDRV_REQ_ZERO_WRITE?  That should be documented, then.
+
+Max
+
+>      bdrv_inc_in_flight(bs);
+>      /*
+>       * Align write if necessary by performing a read-modify-write cycl=
+e.
+> @@ -1822,6 +1828,14 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild=
+ *child, int64_t offset,
+>  {
+>      trace_bdrv_co_pwrite_zeroes(child->bs, offset, bytes, flags);
+> =20
+> +    assert(!((flags & BDRV_REQ_MAY_UNMAP) && (flags & BDRV_REQ_ALLOCAT=
+E)));
+> +
+> +    if ((flags & BDRV_REQ_ALLOCATE) &&
+> +        !(child->bs->supported_zero_flags & BDRV_REQ_ALLOCATE))
+> +    {
+> +        return -ENOTSUP;
+> +    }
+> +
+>      if (!(child->bs->open_flags & BDRV_O_UNMAP)) {
+>          flags &=3D ~BDRV_REQ_MAY_UNMAP;
+>      }
+>=20
+
+
+
+--kxcbX0LpKUnNCzb3QSwnDxLhUYm0tJcg5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpvd/gSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ASsAIAL7uTgEmw+/WkDakUW0ci2g2QUvdzOaN
+3UmADRi25BPfTRzKl/d81h2xsWldmn2UKxcuXs5bgcM/gljHVNrrUKmaEzXlb9Z/
+QDNifG62Ys1RUHZGX02iFOizuAVtTYirVkyuz+tbgydIFcG4eJs9ATm3zGpur7ia
+D1aQ5J8dVgDZEG0lbihth68+DiCuSRUjxCSGYh99vTZ7DeNA2pOyxELZ8BmrwM5x
+OVtHfnw4Kik7r8449HXzTQG21cI0G6zuVTeadDHJ1+OZKNZgueWgK1l8e2zdy0PK
+C3hPnHMd2uL+a9+Kyxxj6cNDIPr7uxynBHLo2gWYkLiafp9cmAanUmU=
+=lRl0
+-----END PGP SIGNATURE-----
+
+--kxcbX0LpKUnNCzb3QSwnDxLhUYm0tJcg5--
