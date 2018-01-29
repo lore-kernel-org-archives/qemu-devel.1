@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egCrk-0002F4-4u
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:13 -0500
+	(envelope-from <groug@kaod.org>) id 1egCs5-0002Ye-2n
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egCra-0006Ja-6T
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:08 -0500
-Date: Mon, 29 Jan 2018 18:04:42 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180129170442.GL6141@localhost.localdomain>
-References: <20180127020515.27137-1-jsnow@redhat.com>
-	<20180127020515.27137-3-jsnow@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1egCrw-0006Xm-OT
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:28 -0500
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:51519)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egCrw-0006Ww-HE
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:20 -0500
+Received: from player730.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5E7CFD36B3
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 18:05:18 +0100 (CET)
+Date: Mon, 29 Jan 2018 18:05:06 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180129180506.33520c68@bahia.lan>
+In-Reply-To: <f0bd7f3d-d3ba-556b-3c69-cbfaf7d7b929@huawei.com>
+References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
+	<20180112171416.6048ae9e@bahia.lan>
+	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
+	<20180119112733.4a9dd43f@bahia.lan>
+	<05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
+	<899644b1-e401-8ed5-8a49-1f0e2dbf9b2b@huawei.com>
+	<20180119190555.35127373@bahia.lan>
+	<e6ad35e8-2fda-8318-c043-dcf092cc0daa@huawei.com>
+	<f0bd7f3d-d3ba-556b-3c69-cbfaf7d7b929@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180127020515.27137-3-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v3 02/14] blockjobs: Add status enum
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,157 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Veaceslav Falico <veaceslav.falico@huawei.com>
+Cc: Eduard Shishkin <eduard.shishkin@huawei.com>, Antonios Motakis <antonios.motakis@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei
+	(CR)" <zhangwei555@huawei.com>, "Emilio G. Cota" <cota@braap.org>
 
-Am 27.01.2018 um 03:05 hat John Snow geschrieben:
-> We're about to add several new states, and booleans are becoming
-> unwieldly and difficult to reason about. To this end, add a new "status"
-> field and add our existing states in a redundant manner alongside the
-> bools they are replacing:
+On Thu, 25 Jan 2018 17:08:40 +0100
+Veaceslav Falico <veaceslav.falico@huawei.com> wrote:
+
+> On 1/25/2018 3:46 PM, Veaceslav Falico wrote:
+[...]
+> > 
+> > I've reproduced it today without fscache:
+> > 
+> > host:
+> > mount -o bind /tmp/mounted t1
+> > mount -o bind /tmp/mounted t2
+> > 
+> > guest:
+> > / # tail -f t1/file &
+> > / # 321
+> > 
+> > / # cat t2/file
+> > 321
+> > / #
+> > 
+> > host:
+> > mv t1/file t1/file_moved
+> > 
+> > guest:
+> > / # cat t2/file
+> > cat: can't open 't2/file': No such file or directory
+> > / # mount | grep fscache
+> > / #  
 > 
-> UNDEFINED: Placeholder, default state.
-> CREATED:   replaces (paused && !busy)
-> RUNNING:   replaces effectively (!paused && busy)
-> PAUSED:    Nearly redundant with info->paused, which shows pause_count.
->            This reports the actual status of the job, which almost always
->            matches the paused request status. It differs in that it is
->            strictly only true when the job has actually gone dormant.
-> READY:     replaces job->ready.
+> Sorry, disregard this test case, it's operating normally -
+> when we move the t1/file, we also move the t2/file, as they're
+> the same directory... Sorry, it's a brainfart after a long
+> discussion about the issue :).
 > 
-> New state additions in coming commits will not be quite so redundant:
+
+No problem :)
+
+> So, it's still not reproducible without (fs)cache guest-side.
 > 
-> WAITING:   Waiting on Transaction. This job has finished all the work
->            it can until the transaction converges, fails, or is canceled.
->            This status does not feature for non-transactional jobs.
-> PENDING:   Pending authorization from user. This job has finished all the
->            work it can until the job or transaction is finalized via
->            block_job_finalize. If this job is in a transaction, it has
->            already left the WAITING status.
-> CONCLUDED: Job has ceased all operations and has a return code available
->            for query and may be dismissed via block_job_dismiss.
-> Signed-off-by: John Snow <jsnow@redhat.com>
-
-Empty line before S-o-b?
-
->  blockjob.c               | 10 ++++++++++
->  include/block/blockjob.h |  4 ++++
->  qapi/block-core.json     | 17 ++++++++++++++++-
->  3 files changed, 30 insertions(+), 1 deletion(-)
 > 
-> diff --git a/blockjob.c b/blockjob.c
-> index 9850d70cb0..6eb783a354 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -321,6 +321,7 @@ void block_job_start(BlockJob *job)
->      job->pause_count--;
->      job->busy = true;
->      job->paused = false;
-> +    job->status = BLOCK_JOB_STATUS_RUNNING;
->      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
->  }
->  
-> @@ -601,6 +602,10 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
->      info->speed     = job->speed;
->      info->io_status = job->iostatus;
->      info->ready     = job->ready;
-> +    if (job->manual) {
-> +        info->has_status = true;
-> +        info->status = job->status;
-> +    }
+> Anyway, the question below still stands - is the guest
+> allowed to re-use the FIDs for the files with same QIDs?
+> 
 
-Why do we want to hide the status from clients that don't want to
-complete the job manually? Isn't this conflating two orthogonal things?
+AFAIU FIDs have a 1:1 relation to either a path in the file hierarchy or
+to an open file. I don't think they can be re-used.
 
->      return info;
->  }
->  
-> @@ -704,6 +709,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->      job->pause_count   = 1;
->      job->refcnt        = 1;
->      job->manual        = manual;
-> +    job->status        = BLOCK_JOB_STATUS_CREATED;
->      aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
->                     QEMU_CLOCK_REALTIME, SCALE_NS,
->                     block_job_sleep_timer_cb, job);
-> @@ -808,9 +814,12 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
->      }
->  
->      if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
-> +        BlockJobStatus status = job->status;
-> +        job->status = BLOCK_JOB_STATUS_PAUSED;
->          job->paused = true;
->          block_job_do_yield(job, -1);
->          job->paused = false;
-> +        job->status = status;
->      }
->  
->      if (job->driver->resume) {
-> @@ -916,6 +925,7 @@ void block_job_iostatus_reset(BlockJob *job)
->  
->  void block_job_event_ready(BlockJob *job)
->  {
-> +    job->status = BLOCK_JOB_STATUS_READY;
->      job->ready = true;
->  
->      if (block_job_is_internal(job)) {
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index b94d0c9fa6..d8e7df7e6e 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -146,6 +146,10 @@ typedef struct BlockJob {
->       */
->      bool manual;
->  
-> +    /* Current state, using 2.12+ state names
-> +     */
-> +    BlockJobStatus status;
-> +
->      /** Non-NULL if this job is part of a transaction */
->      BlockJobTxn *txn;
->      QLIST_ENTRY(BlockJob) txn_list;
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 8225308904..eac89754c1 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -955,6 +955,18 @@
->  { 'enum': 'BlockJobType',
->    'data': ['commit', 'stream', 'mirror', 'backup'] }
->  
-> +##
-> +# @BlockJobStatus:
-> +#
-> +# Block Job State
-> +#
-> +#
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'enum': 'BlockJobStatus',
-> +  'data': ['undefined', 'created', 'running', 'paused', 'ready'] }
-
-I assume these multiple empty lines are left there so you have space to
-fill in the information from the commit message?
-
->  ##
->  # @BlockJobInfo:
->  #
-> @@ -981,12 +993,15 @@
->  #
->  # @ready: true if the job may be completed (since 2.2)
->  #
-> +# @status: Current job state/status (since 2.12)
-> +#
->  # Since: 1.1
->  ##
->  { 'struct': 'BlockJobInfo',
->    'data': {'type': 'str', 'device': 'str', 'len': 'int',
->             'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
-> -           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool'} }
-> +           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
-> +           '*status': 'BlockJobStatus' } }
-
-If we don't actually have a reason to hide the status above, it can
-become a non-opional field here.
-
-Kevin
+> > 
+> > Also, per internal discussions, we're not sure if the guest side
+> > is allowed to reuse the FIDs opened previously for same QID.paths.
+> > 
+> > QEMU holds FID.path for each FID, which contains the actual FS path,
+> > i.e. "/path/to/file". 
+> > 
+> > So, if we (guest) have two "identical" (per QID.path and RFC) files
+> > (f1 and f2), though in different directories (host and guest), and 
+> > we've accessed f1 once (FID 10, for example) - are we allowed to
+> > re-use FID 10 for f2, if f1's QID.path == f2's QID.path ?
+> >   
+> >>  
+> >>>  
+> >>>>
+> >>>> Thanks,
+> >>>> Eduard.
+> >>>>     
+> >>>>>    
+> >>>>>>>    
+> >>>>>>>> With our proof of concept patch, the issues caused by qid path collisions go away, so it can be seen as an interim solution of sorts. However, the chance of collisions is not eliminated, we are just replacing the current strategy, which is almost guaranteed to cause collisions in certain use cases, with one that makes them more rare. We think that a virtio feature flag for longer qid paths is the only way to eliminate these issues completely.
+> >>>>>>>>
+> >>>>>>>> This is the extent that we were able to analyze the issue from our side, we would like to hear if there are some better ideas, or which approach would be more appropriate for upstream.
+> >>>>>>>>
+> >>>>>>>> Best regards,
+> >>>>>>>>    
+> >>>>>>>
+> >>>>>>> Cheers,
+> >>>>>>>
+> >>>>>>> -- 
+> >>>>>>> Greg
+> >>>>>>>    
+> >>>>>>    
+> >>>>>    
+> >>>>
+> >>>> .
+> >>>>     
+> >>>
+> >>>  
+> >>
+> >> .
+> >>  
+> >   
+> 
+> 
