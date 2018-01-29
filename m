@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1egE3w-0004YQ-1h
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:21:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egE5e-0005xN-5k
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:23:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1egE3v-0005ED-7F
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:21:48 -0500
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:43350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
-	id 1egE3v-0005Bo-3p
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:21:47 -0500
-Received: by mail-vk0-x242.google.com with SMTP id x203so5080239vkx.10
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 10:21:46 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1egE5d-0006ue-B8
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:23:34 -0500
+References: <20180111195225.4226-1-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <4ca01121-3446-99a6-12e8-b3606262141e@redhat.com>
+Date: Mon, 29 Jan 2018 19:23:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180115144944.GG32271@localhost.localdomain>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-	<20171012235439.19457-2-anatol.pomozov@gmail.com>
-	<20180115144944.GG32271@localhost.localdomain>
-From: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date: Mon, 29 Jan 2018 10:21:45 -0800
-Message-ID: <CAOMFOmU4pLtJMQ_SLqffpritydx4ghs9gUJBfyVT+zN_fudCRA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/4] multiboot: Change multiboot_info from
- array of bytes to a C struct
+In-Reply-To: <20180111195225.4226-1-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4zvot0kVzc3DA6tZq3QhxdstRHe4OpCk8"
+Subject: Re: [Qemu-devel] [RFC PATCH 00/10] x-blockdev-create for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4zvot0kVzc3DA6tZq3QhxdstRHe4OpCk8
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <4ca01121-3446-99a6-12e8-b3606262141e@redhat.com>
+Subject: Re: [RFC PATCH 00/10] x-blockdev-create for qcow2
+References: <20180111195225.4226-1-kwolf@redhat.com>
+In-Reply-To: <20180111195225.4226-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 15, 2018 at 6:49 AM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 13.10.2017 um 01:54 hat Anatol Pomozov geschrieben:
->> Using C structs makes the code more readable and prevents type conversion
->> errors.
->>
->> Borrow multiboot1 header from GRUB project.
->>
->> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
->> ---
->>  hw/i386/multiboot.c         | 124 +++++++++------------
->>  hw/i386/multiboot_header.h  | 254 ++++++++++++++++++++++++++++++++++++++++++++
->>  tests/multiboot/mmap.c      |  14 +--
->>  tests/multiboot/mmap.out    |  10 ++
->>  tests/multiboot/modules.c   |  12 ++-
->>  tests/multiboot/modules.out |  10 ++
->>  tests/multiboot/multiboot.h |  66 ------------
->>  7 files changed, 339 insertions(+), 151 deletions(-)
->>  create mode 100644 hw/i386/multiboot_header.h
->>  delete mode 100644 tests/multiboot/multiboot.h
->
-> This is a good change in general. However, I'm not sure if we should
-> really replace the header used in the tests. After all, the tests also
-> test whether things are at the right place, and if there is an error in
-> the header file, we can only catch it if the tests keep using their own
-> definitions.
+On 2018-01-11 20:52, Kevin Wolf wrote:
+> This series implements a minimal QMP command that allows to create an
+> image format on a given block node. The interface is still going to
+> change to some kind of an async command (possibly a block job), so I
+> prefixed x- for now.
+>=20
+> At this point, I'm mostly interested in comments about
+> BlockdevCreateOptions in the schema, the .bdrv_co_create callback and
+> the way that legacy .bdrv_create is implemented in qcow2 now.
+>=20
+> It looks to me as if we will have to keep .bdrv_create in addition to
+> the new .bdrv_co_create for a while in all drivers, where the
+> implementation of .bdrv_create would call .bdrv_co_create like this
+> series does it for qcow2. We'll only be able to drop the old interface
+> after deprecating and eventually removing all of the driver-specific
+> compatibility work that remains. The example of qcow2 shows that the
+> "translation" from old to new is managable, but there are a few
+> differences.
 
-The added multibooh.h is from GRUB - the developers of multiboot. I
-think we can trust it. Having a single header will make future tests
-maintainence easier.
+Looks good. :-)
 
-But if you feel strongly that qemu tests should use it's own version
-of multiboot header then I can add it back.
+Max
+
+
+--4zvot0kVzc3DA6tZq3QhxdstRHe4OpCk8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpvZpwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A0ToH/iXrPl6WRsj0RDhIfoTDlfP77YY3ugyJ
+au9sjFNu9IDJ2A9THjWbVmbYHQxSrqk+detzMDcFOrTQm9qiIzcoZ4yZn3p7t949
+rQ4QzwHRS4ykyCTnEoN9RgC01uHcxW7nL5cdUgKr8R950h+RpQzidHe+N7BNNng0
+bkuEFSS+9IkQ5aH9i/duHGRl2k9Y1ld1Ll/EQg/V6qN14IM3ltg/trUZ8mr+ecWa
+kYhixeAYGFvFzRQOXEiETaZCC7tSOwIDb/fEeCVoypJMv/21dCDsn6CTSwZ1n3Cb
+mVnL3gHrBf9oo25vstKJCoOrf8dcZjt5OlidIvywxXdizs4dxX6ER1c=
+=JnNT
+-----END PGP SIGNATURE-----
+
+--4zvot0kVzc3DA6tZq3QhxdstRHe4OpCk8--
