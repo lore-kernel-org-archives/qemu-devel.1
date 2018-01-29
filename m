@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eg18M-0001QU-Si
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 23:33:32 -0500
+	(envelope-from <mst@redhat.com>) id 1eg1KR-0004ei-0L
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 23:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eg18K-0005PQ-E5
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 23:33:30 -0500
-Resent-Message-Id: <E1eg18K-0005PQ-E5@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eg18K-0005OS-7b
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 23:33:28 -0500
-In-Reply-To: <20180129032826.16876-1-david@gibson.dropbear.id.au>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151719763812.776.9545810087336953261@5adcb62bf0d6>
+	(envelope-from <mst@redhat.com>) id 1eg1KN-0005AG-TW
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 23:45:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eg1KN-00059b-Mx
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 23:45:55 -0500
+Date: Mon, 29 Jan 2018 06:45:52 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180129064446-mutt-send-email-mst@kernel.org>
+References: <1516747387-31760-1-git-send-email-mst@redhat.com>
+	<1516747387-31760-2-git-send-email-mst@redhat.com>
+	<20180124094621.46ff2f43@bahia.lan>
+	<20180124100500.1f9bf54a@bahia.lan>
+	<d0698024-65ae-fb6b-397d-cccdc1fb36f4@redhat.com>
+	<20180124103402.6ef42523@bahia.lan>
+	<20180124190820-mutt-send-email-mst@kernel.org>
+	<CAA2ifQybqzCYC48fjzT9mztn=3iTS+3uO0DUF8bxAF5jt3u-Vg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 28 Jan 2018 19:47:19 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180129
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA2ifQybqzCYC48fjzT9mztn=3iTS+3uO0DUF8bxAF5jt3u-Vg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 1/1] kvm-all: Partially reverts 4fe6d78b2e
+ to remove the cleanup call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +34,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, peter.maydell@linaro.org, lvivier@redhat.com, surajjs@au1.ibm.com, groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Gal Hammer <ghammer@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Anton Blanchard <anton@samba.org>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTI5MDMyODI2LjE2ODc2LTEtZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlk
-LmF1ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMl0gcHBjLWZvci0yLjEyIHF1ZXVl
-IDIwMTgwMTI5Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
-dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
-UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
-ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
-ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
-dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE4MDEyOTAzMjgyNi4xNjg3Ni0xLWRhdmlkQGdpYnNvbi5kcm9w
-YmVhci5pZC5hdSAtPiBwYXRjaGV3LzIwMTgwMTI5MDMyODI2LjE2ODc2LTEtZGF2aWRAZ2lic29u
-LmRyb3BiZWFyLmlkLmF1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTk3ZWY2NjE5
-ZSB0YXJnZXQvcHBjL3NwYXByOiBBZGQgSC1DYWxsIEhfR0VUX0NQVV9DSEFSQUNURVJJU1RJQ1MK
-YzA2MjFjMTdlYSB0YXJnZXQvcHBjL3NwYXByX2NhcHM6IEFkZCBuZXcgdHJpc3RhdGUgY2FwIHNh
-ZmVfaW5kaXJlY3RfYnJhbmNoCmI2Yzg3ODk0MTkgdGFyZ2V0L3BwYy9zcGFwcl9jYXBzOiBBZGQg
-bmV3IHRyaXN0YXRlIGNhcCBzYWZlX2JvdW5kc19jaGVjawpiMjJhOWJkNDhlIHRhcmdldC9wcGMv
-c3BhcHJfY2FwczogQWRkIG5ldyB0cmlzdGF0ZSBjYXAgc2FmZV9jYWNoZQowMzZmYjVjNzdiIHRh
-cmdldC9wcGMvc3BhcHJfY2FwczogQWRkIHN1cHBvcnQgZm9yIHRyaXN0YXRlIHNwYXByX2NhcGFi
-aWxpdGllcwoyOGU3MjYwOWNlIHRhcmdldC9wcGMva3ZtOiBBZGQgY2FwX3BwY19zYWZlX1tjYWNo
-ZS9ib3VuZHNfY2hlY2svaW5kaXJlY3RfYnJhbmNoXQozNTQ4ZmFjOGE0IHNwYXByX3BjaTogZml4
-IE1TSS9NU0lYIHNlbGVjdGlvbgoyNDBjZWRiNDU5IGlucHV0OiBhZGQgbWlzc2luZyBuZXdsaW5l
-IGZyb20gdHJhY2UtZXZlbnRzCjYzODNiMzJlYmYgdW5pbm9ydGg6IGNvbnZlcnQgdG8gdHJhY2Ut
-ZXZlbnRzCmIwZDcyMmE3NzggZ3JhY2tsZTogY29udmVydCB0byB0cmFjZS1ldmVudHMKMmNkZTY4
-OWM4ZSBwcGM6IERlcHJlY2F0ZSBxZW11LXN5c3RlbS1wcGNlbWIKYzdlZGVjY2Y1OSBwcGMvcG52
-OiBmaXggUG52Q2hpcCByZWRlZmluaXRpb24gaW4gPGh3L3BwYy9wbnZfeHNjb20uaD4KCj09PSBP
-VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IHBwYy9wbnY6IGZpeCBQbnZDaGlw
-IHJlZGVmaW5pdGlvbiBpbiA8aHcvcHBjL3Budl94c2NvbS5oPi4uLgpDaGVja2luZyBQQVRDSCAy
-LzEyOiBwcGM6IERlcHJlY2F0ZSBxZW11LXN5c3RlbS1wcGNlbWIuLi4KQ2hlY2tpbmcgUEFUQ0gg
-My8xMjogZ3JhY2tsZTogY29udmVydCB0byB0cmFjZS1ldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NC8xMjogdW5pbm9ydGg6IGNvbnZlcnQgdG8gdHJhY2UtZXZlbnRzLi4uCkNoZWNraW5nIFBBVENI
-IDUvMTI6IGlucHV0OiBhZGQgbWlzc2luZyBuZXdsaW5lIGZyb20gdHJhY2UtZXZlbnRzLi4uCkNo
-ZWNraW5nIFBBVENIIDYvMTI6IHNwYXByX3BjaTogZml4IE1TSS9NU0lYIHNlbGVjdGlvbi4uLgpD
-aGVja2luZyBQQVRDSCA3LzEyOiB0YXJnZXQvcHBjL2t2bTogQWRkIGNhcF9wcGNfc2FmZV9bY2Fj
-aGUvYm91bmRzX2NoZWNrL2luZGlyZWN0X2JyYW5jaF0uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMjog
-dGFyZ2V0L3BwYy9zcGFwcl9jYXBzOiBBZGQgc3VwcG9ydCBmb3IgdHJpc3RhdGUgc3BhcHJfY2Fw
-YWJpbGl0aWVzLi4uCkNoZWNraW5nIFBBVENIIDkvMTI6IHRhcmdldC9wcGMvc3BhcHJfY2Fwczog
-QWRkIG5ldyB0cmlzdGF0ZSBjYXAgc2FmZV9jYWNoZS4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzc1OiBGSUxFOiBody9wcGMvc3BhcHJfY2Fwcy5jOjE4ODoKKyAgICAgICAgZXJy
-b3Jfc2V0ZyhlcnJwLCAiUmVxdWVzdGVkIHNhZmUgY2FjaGUgY2FwYWJpbGl0eSBsZXZlbCBub3Qg
-c3VwcG9ydGVkIGJ5IHRjZywgdHJ5IGEgZGlmZmVyZW50IHZhbHVlIGZvciBjYXAtY2ZwYyIpOwoK
-RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3NzogRklMRTogaHcvcHBjL3NwYXByX2Nh
-cHMuYzoxOTA6CisgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlJlcXVlc3RlZCBzYWZlIGNhY2hl
-IGNhcGFiaWxpdHkgbGV2ZWwgbm90IHN1cHBvcnRlZCBieSBrdm0sIHRyeSBhIGRpZmZlcmVudCB2
-YWx1ZSBmb3IgY2FwLWNmcGMiKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgOTggbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggMTAvMTI6IHRhcmdldC9wcGMvc3BhcHJfY2FwczogQWRkIG5ldyB0cmlzdGF0ZSBj
-YXAgc2FmZV9ib3VuZHNfY2hlY2suLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0
-NzogRklMRTogaHcvcHBjL3NwYXByX2NhcHMuYzoxOTk6CisgICAgICAgIGVycm9yX3NldGcoZXJy
-cCwgIlJlcXVlc3RlZCBzYWZlIGJvdW5kcyBjaGVjayBjYXBhYmlsaXR5IGxldmVsIG5vdCBzdXBw
-b3J0ZWQgYnkgdGNnLCB0cnkgYSBkaWZmZXJlbnQgdmFsdWUgZm9yIGNhcC1zYmJjIik7CgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ5OiBGSUxFOiBody9wcGMvc3BhcHJfY2Fwcy5j
-OjIwMToKKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiUmVxdWVzdGVkIHNhZmUgYm91bmRzIGNo
-ZWNrIGNhcGFiaWxpdHkgbGV2ZWwgbm90IHN1cHBvcnRlZCBieSBrdm0sIHRyeSBhIGRpZmZlcmVu
-dCB2YWx1ZSBmb3IgY2FwLXNiYmMiKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiM2MjogRklMRTogaHcvcHBjL3NwYXByX2NhcHMuYzoyNDY6CisgICAgICAgIC5kZXNjcmlwdGlv
-biA9ICJTcGVjdWxhdGlvbiBCYXJyaWVyIEJvdW5kcyBDaGVja2luZyIgVkFMVUVfREVTQ19UUklT
-VEFURSwKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNzEgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMTI6
-IHRhcmdldC9wcGMvc3BhcHJfY2FwczogQWRkIG5ldyB0cmlzdGF0ZSBjYXAgc2FmZV9pbmRpcmVj
-dF9icmFuY2guLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0ODogRklMRTogaHcv
-cHBjL3NwYXByX2NhcHMuYzoyMTA6CisgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlJlcXVlc3Rl
-ZCBzYWZlIGluZGlyZWN0IGJyYW5jaCBjYXBhYmlsaXR5IGxldmVsIG5vdCBzdXBwb3J0ZWQgYnkg
-dGNnLCB0cnkgYSBkaWZmZXJlbnQgdmFsdWUgZm9yIGNhcC1pYnMiKTsKCkVSUk9SOiBsaW5lIG92
-ZXIgOTAgY2hhcmFjdGVycwojNTA6IEZJTEU6IGh3L3BwYy9zcGFwcl9jYXBzLmM6MjEyOgorICAg
-ICAgICBlcnJvcl9zZXRnKGVycnAsICJSZXF1ZXN0ZWQgc2FmZSBpbmRpcmVjdCBicmFuY2ggY2Fw
-YWJpbGl0eSBsZXZlbCBub3Qgc3VwcG9ydGVkIGJ5IGt2bSwgdHJ5IGEgZGlmZmVyZW50IHZhbHVl
-IGZvciBjYXAtaWJzIik7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDcxIGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDEyLzEyOiB0YXJnZXQvcHBjL3NwYXByOiBBZGQgSC1DYWxsIEhfR0VUX0NQVV9DSEFSQUNU
-RVJJU1RJQ1MuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Sun, Jan 28, 2018 at 04:07:27PM +0200, Gal Hammer wrote:
+> Hi,
+> 
+> Sorry for a bad patch and the problems it may have caused.
+
+Not at all, these things happen.  Do you have short term plans to work
+on a new version?
