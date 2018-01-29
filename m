@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8GV-00062C-1M
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:24 -0500
+	(envelope-from <quintela@redhat.com>) id 1eg8O1-0004Vl-8U
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8GQ-0001si-1r
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59166)
+	(envelope-from <quintela@redhat.com>) id 1eg8Nv-0000zh-00
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8GP-0001rM-Mn
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:17 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8Nu-0000zG-OK
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:02 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1BEA8461C5
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:10:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 197C681239
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:18:02 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 29 Jan 2018 13:09:32 +0100
-Message-Id: <20180129120932.12874-14-quintela@redhat.com>
-In-Reply-To: <20180129120932.12874-1-quintela@redhat.com>
-References: <20180129120932.12874-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 13/13] tests: Adjust sleeps for migration test
+Date: Mon, 29 Jan 2018 13:17:50 +0100
+Message-Id: <20180129121754.13033-2-quintela@redhat.com>
+In-Reply-To: <20180129121754.13033-1-quintela@redhat.com>
+References: <20180129121754.13033-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 1/5] migration: Create tcp_port parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +32,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Also reorder code to not sleep when event already happened.
+It will be used to store the uri tcp_port parameter.  This is the only
+parameter than can change and we can need to be able to connect to it.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
----
- tests/migration-test.c | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index d191f6e03b..fcad2ed460 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -268,10 +268,9 @@ static uint64_t get_migration_pass(QTestState *who)
+--
+
+This used to be uri parameter, but it has so many troubles to
+reproduce that it don't just make sense.
+---
+ hmp.c                 |  3 +++
+ migration/migration.c |  8 ++++++++
+ qapi/migration.json   | 19 ++++++++++++++++---
+ 3 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/hmp.c b/hmp.c
+index b3de32d219..369cb991f2 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -345,6 +345,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRIu64 "\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+             params->xbzrle_cache_size);
++        monitor_printf(mon, "%s: %d\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_X_TCP_PORT),
++            params->x_tcp_port);
+     }
  
- static void wait_for_migration_complete(QTestState *who)
- {
--    QDict *rsp, *rsp_return;
--    bool completed;
--
--    do {
-+    while (true) {
-+        QDict *rsp, *rsp_return;
-+        bool completed;
-         const char *status;
+     qapi_free_MigrationParameters(params);
+diff --git a/migration/migration.c b/migration/migration.c
+index 44cbfb0ddd..eb6958dcda 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -522,6 +522,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+     params->has_xbzrle_cache_size = true;
+     params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
++    params->has_x_tcp_port = true;
++    params->x_tcp_port = s->parameters.x_tcp_port;
  
-         rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
-@@ -280,8 +279,11 @@ static void wait_for_migration_complete(QTestState *who)
-         completed = strcmp(status, "completed") == 0;
-         g_assert_cmpstr(status, !=,  "failed");
-         QDECREF(rsp);
--        usleep(1000 * 100);
--    } while (!completed);
-+        if (completed) {
-+            return;
-+        }
-+        usleep(1000);
+     return params;
+ }
+@@ -889,6 +891,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+     if (params->has_xbzrle_cache_size) {
+         dest->xbzrle_cache_size = params->xbzrle_cache_size;
+     }
++    if (params->has_x_tcp_port) {
++        dest->x_tcp_port = params->x_tcp_port;
 +    }
  }
  
- static void wait_for_migration_pass(QTestState *who)
-@@ -290,16 +292,13 @@ static void wait_for_migration_pass(QTestState *who)
-     uint64_t pass;
- 
-     /* Wait for the 1st sync */
--    do {
-+    while (!got_stop && !initial_pass) {
-+        usleep(1000);
-         initial_pass = get_migration_pass(who);
--        if (got_stop || initial_pass) {
--            break;
--        }
--        usleep(1000 * 100);
--    } while (true);
+ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+@@ -961,6 +966,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+         s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+         xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+     }
++    if (params->has_x_tcp_port) {
++        s->parameters.x_tcp_port = params->x_tcp_port;
 +    }
- 
-     do {
--        usleep(1000 * 100);
-+        usleep(1000);
-         pass = get_migration_pass(who);
-     } while (pass == initial_pass && !got_stop);
  }
-@@ -489,13 +488,13 @@ static void test_migrate_end(QTestState *from, QTestState *to)
-     /* Destination still running, wait for a byte to change */
-     do {
-         qtest_memread(to, start_address, &dest_byte_b, 1);
--        usleep(10 * 1000);
-+        usleep(1000 * 10);
-     } while (dest_byte_a == dest_byte_b);
  
-     qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
-     /* With it stopped, check nothing changes */
-     qtest_memread(to, start_address, &dest_byte_c, 1);
--    sleep(1);
-+    usleep(1000 * 200);
-     qtest_memread(to, start_address, &dest_byte_d, 1);
-     g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
+ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 4cd3d13158..26661b0df6 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -488,6 +488,9 @@
+ #                     and a power of 2
+ #                     (Since 2.11)
+ #
++# @x-tcp-port: Only used for tcp, to know what the real port is
++#                     (Since 2.12)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+@@ -496,7 +499,7 @@
+            'tls-creds', 'tls-hostname', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+            'x-multifd-channels', 'x-multifd-page-count',
+-           'xbzrle-cache-size' ] }
++           'xbzrle-cache-size', 'x-tcp-port' ] }
  
+ ##
+ # @MigrateSetParameters:
+@@ -564,6 +567,10 @@
+ #                     needs to be a multiple of the target page size
+ #                     and a power of 2
+ #                     (Since 2.11)
++#
++# @x-tcp-port: Only used for tcp, to know what the real port is
++#                     (Since 2.12)
++#
+ # Since: 2.4
+ ##
+ # TODO either fuse back into MigrationParameters, or make
+@@ -582,7 +589,8 @@
+             '*block-incremental': 'bool',
+             '*x-multifd-channels': 'int',
+             '*x-multifd-page-count': 'int',
+-            '*xbzrle-cache-size': 'size' } }
++            '*xbzrle-cache-size': 'size',
++            '*x-tcp-port': 'uint16'} }
+ 
+ ##
+ # @migrate-set-parameters:
+@@ -665,6 +673,10 @@
+ #                     needs to be a multiple of the target page size
+ #                     and a power of 2
+ #                     (Since 2.11)
++#
++# @x-tcp-port: Only used for tcp, to know what the real port is
++#                     (Since 2.12)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+@@ -681,7 +693,8 @@
+             '*block-incremental': 'bool' ,
+             '*x-multifd-channels': 'uint8',
+             '*x-multifd-page-count': 'uint32',
+-            '*xbzrle-cache-size': 'size' } }
++            '*xbzrle-cache-size': 'size',
++            '*x-tcp-port': 'uint16'} }
+ 
+ ##
+ # @query-migrate-parameters:
 -- 
 2.14.3
