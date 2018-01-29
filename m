@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eg8DE-0004Lr-4p
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:07:01 -0500
+	(envelope-from <quintela@redhat.com>) id 1eg8Ft-0005TZ-GO
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eg8D9-00071S-FG
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:07:00 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1e32b96c-b65a-eba3-9d8e-7d0ec9bad741@redhat.com>
-References: <cover.1516978645.git.berto@igalia.com>
-	<7d8d80bfde60d29e8a0abe04db8241b754714329.1516978645.git.berto@igalia.com>
-	<1e32b96c-b65a-eba3-9d8e-7d0ec9bad741@redhat.com>
-Date: Mon, 29 Jan 2018 13:06:16 +0100
-Message-ID: <w51d11syimf.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 30/39] qcow2: Update
- expand_zero_clusters_in_l1() to support L2 slices
+	(envelope-from <quintela@redhat.com>) id 1eg8Fq-00018s-BF
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:09:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37428)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8Fq-00018G-5E
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:09:42 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 88D3D4A6F3
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:09:41 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Mon, 29 Jan 2018 13:09:19 +0100
+Message-Id: <20180129120932.12874-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 00/13] Migration PULL request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Fri 26 Jan 2018 08:46:19 PM CET, Eric Blake wrote:
->> -                ret = qcow2_cache_get(bs, s->l2_table_cache, l2_offset,
->> -                                      (void **)&l2_table);
->> +                ret = qcow2_cache_get(bs, s->l2_table_cache, slice_offset,
->> +                                      (void **)&l2_slice);
->
-> The (void **) cast is probably still necessary (anything can go to
-> void*, but C gets pickier when going to void**), but...
->
->>              } else {
->>                  /* load inactive L2 tables from disk */
->> -                ret = bdrv_read(bs->file, l2_offset / BDRV_SECTOR_SIZE,
->> -                                (void *)l2_table, s->cluster_sectors);
->> +                ret = bdrv_pread(bs->file, slice_offset,
->> +                                 (void *)l2_slice, slice_size2);
->
-> ...do we still need this cast to void*?
->
->
->>  
->> -                    ret = bdrv_write(bs->file, l2_offset / BDRV_SECTOR_SIZE,
->> -                                     (void *)l2_table, s->cluster_sectors);
->> +                    ret = bdrv_pwrite(bs->file, slice_offset,
->> +                                      (void *)l2_slice, slice_size2);
->
-> and again here
+Hi
 
-Good idea, I'll remove the void * casts.
+- migrate_fd_connect cleanup (dave)
+- use MAX_VM_PACKAGED_SIZE
+  have to change (1<<32) for UINT32_MAX to get no warnings on win32
+- Use right s->threashord_size(wei)
+- patches reviewed from info/migrate, migration tests and multifd (me)
 
-Berto
+Later, Juan.
+
+The following changes since commit 6233b4a8c2a32ef6955a921246fa08705bbb3676:
+
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-26' into staging (2018-01-26 17:29:14 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/juanquintela/qemu.git tags/migration/20180129
+
+for you to fetch changes up to 4b6bb0a77761b8a906a540e927c7a9dde99bc10f:
+
+  tests: Adjust sleeps for migration test (2018-01-29 12:10:22 +0100)
+
+----------------------------------------------------------------
+migration/next for 20180129
+
+----------------------------------------------------------------
+Daniel Henrique Barboza (1):
+      migration/savevm.c: set MAX_VM_CMD_PACKAGED_SIZE to 1ul << 32
+
+Dr. David Alan Gilbert (2):
+      migration: Allow migrate_fd_connect to take an Error *
+      migration: Route errors down through migration_channel_connect
+
+Juan Quintela (9):
+      migration: Drop current address parameter from save_zero_page()
+      tests: Remove deprecated migration tests commands
+      tests: Consolidate accelerators declaration
+      tests: Use consistent names for migration
+      tests: Add deprecated commands migration test
+      tests: Add migration precopy test
+      tests: Add migration xbzrle test
+      tests: Create migrate-start-postcopy command
+      tests: Adjust sleeps for migration test
+
+Wei Wang (1):
+      migration: use s->threshold_size inside migration_update_counters
+
+ migration/channel.c    |  34 +++----
+ migration/channel.h    |   3 +-
+ migration/exec.c       |   2 +-
+ migration/fd.c         |   2 +-
+ migration/migration.c  |  12 ++-
+ migration/migration.h  |   2 +-
+ migration/ram.c        |  11 +--
+ migration/rdma.c       |   2 +-
+ migration/savevm.c     |   2 +-
+ migration/socket.c     |   4 +-
+ migration/tls.c        |   3 +-
+ migration/trace-events |   2 +-
+ tests/migration-test.c | 252 ++++++++++++++++++++++++++++++++++++++-----------
+ 13 files changed, 236 insertions(+), 95 deletions(-)
