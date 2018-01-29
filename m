@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eg07a-0004TV-TJ
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eg07c-0004Vt-Nv
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eg07Z-0001eC-8Y
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eg07b-0001gS-FS
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:40 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 29 Jan 2018 14:28:24 +1100
-Message-Id: <20180129032826.16876-11-david@gibson.dropbear.id.au>
+Date: Mon, 29 Jan 2018 14:28:26 +1100
+Message-Id: <20180129032826.16876-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180129032826.16876-1-david@gibson.dropbear.id.au>
 References: <20180129032826.16876-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 10/12] target/ppc/spapr_caps: Add new tristate
- cap safe_bounds_check
+Subject: [Qemu-devel] [PULL 12/12] target/ppc/spapr: Add H-Call
+ H_GET_CPU_CHARACTERISTICS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +25,106 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.
 
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Add new tristate cap cap-sbbc to represent the speculation barrier
-bounds checking capability.
+The new H-Call H_GET_CPU_CHARACTERISTICS is used by the guest to query
+behaviours and available characteristics of the cpu.
+
+Implement the handler for this new H-Call which formulates its response
+based on the setting of the spapr_caps cap-cfpc, cap-sbbc and cap-ibs.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         |  2 ++
- hw/ppc/spapr_caps.c    | 21 +++++++++++++++++++++
- include/hw/ppc/spapr.h |  5 ++++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ hw/ppc/spapr_hcall.c   | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  1 +
+ 2 files changed, 59 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f881f814ca..57433e7a6e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1792,6 +1792,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_cap_vsx,
-         &vmstate_spapr_cap_dfp,
-         &vmstate_spapr_cap_cfpc,
-+        &vmstate_spapr_cap_sbbc,
-         NULL
-     }
- };
-@@ -3883,6 +3884,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-     spapr_caps_add_properties(smc, &error_abort);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 51eba52e86..4d0e6eb0cf 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1654,6 +1654,60 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     return H_SUCCESS;
  }
  
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index d53da63b1c..ce1f74f26d 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -191,6 +191,17 @@ static void cap_safe_cache_apply(sPAPRMachineState *spapr, uint8_t val,
-     }
- }
- 
-+static void cap_safe_bounds_check_apply(sPAPRMachineState *spapr, uint8_t val,
-+                                        Error **errp)
++static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
++                                              sPAPRMachineState *spapr,
++                                              target_ulong opcode,
++                                              target_ulong *args)
 +{
-+    if (tcg_enabled() && val) {
-+        /* TODO - for now only allow broken for TCG */
-+        error_setg(errp, "Requested safe bounds check capability level not supported by tcg, try a different value for cap-sbbc");
-+    } else if (kvm_enabled() && (val > kvmppc_get_cap_safe_bounds_check())) {
-+        error_setg(errp, "Requested safe bounds check capability level not supported by kvm, try a different value for cap-sbbc");
++    uint64_t characteristics = H_CPU_CHAR_HON_BRANCH_HINTS &
++                               ~H_CPU_CHAR_THR_RECONF_TRIG;
++    uint64_t behaviour = H_CPU_BEHAV_FAVOUR_SECURITY;
++    uint8_t safe_cache = spapr_get_cap(spapr, SPAPR_CAP_CFPC);
++    uint8_t safe_bounds_check = spapr_get_cap(spapr, SPAPR_CAP_SBBC);
++    uint8_t safe_indirect_branch = spapr_get_cap(spapr, SPAPR_CAP_IBS);
++
++    switch (safe_cache) {
++    case SPAPR_CAP_WORKAROUND:
++        characteristics |= H_CPU_CHAR_L1D_FLUSH_ORI30;
++        characteristics |= H_CPU_CHAR_L1D_FLUSH_TRIG2;
++        characteristics |= H_CPU_CHAR_L1D_THREAD_PRIV;
++        behaviour |= H_CPU_BEHAV_L1D_FLUSH_PR;
++        break;
++    case SPAPR_CAP_FIXED:
++        break;
++    default: /* broken */
++        assert(safe_cache == SPAPR_CAP_BROKEN);
++        behaviour |= H_CPU_BEHAV_L1D_FLUSH_PR;
++        break;
 +    }
++
++    switch (safe_bounds_check) {
++    case SPAPR_CAP_WORKAROUND:
++        characteristics |= H_CPU_CHAR_SPEC_BAR_ORI31;
++        behaviour |= H_CPU_BEHAV_BNDS_CHK_SPEC_BAR;
++        break;
++    case SPAPR_CAP_FIXED:
++        break;
++    default: /* broken */
++        assert(safe_bounds_check == SPAPR_CAP_BROKEN);
++        behaviour |= H_CPU_BEHAV_BNDS_CHK_SPEC_BAR;
++        break;
++    }
++
++    switch (safe_indirect_branch) {
++    case SPAPR_CAP_FIXED:
++        characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
++    default: /* broken */
++        assert(safe_indirect_branch == SPAPR_CAP_BROKEN);
++        break;
++    }
++
++    args[0] = characteristics;
++    args[1] = behaviour;
++
++    return H_SUCCESS;
 +}
 +
- #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
+ static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
+ static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
  
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-@@ -230,6 +241,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .type = "string",
-         .apply = cap_safe_cache_apply,
-     },
-+    [SPAPR_CAP_SBBC] = {
-+        .name = "sbbc",
-+        .description = "Speculation Barrier Bounds Checking" VALUE_DESC_TRISTATE,
-+        .index = SPAPR_CAP_SBBC,
-+        .get = spapr_cap_get_tristate,
-+        .set = spapr_cap_set_tristate,
-+        .type = "string",
-+        .apply = cap_safe_bounds_check_apply,
-+    },
- };
+@@ -1733,6 +1787,10 @@ static void hypercall_register_types(void)
+     spapr_register_hypercall(H_INVALIDATE_PID, h_invalidate_pid);
+     spapr_register_hypercall(H_REGISTER_PROC_TBL, h_register_process_table);
  
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-@@ -336,6 +356,7 @@ SPAPR_CAP_MIG_STATE(htm, HTM);
- SPAPR_CAP_MIG_STATE(vsx, VSX);
- SPAPR_CAP_MIG_STATE(dfp, DFP);
- SPAPR_CAP_MIG_STATE(cfpc, CFPC);
-+SPAPR_CAP_MIG_STATE(sbbc, SBBC);
- 
- void spapr_caps_reset(sPAPRMachineState *spapr)
- {
++    /* hcall-get-cpu-characteristics */
++    spapr_register_hypercall(H_GET_CPU_CHARACTERISTICS,
++                             h_get_cpu_characteristics);
++
+     /* "debugger" hcalls (also used by SLOF). Note: We do -not- differenciate
+      * here between the "CI" and the "CACHE" variants, they will use whatever
+      * mapping attributes qemu is using. When using KVM, the kernel will
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index ff476693d1..c65be62e92 100644
+index 549d7a4134..62c077ac20 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -62,8 +62,10 @@ typedef enum {
- #define SPAPR_CAP_DFP                   0x02
- /* Cache Flush on Privilege Change */
- #define SPAPR_CAP_CFPC                  0x03
-+/* Speculation Barrier Bounds Checking */
-+#define SPAPR_CAP_SBBC                  0x04
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_CFPC + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_SBBC + 1)
- 
- /*
-  * Capability Values
-@@ -782,6 +784,7 @@ extern const VMStateDescription vmstate_spapr_cap_htm;
- extern const VMStateDescription vmstate_spapr_cap_vsx;
- extern const VMStateDescription vmstate_spapr_cap_dfp;
- extern const VMStateDescription vmstate_spapr_cap_cfpc;
-+extern const VMStateDescription vmstate_spapr_cap_sbbc;
- 
- static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
- {
+@@ -404,6 +404,7 @@ struct sPAPRMachineState {
+ #define H_GET_HCA_INFO          0x1B8
+ #define H_GET_PERF_COUNT        0x1BC
+ #define H_MANAGE_TRACE          0x1C0
++#define H_GET_CPU_CHARACTERISTICS 0x1C8
+ #define H_FREE_LOGICAL_LAN_BUFFER 0x1D4
+ #define H_QUERY_INT_STATE       0x1E4
+ #define H_POLL_PENDING          0x1D8
 -- 
 2.14.3
