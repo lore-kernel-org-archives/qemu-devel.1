@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1egDhH-0002Sn-VN
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:58:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1egDkk-0005QN-30
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1egDhE-0007IN-3U
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:58:24 -0500
-Resent-Message-Id: <E1egDhE-0007IN-3U@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21052)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1egDhD-0007Hi-RZ
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:58:20 -0500
-In-Reply-To: <20180125175949.7780-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151690370921.746.8686094339154511431@5adcb62bf0d6>
+	(envelope-from <peter.maydell@linaro.org>) id 1egDkh-0003J0-W3
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:01:56 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:40865)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1egDkh-0003IG-Ov
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:01:55 -0500
+Received: by mail-ot0-x244.google.com with SMTP id x4so7373044otg.7
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 10:01:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 25 Jan 2018 10:08:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] coroutine-lock: polymorphic CoQueue
+In-Reply-To: <20180123035349.24538-6-richard.henderson@linaro.org>
+References: <20180123035349.24538-1-richard.henderson@linaro.org>
+	<20180123035349.24538-6-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jan 2018 18:01:34 +0000
+Message-ID: <CAFEAcA_HKrxOc9rwiZfbVBW4r14F5u-+y-AATH1yvs6bELZnVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] target/arm: Add SVE state to
+ TB->FLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTI1MTc1OTQ5Ljc3ODAtMS1wYm9uemluaUByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC81XSBjb3JvdXRpbmUtbG9jazogcG9seW1vcnBo
-aWMgQ29RdWV1ZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIGEzZjkzNjJhZjUuLjIw
-NzdmZWY5MWQgIG1hc3RlciAgICAgLT4gbWFzdGVyCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
-IHBhdGNoZXcvMjAxODAxMjUxNzU5NDkuNzc4MC0xLXBib256aW5pQHJlZGhhdC5jb20gLT4gcGF0
-Y2hldy8yMDE4MDEyNTE3NTk0OS43NzgwLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjMxY2MzYzhiZDEgY3VybDogY29udmVydCB0byBDb1F1ZXVl
-CmI5Nzk2YWIwMTQgY29yb3V0aW5lLWxvY2s6IG1ha2UgcWVtdV9jb19lbnRlcl9uZXh0IHRocmVh
-ZC1zYWZlCjBhNDFkY2QxMTQgY29yb3V0aW5lLWxvY2s6IGNvbnZlcnQgQ29RdWV1ZSB0byB1c2Ug
-UWVtdUxvY2thYmxlCjcwMzk4Mzk4YWQgbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUKNjk1YTBk
-Y2FhNSB0ZXN0LWNvcm91dGluZTogYWRkIHNpbXBsZSBDb011dGV4IHRlc3QKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogdGVzdC1jb3JvdXRpbmU6IGFkZCBzaW1wbGUg
-Q29NdXRleCB0ZXN0Li4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAgb3Ig
-TlVMTAojMjk6IEZJTEU6IHRlc3RzL3Rlc3QtY29yb3V0aW5lLmM6MTk4Ogorc3RhdGljIGJvb2wg
-bG9ja2VkID0gZmFsc2U7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDc0IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDIvNTogbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUuLi4KV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzU4OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDoxNDQ6Cisj
-ZGVmaW5lIFFFTVVfR0VORVJJQzIoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBR
-RU1VX0dFTkVSSUMxKHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiM1OTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTQ1OgorI2RlZmluZSBR
-RU1VX0dFTkVSSUMzKHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVNVV9HRU5F
-UklDMih4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-NjA6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE0NjoKKyNkZWZpbmUgUUVNVV9HRU5F
-UklDNCh4LCBhMCwgLi4uKSBRRU1VX0dFTkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJQzMoeCwg
-X19WQV9BUkdTX18pKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzYxOiBGSUxF
-OiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDoxNDc6CisjZGVmaW5lIFFFTVVfR0VORVJJQzUoeCwg
-YTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBRRU1VX0dFTkVSSUM0KHgsIF9fVkFfQVJH
-U19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MjogRklMRTogaW5jbHVk
-ZS9xZW11L2NvbXBpbGVyLmg6MTQ4OgorI2RlZmluZSBRRU1VX0dFTkVSSUM2KHgsIGEwLCAuLi4p
-IFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVNVV9HRU5FUklDNSh4LCBfX1ZBX0FSR1NfXykpCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjM6IEZJTEU6IGluY2x1ZGUvcWVtdS9j
-b21waWxlci5oOjE0OToKKyNkZWZpbmUgUUVNVV9HRU5FUklDNyh4LCBhMCwgLi4uKSBRRU1VX0dF
-TkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJQzYoeCwgX19WQV9BUkdTX18pKQoKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY0OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIu
-aDoxNTA6CisjZGVmaW5lIFFFTVVfR0VORVJJQzgoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lG
-KHgsIGEwLCBRRU1VX0dFTkVSSUM3KHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM2NTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTUxOgor
-I2RlZmluZSBRRU1VX0dFTkVSSUM5KHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwg
-UUVNVV9HRU5FUklDOCh4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojNjY6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE1MjoKKyNkZWZpbmUg
-UUVNVV9HRU5FUklDMTAoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBRRU1VX0dF
-TkVSSUM5KHgsIF9fVkFfQVJHU19fKSkKCnRvdGFsOiAwIGVycm9ycywgOSB3YXJuaW5ncywgMjM0
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hl
-Y2tpbmcgUEFUQ0ggMy81OiBjb3JvdXRpbmUtbG9jazogY29udmVydCBDb1F1ZXVlIHRvIHVzZSBR
-ZW11TG9ja2FibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiBjb3JvdXRpbmUtbG9jazogbWFrZSBx
-ZW11X2NvX2VudGVyX25leHQgdGhyZWFkLXNhZmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNS81OiBjdXJs
-OiBjb252ZXJ0IHRvIENvUXVldWUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On 23 January 2018 at 03:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Add both SVE exception state and vector length.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 10eef870fe..4c1eca7062 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -11263,6 +11263,8 @@ static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+>      dc->user = (dc->current_el == 0);
+>  #endif
+>      dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
+> +    dc->sve_excp_el = ARM_TBFLAG_SVEEXC_EL(dc->base.tb->flags);
+> +    dc->sve_len = (ARM_TBFLAG_ZCR_LEN(dc->base.tb->flags) + 1) * 16;
+
+You've carefully arranged that the sve_excp checks are a superset
+of the fp_excp checks, which means that we get the correct
+exception prioritization by always doing the sve_excp check first
+and then the fp_excp check second, without having to look at
+whether fp_excp_el or sve_excp_el is larger to see which should
+take precedence. We could
+  assert(dc->sve_excp_el <= dc->fp_excp_el);
+and perhaps have a comment noting why this is useful...
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
