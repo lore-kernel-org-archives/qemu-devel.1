@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eg9Z4-0002Mq-Sr
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:33:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eg9cG-0003w0-Eb
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eg9Z1-000861-PW
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:33:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50906)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eg9Z1-00085M-K2
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:33:35 -0500
-Date: Mon, 29 Jan 2018 14:33:31 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180129143331.4c883601@redhat.com>
-In-Reply-To: <7833ad34-e056-c1f7-3a92-f7598dcf1467@suse.com>
-References: <7833ad34-e056-c1f7-3a92-f7598dcf1467@suse.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eg9cF-0002AY-D6
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:36:56 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:32780)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eg9cF-000298-7N
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:36:55 -0500
+Received: by mail-ot0-x241.google.com with SMTP id d7so6543271oti.0
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 05:36:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Can not hotplug device to pci-to-pci bridge using
- machine type older than 1.7
+In-Reply-To: <5A6F10F8.7000904@hisilicon.com>
+References: <5A6B5091.8030601@hisilicon.com>
+	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
+	<5A6B5FCA.2080009@hisilicon.com>
+	<CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
+	<5A6B6671.8070408@hisilicon.com>
+	<CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
+	<5A6F10F8.7000904@hisilicon.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jan 2018 13:36:33 +0000
+Message-ID: <CAFEAcA8fi5VgY4KZqG0_7BXjY81Qg+bGdyf8dcvUMy9wRZtvag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
+ before enabled the interruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +35,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org
+To: Wei Xu <xuwei5@hisilicon.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Rob Herring <rob.herring@linaro.org>, Daode Huang <huangdaode@hisilicon.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, Zhangyi ac <zhangyi.ac@huawei.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, tiantao6@huawei.com, Marc Zyngier <marc.zyngier@arm.com>
 
-On Thu, 25 Jan 2018 16:01:39 +0800
-Fei Li <fli@suse.com> wrote:
+On 29 January 2018 at 12:18, Wei Xu <xuwei5@hisilicon.com> wrote:
+> On 2018/1/26 18:01, Peter Maydell wrote:
+>> No, that's not right either. int_level should already have the
+>> RX bit set, because pl011_put_fifo() sets that bit when it gets a
+>> character from QEMU and puts it into the FIFO.
+>>
+>> Does something else clear the int_level between the character
+>> going into the FIFO from QEMU and the guest enabling
+>> interrupts?
+>
+> Yes. When the guest enabling the interrupts, the pl011 driver in
+> the kernel will clear the RX interrupts[1].
+> And pasted the code below to make it easy to read.
+>
+>         static void pl011_enable_interrupts(struct uart_amba_port *uap)
+>         {
+>                 spin_lock_irq(&uap->port.lock);
+>
+>                 /* Clear out any spuriously appearing RX interrupts */
+>                 pl011_write(UART011_RTIS | UART011_RXIS, uap, REG_ICR);
+>                 uap->im = UART011_RTIM;
+>                 if (!pl011_dma_rx_running(uap))
+>                 uap->im |= UART011_RXIM;
+>                 pl011_write(uap->im, uap, REG_IMSC);
+>                 spin_unlock_irq(&uap->port.lock);
+>         }
+>
 
-> Hi,
-> 
-> After I hotplug a pci device to a pci2pci bridge (I use "pci.1") with 
-> machine type 1.7 or older,
-> I can not see the pci device via `lspci` in the guest, but can see it 
-> via `info qtree` in the hmp.
-> What's more, after I reboot the guest or hotplug another pci device to 
-> pci.0, I can see the
-> previous hotplugged pci device via `lspci`.
-> 
-> I use qemu v2.9.* (but machine type =1.7 or 1.6) and kernel 4.4.
-> I also do the test on self-build qemu v1.7, v1.6 and kernel 4.4, the 
-> same phenomenon.
-> My qemu command line is as follows:
-> /usr/bin/qemu-system-x86_64 -m 1024 -machine 
-> pc-i440fx-1.7,accel=kvm,kernel_irqchip=on -enable-kvm \
-> -smp sockets=1,cores=1,threads=1 -no-user-config -cpu Skylake-Client \
-> -name "pci-hp-qemu" -monitor telnet:127.0.0.1:8848,server,nowait \
-> -drive file=/opt/pcihp.qcow2,if=none,id=drive0,format=qcow2 \
-> -device virtio-blk-pci,drive=drive0,id=sata0,bootindex=1 \
-> -device pci-bridge,chassis_nr=1 \
-> -device virtio-net-pci,bus=pci.1,addr=01,id=netdev1 \
-> -device virtio-net-pci,bus=pci.0,addr=07,id=netdev2 \
-> -boot order=c
-> ...
-> (qemu) device_add virtio-net-pci,bus=pci.1,addr=12,id=netdev12
-> 
-> Checking the qemu commit log, I see qemu v2.0 introduces the acpi based 
-> pci hotplug
-> support and enables hotplug for pci devices behind pci2pci bridges
-> (upstream commit 99fd437d, 9e047b98 and db4728e6).
-> 
-> I also checked qemu v2.9 code, and notice there's a judge: if 
-> use_acpi_pci_hotplug is true (MT >= 2.0),
-> the code will update the hotplug_handler for *all buses* to PIIX4PMState 
-> and uses
-> acpi_pcihp_device_plug_cb as the hp callback; else, for MT<=1.7, the 
-> code will only update the
-> hotplug_handler for pci.0 and leave other buses continue to use its 
-> default hp_handler: the
-> pci2pci bridge and default callback: pci_bridge_dev_hotplug_cb => 
-> shpc_device_hotplug_cb.
-> With the latter shpc* hotplug callback, hotplug a pci device to a 
-> pci2pci bridge, like pci.1, I can
-> not be seen it in the guest via `lspci`.
-> 
-> I am just wondering whether the qemu code does not support the shpc 
-> hotplug to pci2pci bridge,
-Last time, it used to 'work' i.e. guest is notified but fails to init
-hotplugged device due to lack of IO resources.
+This seems at first glance like a kernel driver bug to me -- if it is
+explicitly killing off the pending interrupt without handling
+it then it's naturally going to get stuck if characters come
+in in the window before it does that.
 
-I'd suggest to start looking at issue from guest side and see what
-SHPC driver does to figure out if something in QEMU/firmware needs
-to be fixed.
+(It wouldn't surprise me if there's something in the driver
+init sequence that has the effect of clearing the FIFO on
+real hardware but not QEMU, which would mean that on real
+h/w the window where this can happen would be small, but it's
+still there.)
 
-> or the shpc spec does not support this.
-> Could someone shed some light on me? Thanks a lot!
-> 
-> Have a nice day
-> Fei
-> 
+thanks
+-- PMM
