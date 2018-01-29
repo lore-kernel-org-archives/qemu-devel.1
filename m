@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1egFyD-0003ZO-Ie
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:24:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egG2f-0004tl-4L
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1egFy9-0006ys-JB
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:24:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1egFy9-0006yR-B3
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:23:57 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1384780DB
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 20:23:55 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Mon, 29 Jan 2018 13:23:50 -0700
-Message-ID: <20180129202326.9417.71344.stgit@gimli.home>
+	(envelope-from <mreitz@redhat.com>) id 1egG2e-0000ev-0a
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:28:37 -0500
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
+Date: Mon, 29 Jan 2018 21:28:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] vfio/pci: Add option to disable GeForce quirks
+In-Reply-To: <1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7S2nfaIfSzBDKyqwnNDGMvt7o8PqobM1h"
+Subject: Re: [Qemu-devel] [PATCH v7 8/9] qcow2: skip writing zero buffers to
+ empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +25,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
 
-These quirks are necessary for GeForce, but not for Quadro/GRID/Tesla
-assignment.  Leaving them enabled is fully functional and provides the
-most compatibility, but due to the unique NVIDIA MSI ACK behavior[1],
-it also introduces latency in re-triggering the MSI interrupt.  This
-overhead is typically negligible, but has been shown to adversely
-affect some (very) high interrupt rate applications.  This adds the
-vfio-pci device option "x-no-geforce-quirks=" which can be set to
-"on" to disable this additional overhead.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7S2nfaIfSzBDKyqwnNDGMvt7o8PqobM1h
+From: Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
+ den@virtuozzo.com, berto@igalia.com
+Message-ID: <7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
+Subject: Re: [PATCH v7 8/9] qcow2: skip writing zero buffers to empty COW
+ areas
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-A follow-on optimization for GeForce might be to make use of an
-ioeventfd to allow KVM to trigger an irqfd in the kernel vfio-pci
-driver, avoiding the bounce through userspace to handle this device
-write.
+On 2018-01-18 18:49, Anton Nefedov wrote:
+> If COW areas of the newly allocated clusters are zeroes on the backing =
+image,
+> efficient bdrv_write_zeroes(flags=3DBDRV_REQ_ALLOCATE) can be used on t=
+he whole
+> cluster instead of writing explicit zero buffers later in perform_cow()=
+=2E
+>=20
+> iotest 060:
+> write to the discarded cluster does not trigger COW anymore.
+> Use a backing image instead.
+>=20
+> iotest 066:
+> cluster-alignment areas that were not really COWed are now detected
+> as zeroes, hence the initial write has to be exactly the same size for
+> the maps to match
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>  qapi/block-core.json       |  4 ++-
+>  block/qcow2.h              |  6 +++++
+>  block/qcow2-cluster.c      |  2 +-
+>  block/qcow2.c              | 66 ++++++++++++++++++++++++++++++++++++++=
+++++++--
+>  block/trace-events         |  1 +
+>  tests/qemu-iotests/060     | 26 +++++++++++-------
+>  tests/qemu-iotests/060.out |  5 +++-
+>  tests/qemu-iotests/066     |  2 +-
+>  tests/qemu-iotests/066.out |  4 +--
+>  9 files changed, 98 insertions(+), 18 deletions(-)
 
-[1] Background: the NVIDIA driver has been observed to write 0xff to
-the read-only MSI capability ID register via the MMIO mirror of PCI
-config space in order for the MSI interrupt to re-trigger.  This PCI
-config space mirror is virtualized in QEMU for GeForce.
+[...]
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci-quirks.c |    9 ++++++---
- hw/vfio/pci.c        |    2 ++
- hw/vfio/pci.h        |    1 +
- 3 files changed, 9 insertions(+), 3 deletions(-)
+> @@ -1875,6 +1880,52 @@ static bool is_zero(BlockDriverState *bs, int64_=
+t offset, int64_t bytes)
+>      return res >=3D 0 && (res & BDRV_BLOCK_ZERO) && nr =3D=3D bytes;
+>  }
+> =20
+> +static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
+> +{
+> +    return is_zero(bs, m->offset + m->cow_start.offset,
+> +                   m->cow_start.nb_bytes) &&
+> +           is_zero(bs, m->offset + m->cow_end.offset, m->cow_end.nb_by=
+tes);
+> +}
+> +
+> +static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta=
+)
+> +{
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    QCowL2Meta *m;
+> +
+> +    for (m =3D l2meta; m !=3D NULL; m =3D m->next) {
+> +        int ret;
+> +
+> +        if (!m->cow_start.nb_bytes && !m->cow_end.nb_bytes) {
+> +            continue;
+> +        }
+> +
+> +        if (bs->encrypted) {
+> +            continue;
+> +        }
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 60ad5fb91a83..e5779a7ad35b 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -542,7 +542,8 @@ static void vfio_vga_probe_nvidia_3d0_quirk(VFIOPCIDevice *vdev)
-     VFIOQuirk *quirk;
-     VFIONvidia3d0Quirk *data;
- 
--    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-+    if (vdev->no_geforce_quirks ||
-+        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-         !vdev->bars[1].region.size) {
-         return;
-     }
-@@ -660,7 +661,8 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
-     VFIONvidiaBAR5Quirk *bar5;
-     VFIOConfigWindowQuirk *window;
- 
--    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-+    if (vdev->no_geforce_quirks ||
-+        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-         !vdev->vga || nr != 5 || !vdev->bars[5].ioport) {
-         return;
-     }
-@@ -754,7 +756,8 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
-     VFIOQuirk *quirk;
-     VFIOConfigMirrorQuirk *mirror;
- 
--    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-+    if (vdev->no_geforce_quirks ||
-+        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-         !vfio_is_vga(vdev) || nr != 0) {
-         return;
-     }
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 2c7129512563..6d260b92c1e1 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2989,6 +2989,8 @@ static Property vfio_pci_dev_properties[] = {
-     DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
-     DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
-     DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
-+    DEFINE_PROP_BOOL("x-no-geforce-quirks", VFIOPCIDevice,
-+                     no_geforce_quirks, false),
-     DEFINE_PROP_UINT32("x-pci-vendor-id", VFIOPCIDevice, vendor_id, PCI_ANY_ID),
-     DEFINE_PROP_UINT32("x-pci-device-id", VFIOPCIDevice, device_id, PCI_ANY_ID),
-     DEFINE_PROP_UINT32("x-pci-sub-vendor-id", VFIOPCIDevice,
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index a8fb3b34222c..7c55087a1c44 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -142,6 +142,7 @@ typedef struct VFIOPCIDevice {
-     bool no_kvm_intx;
-     bool no_kvm_msi;
-     bool no_kvm_msix;
-+    bool no_geforce_quirks;
- } VFIOPCIDevice;
- 
- uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+Not sure if the compiler optimizes this anyway, but I'd pull this out of
+the loop.
+
+Maybe you could put all of the conditions under which this function can
+actually do something at its beginning: That is, we can't do anything if
+the BDS is encrypted or if bs->file does not support BDRV_REQ_ALLOCATE
+(and then you just call this function unconditionally in
+qcow2_co_pwritev()).
+
+> +        if (!is_zero_cow(bs, m)) {
+> +            continue;
+> +        }
+
+Is this really efficient?  I remember someone complaining about
+bdrv_co_block_status() being kind of slow on some filesystems, so
+there'd be a tradeoff depending on how it compares to just reading up to
+two clusters from the backing file -- especially considering that the OS
+can query the same information just as quickly, and thus the only
+overhead the read should have is a memset() (assuming the OS is clever).
+
+So basically my question is whether it would be better to just skip this
+if we have any backing file at all and only do this optimization if
+there is none.
+
+> +
+> +        BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC_SPACE);
+> +        /* instead of writing zero COW buffers,
+> +           efficiently zero out the whole clusters */
+> +        ret =3D bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset,
+> +                                    m->nb_clusters * s->cluster_size,
+> +                                    BDRV_REQ_ALLOCATE);
+> +        if (ret < 0) {
+> +            if (ret !=3D -ENOTSUP && ret !=3D -EAGAIN) {
+> +                return ret;
+> +            }
+> +            continue;
+> +        }
+> +
+> +        trace_qcow2_skip_cow(qemu_coroutine_self(), m->offset, m->nb_c=
+lusters);
+> +        m->skip_cow =3D true;
+> +    }
+> +    return 0;
+> +}
+> +
+>  static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_=
+t offset,
+>                                           uint64_t bytes, QEMUIOVector =
+*qiov,
+>                                           int flags)
+
+[...]
+
+> diff --git a/block/trace-events b/block/trace-events
+> index 11c8d5f..c9fa596 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -61,6 +61,7 @@ qcow2_writev_done_part(void *co, int cur_bytes) "co %=
+p cur_bytes %d"
+>  qcow2_writev_data(void *co, uint64_t offset) "co %p offset 0x%" PRIx64=
+
+>  qcow2_pwrite_zeroes_start_req(void *co, int64_t offset, int count) "co=
+ %p offset 0x%" PRIx64 " count %d"
+>  qcow2_pwrite_zeroes(void *co, int64_t offset, int count) "co %p offset=
+ 0x%" PRIx64 " count %d"
+> +qcow2_skip_cow(void* co, uint64_t offset, int nb_clusters) "co %p offs=
+et 0x%" PRIx64 " nb_clusters %d"
+
+Nit: Should be "void *co" to match the rest.
+
+> =20
+>  # block/qcow2-cluster.c
+>  qcow2_alloc_clusters_offset(void *co, uint64_t offset, int bytes) "co =
+%p offset 0x%" PRIx64 " bytes %d"
+
+[...]
+
+> diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
+> index 8638217..3c216a1 100755
+> --- a/tests/qemu-iotests/066
+> +++ b/tests/qemu-iotests/066
+> @@ -71,7 +71,7 @@ echo
+>  _make_test_img $IMG_SIZE
+> =20
+>  # Create data clusters (not aligned to an L2 table)
+> -$QEMU_IO -c 'write -P 42 1M 256k' "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IO -c "write -P 42 $(((1024 + 32) * 1024)) 192k" "$TEST_IMG" | _=
+filter_qemu_io
+
+The comment should probably be updated to note that we don't write head
+and tail because we want them to stay zero, so the mapping information
+matches.
+
+Max
+
+>  orig_map=3D$($QEMU_IMG map --output=3Djson "$TEST_IMG")
+> =20
+>  # Convert the data clusters to preallocated zero clusters
+
+
+--7S2nfaIfSzBDKyqwnNDGMvt7o8PqobM1h
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpvg+YSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ATo4IALHe8p/aAhUaSyZpkTJziZ44Tr0KgDj3
+gVj3hfCJ44YHWBRq0CQED8WpZ4xTnOIsnPfuLXfkZGF0kl5hqYgvW5QUgtmxymx6
+VGCJLQLZ6mxjt8h7z+e5g1qK7SYz3PhQjiG3tmovR4SeB1IwSiK6z/F68qiJ0Pbj
+g7tMI/pG7HK1uFXsiMf3MnLKEKEymDhpzqgEk3vLQtkuIJ1m/2e47MEIa59HcNuz
+bqN8ISF4GT74CRqhwWQER4H2YG3X6tojwXDKvaBX3Cif91tHHzjk072K68MRTYLM
+hvgSGymuy603ehjWhy4RUEh1gk0hkRqHNxoYhjnlg6/BI59paf/OWoU=
+=jm34
+-----END PGP SIGNATURE-----
+
+--7S2nfaIfSzBDKyqwnNDGMvt7o8PqobM1h--
