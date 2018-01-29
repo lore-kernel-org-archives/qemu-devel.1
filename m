@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egCEF-0007z6-6Y
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:24:24 -0500
+	(envelope-from <imammedo@redhat.com>) id 1egCEq-00007z-3i
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:24:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egCED-0002U4-PN
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:24:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39438)
+	(envelope-from <imammedo@redhat.com>) id 1egCEn-00033k-FT
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:24:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:17292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egCED-0002Sq-Hx
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:24:17 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA4AA1752A8
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 16:24:16 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 29 Jan 2018 17:24:04 +0100
-Message-Id: <20180129162408.415-9-kraxel@redhat.com>
-In-Reply-To: <20180129162408.415-1-kraxel@redhat.com>
-References: <20180129162408.415-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/12] curses: use DisplayOptions
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1egCEn-00032z-3M
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:24:53 -0500
+Date: Mon, 29 Jan 2018 17:24:36 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180129171848.708a60c5@redhat.com>
+In-Reply-To: <20180126120306.19225-1-marcandre.lureau@redhat.com>
+References: <20180126120306.19225-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] tpm: add CRB device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +26,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Switch curses ui to use qapi DisplayOptions for configuration.
+On Fri, 26 Jan 2018 13:03:06 +0100
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/console.h | 4 ++--
- ui/curses.c          | 2 +-
- vl.c                 | 4 +++-
- qapi/ui.json         | 5 +++--
- 4 files changed, 9 insertions(+), 6 deletions(-)
+> tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB)
+> Interface as defined in TCG PC Client Platform TPM Profile (PTP)
+> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03 v22.
+>=20
+> The PTP allows device implementation to switch between TIS and CRB
+> model at run time, but given that CRB is a simpler device to
+> implement, I chose to implement it as a different device.
+>=20
+> The device doesn't implement other locality than 0 for now (my laptop
+> TPM doesn't either, so I assume this isn't so bad)
+>=20
+> Tested with some success with Linux upstream and Windows 10, seabios &
+> modified ovmf. The device is recognized and correctly transmit
+> command/response with passthrough & emu. However, we are missing PPI
+> ACPI part atm.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>=20
+> The patch is based on stefanb/tpm-next git branch.
+>=20
+[...]
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 4cb623112e..9749503aa7 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -496,9 +496,9 @@ static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
- 
- /* curses.c */
- #ifdef CONFIG_CURSES
--void curses_display_init(DisplayState *ds, int full_screen);
-+void curses_display_init(DisplayState *ds, DisplayOptions *opts);
- #else
--static inline void curses_display_init(DisplayState *ds, int full_screen)
-+static inline void curses_display_init(DisplayState *ds, DisplayOptions *opts)
- {
-     /* This must never be called if CONFIG_CURSES is disabled */
-     error_report("curses support is disabled");
-diff --git a/ui/curses.c b/ui/curses.c
-index 85503876c0..479b77bd03 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -434,7 +434,7 @@ static const DisplayChangeListenerOps dcl_ops = {
-     .dpy_text_cursor = curses_cursor_position,
- };
- 
--void curses_display_init(DisplayState *ds, int full_screen)
-+void curses_display_init(DisplayState *ds, DisplayOptions *opts)
- {
- #ifndef _WIN32
-     if (!isatty(1)) {
-diff --git a/vl.c b/vl.c
-index 1d801dd96d..6fa65c0dbd 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2189,6 +2189,7 @@ static LegacyDisplayType select_display(const char *p)
-     } else if (strstart(p, "curses", &opts)) {
- #ifdef CONFIG_CURSES
-         display = DT_CURSES;
-+        dpy.type = DISPLAY_TYPE_CURSES;
- #else
-         error_report("curses support is disabled");
-         exit(1);
-@@ -3275,6 +3276,7 @@ int main(int argc, char **argv, char **envp)
-             case QEMU_OPTION_curses:
- #ifdef CONFIG_CURSES
-                 display_type = DT_CURSES;
-+                dpy.type = DISPLAY_TYPE_CURSES;
- #else
-                 error_report("curses support is disabled");
-                 exit(1);
-@@ -4708,7 +4710,7 @@ int main(int argc, char **argv, char **envp)
-     /* init local displays */
-     switch (display_type) {
-     case DT_CURSES:
--        curses_display_init(ds, full_screen);
-+        curses_display_init(ds, &dpy);
-         break;
-     case DT_SDL:
-         sdl_display_init(ds, &dpy);
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 8f0ae1d76b..3fb0e78fbc 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1017,7 +1017,7 @@
- #
- ##
- { 'enum'    : 'DisplayType',
--  'data'    : [ 'default', 'none', 'gtk', 'sdl', 'egl-headless' ] }
-+  'data'    : [ 'default', 'none', 'gtk', 'sdl', 'egl-headless', 'curses' ] }
- 
- ##
- # @DisplayOptions:
-@@ -1042,4 +1042,5 @@
-                 'none'           : 'DisplayNoOpts',
-                 'gtk'            : 'DisplayGTK',
-                 'sdl'            : 'DisplayNoOpts',
--                'egl-headless'   : 'DisplayNoOpts' } }
-+                'egl-headless'   : 'DisplayNoOpts',
-+                'curses'         : 'DisplayNoOpts' } }
--- 
-2.9.3
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index dc4b2b9ffe..ed78c4ed9f 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2224,6 +2224,22 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>              aml_append(sb_scope, scope);
+>          }
+>      }
+> +
+> +    if (TPM_IS_CRB(tpm_find())) {
+> +        dev =3D aml_device("TPM");
+> +        aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")));
+> +        crs =3D aml_resource_template();
+> +        aml_append(crs, aml_memory32_fixed(TPM_CRB_ADDR_BASE,
+> +                                           TPM_CRB_ADDR_SIZE, AML_READ_W=
+RITE));
+> +        aml_append(dev, aml_name_decl("_CRS", crs));
+> +
+[...]
+> +        method =3D aml_method("_STA", 0, AML_NOTSERIALIZED);
+> +        aml_append(method, aml_return(aml_int(0x0f)));
+> +        aml_append(dev, method);
+this is not needed as 0x0f is assumed default value if _STA is missing
+
+[...]
+
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> new file mode 100644
+> index 0000000000..687d2557b7
+> --- /dev/null
+> +++ b/hw/tpm/tpm_crb.c
+[...]
+
+> +static void tpm_crb_realize(DeviceState *dev, Error **errp)
+> +{
+> +    CRBState *s =3D CRB(dev);
+> +
+> +    if (!tpm_find()) {
+> +        error_setg(errp, "at most one TPM device is permitted");
+> +        return;
+> +    }
+> +    if (!s->tpmbe) {
+> +        error_setg(errp, "'tpmdev' property is required");
+> +        return;
+> +    }
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(s), &tpm_crb_memory_ops, s,
+> +        "tpm-crb-mmio", sizeof(s->regs));
+> +    memory_region_init_ram(&s->cmdmem, OBJECT(s),
+> +        "tpm-crb-cmd", CRB_CTRL_CMD_SIZE, errp);
+> +
+> +    memory_region_add_subregion(get_system_memory(),
+> +        TPM_CRB_ADDR_BASE, &s->mmio);
+> +    memory_region_add_subregion(get_system_memory(),
+> +        TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
+just curious, what if there is something else mapped at this addresses,
+will it fail or just ignore error?=20
+
+> +
+> +    tpm_backend_reset(s->tpmbe);
+> +
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     InterfaceType, CRB_INTF_TYPE_CRB_ACTIVE);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     InterfaceVersion, CRB_INTF_VERSION_CRB);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     CapLocality, CRB_INTF_CAP_LOCALITY_0_ONLY);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     CapCRBIdleBypass, CRB_INTF_CAP_IDLE_FAST);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     CapDataXferSizeSupport, CRB_INTF_CAP_XFER_SIZE_64);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     CapFIFO, CRB_INTF_CAP_FIFO_NOT_SUPPORTED);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     CapCRB, CRB_INTF_CAP_CRB_SUPPORTED);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     InterfaceSelector, CRB_INTF_IF_SELECTOR_CRB);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
+> +                     RID, 0b0000);
+> +    ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID2,
+> +                     VID, PCI_VENDOR_ID_IBM);
+> +
+> +    s->regs[R_CRB_CTRL_CMD_SIZE] =3D CRB_CTRL_CMD_SIZE;
+> +    s->regs[R_CRB_CTRL_CMD_LADDR] =3D TPM_CRB_ADDR_BASE + A_CRB_DATA_BUF=
+FER;
+> +    s->regs[R_CRB_CTRL_RSP_SIZE] =3D CRB_CTRL_CMD_SIZE;
+> +    s->regs[R_CRB_CTRL_RSP_ADDR] =3D TPM_CRB_ADDR_BASE + A_CRB_DATA_BUFF=
+ER;
+> +
+> +    s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->tpmbe),
+> +                            CRB_CTRL_CMD_SIZE);
+> +
+> +    tpm_backend_startup_tpm(s->tpmbe, s->be_buffer_size);
+> +}
+[...]
