@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eg7kz-0004Hv-7F
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:50 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eg7pi-0006YY-DK
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:42:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eg7ky-0002wT-6L
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:49 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:45296)
+	(envelope-from <stefanha@gmail.com>) id 1eg7pd-0006Gm-PG
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:42:42 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eg7kx-0002wD-Vj
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:48 -0500
-Received: by mail-ot0-x244.google.com with SMTP id r4so6207490oti.12
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 03:37:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eg7pd-0006Fx-Hu
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:42:37 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id f3so33076932wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 03:42:37 -0800 (PST)
+Date: Mon, 29 Jan 2018 11:42:34 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180129114234.GC20446@stefanha-x1.localdomain>
+References: <20180125175949.7780-1-pbonzini@redhat.com>
+	<20180125175949.7780-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1516992568-3139-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1516992568-3139-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jan 2018 11:37:26 +0000
-Message-ID: <CAFEAcA_aOF-Dz_Ji0AVfi=CHvb7GoKSmOAsCGmA5b5bYn4bKFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] Merge tpm 2018/01/26
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+xNpyl7Qekk2NvDX"
+Content-Disposition: inline
+In-Reply-To: <20180125175949.7780-3-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] lockable: add QemuLockable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com
 
-On 26 January 2018 at 18:49, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> The patches in this pull request fix a bug in the initialization of
-> a variable, adapt the cancel path used by the passthrough device to the
-> sysfs path of more recent versions of the Linux kernel, and do some other
-> cleanups preparing for support of migration. Finally, we add the CRB
-> interface emulation, which is used with a TPM 2.
->
->    Stefan
->
-> The following changes since commit 0f79bfe38a2cf0f43c7ea4959da7f8ebd7858f3d:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.12-pull-request' into staging (2018-01-25 09:53:53 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-01-26-1
->
-> for you to fetch changes up to b510b21e072a0a9218f37051c885e95824d06bea:
->
->   tpm: add CRB device (2018-01-26 10:12:02 -0500)
->
-> ----------------------------------------------------------------
-> Merge tpm 2018/01/26 v1
->
-> ----------------------------------------------------------------
 
-Hi. The new tpm-crb-test fails on sparc host:
+--+xNpyl7Qekk2NvDX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-TEST: tests/tpm-crb-test... (pid=230409)
-  /i386/tpm-crb/test:
-Broken pipe
-FAIL
-GTester: last random seed: R02S29cea50247fe1efa59ee885a26d51a85
-(pid=230423)
-FAIL: tests/tpm-crb-test
+On Thu, Jan 25, 2018 at 06:59:46PM +0100, Paolo Bonzini wrote:
+> +struct QemuLockable {
+> +    void *object;
+> +    QemuLockUnlockFunc *lock;
+> +    QemuLockUnlockFunc *unlock;
+> +};
+...
+> +/* In C, compound literals have the lifetime of an automatic variable.
+> + * In C++ it would be different, but then C++ wouldn't need QemuLockable
+> + * either...
+> + */
+> +#define QEMU_MAKE_LOCKABLE_(x) qemu_make_lockable((x), &(QemuLockable) {    \
+> +        .object = (x),                               \
+> +        .lock = QEMU_LOCK_FUNC(x),                   \
+> +        .unlock = QEMU_UNLOCK_FUNC(x),               \
+> +    })
 
-and generates a new clang sanitizer runtime warning:
+After all these tricks we still end up with a struct containing function
+pointers.  That's a little sad because the power of generics is
+specializing code at compile time.
 
-/home/petmay01/linaro/qemu-for-merges/hw/tpm/tpm_util.h:36:24: runtime
-error: load of misaligned address 0x7fdc24c00002 for type 'const
-uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
-0x7fdc24c00002: note: pointer points here
-<memory cannot be printed>
+IMO the generics usage here doesn't have a big pay-off.  The generated
+code is more or less the same as without generics!
 
-Chances are good these are the same thing, because the sparc architecture
-does not allow misaligned loads and will segfault if you try them.
-This function looks like it's the immediate culprit:
+It makes me wonder if the API would be more maintainable with:
 
-static inline uint32_t tpm_cmd_get_size(const void *b)
-{
-    return be32_to_cpu(*(const uint32_t *)(b + 2));
-}
+  typedef struct {
+      QemuLockUnlockFunc *lock;
+      QemuLockUnlockFunc *unlock;
+  } LockableOps;
 
-I suspect that this function should read
-    return ldl_be_p(b + 2);
+  extern const LockableOps co_mutex_lockable_ops;
+  extern const LockableOps qemu_spin_lockable_ops;
+  ...
 
-This is likely not the only problem with misaligned data in the
-tpm code -- for instance the cast here in tpm_util_is_selftest()
-looks odd:
+The user passes in the appropriate LockableOps instance for their type
+and generics are not needed.
 
-bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
-{
-    struct tpm_req_hdr *hdr = (struct tpm_req_hdr *)in;
+This approach means future changes do not require digging through the
+macros to understand how this stuff works.
 
-As a general rule you can't take an arbitrary pointer into a byte
-buffer and try to interpret it as a structure or a pointer to
-a larger-than-bytesize-data simply by casting the pointer.
-It might be worth reviewing all the tpm code for bugs
-of this nature.
+Maybe I've missed something?
 
-thanks
--- PMM
+Stefan
+
+--+xNpyl7Qekk2NvDX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJabwiqAAoJEJykq7OBq3PI35MIALORBDDvSSn8E/EM/WvQFKOj
+AvkqeIikl2QdUeAt892lkd9yuykFYkJraj1Hg3cEjYYUiu+SxTSYf2BAhREiC2v3
+XvOtjoGDnOztb1KOxNIrVUO3DrobPJL5S2FhTx3zp2+UKqPSoIffYeU4W8DOJfw6
+zrYl46gqPbpKPBA6Hsi3lwPia5jz6m9kSB1dxYMn+kgla/xZbCGtvG6vlv4QLkxq
+kTu/vg05r+QkQVDyhi4pjUqyV19w3yYVvYL9ubAY6fDnruKqbHbQgsyjy0ss/yR8
+HR1txMnsOx6rbbQM/kHhif2pgrDDT5ak3oCKrdqEAK2r7am7+LZUIPAq+u/ofqo=
+=Sv08
+-----END PGP SIGNATURE-----
+
+--+xNpyl7Qekk2NvDX--
