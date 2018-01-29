@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eg4d8-0002oS-UA
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:17:37 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eg4lY-00084y-QF
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:26:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eg4d4-0003pf-AD
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:17:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43468)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eg4d4-0003p5-48
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:17:26 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 29 Jan 2018 16:17:05 +0800
-Message-Id: <1517213825-24085-7-git-send-email-jasowang@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1eg4lV-0007m3-EG
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:26:12 -0500
+Resent-Message-Id: <E1eg4lV-0007m3-EG@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eg4lV-0007kw-6f
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:26:09 -0500
 In-Reply-To: <1517213825-24085-1-git-send-email-jasowang@redhat.com>
-References: <1517213825-24085-1-git-send-email-jasowang@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151721435440.776.955566177382694120@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 6/6] MAINTAINERS: update Dmitry Fleytman email
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 29 Jan 2018 00:25:55 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/6] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Jason Wang <jasowang@redhat.com>
+To: jasowang@redhat.com
+Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-gently asked by his automatic reply :)
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- MAINTAINERS | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 753e799..fe39b30 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1163,7 +1163,7 @@ F: hw/scsi/mfi.h
- F: tests/megasas-test.c
-=20
- Network packet abstractions
--M: Dmitry Fleytman <dmitry@daynix.com>
-+M: Dmitry Fleytman <dmitry.fleytman@gmail.com>
- S: Maintained
- F: include/net/eth.h
- F: net/eth.c
-@@ -1171,7 +1171,7 @@ F: hw/net/net_rx_pkt*
- F: hw/net/net_tx_pkt*
-=20
- Vmware
--M: Dmitry Fleytman <dmitry@daynix.com>
-+M: Dmitry Fleytman <dmitry.fleytman@gmail.com>
- S: Maintained
- F: hw/net/vmxnet*
- F: hw/scsi/vmw_pvscsi*
-@@ -1192,12 +1192,12 @@ F: hw/mem/nvdimm.c
- F: include/hw/mem/nvdimm.h
-=20
- e1000x
--M: Dmitry Fleytman <dmitry@daynix.com>
-+M: Dmitry Fleytman <dmitry.fleytman@gmail.com>
- S: Maintained
- F: hw/net/e1000x*
-=20
- e1000e
--M: Dmitry Fleytman <dmitry@daynix.com>
-+M: Dmitry Fleytman <dmitry.fleytman@gmail.com>
- S: Maintained
- F: hw/net/e1000e*
-=20
---=20
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTcyMTM4MjUtMjQwODUtMS1naXQtc2VuZC1lbWFpbC1qYXNvd2FuZ0ByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzZdIE5ldCBwYXRjaGVzCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
+Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
+dy8xNTE3MjEzODI1LTI0MDg1LTEtZ2l0LXNlbmQtZW1haWwtamFzb3dhbmdAcmVkaGF0LmNvbSAt
+PiBwYXRjaGV3LzE1MTcyMTM4MjUtMjQwODUtMS1naXQtc2VuZC1lbWFpbC1qYXNvd2FuZ0ByZWRo
+YXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjU5OWJiODMwYSBNQUlOVEFJ
+TkVSUzogdXBkYXRlIERtaXRyeSBGbGV5dG1hbiBlbWFpbApkN2UzMzc5NjFjIHFlbXUtZG9jOiBH
+ZXQgcmlkIG9mICJ2bGFuPVgiIGV4YW1wbGUgaW4gdGhlIGRvY3VtZW50YXRpb24KYjdiYzA2YzBm
+NCBuZXQ6IEFsbG93IG5ldGRldnMgdG8gYmUgdXNlZCB3aXRoICdob3N0ZndkX2FkZCcgYW5kICdo
+b3N0ZndkX3JlbW92ZScKODViNGNhYzRhYyBuZXQ6IEFsbG93IGh1YnBvcnRzIHRvIGNvbm5lY3Qg
+dG8gb3RoZXIgbmV0ZGV2cwpiNGEzNTQxM2M0IGNvbG86IGNvbXBhcmUgdGhlIHBhY2tldCBiYXNl
+ZCBvbiB0aGUgdGNwIHNlcXVlbmNlIG51bWJlcgpmNjc4MWRhMzAyIGNvbG86IG1vZGlmaWVkIHRo
+ZSBwYXlsb2FkIGNvbXBhcmUgZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvNjogY29sbzogbW9kaWZpZWQgdGhlIHBheWxvYWQgY29tcGFyZSBmdW5jdGlvbi4u
+LgpDaGVja2luZyBQQVRDSCAyLzY6IGNvbG86IGNvbXBhcmUgdGhlIHBhY2tldCBiYXNlZCBvbiB0
+aGUgdGNwIHNlcXVlbmNlIG51bWJlci4uLgpDaGVja2luZyBQQVRDSCAzLzY6IG5ldDogQWxsb3cg
+aHVicG9ydHMgdG8gY29ubmVjdCB0byBvdGhlciBuZXRkZXZzLi4uCkNoZWNraW5nIFBBVENIIDQv
+NjogbmV0OiBBbGxvdyBuZXRkZXZzIHRvIGJlIHVzZWQgd2l0aCAnaG9zdGZ3ZF9hZGQnIGFuZCAn
+aG9zdGZ3ZF9yZW1vdmUnLi4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBw
+cmVmZXJlbmNlIHRvIHN0cnRvbAojNzI6IEZJTEU6IG5ldC9zbGlycC5jOjQxNDoKKyAgICAgICAg
+ICAgIG5jID0gbmV0X2h1Yl9maW5kX2NsaWVudF9ieV9uYW1lKHN0cnRvbChodWJfaWQsIE5VTEws
+IDApLCBuYW1lKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNzMgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+NS82OiBxZW11LWRvYzogR2V0IHJpZCBvZiAidmxhbj1YIiBleGFtcGxlIGluIHRoZSBkb2N1bWVu
+dGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDYvNjogTUFJTlRBSU5FUlM6IHVwZGF0ZSBEbWl0cnkg
+RmxleXRtYW4gZW1haWwuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
