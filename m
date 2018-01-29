@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eg68G-00023c-3b
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:53:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eg6EG-00055K-J9
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eg68D-0008NO-1X
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:53:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54194)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eg68C-0008LM-Ly
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:53:40 -0500
-Date: Mon, 29 Jan 2018 09:53:31 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180129095330.GA2408@work-vm>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-	<20180126194559.GI2610@work-vm>
-	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eg6EF-0005Iu-DC
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:59:56 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:34266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eg6EF-0005IF-7Z
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 04:59:55 -0500
+Received: by mail-ot0-x230.google.com with SMTP id x15so5995677ote.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 01:59:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+In-Reply-To: <20180126160411.4033-1-eblake@redhat.com>
+References: <20180126160411.4033-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jan 2018 09:59:33 +0000
+Message-ID: <CAFEAcA_g67PikH1YJ7ZEdXLXHa2hLUpgEJdqh=OQKfHM50iEJg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/8] NBD patches through 26 Jan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >> I think the correct fix here is that your test code should turn
-> >> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
-> >> for Arm KVM guests (for the same reason that VGA device video memory
-> >> doesn't work). If it's RAM your guest has to arrange to map it as
-> >> Normal Cacheable, and then everything should work fine.
-> >
-> > Does this cause problems with migrating at just the wrong point during
-> > a VM boot?
-> 
-> It wouldn't surprise me if it did, but I don't think I've ever
-> tried to provoke that problem...
+On 26 January 2018 at 16:04, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit e607bbee553cfe73072870cef458cfa4e78133e2:
+>
+>   Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-2018-01-26.for-upstream' into staging (2018-01-26 14:24:25 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-01-26
+>
+> for you to fetch changes up to 9776f0db6a19a0510e89b7aae38190b4811c95ba:
+>
+>   nbd: implement bdrv_get_info callback (2018-01-26 09:58:46 -0600)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2018-01-26
+>
+> - Vladimir Sementsov-Ogievskiy - nbd export qmp interface
+> - Eric Blake - hmp: Add nbd_server_remove to mirror QMP command
+> - Edgar Kaziakhmedov - nbd: implement bdrv_get_info callback
 
-If you think it'll get the RAM contents wrong, it might be best to fail
-the migration if you can detect the cache is disabled in the guest.
+Applied, thanks.
 
-Dave
-
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
