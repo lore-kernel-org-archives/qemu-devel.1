@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1egBkD-0008Fo-3G
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:53:18 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1egBnd-0002F7-G4
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:56:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1egBk9-0004z8-2m
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:53:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1egBk8-0004yT-RQ
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:53:13 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EFD3B793EC
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 15:53:11 +0000 (UTC)
-References: <20180129121754.13033-1-quintela@redhat.com>
-	<20180129121754.13033-4-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <3ff7c4ce-f807-6f88-d546-fe83d9a294b3@redhat.com>
-Date: Mon, 29 Jan 2018 16:53:04 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1egBna-0007aF-Ao
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:56:49 -0500
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:46662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1egBna-0007Zg-41
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:56:46 -0500
+Received: by mail-pf0-x229.google.com with SMTP id y5so5620976pff.13
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 07:56:45 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+References: <20180124131315.30567-1-alex.bennee@linaro.org>
+	<20180124131315.30567-20-alex.bennee@linaro.org>
+	<57ab078a-049b-72e7-5bc5-f73a3c947b45@linaro.org>
+	<87vafkyiyg.fsf@linaro.org>
+	<85b5aa04-ec85-a2b6-3b79-2bb991824004@linaro.org>
+Message-ID: <841cd62e-1062-6997-10f6-272b55d1b612@linaro.org>
+Date: Mon, 29 Jan 2018 07:56:42 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180129121754.13033-4-quintela@redhat.com>
+In-Reply-To: <85b5aa04-ec85-a2b6-3b79-2bb991824004@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/5] tests: Migration ppc now inlines
- its program
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 19/22] fpu/softfloat: re-factor scalbn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,96 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-On 29/01/2018 13:17, Juan Quintela wrote:
-> No need to write it to a file.  Just need a proper firmware O:-)
+On 01/29/2018 07:50 AM, Richard Henderson wrote:
+> On 01/29/2018 03:59 AM, Alex Bennée wrote:
+>>
+>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>
+>>> On 01/24/2018 05:13 AM, Alex Bennée wrote:
+>>>> +/* Multiply A by 2 raised to the power N.  */
+>>>> +static FloatParts scalbn_decomposed(FloatParts a, int n,
+>>>> +                                          float_status *s)
+>>>> +{
+>>>> +    if (a.cls == float_class_normal) {
+>>>> +        a.exp += n;
+>>>> +    }
+>>>> +    return a;
+>>>> +}
+>>>
+>>> ...
+>>>
+>>>> -    if ( aExp == 0x7FF ) {
+>>>> -        if ( aSig ) {
+>>>> -            return propagateFloat64NaN(a, a, status);
+>>>
+>>> This is where we used to raise inexact.
+>>> In the new function we need to handle this as in round_to_int.
+>>
+>> Why is the handling in round_canonical not good enough for this?
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> CC: Laurent Vivier <lvivier@redhat.com>
-> ---
->  tests/migration-test.c | 41 +++++------------------------------------
->  1 file changed, 5 insertions(+), 36 deletions(-)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index fcad2ed460..26439f6071 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -18,9 +18,6 @@
->  #include "qemu/sockets.h"
->  #include "chardev/char.h"
->  #include "sysemu/sysemu.h"
-> -#include "hw/nvram/chrp_nvram.h"
-> -
-> -#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
->  
->  const unsigned start_address = 1024 * 1024;
->  const unsigned end_address = 100 * 1024 * 1024;
-> @@ -133,36 +130,6 @@ static void init_bootfile_x86(const char *bootpath)
->      fclose(bootfile);
->  }
->  
-> -static void init_bootfile_ppc(const char *bootpath)
-> -{
-> -    FILE *bootfile;
-> -    char buf[MIN_NVRAM_SIZE];
-> -    ChrpNvramPartHdr *header = (ChrpNvramPartHdr *)buf;
-> -
-> -    memset(buf, 0, MIN_NVRAM_SIZE);
-> -
-> -    /* Create a "common" partition in nvram to store boot-command property */
-> -
-> -    header->signature = CHRP_NVPART_SYSTEM;
-> -    memcpy(header->name, "common", 6);
-> -    chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
-> -
-> -    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
-> -     * so let's modify memory between 1MB and 100MB
-> -     * to do like PC bootsector
-> -     */
+> This is scalbn -- you don't call round_canonical.
 
-You should copy this comment where we have inlined the code (below).
+Scratch that -- too early.  And I was trying to talk about invalid not inexact.
+ What a cacophony of errors on my part.  No wonder we're not communicating.
 
-> -
-> -    sprintf(buf + 16,
-> -            "boot-command=hex .\" _\" begin %x %x do i c@ 1 + i c! 1000 +loop "
-> -            ".\" B\" 0 until", end_address, start_address);
-> -
-> -    /* Write partition to the NVRAM file */
-> -
-> -    bootfile = fopen(bootpath, "wb");
-> -    g_assert_cmpint(fwrite(buf, MIN_NVRAM_SIZE, 1, bootfile), ==, 1);
-> -    fclose(bootfile);
-> -}
-> -
->  /*
->   * Wait for some output in the serial output file,
->   * we get an 'A' followed by an endless string of 'B's
-> @@ -453,12 +420,14 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->          if (access("/sys/module/kvm_hv", F_OK)) {
->              accel = "tcg";
->          }
-> -        init_bootfile_ppc(bootpath);
+But you'll notice that round_canonical does not raise invalid for nans.
+Perhaps we could rearrange things so that it does, but at the moment it is the
+responsibility of prior code to have set invalid and msnan/dnan.
 
-I think you could move bootpath allocation/free inside the
-'if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {' as it
-is not used anymore by ppc.
 
->          cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
->                                    " -name source,debug-threads=on"
->                                    " -serial file:%s/src_serial"
-> -                                  " -drive file=%s,if=pflash,format=raw",
-> -                                  accel, tmpfs, bootpath);
-> +                                  " -prom-env '"
-> +                                  "boot-command=hex .\" _\" begin %x %x "
-> +                                  "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
-> +                                  "until'",  accel, tmpfs, end_address,
-> +                                  start_address);
->          cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
->                                    " -name target,debug-threads=on"
->                                    " -serial file:%s/dest_serial"
-> 
-
-Thanks,
-Laurent
+r~
