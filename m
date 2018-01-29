@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eg4lY-00084y-QF
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:26:16 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eg4mr-0000LP-Cu
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eg4lV-0007m3-EG
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:26:12 -0500
-Resent-Message-Id: <E1eg4lV-0007m3-EG@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21037)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eg4lV-0007kw-6f
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:26:09 -0500
-In-Reply-To: <1517213825-24085-1-git-send-email-jasowang@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151721435440.776.955566177382694120@5adcb62bf0d6>
+	(envelope-from <kraxel@redhat.com>) id 1eg4mo-0001Do-AO
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:27:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49188)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eg4mo-0001Cq-4O
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 03:27:30 -0500
+Date: Mon, 29 Jan 2018 09:27:27 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180129082727.jvh4nc2cquuqylrv@sirius.home.kraxel.org>
+References: <CAE5jQCeSL5fRXBh5F9L3G5JkkwmS=sU9VS6Bu82Xpq5fMd=K8Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 29 Jan 2018 00:25:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/6] Net patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAE5jQCeSL5fRXBh5F9L3G5JkkwmS=sU9VS6Bu82Xpq5fMd=K8Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] SDL2 UI behavior of switching views
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +26,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MTcyMTM4MjUtMjQwODUtMS1naXQtc2VuZC1lbWFpbC1qYXNvd2FuZ0ByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzZdIE5ldCBwYXRjaGVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
-CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
-OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
-IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
-aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
-b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
-dy8xNTE3MjEzODI1LTI0MDg1LTEtZ2l0LXNlbmQtZW1haWwtamFzb3dhbmdAcmVkaGF0LmNvbSAt
-PiBwYXRjaGV3LzE1MTcyMTM4MjUtMjQwODUtMS1naXQtc2VuZC1lbWFpbC1qYXNvd2FuZ0ByZWRo
-YXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjU5OWJiODMwYSBNQUlOVEFJ
-TkVSUzogdXBkYXRlIERtaXRyeSBGbGV5dG1hbiBlbWFpbApkN2UzMzc5NjFjIHFlbXUtZG9jOiBH
-ZXQgcmlkIG9mICJ2bGFuPVgiIGV4YW1wbGUgaW4gdGhlIGRvY3VtZW50YXRpb24KYjdiYzA2YzBm
-NCBuZXQ6IEFsbG93IG5ldGRldnMgdG8gYmUgdXNlZCB3aXRoICdob3N0ZndkX2FkZCcgYW5kICdo
-b3N0ZndkX3JlbW92ZScKODViNGNhYzRhYyBuZXQ6IEFsbG93IGh1YnBvcnRzIHRvIGNvbm5lY3Qg
-dG8gb3RoZXIgbmV0ZGV2cwpiNGEzNTQxM2M0IGNvbG86IGNvbXBhcmUgdGhlIHBhY2tldCBiYXNl
-ZCBvbiB0aGUgdGNwIHNlcXVlbmNlIG51bWJlcgpmNjc4MWRhMzAyIGNvbG86IG1vZGlmaWVkIHRo
-ZSBwYXlsb2FkIGNvbXBhcmUgZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvNjogY29sbzogbW9kaWZpZWQgdGhlIHBheWxvYWQgY29tcGFyZSBmdW5jdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCAyLzY6IGNvbG86IGNvbXBhcmUgdGhlIHBhY2tldCBiYXNlZCBvbiB0
-aGUgdGNwIHNlcXVlbmNlIG51bWJlci4uLgpDaGVja2luZyBQQVRDSCAzLzY6IG5ldDogQWxsb3cg
-aHVicG9ydHMgdG8gY29ubmVjdCB0byBvdGhlciBuZXRkZXZzLi4uCkNoZWNraW5nIFBBVENIIDQv
-NjogbmV0OiBBbGxvdyBuZXRkZXZzIHRvIGJlIHVzZWQgd2l0aCAnaG9zdGZ3ZF9hZGQnIGFuZCAn
-aG9zdGZ3ZF9yZW1vdmUnLi4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBw
-cmVmZXJlbmNlIHRvIHN0cnRvbAojNzI6IEZJTEU6IG5ldC9zbGlycC5jOjQxNDoKKyAgICAgICAg
-ICAgIG5jID0gbmV0X2h1Yl9maW5kX2NsaWVudF9ieV9uYW1lKHN0cnRvbChodWJfaWQsIE5VTEws
-IDApLCBuYW1lKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNzMgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
-NS82OiBxZW11LWRvYzogR2V0IHJpZCBvZiAidmxhbj1YIiBleGFtcGxlIGluIHRoZSBkb2N1bWVu
-dGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDYvNjogTUFJTlRBSU5FUlM6IHVwZGF0ZSBEbWl0cnkg
-RmxleXRtYW4gZW1haWwuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Sun, Jan 28, 2018 at 06:43:44PM +0300, Anatoly Trosinenko wrote:
+> When QEMU is run with GTK UI, it changes what is drawn on its single window
+> when I press Ctrl-Alt-{1,2,3,4}. But when I use SDL2 UI, it opens multiple
+> windows: a separate window per each view (display, monitor, serial,
+> parallel). Is it by design or is it a bug?
+
+It's intentional.  With gtk you can have separate windows too (try "View/Detach Tab").
+
+cheers,
+  Gerd
