@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1egBru-0004N1-CI
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:01:15 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egBtd-0005OO-P8
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:03:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1egBro-0001wj-Kx
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:01:14 -0500
-Date: Mon, 29 Jan 2018 16:01:04 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180129160104.GN20446@stefanha-x1.localdomain>
-References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20171211115634.GI13593@stefanha-x1.localdomain>
-	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20171213112345.GK16782@stefanha-x1.localdomain>
-	<VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	(envelope-from <mreitz@redhat.com>) id 1egBtZ-0003gO-3U
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:03:01 -0500
+References: <20171226025247.11082-1-famz@redhat.com>
+	<20171226025247.11082-3-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7c728aa5-4623-79c6-3e6a-04e2b19aefba@redhat.com>
+Date: Mon, 29 Jan 2018 17:01:41 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="aSnC4ZPPfhCvD8sN"
-Content-Disposition: inline
-In-Reply-To: <VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-Subject: Re: [Qemu-devel] qemu process crash: Assertion failed:
- QLIST_EMPTY(&bs->tracked_requests)
+In-Reply-To: <20171226025247.11082-3-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Y1tVZeyLC4jyvIXhwyieRVq8DmUroFfix"
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] qemu-img: Document --force-share /
+ -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +25,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fernando Casas =?iso-8859-1?Q?Sch=F6ssow?= <casasfernando@hotmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, stefanha@redhat.com, kchamart@redhat.com, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com
 
-
---aSnC4ZPPfhCvD8sN
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Y1tVZeyLC4jyvIXhwyieRVq8DmUroFfix
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, stefanha@redhat.com, kchamart@redhat.com,
+ Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com
+Message-ID: <7c728aa5-4623-79c6-3e6a-04e2b19aefba@redhat.com>
+Subject: Re: [PATCH v5 2/2] qemu-img: Document --force-share / -U
+References: <20171226025247.11082-1-famz@redhat.com>
+ <20171226025247.11082-3-famz@redhat.com>
+In-Reply-To: <20171226025247.11082-3-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 13, 2017 at 03:33:01PM +0000, Fernando Casas Sch=C3=B6ssow wrot=
-e:
-> Maybe I=E2=80=99m missing something here but, if I recall correctly, the =
-qemu process for the guest is terminated when this problem happens. So how =
-a debugger will be attached to a process that is gone?
+On 2017-12-26 03:52, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qemu-img.texi | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index 60a0e080c6..e83e140f7a 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -86,6 +86,15 @@ exclusive with the @var{-O} parameters. It is curren=
+tly required to also use
+>  the @var{-n} parameter to skip image creation. This restriction may be=
+ relaxed
+>  in a future release.
+> =20
+> +@item --force-share (-U)
+> +
 
-Sorry, this got lost in my inbox.
+So the previous patch makes the use of blank lines consistent and this
+one breaks it again? :-)
 
-assert(false) sends SIGABRT to the process.  The default behavior is to
-dump a core file that can be analyzed later with GDB.
+> +If specified, @code{qemu-img} will open the image with shared permissi=
+ons,
+> +which makes it less likely to conflict with a running guest's permissi=
+ons due
+> +to image locking. For example, this can be used to get the image infor=
+mation
+> +(with 'info' subcommand) when the image is used by a running guest. No=
+te that
+> +this could produce inconsistent results because of concurrent metadata=
+ changes,
+> +etc. This option is only allowed when opening images in read-only mode=
+=2E
 
-Your system must have core dumps enabled (i.e. ulimit -c unlimited).
-Also, various pieces of software like systemd's coredumpctl can
-influence where and how core dumps are stored.
+I personally don't quite like the "makes it less likely to conflict",
+because that makes it sound like qemu would be stupid and need a nudge
+in the right direction -- when it's actually the user who does something
+a bit risky (and qemu is right in forbidding it by default).  But since
+it's only a read-only thing, I won't actually object to it.
 
-But in short, an assertion failure produces a core dump.
+(Maybe it should document more exactly what's happening, i.e. that this
+option will allow concurrent writers (as a standard user, I wouldn't
+know what "shared permissions" is supposed to mean).)
 
-Stefan
+Max
 
---aSnC4ZPPfhCvD8sN
+> +
+>  @item --backing-chain
+>  will enumerate information about backing files in a disk image chain. =
+Refer
+>  below for further description.
+>=20
+
+
+
+--Y1tVZeyLC4jyvIXhwyieRVq8DmUroFfix
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJab0VAAAoJEJykq7OBq3PIncEIAKqFw3BMEEzz3IVcT4XbIR+n
-kHrjH0/69OVFbBZHHaZ5AbWXn8vn3ku3O0+ammNE6PBH64OWzve9ga4KqJFBYcbS
-y+GYSx4DpN1aY8UM204HdbShlIxo+r1oNHN5/kzYUatGtJMDWILhJLIDBGM1JFSm
-S0FR+A1efVE8VJ1JY5vUrDqtd9Tf+znBCbdjpgjx7VdHf16td8sMiSG3gRty+n9/
-wNaeDeAAWxociZCWcCgZfyDSlGGcP97ds8W8CEDkTXCkGTNoNMptMtYBQUjJC2uy
-i1XoDxTizW4dxd50JTHKLNl4HeVPp7Y6H0fyY5uV9W30JokTqM2furomFzUGQxM=
-=TZhy
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpvRWUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A8R4H/1zmd62VeR8CoSlsljL+3jCFWajphHpu
+B+CgCjL9eSZqUv9ZlPJ0rYKACpG1QFNwH6mh9sWxIHm1S7rVSTtR/IKjm8B/Oz16
+zj6mEpY8xYRcHgzqG4giEvf39TPHEWFGQaAjSj5t3xx8qeaLA2jA77uv8Ubgfwc/
+snAWektCXaJRB49qVci2+SvXjBQIKX4SK0ZhLbukubFmZB0UoDCOkT4CmZRHlZfT
+lp1mVKu15zAqLN1BZlHdc51aLhDeJxh4RbiGFFUxdO+YnapzmvPL3jSFeUBI+dG5
+kdr0NpN04uav2jqGq+/uyugvnYdsRP09ObR9uUvwF3AHxL/4XHOMjHU=
+=C4C/
 -----END PGP SIGNATURE-----
 
---aSnC4ZPPfhCvD8sN--
+--Y1tVZeyLC4jyvIXhwyieRVq8DmUroFfix--
