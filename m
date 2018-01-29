@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eg9SM-00063q-6A
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:26:46 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eg9TU-0006tk-Jt
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:27:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eg9SL-0003Bc-D6
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:26:42 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35125)
+	(envelope-from <stefanha@gmail.com>) id 1eg9TQ-00044o-R7
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:27:52 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eg9SL-0003BE-53
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:26:41 -0500
-Received: by mail-wm0-x244.google.com with SMTP id r78so33715821wme.0
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 05:26:41 -0800 (PST)
-Date: Mon, 29 Jan 2018 13:26:38 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eg9TQ-00044S-JI
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 08:27:48 -0500
+Received: by mail-wr0-x244.google.com with SMTP id d9so7208212wre.3
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 05:27:48 -0800 (PST)
+Date: Mon, 29 Jan 2018 13:27:45 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180129132638.GF20446@stefanha-x1.localdomain>
+Message-ID: <20180129132745.GG20446@stefanha-x1.localdomain>
 References: <20180125175949.7780-1-pbonzini@redhat.com>
-	<20180125175949.7780-2-pbonzini@redhat.com>
+	<20180125175949.7780-6-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="w3uUfsyyY1Pqa/ej"
+	protocol="application/pgp-signature"; boundary="Qf1oXS95uex85X0R"
 Content-Disposition: inline
-In-Reply-To: <20180125175949.7780-2-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] test-coroutine: add simple CoMutex test
+In-Reply-To: <20180125175949.7780-6-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] curl: convert to CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +34,35 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, famz@redhat.com
 
 
---w3uUfsyyY1Pqa/ej
+--Qf1oXS95uex85X0R
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 25, 2018 at 06:59:45PM +0100, Paolo Bonzini wrote:
-> In preparation for adding a similar test using QemuLockable, add a very
-> simple testcase that has two interleaved calls to lock and unlock.
+On Thu, Jan 25, 2018 at 06:59:49PM +0100, Paolo Bonzini wrote:
+> Now that CoQueues can use a QemuMutex for thread-safety, there is no
+> need for curl to roll its own coroutine queue.  Coroutines can be
+> placed directly on the queue instead of using a list of CURLAIOCBs.
 >=20
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  tests/test-coroutine.c | 50 ++++++++++++++++++++++++++++++++++++++++++++=
-++++--
->  1 file changed, 48 insertions(+), 2 deletions(-)
+>  block/curl.c | 20 ++++----------------
+>  1 file changed, 4 insertions(+), 16 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---w3uUfsyyY1Pqa/ej
+--Qf1oXS95uex85X0R
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJabyEOAAoJEJykq7OBq3PIXAMH/RsMG3DZ1rVlJdzkqYp4kF34
-DR+yrUKh9lDHh4eZapMpYxhfrC1OiQXMbpMV+oyAwaGqg2DxG9GYJsJG9BP/Ri5t
-j2q1p0ET6W0hwGmdkq0OrshyCm6CBp2zTUN+KAJg3K7mTl2DjUisM16DIx7XcFcq
-4wu7PVL09nVTERBNaqNA3Rb8YzSqR51Y84yPWhaBGDafEIc/hI5qNV8qApGRVBkS
-SbGRraMlYqZJfhqVoeJTY/BH9aMDRBfdczDTF4q5phKSAFSmKwLDgeLkjmtVCa5s
-9+ykK18BvyNAL6dJVLAEgIjEB1AVe9g5JGI9Xa2nla1q943ZI2uroBxY+uSxanY=
-=EEwd
+iQEcBAEBAgAGBQJabyFRAAoJEJykq7OBq3PIeegIAMR9PPEHYPg2yZtqD/htf74p
+3VeC8pQB4KROjMEcCdFbhYm7yWI5HbXdm1BMQktTxD6yP89ECmjbwxVAFzBh+iJB
+/mVjGRPmRGvfnd4vuOpZRq4pg3hp3vFxZKquy//F7eNYkt72GwLLulp0C1IciBvY
+4Bry0beZWAYC21FbYx99bMgj6fzjw7NyOkF3PdTIzwgUXiQyqwwAE5oWkEZ6jz9Y
+3D+nymq2cyuHMlVhFhniLryF5kix0Tdse1h6OdSrVLFjAW7v21HUp/y7lfl6QNu0
+9zKZUHZg5+e4M0zH0/6ZDH2bfz2H/e2T4hB1dRQNbXnjmqeIv0vrYhrwtKbMJK8=
+=SeP4
 -----END PGP SIGNATURE-----
 
---w3uUfsyyY1Pqa/ej--
+--Qf1oXS95uex85X0R--
