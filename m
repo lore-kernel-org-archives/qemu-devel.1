@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eg7Iy-0003lD-LR
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:08:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eg7Kv-0004in-2w
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:10:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eg7It-0002G2-Mh
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:08:52 -0500
-Date: Mon, 29 Jan 2018 11:08:44 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180129110844.GB20446@stefanha-x1.localdomain>
-References: <20180126193439.20219-1-eblake@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eg7Kt-0004Ir-R3
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:10:53 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33711)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eg7Kt-0004Hv-LK
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:10:51 -0500
+Received: by mail-ot0-x242.google.com with SMTP id d7so6171910oti.0
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 03:10:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mxv5cy4qt+RJ9ypb"
-Content-Disposition: inline
-In-Reply-To: <20180126193439.20219-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Simplify
- bdrv_can_write_zeroes_with_unmap()
+In-Reply-To: <20180129102917.3olxduibcwdqgqls@hawk.localdomain>
+References: <5A6B5091.8030601@hisilicon.com>
+	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
+	<5A6B5FCA.2080009@hisilicon.com>
+	<CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
+	<5A6B6671.8070408@hisilicon.com>
+	<CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
+	<20180129102917.3olxduibcwdqgqls@hawk.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jan 2018 11:10:30 +0000
+Message-ID: <CAFEAcA9y=T0Pd_Zv5zSjT0ZhiKmD__zrS+fP7AU0AC5j_v6c+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
+ before enabled the interruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,91 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, pbonzini@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: Wei Xu <xuwei5@hisilicon.com>, Rob Herring <rob.herring@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, tiantao6@huawei.com, QEMU Developers <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, qemu-arm <qemu-arm@nongnu.org>, Daode Huang <huangdaode@hisilicon.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Zhangyi ac <zhangyi.ac@huawei.com>
 
+On 29 January 2018 at 10:29, Andrew Jones <drjones@redhat.com> wrote:
+> On Fri, Jan 26, 2018 at 06:01:33PM +0000, Peter Maydell wrote:
+>> On 26 January 2018 at 17:33, Wei Xu <xuwei5@hisilicon.com> wrote:
+>> > On 2018/1/26 17:15, Peter Maydell wrote:
+>> >> The pl011 code should call qemu_set_irq(..., 1) when the
+>> >> guest enables interrupts on the device by writing to the int_enabled
+>> >> (UARTIMSC) register. That will be a 0-to-1 level change and the KVM
+>> >> VGIC should report the interrupt to the guest.
+>> >>
+>> >
+>> > Yes.
+>> > And in the pl011_update, the irq level is set by s->int_level & s->int_enabled.
+>> > When writing to the int_enabled, not sure why the int_level is set to
+>> > 0x20(PL011_INT_TX) but int_enabled is 0x50.
+>> >
+>> > It still call qemu_set_irq(..., 0).
+>> >
+>> > I added "s->int_level |= PL011_INT_RX" before calling pl011_update
+>> > when writing to the int_enabled and tested it also works.
+>>
+>> No, that's not right either. int_level should already have the
+>> RX bit set, because pl011_put_fifo() sets that bit when it gets a
+>> character from QEMU and puts it into the FIFO.
+>>
+>> Does something else clear the int_level between the character
+>> going into the FIFO from QEMU and the guest enabling
+>> interrupts?
+>
+> As part of the boot process Linux restarts the UART a few times. When
+> Linux drives the PL011 with the SBSA driver then the FIFO doesn't get
+> reset prior to being used again, as the SBSA doesn't specify a way to
+> do that.
 
---mxv5cy4qt+RJ9ypb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Right, but the FIFO not being cleared shouldn't be a problem --
+if the FIFO is still full then the int_level should still
+indicate that so that when the Linux driver enables interrupts
+it takes an interrupt (and the handler should then drain the
+FIFO by reading characters from it).
 
-On Fri, Jan 26, 2018 at 01:34:39PM -0600, Eric Blake wrote:
-> We don't need the can_write_zeroes_with_unmap field in
-> BlockDriverInfo, because it is redundant information with
-> supported_zero_flags & BDRV_REQ_MAY_UNMAP.  Note that
-> BlockDriverInfo and supported_zero_flags are both per-device
-> settings, rather than global state about the driver as a
-> whole, which means one or both of these bits of information
-> can already be conditional.  Let's audit how they were set:
->=20
-> crypto: always setting can_write_ to false is pointless (the
-> struct starts life zero-initialized), no use of supported_
->=20
-> nbd: just recently fixed to set can_write_ if supported_
-> includes MAY_UNMAP (thus this commit effectively reverts
-> bca80059e and solves the problem mentioned there in a more
-> global way)
->=20
-> file-posix, iscsi, qcow2: can_write_ is conditional, while
-> supported_ was unconditional; but passing MAY_UNMAP would
-> fail with ENOTSUP if the condition wasn't met
->=20
-> qed: can_write_ is unconditional, but pwrite_zeroes lacks
-> support for MAY_UNMAP and supported_ is not set. Perhaps
-> support can be added later (since it would be similar to
-> qcow2), but for now claiming false is no real loss
->=20
-> all other drivers: can_write_ is not set, and supported_ is
-> either unset or a passthrough
->=20
-> Simplify the code by moving the conditional into
-> supported_zero_flags for all drivers, then dropping the
-> now-unused BDI field.  For callers that relied on
-> bdrv_can_write_zeroes_with_unmap(), we return the same
-> per-device settings for drivers that had conditions (no
-> observable change in behavior there); and can now return
-> true (instead of false) for drivers that support passthrough
-> (for example, the commit driver) which gives those drivers
-> the same fix as nbd just got in bca80059e.  For callers that
-> relied on supported_zero_flags, we now have a few more places
-> that can avoid a wasted call to pwrite_zeroes() that will
-> just fail with ENOTSUP.
->=20
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> ---
-> The commit id mentioned above is dependent on me not having to respin
-> my latest NBD pull request:
->=20
-> Based-on: <20180126160411.4033-1-eblake@redhat.com>
-> ([PULL 0/8] NBD patches through 26 Jan)
-> ---
->  include/block/block.h | 11 -----------
->  block.c               |  8 +-------
->  block/crypto.c        |  1 -
->  block/file-posix.c    |  3 +--
->  block/iscsi.c         |  6 ++++--
->  block/nbd.c           | 11 -----------
->  block/qcow2.c         |  3 +--
->  block/qed.c           |  1 -
->  8 files changed, 7 insertions(+), 37 deletions(-)
+It seems likely that there's a bug in QEMU's pl011 model (this doesn't
+happen with real hardware PL011s, I assume) -- but we need to find
+out what the divergence from the hardware is, rather than making
+changes which happen to fix the symptoms without having first
+nailed down what the underlying cause is.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---mxv5cy4qt+RJ9ypb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJabwC8AAoJEJykq7OBq3PIZxYH/3QB9bJZWgq7Jj8ZDf4TvYi8
-3C5hK71bbTa1Jm7NIolug3Cq4vBnV3RLs/te1Yf+9XE1N4cVKM2NtjaDmHYAjWyB
-MsIFhYwNwbx9hBsl2dSs57ybb1Od5QUb5PC3pXlsRw5CJ0QDben/5pum/uI5jf3j
-mL/OAIMpU1+Yc9uM9E6rhsEcAfSWaIor9hVZpAwlXD9Y//zw37hoPcZYmjDMju9r
-RRj5QIEqYEBTxMa9UP1u5GX2ELSl74BH6wlYFUkG+J09eSYVk/uFAhO/I7dj2Pj6
-VI+Kyjpi6+x+se99AJWr/nCd934Ax0XqjerS2JRgYrVX69VfCox3BE2sM6JYO5s=
-=at6D
------END PGP SIGNATURE-----
-
---mxv5cy4qt+RJ9ypb--
+thanks
+-- PMM
