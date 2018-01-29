@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1egEuh-0007WF-Et
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:16:22 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egEyJ-0001Tg-Lk
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:20:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1egEue-0000uv-70
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:16:19 -0500
-Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:46636)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
-	id 1egEud-0000ue-Vd
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:16:16 -0500
-Received: by mail-vk0-x244.google.com with SMTP id e125so5206273vkh.13
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 11:16:15 -0800 (PST)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egEyE-0002wC-Kq
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:20:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55494
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1egEyE-0002vy-EJ
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:19:58 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0TJDwYB015382
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 14:19:57 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ft7m7whfx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 14:19:57 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 29 Jan 2018 12:19:56 -0700
+References: <20180129183307.19689-1-marcandre.lureau@redhat.com>
+	<20180129183307.19689-2-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 29 Jan 2018 14:19:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180115154118.GI32271@localhost.localdomain>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-	<20171012235439.19457-4-anatol.pomozov@gmail.com>
-	<20180115154118.GI32271@localhost.localdomain>
-From: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date: Mon, 29 Jan 2018 11:16:13 -0800
-Message-ID: <CAOMFOmXf9pftsePWBb71a3Eig_Wg5DjMk8qhXxt_oV70UfDnFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/4] multiboot: load elf sections and
- section headers
+In-Reply-To: <20180129183307.19689-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <c67c4999-a6a0-d85d-705a-47fb9b7c3b11@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] tpm: fix alignment issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,702 +42,368 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-Hi
+On 01/29/2018 01:33 PM, Marc-Andr=C3=A9 Lureau wrote:
+> The new tpm-crb-test fails on sparc host:
+>
+> TEST: tests/tpm-crb-test... (pid=3D230409)
+>    /i386/tpm-crb/test:
+> Broken pipe
+> FAIL
+> GTester: last random seed: R02S29cea50247fe1efa59ee885a26d51a85
+> (pid=3D230423)
+> FAIL: tests/tpm-crb-test
+>
+> and generates a new clang sanitizer runtime warning:
+>
+> /home/petmay01/linaro/qemu-for-merges/hw/tpm/tpm_util.h:36:24: runtime
+> error: load of misaligned address 0x7fdc24c00002 for type 'const
+> uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
+> 0x7fdc24c00002: note: pointer points here
+> <memory cannot be printed>
+>
+> The sparc architecture does not allow misaligned loads and will
+> segfault if you try them.  For example, this function:
+>
+> static inline uint32_t tpm_cmd_get_size(const void *b)
+> {
+>      return be32_to_cpu(*(const uint32_t *)(b + 2));
+> }
+>
+> Should read,
+>      return ldl_be_p(b + 2);
+>
+> As a general rule you can't take an arbitrary pointer into a byte
+> buffer and try to interpret it as a structure or a pointer to a
+> larger-than-bytesize-data simply by casting the pointer.
+>
+> Use this clean up as an opportunity to remove unnecessary temporary
+> buffers and casts.
+>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Mon, Jan 15, 2018 at 7:41 AM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 13.10.2017 um 01:54 hat Anatol Pomozov geschrieben:
->> Multiboot may load section headers and all sections (even those that are
->> not part of any segment) to target memory.
->>
->> Tested with an ELF application that uses data from strings table
->> section.
->>
->> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
->> ---
->>  hw/core/loader.c                         |   8 +--
->>  hw/i386/multiboot.c                      |  83 +++++++++++++-----------
->>  hw/s390x/ipl.c                           |   2 +-
->>  include/hw/elf_ops.h                     | 107 ++++++++++++++++++++++++++++++-
->>  include/hw/loader.h                      |  11 +++-
->>  tests/multiboot/Makefile                 |   8 ++-
->>  tests/multiboot/generate_sections_out.py |  33 ++++++++++
->>  tests/multiboot/modules.out              |  22 +++----
->>  tests/multiboot/run_test.sh              |   6 +-
->>  tests/multiboot/sections.c               |  55 ++++++++++++++++
->>  tests/multiboot/start.S                  |   2 +-
->>  11 files changed, 276 insertions(+), 61 deletions(-)
->>  create mode 100755 tests/multiboot/generate_sections_out.py
->>  create mode 100644 tests/multiboot/sections.c
->>
->> diff --git a/hw/core/loader.c b/hw/core/loader.c
->> index 4593061445..a8787f7685 100644
->> --- a/hw/core/loader.c
->> +++ b/hw/core/loader.c
->> @@ -439,7 +439,7 @@ int load_elf_as(const char *filename,
->>  {
->>      return load_elf_ram(filename, translate_fn, translate_opaque,
->>                          pentry, lowaddr, highaddr, big_endian, elf_machine,
->> -                        clear_lsb, data_swab, as, true);
->> +                        clear_lsb, data_swab, as, true, NULL);
->>  }
->>
->>  /* return < 0 if error, otherwise the number of bytes loaded in memory */
->> @@ -448,7 +448,7 @@ int load_elf_ram(const char *filename,
->>                   void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->>                   uint64_t *highaddr, int big_endian, int elf_machine,
->>                   int clear_lsb, int data_swab, AddressSpace *as,
->> -                 bool load_rom)
->> +                 bool load_rom, SectionsData *sections)
->>  {
->>      int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
->>      uint8_t e_ident[EI_NIDENT];
->> @@ -488,11 +488,11 @@ int load_elf_ram(const char *filename,
->>      if (e_ident[EI_CLASS] == ELFCLASS64) {
->>          ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
->>                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
->> -                         data_swab, as, load_rom);
->> +                         data_swab, as, load_rom, sections);
->>      } else {
->>          ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
->>                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
->> -                         data_swab, as, load_rom);
->> +                         data_swab, as, load_rom, sections);
->>      }
->>
->>   fail:
->> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
->> index 7dacd6d827..841d05160a 100644
->> --- a/hw/i386/multiboot.c
->> +++ b/hw/i386/multiboot.c
->> @@ -125,7 +125,7 @@ int load_multiboot(FWCfgState *fw_cfg,
->>  {
->>      int i;
->>      bool is_multiboot = false;
->> -    uint32_t flags = 0;
->> +    uint32_t flags = 0, bootinfo_flags = 0;
->>      uint32_t mh_entry_addr;
->>      uint32_t mh_load_addr;
->>      uint32_t mb_kernel_size;
->> @@ -134,6 +134,7 @@ int load_multiboot(FWCfgState *fw_cfg,
->>      uint8_t *mb_bootinfo_data;
->>      uint32_t cmdline_len;
->>      struct multiboot_header *multiboot_header;
->> +    SectionsData sections;
->>
->>      /* Ok, let's see if it is a multiboot image.
->>         The header is 12x32bit long, so the latest entry may be 8192 - 48. */
->> @@ -161,37 +162,8 @@ int load_multiboot(FWCfgState *fw_cfg,
->>      if (flags & MULTIBOOT_VIDEO_MODE) {
->>          fprintf(stderr, "qemu: multiboot knows VBE. we don't.\n");
->>      }
->> -    if (!(flags & MULTIBOOT_AOUT_KLUDGE)) {
->> -        uint64_t elf_entry;
->> -        uint64_t elf_low, elf_high;
->> -        int kernel_size;
->> -        fclose(f);
->>
->> -        if (((struct elf64_hdr*)header)->e_machine == EM_X86_64) {
->> -            fprintf(stderr, "Cannot load x86-64 image, give a 32bit one.\n");
->> -            exit(1);
->> -        }
->
-> I'm not sure why you're reversing the condition and moving this branch
-> down, but in the code movements the EM_X86_64 check got lost. Please
-> keep it, we don't support 64 bit ELFs at the moment. If you want to
-> change this, it should be a separate patch.
+[I'll prepare a patch for the setters I mentioned in the previous review]
 
-Ok I moved it to a separate patch.
-
+> ---
+>   hw/tpm/tpm_util.h        | 17 ++++++++++-
+>   hw/tpm/tpm_emulator.c    | 14 ++++-----
+>   hw/tpm/tpm_passthrough.c |  6 ++--
+>   hw/tpm/tpm_util.c        | 75 ++++++++++++++++++++++-----------------=
+---------
+>   4 files changed, 58 insertions(+), 54 deletions(-)
 >
->> -        kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
->> -                               &elf_low, &elf_high, 0, EM_NONE,
->> -                               0, 0);
->> -        if (kernel_size < 0) {
->> -            fprintf(stderr, "Error while loading elf kernel\n");
->> -            exit(1);
->> -        }
->> -        mh_load_addr = elf_low;
->> -        mb_kernel_size = elf_high - elf_low;
->> -        mh_entry_addr = elf_entry;
->> -
->> -        mbs.mb_buf = g_malloc(mb_kernel_size);
->> -        if (rom_copy(mbs.mb_buf, mh_load_addr, mb_kernel_size) != mb_kernel_size) {
->> -            fprintf(stderr, "Error while fetching elf kernel from rom\n");
->> -            exit(1);
->> -        }
->> -
->> -        mb_debug("qemu: loading multiboot-elf kernel (%#x bytes) with entry %#zx\n",
->> -                  mb_kernel_size, (size_t)mh_entry_addr);
->> -    } else {
->> +    if (flags & MULTIBOOT_AOUT_KLUDGE) {
->>          /* Valid if mh_flags sets MULTIBOOT_AOUT_KLUDGE. */
->>          uint32_t mh_header_addr = ldl_p(&multiboot_header->header_addr);
->>          uint32_t mh_load_end_addr = ldl_p(&multiboot_header->load_end_addr);
->> @@ -228,12 +200,6 @@ int load_multiboot(FWCfgState *fw_cfg,
->>              mb_load_size = mb_kernel_size;
->>          }
->>
->> -        /* Valid if mh_flags sets MULTIBOOT_VIDEO_MODE.
->> -        uint32_t mh_mode_type = ldl_p(&multiboot_header->mode_type);
->> -        uint32_t mh_width = ldl_p(&multiboot_header->width);
->> -        uint32_t mh_height = ldl_p(&multiboot_header->height);
->> -        uint32_t mh_depth = ldl_p(&multiboot_header->depth); */
->> -
->>          mb_debug("multiboot: mh_header_addr = %#x\n", mh_header_addr);
->>          mb_debug("multiboot: mh_load_addr = %#x\n", mh_load_addr);
->>          mb_debug("multiboot: mh_load_end_addr = %#x\n", mh_load_end_addr);
->> @@ -248,9 +214,45 @@ int load_multiboot(FWCfgState *fw_cfg,
->>              exit(1);
->>          }
->>          memset(mbs.mb_buf + mb_load_size, 0, mb_kernel_size - mb_load_size);
->> -        fclose(f);
->> +    } else {
->> +        uint64_t elf_entry;
->> +        uint64_t elf_low, elf_high;
->> +        int kernel_size;
->> +
->> +        kernel_size = load_elf_ram(kernel_filename, NULL, NULL, &elf_entry,
->> +                               &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->> +                               0, 0, NULL, true, &sections);
->> +        if (kernel_size < 0) {
->> +            fprintf(stderr, "Error while loading elf kernel\n");
->> +            exit(1);
->> +        }
->> +        mh_load_addr = elf_low;
->> +        mb_kernel_size = elf_high - elf_low;
->> +        mh_entry_addr = elf_entry;
->> +
->> +        mbs.mb_buf = g_malloc(mb_kernel_size);
->> +        if (rom_copy(mbs.mb_buf, mh_load_addr, mb_kernel_size) != mb_kernel_size) {
->> +            fprintf(stderr, "Error while fetching elf kernel from rom\n");
->> +            exit(1);
->> +        }
->> +
->> +        mb_debug("qemu: loading multiboot-elf kernel (%#x bytes) with entry %#zx\n",
->> +                  mb_kernel_size, (size_t)mh_entry_addr);
->> +
->> +        stl_p(&bootinfo.u.elf_sec.num, sections.num);
->> +        stl_p(&bootinfo.u.elf_sec.size, sections.size);
->> +        stl_p(&bootinfo.u.elf_sec.addr, sections.addr);
->> +        stl_p(&bootinfo.u.elf_sec.shndx, sections.shndx);
->> +
->> +        bootinfo_flags |= MULTIBOOT_INFO_ELF_SHDR;
->>      }
->>
->> +    /* Valid if mh_flags sets MULTIBOOT_VIDEO_MODE.
->> +    uint32_t mh_mode_type = ldl_p(&multiboot_header->mode_type);
->> +    uint32_t mh_width = ldl_p(&multiboot_header->width);
->> +    uint32_t mh_height = ldl_p(&multiboot_header->height);
->> +    uint32_t mh_depth = ldl_p(&multiboot_header->depth); */
->> +
->>      mbs.mb_buf_phys = mh_load_addr;
->>
->>      mbs.mb_buf_size = TARGET_PAGE_ALIGN(mb_kernel_size);
->> @@ -332,7 +334,8 @@ int load_multiboot(FWCfgState *fw_cfg,
->>      stl_p(&bootinfo.mods_count, mbs.mb_mods_count); /* mods_count */
->>
->>      /* the kernel is where we want it to be now */
->> -    stl_p(&bootinfo.flags, MULTIBOOT_INFO_MEMORY
->> +    stl_p(&bootinfo.flags, bootinfo_flags
->> +                           | MULTIBOOT_INFO_MEMORY
->>                             | MULTIBOOT_INFO_BOOTDEV
->>                             | MULTIBOOT_INFO_CMDLINE
->>                             | MULTIBOOT_INFO_MODS
->> @@ -365,5 +368,7 @@ int load_multiboot(FWCfgState *fw_cfg,
->>      option_rom[nb_option_roms].bootindex = 0;
->>      nb_option_roms++;
->>
->> +    fclose(f);
->> +
->>      return 1; /* yes, we are multiboot */
->>  }
->> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->> index 0d06fc12b6..4d9cc6261a 100644
->> --- a/hw/s390x/ipl.c
->> +++ b/hw/s390x/ipl.c
->> @@ -327,7 +327,7 @@ static int load_netboot_image(Error **errp)
->>      }
->>
->>      img_size = load_elf_ram(netboot_filename, NULL, NULL, &ipl->start_addr,
->> -                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
->> +                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false, NULL);
->>
->>      if (img_size < 0) {
->>          img_size = load_image_size(netboot_filename, ram_ptr, ram_size);
->> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
->> index d192e7e2a3..7a7f7983a4 100644
->> --- a/include/hw/elf_ops.h
->> +++ b/include/hw/elf_ops.h
->
-> The code in this file is rather old and not quite compliant with the
-> QEMU coding style.
-
-The code I added follows existing style in that file.
-
-> This is not an excuse not to apply the correct coding
-> style to new additions to the file:
-
-While fixing coding style in this file is a great idea I am not sure
-if it makes sense to mix functional changes with formatting changes.
-It sounds like formatting should be sent separately.
-
-Even better if there is a way to reformat code automatically. Have you
-considered tools like 'clang-format'? I use it at my daytime project
-and it is a huge time saver.
-
->
->> @@ -264,12 +264,13 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->>                                int must_swab, uint64_t *pentry,
->>                                uint64_t *lowaddr, uint64_t *highaddr,
->>                                int elf_machine, int clear_lsb, int data_swab,
->> -                              AddressSpace *as, bool load_rom)
->> +                              AddressSpace *as, bool load_rom,
->> +                              SectionsData *sections)
->>  {
->>      struct elfhdr ehdr;
->>      struct elf_phdr *phdr = NULL, *ph;
->>      int size, i, total_size;
->> -    elf_word mem_size, file_size;
->> +    elf_word mem_size, file_size, sec_size;
->>      uint64_t addr, low = (uint64_t)-1, high = 0;
->>      uint8_t *data = NULL;
->>      char label[128];
->> @@ -481,6 +482,108 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->>          }
->>      }
->>      g_free(phdr);
->> +
->> +    if (sections) {
->> +        struct elf_shdr *shdr = NULL, *sh;
->> +        int shsize;
->> +
->> +        // user requested loading all ELF sections
->
-> Please use C-style comments: /* ... */
-done
-
->
->> +        shsize = ehdr.e_shnum * sizeof(shdr[0]);
->> +        if (lseek(fd, ehdr.e_shoff, SEEK_SET) != ehdr.e_shoff) {
->> +            goto fail;
->> +        }
->> +        shdr = g_malloc0(shsize);
->> +        if (!shdr)
->> +            goto fail;
->
-> g_malloc0() never returns NULL. If you want it to return NULL instead of
-> aborting qemu when the allocation fails, you need g_try_malloc0().
->
-> Also, the QEMU coding style requires braces after an if condition. I'm
-> mentioning this only here, but it applies to multiple places in the
-> whole patch.
->
->> +        if (read(fd, shdr, shsize) != shsize)
->> +            goto fail;
->> +        if (must_swab) {
->> +            for (i = 0; i < ehdr.e_shnum; i++) {
->> +                sh = &shdr[i];
->> +                glue(bswap_shdr, SZ)(sh);
->> +            }
->> +        }
->> +
->> +        for(i = 0; i < ehdr.e_shnum; i++) {
->
-> A space character is required between for and the bracket.
-
-Fixed.
-
-BTW current QEMU code contains 383 such formatting errors.
-
-$ git grep 'for(' | wc -l
-383
-
-clang-format will help to fix it.
-
->
->> +            sh = &shdr[i];
->> +            if (sh->sh_type == SHT_NULL)
->> +                continue;
->> +            // if section has address then it is loaded (XXX: is it true?), no need to load it again
->
-> This exceeds the limit of 80 characters per line.
-
-fixed
-
->
->> +            if (sh->sh_addr)
->> +                continue;
->> +
->> +            // append section data at the end of the loaded segments
->> +            addr = ROUND_UP(high, sh->sh_addralign);
->> +            sh->sh_addr = addr;
->> +
->> +            sec_size = sh->sh_size; /* Size of the section data */
->> +            data = g_malloc0(sec_size);
->> +            if (sec_size > 0) {
->> +                if (lseek(fd, sh->sh_offset, SEEK_SET) < 0) {
->> +                    goto fail;
->> +                }
->> +                if (read(fd, data, sec_size) != sec_size) {
->> +                    goto fail;
->> +                }
->> +            }
->> +
->> +            // As these sections are not loadable no need to perform reloaction
->> +            // using translate_fn()
->> +
->> +            if (data_swab) {
->> +                int j;
->> +                for (j = 0; j < sec_size; j += (1 << data_swab)) {
->
-> Is sec_size guaranteed to be aligned? I don't see a check to verify
-> this. Otherwise, could we call bswap64() on the last byte of section,
-> accessing seven more bytes outside the allocated buffer?
-
-In this particular case I was following existing code in this file
-above glue(load_elf, SZ). As long as original code works this code
-should work as well.
-
-I looked at code and the only place that has non-zero data_swab value
-is at hw/arm/boot.c. But ARM is not supported by multiboot (at least
-now). In other cases, when data_swab is zero no byteswapping is
-performed.
-
->
->> +                    uint8_t *dp = data + j;
->> +                    switch (data_swab) {
->> +                    case (1):
->
-> Why 'case (1):' instead of 'case 1:' looks odd.
-
-I have no idea. My code follows existing codestyle in this file below.
-
->
->> +                        *(uint16_t *)dp = bswap16(*(uint16_t *)dp);
->> +                        break;
->> +                    case (2):
->> +                        *(uint32_t *)dp = bswap32(*(uint32_t *)dp);
->> +                        break;
->> +                    case (3):
->> +                        *(uint64_t *)dp = bswap64(*(uint64_t *)dp);
->> +                        break;
->> +                    default:
->> +                        g_assert_not_reached();
->> +                    }
->> +                }
->> +            }
->> +
->> +            if (load_rom) {
->> +                snprintf(label, sizeof(label), "shdr #%d: %s", i, name);
->> +
->> +                /* rom_add_elf_program() seize the ownership of 'data' */
->> +                rom_add_elf_program(label, data, sec_size, sec_size, addr, as);
->> +            } else {
->> +                cpu_physical_memory_write(addr, data, sec_size);
->> +                g_free(data);
->> +            }
->> +
->> +            total_size += sec_size;
->> +            high = addr + sec_size;
->> +
->> +            data = NULL;
->> +        }
->> +
->> +        sections->num = ehdr.e_shnum;
->> +        sections->size = ehdr.e_shentsize;
->> +        sections->addr = high; // Address where we load the sections header
->> +        sections->shndx = ehdr.e_shstrndx;
->> +
->> +        // Append section headers at the end of loaded segments/sections
->> +        if (load_rom) {
->> +            snprintf(label, sizeof(label), "shdrs");
->> +
->> +            /* rom_add_elf_program() seize the ownership of 'shdr' */
->> +            rom_add_elf_program(label, shdr, shsize, shsize, high, as);
->> +        } else {
->> +            cpu_physical_memory_write(high, shdr, shsize);
->> +            g_free(shdr);
->> +        }
->> +        high += shsize;
->> +    }
->> +
->>      if (lowaddr)
->>          *lowaddr = (uint64_t)(elf_sword)low;
->>      if (highaddr)
->> diff --git a/include/hw/loader.h b/include/hw/loader.h
->> index 355fe0f5a2..3cf2d6da0f 100644
->> --- a/include/hw/loader.h
->> +++ b/include/hw/loader.h
->> @@ -65,6 +65,13 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
->>  #define ELF_LOAD_WRONG_ENDIAN -4
->>  const char *load_elf_strerror(int error);
->>
->> +typedef struct {
->> +    uint32_t num; // number of loaded sections
->> +    uint32_t size; // size of entry in sections header list
->> +    uint32_t addr; // address of loaded sections header
->> +    uint32_t shndx; // number of section that contains string table
->> +} SectionsData;
->> +
->>  /** load_elf_ram:
->>   * @filename: Path of ELF file
->>   * @translate_fn: optional function to translate load addresses
->> @@ -82,6 +89,8 @@ const char *load_elf_strerror(int error);
->>   * @as: The AddressSpace to load the ELF to. The value of address_space_memory
->>   *      is used if nothing is supplied here.
->>   * @load_rom : Load ELF binary as ROM
->> + * @sections: If parameter is non-NULL then all ELF sections loaded into memory
->> + *      and this structure is populated.
->>   *
->>   * Load an ELF file's contents to the emulated system's address space.
->>   * Clients may optionally specify a callback to perform address
->> @@ -99,7 +108,7 @@ int load_elf_ram(const char *filename,
->>                   void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->>                   uint64_t *highaddr, int big_endian, int elf_machine,
->>                   int clear_lsb, int data_swab, AddressSpace *as,
->> -                 bool load_rom);
->> +                 bool load_rom, SectionsData *sections);
->>
->>  /** load_elf_as:
->>   * Same as load_elf_ram(), but always loads the elf as ROM
->> diff --git a/tests/multiboot/Makefile b/tests/multiboot/Makefile
->> index 36f01dc647..b6a5056347 100644
->> --- a/tests/multiboot/Makefile
->> +++ b/tests/multiboot/Makefile
->> @@ -6,7 +6,7 @@ LD=ld
->>  LDFLAGS=-melf_i386 -T link.ld
->>  LIBS=$(shell $(CC) $(CCFLAGS) -print-libgcc-file-name)
->>
->> -all: mmap.elf modules.elf
->> +all: mmap.elf modules.elf sections.elf sections.out
->>
->>  mmap.elf: start.o mmap.o libc.o
->>       $(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
->> @@ -14,6 +14,12 @@ mmap.elf: start.o mmap.o libc.o
->>  modules.elf: start.o modules.o libc.o
->>       $(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
->>
->> +sections.elf: start.o sections.o libc.o
->> +     $(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
->> +
->> +sections.out: sections.elf generate_sections_out.py
->> +     python2 generate_sections_out.py $^ > $@
->> +
->>  %.o: %.c
->>       $(CC) $(CCFLAGS) -c -o $@ $^
->>
->> diff --git a/tests/multiboot/generate_sections_out.py b/tests/multiboot/generate_sections_out.py
->> new file mode 100755
->> index 0000000000..8077856823
->> --- /dev/null
->> +++ b/tests/multiboot/generate_sections_out.py
->> @@ -0,0 +1,33 @@
->> +#!/usr/bin/env python2
->> +
->> +import sys
->> +
->> +from elftools.elf.elffile import ELFFile
->
-> I don't think we can expect this module to be present. For example, on
-> my system, attempting to run the test fails:
->
-> ImportError: No module named elftools.elf.elffile
->
-> Maybe we can parse the output of readelf instead?
-
-Does readelf avilable at all supported platforms (Windows, MacOSX)?
-How can we sure that readelf output stays consistent across versions/platforms?
-
-Using this library is a great way to avoid the problems.
-
->> +def roundup(num, align):
->> +  return (num + align - 1) / align * align
->> +
->> +def main(filename):
->> +  print "\n\n\n=== Running test case: sections.elf  ===\n"
->> +  print "Multiboot header at 9500, ELF section headers present\n"
->> +
->> +  with open(filename, 'rb') as f:
->> +    elf = ELFFile(f)
->> +    header = elf.header
->> +    load_addr = 0x100000  # we load image starting from 1M
->> +    sections = ""
->> +    for s in elf.iter_sections():
->> +      align = s.header.sh_addralign
->> +      addr = 0
->> +      if s.header.sh_type != 'SHT_NULL':
->> +        addr = s.header.sh_addr
->> +        if addr == 0:
->> +          addr = roundup(load_addr, s.header.sh_addralign)
->> +        load_addr = addr + s.header.sh_size
->> +      sections += "Elf section name=%s addr=%x size=%d\n" % (s.name, addr, s.header.sh_size)
->> +
->> +    print "Sections list with %d entries of size %d at %x, string index %d" % (header.e_shnum, header.e_shentsize, load_addr, header.e_shstrndx)
->
-> We're not as strict about the 80 characters rule in Python code, but I
-> think this line could use being wrapped.
->
->> +    print sections,
->> +
->> +if __name__ == '__main__':
->> +  main(sys.argv[1])
->> diff --git a/tests/multiboot/modules.out b/tests/multiboot/modules.out
->> index 0da7b39374..b6c1a01be1 100644
->> --- a/tests/multiboot/modules.out
->> +++ b/tests/multiboot/modules.out
->> @@ -5,15 +5,15 @@
->>
->>  Multiboot header at 9500
->>
->> -Module list with 0 entries at 102000
->> +Module list with 0 entries at 104000
->>
->>
->>  === Running test case: modules.elf -initrd module.txt ===
->>
->>  Multiboot header at 9500
->>
->> -Module list with 1 entries at 102000
->> -[102000] Module: 103000 - 103038 (56 bytes) 'module.txt'
->> +Module list with 1 entries at 104000
->> +[104000] Module: 105000 - 105038 (56 bytes) 'module.txt'
->>           Content: 'This is a test file that is used as a multiboot module.'
->>
->>
->> @@ -21,8 +21,8 @@ Module list with 1 entries at 102000
->>
->>  Multiboot header at 9500
->>
->> -Module list with 1 entries at 102000
->> -[102000] Module: 103000 - 103038 (56 bytes) 'module.txt argument'
->> +Module list with 1 entries at 104000
->> +[104000] Module: 105000 - 105038 (56 bytes) 'module.txt argument'
->>           Content: 'This is a test file that is used as a multiboot module.'
->>
->>
->> @@ -30,8 +30,8 @@ Module list with 1 entries at 102000
->>
->>  Multiboot header at 9500
->>
->> -Module list with 1 entries at 102000
->> -[102000] Module: 103000 - 103038 (56 bytes) 'module.txt argument,with,commas'
->> +Module list with 1 entries at 104000
->> +[104000] Module: 105000 - 105038 (56 bytes) 'module.txt argument,with,commas'
->>           Content: 'This is a test file that is used as a multiboot module.'
->>
->>
->> @@ -39,10 +39,10 @@ Module list with 1 entries at 102000
->>
->>  Multiboot header at 9500
->>
->> -Module list with 3 entries at 102000
->> -[102000] Module: 103000 - 103038 (56 bytes) 'module.txt'
->> +Module list with 3 entries at 104000
->> +[104000] Module: 105000 - 105038 (56 bytes) 'module.txt'
->>           Content: 'This is a test file that is used as a multiboot module.'
->> -[102010] Module: 104000 - 104038 (56 bytes) 'module.txt argument'
->> +[104010] Module: 106000 - 106038 (56 bytes) 'module.txt argument'
->>           Content: 'This is a test file that is used as a multiboot module.'
->> -[102020] Module: 105000 - 105038 (56 bytes) 'module.txt'
->> +[104020] Module: 107000 - 107038 (56 bytes) 'module.txt'
->>           Content: 'This is a test file that is used as a multiboot module.'
->> diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
->> index 0278148b43..f04e35cbf0 100755
->> --- a/tests/multiboot/run_test.sh
->> +++ b/tests/multiboot/run_test.sh
->> @@ -56,9 +56,13 @@ modules() {
->>      run_qemu modules.elf -initrd "module.txt,module.txt argument,module.txt"
->>  }
->>
->> +sections() {
->> +    run_qemu sections.elf
->> +}
->> +
->>  make all
->>
->> -for t in mmap modules; do
->> +for t in mmap modules sections; do
->>
->>      echo > test.log
->>      $t
->> diff --git a/tests/multiboot/sections.c b/tests/multiboot/sections.c
->> new file mode 100644
->> index 0000000000..05a88f99ac
->> --- /dev/null
->> +++ b/tests/multiboot/sections.c
->> @@ -0,0 +1,55 @@
->> +/*
->> + * Copyright (c) 2017 Anatol Pomozov <anatol.pomozov@gmail.com>
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining a copy
->> + * of this software and associated documentation files (the "Software"), to deal
->> + * in the Software without restriction, including without limitation the rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "libc.h"
->> +#include "../../hw/i386/multiboot_header.h"
->> +#include "../../include/elf.h"
->> +
->> +int test_main(uint32_t magic, struct multiboot_info *mbi)
->> +{
->> +    void *p;
->> +    unsigned int i;
->> +
->> +    (void) magic;
->> +    multiboot_elf_section_header_table_t shdr;
->> +
->> +    printf("Multiboot header at %x, ELF section headers %s\n\n", mbi,
->> +        mbi->flags & MULTIBOOT_INFO_ELF_SHDR ? "present" : "don't present");
->> +
->> +    shdr = mbi->u.elf_sec;
->> +    printf("Sections list with %d entries of size %d at %x, string index %d\n",
->> +        shdr.num, shdr.size, shdr.addr, shdr.shndx);
->> +
->> +    const char *string_table = (char *)((Elf32_Shdr *)(uintptr_t)(shdr.addr + shdr.shndx * shdr.size))->sh_addr;
->
-> 80 characters again.
-
-fixed.
-
->
->> +
->> +    for (i = 0, p = (void *)shdr.addr;
->> +         i < shdr.num;
->> +         i++, p += shdr.size)
->> +    {
->> +        Elf32_Shdr *sec;
->> +
->> +        sec = (Elf32_Shdr *)p;
->> +        printf("Elf section name=%s addr=%lx size=%ld\n", string_table + sec->sh_name, sec->sh_addr, sec->sh_size);
->
-> And here.
-
-fixed.
->
->> +    }
->> +
->> +    return 0;
->> +}
->
-> Should we try to access one of the section headers to make sure that we
-> didn't only get the correct addresses, but that data is actually loaded
-> there?
->
-> Kevin
+> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+> index 19b28474ae..f003d15615 100644
+> --- a/hw/tpm/tpm_util.h
+> +++ b/hw/tpm/tpm_util.h
+> @@ -31,9 +31,24 @@ bool tpm_util_is_selftest(const uint8_t *in, uint32_=
+t in_len);
+>  =20
+>   int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
+>  =20
+> +static inline uint16_t tpm_cmd_get_tag(const void *b)
+> +{
+> +    return lduw_be_p(b);
+> +}
+> +
+>   static inline uint32_t tpm_cmd_get_size(const void *b)
+>   {
+> -    return be32_to_cpu(*(const uint32_t *)(b + 2));
+> +    return ldl_be_p(b + 2);
+> +}
+> +
+> +static inline uint32_t tpm_cmd_get_ordinal(const void *b)
+> +{
+> +    return ldl_be_p(b + 6);
+> +}
+> +
+> +static inline uint32_t tpm_cmd_get_errcode(const void *b)
+> +{
+> +    return ldl_be_p(b + 6);
+>   }
+>  =20
+>   int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> index 35c78de5a9..a34a18ac7a 100644
+> --- a/hw/tpm/tpm_emulator.c
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -120,7 +120,6 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *t=
+pm_emu,
+>   {
+>       ssize_t ret;
+>       bool is_selftest =3D false;
+> -    const struct tpm_resp_hdr *hdr =3D NULL;
+>  =20
+>       if (selftest_done) {
+>           *selftest_done =3D false;
+> @@ -132,22 +131,21 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator =
+*tpm_emu,
+>           return -1;
+>       }
+>  =20
+> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out, sizeo=
+f(*hdr),
+> -                               err);
+> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+> +              sizeof(struct tpm_resp_hdr), err);
+>       if (ret !=3D 0) {
+>           return -1;
+>       }
+>  =20
+> -    hdr =3D (struct tpm_resp_hdr *)out;
+> -    out +=3D sizeof(*hdr);
+> -    ret =3D qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+> -                               be32_to_cpu(hdr->len) - sizeof(*hdr) , =
+err);
+> +    ret =3D qio_channel_read_all(tpm_emu->data_ioc,
+> +              (char *)out + sizeof(struct tpm_resp_hdr),
+> +              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err=
+);
+>       if (ret !=3D 0) {
+>           return -1;
+>       }
+>  =20
+>       if (is_selftest) {
+> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
+> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+>       }
+>  =20
+>       return 0;
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index 29142f38bb..537e11a3f9 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -87,7 +87,6 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruSt=
+ate *tpm_pt,
+>   {
+>       ssize_t ret;
+>       bool is_selftest;
+> -    const struct tpm_resp_hdr *hdr;
+>  =20
+>       /* FIXME: protect shared variables or use other sync mechanism */
+>       tpm_pt->tpm_op_canceled =3D false;
+> @@ -116,15 +115,14 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassth=
+ruState *tpm_pt,
+>                            strerror(errno), errno);
+>           }
+>       } else if (ret < sizeof(struct tpm_resp_hdr) ||
+> -               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D ret=
+) {
+> +               tpm_cmd_get_size(out) !=3D ret) {
+>           ret =3D -1;
+>           error_report("tpm_passthrough: received invalid response "
+>                        "packet from TPM");
+>       }
+>  =20
+>       if (is_selftest && (ret >=3D sizeof(struct tpm_resp_hdr))) {
+> -        hdr =3D (struct tpm_resp_hdr *)out;
+> -        *selftest_done =3D (be32_to_cpu(hdr->errcode) =3D=3D 0);
+> +        *selftest_done =3D tpm_cmd_get_errcode(out) =3D=3D 0;
+>       }
+>  =20
+>   err_exit:
+> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+> index 747075e244..8abde59915 100644
+> --- a/hw/tpm/tpm_util.c
+> +++ b/hw/tpm/tpm_util.c
+> @@ -106,20 +106,16 @@ const PropertyInfo qdev_prop_tpm =3D {
+>   void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_l=
+en)
+>   {
+>       if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+> -        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
+> -
+> -        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
+> -        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
+> -        resp->errcode =3D cpu_to_be32(TPM_FAIL);
+> +        stw_be_p(out, TPM_TAG_RSP_COMMAND);
+> +        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
+> +        stl_be_p(out + 6, TPM_FAIL);
+>       }
+>   }
+>  =20
+>   bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
+>   {
+> -    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
+> -
+> -    if (in_len >=3D sizeof(*hdr)) {
+> -        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfT=
+est);
+> +    if (in_len >=3D sizeof(struct tpm_req_hdr)) {
+> +        return tpm_cmd_get_ordinal(in) =3D=3D TPM_ORD_ContinueSelfTest=
+;
+>       }
+>  =20
+>       return false;
+> @@ -129,12 +125,11 @@ bool tpm_util_is_selftest(const uint8_t *in, uint=
+32_t in_len)
+>    * Send request to a TPM device. We expect a response within one seco=
+nd.
+>    */
+>   static int tpm_util_request(int fd,
+> -                            unsigned char *request,
+> +                            const void *request,
+>                               size_t requestlen,
+> -                            unsigned char *response,
+> +                            void *response,
+>                               size_t responselen)
+>   {
+> -    struct tpm_resp_hdr *resp;
+>       fd_set readfds;
+>       int n;
+>       struct timeval tv =3D {
+> @@ -164,9 +159,8 @@ static int tpm_util_request(int fd,
+>           return -EFAULT;
+>       }
+>  =20
+> -    resp =3D (struct tpm_resp_hdr *)response;
+>       /* check the header */
+> -    if (be32_to_cpu(resp->len) !=3D n) {
+> +    if (tpm_cmd_get_size(response) !=3D n) {
+>           return -EMSGSIZE;
+>       }
+>  =20
+> @@ -178,12 +172,11 @@ static int tpm_util_request(int fd,
+>    * (error response is fine).
+>    */
+>   static int tpm_util_test(int fd,
+> -                         unsigned char *request,
+> +                         const void *request,
+>                            size_t requestlen,
+>                            uint16_t *return_tag)
+>   {
+> -    struct tpm_resp_hdr *resp;
+> -    unsigned char buf[1024];
+> +    char buf[1024];
+>       ssize_t ret;
+>  =20
+>       ret =3D tpm_util_request(fd, request, requestlen,
+> @@ -192,8 +185,7 @@ static int tpm_util_test(int fd,
+>           return ret;
+>       }
+>  =20
+> -    resp =3D (struct tpm_resp_hdr *)buf;
+> -    *return_tag =3D be16_to_cpu(resp->tag);
+> +    *return_tag =3D tpm_cmd_get_tag(buf);
+>  =20
+>       return 0;
+>   }
+> @@ -228,7 +220,7 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tp=
+m_version)
+>       int ret;
+>  =20
+>       /* Send TPM 2 command */
+> -    ret =3D tpm_util_test(tpm_fd, (unsigned char *)&test_req_tpm2,
+> +    ret =3D tpm_util_test(tpm_fd, &test_req_tpm2,
+>                           sizeof(test_req_tpm2), &return_tag);
+>       /* TPM 2 would respond with a tag of TPM2_ST_NO_SESSIONS */
+>       if (!ret && return_tag =3D=3D TPM2_ST_NO_SESSIONS) {
+> @@ -237,7 +229,7 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tp=
+m_version)
+>       }
+>  =20
+>       /* Send TPM 1.2 command */
+> -    ret =3D tpm_util_test(tpm_fd, (unsigned char *)&test_req,
+> +    ret =3D tpm_util_test(tpm_fd, &test_req,
+>                           sizeof(test_req), &return_tag);
+>       if (!ret && return_tag =3D=3D TPM_TAG_RSP_COMMAND) {
+>           *tpm_version =3D TPM_VERSION_1_2;
+> @@ -253,7 +245,6 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tp=
+m_version)
+>   int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+>                                size_t *buffersize)
+>   {
+> -    unsigned char buf[1024];
+>       int ret;
+>  =20
+>       switch (tpm_version) {
+> @@ -277,26 +268,27 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersi=
+on tpm_version,
+>               struct tpm_resp_hdr hdr;
+>               uint32_t len;
+>               uint32_t buffersize;
+> -        } QEMU_PACKED *tpm_resp =3D (struct tpm_resp_get_buffer_size *=
+)buf;
+> +        } QEMU_PACKED tpm_resp;
+>  =20
+> -        ret =3D tpm_util_request(tpm_fd, (unsigned char *)&tpm_get_buf=
+fer_size,
+> -                               sizeof(tpm_get_buffer_size), buf, sizeo=
+f(buf));
+> +        ret =3D tpm_util_request(tpm_fd, &tpm_get_buffer_size,
+> +                               sizeof(tpm_get_buffer_size),
+> +                               &tpm_resp, sizeof(tpm_resp));
+>           if (ret < 0) {
+>               return ret;
+>           }
+>  =20
+> -        if (be32_to_cpu(tpm_resp->hdr.len) !=3D sizeof(*tpm_resp) ||
+> -            be32_to_cpu(tpm_resp->len) !=3D sizeof(uint32_t)) {
+> +        if (be32_to_cpu(tpm_resp.hdr.len) !=3D sizeof(tpm_resp) ||
+> +            be32_to_cpu(tpm_resp.len) !=3D sizeof(uint32_t)) {
+>               DPRINTF("tpm_resp->hdr.len =3D %u, expected =3D %zu\n",
+> -                    be32_to_cpu(tpm_resp->hdr.len), sizeof(*tpm_resp))=
+;
+> +                    be32_to_cpu(tpm_resp.hdr.len), sizeof(tpm_resp));
+>               DPRINTF("tpm_resp->len =3D %u, expected =3D %zu\n",
+> -                    be32_to_cpu(tpm_resp->len), sizeof(uint32_t));
+> +                    be32_to_cpu(tpm_resp.len), sizeof(uint32_t));
+>               error_report("tpm_util: Got unexpected response to "
+>                            "TPM_GetCapability; errcode: 0x%x",
+> -                         be32_to_cpu(tpm_resp->hdr.errcode));
+> +                         be32_to_cpu(tpm_resp.hdr.errcode));
+>               return -EFAULT;
+>           }
+> -        *buffersize =3D be32_to_cpu(tpm_resp->buffersize);
+> +        *buffersize =3D be32_to_cpu(tpm_resp.buffersize);
+>           break;
+>       }
+>       case TPM_VERSION_2_0: {
+> @@ -324,27 +316,28 @@ int tpm_util_get_buffer_size(int tpm_fd, TPMVersi=
+on tpm_version,
+>               uint32_t value1;
+>               uint32_t property2;
+>               uint32_t value2;
+> -        } QEMU_PACKED *tpm2_resp =3D (struct tpm2_resp_get_buffer_size=
+ *)buf;
+> +        } QEMU_PACKED tpm2_resp;
+>  =20
+> -        ret =3D tpm_util_request(tpm_fd, (unsigned char *)&tpm2_get_bu=
+ffer_size,
+> -                               sizeof(tpm2_get_buffer_size), buf, size=
+of(buf));
+> +        ret =3D tpm_util_request(tpm_fd, &tpm2_get_buffer_size,
+> +                               sizeof(tpm2_get_buffer_size),
+> +                               &tpm2_resp, sizeof(tpm2_resp));
+>           if (ret < 0) {
+>               return ret;
+>           }
+>  =20
+> -        if (be32_to_cpu(tpm2_resp->hdr.len) !=3D sizeof(*tpm2_resp) ||
+> -            be32_to_cpu(tpm2_resp->count) !=3D 2) {
+> +        if (be32_to_cpu(tpm2_resp.hdr.len) !=3D sizeof(tpm2_resp) ||
+> +            be32_to_cpu(tpm2_resp.count) !=3D 2) {
+>               DPRINTF("tpm2_resp->hdr.len =3D %u, expected =3D %zu\n",
+> -                    be32_to_cpu(tpm2_resp->hdr.len), sizeof(*tpm2_resp=
+));
+> +                    be32_to_cpu(tpm2_resp.hdr.len), sizeof(tpm2_resp))=
+;
+>               DPRINTF("tpm2_resp->len =3D %u, expected =3D %u\n",
+> -                    be32_to_cpu(tpm2_resp->count), 2);
+> +                    be32_to_cpu(tpm2_resp.count), 2);
+>               error_report("tpm_util: Got unexpected response to "
+>                            "TPM2_GetCapability; errcode: 0x%x",
+> -                         be32_to_cpu(tpm2_resp->hdr.errcode));
+> +                         be32_to_cpu(tpm2_resp.hdr.errcode));
+>               return -EFAULT;
+>           }
+> -        *buffersize =3D MAX(be32_to_cpu(tpm2_resp->value1),
+> -                          be32_to_cpu(tpm2_resp->value2));
+> +        *buffersize =3D MAX(be32_to_cpu(tpm2_resp.value1),
+> +                          be32_to_cpu(tpm2_resp.value2));
+>           break;
+>       }
+>       case TPM_VERSION_UNSPEC:
