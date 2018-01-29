@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1egCfL-0001fK-B0
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:52:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egCkd-0005I3-Uq
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:57:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1egCfJ-0006Oq-Me
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:52:19 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 29 Jan 2018 17:52:09 +0100
-Message-Id: <20180129165210.21086-2-cohuck@redhat.com>
-In-Reply-To: <20180129165210.21086-1-cohuck@redhat.com>
-References: <20180129165210.21086-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 1/2] s390x/tcg: wire up pci instructions
+	(envelope-from <mreitz@redhat.com>) id 1egCkY-0001HL-6G
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:57:48 -0500
+References: <20180111195225.4226-1-kwolf@redhat.com>
+	<20180111195225.4226-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ce7c11c5-bb34-fc54-308e-9f4ade6237fb@redhat.com>
+Date: Mon, 29 Jan 2018 17:57:31 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180111195225.4226-3-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="v78XtRLE58aUd3tAwQTayBAea2cOHAHUw"
+Subject: Re: [Qemu-devel] [RFC PATCH 02/10] block/qapi: Add qcow2 create
+ options to schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,340 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On s390x, pci support is implemented via a set of instructions
-(no mmio). Unfortunately, none of them are documented in the
-PoP; the code is based upon the existing implementation for KVM
-and the Linux zpci driver.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--v78XtRLE58aUd3tAwQTayBAea2cOHAHUw
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <ce7c11c5-bb34-fc54-308e-9f4ade6237fb@redhat.com>
+Subject: Re: [RFC PATCH 02/10] block/qapi: Add qcow2 create options to schema
+References: <20180111195225.4226-1-kwolf@redhat.com>
+ <20180111195225.4226-3-kwolf@redhat.com>
+In-Reply-To: <20180111195225.4226-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/helper.h      |   9 ++++
- target/s390x/insn-data.def |  13 +++++
- target/s390x/misc_helper.c | 123 +++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c   | 123 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 268 insertions(+)
+On 2018-01-11 20:52, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json | 33 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 32 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 1749376c61..9341f6708d 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3320,6 +3320,37 @@
+>  { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+> =20
+>  ##
+> +# @BlockdevQcow2CompatLevel:
+> +# @0_10:    The original QCOW2 format as introduced in qemu 0.10 (vers=
+ion 2)
+> +# @1_1:     The extended QCOW2 format as introduced in qemu 1.1 (versi=
+on 3)
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'enum': 'BlockdevQcow2CompatLevel',
+> +  'data': [ '0_10', '1_1' ] }
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 59a1d9869b..9887efbb3a 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -172,4 +172,13 @@ DEF_HELPER_2(stcrw, void, env, i64)
- DEF_HELPER_3(stsch, void, env, i64, i64)
- DEF_HELPER_3(tsch, void, env, i64, i64)
- DEF_HELPER_2(chsc, void, env, i64)
-+
-+DEF_HELPER_2(clp, void, env, i32)
-+DEF_HELPER_3(pcilg, void, env, i32, i32)
-+DEF_HELPER_3(pcistg, void, env, i32, i32)
-+DEF_HELPER_4(stpcifc, void, env, i32, i64, i32)
-+DEF_HELPER_3(sic, void, env, i64, i64)
-+DEF_HELPER_3(rpcit, void, env, i32, i32)
-+DEF_HELPER_5(pcistb, void, env, i32, i32, i64, i32)
-+DEF_HELPER_4(mpcifc, void, env, i32, i64, i32)
- #endif
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 11ee43dcbc..2ffc051072 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1067,4 +1067,17 @@
-     /* ??? Not listed in PoO ninth edition, but there's a linux driver that
-        uses it: "A CHSC subchannel is usually present on LPAR only."  */
-     C(0xb25f, CHSC,  RRE,     Z,   0, insn, 0, 0, chsc, 0)
-+
-+/* zPCI Instructions */
-+    /* None of these instructions are documented in the PoP, so this is all
-+       based upon target/s390x/kvm.c and Linux code and likely incomplete */
-+    C(0xebd0, PCISTB, RSY_a, PCI, 0, 0, 0, 0, pcistb, 0)
-+    C(0xebd1, SIC, RSY_a, PCI, 0, 0, 0, 0, sic, 0)
-+    C(0xb9a0, CLP, RRF_c, PCI, 0, 0, 0, 0, clp, 0)
-+    C(0xb9d0, PCISTG, RRE, PCI, 0, 0, 0, 0, pcistg, 0)
-+    C(0xb9d2, PCILG, RRE, PCI, 0, 0, 0, 0, pcilg, 0)
-+    C(0xb9d3, RPCIT, RRE, PCI, 0, 0, 0, 0, rpcit, 0)
-+    C(0xe3d0, MPCIFC, RXY_a, PCI, 0, 0, 0, 0, mpcifc, 0)
-+    C(0xe3d4, STPCIFC, RXY_a, PCI, 0, 0, 0, 0, stpcifc, 0)
-+
- #endif /* CONFIG_USER_ONLY */
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 86da6aab7e..1271106628 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -36,6 +36,7 @@
- #include "hw/s390x/ebcdic.h"
- #include "hw/s390x/s390-virtio-hcall.h"
- #include "hw/s390x/sclp.h"
-+#include "hw/s390x/s390-pci-inst.h"
- #endif
- 
- /* #define DEBUG_HELPER */
-@@ -560,3 +561,125 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
-     env->regs[0] = deposit64(env->regs[0], 0, 8, (max_bytes / 8) - 1);
-     return count_bytes >= max_bytes ? 0 : 3;
- }
-+
-+#ifndef CONFIG_USER_ONLY
-+void HELPER(clp)(CPUS390XState *env, uint32_t r2)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    int r = -1;
-+
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        qemu_mutex_lock_iothread();
-+        r = clp_service_call(cpu, r2, GETPC());
-+        qemu_mutex_unlock_iothread();
-+    }
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+
-+void HELPER(pcilg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    int r = -1;
-+
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        qemu_mutex_lock_iothread();
-+        r = pcilg_service_call(cpu, r1, r2, GETPC());
-+        qemu_mutex_unlock_iothread();
-+    }
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+
-+void HELPER(pcistg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    int r = -1;
-+
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        qemu_mutex_lock_iothread();
-+        r = pcistg_service_call(cpu, r1, r2, GETPC());
-+        qemu_mutex_unlock_iothread();
-+    }
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+
-+void HELPER(stpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
-+                     uint32_t ar)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    int r = -1;
-+
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        qemu_mutex_lock_iothread();
-+        r = stpcifc_service_call(cpu, r1, fiba, ar, GETPC());
-+        qemu_mutex_unlock_iothread();
-+    }
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+
-+void HELPER(sic)(CPUS390XState *env, uint64_t r1, uint64_t r3)
-+{
-+    int r;
-+
-+    qemu_mutex_lock_iothread();
-+    r = css_do_sic(env, r1 & 0xffff, (r3 >> 27) & 0x7);
-+    qemu_mutex_unlock_iothread();
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+
-+void HELPER(rpcit)(CPUS390XState *env, uint32_t r1, uint32_t r2)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    int r = -1;
-+
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        qemu_mutex_lock_iothread();
-+        r = rpcit_service_call(cpu, r1, r2, GETPC());
-+        qemu_mutex_unlock_iothread();
-+    }
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+
-+void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
-+                    uint64_t gaddr, uint32_t ar)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    int r = -1;
-+
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        qemu_mutex_lock_iothread();
-+        r = pcistb_service_call(cpu, r1, r3, gaddr, ar, GETPC());
-+        qemu_mutex_unlock_iothread();
-+    }
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+
-+void HELPER(mpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
-+                    uint32_t ar)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    int r = -1;
-+
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        qemu_mutex_lock_iothread();
-+        r = mpcifc_service_call(cpu, r1, fiba, ar, GETPC());
-+        qemu_mutex_unlock_iothread();
-+    }
-+    if (r) {
-+        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-+    }
-+}
-+#endif
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index df0b41606d..b73f7143db 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4777,6 +4777,128 @@ static ExitStatus op_zero2(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
- }
- 
-+#ifndef CONFIG_USER_ONLY
-+static ExitStatus op_clp(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
-+
-+    check_privileged(s);
-+    gen_helper_clp(cpu_env, r2);
-+    tcg_temp_free_i32(r2);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_pcilg(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
-+
-+    check_privileged(s);
-+    gen_helper_pcilg(cpu_env, r1, r2);
-+    tcg_temp_free_i32(r1);
-+    tcg_temp_free_i32(r2);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_pcistg(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
-+
-+    check_privileged(s);
-+    gen_helper_pcistg(cpu_env, r1, r2);
-+    tcg_temp_free_i32(r1);
-+    tcg_temp_free_i32(r2);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_stpcifc(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    int b2 = get_field(s->fields, b2);
-+    int d2 = get_field(s->fields, d2);
-+    TCGv_i64 addr;
-+    TCGv_i32 ar;
-+
-+    check_privileged(s);
-+    addr = get_address(s, 0, b2, d2);
-+    ar = tcg_const_i32(b2);
-+    gen_helper_stpcifc(cpu_env, r1, addr, ar);
-+    tcg_temp_free_i64(addr);
-+    tcg_temp_free_i32(ar);
-+    tcg_temp_free_i32(r1);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_sic(DisasContext *s, DisasOps *o)
-+{
-+    int r1 = get_field(s->fields, r1);
-+    int r3 = get_field(s->fields, r3);
-+
-+    check_privileged(s);
-+    gen_helper_sic(cpu_env, regs[r1], regs[r3]);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_rpcit(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
-+
-+    check_privileged(s);
-+    gen_helper_rpcit(cpu_env, r1, r2);
-+    tcg_temp_free_i32(r1);
-+    tcg_temp_free_i32(r2);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_pcistb(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
-+    int b2 = get_field(s->fields, b2);
-+    int d2 = get_field(s->fields, d2);
-+    TCGv_i64 addr;
-+    TCGv_i32 ar;
-+
-+    check_privileged(s);
-+    addr = get_address(s, 0, b2, d2);
-+    ar = tcg_const_i32(b2);
-+    gen_helper_pcistb(cpu_env, r1, r3, addr, ar);
-+    tcg_temp_free_i64(addr);
-+    tcg_temp_free_i32(ar);
-+    tcg_temp_free_i32(r1);
-+    tcg_temp_free_i32(r3);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_mpcifc(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    int b2 = get_field(s->fields, b2);
-+    int d2 = get_field(s->fields, d2);
-+    TCGv_i64 addr;
-+    TCGv_i32 ar;
-+
-+    check_privileged(s);
-+    addr = get_address(s, 0, b2, d2);
-+    ar = tcg_const_i32(b2);
-+    gen_helper_mpcifc(cpu_env, r1, addr, ar);
-+    tcg_temp_free_i64(addr);
-+    tcg_temp_free_i32(ar);
-+    tcg_temp_free_i32(r1);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+#endif
-+
- /* ====================================================================== */
- /* The "Cc OUTput" generators.  Given the generated output (and in some cases
-    the original inputs), update the various cc data structures in order to
-@@ -5708,6 +5830,7 @@ enum DisasInsnEnum {
- #define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
- #define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
- #define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
-+#define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
- 
- static const DisasInsn insn_info[] = {
- #include "insn-data.def"
--- 
-2.13.6
+Just my two cents: I'd prefer 2 and 3 because I've never quite liked
+that people are supposed to remember some pretty random qemu version
+numbers anyway.
+
+Max
+
+
+--v78XtRLE58aUd3tAwQTayBAea2cOHAHUw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpvUnsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ASv8H/iOe2H3UoKIdzm00LwlmZEXMrwSRuiC6
+ugESmmBM31c9+lKlzLpY9kfc3qRxKqBAEmJN13gTSC5MtEjZmeirIWASDlm743OF
+IY9AqKhlirXlb11HzGgEnYYrfHWefnCfaCRo160yKsbv7/K/X2845KT1+8XStjS7
+6qPT8dr6GMhceV4ZBWFd0hfZ31MVYJX5hqZwVE9g28CaCpaKAotqoBQjA9fWby9S
+t4lPx5/tyBqccwp6LG365w8TE73Nt13ViF0ooSPbyUi2AQlX88KwzQ+lw1+fb9Iu
+YWirh/4j9G++SmQRNmP3RCoWs8fcWJRh76RNhYkTWRfKTwj6jomJX4A=
+=XSnC
+-----END PGP SIGNATURE-----
+
+--v78XtRLE58aUd3tAwQTayBAea2cOHAHUw--
