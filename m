@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liliang.opensource@gmail.com>) id 1eg0Qy-0008PS-B9
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:48:41 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eg0Y5-00020i-E9
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:56:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liliang.opensource@gmail.com>) id 1eg0Qx-0006Jn-8c
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:48:40 -0500
-From: Liang Li <liliang.opensource@gmail.com>
-Date: Mon, 29 Jan 2018 11:48:25 +0800
-Message-ID: <20180129034823.GA20875@liangdeMacBook-Pro.local>
-References: <20180124061728.GA99621@localhost>
-	<d49dfbf5-b6e4-43d2-c24d-5c493aa5bfe5@redhat.com>
-	<20180125045926.GA4720@localhost>
-	<b54574f8-ff1a-24bd-f86f-d908447c3459@redhat.com>
-	<20180126064647.GA12068@localhost>
-	<b6f06c50-8b50-809c-0c7d-770db232d762@redhat.com>
+	(envelope-from <aik@ozlabs.ru>) id 1eg0Y2-0001t6-A2
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:56:01 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34367)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eg0Y2-0001sQ-0G
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:55:58 -0500
+Received: by mail-pf0-x241.google.com with SMTP id e76so3798128pfk.1
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 19:55:57 -0800 (PST)
+References: <20180125042210.7012-1-aik@ozlabs.ru>
+	<03afc632-2c3e-ca7a-fa11-d58d97983cd4@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <026c88e9-25ef-5d9e-4572-616a9c854428@ozlabs.ru>
+Date: Mon, 29 Jan 2018 14:55:51 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6f06c50-8b50-809c-0c7d-770db232d762@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/mirror: fix fail to cancel when VM
- has heavy BLK IO
+In-Reply-To: <03afc632-2c3e-ca7a-fa11-d58d97983cd4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v4] RFC: vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +31,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Liang Li <liliang.opensource@gmail.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Huaitong Han <hanhuaitong@didichuxing.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Jan 26, 2018 at 08:04:08AM -0600, Eric Blake wrote:
-> On 01/26/2018 12:46 AM, Liang Li wrote:
-> > The current QMP command is:
-> > 
-> > { 'command': 'block-job-cancel', 'data': { 'device': 'str', '*force': 'bool' } }
-> > 
-> > 'force' has other meaning which is not used by libvirt, for the change, there
-> > are 3 options:
-> > 
-> > a. Now that 'force' is not used by libvirt and it current semantic is not very useful,
-> > we can change it's semantic to force-quit without syncing.
+On 26/01/18 00:56, Auger Eric wrote:
+> Hi Alexey,
 > 
-> The current semantics are:
-> 
-> # @force: whether to allow cancellation of a paused job (default
-> #         false).  Since 1.3.
-> 
-> You are right that libvirt is not using it at the moment; but that
-> doesn't tell us whether someone else is using it.  On the other hand, it
-> is a fairly easy argument to make that "a job which is paused is not
-> complete, so forcing it to cancel means an unclean image left behind",
-> which can then be reformulated as "the force flag says to cancel
-> immediately, whether the job is paused or has pending data, and thus
-> leave an unclean image behind".  In other words, I don't think it is too
-> bad to just tidy up the wording, and allow the existing 'force':true
-> parameter to be enabled to quit a job that won't converge.
-> 
-> > 
-> > b. change 'force' from bool to flag, and bit 0 is used for it's original meaning.
-> 
-> Not possible.  You can't change from 'force':true to 'force':1 in JSON,
-> at least not without rewriting the command to use an alternate that
-> accepts both bool and int (actually, I seem to recall that we tightened
-> QAPI to not permit alternates that might be ambiguous when parsed by
-> QemuOpts, which may mean that is not even possible - although I haven't
-> tried to see if it works or gives an error).
-> 
-> > 
-> > c. add another bool parameter.
-> 
-> Also doable, if we are concerned that existing semantics of 'force'
-> affecting only paused jobs must be preserved.
-> 
-> > 
-> > 
-> > which is the best one?
-> 
-> 1 is slightly less code, but 3 is more conservative.  I'd be okay with
-> option 1 if no one else can provide a reason why it would break something.
-> 
+> On 25/01/18 05:22, Alexey Kardashevskiy wrote:
+>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+>> which tells that a region with MSIX data can be mapped entirely, i.e.
+>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+>>
+>> With this change, all BARs are mapped in a single chunk and MSIX vectors
+>> are emulated on top unless the machine requests not to by defining and
+>> enabling a new "vfio-no-msix-emulation" property. At the moment only
+>> sPAPR machine does so - it prohibits MSIX emulation and does not allow
+>> enabling it as it does not define the "set" callback for the new property;
+>> the new property also does not appear in "-machine pseries,help".
+>>
+>> If MSIX vectors section is not aligned to the page size, the KVM memory
+>> listener does not register it with the KVM as a memory slot and MSIX is
+>> emulated by QEMU as before. This may create MMIO RAM memory sections with
+>> an address or/and a size not aligned which will make vfio_dma_map() fail;
+>> to address this, this treats such failures as non-fatal and does not print
+>> an error. This adds a return value from vfio_dma_map() to the tracepoint
+>> and moves the latter further down to let the user have a clue why P2P
+>> might not work.
+>>
+>> This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+>> for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>> Changes:
+>> v4:
+>> * silenced dma map errors if unaligned mapping is attempted - they are going
+>> to fail anyway
+>>
+>> v3:
+>> * vfio_listener_region_add() won't make qemu exit if failed on MMIO MR
+>> ---
+>>  include/hw/vfio/vfio-common.h |  1 +
+>>  linux-headers/linux/vfio.h    |  5 +++++
+>>  hw/ppc/spapr.c                |  7 +++++++
+>>  hw/vfio/common.c              | 27 +++++++++++++++++++++++++--
+>>  hw/vfio/pci.c                 | 10 ++++++++++
+>>  hw/vfio/trace-events          |  2 +-
+>>  6 files changed, 49 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+>> index f3a2ac9..927d600 100644
+>> --- a/include/hw/vfio/vfio-common.h
+>> +++ b/include/hw/vfio/vfio-common.h
+>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+>>                           struct vfio_region_info **info);
+>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>                               uint32_t subtype, struct vfio_region_info **info);
+>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+>>  #endif
+>>  extern const MemoryListener vfio_prereg_listener;
+>>  
+>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>> index 4312e96..b45182e 100644
+>> --- a/linux-headers/linux/vfio.h
+>> +++ b/linux-headers/linux/vfio.h
+>> @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>>  
+>> +/*
+>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+>> + */
+>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+>> +
+>>  /**
+>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+>>   *				    struct vfio_irq_info)
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index d1acfe8..5ff43ce 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -2789,6 +2789,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+>>      spapr->use_hotplug_event_source = value;
+>>  }
+>>  
+>> +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
+>> +{
+>> +    return true;
+>> +}
+>> +
+>>  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+>>  {
+>>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+>> @@ -2870,6 +2875,8 @@ static void spapr_instance_init(Object *obj)
+>>      object_property_set_description(obj, "vsmt",
+>>                                      "Virtual SMT: KVM behaves as if this were"
+>>                                      " the host's SMT mode", &error_abort);
+>> +    object_property_add_bool(obj, "vfio-no-msix-emulation",
+>> +                             spapr_get_msix_emulation, NULL, NULL);
+>>  }
+>>  
+>>  static void spapr_machine_finalizefn(Object *obj)
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 3d652c8..04a8280 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -513,13 +513,21 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>>              section->offset_within_region +
+>>              (iova - section->offset_within_address_space);
+>>  
+>> -    trace_vfio_listener_region_add_ram(iova, end, vaddr);
+>> -
+>>      llsize = int128_sub(llend, int128_make64(iova));
+>>  
+>>      ret = vfio_dma_map(container, iova, int128_get64(llsize),
+>>                         vaddr, section->readonly);
+>> +    trace_vfio_listener_region_add_ram(iova, end, vaddr, ret);
+>> +
+>>      if (ret) {
+>> +        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
+>> +
+>> +        if (memory_region_is_ram_device(section->mr) &&
+>> +            ((section->offset_within_region & pgmask) ||
+>> +             (int128_getlo(section->size) & pgmask))) {
+>> +            return;
+>> +        }
+>> +
+> Why not avoiding to call vfio_dma_map in this case and print a helpful
+> message for the end-user?
 
-OK. I will send a patch based on the first option.
+Avoiding is a good point, but I am not sure about the message though. I am
+leaning towards disabling these regions from being dma mapped by default
+and have a machine option for it, for example. We do not need this in most
+cases but if we do, we actually want to see every failed dma map request. I
+am just not sure about that property interface.
 
-Thanks!
 
-Liang
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+> qemu-system-aarch64: VFIO_UNMAP_DMA: -22
+
+
+Ah, missed this.
+
+
+> qemu-system-aarch64: vfio_dma_unmap(0xc0dab90, 0x8000000000, 0x2000) =
+> -22 (Invalid argument)
 > 
+> is not self-explanatory I think.
+
+What is missing?
+
+
+
+
+> 
+> Thanks
+> 
+> Eric
+>>          error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+>>                       "0x%"HWADDR_PRIx", %p) = %d (%m)",
+>>                       container, iova, int128_get64(llsize), vaddr, ret);
+>> @@ -1386,6 +1394,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>      return -ENODEV;
+>>  }
+>>  
+>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
+>> +{
+>> +    struct vfio_region_info *info = NULL;
+>> +    bool ret = false;
+>> +
+>> +    if (!vfio_get_region_info(vbasedev, region, &info)) {
+>> +        if (vfio_get_region_info_cap(info, cap_type)) {
+>> +            ret = true;
+>> +        }
+>> +        g_free(info);
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>>  /*
+>>   * Interfaces for IBM EEH (Enhanced Error Handling)
+>>   */
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index 359a8f1..a96ece6 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+>>      off_t start, end;
+>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+>>  
+>> +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
+>> +                            vdev->msix->table_bar)) {
+>> +        return;
+>> +    }
+>> +
+>>      /*
+>>       * We expect to find a single mmap covering the whole BAR, anything else
+>>       * means it's either unsupported or already setup.
+>> @@ -1569,6 +1574,11 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+>>       */
+>>      memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
+>>  
+>> +    if (object_property_get_bool(OBJECT(qdev_get_machine()),
+>> +                                 "vfio-no-msix-emulation", NULL)) {
+>> +        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
+>> +    }
+>> +
+>>      return 0;
+>>  }
+>>  
+>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+>> index 437ccdd..d747c11 100644
+>> --- a/hw/vfio/trace-events
+>> +++ b/hw/vfio/trace-events
+>> @@ -89,7 +89,7 @@ vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t d
+>>  vfio_iommu_map_notify(const char *op, uint64_t iova_start, uint64_t iova_end) "iommu %s @ 0x%"PRIx64" - 0x%"PRIx64
+>>  vfio_listener_region_add_skip(uint64_t start, uint64_t end) "SKIPPING region_add 0x%"PRIx64" - 0x%"PRIx64
+>>  vfio_listener_region_add_iommu(uint64_t start, uint64_t end) "region_add [iommu] 0x%"PRIx64" - 0x%"PRIx64
+>> -vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p]"
+>> +vfio_listener_region_add_ram(uint64_t iova_start, uint64_t iova_end, void *vaddr, int ret) "region_add [ram] 0x%"PRIx64" - 0x%"PRIx64" [%p] ret=%d"
+>>  vfio_listener_region_del_skip(uint64_t start, uint64_t end) "SKIPPING region_del 0x%"PRIx64" - 0x%"PRIx64
+>>  vfio_listener_region_del(uint64_t start, uint64_t end) "region_del 0x%"PRIx64" - 0x%"PRIx64
+>>  vfio_disconnect_container(int fd) "close container->fd=%d"
+>>
+
+
+-- 
+Alexey
