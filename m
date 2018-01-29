@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8G3-0005ax-Qq
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:09:59 -0500
+	(envelope-from <quintela@redhat.com>) id 1eg8GF-0005ji-4L
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8G2-0001Lw-SQ
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:09:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39504)
+	(envelope-from <quintela@redhat.com>) id 1eg8G9-0001TM-0C
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8G2-0001LC-Mj
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:09:54 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8G8-0001SN-QV
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:10:00 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 13FA3356F6
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:09:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 333A74E05D
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:10:00 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 29 Jan 2018 13:09:24 +0100
-Message-Id: <20180129120932.12874-6-quintela@redhat.com>
+Date: Mon, 29 Jan 2018 13:09:26 +0100
+Message-Id: <20180129120932.12874-8-quintela@redhat.com>
 In-Reply-To: <20180129120932.12874-1-quintela@redhat.com>
 References: <20180129120932.12874-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 05/13] migration: Drop current address parameter
- from save_zero_page()
+Subject: [Qemu-devel] [PULL 07/13] tests: Consolidate accelerators
+ declaration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +33,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-It already has RAMBlock and offset, it can calculate it itself.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ tests/migration-test.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index cb1950f3eb..5a109efeda 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -907,11 +907,10 @@ static void migration_bitmap_sync(RAMState *rs)
-  * @rs: current RAM state
-  * @block: block that contains the page we want to send
-  * @offset: offset inside the block for the page
-- * @p: pointer to the page
-  */
--static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
--                          uint8_t *p)
-+static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
- {
-+    uint8_t *p = block->host + offset;
-     int pages = -1;
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 0428d450df..3732682a29 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -422,27 +422,29 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+     gchar *cmd_src, *cmd_dst;
+     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
+     const char *arch = qtest_get_arch();
++    const char *accel = "kvm:tcg";
  
-     if (is_zero_range(p, TARGET_PAGE_SIZE)) {
-@@ -984,7 +983,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
-             }
-         }
-     } else {
--        pages = save_zero_page(rs, block, offset, p);
-+        pages = save_zero_page(rs, block, offset);
-         if (pages > 0) {
-             /* Must let xbzrle know, otherwise a previous (now 0'd) cached
-              * page would be stale
-@@ -1160,7 +1159,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-          */
-         if (block != rs->last_sent_block) {
-             flush_compressed_data(rs);
--            pages = save_zero_page(rs, block, offset, p);
-+            pages = save_zero_page(rs, block, offset);
-             if (pages == -1) {
-                 /* Make sure the first page is sent out before other pages */
-                 bytes_xmit = save_page_header(rs, rs->f, block, offset |
-@@ -1180,7 +1179,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-                 ram_release_pages(block->idstr, offset, pages);
-             }
-         } else {
--            pages = save_zero_page(rs, block, offset, p);
-+            pages = save_zero_page(rs, block, offset);
-             if (pages == -1) {
-                 pages = compress_page_with_multi_thread(rs, block, offset);
-             } else {
+     got_stop = false;
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         init_bootfile_x86(bootpath);
+-        cmd_src = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
++        cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
+                                   " -name pcsource,debug-threads=on"
+                                   " -serial file:%s/src_serial"
+                                   " -drive file=%s,format=raw",
+-                                  tmpfs, bootpath);
+-        cmd_dst = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
++                                  accel, tmpfs, bootpath);
++        cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
+                                   " -name pcdest,debug-threads=on"
+                                   " -serial file:%s/dest_serial"
+                                   " -drive file=%s,format=raw"
+                                   " -incoming %s",
+-                                  tmpfs, bootpath, uri);
++                                  accel, tmpfs, bootpath, uri);
+     } else if (strcmp(arch, "ppc64") == 0) {
+-        const char *accel;
+ 
+         /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
+-        accel = access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
++        if (access("/sys/module/kvm_hv", F_OK)) {
++            accel = "tcg";
++        }
+         init_bootfile_ppc(bootpath);
+         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
+                                   " -name pcsource,debug-threads=on"
 -- 
 2.14.3
