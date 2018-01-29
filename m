@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8O8-0004be-JG
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:18 -0500
+	(envelope-from <xuwei5@huawei.com>) id 1eg8Oc-00051N-Kz
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eg8O3-000175-Tr
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eg8O3-00016k-Ni
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:11 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 13E1372665
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:18:11 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 29 Jan 2018 13:17:54 +0100
-Message-Id: <20180129121754.13033-6-quintela@redhat.com>
-In-Reply-To: <20180129121754.13033-1-quintela@redhat.com>
-References: <20180129121754.13033-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 5/5] [RFH] tests: Add migration compress
- threads tests
+	(envelope-from <xuwei5@huawei.com>) id 1eg8OY-0001Sn-8t
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 07:18:46 -0500
+References: <5A6B5091.8030601@hisilicon.com>
+	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
+	<5A6B5FCA.2080009@hisilicon.com>
+	<CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
+	<5A6B6671.8070408@hisilicon.com>
+	<CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
+From: Wei Xu <xuwei5@hisilicon.com>
+Message-ID: <5A6F10F8.7000904@hisilicon.com>
+Date: Mon, 29 Jan 2018 12:18:00 +0000
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
+ before enabled the interruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Rob Herring <rob.herring@linaro.org>, Daode Huang <huangdaode@hisilicon.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, Zhangyi ac <zhangyi.ac@huawei.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, tiantao6@huawei.com, Marc Zyngier <marc.zyngier@arm.com>
 
-Yeap, it is still not working. trying to learn how to debug threads
-for guests running from the testt hardness.
+Hi Peter,
 
-For some reason, compression is not working at the moment, test is
-disabled until I found why.
+On 2018/1/26 18:01, Peter Maydell wrote:
+> On 26 January 2018 at 17:33, Wei Xu <xuwei5@hisilicon.com> wrote:
+>> On 2018/1/26 17:15, Peter Maydell wrote:
+>>> The pl011 code should call qemu_set_irq(..., 1) when the
+>>> guest enables interrupts on the device by writing to the int_enabled
+>>> (UARTIMSC) register. That will be a 0-to-1 level change and the KVM
+>>> VGIC should report the interrupt to the guest.
+>>>
+>>
+>> Yes.
+>> And in the pl011_update, the irq level is set by s->int_level & s->int_enabled.
+>> When writing to the int_enabled, not sure why the int_level is set to
+>> 0x20(PL011_INT_TX) but int_enabled is 0x50.
+>>
+>> It still call qemu_set_irq(..., 0).
+>>
+>> I added "s->int_level |= PL011_INT_RX" before calling pl011_update
+>> when writing to the int_enabled and tested it also works.
+> 
+> No, that's not right either. int_level should already have the
+> RX bit set, because pl011_put_fifo() sets that bit when it gets a
+> character from QEMU and puts it into the FIFO.
+> 
+> Does something else clear the int_level between the character
+> going into the FIFO from QEMU and the guest enabling
+> interrupts?
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- tests/migration-test.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+Yes. When the guest enabling the interrupts, the pl011 driver in
+the kernel will clear the RX interrupts[1].
+And pasted the code below to make it easy to read.
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 355e6d18e9..02d8ae7cb6 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -715,6 +715,55 @@ static void test_precopy_tcp(void)
-     g_free(port);
- }
- 
-+static void test_compress(const char *uri)
-+{
-+    QTestState *from, *to;
-+
-+    test_migrate_start(&from, &to, uri);
-+
-+    /* We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 1 ms should make it not converge*/
-+    migrate_set_parameter(from, "downtime-limit", "1");
-+    /* 1GB/s */
-+    migrate_set_parameter(from, "max-bandwidth", "100000000");
-+
-+    migrate_set_parameter(from, "compress-threads", "4");
-+    migrate_set_parameter(to, "decompress-threads", "3");
-+
-+    migrate_set_capability(from, "compress", "true");
-+    migrate_set_capability(to, "compress", "true");
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    migrate(from, uri);
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms should converge */
-+    migrate_set_parameter(from, "downtime-limit", "300");
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
-+    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to);
-+}
-+
-+static void test_compress_unix(void)
-+{
-+    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-+
-+    test_compress(uri);
-+    g_free(uri);
-+}
-+
- int main(int argc, char **argv)
- {
-     char template[] = "/tmp/migration-test-XXXXXX";
-@@ -739,6 +788,9 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/deprecated", test_deprecated);
-     qtest_add_func("/migration/postcopy/unix", test_postcopy);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-+    if (0) {
-+        qtest_add_func("/migration/compress/unix", test_compress_unix);
-+    }
- 
-     ret = g_test_run();
- 
--- 
-2.14.3
+	static void pl011_enable_interrupts(struct uart_amba_port *uap)
+	{
+		spin_lock_irq(&uap->port.lock);
+
+		/* Clear out any spuriously appearing RX interrupts */
+		pl011_write(UART011_RTIS | UART011_RXIS, uap, REG_ICR);
+		uap->im = UART011_RTIM;
+		if (!pl011_dma_rx_running(uap))
+		uap->im |= UART011_RXIM;
+		pl011_write(uap->im, uap, REG_IMSC);
+		spin_unlock_irq(&uap->port.lock);
+	}
+
+I tried kept the RXIS in the kernel side to test and found the issue is still there.
+A little confused now :(
+
+[1]: https://elixir.free-electrons.com/linux/latest/source/drivers/tty/serial/amba-pl011.c#L1732
+
+Best Regards,
+Wei
+
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
