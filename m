@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1egBBi-0001Ed-Pz
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:17:44 -0500
+	(envelope-from <stefanha@gmail.com>) id 1egBN2-0005lW-Rf
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:29:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1egBBh-00048t-QJ
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:17:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1egBBh-000485-Hl
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:17:37 -0500
-References: <20180129033133.31288-1-famz@redhat.com>
-	<f090e697-424b-6ce6-4517-3e16c728958f@redhat.com>
-	<CAK1Eb9mjV4KV2N8=yOdUVeg+P0sHnqER0BUYg5kb_FjVcmzXnQ@mail.gmail.com>
-	<ae6cb50d-28d8-da44-e57b-6170dd60fafc@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <15af7545-781d-5e34-e100-9ddc0f08725b@redhat.com>
-Date: Mon, 29 Jan 2018 16:16:15 +0100
+	(envelope-from <stefanha@gmail.com>) id 1egBMx-0004cY-RK
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:29:20 -0500
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:39211)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1egBMx-0004c3-Jl
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:29:15 -0500
+Received: by mail-wr0-x22f.google.com with SMTP id f6so6017142wra.6
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 07:29:15 -0800 (PST)
+Date: Mon, 29 Jan 2018 15:29:12 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180129152912.GL20446@stefanha-x1.localdomain>
+References: <1516003315-17878-1-git-send-email-changpeng.liu@intel.com>
+	<1516003315-17878-2-git-send-email-changpeng.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <ae6cb50d-28d8-da44-e57b-6170dd60fafc@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="wOcBJDahJqVmwkO8sZF30uGOxjalPIZg8"
-Subject: Re: [Qemu-devel] [PATCH] docs: Add docs/devel/testing.rst
+	protocol="application/pgp-signature"; boundary="zH41lVBEV8cLJnCl"
+Content-Disposition: inline
+In-Reply-To: <1516003315-17878-2-git-send-email-changpeng.liu@intel.com>
+Subject: Re: [Qemu-devel] [RFC v1] block/NVMe: introduce a new vhost NVMe
+ host device to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Changpeng Liu <changpeng.liu@intel.com>
+Cc: qemu-devel@nongnu.org, james.r.harris@intel.com, keith.busch@intel.com, famz@redhat.com, pbonzini@redhat.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wOcBJDahJqVmwkO8sZF30uGOxjalPIZg8
-From: Thomas Huth <thuth@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <15af7545-781d-5e34-e100-9ddc0f08725b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docs: Add docs/devel/testing.rst
-References: <20180129033133.31288-1-famz@redhat.com>
- <f090e697-424b-6ce6-4517-3e16c728958f@redhat.com>
- <CAK1Eb9mjV4KV2N8=yOdUVeg+P0sHnqER0BUYg5kb_FjVcmzXnQ@mail.gmail.com>
- <ae6cb50d-28d8-da44-e57b-6170dd60fafc@redhat.com>
-In-Reply-To: <ae6cb50d-28d8-da44-e57b-6170dd60fafc@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--zH41lVBEV8cLJnCl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 29.01.2018 15:36, Eric Blake wrote:
-> On 01/29/2018 01:42 AM, Fam Zheng wrote:
->> On Mon, Jan 29, 2018 at 2:56 PM, Thomas Huth <thuth@redhat.com> wrote:=
+On Mon, Jan 15, 2018 at 04:01:55PM +0800, Changpeng Liu wrote:
+> NVMe 1.3 specification introduces a new NVMe ADMIN command:
+> doorbell buffer config, which can write shadow doorbell buffer
+> instead of MMIO registers, so it can improve the Guest performance
+> a lot for emulated NVMe devices inside VM.
 
->>> On 29.01.2018 04:31, Fam Zheng wrote:
->>> [...]
->>>> +1. Create a new source file. For example, ``tests/test-foo.c``.
->>> [...]
->>>> +1. Create a new source file for the test. (More than one file can b=
-e added as
->>>> +   necessary.) For example, ``tests/test-foo-device.c``.  2. Write =
-the test
->>>> +   code with the glib and libqtest/libqos API. See also existing te=
-sts and the
->>>> +   library headers for reference.
->>>
->>> Can you please name the examples tests/foo-test.c and
->>> tests/foo-device-test.c instead? Then the binaries will be covered by=
+If I understand correctly the Shadow Doorbell Buffer offers two
+optimizations:
 
->>> the wildcard in tests/.gitignore automatically. Otherwise the list in=
+1. The guest driver only writes to the MMIO register when EventIdx has
+   been reached.  This eliminates some MMIO writes.
 
->>> that gitignore file will grow and grow... Maybe it's also worth to
->>> mention the naming scheme in this doc file?
->>
->> Yeah, I can do it. It's just I fail to find a definitive guideline on
->> test-* vs *-test for the names, and the numbers are neck-and-neck:
->>
->> fam@lemon:~/work/qemu [master]$ ls tests/*test.c | wc -l
->> 67
->> fam@lemon:~/work/qemu [master]$ ls tests/test-*.c | wc -l
->> 68
+2. The device may poll the Shadow Doorbell Buffer so that command
+   processing can begin before guest driver performs an MMIO write.
+
+Is this correct?
+
+> Similar with existing vhost-user-scsi solution, this commit builds a
+> new vhost_user_nvme host device to VM and the I/O is processed at
+> the slave I/O target, so users can implement a user space NVMe driver
+> in the slave I/O target.
 >=20
-> I'm all for a mass rename to the suffix style (as it is easier to write=
+> Users can start QEMU with: -chardev socket,id=3Dchar0,path=3D/path/vhost.=
+0 \
+> -device vhost-user-nvme,chardev=3Dchar0,num_io_queues=3D2.
 
-> a gitignore suffix), if no one can provide a good reason for the naming=
+Each new feature has a cost in terms of maintainance, testing,
+documentation, and support.  Users need to be educated about the role of
+each available storage controller and how to choose between them.
 
-> difference.=20
+I'm not sure why QEMU should go in this direction since it makes the
+landscape more complex and harder to support.  You've said the
+performance is comparable to vhost-user-blk.  So what does NVMe offer
+that makes this worthwhile?
 
-Good idea. And while we're at it, I think we should also sort the tests
-into subfolders, e.g. tests/qtest/ and tests/unit/ etc.
+A cool NVMe feature would be the ability to pass through invididual
+queues to different guests without SR-IOV.  In other words, bind a queue
+to namespace subset so that multiple guests can be isolated from each
+other.  That way the data path would not require vmexits.  The control
+path and device initialization would still be emulated by QEMU so the
+hardware does not need to provide the full resources and state needed
+for SR-IOV.  I looked into this but came to the conclusion that it would
+require changes to the NVMe specification because the namespace is a
+per-command field.
 
- Thomas
-
-
---wOcBJDahJqVmwkO8sZF30uGOxjalPIZg8
+--zH41lVBEV8cLJnCl
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIcBAEBAgAGBQJabzrFAAoJEC7Z13T+cC216oYP/i8yXaWpVk2yv7QtZcn3gYUh
-tfDFWAGjNHgVFtMWC0a9ohRkSyT7jtXEob/QhEDE9WOKJoIGADaiHiSmMA13NsaJ
-y/D0dAM72ZQO39f0d0puIS4MoS99YYcpiKKtY9Uu59Ydlar5B6IPikyrICYuOUv9
-wg2IAlgzwkVWPRJ91eo3Q90LcbRJQfzfISt2o5fZVqVhLS270zav7V/JH3oj+0IY
-32JO4kU0DAhcyrhhAj/Ullv7uYgMJNGS5MDUKvP0xLZMer0/Anwvi4TrTRRUGubH
-khZlkwHzsGBzDn9R4yBGilKS820Vv7QFmHW4aLF9rVRfSNvAoedx2lLgi07aPktS
-TS6zvsSJHc5nQ9mikDNxOt1pEkxdo7pvGmEXkSSf+zAVFrPcqjgIAyvcsata+XCX
-p4KefIj+Z66Og//GmRafvKY31CClY7546DzDwr3YDA05HiWGZfF9ZisNUWmV/+LL
-/aU0vfmiQVKdgJyOP+W7KC+1fwm47380V8vOKmH2iFZSReEVuYYzhB9UNWF4yroY
-qSYMA2qJYA0+OdLnOeoAiaJ9gb7iueAS1TNAeFInpQyLQZUQpGOSNXLH/dAiQ9W6
-YPsN3TmT3JTdUAxBbVok7mUek4PxYgshVqCUtec+DuWqnJxsf6Ig9E+mys8WvrLp
-u+VI5oyM669Y0IF+mIu7
-=9Qil
+iQEcBAEBAgAGBQJabz3IAAoJEJykq7OBq3PI+iwH/R4xfu5FJlH6zbPAOu7lKzDA
+m2Hwv85+7uloSvK82fqFrpXb+CJ3WBYOXHJmZYeqqv+rqoodxaVXDx5fmjE53DaP
+RYyA5zLrEgWH7lsyUNBOWasYrdMC299CjsxpDOYoSmCKS4j3GJV0x3XBFBGTW3kg
+LHKXpf92cGihNyPHygeTJhLUAxVvh+4dBqiXr1LygEXnsQhoaLZqQcCr6oEB4flv
+z9LYvGavNC9vxlzzEwhRsbp/0WwLeidrW8Bawky5qWE7ixJqhNz5Vi60etrMIgis
+M+2Jm2TGv0kuaZltG0KUH7u9/tZjnbgbcUWPAF9A7iwZvafPT2GPt358Ak5pWnU=
+=CgCv
 -----END PGP SIGNATURE-----
 
---wOcBJDahJqVmwkO8sZF30uGOxjalPIZg8--
+--zH41lVBEV8cLJnCl--
