@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eg7bO-0001PJ-Cu
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:27:55 -0500
+	(envelope-from <xuwei5@huawei.com>) id 1eg7kp-000483-Nt
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eg7bJ-0004Pr-E9
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:27:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59860)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eg7bJ-0004OR-4X
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:27:49 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6C52E461C5
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 11:27:47 +0000 (UTC)
-References: <1516958370-3955-1-git-send-email-thuth@redhat.com>
-	<7b6392e6-6ff7-9f18-9bdf-eb8b27e72117@redhat.com>
-	<64c6c821-f007-16ea-c500-0d0ce48f6bac@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b5fdc573-d44a-ca23-6e51-0cdeb0087771@redhat.com>
-Date: Mon, 29 Jan 2018 12:27:40 +0100
+	(envelope-from <xuwei5@huawei.com>) id 1eg7kk-0002mC-Te
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:39 -0500
+References: <5A6B5091.8030601@hisilicon.com>
+	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
+	<5A6B5FCA.2080009@hisilicon.com>
+	<CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
+	<5A6B6671.8070408@hisilicon.com>
+	<CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
+	<20180129102917.3olxduibcwdqgqls@hawk.localdomain>
+From: Wei Xu <xuwei5@hisilicon.com>
+Message-ID: <5A6F0761.2010305@hisilicon.com>
+Date: Mon, 29 Jan 2018 11:37:05 +0000
 MIME-Version: 1.0
-In-Reply-To: <64c6c821-f007-16ea-c500-0d0ce48f6bac@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="3QFvYPUy9pPUOQ4z0jgrxb4qkhI7KYFpH"
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add "Understanding QEMU devices"
- blog post
+In-Reply-To: <20180129102917.3olxduibcwdqgqls@hawk.localdomain>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
+ before enabled the interruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,81 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Rob Herring <rob.herring@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, tiantao6@huawei.com, QEMU Developers <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, qemu-arm <qemu-arm@nongnu.org>, Daode Huang <huangdaode@hisilicon.com>, Jonathan
+	Cameron <Jonathan.Cameron@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Zhangyi ac <zhangyi.ac@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3QFvYPUy9pPUOQ4z0jgrxb4qkhI7KYFpH
-From: Thomas Huth <thuth@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <b5fdc573-d44a-ca23-6e51-0cdeb0087771@redhat.com>
-Subject: Re: [qemu-web PATCH] Add "Understanding QEMU devices" blog post
-References: <1516958370-3955-1-git-send-email-thuth@redhat.com>
- <7b6392e6-6ff7-9f18-9bdf-eb8b27e72117@redhat.com>
- <64c6c821-f007-16ea-c500-0d0ce48f6bac@redhat.com>
-In-Reply-To: <64c6c821-f007-16ea-c500-0d0ce48f6bac@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Andrew,
 
-On 26.01.2018 15:46, Eric Blake wrote:
-> On 01/26/2018 06:40 AM, Paolo Bonzini wrote:
->> On 26/01/2018 10:19, Thomas Huth wrote:
->>> Last July, Eric Blake wrote a nice summary for newcomers about what
->>> QEMU has to do to emulate devices for the guests. So far, we missed
->>> to integrate this somewhere into the QEM web site or wiki, so let's
->>> publish this now as a nice blog post for the users.
+On 2018/1/29 10:29, Andrew Jones wrote:
+> On Fri, Jan 26, 2018 at 06:01:33PM +0000, Peter Maydell wrote:
+>> On 26 January 2018 at 17:33, Wei Xu <xuwei5@hisilicon.com> wrote:
+>>> On 2018/1/26 17:15, Peter Maydell wrote:
+>>>> The pl011 code should call qemu_set_irq(..., 1) when the
+>>>> guest enables interrupts on the device by writing to the int_enabled
+>>>> (UARTIMSC) register. That will be a 0-to-1 level change and the KVM
+>>>> VGIC should report the interrupt to the guest.
+>>>>
+>>>
+>>> Yes.
+>>> And in the pl011_update, the irq level is set by s->int_level & s->int_enabled.
+>>> When writing to the int_enabled, not sure why the int_level is set to
+>>> 0x20(PL011_INT_TX) but int_enabled is 0x50.
+>>>
+>>> It still call qemu_set_irq(..., 0).
+>>>
+>>> I added "s->int_level |= PL011_INT_RX" before calling pl011_update
+>>> when writing to the int_enabled and tested it also works.
 >>
->> It's very nice!  Some proofreading and corrections follow.
->=20
-> Thanks for digging up my original email, and enhancing it (I guess the
-> fact that I don't blog very often, and stick to email, means that I rel=
-y
-> on others helping to polish my gems for the masses).
+>> No, that's not right either. int_level should already have the
+>> RX bit set, because pl011_put_fifo() sets that bit when it gets a
+>> character from QEMU and puts it into the FIFO.
+>>
+>> Does something else clear the int_level between the character
+>> going into the FIFO from QEMU and the guest enabling
+>> interrupts?
+> 
+> As part of the boot process Linux restarts the UART a few times. When
+> Linux drives the PL011 with the SBSA driver then the FIFO doesn't get
+> reset prior to being used again, as the SBSA doesn't specify a way to
+> do that. I'm not sure if this issue is due to the SBSA attempting to
+> be overly simple, or something the Linux driver can deal with. See
+> this thread for a discussion I started once.
+> 
+> https://www.spinics.net/lists/linux-serial/msg23163.html
 
-Sure ... Would you like to give it a try this time and continue with the
-patch, or shall I continue and send a v2?
+I am not sure it is the same problem or not.
+I will check that.
+Thanks!
 
->>> +++ b/_posts/2018-01-26-understanding-qemu-devices.md
->>> @@ -0,0 +1,139 @@
->>> +---
->>> +layout: post
->>> +title:  "Understanding QEMU devices"
->>> +date:   2018-01-26 10:00:00 +0100
->=20
-> That's when you're posting it online, but should it also mention when I=
+> 
+> Wei,
+> 
+> I assume you're using UEFI/ACPI when booting, as I don't recall this
+> problem occurring with the Linux PL011 driver which would be used
+> when booting with DT.
+>
 
-> first started these thoughts in email form?
+I am using an ARM64 board, the guest is booted *without* UEFI but the
+host is booted with UEFI/ACPI.
+The command I am using is as below:
+	"qemu-system-aarch64 -enable-kvm -m 1024 -cpu host -M virt \
+	-nographic --kernel Image --initrd roofs.cpio.gz"
 
-At least in the header we should have the current date, or the blog post
-will not show up at the top of the blog. Not sure whether there is an
-alternate field for the original date ... maybe we could rather add an
-"originally written in 2017 ..." sentence at the bottom of the post inste=
-ad?
+Thanks!
 
- Thomas
+Best Regards,
+Wei
 
-
---3QFvYPUy9pPUOQ4z0jgrxb4qkhI7KYFpH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJabwUwAAoJEC7Z13T+cC21nGoQAK/kNZkJLuGHvw8ALrlKUnS9
-7jNp1ArQOVEOTtidToeRux8yN07ghkGFOaG5tRtCeVNoEy8/CobXcjGXSu5E0xhz
-t8SNgx+l3YwhkDnEfrwMIjEXRTkLBDmjWS89kNHug0txHsJjGZUT4LM6DQJZuYRl
-rM9PVCEx2CDwt7c/MuJw8M96OygnA9oKcn6eqoWTClJiTgbbklPuktzoikvJEk5O
-nKb6mOVeCRAmhzdzO9MA2+RqX7oH6fQM/FBE47PDcQOcv5unt1dY+lUx07x0jMXi
-9SfWNUbFfwuRG93nNfxPpRRdPurIwnJNV9Dn3eyrcG9aaxrpYniCaVL+yXxIynnC
-+XqGHWnRdmKX7Uk7ySZwV4RbIP9kHOFS043sJze07F/k0nFwx5njSVTq11Wi6bkP
-XLod9lNnRf28bKewNK7DVwzk5Zb8b+W/5LXVp980FY82o2YhWRmPAoW7IiNZ8krN
-8eScpNjrNIyMWkky7adBal6y4qSyuB+ARRHdPVC5NhJRwiIyWB9rsed7/0fb04iI
-2TcRuRkpgXAXw+n1oVu46rCuQmlUaH0LnAnwMULsQcHzQ8Wj+kB/bU58VDH/olN4
-D4NCUmjGhcWw+ra3g3InsouXShdinVABKeNBWv52rcqtZH85eIOpr857VtGIDf2M
-tX+CuHvAKi0t5K0zBNa8
-=TVPx
------END PGP SIGNATURE-----
-
---3QFvYPUy9pPUOQ4z0jgrxb4qkhI7KYFpH--
+> Thanks,
+> drew
+> 
+> .
+> 
