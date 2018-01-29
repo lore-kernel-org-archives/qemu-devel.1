@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1eg7kp-000483-Nt
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eg7kz-0004Hv-7F
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1eg7kk-0002mC-Te
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:39 -0500
-References: <5A6B5091.8030601@hisilicon.com>
-	<CAFEAcA_39SgDKFnkrcVePs89kYUMHvqqAdnkFhrCa=GYTu0Kpw@mail.gmail.com>
-	<5A6B5FCA.2080009@hisilicon.com>
-	<CAFEAcA-N-pjHwqrStf-qK+EOmGYyR-4dfY=sL5kLzeodgYUiRw@mail.gmail.com>
-	<5A6B6671.8070408@hisilicon.com>
-	<CAFEAcA-_vYgDYofx61rmCL7sZKOVSBHfw0k3us1=SHzD+TEnGw@mail.gmail.com>
-	<20180129102917.3olxduibcwdqgqls@hawk.localdomain>
-From: Wei Xu <xuwei5@hisilicon.com>
-Message-ID: <5A6F0761.2010305@hisilicon.com>
-Date: Mon, 29 Jan 2018 11:37:05 +0000
+	(envelope-from <peter.maydell@linaro.org>) id 1eg7ky-0002wT-6L
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:49 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:45296)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eg7kx-0002wD-Vj
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 06:37:48 -0500
+Received: by mail-ot0-x244.google.com with SMTP id r4so6207490oti.12
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 03:37:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180129102917.3olxduibcwdqgqls@hawk.localdomain>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] pl011: do not put into fifo
- before enabled the interruption
+In-Reply-To: <1516992568-3139-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1516992568-3139-1-git-send-email-stefanb@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jan 2018 11:37:26 +0000
+Message-ID: <CAFEAcA_aOF-Dz_Ji0AVfi=CHvb7GoKSmOAsCGmA5b5bYn4bKFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] Merge tpm 2018/01/26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Rob Herring <rob.herring@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, "Chenxin (Charles)" <charles.chenxin@huawei.com>, tiantao6@huawei.com, QEMU Developers <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Liuxinliang (Matthew Liu)" <z.liuxinliang@hisilicon.com>, qemu-arm <qemu-arm@nongnu.org>, Daode Huang <huangdaode@hisilicon.com>, Jonathan
-	Cameron <Jonathan.Cameron@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>, Zhangyi ac <zhangyi.ac@huawei.com>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-Hi Andrew,
-
-On 2018/1/29 10:29, Andrew Jones wrote:
-> On Fri, Jan 26, 2018 at 06:01:33PM +0000, Peter Maydell wrote:
->> On 26 January 2018 at 17:33, Wei Xu <xuwei5@hisilicon.com> wrote:
->>> On 2018/1/26 17:15, Peter Maydell wrote:
->>>> The pl011 code should call qemu_set_irq(..., 1) when the
->>>> guest enables interrupts on the device by writing to the int_enabled
->>>> (UARTIMSC) register. That will be a 0-to-1 level change and the KVM
->>>> VGIC should report the interrupt to the guest.
->>>>
->>>
->>> Yes.
->>> And in the pl011_update, the irq level is set by s->int_level & s->int_enabled.
->>> When writing to the int_enabled, not sure why the int_level is set to
->>> 0x20(PL011_INT_TX) but int_enabled is 0x50.
->>>
->>> It still call qemu_set_irq(..., 0).
->>>
->>> I added "s->int_level |= PL011_INT_RX" before calling pl011_update
->>> when writing to the int_enabled and tested it also works.
->>
->> No, that's not right either. int_level should already have the
->> RX bit set, because pl011_put_fifo() sets that bit when it gets a
->> character from QEMU and puts it into the FIFO.
->>
->> Does something else clear the int_level between the character
->> going into the FIFO from QEMU and the guest enabling
->> interrupts?
-> 
-> As part of the boot process Linux restarts the UART a few times. When
-> Linux drives the PL011 with the SBSA driver then the FIFO doesn't get
-> reset prior to being used again, as the SBSA doesn't specify a way to
-> do that. I'm not sure if this issue is due to the SBSA attempting to
-> be overly simple, or something the Linux driver can deal with. See
-> this thread for a discussion I started once.
-> 
-> https://www.spinics.net/lists/linux-serial/msg23163.html
-
-I am not sure it is the same problem or not.
-I will check that.
-Thanks!
-
-> 
-> Wei,
-> 
-> I assume you're using UEFI/ACPI when booting, as I don't recall this
-> problem occurring with the Linux PL011 driver which would be used
-> when booting with DT.
+On 26 January 2018 at 18:49, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+> The patches in this pull request fix a bug in the initialization of
+> a variable, adapt the cancel path used by the passthrough device to the
+> sysfs path of more recent versions of the Linux kernel, and do some other
+> cleanups preparing for support of migration. Finally, we add the CRB
+> interface emulation, which is used with a TPM 2.
 >
+>    Stefan
+>
+> The following changes since commit 0f79bfe38a2cf0f43c7ea4959da7f8ebd7858f3d:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.12-pull-request' into staging (2018-01-25 09:53:53 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-01-26-1
+>
+> for you to fetch changes up to b510b21e072a0a9218f37051c885e95824d06bea:
+>
+>   tpm: add CRB device (2018-01-26 10:12:02 -0500)
+>
+> ----------------------------------------------------------------
+> Merge tpm 2018/01/26 v1
+>
+> ----------------------------------------------------------------
 
-I am using an ARM64 board, the guest is booted *without* UEFI but the
-host is booted with UEFI/ACPI.
-The command I am using is as below:
-	"qemu-system-aarch64 -enable-kvm -m 1024 -cpu host -M virt \
-	-nographic --kernel Image --initrd roofs.cpio.gz"
+Hi. The new tpm-crb-test fails on sparc host:
 
-Thanks!
+TEST: tests/tpm-crb-test... (pid=230409)
+  /i386/tpm-crb/test:
+Broken pipe
+FAIL
+GTester: last random seed: R02S29cea50247fe1efa59ee885a26d51a85
+(pid=230423)
+FAIL: tests/tpm-crb-test
 
-Best Regards,
-Wei
+and generates a new clang sanitizer runtime warning:
 
-> Thanks,
-> drew
-> 
-> .
-> 
+/home/petmay01/linaro/qemu-for-merges/hw/tpm/tpm_util.h:36:24: runtime
+error: load of misaligned address 0x7fdc24c00002 for type 'const
+uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment
+0x7fdc24c00002: note: pointer points here
+<memory cannot be printed>
+
+Chances are good these are the same thing, because the sparc architecture
+does not allow misaligned loads and will segfault if you try them.
+This function looks like it's the immediate culprit:
+
+static inline uint32_t tpm_cmd_get_size(const void *b)
+{
+    return be32_to_cpu(*(const uint32_t *)(b + 2));
+}
+
+I suspect that this function should read
+    return ldl_be_p(b + 2);
+
+This is likely not the only problem with misaligned data in the
+tpm code -- for instance the cast here in tpm_util_is_selftest()
+looks odd:
+
+bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
+{
+    struct tpm_req_hdr *hdr = (struct tpm_req_hdr *)in;
+
+As a general rule you can't take an arbitrary pointer into a byte
+buffer and try to interpret it as a structure or a pointer to
+a larger-than-bytesize-data simply by casting the pointer.
+It might be worth reviewing all the tpm code for bugs
+of this nature.
+
+thanks
+-- PMM
