@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1egEt5-0005zV-DK
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:14:40 -0500
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1egEt7-000623-N9
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:14:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1egEt3-000090-DH
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:14:39 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:40342)
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1egEt6-0000B6-Ky
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:14:41 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:44585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1egEt3-00008c-7c
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:14:37 -0500
-Received: by mail-pf0-x242.google.com with SMTP id i66so6229677pfd.7
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 11:14:37 -0800 (PST)
+	id 1egEt6-0000Ap-F4
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 14:14:40 -0500
+Received: by mail-pf0-x244.google.com with SMTP id 17so4786063pfw.11
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 11:14:40 -0800 (PST)
 From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Tue, 30 Jan 2018 03:13:43 +0800
-Message-Id: <1517253224-14361-4-git-send-email-whois.zihan.yang@gmail.com>
+Date: Tue, 30 Jan 2018 03:13:44 +0800
+Message-Id: <1517253224-14361-5-git-send-email-whois.zihan.yang@gmail.com>
 In-Reply-To: <1517253224-14361-1-git-send-email-whois.zihan.yang@gmail.com>
 References: <1517253224-14361-1-git-send-email-whois.zihan.yang@gmail.com>
-Subject: [Qemu-devel] [RFC 3/4] net/socket: change net_socket_listen_init to
- use functions in include/qemu/sockets.h
+Subject: [Qemu-devel] [RFC 4/4] net/socket: change net_socket_connect_init
+ to use functions in sockets.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +30,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zihan Yang <whois.zihan.yang@gmail.com>, Jason Wang <jasowang@redhat.com>
 
-Some functions in net/socket.c still uses bind/connect/listen
-directly. Change it to use functions in include/qemu/sockets.h
+net_socket_connect_init still uses parse_host_port() and connect()
+directly. Convert it into functions in include/qemu/sockets.h
 
 Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
 ---
- net/socket.c | 41 +++++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 20 deletions(-)
+ net/socket.c | 52 +++++++++++++++++++++++-----------------------------
+ 1 file changed, 23 insertions(+), 29 deletions(-)
 
 diff --git a/net/socket.c b/net/socket.c
-index 6917fbc..7b07223 100644
+index 7b07223..312b638 100644
 --- a/net/socket.c
 +++ b/net/socket.c
-@@ -494,35 +494,35 @@ static int net_socket_listen_init(NetClientState *peer,
+@@ -543,48 +543,42 @@ static int net_socket_connect_init(NetClientState *peer,
+                                    Error **errp)
  {
-     NetClientState *nc;
      NetSocketState *s;
+-    int fd, connected, ret;
 -    struct sockaddr_in saddr;
--    int fd, ret;
++    int fd, connected;
 +    SocketAddress *saddr;
 +    QemuSocketConfig *sconf;
 +    Error *local_err = NULL;
-+    int fd;
  
 -    if (parse_host_port(&saddr, host_str, errp) < 0) {
 +    saddr = socket_parse(host_str, &local_err);
@@ -63,45 +63,53 @@ index 6917fbc..7b07223 100644
 -    fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
 -    if (fd < 0) {
 -        error_setg_errno(errp, errno, "can't create stream socket");
-+    /* Manually prepare config because socket_listen
-++     * will not set O_NONBLOCKING */
-+    sconf = g_new0(QemuSocketConfig, 1);
-+    if(NULL == sconf) {
-+        qapi_free_SocketAddress(saddr);
-+        error_setg_errno(errp, errno, "out of memory");
-         return -1;
-     }
+-        return -1;
+-    }
 -    qemu_set_nonblock(fd);
++    sconf = g_new0(QemuSocketConfig, 1);
 +    sconf->nonblocking = true;
 +    sconf->options = NULL;
  
--    socket_set_fast_reuse(fd);
--
--    ret = bind(fd, (struct sockaddr *)&saddr, sizeof(saddr));
--    if (ret < 0) {
--        error_setg_errno(errp, errno, "can't bind ip=%s to socket",
--                         inet_ntoa(saddr.sin_addr));
--        closesocket(fd);
--        return -1;
--    }
--    ret = listen(fd, 0);
--    if (ret < 0) {
--        error_setg_errno(errp, errno, "can't listen on socket");
--        closesocket(fd);
-+    fd = socket_listen(saddr, errp, sconf);
+     connected = 0;
+-    for(;;) {
+-        ret = connect(fd, (struct sockaddr *)&saddr, sizeof(saddr));
+-        if (ret < 0) {
+-            if (errno == EINTR || errno == EWOULDBLOCK) {
+-                /* continue */
+-            } else if (errno == EINPROGRESS ||
+-                       errno == EALREADY ||
+-                       errno == EINVAL) {
+-                break;
+-            } else {
+-                error_setg_errno(errp, errno, "can't connect socket");
+-                closesocket(fd);
+-                return -1;
+-            }
+-        } else {
+-            connected = 1;
+-            break;
+-        }
++    fd = socket_connect(saddr, errp, sconf);
 +    if(fd < 0) {
-+        error_setg_errno(errp, errno, "can't listen on address");
++        error_setg_errno(errp, errno, "socket_connect failed");
++        g_free(sconf);
 +        qapi_free_SocketAddress(saddr);
-         return -1;
++        return -1;
++    } else if(errno != EINPROGRESS && errno != EALREADY && errno != EINVAL) {
++        connected = 1;
      }
 +    g_free(sconf);
++
+     s = net_socket_fd_init(peer, model, name, fd, connected, NULL, errp);
+     if (!s) {
+         return -1;
+     }
  
-     nc = qemu_new_net_client(&net_socket_info, peer, model, name);
-     s = DO_UPCAST(NetSocketState, nc, nc);
-@@ -532,6 +532,7 @@ static int net_socket_listen_init(NetClientState *peer,
-     net_socket_rs_init(&s->rs, net_socket_rs_finalize, false);
- 
-     qemu_set_fd_handler(s->listen_fd, net_socket_accept, NULL, s);
+     snprintf(s->nc.info_str, sizeof(s->nc.info_str),
+-             "socket: connect to %s:%d",
+-             inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
++             "socket: connect to %s:%s",
++             saddr->u.inet.host, saddr->u.inet.port);
 +    qapi_free_SocketAddress(saddr);
      return 0;
  }
