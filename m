@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1egGrD-0005Pm-Ip
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 16:20:52 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egHrz-0004Xh-Dc
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 17:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1egGrA-0006DJ-9p
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 16:20:51 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:42738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1egGrA-0006Cq-23
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 16:20:48 -0500
-Received: by mail-wr0-x241.google.com with SMTP id 41so7415897wrc.9
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 13:20:47 -0800 (PST)
-Date: Mon, 29 Jan 2018 21:20:45 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180129212045.GB1640@stefanha-x1.localdomain>
-References: <151675071042.29381.16225631028845063799.stgit@bahia.lan>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1egHrw-0005sy-8s
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 17:25:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35048
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1egHrw-0005sU-3F
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 17:25:40 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0TMNfZg033883
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 17:25:39 -0500
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ft873tbvr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 17:25:38 -0500
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 29 Jan 2018 17:25:38 -0500
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 29 Jan 2018 17:25:16 -0500
+In-Reply-To: <1517264719-18288-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1517264719-18288-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0ntfKIWw70PvrIHh"
-Content-Disposition: inline
-In-Reply-To: <151675071042.29381.16225631028845063799.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 0/7] tests: virtio-9p: test request
- cancellation
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1517264719-18288-4-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 3/6] tpm: lookup cancel path under tpm device
+ class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +42,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com, peter.maydell@linaro.org
 
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
---0ntfKIWw70PvrIHh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Since Linux commit 313d21eeab9282e, tpm devices have their own device
+class "tpm" and the cancel path must be looked up under
+/sys/class/tpm/ instead of /sys/class/misc/.
 
-On Wed, Jan 24, 2018 at 12:38:30AM +0100, Greg Kurz wrote:
-> This series does several changes to virtio-9p-test in order to be able
-> to test request cancellation (flush in 9p wording):
->=20
-> patches 1-2: preparatory work, basically doing things in the test code,
->              rather that in the common code for flexibility and clarity
->=20
-> patch 3: the cornerstone of the series, switch to using the synth fsdev
->          backend, which allows to associate specific write/read ops to
->          a given file. Since this backend never got used since it was
->          merged, it looks like an ideal vehicle to add QTEST aware code
->          in QEMU
->=20
-> patches 4-5: trivial open & write tests, since the flush test will need
->              to open a file and write to it
->=20
-> patch 6: another important patch that allows to know the length written
->          by the guest into a used buffer=20
->=20
-> patch 7: the goal of this series, two request cancellation tests
->=20
-> This series depends on the following patch:
->=20
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05604.html
->=20
-> Please comment.
->=20
-> Cheers,
->=20
-> --
-> Greg
->=20
-> ---
->=20
-> Greg Kurz (7):
->       tests: virtio-9p: move request tag to the test functions
->       tests: virtio-9p: wait for completion in the test code
->       tests: virtio-9p: use the synth backend
->       tests: virtio-9p: add LOPEN operation test
->       tests: virtio-9p: add WRITE operation test
->       libqos/virtio: return length written into used descriptor
->       tests: virtio-9p: add FLUSH operation test
->=20
->=20
->  hw/9pfs/9p-synth.c       |   56 ++++++++++
->  hw/9pfs/9p-synth.h       |   11 ++
->  hw/9pfs/9p.c             |    1=20
->  tests/libqos/virtio.c    |   25 +++-
->  tests/libqos/virtio.h    |    3 -
->  tests/virtio-9p-test.c   |  263 ++++++++++++++++++++++++++++++++++++++++=
-------
->  tests/virtio-blk-test.c  |   24 ++--
->  tests/virtio-net-test.c  |    6 +
->  tests/virtio-scsi-test.c |    3 -
->  9 files changed, 335 insertions(+), 57 deletions(-)
->=20
->=20
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_passthrough.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---0ntfKIWw70PvrIHh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJab5AtAAoJEJykq7OBq3PIQ90IAKqiqcrhG4GqyDJzRnNODsV7
-YlgDM7CEWhtVFdbYhuQQ7ZdujH6tyKs60W5bbeTExTKXiPiqhoE0PRq5m9zDUd0o
-1m4g7lojQsOk8HZBX8yndF43SDas3yOwoSsc6SaE9BeZffBAy9rIQd4WumBdXEPF
-mcwjGpuF2hPSRKJLYW3rMES4k3uiQqUpUYzz4ULo/C6wchHXG+Sovkr9fNSeMJeq
-5L3ZQhFLFxG8dQ7/Tstoqa6JyxGA5FJWjeU74iolwR+ZG50elKe6m7TtiedWYrfT
-v7/y2fVKAEdCIZCrJD+Z0jSqh1Ct4L9qjLh+B31julP0lbmrkR0K2YPsO1D94wo=
-=oeQ5
------END PGP SIGNATURE-----
-
---0ntfKIWw70PvrIHh--
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 537e11a..fc42fe0 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -214,7 +214,8 @@ static size_t tpm_passthrough_get_buffer_size(TPMBack=
+end *tb)
+  * Unless path or file descriptor set has been provided by user,
+  * determine the sysfs cancel file following kernel documentation
+  * in Documentation/ABI/stable/sysfs-class-tpm.
+- * From /dev/tpm0 create /sys/class/misc/tpm0/device/cancel
++ * From /dev/tpm0 create /sys/class/tpm/tpm0/device/cancel
++ * before 4.0: /sys/class/misc/tpm0/device/cancel
+  */
+ static int tpm_passthrough_open_sysfs_cancel(TPMPassthruState *tpm_pt)
+ {
+@@ -225,26 +226,35 @@ static int tpm_passthrough_open_sysfs_cancel(TPMPas=
+sthruState *tpm_pt)
+     if (tpm_pt->options->cancel_path) {
+         fd =3D qemu_open(tpm_pt->options->cancel_path, O_WRONLY);
+         if (fd < 0) {
+-            error_report("Could not open TPM cancel path : %s",
++            error_report("tpm_passthrough: Could not open TPM cancel pat=
+h: %s",
+                          strerror(errno));
+         }
+         return fd;
+     }
+=20
+     dev =3D strrchr(tpm_pt->tpm_dev, '/');
+-    if (dev) {
+-        dev++;
+-        if (snprintf(path, sizeof(path), "/sys/class/misc/%s/device/canc=
+el",
+-                     dev) < sizeof(path)) {
+-            fd =3D qemu_open(path, O_WRONLY);
+-            if (fd < 0) {
+-                error_report("tpm_passthrough: Could not open TPM cancel=
+ "
+-                             "path %s : %s", path, strerror(errno));
++    if (!dev) {
++        error_report("tpm_passthrough: Bad TPM device path %s",
++                     tpm_pt->tpm_dev);
++        return -1;
++    }
++
++    dev++;
++    if (snprintf(path, sizeof(path), "/sys/class/tpm/%s/device/cancel",
++                 dev) < sizeof(path)) {
++        fd =3D qemu_open(path, O_WRONLY);
++        if (fd < 0) {
++            if (snprintf(path, sizeof(path), "/sys/class/misc/%s/device/=
+cancel",
++                         dev) < sizeof(path)) {
++                fd =3D qemu_open(path, O_WRONLY);
+             }
+         }
++    }
++
++    if (fd < 0) {
++        error_report("tpm_passthrough: Could not guess TPM cancel path")=
+;
+     } else {
+-       error_report("tpm_passthrough: Bad TPM device path %s",
+-                    tpm_pt->tpm_dev);
++        tpm_pt->options->cancel_path =3D g_strdup(path);
+     }
+=20
+     return fd;
+--=20
+2.5.5
