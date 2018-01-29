@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egD4t-0000PO-RS
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:18:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1egDGk-0006XJ-57
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:30:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egD4p-0005sP-VW
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:18:43 -0500
-Date: Mon, 29 Jan 2018 18:17:55 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180129171755.GM6141@localhost.localdomain>
-References: <20180127020515.27137-1-jsnow@redhat.com>
-	<20180127020515.27137-4-jsnow@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1egDGj-0002ml-6Z
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:30:58 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:33871)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1egDGj-0002la-1v
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:30:57 -0500
+Received: by mail-ot0-x241.google.com with SMTP id x15so7286721ote.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 09:30:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180127020515.27137-4-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v3 03/14] blockjobs: add state transition
- table
+In-Reply-To: <20180123035349.24538-2-richard.henderson@linaro.org>
+References: <20180123035349.24538-1-richard.henderson@linaro.org>
+	<20180123035349.24538-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jan 2018 17:30:35 +0000
+Message-ID: <CAFEAcA-9h0v_FqvR8rYrF-J4-CRnzHt7ByU1ygPA_6chukGEQw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] target/arm: Expand vector registers
+ for SVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Am 27.01.2018 um 03:05 hat John Snow geschrieben:
-> The state transition table has mostly been implied. We're about to make
-> it a bit more complex, so let's make the STM explicit instead.
-> 
-> Perform state transitions with a function that for now just asserts the
-> transition is appropriate.
-> 
-> undefined: May only transition to 'created'.
-> created: May only transition to 'running'.
->          It cannot transition to pause directly, but if a created job
->          is requested to pause prior to starting, it will transition
->          synchronously to 'running' and then to 'paused'.
-> running: May transition either to 'paused' or 'ready'.
-> paused: May transition to either 'running' or 'ready', but only in
->         terms of returning to that prior state.
->         p->r->y is not possible, but this is not encapsulated by the
->         STM table.
-
-Do you mean y->p->r->y here? If not, I don't understand.
-
-> ready: May transition to paused.
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On 23 January 2018 at 03:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Change vfp.regs as a uint64_t to vfp.zregs as an ARMVectorReg.
+> The previous patches have made the change in representation
+> relatively painless.
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  blockjob.c | 39 ++++++++++++++++++++++++++++++++++-----
->  1 file changed, 34 insertions(+), 5 deletions(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 6eb783a354..d084a1e318 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -42,6 +42,35 @@
->   * block_job_enter. */
->  static QemuMutex block_job_mutex;
->  
-> +/* BlockJob State Transition Table */
-> +bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
-> +                                          /* U, C, R, P, Y */
-> +    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0},
-> +    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0},
-> +    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1},
-> +    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 1},
-> +    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 1, 0},
-> +};
-> +
-> +static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
-> +{
-> +    BlockJobStatus s0 = job->status;
-> +    if (s0 == s1) {
-> +        return;
-> +    }
-> +    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
-> +    assert(BlockJobSTT[s0][s1]);
-> +    switch (s1) {
-> +    case BLOCK_JOB_STATUS_WAITING:
-> +    case BLOCK_JOB_STATUS_PENDING:
-> +    case BLOCK_JOB_STATUS_CONCLUDED:
-> +        assert(job->manual);
-> +    default:
-> +        break;
-> +    }
+>  target/arm/cpu.h           | 59 +++++++++++++++++++++++++++++++---------=
+------
+>  target/arm/machine.c       | 35 ++++++++++++++++++++++++++-
+>  target/arm/translate-a64.c |  8 +++----
+>  target/arm/translate.c     |  7 +++---
+>  4 files changed, 81 insertions(+), 28 deletions(-)
+>
 
-This doesn't compile because the constants don't exist yet.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Apart from that, I think the assertion is misguided, too. Which states a
-job goes through shouldn't depend on whether the client wants to
-complete the job manually or have it completed automatically. The
-difference should only be which state transitions are automatic.
-
-In other words, WAITING/PENDING/CONCLUDED may never be visible in
-query-block-job for automatically completed jobs, but the jobs should
-still (synchronously) go through all of these states.
-
-> +    job->status = s1;
-> +}
-> +
-
-Kevin
+thanks
+-- PMM
