@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egCs5-0002Ye-2n
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:33 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egCyz-0005ml-NF
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:12:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egCrw-0006Xm-OT
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:28 -0500
-Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:51519)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egCrw-0006Ww-HE
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:05:20 -0500
-Received: from player730.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5E7CFD36B3
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 18:05:18 +0100 (CET)
-Date: Mon, 29 Jan 2018 18:05:06 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180129180506.33520c68@bahia.lan>
-In-Reply-To: <f0bd7f3d-d3ba-556b-3c69-cbfaf7d7b929@huawei.com>
-References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
-	<20180112171416.6048ae9e@bahia.lan>
-	<e059ddfb-030d-98b6-8e6e-4938270bcebf@huawei.com>
-	<20180119112733.4a9dd43f@bahia.lan>
-	<05660a29-b22d-7bd6-91e2-37c54b5f2194@huawei.com>
-	<899644b1-e401-8ed5-8a49-1f0e2dbf9b2b@huawei.com>
-	<20180119190555.35127373@bahia.lan>
-	<e6ad35e8-2fda-8318-c043-dcf092cc0daa@huawei.com>
-	<f0bd7f3d-d3ba-556b-3c69-cbfaf7d7b929@huawei.com>
+	(envelope-from <mreitz@redhat.com>) id 1egCyr-0002NU-Th
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 12:12:37 -0500
+References: <20180111195225.4226-1-kwolf@redhat.com>
+	<20180111195225.4226-5-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <99b05d90-756d-be4c-f6b5-240a26176d57@redhat.com>
+Date: Mon, 29 Jan 2018 18:12:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
+In-Reply-To: <20180111195225.4226-5-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LCwRgzM0j3crP0Copg5SkVeohkrFIuNx1"
+Subject: Re: [Qemu-devel] [RFC PATCH 04/10] qcow2: Pass
+ BlockdevCreateOptions to qcow2_create2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,99 +25,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Veaceslav Falico <veaceslav.falico@huawei.com>
-Cc: Eduard Shishkin <eduard.shishkin@huawei.com>, Antonios Motakis <antonios.motakis@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "zhangwei
-	(CR)" <zhangwei555@huawei.com>, "Emilio G. Cota" <cota@braap.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On Thu, 25 Jan 2018 17:08:40 +0100
-Veaceslav Falico <veaceslav.falico@huawei.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LCwRgzM0j3crP0Copg5SkVeohkrFIuNx1
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <99b05d90-756d-be4c-f6b5-240a26176d57@redhat.com>
+Subject: Re: [RFC PATCH 04/10] qcow2: Pass BlockdevCreateOptions to
+ qcow2_create2()
+References: <20180111195225.4226-1-kwolf@redhat.com>
+ <20180111195225.4226-5-kwolf@redhat.com>
+In-Reply-To: <20180111195225.4226-5-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 1/25/2018 3:46 PM, Veaceslav Falico wrote:
+On 2018-01-11 20:52, Kevin Wolf wrote:
+> All of the simple options are now passed to qcow2_create2() in a
+> BlockdevCreateOptions object. Still missing: node-name and the
+> encryption options.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qcow2.c | 186 ++++++++++++++++++++++++++++++++++++++++++++++----=
+--------
+>  1 file changed, 148 insertions(+), 38 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index b02bc39a01..09e567324d 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+
 [...]
-> > 
-> > I've reproduced it today without fscache:
-> > 
-> > host:
-> > mount -o bind /tmp/mounted t1
-> > mount -o bind /tmp/mounted t2
-> > 
-> > guest:
-> > / # tail -f t1/file &
-> > / # 321
-> > 
-> > / # cat t2/file
-> > 321
-> > / #
-> > 
-> > host:
-> > mv t1/file t1/file_moved
-> > 
-> > guest:
-> > / # cat t2/file
-> > cat: can't open 't2/file': No such file or directory
-> > / # mount | grep fscache
-> > / #  
-> 
-> Sorry, disregard this test case, it's operating normally -
-> when we move the t1/file, we also move the t2/file, as they're
-> the same directory... Sorry, it's a brainfart after a long
-> discussion about the issue :).
-> 
 
-No problem :)
+> @@ -2690,12 +2697,11 @@ static uint64_t qcow2_opt_get_refcount_bits_del=
+(QemuOpts *opts, int version,
+>      return refcount_bits;
+>  }
+> =20
+> -static int qcow2_create2(BlockDriverState *bs, int64_t total_size,
+> -                         const char *backing_file, const char *backing=
+_format,
+> -                         int flags, size_t cluster_size, PreallocMode =
+prealloc,
+> -                         QemuOpts *opts, int version, int refcount_ord=
+er,
+> -                         const char *encryptfmt, Error **errp)
+> +static int qcow2_create2(BlockDriverState *bs,
+> +                         BlockdevCreateOptions *create_options,
 
-> So, it's still not reproducible without (fs)cache guest-side.
-> 
-> 
-> Anyway, the question below still stands - is the guest
-> allowed to re-use the FIDs for the files with same QIDs?
-> 
+I'd personally really prefer this to be const...
 
-AFAIU FIDs have a 1:1 relation to either a path in the file hierarchy or
-to an open file. I don't think they can be re-used.
+> +                         QemuOpts *opts, const char *encryptfmt, Error=
+ **errp)
+>  {
+> +    BlockdevCreateOptionsQcow2 *qcow2_opts;
+>      QDict *options;
+> =20
+>      /*
+> @@ -2712,10 +2718,88 @@ static int qcow2_create2(BlockDriverState *bs, =
+int64_t total_size,
 
-> > 
-> > Also, per internal discussions, we're not sure if the guest side
-> > is allowed to reuse the FIDs opened previously for same QID.paths.
-> > 
-> > QEMU holds FID.path for each FID, which contains the actual FS path,
-> > i.e. "/path/to/file". 
-> > 
-> > So, if we (guest) have two "identical" (per QID.path and RFC) files
-> > (f1 and f2), though in different directories (host and guest), and 
-> > we've accessed f1 once (FID 10, for example) - are we allowed to
-> > re-use FID 10 for f2, if f1's QID.path == f2's QID.path ?
-> >   
-> >>  
-> >>>  
-> >>>>
-> >>>> Thanks,
-> >>>> Eduard.
-> >>>>     
-> >>>>>    
-> >>>>>>>    
-> >>>>>>>> With our proof of concept patch, the issues caused by qid path collisions go away, so it can be seen as an interim solution of sorts. However, the chance of collisions is not eliminated, we are just replacing the current strategy, which is almost guaranteed to cause collisions in certain use cases, with one that makes them more rare. We think that a virtio feature flag for longer qid paths is the only way to eliminate these issues completely.
-> >>>>>>>>
-> >>>>>>>> This is the extent that we were able to analyze the issue from our side, we would like to hear if there are some better ideas, or which approach would be more appropriate for upstream.
-> >>>>>>>>
-> >>>>>>>> Best regards,
-> >>>>>>>>    
-> >>>>>>>
-> >>>>>>> Cheers,
-> >>>>>>>
-> >>>>>>> -- 
-> >>>>>>> Greg
-> >>>>>>>    
-> >>>>>>    
-> >>>>>    
-> >>>>
-> >>>> .
-> >>>>     
-> >>>
-> >>>  
-> >>
-> >> .
-> >>  
-> >   
-> 
-> 
+[...]
+
+> +
+> +    if (!qcow2_opts->has_preallocation) {
+> +        qcow2_opts->preallocation =3D PREALLOC_MODE_OFF;
+> +    }
+> +    if (qcow2_opts->backing_file &&
+> +        qcow2_opts->preallocation !=3D PREALLOC_MODE_OFF)
+> +    {
+> +        error_setg(errp, "Backing file and preallocation cannot be use=
+d at "
+> +                   "the same time");
+> +        return -EINVAL;
+> +    }
+> +
+> +    if (!qcow2_opts->has_lazy_refcounts) {
+> +        qcow2_opts->lazy_refcounts =3D false;
+
+=2E..because modifying some ideally QMP-provided objects just looks wrong=
+=2E
+
+[...]
+
+> @@ -2804,18 +2888,26 @@ static int qcow2_create2(BlockDriverState *bs, =
+int64_t total_size,
+
+[...]
+
+>      /* Want a backing file? There you go.*/
+> -    if (backing_file) {
+> -        ret =3D bdrv_change_backing_file(blk_bs(blk), backing_file, ba=
+cking_format);
+> +    if (qcow2_opts->has_backing_file) {
+> +        const char *backing_format =3D NULL;
+> +
+> +        if (qcow2_opts->has_backing_fmt) {
+> +            backing_format =3D BlockdevDriver_str(qcow2_opts->backing_=
+fmt);
+> +        }
+
+has_backing_fmt && !has_backing_file should probably be an error.
+
+Max
+
+> +
+> +        ret =3D bdrv_change_backing_file(blk_bs(blk), qcow2_opts->back=
+ing_file,
+> +                                       backing_format);
+>          if (ret < 0) {
+>              error_setg_errno(errp, -ret, "Could not assign backing fil=
+e '%s' "
+> -                             "with format '%s'", backing_file, backing=
+_format);
+> +                             "with format '%s'", qcow2_opts->backing_f=
+ile,
+> +                             backing_format);
+>              goto out;
+>          }
+>      }
+
+
+--LCwRgzM0j3crP0Copg5SkVeohkrFIuNx1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpvVfMSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AKskH/1JFCyUUZ2Jfcpc0I2nnZiMjMNqrAQAv
+jnRTmO5Q3/ZI9ZKQ2tSl6gxi8S/hThcnwt0bwd2h9UGNiOlkfIL7bvaH/i4kdRWr
+ORitQl69IV8XaYPkdvIOM68vWJqk1IAxs5k65LtVgnL7+49HwcVGa5acborN5p/1
+L2K/rLBCeeoMtK7wNf+FNdy7FLARYrcgjF1Cg03B4SpNSuw1xXI+qE6hyLgrkTpL
+yTb1iuS1BcTtcwBOqlKvKIciVVBNzsfF28Xfg3bFiZio9bGo1xsrwfZhNjb8zBYF
+6DVPmO32zM4yoTswG4wAYxiupqbeQV6oAMI/jhQUxfogvN2kZBnEc2w=
+=TOyC
+-----END PGP SIGNATURE-----
+
+--LCwRgzM0j3crP0Copg5SkVeohkrFIuNx1--
