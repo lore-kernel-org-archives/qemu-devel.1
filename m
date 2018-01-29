@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eg07Y-0004Sf-UO
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eg07b-0004Tj-3x
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eg07X-0001cy-Pb
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eg07Z-0001ef-E8
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:28:39 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 29 Jan 2018 14:28:18 +1100
-Message-Id: <20180129032826.16876-5-david@gibson.dropbear.id.au>
+Date: Mon, 29 Jan 2018 14:28:21 +1100
+Message-Id: <20180129032826.16876-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20180129032826.16876-1-david@gibson.dropbear.id.au>
 References: <20180129032826.16876-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/12] uninorth: convert to trace-events
+Subject: [Qemu-devel] [PULL 07/12] target/ppc/kvm: Add
+ cap_ppc_safe_[cache/bounds_check/indirect_branch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,93 +21,179 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, groug@kaod.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, surajjs@au1.ibm.com, groug@kaod.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Add three new kvm capabilities used to represent the level of host support
+for three corresponding workarounds.
+
+Host support for each of the capabilities is queried through the
+new ioctl KVM_PPC_GET_CPU_CHAR which returns four uint64 quantities. The
+first two, character and behaviour, represent the available
+characteristics of the cpu and the behaviour of the cpu respectively.
+The second two, c_mask and b_mask, represent the mask of known bits for
+the character and beheviour dwords respectively.
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+[dwg: Correct some compile errors due to name change in final kernel
+ patch version]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/pci-host/trace-events |  6 ++++++
- hw/pci-host/uninorth.c   | 24 +++++-------------------
- 2 files changed, 11 insertions(+), 19 deletions(-)
+ include/hw/ppc/spapr.h | 12 +++++++++++
+ target/ppc/kvm.c       | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/ppc/kvm_ppc.h   | 18 ++++++++++++++++
+ 3 files changed, 88 insertions(+)
 
-diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-index 5b8fcc228b..341a87a702 100644
---- a/hw/pci-host/trace-events
-+++ b/hw/pci-host/trace-events
-@@ -12,3 +12,9 @@ sabre_pci_config_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PR
- sabre_pci_config_read(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
- sabre_pci_set_irq(int irq_num, int level) "set irq_in %d level %d"
- sabre_pci_set_obio_irq(int irq_num, int level) "set irq %d level %d"
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 0f5628f22e..eded0ea57d 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -295,6 +295,18 @@ struct sPAPRMachineState {
+ #define H_DABRX_KERNEL     (1ULL<<(63-62))
+ #define H_DABRX_USER       (1ULL<<(63-63))
+ 
++/* Values for KVM_PPC_GET_CPU_CHAR & H_GET_CPU_CHARACTERISTICS */
++#define H_CPU_CHAR_SPEC_BAR_ORI31               PPC_BIT(0)
++#define H_CPU_CHAR_BCCTRL_SERIALISED            PPC_BIT(1)
++#define H_CPU_CHAR_L1D_FLUSH_ORI30              PPC_BIT(2)
++#define H_CPU_CHAR_L1D_FLUSH_TRIG2              PPC_BIT(3)
++#define H_CPU_CHAR_L1D_THREAD_PRIV              PPC_BIT(4)
++#define H_CPU_CHAR_HON_BRANCH_HINTS             PPC_BIT(5)
++#define H_CPU_CHAR_THR_RECONF_TRIG              PPC_BIT(6)
++#define H_CPU_BEHAV_FAVOUR_SECURITY             PPC_BIT(0)
++#define H_CPU_BEHAV_L1D_FLUSH_PR                PPC_BIT(1)
++#define H_CPU_BEHAV_BNDS_CHK_SPEC_BAR           PPC_BIT(2)
 +
-+# hw/pci-host/uninorth.c
-+unin_set_irq(int irq_num, int level) "setting INT %d = %d"
-+unin_get_config_reg(uint32_t reg, uint32_t addr, uint32_t retval) "converted config space accessor 0x%"PRIx32 "/0x%"PRIx32 " -> 0x%"PRIx32
-+unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0x%"PRIx64 " len %d val 0x%"PRIx64
-+unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%"PRIx64 " len %d val 0x%"PRIx64
-diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index 5d8ccaa711..66991da975 100644
---- a/hw/pci-host/uninorth.c
-+++ b/hw/pci-host/uninorth.c
-@@ -26,16 +26,7 @@
- #include "hw/ppc/mac.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
--
--/* debug UniNorth */
--//#define DEBUG_UNIN
--
--#ifdef DEBUG_UNIN
--#define UNIN_DPRINTF(fmt, ...)                                  \
--    do { printf("UNIN: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define UNIN_DPRINTF(fmt, ...)
--#endif
-+#include "trace.h"
+ /* Each control block has to be on a 4K boundary */
+ #define H_CB_ALIGNMENT     4096
  
- static const int unin_irq_line[] = { 0x1b, 0x1c, 0x1d, 0x1e };
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 914be687e7..84284d5957 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -89,6 +89,9 @@ static int cap_mmu_radix;
+ static int cap_mmu_hash_v3;
+ static int cap_resize_hpt;
+ static int cap_ppc_pvr_compat;
++static int cap_ppc_safe_cache;
++static int cap_ppc_safe_bounds_check;
++static int cap_ppc_safe_indirect_branch;
  
-@@ -69,8 +60,7 @@ static void pci_unin_set_irq(void *opaque, int irq_num, int level)
+ static uint32_t debug_inst_opcode;
+ 
+@@ -121,6 +124,7 @@ static bool kvmppc_is_pr(KVMState *ks)
+ }
+ 
+ static int kvm_ppc_register_host_cpu_type(MachineState *ms);
++static void kvmppc_get_cpu_characteristics(KVMState *s);
+ 
+ int kvm_arch_init(MachineState *ms, KVMState *s)
  {
-     qemu_irq *pic = opaque;
- 
--    UNIN_DPRINTF("%s: setting INT %d = %d\n", __func__,
--                 unin_irq_line[irq_num], level);
-+    trace_unin_set_irq(unin_irq_line[irq_num], level);
-     qemu_set_irq(pic[unin_irq_line[irq_num]], level);
+@@ -147,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
++    kvmppc_get_cpu_characteristics(s);
+     /*
+      * Note: setting it to false because there is not such capability
+      * in KVM at this moment.
+@@ -2456,6 +2461,59 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
+     return cap_mmu_hash_v3;
  }
  
-@@ -103,9 +93,7 @@ static uint32_t unin_get_config_reg(uint32_t reg, uint32_t addr)
-         retval |= func << 8;
-     }
- 
--
--    UNIN_DPRINTF("Converted config space accessor %08x/%08x -> %08x\n",
--                 reg, addr, retval);
-+    trace_unin_get_config_reg(reg, addr, retval);
- 
-     return retval;
- }
-@@ -115,8 +103,7 @@ static void unin_data_write(void *opaque, hwaddr addr,
++static void kvmppc_get_cpu_characteristics(KVMState *s)
++{
++    struct kvm_ppc_cpu_char c;
++    int ret;
++
++    /* Assume broken */
++    cap_ppc_safe_cache = 0;
++    cap_ppc_safe_bounds_check = 0;
++    cap_ppc_safe_indirect_branch = 0;
++
++    ret = kvm_vm_check_extension(s, KVM_CAP_PPC_GET_CPU_CHAR);
++    if (!ret) {
++        return;
++    }
++    ret = kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &c);
++    if (ret < 0) {
++        return;
++    }
++    /* Parse and set cap_ppc_safe_cache */
++    if (~c.behaviour & c.behaviour_mask & H_CPU_BEHAV_L1D_FLUSH_PR) {
++        cap_ppc_safe_cache = 2;
++    } else if ((c.character & c.character_mask & H_CPU_CHAR_L1D_THREAD_PRIV) &&
++               (c.character & c.character_mask
++                & (H_CPU_CHAR_L1D_FLUSH_ORI30 | H_CPU_CHAR_L1D_FLUSH_TRIG2))) {
++        cap_ppc_safe_cache = 1;
++    }
++    /* Parse and set cap_ppc_safe_bounds_check */
++    if (~c.behaviour & c.behaviour_mask & H_CPU_BEHAV_BNDS_CHK_SPEC_BAR) {
++        cap_ppc_safe_bounds_check = 2;
++    } else if (c.character & c.character_mask & H_CPU_CHAR_SPEC_BAR_ORI31) {
++        cap_ppc_safe_bounds_check = 1;
++    }
++    /* Parse and set cap_ppc_safe_indirect_branch */
++    if (c.character & H_CPU_CHAR_BCCTRL_SERIALISED) {
++        cap_ppc_safe_indirect_branch = 2;
++    }
++}
++
++int kvmppc_get_cap_safe_cache(void)
++{
++    return cap_ppc_safe_cache;
++}
++
++int kvmppc_get_cap_safe_bounds_check(void)
++{
++    return cap_ppc_safe_bounds_check;
++}
++
++int kvmppc_get_cap_safe_indirect_branch(void)
++{
++    return cap_ppc_safe_indirect_branch;
++}
++
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
  {
-     UNINState *s = opaque;
-     PCIHostState *phb = PCI_HOST_BRIDGE(s);
--    UNIN_DPRINTF("write addr " TARGET_FMT_plx " len %d val %"PRIx64"\n",
--                 addr, len, val);
-+    trace_unin_data_write(addr, len, val);
-     pci_data_write(phb->bus,
-                    unin_get_config_reg(phb->config_reg, addr),
-                    val, len);
-@@ -132,8 +119,7 @@ static uint64_t unin_data_read(void *opaque, hwaddr addr,
-     val = pci_data_read(phb->bus,
-                         unin_get_config_reg(phb->config_reg, addr),
-                         len);
--    UNIN_DPRINTF("read addr " TARGET_FMT_plx " len %d val %x\n",
--                 addr, len, val);
-+    trace_unin_data_read(addr, len, val);
-     return val;
+     uint32_t host_pvr = mfpvr();
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index ecb55493cc..39830baa77 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -59,6 +59,9 @@ bool kvmppc_has_cap_fixup_hcalls(void);
+ bool kvmppc_has_cap_htm(void);
+ bool kvmppc_has_cap_mmu_radix(void);
+ bool kvmppc_has_cap_mmu_hash_v3(void);
++int kvmppc_get_cap_safe_cache(void);
++int kvmppc_get_cap_safe_bounds_check(void);
++int kvmppc_get_cap_safe_indirect_branch(void);
+ int kvmppc_enable_hwrng(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+@@ -290,6 +293,21 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
+     return false;
  }
  
++static inline int kvmppc_get_cap_safe_cache(void)
++{
++    return 0;
++}
++
++static inline int kvmppc_get_cap_safe_bounds_check(void)
++{
++    return 0;
++}
++
++static inline int kvmppc_get_cap_safe_indirect_branch(void)
++{
++    return 0;
++}
++
+ static inline int kvmppc_enable_hwrng(void)
+ {
+     return -1;
 -- 
 2.14.3
