@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1efyyv-0004Kr-5m
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 21:15:38 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1efzj2-0006rU-3f
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1efyys-0004ud-06
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 21:15:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48924)
+	(envelope-from <aik@ozlabs.ru>) id 1efziz-0007Oo-0F
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:03:16 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1efyyr-0004uB-Ph
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 21:15:33 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1efyyq-00074V-Qw
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 02:15:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C90062E8025
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 02:15:32 +0000 (UTC)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1efziy-0007OO-Kk
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 22:03:12 -0500
+Received: by mail-pf0-x242.google.com with SMTP id t5so3684289pfi.0
+	for <qemu-devel@nongnu.org>; Sun, 28 Jan 2018 19:03:11 -0800 (PST)
+References: <20180119050005.29392-1-sjitindarsingh@gmail.com>
+	<20180119050005.29392-3-sjitindarsingh@gmail.com>
+	<59acc32f-94e9-42b6-a8aa-4eddd504c8c8@ozlabs.ru>
+	<1517183014.2332.0.camel@gmail.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <65d10029-1a70-e07f-98e9-0dbc9033f4d1@ozlabs.ru>
+Date: Mon, 29 Jan 2018 14:03:06 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jan 2018 02:08:34 -0000
-From: Michael Chapman <launchpad@very.puzzling.org>
-Reply-To: Bug 1745895 <1745895@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151719171489.17422.7852330772200128264.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1745895] [NEW] Unable to migrate vhost-net to
- virtio-1.0-capable kernel
+In-Reply-To: <1517183014.2332.0.camel@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V5 2/7] target/ppc/spapr_caps:
+ Add macro to generate spapr_caps migration vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,111 +33,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org
+Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Public bug reported:
+On 29/01/18 10:43, Suraj Jitindar Singh wrote:
+> On Fri, 2018-01-19 at 16:18 +1100, Alexey Kardashevskiy wrote:
+>> On 19/01/18 16:00, Suraj Jitindar Singh wrote:
+>>> The vmstate description and the contained needed function for
+>>> migration
+>>> of spapr_caps is the same for each cap, with the name of the cap
+>>> substituted. As such introduce a macro to allow for easier
+>>> generation of
+>>> these.
+>>>
+>>> Convert the three existing spapr_caps (htm, vsx, and dfp) to use
+>>> this
+>>> macro.
+>>>
+>>> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>>>
+>>> ---
+>>>
+>>> V5:
+>>>  - Patch added to series
+>>> ---
+>>>  hw/ppc/spapr_caps.c | 78 +++++++++++++++++----------------------
+>>> --------------
+>>>  1 file changed, 24 insertions(+), 54 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+>>> index d5c9ce774a..5d52969bd5 100644
+>>> --- a/hw/ppc/spapr_caps.c
+>>> +++ b/hw/ppc/spapr_caps.c
+>>> @@ -228,62 +228,32 @@ int
+>>> spapr_caps_post_migration(sPAPRMachineState *spapr)
+>>>      return ok ? 0 : -EINVAL;
+>>>  }
+>>>  
+>>> -static bool spapr_cap_htm_needed(void *opaque)
+>>> -{
+>>> -    sPAPRMachineState *spapr = opaque;
+>>> -
+>>> -    return spapr->cmd_line_caps[SPAPR_CAP_HTM] &&
+>>> -           (spapr->eff.caps[SPAPR_CAP_HTM] != spapr-
+>>>> def.caps[SPAPR_CAP_HTM]);
+>>> -}
+>>> -
+>>> -const VMStateDescription vmstate_spapr_cap_htm = {
+>>> -    .name = "spapr/cap/htm",
+>>> -    .version_id = 1,
+>>> -    .minimum_version_id = 1,
+>>> -    .needed = spapr_cap_htm_needed,
+>>> -    .fields = (VMStateField[]) {
+>>> -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_HTM], sPAPRMachineState),
+>>> -        VMSTATE_END_OF_LIST()
+>>> -    },
+>>> -};
+>>> -
+>>> -static bool spapr_cap_vsx_needed(void *opaque)
+>>> -{
+>>> -    sPAPRMachineState *spapr = opaque;
+>>> -
+>>> -    return spapr->cmd_line_caps[SPAPR_CAP_VSX] &&
+>>> -           (spapr->eff.caps[SPAPR_CAP_VSX] != spapr-
+>>>> def.caps[SPAPR_CAP_VSX]);
+>>> +/* Used to generate the migration field and needed function for a
+>>> spapr cap */
+>>> +#define SPAPR_CAP_MIG_STATE(cap, ccap)                  \
+>>> +static bool spapr_cap_##cap##_needed(void *opaque)      \
+>>> +{                                                       \
+>>> +    sPAPRMachineState *spapr = opaque;                  \
+>>> +                                                        \
+>>> +    return spapr->cmd_line_caps[SPAPR_CAP_##ccap] &&    \
+>>> +           (spapr->eff.caps[SPAPR_CAP_##ccap] !=        \
+>>> +            spapr->def.caps[SPAPR_CAP_##ccap]);         \
+>>> +}                                                       \
+>>> +                                                        \
+>>> +const VMStateDescription vmstate_spapr_cap_##cap = {    \
+>>> +    .name = "spapr/cap/" #cap,                          \
+>>> +    .version_id = 1,                                    \
+>>> +    .minimum_version_id = 1,                            \
+>>> +    .needed = spapr_cap_##cap##_needed,                 \
+>>> +    .fields = (VMStateField[]) {                        \
+>>> +        VMSTATE_UINT8(mig.caps[SPAPR_CAP_##ccap],       \
+>>> +                      sPAPRMachineState),               \
+>>> +        VMSTATE_END_OF_LIST()                           \
+>>> +    },                                                  \
+>>>  }
+>>>  
+>>> -const VMStateDescription vmstate_spapr_cap_vsx = {
+>>> -    .name = "spapr/cap/vsx",
+>>> -    .version_id = 1,
+>>> -    .minimum_version_id = 1,
+>>> -    .needed = spapr_cap_vsx_needed,
+>>> -    .fields = (VMStateField[]) {
+>>> -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_VSX], sPAPRMachineState),
+>>> -        VMSTATE_END_OF_LIST()
+>>> -    },
+>>> -};
+>>> -
+>>> -static bool spapr_cap_dfp_needed(void *opaque)
+>>> -{
+>>> -    sPAPRMachineState *spapr = opaque;
+>>> -
+>>> -    return spapr->cmd_line_caps[SPAPR_CAP_DFP] &&
+>>> -           (spapr->eff.caps[SPAPR_CAP_DFP] != spapr-
+>>>> def.caps[SPAPR_CAP_DFP]);
+>>> -}
+>>> -
+>>> -const VMStateDescription vmstate_spapr_cap_dfp = {
+>>> -    .name = "spapr/cap/dfp",
+>>> -    .version_id = 1,
+>>> -    .minimum_version_id = 1,
+>>> -    .needed = spapr_cap_dfp_needed,
+>>> -    .fields = (VMStateField[]) {
+>>> -        VMSTATE_UINT8(mig.caps[SPAPR_CAP_DFP], sPAPRMachineState),
+>>> -        VMSTATE_END_OF_LIST()
+>>> -    },
+>>> -};
+>>> +SPAPR_CAP_MIG_STATE(htm, HTM);
+>>> +SPAPR_CAP_MIG_STATE(vsx, VSX);
+>>> +SPAPR_CAP_MIG_STATE(dfp, DFP);
+>>
+>>
+>> A nit: I really dislike this kind of parameters which you cannot
+>> really
+>> cscope/ctags for because they are joined to some other things.
+>>
+>> "no matches found for cscope query g HTM of HTM" says vim's cscope
+>> when I
+>> search for "HTM".
+> 
+> Would something like:
+> SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_HTM);
+> SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_VSX);
+> SPAPR_CAP_MIG_STATE(htm, SPAPR_CAP_DFP);
+> 
+> be better?
 
-I am running QEMU 2.11 (from upstream source, not Red Hat package) on
-stock RHEL 6 and RHEL 7 kernels. Only the RHEL 7 kernel supports
-VIRTIO_F_VERSION_1 in its vhost-net driver.
+It would indeed.
 
-When migrating a guest using vhost-net from the RHEL 6 host to RHEL 7,
-the PCI config is rejected by QEMU on the target machine.
+> I could send a follow up
 
-A simple test case:
+Too late, David already merged :( And this seems to bother only me anyway.
 
-1. On the RHEL 7 host, prepare for an incoming migration:
 
-  rhel7# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio
--nodefaults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno -d=
-evice
-virtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff -incoming
-tcp:0.0.0.0:12345
+> 
+>>
+>>
+>>>  
+>>>  void spapr_caps_reset(sPAPRMachineState *spapr)
+>>>  {
+>>>
+>>
+>>
 
-2. On the RHEL 6 host, start a guest and migrate it to the RHEL 7 host:
 
-  rhel6# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio -nodefa=
-ults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno -device v=
-irtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff
-QEMU 2.11.0 monitor - type 'help' for more information
-  (qemu) migrate tcp:rhel7:12345
-
-The RHEL 7 QEMU errors out:
-
-  qemu-system-x86_64: get_pci_config_device: Bad config data: i=3D0x20 read=
-: 0 device: c cmask: ff wmask: 0 w1cmask:0
-  qemu-system-x86_64: Failed to load PCIDevice:config
-  qemu-system-x86_64: Failed to load virtio-net:virtio
-  qemu-system-x86_64: error while loading state for instance 0x0 of device =
-'0000:00:02.0/virtio-net'
-  qemu-system-x86_64: load of migration failed: Invalid argument
-
-If I start the source QEMU with vhost=3Doff, or the target QEMU with
-disable-modern=3Dtrue, the migration is successful.
-
-My hunch here is that the target QEMU prepares the PCI device to support
-VIRTIO_F_VERSION_1, as that's available in the kernel there, but then
-fails to (or does not know to) disable this during the migration.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1745895
-
-Title:
-  Unable to migrate vhost-net to virtio-1.0-capable kernel
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am running QEMU 2.11 (from upstream source, not Red Hat package) on
-  stock RHEL 6 and RHEL 7 kernels. Only the RHEL 7 kernel supports
-  VIRTIO_F_VERSION_1 in its vhost-net driver.
-
-  When migrating a guest using vhost-net from the RHEL 6 host to RHEL 7,
-  the PCI config is rejected by QEMU on the target machine.
-
-  A simple test case:
-
-  1. On the RHEL 7 host, prepare for an incoming migration:
-
-    rhel7# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio
-  -nodefaults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno
-  -device virtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff -incoming
-  tcp:0.0.0.0:12345
-
-  2. On the RHEL 6 host, start a guest and migrate it to the RHEL 7
-  host:
-
-    rhel6# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio -node=
-faults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno -device=
- virtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff
-  QEMU 2.11.0 monitor - type 'help' for more information
-    (qemu) migrate tcp:rhel7:12345
-
-  The RHEL 7 QEMU errors out:
-
-    qemu-system-x86_64: get_pci_config_device: Bad config data: i=3D0x20 re=
-ad: 0 device: c cmask: ff wmask: 0 w1cmask:0
-    qemu-system-x86_64: Failed to load PCIDevice:config
-    qemu-system-x86_64: Failed to load virtio-net:virtio
-    qemu-system-x86_64: error while loading state for instance 0x0 of devic=
-e '0000:00:02.0/virtio-net'
-    qemu-system-x86_64: load of migration failed: Invalid argument
-
-  If I start the source QEMU with vhost=3Doff, or the target QEMU with
-  disable-modern=3Dtrue, the migration is successful.
-
-  My hunch here is that the target QEMU prepares the PCI device to
-  support VIRTIO_F_VERSION_1, as that's available in the kernel there,
-  but then fails to (or does not know to) disable this during the
-  migration.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1745895/+subscriptions
+-- 
+Alexey
