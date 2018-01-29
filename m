@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egDuF-0005IE-1U
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:11:48 -0500
+	(envelope-from <no-reply@patchew.org>) id 1egDwH-00075w-V6
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:13:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egDuD-0006Mi-Oe
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:11:46 -0500
-References: <20180111195225.4226-1-kwolf@redhat.com>
-	<20180111195225.4226-5-kwolf@redhat.com>
-	<99b05d90-756d-be4c-f6b5-240a26176d57@redhat.com>
-	<20180129181046.GQ6141@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <38a47c05-5e24-f9e6-30fc-8b446e431588@redhat.com>
-Date: Mon, 29 Jan 2018 19:11:36 +0100
+	(envelope-from <no-reply@patchew.org>) id 1egDwE-0007ew-Ml
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:13:53 -0500
+Resent-Message-Id: <E1egDwE-0007ew-Ml@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21063)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1egDwE-0007bj-G4
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:13:50 -0500
+In-Reply-To: <20180129174132.108925-1-brijesh.singh@amd.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151724958682.794.18410104780159289317@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <20180129181046.GQ6141@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="m2AjRh12CdEo2wzZzeL5qrMfu8NIbpCft"
-Subject: Re: [Qemu-devel] [RFC PATCH 04/10] qcow2: Pass
- BlockdevCreateOptions to qcow2_create2()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 29 Jan 2018 10:13:08 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v6 00/23] x86: Secure Encrypted
+ Virtualization (AMD)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,119 +29,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: brijesh.singh@amd.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org, Thomas.Lendacky@amd.com, stefanha@gmail.com, mst@redhat.com, richard.henderson@linaro.org, dgilbert@redhat.com, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---m2AjRh12CdEo2wzZzeL5qrMfu8NIbpCft
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <38a47c05-5e24-f9e6-30fc-8b446e431588@redhat.com>
-Subject: Re: [RFC PATCH 04/10] qcow2: Pass BlockdevCreateOptions to
- qcow2_create2()
-References: <20180111195225.4226-1-kwolf@redhat.com>
- <20180111195225.4226-5-kwolf@redhat.com>
- <99b05d90-756d-be4c-f6b5-240a26176d57@redhat.com>
- <20180129181046.GQ6141@localhost.localdomain>
-In-Reply-To: <20180129181046.GQ6141@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-01-29 19:10, Kevin Wolf wrote:
-> Am 29.01.2018 um 18:12 hat Max Reitz geschrieben:
->> On 2018-01-11 20:52, Kevin Wolf wrote:
->>> All of the simple options are now passed to qcow2_create2() in a
->>> BlockdevCreateOptions object. Still missing: node-name and the
->>> encryption options.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>  block/qcow2.c | 186 ++++++++++++++++++++++++++++++++++++++++++++++--=
-----------
->>>  1 file changed, 148 insertions(+), 38 deletions(-)
->>>
->>> diff --git a/block/qcow2.c b/block/qcow2.c
->>> index b02bc39a01..09e567324d 100644
->>> --- a/block/qcow2.c
->>> +++ b/block/qcow2.c
->>
->> [...]
->>
->>> @@ -2690,12 +2697,11 @@ static uint64_t qcow2_opt_get_refcount_bits_d=
-el(QemuOpts *opts, int version,
->>>      return refcount_bits;
->>>  }
->>> =20
->>> -static int qcow2_create2(BlockDriverState *bs, int64_t total_size,
->>> -                         const char *backing_file, const char *backi=
-ng_format,
->>> -                         int flags, size_t cluster_size, PreallocMod=
-e prealloc,
->>> -                         QemuOpts *opts, int version, int refcount_o=
-rder,
->>> -                         const char *encryptfmt, Error **errp)
->>> +static int qcow2_create2(BlockDriverState *bs,
->>> +                         BlockdevCreateOptions *create_options,
->>
->> I'd personally really prefer this to be const...
->>
->>> +                         QemuOpts *opts, const char *encryptfmt, Err=
-or **errp)
->>>  {
->>> +    BlockdevCreateOptionsQcow2 *qcow2_opts;
->>>      QDict *options;
->>> =20
->>>      /*
->>> @@ -2712,10 +2718,88 @@ static int qcow2_create2(BlockDriverState *bs=
-, int64_t total_size,
->>
->> [...]
->>
->>> +
->>> +    if (!qcow2_opts->has_preallocation) {
->>> +        qcow2_opts->preallocation =3D PREALLOC_MODE_OFF;
->>> +    }
->>> +    if (qcow2_opts->backing_file &&
->>> +        qcow2_opts->preallocation !=3D PREALLOC_MODE_OFF)
->>> +    {
->>> +        error_setg(errp, "Backing file and preallocation cannot be u=
-sed at "
->>> +                   "the same time");
->>> +        return -EINVAL;
->>> +    }
->>> +
->>> +    if (!qcow2_opts->has_lazy_refcounts) {
->>> +        qcow2_opts->lazy_refcounts =3D false;
->>
->> ...because modifying some ideally QMP-provided objects just looks wron=
-g.
->=20
-> Isn't this pretty standard, though? Most commands don't use boxed
-> options, so there they only modify stack variables, but if you look at
-> boxed ones like do_blockdev_backup() or qmp_drive_mirror(), they do the=
-
-> same.
-
-:C
-
-
---m2AjRh12CdEo2wzZzeL5qrMfu8NIbpCft
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpvY9gSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Aqv0IALPfQGtt9FHCiFfU3iHdveubiwV/KCE8
-UJk6c5k47n6fTWQt5EOLNslMVJABb9mTbBSHiEfA1TRi/4b+O7jVa+7A9W6Diaqe
-Ggq7FDRcf43h4TmU2bbKEW9qvs5Qhx9u54dRUKtQkyQFTkS+Aj9O5v0nt5wHM1PY
-21gXdd8HEHU5PSOIURRDHtSHyAeaRZg6rYirl3iEuJ3XuunfLCA4geRThORZWDg4
-CCxcmAXWDEn1Q+uBVYNLW9Y/KhwfvBB6Pfstog7M32vavEMtgoZBNGmeowSzn5wD
-GVPXsIjXsGj/HtYeTNrv8EKYz+PV9xTYTIu0l3HA8guSI6gMWq6H3+o=
-=kc5l
------END PGP SIGNATURE-----
-
---m2AjRh12CdEo2wzZzeL5qrMfu8NIbpCft--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTI5MTc0MTMyLjEwODkyNS0xLWJyaWplc2guc2luZ2hAYW1kLmNvbQpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY2IDAwLzIzXSB4ODY6IFNlY3VyZSBFbmNyeXB0
+ZWQgVmlydHVhbGl6YXRpb24gKEFNRCkKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
+d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
+Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
+Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
+ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
+IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBb
+dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1MTcyMzU2NTctMjI1NDctMS1naXQtc2Vu
+ZC1lbWFpbC1naGFtbWVyQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTE3MjM1NjU3LTIyNTQ3LTEt
+Z2l0LXNlbmQtZW1haWwtZ2hhbW1lckByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAg
+ICAgIHBhdGNoZXcvMjAxODAxMjMwMzUzNDkuMjQ1MzgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
+cm8ub3JnIC0+IHBhdGNoZXcvMjAxODAxMjMwMzUzNDkuMjQ1MzgtMS1yaWNoYXJkLmhlbmRlcnNv
+bkBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAxMjkx
+NzQxMzIuMTA4OTI1LTEtYnJpamVzaC5zaW5naEBhbWQuY29tIC0+IHBhdGNoZXcvMjAxODAxMjkx
+NzQxMzIuMTA4OTI1LTEtYnJpamVzaC5zaW5naEBhbWQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKNmVmY2FlMjg4OCBzZXY6IGFkZCBtaWdyYXRpb24gYmxvY2tlcgoxNmE5ZTAw
+OTQ2IHRhcmdldC9pMzg2OiBjbGVhciBDLWJpdCB3aGVuIHdhbGtpbmcgU0VWIGd1ZXN0IHBhZ2Ug
+dGFibGUKM2I1ZTRhNWE1NCBzZXY6IGFkZCBkZWJ1ZyBlbmNyeXB0IGFuZCBkZWNyeXB0IGNvbW1h
+bmRzCjkwMzRkMDcyYjMgaHc6IGkzODY6IHNldCByYW1fZGVidWdfb3BzIHdoZW4gbWVtb3J5IGVu
+Y3J5cHRpb24gaXMgZW5hYmxlZAo5YjQ4MzcwODQyIHNldjogRmluYWxpemUgdGhlIFNFViBndWVz
+dCBsYXVuY2ggZmxvdwo1ZTEyNjgxOGE1IHNldjogZW1pdCB0aGUgU0VWX01FQVNVUkVNRU5UIGV2
+ZW50CjFjOWE1NjI5MTYgcWFwaTogYWRkIFNFVl9NRUFTVVJFTUVOVCBldmVudApiMzIyZmNhNTU0
+IHRhcmdldC9pMzg2OiBlbmNyeXB0IGJpb3Mgcm9tCjEwZGEzZWQ4MzAgc2V2OiBhZGQgY29tbWFu
+ZCB0byBlbmNyeXB0IGd1ZXN0IG1lbW9yeSByZWdpb24KY2M5NzlmN2ZmYiBzZXY6IGFkZCBjb21t
+YW5kIHRvIGNyZWF0ZSBsYXVuY2ggbWVtb3J5IGVuY3J5cHRpb24gY29udGV4dAo5Mzg4ZTlmYmY3
+IGhtcDogZGlzcGxheSBtZW1vcnkgZW5jcnlwdGlvbiBzdXBwb3J0IGluICdpbmZvIGt2bScKODg3
+NWE5ZWZmMyBrdm06IGludHJvZHVjZSBtZW1vcnkgZW5jcnlwdGlvbiBBUElzCmM1MzBjZjNhMGYg
+c2V2OiByZWdpc3RlciB0aGUgZ3Vlc3QgbWVtb3J5IHJhbmdlIHdoaWNoIG1heSBjb250YWluIGVu
+Y3J5cHRlZCBkYXRhCmY0ODZlZGE5NzIgc2V2OiBhZGQgY29tbWFuZCB0byBpbml0aWFsaXplIHRo
+ZSBtZW1vcnkgZW5jcnlwdGlvbiBjb250ZXh0CmNkNjQ5MDg2MjcgYWNjZWw6IGFkZCBTZWN1cmUg
+RW5jcnlwdGVkIFZpcnR1bGl6YXRpb24gKFNFVikgb2JqZWN0CjA4NzI5Y2E3ZTQgZG9jczogYWRk
+IEFNRCBTZWN1cmUgRW5jcnlwdGVkIFZpcnR1YWxpemF0aW9uIChTRVYpCmUxMzA0NGE0NjUga3Zt
+OiB1cGRhdGUga3ZtLmggdG8gaW5jbHVkZSBtZW1vcnkgZW5jcnlwdGlvbiBpb2N0bHMKMTEzZTE2
+YjY2ZSBtYWNoaW5lOiBhZGQgLW1lbW9yeS1lbmNyeXB0aW9uIHByb3BlcnR5CmY4MzlhN2Y1ZDEg
+dGFyZ2V0L2kzODY6IGFkZCBtZW1vcnkgZW5jcnlwdGlvbiBmZWF0dXJlIGNwdWlkIHN1cHBvcnQK
+NGUxNTllNzgxZiBtb25pdG9yL2kzODY6IHVzZSBkZWJ1ZyBBUElzIHdoZW4gYWNjZXNzaW5nIGd1
+ZXN0IG1lbW9yeQpmYmViNzA2ZTIzIGV4ZWM6IGFkZCBkZWJ1ZyB2ZXJzaW9uIG9mIHBoeXNpY2Fs
+IG1lbW9yeSByZWFkIGFuZCB3cml0ZSBBUEkKMTFiYzEzNzJkNyBleGVjOiBhZGQgcmFtX2RlYnVn
+X29wcyBzdXBwb3J0CjFiMDJkZjYyOWUgbWVtYXR0cnM6IGFkZCBkZWJ1ZyBhdHRyaWJ1dGUKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjM6IG1lbWF0dHJzOiBhZGQgZGVi
+dWcgYXR0cmlidXRlLi4uCkNoZWNraW5nIFBBVENIIDIvMjM6IGV4ZWM6IGFkZCByYW1fZGVidWdf
+b3BzIHN1cHBvcnQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwODogRklM
+RTogaW5jbHVkZS9leGVjL21lbW9yeS5oOjY0MDoKKyAqIG1lbW9yeV9yZWdpb25fc2V0X3JhbV9k
+ZWJ1Z19vcHM6IFNldCBkZWJ1ZyBhY2Nlc3Mgb3BzIGZvciBhIGdpdmVuIG1lbW9yeSByZWdpb24K
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTczIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy8yMzogZXhlYzog
+YWRkIGRlYnVnIHZlcnNpb24gb2YgcGh5c2ljYWwgbWVtb3J5IHJlYWQgYW5kIHdyaXRlIEFQSS4u
+LgpDaGVja2luZyBQQVRDSCA0LzIzOiBtb25pdG9yL2kzODY6IHVzZSBkZWJ1ZyBBUElzIHdoZW4g
+YWNjZXNzaW5nIGd1ZXN0IG1lbW9yeS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMzU2OiBGSUxFOiB0YXJnZXQvaTM4Ni9tb25pdG9yLmM6NTEyOgorICAgICAgICAgICAgICAg
+ICAgICAgICAgY3B1X3BoeXNpY2FsX21lbW9yeV9yZWFkX2RlYnVnKHB0X2FkZHIgKyBsNCAqIDgs
+ICZwdGUsIDgpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyOTEgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA1
+LzIzOiB0YXJnZXQvaTM4NjogYWRkIG1lbW9yeSBlbmNyeXB0aW9uIGZlYXR1cmUgY3B1aWQgc3Vw
+cG9ydC4uLgpDaGVja2luZyBQQVRDSCA2LzIzOiBtYWNoaW5lOiBhZGQgLW1lbW9yeS1lbmNyeXB0
+aW9uIHByb3BlcnR5Li4uCkNoZWNraW5nIFBBVENIIDcvMjM6IGt2bTogdXBkYXRlIGt2bS5oIHRv
+IGluY2x1ZGUgbWVtb3J5IGVuY3J5cHRpb24gaW9jdGxzLi4uCkNoZWNraW5nIFBBVENIIDgvMjM6
+IGRvY3M6IGFkZCBBTUQgU2VjdXJlIEVuY3J5cHRlZCBWaXJ0dWFsaXphdGlvbiAoU0VWKS4uLgpD
+aGVja2luZyBQQVRDSCA5LzIzOiBhY2NlbDogYWRkIFNlY3VyZSBFbmNyeXB0ZWQgVmlydHVsaXph
+dGlvbiAoU0VWKSBvYmplY3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjM6IHNldjogYWRkIGNvbW1h
+bmQgdG8gaW5pdGlhbGl6ZSB0aGUgbWVtb3J5IGVuY3J5cHRpb24gY29udGV4dC4uLgpDaGVja2lu
+ZyBQQVRDSCAxMS8yMzogc2V2OiByZWdpc3RlciB0aGUgZ3Vlc3QgbWVtb3J5IHJhbmdlIHdoaWNo
+IG1heSBjb250YWluIGVuY3J5cHRlZCBkYXRhLi4uCkNoZWNraW5nIFBBVENIIDEyLzIzOiBrdm06
+IGludHJvZHVjZSBtZW1vcnkgZW5jcnlwdGlvbiBBUElzLi4uCkNoZWNraW5nIFBBVENIIDEzLzIz
+OiBobXA6IGRpc3BsYXkgbWVtb3J5IGVuY3J5cHRpb24gc3VwcG9ydCBpbiAnaW5mbyBrdm0nLi4u
+CkNoZWNraW5nIFBBVENIIDE0LzIzOiBzZXY6IGFkZCBjb21tYW5kIHRvIGNyZWF0ZSBsYXVuY2gg
+bWVtb3J5IGVuY3J5cHRpb24gY29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAxNS8yMzogc2V2OiBh
+ZGQgY29tbWFuZCB0byBlbmNyeXB0IGd1ZXN0IG1lbW9yeSByZWdpb24uLi4KRVJST1I6IHNwYWNl
+IHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICco
+JwojODY6IEZJTEU6IGFjY2VsL2t2bS9zZXYuYzo0NzQ6CisgICAgYXNzZXJ0IChoYW5kbGUpOwoK
+dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxNi8yMzogdGFyZ2V0
+L2kzODY6IGVuY3J5cHQgYmlvcyByb20uLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjM6IHFhcGk6IGFk
+ZCBTRVZfTUVBU1VSRU1FTlQgZXZlbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjM6IHNldjogZW1p
+dCB0aGUgU0VWX01FQVNVUkVNRU5UIGV2ZW50Li4uCkNoZWNraW5nIFBBVENIIDE5LzIzOiBzZXY6
+IEZpbmFsaXplIHRoZSBTRVYgZ3Vlc3QgbGF1bmNoIGZsb3cuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAv
+MjM6IGh3OiBpMzg2OiBzZXQgcmFtX2RlYnVnX29wcyB3aGVuIG1lbW9yeSBlbmNyeXB0aW9uIGlz
+IGVuYWJsZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjM6IHNldjogYWRkIGRlYnVnIGVuY3J5cHQg
+YW5kIGRlY3J5cHQgY29tbWFuZHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjM6IHRhcmdldC9pMzg2
+OiBjbGVhciBDLWJpdCB3aGVuIHdhbGtpbmcgU0VWIGd1ZXN0IHBhZ2UgdGFibGUuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjMvMjM6IHNldjogYWRkIG1pZ3JhdGlvbiBibG9ja2VyLi4uCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
