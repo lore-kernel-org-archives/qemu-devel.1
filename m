@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eg6XV-0003yz-4x
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:19:50 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eg6b3-0006Ns-MX
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:23:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eg6XP-0006JL-FE
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:19:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39850)
+	(envelope-from <kraxel@redhat.com>) id 1eg6b2-0001X1-2w
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:23:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eg6XP-0006HS-9P
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:19:43 -0500
-Date: Mon, 29 Jan 2018 10:19:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180129101935.GB2408@work-vm>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-	<20180126194559.GI2610@work-vm>
-	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
-	<20180129095330.GA2408@work-vm>
-	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eg6b1-0001WK-R9
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 05:23:28 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 32955C047B8E
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 10:23:27 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 29 Jan 2018 11:23:18 +0100
+Message-Id: <20180129102320.21534-6-kraxel@redhat.com>
+In-Reply-To: <20180129102320.21534-1-kraxel@redhat.com>
+References: <20180129102320.21534-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 5/7] hw: convert the escc device to keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +29,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+To: qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> >> > * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >> >> I think the correct fix here is that your test code should turn
-> >> >> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
-> >> >> for Arm KVM guests (for the same reason that VGA device video memory
-> >> >> doesn't work). If it's RAM your guest has to arrange to map it as
-> >> >> Normal Cacheable, and then everything should work fine.
-> >> >
-> >> > Does this cause problems with migrating at just the wrong point during
-> >> > a VM boot?
-> >>
-> >> It wouldn't surprise me if it did, but I don't think I've ever
-> >> tried to provoke that problem...
-> >
-> > If you think it'll get the RAM contents wrong, it might be best to fail
-> > the migration if you can detect the cache is disabled in the guest.
-> 
-> I guess QEMU could look at the value of the "MMU disabled/enabled" bit
-> in the guest's system registers, and refuse migration if it's off...
-> 
-> (cc'd Marc, Christoffer to check that I don't have the wrong end
-> of the stick about how thin the ice is in the period before the
-> guest turns on its MMU...)
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-OK; I mean it's not nice either way - but a failed migration is better
-than one with corrupt RAM.
+Replace the qcode_to_keycode table with automatically
+generated tables.
 
-It's not pretty for cloud users; they do host-evacuations and the like
-fully automatically without any knowledge of the state of a VM and hope
-for migrations to work in any state.
+Missing entries in qcode_to_keycode now fixed:
 
-Dave
+ - Q_KEY_CODE_KP_COMMA -> 0x2d
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20180117164118.8510-3-berrange@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ Makefile           |   1 +
+ include/ui/input.h |   3 ++
+ hw/char/escc.c     | 126 +++--------------------------------------------------
+ ui/input-keymap.c  |   1 +
+ 4 files changed, 10 insertions(+), 121 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index cd65eb4a80..f9278f14c9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -238,6 +238,7 @@ KEYCODEMAP_FILES = \
+ 		 ui/input-keymap-qcode-to-atset2.c \
+ 		 ui/input-keymap-qcode-to-atset3.c \
+ 		 ui/input-keymap-qcode-to-qnum.c \
++		 ui/input-keymap-qcode-to-sun.c \
+ 		 ui/input-keymap-qnum-to-qcode.c \
+ 		 ui/input-keymap-qcode-to-linux.c \
+ 		 ui/input-keymap-usb-to-qcode.c \
+diff --git a/include/ui/input.h b/include/ui/input.h
+index cffeb1c1a0..7d6c92224e 100644
+--- a/include/ui/input.h
++++ b/include/ui/input.h
+@@ -86,6 +86,9 @@ extern const guint16 qemu_input_map_qcode_to_atset3[];
+ extern const guint qemu_input_map_qcode_to_qnum_len;
+ extern const guint16 qemu_input_map_qcode_to_qnum[];
+ 
++extern const guint qemu_input_map_qcode_to_sun_len;
++extern const guint16 qemu_input_map_qcode_to_sun[];
++
+ extern const guint qemu_input_map_qnum_to_qcode_len;
+ extern const guint16 qemu_input_map_qnum_to_qcode[];
+ 
+diff --git a/hw/char/escc.c b/hw/char/escc.c
+index 3ab831a6a7..449bf2fc63 100644
+--- a/hw/char/escc.c
++++ b/hw/char/escc.c
+@@ -717,126 +717,6 @@ MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
+     return &d->mmio;
+ }
+ 
+-static const uint8_t qcode_to_keycode[Q_KEY_CODE__MAX] = {
+-    [Q_KEY_CODE_SHIFT]         = 99,
+-    [Q_KEY_CODE_SHIFT_R]       = 110,
+-    [Q_KEY_CODE_ALT]           = 19,
+-    [Q_KEY_CODE_ALT_R]         = 13,
+-    [Q_KEY_CODE_CTRL]          = 76,
+-    [Q_KEY_CODE_CTRL_R]        = 76,
+-    [Q_KEY_CODE_ESC]           = 29,
+-    [Q_KEY_CODE_1]             = 30,
+-    [Q_KEY_CODE_2]             = 31,
+-    [Q_KEY_CODE_3]             = 32,
+-    [Q_KEY_CODE_4]             = 33,
+-    [Q_KEY_CODE_5]             = 34,
+-    [Q_KEY_CODE_6]             = 35,
+-    [Q_KEY_CODE_7]             = 36,
+-    [Q_KEY_CODE_8]             = 37,
+-    [Q_KEY_CODE_9]             = 38,
+-    [Q_KEY_CODE_0]             = 39,
+-    [Q_KEY_CODE_MINUS]         = 40,
+-    [Q_KEY_CODE_EQUAL]         = 41,
+-    [Q_KEY_CODE_BACKSPACE]     = 43,
+-    [Q_KEY_CODE_TAB]           = 53,
+-    [Q_KEY_CODE_Q]             = 54,
+-    [Q_KEY_CODE_W]             = 55,
+-    [Q_KEY_CODE_E]             = 56,
+-    [Q_KEY_CODE_R]             = 57,
+-    [Q_KEY_CODE_T]             = 58,
+-    [Q_KEY_CODE_Y]             = 59,
+-    [Q_KEY_CODE_U]             = 60,
+-    [Q_KEY_CODE_I]             = 61,
+-    [Q_KEY_CODE_O]             = 62,
+-    [Q_KEY_CODE_P]             = 63,
+-    [Q_KEY_CODE_BRACKET_LEFT]  = 64,
+-    [Q_KEY_CODE_BRACKET_RIGHT] = 65,
+-    [Q_KEY_CODE_RET]           = 89,
+-    [Q_KEY_CODE_A]             = 77,
+-    [Q_KEY_CODE_S]             = 78,
+-    [Q_KEY_CODE_D]             = 79,
+-    [Q_KEY_CODE_F]             = 80,
+-    [Q_KEY_CODE_G]             = 81,
+-    [Q_KEY_CODE_H]             = 82,
+-    [Q_KEY_CODE_J]             = 83,
+-    [Q_KEY_CODE_K]             = 84,
+-    [Q_KEY_CODE_L]             = 85,
+-    [Q_KEY_CODE_SEMICOLON]     = 86,
+-    [Q_KEY_CODE_APOSTROPHE]    = 87,
+-    [Q_KEY_CODE_GRAVE_ACCENT]  = 42,
+-    [Q_KEY_CODE_BACKSLASH]     = 88,
+-    [Q_KEY_CODE_Z]             = 100,
+-    [Q_KEY_CODE_X]             = 101,
+-    [Q_KEY_CODE_C]             = 102,
+-    [Q_KEY_CODE_V]             = 103,
+-    [Q_KEY_CODE_B]             = 104,
+-    [Q_KEY_CODE_N]             = 105,
+-    [Q_KEY_CODE_M]             = 106,
+-    [Q_KEY_CODE_COMMA]         = 107,
+-    [Q_KEY_CODE_DOT]           = 108,
+-    [Q_KEY_CODE_SLASH]         = 109,
+-    [Q_KEY_CODE_ASTERISK]      = 47,
+-    [Q_KEY_CODE_SPC]           = 121,
+-    [Q_KEY_CODE_CAPS_LOCK]     = 119,
+-    [Q_KEY_CODE_F1]            = 5,
+-    [Q_KEY_CODE_F2]            = 6,
+-    [Q_KEY_CODE_F3]            = 8,
+-    [Q_KEY_CODE_F4]            = 10,
+-    [Q_KEY_CODE_F5]            = 12,
+-    [Q_KEY_CODE_F6]            = 14,
+-    [Q_KEY_CODE_F7]            = 16,
+-    [Q_KEY_CODE_F8]            = 17,
+-    [Q_KEY_CODE_F9]            = 18,
+-    [Q_KEY_CODE_F10]           = 7,
+-    [Q_KEY_CODE_NUM_LOCK]      = 98,
+-    [Q_KEY_CODE_SCROLL_LOCK]   = 23,
+-    [Q_KEY_CODE_KP_DIVIDE]     = 46,
+-    [Q_KEY_CODE_KP_MULTIPLY]   = 47,
+-    [Q_KEY_CODE_KP_SUBTRACT]   = 71,
+-    [Q_KEY_CODE_KP_ADD]        = 125,
+-    [Q_KEY_CODE_KP_ENTER]      = 90,
+-    [Q_KEY_CODE_KP_DECIMAL]    = 50,
+-    [Q_KEY_CODE_KP_0]          = 94,
+-    [Q_KEY_CODE_KP_1]          = 112,
+-    [Q_KEY_CODE_KP_2]          = 113,
+-    [Q_KEY_CODE_KP_3]          = 114,
+-    [Q_KEY_CODE_KP_4]          = 91,
+-    [Q_KEY_CODE_KP_5]          = 92,
+-    [Q_KEY_CODE_KP_6]          = 93,
+-    [Q_KEY_CODE_KP_7]          = 68,
+-    [Q_KEY_CODE_KP_8]          = 69,
+-    [Q_KEY_CODE_KP_9]          = 70,
+-    [Q_KEY_CODE_LESS]          = 124,
+-    [Q_KEY_CODE_F11]           = 9,
+-    [Q_KEY_CODE_F12]           = 11,
+-    [Q_KEY_CODE_HOME]          = 52,
+-    [Q_KEY_CODE_PGUP]          = 96,
+-    [Q_KEY_CODE_PGDN]          = 123,
+-    [Q_KEY_CODE_END]           = 74,
+-    [Q_KEY_CODE_LEFT]          = 24,
+-    [Q_KEY_CODE_UP]            = 20,
+-    [Q_KEY_CODE_DOWN]          = 27,
+-    [Q_KEY_CODE_RIGHT]         = 28,
+-    [Q_KEY_CODE_INSERT]        = 44,
+-    [Q_KEY_CODE_DELETE]        = 66,
+-    [Q_KEY_CODE_STOP]          = 1,
+-    [Q_KEY_CODE_AGAIN]         = 3,
+-    [Q_KEY_CODE_PROPS]         = 25,
+-    [Q_KEY_CODE_UNDO]          = 26,
+-    [Q_KEY_CODE_FRONT]         = 49,
+-    [Q_KEY_CODE_COPY]          = 51,
+-    [Q_KEY_CODE_OPEN]          = 72,
+-    [Q_KEY_CODE_PASTE]         = 73,
+-    [Q_KEY_CODE_FIND]          = 95,
+-    [Q_KEY_CODE_CUT]           = 97,
+-    [Q_KEY_CODE_LF]            = 111,
+-    [Q_KEY_CODE_HELP]          = 118,
+-    [Q_KEY_CODE_META_L]        = 120,
+-    [Q_KEY_CODE_META_R]        = 122,
+-    [Q_KEY_CODE_COMPOSE]       = 67,
+-    [Q_KEY_CODE_PRINT]         = 22,
+-    [Q_KEY_CODE_SYSRQ]         = 21,
+-};
+ 
+ static void sunkbd_handle_event(DeviceState *dev, QemuConsole *src,
+                                 InputEvent *evt)
+@@ -879,7 +759,11 @@ static void sunkbd_handle_event(DeviceState *dev, QemuConsole *src,
+         }
+     }
+ 
+-    keycode = qcode_to_keycode[qcode];
++    if (qcode > qemu_input_map_qcode_to_sun_len) {
++        return;
++    }
++
++    keycode = qemu_input_map_qcode_to_sun[qcode];
+     if (!key->down) {
+         keycode |= 0x80;
+     }
+diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+index 07be8f4415..7a9475abd9 100644
+--- a/ui/input-keymap.c
++++ b/ui/input-keymap.c
+@@ -11,6 +11,7 @@
+ #include "ui/input-keymap-qcode-to-atset2.c"
+ #include "ui/input-keymap-qcode-to-atset3.c"
+ #include "ui/input-keymap-qcode-to-qnum.c"
++#include "ui/input-keymap-qcode-to-sun.c"
+ #include "ui/input-keymap-qnum-to-qcode.c"
+ #include "ui/input-keymap-qcode-to-linux.c"
+ #include "ui/input-keymap-usb-to-qcode.c"
+-- 
+2.9.3
