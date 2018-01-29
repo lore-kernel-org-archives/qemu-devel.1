@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egBjX-0007i4-EQ
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:52:36 -0500
+	(envelope-from <lvivier@redhat.com>) id 1egBkD-0008Fo-3G
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:53:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egBjR-0004YT-JB
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:52:35 -0500
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:33074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1egBjR-0004Y6-EG
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:52:29 -0500
-Received: by mail-oi0-x22c.google.com with SMTP id l8so5403315oig.0
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 07:52:29 -0800 (PST)
+	(envelope-from <lvivier@redhat.com>) id 1egBk9-0004z8-2m
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:53:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1egBk8-0004yT-RQ
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:53:13 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFD3B793EC
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 15:53:11 +0000 (UTC)
+References: <20180129121754.13033-1-quintela@redhat.com>
+	<20180129121754.13033-4-quintela@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <3ff7c4ce-f807-6f88-d546-fe83d9a294b3@redhat.com>
+Date: Mon, 29 Jan 2018 16:53:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <1517213825-24085-1-git-send-email-jasowang@redhat.com>
-References: <1517213825-24085-1-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jan 2018 15:52:08 +0000
-Message-ID: <CAFEAcA84DZrp19=rxp5cnU1XkWXB3gL5CFKrdGM4iZq7NmqaAw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/6] Net patches
+In-Reply-To: <20180129121754.13033-4-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/5] tests: Migration ppc now inlines
+ its program
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +35,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com
 
-On 29 January 2018 at 08:16, Jason Wang <jasowang@redhat.com> wrote:
-> The following changes since commit e607bbee553cfe73072870cef458cfa4e78133=
-e2:
->
->   Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-2018=
--01-26.for-upstream' into staging (2018-01-26 14:24:25 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to bf4835a4d5338bb7424827715df22570a8adc67c:
->
->   MAINTAINERS: update Dmitry Fleytman email (2018-01-29 16:05:38 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
-> Mao Zhongyi (2):
->       colo: modified the payload compare function
->       colo: compare the packet based on the tcp sequence number
->
-> Philippe Mathieu-Daud=C3=A9 (1):
->       MAINTAINERS: update Dmitry Fleytman email
->
-> Thomas Huth (3):
->       net: Allow hubports to connect to other netdevs
->       net: Allow netdevs to be used with 'hostfwd_add' and 'hostfwd_remov=
-e'
->       qemu-doc: Get rid of "vlan=3DX" example in the documentation
->
+On 29/01/2018 13:17, Juan Quintela wrote:
+> No need to write it to a file.  Just need a proper firmware O:-)
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> CC: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  tests/migration-test.c | 41 +++++------------------------------------
+>  1 file changed, 5 insertions(+), 36 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index fcad2ed460..26439f6071 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -18,9 +18,6 @@
+>  #include "qemu/sockets.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/sysemu.h"
+> -#include "hw/nvram/chrp_nvram.h"
+> -
+> -#define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
+>  
+>  const unsigned start_address = 1024 * 1024;
+>  const unsigned end_address = 100 * 1024 * 1024;
+> @@ -133,36 +130,6 @@ static void init_bootfile_x86(const char *bootpath)
+>      fclose(bootfile);
+>  }
+>  
+> -static void init_bootfile_ppc(const char *bootpath)
+> -{
+> -    FILE *bootfile;
+> -    char buf[MIN_NVRAM_SIZE];
+> -    ChrpNvramPartHdr *header = (ChrpNvramPartHdr *)buf;
+> -
+> -    memset(buf, 0, MIN_NVRAM_SIZE);
+> -
+> -    /* Create a "common" partition in nvram to store boot-command property */
+> -
+> -    header->signature = CHRP_NVPART_SYSTEM;
+> -    memcpy(header->name, "common", 6);
+> -    chrp_nvram_finish_partition(header, MIN_NVRAM_SIZE);
+> -
+> -    /* FW_MAX_SIZE is 4MB, but slof.bin is only 900KB,
+> -     * so let's modify memory between 1MB and 100MB
+> -     * to do like PC bootsector
+> -     */
 
-Applied, thanks.
+You should copy this comment where we have inlined the code (below).
 
--- PMM
+> -
+> -    sprintf(buf + 16,
+> -            "boot-command=hex .\" _\" begin %x %x do i c@ 1 + i c! 1000 +loop "
+> -            ".\" B\" 0 until", end_address, start_address);
+> -
+> -    /* Write partition to the NVRAM file */
+> -
+> -    bootfile = fopen(bootpath, "wb");
+> -    g_assert_cmpint(fwrite(buf, MIN_NVRAM_SIZE, 1, bootfile), ==, 1);
+> -    fclose(bootfile);
+> -}
+> -
+>  /*
+>   * Wait for some output in the serial output file,
+>   * we get an 'A' followed by an endless string of 'B's
+> @@ -453,12 +420,14 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>          if (access("/sys/module/kvm_hv", F_OK)) {
+>              accel = "tcg";
+>          }
+> -        init_bootfile_ppc(bootpath);
+
+I think you could move bootpath allocation/free inside the
+'if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {' as it
+is not used anymore by ppc.
+
+>          cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
+>                                    " -name source,debug-threads=on"
+>                                    " -serial file:%s/src_serial"
+> -                                  " -drive file=%s,if=pflash,format=raw",
+> -                                  accel, tmpfs, bootpath);
+> +                                  " -prom-env '"
+> +                                  "boot-command=hex .\" _\" begin %x %x "
+> +                                  "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
+> +                                  "until'",  accel, tmpfs, end_address,
+> +                                  start_address);
+>          cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
+>                                    " -name target,debug-threads=on"
+>                                    " -serial file:%s/dest_serial"
+> 
+
+Thanks,
+Laurent
