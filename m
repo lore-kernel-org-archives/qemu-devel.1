@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1egCRQ-00021P-Iz
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:38:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1egCSu-0003CM-Fm
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:39:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1egCRK-000500-Pb
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:37:56 -0500
-Date: Mon, 29 Jan 2018 17:37:25 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180129163725.lhovxm6mjjtzceao@eukaryote>
-References: <20171226025247.11082-1-famz@redhat.com>
-	<20171226025247.11082-3-famz@redhat.com>
-	<7c728aa5-4623-79c6-3e6a-04e2b19aefba@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1egCSt-0005za-Mh
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:39:28 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34144)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1egCSt-0005z6-Ff
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 11:39:27 -0500
+Received: by mail-ot0-x243.google.com with SMTP id x15so7120356ote.1
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 08:39:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c728aa5-4623-79c6-3e6a-04e2b19aefba@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] qemu-img: Document --force-share /
- -U
+In-Reply-To: <20171217055023.29225-1-pbonzini@redhat.com>
+References: <20171217055023.29225-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jan 2018 16:39:06 +0000
+Message-ID: <CAFEAcA8t0kAx9mDNuEEU_-4J9x1XM=ZHP4m19fz0vL+DHzPXxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg: add cs_base and flags to -d exec
+ output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On Mon, Jan 29, 2018 at 05:01:41PM +0100, Max Reitz wrote:
-> On 2017-12-26 03:52, Fam Zheng wrote:
+On 17 December 2017 at 05:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  accel/tcg/cpu-exec.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 4318441e4c..18c1a2aedb 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -146,8 +146,10 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
+>      uint8_t *tb_ptr = itb->tc.ptr;
+>
+>      qemu_log_mask_and_addr(CPU_LOG_EXEC, itb->pc,
+> -                           "Trace %p [%d: " TARGET_FMT_lx "] %s\n",
+> -                           itb->tc.ptr, cpu->cpu_index, itb->pc,
+> +                           "Trace %d: %p ["
+> +                           TARGET_FMT_lx "/" TARGET_FMT_lx "/%d] %s\n",
+> +                           cpu->cpu_index, itb->tc.ptr,
+> +                           itb->cs_base, itb->pc, itb->flags,
+>                             lookup_symbol(itb->pc));
 
-[...]
+At the risk of having to update my log-parsing scripts again, I
+notice that the output now looks a bit odd:
 
-> So the previous patch makes the use of blank lines consistent and this
-> one breaks it again? :-)
-> 
-> > +If specified, @code{qemu-img} will open the image with shared permissions,
-> > +which makes it less likely to conflict with a running guest's permissions due
-> > +to image locking. For example, this can be used to get the image information
-> > +(with 'info' subcommand) when the image is used by a running guest. Note that
-> > +this could produce inconsistent results because of concurrent metadata changes,
-> > +etc. This option is only allowed when opening images in read-only mode.
-> 
-> I personally don't quite like the "makes it less likely to conflict",
-> because that makes it sound like qemu would be stupid and need a nudge
-> in the right direction -- when it's actually the user who does something
-> a bit risky (and qemu is right in forbidding it by default).  But since
-> it's only a read-only thing, I won't actually object to it.
-> 
-> (Maybe it should document more exactly what's happening, i.e. that this
-> option will allow concurrent writers (as a standard user, I wouldn't
-> know what "shared permissions" is supposed to mean).)
+Trace 0: 0x7f70942390c0 [00000000/6aa01000/0x51080001] someFunction
 
-Eerie -- Although I reviewed it, I was just mulling over this wording
-yesterday (while I was tweaking the wording of '--force-share' on a
-slide for a public conference).  
+in that the first two items in the [] have no preceding 0x but the
+last one does.
 
-Indeed, "concurrent writers" is much clearer.
-
-
-[...]
-
-
--- 
-/kashyap
+thanks
+-- PMM
