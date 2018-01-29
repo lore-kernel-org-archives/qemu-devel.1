@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egFdD-0004dk-Tg
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:02:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1egFmS-0007Vd-Jo
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:11:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egFd9-0008B5-2B
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:02:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39922)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1egFd8-0008An-SV
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:02:14 -0500
-Date: Mon, 29 Jan 2018 21:02:10 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180129200210.GT6141@localhost.localdomain>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-	<20171012235439.19457-2-anatol.pomozov@gmail.com>
-	<20180115144944.GG32271@localhost.localdomain>
-	<CAOMFOmU4pLtJMQ_SLqffpritydx4ghs9gUJBfyVT+zN_fudCRA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1egFmR-0006Nx-73
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:11:52 -0500
+References: <20180105225753.30509-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <240b435c-0b76-bb8e-ccdc-4a213ce4299d@redhat.com>
+Date: Mon, 29 Jan 2018 14:11:38 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMFOmU4pLtJMQ_SLqffpritydx4ghs9gUJBfyVT+zN_fudCRA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] multiboot: Change multiboot_info from
- array of bytes to a C struct
+In-Reply-To: <20180105225753.30509-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HrlhGaKzLidh41zSZZaSLGoz2P0ATRUgL"
+Subject: Re: [Qemu-devel] [PATCH v7 00/20] add byte-based block_status
+ driver callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +24,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-block@nongnu.org
 
-Am 29.01.2018 um 19:21 hat Anatol Pomozov geschrieben:
-> Hi
-> 
-> On Mon, Jan 15, 2018 at 6:49 AM, Kevin Wolf <kwolf@redhat.com> wrote:
-> > Am 13.10.2017 um 01:54 hat Anatol Pomozov geschrieben:
-> >> Using C structs makes the code more readable and prevents type conversion
-> >> errors.
-> >>
-> >> Borrow multiboot1 header from GRUB project.
-> >>
-> >> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
-> >> ---
-> >>  hw/i386/multiboot.c         | 124 +++++++++------------
-> >>  hw/i386/multiboot_header.h  | 254 ++++++++++++++++++++++++++++++++++++++++++++
-> >>  tests/multiboot/mmap.c      |  14 +--
-> >>  tests/multiboot/mmap.out    |  10 ++
-> >>  tests/multiboot/modules.c   |  12 ++-
-> >>  tests/multiboot/modules.out |  10 ++
-> >>  tests/multiboot/multiboot.h |  66 ------------
-> >>  7 files changed, 339 insertions(+), 151 deletions(-)
-> >>  create mode 100644 hw/i386/multiboot_header.h
-> >>  delete mode 100644 tests/multiboot/multiboot.h
-> >
-> > This is a good change in general. However, I'm not sure if we should
-> > really replace the header used in the tests. After all, the tests also
-> > test whether things are at the right place, and if there is an error in
-> > the header file, we can only catch it if the tests keep using their own
-> > definitions.
-> 
-> The added multibooh.h is from GRUB - the developers of multiboot. I
-> think we can trust it. Having a single header will make future tests
-> maintainence easier.
-> 
-> But if you feel strongly that qemu tests should use it's own version
-> of multiboot header then I can add it back.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HrlhGaKzLidh41zSZZaSLGoz2P0ATRUgL
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com,
+ famz@redhat.com, qemu-block@nongnu.org
+Message-ID: <240b435c-0b76-bb8e-ccdc-4a213ce4299d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 00/20] add byte-based block_status driver
+ callbacks
+References: <20180105225753.30509-1-eblake@redhat.com>
+In-Reply-To: <20180105225753.30509-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-No, I don't feel strongly, just wanted to mention that there is an
-advantage of having a separate header in case you had not thought of it.
-The decision is up to you.
+ping
 
-Kevin
+On 01/05/2018 04:57 PM, Eric Blake wrote:
+> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+> but NBD wants to report status on byte granularity (even if the
+> reporting will probably be naturally aligned to sectors or even
+> much higher levels).  I've therefore started the task of
+> converting our block status code to report at a byte granularity
+> rather than sectors.
+>=20
+> These patches have been around for a while, but it's time to
+> finish it now that 2.12 is open for patches.
+>=20
+> Based-on: <20171222151846.28110-1-kwolf@redhat.com>
+> (Kevin's [PULL v3 00/35] Block layer patches)
+>=20
+> The overall conversion currently looks like:
+> part 1: bdrv_is_allocated (merged, commit 51b0a488, 2.10)
+> part 2: dirty-bitmap (merged, commit ca759622, 2.11)
+> part 3: bdrv_get_block_status (merged, commit f0a9c18f, 2.11)
+> part 4: .bdrv_co_block_status (this series, v5 was here [1])
+>=20
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg01246.html=
+
+>=20
+> Available as a tag at:
+> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-callback-v7
+>=20
+> Since v6:
+> - add R-bs
+> - improve some commit messages, comments, and variable types [Fam]
+> - fix conversion bugs [Vladimir]
+> - rebase to master (well, Kevin's pull request) [Jeff]
+>=20
+> 001/20:[----] [--] 'block: Add .bdrv_co_block_status() callback'
+> 002/20:[----] [--] 'block: Switch passthrough drivers to .bdrv_co_block=
+_status()'
+> 003/20:[----] [--] 'file-posix: Switch to .bdrv_co_block_status()'
+> 004/20:[----] [--] 'gluster: Switch to .bdrv_co_block_status()'
+> 005/20:[----] [--] 'iscsi: Switch cluster_sectors to byte-based'
+> 006/20:[0004] [FC] 'iscsi: Switch iscsi_allocmap_update() to byte-based=
+'
+> 007/20:[0006] [FC] 'iscsi: Switch to .bdrv_co_block_status()'
+> 008/20:[----] [--] 'null: Switch to .bdrv_co_block_status()'
+> 009/20:[0002] [FC] 'parallels: Switch to .bdrv_co_block_status()'
+> 010/20:[----] [--] 'qcow: Switch to .bdrv_co_block_status()'
+> 011/20:[----] [--] 'qcow2: Switch to .bdrv_co_block_status()'
+> 012/20:[----] [--] 'qed: Switch to .bdrv_co_block_status()'
+> 013/20:[----] [--] 'raw: Switch to .bdrv_co_block_status()'
+> 014/20:[0012] [FC] 'sheepdog: Switch to .bdrv_co_block_status()'
+> 015/20:[----] [--] 'vdi: Avoid bitrot of debugging code'
+> 016/20:[----] [--] 'vdi: Switch to .bdrv_co_block_status()'
+> 017/20:[----] [--] 'vmdk: Switch to .bdrv_co_block_status()'
+> 018/20:[0002] [FC] 'vpc: Switch to .bdrv_co_block_status()'
+> 019/20:[----] [--] 'vvfat: Switch to .bdrv_co_block_status()'
+> 020/20:[----] [--] 'block: Drop unused .bdrv_co_get_block_status()'
+>=20
+> Eric Blake (20):
+>   block: Add .bdrv_co_block_status() callback
+>   block: Switch passthrough drivers to .bdrv_co_block_status()
+>   file-posix: Switch to .bdrv_co_block_status()
+>   gluster: Switch to .bdrv_co_block_status()
+>   iscsi: Switch cluster_sectors to byte-based
+>   iscsi: Switch iscsi_allocmap_update() to byte-based
+>   iscsi: Switch to .bdrv_co_block_status()
+>   null: Switch to .bdrv_co_block_status()
+>   parallels: Switch to .bdrv_co_block_status()
+>   qcow: Switch to .bdrv_co_block_status()
+>   qcow2: Switch to .bdrv_co_block_status()
+>   qed: Switch to .bdrv_co_block_status()
+>   raw: Switch to .bdrv_co_block_status()
+>   sheepdog: Switch to .bdrv_co_block_status()
+>   vdi: Avoid bitrot of debugging code
+>   vdi: Switch to .bdrv_co_block_status()
+>   vmdk: Switch to .bdrv_co_block_status()
+>   vpc: Switch to .bdrv_co_block_status()
+>   vvfat: Switch to .bdrv_co_block_status()
+>   block: Drop unused .bdrv_co_get_block_status()
+>=20
+>  include/block/block.h     |  14 ++---
+>  include/block/block_int.h |  51 +++++++++------
+>  block/io.c                |  86 +++++++++++--------------
+>  block/blkdebug.c          |  20 +++---
+>  block/commit.c            |   2 +-
+>  block/file-posix.c        |  62 +++++++++---------
+>  block/gluster.c           |  70 ++++++++++-----------
+>  block/iscsi.c             | 157 ++++++++++++++++++++++++--------------=
+--------
+>  block/mirror.c            |   2 +-
+>  block/null.c              |  23 +++----
+>  block/parallels.c         |  22 ++++---
+>  block/qcow.c              |  27 ++++----
+>  block/qcow2.c             |  24 +++----
+>  block/qed.c               |  84 +++++++++----------------
+>  block/raw-format.c        |  16 ++---
+>  block/sheepdog.c          |  26 ++++----
+>  block/throttle.c          |   2 +-
+>  block/vdi.c               |  45 +++++++------
+>  block/vmdk.c              |  38 +++++------
+>  block/vpc.c               |  45 ++++++-------
+>  block/vvfat.c             |  16 +++--
+>  21 files changed, 404 insertions(+), 428 deletions(-)
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--HrlhGaKzLidh41zSZZaSLGoz2P0ATRUgL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpvf/oACgkQp6FrSiUn
+Q2pD2Qf7BKcFCB87YQjCkUL52ZsoNpXjhRSrTGLXWxqVz4ufiZ6e9+AunilQlpF3
+oNSxAORFwX3B/C5h5pxaWIUSezGb/f1Kn2LMjDpf49z8SCZVFW6C/c82HzIi48uw
+N6/sGLpAdWgZOxQhDKLCYX5xUKtn+GJqPf8u8gTDgvyuMESE8EIKtlwgK1urWTRm
+urVtgCHnXUELVECnZDxp06sNPY3LyOPc7fXOf4b3uyHKgkpPqTfGdnjXCZTa85P/
+oqi6Zjt7g1x4bHa79bIniJkSsixaFfZvt8h6qu9MrPKjMM3TKc8wcnlxIkiAnf0O
+W3FvyhGiy1pDbCbkAi4wPAZ2msGsHw==
+=TK6X
+-----END PGP SIGNATURE-----
+
+--HrlhGaKzLidh41zSZZaSLGoz2P0ATRUgL--
