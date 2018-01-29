@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1efxTo-0000Gk-2Q
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 19:39:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1efyyv-0004Kr-5m
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 21:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1efxTm-00038D-TW
-	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 19:39:24 -0500
-Date: Mon, 29 Jan 2018 11:36:23 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180129003623.GE12900@umbus>
-References: <20180119050005.29392-1-sjitindarsingh@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1efyys-0004ud-06
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 21:15:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1efyyr-0004uB-Ph
+	for qemu-devel@nongnu.org; Sun, 28 Jan 2018 21:15:33 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1efyyq-00074V-Qw
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 02:15:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C90062E8025
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 02:15:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wTWi5aaYRw9ix9vO"
-Content-Disposition: inline
-In-Reply-To: <20180119050005.29392-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V5 0/7] target/ppc: Rework
- spapr_caps
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jan 2018 02:08:34 -0000
+From: Michael Chapman <launchpad@very.puzzling.org>
+Reply-To: Bug 1745895 <1745895@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151719171489.17422.7852330772200128264.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1745895] [NEW] Unable to migrate vhost-net to
+ virtio-1.0-capable kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +36,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, paulus@ozlabs.org
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
---wTWi5aaYRw9ix9vO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am running QEMU 2.11 (from upstream source, not Red Hat package) on
+stock RHEL 6 and RHEL 7 kernels. Only the RHEL 7 kernel supports
+VIRTIO_F_VERSION_1 in its vhost-net driver.
 
-On Fri, Jan 19, 2018 at 03:59:58PM +1100, Suraj Jitindar Singh wrote:
-> The following patch series adds 3 new tristate capabilities and their
-> associated handling.
->=20
-> A new H-Call is implemented which a guest will use to query the=20
-> requirement for and availability of workarounds for certain cpu=20
-> behaviours.
->=20
-> Applies on top of David's tree: ppc-for-2.12
+When migrating a guest using vhost-net from the RHEL 6 host to RHEL 7,
+the PCI config is rejected by QEMU on the target machine.
 
-Applied to ppc-for-2.12 (except that the kernel header updates from
-1/7 were dropped, since they were already included by Cornelia's
-general update in 9cbb6362.
+A simple test case:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+1. On the RHEL 7 host, prepare for an incoming migration:
 
---wTWi5aaYRw9ix9vO
-Content-Type: application/pgp-signature; name="signature.asc"
+  rhel7# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio
+-nodefaults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno -d=
+evice
+virtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff -incoming
+tcp:0.0.0.0:12345
 
------BEGIN PGP SIGNATURE-----
+2. On the RHEL 6 host, start a guest and migrate it to the RHEL 7 host:
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpubIQACgkQbDjKyiDZ
-s5Lhsg//WzlDGri5UbFuk5hc5gpT0EX/AgVML3DoCie/ZT6/NHml8DyVpmoeFsUb
-Y5yz9b/rV8i4Zv0WxsfLBuzaBm3OFpab2ni+XiqnzW8C13BgJ5QIcE7mMgCeA5N/
-D62sAFpN1QQB/j/sPUBXQbEWhTOD2a8wpvE0GJ+3vYgUSdy/E80aGuPY2XiDQI1d
-goc7EjqSdSMirf5Y3v0fcQ95nRPWOxwNqUpj/XHbD1FY0DW9rAeZfasD9HruB7BD
-8ESjN7OFhCXr/smezy4utxFez3BWd/NRdD60LojswNRaV0ZHjwkRP9smgdK47ivD
-e7Z9xmDy3DJHkQ51qUQudvhsp25hn+z8OmDSv1sQwnLn7aA8JwnfGflSt81NRQff
-Y1m/8hZNtEj6ntbKg1wuQIR8UhjDLStMx31zf83eyvPmh2n9RBAj9qFs+yhdZOZP
-cY6X+oYlCf35Rc8qtThKLa+ggUWfeqHE4BDXsXE64pKh3SyZ4PxATwKftRRmkPpC
-MEEdWxRS4Qtz5NG6yxBjyq7FOn5+/4WHjRtX5tT9BpEI6hVRbFjQNgx7khbzjbNW
-UVTKlQfl+OI7mh3LtSWDfxRgasUohGTdby6wv0BViTvhLsGwXX1veRlpn2eUe+Kv
-WkgsT97p8XOfw4p93LJhBVW4HrG0ZM9W9gQIu0bdazIbeopG8tY=
-=ITuR
------END PGP SIGNATURE-----
+  rhel6# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio -nodefa=
+ults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno -device v=
+irtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff
+QEMU 2.11.0 monitor - type 'help' for more information
+  (qemu) migrate tcp:rhel7:12345
 
---wTWi5aaYRw9ix9vO--
+The RHEL 7 QEMU errors out:
+
+  qemu-system-x86_64: get_pci_config_device: Bad config data: i=3D0x20 read=
+: 0 device: c cmask: ff wmask: 0 w1cmask:0
+  qemu-system-x86_64: Failed to load PCIDevice:config
+  qemu-system-x86_64: Failed to load virtio-net:virtio
+  qemu-system-x86_64: error while loading state for instance 0x0 of device =
+'0000:00:02.0/virtio-net'
+  qemu-system-x86_64: load of migration failed: Invalid argument
+
+If I start the source QEMU with vhost=3Doff, or the target QEMU with
+disable-modern=3Dtrue, the migration is successful.
+
+My hunch here is that the target QEMU prepares the PCI device to support
+VIRTIO_F_VERSION_1, as that's available in the kernel there, but then
+fails to (or does not know to) disable this during the migration.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1745895
+
+Title:
+  Unable to migrate vhost-net to virtio-1.0-capable kernel
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am running QEMU 2.11 (from upstream source, not Red Hat package) on
+  stock RHEL 6 and RHEL 7 kernels. Only the RHEL 7 kernel supports
+  VIRTIO_F_VERSION_1 in its vhost-net driver.
+
+  When migrating a guest using vhost-net from the RHEL 6 host to RHEL 7,
+  the PCI config is rejected by QEMU on the target machine.
+
+  A simple test case:
+
+  1. On the RHEL 7 host, prepare for an incoming migration:
+
+    rhel7# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio
+  -nodefaults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno
+  -device virtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff -incoming
+  tcp:0.0.0.0:12345
+
+  2. On the RHEL 6 host, start a guest and migrate it to the RHEL 7
+  host:
+
+    rhel6# qemu-system-x86_64 -S -accel kvm -nographic -monitor stdio -node=
+faults -netdev tap,id=3Dnet0,vhost=3Don,script=3Dno,downscript=3Dno -device=
+ virtio-net-pci,netdev=3Dnet0,mac=3D54:52:00:ff:ff:ff
+  QEMU 2.11.0 monitor - type 'help' for more information
+    (qemu) migrate tcp:rhel7:12345
+
+  The RHEL 7 QEMU errors out:
+
+    qemu-system-x86_64: get_pci_config_device: Bad config data: i=3D0x20 re=
+ad: 0 device: c cmask: ff wmask: 0 w1cmask:0
+    qemu-system-x86_64: Failed to load PCIDevice:config
+    qemu-system-x86_64: Failed to load virtio-net:virtio
+    qemu-system-x86_64: error while loading state for instance 0x0 of devic=
+e '0000:00:02.0/virtio-net'
+    qemu-system-x86_64: load of migration failed: Invalid argument
+
+  If I start the source QEMU with vhost=3Doff, or the target QEMU with
+  disable-modern=3Dtrue, the migration is successful.
+
+  My hunch here is that the target QEMU prepares the PCI device to
+  support VIRTIO_F_VERSION_1, as that's available in the kernel there,
+  but then fails to (or does not know to) disable this during the
+  migration.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1745895/+subscriptions
