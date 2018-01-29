@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1egDwH-00075w-V6
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:13:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1egDwl-0007TN-HU
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:14:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1egDwE-0007ew-Ml
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:13:53 -0500
-Resent-Message-Id: <E1egDwE-0007ew-Ml@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21063)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1egDwE-0007bj-G4
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:13:50 -0500
-In-Reply-To: <20180129174132.108925-1-brijesh.singh@amd.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151724958682.794.18410104780159289317@5adcb62bf0d6>
+	(envelope-from <kwolf@redhat.com>) id 1egDwk-0007su-FK
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 13:14:23 -0500
+Date: Mon, 29 Jan 2018 19:14:10 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180129181410.GR6141@localhost.localdomain>
+References: <20180111195225.4226-1-kwolf@redhat.com>
+	<20180111195225.4226-6-kwolf@redhat.com>
+	<3a7536f1-c4af-da6c-1282-ba336e96a86c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 29 Jan 2018 10:13:08 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v6 00/23] x86: Secure Encrypted
- Virtualization (AMD)
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="6BvahUXLYAruDZOj"
+Content-Disposition: inline
+In-Reply-To: <3a7536f1-c4af-da6c-1282-ba336e96a86c@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 05/10] qcow2: Use BlockdevRef in
+ qcow2_create2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +26,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: brijesh.singh@amd.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org, Thomas.Lendacky@amd.com, stefanha@gmail.com, mst@redhat.com, richard.henderson@linaro.org, dgilbert@redhat.com, pbonzini@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTI5MTc0MTMyLjEwODkyNS0xLWJyaWplc2guc2luZ2hAYW1kLmNvbQpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY2IDAwLzIzXSB4ODY6IFNlY3VyZSBFbmNyeXB0
-ZWQgVmlydHVhbGl6YXRpb24gKEFNRCkKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBb
-dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1MTcyMzU2NTctMjI1NDctMS1naXQtc2Vu
-ZC1lbWFpbC1naGFtbWVyQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTE3MjM1NjU3LTIyNTQ3LTEt
-Z2l0LXNlbmQtZW1haWwtZ2hhbW1lckByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAg
-ICAgIHBhdGNoZXcvMjAxODAxMjMwMzUzNDkuMjQ1MzgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
-cm8ub3JnIC0+IHBhdGNoZXcvMjAxODAxMjMwMzUzNDkuMjQ1MzgtMS1yaWNoYXJkLmhlbmRlcnNv
-bkBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODAxMjkx
-NzQxMzIuMTA4OTI1LTEtYnJpamVzaC5zaW5naEBhbWQuY29tIC0+IHBhdGNoZXcvMjAxODAxMjkx
-NzQxMzIuMTA4OTI1LTEtYnJpamVzaC5zaW5naEBhbWQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKNmVmY2FlMjg4OCBzZXY6IGFkZCBtaWdyYXRpb24gYmxvY2tlcgoxNmE5ZTAw
-OTQ2IHRhcmdldC9pMzg2OiBjbGVhciBDLWJpdCB3aGVuIHdhbGtpbmcgU0VWIGd1ZXN0IHBhZ2Ug
-dGFibGUKM2I1ZTRhNWE1NCBzZXY6IGFkZCBkZWJ1ZyBlbmNyeXB0IGFuZCBkZWNyeXB0IGNvbW1h
-bmRzCjkwMzRkMDcyYjMgaHc6IGkzODY6IHNldCByYW1fZGVidWdfb3BzIHdoZW4gbWVtb3J5IGVu
-Y3J5cHRpb24gaXMgZW5hYmxlZAo5YjQ4MzcwODQyIHNldjogRmluYWxpemUgdGhlIFNFViBndWVz
-dCBsYXVuY2ggZmxvdwo1ZTEyNjgxOGE1IHNldjogZW1pdCB0aGUgU0VWX01FQVNVUkVNRU5UIGV2
-ZW50CjFjOWE1NjI5MTYgcWFwaTogYWRkIFNFVl9NRUFTVVJFTUVOVCBldmVudApiMzIyZmNhNTU0
-IHRhcmdldC9pMzg2OiBlbmNyeXB0IGJpb3Mgcm9tCjEwZGEzZWQ4MzAgc2V2OiBhZGQgY29tbWFu
-ZCB0byBlbmNyeXB0IGd1ZXN0IG1lbW9yeSByZWdpb24KY2M5NzlmN2ZmYiBzZXY6IGFkZCBjb21t
-YW5kIHRvIGNyZWF0ZSBsYXVuY2ggbWVtb3J5IGVuY3J5cHRpb24gY29udGV4dAo5Mzg4ZTlmYmY3
-IGhtcDogZGlzcGxheSBtZW1vcnkgZW5jcnlwdGlvbiBzdXBwb3J0IGluICdpbmZvIGt2bScKODg3
-NWE5ZWZmMyBrdm06IGludHJvZHVjZSBtZW1vcnkgZW5jcnlwdGlvbiBBUElzCmM1MzBjZjNhMGYg
-c2V2OiByZWdpc3RlciB0aGUgZ3Vlc3QgbWVtb3J5IHJhbmdlIHdoaWNoIG1heSBjb250YWluIGVu
-Y3J5cHRlZCBkYXRhCmY0ODZlZGE5NzIgc2V2OiBhZGQgY29tbWFuZCB0byBpbml0aWFsaXplIHRo
-ZSBtZW1vcnkgZW5jcnlwdGlvbiBjb250ZXh0CmNkNjQ5MDg2MjcgYWNjZWw6IGFkZCBTZWN1cmUg
-RW5jcnlwdGVkIFZpcnR1bGl6YXRpb24gKFNFVikgb2JqZWN0CjA4NzI5Y2E3ZTQgZG9jczogYWRk
-IEFNRCBTZWN1cmUgRW5jcnlwdGVkIFZpcnR1YWxpemF0aW9uIChTRVYpCmUxMzA0NGE0NjUga3Zt
-OiB1cGRhdGUga3ZtLmggdG8gaW5jbHVkZSBtZW1vcnkgZW5jcnlwdGlvbiBpb2N0bHMKMTEzZTE2
-YjY2ZSBtYWNoaW5lOiBhZGQgLW1lbW9yeS1lbmNyeXB0aW9uIHByb3BlcnR5CmY4MzlhN2Y1ZDEg
-dGFyZ2V0L2kzODY6IGFkZCBtZW1vcnkgZW5jcnlwdGlvbiBmZWF0dXJlIGNwdWlkIHN1cHBvcnQK
-NGUxNTllNzgxZiBtb25pdG9yL2kzODY6IHVzZSBkZWJ1ZyBBUElzIHdoZW4gYWNjZXNzaW5nIGd1
-ZXN0IG1lbW9yeQpmYmViNzA2ZTIzIGV4ZWM6IGFkZCBkZWJ1ZyB2ZXJzaW9uIG9mIHBoeXNpY2Fs
-IG1lbW9yeSByZWFkIGFuZCB3cml0ZSBBUEkKMTFiYzEzNzJkNyBleGVjOiBhZGQgcmFtX2RlYnVn
-X29wcyBzdXBwb3J0CjFiMDJkZjYyOWUgbWVtYXR0cnM6IGFkZCBkZWJ1ZyBhdHRyaWJ1dGUKCj09
-PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjM6IG1lbWF0dHJzOiBhZGQgZGVi
-dWcgYXR0cmlidXRlLi4uCkNoZWNraW5nIFBBVENIIDIvMjM6IGV4ZWM6IGFkZCByYW1fZGVidWdf
-b3BzIHN1cHBvcnQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwODogRklM
-RTogaW5jbHVkZS9leGVjL21lbW9yeS5oOjY0MDoKKyAqIG1lbW9yeV9yZWdpb25fc2V0X3JhbV9k
-ZWJ1Z19vcHM6IFNldCBkZWJ1ZyBhY2Nlc3Mgb3BzIGZvciBhIGdpdmVuIG1lbW9yeSByZWdpb24K
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTczIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy8yMzogZXhlYzog
-YWRkIGRlYnVnIHZlcnNpb24gb2YgcGh5c2ljYWwgbWVtb3J5IHJlYWQgYW5kIHdyaXRlIEFQSS4u
-LgpDaGVja2luZyBQQVRDSCA0LzIzOiBtb25pdG9yL2kzODY6IHVzZSBkZWJ1ZyBBUElzIHdoZW4g
-YWNjZXNzaW5nIGd1ZXN0IG1lbW9yeS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojMzU2OiBGSUxFOiB0YXJnZXQvaTM4Ni9tb25pdG9yLmM6NTEyOgorICAgICAgICAgICAgICAg
-ICAgICAgICAgY3B1X3BoeXNpY2FsX21lbW9yeV9yZWFkX2RlYnVnKHB0X2FkZHIgKyBsNCAqIDgs
-ICZwdGUsIDgpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyOTEgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA1
-LzIzOiB0YXJnZXQvaTM4NjogYWRkIG1lbW9yeSBlbmNyeXB0aW9uIGZlYXR1cmUgY3B1aWQgc3Vw
-cG9ydC4uLgpDaGVja2luZyBQQVRDSCA2LzIzOiBtYWNoaW5lOiBhZGQgLW1lbW9yeS1lbmNyeXB0
-aW9uIHByb3BlcnR5Li4uCkNoZWNraW5nIFBBVENIIDcvMjM6IGt2bTogdXBkYXRlIGt2bS5oIHRv
-IGluY2x1ZGUgbWVtb3J5IGVuY3J5cHRpb24gaW9jdGxzLi4uCkNoZWNraW5nIFBBVENIIDgvMjM6
-IGRvY3M6IGFkZCBBTUQgU2VjdXJlIEVuY3J5cHRlZCBWaXJ0dWFsaXphdGlvbiAoU0VWKS4uLgpD
-aGVja2luZyBQQVRDSCA5LzIzOiBhY2NlbDogYWRkIFNlY3VyZSBFbmNyeXB0ZWQgVmlydHVsaXph
-dGlvbiAoU0VWKSBvYmplY3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjM6IHNldjogYWRkIGNvbW1h
-bmQgdG8gaW5pdGlhbGl6ZSB0aGUgbWVtb3J5IGVuY3J5cHRpb24gY29udGV4dC4uLgpDaGVja2lu
-ZyBQQVRDSCAxMS8yMzogc2V2OiByZWdpc3RlciB0aGUgZ3Vlc3QgbWVtb3J5IHJhbmdlIHdoaWNo
-IG1heSBjb250YWluIGVuY3J5cHRlZCBkYXRhLi4uCkNoZWNraW5nIFBBVENIIDEyLzIzOiBrdm06
-IGludHJvZHVjZSBtZW1vcnkgZW5jcnlwdGlvbiBBUElzLi4uCkNoZWNraW5nIFBBVENIIDEzLzIz
-OiBobXA6IGRpc3BsYXkgbWVtb3J5IGVuY3J5cHRpb24gc3VwcG9ydCBpbiAnaW5mbyBrdm0nLi4u
-CkNoZWNraW5nIFBBVENIIDE0LzIzOiBzZXY6IGFkZCBjb21tYW5kIHRvIGNyZWF0ZSBsYXVuY2gg
-bWVtb3J5IGVuY3J5cHRpb24gY29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAxNS8yMzogc2V2OiBh
-ZGQgY29tbWFuZCB0byBlbmNyeXB0IGd1ZXN0IG1lbW9yeSByZWdpb24uLi4KRVJST1I6IHNwYWNl
-IHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICco
-JwojODY6IEZJTEU6IGFjY2VsL2t2bS9zZXYuYzo0NzQ6CisgICAgYXNzZXJ0IChoYW5kbGUpOwoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxNi8yMzogdGFyZ2V0
-L2kzODY6IGVuY3J5cHQgYmlvcyByb20uLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjM6IHFhcGk6IGFk
-ZCBTRVZfTUVBU1VSRU1FTlQgZXZlbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjM6IHNldjogZW1p
-dCB0aGUgU0VWX01FQVNVUkVNRU5UIGV2ZW50Li4uCkNoZWNraW5nIFBBVENIIDE5LzIzOiBzZXY6
-IEZpbmFsaXplIHRoZSBTRVYgZ3Vlc3QgbGF1bmNoIGZsb3cuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAv
-MjM6IGh3OiBpMzg2OiBzZXQgcmFtX2RlYnVnX29wcyB3aGVuIG1lbW9yeSBlbmNyeXB0aW9uIGlz
-IGVuYWJsZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjM6IHNldjogYWRkIGRlYnVnIGVuY3J5cHQg
-YW5kIGRlY3J5cHQgY29tbWFuZHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjM6IHRhcmdldC9pMzg2
-OiBjbGVhciBDLWJpdCB3aGVuIHdhbGtpbmcgU0VWIGd1ZXN0IHBhZ2UgdGFibGUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjMvMjM6IHNldjogYWRkIG1pZ3JhdGlvbiBibG9ja2VyLi4uCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+
+--6BvahUXLYAruDZOj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 29.01.2018 um 18:30 hat Max Reitz geschrieben:
+> On 2018-01-11 20:52, Kevin Wolf wrote:
+> > Instead of passing a separate BlockDriverState* into qcow2_create2(),
+> > make use of the BlockdevRef that is included in BlockdevCreateOptions.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  include/block/block.h |  1 +
+> >  block.c               | 39 +++++++++++++++++++++++++++++++++++++++
+> >  block/qcow2.c         | 33 +++++++++++++++++++++------------
+> >  3 files changed, 61 insertions(+), 12 deletions(-)
+>=20
+> [...]
+>=20
+> > diff --git a/block.c b/block.c
+> > index a8da4f2b25..c9b0e1d6d3 100644
+> > --- a/block.c
+> > +++ b/block.c
+>=20
+> [...]
+>=20
+> > @@ -2405,6 +2407,43 @@ BdrvChild *bdrv_open_child(const char *filename,
+> >      return c;
+> >  }
+> > =20
+> > +/* TODO Future callers may need to specify parent/child_role in order =
+for
+> > + * option inheritance to work. Existing callers use it for the root no=
+de. */
+> > +BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **err=
+p)
+> > +{
+> > +    BlockDriverState *bs =3D NULL;
+> > +    Error *local_err =3D NULL;
+> > +    QObject *obj =3D NULL;
+> > +    QDict *qdict =3D NULL;
+> > +    const char *reference =3D NULL;
+> > +    Visitor *v =3D NULL;
+> > +
+> > +    if (ref->type =3D=3D QTYPE_QSTRING) {
+> > +        reference =3D ref->u.reference;
+> > +    } else {
+> > +        BlockdevOptions *options =3D &ref->u.definition;
+> > +        assert(ref->type =3D=3D QTYPE_QDICT);
+> > +
+> > +        v =3D qobject_output_visitor_new(&obj);
+> > +        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+> > +        if (local_err) {
+> > +            error_propagate(errp, local_err);
+> > +            goto fail;
+> > +        }
+> > +        visit_complete(v, &obj);
+> > +
+> > +        qdict =3D qobject_to_qdict(obj);
+> > +        qdict_flatten(qdict);
+> > +    }
+> > +
+> > +    bs =3D bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, er=
+rp);
+> > +
+> > +fail:
+> > +    qobject_decref(obj);
+>=20
+> I'd prefer QDECREF(qdict), myself, although I can't quite explain why.
+> Probably because @qdict is the object you're actually using and @obj is
+> just some temporary designation.
+
+Hm... If visit_type_BlockdevOptions() fails, qdict is not yet assigned.
+Are we sure that obj remains NULL in this case?
+
+qobject_decref(obj) looks more obviously correct to me.
+
+> Also, doesn't bdrv_open_inherit() take ownership of @qdict and thus @obj?
+
+That's a very good point...
+
+Kevin
+
+> Max
+>=20
+> > +    visit_free(v);
+> > +    return bs;
+> > +}
+> > +
+> >  static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *b=
+s,
+> >                                                     int flags,
+> >                                                     QDict *snapshot_opt=
+ions,
+>=20
+
+
+
+
+--6BvahUXLYAruDZOj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJab2RyAAoJEH8JsnLIjy/Wer4P/R31+A3GdeRTumWm/g4O6TV0
+5ORCgtmVk7LIv9BR+bKYxl6+MzLWBAPzBpptEleP0JOo44sz7DR8VHx89ggqQZmJ
+IdvLL0aCk37dAwMhYGZMNL7fP0NpRa0RlVoL+P5FLzi+HrFx1XoE/riq2wW0JCAK
+9zVZxX6MzLIlLZdBShfWY2IsGrySmOlSarnaiWS2ZbT+FhsFG4q8a7eUToi9rSRO
+HBsoBmRIgFY7KouOemq/6497O13QmwzjmIKsmKUS4Ot+qgje753vigH2Lmv2l2t3
+ldAVBm8+ofWpijuJPry5j7f/whm584LfSe1fTYcHwbCkWmWAWcm2svlzMiZQdTjT
+u+6u2/D5bewnLdUFmmd3yWWP2cp32QVr95BuiRwIdfQRY6qgz32dQKgDyFPmYVXl
+ZuRFh9gkY78ktp7xnZaL7xqqRXRkrVb7+bpZM2scz0saB7Lywm7EFauKxwx9EFwj
+bfk+kw+YbYhyCbwagn8p61yLtdmnsGCk9CsrhYiFfcczgllmkNZQvedYYBLqsbBt
+ovPhvmZOk+nN2Nb7FoxxNg2G7WwHRdUTH9VsfQrWL4aHkRsPdAI1ISikqbi5FVzZ
+ouK+WAypHDBpMWWcJbYr+gZpagbZeV7Y9Ugpd6VH0TjlhwMeRRa9j9tlvV4ZeNii
+M0jzRcBkzNkXY3b2HVR/
+=KvyB
+-----END PGP SIGNATURE-----
+
+--6BvahUXLYAruDZOj--
