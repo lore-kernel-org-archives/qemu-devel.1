@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egG76-0007IP-Cx
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:33:16 -0500
+	(envelope-from <jimw@sifive.com>) id 1egG7G-0007MN-19
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:33:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egG75-0002jB-4g
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:33:12 -0500
-References: <20180127020515.27137-1-jsnow@redhat.com>
-	<20180127020515.27137-6-jsnow@redhat.com>
-	<20180129173802.GN6141@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <0f7eaeed-de09-fbf1-1998-55f1155228fd@redhat.com>
-Date: Mon, 29 Jan 2018 15:33:00 -0500
+	(envelope-from <jimw@sifive.com>) id 1egG7F-0002pD-1n
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:33:22 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:46459)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jimw@sifive.com>) id 1egG7E-0002oe-R1
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 15:33:20 -0500
+Received: by mail-qt0-x244.google.com with SMTP id o35so14394828qtj.13
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 12:33:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180129173802.GN6141@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 05/14] blockjobs: add block_job_dismiss
+In-Reply-To: <75ba8c40-803f-4652-93d9-852c97334aad@linaro.org>
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-7-git-send-email-mjc@sifive.com>
+	<f15753f1-7446-26f1-9937-f3b67d15c0a6@linaro.org>
+	<CAHNT7NvcUU8D10jaq+y=B2odsD7-r0MnsZRsq2yheY_a-THSUA@mail.gmail.com>
+	<14dcf85d-a8e0-fc21-df46-b94fe48d1067@linaro.org>
+	<CAFyWVabFUocnxebZxTYrVr71gbyd6PgLYfqxiAHAqSaw0=6VgA@mail.gmail.com>
+	<75ba8c40-803f-4652-93d9-852c97334aad@linaro.org>
+From: Jim Wilson <jimw@sifive.com>
+Date: Mon, 29 Jan 2018 12:33:19 -0800
+Message-ID: <CAFyWVaZvMRyGkFmfgXG_i_chJtNUm8fw9Q3XSuye9Fpy2dGyZw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 06/21] RISC-V FPU Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,164 +33,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-
-
-On 01/29/2018 12:38 PM, Kevin Wolf wrote:
-> Am 27.01.2018 um 03:05 hat John Snow geschrieben:
->> For jobs that have reached their terminal state, prior to having their
->> last reference put down (meaning jobs that have completed successfully,
->> unsuccessfully, or have been canceled), allow the user to dismiss the
->> job's lingering status report via block-job-dismiss.
+On Wed, Jan 24, 2018 at 3:47 PM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 01/24/2018 10:58 AM, Jim Wilson wrote:
+>> Although, looking at this again, I see another statement in a
+>> different place that says:
 >>
->> This gives management APIs the chance to conclusively determine if a job
->> failed or succeeded, even if the event broadcast was missed.
->>
->> Note that jobs do not yet linger in any such state, they are freed
->> immediately upon reaching this previously-unnamed state. such a state is
->> added immediately in the next commit.
->>
->> Valid objects:
->> Concluded: (added in a future commit); dismisses the concluded job.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/trace-events       |  1 +
->>  blockdev.c               | 14 ++++++++++++++
->>  blockjob.c               | 30 ++++++++++++++++++++++++++++++
->>  include/block/blockjob.h |  9 +++++++++
->>  qapi/block-core.json     | 19 +++++++++++++++++++
->>  5 files changed, 73 insertions(+)
->>
->> diff --git a/block/trace-events b/block/trace-events
->> index 11c8d5f590..8f61566770 100644
->> --- a/block/trace-events
->> +++ b/block/trace-events
->> @@ -46,6 +46,7 @@ qmp_block_job_cancel(void *job) "job %p"
->>  qmp_block_job_pause(void *job) "job %p"
->>  qmp_block_job_resume(void *job) "job %p"
->>  qmp_block_job_complete(void *job) "job %p"
->> +qmp_block_job_dismiss(void *job) "job %p"
->>  qmp_block_stream(void *bs, void *job) "bs %p job %p"
->>  
->>  # block/file-win32.c
->> diff --git a/blockdev.c b/blockdev.c
->> index 2c0773bba7..5e8edff322 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -3849,6 +3849,20 @@ void qmp_block_job_complete(const char *device, Error **errp)
->>      aio_context_release(aio_context);
->>  }
->>  
->> +void qmp_block_job_dismiss(const char *id, Error **errp)
->> +{
->> +    AioContext *aio_context;
->> +    BlockJob *job = find_block_job(id, &aio_context, errp);
->> +
->> +    if (!job) {
->> +        return;
->> +    }
->> +
->> +    trace_qmp_block_job_dismiss(job);
->> +    block_job_dismiss(&job, errp);
->> +    aio_context_release(aio_context);
->> +}
->> +
->>  void qmp_change_backing_file(const char *device,
->>                               const char *image_node_name,
->>                               const char *backing_file,
->> diff --git a/blockjob.c b/blockjob.c
->> index ea216aca5e..5531f5c2ab 100644
->> --- a/blockjob.c
->> +++ b/blockjob.c
->> @@ -58,6 +58,7 @@ enum BlockJobVerb {
->>      BLOCK_JOB_VERB_RESUME,
->>      BLOCK_JOB_VERB_SET_SPEED,
->>      BLOCK_JOB_VERB_COMPLETE,
->> +    BLOCK_JOB_VERB_DISMISS,
->>      BLOCK_JOB_VERB__MAX
->>  };
->>  
->> @@ -68,6 +69,7 @@ bool BlockJobVerb[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
->>      [BLOCK_JOB_VERB_RESUME]               = {0, 0, 0, 1, 0},
->>      [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1},
->>      [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1},
->> +    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0},
-> 
-> This makes it very obvious that the patches should probably be
-> reordered.
-> 
+>> Except when otherwise stated, if the result of a floating-point operation is
+>> NaN, it is the canonical NaN. The canonical NaN has a positive sign and all
+>> significand bits clear except the MSB, a.k.a. the quiet bit. For
+>> single-precision floating-point, this corresponds to the pattern
+>> 0x7fc00000.
+> Yes, I had read this before as well.  I had assumed that your patch constituted
+> an intended change to this text.
+>
+>> This could take a little time to sort out.
+> Ok.  I don't see this as a blocking issue for merging.
 
-I think this bit is fine, but the half-baked dismiss error checking and
-the broken transition to UNDEFINED before deference makes a better case.
-I'll play with it.
+So after looking at this a bit more, I've come to the conclusion that
+my patch to remove the default/canonical nan support from RISC-V qemu
+was wrong.  We will have to fix this on the gcc/glibc side.
 
->>  };
->>  
->>  static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
->> @@ -426,6 +428,13 @@ static void block_job_cancel_async(BlockJob *job)
->>      job->cancelled = true;
->>  }
->>  
->> +static void block_job_do_dismiss(BlockJob *job)
->> +{
->> +    assert(job && job->manual == true);
->> +    block_job_state_transition(job, BLOCK_JOB_STATUS_UNDEFINED);
-> 
-> I don't think you made that an allowed transition from anywhere?
-> 
+Michael, please revert my change
+    https://github.com/riscv/riscv-qemu/commit/4223d89b0c5c671332d66bcd649db5c6f46559f5
 
-Ah, you know, this is true... until the next commit.
-
->> +    block_job_unref(job);
->> +}
->> +
->>  static int block_job_finish_sync(BlockJob *job,
->>                                   void (*finish)(BlockJob *, Error **errp),
->>                                   Error **errp)
->> @@ -455,6 +464,9 @@ static int block_job_finish_sync(BlockJob *job,
->>          aio_poll(qemu_get_aio_context(), true);
->>      }
->>      ret = (job->cancelled && job->ret == 0) ? -ECANCELED : job->ret;
->> +    if (job->manual) {
->> +        block_job_do_dismiss(job);
->> +    }
->>      block_job_unref(job);
->>      return ret;
->>  }
->> @@ -570,6 +582,24 @@ void block_job_complete(BlockJob *job, Error **errp)
->>      job->driver->complete(job, errp);
->>  }
->>  
->> +void block_job_dismiss(BlockJob **jobptr, Error **errp)
->> +{
->> +    BlockJob *job = *jobptr;
->> +    /* similarly to _complete, this is QMP-interface only. */
->> +    assert(job->id);
->> +    if (!job->manual) {
->> +        error_setg(errp, "The active block job '%s' was not started with "
->> +                   "\'manual\': true, and so cannot be dismissed as it will "
->> +                   "clean up after itself automatically", job->id);
->> +        return;
->> +    }
-> 
-> If you check instead that the job is in the right state to be dismissed
-> (CONCLUDED), the job->manual check wouldn't be needed any more because
-> the user can never catch an automatically completed job in CONCLUDED.
-> 
->> +    error_setg(errp, "unimplemented");
-> 
-> This should hopefully go away when you reorder the patches.
-> 
->> +    block_job_do_dismiss(job);
->> +    *jobptr = NULL;
->> +}
-> 
-> Kevin
-> 
-
-Thanks,
-
---js
+Jim
