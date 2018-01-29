@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1egBN2-0005lW-Rf
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:29:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1egBOB-0006Yx-3W
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:30:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1egBMx-0004cY-RK
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:29:20 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:39211)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1egBMx-0004c3-Jl
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:29:15 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id f6so6017142wra.6
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 07:29:15 -0800 (PST)
-Date: Mon, 29 Jan 2018 15:29:12 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180129152912.GL20446@stefanha-x1.localdomain>
-References: <1516003315-17878-1-git-send-email-changpeng.liu@intel.com>
-	<1516003315-17878-2-git-send-email-changpeng.liu@intel.com>
+	(envelope-from <kwolf@redhat.com>) id 1egBOA-0005Hb-9R
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 10:30:31 -0500
+Date: Mon, 29 Jan 2018 16:30:17 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180129153017.GH6141@localhost.localdomain>
+References: <20180122144549.25318-1-vsementsov@virtuozzo.com>
+	<20180125113724.GA28396@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zH41lVBEV8cLJnCl"
+	protocol="application/pgp-signature"; boundary="oTHb8nViIGeoXxdp"
 Content-Disposition: inline
-In-Reply-To: <1516003315-17878-2-git-send-email-changpeng.liu@intel.com>
-Subject: Re: [Qemu-devel] [RFC v1] block/NVMe: introduce a new vhost NVMe
- host device to QEMU
+In-Reply-To: <20180125113724.GA28396@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC] block-backend: fix double
+ inc/dec inflight requests number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, james.r.harris@intel.com, keith.busch@intel.com, famz@redhat.com, pbonzini@redhat.com, mst@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, den@openvz.org, mreitz@redhat.com, el13635@mail.ntua.gr
 
 
---zH41lVBEV8cLJnCl
+--oTHb8nViIGeoXxdp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 15, 2018 at 04:01:55PM +0800, Changpeng Liu wrote:
-> NVMe 1.3 specification introduces a new NVMe ADMIN command:
-> doorbell buffer config, which can write shadow doorbell buffer
-> instead of MMIO registers, so it can improve the Guest performance
-> a lot for emulated NVMe devices inside VM.
-
-If I understand correctly the Shadow Doorbell Buffer offers two
-optimizations:
-
-1. The guest driver only writes to the MMIO register when EventIdx has
-   been reached.  This eliminates some MMIO writes.
-
-2. The device may poll the Shadow Doorbell Buffer so that command
-   processing can begin before guest driver performs an MMIO write.
-
-Is this correct?
-
-> Similar with existing vhost-user-scsi solution, this commit builds a
-> new vhost_user_nvme host device to VM and the I/O is processed at
-> the slave I/O target, so users can implement a user space NVMe driver
-> in the slave I/O target.
+Am 25.01.2018 um 12:37 hat Stefan Hajnoczi geschrieben:
+> On Mon, Jan 22, 2018 at 05:45:49PM +0300, Vladimir Sementsov-Ogievskiy wr=
+ote:
+> > Is it a bug or a feature? Why do we call inc/dec twice for read/write?
+> > We don't do this for flush and discard..
 >=20
-> Users can start QEMU with: -chardev socket,id=3Dchar0,path=3D/path/vhost.=
-0 \
-> -device vhost-user-nvme,chardev=3Dchar0,num_io_queues=3D2.
+> It's non-obvious and I asked Paolo the same question previously.
+>=20
+> > -    bdrv_inc_in_flight(bs);
+> > -
+> >      /* throttling disk I/O */
+> >      if (blk->public.throttle_group_member.throttle_state) {
+> >          throttle_group_co_io_limits_intercept(&blk->public.throttle_gr=
+oup_member,
+> >                  bytes, false);
+> >      }
+>=20
+> ^^^ HINT HINT HINT ^^^
+>=20
+> > =20
+> > -    ret =3D bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
+> > -    bdrv_dec_in_flight(bs);
+> > -    return ret;
+> > +    return bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
+>=20
+> The problem is what happens if the request is throttled?
+>=20
+> Even throttled requests must be counted so that bdrv_drain() and friends
+> work.
+>=20
+> It may be possible to eliminate this now that throttling is a BDS node.
+> It used to be implemented as a completely separate API outside the BDS
+> node graph.  Now there is a throttling node in the graph, so maybe we
+> can stop taking the extra reference but some refactoring may be
+> necessary.
 
-Each new feature has a cost in terms of maintainance, testing,
-documentation, and support.  Users need to be educated about the role of
-each available storage controller and how to choose between them.
+The patches to use a throttling node even when the legacy options are
+used have not been merged yet.
 
-I'm not sure why QEMU should go in this direction since it makes the
-landscape more complex and harder to support.  You've said the
-performance is comparable to vhost-user-blk.  So what does NVMe offer
-that makes this worthwhile?
+Kevin
 
-A cool NVMe feature would be the ability to pass through invididual
-queues to different guests without SR-IOV.  In other words, bind a queue
-to namespace subset so that multiple guests can be isolated from each
-other.  That way the data path would not require vmexits.  The control
-path and device initialization would still be emulated by QEMU so the
-hardware does not need to provide the full resources and state needed
-for SR-IOV.  I looked into this but came to the conclusion that it would
-require changes to the NVMe specification because the namespace is a
-per-command field.
-
---zH41lVBEV8cLJnCl
+--oTHb8nViIGeoXxdp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJabz3IAAoJEJykq7OBq3PI+iwH/R4xfu5FJlH6zbPAOu7lKzDA
-m2Hwv85+7uloSvK82fqFrpXb+CJ3WBYOXHJmZYeqqv+rqoodxaVXDx5fmjE53DaP
-RYyA5zLrEgWH7lsyUNBOWasYrdMC299CjsxpDOYoSmCKS4j3GJV0x3XBFBGTW3kg
-LHKXpf92cGihNyPHygeTJhLUAxVvh+4dBqiXr1LygEXnsQhoaLZqQcCr6oEB4flv
-z9LYvGavNC9vxlzzEwhRsbp/0WwLeidrW8Bawky5qWE7ixJqhNz5Vi60etrMIgis
-M+2Jm2TGv0kuaZltG0KUH7u9/tZjnbgbcUWPAF9A7iwZvafPT2GPt358Ak5pWnU=
-=CgCv
+iQIcBAEBAgAGBQJabz4JAAoJEH8JsnLIjy/WnYUP/j8eNtMNJWYUuWUHuKyq2Ci8
+0YXH/2851RJWy+FQKvwHC3JZPgXGNApv8F2rO5ubBSAi06CTta5j7sfsXWxL3/9P
+9F8XX++Tu7MjCgD7Ak6sy9NPJwec/QczW0yT8Fb2Iw/2ApAtoIpS2T1TZTvfoVpN
+mT1rSKT+siUYJHe73k3FzIxY5k4Tqc/+vfGaJZ1/HlzGTmhMWW8fbnUK0UxvTp1S
+2PGtgW+Kg6O15psRuPun9bmj+j69RvHZ/8lYpDxHXKfrRP9Vaw3r/FcerJEcr4Nj
+ICpuEybNlNpO4oyF/LMMpgv+8hoAnnar9+JYxgv1i+gF6bjKbADKeOeiI7c8T6VZ
+UHvDn99lEmzQRxATnx7zO2bnhxt8kPjvE0Zzfzv8lFUhGJqD0l8e5NVH3l3XdL34
+SUy5LqPpOSUPLAWulPfEVNLY0WC/o4Z8RBl9nUUO7uO6ufoLEEi6pR5jGhed4Klt
+lHw8tWDfahzg5iT+6a1guAHBbL4FI6EXRoJWvVZnrW2YjphPCMJdQ450G7IF5YlK
+1McPQNJFbC80jan1diJy6Z2rAP7xuoSTTpzdcFaVW/pFNYcI9RjVqlRrFZIi5Rxs
+NCW3sesQv2WIWl9fxresjZFb/dxETjbszsVMIj3lfpFeLlhfeyRoX7TP2RgDPTfK
+/C/uKCJgVv9VxLSNkTxz
+=Rx1k
 -----END PGP SIGNATURE-----
 
---zH41lVBEV8cLJnCl--
+--oTHb8nViIGeoXxdp--
