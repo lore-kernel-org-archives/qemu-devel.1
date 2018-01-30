@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egWlv-000255-S6
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 09:20:32 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1egWp8-0003BT-Mv
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 09:23:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egWlr-0002S5-0z
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 09:20:27 -0500
-References: <20180130083532.GA31511@localhost>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <12089106-4c7f-5300-9cac-d1b5556da64d@redhat.com>
-Date: Tue, 30 Jan 2018 08:20:03 -0600
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1egWp7-0004F8-6d
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 09:23:46 -0500
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
+	<7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <2e58f0a9-7db4-b562-e1d0-b8c712a67b21@virtuozzo.com>
+Date: Tue, 30 Jan 2018 17:23:30 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180130083532.GA31511@localhost>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0B1m3pmlESlKSKrChVCrALgBB0wxskGqr"
-Subject: Re: [Qemu-devel] [PATCH] block/mirror: change the semantic of
- 'force' of block-job-cancel
+In-Reply-To: <7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 8/9] qcow2: skip writing zero buffers to
+ empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,210 +26,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liang Li <liliang.opensource@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
-Cc: Liang Li <liliangleo@didichuxing.com>, Huaitong Han <huanhuaitong@didichuxing.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0B1m3pmlESlKSKrChVCrALgBB0wxskGqr
-From: Eric Blake <eblake@redhat.com>
-To: Liang Li <liliang.opensource@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
-Cc: Liang Li <liliangleo@didichuxing.com>,
- Huaitong Han <huanhuaitong@didichuxing.com>
-Message-ID: <12089106-4c7f-5300-9cac-d1b5556da64d@redhat.com>
-Subject: Re: [PATCH] block/mirror: change the semantic of 'force' of
- block-job-cancel
-References: <20180130083532.GA31511@localhost>
-In-Reply-To: <20180130083532.GA31511@localhost>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/30/2018 02:38 AM, Liang Li wrote:
-> When doing drive mirror to a low speed shared storage, if there was hea=
-vy
-> BLK IO write workload in VM after the 'ready' event, drive mirror block=
- job
-> can't be canceled immediately, it would keep running until the heavy BL=
-K IO
-> workload stopped in the VM.
-
-So far so good.   But the grammar and explanation in the rest of the
-commit is a bit hard to read; let me give a shot at an alternative wordin=
-g:
-
-Libvirt depends on the current block-job-cancel semantics, which is that
-when used without a flag after the 'ready' event, the command blocks
-until data is in sync.  However, these semantics are awkward in other
-situations, for example, people may use drive mirror for realtime
-backups while still wanting to use block live migration.  Libvirt cannot
-start a block live migration while another drive mirror is in progress,
-but the user would rather abandon the backup attempt as broken and
-proceed with the live migration than be stuck waiting for the current
-drive mirror backup to finish.
-
-The drive-mirror command already includes a 'force' flag, which libvirt
-does not use, although it documented the flag as only being useful to
-quit a job which is paused.  However, since quitting a paused job has
-the same effect as abandoning a backup in a non-paused job (namely, the
-destination file is not in sync, and the command completes immediately),
-we can just improve the documentation to make the force flag obviously
-useful.
-
->=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Jeff Cody <jcody@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: John Snow <jsnow@redhat.com>
-> Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
-> Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
-> Signed-off-by: Liang Li <liliangleo@didichuxing.com>
-> ---
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
 
 
-> +++ b/hmp-commands.hx
-> @@ -106,7 +106,8 @@ ETEXI
->          .args_type  =3D "force:-f,device:B",
->          .params     =3D "[-f] device",
->          .help       =3D "stop an active background block operation (us=
-e -f"
-> -                      "\n\t\t\t if the operation is currently paused)"=
-,
-> +                      "\n\t\t\t if you want to abort the operation imm=
-ediately"
-> +                      "\n\t\t\t instead of keep running until data is =
-in sync )",
 
-s/sync )/sync)/
+On 29/1/2018 11:28 PM, Max Reitz wrote:
+> On 2018-01-18 18:49, Anton Nefedov wrote:
+>> If COW areas of the newly allocated clusters are zeroes on the backing image,
+>> efficient bdrv_write_zeroes(flags=BDRV_REQ_ALLOCATE) can be used on the whole
+>> cluster instead of writing explicit zero buffers later in perform_cow().
+>>
+>> iotest 060:
+>> write to the discarded cluster does not trigger COW anymore.
+>> Use a backing image instead.
+>>
+>> iotest 066:
+>> cluster-alignment areas that were not really COWed are now detected
+>> as zeroes, hence the initial write has to be exactly the same size for
+>> the maps to match
+>>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>>   qapi/block-core.json       |  4 ++-
+>>   block/qcow2.h              |  6 +++++
+>>   block/qcow2-cluster.c      |  2 +-
+>>   block/qcow2.c              | 66 ++++++++++++++++++++++++++++++++++++++++++++--
+>>   block/trace-events         |  1 +
+>>   tests/qemu-iotests/060     | 26 +++++++++++-------
+>>   tests/qemu-iotests/060.out |  5 +++-
+>>   tests/qemu-iotests/066     |  2 +-
+>>   tests/qemu-iotests/066.out |  4 +--
+>>   9 files changed, 98 insertions(+), 18 deletions(-)
+> 
+> [...]
+> 
+>> @@ -1875,6 +1880,52 @@ static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
+>>       return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == bytes;
+>>   }
+>>   
+>> +static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
+>> +{
+>> +    return is_zero(bs, m->offset + m->cow_start.offset,
+>> +                   m->cow_start.nb_bytes) &&
+>> +           is_zero(bs, m->offset + m->cow_end.offset, m->cow_end.nb_bytes);
+>> +}
+>> +
+>> +static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+>> +{
+>> +    BDRVQcow2State *s = bs->opaque;
+>> +    QCowL2Meta *m;
+>> +
+>> +    for (m = l2meta; m != NULL; m = m->next) {
+>> +        int ret;
+>> +
+>> +        if (!m->cow_start.nb_bytes && !m->cow_end.nb_bytes) {
+>> +            continue;
+>> +        }
+>> +
+>> +        if (bs->encrypted) {
+>> +            continue;
+>> +        }
+> 
+> Not sure if the compiler optimizes this anyway, but I'd pull this out of
+> the loop.
+> 
 
->          .cmd        =3D hmp_block_job_cancel,
->      },
-> =20
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index 00403d9..4a96c42 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -63,6 +63,12 @@ typedef struct BlockJob {
->      bool cancelled;
-> =20
->      /**
-> +     * Set to true if the job should be abort immediately without wait=
-ing
+An imprint of the following patches (which were dropped from this
+series) - preallocation ahead of image EOF, which takes action
+regardless of image encryption.
 
-s/be //
-
-> +     * for data is in sync.
-
-s/is/to be/
-
-> +     */
-> +    bool force;
-> +
-> +    /**
->       * Counter for pause request. If non-zero, the block job is either=
- paused,
->       * or if busy =3D=3D true will pause itself as soon as possible.
->       */
-> @@ -218,10 +224,11 @@ void block_job_start(BlockJob *job);
->  /**
->   * block_job_cancel:
->   * @job: The job to be canceled.
-> + * @force: Quit a job without waiting data is in sync.
-
-s/data is/for data to be/
-
-> +++ b/qapi/block-core.json
-> @@ -2098,8 +2098,10 @@
->  #          the name of the parameter), but since QEMU 2.7 it can have
->  #          other values.
->  #
-> -# @force: whether to allow cancellation of a paused job (default
-> -#         false).  Since 1.3.
-> +# @force: #optional whether to allow cancellation a job without waitin=
-g data is
-
-The '#optional' tag should no longer be added.
-
-> +#         in sync, please not that since 2.12 it's semantic is not exa=
-ctly the
-> +#         same as before, from 1.3 to 2.11 it means whether to allow c=
-ancellation
-> +#         of a paused job (default false).  Since 1.3.
-
-Reads awkwardly.  I suggest:
-
-@force: If true, and the job has already emitted the event
-BLOCK_JOB_READY, abandon the job immediately (even if it is paused)
-instead of waiting for the destination to complete its final
-synchronization (since 1.3)
+But I'll leave the check outside the loop until it's needed
+there.
 
 
-> +++ b/tests/test-blockjob-txn.c
-> @@ -125,7 +125,7 @@ static void test_single_job(int expected)
->      block_job_start(job);
-> =20
->      if (expected =3D=3D -ECANCELED) {
-> -        block_job_cancel(job);
-> +        block_job_cancel(job, false);
->      }
-> =20
->      while (result =3D=3D -EINPROGRESS) {
-> @@ -173,10 +173,10 @@ static void test_pair_jobs(int expected1, int exp=
-ected2)
->      block_job_txn_unref(txn);
-> =20
->      if (expected1 =3D=3D -ECANCELED) {
-> -        block_job_cancel(job1);
-> +        block_job_cancel(job1, false);
->      }
->      if (expected2 =3D=3D -ECANCELED) {
-> -        block_job_cancel(job2);
-> +        block_job_cancel(job2, false);
->      }
-> =20
->      while (result1 =3D=3D -EINPROGRESS || result2 =3D=3D -EINPROGRESS)=
- {
-> @@ -231,7 +231,7 @@ static void test_pair_jobs_fail_cancel_race(void)
->      block_job_start(job1);
->      block_job_start(job2);
-> =20
-> -    block_job_cancel(job1);
-> +    block_job_cancel(job1, false);
-> =20
->      /* Now make job2 finish before the main loop kicks jobs.  This sim=
-ulates
->       * the race between a pending kick and another job completing.
->=20
+> Maybe you could put all of the conditions under which this function can
+> actually do something at its beginning: That is, we can't do anything if
+> the BDS is encrypted or if bs->file does not support BDRV_REQ_ALLOCATE
+> (and then you just call this function unconditionally in
+> qcow2_co_pwritev()).
+> 
 
-The testsuite should probably also test block_job_cancel(..., true).
+Done.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>> +        if (!is_zero_cow(bs, m)) {
+>> +            continue;
+>> +        }
+> 
+> Is this really efficient?  I remember someone complaining about
+> bdrv_co_block_status() being kind of slow on some filesystems, so
+> there'd be a tradeoff depending on how it compares to just reading up to
+> two clusters from the backing file -- especially considering that the OS
+> can query the same information just as quickly, and thus the only
+> overhead the read should have is a memset() (assuming the OS is clever).
+> 
+> So basically my question is whether it would be better to just skip this
+> if we have any backing file at all and only do this optimization if
+> there is none.
+> 
 
+So what we trade between is
+(read+write) vs (lseek+fallocate or lseek+read+write).
 
---0B1m3pmlESlKSKrChVCrALgBB0wxskGqr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Indeed if it comes to lseek the profit is smaller, and we're probably
+unlikely to find a hole anyway.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Maybe it's good enough to cover these cases:
+  1. no backing
+  2. beyond bdrv_getlength() in backing
+  3. unallocated in backing qcow2 (covers 'beyond bdrv_getlength()
+                                           in backing->file')
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwfxMACgkQp6FrSiUn
-Q2qAlggAn6WU7GowNKQDAldoyzmrvhMKyvk0tNJadx7bh06TYVP9pFaX0ykBW7fU
-UTLrjE5JFh/Qd2WsMCXT0XlctO3Wf2u0SSV9wB3e3cG+kUe7sbo4Tc4hlESQEwkN
-qf9od41BPwkIycw3jzc1YB6Tp3iXc84MM+0+/mLc1C2wyp2MMYP9S71nd8k66mQA
-yYfuCrnGJliEuxpbCDoheDq5ow4QH5DRCejJIagfgn7bCzwzVuD3Tnz2QWyIEOlb
-NnQM07aNxEwr9I1dacLTe3jjWQ7MdLko0CsI/S0J4xJq2txc7AQnLDw+5RpBRp36
-BmpdBmiWZgG6VZVfxzn8bvst3MAvDA==
-=h2ic
------END PGP SIGNATURE-----
+1 & 2 are easy to check;
+3: if that's not too hacky maybe we can do the bdrv_is_allocated() check
+for qcow2 exclusively and if there is raw (or any other format) backing
+image - do the COW
 
---0B1m3pmlESlKSKrChVCrALgBB0wxskGqr--
+>> +
+>> +        BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC_SPACE);
+>> +        /* instead of writing zero COW buffers,
+>> +           efficiently zero out the whole clusters */
+>> +        ret = bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset,
+>> +                                    m->nb_clusters * s->cluster_size,
+>> +                                    BDRV_REQ_ALLOCATE);
+>> +        if (ret < 0) {
+>> +            if (ret != -ENOTSUP && ret != -EAGAIN) {
+>> +                return ret;
+>> +            }
+>> +            continue;
+>> +        }
+>> +
+>> +        trace_qcow2_skip_cow(qemu_coroutine_self(), m->offset, m->nb_clusters);
+>> +        m->skip_cow = true;
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>>   static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>>                                            uint64_t bytes, QEMUIOVector *qiov,
+>>                                            int flags)
+> 
+> [...]
+> 
+>> diff --git a/block/trace-events b/block/trace-events
+>> index 11c8d5f..c9fa596 100644
+>> --- a/block/trace-events
+>> +++ b/block/trace-events
+>> @@ -61,6 +61,7 @@ qcow2_writev_done_part(void *co, int cur_bytes) "co %p cur_bytes %d"
+>>   qcow2_writev_data(void *co, uint64_t offset) "co %p offset 0x%" PRIx64
+>>   qcow2_pwrite_zeroes_start_req(void *co, int64_t offset, int count) "co %p offset 0x%" PRIx64 " count %d"
+>>   qcow2_pwrite_zeroes(void *co, int64_t offset, int count) "co %p offset 0x%" PRIx64 " count %d"
+>> +qcow2_skip_cow(void* co, uint64_t offset, int nb_clusters) "co %p offset 0x%" PRIx64 " nb_clusters %d"
+> 
+> Nit: Should be "void *co" to match the rest.
+> 
+
+apparently checkpatch.pl doesn't cover events files :) thanks, done
+
+>>   
+>>   # block/qcow2-cluster.c
+>>   qcow2_alloc_clusters_offset(void *co, uint64_t offset, int bytes) "co %p offset 0x%" PRIx64 " bytes %d"
+> 
+> [...]
+> 
+>> diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
+>> index 8638217..3c216a1 100755
+>> --- a/tests/qemu-iotests/066
+>> +++ b/tests/qemu-iotests/066
+>> @@ -71,7 +71,7 @@ echo
+>>   _make_test_img $IMG_SIZE
+>>   
+>>   # Create data clusters (not aligned to an L2 table)
+>> -$QEMU_IO -c 'write -P 42 1M 256k' "$TEST_IMG" | _filter_qemu_io
+>> +$QEMU_IO -c "write -P 42 $(((1024 + 32) * 1024)) 192k" "$TEST_IMG" | _filter_qemu_io
+> 
+> The comment should probably be updated to note that we don't write head
+> and tail because we want them to stay zero, so the mapping information
+> matches.
+> 
+> Max
+> 
+
+Done.
+
+>>   orig_map=$($QEMU_IMG map --output=json "$TEST_IMG")
+>>   
+>>   # Convert the data clusters to preallocated zero clusters
+> 
