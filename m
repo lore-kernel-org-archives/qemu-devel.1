@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egT3S-0004A5-2a
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:23 -0500
+	(envelope-from <armbru@redhat.com>) id 1egT3L-000472-Fr
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egT3I-0000an-VL
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40026)
+	(envelope-from <armbru@redhat.com>) id 1egT3J-0000at-0n
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egT3I-0000aY-PX
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egT3I-0000aa-RZ
 	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:08 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 26D11C0467D5
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A90219D385
 	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 10:22:08 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
 	[10.36.116.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DC6ED7C857
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E2CDA5C266
 	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 10:22:07 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 30 Jan 2018 11:22:00 +0100
-Message-Id: <20180130102202.28519-17-armbru@redhat.com>
+Date: Tue, 30 Jan 2018 11:21:59 +0100
+Message-Id: <20180130102202.28519-16-armbru@redhat.com>
 In-Reply-To: <20180130102202.28519-1-armbru@redhat.com>
 References: <20180130102202.28519-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/18] Drop superfluous includes of
- qapi/qmp/dispatch.h
+Subject: [Qemu-devel] [PATCH 15/18] Include qapi/qmp/qnull.h exactly where
+ needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,46 +38,33 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- monitor.c                 | 1 -
- qga/main.c                | 1 -
- tests/test-qmp-commands.c | 1 -
- 3 files changed, 3 deletions(-)
+ target/ppc/translate.c      | 1 -
+ target/ppc/translate_init.c | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor.c b/monitor.c
-index 02d9dd8708..6f70c8db9a 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -79,7 +79,6 @@
- #include "sysemu/qtest.h"
- #include "sysemu/cpus.h"
- #include "qemu/cutils.h"
--#include "qapi/qmp/dispatch.h"
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index eeaad9e91f..4132f67bb1 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -24,7 +24,6 @@
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
+-#include "qapi/qmp/qnull.h"
+ #include "qemu/host-utils.h"
+ #include "exec/cpu_ldst.h"
  
- #if defined(TARGET_S390X)
- #include "hw/s390x/storage-keys.h"
-diff --git a/qga/main.c b/qga/main.c
-index 64e0776bf2..30aa7f92f7 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -27,7 +27,6 @@
- #include "qga-qmp-commands.h"
- #include "qapi/qmp/qerror.h"
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 2913af912a..434c42731d 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -30,6 +30,7 @@
+ #include "mmu-hash64.h"
+ #include "qemu/error-report.h"
  #include "qapi/error.h"
--#include "qapi/qmp/dispatch.h"
- #include "qga/channel.h"
- #include "qemu/bswap.h"
- #include "qemu/help_option.h"
-diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
-index b5a3d88775..24660d0868 100644
---- a/tests/test-qmp-commands.c
-+++ b/tests/test-qmp-commands.c
-@@ -5,7 +5,6 @@
- #include "qapi/qmp/qstring.h"
- #include "test-qmp-commands.h"
- #include "qapi/error.h"
--#include "qapi/qmp/dispatch.h"
- #include "qemu/module.h"
- #include "qapi/qobject-input-visitor.h"
- #include "tests/test-qapi-types.h"
++#include "qapi/qmp/qnull.h"
+ #include "qapi/visitor.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/ppc/ppc.h"
 -- 
 2.13.6
