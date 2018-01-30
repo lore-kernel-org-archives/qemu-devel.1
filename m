@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egZ3z-0000cC-9i
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:47:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1egZ4T-0000tO-Eh
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egZ3r-0000Y7-DE
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:47:15 -0500
-References: <20180130150435.2553-1-berto@igalia.com>
-	<b93f21cf-5cd4-a6d0-7005-e19a3de211c8@redhat.com>
-	<w51607juy5j.fsf@maestria.local.igalia.com>
-	<62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
-	<w51372nuxj9.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0127ca7d-958b-40cc-e714-bb7b61871502@redhat.com>
-Date: Tue, 30 Jan 2018 10:46:47 -0600
+	(envelope-from <cohuck@redhat.com>) id 1egZ4O-0001Bp-Io
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:47:45 -0500
+Date: Tue, 30 Jan 2018 17:46:53 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180130174653.6b44bc3d.cohuck@redhat.com>
+In-Reply-To: <3c0eb044-20ad-9f62-6ba8-caaed34cf3e5@redhat.com>
+References: <20180129165210.21086-1-cohuck@redhat.com>
+	<20180129165210.21086-3-cohuck@redhat.com>
+	<3c0eb044-20ad-9f62-6ba8-caaed34cf3e5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <w51372nuxj9.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kNKurKs15TvNql7VZs3rlpLsLOqRUBQgR"
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Replace align_offset() with
- ROUND_UP()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] s390x/cpumodel: allow zpci
+ features in qemu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kNKurKs15TvNql7VZs3rlpLsLOqRUBQgR
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <0127ca7d-958b-40cc-e714-bb7b61871502@redhat.com>
-Subject: Re: [PATCH] qcow2: Replace align_offset() with ROUND_UP()
-References: <20180130150435.2553-1-berto@igalia.com>
- <b93f21cf-5cd4-a6d0-7005-e19a3de211c8@redhat.com>
- <w51607juy5j.fsf@maestria.local.igalia.com>
- <62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
- <w51372nuxj9.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51372nuxj9.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 30 Jan 2018 14:09:43 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On 01/30/2018 10:22 AM, Alberto Garcia wrote:
-> On Tue 30 Jan 2018 05:17:47 PM CET, Eric Blake wrote:
->> On 01/30/2018 10:08 AM, Alberto Garcia wrote:
->>> On Tue 30 Jan 2018 05:03:16 PM CET, Eric Blake wrote:
->>>
->>>>> -    virtual_size =3D align_offset(qemu_opt_get_size_del(opts, BLOC=
-K_OPT_SIZE, 0),
->>>>> +    virtual_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OP=
-T_SIZE, 0),
->>>>>                                  cluster_size);
->>>
->>> I just realized that the first parameter here is a function call with=
+> On 29.01.2018 17:52, Cornelia Huck wrote:
+> > AEN can be provided unconditionally, ZPCI has to be turned on
+> > manually (it should really depend on CONFIG_PCI).
 
->>> side effects, it it safe to use ROUND_UP() in this case?
->>>
->>> #define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
->>
->> Oh, good catch.  No, we need a temporary variable to hold the result
->> of the function call
->=20
-> ...which is what align_offset() was doing in the first place. I can
-> still modify that function to use the macro internally.
+I think we should keep it non-default even with your suggested change.
 
-Nah. I think the ROUND_UP naming is enough to remind us to be careful,
-and since this was the only affected spot in your conversion, it's nicer
-to drop align_offset() and just do:
+> > 
+> > With -cpu qemu,zpci=on, a 4.15 guest kernel can now successfully
+> > detect virtio-pci devices under tcg.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  target/s390x/gen-features.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> > index 0570f597ec..db7ac965a0 100644
+> > --- a/target/s390x/gen-features.c
+> > +++ b/target/s390x/gen-features.c
+> > @@ -574,6 +574,7 @@ static uint16_t qemu_LATEST[] = {
+> >      S390_FEAT_INTERLOCKED_ACCESS_2,
+> >      S390_FEAT_MSA_EXT_4,
+> >      S390_FEAT_MSA_EXT_3,
+> > +    S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
+> >  };
+> >  
+> >  /* add all new definitions before this point */
+> > @@ -582,6 +583,8 @@ static uint16_t qemu_MAX[] = {
+> >      S390_FEAT_STFLE_53,
+> >      /* generates a dependency warning, leave it out for now */
+> >      S390_FEAT_MSA_EXT_5,
+> > +    /* should be conditional on CONFIG_PCI */
+> > +    S390_FEAT_ZPCI,
+> >  };
+> >    
+> 
+> What about something in addition like that, should work for now
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 212a5f0697..62fc8d538d 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -23,6 +23,7 @@
+>  #include "qapi/qmp/qbool.h"
+>  #ifndef CONFIG_USER_ONLY
+>  #include "sysemu/arch_init.h"
+> +#include "hw/pci/pci.h"
+>  #endif
+> 
+>  #define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc) \
+> @@ -1271,6 +1272,12 @@ static void register_types(void)
+> 
+>      /* init all bitmaps from gnerated data initially */
+>      s390_init_feat_bitmap(qemu_max_cpu_feat_init, qemu_max_cpu_feat);
+> +#ifndef CONFIG_USER_ONLY
+> +    if (!pci_available) {
+> +        clear_bit(S390_FEAT_ZPCI, qemu_max_cpu_feat);
+> +    }
+> +#endif
+> +
+>      for (i = 0; i < ARRAY_SIZE(s390_cpu_defs); i++) {
+>          s390_init_feat_bitmap(s390_cpu_defs[i].base_init,
+>                                s390_cpu_defs[i].base_feat);
+> 
+> 
 
-virtual_size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-virtual_size =3D ROUND_UP(virtual_size, cluster_size);
+That makes sense, added. Thanks!
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---kNKurKs15TvNql7VZs3rlpLsLOqRUBQgR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwoXcACgkQp6FrSiUn
-Q2r1tAgArXxThbdmGN6nKF7PDDSPLs4HDJyasJVAQky6iKBFQls2vfuwhylfI0cY
-I0yy46p7VLuzsuJna3JA08Q1+50jzAbl5+WaZ6YEMkIbEzG/2HeoQvqHKPs0yokr
-peYvInYjj0bYOHdPU2v0ufAhvvILyILtFDutnhb0YKiwgNoVVYAvejzcX3+rG1ga
-ulAHrV3NahObuTcN2A+OwIbuPPfcNCjiF3JiUS1jwofnzoJkhepnkCZakhUizAS6
-uRUrDTCkqF2IlTa1BnOxAntG2t2agH/FVEcy5CjRXxf7PBueebkcrjRxND57unmr
-gAsp5t7AeSFsMix4Vi952qC1cPGhLg==
-=qqKr
------END PGP SIGNATURE-----
-
---kNKurKs15TvNql7VZs3rlpLsLOqRUBQgR--
+> 
+> >  /****** END FEATURE DEFS ******/
+> >   
+> 
+> 
