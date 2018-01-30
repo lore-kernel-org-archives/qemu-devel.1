@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egXhj-0002no-H9
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:20:15 -0500
+	(envelope-from <kraxel@redhat.com>) id 1egXkG-0004LB-Tj
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egXhi-00070n-JI
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:20:11 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1egXhi-0006zb-Dq
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:20:10 -0500
-Received: by mail-oi0-x241.google.com with SMTP id k15so8055764oib.1
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 07:20:10 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1egXk7-0000IV-G7
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:22:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egXk7-0000Go-9G
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:22:39 -0500
+Date: Tue, 30 Jan 2018 16:22:33 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180130152233.kg2qpibe4zxrtytx@sirius.home.kraxel.org>
+References: <20180117145029.28736-1-tournier.elie@gmail.com>
+	<20180129161155.GA25994@Nikki.localdomain>
+	<20180129180830.tinzwowiarfolyfr@sirius.home.kraxel.org>
+	<20180130144335.GA4881@Nikki.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <1517318239-15764-1-git-send-email-peter.maydell@linaro.org>
-References: <1517318239-15764-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jan 2018 15:19:49 +0000
-Message-ID: <CAFEAcA9WEM=eSa-7sFCV0ue5wHcRfvRC8EmA+9VEdsG85+9vCg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user/signal.c: Rename MC_* defines
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180130144335.GA4881@Nikki.localdomain>
+Subject: Re: [Qemu-devel] [RFC 0/2] Use SDL to create an OpenGL ES context
+ for virglrenderer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, "patches@linaro.org" <patches@linaro.org>, qemu-stable <qemu-stable@nongnu.org>
+To: Elie Tournier <tournier.elie@gmail.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On 30 January 2018 at 13:17, Peter Maydell <peter.maydell@linaro.org> wrote:
-> The SPARC code in linux-user/signal.c defines a set of
-> MC_* constants. On some SPARC hosts these are also defined
-> by sys/ucontext.h, resulting in build failures:
->
-> linux-user/signal.c:2786:0: error: "MC_NGREG" redefined [-Werror]
->  #define MC_NGREG 19
->
-> In file included from /usr/include/signal.h:302:0,
->                  from include/qemu/osdep.h:86,
->                  from linux-user/signal.c:19:
-> /usr/include/sparc64-linux-gnu/sys/ucontext.h:59:0: note: this is the location of the previous definition
->  # define MC_NGREG __MC_NGREG
->
-> Rename all these constants to SPARC_MC_* to avoid the clash.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This has just started causing failures on the SPARC build
-> box I use for merge tests (presumably due to a system
-> header update), so I'm planning to apply this to master as
-> a buildfix.
+  Hi,
 
-Now applied, thanks. I threw in a cc of qemu-stable too,
-since otherwise stable point releases won't build on these hosts.
+> > Well, display configuration is going to be rewritten, and while that is
+> > in flight adding new config options isn't a good idea b/c things will
+> > conflict ...
+> I'm wondering how extensive this rewrite is going to be. Did you plan to modify the qemu interface?
+> If someone already start working on this task, can you send me the link to the repository?
+> I will be happy to help if needed.
 
--- PMM
+https://www.kraxel.org/cgit/qemu/log/?h=sirius/display-cmdline
+
+> > Beside that:  Is a new config option actually needed in the first place?
+> > 
+> > Ideally qemu (or sdl) would figure on its own that a full core context
+> > isn't available and try fallback to gles then.
+> I'm fine with this idea.
+> However, I think we still need to add a way to the user to choose the backend he want.
+
+Changing gl from bool to multiple choice looks more useful to me then,
+i.e. have "gl={on,core,gles,off}", where "on" automatically picks "core"
+or "gles" depending on what is available.
+
+What is the status of the virglrenderer patches btw?
+
+cheers,
+  Gerd
