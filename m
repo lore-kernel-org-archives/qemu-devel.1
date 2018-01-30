@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liliang.opensource@gmail.com>) id 1egRRS-0000Xu-CU
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:39:00 -0500
+	(envelope-from <kraxel@redhat.com>) id 1egS6J-0003d4-6S
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:21:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liliang.opensource@gmail.com>) id 1egRRP-00037W-41
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:38:58 -0500
-From: Liang Li <liliang.opensource@gmail.com>
-Date: Tue, 30 Jan 2018 16:38:04 +0800
-Message-ID: <20180130083532.GA31511@localhost>
+	(envelope-from <kraxel@redhat.com>) id 1egS6G-0005GI-24
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:21:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egS6F-0005Fb-Sc
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:21:07 -0500
+Date: Tue, 30 Jan 2018 10:21:01 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180130092101.hiuru6lnzbjw2jiy@sirius.home.kraxel.org>
+References: <CAE5jQCeSL5fRXBh5F9L3G5JkkwmS=sU9VS6Bu82Xpq5fMd=K8Q@mail.gmail.com>
+	<20180129082727.jvh4nc2cquuqylrv@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.1801291701130.88941@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] block/mirror: change the semantic of 'force'
- of block-job-cancel
+In-Reply-To: <alpine.BSF.2.21.1801291701130.88941@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] SDL2 UI behavior of switching views
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,245 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
-Cc: Liang Li <liliangleo@didichuxing.com>, Huaitong Han <huanhuaitong@didichuxing.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org
 
-When doing drive mirror to a low speed shared storage, if there was heavy
-BLK IO write workload in VM after the 'ready' event, drive mirror block job
-can't be canceled immediately, it would keep running until the heavy BLK IO
-workload stopped in the VM.
+On Mon, Jan 29, 2018 at 07:21:02PM +0100, BALATON Zoltan wrote:
+> On Mon, 29 Jan 2018, Gerd Hoffmann wrote:
+> > On Sun, Jan 28, 2018 at 06:43:44PM +0300, Anatoly Trosinenko wrote:
+> > > When QEMU is run with GTK UI, it changes what is drawn on its single window
+> > > when I press Ctrl-Alt-{1,2,3,4}. But when I use SDL2 UI, it opens multiple
+> > > windows: a separate window per each view (display, monitor, serial,
+> > > parallel). Is it by design or is it a bug?
+> > 
+> > It's intentional.  With gtk you can have separate windows too (try "View/Detach Tab").
+> 
+> Is there an option also to get back the old SDL1 behaviour with SDL2? Could
+> that be made the default to make the transition easier?
 
-Because libvirt depends on block-job-cancel for block live migration, the
-current block-job-cancel has the semantic to make sure data is in sync after
-the 'ready' event.  This semantic can't meet some requirement, for example,
-people may use drive mirror for realtime backup while need the ability of
-block live migration. If drive mirror can't not be cancelled immediately,
-it means block live migration need to wait, because libvirt make use drive
-mirror to implement block live migration and only one drive mirror block
-job is allowed at the same time for a give block dev.
+Well, that kind of flexibility is alot harder to do with SDL as it
+doesn't offer widgets to manage views ...
 
-We need a new interface for 'force cancel', which could quit block job
-immediately if don't care about whether data is in sync or not.
+In contrast gtk has one widget per virtual console, and I can easily
+shuffle around them: Just reparent from notebook to standalone window
+("detach tab") and visa-versa (when closing the detached window).
 
-'force' is not used by libvirt currently, to make things simple, change
-it's semantic slightly, hope it will not break some use case which need its
-original semantic.
+How about using gtk instead?
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: John Snow <jsnow@redhat.com>
-Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
-Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
-Signed-off-by: Liang Li <liliangleo@didichuxing.com>
----
- block/mirror.c            |  9 +++------
- blockdev.c                |  4 ++--
- blockjob.c                | 11 ++++++-----
- hmp-commands.hx           |  3 ++-
- include/block/blockjob.h  |  9 ++++++++-
- qapi/block-core.json      |  6 ++++--
- tests/test-blockjob-txn.c |  8 ++++----
- 7 files changed, 29 insertions(+), 21 deletions(-)
-
-diff --git a/block/mirror.c b/block/mirror.c
-index c9badc1..c22dff9 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -869,11 +869,8 @@ static void coroutine_fn mirror_run(void *opaque)
- 
-         ret = 0;
-         trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
--        if (!s->synced) {
--            block_job_sleep_ns(&s->common, delay_ns);
--            if (block_job_is_cancelled(&s->common)) {
--                break;
--            }
-+        if (block_job_is_cancelled(&s->common) && s->common.force) {
-+            break;
-         } else if (!should_complete) {
-             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
-             block_job_sleep_ns(&s->common, delay_ns);
-@@ -887,7 +884,7 @@ immediate_exit:
-          * or it was cancelled prematurely so that we do not guarantee that
-          * the target is a copy of the source.
-          */
--        assert(ret < 0 || (!s->synced && block_job_is_cancelled(&s->common)));
-+        assert(ret < 0 || block_job_is_cancelled(&s->common));
-         assert(need_drain);
-         mirror_wait_for_all_io(s);
-     }
-diff --git a/blockdev.c b/blockdev.c
-index 8e977ee..039f156 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -145,7 +145,7 @@ void blockdev_mark_auto_del(BlockBackend *blk)
-         aio_context_acquire(aio_context);
- 
-         if (bs->job) {
--            block_job_cancel(bs->job);
-+            block_job_cancel(bs->job, false);
-         }
- 
-         aio_context_release(aio_context);
-@@ -3802,7 +3802,7 @@ void qmp_block_job_cancel(const char *device,
-     }
- 
-     trace_qmp_block_job_cancel(job);
--    block_job_cancel(job);
-+    block_job_cancel(job, force);
- out:
-     aio_context_release(aio_context);
- }
-diff --git a/blockjob.c b/blockjob.c
-index f5cea84..0aacb50 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -365,7 +365,7 @@ static void block_job_completed_single(BlockJob *job)
-     block_job_unref(job);
- }
- 
--static void block_job_cancel_async(BlockJob *job)
-+static void block_job_cancel_async(BlockJob *job, bool force)
- {
-     if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
-         block_job_iostatus_reset(job);
-@@ -376,6 +376,7 @@ static void block_job_cancel_async(BlockJob *job)
-         job->pause_count--;
-     }
-     job->cancelled = true;
-+    job->force = force;
- }
- 
- static int block_job_finish_sync(BlockJob *job,
-@@ -437,7 +438,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
-      * on the caller, so leave it. */
-     QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
-         if (other_job != job) {
--            block_job_cancel_async(other_job);
-+            block_job_cancel_async(other_job, true);
-         }
-     }
-     while (!QLIST_EMPTY(&txn->jobs)) {
-@@ -542,10 +543,10 @@ void block_job_user_resume(BlockJob *job)
-     }
- }
- 
--void block_job_cancel(BlockJob *job)
-+void block_job_cancel(BlockJob *job, bool force)
- {
-     if (block_job_started(job)) {
--        block_job_cancel_async(job);
-+        block_job_cancel_async(job, force);
-         block_job_enter(job);
-     } else {
-         block_job_completed(job, -ECANCELED);
-@@ -557,7 +558,7 @@ void block_job_cancel(BlockJob *job)
-  * function pointer casts there. */
- static void block_job_cancel_err(BlockJob *job, Error **errp)
- {
--    block_job_cancel(job);
-+    block_job_cancel(job, false);
- }
- 
- int block_job_cancel_sync(BlockJob *job)
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 15620c9..c8bb414 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -106,7 +106,8 @@ ETEXI
-         .args_type  = "force:-f,device:B",
-         .params     = "[-f] device",
-         .help       = "stop an active background block operation (use -f"
--                      "\n\t\t\t if the operation is currently paused)",
-+                      "\n\t\t\t if you want to abort the operation immediately"
-+                      "\n\t\t\t instead of keep running until data is in sync )",
-         .cmd        = hmp_block_job_cancel,
-     },
- 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 00403d9..4a96c42 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -63,6 +63,12 @@ typedef struct BlockJob {
-     bool cancelled;
- 
-     /**
-+     * Set to true if the job should be abort immediately without waiting
-+     * for data is in sync.
-+     */
-+    bool force;
-+
-+    /**
-      * Counter for pause request. If non-zero, the block job is either paused,
-      * or if busy == true will pause itself as soon as possible.
-      */
-@@ -218,10 +224,11 @@ void block_job_start(BlockJob *job);
- /**
-  * block_job_cancel:
-  * @job: The job to be canceled.
-+ * @force: Quit a job without waiting data is in sync.
-  *
-  * Asynchronously cancel the specified job.
-  */
--void block_job_cancel(BlockJob *job);
-+void block_job_cancel(BlockJob *job, bool force);
- 
- /**
-  * block_job_complete:
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 8225308..7c4dbfe 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2098,8 +2098,10 @@
- #          the name of the parameter), but since QEMU 2.7 it can have
- #          other values.
- #
--# @force: whether to allow cancellation of a paused job (default
--#         false).  Since 1.3.
-+# @force: #optional whether to allow cancellation a job without waiting data is
-+#         in sync, please not that since 2.12 it's semantic is not exactly the
-+#         same as before, from 1.3 to 2.11 it means whether to allow cancellation
-+#         of a paused job (default false).  Since 1.3.
- #
- # Returns: Nothing on success
- #          If no background operation is active on this device, DeviceNotActive
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 3591c96..53daadb 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -125,7 +125,7 @@ static void test_single_job(int expected)
-     block_job_start(job);
- 
-     if (expected == -ECANCELED) {
--        block_job_cancel(job);
-+        block_job_cancel(job, false);
-     }
- 
-     while (result == -EINPROGRESS) {
-@@ -173,10 +173,10 @@ static void test_pair_jobs(int expected1, int expected2)
-     block_job_txn_unref(txn);
- 
-     if (expected1 == -ECANCELED) {
--        block_job_cancel(job1);
-+        block_job_cancel(job1, false);
-     }
-     if (expected2 == -ECANCELED) {
--        block_job_cancel(job2);
-+        block_job_cancel(job2, false);
-     }
- 
-     while (result1 == -EINPROGRESS || result2 == -EINPROGRESS) {
-@@ -231,7 +231,7 @@ static void test_pair_jobs_fail_cancel_race(void)
-     block_job_start(job1);
-     block_job_start(job2);
- 
--    block_job_cancel(job1);
-+    block_job_cancel(job1, false);
- 
-     /* Now make job2 finish before the main loop kicks jobs.  This simulates
-      * the race between a pending kick and another job completing.
--- 
-1.8.3.1
+cheers,
+  Gerd
