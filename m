@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1egUVa-0004y3-2V
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 06:55:29 -0500
+	(envelope-from <no-reply@patchew.org>) id 1egUeT-0007Un-LK
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1egUVQ-0006VU-DC
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 06:55:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1egUVP-0006UB-M4
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 06:55:15 -0500
-Date: Tue, 30 Jan 2018 19:55:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180130115510.GA13988@xz-mi>
-References: <1972503886.3523325.1517308471375.ref@mail.yahoo.com>
-	<1972503886.3523325.1517308471375@mail.yahoo.com>
+	(envelope-from <no-reply@patchew.org>) id 1egUeK-0003zl-5d
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:04:37 -0500
+Resent-Message-Id: <E1egUeK-0003zl-5d@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1egUeJ-0003zL-SE
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:04:28 -0500
+In-Reply-To: <20180130035527.47336-1-aik@ozlabs.ru>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151728588035.800.15328948644533230574@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1972503886.3523325.1517308471375@mail.yahoo.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Savevm and loadvm not working
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 29 Jan 2018 20:18:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH qemu v5 0/2] vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sridhar kulkarni <sridhar_kulk@yahoo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: aik@ozlabs.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, eric.auger@redhat.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Tue, Jan 30, 2018 at 10:34:31AM +0000, sridhar kulkarni via Qemu-devel=
- wrote:
-> Hi,
-> I am new bee to snapshot feature and how to use it correctly. My requir=
-ement is simple, in that I want to snapshot the running VM and save the s=
-napshot file. Using the snapshot file, I want to boot the VM directly to =
-snapshot state.I came across the qemu monitors "savevm" and "loadvm" comm=
-ands. The following are the steps I follow to create snapshot and load th=
-e snapshot,Step 1: Launch VM using below command,=20
-> qemu-system-arm -M arm-machine -m 512M -name my_name -kernel main.rbx -=
-serial pty -serial vc -serial vc -serial vc -drive if=3Dnone,format=3Dqco=
-w2,file=3D/home/sridhar/qemu_disk_image/dummy.qcow2=20
->=20
-> Step 2: Save the snapshot (issue savevm from qemu monitor)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --> savevm my_snapshot
->=20
-> Step 3 Launch the VM using snapshot image saved in step 2,
-> qemu-system-arm -M arm-machine -m 512M -name my_name -kernel main.rbx -=
-serial pty -serial vc -serial vc -serial vc -drive if=3Dnone,format=3Dqco=
-w2,file=3D/home/sridhar/qemu_disk_image/dummy.qcow2 -loadvm my_snapshot
-> With this approach, I am seeing that RAM contents are not getting saved=
- when I issue "savevm" command.
-
-Could I ask how do you know that RAM contents are not saved?  Is there
-any error happened after your loadvm operation?
-
-> I have copied the part of the file, when the function "ram_control_save=
-_page" returns "RAM_SAVE_CONTROL_NOT_SUPP" and hence the page is not gett=
-ing saved.
->=20
-> size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 ram_addr_t offset, size_t size,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 uint64_t *bytes_sent)
-> {
-> =C2=A0=C2=A0=C2=A0 if (f->hooks && f->hooks->save_page) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D f->hooks->save_p=
-age(f, f->opaque, block_offset,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- offset, size, bytes_sent);
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret !=3D RAM_SAVE_CONTRO=
-L_DELAYED) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (=
-bytes_sent && *bytes_sent > 0) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 qemu_update_position(f, *bytes_sent);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } el=
-se if (ret < 0) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 qemu_file_set_error(f, ret);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
-> =C2=A0=C2=A0=C2=A0 }
->=20
-> =C2=A0=C2=A0=C2=A0 return RAM_SAVE_CONTROL_NOT_SUPP;
-
-Here IMHO as long as you are not using RDMA, this function should
-always return with RAM_SAVE_CONTROL_NOT_SUPP.
-
-And I do think the name is slightly misleading.
-
-> }
->=20
-> Is there anything that I am missing here in the understanding "savevm" =
-and "loadvm" commands?=20
->=20
-> Thanks
-
---=20
-Peter Xu
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTMwMDM1NTI3LjQ3MzM2LTEtYWlrQG96bGFicy5ydQpTdWJqZWN0OiBb
+UWVtdS1kZXZlbF0gW1BBVENIIHFlbXUgdjUgMC8yXSB2ZmlvLXBjaTogQWxsb3cgbW1hcCBvZiBN
+U0lYIEJBUgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjYxYjRhMTMyNyBSRkM6IHZmaW8tcGNpOiBBbGxvdyBt
+bWFwIG9mIE1TSVggQkFSCmVmZDQ0NzczNmMgdmZpby9jb21tb246IEFkZCAncDJwJyBwcm9wZXJ0
+eSB0byBlbmFibGUgRE1BIG1hcHBpbmcgb2YgTU1JTyByZWdpb25zCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHZmaW8vY29tbW9uOiBBZGQgJ3AycCcgcHJvcGVydHkg
+dG8gZW5hYmxlIERNQSBtYXBwaW5nIG9mIE1NSU8gcmVnaW9ucy4uLgpFUlJPUjogbGluZSBvdmVy
+IDkwIGNoYXJhY3RlcnMKIzU5OiBGSUxFOiBody92ZmlvL2NvbW1vbi5jOjUyMzoKKyAgICAgICAg
+ICAgIGVycm9yX3JlcG9ydCgiUmVnaW9uICUiSFdBRERSX1BSSXgiLi4lIkhXQUREUl9QUkl4IiBp
+cyBub3QgYWxpZ25lZCB0byAlIkhXQUREUl9QUkl4IiBhbmQgY2Fubm90IGJlIG1hcHBlZCBmb3Ig
+RE1BIiwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTA1IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMjog
+UkZDOiB2ZmlvLXBjaTogQWxsb3cgbW1hcCBvZiBNU0lYIEJBUi4uLgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
