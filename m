@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egREf-0003Kg-FY
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:25:46 -0500
+	(envelope-from <groug@kaod.org>) id 1egRLk-0006Bn-Jo
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:33:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egREb-0002yg-IN
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:25:45 -0500
-Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:37605)
+	(envelope-from <groug@kaod.org>) id 1egRLf-00078L-OG
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:33:04 -0500
+Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:40426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egREb-0002xn-Al
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:25:41 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egRLf-00076T-Gp
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:32:59 -0500
 Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 7164A140F63
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 09:25:38 +0100 (CET)
-Date: Tue, 30 Jan 2018 09:25:31 +0100
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id E1EA91450DF
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 09:32:57 +0100 (CET)
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180130092531.52c4eb37@bahia.lan>
-In-Reply-To: <20180129211431.GA1640@stefanha-x1.localdomain>
-References: <151675071042.29381.16225631028845063799.stgit@bahia.lan>
-	<151675076332.29381.6289851186190918274.stgit@bahia.lan>
-	<20180129211431.GA1640@stefanha-x1.localdomain>
+Date: Tue, 30 Jan 2018 09:32:48 +0100
+Message-ID: <151730107324.755.12264321256439401751.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/G6E.19/myIf6TP5_hAtKx.2";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 5/7] tests: virtio-9p: add WRITE operation
- test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] tests/virtio-9p: explicitely handle potential
+ integer overflows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Greg Kurz <groug@kaod.org>
 
---Sig_/G6E.19/myIf6TP5_hAtKx.2
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ tests/virtio-9p-test.c |   31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-On Mon, 29 Jan 2018 21:14:31 +0000
-Stefan Hajnoczi <stefanha@gmail.com> wrote:
+This is based on SHA1 2eab02aa260ac5405e1e51c9cc1b4c3aa23fc45a from my
+9p-next branch:
 
-> On Wed, Jan 24, 2018 at 12:39:23AM +0100, Greg Kurz wrote:
-> > +/* size[4] Twrite tag[2] fid[4] offset[8] count[4] data[count] */
-> > +static P9Req *v9fs_twrite(QVirtIO9P *v9p, uint32_t fid, uint64_t offse=
-t,
-> > +                          uint32_t count, const void *data, uint16_t t=
-ag)
-> > +{
-> > +    P9Req *req;
-> > +
-> > +    req =3D v9fs_req_init(v9p,  4 + 8 + 4 + count, P9_TWRITE, tag); =20
->=20
-> (uint32_t)(4 + 8 + 4 + (uint32_t)count) can overflow.  I didn't look
-> closely at the code and it's just a test case, but it seems safer to use
-> types that avoid overflows or to handle them explicitly.
->=20
-> It may not be an issue in a test case, but if someone copy pastes this
-> code it could become a security issue.
+https://github.com/gkurz/qemu/commits/9p-next
 
-You're right. I'll add something like:
-
-    uint32_t body_size =3D 4 + 8 + 4;
-
-    g_assert_cmpint(body_size, <=3D, UINT32_MAX - count);
-
-and I now realize that several other places in this file need
-a similar change.
-
---Sig_/G6E.19/myIf6TP5_hAtKx.2
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlpwK/sACgkQcdTV5YIv
-c9Yg5xAAitN0pA0LC1SELyXN8rS47zlRSAxsHFgFxrJq81BtABGXk/oKa896lxFT
-1/CcfqK9/6OQ89JRxmYOAFBwNxpSi+NUFxmemEQmyTmMl35WrCAN//qUrPY6akVh
-hDRZFc4UJ2en50zeh4Cho+VvbZq2f9PCTCKqsf4G1sRp6eqGDvH0/wSUmdobMkFV
-N0v4kbNcUE5b3v9KJEm5dbBaSZd28KYzoqaVUDk1GLACiM33YQtWuBq7FLBAGEOd
-AePhdyJMos+6+1U0ZtlwnOl7YFNGfxoqk7AUzyp1bYFQxYf9nRgC/1v/5acBTElp
-ESVBfhBxU7qftesHP04NL1awfbferNP6Dzyj3IAdBAmkuBJxOacUayTeSvMfvdw0
-y5/8sFBJSjx7a1ULAzL8PPYrgnCrQtNeceWH3wuV3SPNK82LlVurpxGLAwBMuA+w
-uIeLMlV+GYAoHH7OEo/teapBuTZIhntsYKo6C3vcPoiRi46rQ7S4YZZbcXxlOlkv
-NwYPTf9IJ9OzvLi4KRReWazbRsdOEDKMUjoPemDnITryLmkenm2i5dEZyyb0V5Mr
-vNUiVRIlaioCJN/EebZO/mltox9EZUwLfJDgkKkkZmbtBWb68NiIIlrziZwo8O8i
-abJtETnYyXBp+k4tZthFtmhN1imDAhWtPxd3HddCitRZQEijZ5I=
-=ulVN
------END PGP SIGNATURE-----
-
---Sig_/G6E.19/myIf6TP5_hAtKx.2--
+diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+index 41fa492cb778..f4824fa33b87 100644
+--- a/tests/virtio-9p-test.c
++++ b/tests/virtio-9p-test.c
+@@ -168,7 +168,7 @@ static uint16_t v9fs_string_size(const char *string)
+ {
+     size_t len = strlen(string);
+ 
+-    g_assert_cmpint(len, <=, UINT16_MAX);
++    g_assert_cmpint(len, <=, UINT16_MAX - 2);
+ 
+     return 2 + len;
+ }
+@@ -209,17 +209,20 @@ static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
+                             uint16_t tag)
+ {
+     P9Req *req = g_new0(P9Req, 1);
+-    uint32_t t_size = 7 + size; /* 9P header has well-known size of 7 bytes */
++    uint32_t total_size = 7; /* 9P header has well-known size of 7 bytes */
+     P9Hdr hdr = {
+-        .size = cpu_to_le32(t_size),
+         .id = id,
+         .tag = cpu_to_le16(tag)
+     };
+ 
+-    g_assert_cmpint(t_size, <=, P9_MAX_SIZE);
++    g_assert_cmpint(total_size, <=, UINT32_MAX - size);
++    total_size += size;
++    hdr.size = cpu_to_le32(total_size);
++
++    g_assert_cmpint(total_size, <=, P9_MAX_SIZE);
+ 
+     req->v9p = v9p;
+-    req->t_size = t_size;
++    req->t_size = total_size;
+     req->t_msg = guest_alloc(v9p->qs->alloc, req->t_size);
+     v9fs_memwrite(req, &hdr, 7);
+     req->tag = tag;
+@@ -305,8 +308,13 @@ static void v9fs_rlerror(P9Req *req, uint32_t *err)
+ static P9Req *v9fs_tversion(QVirtIO9P *v9p, uint32_t msize, const char *version,
+                             uint16_t tag)
+ {
+-    P9Req *req = v9fs_req_init(v9p, 4 + v9fs_string_size(version), P9_TVERSION,
+-                               tag);
++    P9Req *req;
++    uint32_t body_size = 4;
++    uint16_t string_size = v9fs_string_size(version);
++
++    g_assert_cmpint(body_size, <=, UINT32_MAX - string_size);
++    body_size += string_size;
++    req = v9fs_req_init(v9p, body_size, P9_TVERSION, tag);
+ 
+     v9fs_uint32_write(req, msize);
+     v9fs_string_write(req, version);
+@@ -366,12 +374,15 @@ static P9Req *v9fs_twalk(QVirtIO9P *v9p, uint32_t fid, uint32_t newfid,
+ {
+     P9Req *req;
+     int i;
+-    uint32_t size = 4 + 4 + 2;
++    uint32_t body_size = 4 + 4 + 2;
+ 
+     for (i = 0; i < nwname; i++) {
+-        size += v9fs_string_size(wnames[i]);
++        uint16_t wname_size = v9fs_string_size(wnames[i]);
++
++        g_assert_cmpint(body_size, <=, UINT32_MAX - wname_size);
++        body_size += wname_size;
+     }
+-    req = v9fs_req_init(v9p,  size, P9_TWALK, tag);
++    req = v9fs_req_init(v9p,  body_size, P9_TWALK, tag);
+     v9fs_uint32_write(req, fid);
+     v9fs_uint32_write(req, newfid);
+     v9fs_uint16_write(req, nwname);
