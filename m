@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXQq-0000Jo-Gv
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:50 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1egXQu-0000O5-OR
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXQp-0005dt-0S
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:44 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1egXQo-0005dV-EY
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:48 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jan 2018 15:02:16 +0000
-Message-Id: <1517324542-6607-2-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 30 Jan 2018 15:02:18 +0000
+Message-Id: <1517324542-6607-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
 References: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/7] target/arm: Add
- armv7m_nvic_set_pending_derived()
+Subject: [Qemu-devel] [PATCH 3/7] target/arm: Add ignore_stackfaults
+ argument to v7m_exception_taken()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,161 +23,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-In order to support derived exceptions (exceptions generated in
-the course of trying to take an exception), we need to be able
-to handle prioritizing whether to take the original exception
-or the derived exception.
+In the v8M architecture, if the process of taking an exception
+results in a further exception this is called a derived exception
+(for example, an MPU exception when writing the exception frame to
+memory). If the derived exception happens while pushing the initial
+stack frame, we must ignore any subsequent possible exception
+pushing the callee-saves registers.
 
-We do this by introducing a new function
-armv7m_nvic_set_pending_derived() which the exception-taking code in
-helper.c will call when a derived exception occurs.  Derived
-exceptions are dealt with mostly like normal pending exceptions, so
-we share the implementation with the armv7m_nvic_set_pending()
-function.
+In preparation for making the stack writes check for exceptions,
+add a return value from v7m_push_stack() and a new parameter to
+v7m_exception_taken(), so that the former can tell the latter that
+it needs to ignore failures to write to the stack. We also plumb
+the argument through to v7m_push_callee_stack(), which is where
+the code to ignore the failures will be.
 
-Note that the way we structure this is significantly different
-from the v8M Arm ARM pseudocode: that does all the prioritization
-logic in the DerivedLateArrival() function, whereas we choose to
-let the existing "identify highest priority exception" logic
-do the prioritization for us. The effect is the same, though.
+(Note that the v8M ARM pseudocode structures this slightly differently:
+derived exceptions cause the attempt to process the original
+exception to be abandoned; then at the top level it calls
+DerivedLateArrival to prioritize the derived exception and call
+TakeException from there. We choose to let the NVIC do the prioritization
+and continue forward with a call to TakeException which will then
+take either the original or the derived exception. The effect is
+the same, but this structure works better for QEMU because we don't
+have a convenient top level place to do the abandon-and-retry logic.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h      | 13 ++++++++++
- hw/intc/armv7m_nvic.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++--
- hw/intc/trace-events  |  2 +-
- 3 files changed, 80 insertions(+), 3 deletions(-)
+ target/arm/helper.c | 35 +++++++++++++++++++++++------------
+ 1 file changed, 23 insertions(+), 12 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index d2bb59e..9ed03e6 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1506,6 +1506,19 @@ static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
-  */
- void armv7m_nvic_set_pending(void *opaque, int irq, bool secure);
- /**
-+ * armv7m_nvic_set_pending_derived: mark this derived exception as pending
-+ * @opaque: the NVIC
-+ * @irq: the exception number to mark pending
-+ * @secure: false for non-banked exceptions or for the nonsecure
-+ * version of a banked exception, true for the secure version of a banked
-+ * exception.
-+ *
-+ * Similar to armv7m_nvic_set_pending(), but specifically for derived
-+ * exceptions (exceptions generated in the course of trying to take
-+ * a different exception).
-+ */
-+void armv7m_nvic_set_pending_derived(void *opaque, int irq, bool secure);
-+/**
-  * armv7m_nvic_acknowledge_irq: make highest priority pending exception active
-  * @opaque: the NVIC
-  *
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 8ca6cee..b4a6e7c 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -503,8 +503,25 @@ static void armv7m_nvic_clear_pending(void *opaque, int irq, bool secure)
-     }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 6062f38..c713eea 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6419,7 +6419,8 @@ static uint32_t arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure)
+     return addr;
  }
  
--void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
-+static void do_armv7m_nvic_set_pending(void *opaque, int irq, bool secure,
-+                                       bool derived)
+-static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain)
++static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
++                                  bool ignore_faults)
  {
-+    /* Pend an exception, including possibly escalating it to HardFault.
-+     *
-+     * This function handles both "normal" pending of interrupts and
-+     * exceptions, and also derived exceptions (ones which occur as
-+     * a result of trying to take some other exception).
-+     *
-+     * If derived == true, the caller guarantees that we are part way through
-+     * trying to take an exception (but have not yet called
-+     * armv7m_nvic_acknowledge_irq() to make it active), and so:
-+     *  - s->vectpending is the "original exception" we were trying to take
-+     *  - irq is the "derived exception"
-+     *  - nvic_exec_prio(s) gives the priority before exception entry
-+     * Here we handle the prioritization logic which the pseudocode puts
-+     * in the DerivedLateArrival() function.
-+     */
-+
-     NVICState *s = (NVICState *)opaque;
-     bool banked = exc_is_banked(irq);
-     VecInfo *vec;
-@@ -514,7 +531,44 @@ void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
- 
-     vec = (banked && secure) ? &s->sec_vectors[irq] : &s->vectors[irq];
- 
--    trace_nvic_set_pending(irq, secure, vec->enabled, vec->prio);
-+    trace_nvic_set_pending(irq, secure, derived, vec->enabled, vec->prio);
-+
-+    if (derived) {
-+        /* Derived exceptions are always synchronous. */
-+        assert(irq >= ARMV7M_EXCP_HARD && irq < ARMV7M_EXCP_PENDSV);
-+
-+        if (irq == ARMV7M_EXCP_DEBUG &&
-+            exc_group_prio(s, vec->prio, secure) >= nvic_exec_prio(s)) {
-+            /* DebugMonitorFault, but its priority is lower than the
-+             * preempted exception priority: just ignore it.
-+             */
-+            return;
-+        }
-+
-+        if (irq == ARMV7M_EXCP_HARD && vec->prio >= s->vectpending_prio) {
-+            /* If this is a terminal exception (one which means we cannot
-+             * take the original exception, like a failure to read its
-+             * vector table entry), then we must take the derived exception.
-+             * If the derived exception can't take priority over the
-+             * original exception, then we go into Lockup.
-+             *
-+             * For QEMU, we rely on the fact that a derived exception is
-+             * terminal if and only if it's reported to us as HardFault,
-+             * which saves having to have an extra argument is_terminal
-+             * that we'd only use in one place.
-+             */
-+            cpu_abort(&s->cpu->parent_obj,
-+                      "Lockup: can't take terminal derived exception "
-+                      "(original exception priority %d)\n",
-+                      s->vectpending_prio);
-+        }
-+        /* We now continue with the same code as for a normal pending
-+         * exception, which will cause us to pend the derived exception.
-+         * We'll then take either the original or the derived exception
-+         * based on which is higher priority by the usual mechanism
-+         * for selecting the highest priority pending interrupt.
-+         */
-+    }
- 
-     if (irq >= ARMV7M_EXCP_HARD && irq < ARMV7M_EXCP_PENDSV) {
-         /* If a synchronous exception is pending then it may be
-@@ -585,6 +639,16 @@ void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
-     }
+     /* For v8M, push the callee-saves register part of the stack frame.
+      * Compare the v8M pseudocode PushCalleeStack().
+@@ -6453,7 +6454,8 @@ static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain)
+     *frame_sp_p = frameptr;
  }
  
-+void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
-+{
-+    do_armv7m_nvic_set_pending(opaque, irq, secure, false);
-+}
-+
-+void armv7m_nvic_set_pending_derived(void *opaque, int irq, bool secure)
-+{
-+    do_armv7m_nvic_set_pending(opaque, irq, secure, true);
-+}
-+
- /* Make pending IRQ active.  */
- bool armv7m_nvic_acknowledge_irq(void *opaque)
+-static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
++static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
++                                bool ignore_stackfaults)
  {
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index be76918..09e87d1 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -177,7 +177,7 @@ nvic_set_prio(int irq, bool secure, uint8_t prio) "NVIC set irq %d secure-bank %
- nvic_irq_update(int vectpending, int pendprio, int exception_prio, int level) "NVIC vectpending %d pending prio %d exception_prio %d: setting irq line to %d"
- nvic_escalate_prio(int irq, int irqprio, int runprio) "NVIC escalating irq %d to HardFault: insufficient priority %d >= %d"
- nvic_escalate_disabled(int irq) "NVIC escalating irq %d to HardFault: disabled"
--nvic_set_pending(int irq, bool secure, int en, int prio) "NVIC set pending irq %d secure-bank %d (enabled: %d priority %d)"
-+nvic_set_pending(int irq, bool secure, bool derived, int en, int prio) "NVIC set pending irq %d secure-bank %d derived %d (enabled: %d priority %d)"
- nvic_clear_pending(int irq, bool secure, int en, int prio) "NVIC clear pending irq %d secure-bank %d (enabled: %d priority %d)"
- nvic_set_pending_level(int irq) "NVIC set pending: irq %d higher prio than vectpending: setting irq line to 1"
- nvic_acknowledge_irq(int irq, int prio, bool targets_secure) "NVIC acknowledge IRQ: %d now active (prio %d targets_secure %d)"
+     /* Do the "take the exception" parts of exception entry,
+      * but not the pushing of state to the stack. This is
+@@ -6490,7 +6492,8 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
+                  */
+                 if (lr & R_V7M_EXCRET_DCRS_MASK &&
+                     !(dotailchain && (lr & R_V7M_EXCRET_ES_MASK))) {
+-                    v7m_push_callee_stack(cpu, lr, dotailchain);
++                    v7m_push_callee_stack(cpu, lr, dotailchain,
++                                          ignore_stackfaults);
+                 }
+                 lr |= R_V7M_EXCRET_DCRS_MASK;
+             }
+@@ -6551,10 +6554,13 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
+     env->thumb = addr & 1;
+ }
+ 
+-static void v7m_push_stack(ARMCPU *cpu)
++static bool v7m_push_stack(ARMCPU *cpu)
+ {
+     /* Do the "set up stack frame" part of exception entry,
+      * similar to pseudocode PushStack().
++     * Return true if we generate a derived exception (and so
++     * should ignore further stack faults trying to process
++     * that derived exception.)
+      */
+     CPUARMState *env = &cpu->env;
+     uint32_t xpsr = xpsr_read(env);
+@@ -6574,6 +6580,8 @@ static void v7m_push_stack(ARMCPU *cpu)
+     v7m_push(env, env->regs[2]);
+     v7m_push(env, env->regs[1]);
+     v7m_push(env, env->regs[0]);
++
++    return false;
+ }
+ 
+ static void do_v7m_exception_exit(ARMCPU *cpu)
+@@ -6719,7 +6727,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+     if (sfault) {
+         env->v7m.sfsr |= R_V7M_SFSR_INVER_MASK;
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
+-        v7m_exception_taken(cpu, excret, true);
++        v7m_exception_taken(cpu, excret, true, false);
+         qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
+                       "stackframe: failed EXC_RETURN.ES validity check\n");
+         return;
+@@ -6731,7 +6739,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+          */
+         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
+-        v7m_exception_taken(cpu, excret, true);
++        v7m_exception_taken(cpu, excret, true, false);
+         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+                       "stackframe: failed exception return integrity check\n");
+         return;
+@@ -6779,7 +6787,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+                 /* Take a SecureFault on the current stack */
+                 env->v7m.sfsr |= R_V7M_SFSR_INVIS_MASK;
+                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
+-                v7m_exception_taken(cpu, excret, true);
++                v7m_exception_taken(cpu, excret, true, false);
+                 qemu_log_mask(CPU_LOG_INT, "...taking SecureFault on existing "
+                               "stackframe: failed exception return integrity "
+                               "signature check\n");
+@@ -6844,7 +6852,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
+                                         env->v7m.secure);
+                 env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
+-                v7m_exception_taken(cpu, excret, true);
++                v7m_exception_taken(cpu, excret, true, false);
+                 qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+                               "stackframe: failed exception return integrity "
+                               "check\n");
+@@ -6877,11 +6885,13 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+         /* Take an INVPC UsageFault by pushing the stack again;
+          * we know we're v7M so this is never a Secure UsageFault.
+          */
++        bool ignore_stackfaults;
++
+         assert(!arm_feature(env, ARM_FEATURE_V8));
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, false);
+         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
+-        v7m_push_stack(cpu);
+-        v7m_exception_taken(cpu, excret, false);
++        ignore_stackfaults = v7m_push_stack(cpu);
++        v7m_exception_taken(cpu, excret, false, ignore_stackfaults);
+         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
+                       "failed exception return integrity check\n");
+         return;
+@@ -7122,6 +7132,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+     ARMCPU *cpu = ARM_CPU(cs);
+     CPUARMState *env = &cpu->env;
+     uint32_t lr;
++    bool ignore_stackfaults;
+ 
+     arm_log_exception(cs->exception_index);
+ 
+@@ -7296,8 +7307,8 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+         lr |= R_V7M_EXCRET_MODE_MASK;
+     }
+ 
+-    v7m_push_stack(cpu);
+-    v7m_exception_taken(cpu, lr, false);
++    ignore_stackfaults = v7m_push_stack(cpu);
++    v7m_exception_taken(cpu, lr, false, ignore_stackfaults);
+     qemu_log_mask(CPU_LOG_INT, "... as %d\n", env->v7m.exception);
+ }
+ 
 -- 
 2.7.4
