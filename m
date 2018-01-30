@@ -1,15 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david.engraf@sysgo.com>) id 1egQp6-0003fT-Al
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 02:59:21 -0500
+	(envelope-from <groug@kaod.org>) id 1egREf-0003Kg-FY
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david.engraf@sysgo.com>) id 1egQp1-0001IH-Ma
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 02:59:20 -0500
-From: David Engraf <david.engraf@sysgo.com>
-Date: Tue, 30 Jan 2018 08:58:47 +0100
-Message-Id: <20180130075847.6023-1-david.engraf@sysgo.com>
-Subject: [Qemu-devel] [PATCH] PPC: e500: Fix duplicate kernel load and
- device tree overlap
+	(envelope-from <groug@kaod.org>) id 1egREb-0002yg-IN
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:25:45 -0500
+Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:37605)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egREb-0002xn-Al
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 03:25:41 -0500
+Received: from player798.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 7164A140F63
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 09:25:38 +0100 (CET)
+Date: Tue, 30 Jan 2018 09:25:31 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180130092531.52c4eb37@bahia.lan>
+In-Reply-To: <20180129211431.GA1640@stefanha-x1.localdomain>
+References: <151675071042.29381.16225631028845063799.stgit@bahia.lan>
+	<151675076332.29381.6289851186190918274.stgit@bahia.lan>
+	<20180129211431.GA1640@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/G6E.19/myIf6TP5_hAtKx.2";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 5/7] tests: virtio-9p: add WRITE operation
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,157 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Engraf <david.engraf@sysgo.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This patch fixes an incorrect behavior when the -kernel argument has been
-specified without -bios. In this case the kernel was loaded twice. At address
-32M as a raw image and afterwards by load_elf/load_uimage at the
-corresponding load address. In this case the region for the device tree and
-the raw kernel image may overlap.
+--Sig_/G6E.19/myIf6TP5_hAtKx.2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The patch fixes the behavior by loading the kernel image once with
-load_elf/load_uimage and skips loading the raw image. It also ensures that
-the device tree is generated behind bios/kernel/initrd.
+On Mon, 29 Jan 2018 21:14:31 +0000
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-Signed-off-by: David Engraf <david.engraf@sysgo.com>
----
- hw/ppc/e500.c | 89 ++++++++++++++++++++++++++++++++---------------------------
- 1 file changed, 48 insertions(+), 41 deletions(-)
+> On Wed, Jan 24, 2018 at 12:39:23AM +0100, Greg Kurz wrote:
+> > +/* size[4] Twrite tag[2] fid[4] offset[8] count[4] data[count] */
+> > +static P9Req *v9fs_twrite(QVirtIO9P *v9p, uint32_t fid, uint64_t offse=
+t,
+> > +                          uint32_t count, const void *data, uint16_t t=
+ag)
+> > +{
+> > +    P9Req *req;
+> > +
+> > +    req =3D v9fs_req_init(v9p,  4 + 8 + 4 + count, P9_TWRITE, tag); =20
+>=20
+> (uint32_t)(4 + 8 + 4 + (uint32_t)count) can overflow.  I didn't look
+> closely at the code and it's just a test case, but it seems safer to use
+> types that avoid overflows or to handle them explicitly.
+>=20
+> It may not be an issue in a test case, but if someone copy pastes this
+> code it could become a security issue.
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index c4fe06ea2a..0321bd66a8 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -776,7 +776,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     PCIBus *pci_bus;
-     CPUPPCState *env = NULL;
--    uint64_t loadaddr;
-     hwaddr kernel_base = -1LL;
-     int kernel_size = 0;
-     hwaddr dt_base = 0;
-@@ -913,11 +912,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     /* Register spinning region */
-     sysbus_create_simple("e500-spin", params->spin_base, NULL);
- 
--    if (cur_base < (32 * 1024 * 1024)) {
--        /* u-boot occupies memory up to 32MB, so load blobs above */
--        cur_base = (32 * 1024 * 1024);
--    }
--
-     if (params->has_mpc8xxx_gpio) {
-         qemu_irq poweroff_irq;
- 
-@@ -952,36 +946,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-                                     sysbus_mmio_get_region(s, 0));
-     }
- 
--    /* Load kernel. */
--    if (machine->kernel_filename) {
--        kernel_base = cur_base;
--        kernel_size = load_image_targphys(machine->kernel_filename,
--                                          cur_base,
--                                          ram_size - cur_base);
--        if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    machine->kernel_filename);
--            exit(1);
--        }
--
--        cur_base += kernel_size;
--    }
--
--    /* Load initrd. */
--    if (machine->initrd_filename) {
--        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
--        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
--                                          ram_size - initrd_base);
--
--        if (initrd_size < 0) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
--                    machine->initrd_filename);
--            exit(1);
--        }
--
--        cur_base = initrd_base + initrd_size;
--    }
--
-     /*
-      * Smart firmware defaults ahead!
-      *
-@@ -1006,24 +970,67 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
- 
--    bios_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
-+    bios_size = load_elf(filename, NULL, NULL, &bios_entry, &cur_base, NULL,
-                          1, PPC_ELF_MACHINE, 0, 0);
-     if (bios_size < 0) {
-         /*
-          * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
-          * ePAPR compliant kernel
-          */
--        kernel_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
--                                  NULL, NULL);
--        if (kernel_size < 0) {
-+        bios_size = load_uimage(filename, &bios_entry, &cur_base, NULL,
-+                                NULL, NULL);
-+        if (bios_size < 0) {
-             fprintf(stderr, "qemu: could not load firmware '%s'\n", filename);
-             exit(1);
-         }
-     }
-+    cur_base += bios_size;
-     g_free(filename);
- 
-+    /* Load bare kernel only if no bios/u-boot has been provided */
-+    if (machine->kernel_filename != bios_name) {
-+        kernel_base = cur_base;
-+        kernel_size = load_image_targphys(machine->kernel_filename,
-+                                          cur_base,
-+                                          ram_size - cur_base);
-+        if (kernel_size < 0) {
-+            fprintf(stderr, "qemu: could not load kernel '%s'\n",
-+                    machine->kernel_filename);
-+            exit(1);
-+        }
-+
-+        cur_base += kernel_size;
-+    } else {
-+        kernel_base = cur_base;
-+        kernel_size = bios_size;
-+    }
-+
-+    if (cur_base < (32 * 1024 * 1024)) {
-+        /* u-boot occupies memory up to 32MB, so load blobs above */
-+        cur_base = (32 * 1024 * 1024);
-+    }
-+
-+    /* Load initrd. */
-+    if (machine->initrd_filename) {
-+        initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
-+        initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
-+                                          ram_size - initrd_base);
-+
-+        if (initrd_size < 0) {
-+            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
-+                    machine->initrd_filename);
-+            exit(1);
-+        }
-+
-+        cur_base = initrd_base + initrd_size;
-+    }
-+
-     /* Reserve space for dtb */
--    dt_base = (loadaddr + bios_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
-+    dt_base = (cur_base + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
-+    if (dt_base + DTB_MAX_SIZE > ram_size) {
-+            fprintf(stderr, "qemu: not enough memory for device tree\n");
-+            exit(1);
-+    }
- 
-     dt_size = ppce500_prep_device_tree(machine, params, dt_base,
-                                        initrd_base, initrd_size,
--- 
-2.14.1
+You're right. I'll add something like:
+
+    uint32_t body_size =3D 4 + 8 + 4;
+
+    g_assert_cmpint(body_size, <=3D, UINT32_MAX - count);
+
+and I now realize that several other places in this file need
+a similar change.
+
+--Sig_/G6E.19/myIf6TP5_hAtKx.2
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlpwK/sACgkQcdTV5YIv
+c9Yg5xAAitN0pA0LC1SELyXN8rS47zlRSAxsHFgFxrJq81BtABGXk/oKa896lxFT
+1/CcfqK9/6OQ89JRxmYOAFBwNxpSi+NUFxmemEQmyTmMl35WrCAN//qUrPY6akVh
+hDRZFc4UJ2en50zeh4Cho+VvbZq2f9PCTCKqsf4G1sRp6eqGDvH0/wSUmdobMkFV
+N0v4kbNcUE5b3v9KJEm5dbBaSZd28KYzoqaVUDk1GLACiM33YQtWuBq7FLBAGEOd
+AePhdyJMos+6+1U0ZtlwnOl7YFNGfxoqk7AUzyp1bYFQxYf9nRgC/1v/5acBTElp
+ESVBfhBxU7qftesHP04NL1awfbferNP6Dzyj3IAdBAmkuBJxOacUayTeSvMfvdw0
+y5/8sFBJSjx7a1ULAzL8PPYrgnCrQtNeceWH3wuV3SPNK82LlVurpxGLAwBMuA+w
+uIeLMlV+GYAoHH7OEo/teapBuTZIhntsYKo6C3vcPoiRi46rQ7S4YZZbcXxlOlkv
+NwYPTf9IJ9OzvLi4KRReWazbRsdOEDKMUjoPemDnITryLmkenm2i5dEZyyb0V5Mr
+vNUiVRIlaioCJN/EebZO/mltox9EZUwLfJDgkKkkZmbtBWb68NiIIlrziZwo8O8i
+abJtETnYyXBp+k4tZthFtmhN1imDAhWtPxd3HddCitRZQEijZ5I=
+=ulVN
+-----END PGP SIGNATURE-----
+
+--Sig_/G6E.19/myIf6TP5_hAtKx.2--
