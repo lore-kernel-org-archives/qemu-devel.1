@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1egV9U-0000md-Vy
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:36:46 -0500
+	(envelope-from <imammedo@redhat.com>) id 1egVRf-00068M-5T
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:55:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1egV9U-0002EN-4F
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:36:41 -0500
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516297747-107232-5-git-send-email-anton.nefedov@virtuozzo.com>
-	<e6a78f65-3be4-9c14-401c-ea7f1fd5fb9c@redhat.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <931c225d-7d0a-ea1e-59a9-d9f7a257274a@virtuozzo.com>
-Date: Tue, 30 Jan 2018 15:36:26 +0300
+	(envelope-from <imammedo@redhat.com>) id 1egVRa-0004Pi-3E
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:55:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1egVRZ-0004Nl-OX
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 07:55:21 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6622C2CE918
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:55:20 +0000 (UTC)
+Date: Tue, 30 Jan 2018 13:55:14 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180130135514.065e1c6a@redhat.com>
+In-Reply-To: <1516116626-195863-1-git-send-email-imammedo@redhat.com>
+References: <1516116626-195863-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e6a78f65-3be4-9c14-401c-ea7f1fd5fb9c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 4/9] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Subject: Re: [Qemu-devel] [PATCH v2] tests: acpi: fix FADT not being
+ compared to reference table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +33,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com
 
+On Tue, 16 Jan 2018 16:30:26 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-
-On 29/1/2018 10:48 PM, Max Reitz wrote:
-> On 2018-01-18 18:49, Anton Nefedov wrote:
->> The idea is that ALLOCATE requests may overlap with other requests.
->> Reuse the existing block layer infrastructure for serialising requests.
->> Use the following approach:
->>    - mark ALLOCATE serialising, so subsequent requests to the area wait
->>    - ALLOCATE request itself must never wait if another request is in flight
->>      already. Return EAGAIN, let the caller reconsider.
->>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> ---
->>   block/io.c | 27 +++++++++++++++++++--------
->>   1 file changed, 19 insertions(+), 8 deletions(-)
+> It turns out that FADT isn't actually tested for changes
+> against reference table, since it happens to be the 1st
+> table in RSDT which is currently ignored.
+> Fix it by making sure that all tables from RSDT are added
+> to test list.
 > 
-> The basic principle looks good to me.
+> NOTE: FADT contains guest allocated pointers to FACS/DSDT,
+> zero them out so that possible FACS/DSDT address change
+> won't affect test results.
 > 
->> diff --git a/block/io.c b/block/io.c
->> index cf2f84c..4b0d34f 100644
->> --- a/block/io.c
->> +++ b/block/io.c
-> 
-> [...]
-> 
->> @@ -1717,7 +1728,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
->>           struct iovec head_iov;
->>   
->>           mark_request_serialising(&req, align);
->> -        wait_serialising_requests(&req);
->> +        wait_serialising_requests(&req, false);
-> 
-> What if someone calls bdrv_co_pwritev() with BDRV_REQ_ZERO_WRITE |
-> BDRV_REQ_ALLOCATE?  
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>   - fixup FACS/DSDT pointers in FADT to avoid false test
+>     failure if pointers change ("Michael S. Tsirkin" <mst@redhat.com>)
+ping
 
-Either
-
-     assert(!(qiov && (flags & BDRV_REQ_ALLOCATE)));
-
-will fail or bdrv_co_do_zero_pwritev() will be used.
-
-> .. Then this should do exactly the same as
-> bdrv_co_do_zero_pwritev(), which it currently does not -- besides this
-> serialization, this includes returning -ENOTSUP if there is a head or
-> tail to write.
-> 
-
-Another question is if that assertion is ok.
-In other words: should (qiov!=NULL && REQ_ALLOCATE) be a valid case?
-e.g. with qiov filled with zeroes?
-
-I'd rather document that not supported (and leave the assertion).
-
-Actually, even (qiov!=NULL && REQ_ZERO_WRITE) looks kind of
-unsupported/broken? Alignment code in bdrv_co_pwritev() zeroes out the
-head and tail by passing the flag down bdrv_aligned_pwritev()
+[...]
