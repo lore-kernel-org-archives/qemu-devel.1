@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egYbn-0000mj-Ps
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:18:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1egYef-0002jE-Br
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:21:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egYbj-0005Zm-OG
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:18:07 -0500
-References: <20180130150435.2553-1-berto@igalia.com>
-	<b93f21cf-5cd4-a6d0-7005-e19a3de211c8@redhat.com>
-	<w51607juy5j.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1egYeb-0006UK-AO
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:21:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58172)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1egYeb-0006Tx-3A
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:21:01 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 61985445C1
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 16:21:00 +0000 (UTC)
+References: <20180130102202.28519-1-armbru@redhat.com>
+	<20180130102202.28519-5-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
-Date: Tue, 30 Jan 2018 10:17:47 -0600
+Message-ID: <75f40c27-4247-6283-8967-2d19ea474175@redhat.com>
+Date: Tue, 30 Jan 2018 10:20:58 -0600
 MIME-Version: 1.0
-In-Reply-To: <w51607juy5j.fsf@maestria.local.igalia.com>
+In-Reply-To: <20180130102202.28519-5-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh"
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Replace align_offset() with
- ROUND_UP()
+	boundary="veDtGi0QzfOEaJh1C2sB0b5WeH5HvtZjZ"
+Subject: Re: [Qemu-devel] [PATCH 04/18] Drop superfluous includes of
+ qapi/qmp/qerror.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh
+--veDtGi0QzfOEaJh1C2sB0b5WeH5HvtZjZ
 From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
-Subject: Re: [PATCH] qcow2: Replace align_offset() with ROUND_UP()
-References: <20180130150435.2553-1-berto@igalia.com>
- <b93f21cf-5cd4-a6d0-7005-e19a3de211c8@redhat.com>
- <w51607juy5j.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51607juy5j.fsf@maestria.local.igalia.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <75f40c27-4247-6283-8967-2d19ea474175@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/18] Drop superfluous includes of
+ qapi/qmp/qerror.h
+References: <20180130102202.28519-1-armbru@redhat.com>
+ <20180130102202.28519-5-armbru@redhat.com>
+In-Reply-To: <20180130102202.28519-5-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 01/30/2018 10:08 AM, Alberto Garcia wrote:
-> On Tue 30 Jan 2018 05:03:16 PM CET, Eric Blake wrote:
+On 01/30/2018 04:21 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  backends/tpm.c             | 1 -
+>  block/qcow.c               | 1 -
+>  block/qed.c                | 1 -
+>  blockdev-nbd.c             | 1 -
+>  hw/s390x/s390-virtio-ccw.c | 1 -
+>  net/colo-compare.c         | 1 -
+>  net/filter-mirror.c        | 1 -
+>  net/filter-rewriter.c      | 1 -
+>  qapi/qmp-dispatch.c        | 1 -
+>  qemu-img.c                 | 1 -
+>  ui/vnc.c                   | 1 -
+>  11 files changed, 11 deletions(-)
 >=20
->>> -    virtual_size =3D align_offset(qemu_opt_get_size_del(opts, BLOCK_=
-OPT_SIZE, 0),
->>> +    virtual_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_=
-SIZE, 0),
->>>                                  cluster_size);
->=20
-> I just realized that the first parameter here is a function call with
-> side effects, it it safe to use ROUND_UP() in this case?
->=20
-> #define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
-
-Oh, good catch.  No, we need a temporary variable to hold the result of
-the function call (or we could rewrite ROUND_UP to have evaluate-once
-semantics using gcc/clang extensions).
+> diff --git a/backends/tpm.c b/backends/tpm.c
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -68,7 +75,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh
+--veDtGi0QzfOEaJh1C2sB0b5WeH5HvtZjZ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -77,14 +84,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwmqsACgkQp6FrSiUn
-Q2rNVAf+MTaVoqtO7YFnwRt0lt1hmi9PKZfRX3o0GKzjRy+c+JagVf5ObBZuIOjW
-FhHFag2ei+zKhL+9abPY+TKwYVMgAYPtsP0w4FJiOjcd1KQpVmOqUxUqLoumXEfj
-z20Xn6FNNX9bmOquBPCqPeBAAE7taSIgV8PKbg/34DK3NXvr8mkQbdgDFi0F+W9Q
-2U8TLpJ1VFdj+WsvpmTNyL4W3Uby2CuF7g17C1RB5wrlFQva0nfLqlwmL96noiKp
-ReNX0q5CHEHTaDZgMkGUVv02cUuB72vEMMIsCFS3DU1fKWVQMOh70/v86H9SdbPi
-o9eJDCJMRucB42m8wGy6qm1PllIyew==
-=+Ve0
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwm2oACgkQp6FrSiUn
+Q2qmSgf+PrNsMU5ne1cJKfD97GYoJtLkQ2eaSVu+eOqxoarImvpvFX3zk4uZ8ugQ
+bUmw+/k32mcaKjLBRzCx06Ef39b+HzJvqpOCyWDOn4jrP98xwU9TgRy5Xw2/jDUg
+ac5NiDOK1cXf/MglfmKDnuTrJ5Zd45tp/IqfTOYM91iFNarMcWaPok+T7ut0Ye3P
+8lK4ByMTkhkcUeYYFiwSLzirkiARsaH68xLZ8UV+0LZFkAAs/GCfwRRsFiOThDJm
++VZYDAps93eceKut3MCRiZglYNdPPOIBgB9CssuWP/yjdI7qeHXEnhunJ+J6pT19
+RTVgntLP4Y/2i1gfTKI6j1QsLHerYQ==
+=Q72J
 -----END PGP SIGNATURE-----
 
---nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh--
+--veDtGi0QzfOEaJh1C2sB0b5WeH5HvtZjZ--
