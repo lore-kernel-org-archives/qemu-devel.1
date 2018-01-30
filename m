@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1egYZh-0007o3-HC
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:15:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1egYbn-0000mj-Ps
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1egYZZ-0004HV-Qk
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:15:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1egYZZ-0004HC-KR
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:15:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1egYZX-0003LG-6n
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 16:15:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DF7642E8558
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 16:15:45 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1egYbj-0005Zm-OG
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:18:07 -0500
+References: <20180130150435.2553-1-berto@igalia.com>
+	<b93f21cf-5cd4-a6d0-7005-e19a3de211c8@redhat.com>
+	<w51607juy5j.fsf@maestria.local.igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
+Date: Tue, 30 Jan 2018 10:17:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jan 2018 16:00:47 -0000
-From: Babu Moger <1703506@bugs.launchpad.net>
-Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
-Message-Id: <151732804744.7610.8587113318796890765.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
- Ryzen CPU
+In-Reply-To: <w51607juy5j.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Replace align_offset() with
+ ROUND_UP()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Posted few patches to support this feature on AMD EPYC processors. Feel fre=
-e to test and review.
-1. Kernel kvm patch
-   https://patchwork.kernel.org/patch/10190107/
-2. qemu patches
-   https://patchwork.kernel.org/project/qemu-devel/list/?submitter=3D178527
-Thanks
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
+Subject: Re: [PATCH] qcow2: Replace align_offset() with ROUND_UP()
+References: <20180130150435.2553-1-berto@igalia.com>
+ <b93f21cf-5cd4-a6d0-7005-e19a3de211c8@redhat.com>
+ <w51607juy5j.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51607juy5j.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 01/30/2018 10:08 AM, Alberto Garcia wrote:
+> On Tue 30 Jan 2018 05:03:16 PM CET, Eric Blake wrote:
+>=20
+>>> -    virtual_size =3D align_offset(qemu_opt_get_size_del(opts, BLOCK_=
+OPT_SIZE, 0),
+>>> +    virtual_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_=
+SIZE, 0),
+>>>                                  cluster_size);
+>=20
+> I just realized that the first parameter here is a function call with
+> side effects, it it safe to use ROUND_UP() in this case?
+>=20
+> #define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1703506
+Oh, good catch.  No, we need a temporary variable to hold the result of
+the function call (or we could rewrite ROUND_UP to have evaluate-once
+semantics using gcc/clang extensions).
 
-Title:
-  SMT not supported by QEMU on AMD Ryzen CPU
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Status in QEMU:
-  New
 
-Bug description:
-  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
-  message when setting the topology to threads=3D2:
+--nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
-  configure -smp options properly.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  Checking in a Windows 10 guest reveals that SMT is not enabled, and
-  from what I understand, QEMU converts the topology from threads to
-  cores internally on AMD CPUs. This appears to cause performance
-  problems in the guest perhaps because programs are assuming that these
-  threads are actual cores.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwmqsACgkQp6FrSiUn
+Q2rNVAf+MTaVoqtO7YFnwRt0lt1hmi9PKZfRX3o0GKzjRy+c+JagVf5ObBZuIOjW
+FhHFag2ei+zKhL+9abPY+TKwYVMgAYPtsP0w4FJiOjcd1KQpVmOqUxUqLoumXEfj
+z20Xn6FNNX9bmOquBPCqPeBAAE7taSIgV8PKbg/34DK3NXvr8mkQbdgDFi0F+W9Q
+2U8TLpJ1VFdj+WsvpmTNyL4W3Uby2CuF7g17C1RB5wrlFQva0nfLqlwmL96noiKp
+ReNX0q5CHEHTaDZgMkGUVv02cUuB72vEMMIsCFS3DU1fKWVQMOh70/v86H9SdbPi
+o9eJDCJMRucB42m8wGy6qm1PllIyew==
+=+Ve0
+-----END PGP SIGNATURE-----
 
-  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
-  guest
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
+--nY42jLoykiSfXwtULHN1I9rUSwb3ZugVh--
