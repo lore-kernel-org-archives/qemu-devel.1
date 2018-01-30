@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1egPQS-0007Ai-4k
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 01:29:49 -0500
+	(envelope-from <famz@redhat.com>) id 1egPVL-0000Bm-Ck
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 01:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1egPQO-0000Lm-2p
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 01:29:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1egPQN-0000KS-Sx
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 01:29:44 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <CAFEAcA_DrUj0MdJVRMst91k--Cvc9j+QKy-tscp0R526cEttdQ@mail.gmail.com>
-	(Peter Maydell's message of "Mon, 29 Jan 2018 18:53:56 +0000")
-References: <20180129120932.12874-1-quintela@redhat.com>
-	<CAFEAcA_DrUj0MdJVRMst91k--Cvc9j+QKy-tscp0R526cEttdQ@mail.gmail.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 30 Jan 2018 07:29:43 +0100
-Message-ID: <87d11r3lm0.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 00/13] Migration PULL request
+	(envelope-from <famz@redhat.com>) id 1egPVK-0002gN-5S
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 01:34:51 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 30 Jan 2018 14:34:32 +0800
+Message-Id: <20180130063433.11605-2-famz@redhat.com>
+In-Reply-To: <20180130063433.11605-1-famz@redhat.com>
+References: <20180130063433.11605-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 1/2] qemu-img.texi: Clean up parameter list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +19,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, stefanha@redhat.com, kchamart@redhat.com, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Max Reitz <mreitz@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 29 January 2018 at 12:09, Juan Quintela <quintela@redhat.com> wrote:
->> Hi
->>
->> - migrate_fd_connect cleanup (dave)
->> - use MAX_VM_PACKAGED_SIZE
->>   have to change (1<<32) for UINT32_MAX to get no warnings on win32
->> - Use right s->threashord_size(wei)
->> - patches reviewed from info/migrate, migration tests and multifd (me)
->>
->> Later, Juan.
->>
->> The following changes since commit 6233b4a8c2a32ef6955a921246fa08705bbb3676:
->>
->>   Merge remote-tracking branch
->> 'remotes/ericb/tags/pull-nbd-2018-01-26' into staging (2018-01-26
->> 17:29:14 +0000)
->>
->> are available in the Git repository at:
->>
->>   git://github.com/juanquintela/qemu.git tags/migration/20180129
->>
->> for you to fetch changes up to 4b6bb0a77761b8a906a540e927c7a9dde99bc10f:
->>
->>   tests: Adjust sleeps for migration test (2018-01-29 12:10:22 +0100)
->>
->> ----------------------------------------------------------------
->> migration/next for 20180129
->
-> Hi. On aarch32 host I get this assert in the tests:
->
-> TEST: tests/migration-test... (pid=605)
->   /ppc64/migration/deprecated:                                         OK
->   /ppc64/migration/precopy/unix:                                       OK
->   /ppc64/migration/postcopy/unix:                                      OK
->   /ppc64/migration/xbzrle/unix:
-> Unexpected 32 on dest_serial serial
-> **
-> ERROR:/home/peter.maydell/qemu/tests/migration-test.c:218:wait_for_serial:
-> code should not be reached
+Split options out of the "@table @var" section and create a "@table
+@option", then use whitespaces and blank lines consistently.
 
-1st time I see a problem on the xbzrle test.  I can resent the pull
-without that patch, but that is a *test*, the problem is that we have a
-xbzrle problem on aarch32 that we didn't know about yet.
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ qemu-img.texi | 66 +++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 39 insertions(+), 27 deletions(-)
 
-So I will just try to do the PULL request anyways.  I will try to get
-access to an arm32 system tomorrow and see what is going on.
-
-Thanks for checking it.
-
-Later, Juan.
-
-
-> FAIL
-> GTester: last random seed: R02S31c8250adcdb12a122a1c5c0ab62d01e
-> (pid=639)
-> FAIL: tests/migration-test
->
-> thanks
-> -- PMM
+diff --git a/qemu-img.texi b/qemu-img.texi
+index fdcf120f36..60a0e080c6 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -33,38 +33,14 @@ The following commands are supported:
+ 
+ Command parameters:
+ @table @var
++
+ @item filename
+- is a disk image filename
+-
+-@item --object @var{objectdef}
+-
+-is a QEMU user creatable object definition. See the @code{qemu(1)} manual
+-page for a description of the object properties. The most common object
+-type is a @code{secret}, which is used to supply passwords and/or encryption
+-keys.
+-
+-@item --image-opts
+-
+-Indicates that the source @var{filename} parameter is to be interpreted as a
+-full option string, not a plain filename. This parameter is mutually
+-exclusive with the @var{-f} parameter.
+-
+-@item --target-image-opts
+-
+-Indicates that the @var{output_filename} parameter(s) are to be interpreted as
+-a full option string, not a plain filename. This parameter is mutually
+-exclusive with the @var{-O} parameters. It is currently required to also use
+-the @var{-n} parameter to skip image creation. This restriction may be relaxed
+-in a future release.
++is a disk image filename
+ 
+ @item fmt
+ is the disk image format. It is guessed automatically in most cases. See below
+ for a description of the supported disk formats.
+ 
+-@item --backing-chain
+-will enumerate information about backing files in a disk image chain. Refer
+-below for further description.
+-
+ @item size
+ is the disk image size in bytes. Optional suffixes @code{k} or @code{K}
+ (kilobyte, 1024) @code{M} (megabyte, 1024k) and @code{G} (gigabyte, 1024M)
+@@ -74,42 +50,78 @@ and T (terabyte, 1024G) are supported.  @code{b} is ignored.
+ is the destination disk image filename
+ 
+ @item output_fmt
+- is the destination format
++is the destination format
++
+ @item options
+ is a comma separated list of format specific options in a
+ name=value format. Use @code{-o ?} for an overview of the options supported
+ by the used format or see the format descriptions below for details.
++
+ @item snapshot_param
+ is param used for internal snapshot, format is
+ 'snapshot.id=[ID],snapshot.name=[NAME]' or '[ID_OR_NAME]'
++
+ @item snapshot_id_or_name
+ is deprecated, use snapshot_param instead
+ 
++@end table
++
++@table @option
++
++@item --object @var{objectdef}
++is a QEMU user creatable object definition. See the @code{qemu(1)} manual
++page for a description of the object properties. The most common object
++type is a @code{secret}, which is used to supply passwords and/or encryption
++keys.
++
++@item --image-opts
++Indicates that the source @var{filename} parameter is to be interpreted as a
++full option string, not a plain filename. This parameter is mutually
++exclusive with the @var{-f} parameter.
++
++@item --target-image-opts
++Indicates that the @var{output_filename} parameter(s) are to be interpreted as
++a full option string, not a plain filename. This parameter is mutually
++exclusive with the @var{-O} parameters. It is currently required to also use
++the @var{-n} parameter to skip image creation. This restriction may be relaxed
++in a future release.
++
++@item --backing-chain
++will enumerate information about backing files in a disk image chain. Refer
++below for further description.
++
+ @item -c
+ indicates that target image must be compressed (qcow format only)
++
+ @item -h
+ with or without a command shows help and lists the supported formats
++
+ @item -p
+ display progress bar (compare, convert and rebase commands only).
+ If the @var{-p} option is not used for a command that supports it, the
+ progress is reported when the process receives a @code{SIGUSR1} or
+ @code{SIGINFO} signal.
++
+ @item -q
+ Quiet mode - do not print any output (except errors). There's no progress bar
+ in case both @var{-q} and @var{-p} options are used.
++
+ @item -S @var{size}
+ indicates the consecutive number of bytes that must contain only zeros
+ for qemu-img to create a sparse image during conversion. This value is rounded
+ down to the nearest 512 bytes. You may use the common size suffixes like
+ @code{k} for kilobytes.
++
+ @item -t @var{cache}
+ specifies the cache mode that should be used with the (destination) file. See
+ the documentation of the emulator's @code{-drive cache=...} option for allowed
+ values.
++
+ @item -T @var{src_cache}
+ specifies the cache mode that should be used with the source file(s). See
+ the documentation of the emulator's @code{-drive cache=...} option for allowed
+ values.
++
+ @end table
+ 
+ Parameters to snapshot subcommand:
+-- 
+2.14.3
