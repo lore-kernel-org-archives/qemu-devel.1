@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1egOS0-00089Z-W6
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:27:23 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1egOgK-0003Kq-OP
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:42:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1egORx-0004Qb-Ga
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:27:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36718
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1egORx-0004P7-Ar
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:27:17 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0U5ObKS085878
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 00:27:16 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ftdgghw6w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 00:27:16 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 30 Jan 2018 00:27:15 -0500
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-In-Reply-To: <879459e4-e6b1-2030-e3d4-0b991b532f51@linux.vnet.ibm.com>
-References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
-	<f9224bba-08fb-589e-ed6e-d8e967a8fe67@linux.vnet.ibm.com>
-	<20180115085945.GC12499@bjsdjshi@linux.vnet.ibm.com>
-	<a4f39e6e-c031-0861-ff6b-e29747ba9489@linux.vnet.ibm.com>
-	<20180123062356.GC32354@bjsdjshi@linux.vnet.ibm.com>
-	<879459e4-e6b1-2030-e3d4-0b991b532f51@linux.vnet.ibm.com>
-Date: Tue, 30 Jan 2018 13:27:06 +0800
+	(envelope-from <zhangckid@gmail.com>) id 1egOgJ-0007jO-9p
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:42:08 -0500
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36974)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1egOgI-0007if-VG
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:42:07 -0500
+Received: by mail-wr0-x230.google.com with SMTP id a43so2131711wrc.4
+	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 21:42:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <878tcfex1x.fsf@bjsdjshi.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] vfio: ccw: basic channel path
- event handling
+In-Reply-To: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
+References: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Tue, 30 Jan 2018 05:42:04 +0000
+Message-ID: <CAK3tnvLTwPASC7eypwnc25GvMdJ==k9JZpJbg8piZxs6CNDj0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V4 00/16] COLO: integrate colo frame with
+ block replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,281 +28,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, pmorel@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-Halil Pasic <pasic@linux.vnet.ibm.com> writes:
---text follows this line--
-Hi Halil,
---text follows this line--
-AS you may noticed, Conny replied to this thread on my mail. Some of her
-comments there could answer your questions. If that applies, I will just
-say "See Conny's mail" in the following, and you can reply to that mail,
-so we can consolidate further discussion.
+Hi~ All~
 
->>> * When a channel path malfunctions a CRW is generated and a machine
->>> check channel report pending is generated. Same goes for
->>> channel paths popping up (on HW level). Should not these get
->>> propagated?
->> AFAIR, channel path related CRW is not that reliable. I mean it seems
->> that it's not mandatory to generate CRWs for channel path malfunctions.
->> AFAIU, it depneds on machine models. For example, we won't get
->> CRW_ERC_INIT for a "path has come" event on many models I believe. And
->> that's why nobody noticed the misuse of CRW_ERC_IPARM and CRW_ERC_INIT
->> in the CRW handling logic for channel path CRWs.
->> Ref:
->> 2daace78a8c9 s390: chp: handle CRW_ERC_INIT for channel-path status change
->> 
->
-> Honestly, I forgot about this discussion. I've refreshed my memories by
-> now, but I could not find why is it supposed to be architecturally OK
-> to loose CRWs when for instance a chp goes away.
->
->> So my understanding for this is: it really a design decision for us to
->> propagate all of the channel path CRWs, or we just use other ways (like
->> using PNO and PNOM as this series shows).
->
-> From what I read, CRWs did not seem optional.
-> I wonder what should I read in order to change my mind. I'm not
-> talking about the hardware in the wild -- but that could be buggy
-> hardware.
->
-Ah, can you point out the chapter that says CRWs is mandatory?
+No news for a long time, this is the last part to make COLO running in
+upstream.
+Any comments for this series?
 
-AFAIU, PoP doesn't say, for example, chp gone will lead to a CRW, but it
-only says when we got a chp gone CRW it means a chp has been gone.
+Thanks
+Zhang Chen
 
-[See Conny's mail pls, and we can discuss there.]
 
->> 
->> Of course, CRW propagation is good to have. But as a discussion result
->> of a former thread, that is something we can consider only after we have
->> a good channel path re-modelling. That is the problem. We can try to
->> trigger CRW event in some work of machine checks handling enhancement
->> later.
->> 
->>> * Kind of instead of the CRW you introduce a per device interrupt
->>> for channel path events on the qemu/kvm boundary. AFAIU for a chp
->>> event you do an STSCH for each (affected?) subchannel
->> Until here, yes and right.
->> 
->>> and generate an irq. Right? Why is this a good idea.
->> This is not right. This series does not generate an irq for the guest.
->
-> You misunderstood this. The word 'irq' this sentence is a short version
-> of 'per device interrupt for channel path events on the qemu/kvm boundary'
-> form the previous sentence. It's not an irq injected into the guest but
-> a notification (which you call irq in '[RFC PATCH 2/3] vfio: ccw:
-> introduce channel path irq') for QEMU.
->
-I see now. I misunderstood.
+On Fri, Jan 19, 2018 at 1:44 PM, Zhang Chen <zhangckid@gmail.com> wrote:
 
->> In QEMU, when it gets the notification of a channel path status change
->> event, it read the newest SCHIB from the schib region, and update the
->> SCHIB (patch related parts) for the virtual subchannel. The guest will
->> get the new SCHIB whenever it calls STSCH then.
+> From: Zhang Chen <chen.zhang@intel.com>
 >
-> We are in agreement. I just wanted to say, if let's say 42 vfio-ccw devices
-> are using the same chp and it goes away, you will generate 42 notifications.
-See reply below #LabelA.
-
+> Hi~
 >
->> 
->> I think this is a good idea, because:
->> 1. This is complies the Linux implementation. Path status change could
->>    be noticed by Linux.
->> 2. This provides enhancement with a small work. On the contrary, channel
->>    path re-modelling needs a lot of work.
+> COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
+> filter-redirector,filter-rewriter) have been exist in qemu
+> for long time, it's time to integrate these three parts to make COLO
+> really works.
 >
-> I thing your answer is based on the misunderstanding explained above.
-I see now.
-
+> In this series, we have some optimizations for COLO frame, including
+> separating the
+> process of saving ram and device state, using an COLO_EXIT event to notify
+> users that
+> VM exits COLO, for these parts, most of them have been reviewed long time
+> ago in old version,
+> but since this series have just rebased on upstream which had merged a new
+> series of migration,
+> parts of pathes in this series deserve review again.
 >
-> My idea was to be lazy in a different way. Instead of being lazy about
-> reading the subsection, I was wondering why not do an STSCH in the host
-> as a response to one being done in the guest.
+> We use notifier/callback method for COLO compare to notify COLO frame about
+> net packets inconsistent event, and add a handle_event method for
+> NetFilterClass to
+> help COLO frame to notify filters and colo-compare about
+> checkpoint/failover event,
+> it is flexible.
 >
-> That means: if there is no activity on the passed trough devices, nothing
-> needs to be done. (Except maybe the CRWs).
+> For the neweset version, please refer to:
+> https://github.com/zhangckid/qemu/tree/qemu-colo-18jan19
 >
-#LabelA:
-
-I see your point. This is an interesting idea.
-
-Pros:
-- code simplification
-- no chp event notification and handling
-
-Cons:
-- have to read schib region (or issue STSCH on host) for each STSCH
-  request from a guest
-
-I think code siplification is very acctractive, and performance is not
-the most important issue. Any comments? @Conny
-
-> The things aren't observable by the guest if it does not do STSCH anyway.
-Nod. This is the idea that this series is based on.
-
+> Please review, thanks.
 >
+> V4:
+>  - Address Eric's comments in patch 10/16.
+>  - Rebase on upstream codes.
+>  - Fix mingw compile error in patch 02/16.
+>  - Fix some comments.
+>  - Fix conflect with the patch "migration: remove "enable_colo" var" in
+> patch 06/16.
 >
->> 
->>> * SCHIB.PMCW provides path information relevant for a given device.
->>> This information is retrieved using store subchannel. Is your series
->>> sufficient for making store subchannel work properly (correct and
->>> reasonably up to date)?
->> Introducing a SCHIB region is the basis of further STSCH hanlding work.
->> This series depends on it, and only focuses on the update of the channel
->> path related parts of it. And for these parts, this work I think is
->> basically correct (more review comments are surely to be welcomed).
->> 
->
-> Please elaborate on that basically. Or are those actually just correct
-> in your opinion?!
->
-As listed in a former mail, the following values will be updated for the
-guest:
-PMCW:
-  - PIM/PAM/POM
-  - PNOM
-  - CHPIDs
-SCSW
-  - PNOM bit                                                                                           
-
-What else do we need?
-
->> For the rest parts, this does not change anything than what have. As
->> replied to Conny in other mail of this thread: I think, if the other
->> fields are handled by QEMU well, then we don't need to trigger update
->> events for them. Currently I don't find things that need extra trigger.
->> 
->
-> Fair.
->
->>> Regarding PMCW it's supposed to get updated when io functions are
->>> preformed by the css, AFAIR. Is that right?
->> I think so. And also for some other cases, for example, when we
->> configure on/off a channel path.
->> 
->
-> Sorry, I ended up confusing opm with pom. That would have been illegal
-> (as Connie has pointed out recently) because it can only  change
-> only if the path is tried for IO.
-What is opm? Sorry, I lost in translation... See Conny's mail, and let's
-discuss there?
-
+> V3:
+>  - Address community comments from V2.
+>  - Rebase on upstream codes.
+>  - Fix several bugs.
+>  - Splite shared disk part to indepentent patch set.
+>  - Optimize codes.
 >
 >
->>>  If yes what are the implications? Are the manipulations you do on
->>>  some PMCW fields architecturally correct?
->> If "architecturally correct" means what guest sees/senses is all obey to
->> the PoP, then I think so. We don't have to emulate the internal
->> behaviors (which could not be seen by OS) of CSS exactly when we
->> emulate, if the emulation does not impact on what Linux guest will see,
->> right?
->> 
->> I mean, the time point we update the PMCW does not has to be in the time
->> slot of io function performance. The guest would still have to get the
->> updated information through the calls of STSCH. We only need to provide
->> the updaetd result to the guest by handling STSCH well. And that's why
->> we say we do that lazily.
->> 
->> Nothing different (added value) will be seen by the guest, comparing
->> with the current lazy implementation I think.> 
->>> * The one thing I would very much appreciate as an user of vfio,
->>> and should in my understanding be the user story of this series
->>> (and the qemu counterpart of course) is the following. If my device
->>> (that is IO operation) failed because no path could be found on
->>> which the device is accessible, I would like to be able to identify
->>> that. Preferably the same way I would do for an LPAR guest. Is this
->>> series accomplishing that? 
->> With this the guest could lazily identify that. But since we have no
->> machine check propagation yet, for those cases which generate CRWs, it
->> might not be the same way for an LPAR guest I think.
->> 
+> Zhang Chen (8):
+>   filter-rewriter: fix memory leak for connection in
+>     connection_track_table
+>   colo-compare: implement the process of checkpoint
+>   colo-compare: use notifier to notify packets comparing result
+>   COLO: integrate colo compare with colo frame
+>   COLO: Add block replication into colo process
+>   ram/COLO: Record the dirty pages that SVM received
+>   filter: Add handle_event method for NetFilterClass
+>   filter-rewriter: handle checkpoint and failover event
 >
-> This was a yes/no question. I can't interpret your answer neither as
-> yes or as no. Maybe a little clarification: I'm talking about a
-> recent linux guest. 
-See Conny's mail.
-
+> zhanghailiang (8):
+>   COLO: Remove colo_state migration struct
+>   COLO: Load dirty pages into SVM's RAM cache firstly
+>   COLO: Flush memory data from ram cache
+>   qmp event: Add COLO_EXIT event to notify users while exited COLO
+>   savevm: split the process of different stages for loadvm/savevm
+>   COLO: flush host dirty ram from cache
+>   COLO: notify net filters about checkpoint/failover event
+>   COLO: quick failover process by kick COLO thread
 >
->>> * Why not just do proper STSCH for vfio-ccw?
->> I only did the interested parts (path related). For the other parts, the
->> current handling is enough, no? Anyway, after we have the schib region,
->> we can do further STSCH handling any time later we want then.
->> 
+>  include/exec/ram_addr.h  |   1 +
+>  include/migration/colo.h |  11 ++-
+>  include/net/filter.h     |   5 ++
+>  migration/Makefile.objs  |   2 +-
+>  migration/colo-comm.c    |  76 -------------------
+>  migration/colo.c         | 188 ++++++++++++++++++++++++++++++
+> ++++++++++++++---
+>  migration/migration.c    |  38 +++++++++-
+>  migration/ram.c          | 181 ++++++++++++++++++++++++++++++
+> ++++++++++++++-
+>  migration/ram.h          |   4 +
+>  migration/savevm.c       |  54 ++++++++++++--
+>  migration/savevm.h       |   5 ++
+>  migration/trace-events   |   3 +
+>  net/colo-compare.c       | 108 +++++++++++++++++++++++++--
+>  net/colo-compare.h       |  24 ++++++
+>  net/colo.h               |   4 +
+>  net/filter-rewriter.c    | 109 +++++++++++++++++++++++++--
+>  net/filter.c             |  17 +++++
+>  net/net.c                |  28 +++++++
+>  qapi/migration.json      |  35 +++++++++
+>  vl.c                     |   2 -
+>  20 files changed, 777 insertions(+), 118 deletions(-)
+>  delete mode 100644 migration/colo-comm.c
+>  create mode 100644 net/colo-compare.h
 >
-> I mean, your approach works on the premise, that the host will notify
-> QEMU each time the content of the SCHIB (area) changes (modulo stuff) so
-> it can do an update in QEMU, and give the guest an up to date virtualized
-> SCHIB when it asks for it executing the STSCH instruction.
+> --
+> 2.7.4
 >
-> I was asking myself. Why not instead while interpreting STSCH do a
-> STSCH on the host device (that is passed through), and virtualize the
-> result as necessary.
 >
-> It occurred to me if nothing simpler. 
-I think I got your point now, and replied in the above #LabelA section.
-
->
->>> * Shouldn't we virtualize CHPIDs?
->> Nobody would say no for this. :) The problem is that this is something
->> big, and it's not a short-term goal in my current working project... I
->> really want to deliver a minimal function set in the near future
->> firstly. If the current working does not hurt, can we defer channel path
->> re-modelling and CHPIDs virtualization?
->
-> The problem is, I'm not sure it does not hurt. For instance because of
-> the question below. I would also prefer having a fair idea of what
-> we need for the envisioned (complete) solution before introducing
-> kernel interfaces (to avoid: pity in the end we need something
-> different, and resulting cluttered interface).
->
->> 
->>> What if we have a clash? Lets say my dasd is only accessible via chp
->>> 0.00 in the host. Currently we have a problem there, or (as the only
->>> path would end up being ignored)?
->> You mean the clash that sharing path 0.00 between a physical dasd and
->> the virtio ccw devices? The problem I saw is in the checking of the
->> chpid.is_virtual in css_do_rchp(). For a virtual chp, we should generate
->> INIT CRWs; while for a non-virtual one, we shouldn't. If the chp is
->> shared with virtual and non-virtual device, I don't know what to do
->> then...
->> 
->> I don't think we can fix this before we re-modelled the channel path.
->> But this is neither introduced nor aggravated by this series, right?
->
-> I'm not sure about the later. What prevents the guest from believing
-> the (to use your terminology shared) chp 0.00 has become unavailable
-> if 0.00 becomes unavailable in the host?
->
-> Would that adversely affect the virtual devices? It would at
-> least look strange.
-AFAI read the code, this series does not hurt the vritual devices, which
-always have fixed path information in SCHIB.
-
-The strange thing is, the chp 0.00 is both virtual and non-virtual with
-mix use of virtual and non-virtual devices. And any existing problem is
-not caused or enhanced by this work. If we can not fix the problem
-without MCSS support or chp re-modelling in the near future, we should
-document the problem and the effect.
-
-I will do some test on this.
-
->
->> 
->> We'd have to document this either I think.
->> 
->>> Note: this is another unpleasant effect of not having MCSSE in the
->>> guest. The original design was to have a separate css for vfio, and
->>> then we would not have this kind of a problem.  (Virtualization of
->>> chps would still be good for migration.)
->> Nod. BTW, I don't say that I do not want channel path virtualization in
->> the long run. It's just I want a minimal function set more currently
->> from what I'm focusing perspective.
->> 
->> THANKS for these insightful questions!
->> 
-
--- 
-Dong Jia Shi
