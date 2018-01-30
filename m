@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55135)
+Received: from eggs.gnu.org ([208.118.235.92]:54449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1egeYC-0000o8-AF
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:39:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1egevd-0002kV-FR
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 18:04:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1egeX9-0007Lh-Jb
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:38:48 -0500
-Received: from mail-cys01nam02on0055.outbound.protection.outlook.com
-	([104.47.37.55]:13536
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgar@xilinx.com>) id 1egeX8-0007HB-Jp
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:37:43 -0500
-Date: Wed, 31 Jan 2018 05:37:32 +0700
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180130223732.GD7547@toto>
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
-	<20180129174132.108925-3-brijesh.singh@amd.com>
-	<20180130215920.GA7547@toto>
-	<c7884b04-d8e1-9f67-bd54-90538adfb45b@amd.com>
+	(envelope-from <pbonzini@redhat.com>) id 1egev2-0002F2-GX
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 18:03:01 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <1517304981-28254-1-git-send-email-thuth@redhat.com>
+Message-ID: <a04796db-26dc-a4c6-ed4f-eef6460b1a8b@redhat.com>
+Date: Tue, 30 Jan 2018 18:02:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <c7884b04-d8e1-9f67-bd54-90538adfb45b@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v6 02/23] exec: add ram_debug_ops support
+In-Reply-To: <1517304981-28254-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-options.hx: Remove confusing spaces
+ in parameter listings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,267 +24,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P .
-	Berrange" <berrange@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Tue, Jan 30, 2018 at 04:34:37PM -0600, Brijesh Singh wrote:
+On 30/01/2018 10:36, Thomas Huth wrote:
+> The spaces between the parameters in the chardev and tpmdev sections
+> are rather confusing than helpful, and prevent that the lists can be
+> copy-n-pasted easily for real usage. We also don't use such spaces
+> in other sections in the documentation, e.g. with the -netdev option,
+> so let's be consistent and remove the spaces in the chardev and tpmdev
+> sections, too.
 > 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  qemu-options.hx | 48 ++++++++++++++++++++++++------------------------
+>  1 file changed, 24 insertions(+), 24 deletions(-)
 > 
-> On 1/30/18 3:59 PM, Edgar E. Iglesias wrote:
-> > On Mon, Jan 29, 2018 at 11:41:11AM -0600, Brijesh Singh wrote:
-> >> Currently, the guest memory access for the debug purpose is performed
-> >> using the memcpy(). Lets extend the 'struct MemoryRegion' to include
-> >> ram_debug_ops callbacks. The ram_debug_ops can be used to override
-> >> memcpy() with something else.
-> >>
-> >> The feature can be used by encrypted guest -- which can register
-> >> callbacks to override memcpy() with memory encryption/decryption APIs.
-> >>
-> >> a typical usage:
-> >>
-> >> mem_read(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
-> >> mem_write(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
-> >>
-> >> MemoryRegionRAMReadWriteOps ops;
-> >> ops.read = mem_read;
-> >> ops.write = mem_write;
-> >
-> > Hi,
-> >
-> > Do these really need to be RAM specific (ram_debug_ops -> debug_ops) ?
-> > I was hoping a similar infrastructure could be used for MMIO
-> > debug accesses.
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 8ce427d..08a73fa 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -2522,7 +2522,7 @@ STEXI
+>  
+>  The general form of a character device option is:
+>  @table @option
+> -@item -chardev @var{backend} ,id=@var{id} [,mux=on|off] [,@var{options}]
+> +@item -chardev @var{backend},id=@var{id}[,mux=on|off][,@var{options}]
+>  @findex -chardev
+>  Backend is one of:
+>  @option{null},
+> @@ -2541,7 +2541,7 @@ Backend is one of:
+>  @option{tty},
+>  @option{parallel},
+>  @option{parport},
+> -@option{spicevmc}.
+> +@option{spicevmc},
+>  @option{spiceport}.
+>  The specific backend will determine the applicable options.
+>  
+> @@ -2605,11 +2605,11 @@ opened.
+>  The available backends are:
+>  
+>  @table @option
+> -@item -chardev null ,id=@var{id}
+> +@item -chardev null,id=@var{id}
+>  A void device. This device will not emit any data, and will drop any data it
+>  receives. The null backend does not take any options.
+>  
+> -@item -chardev socket ,id=@var{id} [@var{TCP options} or @var{unix options}] [,server] [,nowait] [,telnet] [,reconnect=@var{seconds}] [,tls-creds=@var{id}]
+> +@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,reconnect=@var{seconds}][,tls-creds=@var{id}]
+>  
+>  Create a two-way stream socket, which can be either a TCP or a unix socket. A
+>  unix socket will be created if @option{path} is specified. Behaviour is
+> @@ -2636,7 +2636,7 @@ TCP and unix socket options are given below:
+>  
+>  @table @option
+>  
+> -@item TCP options: port=@var{port} [,host=@var{host}] [,to=@var{to}] [,ipv4] [,ipv6] [,nodelay]
+> +@item TCP options: port=@var{port}[,host=@var{host}][,to=@var{to}][,ipv4][,ipv6][,nodelay]
+>  
+>  @option{host} for a listening socket specifies the local address to be bound.
+>  For a connecting socket species the remote host to connect to. @option{host} is
+> @@ -2664,7 +2664,7 @@ required.
+>  
+>  @end table
+>  
+> -@item -chardev udp ,id=@var{id} [,host=@var{host}] ,port=@var{port} [,localaddr=@var{localaddr}] [,localport=@var{localport}] [,ipv4] [,ipv6]
+> +@item -chardev udp,id=@var{id}[,host=@var{host}],port=@var{port}[,localaddr=@var{localaddr}][,localport=@var{localport}][,ipv4][,ipv6]
+>  
+>  Sends all traffic from the guest to a remote host over UDP.
+>  
+> @@ -2683,12 +2683,12 @@ available local port will be used.
+>  @option{ipv4} and @option{ipv6} specify that either IPv4 or IPv6 must be used.
+>  If neither is specified the device may use either protocol.
+>  
+> -@item -chardev msmouse ,id=@var{id}
+> +@item -chardev msmouse,id=@var{id}
+>  
+>  Forward QEMU's emulated msmouse events to the guest. @option{msmouse} does not
+>  take any options.
+>  
+> -@item -chardev vc ,id=@var{id} [[,width=@var{width}] [,height=@var{height}]] [[,cols=@var{cols}] [,rows=@var{rows}]]
+> +@item -chardev vc,id=@var{id}[[,width=@var{width}][,height=@var{height}]][[,cols=@var{cols}][,rows=@var{rows}]]
+>  
+>  Connect to a QEMU text console. @option{vc} may optionally be given a specific
+>  size.
+> @@ -2699,12 +2699,12 @@ the console, in pixels.
+>  @option{cols} and @option{rows} specify that the console be sized to fit a text
+>  console with the given dimensions.
+>  
+> -@item -chardev ringbuf ,id=@var{id} [,size=@var{size}]
+> +@item -chardev ringbuf,id=@var{id}[,size=@var{size}]
+>  
+>  Create a ring buffer with fixed size @option{size}.
+>  @var{size} must be a power of two and defaults to @code{64K}.
+>  
+> -@item -chardev file ,id=@var{id} ,path=@var{path}
+> +@item -chardev file,id=@var{id},path=@var{path}
+>  
+>  Log all traffic received from the guest to a file.
+>  
+> @@ -2712,7 +2712,7 @@ Log all traffic received from the guest to a file.
+>  created if it does not already exist, and overwritten if it does. @option{path}
+>  is required.
+>  
+> -@item -chardev pipe ,id=@var{id} ,path=@var{path}
+> +@item -chardev pipe,id=@var{id},path=@var{path}
+>  
+>  Create a two-way connection to the guest. The behaviour differs slightly between
+>  Windows hosts and other hosts:
+> @@ -2729,14 +2729,14 @@ be present.
+>  @option{path} forms part of the pipe path as described above. @option{path} is
+>  required.
+>  
+> -@item -chardev console ,id=@var{id}
+> +@item -chardev console,id=@var{id}
+>  
+>  Send traffic from the guest to QEMU's standard output. @option{console} does not
+>  take any options.
+>  
+>  @option{console} is only available on Windows hosts.
+>  
+> -@item -chardev serial ,id=@var{id} ,path=@option{path}
+> +@item -chardev serial,id=@var{id},path=@option{path}
+>  
+>  Send traffic from the guest to a serial device on the host.
+>  
+> @@ -2745,33 +2745,33 @@ not only serial lines.
+>  
+>  @option{path} specifies the name of the serial device to open.
+>  
+> -@item -chardev pty ,id=@var{id}
+> +@item -chardev pty,id=@var{id}
+>  
+>  Create a new pseudo-terminal on the host and connect to it. @option{pty} does
+>  not take any options.
+>  
+>  @option{pty} is not available on Windows hosts.
+>  
+> -@item -chardev stdio ,id=@var{id} [,signal=on|off]
+> +@item -chardev stdio,id=@var{id}[,signal=on|off]
+>  Connect to standard input and standard output of the QEMU process.
+>  
+>  @option{signal} controls if signals are enabled on the terminal, that includes
+>  exiting QEMU with the key sequence @key{Control-c}. This option is enabled by
+>  default, use @option{signal=off} to disable it.
+>  
+> -@item -chardev braille ,id=@var{id}
+> +@item -chardev braille,id=@var{id}
+>  
+>  Connect to a local BrlAPI server. @option{braille} does not take any options.
+>  
+> -@item -chardev tty ,id=@var{id} ,path=@var{path}
+> +@item -chardev tty,id=@var{id},path=@var{path}
+>  
+>  @option{tty} is only available on Linux, Sun, FreeBSD, NetBSD, OpenBSD and
+>  DragonFlyBSD hosts.  It is an alias for @option{serial}.
+>  
+>  @option{path} specifies the path to the tty. @option{path} is required.
+>  
+> -@item -chardev parallel ,id=@var{id} ,path=@var{path}
+> -@itemx -chardev parport ,id=@var{id} ,path=@var{path}
+> +@item -chardev parallel,id=@var{id},path=@var{path}
+> +@itemx -chardev parport,id=@var{id},path=@var{path}
+>  
+>  @option{parallel} is only available on Linux, FreeBSD and DragonFlyBSD hosts.
+>  
+> @@ -2780,7 +2780,7 @@ Connect to a local parallel port.
+>  @option{path} specifies the path to the parallel port device. @option{path} is
+>  required.
+>  
+> -@item -chardev spicevmc ,id=@var{id} ,debug=@var{debug}, name=@var{name}
+> +@item -chardev spicevmc,id=@var{id},debug=@var{debug},name=@var{name}
+>  
+>  @option{spicevmc} is only available when spice support is built in.
+>  
+> @@ -2790,7 +2790,7 @@ required.
+>  
+>  Connect to a spice virtual machine channel, such as vdiport.
+>  
+> -@item -chardev spiceport ,id=@var{id} ,debug=@var{debug}, name=@var{name}
+> +@item -chardev spiceport,id=@var{id},debug=@var{debug},name=@var{name}
+>  
+>  @option{spiceport} is only available when spice support is built in.
+>  
+> @@ -2898,7 +2898,7 @@ STEXI
+>  The general form of a TPM device option is:
+>  @table @option
+>  
+> -@item -tpmdev @var{backend} ,id=@var{id} [,@var{options}]
+> +@item -tpmdev @var{backend},id=@var{id}[,@var{options}]
+>  @findex -tpmdev
+>  
+>  The specific backend type will determine the applicable options.
+> @@ -2913,7 +2913,7 @@ The available backends are:
+>  
+>  @table @option
+>  
+> -@item -tpmdev passthrough, id=@var{id}, path=@var{path}, cancel-path=@var{cancel-path}
+> +@item -tpmdev passthrough,id=@var{id},path=@var{path},cancel-path=@var{cancel-path}
+>  
+>  (Linux-host only) Enable access to the host's TPM using the passthrough
+>  driver.
+> @@ -2950,7 +2950,7 @@ To create a passthrough TPM use the following two options:
+>  Note that the @code{-tpmdev} id is @code{tpm0} and is referenced by
+>  @code{tpmdev=tpm0} in the device option.
+>  
+> -@item -tpmdev emulator, id=@var{id}, chardev=@var{dev}
+> +@item -tpmdev emulator,id=@var{id},chardev=@var{dev}
+>  
+>  (Linux-host only) Enable access to a TPM emulator using Unix domain socket based
+>  chardev backend.
 > 
-> Hi Edgar,
-> 
-> The MMIO regions will contains unencrypted data hence I do not find the
-> need to add debug hooks for it. A memcpy() to/from MMIO should be fine.
-> If we see the need for MMIO case then it can extended later.
 
-In this use-case yes, but in a general use-case MMIO regions may also
-want to differentiate debug from normal accesses.
-
-I'm not saying you need to implement MMIO examples but do we really
-need to have ram_debug_ops and mmio_debug_ops in the future?
-Can we get away with one somehow?
-
-Cheers,
-Edgar
-
-> 
-> Brijesh
-> > Best regards,
-> > Edgar
-> >
-> >
-> >
-> >> memory_region_init_ram(mem, NULL, "memory", size, NULL);
-> >> memory_region_set_ram_debug_ops(mem, ops);
-> >>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-> >> Cc: Richard Henderson <rth@twiddle.net>
-> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> >> ---
-> >>  exec.c                | 66 ++++++++++++++++++++++++++++++++++++++-------------
-> >>  include/exec/memory.h | 27 +++++++++++++++++++++
-> >>  2 files changed, 77 insertions(+), 16 deletions(-)
-> >>
-> >> diff --git a/exec.c b/exec.c
-> >> index 629a5083851d..1919052b7385 100644
-> >> --- a/exec.c
-> >> +++ b/exec.c
-> >> @@ -3050,7 +3050,11 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
-> >>          } else {
-> >>              /* RAM case */
-> >>              ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
-> >> -            memcpy(ptr, buf, l);
-> >> +            if (attrs.debug && mr->ram_debug_ops) {
-> >> +                mr->ram_debug_ops->write(ptr, buf, l, attrs);
-> >> +            } else {
-> >> +                memcpy(ptr, buf, l);
-> >> +            }
-> >>              invalidate_and_set_dirty(mr, addr1, l);
-> >>          }
-> >>  
-> >> @@ -3148,7 +3152,11 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
-> >>          } else {
-> >>              /* RAM case */
-> >>              ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
-> >> -            memcpy(buf, ptr, l);
-> >> +            if (attrs.debug && mr->ram_debug_ops) {
-> >> +                mr->ram_debug_ops->read(buf, ptr, l, attrs);
-> >> +            } else {
-> >> +                memcpy(buf, ptr, l);
-> >> +            }
-> >>          }
-> >>  
-> >>          if (release_lock) {
-> >> @@ -3218,11 +3226,13 @@ void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
-> >>  
-> >>  enum write_rom_type {
-> >>      WRITE_DATA,
-> >> +    READ_DATA,
-> >>      FLUSH_CACHE,
-> >>  };
-> >>  
-> >> -static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
-> >> -    hwaddr addr, const uint8_t *buf, int len, enum write_rom_type type)
-> >> +static inline void cpu_physical_memory_rw_internal(AddressSpace *as,
-> >> +    hwaddr addr, uint8_t *buf, int len, MemTxAttrs attrs,
-> >> +    enum write_rom_type type)
-> >>  {
-> >>      hwaddr l;
-> >>      uint8_t *ptr;
-> >> @@ -3237,12 +3247,33 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
-> >>          if (!(memory_region_is_ram(mr) ||
-> >>                memory_region_is_romd(mr))) {
-> >>              l = memory_access_size(mr, l, addr1);
-> >> +            /* Pass MMIO down to address address_space_rw */
-> >> +            switch (type) {
-> >> +            case READ_DATA:
-> >> +            case WRITE_DATA:
-> >> +                address_space_rw(as, addr1, attrs, buf, l,
-> >> +                                 type == WRITE_DATA);
-> >> +                break;
-> >> +            case FLUSH_CACHE:
-> >> +                break;
-> >> +            }
-> >>          } else {
-> >>              /* ROM/RAM case */
-> >>              ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-> >>              switch (type) {
-> >> +            case READ_DATA:
-> >> +                if (mr->ram_debug_ops) {
-> >> +                    mr->ram_debug_ops->read(buf, ptr, l, attrs);
-> >> +                } else {
-> >> +                    memcpy(buf, ptr, l);
-> >> +                }
-> >> +                break;
-> >>              case WRITE_DATA:
-> >> -                memcpy(ptr, buf, l);
-> >> +                if (mr->ram_debug_ops) {
-> >> +                    mr->ram_debug_ops->write(ptr, buf, l, attrs);
-> >> +                } else {
-> >> +                    memcpy(ptr, buf, l);
-> >> +                }
-> >>                  invalidate_and_set_dirty(mr, addr1, l);
-> >>                  break;
-> >>              case FLUSH_CACHE:
-> >> @@ -3261,7 +3292,8 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
-> >>  void cpu_physical_memory_write_rom(AddressSpace *as, hwaddr addr,
-> >>                                     const uint8_t *buf, int len)
-> >>  {
-> >> -    cpu_physical_memory_write_rom_internal(as, addr, buf, len, WRITE_DATA);
-> >> +    cpu_physical_memory_rw_internal(as, addr, (uint8_t *)buf, len,
-> >> +            MEMTXATTRS_UNSPECIFIED, WRITE_DATA);
-> >>  }
-> >>  
-> >>  void cpu_flush_icache_range(hwaddr start, int len)
-> >> @@ -3276,8 +3308,10 @@ void cpu_flush_icache_range(hwaddr start, int len)
-> >>          return;
-> >>      }
-> >>  
-> >> -    cpu_physical_memory_write_rom_internal(&address_space_memory,
-> >> -                                           start, NULL, len, FLUSH_CACHE);
-> >> +    cpu_physical_memory_rw_internal(&address_space_memory,
-> >> +                                    start, NULL, len,
-> >> +                                    MEMTXATTRS_UNSPECIFIED,
-> >> +                                    FLUSH_CACHE);
-> >>  }
-> >>  
-> >>  typedef struct {
-> >> @@ -3583,6 +3617,7 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-> >>      int l;
-> >>      hwaddr phys_addr;
-> >>      target_ulong page;
-> >> +    int type = is_write ? WRITE_DATA : READ_DATA;
-> >>  
-> >>      cpu_synchronize_state(cpu);
-> >>      while (len > 0) {
-> >> @@ -3592,6 +3627,10 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-> >>          page = addr & TARGET_PAGE_MASK;
-> >>          phys_addr = cpu_get_phys_page_attrs_debug(cpu, page, &attrs);
-> >>          asidx = cpu_asidx_from_attrs(cpu, attrs);
-> >> +
-> >> +        /* set debug attrs to indicate memory access is from the debugger */
-> >> +        attrs.debug = 1;
-> >> +
-> >>          /* if no physical page mapped, return an error */
-> >>          if (phys_addr == -1)
-> >>              return -1;
-> >> @@ -3599,14 +3638,9 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-> >>          if (l > len)
-> >>              l = len;
-> >>          phys_addr += (addr & ~TARGET_PAGE_MASK);
-> >> -        if (is_write) {
-> >> -            cpu_physical_memory_write_rom(cpu->cpu_ases[asidx].as,
-> >> -                                          phys_addr, buf, l);
-> >> -        } else {
-> >> -            address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
-> >> -                             MEMTXATTRS_UNSPECIFIED,
-> >> -                             buf, l, 0);
-> >> -        }
-> >> +        cpu_physical_memory_rw_internal(cpu->cpu_ases[asidx].as,
-> >> +                                        phys_addr, buf, l, attrs,
-> >> +                                        type);
-> >>          len -= l;
-> >>          buf += l;
-> >>          addr += l;
-> >> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> >> index 07c5d6d59796..4d027fffeebf 100644
-> >> --- a/include/exec/memory.h
-> >> +++ b/include/exec/memory.h
-> >> @@ -215,6 +215,18 @@ typedef struct IOMMUMemoryRegionClass {
-> >>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
-> >>  typedef struct MemoryRegionIoeventfd MemoryRegionIoeventfd;
-> >>  
-> >> +/* Memory Region RAM debug callback */
-> >> +typedef struct MemoryRegionRAMReadWriteOps MemoryRegionRAMReadWriteOps;
-> >> +
-> >> +struct MemoryRegionRAMReadWriteOps {
-> >> +    /* Write data into guest memory */
-> >> +    int (*write) (uint8_t *dest, const uint8_t *src,
-> >> +                  uint32_t len, MemTxAttrs attrs);
-> >> +    /* Read data from guest memory */
-> >> +    int (*read) (uint8_t *dest, const uint8_t *src,
-> >> +                 uint32_t len, MemTxAttrs attrs);
-> >> +};
-> >> +
-> >>  struct MemoryRegion {
-> >>      Object parent_obj;
-> >>  
-> >> @@ -254,6 +266,7 @@ struct MemoryRegion {
-> >>      const char *name;
-> >>      unsigned ioeventfd_nb;
-> >>      MemoryRegionIoeventfd *ioeventfds;
-> >> +    const MemoryRegionRAMReadWriteOps *ram_debug_ops;
-> >>  };
-> >>  
-> >>  struct IOMMUMemoryRegion {
-> >> @@ -624,6 +637,20 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-> >>                                               Error **errp);
-> >>  
-> >>  /**
-> >> + * memory_region_set_ram_debug_ops: Set debug access ops for a given memory region
-> >> + *
-> >> + * @mr: the #MemoryRegion to be initialized
-> >> + * @ops: a function that will be used for when accessing @target region during
-> >> + *       debug
-> >> + */
-> >> +static inline void
-> >> +memory_region_set_ram_debug_ops(MemoryRegion *mr,
-> >> +                                const MemoryRegionRAMReadWriteOps *ops)
-> >> +{
-> >> +    mr->ram_debug_ops = ops;
-> >> +}
-> >> +
-> >> +/**
-> >>   * memory_region_init_reservation: Initialize a memory region that reserves
-> >>   *                                 I/O space.
-> >>   *
-> >> -- 
-> >> 2.9.5
-> >>
-> 
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
