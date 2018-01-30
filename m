@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egMsj-00048A-0F
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 22:46:50 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1egN1G-0006yD-NY
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 22:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egMsf-0001Yg-2x
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 22:46:49 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:41463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egMse-0001Ws-Tp
-	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 22:46:45 -0500
-Received: by mail-qk0-x244.google.com with SMTP id l29so8465546qkj.8
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 19:46:44 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180129202326.9417.71344.stgit@gimli.home>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e68d0f7f-b942-3452-0771-578bdfb1b276@amsat.org>
-Date: Tue, 30 Jan 2018 00:46:38 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180129202326.9417.71344.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] vfio/pci: Add option to disable GeForce
- quirks
+	(envelope-from <aik@ozlabs.ru>) id 1egN1F-0001jt-8T
+	for qemu-devel@nongnu.org; Mon, 29 Jan 2018 22:55:38 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Tue, 30 Jan 2018 14:55:27 +1100
+Message-Id: <20180130035527.47336-3-aik@ozlabs.ru>
+In-Reply-To: <20180130035527.47336-1-aik@ozlabs.ru>
+References: <20180130035527.47336-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v5 2/2] RFC: vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,100 +20,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Auger Eric <eric.auger@redhat.com>
 
-Hi Alex,
+This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+which tells that a region with MSIX data can be mapped entirely, i.e.
+the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
 
-On 01/29/2018 05:23 PM, Alex Williamson wrote:
-> These quirks are necessary for GeForce, but not for Quadro/GRID/Tesla
-> assignment.  Leaving them enabled is fully functional and provides the
-> most compatibility, but due to the unique NVIDIA MSI ACK behavior[1],
-> it also introduces latency in re-triggering the MSI interrupt.  This
-> overhead is typically negligible, but has been shown to adversely
-> affect some (very) high interrupt rate applications.  This adds the
-> vfio-pci device option "x-no-geforce-quirks=" which can be set to
-> "on" to disable this additional overhead.
-> 
-> A follow-on optimization for GeForce might be to make use of an
-> ioeventfd to allow KVM to trigger an irqfd in the kernel vfio-pci
-> driver, avoiding the bounce through userspace to handle this device
-> write.
-> 
-> [1] Background: the NVIDIA driver has been observed to write 0xff to
-> the read-only MSI capability ID register via the MMIO mirror of PCI
-> config space in order for the MSI interrupt to re-trigger.  This PCI
-> config space mirror is virtualized in QEMU for GeForce.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  hw/vfio/pci-quirks.c |    9 ++++++---
->  hw/vfio/pci.c        |    2 ++
->  hw/vfio/pci.h        |    1 +
->  3 files changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 60ad5fb91a83..e5779a7ad35b 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -542,7 +542,8 @@ static void vfio_vga_probe_nvidia_3d0_quirk(VFIOPCIDevice *vdev)
->      VFIOQuirk *quirk;
->      VFIONvidia3d0Quirk *data;
->  
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-> +    if (vdev->no_geforce_quirks ||
-> +        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
+With this change, all BARs are mapped in a single chunk and MSIX vectors
+are emulated on top unless the machine requests not to by defining and
+enabling a new "vfio-no-msix-emulation" property. At the moment only
+sPAPR machine does so - it prohibits MSIX emulation and does not allow
+enabling it as it does not define the "set" callback for the new property;
+the new property also does not appear in "-machine pseries,help".
 
-Isn't it enough to check x-pci-device-id == 0x03d0 for GeForce rather
-than introduce a x-no-geforce-quirks property?
+This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
 
->          !vdev->bars[1].region.size) {
->          return;
->      }
-> @@ -660,7 +661,8 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
->      VFIONvidiaBAR5Quirk *bar5;
->      VFIOConfigWindowQuirk *window;
->  
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-> +    if (vdev->no_geforce_quirks ||
-> +        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
->          !vdev->vga || nr != 5 || !vdev->bars[5].ioport) {
->          return;
->      }
-> @@ -754,7 +756,8 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
->      VFIOQuirk *quirk;
->      VFIOConfigMirrorQuirk *mirror;
->  
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-> +    if (vdev->no_geforce_quirks ||
-> +        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
->          !vfio_is_vga(vdev) || nr != 0) {
->          return;
->      }
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 2c7129512563..6d260b92c1e1 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2989,6 +2989,8 @@ static Property vfio_pci_dev_properties[] = {
->      DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
->      DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
->      DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
-> +    DEFINE_PROP_BOOL("x-no-geforce-quirks", VFIOPCIDevice,
-> +                     no_geforce_quirks, false),
->      DEFINE_PROP_UINT32("x-pci-vendor-id", VFIOPCIDevice, vendor_id, PCI_ANY_ID),
->      DEFINE_PROP_UINT32("x-pci-device-id", VFIOPCIDevice, device_id, PCI_ANY_ID),
->      DEFINE_PROP_UINT32("x-pci-sub-vendor-id", VFIOPCIDevice,
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index a8fb3b34222c..7c55087a1c44 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -142,6 +142,7 @@ typedef struct VFIOPCIDevice {
->      bool no_kvm_intx;
->      bool no_kvm_msi;
->      bool no_kvm_msix;
-> +    bool no_geforce_quirks;
->  } VFIOPCIDevice;
->  
->  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-> 
-> 
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v5:
+* rebased on top of 'p2p' proposed patch
+
+v4:
+* silenced dma map errors if unaligned mapping is attempted - they are going
+to fail anyway
+
+v3:
+* vfio_listener_region_add() won't make qemu exit if failed on MMIO MR
+---
+ include/hw/vfio/vfio-common.h |  1 +
+ linux-headers/linux/vfio.h    |  5 +++++
+ hw/ppc/spapr.c                |  7 +++++++
+ hw/vfio/common.c              | 15 +++++++++++++++
+ hw/vfio/pci.c                 | 10 ++++++++++
+ 5 files changed, 38 insertions(+)
+
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 8c7ba75..3ef9f8e 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -172,6 +172,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+                          struct vfio_region_info **info);
+ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+                              uint32_t subtype, struct vfio_region_info **info);
++bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+ #endif
+ extern const MemoryListener vfio_prereg_listener;
+ 
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 4312e96..b45182e 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+ 
++/*
++ * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
++ */
++#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
++
+ /**
+  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+  *				    struct vfio_irq_info)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 32a876b..6d333e2 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2830,6 +2830,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+     spapr->use_hotplug_event_source = value;
+ }
+ 
++static bool spapr_get_msix_emulation(Object *obj, Error **errp)
++{
++    return true;
++}
++
+ static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+@@ -2911,6 +2916,8 @@ static void spapr_instance_init(Object *obj)
+     object_property_set_description(obj, "vsmt",
+                                     "Virtual SMT: KVM behaves as if this were"
+                                     " the host's SMT mode", &error_abort);
++    object_property_add_bool(obj, "vfio-no-msix-emulation",
++                             spapr_get_msix_emulation, NULL, NULL);
+ }
+ 
+ static void spapr_machine_finalizefn(Object *obj)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 8aaed8d..18b98e8 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1431,6 +1431,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+     return -ENODEV;
+ }
+ 
++bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
++{
++    struct vfio_region_info *info = NULL;
++    bool ret = false;
++
++    if (!vfio_get_region_info(vbasedev, region, &info)) {
++        if (vfio_get_region_info_cap(info, cap_type)) {
++            ret = true;
++        }
++        g_free(info);
++    }
++
++    return ret;
++}
++
+ /*
+  * Interfaces for IBM EEH (Enhanced Error Handling)
+  */
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5b20620..87a186f 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+     off_t start, end;
+     VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+ 
++    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
++                            vdev->msix->table_bar)) {
++        return;
++    }
++
+     /*
+      * We expect to find a single mmap covering the whole BAR, anything else
+      * means it's either unsupported or already setup.
+@@ -1473,6 +1478,11 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+      */
+     memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
+ 
++    if (object_property_get_bool(OBJECT(qdev_get_machine()),
++                                 "vfio-no-msix-emulation", NULL)) {
++        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
++    }
++
+     return 0;
+ }
+ 
+-- 
+2.11.0
