@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egZt2-0008K5-EY
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:06 -0500
+	(envelope-from <groug@kaod.org>) id 1egZt4-0008Kb-GA
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egZsx-0004KE-93
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46468
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1egZt0-0004O8-C6
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46912)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egZsx-0004AD-2W
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:39:55 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0UHdd0N020562
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:46 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ftuq8cs4k-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egZt0-0004D0-2C
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:39:58 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0UHddVN139360
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:49 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ftvw696b5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:46 -0500
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:48 -0500
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
 	Tue, 30 Jan 2018 17:39:44 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 30 Jan 2018 18:39:33 +0100
+Date: Tue, 30 Jan 2018 18:39:32 +0100
 In-Reply-To: <20180130173935.5172-1-groug@kaod.org>
 References: <20180130173935.5172-1-groug@kaod.org>
-Message-Id: <20180130173935.5172-9-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 08/10] libqos/virtio: return length written into
- used descriptor
+Message-Id: <20180130173935.5172-8-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 07/10] tests: virtio-9p: add WRITE operation test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,278 +39,157 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-When a 9p request is flushed (ie, cancelled) by the guest, the device
-is expected to simply mark the request as used, without sending a 9p
-reply (ie, without writing anything into the used buffer).
-
-To be able to test this, we need access to the length written by the
-device into the used descriptor. This patch adds a uint32_t * argument
-to qvirtqueue_get_buf() and qvirtio_wait_used_elem() for this purpose.
-
-All existing users are updated accordingly.
+Trivial test of a successful write.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
+(groug, handle potential overflow when computing request size)
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/libqos/virtio.c    | 25 +++++++++++++++++--------
- tests/libqos/virtio.h    |  3 ++-
- tests/virtio-9p-test.c   |  2 +-
- tests/virtio-blk-test.c  | 24 +++++++++++++-----------
- tests/virtio-net-test.c  |  6 +++---
- tests/virtio-scsi-test.c |  3 ++-
- 6 files changed, 38 insertions(+), 25 deletions(-)
+ hw/9pfs/9p-synth.c     | 11 +++++++++
+ hw/9pfs/9p-synth.h     |  1 +
+ tests/virtio-9p-test.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 74 insertions(+)
 
-diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-index 0879a621c8af..0dad5c19acde 100644
---- a/tests/libqos/virtio.c
-+++ b/tests/libqos/virtio.c
-@@ -119,6 +119,8 @@ uint8_t qvirtio_wait_status_byte_no_isr(QVirtioDevice *d,
- /*
-  * qvirtio_wait_used_elem:
-  * @desc_idx: The next expected vq->desc[] index in the used ring
-+ * @len: A pointer that is filled with the length written into the buffer, may
-+ *       be NULL
-  * @timeout_us: How many microseconds to wait before failing
-  *
-  * This function waits for the next completed request on the used ring.
-@@ -126,6 +128,7 @@ uint8_t qvirtio_wait_status_byte_no_isr(QVirtioDevice *d,
- void qvirtio_wait_used_elem(QVirtioDevice *d,
-                             QVirtQueue *vq,
-                             uint32_t desc_idx,
-+                            uint32_t *len,
-                             gint64 timeout_us)
- {
-     gint64 start_time = g_get_monotonic_time();
-@@ -136,7 +139,7 @@ void qvirtio_wait_used_elem(QVirtioDevice *d,
-         clock_step(100);
- 
-         if (d->bus->get_queue_isr_status(d, vq) &&
--            qvirtqueue_get_buf(vq, &got_desc_idx)) {
-+            qvirtqueue_get_buf(vq, &got_desc_idx, len)) {
-             g_assert_cmpint(got_desc_idx, ==, desc_idx);
-             return;
-         }
-@@ -304,30 +307,36 @@ void qvirtqueue_kick(QVirtioDevice *d, QVirtQueue *vq, uint32_t free_head)
- /*
-  * qvirtqueue_get_buf:
-  * @desc_idx: A pointer that is filled with the vq->desc[] index, may be NULL
-+ * @len: A pointer that is filled with the length written into the buffer, may
-+ *       be NULL
-  *
-  * This function gets the next used element if there is one ready.
-  *
-  * Returns: true if an element was ready, false otherwise
-  */
--bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx)
-+bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx, uint32_t *len)
- {
-     uint16_t idx;
-+    uint64_t elem_addr;
- 
-     idx = readw(vq->used + offsetof(struct vring_used, idx));
-     if (idx == vq->last_used_idx) {
-         return false;
-     }
- 
--    if (desc_idx) {
--        uint64_t elem_addr;
-+    elem_addr = vq->used +
-+        offsetof(struct vring_used, ring) +
-+        (vq->last_used_idx % vq->size) *
-+        sizeof(struct vring_used_elem);
- 
--        elem_addr = vq->used +
--                    offsetof(struct vring_used, ring) +
--                    (vq->last_used_idx % vq->size) *
--                    sizeof(struct vring_used_elem);
-+    if (desc_idx) {
-         *desc_idx = readl(elem_addr + offsetof(struct vring_used_elem, id));
-     }
- 
-+    if (len) {
-+        *len = readw(elem_addr + offsetof(struct vring_used_elem, len));
-+    }
-+
-     vq->last_used_idx++;
-     return true;
+diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
+index f17b74f44461..f2d59a90a670 100644
+--- a/hw/9pfs/9p-synth.c
++++ b/hw/9pfs/9p-synth.c
+@@ -515,6 +515,12 @@ static int synth_unlinkat(FsContext *ctx, V9fsPath *dir,
+     return -1;
  }
-diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
-index 0a04740adfe1..69b5b13840e7 100644
---- a/tests/libqos/virtio.h
-+++ b/tests/libqos/virtio.h
-@@ -124,6 +124,7 @@ uint8_t qvirtio_wait_status_byte_no_isr(QVirtioDevice *d,
- void qvirtio_wait_used_elem(QVirtioDevice *d,
-                             QVirtQueue *vq,
-                             uint32_t desc_idx,
-+                            uint32_t *len,
-                             gint64 timeout_us);
- void qvirtio_wait_config_isr(QVirtioDevice *d, gint64 timeout_us);
- QVirtQueue *qvirtqueue_setup(QVirtioDevice *d,
-@@ -140,7 +141,7 @@ uint32_t qvirtqueue_add(QVirtQueue *vq, uint64_t data, uint32_t len, bool write,
-                                                                     bool next);
- uint32_t qvirtqueue_add_indirect(QVirtQueue *vq, QVRingIndirectDesc *indirect);
- void qvirtqueue_kick(QVirtioDevice *d, QVirtQueue *vq, uint32_t free_head);
--bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx);
-+bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx, uint32_t *len);
  
- void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx);
++static ssize_t v9fs_synth_qtest_write(void *buf, int len, off_t offset,
++                                      void *arg)
++{
++    return len;
++}
++
+ static int synth_init(FsContext *ctx, Error **errp)
+ {
+     QLIST_INIT(&synth_root.child);
+@@ -546,6 +552,11 @@ static int synth_init(FsContext *ctx, Error **errp)
+         ret = qemu_v9fs_synth_add_file(NULL, 0, QTEST_V9FS_SYNTH_LOPEN_FILE,
+                                        NULL, NULL, ctx);
+         assert(!ret);
++
++        /* File for WRITE test */
++        ret = qemu_v9fs_synth_add_file(NULL, 0, QTEST_V9FS_SYNTH_WRITE_FILE,
++                                       NULL, v9fs_synth_qtest_write, ctx);
++        assert(!ret);
+     }
  
+     return 0;
+diff --git a/hw/9pfs/9p-synth.h b/hw/9pfs/9p-synth.h
+index 2a8d6fd00d69..a74032d7bd9a 100644
+--- a/hw/9pfs/9p-synth.h
++++ b/hw/9pfs/9p-synth.h
+@@ -53,5 +53,6 @@ int qemu_v9fs_synth_add_file(V9fsSynthNode *parent, int mode,
+ 
+ #define QTEST_V9FS_SYNTH_WALK_FILE "WALK%d"
+ #define QTEST_V9FS_SYNTH_LOPEN_FILE "LOPEN"
++#define QTEST_V9FS_SYNTH_WRITE_FILE "WRITE"
+ 
+ #endif
 diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 37a7dae3f78e..cef21aea76c9 100644
+index 6ba782e24f3a..37a7dae3f78e 100644
 --- a/tests/virtio-9p-test.c
 +++ b/tests/virtio-9p-test.c
-@@ -254,7 +254,7 @@ static void v9fs_req_wait_for_reply(P9Req *req)
- {
-     QVirtIO9P *v9p = req->v9p;
- 
--    qvirtio_wait_used_elem(v9p->dev, v9p->vq, req->free_head,
-+    qvirtio_wait_used_elem(v9p->dev, v9p->vq, req->free_head, NULL,
-                            QVIRTIO_9P_TIMEOUT_US);
+@@ -150,6 +150,13 @@ static void v9fs_uint32_write(P9Req *req, uint32_t val)
+     v9fs_memwrite(req, &le_val, 4);
  }
  
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 45f368dcd966..2ac64e5e2559 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -193,7 +193,7 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
++static void v9fs_uint64_write(P9Req *req, uint64_t val)
++{
++    uint64_t le_val = cpu_to_le64(val);
++
++    v9fs_memwrite(req, &le_val, 8);
++}
++
+ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
+ {
+     v9fs_memread(req, val, 4);
+@@ -239,6 +246,7 @@ static const char *rmessage_name(uint8_t id)
+         id == P9_RATTACH ? "RATTACH" :
+         id == P9_RWALK ? "RWALK" :
+         id == P9_RLOPEN ? "RLOPEN" :
++        id == P9_RWRITE ? "RWRITE" :
+         "<unknown>";
+ }
  
-     qvirtqueue_kick(dev, vq, free_head);
+@@ -418,6 +426,34 @@ static void v9fs_rlopen(P9Req *req, v9fs_qid *qid, uint32_t *iounit)
+     v9fs_req_free(req);
+ }
  
--    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL, QVIRTIO_BLK_TIMEOUT_US);
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
++/* size[4] Twrite tag[2] fid[4] offset[8] count[4] data[count] */
++static P9Req *v9fs_twrite(QVirtIO9P *v9p, uint32_t fid, uint64_t offset,
++                          uint32_t count, const void *data, uint16_t tag)
++{
++    P9Req *req;
++    uint32_t body_size = 4 + 8 + 4;
++
++    g_assert_cmpint(body_size, <=, UINT32_MAX - count);
++    body_size += count;
++    req = v9fs_req_init(v9p,  body_size, P9_TWRITE, tag);
++    v9fs_uint32_write(req, fid);
++    v9fs_uint64_write(req, offset);
++    v9fs_uint32_write(req, count);
++    v9fs_memwrite(req, data, count);
++    v9fs_req_send(req);
++    return req;
++}
++
++/* size[4] Rwrite tag[2] count[4] */
++static void v9fs_rwrite(P9Req *req, uint32_t *count)
++{
++    v9fs_req_recv(req, P9_RWRITE);
++    if (count) {
++        v9fs_uint32_read(req, count);
++    }
++    v9fs_req_free(req);
++}
++
+ static void fs_version(QVirtIO9P *v9p)
+ {
+     const char *version = "9P2000.L";
+@@ -524,6 +560,31 @@ static void fs_lopen(QVirtIO9P *v9p)
+     g_free(wnames[0]);
+ }
  
-@@ -215,7 +215,7 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
++static void fs_write(QVirtIO9P *v9p)
++{
++    static const uint32_t write_count = P9_MAX_SIZE / 2;
++    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_WRITE_FILE) };
++    char *buf = g_malloc(write_count);
++    uint32_t count;
++    P9Req *req;
++
++    fs_attach(v9p);
++    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
++    v9fs_req_wait_for_reply(req);
++    v9fs_rwalk(req, NULL, NULL);
++
++    req = v9fs_tlopen(v9p, 1, O_WRONLY, 0);
++    v9fs_req_wait_for_reply(req);
++    v9fs_rlopen(req, NULL, NULL);
++
++    req = v9fs_twrite(v9p, 1, 0, write_count, buf, 0);
++    v9fs_req_wait_for_reply(req);
++    v9fs_rwrite(req, &count);
++    g_assert_cmpint(count, ==, write_count);
++
++    g_free(wnames[0]);
++}
++
+ typedef void (*v9fs_test_fn)(QVirtIO9P *v9p);
  
-     qvirtqueue_kick(dev, vq, free_head);
+ static void v9fs_run_pci_test(gconstpointer data)
+@@ -554,6 +615,7 @@ int main(int argc, char **argv)
+     v9fs_qtest_pci_add("/virtio/9p/pci/fs/walk/dotdot_from_root",
+                        fs_walk_dotdot);
+     v9fs_qtest_pci_add("/virtio/9p/pci/fs/lopen/basic", fs_lopen);
++    v9fs_qtest_pci_add("/virtio/9p/pci/fs/write/basic", fs_write);
  
--    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL, QVIRTIO_BLK_TIMEOUT_US);
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
- 
-@@ -243,7 +243,8 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
-         qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-         qvirtqueue_kick(dev, vq, free_head);
- 
--        qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-         status = readb(req_addr + 528);
-         g_assert_cmpint(status, ==, 0);
- 
-@@ -264,7 +265,8 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
- 
-         qvirtqueue_kick(dev, vq, free_head);
- 
--        qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_BLK_TIMEOUT_US);
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-         status = readb(req_addr + 528);
-         g_assert_cmpint(status, ==, 0);
- 
-@@ -345,7 +347,7 @@ static void pci_indirect(void)
-     free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
-     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
-+    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
-@@ -370,7 +372,7 @@ static void pci_indirect(void)
-     free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
-     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
-+    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
-@@ -481,7 +483,7 @@ static void pci_msix(void)
-     qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
-     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
-+    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
- 
-     status = readb(req_addr + 528);
-@@ -506,7 +508,7 @@ static void pci_msix(void)
-     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
- 
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
-+    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
- 
-     status = readb(req_addr + 528);
-@@ -580,7 +582,7 @@ static void pci_idx(void)
-     qvirtqueue_add(&vqpci->vq, req_addr + 528, 1, true, false);
-     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
- 
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head,
-+    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, free_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
- 
-     /* Write request */
-@@ -627,9 +629,9 @@ static void pci_idx(void)
-     qvirtqueue_kick(&dev->vdev, &vqpci->vq, free_head);
- 
-     /* We get just one notification for both requests */
--    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, write_head,
-+    qvirtio_wait_used_elem(&dev->vdev, &vqpci->vq, write_head, NULL,
-                            QVIRTIO_BLK_TIMEOUT_US);
--    g_assert(qvirtqueue_get_buf(&vqpci->vq, &desc_idx));
-+    g_assert(qvirtqueue_get_buf(&vqpci->vq, &desc_idx, NULL));
-     g_assert_cmpint(desc_idx, ==, free_head);
- 
-     status = readb(req_addr + 528);
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 635b942c3601..ea634dc05a60 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -108,7 +108,7 @@ static void rx_test(QVirtioDevice *dev,
-     ret = iov_send(socket, iov, 2, 0, sizeof(len) + sizeof(test));
-     g_assert_cmpint(ret, ==, sizeof(test) + sizeof(len));
- 
--    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_NET_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL, QVIRTIO_NET_TIMEOUT_US);
-     memread(req_addr + VNET_HDR_SIZE, buffer, sizeof(test));
-     g_assert_cmpstr(buffer, ==, "TEST");
- 
-@@ -131,7 +131,7 @@ static void tx_test(QVirtioDevice *dev,
-     free_head = qvirtqueue_add(vq, req_addr, 64, false, false);
-     qvirtqueue_kick(dev, vq, free_head);
- 
--    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_NET_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL, QVIRTIO_NET_TIMEOUT_US);
-     guest_free(alloc, req_addr);
- 
-     ret = qemu_recv(socket, &len, sizeof(len), 0);
-@@ -182,7 +182,7 @@ static void rx_stop_cont_test(QVirtioDevice *dev,
-     rsp = qmp("{ 'execute' : 'cont'}");
-     QDECREF(rsp);
- 
--    qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_NET_TIMEOUT_US);
-+    qvirtio_wait_used_elem(dev, vq, free_head, NULL, QVIRTIO_NET_TIMEOUT_US);
-     memread(req_addr + VNET_HDR_SIZE, buffer, sizeof(test));
-     g_assert_cmpstr(buffer, ==, "TEST");
- 
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 2934305b2bff..bcf408fbb637 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -121,7 +121,8 @@ static uint8_t virtio_scsi_do_command(QVirtIOSCSI *vs, const uint8_t *cdb,
-     }
- 
-     qvirtqueue_kick(vs->dev, vq, free_head);
--    qvirtio_wait_used_elem(vs->dev, vq, free_head, QVIRTIO_SCSI_TIMEOUT_US);
-+    qvirtio_wait_used_elem(vs->dev, vq, free_head, NULL,
-+                           QVIRTIO_SCSI_TIMEOUT_US);
- 
-     response = readb(resp_addr +
-                      offsetof(struct virtio_scsi_cmd_resp, response));
+     return g_test_run();
+ }
 -- 
 2.13.6
