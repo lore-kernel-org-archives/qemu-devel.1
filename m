@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1egYfx-0003gG-7L
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:22:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1egYj8-0006oT-4j
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:25:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1egYft-00072x-64
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:22:25 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
-References: <20180130150435.2553-1-berto@igalia.com>
-	<b93f21cf-5cd4-a6d0-7005-e19a3de211c8@redhat.com>
-	<w51607juy5j.fsf@maestria.local.igalia.com>
-	<62e23e8c-9873-9fa2-c70f-c823d64f4415@redhat.com>
-Date: Tue, 30 Jan 2018 17:22:18 +0100
-Message-ID: <w51372nuxj9.fsf@maestria.local.igalia.com>
+	(envelope-from <bounces@canonical.com>) id 1egYj4-0001LN-2u
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:25:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38732)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1egYj3-0001K6-SH
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:25:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1egYj2-0005I3-IH
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 16:25:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6DECE2E8554
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 16:25:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Replace align_offset() with
- ROUND_UP()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 30 Jan 2018 16:19:39 -0000
+From: Babu Moger <1703506@bugs.launchpad.net>
+Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
+Message-Id: <151732917945.7449.6759676826709822637.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
+ Ryzen CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,26 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue 30 Jan 2018 05:17:47 PM CET, Eric Blake wrote:
-> On 01/30/2018 10:08 AM, Alberto Garcia wrote:
->> On Tue 30 Jan 2018 05:03:16 PM CET, Eric Blake wrote:
->> 
->>>> -    virtual_size = align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
->>>> +    virtual_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
->>>>                                  cluster_size);
->> 
->> I just realized that the first parameter here is a function call with
->> side effects, it it safe to use ROUND_UP() in this case?
->> 
->> #define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
->
-> Oh, good catch.  No, we need a temporary variable to hold the result
-> of the function call
+just to be clear.. The kernel kvm patch is rebased on linux-next. If you
+are on older kernel then try this kernel patch.
+https://patchwork.kernel.org/patch/10031775/  plus qemu patch.
 
-...which is what align_offset() was doing in the first place. I can
-still modify that function to use the macro internally.
+-- =
 
-Berto
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703506
+
+Title:
+  SMT not supported by QEMU on AMD Ryzen CPU
+
+Status in QEMU:
+  New
+
+Bug description:
+  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
+  message when setting the topology to threads=3D2:
+
+  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
+  configure -smp options properly.
+
+  Checking in a Windows 10 guest reveals that SMT is not enabled, and
+  from what I understand, QEMU converts the topology from threads to
+  cores internally on AMD CPUs. This appears to cause performance
+  problems in the guest perhaps because programs are assuming that these
+  threads are actual cores.
+
+  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
+  guest
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
