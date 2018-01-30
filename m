@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egYGw-0004iS-QQ
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:56:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1egYKn-0006P5-Va
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egYGs-0001yC-Mv
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:56:34 -0500
-Date: Tue, 30 Jan 2018 16:56:12 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180130155612.GA4503@localhost.localdomain>
-References: <1516633309-20803-1-git-send-email-mark.kanda@oracle.com>
-	<20180124113123.GB17193@stefanha-x1.localdomain>
-	<20180129154107.GI6141@localhost.localdomain>
-	<20180130123823.GE15551@stefanha-x1.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1egYKj-00041L-EI
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:00:34 -0500
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516297747-107232-2-git-send-email-anton.nefedov@virtuozzo.com>
+	<3f0a7d0a-cc3b-7d24-8539-74271c7b956d@redhat.com>
+	<563acc14-1b0a-94d5-a12a-67640929e1ec@redhat.com>
+	<f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fa7970fe-edbd-fd67-795b-84e83d216198@redhat.com>
+Date: Tue, 30 Jan 2018 10:00:08 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PEIAKu/WMn1b1Hv9"
-Content-Disposition: inline
-In-Reply-To: <20180130123823.GE15551@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] virtio-blk: check for NULL
- BlockDriverState
+In-Reply-To: <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iDmAEn2uYvKS45gD89Vngj7XOkOz0uxni"
+Subject: Re: [Qemu-devel] [PATCH v7 1/9] mirror: inherit supported
+ write/zero flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Mark Kanda <mark.kanda@oracle.com>, ameya.more@oracle.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com, berto@igalia.com
 
-
---PEIAKu/WMn1b1Hv9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iDmAEn2uYvKS45gD89Vngj7XOkOz0uxni
+From: Eric Blake <eblake@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Max Reitz
+ <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com,
+ berto@igalia.com
+Message-ID: <fa7970fe-edbd-fd67-795b-84e83d216198@redhat.com>
+Subject: Re: [PATCH v7 1/9] mirror: inherit supported write/zero flags
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516297747-107232-2-git-send-email-anton.nefedov@virtuozzo.com>
+ <3f0a7d0a-cc3b-7d24-8539-74271c7b956d@redhat.com>
+ <563acc14-1b0a-94d5-a12a-67640929e1ec@redhat.com>
+ <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+In-Reply-To: <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Am 30.01.2018 um 13:38 hat Stefan Hajnoczi geschrieben:
-> On Mon, Jan 29, 2018 at 04:41:07PM +0100, Kevin Wolf wrote:
-> > Am 24.01.2018 um 12:31 hat Stefan Hajnoczi geschrieben:
-> > > On Mon, Jan 22, 2018 at 09:01:49AM -0600, Mark Kanda wrote:
-> > > > Add a BlockDriverState NULL check to virtio_blk_handle_request()
-> > > > to prevent a segfault if the drive is forcibly removed using HMP
-> > > > 'drive_del' (without performing a hotplug 'device_del' first).
-> > > >=20
-> > > > Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-> > > > Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> > > > Reviewed-by: Ameya More <ameya.more@oracle.com>
-> > > > ---
-> > > >  hw/block/virtio-blk.c | 7 +++++++
-> > > >  1 file changed, 7 insertions(+)
-> > > >=20
-> > > > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> > > > index b1532e4..76ddbbf 100644
-> > > > --- a/hw/block/virtio-blk.c
-> > > > +++ b/hw/block/virtio-blk.c
-> > > > @@ -507,6 +507,13 @@ static int virtio_blk_handle_request(VirtIOBlo=
-ckReq *req, MultiReqBuffer *mrb)
-> > > >          return -1;
-> > > >      }
-> > > > =20
-> > > > +    /* If the drive was forcibly removed (e.g. HMP 'drive_del'), t=
-he block
-> > > > +     * driver state may be NULL and there is nothing left to do. */
-> > > > +    if (!blk_bs(req->dev->blk)) {
-> > >=20
-> > > Adding Markus Armbruster to check my understanding of drive_del:
-> > >=20
-> > > 1. If id is a node name (e.g. created via blockdev-add) then attempti=
-ng
-> > >    to remove the root node produces the "Node %s is in use" error.  In
-> > >    that case this patch isn't needed.
-> > >=20
-> > > 2. If id is a BlockBackend (e.g. created via -drive) then removing the
-> > >    root node is allowed.  The BlockBackend stays in place but blk->ro=
-ot
-> > >    becomes NULL, hence this patch is needed.
-> > >=20
-> > > Markus: What are the valid use cases for #2?  If blk->bs becomes NULL=
- I
-> > > would think a lot more code beyond virtio-blk can segfault.
-> >=20
-> > blk->root =3D NULL is completely normal, it is what happens with remova=
-ble
-> > media when the drive is empty.
-> >=20
-> > The problem, which was first reported during the 2.10 RC phase and was
-> > worked around in IDE code then, is that Paolo's commit 99723548561 added
-> > unconditional bdrv_inc/dec_in_flight() calls. I am pretty sure that any
-> > segfaults that Mark is seeing have the same cause.
-> >=20
-> > We do need an in-flight counter even for those requests so that
-> > blk_drain() works correctly, so just making the calls condition wouldn't
-> > be right. However, this needs to become a separate counter in
-> > BlockBackend, and the drain functions must be changed to make use of it.
-> >=20
-> > I did post rough patches back then, but they weren't quite ready, and
-> > since then they have fallen through the cracks.
+On 01/30/2018 06:15 AM, Anton Nefedov wrote:
+
+>>>> @@ -1064,6 +1064,11 @@ static void
+>>>> bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_refresh_filename(bs->backing->bs=
+);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pstrcpy(bs->exact_filename, sizeof(bs=
+->exact_filename),
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 bs->backing->bs->filename);
+>>>> +=C2=A0=C2=A0=C2=A0 bs->supported_write_flags =3D BDRV_REQ_FUA &
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->backing->bs->support=
+ed_write_flags;
+
+>>> Fundamentally OK, but why is this in *_refresh_filename()?
+>>
+>> Indeed, I missed that (or maybe it got moved during a botched rebase?)=
+=2E
+>> For comparison, blkdebug sets it during blkdebug_open(), and nbd sets =
+it
+>> during nbd_client_init() (called during nbd_open()).
+>>
 >=20
-> Will you send a new version of that patch series?
+> We need a backing bs here and I believe it's not generally set at the
+> time of .bdrv_open()
 
-I would like to continue my work on the drain functions (which this
-would be a part of) sooner or later, but the work to enable libvirt to
-use blockdev-add is at a higher priority at the moment.
+Then is mirror_start_job() a better location, right after we call
+bdrv_new_open_driver()?  (Maybe this just goes to show I haven't fully
+traced the lifecycle of the mirror driver, and it may all be changing
+anyways as we try to fix the BDS graph modifications related with mirrors=
+).
 
-So if you can wait, I'll get to it eventually. If not, feel free to pick
-up the patches.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Kevin
 
---PEIAKu/WMn1b1Hv9
+--iDmAEn2uYvKS45gD89Vngj7XOkOz0uxni
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIcBAEBAgAGBQJacJWcAAoJEH8JsnLIjy/W8dYP/ju04FJjOksXVF8Pnc1SPOLx
-UWn+sTvVx7FC6cvyO3waMDN0MjRgySXpA+30AfKEOHGq6tr1NAXbIxZBQBG5TlTt
-NpkoHfNZ73DgKAKlKID1HmRl9e+d25nFysFPA8XgFcRNc1mxfBO1Ng+J+JgIIBed
-IsWNByTSNBZ7K093NHPQGImyC2M70B8Pn2k4G0Ex+5fyEWTWHBKPQR+lwz4Sb3XP
-bNE951EpJr+lk/eHXM3CXU8OS8fBLiaod/Srh90GrWHYUC6Gmn6aNqDsPXbBurDN
-Gzwc6lBzM0xSd3BNxsvdBOg7XNHkBcKI3U8v2YLqb7TslvOs3ggTKy4iRKv329zK
-yjpAUDFl4cDATXHtduKwTM+320yM/weiQoLr2UtAQLzHJkTapT/vdCFfrlXnQSIk
-/gKIRwbOirW4M7DWbe1NNPDtUrwFx6Nly5soi8ggy43ihlD0oul0umVVKFLZ9LfB
-2QReqpY6gzeR/FI1pI0N5bOQYkOZwxlxovItn7q+viDUhsHxaa2WpPCw67jC0ekp
-gl2Sf+I8paFYobT8/Pg79NgfRptLL70d0r1IxDkvWkb2rVyYdk/Bv/3PhsaRqoE7
-AM31FZgGzBrDEeMFtjnZbPd+NwwKSfCT9nk2o6YaBMr6mOIHowxmxmSsQtbEjInV
-2cO6HVUR32WKliNxYPSI
-=dxxx
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwlogACgkQp6FrSiUn
+Q2q5bwf/S4A/Th0gUrrRkqotrkFE2ZKdm8SFzARq9wJjLdPOf8X13UQ4Z+GG0zoU
+1sPr3GPgZG/L1MpK6rztqkVyRzwNCfvqTQFMphe4P4W0phKtX5YJtWrVkTLQrYfh
+e0vujZeoPYaj+6PyzmgYgLmPZtwkc0JDfvBDtGy5ahT6XlNd18aAcw4mPRId5rUl
+15blLH64Pe+o7hmhQP7Dd6pDzdV35fE0udRZvWseU3iDHH8BVxiIXO7kP2LCS69s
+3luHNWOFhqJow1t+/uQ0noE3hwRo63ZenvgKsl1us56uCy/K/msxLJcrKFYYq6n0
+eyW7A20xV3ncYHHAwfS0f+znANRMeg==
+=SGTj
 -----END PGP SIGNATURE-----
 
---PEIAKu/WMn1b1Hv9--
+--iDmAEn2uYvKS45gD89Vngj7XOkOz0uxni--
