@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1egbLS-00008B-8F
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:14:25 -0500
+	(envelope-from <crobinso@redhat.com>) id 1egbgG-0006Y7-0p
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:36:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1egbKr-0002OA-MP
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:13:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43022)
+	(envelope-from <crobinso@redhat.com>) id 1egbfB-00013P-Vs
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:34:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1egbKr-0002MM-7x
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:12:49 -0500
-References: <20180122060244.29368-1-peterx@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <588ccc09-1c0b-b4f9-a22c-3e7c5b971dcc@redhat.com>
-Date: Tue, 30 Jan 2018 14:12:34 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180122060244.29368-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] memory/vfio: notify region_del()
- when unregister listeners
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1egbfB-0000qN-NU
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:33:49 -0500
+From: Cole Robinson <crobinso@redhat.com>
+Date: Tue, 30 Jan 2018 14:33:35 -0500
+Message-Id: <2a250f8d59f1eedd7728d94a9dae1a6de54d0c14.1517340741.git.crobinso@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] scripts/make-release: Don't archive .git
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +22,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, thuth@redhat.com, Cole Robinson <crobinso@redhat.com>
 
-On 22/01/2018 01:02, Peter Xu wrote:
-> v2
-> - add begin() hooks [Paolo]
-> - move vfio patch to front [Paolo]
-> - one more patch for arm devlistener unregister [Paolo]
-> - one more patch for vhost traces
-> - removing RFC tag
-> 
-> This series fixes bug reported here:
-> 
->   https://bugzilla.redhat.com/show_bug.cgi?id=1531393
-> 
-> The first patch only adds traces for vhost, with which I tested on
-> vhost to make sure that my last patch works as expected with vhost.
-> Please pick it if anyone wants, or ignore it if no one likes it.
-> 
-> The 2nd patch is the arm fix for preparation of the last patch.
-> 
-> The 3rd patch is the vfio fix for preparation of the last patch.
-> 
-> The 4th patch is the core fix of the problem.
-> 
-> Please review, thanks.
-> 
-> Thanks.
-> 
-> Peter Xu (4):
->   vhost: add traces for memory listeners
->   arm: postpone device listener unregister
->   vfio: listener unregister before unset container
->   memory: do explicit cleanup when remove listeners
-> 
->  hw/vfio/common.c       | 16 ++++++++++++----
->  hw/virtio/trace-events |  6 ++++++
->  hw/virtio/vhost.c      | 11 +++++++----
->  memory.c               | 27 +++++++++++++++++++++++++++
->  target/arm/kvm.c       |  2 +-
->  5 files changed, 53 insertions(+), 9 deletions(-)
-> 
+As was last done in 379e21c25, we don't want .git files for
+submodules here, which we aren't presently doing for capstone and
+keycodemapdb.
 
-Queued, thanks.
+Rather than delete the offending files before archiving, ask tar
+to --exclude=.git
 
-Paolo
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+v2:
+    Use armbru's --exclude suggestion, requires tweaking
+    existing tar options a bit.
+
+v3:
+    thuth's suggestion to use --exclude for both tar commands
+
+ scripts/make-release | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/make-release b/scripts/make-release
+index 3917df7142..04fa9defdc 100755
+--- a/scripts/make-release
++++ b/scripts/make-release
+@@ -19,11 +19,10 @@ pushd ${destination}
+ git checkout "v${version}"
+ git submodule update --init
+ (cd roms/seabios && git describe --tags --long --dirty > .version)
+-rm -rf .git roms/*/.git dtc/.git pixman/.git
+ # FIXME: The following line is a workaround for avoiding filename collisions
+ # when unpacking u-boot sources on case-insensitive filesystems. Once we
+ # update to something with u-boot commit 610eec7f0 we can drop this line.
+-tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
++tar --exclude=.git -cjf roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
+ popd
+-tar cfj ${destination}.tar.bz2 ${destination}
++tar --exclude=.git -cjf ${destination}.tar.bz2 ${destination}
+ rm -rf ${destination}
+-- 
+2.14.3
