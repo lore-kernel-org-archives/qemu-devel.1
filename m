@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48215)
+Received: from eggs.gnu.org ([208.118.235.92]:59834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1egbnN-0001ck-DB
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:42:50 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1egbvb-0005Sn-UT
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:51:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1egbmL-0003Cz-0X
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:42:17 -0500
-Received: from mail-by2nam01on0119.outbound.protection.outlook.com
-	([104.47.34.119]:15360
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1egbmK-0003B1-DB
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:41:12 -0500
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Tue, 30 Jan 2018 19:41:09 +0000
-Message-ID: <CY4PR2101MB0866DB2C44341224F0FE96CFB6E40@CY4PR2101MB0866.namprd21.prod.outlook.com>
-References: <1516655269-1785-1-git-send-email-juterry@microsoft.com>
-	<CY4PR2101MB0866914EE81498938229BA5FB6E50@CY4PR2101MB0866.namprd21.prod.outlook.com>
-	<b6dfe694-1b67-46f3-7ea6-3f68cb2985e3@redhat.com>
-In-Reply-To: <b6dfe694-1b67-46f3-7ea6-3f68cb2985e3@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1egbuY-0007gC-RW
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:50:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59004)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1egbuY-0007db-Df
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:49:42 -0500
+References: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bb1b8270-e924-3d41-a172-38ba79db9bf7@redhat.com>
+Date: Tue, 30 Jan 2018 14:49:31 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Updates based on feedback.
+In-Reply-To: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5] chardev/char-socket: add POLLHUP handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +27,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+To: Klim Kireev <klim.kireev@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com
 
-Tm8gd29ycmllcyBhdCBhbGwgUGFvbG8uIEkgd2FzIGp1c3QgbWFraW5nIHN1cmUgSSBkaWRu4oCZ
-dCBtaXNzIHNvbWV0aGluZy4NCg0KV2UgaGF2ZSBiZWVuIHdvcmtpbmcgb24gc29tZSBtaW5vciBm
-aXh1cHMvcGVyZiBpbXByb3ZlbWVudHMgb24gb3VyIGVuZCBhbmQgSSB3aWxsIHN1Ym1pdCB0aG9z
-ZSBwYXRjaGVzIGFmdGVyIHRoaXMgbWVyZ2VzLiBJIGZpZ3VyZWQgaXQgd291bGQgYmUgZWFzaWVy
-IGJlY2F1c2UgdGhleSB3aWxsIGJlIHZlcnkgc21hbGwgYW5kIGlzb2xhdGVkIHNvIGVhc2llciB0
-byByZXZpZXcgbW92aW5nIGZvcndhcmQuDQoNClRoYW5rcywNCkp1c3Rpbg0KDQo+IC0tLS0tT3Jp
-Z2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBhb2xvIEJvbnppbmkgW21haWx0bzpwYm9uemlu
-aUByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVzZGF5LCBKYW51YXJ5IDMwLCAyMDE4IDExOjM0IEFN
-DQo+IFRvOiBKdXN0aW4gVGVycnkgKFZNKSA8anV0ZXJyeUBtaWNyb3NvZnQuY29tPjsgcWVtdS1k
-ZXZlbEBub25nbnUub3JnDQo+IENjOiBjcm9zdGh3YWl0ZS5wZXRlckBnbWFpbC5jb207IHJ0aEB0
-d2lkZGxlLm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYy
-IDAvNF0gVXBkYXRlcyBiYXNlZCBvbiBmZWVkYmFjay4NCj4gDQo+IE9uIDI5LzAxLzIwMTggMTQ6
-NTgsIEp1c3RpbiBUZXJyeSAoVk0pIHdyb3RlOg0KPiA+IEhpIEFsbCwNCj4gPg0KPiA+IElzIHRo
-ZXJlIGFueSBhZGRpdGlvbmFsIGZlZWRiYWNrIEkgY2FuIGFkZHJlc3MgaGVyZSB0byBoZWxwIG91
-dCB0aGUNCj4gcHJvY2Vzcz8gUGxlYXNlIGxldCBtZSBrbm93Lg0KPiANCj4gTm90aGluZyBzcGVj
-aWZpY2FsbHkgKGl0IGRpZG4ndCBoZWxwIHRoYXQgbW9zdCBvZiBsYXN0IHdlZWsgSSB3YXMgc2lj
-ayEpLiAgRnJvbQ0KPiBteSBwb2ludCBvZiB2aWV3LCBJIGp1c3QgbmVlZCB0byByZXZpZXcgdGhl
-IGNoYW5nZXMgeW91IG1hZGUgYW5kIGluY2x1ZGUNCj4gdGhlc2UgcGF0Y2hlcyBpbiBhIHB1bGwg
-cmVxdWVzdC4NCj4gDQo+IFRoYW5rcywNCj4gDQo+IFBhb2xvDQo+IA0KPiA+IFRoYW5rcyBhZ2Fp
-biwNCj4gPiBKdXN0aW4NCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+
-PiBGcm9tOiBKdXN0aW4gVGVycnkgKFZNKQ0KPiA+PiBTZW50OiBNb25kYXksIEphbnVhcnkgMjIs
-IDIwMTggMTowOCBQTQ0KPiA+PiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+ID4+IENjOiBw
-Ym9uemluaUByZWRoYXQuY29tOyBjcm9zdGh3YWl0ZS5wZXRlckBnbWFpbC5jb207DQo+ID4+IHJ0
-aEB0d2lkZGxlLm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNvbTsgSnVzdGluIFRlcnJ5IChWTSkNCj4g
-Pj4gPGp1dGVycnlAbWljcm9zb2Z0LmNvbT4NCj4gPj4gU3ViamVjdDogW1BBVENIIHYyIDAvNF0g
-VXBkYXRlcyBiYXNlZCBvbiBmZWVkYmFjay4NCj4gPj4NCj4gPj4gVXBkYXRlcyBiYXNlZCBvbiBy
-ZXZpZXcgZmVlZGJhY2suDQo+ID4+DQo+ID4+IDEuIEZpeGVzIHN0eWxlIGlzc3VlcyBhbmQgcHJv
-cGVybHkgcmFuIHRoZSBzY3JpcHRzL2NoZWNrcGF0Y2ggcHJlDQo+IHN1Ym1pc3Npb24uDQo+ID4+
-IDIuIEFkZGVkIG1pZ3JhdGlvbiBibG9ja2VycyBmb3IgQ1BVSUQsIGRpcnR5IG1lbW9yeSB0cmFj
-a2luZywgYW5kDQo+ID4+IFhTQVZFL1hSU1RPUi4NCj4gPj4gMy4gRml4ZWQgc29tZSBidWdzIGFy
-b3VuZCByZWdpc3RlciBzdGF0ZXMgd2hlbiB1c2luZyBiaW9zIHZzIGVmaS4NCj4gPj4NCj4gPj4g
-SnVzdGluIFRlcnJ5IChWTSkgKDQpOg0KPiA+PiAgIEFkZCB0aGUgV2luZG93cyBIeXBlcnZpc29y
-IFBsYXRmb3JtIGFjY2VsZXJhdG9yLg0KPiA+PiAgIEFkZCB0aGUgV0hQWCB2Y3B1IEFQSQ0KPiA+
-PiAgIEludHJvZHVjZSB0aGUgV0hQWCBpbXBsDQo+ID4+ICAgQWRkIHRoZSBXSFBYIGFjY2VsZXJh
-dGlvbiBlbmxpZ2h0ZW5tZW50cw0KPiA+Pg0KPiA+PiAgYWNjZWwvc3R1YnMvTWFrZWZpbGUub2Jq
-cyB8ICAgIDkgKy0NCj4gPj4gIGFjY2VsL3N0dWJzL3docHgtc3R1Yi5jICAgfCAgIDQ4ICsrDQo+
-ID4+ICBjb25maWd1cmUgICAgICAgICAgICAgICAgIHwgICA0OCArLQ0KPiA+PiAgY3B1cy5jICAg
-ICAgICAgICAgICAgICAgICB8ICAgNjYgKystDQo+ID4+ICBpbmNsdWRlL3N5c2VtdS9od19hY2Nl
-bC5oIHwgICAxMyArDQo+ID4+ICBpbmNsdWRlL3N5c2VtdS93aHB4LmggICAgIHwgICA0MCArKw0K
-PiA+PiAgcWVtdS1vcHRpb25zLmh4ICAgICAgICAgICB8ICAgIDggKy0NCj4gPj4gIHRhcmdldC9p
-Mzg2L01ha2VmaWxlLm9ianMgfCAgICAxICsNCj4gPj4gIHRhcmdldC9pMzg2L2hlbHBlci5jICAg
-ICAgfCAgICAyICstDQo+ID4+ICB0YXJnZXQvaTM4Ni93aHB4LWFsbC5jICAgIHwgMTM2Ng0KPiA+
-PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPj4gIDEw
-IGZpbGVzIGNoYW5nZWQsIDE1OTAgaW5zZXJ0aW9ucygrKSwgMTEgZGVsZXRpb25zKC0pICBjcmVh
-dGUgbW9kZQ0KPiA+PiAxMDA2NDQgYWNjZWwvc3R1YnMvd2hweC1zdHViLmMgIGNyZWF0ZSBtb2Rl
-IDEwMDY0NA0KPiA+PiBpbmNsdWRlL3N5c2VtdS93aHB4LmggY3JlYXRlIG1vZGUgMTAwNjQ0IHRh
-cmdldC9pMzg2L3docHgtYWxsLmMNCj4gPj4NCj4gPj4gLS0NCj4gPj4gMi43LjQNCj4gPg0KDQo=
+On 25/01/2018 08:51, Klim Kireev wrote:
+> The following behavior was observed for QEMU configured by libvirt
+> to use guest agent as usual for the guests without virtio-serial
+> driver (Windows or the guest remaining in BIOS stage).
+> 
+> In QEMU on first connect to listen character device socket
+> the listen socket is removed from poll just after the accept().
+> virtio_serial_guest_ready() returns 0 and the descriptor
+> of the connected Unix socket is removed from poll and it will
+> not be present in poll() until the guest will initialize the driver
+> and change the state of the serial to "guest connected".
+> 
+> In libvirt connect() to guest agent is performed on restart and
+> is run under VM state lock. Connect() is blocking and can
+> wait forever.
+> In this case libvirt can not perform ANY operation on that VM.
+> 
+> The bug can be easily reproduced this way:
+> 
+> Terminal 1:
+> qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
+> (virtio-serial and isa-serial also fit)
+> 
+> Terminal 2:
+> minicom -D unix\#/tmp/console.sock
+> (type something and press enter)
+> C-a x (to exit)
+> 
+> Do 3 times:
+> minicom -D unix\#/tmp/console.sock
+> C-a x
+> 
+> It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
+> the kernel, and the 4th blocks.
+> 
+> The problem is that QEMU doesn't add a read watcher after succesful read
+> until the guest device wants to acquire recieved data, so
+> I propose to install a separate pullhup watcher regardless of
+> whether the device waits for data or not.
+> 
+> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+> ---
+> Changelog:
+> v2: Remove timer as a redundant feature
+> 
+> v3: Remove read call and return G_SOURCE_REMOVE
+> 
+> v4: Move to GSource API
+> 
+> v5: Fix git typos 
+> 
+>  chardev/char-socket.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 77cdf487eb..a340af6cd3 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -42,6 +42,7 @@ typedef struct {
+>      QIOChannel *ioc; /* Client I/O channel */
+>      QIOChannelSocket *sioc; /* Client master channel */
+>      QIONetListener *listener;
+> +    GSource *hup_source;
+>      QCryptoTLSCreds *tls_creds;
+>      int connected;
+>      int max_size;
+> @@ -352,6 +353,12 @@ static void tcp_chr_free_connection(Chardev *chr)
+>          s->read_msgfds_num = 0;
+>      }
+>  
+> +    if (s->hup_source != NULL) {
+> +        g_source_destroy(s->hup_source);
+> +        g_source_unref(s->hup_source);
+> +        s->hup_source = NULL;
+> +    }
+> +
+>      tcp_set_msgfds(chr, NULL, 0);
+>      remove_fd_in_watch(chr);
+>      object_unref(OBJECT(s->sioc));
+> @@ -455,6 +462,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
+>      return TRUE;
+>  }
+>  
+> +static gboolean tcp_chr_hup(QIOChannel *channel,
+> +                               GIOCondition cond,
+> +                               void *opaque)
+> +{
+> +    Chardev *chr = CHARDEV(opaque);
+> +    tcp_chr_disconnect(chr);
+> +    return G_SOURCE_REMOVE;
+> +}
+> +
+>  static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+>  {
+>      SocketChardev *s = SOCKET_CHARDEV(chr);
+> @@ -528,6 +544,12 @@ static void tcp_chr_connect(void *opaque)
+>                                             tcp_chr_read,
+>                                             chr, chr->gcontext);
+>      }
+> +
+> +    s->hup_source = qio_channel_create_watch(s->ioc, G_IO_HUP);
+> +    g_source_set_callback(s->hup_source, (GSourceFunc)tcp_chr_hup,
+> +                          chr, NULL);
+> +    g_source_attach(s->hup_source, chr->gcontext);
+> +
+>      qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+>  }
+>  
+> 
+
+Queued, thanks.
+
+Paolo
