@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1egbgG-0006Y7-0p
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:36:02 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1egbgH-0006ZL-7Y
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1egbfB-00013P-Vs
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:34:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49780)
+	(envelope-from <pbonzini@redhat.com>) id 1egbff-0001i1-T1
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:34:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1egbfB-0000qN-NU
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:33:49 -0500
-From: Cole Robinson <crobinso@redhat.com>
-Date: Tue, 30 Jan 2018 14:33:35 -0500
-Message-Id: <2a250f8d59f1eedd7728d94a9dae1a6de54d0c14.1517340741.git.crobinso@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] scripts/make-release: Don't archive .git
- files
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1egbff-0001h6-GF
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 14:34:19 -0500
+References: <1516655269-1785-1-git-send-email-juterry@microsoft.com>
+	<CY4PR2101MB0866914EE81498938229BA5FB6E50@CY4PR2101MB0866.namprd21.prod.outlook.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b6dfe694-1b67-46f3-7ea6-3f68cb2985e3@redhat.com>
+Date: Tue, 30 Jan 2018 14:34:13 -0500
+MIME-Version: 1.0
+In-Reply-To: <CY4PR2101MB0866914EE81498938229BA5FB6E50@CY4PR2101MB0866.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Updates based on feedback.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,45 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, thuth@redhat.com, Cole Robinson <crobinso@redhat.com>
+To: "Justin Terry (VM)" <juterry@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
 
-As was last done in 379e21c25, we don't want .git files for
-submodules here, which we aren't presently doing for capstone and
-keycodemapdb.
+On 29/01/2018 14:58, Justin Terry (VM) wrote:
+> Hi All,
+> 
+> Is there any additional feedback I can address here to help out the process? Please let me know.
 
-Rather than delete the offending files before archiving, ask tar
-to --exclude=.git
+Nothing specifically (it didn't help that most of last week I was
+sick!).  From my point of view, I just need to review the changes you
+made and include these patches in a pull request.
 
-Signed-off-by: Cole Robinson <crobinso@redhat.com>
----
-v2:
-    Use armbru's --exclude suggestion, requires tweaking
-    existing tar options a bit.
+Thanks,
 
-v3:
-    thuth's suggestion to use --exclude for both tar commands
+Paolo
 
- scripts/make-release | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/make-release b/scripts/make-release
-index 3917df7142..04fa9defdc 100755
---- a/scripts/make-release
-+++ b/scripts/make-release
-@@ -19,11 +19,10 @@ pushd ${destination}
- git checkout "v${version}"
- git submodule update --init
- (cd roms/seabios && git describe --tags --long --dirty > .version)
--rm -rf .git roms/*/.git dtc/.git pixman/.git
- # FIXME: The following line is a workaround for avoiding filename collisions
- # when unpacking u-boot sources on case-insensitive filesystems. Once we
- # update to something with u-boot commit 610eec7f0 we can drop this line.
--tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
-+tar --exclude=.git -cjf roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
- popd
--tar cfj ${destination}.tar.bz2 ${destination}
-+tar --exclude=.git -cjf ${destination}.tar.bz2 ${destination}
- rm -rf ${destination}
--- 
-2.14.3
+> Thanks again,
+> Justin
+> 
+>> -----Original Message-----
+>> From: Justin Terry (VM)
+>> Sent: Monday, January 22, 2018 1:08 PM
+>> To: qemu-devel@nongnu.org
+>> Cc: pbonzini@redhat.com; crosthwaite.peter@gmail.com; rth@twiddle.net;
+>> ehabkost@redhat.com; Justin Terry (VM) <juterry@microsoft.com>
+>> Subject: [PATCH v2 0/4] Updates based on feedback.
+>>
+>> Updates based on review feedback.
+>>
+>> 1. Fixes style issues and properly ran the scripts/checkpatch pre submission.
+>> 2. Added migration blockers for CPUID, dirty memory tracking, and
+>> XSAVE/XRSTOR.
+>> 3. Fixed some bugs around register states when using bios vs efi.
+>>
+>> Justin Terry (VM) (4):
+>>   Add the Windows Hypervisor Platform accelerator.
+>>   Add the WHPX vcpu API
+>>   Introduce the WHPX impl
+>>   Add the WHPX acceleration enlightenments
+>>
+>>  accel/stubs/Makefile.objs |    9 +-
+>>  accel/stubs/whpx-stub.c   |   48 ++
+>>  configure                 |   48 +-
+>>  cpus.c                    |   66 ++-
+>>  include/sysemu/hw_accel.h |   13 +
+>>  include/sysemu/whpx.h     |   40 ++
+>>  qemu-options.hx           |    8 +-
+>>  target/i386/Makefile.objs |    1 +
+>>  target/i386/helper.c      |    2 +-
+>>  target/i386/whpx-all.c    | 1366
+>> +++++++++++++++++++++++++++++++++++++++++++++
+>>  10 files changed, 1590 insertions(+), 11 deletions(-)  create mode 100644
+>> accel/stubs/whpx-stub.c  create mode 100644 include/sysemu/whpx.h
+>> create mode 100644 target/i386/whpx-all.c
+>>
+>> --
+>> 2.7.4
+> 
