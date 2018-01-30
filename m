@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egYwc-0005b4-C4
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:39:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1egZ0T-0007mO-CW
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:43:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1egYwY-0002dj-Ft
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:39:38 -0500
-Date: Tue, 30 Jan 2018 17:38:20 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180130163820.GC4503@localhost.localdomain>
-References: <20180130063433.11605-1-famz@redhat.com>
-	<20180130063433.11605-3-famz@redhat.com>
-	<b552c5fb-f79a-98f1-bac7-26cf6e106f06@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1egZ0Q-0004Tp-AL
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:43:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1egZ0Q-0004Tg-3o
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:43:34 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 47A5F776C3
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 16:43:33 +0000 (UTC)
+References: <20180130102202.28519-1-armbru@redhat.com>
+	<20180130102202.28519-6-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9a610949-05ea-753b-296f-1d1e79c1a379@redhat.com>
+Date: Tue, 30 Jan 2018 10:43:31 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
-Content-Disposition: inline
-In-Reply-To: <b552c5fb-f79a-98f1-bac7-26cf6e106f06@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] qemu-img: Document --force-share /
- -U
+In-Reply-To: <20180130102202.28519-6-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WIniMsKuT8iEqzQIGGAsgnFYdAbILoFgh"
+Subject: Re: [Qemu-devel] [PATCH 05/18] Include qmp-commands.h exactly where
+ needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +35,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, kchamart@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-
---FkmkrVfFsRoUs1wW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WIniMsKuT8iEqzQIGGAsgnFYdAbILoFgh
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <9a610949-05ea-753b-296f-1d1e79c1a379@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/18] Include qmp-commands.h exactly where
+ needed
+References: <20180130102202.28519-1-armbru@redhat.com>
+ <20180130102202.28519-6-armbru@redhat.com>
+In-Reply-To: <20180130102202.28519-6-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Am 30.01.2018 um 15:23 hat Eric Blake geschrieben:
-> On 01/30/2018 12:34 AM, Fam Zheng wrote:
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qemu-img.texi | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >=20
-> > diff --git a/qemu-img.texi b/qemu-img.texi
-> > index 60a0e080c6..ec7e2f5d1e 100644
-> > --- a/qemu-img.texi
-> > +++ b/qemu-img.texi
-> > @@ -86,6 +86,13 @@ exclusive with the @var{-O} parameters. It is curren=
-tly required to also use
-> >  the @var{-n} parameter to skip image creation. This restriction may be=
- relaxed
-> >  in a future release.
-> > =20
-> > +@item --force-share (-U)
-> > +If specified, @code{qemu-img} will open the image in shared mode, allo=
-wing
-> > +concurrent writers. For example, this can be used to get the image inf=
-ormation
->=20
-> Actually, we only permit one writer at a time.  Would it be better to
-> say "allowing a concurrent writer"?
+On 01/30/2018 04:21 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-As far as qemu-img is concerned, multiple writers to the image are
-allowed. There may be further restrictions imposed by a writer so that a
-second writer isn't allowed, but with raw images and share-rw=3Don nothing
-prevents two qemu instances writing to the same image while qemu-img is
-accessing it read-only.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Kevin
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
---FkmkrVfFsRoUs1wW
+
+--WIniMsKuT8iEqzQIGGAsgnFYdAbILoFgh
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIcBAEBAgAGBQJacJ98AAoJEH8JsnLIjy/WSpEQAKt192s7zWpOr+CmRpWUaSQS
-pHI+1+8rn7aTBvH94gf4AqPeF3hGZGdvWtYs26yqKCfzc0Ta5ZMKBvnjrGU4MZbR
-uUWxHvzhe6vt56BZUclKskkltwm2lYcaP8ctIiULd2fVyin6fHXL9QzG4/PrY3YE
-T2f+G2n6rTqbMYQaaiJ6j2WK4sbSeQDfi6mnkRnXFcwhx3qTKd66XVkgMUKsnow4
-igw5YOG8D5aNUSuVEA4xjlZx1dLkpL+vssU055LJLFivcUZKNatIbK3DFq/aHCkz
-pZq7XcjVxVFGnRwNWwwVudvtaP9G+moTDEn+BPQbMzrUt8ONd2I5puVrNhV10KTL
-aedxRFUM8JiDDTLdAxdLAfs2QrA8x3HeTuk8GX4qH/lfSve4fWa841fXVByVoVrs
-aLzMKdOJ01cRbokvzxwpk5Qve/SvqJdpSnEeiK08sCpdnCihQzDRmOXXp65ooRuS
-uLIcjoqhMDBPpQDzA0JUc8yVfdru+RPybqW2DzAlKpAmV+x0AjFg0Arf6HHyOw5+
-bWN891Vh9dYdz3T4aTjiNa8L7eBs261xUDjm/xrdpP+oBCYH6wVFVnP58sy+XQ1P
-RtzWluN6p90CfhOFLLOPL6SZOTmaHM6YzXc4eK4n5i3Rrd2HoiKdNLO8yAs+6W0v
-KHT2xKGizDfr2Pe1VzUa
-=outo
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwoLQACgkQp6FrSiUn
+Q2oDEQf9FxVxnxoMlE/dbqRix0x3vIM262ibL0llJMBE9FXPzTqFceN5HUJjVWpd
+9GU1aypiAEEDW3v6uj/Ed8abRhgHvO1pBVD6gq3YUpc5jLsTmj+ixp9SawOKDSOC
+MlinLlYrASkEQGLOTRf8rH47OYZU69AlmB4608MoE4gM3EMxQjSWVQkDqYBWm2xO
+DVwXAUwD4D3rtv2dsPUGvZZ8EEy/AjGx5qil4hccyiaCWSusZX3psYJoQzR9s/Tq
+HWF/dBiSaLAjFUd743GQRBlNl74gBTdq6s9X5qo9RNGR/gUHgTgXaVVH4S65zGjW
+oAxPyGmYXzp4MTJBgQ2rfZpfnfZFag==
+=7wi9
 -----END PGP SIGNATURE-----
 
---FkmkrVfFsRoUs1wW--
+--WIniMsKuT8iEqzQIGGAsgnFYdAbILoFgh--
