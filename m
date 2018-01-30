@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egZtQ-0000Em-KU
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1ega0P-0006WI-QO
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:47:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egZtK-0004mW-Ay
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51470
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egZtK-0004lf-2Z
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:18 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0UHeCH0060476
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:40:17 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fttm611g9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:40:13 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 30 Jan 2018 17:39:43 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 30 Jan 2018 18:39:29 +0100
-In-Reply-To: <20180130173935.5172-1-groug@kaod.org>
-References: <20180130173935.5172-1-groug@kaod.org>
-Message-Id: <20180130173935.5172-5-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 04/10] tests: virtio-9p: wait for completion in
- the test code
+	(envelope-from <eblake@redhat.com>) id 1ega0L-0004D6-N1
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:47:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ega0L-0004C8-D4
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:47:33 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E7EDC0587D1
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 17:47:32 +0000 (UTC)
+References: <20180130102202.28519-1-armbru@redhat.com>
+	<20180130102202.28519-11-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7dca2783-d284-8f8a-73b8-a270b2ca6a4d@redhat.com>
+Date: Tue, 30 Jan 2018 11:47:31 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180130102202.28519-11-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Om1gUvzlmmoMaNN8r4S7uFlCR8qKpnGGD"
+Subject: Re: [Qemu-devel] [PATCH 10/18] Include qapi/qmp/qlist.h exactly
+ where needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,90 +35,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-In order to test request cancellation, we will need to send multiple
-requests and wait for the associated replies. Since we poll the ISR
-to know if a request completed, we may have several replies to parse
-when we detect ISR was set to 1.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Om1gUvzlmmoMaNN8r4S7uFlCR8qKpnGGD
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <7dca2783-d284-8f8a-73b8-a270b2ca6a4d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/18] Include qapi/qmp/qlist.h exactly where
+ needed
+References: <20180130102202.28519-1-armbru@redhat.com>
+ <20180130102202.28519-11-armbru@redhat.com>
+In-Reply-To: <20180130102202.28519-11-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This patch moves the waiting out of the reply parsing path, up into
-the functional tests.
+On 01/30/2018 04:21 AM, Markus Armbruster wrote:
+> This cleanup makes the number of objects depending on qapi/qmp/qlist.h
+> drop from 4548 (out of 4739) to 16 in my "build everything" tree.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/virtio-9p-test.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+> +++ b/tests/check-qdict.c
+> @@ -9,9 +9,11 @@
+>   * This work is licensed under the terms of the GNU LGPL, version 2.1 =
+or later.
+>   * See the COPYING.LIB file in the top-level directory.
+>   */
+> +
+>  #include "qemu/osdep.h"
 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 5ada2839b9ae..cb086315a36e 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -246,13 +246,17 @@ static const char *rmessage_name(uint8_t id)
-         "<unknown>";
- }
- 
--static void v9fs_req_recv(P9Req *req, uint8_t id)
-+static void v9fs_req_wait_for_reply(P9Req *req)
- {
-     QVirtIO9P *v9p = req->v9p;
--    P9Hdr hdr;
- 
-     qvirtio_wait_used_elem(v9p->dev, v9p->vq, req->free_head,
-                            QVIRTIO_9P_TIMEOUT_US);
-+}
-+
-+static void v9fs_req_recv(P9Req *req, uint8_t id)
-+{
-+    P9Hdr hdr;
- 
-     v9fs_memread(req, &hdr, 7);
-     hdr.size = ldl_le_p(&hdr.size);
-@@ -398,6 +402,7 @@ static void fs_version(QVirtIO9P *v9p)
-     P9Req *req;
- 
-     req = v9fs_tversion(v9p, P9_MAX_SIZE, version, P9_NOTAG);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rversion(req, &server_len, &server_version);
- 
-     g_assert_cmpmem(server_version, server_len, version, strlen(version));
-@@ -411,6 +416,7 @@ static void fs_attach(QVirtIO9P *v9p)
- 
-     fs_version(v9p);
-     req = v9fs_tattach(v9p, 0, getuid(), 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rattach(req, NULL);
- }
- 
-@@ -431,6 +437,7 @@ static void fs_walk(QVirtIO9P *v9p)
- 
-     fs_attach(v9p);
-     req = v9fs_twalk(v9p, 0, 1, P9_MAXWELEM, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rwalk(req, &nwqid, &wqid);
- 
-     g_assert_cmpint(nwqid, ==, P9_MAXWELEM);
-@@ -452,6 +459,7 @@ static void fs_walk_no_slash(QVirtIO9P *v9p)
- 
-     fs_attach(v9p);
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rlerror(req, &err);
- 
-     g_assert_cmpint(err, ==, ENOENT);
-@@ -467,9 +475,11 @@ static void fs_walk_dotdot(QVirtIO9P *v9p)
- 
-     fs_version(v9p);
-     req = v9fs_tattach(v9p, 0, getuid(), 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rattach(req, &root_qid);
- 
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rwalk(req, NULL, &wqid); /* We now we'll get one qid */
- 
-     g_assert_cmpmem(&root_qid, 13, wqid[0], 13);
--- 
-2.13.6
+Another one of these whitespace cleanups around osdep.h that might be
+worth collecting into its own patch.
+
+> =20
+>  #include "qapi/qmp/qdict.h"
+> +#include "qapi/qmp/qlist.h"
+>  #include "qapi/qmp/qnum.h"
+>  #include "qapi/qmp/qstring.h"
+>  #include "qapi/error.h"
+
+But at least it was in the same hunk as the actual meat of the commit.
+
+> +++ b/tests/libqtest.c
+> @@ -14,6 +14,7 @@
+>   * See the COPYING file in the top-level directory.
+>   *
+>   */
+> +
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> =20
+> @@ -25,6 +26,7 @@
+>  #include "qapi/qmp/json-parser.h"
+>  #include "qapi/qmp/json-streamer.h"
+>  #include "qapi/qmp/qjson.h"
+> +#include "qapi/qmp/qlist.h"
+> =20
+
+In contrast to this location.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Om1gUvzlmmoMaNN8r4S7uFlCR8qKpnGGD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpwr7MACgkQp6FrSiUn
+Q2oXuAf/exhcH56aLPkwnkIWKv1P4oFlPOok/1SLXUWUijsleRZlG6B4YqcGfh2F
+UKXIsaZlVJ9fK+eHRXLe62LrgxBA/s9s+RdcnudFw9mq2KhOUWcpwBwpBcB/P4AR
+XPgksSxYY1UDgKz9m7PbljPwKLrisoapaFT4uskjvIcjHtUYF0mj7B0JcTpxqIpt
+Kuv2cM+z/ftmKUm2SYJDDE1+Z64uwyxOXmVkUSFySM4e9qKuB2LV15WDVf7ORxQB
+1B/zq5tJp4p2MX1OW+N3lxxWQkSqvoOB2HA9OfJX6JtXO1fARGE8jjfkWi89xn5w
+c9smC59sUYtxnZBYup9wl393LNK97w==
+=ASSM
+-----END PGP SIGNATURE-----
+
+--Om1gUvzlmmoMaNN8r4S7uFlCR8qKpnGGD--
