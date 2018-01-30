@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egWOT-0001af-Lt
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 08:56:23 -0500
+	(envelope-from <fzheng@redhat.com>) id 1egWf1-0007XO-Cw
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 09:13:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egWOP-0002WE-Hj
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 08:56:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1egWOP-0002Vj-9s
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 08:56:09 -0500
-References: <151730107324.755.12264321256439401751.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <290cc563-b4a3-70d4-59a5-66ad63cd7abc@redhat.com>
-Date: Tue, 30 Jan 2018 07:56:01 -0600
+	(envelope-from <fzheng@redhat.com>) id 1egWex-000790-Bh
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 09:13:19 -0500
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:34948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1egWex-000789-5P
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 09:13:15 -0500
+Received: by mail-wr0-f193.google.com with SMTP id w50so11338066wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 06:13:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <151730107324.755.12264321256439401751.stgit@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MWcUztg0vKSNfHIGl7titFA5B5iJ6Y0OZ"
-Subject: Re: [Qemu-devel] [PATCH] tests/virtio-9p: explicitely handle
- potential integer overflows
+In-Reply-To: <b0a1f5dd-dc2a-cb80-b1d2-f94215594cbb@redhat.com>
+References: <20180130062503.32596-1-famz@redhat.com>
+	<b0a1f5dd-dc2a-cb80-b1d2-f94215594cbb@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 30 Jan 2018 22:12:43 +0800
+Message-ID: <CAK1Eb9k9_Zs=hoRHXyEQ755xb9PZWq+xmhK=-Y2AUEcGTVT=XQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Fix CID for VMDK afl image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MWcUztg0vKSNfHIGl7titFA5B5iJ6Y0OZ
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <290cc563-b4a3-70d4-59a5-66ad63cd7abc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/virtio-9p: explicitely handle
- potential integer overflows
-References: <151730107324.755.12264321256439401751.stgit@bahia.lan>
-In-Reply-To: <151730107324.755.12264321256439401751.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 30, 2018 at 9:48 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 01/30/2018 12:25 AM, Fam Zheng wrote:
+>> This reverts commit 76bf133c4 which updated the reference output, and
+>> fixed the reference image, because the code path we want to exercise is
+>> actually the invalid image size.
+>>
+>> The descriptor block in the image, which includes the CID to verify, has been
+>> invalid since the reference image was added. Since commit 9877860e7bd we report
+>> this error earlier than the "file too large", so 059.out mismatches.
+>>
+>> The binary change is generated along the operations of:
+>>
+>>   $ bunzip2 afl9.vmdk.bz2
+>>   $ qemu-img create -f vmdk fix.vmdk 1G
+>>   $ dd if=afl9.vmdk.bz2 of=fix.vmdk bs=512 count=1 conv=notrunc
+>
+> Is the .bz2 suffix spurious here?
 
-On 01/30/2018 02:32 AM, Greg Kurz wrote:
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Hmm, yes. I have no idea why it is here. :-/
 
-In the subject: s/explicitely/explicitly/
+Fam
 
-> ---
->  tests/virtio-9p-test.c |   31 +++++++++++++++++++++----------
->  1 file changed, 21 insertions(+), 10 deletions(-)
->=20
-> This is based on SHA1 2eab02aa260ac5405e1e51c9cc1b4c3aa23fc45a from my
-> 9p-next branch:
->=20
-> https://github.com/gkurz/qemu/commits/9p-next
-
-I don't think patchew recognizes those sorts of references yet; better
-might be:
-
-Based-on: <151675071042.29381.16225631028845063799.stgit@bahia.lan>
-([PATCH 0/7] tests: virtio-9p: test request cancellation)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---MWcUztg0vKSNfHIGl7titFA5B5iJ6Y0OZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpweXEACgkQp6FrSiUn
-Q2oROggAmTEFFc8dbp/o7JO1xA9XS8tsUFnp+v9/z4y8EEJKVu1XHzIEonR4JwMX
-Hix2WZ8dDHcdFjPvzuvCwCEB+IyAoEckN1EihXxrjXU36sqhszEEDUYDz8DMPq6p
-EXexic8kIx7/y64jHxftYEVnxQ7BPEJ6H6Ttsbm5bpmkZWH5lbDMOqB4E4r7HSsX
-sQWuNWInpvu+YYjL556HK4RGViO7Ezpfy/d+T/IJoTB1bXiPN05Fg47VSgvGm55J
-pLTSjXUk6gO3NH80vinvLa+MByCxRCXVFARB3Euv+4HAXocSlIT9cPTjadeSMcLi
-9z0+luGIPF0GAfwA073xRlIlMRLWmQ==
-=zvgK
------END PGP SIGNATURE-----
-
---MWcUztg0vKSNfHIGl7titFA5B5iJ6Y0OZ--
+>
+>>   $ mv fix.vmdk afl9.vmdk
+>>   $ bzip2 afl9.vmdk
+>>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>>
+>> ---
+>>
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
