@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egcFz-0004oN-Rs
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:13:02 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1egcFM-0004Mt-AV
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:16:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egcEs-0003Ut-JC
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:11:51 -0500
-References: <20180130083532.GA31511@localhost>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b5c53de8-64c7-41df-d0ba-009962a18b9e@redhat.com>
-Date: Tue, 30 Jan 2018 15:08:34 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1egcEI-0002Np-5b
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:11:12 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:50898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1egcEH-00023M-LY
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:10:05 -0500
+Date: Tue, 30 Jan 2018 21:09:57 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180130145858.hczpqjfzdjziosj6@sirius.home.kraxel.org>
+Message-ID: <alpine.BSF.2.21.1801302047290.89551@zero.eik.bme.hu>
+References: <CAE5jQCeSL5fRXBh5F9L3G5JkkwmS=sU9VS6Bu82Xpq5fMd=K8Q@mail.gmail.com>
+	<20180129082727.jvh4nc2cquuqylrv@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.1801291701130.88941@zero.eik.bme.hu>
+	<20180130092101.hiuru6lnzbjw2jiy@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.1801301425250.81470@zero.eik.bme.hu>
+	<20180130145858.hczpqjfzdjziosj6@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180130083532.GA31511@localhost>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block/mirror: change the semantic of
- 'force' of block-job-cancel
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] SDL2 UI behavior of switching views
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Liang Li <liliang.opensource@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Liang Li <liliangleo@didichuxing.com>, Huaitong Han <huanhuaitong@didichuxing.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Tue, 30 Jan 2018, Gerd Hoffmann wrote:
+> SDL1 has a single window for all consoles.
+> SDL2 has one window for each console.
+>
+> Fixed.  Not switchable, neither for SDL1 nor for SDL2.
+>
+> It sure is possible to make it runtime switchable, but I expect it is
+> more much difficuilt to code up when compared to gtk due to the lack of
+> widgets.  gtk has one widget per console, I can hook the console widgets
+> into my widget/window tree as I like and gtk handles alot of the
+> management for me.
 
+I think it does not have to be runtime switchable in the sense that the 
+setting does not need to be changable during run (like in gtk) because we 
+don't have a UI for changing it anyway. It's enough to have an option to 
+decide it once at startup, in case that's easier to implement. If not then 
+I guess this will remain as it is now but it's unfortunate to change the 
+previous behaviour with a version change for no good reason.
 
-On 01/30/2018 03:38 AM, Liang Li wrote:
-> When doing drive mirror to a low speed shared storage, if there was hea=
-vy
-> BLK IO write workload in VM after the 'ready' event, drive mirror block=
- job
-> can't be canceled immediately, it would keep running until the heavy BL=
-K IO
-> workload stopped in the VM.
->=20
-> Because libvirt depends on block-job-cancel for block live migration, t=
-he
-> current block-job-cancel has the semantic to make sure data is in sync =
-after
-> the 'ready' event.  This semantic can't meet some requirement, for exam=
-ple,
-> people may use drive mirror for realtime backup while need the ability =
-of
-> block live migration. If drive mirror can't not be cancelled immediatel=
-y,
-> it means block live migration need to wait, because libvirt make use dr=
-ive
-> mirror to implement block live migration and only one drive mirror bloc=
-k
-> job is allowed at the same time for a give block dev.
->=20
-> We need a new interface for 'force cancel', which could quit block job
-> immediately if don't care about whether data is in sync or not.
->=20
-> 'force' is not used by libvirt currently, to make things simple, change
-> it's semantic slightly, hope it will not break some use case which need=
- its
-> original semantic.
->=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Jeff Cody <jcody@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: John Snow <jsnow@redhat.com>
-> Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
-> Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
-> Signed-off-by: Liang Li <liliangleo@didichuxing.com>
+> But feel free to try and send patches.
 
-Just a note to JTC that this will conflict with my two series trying to
-refactor jobs:
+Unortunately I know nothing about this code and don't have time nor much 
+inclination to learn it now. So unless you can at least give some hints on 
+what would need to be done I can't send patches for this.
 
-(1) [Qemu-devel] [PATCH v2 00/13] blockjob: refactor mirror_throttle
-(2) [Qemu-devel] [RFC v3 00/14] blockjobs: add explicit job management=E2=
-=80=8B
+> Can't see much of a difference here.  gtk has a menu bar, sdl hasn't,
+> otherwise the two look the same and most hotkeys are the same too.
+>
+> Adding an option to hide the gtk menu bar shouldn't be much of an issue,
+> some code for that is already there as gtk hides the menu bar in
+> fullscreen mode.
+
+There's also a version change going on on the gtk side moving from gtk 2 
+to 3 which brought similar issues: old behaviour is changed and not 
+working the same way any more, themes are broken, more dependencies 
+introduced and so on. (Not specifically in QEMU but generally for all gtk 
+apps.) Using SDL was also a way to avoid those problems, but then it all 
+happens there again.
+
+> I think at the end of the day it boils down to personal preference.
+> Which is perfectly fine.  But it needs someone who finds sdl important
+> enough to step up and care about it.
+
+I think people who used SDL so far were happy with the way it worked 
+before and that's why there wasn't a need to change until now that a 
+version update brought unexpected UI changes.
+
+Regards,
+BALATON Zoltan
