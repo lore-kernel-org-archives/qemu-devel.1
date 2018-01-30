@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egZA7-0004Ly-66
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:53:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1egZC5-0005Dm-8R
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egZA5-00042n-Jd
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:53:35 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:32975)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1egZA5-00042S-DM
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:53:33 -0500
-Received: by mail-oi0-x241.google.com with SMTP id l8so8303943oig.0
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 08:53:33 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1egZC4-000616-7o
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 11:55:37 -0500
+Date: Tue, 30 Jan 2018 17:54:56 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180130165456.GD4503@localhost.localdomain>
+References: <20180130153835.7372-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1517264719-18288-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1517264719-18288-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jan 2018 16:53:12 +0000
-Message-ID: <CAFEAcA9eY4JFdHThCXFSW5iFSk16vUj65Sxgj8=seG0Wihm3_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 0/6] Merge tpm 2018/01/26
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180130153835.7372-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vl: pause vcpus before stopping iothreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +22,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>
 
-On 29 January 2018 at 22:25, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> The patches in this pull request fix a bug in the initialization of
-> a variable, adapt the cancel path used by the passthrough device to the
-> sysfs path of more recent versions of the Linux kernel, and do some other
-> cleanups preparing for support of migration. Finally, we add the CRB
-> interface emulation, which is used with a TPM 2.
->
-> The following changes since commit 0d1442912b3d6591a57ee45fbf28bc91e58d9e76:
->
->   Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2018-01-29 14:29:17 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-01-26-2
->
-> for you to fetch changes up to 4ab6cb4c62273bb46102e5ae1d6af691b47cbcd8:
->
->   tpm: add CRB device (2018-01-29 14:22:50 -0500)
->
-> ----------------------------------------------------------------
-> Merge tpm 2018/01/26 v2
->
+Am 30.01.2018 um 16:38 hat Stefan Hajnoczi geschrieben:
+> Commit dce8921b2baaf95974af8176406881872067adfa ("iothread: Stop threads
+> before main() quits") introduced iothread_stop_all() to avoid the
+> following virtio-scsi assertion failure:
+> 
+>   assert(blk_get_aio_context(d->conf.blk) == s->ctx);
+> 
+> Back then the assertion failed because when bdrv_close_all() made
+> d->conf.blk NULL, blk_get_aio_context() returned the global AioContext
+> instead of s->ctx.
+> 
+> The same assertion can still fail today when vcpus submit new I/O
+> requests after iothread_stop_all() has moved the BDS to the global
+> AioContext.
+> 
+> This patch hardens the iothread_stop_all() approach by pausing vcpus
+> before calling iothread_stop_all().
+> 
+> Note that the assertion failure is a race condition.  It is not possible
+> to reproduce it reliably.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Applied, thanks.
+Does pausing the vcpus actually make sure that the iothread isn't active
+any more, or do we still have a small window where the vcpu is already
+stopped, but the iothread is still processing requests?
 
--- PMM
+Essentially, I think the bdrv_set_aio_context() in iothread_stop_all()
+does either not have any effect, or if it does have an effect, it's
+wrong. You can't just force an in-use BDS into a different AioContext
+when the user that set the AioContext is still there.
+
+At the very least, do we need a blk_drain_all() before stopping the
+iothreads? It would still just be a hack, the proper way seens to be
+getting the virtio device out of dataplane mode so that the iothread is
+actually unused and doesn't just happen to not process something at the
+moment.
+
+Kevin
+
+>  vl.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index e517a8d995..011f22ae20 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4765,10 +4765,10 @@ int main(int argc, char **argv, char **envp)
+>      os_setup_post();
+>  
+>      main_loop();
+> +
+>      replay_disable_events();
+> +    pause_all_vcpus();
+>      iothread_stop_all();
+> -
+> -    pause_all_vcpus();
+>      bdrv_close_all();
+>      res_free();
+>  
+> -- 
+> 2.14.3
+> 
