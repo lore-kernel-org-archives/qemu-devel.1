@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:60742)
+Received: from eggs.gnu.org ([208.118.235.92]:46781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egcVq-0003Px-1g
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:29:13 -0500
+	(envelope-from <thuth@redhat.com>) id 1egccY-0006Hw-Rp
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:36:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egcUs-0006CM-Ta
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:28:13 -0500
-References: <20180119205847.7141-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5ce53137-e975-9e62-61b6-e4dc785d0969@redhat.com>
-Date: Tue, 30 Jan 2018 15:25:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1egcZL-0005J6-ML
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 15:32:57 -0500
+References: <2a250f8d59f1eedd7728d94a9dae1a6de54d0c14.1517340741.git.crobinso@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <58c4c86f-a9a7-a2bc-4d4f-ce331334abba@redhat.com>
+Date: Tue, 30 Jan 2018 21:31:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180119205847.7141-1-jsnow@redhat.com>
+In-Reply-To: <2a250f8d59f1eedd7728d94a9dae1a6de54d0c14.1517340741.git.crobinso@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/13] blockjob: refactor mirror_throttle
+Subject: Re: [Qemu-devel] [PATCH v3] scripts/make-release: Don't archive
+ .git files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: Cole Robinson <crobinso@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-ping;
-
-I won't respin for patchew until this gets looked over again, sorry :)
-
-On 01/19/2018 03:58 PM, John Snow wrote:
-> mirror_throttle attempts to make sure we yield every so often when we're
-> doing operations that may not otherwise be as cooperative as we'd like.
+On 30.01.2018 20:33, Cole Robinson wrote:
+> As was last done in 379e21c25, we don't want .git files for
+> submodules here, which we aren't presently doing for capstone and
+> keycodemapdb.
 > 
-> This pattern is useful to other jobs like commit as well; if commit
-> continuously decides not to copy data (and calculates delay_ns to be 0),
-> we'll frequently and aggressively yield, only to be rescheduled immediately.
+> Rather than delete the offending files before archiving, ask tar
+> to --exclude=.git
 > 
-> This causes those "WARNING: I/O thread spun for 1000 iterations"
-> warnings that everyone loves so much.
-> 
-> Split out the mirror_throttle function to become a new internal
-> BlockJob API function, block_job_throttle; then use it for all
-> the other jobs in their runtime loops.
-> 
-> I decided to use it in stream and backup as well, so that regardless of if the
-> loop structure has the chance to be greedy or not (I did not audit this), the
-> BlockJob has some kind of failsafe that will occasionally perform a 0ns sleep
-> every SLICE_TIME.
-> 
+> Signed-off-by: Cole Robinson <crobinso@redhat.com>
+> ---
 > v2:
->  - Fixed spacing consistency (Paolo)
->  - Renamed last_yield_ns to last_enter_ns (Stefan)
->  - Renamed block_job_throttle to block_job_relax (Stefan)
->  - Removed external usages of block_job_pause_point and
->    block_job_sleep_ns (Paolo)
->  - Further cut down block/backup code to use block_job_relax
+>     Use armbru's --exclude suggestion, requires tweaking
+>     existing tar options a bit.
 > 
-> ________________________________________________________________________________
+> v3:
+>     thuth's suggestion to use --exclude for both tar commands
 > 
-> For convenience, this branch is available at:
-> https://github.com/jnsnow/qemu.git branch block-job-yield
-> https://github.com/jnsnow/qemu/tree/block-job-yield
+>  scripts/make-release | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 > 
-> This version is tagged block-job-yield-v2:
-> https://github.com/jnsnow/qemu/releases/tag/block-job-yield-v2
-> 
-> John Snow (13):
->   blockjob: record time of last entrance
->   blockjob: consolidate SLICE_TIME definition
->   blockjob: create block_job_relax
->   blockjob: allow block_job_throttle to take delay_ns
->   block/commit: use block_job_relax
->   block/stream: use block_job_relax
->   block/backup: use block_job_relax
->   allow block_job_relax to return -ECANCELED
->   block/backup: remove yield_and_check
->   block/mirror: condense cancellation and relax calls
->   block/mirror: remove block_job_sleep_ns calls
->   blockjob: privatize block_job_sleep_ns
->   blockjob: remove block_job_pause_point from interface
-> 
->  block/backup.c               | 27 ++++++-----------------
->  block/commit.c               |  4 +---
->  block/mirror.c               | 52 +++++++++++++++-----------------------------
->  block/stream.c               |  4 +---
->  block/trace-events           |  2 +-
->  blockjob.c                   | 51 ++++++++++++++++++++++++++++++++++++-------
->  include/block/blockjob.h     |  5 +++++
->  include/block/blockjob_int.h | 37 +++++++++++++++----------------
->  tests/test-bdrv-drain.c      |  2 +-
->  tests/test-blockjob-txn.c    |  2 +-
->  10 files changed, 94 insertions(+), 92 deletions(-)
-> 
+> diff --git a/scripts/make-release b/scripts/make-release
+> index 3917df7142..04fa9defdc 100755
+> --- a/scripts/make-release
+> +++ b/scripts/make-release
+> @@ -19,11 +19,10 @@ pushd ${destination}
+>  git checkout "v${version}"
+>  git submodule update --init
+>  (cd roms/seabios && git describe --tags --long --dirty > .version)
+> -rm -rf .git roms/*/.git dtc/.git pixman/.git
+
+Thanks, this also fixes the dead pixman/.git path :-)
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
