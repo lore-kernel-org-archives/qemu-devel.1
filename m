@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56324)
+Received: from eggs.gnu.org ([208.118.235.92]:57542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1egeAi-0005bB-6k
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:15:15 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1egeBB-0005mq-6n
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:15:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ege9e-0006pX-4e
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:14:32 -0500
-Received: from mail-bn3nam01on0057.outbound.protection.outlook.com
-	([104.47.33.57]:25121
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1ege9d-0006mj-AV
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:13:25 -0500
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
-	<20180129174132.108925-19-brijesh.singh@amd.com>
-	<20180130200838.GB2319@work-vm>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <0abe3fee-a970-dc82-fd92-ad923bfa863a@amd.com>
-Date: Tue, 30 Jan 2018 16:13:13 -0600
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ege9o-00077L-SL
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:15:00 -0500
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:12353)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ege9o-00072d-6d
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 17:13:36 -0500
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Date: Tue, 30 Jan 2018 23:12:59 +0100
+References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<201801252233.45477.pisa@cmp.felk.cvut.cz>
+	<fe13d005-de44-fea3-6102-e9723aac398a@redhat.com>
+In-Reply-To: <fe13d005-de44-fea3-6102-e9723aac398a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180130200838.GB2319@work-vm>
-Content-Type: text/plain; charset=utf-8
+Content-Type: Text/Plain;
+  charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v6 18/23] sev: emit the SEV_MEASUREMENT
- event
+Content-Disposition: inline
+Message-Id: <201801302312.59762.pisa@cmp.felk.cvut.cz>
+Subject: Re: [Qemu-devel] [PATCH V4 0/7] CAN bus support for QEMU (SJA1000
+ PCI so far)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,176 +31,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>, =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+Hello Paolo,
 
+thanks much for conversion to acceptable QOM model.
 
-On 1/30/18 2:08 PM, Dr. David Alan Gilbert wrote:
-> * Brijesh Singh (brijesh.singh@amd.com) wrote:
->> During machine creation we encrypted the guest bios image, the
->> LAUNCH_MEASURE command can be used to retrieve the measurement of
->> the encrypted memory region. Emit the SEV_MEASUREMENT event so that
->> libvirt can grab the measurement value as soon as we are done with
->> creating the encrypted machine.
-> Can you ust clarify what happens if the libvirt has disconnected and
-> reconnected to qemu and so didn't see the event?  Can the reconnecting
-> libvirt query it and find out it's ready/not ready yet?
-
-Dave,
-
-I have not looked into details between libvirt and qemu interaction to
-comment how and when the events will be delivered. Recently, one of my
-colleague was implementing libvirt interface for the SEV guest and ran
-into somewhat a similar challenge and posted question on libvirt mailing
-list [1].
-
-In previous discussion on qemu mailing list, we agreed to implement SEV
-MEASUREMENT event which can be seen by libvirt. That's what this patch
-is doing.
-
-But during the libvirt implementation it seems that qemu monitor
-silently drops all the events before it get the first qmp_capabilities
-command. At a quick glance it seems on reconnect, libvirt issues
-qmp_capabilities command and any event issued before the
-qmp_capabilities command will never to delivered to libvirt. we are
-looking for=C2=A0 help from libvirt/qemu monitor experts on how we solve th=
-is
-problem. Our goal is to provide the measurement to libvirt before
-libvirt issues "continue" command. Since event can't be seen by libvirt
-before it resumes the guest hence I was wondering if we should we should
-drop the SEV measurement event and consider adding a new QMP command to
-query the SEV measurement.
-
-[1] https://www.redhat.com/archives/libvir-list/2018-January/msg00602.html
-
-> Dave
+On Tuesday 30 of January 2018 15:15:22 Paolo Bonzini wrote:
+> On 25/01/2018 22:33, Pavel Pisa wrote:
+> > Hello Paolo,
+> >
+> > thanks for suggestions. I understand and fully agree with your
+> > request to switch to QOM. I have succeed with that for CAN devices
+> > some time ago. It worth to be done for the rest of the objects
+> > but I fear that I do not find time to complete QOMification
+> > in reasonable future. Contributions/suggestions from other
+> > are welcomed. I can look for students for GSoC at our university
+> > or under other funding.
 >
->> Cc: Daniel P. Berrange <berrange@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: kvm@vger.kernel.org
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  accel/kvm/sev.c        | 58 +++++++++++++++++++++++++++++++++++++++++++=
-+++++++
->>  accel/kvm/trace-events |  1 +
->>  include/sysemu/sev.h   |  1 +
->>  3 files changed, 60 insertions(+)
->>
->> diff --git a/accel/kvm/sev.c b/accel/kvm/sev.c
->> index 1f757df725df..b78cf3144b1d 100644
->> --- a/accel/kvm/sev.c
->> +++ b/accel/kvm/sev.c
->> @@ -19,11 +19,13 @@
->>  #include "sysemu/sev.h"
->>  #include "sysemu/sysemu.h"
->>  #include "trace.h"
->> +#include "qapi-event.h"
->> =20
->>  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
->>  #define DEFAULT_SEV_DEVICE      "/dev/sev"
->> =20
->>  static int sev_fd;
->> +static SEVState *sev_state;
->> =20
->>  #define SEV_FW_MAX_ERROR      0x17
->> =20
->> @@ -418,6 +420,59 @@ err:
->>      return ret;
->>  }
->> =20
->> +static void
->> +sev_launch_get_measure(Notifier *notifier, void *unused)
->> +{
->> +    int ret, error;
->> +    guchar *data;
->> +    SEVState *s =3D sev_state;
->> +    struct kvm_sev_launch_measure *measurement;
->> +
->> +    measurement =3D g_malloc0(sizeof(*measurement));
->> +    if (!measurement) {
->> +        return;
->> +    }
->> +
->> +    /* query the measurement blob length */
->> +    ret =3D sev_ioctl(KVM_SEV_LAUNCH_MEASURE, measurement, &error);
->> +    if (!measurement->len) {
->> +        error_report("%s: LAUNCH_MEASURE ret=3D%d fw_error=3D%d '%s'",
->> +                     __func__, ret, error, fw_error_to_str(errno));
->> +        goto free_measurement;
->> +    }
->> +
->> +    data =3D g_malloc(measurement->len);
->> +    if (s->measurement) {
->> +        goto free_data;
->> +    }
->> +
->> +    measurement->uaddr =3D (unsigned long)data;
->> +
->> +    /* get the measurement blob */
->> +    ret =3D sev_ioctl(KVM_SEV_LAUNCH_MEASURE, measurement, &error);
->> +    if (ret) {
->> +        error_report("%s: LAUNCH_MEASURE ret=3D%d fw_error=3D%d '%s'",
->> +                     __func__, ret, error, fw_error_to_str(errno));
->> +        goto free_data;
->> +    }
->> +
->> +    sev_set_guest_state(SEV_STATE_SECRET);
->> +
->> +    /* encode the measurement value and emit the event */
->> +    s->measurement =3D g_base64_encode(data, measurement->len);
->> +    trace_kvm_sev_launch_measurement(s->measurement);
->> +    qapi_event_send_sev_measurement(s->measurement, &error_abort);
->> +
->> +free_data:
->> +    g_free(data);
->> +free_measurement:
->> +    g_free(measurement);
->> +}
->> +
->> +static Notifier sev_machine_done_notify =3D {
->> +    .notify =3D sev_launch_get_measure,
->> +};
->> +
->>  void *
->>  sev_guest_init(const char *id)
->>  {
->> @@ -461,6 +516,9 @@ sev_guest_init(const char *id)
->>      }
->> =20
->>      ram_block_notifier_add(&sev_ram_notifier);
->> +    qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
->> +
->> +    sev_state =3D s;
->> =20
->>      return s;
->>  err:
->> diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
->> index c55546f36a25..51df5113ad07 100644
->> --- a/accel/kvm/trace-events
->> +++ b/accel/kvm/trace-events
->> @@ -20,3 +20,4 @@ kvm_memcrypt_unregister_region(void *addr, size_t len)=
- "addr %p len 0x%lu"
->>  kvm_sev_change_state(char *old, char *new) "%s -> %s"
->>  kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x=
- session %p pdh %p"
->>  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" =
-PRIu64
->> +kvm_sev_launch_measurement(const char *value) "data %s"
->> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
->> index 839800efdbbf..572120c865ea 100644
->> --- a/include/sysemu/sev.h
->> +++ b/include/sysemu/sev.h
->> @@ -63,6 +63,7 @@ typedef enum {
->> =20
->>  struct SEVState {
->>      QSevGuestInfo *sev_info;
->> +    gchar *measurement;
->>  };
->> =20
->>  typedef struct SEVState SEVState;
->> --=20
->> 2.9.5
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Please take a look at branch can-pci-qom of github.com/bonzini/qemu.git.
+>  Apart from QOMification of the backend include, I simplified the IRQ
+> handling in can_kvaser_pci (fixing bugs too I think), and removed an
+> unnecessary mutex.  I also moved the files to net/can and hw/net/can so
+> that in the future Jason (networking maintainer) can take care of pull
+> requests.
+>
+> I might have broken something, and the top commit in particular is
+> completely untested.
+
+I have run basic test with Linux kernel on both sides
+for one kavser_pci card on guest side and vcan (no real interface)
+on host side.
+
+Mesages exchange tests passed and looks OK.
+
+I have used next parameters
+
+      -object can-bus,id=3Dcanbus0 \
+      -device kvaser_pci,canbus=3Dcanbus0 \
+      -object can-host-socketcan,if=3Dcan0,canbus=3Dcanbus0,id=3Dcanbus0-so=
+cketcan
+
+The id parameter is required for "can-host-socketcan" object.
+Else next error is printed
+
+  qemu-system-x86_64: -object can-host-socketcan,if=3Dcan0,canbus=3Dcanbus0=
+: Parameter 'id' is missing
+
+If "-object can-bus,id=3Dcanbus0" is missing then next error is reported
+
+  qemu-system-x86_64: -object can-host-socketcan,if=3Dcan0,canbus=3Dcanbus0=
+,id=3Dcanbus0-socketcan: Device 'canbus0' not found
+
+I have inspected through monitor the state of objects
+
+  (qemu) qom-list /objects
+  canbus0-socketcan (child<can-host-socketcan>)
+  type (string)
+  canbus0 (child<can-bus>)
+
+  (qemu) info qom-tree
+  /machine (pc-i440fx-2.12-machine)
+    ...
+    /peripheral-anon (container)
+      /device[1] (kvaser_pci)
+        /bus master[0] (qemu:memory-region)
+        /kvaser_pci-xilinx[0] (qemu:memory-region)
+        /kvaser_pci-s5920[0] (qemu:memory-region)
+        /kvaser_pci-sja[0] (qemu:memory-region)
+        /bus master container[0] (qemu:memory-region)
+    ...
+
+
+  (qemu) qom-list /objects
+  canbus0-socketcan (child<can-host-socketcan>)
+  type (string)
+  canbus0 (child<can-bus>)
+
+  (qemu) qom-list /machine/peripheral-anon/device[1]
+  bus master container[0] (child<qemu:memory-region>)
+  canbus (link<can-bus>)
+  rombar (uint32)
+  hotpluggable (bool)
+  x-pcie-lnksta-dllla (bool)
+  kvaser_pci-sja[0] (child<qemu:memory-region>)
+  multifunction (bool)
+  hotplugged (bool)
+  parent_bus (link<bus>)
+  romfile (str)
+  kvaser_pci-s5920[0] (child<qemu:memory-region>)
+  x-pcie-extcap-init (bool)
+  command_serr_enable (bool)
+  addr (int32)
+  type (string)
+  legacy-addr (str)
+  kvaser_pci-xilinx[0] (child<qemu:memory-region>)
+  realized (bool)
+  bus master[0] (child<qemu:memory-region>)
+
+=46rom the user point of view, it would be nice if "can-bus"
+can be populated when required automatically.
+
+I am not sure, but may it be that it would worth to
+push can-bus objects under some category/specific
+container. The path /objects is quite wide.
+Into something like /object/can-bus or /net/can.
+
+But generally thanks much, the progress you have made
+in one day is really great. I hope that others check
+your branch. I have pushed your unmodified version into
+"can-pci-qom" branch of my repo
+
+  https://gitlab.fel.cvut.cz/canbus/qemu-canbus/tree/can-pci-qom
+
+It would be great if others can check that everything
+works in their setup. I think that then it can be pushed
+into mainline and some usability improvements can be
+done/experiment with later.
+
+Thanks much,
+
+
+                Pavel Pisa
