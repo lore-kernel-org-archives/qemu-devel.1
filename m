@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXR0-0000UM-F3
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:03:02 -0500
+	(envelope-from <berto@igalia.com>) id 1egXTU-0002jO-Nu
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXQu-0005gr-55
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:54 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jan 2018 15:02:19 +0000
-Message-Id: <1517324542-6607-5-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
-References: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/7] target/arm: Make v7M exception entry stack
- push check MPU
+	(envelope-from <berto@igalia.com>) id 1egXTR-0007FJ-DD
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:05:28 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue, 30 Jan 2018 17:04:35 +0200
+Message-Id: <20180130150435.2553-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] qcow2: Replace align_offset() with ROUND_UP()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,152 +17,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The memory writes done to push registers on the stack
-on exception entry in M profile CPUs are supposed to
-go via MPU permissions checks, which may cause us to
-take a derived exception instead of the original one of
-the MPU lookup fails. We were implementing these as
-always-succeeds direct writes to physical memory.
-Rewrite v7m_push_stack() to do the necessary checks.
+The align_offset() function is equivalent to the ROUND_UP() macro so
+there's no need to use the former. The ROUND_UP() name is also a bit
+more explicit.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This patch uses ROUND_UP() instead of the slower QEMU_ALIGN_UP()
+because align_offset() already requires that the second parameter is a
+power of two.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- target/arm/helper.c | 103 ++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 87 insertions(+), 16 deletions(-)
+ block/qcow2-bitmap.c   |  2 +-
+ block/qcow2-cluster.c  |  4 ++--
+ block/qcow2-refcount.c |  4 ++--
+ block/qcow2-snapshot.c | 10 +++++-----
+ block/qcow2.c          | 12 ++++++------
+ block/qcow2.h          |  6 ------
+ 6 files changed, 16 insertions(+), 22 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c713eea..007e760 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6161,12 +6161,66 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-     return target_el;
- }
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index efa10c6663..1cf99ca51e 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -413,7 +413,7 @@ static inline void bitmap_dir_entry_to_be(Qcow2BitmapDirEntry *entry)
  
--static void v7m_push(CPUARMState *env, uint32_t val)
-+static bool v7m_stack_write(ARMCPU *cpu, uint32_t addr, uint32_t value,
-+                            ARMMMUIdx mmu_idx, bool ignfault)
+ static inline int calc_dir_entry_size(size_t name_size, size_t extra_data_size)
  {
--    CPUState *cs = CPU(arm_env_get_cpu(env));
-+    CPUState *cs = CPU(cpu);
-+    CPUARMState *env = &cpu->env;
-+    MemTxAttrs attrs = {};
-+    MemTxResult txres;
-+    target_ulong page_size;
-+    hwaddr physaddr;
-+    int prot;
-+    ARMMMUFaultInfo fi;
-+    bool secure = mmu_idx & ARM_MMU_IDX_M_S;
-+    int exc;
-+    bool exc_secure;
- 
--    env->regs[13] -= 4;
--    stl_phys(cs->as, env->regs[13], val);
-+    if (get_phys_addr(env, addr, MMU_DATA_STORE, mmu_idx, &physaddr,
-+                      &attrs, &prot, &page_size, &fi, NULL)) {
-+        /* MPU/SAU lookup failed */
-+        if (fi.type == ARMFault_QEMU_SFault) {
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...SecureFault with SFSR.AUVIOL during stacking\n");
-+            env->v7m.sfsr |= R_V7M_SFSR_AUVIOL_MASK | R_V7M_SFSR_SFARVALID_MASK;
-+            env->v7m.sfar = addr;
-+            exc = ARMV7M_EXCP_SECURE;
-+            exc_secure = true;
-+        } else {
-+            qemu_log_mask(CPU_LOG_INT, "...MemManageFault with CFSR.MSTKERR\n");
-+            env->v7m.cfsr[secure] |= R_V7M_CFSR_MSTKERR_MASK;
-+            exc = ARMV7M_EXCP_MEM;
-+            exc_secure = secure;
-+        }
-+        goto pend_fault;
-+    }
-+    address_space_stl_le(arm_addressspace(cs, attrs), physaddr, value,
-+                         attrs, &txres);
-+    if (txres != MEMTX_OK) {
-+        /* BusFault trying to write the data */
-+        qemu_log_mask(CPU_LOG_INT, "...BusFault with BFSR.STKERR\n");
-+        env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_STKERR_MASK;
-+        exc = ARMV7M_EXCP_BUS;
-+        exc_secure = false;
-+        goto pend_fault;
-+    }
-+    return true;
-+
-+pend_fault:
-+    /* By pending the exception at this point we are making
-+     * the IMPDEF choice "overridden exceptions pended" (see the
-+     * MergeExcInfo() pseudocode). The other choice would be to not
-+     * pend them now and then make a choice about which to throw away
-+     * later if we have two derived exceptions.
-+     * The only case when we must not pend the exception but instead
-+     * throw it away is if we are doing the push of the callee registers
-+     * and we've already generated a derived exception. Even in this
-+     * case we will still update the fault status registers.
-+     */
-+    if (!ignfault) {
-+        armv7m_nvic_set_pending_derived(env->nvic, exc, exc_secure);
-+    }
-+    return false;
+-    return align_offset(sizeof(Qcow2BitmapDirEntry) +
++    return ROUND_UP(sizeof(Qcow2BitmapDirEntry) +
+                         name_size + extra_data_size, 8);
  }
  
- /* Return true if we're using the process stack pointer (not the MSP) */
-@@ -6562,26 +6616,43 @@ static bool v7m_push_stack(ARMCPU *cpu)
-      * should ignore further stack faults trying to process
-      * that derived exception.)
-      */
-+    bool stacked_ok;
-     CPUARMState *env = &cpu->env;
-     uint32_t xpsr = xpsr_read(env);
-+    uint32_t frameptr = env->regs[13];
-+    ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index a3fec27bf9..29d70e1f3e 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -127,11 +127,11 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
  
-     /* Align stack pointer if the guest wants that */
--    if ((env->regs[13] & 4) &&
-+    if ((frameptr & 4) &&
-         (env->v7m.ccr[env->v7m.secure] & R_V7M_CCR_STKALIGN_MASK)) {
--        env->regs[13] -= 4;
-+        frameptr -= 4;
-         xpsr |= XPSR_SPREALIGN;
+     new_l1_size2 = sizeof(uint64_t) * new_l1_size;
+     new_l1_table = qemu_try_blockalign(bs->file->bs,
+-                                       align_offset(new_l1_size2, 512));
++                                       ROUND_UP(new_l1_size2, 512));
+     if (new_l1_table == NULL) {
+         return -ENOMEM;
      }
--    /* Switch to the handler mode.  */
--    v7m_push(env, xpsr);
--    v7m_push(env, env->regs[15]);
--    v7m_push(env, env->regs[14]);
--    v7m_push(env, env->regs[12]);
--    v7m_push(env, env->regs[3]);
--    v7m_push(env, env->regs[2]);
--    v7m_push(env, env->regs[1]);
--    v7m_push(env, env->regs[0]);
+-    memset(new_l1_table, 0, align_offset(new_l1_size2, 512));
++    memset(new_l1_table, 0, ROUND_UP(new_l1_size2, 512));
  
--    return false;
-+    frameptr -= 0x20;
-+
-+    /* Write as much of the stack frame as we can. If we fail a stack
-+     * write this will result in a derived exception being pended
-+     * (which may be taken in preference to the one we started with
-+     * if it has higher priority).
-+     */
-+    stacked_ok =
-+        v7m_stack_write(cpu, frameptr, env->regs[0], mmu_idx, false) &&
-+        v7m_stack_write(cpu, frameptr + 4, env->regs[1], mmu_idx, false) &&
-+        v7m_stack_write(cpu, frameptr + 8, env->regs[2], mmu_idx, false) &&
-+        v7m_stack_write(cpu, frameptr + 12, env->regs[3], mmu_idx, false) &&
-+        v7m_stack_write(cpu, frameptr + 16, env->regs[12], mmu_idx, false) &&
-+        v7m_stack_write(cpu, frameptr + 20, env->regs[14], mmu_idx, false) &&
-+        v7m_stack_write(cpu, frameptr + 24, env->regs[15], mmu_idx, false) &&
-+        v7m_stack_write(cpu, frameptr + 28, xpsr, mmu_idx, false);
-+
-+    /* Update SP regardless of whether any of the stack accesses failed.
-+     * When we implement v8M stack limit checking then this attempt to
-+     * update SP might also fail and result in a derived exception.
-+     */
-+    env->regs[13] = frameptr;
-+
-+    return !stacked_ok;
+     if (s->l1_size) {
+         memcpy(new_l1_table, s->l1_table, s->l1_size * sizeof(uint64_t));
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 92701ab7af..1d520615a8 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1202,7 +1202,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
+      * l1_table_offset when it is the current s->l1_table_offset! Be careful
+      * when changing this! */
+     if (l1_table_offset != s->l1_table_offset) {
+-        l1_table = g_try_malloc0(align_offset(l1_size2, 512));
++        l1_table = g_try_malloc0(ROUND_UP(l1_size2, 512));
+         if (l1_size2 && l1_table == NULL) {
+             ret = -ENOMEM;
+             goto fail;
+@@ -2545,7 +2545,7 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+     }
+ 
+     /* align range to test to cluster boundaries */
+-    size = align_offset(offset_into_cluster(s, offset) + size, s->cluster_size);
++    size = ROUND_UP(offset_into_cluster(s, offset) + size, s->cluster_size);
+     offset = start_of_cluster(s, offset);
+ 
+     if ((chk & QCOW2_OL_ACTIVE_L1) && s->l1_size) {
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 44243e0e95..cee25f582b 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -66,7 +66,7 @@ int qcow2_read_snapshots(BlockDriverState *bs)
+ 
+     for(i = 0; i < s->nb_snapshots; i++) {
+         /* Read statically sized part of the snapshot header */
+-        offset = align_offset(offset, 8);
++        offset = ROUND_UP(offset, 8);
+         ret = bdrv_pread(bs->file, offset, &h, sizeof(h));
+         if (ret < 0) {
+             goto fail;
+@@ -155,7 +155,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
+     offset = 0;
+     for(i = 0; i < s->nb_snapshots; i++) {
+         sn = s->snapshots + i;
+-        offset = align_offset(offset, 8);
++        offset = ROUND_UP(offset, 8);
+         offset += sizeof(h);
+         offset += sizeof(extra);
+         offset += strlen(sn->id_str);
+@@ -215,7 +215,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
+         assert(id_str_size <= UINT16_MAX && name_size <= UINT16_MAX);
+         h.id_str_size = cpu_to_be16(id_str_size);
+         h.name_size = cpu_to_be16(name_size);
+-        offset = align_offset(offset, 8);
++        offset = ROUND_UP(offset, 8);
+ 
+         ret = bdrv_pwrite(bs->file, offset, &h, sizeof(h));
+         if (ret < 0) {
+@@ -441,7 +441,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+     /* The VM state isn't needed any more in the active L1 table; in fact, it
+      * hurts by causing expensive COW for the next snapshot. */
+     qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
+-                          align_offset(sn->vm_state_size, s->cluster_size),
++                          ROUND_UP(sn->vm_state_size, s->cluster_size),
+                           QCOW2_DISCARD_NEVER, false);
+ 
+ #ifdef DEBUG_ALLOC
+@@ -710,7 +710,7 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
+     }
+     new_l1_bytes = sn->l1_size * sizeof(uint64_t);
+     new_l1_table = qemu_try_blockalign(bs->file->bs,
+-                                       align_offset(new_l1_bytes, 512));
++                                       ROUND_UP(new_l1_bytes, 512));
+     if (new_l1_table == NULL) {
+         return -ENOMEM;
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 1f80961e1b..e09d5c2a74 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1354,7 +1354,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     if (s->l1_size > 0) {
+         s->l1_table = qemu_try_blockalign(bs->file->bs,
+-            align_offset(s->l1_size * sizeof(uint64_t), 512));
++            ROUND_UP(s->l1_size * sizeof(uint64_t), 512));
+         if (s->l1_table == NULL) {
+             error_setg(errp, "Could not allocate L1 table");
+             ret = -ENOMEM;
+@@ -2615,19 +2615,19 @@ static int64_t qcow2_calc_prealloc_size(int64_t total_size,
+ {
+     int64_t meta_size = 0;
+     uint64_t nl1e, nl2e;
+-    int64_t aligned_total_size = align_offset(total_size, cluster_size);
++    int64_t aligned_total_size = ROUND_UP(total_size, cluster_size);
+ 
+     /* header: 1 cluster */
+     meta_size += cluster_size;
+ 
+     /* total size of L2 tables */
+     nl2e = aligned_total_size / cluster_size;
+-    nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
++    nl2e = ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
+     meta_size += nl2e * sizeof(uint64_t);
+ 
+     /* total size of L1 tables */
+     nl1e = nl2e * sizeof(uint64_t) / cluster_size;
+-    nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
++    nl1e = ROUND_UP(nl1e, cluster_size / sizeof(uint64_t));
+     meta_size += nl1e * sizeof(uint64_t);
+ 
+     /* total size of refcount table and blocks */
+@@ -3681,7 +3681,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     has_backing_file = !!optstr;
+     g_free(optstr);
+ 
+-    virtual_size = align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
++    virtual_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+                                 cluster_size);
+ 
+     /* Check that virtual disk size is valid */
+@@ -3702,7 +3702,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+             goto err;
+         }
+ 
+-        virtual_size = align_offset(ssize, cluster_size);
++        virtual_size = ROUND_UP(ssize, cluster_size);
+ 
+         if (has_backing_file) {
+             /* We don't how much of the backing chain is shared by the input
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 46c8cf44ec..33d2eb0ead 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -468,12 +468,6 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
+     return (offset >> s->cluster_bits) & (s->l2_size - 1);
  }
  
- static void do_v7m_exception_exit(ARMCPU *cpu)
+-static inline int64_t align_offset(int64_t offset, int n)
+-{
+-    offset = (offset + n - 1) & ~(n - 1);
+-    return offset;
+-}
+-
+ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+ {
+     return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bits);
 -- 
-2.7.4
+2.11.0
