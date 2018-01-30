@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1egSVq-0001vr-Bo
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1egT3K-00046X-Fp
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1egSVj-00036h-Vp
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57154
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1egSVj-00036V-Pj
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:27 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0U9hkDD124408
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 04:47:24 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ftkcxyj19-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 04:47:23 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Tue, 30 Jan 2018 04:47:23 -0500
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Tue, 30 Jan 2018 10:47:13 +0100
-In-Reply-To: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-Message-Id: <20180130094715.11578-2-zyimin@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/3] s390x/pci: fixup the code walking IOMMU
- tables
+	(envelope-from <armbru@redhat.com>) id 1egT3H-0000Zu-FA
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egT3H-0000Yy-78
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 05:22:07 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6569AC0587E1
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 10:22:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+	[10.36.116.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 042905C3FD
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 10:22:06 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 30 Jan 2018 11:21:54 +0100
+Message-Id: <20180130102202.28519-11-armbru@redhat.com>
+In-Reply-To: <20180130102202.28519-1-armbru@redhat.com>
+References: <20180130102202.28519-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 10/18] Include qapi/qmp/qlist.h exactly where
+ needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,343 +35,379 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, alex.williamson@redhat.com, marcel@redhat.com, zyimin@linux.vnet.ibm.com
 
-Current s390x PCI IOMMU code is lack of flags' checking, including:
-1) protection bit
-2) table length
-3) table offset
-4) intermediate tables' invalid bit
-5) format control bit
+This cleanup makes the number of objects depending on qapi/qmp/qlist.h
+drop from 4548 (out of 4739) to 16 in my "build everything" tree.
 
-This patch introduces a new struct named S390IOTLBEntry, and makes up
-these missed checkings. At the same time, inform the guest with the
-corresponding error number when the check fails.
-
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c  | 223 ++++++++++++++++++++++++++++++++++++++---------
- hw/s390x/s390-pci-bus.h  |  10 +++
- hw/s390x/s390-pci-inst.c |  10 ---
- 3 files changed, 190 insertions(+), 53 deletions(-)
+ block/qapi.c                        | 1 +
+ block/rbd.c                         | 1 +
+ blockdev.c                          | 1 +
+ include/qapi/qmp/json-parser.h      | 1 -
+ include/qapi/qmp/qdict.h            | 1 -
+ qapi/qobject-input-visitor.c        | 1 +
+ qapi/qobject-output-visitor.c       | 1 +
+ qobject/json-parser.c               | 1 +
+ qobject/qdict.c                     | 1 +
+ qobject/qjson.c                     | 1 +
+ qobject/qlit.c                      | 1 +
+ qobject/qobject.c                   | 1 +
+ tests/check-qdict.c                 | 2 ++
+ tests/check-qlit.c                  | 1 +
+ tests/check-qobject.c               | 2 ++
+ tests/device-introspect-test.c      | 1 +
+ tests/libqtest.c                    | 2 ++
+ tests/numa-test.c                   | 1 +
+ tests/qmp-test.c                    | 1 +
+ tests/qom-test.c                    | 1 +
+ tests/test-keyval.c                 | 1 +
+ tests/test-qga.c                    | 1 +
+ tests/test-qobject-output-visitor.c | 1 +
+ tests/test-x86-cpuid-compat.c       | 1 +
+ ui/vnc-palette.h                    | 1 -
+ util/keyval.c                       | 1 +
+ util/qemu-config.c                  | 1 +
+ 27 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 2b1e1409bf..e349d73abe 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -309,49 +309,186 @@ static uint64_t get_st_pto(uint64_t entry)
-             : 0;
- }
+diff --git a/block/qapi.c b/block/qapi.c
+index 1e0cb2743d..12a8cb5a82 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -32,6 +32,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
+ #include "sysemu/block-backend.h"
+diff --git a/block/rbd.c b/block/rbd.c
+index a76a5e8755..76b9e83cea 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -21,6 +21,7 @@
+ #include "qemu/cutils.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qlist.h"
  
--static uint64_t s390_guest_io_table_walk(uint64_t guest_iota,
--                                  uint64_t guest_dma_address)
-+static bool rt_entry_isvalid(uint64_t entry)
+ /*
+  * When specifying the image filename use:
+diff --git a/blockdev.c b/blockdev.c
+index c487cf0e4b..90ef3166de 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -45,6 +45,7 @@
+ #include "qapi-visit.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qerror.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/iothread.h"
+diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parser.h
+index 9987f8ca85..102f5c0068 100644
+--- a/include/qapi/qmp/json-parser.h
++++ b/include/qapi/qmp/json-parser.h
+@@ -15,7 +15,6 @@
+ #define QEMU_JSON_PARSER_H
+ 
+ #include "qemu-common.h"
+-#include "qapi/qmp/qlist.h"
+ 
+ QObject *json_parser_parse(GQueue *tokens, va_list *ap);
+ QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp);
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index 3c1def00f7..ff6f7842c3 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -14,7 +14,6 @@
+ #define QDICT_H
+ 
+ #include "qapi/qmp/qobject.h"
+-#include "qapi/qmp/qlist.h"
+ #include "qemu/queue.h"
+ 
+ #define QDICT_BUCKET_MAX 512
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 31183dcb62..3e235a1eee 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -22,6 +22,7 @@
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qerror.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qemu/cutils.h"
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
+index f0cc46b3cf..52634b9725 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -18,6 +18,7 @@
+ #include "qemu/queue.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 8f4badc6d9..ee0cbba6a5 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -16,6 +16,7 @@
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
+diff --git a/qobject/qdict.c b/qobject/qdict.c
+index 88f87d2527..23df84f9cd 100644
+--- a/qobject/qdict.c
++++ b/qobject/qdict.c
+@@ -14,6 +14,7 @@
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/error.h"
+diff --git a/qobject/qjson.c b/qobject/qjson.c
+index 7fbb68b6ba..527b5bb571 100644
+--- a/qobject/qjson.c
++++ b/qobject/qjson.c
+@@ -18,6 +18,7 @@
+ #include "qapi/qmp/json-streamer.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qemu/unicode.h"
+ 
+diff --git a/qobject/qlit.c b/qobject/qlit.c
+index c2d0303425..948e0b860c 100644
+--- a/qobject/qlit.c
++++ b/qobject/qlit.c
+@@ -17,6 +17,7 @@
+ 
+ #include "qapi/qmp/qlit.h"
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
+diff --git a/qobject/qobject.c b/qobject/qobject.c
+index 5bbcd04812..23600aa1c1 100644
+--- a/qobject/qobject.c
++++ b/qobject/qobject.c
+@@ -13,6 +13,7 @@
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
+ 
+ static void (*qdestroy[QTYPE__MAX])(QObject *) = {
+diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+index 1b1173634f..d11904ea0c 100644
+--- a/tests/check-qdict.c
++++ b/tests/check-qdict.c
+@@ -9,9 +9,11 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
+  * See the COPYING.LIB file in the top-level directory.
+  */
++
+ #include "qemu/osdep.h"
+ 
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/error.h"
+diff --git a/tests/check-qlit.c b/tests/check-qlit.c
+index c59ec1ab88..b8b5016af7 100644
+--- a/tests/check-qlit.c
++++ b/tests/check-qlit.c
+@@ -11,6 +11,7 @@
+ 
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qlit.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
+diff --git a/tests/check-qobject.c b/tests/check-qobject.c
+index 9e1e82045f..927966093a 100644
+--- a/tests/check-qobject.c
++++ b/tests/check-qobject.c
+@@ -6,9 +6,11 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
+  * See the COPYING.LIB file in the top-level directory.
+  */
++
+ #include "qemu/osdep.h"
+ 
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
+diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+index f7162c023f..2b3d01174d 100644
+--- a/tests/device-introspect-test.c
++++ b/tests/device-introspect-test.c
+@@ -22,6 +22,7 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qlist.h"
+ #include "libqtest.h"
+ 
+ const char common_args[] = "-nodefaults -machine none";
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 0ec8af2923..cd0cc57e80 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -14,6 +14,7 @@
+  * See the COPYING file in the top-level directory.
+  *
+  */
++
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+ 
+@@ -25,6 +26,7 @@
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/json-streamer.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qlist.h"
+ 
+ #define MAX_IRQ 256
+ #define SOCKET_TIMEOUT 50
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index e1b6152244..8158854e17 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -11,6 +11,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
++#include "qapi/qmp/qlist.h"
+ 
+ static char *make_cli(const char *generic_cli, const char *test_cli)
  {
--    uint64_t sto_a, pto_a, px_a;
--    uint64_t sto, pto, pte;
--    uint32_t rtx, sx, px;
--
--    rtx = calc_rtx(guest_dma_address);
--    sx = calc_sx(guest_dma_address);
--    px = calc_px(guest_dma_address);
--
--    sto_a = guest_iota + rtx * sizeof(uint64_t);
--    sto = address_space_ldq(&address_space_memory, sto_a,
--                            MEMTXATTRS_UNSPECIFIED, NULL);
--    sto = get_rt_sto(sto);
--    if (!sto) {
--        pte = 0;
-+    return (entry & ZPCI_TABLE_VALID_MASK) == ZPCI_TABLE_VALID;
-+}
-+
-+static bool pt_entry_isvalid(uint64_t entry)
-+{
-+    return (entry & ZPCI_PTE_VALID_MASK) == ZPCI_PTE_VALID;
-+}
-+
-+static bool entry_isprotected(uint64_t entry)
-+{
-+    return (entry & ZPCI_TABLE_PROT_MASK) == ZPCI_TABLE_PROTECTED;
-+}
-+
-+/* ett is expected table type, -1 page table, 0 segment table, 1 region table */
-+static uint64_t get_table_index(uint64_t iova, int8_t ett)
-+{
-+    switch (ett) {
-+    case -1:
-+        return calc_px(iova);
-+    case 0:
-+        return calc_sx(iova);
-+    case 1:
-+        return calc_rtx(iova);
-+    }
-+
-+    return -1;
-+}
-+
-+static bool entry_isvalid(uint64_t entry, int8_t ett)
-+{
-+    switch (ett) {
-+    case -1:
-+        return pt_entry_isvalid(entry);
-+    case 0:
-+    case 1:
-+        return rt_entry_isvalid(entry);
-+    }
-+
-+    return false;
-+}
-+
-+/* Return true if address translation is done */
-+static bool translate_iscomplete(uint64_t entry, int8_t ett)
-+{
-+    switch (ett) {
-+    case 0:
-+        return (entry & ZPCI_TABLE_FC) ? true : false;
-+    case 1:
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
-+static uint64_t get_frame_size(int8_t ett)
-+{
-+    switch (ett) {
-+    case -1:
-+        return 1ULL << 12;
-+    case 0:
-+        return 1ULL << 20;
-+    case 1:
-+        return 1ULL << 31;
-+    }
-+
-+    return 0;
-+}
-+
-+static uint64_t get_next_table_origin(uint64_t entry, int8_t ett)
-+{
-+    switch (ett) {
-+    case -1:
-+        return entry & ZPCI_PTE_ADDR_MASK;
-+    case 0:
-+        return get_st_pto(entry);
-+    case 1:
-+        return get_rt_sto(entry);
-+    }
-+
-+    return 0;
-+}
-+
-+/**
-+ * table_translate: do translation within one table and return the following
-+ *                  table origin
-+ *
-+ * @entry: the entry being traslated, the result is stored in this.
-+ * @to: the address of table origin.
-+ * @ett: expected table type, 1 region table, 0 segment table and -1 page table.
-+ * @error: error code
-+ */
-+static uint64_t table_translate(S390IOTLBEntry *entry, uint64_t to, int8_t ett,
-+                                uint16_t *error)
-+{
-+    uint64_t tx, te, nto = 0;
-+    uint16_t err = 0;
-+
-+    tx = get_table_index(entry->iova, ett);
-+    te = address_space_ldq(&address_space_memory, to + tx * sizeof(uint64_t),
-+                           MEMTXATTRS_UNSPECIFIED, NULL);
-+
-+    if (!te) {
-+        err = ERR_EVENT_INVALTE;
-         goto out;
-     }
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 36feb2204b..cc9661af47 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -14,6 +14,7 @@
+ #include "libqtest.h"
+ #include "qapi-visit.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/util.h"
+ #include "qapi/visitor.h"
+diff --git a/tests/qom-test.c b/tests/qom-test.c
+index 0ee990710c..847703cb14 100644
+--- a/tests/qom-test.c
++++ b/tests/qom-test.c
+@@ -10,6 +10,7 @@
+ #include "qemu/osdep.h"
  
--    pto_a = sto + sx * sizeof(uint64_t);
--    pto = address_space_ldq(&address_space_memory, pto_a,
--                            MEMTXATTRS_UNSPECIFIED, NULL);
--    pto = get_st_pto(pto);
--    if (!pto) {
--        pte = 0;
-+    if (!entry_isvalid(te, ett)) {
-+        entry->perm &= IOMMU_NONE;
-         goto out;
-     }
+ #include "qemu-common.h"
++#include "qapi/qmp/qlist.h"
+ #include "qemu/cutils.h"
+ #include "libqtest.h"
  
--    px_a = pto + px * sizeof(uint64_t);
--    pte = address_space_ldq(&address_space_memory, px_a,
--                            MEMTXATTRS_UNSPECIFIED, NULL);
-+    if (ett == 1 && ((te & ZPCI_TABLE_LEN_RTX) != ZPCI_TABLE_LEN_RTX ||
-+                     te & ZPCI_TABLE_OFFSET_MASK)) {
-+        err = ERR_EVENT_INVALTL;
-+        goto out;
-+    }
+diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+index baf7e339ab..d0c4bf2b9d 100644
+--- a/tests/test-keyval.c
++++ b/tests/test-keyval.c
+@@ -12,6 +12,7 @@
  
-+    nto = get_next_table_origin(te, ett);
-+    if (!nto) {
-+        err = ERR_EVENT_TT;
-+        goto out;
-+    }
-+
-+    if (entry_isprotected(te)) {
-+        entry->perm &= IOMMU_RO;
-+    } else {
-+        entry->perm &= IOMMU_RW;
-+    }
-+
-+    if (translate_iscomplete(te, ett)) {
-+        switch (ett) {
-+        case -1:
-+            entry->translated_addr = te & ZPCI_PTE_ADDR_MASK;
-+            break;
-+        case 0:
-+            entry->translated_addr = (te & ZPCI_SFAA_MASK) |
-+                (entry->iova & ~ZPCI_SFAA_MASK);
-+            break;
-+        }
-+        nto = 0;
-+    }
- out:
--    return pte;
-+    if (err) {
-+        entry->perm = IOMMU_NONE;
-+        *error = err;
-+    }
-+    entry->len = get_frame_size(ett);
-+    return nto;
-+}
-+
-+static uint16_t s390_guest_io_table_walk(uint64_t g_iota, hwaddr addr,
-+                                         S390IOTLBEntry *entry)
-+{
-+    uint64_t to = s390_pci_get_table_origin(g_iota);
-+    int8_t ett = 1;
-+    uint16_t error = 0;
-+
-+    entry->iova = addr & PAGE_MASK;
-+    entry->translated_addr = 0;
-+    entry->perm = IOMMU_RW;
-+
-+    if (entry_isprotected(g_iota)) {
-+        entry->perm &= IOMMU_RO;
-+    }
-+
-+    while (to) {
-+        to = table_translate(entry, to, ett--, &error);
-+    }
-+
-+    return error;
- }
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "test-qapi-visit.h"
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index fd6bc7690f..e67c7289eb 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -5,6 +5,7 @@
+ #include <sys/un.h>
  
- static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
-                                           IOMMUAccessFlags flag)
- {
--    uint64_t pte;
--    uint32_t flags;
-     S390PCIIOMMU *iommu = container_of(mr, S390PCIIOMMU, iommu_mr);
-+    S390IOTLBEntry entry;
-+    uint16_t error = 0;
-     IOMMUTLBEntry ret = {
-         .target_as = &address_space_memory,
-         .iova = 0,
-@@ -374,26 +511,26 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
-     DPRINTF("iommu trans addr 0x%" PRIx64 "\n", addr);
+ #include "libqtest.h"
++#include "qapi/qmp/qlist.h"
  
-     if (addr < iommu->pba || addr > iommu->pal) {
--        return ret;
-+        error = ERR_EVENT_OORANGE;
-+        goto err;
-     }
+ typedef struct {
+     char *test_dir;
+diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
+index 4a24e12121..7cf86707ec 100644
+--- a/tests/test-qobject-output-visitor.c
++++ b/tests/test-qobject-output-visitor.c
+@@ -17,6 +17,7 @@
+ #include "qapi/qobject-output-visitor.h"
+ #include "test-qapi-visit.h"
+ #include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qjson.h"
+diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
+index c594b5bd97..495dd1e7ef 100644
+--- a/tests/test-x86-cpuid-compat.c
++++ b/tests/test-x86-cpuid-compat.c
+@@ -1,6 +1,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qbool.h"
+ #include "libqtest.h"
+diff --git a/ui/vnc-palette.h b/ui/vnc-palette.h
+index 1bd4318f53..e9f0eaf73b 100644
+--- a/ui/vnc-palette.h
++++ b/ui/vnc-palette.h
+@@ -29,7 +29,6 @@
+ #ifndef VNC_PALETTE_H
+ #define VNC_PALETTE_H
  
--    pte = s390_guest_io_table_walk(s390_pci_get_table_origin(iommu->g_iota),
--                                   addr);
--    if (!pte) {
--        return ret;
--    }
-+    error = s390_guest_io_table_walk(iommu->g_iota, addr, &entry);
+-#include "qapi/qmp/qlist.h"
+ #include "qemu/queue.h"
  
--    flags = pte & ZPCI_PTE_FLAG_MASK;
--    ret.iova = addr;
--    ret.translated_addr = pte & ZPCI_PTE_ADDR_MASK;
--    ret.addr_mask = 0xfff;
-+    ret.iova = entry.iova;
-+    ret.translated_addr = entry.translated_addr;
-+    ret.addr_mask = entry.len - 1;
-+    ret.perm = entry.perm;
+ #define VNC_PALETTE_HASH_SIZE 256
+diff --git a/util/keyval.c b/util/keyval.c
+index 7dfc75cf01..4085282a7a 100644
+--- a/util/keyval.c
++++ b/util/keyval.c
+@@ -81,6 +81,7 @@
  
--    if (flags & ZPCI_PTE_INVALID) {
--        ret.perm = IOMMU_NONE;
--    } else {
--        ret.perm = IOMMU_RW;
-+    if ((flag != IOMMU_NONE) && !(flag & ret.perm)) {
-+        error = ERR_EVENT_TPROTE;
-+    }
-+err:
-+    if (error) {
-+        iommu->pbdev->state = ZPCI_FS_ERROR;
-+        s390_pci_generate_error_event(error, iommu->pbdev->fh,
-+                                      iommu->pbdev->fid, addr, 0);
-     }
--
-     return ret;
- }
- 
-diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-index 2993f0ddef..ca22ef393b 100644
---- a/hw/s390x/s390-pci-bus.h
-+++ b/hw/s390x/s390-pci-bus.h
-@@ -148,6 +148,8 @@ enum ZpciIoatDtype {
- #define ZPCI_STE_FLAG_MASK      0x7ffULL
- #define ZPCI_STE_ADDR_MASK      (~ZPCI_STE_FLAG_MASK)
- 
-+#define ZPCI_SFAA_MASK          (~((1ULL << 20) - 1))
-+
- /* I/O Page tables */
- #define ZPCI_PTE_VALID_MASK             0x400
- #define ZPCI_PTE_INVALID                0x400
-@@ -165,6 +167,7 @@ enum ZpciIoatDtype {
- #define ZPCI_TABLE_INVALID              0x20
- #define ZPCI_TABLE_PROTECTED            0x200
- #define ZPCI_TABLE_UNPROTECTED          0x000
-+#define ZPCI_TABLE_FC                   0x400
- 
- #define ZPCI_TABLE_VALID_MASK           0x20
- #define ZPCI_TABLE_PROT_MASK            0x200
-@@ -253,6 +256,13 @@ typedef struct S390MsixInfo {
-     uint32_t pba_offset;
- } S390MsixInfo;
- 
-+typedef struct S390IOTLBEntry {
-+    uint64_t iova;
-+    uint64_t translated_addr;
-+    uint64_t len;
-+    uint64_t perm;
-+} S390IOTLBEntry;
-+
- typedef struct S390PCIBusDevice S390PCIBusDevice;
- typedef struct S390PCIIOMMU {
-     Object parent_obj;
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index be449210d9..63fa06fb97 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -644,16 +644,6 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
- 
-     while (start < end) {
-         entry = imrc->translate(iommu_mr, start, IOMMU_NONE);
--
--        if (!entry.translated_addr) {
--            pbdev->state = ZPCI_FS_ERROR;
--            setcc(cpu, ZPCI_PCI_LS_ERR);
--            s390_set_status_code(env, r1, ZPCI_PCI_ST_INSUF_RES);
--            s390_pci_generate_error_event(ERR_EVENT_SERR, pbdev->fh, pbdev->fid,
--                                          start, ERR_EVENT_Q_BIT);
--            goto out;
--        }
--
-         memory_region_notify_iommu(iommu_mr, entry);
-         start += entry.addr_mask + 1;
-     }
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
+diff --git a/util/qemu-config.c b/util/qemu-config.c
+index 26ea248062..230c699a51 100644
+--- a/util/qemu-config.c
++++ b/util/qemu-config.c
+@@ -1,5 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qlist.h"
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
 -- 
-2.14.3 (Apple Git-98)
+2.13.6
