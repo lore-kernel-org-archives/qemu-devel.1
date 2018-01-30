@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1egSVl-0001ue-Uf
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:34 -0500
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1egSVn-0001v3-Vs
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1egSVf-00033F-SB
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52216
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1egSVk-00036n-0l
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1egSVf-00030a-KN
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:23 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0U9ifaW087405
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 04:47:22 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ftkubxpq0-1
+	id 1egSVj-00036N-PA
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:47:27 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0U9l5L5137477
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 04:47:26 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ftkcyqrcx-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 04:47:21 -0500
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 04:47:26 -0500
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Tue, 30 Jan 2018 04:47:21 -0500
+	Tue, 30 Jan 2018 04:47:23 -0500
 From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Tue, 30 Jan 2018 10:47:12 +0100
-Message-Id: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 0/3] s390x/pci: fixup and optimize IOTLB code
+Date: Tue, 30 Jan 2018 10:47:15 +0100
+In-Reply-To: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
+References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
+Message-Id: <20180130094715.11578-4-zyimin@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 3/3] s390x/pci: use the right pal and pba in
+ reg_ioat()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,53 +41,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, alex.williamson@redhat.com, marcel@redhat.com, zyimin@linux.vnet.ibm.com
 
-This series contains three patches,
-1) optimizes the code including walking DMA tables and rpcit handler
-2) fixes the issue caused by IOTLB global refresh 
-3) uses the right pal and pba when registering ioat
+When registering ioat, pba should be comprised of leftmost 52 bits and
+rightmost 12 binary zeros, and pal should be comprised of leftmost 52
+bits and right most 12 binary ones. Let's fixup this.
 
-The issue mentioned above was found when we tested SMC-r tools. This
-behavior has been introduced when linux guest started using a global
-refresh to purge the whole IOTLB of invalid entries in a lazy fashion
-instead of flushing each entry when invalidating table entries.
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+---
+ hw/s390x/s390-pci-inst.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-The previous QEMU implementation didn't keep track of the mapping,
-didn't handle correctly the global flush demand from the guest and a
-major part of the IOTLB entries were not flushed.
-
-Consequently linux kernel on the host keeping the previous mapping
-reports, as it should, -EEXIST DMA mapping error on the next mapping
-with the same IOVA. The second patch fixes this issue.
-
-During the investigation, we noticed that the current code walking
-PCI IOMMU page tables didn't check important flags of table entries,
-including:
-1) protection bit
-2) table length
-3) table offset
-4) intermediate tables' invalid bit
-5) format control bit
-
-We implement the checking in the first patch before handling the
-IOTLB global refresh issue. To keep track of the mapped IOTLB entries
-and be able to check if the host IOTLB entries need to be refreshed
-we implement a IOTLB cache in QEMU, and introduce some helper
-functions to check these bits. All S390IOTLBEntry instances are stored
-in a new hashtable which are indexed by IOVA. Each PCI device has its
-own IOMMU. Therefore each IOMMU also has its own hashtable caching
-corresponding PCI device's DMA entries. Finally, we split 1M
-contiguous DMA range into 4K pages to do DMA map, and the code about
-error notification is also optimized.
-
-Yi Min Zhao (3):
-  s390x/pci: fixup the code walking IOMMU tables
-  s390x/pci: fixup global refresh
-  s390x/pci: use the right pal and pba in reg_ioat()
-
- hw/s390x/s390-pci-bus.c  | 233 ++++++++++++++++++++++++++++++++++++++---------
- hw/s390x/s390-pci-bus.h  |  13 +++
- hw/s390x/s390-pci-inst.c | 103 ++++++++++++++-------
- 3 files changed, 271 insertions(+), 78 deletions(-)
-
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 997a9cc2e9..3fcc330fe3 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -865,6 +865,8 @@ static int reg_ioat(CPUS390XState *env, S390PCIIOMMU *iommu, ZpciFib fib,
+     uint8_t dt = (g_iota >> 2) & 0x7;
+     uint8_t t = (g_iota >> 11) & 0x1;
+ 
++    pba &= ~0xfff;
++    pal |= 0xfff;
+     if (pba > pal || pba < ZPCI_SDMA_ADDR || pal > ZPCI_EDMA_ADDR) {
+         s390_program_interrupt(env, PGM_OPERAND, 6, ra);
+         return -EINVAL;
 -- 
 2.14.3 (Apple Git-98)
