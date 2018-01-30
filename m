@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXQw-0000QF-R8
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:52 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1egXQv-0000Ob-A9
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXQn-0005d1-Ax
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:50 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1egXQk-0005cW-Vg
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:49 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jan 2018 15:02:21 +0000
-Message-Id: <1517324542-6607-7-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 30 Jan 2018 15:02:17 +0000
+Message-Id: <1517324542-6607-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
 References: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 6/7] target/arm: Make exception vector loads
- honour the SAU
+Subject: [Qemu-devel] [PATCH 2/7] target/arm: Split "get pending exception
+ info" from "acknowledge it"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +23,209 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Make the load of the exception vector from the vector table honour
-the SAU and any bus error on the load (possibly provoking a derived
-exception), rather than simply aborting if the load fails.
+Currently armv7m_nvic_acknowledge_irq() does three things:
+ * make the current highest priority pending interrupt active
+ * return a bool indicating whether that interrupt is targeting
+   Secure or NonSecure state
+ * implicitly tell the caller which is the highest priority
+   pending interrupt by setting env->v7m.exception
+
+We need to split these jobs, because v7m_exception_taken()
+needs to know whether the pending interrupt targets Secure so
+it can choose to stack callee-saves registers or not, but it
+must not make the interrupt active until after it has done
+that stacking, in case the stacking causes a derived exception.
+Similarly, it needs to know the number of the pending interrupt
+so it can read the correct vector table entry before the
+interrupt is made active, because vector table reads might
+also cause a derived exception.
+
+Create a new armv7m_nvic_get_pending_irq_info() function which simply
+returns information about the highest priority pending interrupt, and
+use it to rearrange the v7m_exception_taken() code so we don't
+acknowledge the exception until we've done all the things which could
+possibly cause a derived exception.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 71 +++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 55 insertions(+), 16 deletions(-)
+ target/arm/cpu.h      | 19 ++++++++++++++++---
+ hw/intc/armv7m_nvic.c | 30 +++++++++++++++++++++++-------
+ target/arm/helper.c   | 16 ++++++++++++----
+ hw/intc/trace-events  |  3 ++-
+ 4 files changed, 53 insertions(+), 15 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9ed03e6..f21f68e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1519,16 +1519,29 @@ void armv7m_nvic_set_pending(void *opaque, int irq, bool secure);
+  */
+ void armv7m_nvic_set_pending_derived(void *opaque, int irq, bool secure);
+ /**
++ * armv7m_nvic_get_pending_irq_info: return highest priority pending
++ *    exception, and whether it targets Secure state
++ * @opaque: the NVIC
++ * @pirq: set to pending exception number
++ * @ptargets_secure: set to whether pending exception targets Secure
++ *
++ * This function writes the number of the highest priority pending
++ * exception (the one which would be made active by
++ * armv7m_nvic_acknowledge_irq()) to @pirq, and sets @ptargets_secure
++ * to true if the current highest priority pending exception should
++ * be taken to Secure state, false for NS.
++ */
++void armv7m_nvic_get_pending_irq_info(void *opaque, int *pirq,
++                                      bool *ptargets_secure);
++/**
+  * armv7m_nvic_acknowledge_irq: make highest priority pending exception active
+  * @opaque: the NVIC
+  *
+  * Move the current highest priority pending exception from the pending
+  * state to the active state, and update v7m.exception to indicate that
+  * it is the exception currently being handled.
+- *
+- * Returns: true if exception should be taken to Secure state, false for NS
+  */
+-bool armv7m_nvic_acknowledge_irq(void *opaque);
++void armv7m_nvic_acknowledge_irq(void *opaque);
+ /**
+  * armv7m_nvic_complete_irq: complete specified interrupt or exception
+  * @opaque: the NVIC
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index b4a6e7c..360889d 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -650,24 +650,20 @@ void armv7m_nvic_set_pending_derived(void *opaque, int irq, bool secure)
+ }
+ 
+ /* Make pending IRQ active.  */
+-bool armv7m_nvic_acknowledge_irq(void *opaque)
++void armv7m_nvic_acknowledge_irq(void *opaque)
+ {
+     NVICState *s = (NVICState *)opaque;
+     CPUARMState *env = &s->cpu->env;
+     const int pending = s->vectpending;
+     const int running = nvic_exec_prio(s);
+     VecInfo *vec;
+-    bool targets_secure;
+ 
+     assert(pending > ARMV7M_EXCP_RESET && pending < s->num_irq);
+ 
+     if (s->vectpending_is_s_banked) {
+         vec = &s->sec_vectors[pending];
+-        targets_secure = true;
+     } else {
+         vec = &s->vectors[pending];
+-        targets_secure = !exc_is_banked(s->vectpending) &&
+-            exc_targets_secure(s, s->vectpending);
+     }
+ 
+     assert(vec->enabled);
+@@ -675,7 +671,7 @@ bool armv7m_nvic_acknowledge_irq(void *opaque)
+ 
+     assert(s->vectpending_prio < running);
+ 
+-    trace_nvic_acknowledge_irq(pending, s->vectpending_prio, targets_secure);
++    trace_nvic_acknowledge_irq(pending, s->vectpending_prio);
+ 
+     vec->active = 1;
+     vec->pending = 0;
+@@ -683,8 +679,28 @@ bool armv7m_nvic_acknowledge_irq(void *opaque)
+     write_v7m_exception(env, s->vectpending);
+ 
+     nvic_irq_update(s);
++}
++
++void armv7m_nvic_get_pending_irq_info(void *opaque,
++                                      int *pirq, bool *ptargets_secure)
++{
++    NVICState *s = (NVICState *)opaque;
++    const int pending = s->vectpending;
++    bool targets_secure;
++
++    assert(pending > ARMV7M_EXCP_RESET && pending < s->num_irq);
++
++    if (s->vectpending_is_s_banked) {
++        targets_secure = true;
++    } else {
++        targets_secure = !exc_is_banked(pending) &&
++            exc_targets_secure(s, pending);
++    }
++
++    trace_nvic_get_pending_irq_info(pending, targets_secure);
+ 
+-    return targets_secure;
++    *ptargets_secure = targets_secure;
++    *pirq = pending;
+ }
+ 
+ int armv7m_nvic_complete_irq(void *opaque, int irq, bool secure)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index de0031b..6931a9d 100644
+index bfce096..6062f38 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -6449,28 +6449,63 @@ static uint32_t *get_v7m_sp_ptr(CPUARMState *env, bool secure, bool threadmode,
+@@ -6395,12 +6395,12 @@ static uint32_t *get_v7m_sp_ptr(CPUARMState *env, bool secure, bool threadmode,
      }
  }
  
--static uint32_t arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure)
-+static bool arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure,
-+                                uint32_t *pvec)
+-static uint32_t arm_v7m_load_vector(ARMCPU *cpu, bool targets_secure)
++static uint32_t arm_v7m_load_vector(ARMCPU *cpu, int exc, bool targets_secure)
  {
      CPUState *cs = CPU(cpu);
      CPUARMState *env = &cpu->env;
      MemTxResult result;
--    hwaddr vec = env->v7m.vecbase[targets_secure] + exc * 4;
--    uint32_t addr;
-+    uint32_t addr = env->v7m.vecbase[targets_secure] + exc * 4;
-+    uint32_t vector_entry;
-+    MemTxAttrs attrs = {};
-+    ARMMMUIdx mmu_idx;
-+    bool exc_secure;
-+
-+    mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, targets_secure, true);
+-    hwaddr vec = env->v7m.vecbase[targets_secure] + env->v7m.exception * 4;
++    hwaddr vec = env->v7m.vecbase[targets_secure] + exc * 4;
+     uint32_t addr;
  
--    addr = address_space_ldl(cs->as, vec,
--                             MEMTXATTRS_UNSPECIFIED, &result);
-+    /* We don't do a get_phys_addr() here because the rules for vector
-+     * loads are special: they always use the default memory map, and
-+     * the default memory map permits reads from all addresses.
-+     * Since there's no easy way to pass through to pmsav8_mpu_lookup()
-+     * that we want this special case which would always say "yes",
-+     * we just do the SAU lookup here followed by a direct physical load.
-+     */
-+    attrs.secure = targets_secure;
-+    attrs.user = false;
-+
-+    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+        V8M_SAttributes sattrs = {};
-+
-+        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, &sattrs);
-+        if (sattrs.ns) {
-+            attrs.secure = false;
-+        } else if (!targets_secure) {
-+            /* NS access to S memory */
-+            goto load_fail;
-+        }
-+    }
-+
-+    vector_entry = address_space_ldl(arm_addressspace(cs, attrs), addr,
-+                                     attrs, &result);
-     if (result != MEMTX_OK) {
--        /* Architecturally this should cause a HardFault setting HSFR.VECTTBL,
--         * which would then be immediately followed by our failing to load
--         * the entry vector for that HardFault, which is a Lockup case.
--         * Since we don't model Lockup, we just report this guest error
--         * via cpu_abort().
--         */
--        cpu_abort(cs, "Failed to read from %s exception vector table "
--                  "entry %08x\n", targets_secure ? "secure" : "nonsecure",
--                  (unsigned)vec);
-+        goto load_fail;
+     addr = address_space_ldl(cs->as, vec,
+@@ -6462,8 +6462,9 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
+     CPUARMState *env = &cpu->env;
+     uint32_t addr;
+     bool targets_secure;
++    int exc;
+ 
+-    targets_secure = armv7m_nvic_acknowledge_irq(env->nvic);
++    armv7m_nvic_get_pending_irq_info(env->nvic, &exc, &targets_secure);
+ 
+     if (arm_feature(env, ARM_FEATURE_V8)) {
+         if (arm_feature(env, ARM_FEATURE_M_SECURITY) &&
+@@ -6531,6 +6532,14 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
+         }
      }
--    return addr;
-+    *pvec = vector_entry;
-+    return true;
+ 
++    addr = arm_v7m_load_vector(cpu, exc, targets_secure);
 +
-+load_fail:
-+    /* All vector table fetch fails are reported as HardFault, with
-+     * HFSR.VECTTBL and .FORCED set. (FORCED is set because
-+     * technically the underlying exception is a MemManage or BusFault
-+     * that is escalated to HardFault.) This is a terminal exception,
-+     * so we will either take the HardFault immediately or else enter
-+     * lockup (the latter case is handled in armv7m_nvic_set_pending_derived()).
++    /* Now we've done everything that might cause a derived exception
++     * we can go ahead and activate whichever exception we're going to
++     * take (which might now be the derived exception).
 +     */
-+    exc_secure = targets_secure ||
-+        !(cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK);
-+    env->v7m.hfsr |= R_V7M_HFSR_VECTTBL_MASK | R_V7M_HFSR_FORCED_MASK;
-+    armv7m_nvic_set_pending_derived(env->nvic, ARMV7M_EXCP_HARD, exc_secure);
-+    return false;
++    armv7m_nvic_acknowledge_irq(env->nvic);
++
+     /* Switch to target security state -- must do this before writing SPSEL */
+     switch_v7m_security_state(env, targets_secure);
+     write_v7m_control_spsel(env, 0);
+@@ -6538,7 +6547,6 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain)
+     /* Clear IT bits */
+     env->condexec_bits = 0;
+     env->regs[14] = lr;
+-    addr = arm_v7m_load_vector(cpu, targets_secure);
+     env->regs[15] = addr & 0xfffffffe;
+     env->thumb = addr & 1;
  }
- 
- static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-@@ -6623,7 +6658,11 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-         return;
-     }
- 
--    addr = arm_v7m_load_vector(cpu, exc, targets_secure);
-+    if (!arm_v7m_load_vector(cpu, exc, targets_secure, &addr)) {
-+        /* Vector load failed: derived exception */
-+        v7m_exception_taken(cpu, lr, true, true);
-+        return;
-+    }
- 
-     /* Now we've done everything that might cause a derived exception
-      * we can go ahead and activate whichever exception we're going to
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index 09e87d1..4092d28 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -180,7 +180,8 @@ nvic_escalate_disabled(int irq) "NVIC escalating irq %d to HardFault: disabled"
+ nvic_set_pending(int irq, bool secure, bool derived, int en, int prio) "NVIC set pending irq %d secure-bank %d derived %d (enabled: %d priority %d)"
+ nvic_clear_pending(int irq, bool secure, int en, int prio) "NVIC clear pending irq %d secure-bank %d (enabled: %d priority %d)"
+ nvic_set_pending_level(int irq) "NVIC set pending: irq %d higher prio than vectpending: setting irq line to 1"
+-nvic_acknowledge_irq(int irq, int prio, bool targets_secure) "NVIC acknowledge IRQ: %d now active (prio %d targets_secure %d)"
++nvic_acknowledge_irq(int irq, int prio) "NVIC acknowledge IRQ: %d now active (prio %d)"
++nvic_get_pending_irq_info(int irq, bool secure) "NVIC next IRQ %d: targets_secure: %d"
+ nvic_complete_irq(int irq, bool secure) "NVIC complete IRQ %d (secure %d)"
+ nvic_set_irq_level(int irq, int level) "NVIC external irq %d level set to %d"
+ nvic_sysreg_read(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
 -- 
 2.7.4
