@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egZt4-0008Kb-GA
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:07 -0500
+	(envelope-from <groug@kaod.org>) id 1egZt3-0008KC-26
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egZt0-0004O8-C6
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46912)
+	(envelope-from <groug@kaod.org>) id 1egZsy-0004MF-Qp
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:40:01 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43448
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egZt0-0004D0-2C
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:39:58 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0UHddVN139360
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:49 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ftvw696b5-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egZsy-0004Bf-Lw
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 12:39:56 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0UHdbIp065931
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:46 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ftupvmvv2-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:48 -0500
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 12:39:45 -0500
 Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 30 Jan 2018 17:39:44 -0000
+	Tue, 30 Jan 2018 17:39:43 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 30 Jan 2018 18:39:32 +0100
+Date: Tue, 30 Jan 2018 18:39:26 +0100
 In-Reply-To: <20180130173935.5172-1-groug@kaod.org>
 References: <20180130173935.5172-1-groug@kaod.org>
-Message-Id: <20180130173935.5172-8-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 07/10] tests: virtio-9p: add WRITE operation test
+Message-Id: <20180130173935.5172-2-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 01/10] 9pfs: drop v9fs_register_transport()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,157 +40,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-Trivial test of a successful write.
+No good reasons to do this outside of v9fs_device_realize_common().
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-(groug, handle potential overflow when computing request size)
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/9pfs/9p-synth.c     | 11 +++++++++
- hw/9pfs/9p-synth.h     |  1 +
- tests/virtio-9p-test.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 74 insertions(+)
+ hw/9pfs/9p.c               |  6 +++++-
+ hw/9pfs/9p.h               | 10 ++--------
+ hw/9pfs/virtio-9p-device.c |  8 ++------
+ hw/9pfs/xen-9p-backend.c   |  3 +--
+ 4 files changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
-index f17b74f44461..f2d59a90a670 100644
---- a/hw/9pfs/9p-synth.c
-+++ b/hw/9pfs/9p-synth.c
-@@ -515,6 +515,12 @@ static int synth_unlinkat(FsContext *ctx, V9fsPath *dir,
-     return -1;
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 909a61139405..364c7cb44628 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3485,7 +3485,8 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
  }
  
-+static ssize_t v9fs_synth_qtest_write(void *buf, int len, off_t offset,
-+                                      void *arg)
-+{
-+    return len;
-+}
-+
- static int synth_init(FsContext *ctx, Error **errp)
+ /* Returns 0 on success, 1 on failure. */
+-int v9fs_device_realize_common(V9fsState *s, Error **errp)
++int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
++                               Error **errp)
  {
-     QLIST_INIT(&synth_root.child);
-@@ -546,6 +552,11 @@ static int synth_init(FsContext *ctx, Error **errp)
-         ret = qemu_v9fs_synth_add_file(NULL, 0, QTEST_V9FS_SYNTH_LOPEN_FILE,
-                                        NULL, NULL, ctx);
-         assert(!ret);
+     int i, len;
+     struct stat stat;
+@@ -3493,6 +3494,9 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
+     V9fsPath path;
+     int rc = 1;
+ 
++    assert(!s->transport);
++    s->transport = t;
 +
-+        /* File for WRITE test */
-+        ret = qemu_v9fs_synth_add_file(NULL, 0, QTEST_V9FS_SYNTH_WRITE_FILE,
-+                                       NULL, v9fs_synth_qtest_write, ctx);
-+        assert(!ret);
+     /* initialize pdu allocator */
+     QLIST_INIT(&s->free_list);
+     QLIST_INIT(&s->active_list);
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index ffe658ab8975..5ced427d861b 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -346,7 +346,8 @@ void v9fs_path_sprintf(V9fsPath *path, const char *fmt, ...);
+ void v9fs_path_copy(V9fsPath *lhs, V9fsPath *rhs);
+ int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
+                       const char *name, V9fsPath *path);
+-int v9fs_device_realize_common(V9fsState *s, Error **errp);
++int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
++                               Error **errp);
+ void v9fs_device_unrealize_common(V9fsState *s, Error **errp);
+ 
+ V9fsPDU *pdu_alloc(V9fsState *s);
+@@ -366,11 +367,4 @@ struct V9fsTransport {
+     void        (*push_and_notify)(V9fsPDU *pdu);
+ };
+ 
+-static inline int v9fs_register_transport(V9fsState *s, const V9fsTransport *t)
+-{
+-    assert(!s->transport);
+-    s->transport = t;
+-    return 0;
+-}
+-
+ #endif
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index 43f4e53f336f..775e8ff76671 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -198,17 +198,13 @@ static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
+     V9fsVirtioState *v = VIRTIO_9P(dev);
+     V9fsState *s = &v->state;
+ 
+-    if (v9fs_device_realize_common(s, errp)) {
+-        goto out;
++    if (v9fs_device_realize_common(s, &virtio_9p_transport, errp)) {
++        return;
      }
  
+     v->config_size = sizeof(struct virtio_9p_config) + strlen(s->fsconf.tag);
+     virtio_init(vdev, "virtio-9p", VIRTIO_ID_9P, v->config_size);
+     v->vq = virtio_add_queue(vdev, MAX_REQ, handle_9p_output);
+-    v9fs_register_transport(s, &virtio_9p_transport);
+-
+-out:
+-    return;
+ }
+ 
+ static void virtio_9p_device_unrealize(DeviceState *dev, Error **errp)
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index df2a4100bf55..14f0d6a50e75 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -446,7 +446,6 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+     xen_9pdev->id = s->fsconf.fsdev_id =
+         g_strdup_printf("xen9p%d", xendev->dev);
+     xen_9pdev->tag = s->fsconf.tag = xenstore_read_fe_str(xendev, "tag");
+-    v9fs_register_transport(s, &xen_9p_transport);
+     fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
+             s->fsconf.tag,
+             1, NULL);
+@@ -455,7 +454,7 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+     qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
+     qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
+     qemu_fsdev_add(fsdev);
+-    v9fs_device_realize_common(s, NULL);
++    v9fs_device_realize_common(s, &xen_9p_transport, NULL);
+ 
      return 0;
-diff --git a/hw/9pfs/9p-synth.h b/hw/9pfs/9p-synth.h
-index 2a8d6fd00d69..a74032d7bd9a 100644
---- a/hw/9pfs/9p-synth.h
-+++ b/hw/9pfs/9p-synth.h
-@@ -53,5 +53,6 @@ int qemu_v9fs_synth_add_file(V9fsSynthNode *parent, int mode,
  
- #define QTEST_V9FS_SYNTH_WALK_FILE "WALK%d"
- #define QTEST_V9FS_SYNTH_LOPEN_FILE "LOPEN"
-+#define QTEST_V9FS_SYNTH_WRITE_FILE "WRITE"
- 
- #endif
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 6ba782e24f3a..37a7dae3f78e 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -150,6 +150,13 @@ static void v9fs_uint32_write(P9Req *req, uint32_t val)
-     v9fs_memwrite(req, &le_val, 4);
- }
- 
-+static void v9fs_uint64_write(P9Req *req, uint64_t val)
-+{
-+    uint64_t le_val = cpu_to_le64(val);
-+
-+    v9fs_memwrite(req, &le_val, 8);
-+}
-+
- static void v9fs_uint32_read(P9Req *req, uint32_t *val)
- {
-     v9fs_memread(req, val, 4);
-@@ -239,6 +246,7 @@ static const char *rmessage_name(uint8_t id)
-         id == P9_RATTACH ? "RATTACH" :
-         id == P9_RWALK ? "RWALK" :
-         id == P9_RLOPEN ? "RLOPEN" :
-+        id == P9_RWRITE ? "RWRITE" :
-         "<unknown>";
- }
- 
-@@ -418,6 +426,34 @@ static void v9fs_rlopen(P9Req *req, v9fs_qid *qid, uint32_t *iounit)
-     v9fs_req_free(req);
- }
- 
-+/* size[4] Twrite tag[2] fid[4] offset[8] count[4] data[count] */
-+static P9Req *v9fs_twrite(QVirtIO9P *v9p, uint32_t fid, uint64_t offset,
-+                          uint32_t count, const void *data, uint16_t tag)
-+{
-+    P9Req *req;
-+    uint32_t body_size = 4 + 8 + 4;
-+
-+    g_assert_cmpint(body_size, <=, UINT32_MAX - count);
-+    body_size += count;
-+    req = v9fs_req_init(v9p,  body_size, P9_TWRITE, tag);
-+    v9fs_uint32_write(req, fid);
-+    v9fs_uint64_write(req, offset);
-+    v9fs_uint32_write(req, count);
-+    v9fs_memwrite(req, data, count);
-+    v9fs_req_send(req);
-+    return req;
-+}
-+
-+/* size[4] Rwrite tag[2] count[4] */
-+static void v9fs_rwrite(P9Req *req, uint32_t *count)
-+{
-+    v9fs_req_recv(req, P9_RWRITE);
-+    if (count) {
-+        v9fs_uint32_read(req, count);
-+    }
-+    v9fs_req_free(req);
-+}
-+
- static void fs_version(QVirtIO9P *v9p)
- {
-     const char *version = "9P2000.L";
-@@ -524,6 +560,31 @@ static void fs_lopen(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
-+static void fs_write(QVirtIO9P *v9p)
-+{
-+    static const uint32_t write_count = P9_MAX_SIZE / 2;
-+    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_WRITE_FILE) };
-+    char *buf = g_malloc(write_count);
-+    uint32_t count;
-+    P9Req *req;
-+
-+    fs_attach(v9p);
-+    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-+    v9fs_rwalk(req, NULL, NULL);
-+
-+    req = v9fs_tlopen(v9p, 1, O_WRONLY, 0);
-+    v9fs_req_wait_for_reply(req);
-+    v9fs_rlopen(req, NULL, NULL);
-+
-+    req = v9fs_twrite(v9p, 1, 0, write_count, buf, 0);
-+    v9fs_req_wait_for_reply(req);
-+    v9fs_rwrite(req, &count);
-+    g_assert_cmpint(count, ==, write_count);
-+
-+    g_free(wnames[0]);
-+}
-+
- typedef void (*v9fs_test_fn)(QVirtIO9P *v9p);
- 
- static void v9fs_run_pci_test(gconstpointer data)
-@@ -554,6 +615,7 @@ int main(int argc, char **argv)
-     v9fs_qtest_pci_add("/virtio/9p/pci/fs/walk/dotdot_from_root",
-                        fs_walk_dotdot);
-     v9fs_qtest_pci_add("/virtio/9p/pci/fs/lopen/basic", fs_lopen);
-+    v9fs_qtest_pci_add("/virtio/9p/pci/fs/write/basic", fs_write);
- 
-     return g_test_run();
- }
 -- 
 2.13.6
