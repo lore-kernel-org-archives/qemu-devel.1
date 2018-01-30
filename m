@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXQu-0000O0-Mg
+	(envelope-from <pm215@archaic.org.uk>) id 1egXQq-0000Jo-Gv
 	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1egXQp-0005ee-Qc
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:48 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1egXQp-0005dt-0S
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 10:02:44 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jan 2018 15:02:22 +0000
-Message-Id: <1517324542-6607-8-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 30 Jan 2018 15:02:16 +0000
+Message-Id: <1517324542-6607-2-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
 References: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 7/7] target/arm: Handle exceptions during
- exception stack pop
+Subject: [Qemu-devel] [PATCH 1/7] target/arm: Add
+ armv7m_nvic_set_pending_derived()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,164 +23,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Handle possible MPU faults, SAU faults or bus errors when
-popping register state off the stack during exception return.
+In order to support derived exceptions (exceptions generated in
+the course of trying to take an exception), we need to be able
+to handle prioritizing whether to take the original exception
+or the derived exception.
+
+We do this by introducing a new function
+armv7m_nvic_set_pending_derived() which the exception-taking code in
+helper.c will call when a derived exception occurs.  Derived
+exceptions are dealt with mostly like normal pending exceptions, so
+we share the implementation with the armv7m_nvic_set_pending()
+function.
+
+Note that the way we structure this is significantly different
+from the v8M Arm ARM pseudocode: that does all the prioritization
+logic in the DerivedLateArrival() function, whereas we choose to
+let the existing "identify highest priority exception" logic
+do the prioritization for us. The effect is the same, though.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 115 ++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 94 insertions(+), 21 deletions(-)
+ target/arm/cpu.h      | 13 ++++++++++
+ hw/intc/armv7m_nvic.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ hw/intc/trace-events  |  2 +-
+ 3 files changed, 80 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 6931a9d..3332565 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6223,6 +6223,67 @@ pend_fault:
-     return false;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index d2bb59e..9ed03e6 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1506,6 +1506,19 @@ static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
+  */
+ void armv7m_nvic_set_pending(void *opaque, int irq, bool secure);
+ /**
++ * armv7m_nvic_set_pending_derived: mark this derived exception as pending
++ * @opaque: the NVIC
++ * @irq: the exception number to mark pending
++ * @secure: false for non-banked exceptions or for the nonsecure
++ * version of a banked exception, true for the secure version of a banked
++ * exception.
++ *
++ * Similar to armv7m_nvic_set_pending(), but specifically for derived
++ * exceptions (exceptions generated in the course of trying to take
++ * a different exception).
++ */
++void armv7m_nvic_set_pending_derived(void *opaque, int irq, bool secure);
++/**
+  * armv7m_nvic_acknowledge_irq: make highest priority pending exception active
+  * @opaque: the NVIC
+  *
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 8ca6cee..b4a6e7c 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -503,8 +503,25 @@ static void armv7m_nvic_clear_pending(void *opaque, int irq, bool secure)
+     }
  }
  
-+static bool v7m_stack_read(ARMCPU *cpu, uint32_t *dest, uint32_t addr,
-+                           ARMMMUIdx mmu_idx)
-+{
-+    CPUState *cs = CPU(cpu);
-+    CPUARMState *env = &cpu->env;
-+    MemTxAttrs attrs = {};
-+    MemTxResult txres;
-+    target_ulong page_size;
-+    hwaddr physaddr;
-+    int prot;
-+    ARMMMUFaultInfo fi;
-+    bool secure = mmu_idx & ARM_MMU_IDX_M_S;
-+    int exc;
-+    bool exc_secure;
-+    uint32_t value;
-+
-+    if (get_phys_addr(env, addr, MMU_DATA_LOAD, mmu_idx, &physaddr,
-+                      &attrs, &prot, &page_size, &fi, NULL)) {
-+        /* MPU/SAU lookup failed */
-+        if (fi.type == ARMFault_QEMU_SFault) {
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...SecureFault with SFSR.AUVIOL during unstack\n");
-+            env->v7m.sfsr |= R_V7M_SFSR_AUVIOL_MASK | R_V7M_SFSR_SFARVALID_MASK;
-+            env->v7m.sfar = addr;
-+            exc = ARMV7M_EXCP_SECURE;
-+            exc_secure = true;
-+        } else {
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...MemManageFault with CFSR.MUNSTKERR\n");
-+            env->v7m.cfsr[secure] |= R_V7M_CFSR_MUNSTKERR_MASK;
-+            exc = ARMV7M_EXCP_MEM;
-+            exc_secure = secure;
-+        }
-+        goto pend_fault;
-+    }
-+
-+    value = address_space_ldl(arm_addressspace(cs, attrs), physaddr,
-+                              attrs, &txres);
-+    if (txres != MEMTX_OK) {
-+        /* BusFault trying to read the data */
-+        qemu_log_mask(CPU_LOG_INT, "...BusFault with BFSR.UNSTKERR\n");
-+        env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_UNSTKERR_MASK;
-+        exc = ARMV7M_EXCP_BUS;
-+        exc_secure = false;
-+        goto pend_fault;
-+    }
-+
-+    *dest = value;
-+    return true;
-+
-+pend_fault:
-+    /* By pending the exception at this point we are making
-+     * the IMPDEF choice "overridden exceptions pended" (see the
-+     * MergeExcInfo() pseudocode). The other choice would be to not
-+     * pend them now and then make a choice about which to throw away
-+     * later if we have two derived exceptions.
-+     */
-+    armv7m_nvic_set_pending(env->nvic, exc, exc_secure);
-+    return false;
-+}
-+
- /* Return true if we're using the process stack pointer (not the MSP) */
- static bool v7m_using_psp(CPUARMState *env)
+-void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
++static void do_armv7m_nvic_set_pending(void *opaque, int irq, bool secure,
++                                       bool derived)
  {
-@@ -6912,6 +6973,11 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-                                               !return_to_handler,
-                                               return_to_sp_process);
-         uint32_t frameptr = *frame_sp_p;
-+        bool pop_ok = true;
-+        ARMMMUIdx mmu_idx;
++    /* Pend an exception, including possibly escalating it to HardFault.
++     *
++     * This function handles both "normal" pending of interrupts and
++     * exceptions, and also derived exceptions (ones which occur as
++     * a result of trying to take some other exception).
++     *
++     * If derived == true, the caller guarantees that we are part way through
++     * trying to take an exception (but have not yet called
++     * armv7m_nvic_acknowledge_irq() to make it active), and so:
++     *  - s->vectpending is the "original exception" we were trying to take
++     *  - irq is the "derived exception"
++     *  - nvic_exec_prio(s) gives the priority before exception entry
++     * Here we handle the prioritization logic which the pseudocode puts
++     * in the DerivedLateArrival() function.
++     */
 +
-+        mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, return_to_secure,
-+                                                        !return_to_handler);
+     NVICState *s = (NVICState *)opaque;
+     bool banked = exc_is_banked(irq);
+     VecInfo *vec;
+@@ -514,7 +531,44 @@ void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
  
-         if (!QEMU_IS_ALIGNED(frameptr, 8) &&
-             arm_feature(env, ARM_FEATURE_V8)) {
-@@ -6938,29 +7004,38 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-                 return;
-             }
+     vec = (banked && secure) ? &s->sec_vectors[irq] : &s->vectors[irq];
  
--            env->regs[4] = ldl_phys(cs->as, frameptr + 0x8);
--            env->regs[5] = ldl_phys(cs->as, frameptr + 0xc);
--            env->regs[6] = ldl_phys(cs->as, frameptr + 0x10);
--            env->regs[7] = ldl_phys(cs->as, frameptr + 0x14);
--            env->regs[8] = ldl_phys(cs->as, frameptr + 0x18);
--            env->regs[9] = ldl_phys(cs->as, frameptr + 0x1c);
--            env->regs[10] = ldl_phys(cs->as, frameptr + 0x20);
--            env->regs[11] = ldl_phys(cs->as, frameptr + 0x24);
-+            pop_ok =
-+                v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[5], frameptr + 0xc, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[6], frameptr + 0x10, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[7], frameptr + 0x14, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[8], frameptr + 0x18, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[9], frameptr + 0x1c, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[10], frameptr + 0x20, mmu_idx) &&
-+                v7m_stack_read(cpu, &env->regs[11], frameptr + 0x24, mmu_idx);
- 
-             frameptr += 0x28;
-         }
- 
--        /* Pop registers. TODO: make these accesses use the correct
--         * attributes and address space (S/NS, priv/unpriv) and handle
--         * memory transaction failures.
--         */
--        env->regs[0] = ldl_phys(cs->as, frameptr);
--        env->regs[1] = ldl_phys(cs->as, frameptr + 0x4);
--        env->regs[2] = ldl_phys(cs->as, frameptr + 0x8);
--        env->regs[3] = ldl_phys(cs->as, frameptr + 0xc);
--        env->regs[12] = ldl_phys(cs->as, frameptr + 0x10);
--        env->regs[14] = ldl_phys(cs->as, frameptr + 0x14);
--        env->regs[15] = ldl_phys(cs->as, frameptr + 0x18);
-+        /* Pop registers */
-+        pop_ok = pop_ok &&
-+            v7m_stack_read(cpu, &env->regs[0], frameptr, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[1], frameptr + 0x4, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[2], frameptr + 0x8, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[3], frameptr + 0xc, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[12], frameptr + 0x10, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[14], frameptr + 0x14, mmu_idx) &&
-+            v7m_stack_read(cpu, &env->regs[15], frameptr + 0x18, mmu_idx) &&
-+            v7m_stack_read(cpu, &xpsr, frameptr + 0x1c, mmu_idx);
+-    trace_nvic_set_pending(irq, secure, vec->enabled, vec->prio);
++    trace_nvic_set_pending(irq, secure, derived, vec->enabled, vec->prio);
 +
-+        if (!pop_ok) {
-+            /* v7m_stack_read() pended a fault, so take it (as a tail
-+             * chained exception on the same stack frame)
++    if (derived) {
++        /* Derived exceptions are always synchronous. */
++        assert(irq >= ARMV7M_EXCP_HARD && irq < ARMV7M_EXCP_PENDSV);
++
++        if (irq == ARMV7M_EXCP_DEBUG &&
++            exc_group_prio(s, vec->prio, secure) >= nvic_exec_prio(s)) {
++            /* DebugMonitorFault, but its priority is lower than the
++             * preempted exception priority: just ignore it.
 +             */
-+            v7m_exception_taken(cpu, excret, true, false);
 +            return;
 +        }
++
++        if (irq == ARMV7M_EXCP_HARD && vec->prio >= s->vectpending_prio) {
++            /* If this is a terminal exception (one which means we cannot
++             * take the original exception, like a failure to read its
++             * vector table entry), then we must take the derived exception.
++             * If the derived exception can't take priority over the
++             * original exception, then we go into Lockup.
++             *
++             * For QEMU, we rely on the fact that a derived exception is
++             * terminal if and only if it's reported to us as HardFault,
++             * which saves having to have an extra argument is_terminal
++             * that we'd only use in one place.
++             */
++            cpu_abort(&s->cpu->parent_obj,
++                      "Lockup: can't take terminal derived exception "
++                      "(original exception priority %d)\n",
++                      s->vectpending_prio);
++        }
++        /* We now continue with the same code as for a normal pending
++         * exception, which will cause us to pend the derived exception.
++         * We'll then take either the original or the derived exception
++         * based on which is higher priority by the usual mechanism
++         * for selecting the highest priority pending interrupt.
++         */
++    }
  
-         /* Returning from an exception with a PC with bit 0 set is defined
-          * behaviour on v8M (bit 0 is ignored), but for v7M it was specified
-@@ -6979,8 +7054,6 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-             }
-         }
+     if (irq >= ARMV7M_EXCP_HARD && irq < ARMV7M_EXCP_PENDSV) {
+         /* If a synchronous exception is pending then it may be
+@@ -585,6 +639,16 @@ void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
+     }
+ }
  
--        xpsr = ldl_phys(cs->as, frameptr + 0x1c);
--
-         if (arm_feature(env, ARM_FEATURE_V8)) {
-             /* For v8M we have to check whether the xPSR exception field
-              * matches the EXCRET value for return to handler/thread
++void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
++{
++    do_armv7m_nvic_set_pending(opaque, irq, secure, false);
++}
++
++void armv7m_nvic_set_pending_derived(void *opaque, int irq, bool secure)
++{
++    do_armv7m_nvic_set_pending(opaque, irq, secure, true);
++}
++
+ /* Make pending IRQ active.  */
+ bool armv7m_nvic_acknowledge_irq(void *opaque)
+ {
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index be76918..09e87d1 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -177,7 +177,7 @@ nvic_set_prio(int irq, bool secure, uint8_t prio) "NVIC set irq %d secure-bank %
+ nvic_irq_update(int vectpending, int pendprio, int exception_prio, int level) "NVIC vectpending %d pending prio %d exception_prio %d: setting irq line to %d"
+ nvic_escalate_prio(int irq, int irqprio, int runprio) "NVIC escalating irq %d to HardFault: insufficient priority %d >= %d"
+ nvic_escalate_disabled(int irq) "NVIC escalating irq %d to HardFault: disabled"
+-nvic_set_pending(int irq, bool secure, int en, int prio) "NVIC set pending irq %d secure-bank %d (enabled: %d priority %d)"
++nvic_set_pending(int irq, bool secure, bool derived, int en, int prio) "NVIC set pending irq %d secure-bank %d derived %d (enabled: %d priority %d)"
+ nvic_clear_pending(int irq, bool secure, int en, int prio) "NVIC clear pending irq %d secure-bank %d (enabled: %d priority %d)"
+ nvic_set_pending_level(int irq) "NVIC set pending: irq %d higher prio than vectpending: setting irq line to 1"
+ nvic_acknowledge_irq(int irq, int prio, bool targets_secure) "NVIC acknowledge IRQ: %d now active (prio %d targets_secure %d)"
 -- 
 2.7.4
