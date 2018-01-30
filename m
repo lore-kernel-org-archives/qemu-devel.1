@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1egOgK-0003Kq-OP
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:42:10 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1egOus-00073P-Mr
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1egOgJ-0007jO-9p
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:42:08 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36974)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1egOgI-0007if-VG
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:42:07 -0500
-Received: by mail-wr0-x230.google.com with SMTP id a43so2131711wrc.4
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 21:42:06 -0800 (PST)
+	(envelope-from <dovgaluk@ispras.ru>) id 1egOuo-00010T-1J
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:57:10 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:53756)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1egOun-0000vA-LP
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:57:05 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
+In-Reply-To: <20180123085319.3419.97865.stgit@pasha-VirtualBox>
+Date: Tue, 30 Jan 2018 08:57:03 +0300
+Message-ID: <001801d3998f$27190300$754b0900$@ru>
 MIME-Version: 1.0
-In-Reply-To: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
-References: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 30 Jan 2018 05:42:04 +0000
-Message-ID: <CAK3tnvLTwPASC7eypwnc25GvMdJ==k9JZpJbg8piZxs6CNDj0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V4 00/16] COLO: integrate colo frame with
- block replication and COLO proxy
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH v5 00/24] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-Hi~ All~
+Ping?
 
-No news for a long time, this is the last part to make COLO running in
-upstream.
-Any comments for this series?
-
-Thanks
-Zhang Chen
+Pavel Dovgalyuk
 
 
-On Fri, Jan 19, 2018 at 1:44 PM, Zhang Chen <zhangckid@gmail.com> wrote:
-
-> From: Zhang Chen <chen.zhang@intel.com>
->
-> Hi~
->
-> COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
-> filter-redirector,filter-rewriter) have been exist in qemu
-> for long time, it's time to integrate these three parts to make COLO
-> really works.
->
-> In this series, we have some optimizations for COLO frame, including
-> separating the
-> process of saving ram and device state, using an COLO_EXIT event to notify
-> users that
-> VM exits COLO, for these parts, most of them have been reviewed long time
-> ago in old version,
-> but since this series have just rebased on upstream which had merged a new
-> series of migration,
-> parts of pathes in this series deserve review again.
->
-> We use notifier/callback method for COLO compare to notify COLO frame about
-> net packets inconsistent event, and add a handle_event method for
-> NetFilterClass to
-> help COLO frame to notify filters and colo-compare about
-> checkpoint/failover event,
-> it is flexible.
->
-> For the neweset version, please refer to:
-> https://github.com/zhangckid/qemu/tree/qemu-colo-18jan19
->
-> Please review, thanks.
->
-> V4:
->  - Address Eric's comments in patch 10/16.
->  - Rebase on upstream codes.
->  - Fix mingw compile error in patch 02/16.
->  - Fix some comments.
->  - Fix conflect with the patch "migration: remove "enable_colo" var" in
-> patch 06/16.
->
-> V3:
->  - Address community comments from V2.
->  - Rebase on upstream codes.
->  - Fix several bugs.
->  - Splite shared disk part to indepentent patch set.
->  - Optimize codes.
->
->
-> Zhang Chen (8):
->   filter-rewriter: fix memory leak for connection in
->     connection_track_table
->   colo-compare: implement the process of checkpoint
->   colo-compare: use notifier to notify packets comparing result
->   COLO: integrate colo compare with colo frame
->   COLO: Add block replication into colo process
->   ram/COLO: Record the dirty pages that SVM received
->   filter: Add handle_event method for NetFilterClass
->   filter-rewriter: handle checkpoint and failover event
->
-> zhanghailiang (8):
->   COLO: Remove colo_state migration struct
->   COLO: Load dirty pages into SVM's RAM cache firstly
->   COLO: Flush memory data from ram cache
->   qmp event: Add COLO_EXIT event to notify users while exited COLO
->   savevm: split the process of different stages for loadvm/savevm
->   COLO: flush host dirty ram from cache
->   COLO: notify net filters about checkpoint/failover event
->   COLO: quick failover process by kick COLO thread
->
->  include/exec/ram_addr.h  |   1 +
->  include/migration/colo.h |  11 ++-
->  include/net/filter.h     |   5 ++
->  migration/Makefile.objs  |   2 +-
->  migration/colo-comm.c    |  76 -------------------
->  migration/colo.c         | 188 ++++++++++++++++++++++++++++++
-> ++++++++++++++---
->  migration/migration.c    |  38 +++++++++-
->  migration/ram.c          | 181 ++++++++++++++++++++++++++++++
-> ++++++++++++++-
->  migration/ram.h          |   4 +
->  migration/savevm.c       |  54 ++++++++++++--
->  migration/savevm.h       |   5 ++
->  migration/trace-events   |   3 +
->  net/colo-compare.c       | 108 +++++++++++++++++++++++++--
->  net/colo-compare.h       |  24 ++++++
->  net/colo.h               |   4 +
->  net/filter-rewriter.c    | 109 +++++++++++++++++++++++++--
->  net/filter.c             |  17 +++++
->  net/net.c                |  28 +++++++
->  qapi/migration.json      |  35 +++++++++
->  vl.c                     |   2 -
->  20 files changed, 777 insertions(+), 118 deletions(-)
->  delete mode 100644 migration/colo-comm.c
->  create mode 100644 net/colo-compare.h
->
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:Pavel.Dovgaluk@ispras.ru]
+> Sent: Tuesday, January 23, 2018 11:53 AM
+> To: qemu-devel@nongnu.org
+> Cc: kwolf@redhat.com; peter.maydell@linaro.org; boost.lists@gmail.com; =
+quintela@redhat.com;
+> jasowang@redhat.com; mst@redhat.com; zuban32s@gmail.com; =
+maria.klimushenkova@ispras.ru;
+> dovgaluk@ispras.ru; kraxel@redhat.com; pavel.dovgaluk@ispras.ru; =
+pbonzini@redhat.com;
+> alex.bennee@linaro.org
+> Subject: [RFC PATCH v5 00/24] replay additions
+>=20
+> This set of patches includex fixes from Alex Benn=C3=A9e for fixing
+> BQL and replay locks after inventing the MTTCG. It also includes some
+> additional replay patches that makes this set of fixes working.
+> It is also fixes some vmstate creation (and loading) issues
+> in record/replay modes:
+>  - VM start/stop fixes in replay mode
+>  - overlay creation for blkreplay filter
+>  - fixes for vmstate save/load in record/replay mode
+>  - fixes for host clock vmstate
+>=20
+> There is also a set of helper scripts written by Alex Benn=C3=A9e
+> for debugging the record/replay code.
+>=20
+> v5 changes:
+>  - removed patch for narrowing BQL-protected code
+>  - disabled bdrv_(drain/flush)_all for record/replay mode
+>=20
+> v4 changes:
+>  - removed upstreamed patches
+>  - added patch for saving async queue state in replay
+>  - minor fixes
+>=20
+> v3 changes:
+>  - removed upstreamed patches
+>  - fixed bug with recursive checkpoints
+>  - fixed bug with icount warp checkpoint
+>=20
+> v2 changes:
+>  - updated lock/unlock logic (as suggested by Paolo Bonzini)
+>  - updated cpu execution loop to avoid races in setting/resetting exit =
+request (as suggested
+> by Paolo Bonzini)
+>  - minor changes
+>=20
+> ---
+>=20
+> Alex Benn=C3=A9e (7):
+>       target/arm/arm-powertctl: drop BQL assertions
+>       cpus: push BQL lock to qemu_*_wait_io_event
+>       replay/replay.c: bump REPLAY_VERSION again
+>       replay/replay-internal.c: track holding of replay_lock
+>       replay: make locking visible outside replay code
+>       replay: push replay_mutex_lock up the call tree
+>       scripts/replay-dump.py: replay log dumper
+>=20
+> Pavel Dovgalyuk (17):
+>       cpu-exec: fix exception_index handling
+>       block: implement bdrv_snapshot_goto for blkreplay
+>       blkreplay: create temporary overlay for underlaying devices
+>       replay: disable default snapshot for record/replay
+>       replay: fix processing async events
+>       replay: fixed replay_enable_events
+>       replay: fix save/load vm for non-empty queue
+>       replay: added replay log format description
+>       replay: save prior value of the host clock
+>       hax: remove BQL lock/unlock
+>       kvm: remove BQL lock/unlock
+>       replay: don't destroy mutex at exit
+>       replay: check return values of fwrite
+>       replay: avoid recursive call of checkpoints
+>       replay: don't process async events when warping the clock
+>       replay: save vmstate of the asynchronous events
+>       replay: don't drain/flush bdrv queue while RR is working
+>=20
+>=20
+>  accel/kvm/kvm-all.c       |    3
+>  accel/tcg/cpu-exec.c      |    5 +
+>  block/blkreplay.c         |   73 +++++++++++
+>  block/io.c                |   22 +++
+>  cpus.c                    |   47 +++++--
+>  docs/replay.txt           |   91 +++++++++++++
+>  include/qemu/timer.h      |   14 ++
+>  include/sysemu/replay.h   |   19 +++
+>  migration/savevm.c        |   13 ++
+>  replay/replay-char.c      |   21 +--
+>  replay/replay-events.c    |   73 +++++------
+>  replay/replay-internal.c  |   48 ++++++-
+>  replay/replay-internal.h  |   15 ++
+>  replay/replay-snapshot.c  |   12 ++
+>  replay/replay-time.c      |   10 +
+>  replay/replay.c           |   62 ++++++---
+>  scripts/replay-dump.py    |  308 =
++++++++++++++++++++++++++++++++++++++++++++++
+>  stubs/replay.c            |   16 ++
+>  target/arm/arm-powerctl.c |    8 -
+>  target/i386/hax-all.c     |    2
+>  util/main-loop.c          |   17 ++
+>  util/qemu-timer.c         |   12 ++
+>  vl.c                      |   12 +-
+>  23 files changed, 777 insertions(+), 126 deletions(-)
+>  create mode 100755 scripts/replay-dump.py
+>=20
 > --
-> 2.7.4
->
->
+> Pavel Dovgalyuk
