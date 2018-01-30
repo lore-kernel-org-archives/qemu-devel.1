@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1egOJn-0005zE-1C
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:18:53 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1egOS0-00089Z-W6
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1egOJj-0000hG-KW
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:18:51 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:36443)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1egOJj-0000go-Ca
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:18:47 -0500
-Received: by mail-io0-x243.google.com with SMTP id l17so10076953ioc.3
-	for <qemu-devel@nongnu.org>; Mon, 29 Jan 2018 21:18:47 -0800 (PST)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Tue, 30 Jan 2018 00:18:37 -0500
-Message-Id: <20180130051837.8725-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw/audio/sb16.c: Convert file to new logging
- API
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1egORx-0004Qb-Ga
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:27:20 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36718
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1egORx-0004P7-Ar
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 00:27:17 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0U5ObKS085878
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 00:27:16 -0500
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ftdgghw6w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 30 Jan 2018 00:27:16 -0500
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 30 Jan 2018 00:27:15 -0500
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+In-Reply-To: <879459e4-e6b1-2030-e3d4-0b991b532f51@linux.vnet.ibm.com>
+References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
+	<f9224bba-08fb-589e-ed6e-d8e967a8fe67@linux.vnet.ibm.com>
+	<20180115085945.GC12499@bjsdjshi@linux.vnet.ibm.com>
+	<a4f39e6e-c031-0861-ff6b-e29747ba9489@linux.vnet.ibm.com>
+	<20180123062356.GC32354@bjsdjshi@linux.vnet.ibm.com>
+	<879459e4-e6b1-2030-e3d4-0b991b532f51@linux.vnet.ibm.com>
+Date: Tue, 30 Jan 2018 13:27:06 +0800
+MIME-Version: 1.0
+Content-Type: text/plain
+Message-Id: <878tcfex1x.fsf@bjsdjshi.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] vfio: ccw: basic channel path
+ event handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,611 +46,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, pmorel@linux.vnet.ibm.com
 
-Use the qemu_log_mask() function to log messages.
+Halil Pasic <pasic@linux.vnet.ibm.com> writes:
+--text follows this line--
+Hi Halil,
+--text follows this line--
+AS you may noticed, Conny replied to this thread on my mail. Some of her
+comments there could answer your questions. If that applies, I will just
+say "See Conny's mail" in the following, and you can reply to that mail,
+so we can consolidate further discussion.
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
- hw/audio/sb16.c | 221 ++++++++++++++++++++++++++++----------------------------
- 1 file changed, 112 insertions(+), 109 deletions(-)
+>>> * When a channel path malfunctions a CRW is generated and a machine
+>>> check channel report pending is generated. Same goes for
+>>> channel paths popping up (on HW level). Should not these get
+>>> propagated?
+>> AFAIR, channel path related CRW is not that reliable. I mean it seems
+>> that it's not mandatory to generate CRWs for channel path malfunctions.
+>> AFAIU, it depneds on machine models. For example, we won't get
+>> CRW_ERC_INIT for a "path has come" event on many models I believe. And
+>> that's why nobody noticed the misuse of CRW_ERC_IPARM and CRW_ERC_INIT
+>> in the CRW handling logic for channel path CRWs.
+>> Ref:
+>> 2daace78a8c9 s390: chp: handle CRW_ERC_INIT for channel-path status change
+>> 
+>
+> Honestly, I forgot about this discussion. I've refreshed my memories by
+> now, but I could not find why is it supposed to be architecturally OK
+> to loose CRWs when for instance a chp goes away.
+>
+>> So my understanding for this is: it really a design decision for us to
+>> propagate all of the channel path CRWs, or we just use other ways (like
+>> using PNO and PNOM as this series shows).
+>
+> From what I read, CRWs did not seem optional.
+> I wonder what should I read in order to change my mind. I'm not
+> talking about the hardware in the wild -- but that could be buggy
+> hardware.
+>
+Ah, can you point out the chapter that says CRWs is mandatory?
 
-diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
-index 6ab2f6f89a..bdb79aeafa 100644
---- a/hw/audio/sb16.c
-+++ b/hw/audio/sb16.c
-@@ -29,18 +29,12 @@
- #include "hw/qdev.h"
- #include "qemu/timer.h"
- #include "qemu/host-utils.h"
-+#include "qemu/log.h"
- 
--#define dolog(...) AUD_log ("sb16", __VA_ARGS__)
- 
- /* #define DEBUG */
- /* #define DEBUG_SB16_MOST */
- 
--#ifdef DEBUG
--#define ldebug(...) dolog (__VA_ARGS__)
--#else
--#define ldebug(...)
--#endif
--
- static const char e3[] = "COPYRIGHT (C) CREATIVE TECHNOLOGY LTD, 1992.";
- 
- #define TYPE_SB16 "sb16"
-@@ -123,7 +117,7 @@ static int magic_of_irq (int irq)
-     case 10:
-         return 8;
-     default:
--        dolog ("bad irq %d\n", irq);
-+        qemu_log_mask(LOG_UNIMP, "bad irq %d\n", irq);
-         return 2;
-     }
- }
-@@ -140,7 +134,7 @@ static int irq_of_magic (int magic)
-     case 8:
-         return 10;
-     default:
--        dolog ("bad irq magic %d\n", magic);
-+        qemu_log_mask(LOG_UNIMP, "bad irq magic %d\n", magic);
-         return -1;
-     }
- }
-@@ -148,15 +142,16 @@ static int irq_of_magic (int magic)
- #if 0
- static void log_dsp (SB16State *dsp)
- {
--    ldebug ("%s:%s:%d:%s:dmasize=%d:freq=%d:const=%d:speaker=%d\n",
--            dsp->fmt_stereo ? "Stereo" : "Mono",
--            dsp->fmt_signed ? "Signed" : "Unsigned",
--            dsp->fmt_bits,
--            dsp->dma_auto ? "Auto" : "Single",
--            dsp->block_size,
--            dsp->freq,
--            dsp->time_const,
--            dsp->speaker);
-+    qemu_log_mask(LOG_UNIMP, "%s:%s:%d:%s:dmasize=%d:freq=%d:const=%d:"
-+                  "speaker=%d\n",
-+                  dsp->fmt_stereo ? "Stereo" : "Mono",
-+                  dsp->fmt_signed ? "Signed" : "Unsigned",
-+                  dsp->fmt_bits,
-+                  dsp->dma_auto ? "Auto" : "Single",
-+                  dsp->block_size,
-+                  dsp->freq,
-+                  dsp->time_const,
-+                  dsp->speaker);
- }
- #endif
- 
-@@ -173,7 +168,8 @@ static void control (SB16State *s, int hold)
-     IsaDmaClass *k = ISADMA_GET_CLASS(isa_dma);
-     s->dma_running = hold;
- 
--    ldebug ("hold %d high %d dma %d\n", hold, s->use_hdma, dma);
-+    qemu_log_mask(LOG_UNIMP, "hold %d high %d dma %d\n", hold, s->use_hdma,
-+                  dma);
- 
-     if (hold) {
-         k->hold_DREQ(isa_dma, dma);
-@@ -258,14 +254,14 @@ static void dma_cmd8 (SB16State *s, int mask, int dma_len)
-     s->align = (1 << s->fmt_stereo) - 1;
- 
-     if (s->block_size & s->align) {
--        dolog ("warning: misaligned block size %d, alignment %d\n",
--               s->block_size, s->align + 1);
-+        qemu_log_mask(LOG_UNIMP, "warning: misaligned block size %d, alignment"
-+                      " %d\n", s->block_size, s->align + 1);
-     }
- 
--    ldebug ("freq %d, stereo %d, sign %d, bits %d, "
--            "dma %d, auto %d, fifo %d, high %d\n",
--            s->freq, s->fmt_stereo, s->fmt_signed, s->fmt_bits,
--            s->block_size, s->dma_auto, s->fifo, s->highspeed);
-+    qemu_log_mask(LOG_UNIMP, "freq %d, stereo %d, sign %d, bits %d, "
-+                  "dma %d, auto %d, fifo %d, high %d\n",
-+                  s->freq, s->fmt_stereo, s->fmt_signed, s->fmt_bits,
-+                  s->block_size, s->dma_auto, s->fifo, s->highspeed);
- 
-     continue_dma8 (s);
-     speaker (s, 1);
-@@ -310,10 +306,10 @@ static void dma_cmd (SB16State *s, uint8_t cmd, uint8_t d0, int dma_len)
-         s->block_size <<= s->fmt_stereo;
-     }
- 
--    ldebug ("freq %d, stereo %d, sign %d, bits %d, "
--            "dma %d, auto %d, fifo %d, high %d\n",
--            s->freq, s->fmt_stereo, s->fmt_signed, s->fmt_bits,
--            s->block_size, s->dma_auto, s->fifo, s->highspeed);
-+    qemu_log_mask(LOG_UNIMP, "freq %d, stereo %d, sign %d, bits %d, "
-+                  "dma %d, auto %d, fifo %d, high %d\n",
-+                  s->freq, s->fmt_stereo, s->fmt_signed, s->fmt_bits,
-+                  s->block_size, s->dma_auto, s->fifo, s->highspeed);
- 
-     if (16 == s->fmt_bits) {
-         if (s->fmt_signed) {
-@@ -338,8 +334,8 @@ static void dma_cmd (SB16State *s, uint8_t cmd, uint8_t d0, int dma_len)
-     s->highspeed = 0;
-     s->align = (1 << (s->fmt_stereo + (s->fmt_bits == 16))) - 1;
-     if (s->block_size & s->align) {
--        dolog ("warning: misaligned block size %d, alignment %d\n",
--               s->block_size, s->align + 1);
-+        qemu_log_mask(LOG_UNIMP, "warning: misaligned block size %d, alignment"
-+                      " %d\n", s->block_size, s->align + 1);
-     }
- 
-     if (s->freq) {
-@@ -368,7 +364,7 @@ static void dma_cmd (SB16State *s, uint8_t cmd, uint8_t d0, int dma_len)
- 
- static inline void dsp_out_data (SB16State *s, uint8_t val)
- {
--    ldebug ("outdata %#x\n", val);
-+    qemu_log_mask(LOG_UNIMP, "outdata %#x\n", val);
-     if ((size_t) s->out_data_len < sizeof (s->out_data)) {
-         s->out_data[s->out_data_len++] = val;
-     }
-@@ -380,18 +376,19 @@ static inline uint8_t dsp_get_data (SB16State *s)
-         return s->in2_data[--s->in_index];
-     }
-     else {
--        dolog ("buffer underflow\n");
-+        qemu_log_mask(LOG_UNIMP, "buffer underflow\n");
-         return 0;
-     }
- }
- 
- static void command (SB16State *s, uint8_t cmd)
- {
--    ldebug ("command %#x\n", cmd);
-+    qemu_log_mask(LOG_UNIMP, "command %#x\n", cmd);
- 
-     if (cmd > 0xaf && cmd < 0xd0) {
-         if (cmd & 8) {
--            dolog ("ADC not yet supported (command %#x)\n", cmd);
-+            qemu_log_mask(LOG_UNIMP, "ADC not yet supported (command %#x)\n",
-+                          cmd);
-         }
- 
-         switch (cmd >> 4) {
-@@ -399,7 +396,7 @@ static void command (SB16State *s, uint8_t cmd)
-         case 12:
-             break;
-         default:
--            dolog ("%#x wrong bits\n", cmd);
-+            qemu_log_mask(LOG_UNIMP, "%#x wrong bits\n", cmd);
-         }
-         s->needed_bytes = 3;
-     }
-@@ -453,7 +450,7 @@ static void command (SB16State *s, uint8_t cmd)
-             goto warn;
- 
-         case 0x35:
--            dolog ("0x35 - MIDI command not implemented\n");
-+            qemu_log_mask(LOG_UNIMP, "0x35 - MIDI command not implemented\n");
-             break;
- 
-         case 0x40:
-@@ -487,34 +484,37 @@ static void command (SB16State *s, uint8_t cmd)
- 
-         case 0x74:
-             s->needed_bytes = 2; /* DMA DAC, 4-bit ADPCM */
--            dolog ("0x75 - DMA DAC, 4-bit ADPCM not implemented\n");
-+            qemu_log_mask(LOG_UNIMP, "0x75 - DMA DAC, 4-bit ADPCM not"
-+                          " implemented\n");
-             break;
- 
-         case 0x75:              /* DMA DAC, 4-bit ADPCM Reference */
-             s->needed_bytes = 2;
--            dolog ("0x74 - DMA DAC, 4-bit ADPCM Reference not implemented\n");
-+            qemu_log_mask(LOG_UNIMP, "0x74 - DMA DAC, 4-bit ADPCM Reference not"
-+                          " implemented\n");
-             break;
- 
-         case 0x76:              /* DMA DAC, 2.6-bit ADPCM */
-             s->needed_bytes = 2;
--            dolog ("0x74 - DMA DAC, 2.6-bit ADPCM not implemented\n");
-+            qemu_log_mask(LOG_UNIMP, "0x74 - DMA DAC, 2.6-bit ADPCM not"
-+                          " implemented\n");
-             break;
- 
-         case 0x77:              /* DMA DAC, 2.6-bit ADPCM Reference */
-             s->needed_bytes = 2;
--            dolog ("0x74 - DMA DAC, 2.6-bit ADPCM Reference not implemented\n");
-+            qemu_log_mask(LOG_UNIMP, "0x74 - DMA DAC, 2.6-bit ADPCM Reference"
-+                          " not implemented\n");
-             break;
- 
-         case 0x7d:
--            dolog ("0x7d - Autio-Initialize DMA DAC, 4-bit ADPCM Reference\n");
--            dolog ("not implemented\n");
-+            qemu_log_mask(LOG_UNIMP, "0x7d - Autio-Initialize DMA DAC, 4-bit"
-+                          " ADPCM Reference\n");
-+            qemu_log_mask(LOG_UNIMP, "not implemented\n");
-             break;
- 
-         case 0x7f:
--            dolog (
--                "0x7d - Autio-Initialize DMA DAC, 2.6-bit ADPCM Reference\n"
--                );
--            dolog ("not implemented\n");
-+            qemu_log_mask(LOG_UNIMP, "0x7d - Autio-Initialize DMA DAC, 2.6-bit"
-+                          " ADPCM Reference\nnot implemented\n");
-             break;
- 
-         case 0x80:
-@@ -586,7 +586,7 @@ static void command (SB16State *s, uint8_t cmd)
-             break;
- 
-         case 0xe7:
--            dolog ("Attempt to probe for ESS (0xe7)?\n");
-+            qemu_log_mask(LOG_UNIMP, "Attempt to probe for ESS (0xe7)?\n");
-             break;
- 
-         case 0xe8:              /* read test reg */
-@@ -613,13 +613,13 @@ static void command (SB16State *s, uint8_t cmd)
-             goto warn;
- 
-         default:
--            dolog ("Unrecognized command %#x\n", cmd);
-+            qemu_log_mask(LOG_UNIMP, "Unrecognized command %#x\n", cmd);
-             break;
-         }
-     }
- 
-     if (!s->needed_bytes) {
--        ldebug ("\n");
-+        qemu_log_mask(LOG_UNIMP, "\n");
-     }
- 
-  exit:
-@@ -632,8 +632,8 @@ static void command (SB16State *s, uint8_t cmd)
-     return;
- 
-  warn:
--    dolog ("warning: command %#x,%d is not truly understood yet\n",
--           cmd, s->needed_bytes);
-+    qemu_log_mask(LOG_UNIMP, "warning: command %#x,%d is not truly understood"
-+                  " yet\n", cmd, s->needed_bytes);
-     goto exit;
- 
- }
-@@ -655,8 +655,8 @@ static uint16_t dsp_get_hilo (SB16State *s)
- static void complete (SB16State *s)
- {
-     int d0, d1, d2;
--    ldebug ("complete command %#x, in_index %d, needed_bytes %d\n",
--            s->cmd, s->in_index, s->needed_bytes);
-+    qemu_log_mask(LOG_UNIMP, "complete command %#x, in_index %d, needed_bytes"
-+                  " %d\n", s->cmd, s->in_index, s->needed_bytes);
- 
-     if (s->cmd > 0xaf && s->cmd < 0xd0) {
-         d2 = dsp_get_data (s);
-@@ -664,12 +664,12 @@ static void complete (SB16State *s)
-         d0 = dsp_get_data (s);
- 
-         if (s->cmd & 8) {
--            dolog ("ADC params cmd = %#x d0 = %d, d1 = %d, d2 = %d\n",
--                   s->cmd, d0, d1, d2);
-+            qemu_log_mask(LOG_UNIMP, "ADC params cmd = %#x d0 = %d, d1 = %d,"
-+                          " d2 = %d\n", s->cmd, d0, d1, d2);
-         }
-         else {
--            ldebug ("cmd = %#x d0 = %d, d1 = %d, d2 = %d\n",
--                    s->cmd, d0, d1, d2);
-+            qemu_log_mask(LOG_UNIMP, "cmd = %#x d0 = %d, d1 = %d, d2 = %d\n",
-+                          s->cmd, d0, d1, d2);
-             dma_cmd (s, s->cmd, d0, d1 + (d2 << 8));
-         }
-     }
-@@ -679,23 +679,24 @@ static void complete (SB16State *s)
-             s->csp_mode = dsp_get_data (s);
-             s->csp_reg83r = 0;
-             s->csp_reg83w = 0;
--            ldebug ("CSP command 0x04: mode=%#x\n", s->csp_mode);
-+            qemu_log_mask(LOG_UNIMP, "CSP command 0x04: mode=%#x\n",
-+                          s->csp_mode);
-             break;
- 
-         case 0x05:
-             s->csp_param = dsp_get_data (s);
-             s->csp_value = dsp_get_data (s);
--            ldebug ("CSP command 0x05: param=%#x value=%#x\n",
--                    s->csp_param,
--                    s->csp_value);
-+            qemu_log_mask(LOG_UNIMP, "CSP command 0x05: param=%#x value=%#x\n",
-+                          s->csp_param, s->csp_value);
-             break;
- 
-         case 0x0e:
-             d0 = dsp_get_data (s);
-             d1 = dsp_get_data (s);
--            ldebug ("write CSP register %d <- %#x\n", d1, d0);
-+            qemu_log_mask(LOG_UNIMP, "write CSP register %d <- %#x\n", d1, d0);
-             if (d1 == 0x83) {
--                ldebug ("0x83[%d] <- %#x\n", s->csp_reg83r, d0);
-+                qemu_log_mask(LOG_UNIMP, "0x83[%d] <- %#x\n", s->csp_reg83r,
-+                              d0);
-                 s->csp_reg83[s->csp_reg83r % 4] = d0;
-                 s->csp_reg83r += 1;
-             }
-@@ -706,12 +707,11 @@ static void complete (SB16State *s)
- 
-         case 0x0f:
-             d0 = dsp_get_data (s);
--            ldebug ("read CSP register %#x -> %#x, mode=%#x\n",
--                    d0, s->csp_regs[d0], s->csp_mode);
-+            qemu_log_mask(LOG_UNIMP, "read CSP register %#x -> %#x, mode=%#x\n",
-+                          d0, s->csp_regs[d0], s->csp_mode);
-             if (d0 == 0x83) {
--                ldebug ("0x83[%d] -> %#x\n",
--                        s->csp_reg83w,
--                        s->csp_reg83[s->csp_reg83w % 4]);
-+                qemu_log_mask(LOG_UNIMP, "0x83[%d] -> %#x\n",
-+                              s->csp_reg83w, s->csp_reg83[s->csp_reg83w % 4]);
-                 dsp_out_data (s, s->csp_reg83[s->csp_reg83w % 4]);
-                 s->csp_reg83w += 1;
-             }
-@@ -722,7 +722,7 @@ static void complete (SB16State *s)
- 
-         case 0x10:
-             d0 = dsp_get_data (s);
--            dolog ("cmd 0x10 d0=%#x\n", d0);
-+            qemu_log_mask(LOG_UNIMP, "cmd 0x10 d0=%#x\n", d0);
-             break;
- 
-         case 0x14:
-@@ -731,21 +731,22 @@ static void complete (SB16State *s)
- 
-         case 0x40:
-             s->time_const = dsp_get_data (s);
--            ldebug ("set time const %d\n", s->time_const);
-+            qemu_log_mask(LOG_UNIMP, "set time const %d\n", s->time_const);
-             break;
- 
-         case 0x42:              /* FT2 sets output freq with this, go figure */
- #if 0
--            dolog ("cmd 0x42 might not do what it think it should\n");
-+            qemu_log_mask(LOG_UNIMP, "cmd 0x42 might not do what it think it"
-+                          " should\n");
- #endif
-         case 0x41:
-             s->freq = dsp_get_hilo (s);
--            ldebug ("set freq %d\n", s->freq);
-+            qemu_log_mask(LOG_UNIMP, "set freq %d\n", s->freq);
-             break;
- 
-         case 0x48:
-             s->block_size = dsp_get_lohi (s) + 1;
--            ldebug ("set dma block len %d\n", s->block_size);
-+            qemu_log_mask(LOG_UNIMP, "set dma block len %d\n", s->block_size);
-             break;
- 
-         case 0x74:
-@@ -775,21 +776,22 @@ static void complete (SB16State *s)
-                             );
-                     }
-                 }
--                ldebug ("mix silence %d %d %" PRId64 "\n", samples, bytes, ticks);
-+                qemu_log_mask(LOG_UNIMP, "mix silence %d %d %" PRId64 "\n",
-+                              samples, bytes, ticks);
-             }
-             break;
- 
-         case 0xe0:
-             d0 = dsp_get_data (s);
-             s->out_data_len = 0;
--            ldebug ("E0 data = %#x\n", d0);
-+            qemu_log_mask(LOG_UNIMP, "E0 data = %#x\n", d0);
-             dsp_out_data (s, ~d0);
-             break;
- 
-         case 0xe2:
- #ifdef DEBUG
-             d0 = dsp_get_data (s);
--            dolog ("E2 = %#x\n", d0);
-+            qemu_log_mask(LOG_UNIMP, "E2 = %#x\n", d0);
- #endif
-             break;
- 
-@@ -799,7 +801,7 @@ static void complete (SB16State *s)
- 
-         case 0xf9:
-             d0 = dsp_get_data (s);
--            ldebug ("command 0xf9 with %#x\n", d0);
-+            qemu_log_mask(LOG_UNIMP, "command 0xf9 with %#x\n", d0);
-             switch (d0) {
-             case 0x0e:
-                 dsp_out_data (s, 0xff);
-@@ -820,12 +822,13 @@ static void complete (SB16State *s)
-             break;
- 
-         default:
--            dolog ("complete: unrecognized command %#x\n", s->cmd);
-+            qemu_log_mask(LOG_UNIMP, "complete: unrecognized command %#x\n",
-+                          s->cmd);
-             return;
-         }
-     }
- 
--    ldebug ("\n");
-+    qemu_log_mask(LOG_UNIMP, "\n");
-     s->cmd = -1;
- }
- 
-@@ -889,7 +892,7 @@ static void dsp_write(void *opaque, uint32_t nport, uint32_t val)
- 
-     iport = nport - s->port;
- 
--    ldebug ("write %#x <- %#x\n", nport, val);
-+    qemu_log_mask(LOG_UNIMP, "write %#x <- %#x\n", nport, val);
-     switch (iport) {
-     case 0x06:
-         switch (val) {
-@@ -939,7 +942,7 @@ static void dsp_write(void *opaque, uint32_t nport, uint32_t val)
-         }
-         else {
-             if (s->in_index == sizeof (s->in2_data)) {
--                dolog ("in data overrun\n");
-+                qemu_log_mask(LOG_UNIMP, "in data overrun\n");
-             }
-             else {
-                 s->in2_data[s->in_index++] = val;
-@@ -955,7 +958,7 @@ static void dsp_write(void *opaque, uint32_t nport, uint32_t val)
-         break;
- 
-     default:
--        ldebug ("(nport=%#x, val=%#x)\n", nport, val);
-+        qemu_log_mask(LOG_UNIMP, "(nport=%#x, val=%#x)\n", nport, val);
-         break;
-     }
- }
-@@ -979,8 +982,8 @@ static uint32_t dsp_read(void *opaque, uint32_t nport)
-         }
-         else {
-             if (s->cmd != -1) {
--                dolog ("empty output buffer for command %#x\n",
--                       s->cmd);
-+                qemu_log_mask(LOG_UNIMP, "empty output buffer for command"
-+                              " %#x\n", s->cmd);
-             }
-             retval = s->last_read_byte;
-             /* goto error; */
-@@ -992,7 +995,7 @@ static uint32_t dsp_read(void *opaque, uint32_t nport)
-         break;
- 
-     case 0x0d:                  /* timer interrupt clear */
--        /* dolog ("timer interrupt clear\n"); */
-+        /* qemu_log_mask(LOG_UNIMP, "timer interrupt clear\n"); */
-         retval = 0;
-         break;
- 
-@@ -1019,13 +1022,13 @@ static uint32_t dsp_read(void *opaque, uint32_t nport)
-     }
- 
-     if (!ack) {
--        ldebug ("read %#x -> %#x\n", nport, retval);
-+        qemu_log_mask(LOG_UNIMP, "read %#x -> %#x\n", nport, retval);
-     }
- 
-     return retval;
- 
-  error:
--    dolog ("warning: dsp_read %#x error\n", nport);
-+    qemu_log_mask(LOG_UNIMP, "warning: dsp_read %#x error\n", nport);
-     return 0xff;
- }
- 
-@@ -1071,7 +1074,7 @@ static void mixer_write_datab(void *opaque, uint32_t nport, uint32_t val)
-     SB16State *s = opaque;
- 
-     (void) nport;
--    ldebug ("mixer_write [%#x] <- %#x\n", s->mixer_nreg, val);
-+    qemu_log_mask(LOG_UNIMP, "mixer_write [%#x] <- %#x\n", s->mixer_nreg, val);
- 
-     switch (s->mixer_nreg) {
-     case 0x00:
-@@ -1081,7 +1084,7 @@ static void mixer_write_datab(void *opaque, uint32_t nport, uint32_t val)
-     case 0x80:
-         {
-             int irq = irq_of_magic (val);
--            ldebug ("setting irq to %d (val=%#x)\n", irq, val);
-+            qemu_log_mask(LOG_UNIMP, "setting irq to %d (val=%#x)\n", irq, val);
-             if (irq > 0) {
-                 s->irq = irq;
-             }
-@@ -1095,10 +1098,9 @@ static void mixer_write_datab(void *opaque, uint32_t nport, uint32_t val)
-             dma = ctz32 (val & 0xf);
-             hdma = ctz32 (val & 0xf0);
-             if (dma != s->dma || hdma != s->hdma) {
--                dolog (
--                    "attempt to change DMA "
--                    "8bit %d(%d), 16bit %d(%d) (val=%#x)\n",
--                    dma, s->dma, hdma, s->hdma, val);
-+                qemu_log_mask(LOG_UNIMP, "attempt to change DMA 8bit %d(%d),"
-+                              " 16bit %d(%d) (val=%#x)\n", dma, s->dma, hdma,
-+                              s->hdma, val);
-             }
- #if 0
-             s->dma = dma;
-@@ -1108,13 +1110,14 @@ static void mixer_write_datab(void *opaque, uint32_t nport, uint32_t val)
-         break;
- 
-     case 0x82:
--        dolog ("attempt to write into IRQ status register (val=%#x)\n",
--               val);
-+        qemu_log_mask(LOG_UNIMP, "attempt to write into IRQ status register"
-+                      " (val=%#x)\n", val);
-         return;
- 
-     default:
-         if (s->mixer_nreg >= 0x80) {
--            ldebug ("attempt to write mixer[%#x] <- %#x\n", s->mixer_nreg, val);
-+            qemu_log_mask(LOG_UNIMP, "attempt to write mixer[%#x] <- %#x\n",
-+                          s->mixer_nreg, val);
-         }
-         break;
-     }
-@@ -1129,12 +1132,12 @@ static uint32_t mixer_read(void *opaque, uint32_t nport)
-     (void) nport;
- #ifndef DEBUG_SB16_MOST
-     if (s->mixer_nreg != 0x82) {
--        ldebug ("mixer_read[%#x] -> %#x\n",
--                s->mixer_nreg, s->mixer_regs[s->mixer_nreg]);
-+        qemu_log_mask(LOG_UNIMP, "mixer_read[%#x] -> %#x\n", s->mixer_nreg,
-+                      s->mixer_regs[s->mixer_nreg]);
-     }
- #else
--    ldebug ("mixer_read[%#x] -> %#x\n",
--            s->mixer_nreg, s->mixer_regs[s->mixer_nreg]);
-+    qemu_log_mask(LOG_UNIMP, "mixer_read[%#x] -> %#x\n",
-+                  s->mixer_nreg, s->mixer_regs[s->mixer_nreg]);
- #endif
-     return s->mixer_regs[s->mixer_nreg];
- }
-@@ -1181,8 +1184,8 @@ static int SB_read_DMA (void *opaque, int nchan, int dma_pos, int dma_len)
-     int till, copy, written, free;
- 
-     if (s->block_size <= 0) {
--        dolog ("invalid block size=%d nchan=%d dma_pos=%d dma_len=%d\n",
--               s->block_size, nchan, dma_pos, dma_len);
-+        qemu_log_mask(LOG_UNIMP, "invalid block size=%d nchan=%d dma_pos=%d"
-+                      " dma_len=%d\n", s->block_size, nchan, dma_pos, dma_len);
-         return dma_pos;
-     }
- 
-@@ -1204,8 +1207,8 @@ static int SB_read_DMA (void *opaque, int nchan, int dma_pos, int dma_len)
-     till = s->left_till_irq;
- 
- #ifdef DEBUG_SB16_MOST
--    dolog ("pos:%06d %d till:%d len:%d\n",
--           dma_pos, free, till, dma_len);
-+    qemu_log_mask(LOG_UNIMP, "pos:%06d %d till:%d len:%d\n", dma_pos, free,
-+                  till, dma_len);
- #endif
- 
-     if (till <= copy) {
-@@ -1228,9 +1231,9 @@ static int SB_read_DMA (void *opaque, int nchan, int dma_pos, int dma_len)
-     }
- 
- #ifdef DEBUG_SB16_MOST
--    ldebug ("pos %5d free %5d size %5d till % 5d copy %5d written %5d size %5d\n",
--            dma_pos, free, dma_len, s->left_till_irq, copy, written,
--            s->block_size);
-+    qemu_log_mask(LOG_UNIMP, "pos %5d free %5d size %5d till % 5d copy %5d"
-+                  " written %5d size %5d\n", dma_pos, free, dma_len,
-+                  s->left_till_irq, copy, written, s->block_size);
- #endif
- 
-     while (s->left_till_irq <= 0) {
-@@ -1376,7 +1379,7 @@ static void sb16_realizefn (DeviceState *dev, Error **errp)
-     reset_mixer (s);
-     s->aux_ts = timer_new_ns(QEMU_CLOCK_VIRTUAL, aux_timer, s);
-     if (!s->aux_ts) {
--        dolog ("warning: Could not create auxiliary timer\n");
-+        qemu_log_mask(LOG_UNIMP, "warning: Could not create auxiliary timer\n");
-     }
- 
-     isa_register_portio_list(isadev, &s->portio_list, s->port,
+AFAIU, PoP doesn't say, for example, chp gone will lead to a CRW, but it
+only says when we got a chp gone CRW it means a chp has been gone.
+
+[See Conny's mail pls, and we can discuss there.]
+
+>> 
+>> Of course, CRW propagation is good to have. But as a discussion result
+>> of a former thread, that is something we can consider only after we have
+>> a good channel path re-modelling. That is the problem. We can try to
+>> trigger CRW event in some work of machine checks handling enhancement
+>> later.
+>> 
+>>> * Kind of instead of the CRW you introduce a per device interrupt
+>>> for channel path events on the qemu/kvm boundary. AFAIU for a chp
+>>> event you do an STSCH for each (affected?) subchannel
+>> Until here, yes and right.
+>> 
+>>> and generate an irq. Right? Why is this a good idea.
+>> This is not right. This series does not generate an irq for the guest.
+>
+> You misunderstood this. The word 'irq' this sentence is a short version
+> of 'per device interrupt for channel path events on the qemu/kvm boundary'
+> form the previous sentence. It's not an irq injected into the guest but
+> a notification (which you call irq in '[RFC PATCH 2/3] vfio: ccw:
+> introduce channel path irq') for QEMU.
+>
+I see now. I misunderstood.
+
+>> In QEMU, when it gets the notification of a channel path status change
+>> event, it read the newest SCHIB from the schib region, and update the
+>> SCHIB (patch related parts) for the virtual subchannel. The guest will
+>> get the new SCHIB whenever it calls STSCH then.
+>
+> We are in agreement. I just wanted to say, if let's say 42 vfio-ccw devices
+> are using the same chp and it goes away, you will generate 42 notifications.
+See reply below #LabelA.
+
+>
+>> 
+>> I think this is a good idea, because:
+>> 1. This is complies the Linux implementation. Path status change could
+>>    be noticed by Linux.
+>> 2. This provides enhancement with a small work. On the contrary, channel
+>>    path re-modelling needs a lot of work.
+>
+> I thing your answer is based on the misunderstanding explained above.
+I see now.
+
+>
+> My idea was to be lazy in a different way. Instead of being lazy about
+> reading the subsection, I was wondering why not do an STSCH in the host
+> as a response to one being done in the guest.
+>
+> That means: if there is no activity on the passed trough devices, nothing
+> needs to be done. (Except maybe the CRWs).
+>
+#LabelA:
+
+I see your point. This is an interesting idea.
+
+Pros:
+- code simplification
+- no chp event notification and handling
+
+Cons:
+- have to read schib region (or issue STSCH on host) for each STSCH
+  request from a guest
+
+I think code siplification is very acctractive, and performance is not
+the most important issue. Any comments? @Conny
+
+> The things aren't observable by the guest if it does not do STSCH anyway.
+Nod. This is the idea that this series is based on.
+
+>
+>
+>> 
+>>> * SCHIB.PMCW provides path information relevant for a given device.
+>>> This information is retrieved using store subchannel. Is your series
+>>> sufficient for making store subchannel work properly (correct and
+>>> reasonably up to date)?
+>> Introducing a SCHIB region is the basis of further STSCH hanlding work.
+>> This series depends on it, and only focuses on the update of the channel
+>> path related parts of it. And for these parts, this work I think is
+>> basically correct (more review comments are surely to be welcomed).
+>> 
+>
+> Please elaborate on that basically. Or are those actually just correct
+> in your opinion?!
+>
+As listed in a former mail, the following values will be updated for the
+guest:
+PMCW:
+  - PIM/PAM/POM
+  - PNOM
+  - CHPIDs
+SCSW
+  - PNOM bit                                                                                           
+
+What else do we need?
+
+>> For the rest parts, this does not change anything than what have. As
+>> replied to Conny in other mail of this thread: I think, if the other
+>> fields are handled by QEMU well, then we don't need to trigger update
+>> events for them. Currently I don't find things that need extra trigger.
+>> 
+>
+> Fair.
+>
+>>> Regarding PMCW it's supposed to get updated when io functions are
+>>> preformed by the css, AFAIR. Is that right?
+>> I think so. And also for some other cases, for example, when we
+>> configure on/off a channel path.
+>> 
+>
+> Sorry, I ended up confusing opm with pom. That would have been illegal
+> (as Connie has pointed out recently) because it can only  change
+> only if the path is tried for IO.
+What is opm? Sorry, I lost in translation... See Conny's mail, and let's
+discuss there?
+
+>
+>
+>>>  If yes what are the implications? Are the manipulations you do on
+>>>  some PMCW fields architecturally correct?
+>> If "architecturally correct" means what guest sees/senses is all obey to
+>> the PoP, then I think so. We don't have to emulate the internal
+>> behaviors (which could not be seen by OS) of CSS exactly when we
+>> emulate, if the emulation does not impact on what Linux guest will see,
+>> right?
+>> 
+>> I mean, the time point we update the PMCW does not has to be in the time
+>> slot of io function performance. The guest would still have to get the
+>> updated information through the calls of STSCH. We only need to provide
+>> the updaetd result to the guest by handling STSCH well. And that's why
+>> we say we do that lazily.
+>> 
+>> Nothing different (added value) will be seen by the guest, comparing
+>> with the current lazy implementation I think.> 
+>>> * The one thing I would very much appreciate as an user of vfio,
+>>> and should in my understanding be the user story of this series
+>>> (and the qemu counterpart of course) is the following. If my device
+>>> (that is IO operation) failed because no path could be found on
+>>> which the device is accessible, I would like to be able to identify
+>>> that. Preferably the same way I would do for an LPAR guest. Is this
+>>> series accomplishing that? 
+>> With this the guest could lazily identify that. But since we have no
+>> machine check propagation yet, for those cases which generate CRWs, it
+>> might not be the same way for an LPAR guest I think.
+>> 
+>
+> This was a yes/no question. I can't interpret your answer neither as
+> yes or as no. Maybe a little clarification: I'm talking about a
+> recent linux guest. 
+See Conny's mail.
+
+>
+>>> * Why not just do proper STSCH for vfio-ccw?
+>> I only did the interested parts (path related). For the other parts, the
+>> current handling is enough, no? Anyway, after we have the schib region,
+>> we can do further STSCH handling any time later we want then.
+>> 
+>
+> I mean, your approach works on the premise, that the host will notify
+> QEMU each time the content of the SCHIB (area) changes (modulo stuff) so
+> it can do an update in QEMU, and give the guest an up to date virtualized
+> SCHIB when it asks for it executing the STSCH instruction.
+>
+> I was asking myself. Why not instead while interpreting STSCH do a
+> STSCH on the host device (that is passed through), and virtualize the
+> result as necessary.
+>
+> It occurred to me if nothing simpler. 
+I think I got your point now, and replied in the above #LabelA section.
+
+>
+>>> * Shouldn't we virtualize CHPIDs?
+>> Nobody would say no for this. :) The problem is that this is something
+>> big, and it's not a short-term goal in my current working project... I
+>> really want to deliver a minimal function set in the near future
+>> firstly. If the current working does not hurt, can we defer channel path
+>> re-modelling and CHPIDs virtualization?
+>
+> The problem is, I'm not sure it does not hurt. For instance because of
+> the question below. I would also prefer having a fair idea of what
+> we need for the envisioned (complete) solution before introducing
+> kernel interfaces (to avoid: pity in the end we need something
+> different, and resulting cluttered interface).
+>
+>> 
+>>> What if we have a clash? Lets say my dasd is only accessible via chp
+>>> 0.00 in the host. Currently we have a problem there, or (as the only
+>>> path would end up being ignored)?
+>> You mean the clash that sharing path 0.00 between a physical dasd and
+>> the virtio ccw devices? The problem I saw is in the checking of the
+>> chpid.is_virtual in css_do_rchp(). For a virtual chp, we should generate
+>> INIT CRWs; while for a non-virtual one, we shouldn't. If the chp is
+>> shared with virtual and non-virtual device, I don't know what to do
+>> then...
+>> 
+>> I don't think we can fix this before we re-modelled the channel path.
+>> But this is neither introduced nor aggravated by this series, right?
+>
+> I'm not sure about the later. What prevents the guest from believing
+> the (to use your terminology shared) chp 0.00 has become unavailable
+> if 0.00 becomes unavailable in the host?
+>
+> Would that adversely affect the virtual devices? It would at
+> least look strange.
+AFAI read the code, this series does not hurt the vritual devices, which
+always have fixed path information in SCHIB.
+
+The strange thing is, the chp 0.00 is both virtual and non-virtual with
+mix use of virtual and non-virtual devices. And any existing problem is
+not caused or enhanced by this work. If we can not fix the problem
+without MCSS support or chp re-modelling in the near future, we should
+document the problem and the effect.
+
+I will do some test on this.
+
+>
+>> 
+>> We'd have to document this either I think.
+>> 
+>>> Note: this is another unpleasant effect of not having MCSSE in the
+>>> guest. The original design was to have a separate css for vfio, and
+>>> then we would not have this kind of a problem.  (Virtualization of
+>>> chps would still be good for migration.)
+>> Nod. BTW, I don't say that I do not want channel path virtualization in
+>> the long run. It's just I want a minimal function set more currently
+>> from what I'm focusing perspective.
+>> 
+>> THANKS for these insightful questions!
+>> 
+
 -- 
-2.14.3 (Apple Git-98)
+Dong Jia Shi
