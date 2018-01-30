@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egS6J-0003d4-6S
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:21:19 -0500
+	(envelope-from <thuth@redhat.com>) id 1egSL8-00078j-Fu
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:36:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egS6G-0005GI-24
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:21:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44192)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egS6F-0005Fb-Sc
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:21:07 -0500
-Date: Tue, 30 Jan 2018 10:21:01 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180130092101.hiuru6lnzbjw2jiy@sirius.home.kraxel.org>
-References: <CAE5jQCeSL5fRXBh5F9L3G5JkkwmS=sU9VS6Bu82Xpq5fMd=K8Q@mail.gmail.com>
-	<20180129082727.jvh4nc2cquuqylrv@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.1801291701130.88941@zero.eik.bme.hu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1801291701130.88941@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] SDL2 UI behavior of switching views
+	(envelope-from <thuth@redhat.com>) id 1egSL3-0005kK-Fw
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 04:36:30 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 30 Jan 2018 10:36:21 +0100
+Message-Id: <1517304981-28254-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-options.hx: Remove confusing spaces in
+ parameter listings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +18,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Mon, Jan 29, 2018 at 07:21:02PM +0100, BALATON Zoltan wrote:
-> On Mon, 29 Jan 2018, Gerd Hoffmann wrote:
-> > On Sun, Jan 28, 2018 at 06:43:44PM +0300, Anatoly Trosinenko wrote:
-> > > When QEMU is run with GTK UI, it changes what is drawn on its single window
-> > > when I press Ctrl-Alt-{1,2,3,4}. But when I use SDL2 UI, it opens multiple
-> > > windows: a separate window per each view (display, monitor, serial,
-> > > parallel). Is it by design or is it a bug?
-> > 
-> > It's intentional.  With gtk you can have separate windows too (try "View/Detach Tab").
-> 
-> Is there an option also to get back the old SDL1 behaviour with SDL2? Could
-> that be made the default to make the transition easier?
+The spaces between the parameters in the chardev and tpmdev sections
+are rather confusing than helpful, and prevent that the lists can be
+copy-n-pasted easily for real usage. We also don't use such spaces
+in other sections in the documentation, e.g. with the -netdev option,
+so let's be consistent and remove the spaces in the chardev and tpmdev
+sections, too.
 
-Well, that kind of flexibility is alot harder to do with SDL as it
-doesn't offer widgets to manage views ...
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ qemu-options.hx | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-In contrast gtk has one widget per virtual console, and I can easily
-shuffle around them: Just reparent from notebook to standalone window
-("detach tab") and visa-versa (when closing the detached window).
-
-How about using gtk instead?
-
-cheers,
-  Gerd
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 8ce427d..08a73fa 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2522,7 +2522,7 @@ STEXI
+ 
+ The general form of a character device option is:
+ @table @option
+-@item -chardev @var{backend} ,id=@var{id} [,mux=on|off] [,@var{options}]
++@item -chardev @var{backend},id=@var{id}[,mux=on|off][,@var{options}]
+ @findex -chardev
+ Backend is one of:
+ @option{null},
+@@ -2541,7 +2541,7 @@ Backend is one of:
+ @option{tty},
+ @option{parallel},
+ @option{parport},
+-@option{spicevmc}.
++@option{spicevmc},
+ @option{spiceport}.
+ The specific backend will determine the applicable options.
+ 
+@@ -2605,11 +2605,11 @@ opened.
+ The available backends are:
+ 
+ @table @option
+-@item -chardev null ,id=@var{id}
++@item -chardev null,id=@var{id}
+ A void device. This device will not emit any data, and will drop any data it
+ receives. The null backend does not take any options.
+ 
+-@item -chardev socket ,id=@var{id} [@var{TCP options} or @var{unix options}] [,server] [,nowait] [,telnet] [,reconnect=@var{seconds}] [,tls-creds=@var{id}]
++@item -chardev socket,id=@var{id}[,@var{TCP options} or @var{unix options}][,server][,nowait][,telnet][,reconnect=@var{seconds}][,tls-creds=@var{id}]
+ 
+ Create a two-way stream socket, which can be either a TCP or a unix socket. A
+ unix socket will be created if @option{path} is specified. Behaviour is
+@@ -2636,7 +2636,7 @@ TCP and unix socket options are given below:
+ 
+ @table @option
+ 
+-@item TCP options: port=@var{port} [,host=@var{host}] [,to=@var{to}] [,ipv4] [,ipv6] [,nodelay]
++@item TCP options: port=@var{port}[,host=@var{host}][,to=@var{to}][,ipv4][,ipv6][,nodelay]
+ 
+ @option{host} for a listening socket specifies the local address to be bound.
+ For a connecting socket species the remote host to connect to. @option{host} is
+@@ -2664,7 +2664,7 @@ required.
+ 
+ @end table
+ 
+-@item -chardev udp ,id=@var{id} [,host=@var{host}] ,port=@var{port} [,localaddr=@var{localaddr}] [,localport=@var{localport}] [,ipv4] [,ipv6]
++@item -chardev udp,id=@var{id}[,host=@var{host}],port=@var{port}[,localaddr=@var{localaddr}][,localport=@var{localport}][,ipv4][,ipv6]
+ 
+ Sends all traffic from the guest to a remote host over UDP.
+ 
+@@ -2683,12 +2683,12 @@ available local port will be used.
+ @option{ipv4} and @option{ipv6} specify that either IPv4 or IPv6 must be used.
+ If neither is specified the device may use either protocol.
+ 
+-@item -chardev msmouse ,id=@var{id}
++@item -chardev msmouse,id=@var{id}
+ 
+ Forward QEMU's emulated msmouse events to the guest. @option{msmouse} does not
+ take any options.
+ 
+-@item -chardev vc ,id=@var{id} [[,width=@var{width}] [,height=@var{height}]] [[,cols=@var{cols}] [,rows=@var{rows}]]
++@item -chardev vc,id=@var{id}[[,width=@var{width}][,height=@var{height}]][[,cols=@var{cols}][,rows=@var{rows}]]
+ 
+ Connect to a QEMU text console. @option{vc} may optionally be given a specific
+ size.
+@@ -2699,12 +2699,12 @@ the console, in pixels.
+ @option{cols} and @option{rows} specify that the console be sized to fit a text
+ console with the given dimensions.
+ 
+-@item -chardev ringbuf ,id=@var{id} [,size=@var{size}]
++@item -chardev ringbuf,id=@var{id}[,size=@var{size}]
+ 
+ Create a ring buffer with fixed size @option{size}.
+ @var{size} must be a power of two and defaults to @code{64K}.
+ 
+-@item -chardev file ,id=@var{id} ,path=@var{path}
++@item -chardev file,id=@var{id},path=@var{path}
+ 
+ Log all traffic received from the guest to a file.
+ 
+@@ -2712,7 +2712,7 @@ Log all traffic received from the guest to a file.
+ created if it does not already exist, and overwritten if it does. @option{path}
+ is required.
+ 
+-@item -chardev pipe ,id=@var{id} ,path=@var{path}
++@item -chardev pipe,id=@var{id},path=@var{path}
+ 
+ Create a two-way connection to the guest. The behaviour differs slightly between
+ Windows hosts and other hosts:
+@@ -2729,14 +2729,14 @@ be present.
+ @option{path} forms part of the pipe path as described above. @option{path} is
+ required.
+ 
+-@item -chardev console ,id=@var{id}
++@item -chardev console,id=@var{id}
+ 
+ Send traffic from the guest to QEMU's standard output. @option{console} does not
+ take any options.
+ 
+ @option{console} is only available on Windows hosts.
+ 
+-@item -chardev serial ,id=@var{id} ,path=@option{path}
++@item -chardev serial,id=@var{id},path=@option{path}
+ 
+ Send traffic from the guest to a serial device on the host.
+ 
+@@ -2745,33 +2745,33 @@ not only serial lines.
+ 
+ @option{path} specifies the name of the serial device to open.
+ 
+-@item -chardev pty ,id=@var{id}
++@item -chardev pty,id=@var{id}
+ 
+ Create a new pseudo-terminal on the host and connect to it. @option{pty} does
+ not take any options.
+ 
+ @option{pty} is not available on Windows hosts.
+ 
+-@item -chardev stdio ,id=@var{id} [,signal=on|off]
++@item -chardev stdio,id=@var{id}[,signal=on|off]
+ Connect to standard input and standard output of the QEMU process.
+ 
+ @option{signal} controls if signals are enabled on the terminal, that includes
+ exiting QEMU with the key sequence @key{Control-c}. This option is enabled by
+ default, use @option{signal=off} to disable it.
+ 
+-@item -chardev braille ,id=@var{id}
++@item -chardev braille,id=@var{id}
+ 
+ Connect to a local BrlAPI server. @option{braille} does not take any options.
+ 
+-@item -chardev tty ,id=@var{id} ,path=@var{path}
++@item -chardev tty,id=@var{id},path=@var{path}
+ 
+ @option{tty} is only available on Linux, Sun, FreeBSD, NetBSD, OpenBSD and
+ DragonFlyBSD hosts.  It is an alias for @option{serial}.
+ 
+ @option{path} specifies the path to the tty. @option{path} is required.
+ 
+-@item -chardev parallel ,id=@var{id} ,path=@var{path}
+-@itemx -chardev parport ,id=@var{id} ,path=@var{path}
++@item -chardev parallel,id=@var{id},path=@var{path}
++@itemx -chardev parport,id=@var{id},path=@var{path}
+ 
+ @option{parallel} is only available on Linux, FreeBSD and DragonFlyBSD hosts.
+ 
+@@ -2780,7 +2780,7 @@ Connect to a local parallel port.
+ @option{path} specifies the path to the parallel port device. @option{path} is
+ required.
+ 
+-@item -chardev spicevmc ,id=@var{id} ,debug=@var{debug}, name=@var{name}
++@item -chardev spicevmc,id=@var{id},debug=@var{debug},name=@var{name}
+ 
+ @option{spicevmc} is only available when spice support is built in.
+ 
+@@ -2790,7 +2790,7 @@ required.
+ 
+ Connect to a spice virtual machine channel, such as vdiport.
+ 
+-@item -chardev spiceport ,id=@var{id} ,debug=@var{debug}, name=@var{name}
++@item -chardev spiceport,id=@var{id},debug=@var{debug},name=@var{name}
+ 
+ @option{spiceport} is only available when spice support is built in.
+ 
+@@ -2898,7 +2898,7 @@ STEXI
+ The general form of a TPM device option is:
+ @table @option
+ 
+-@item -tpmdev @var{backend} ,id=@var{id} [,@var{options}]
++@item -tpmdev @var{backend},id=@var{id}[,@var{options}]
+ @findex -tpmdev
+ 
+ The specific backend type will determine the applicable options.
+@@ -2913,7 +2913,7 @@ The available backends are:
+ 
+ @table @option
+ 
+-@item -tpmdev passthrough, id=@var{id}, path=@var{path}, cancel-path=@var{cancel-path}
++@item -tpmdev passthrough,id=@var{id},path=@var{path},cancel-path=@var{cancel-path}
+ 
+ (Linux-host only) Enable access to the host's TPM using the passthrough
+ driver.
+@@ -2950,7 +2950,7 @@ To create a passthrough TPM use the following two options:
+ Note that the @code{-tpmdev} id is @code{tpm0} and is referenced by
+ @code{tpmdev=tpm0} in the device option.
+ 
+-@item -tpmdev emulator, id=@var{id}, chardev=@var{dev}
++@item -tpmdev emulator,id=@var{id},chardev=@var{dev}
+ 
+ (Linux-host only) Enable access to a TPM emulator using Unix domain socket based
+ chardev backend.
+-- 
+1.8.3.1
