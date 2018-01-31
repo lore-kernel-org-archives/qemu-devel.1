@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1egohE-000439-MT
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:28:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1egolS-0005kp-S7
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1egoh9-0007Gx-Mn
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:28:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1egoh9-0007GB-Ho
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:28:43 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A487E8E700
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 09:28:42 +0000 (UTC)
-Date: Wed, 31 Jan 2018 17:28:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180131092835.GA31397@xz-mi>
+	(envelope-from <peter.maydell@linaro.org>) id 1egolO-0004zN-JI
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:33:10 -0500
+Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:32779)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1egolO-0004yR-E7
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:33:06 -0500
+Received: by mail-ot0-x22c.google.com with SMTP id q9so1807568oti.0
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 01:33:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Subject: [Qemu-devel] Windows balloon driver PFN issue
+In-Reply-To: <CAATJJ0+f0hzN_EGqs=z=pBAMY1KmsQH0wLBnQ-A55-qYj_P_tQ@mail.gmail.com>
+References: <CAFEAcA9qyg-J5UcGZu5XJyUnn799-V4HXSGfyCYNYE9_eK-a0Q@mail.gmail.com>
+	<CAATJJ0+f0hzN_EGqs=z=pBAMY1KmsQH0wLBnQ-A55-qYj_P_tQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 31 Jan 2018 09:32:45 +0000
+Message-ID: <CAFEAcA8FT1NexCtWBvOxwgMN1ZQueuqocT1G+oH1O0P4jB7Qaw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] proposed release schedule for QEMU 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Devel Mailing List <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi, Michael and the list,
+On 31 January 2018 at 08:19, Christian Ehrhardt
+<christian.ehrhardt@canonical.com> wrote:
+> On Tue, Jan 30, 2018 at 5:25 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> It seems like it's about time we settled on the dates for the
+>> 2.12 release. I've sketched in a suggestion at:
+>>   https://wiki.qemu.org/Planning/2.12
+>>
+>> which puts softfreeze on the 13th March, hardfreeze a
+>> week later on the 20th, and final release on the 17th April.
+>
+> Hi Peter,
+> 2.12 looks good to me FWIW, but I wanted to ask if there are
+> discussions on a 2.11.1 timing as well?
+> Especially in regard to [1] at least agreeing and defining a date
+> would be great IMHO.
+> I haven't seen any date-talk on 2.11.1 and doesn't say anything about it yet.
 
-I observed this on windows 8 enterprise guests, when doing memory ballooning:
+I don't have anything to do with the stable branch releases:
+you should ask the stable maintainers about that...
 
-23892@1517298572.328354:virtio_balloon_to_target balloon target: 0x80000000 num_pages: 524288
-23892@1517298638.542819:virtio_balloon_get_config num_pages: 524288 actual: 0
-23892@1517298638.542974:virtio_balloon_handle_output section name: pc.ram gpa: 0x174604000
-23892@1517298638.543059:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-23892@1517298638.543135:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460a000
-23892@1517298638.543140:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-23892@1517298638.543143:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460b000
-23892@1517298638.543146:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-23892@1517298638.543148:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460c000
-23892@1517298638.543152:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-23892@1517298638.543154:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460d000
-23892@1517298638.543159:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-23892@1517298638.543162:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460e000
-23892@1517298638.543165:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-23892@1517298638.543167:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460f000
-23892@1517298638.543170:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-...
-
-I think it's very possible that these zero addresses (please let me
-know what the first 4K page is used for if anyone knows, since IIUC
-that's what we throw away now) are half of the 64bit PFN.  Or say, not
-sure whether this means a windows guest driver bug that is using
-64bits for PFN rather than 32bits (and I suppose the protocol is using
-32bit for PFNs).
-
-Michael, do you know what to do with this?
-
-Thanks,
-
--- 
-Peter Xu
+thanks
+-- PMM
