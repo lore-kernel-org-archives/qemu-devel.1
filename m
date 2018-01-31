@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egwId-0003Ah-LR
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:36:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1egwLa-0004dE-7F
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:38:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egwIY-0005qH-Vc
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:35:55 -0500
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516297747-107232-5-git-send-email-anton.nefedov@virtuozzo.com>
-	<e6a78f65-3be4-9c14-401c-ea7f1fd5fb9c@redhat.com>
-	<931c225d-7d0a-ea1e-59a9-d9f7a257274a@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <58f2d14b-714e-afce-65b4-2ec048aa078e@redhat.com>
-Date: Wed, 31 Jan 2018 18:35:41 +0100
+	(envelope-from <cohuck@redhat.com>) id 1egwLW-0007lQ-Pl
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:38:58 -0500
+Date: Wed, 31 Jan 2018 18:38:45 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180131183845.4e3cb8c8.cohuck@redhat.com>
+In-Reply-To: <69d20ca7-4134-4343-383e-80420225c65f@redhat.com>
+References: <20180129165210.21086-1-cohuck@redhat.com>
+	<20180129165210.21086-2-cohuck@redhat.com>
+	<69d20ca7-4134-4343-383e-80420225c65f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <931c225d-7d0a-ea1e-59a9-d9f7a257274a@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IM0lmfA8WMcnDIYMdFyHW6H5M8KJtpPoT"
-Subject: Re: [Qemu-devel] [PATCH v7 4/9] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 1/2] s390x/tcg: wire up pci instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,123 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IM0lmfA8WMcnDIYMdFyHW6H5M8KJtpPoT
-From: Max Reitz <mreitz@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
- den@virtuozzo.com, berto@igalia.com
-Message-ID: <58f2d14b-714e-afce-65b4-2ec048aa078e@redhat.com>
-Subject: Re: [PATCH v7 4/9] block: treat BDRV_REQ_ALLOCATE as serialising
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1516297747-107232-5-git-send-email-anton.nefedov@virtuozzo.com>
- <e6a78f65-3be4-9c14-401c-ea7f1fd5fb9c@redhat.com>
- <931c225d-7d0a-ea1e-59a9-d9f7a257274a@virtuozzo.com>
-In-Reply-To: <931c225d-7d0a-ea1e-59a9-d9f7a257274a@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 30 Jan 2018 14:00:12 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On 2018-01-30 13:36, Anton Nefedov wrote:
->=20
->=20
-> On 29/1/2018 10:48 PM, Max Reitz wrote:
->> On 2018-01-18 18:49, Anton Nefedov wrote:
->>> The idea is that ALLOCATE requests may overlap with other requests.
->>> Reuse the existing block layer infrastructure for serialising request=
-s.
->>> Use the following approach:
->>> =C2=A0=C2=A0 - mark ALLOCATE serialising, so subsequent requests to t=
-he area wait
->>> =C2=A0=C2=A0 - ALLOCATE request itself must never wait if another req=
-uest is in
->>> flight
->>> =C2=A0=C2=A0=C2=A0=C2=A0 already. Return EAGAIN, let the caller recon=
-sider.
->>>
->>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>> ---
->>> =C2=A0 block/io.c | 27 +++++++++++++++++++--------
->>> =C2=A0 1 file changed, 19 insertions(+), 8 deletions(-)
->>
->> The basic principle looks good to me.
->>
->>> diff --git a/block/io.c b/block/io.c
->>> index cf2f84c..4b0d34f 100644
->>> --- a/block/io.c
->>> +++ b/block/io.c
->>
->> [...]
->>
->>> @@ -1717,7 +1728,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *chi=
-ld,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct iovec h=
-ead_iov;
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mark_re=
-quest_serialising(&req, align);
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wait_serialising_requests=
-(&req);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wait_serialising_requests=
-(&req, false);
->>
->> What if someone calls bdrv_co_pwritev() with BDRV_REQ_ZERO_WRITE |
->> BDRV_REQ_ALLOCATE?=C2=A0=20
->=20
-> Either
->=20
-> =C2=A0=C2=A0=C2=A0 assert(!(qiov && (flags & BDRV_REQ_ALLOCATE)));
->=20
-> will fail or bdrv_co_do_zero_pwritev() will be used.
+> On 29.01.2018 17:52, Cornelia Huck wrote:
+> > On s390x, pci support is implemented via a set of instructions
+> > (no mmio). Unfortunately, none of them are documented in the
+> > PoP; the code is based upon the existing implementation for KVM
+> > and the Linux zpci driver.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  target/s390x/helper.h      |   9 ++++
+> >  target/s390x/insn-data.def |  13 +++++
+> >  target/s390x/misc_helper.c | 123 +++++++++++++++++++++++++++++++++++++++++++++
+> >  target/s390x/translate.c   | 123 +++++++++++++++++++++++++++++++++++++++++++++
+> >  4 files changed, 268 insertions(+)
+> > 
 
-Ah, right, I didn't see that condition there.
+> > diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> > index 11ee43dcbc..2ffc051072 100644
+> > --- a/target/s390x/insn-data.def
+> > +++ b/target/s390x/insn-data.def
+> > @@ -1067,4 +1067,17 @@
+> >      /* ??? Not listed in PoO ninth edition, but there's a linux driver that
+> >         uses it: "A CHSC subchannel is usually present on LPAR only."  */
+> >      C(0xb25f, CHSC,  RRE,     Z,   0, insn, 0, 0, chsc, 0)
+> > +
+> > +/* zPCI Instructions */
+> > +    /* None of these instructions are documented in the PoP, so this is all
+> > +       based upon target/s390x/kvm.c and Linux code and likely incomplete */
+> > +    C(0xebd0, PCISTB, RSY_a, PCI, 0, 0, 0, 0, pcistb, 0)
+> > +    C(0xebd1, SIC, RSY_a, PCI, 0, 0, 0, 0, sic, 0)
+> > +    C(0xb9a0, CLP, RRF_c, PCI, 0, 0, 0, 0, clp, 0)
+> > +    C(0xb9d0, PCISTG, RRE, PCI, 0, 0, 0, 0, pcistg, 0)
+> > +    C(0xb9d2, PCILG, RRE, PCI, 0, 0, 0, 0, pcilg, 0)
+> > +    C(0xb9d3, RPCIT, RRE, PCI, 0, 0, 0, 0, rpcit, 0)
+> > +    C(0xe3d0, MPCIFC, RXY_a, PCI, 0, 0, 0, 0, mpcifc, 0)
+> > +    C(0xe3d4, STPCIFC, RXY_a, PCI, 0, 0, 0, 0, stpcifc, 0)
+> > +
+> >  #endif /* CONFIG_USER_ONLY */
 
->> .. Then this should do exactly the same as
->> bdrv_co_do_zero_pwritev(), which it currently does not -- besides this=
+> b) we will handle !s390_has_feat(S390_FEAT_ZPCI) although available
+> later just as other instructions via the "PCI" flag you attached to the
+> instructions (Richard once posted a patch to do that).
 
->> serialization, this includes returning -ENOTSUP if there is a head or
->> tail to write.
->>
->=20
-> Another question is if that assertion is ok.
-> In other words: should (qiov!=3DNULL && REQ_ALLOCATE) be a valid case?
-> e.g. with qiov filled with zeroes?
+> > @@ -5708,6 +5830,7 @@ enum DisasInsnEnum {
+> >  #define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
+> >  #define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
+> >  #define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
+> > +#define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
 
-I think it's OK to leave the assertion that way.  But maybe move it
-down, under the bdrv_co_do_zero_pwritev() call (and then omit the qiov
-!=3D NULL, because that's guaranteed then)?
-
-(But maybe not everyone's as blind as me.)
-
-> I'd rather document that not supported (and leave the assertion).
->=20
-> Actually, even (qiov!=3DNULL && REQ_ZERO_WRITE) looks kind of
-> unsupported/broken? Alignment code in bdrv_co_pwritev() zeroes out the
-> head and tail by passing the flag down bdrv_aligned_pwritev()
-
-Yes.  Maybe we should have an assertion that you aren't allowed to pass
-a qiov with REQ_ZERO_WRITE...
-
-Max
-
-
---IM0lmfA8WMcnDIYMdFyHW6H5M8KJtpPoT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpx/m0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AEF0H/A/8OL6a+mggaQ8eX7hUB25M6lxWPv8D
-sCaFqjfM5hoxf8pTQYXMYga9VL6jY1snw/EwHLHAFJqqo/ThbGD/FA/cgud/+wC2
-PyX1sC884lRWKA0+qh7oVgEMuJvMW+7OdptVYq65aIEPGQaYJrWUSZmSPcCdjbcX
-JsbkBkdCw3ZCpVwZTa/aEUgCooULhHFoCgdISpCXXFExcwXFRGOo0PArPGbCzeCg
-8aWhBnV8m8uN7WGXlVHD7u36nfPbtC7O3w7N7xiYXBTDrWSu8gI5MVDUhot6L/IC
-HKFeYGA4NJbJS3SlJ/rNcgNO44dbz51HIBC+kftBzswvxTiCFRNOzVw=
-=CWqZ
------END PGP SIGNATURE-----
-
---IM0lmfA8WMcnDIYMdFyHW6H5M8KJtpPoT--
+Thinking again: We should probably not attach the PCI flag to SIC, it
+is independent of it (although only in use for pci adapters right now).
