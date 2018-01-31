@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egrFp-0004dj-RO
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:42 -0500
+	(envelope-from <kraxel@redhat.com>) id 1egrFp-0004da-Jm
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egrFk-00084q-06
+	(envelope-from <kraxel@redhat.com>) id 1egrFj-00084Q-Nu
 	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60998)
+Received: from mx1.redhat.com ([209.132.183.28]:47560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egrFj-00084E-Q5
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egrFj-000845-IM
 	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:35 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 31 Jan 2018 13:12:12 +0100
-Message-Id: <20180131121217.13557-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [RfC PATCH v2 0/5] vfio: add display support
+Date: Wed, 31 Jan 2018 13:12:15 +0100
+Message-Id: <20180131121217.13557-4-kraxel@redhat.com>
+In-Reply-To: <20180131121217.13557-1-kraxel@redhat.com>
+References: <20180131121217.13557-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [RfC PATCH v2 3/5] ui/pixman: add
+ qemu_drm_format_to_pixman()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +27,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-This series adds support for a vgpu display to the qemu vfio code.
-For now only regions are supported, dmabufs will follow later.
+Map drm fourcc codes to pixman formats.
 
-The vfio API update is done, queued in drm-next, should land in the
-upstream kernel during the 4.16 merge window.  So the 4.16-rc1 kernel
-header sync should bring the header changes needed for this series.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/qemu-pixman.h |  5 +++++
+ ui/qemu-pixman.c         | 22 ++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-Patch #1 of this series has the vfio.h updates too, for testing
-convinience, but I don't plan to include that patch in the final
-patch submission.
-
-plese test and review,
-  Gerd
-
-Gerd Hoffmann (5):
-  headers: update linux-headers/linux/vfio.h (intel-gvt kernel patches,
-    v17)
-  headers: add drm/drm_fourcc.h to standard-headers
-  ui/pixman: add qemu_drm_format_to_pixman()
-  vfio/display: core & wireup
-  vfio/display: adding region support
-
- hw/vfio/pci.h                             |   4 +
- include/hw/vfio/vfio-common.h             |   8 +
- include/standard-headers/drm/drm_fourcc.h | 382 ++++++++++++++++++++++++++++++
- include/ui/qemu-pixman.h                  |   5 +
- linux-headers/linux/vfio.h                |  64 +++++
- hw/vfio/display.c                         | 149 ++++++++++++
- hw/vfio/pci.c                             |   9 +
- ui/qemu-pixman.c                          |  22 ++
- hw/vfio/Makefile.objs                     |   2 +-
- scripts/update-linux-headers.sh           |   4 +
- 10 files changed, 648 insertions(+), 1 deletion(-)
- create mode 100644 include/standard-headers/drm/drm_fourcc.h
- create mode 100644 hw/vfio/display.c
-
+diff --git a/include/ui/qemu-pixman.h b/include/ui/qemu-pixman.h
+index 4a67e01232..b7c82d17fc 100644
+--- a/include/ui/qemu-pixman.h
++++ b/include/ui/qemu-pixman.h
+@@ -33,6 +33,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_r8g8b8a8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_x8b8g8r8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_a8b8g8r8
++# define PIXMAN_LE_r8g8b8     PIXMAN_b8g8r8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_b8g8r8a8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_b8g8r8x8
+ #else
+ # define PIXMAN_BE_r8g8b8     PIXMAN_b8g8r8
+@@ -44,6 +46,8 @@
+ # define PIXMAN_BE_r8g8b8a8   PIXMAN_a8b8g8r8
+ # define PIXMAN_BE_x8b8g8r8   PIXMAN_r8g8b8x8
+ # define PIXMAN_BE_a8b8g8r8   PIXMAN_r8g8b8a8
++# define PIXMAN_LE_r8g8b8     PIXMAN_r8g8b8
++# define PIXMAN_LE_a8r8g8b8   PIXMAN_a8r8g8b8
+ # define PIXMAN_LE_x8r8g8b8   PIXMAN_x8r8g8b8
+ #endif
+ 
+@@ -51,6 +55,7 @@
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format);
+ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian);
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format);
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift);
+ pixman_format_code_t qemu_pixman_get_format(PixelFormat *pf);
+ bool qemu_pixman_check_format(DisplayChangeListener *dcl,
+diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
+index 6e591ab821..3e52abd92d 100644
+--- a/ui/qemu-pixman.c
++++ b/ui/qemu-pixman.c
+@@ -6,6 +6,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "ui/console.h"
++#include "standard-headers/drm/drm_fourcc.h"
+ 
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format)
+ {
+@@ -88,6 +89,27 @@ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_endian)
+     return 0;
+ }
+ 
++/* Note: drm is little endian, pixman is native endian */
++pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format)
++{
++    static const struct {
++        uint32_t drm_format;
++        pixman_format_code_t pixman;
++    } map[] = {
++        { DRM_FORMAT_RGB888,   PIXMAN_LE_r8g8b8   },
++        { DRM_FORMAT_ARGB8888, PIXMAN_LE_a8r8g8b8 },
++        { DRM_FORMAT_XRGB8888, PIXMAN_LE_x8r8g8b8 }
++    };
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(map); i++) {
++        if (drm_format == map[i].drm_format) {
++            return map[i].pixman;
++        }
++    }
++    return 0;
++}
++
+ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
+ {
+     int type = PIXMAN_TYPE_OTHER;
 -- 
 2.9.3
