@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1egl1Y-0006eS-DY
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 00:33:33 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eglUQ-0006SV-LL
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1egl1V-0001GK-5w
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 00:33:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53146)
+	(envelope-from <haozhong.zhang@intel.com>) id 1eglUN-0007Zc-45
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:22 -0500
+Received: from mga12.intel.com ([192.55.52.136]:50362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1egl1U-0001Et-Vw
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 00:33:29 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 153B4776DE
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 05:33:28 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 31 Jan 2018 13:33:18 +0800
-Message-Id: <20180131053318.13109-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] Add a git-publish configuration file
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eglUM-0007QP-Pg
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:19 -0500
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Wed, 31 Jan 2018 14:02:23 +0800
+Message-Id: <20180131060229.9294-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v4 0/6] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +24,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-git-publish [1] is a convenient tool to send patches and has been
-popular among QEMU developers.  Recently it has been made available in
-Fedora official repo thanks to Stefan's work.
+Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+files on ext4/xfs file system mounted with '-o dax').
 
-One nice feature of the tool is a per-project configuration with
-profiles, especially in which the cccmd option is a handy method to
-create the Cc list.
+A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+    https://patchwork.kernel.org/patch/10028151/
 
-[1]: https://github.com/stefanha/git-publish
+This patchset enables QEMU to use MAP_SYNC flag for memory-backend-file,
+in order to guarantee the guest write persistence to backend files
+supporting DAX.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- .gitpublish | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
- create mode 100644 .gitpublish
+A new auto on/off option 'sync' is added to memory-backend-file:
+ - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+        'share=off', QEMU will abort
+ - off: never pass MAP_SYNC to mmap(2)
+ - auto (default): if MAP_SYNC is supported and 'share=on', work as if
+        'sync=on'; otherwise, work as if 'sync=off'
 
-diff --git a/.gitpublish b/.gitpublish
-new file mode 100644
-index 0000000000..2099c1520f
---- /dev/null
-+++ b/.gitpublish
-@@ -0,0 +1,57 @@
-+#
-+# Common git-publish profiles that can be used to send patches to QEMU upstream.
-+#
-+# See https://github.com/stefanha/git-publish for more information
-+#
-+[gitpublishprofile "qemu"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
-+
-+[gitpublishprofile "qemu-rfc"]
-+base = master
-+prefix = RFC PATCH
-+to = qemu-devel@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
-+
-+[gitpublishprofile "qemu-stable"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-stable@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
-+
-+[gitpublishprofile "qemu-trivial"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
-+
-+[gitpublishprofile "qemu-block"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-block@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
-+
-+[gitpublishprofile "qemu-arm"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-arm@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
-+
-+[gitpublishprofile "qemu-s390"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-s390@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
-+
-+[gitpublishprofile "qemu-ppc"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-pcc@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+Changes in v4:
+ * Add patch 1-3 to switch some functions to a single 'flags'
+   parameters. (Michael S. Tsirkin)
+ * v3 patch 1-3 become v4 patch 4-6.
+ * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+   new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+ * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+
+Changes in v3:
+ * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+   cases, and add back the retry mechanism. MAP_SYNC will be ignored
+   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+ * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+   platforms in order to make qemu_ram_mmap() compile on those platforms.
+ * Patch 2&3: include more information in error messages of
+   memory-backend in hope to help user to identify the error.
+   (Dr. David Alan Gilbert)
+ * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+
+Changes in v2:
+ * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+ * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+ * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+   to osdep.h. (Michael S. Tsirkin)
+
+
+Haozhong Zhang (6):
+  util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
+  exec: switch qemu_ram_alloc_from_{file,fd} to the 'flags' parameter
+  memory: switch memory_region_init_ram_from_file() to 'flags' parameter
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+  hostmem: add more information in error messages
+  hostmem-file: add 'sync' option
+
+ backends/hostmem-file.c               | 51 ++++++++++++++++++++++++++++++++---
+ backends/hostmem.c                    | 11 +++++---
+ docs/nvdimm.txt                       | 20 +++++++++++++-
+ exec.c                                | 15 ++++++-----
+ include/exec/memory.h                 | 36 +++++++++++++++++++++++--
+ include/exec/ram_addr.h               | 29 ++++++++++++++++++--
+ include/qemu/mmap-alloc.h             | 23 +++++++++++++++-
+ include/standard-headers/linux/mman.h | 42 +++++++++++++++++++++++++++++
+ memory.c                              |  8 +++---
+ numa.c                                |  2 +-
+ qemu-options.hx                       | 22 ++++++++++++++-
+ util/mmap-alloc.c                     | 31 ++++++++++++++++++---
+ util/oslib-posix.c                    |  2 +-
+ 13 files changed, 261 insertions(+), 31 deletions(-)
+ create mode 100644 include/standard-headers/linux/mman.h
+
 -- 
-2.14.3
+2.14.1
