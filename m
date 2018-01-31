@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1egiP9-0004x2-By
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 21:45:44 -0500
+	(envelope-from <wangxinxin.wang@huawei.com>) id 1egifK-0001X0-H8
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 22:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1egiP6-0002D5-9b
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 21:45:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1egiP6-0002BM-05
-	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 21:45:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1egiP3-0002oA-5A
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 02:45:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2234D2E854C
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 02:45:37 +0000 (UTC)
+	(envelope-from <wangxinxin.wang@huawei.com>) id 1egifF-0002KF-M3
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 22:02:26 -0500
+Received: from [45.249.212.32] (port=56195 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wangxinxin.wang@huawei.com>)
+	id 1egifF-0002ID-Af
+	for qemu-devel@nongnu.org; Tue, 30 Jan 2018 22:02:21 -0500
+From: Wang Xin <wangxinxin.wang@huawei.com>
+Date: Wed, 31 Jan 2018 11:01:08 +0800
+Message-ID: <1517367668-25048-1-git-send-email-wangxinxin.wang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 31 Jan 2018 02:32:14 -0000
-From: Jeff <1746394@bugs.launchpad.net>
-Reply-To: Bug 1746394 <1746394@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151736593434.17105.9572043390189121151.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1746394] [NEW] No provider of
- glEGLImageTargetTexture2DOES found with NVIDIA proprietary driver
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] pc: correct misspelled CPU model-id for pc 2.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +24,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, mst@redhat.com
+Cc: ehabkost@redhat.com, arei.gonglei@huawei.com, Wang Xin <wangxinxin.wang@huawei.com>
 
-Public bug reported:
+Signed-off-by: Wang Xin <wangxinxin.wang@huawei.com>
 
-https://github.com/anholt/libepoxy/issues/148
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1746394
-
-Title:
-  No provider of glEGLImageTargetTexture2DOES found with NVIDIA
-  proprietary driver
-
-Status in QEMU:
-  New
-
-Bug description:
-  https://github.com/anholt/libepoxy/issues/148
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1746394/+subscriptions
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index bb49165..635c8b2 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -617,7 +617,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
+ #define PC_COMPAT_2_2 \
+     HW_COMPAT_2_2 \
+-    PC_CPU_MODEL_IDS("2.3.0") \
++    PC_CPU_MODEL_IDS("2.2.0") \
+     {\
+         .driver = "kvm64" "-" TYPE_X86_CPU,\
+         .property = "vme",\
+-- 
+2.8.1.windows.1
