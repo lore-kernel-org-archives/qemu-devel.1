@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eglUQ-0006SD-FK
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:23 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eglUW-0006WJ-Ay
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eglUL-0007Xg-NN
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:22 -0500
-Received: from mga12.intel.com ([192.55.52.136]:50368)
+	(envelope-from <haozhong.zhang@intel.com>) id 1eglUU-0007mN-Tq
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:28 -0500
+Received: from mga12.intel.com ([192.55.52.136]:50362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eglUL-0007VH-AF
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:17 -0500
+	id 1eglUU-0007QP-I2
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:26 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Wed, 31 Jan 2018 14:02:25 +0800
-Message-Id: <20180131060229.9294-3-haozhong.zhang@intel.com>
+Date: Wed, 31 Jan 2018 14:02:29 +0800
+Message-Id: <20180131060229.9294-7-haozhong.zhang@intel.com>
 In-Reply-To: <20180131060229.9294-1-haozhong.zhang@intel.com>
 References: <20180131060229.9294-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v4 2/6] exec: switch qemu_ram_alloc_from_{file,
- fd} to the 'flags' parameter
+Subject: [Qemu-devel] [PATCH v4 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +27,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-As more flag parameters besides the existing 'share' are going to be
-added to qemu_ram_alloc_from_{file,fd}(), let's swith 'share' to a
-'flags' parameters in advance, so as to ease the further additions.
+This option controls whether QEMU mmap(2) the memory backend file with
+MAP_SYNC flag, which can fully guarantee the guest write persistence
+to the backend, if MAP_SYNC flag is supported by the host kernel
+(Linux kernel 4.15 and later) and the backend is a file supporting
+DAX (e.g., file on ext4/xfs file system mounted with '-o dax').
+
+It can take one of following values:
+ - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+        'share=off', QEMU will abort
+ - off: never pass MAP_SYNC to mmap(2)
+ - auto (default): if MAP_SYNC is supported and 'share=on', work as if
+        'sync=on'; otherwise, work as if 'sync=off'
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- exec.c                  | 15 ++++++++-------
- include/exec/ram_addr.h | 25 +++++++++++++++++++++++--
- memory.c                |  8 ++++++--
- 3 files changed, 37 insertions(+), 11 deletions(-)
+ backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+ docs/nvdimm.txt         | 20 +++++++++++++++++++-
+ qemu-options.hx         | 22 +++++++++++++++++++++-
+ 3 files changed, 80 insertions(+), 3 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index c0a5a52c4a..0b46b03d87 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1607,6 +1607,7 @@ static void *file_ram_alloc(RAMBlock *block,
-                             ram_addr_t memory,
-                             int fd,
-                             bool truncate,
-+                            uint64_t flags,
-                             Error **errp)
- {
-     void *area;
-@@ -1652,8 +1653,7 @@ static void *file_ram_alloc(RAMBlock *block,
-         perror("ftruncate");
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index df06b547a6..ade80d76f1 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -15,6 +15,7 @@
+ #include "sysemu/hostmem.h"
+ #include "sysemu/sysemu.h"
+ #include "qom/object_interfaces.h"
++#include "qapi-visit.h"
+ 
+ /* hostmem-file.c */
+ /**
+@@ -35,6 +36,7 @@ struct HostMemoryBackendFile {
+     bool discard_data;
+     char *mem_path;
+     uint64_t align;
++    OnOffAuto sync;
+ };
+ 
+ static void
+@@ -60,7 +62,8 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+                                  path,
+                                  backend->size, fb->align,
+-                                 fb->share ? QEMU_RAM_SHARE : 0,
++                                 (fb->share ? QEMU_RAM_SHARE : 0) |
++                                 qemu_ram_sync_flags(fb->sync),
+                                  fb->mem_path, errp);
+         g_free(path);
      }
- 
--    area = qemu_ram_mmap(fd, memory, block->mr->align,
--                         (block->flags & RAM_SHARED) ? QEMU_RAM_SHARE : 0);
-+    area = qemu_ram_mmap(fd, memory, block->mr->align, flags);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-                          "unable to map backing store for guest RAM");
-@@ -2000,7 +2000,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
- 
- #ifdef __linux__
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
--                                 bool share, int fd,
-+                                 uint64_t flags, int fd,
-                                  Error **errp)
- {
-     RAMBlock *new_block;
-@@ -2042,8 +2042,9 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-     new_block->mr = mr;
-     new_block->used_length = size;
-     new_block->max_length = size;
--    new_block->flags = share ? RAM_SHARED : 0;
--    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
-+    new_block->flags = (flags & QEMU_RAM_SHARE) ? RAM_SHARED : 0;
-+    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, flags,
-+                                     errp);
-     if (!new_block->host) {
-         g_free(new_block);
-         return NULL;
-@@ -2061,7 +2062,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
- 
- 
- RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
--                                   bool share, const char *mem_path,
-+                                   uint64_t flags, const char *mem_path,
-                                    Error **errp)
- {
-     int fd;
-@@ -2073,7 +2074,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-         return NULL;
-     }
- 
--    block = qemu_ram_alloc_from_fd(size, mr, share, fd, errp);
-+    block = qemu_ram_alloc_from_fd(size, mr, flags, fd, errp);
-     if (!block) {
-         if (created) {
-             unlink(mem_path);
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 7633ef6342..e24aae75a2 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -72,12 +72,33 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
- 
- long qemu_getrampagesize(void);
- unsigned long last_ram_page(void);
-+
-+/**
-+ * qemu_ram_alloc_from_file,
-+ * qemu_ram_alloc_from_fd: Allocate a ram block from the specified back
-+ *                         file or device
-+ *
-+ * Parameters:
-+ *  @size: the size in bytes of the ram block
-+ *  @mr: the memory region where the ram block is
-+ *  @flags: specify the properties of the ram block, which can be one
-+ *          or bit-or of following values
-+ *          - QEMU_RAM_SHARE: mmap the back file or device with MAP_SHARED
-+ *          Other bits are ignored.
-+ *  @mem_path or @fd: specify the back file or device
-+ *  @errp: pointer to Error*, to store an error if it happens
-+ *
-+ * Return:
-+ *  On success, return a pointer to the ram block.
-+ *  On failure, return NULL.
-+ */
- RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
--                                   bool share, const char *mem_path,
-+                                   uint64_t flags, const char *mem_path,
-                                    Error **errp);
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
--                                 bool share, int fd,
-+                                 uint64_t flags, int fd,
-                                  Error **errp);
-+
- RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-                                   MemoryRegion *mr, Error **errp);
- RAMBlock *qemu_ram_alloc(ram_addr_t size, MemoryRegion *mr, Error **errp);
-diff --git a/memory.c b/memory.c
-index 449a1429b9..1ac4ebcaca 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1580,7 +1580,9 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
-     mr->align = align;
--    mr->ram_block = qemu_ram_alloc_from_file(size, mr, share, path, errp);
-+    mr->ram_block = qemu_ram_alloc_from_file(size, mr,
-+                                             share ? QEMU_RAM_SHARE : 0,
-+                                             path, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+@@ -154,6 +157,39 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+     error_propagate(errp, local_err);
  }
  
-@@ -1596,7 +1598,9 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-     mr->ram = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
--    mr->ram_block = qemu_ram_alloc_from_fd(size, mr, share, fd, errp);
-+    mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
-+                                           share ? QEMU_RAM_SHARE : 0,
-+                                           fd, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
++static void file_memory_backend_get_sync(
++    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
++{
++    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
++    OnOffAuto value = fb->sync;
++
++    visit_type_OnOffAuto(v, name, &value, errp);
++}
++
++static void file_memory_backend_set_sync(
++    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
++{
++    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
++    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
++    Error *local_err = NULL;
++    OnOffAuto value;
++
++    if (host_memory_backend_mr_inited(backend)) {
++        error_setg(&local_err, "cannot change property '%s' of %s '%s'",
++                   name, object_get_typename(obj), backend->id);
++        goto out;
++    }
++
++    visit_type_OnOffAuto(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    fb->sync = value;
++
++ out:
++    error_propagate(errp, local_err);
++}
++
+ static void file_backend_unparent(Object *obj)
+ {
+     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+@@ -188,6 +224,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
+         file_memory_backend_get_align,
+         file_memory_backend_set_align,
+         NULL, NULL, &error_abort);
++    object_class_property_add(oc, "sync", "OnOffAuto",
++        file_memory_backend_get_sync, file_memory_backend_set_sync,
++        NULL, NULL, &error_abort);
  }
- #endif
+ 
+ static void file_backend_instance_finalize(Object *o)
+diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+index e903d8bb09..5e9cee5f5e 100644
+--- a/docs/nvdimm.txt
++++ b/docs/nvdimm.txt
+@@ -142,11 +142,29 @@ backend of vNVDIMM:
+ Guest Data Persistence
+ ----------------------
+ 
++vNVDIMM is designed and implemented to guarantee the guest data
++persistence on the backends even on the host crash and power
++failures. However, there are still some requirements and limitations
++as explained below.
++
+ Though QEMU supports multiple types of vNVDIMM backends on Linux,
+-currently the only one that can guarantee the guest write persistence
++if MAP_SYNC is not supported by the host kernel and the backends,
++the only backend that can guarantee the guest write persistence
+ is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+ which all guest access do not involve any host-side kernel cache.
+ 
++mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
++systems, QEMU can mmap(2) the backend with MAP_SYNC, which can
++guarantee the guest write persistence to vNVDIMM. Besides the host
++kernel support, enabling MAP_SYNC in QEMU also requires:
++
++ - the backend is a file supporting DAX, e.g., a file on an ext4 or
++   xfs file system mounted with '-o dax',
++
++ - 'sync' option of memory-backend-file is not 'off', and
++
++ - 'share' option of memory-backend-file is 'on'.
++
+ When using other types of backends, it's suggested to set 'unarmed'
+ option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+ guest NVDIMM region mapping structure.  This unarmed flag indicates
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 8ce427da78..4e8ec5ed97 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3957,7 +3957,7 @@ property must be set.  These objects are placed in the
+ 
+ @table @option
+ 
+-@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
++@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align},sync=@var{on|off|auto}
+ 
+ Creates a memory file backend object, which can be used to back
+ the guest RAM with huge pages.
+@@ -4017,6 +4017,26 @@ requires an alignment different than the default one used by QEMU, eg
+ the device DAX /dev/dax0.0 requires 2M alignment rather than 4K. In
+ such cases, users can specify the required alignment via this option.
+ 
++The @option{sync} option specifies whether QEMU mmap(2) @option{mem-path}
++with MAP_SYNC flag, which can guarantee the guest write persistence to
++@option{mem-path} even on the host crash and power failures. MAP_SYNC
++requires supports from both the host kernel (since Linux kernel 4.15)
++and @option{mem-path} (only files supporting DAX). It can take one of
++following values:
++
++@table @option
++@item @var{on}
++try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
++@option{share}=@var{off}, QEMU will abort
++
++@item @var{off}
++never pass MAP_SYNC to mmap(2)
++
++@item @var{auto} (default)
++if MAP_SYNC is supported and @option{share}=@var{on}, work as if
++@option{sync}=@var{on}; otherwise, work as if @option{sync}=@var{off}
++@end table
++
+ @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+ 
+ Creates a memory backend object, which can be used to back the guest RAM.
 -- 
 2.14.1
