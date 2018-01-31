@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53845)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvQ5-0005hg-4V
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:39:35 -0500
+	id 1egvS8-0006pk-3R
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:41:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvQ0-0004tw-Rs
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:39:33 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35571)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvQ0-0004tD-M4
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:39:28 -0500
-Received: by mail-qt0-x242.google.com with SMTP id g14so22637613qti.2
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:39:28 -0800 (PST)
+	id 1egvS3-0007n1-GQ
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:41:40 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180131144846.31697-1-armbru@redhat.com>
-	<20180131144846.31697-3-armbru@redhat.com>
+References: <20180131102152.16902-1-berto@igalia.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <796659b8-78e3-735a-2f89-81d951863c1d@amsat.org>
-Date: Wed, 31 Jan 2018 13:39:25 -0300
+Message-ID: <95d66e5c-bc7e-e42f-6121-2b786ad77963@amsat.org>
+Date: Wed, 31 Jan 2018 13:41:26 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180131144846.31697-3-armbru@redhat.com>
+In-Reply-To: <20180131102152.16902-1-berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/19] Clean up includes
+Subject: Re: [Qemu-devel] [PATCH v2] qcow2: Replace align_offset() with
+ ROUND_UP()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,519 +28,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 01/31/2018 11:48 AM, Markus Armbruster wrote:
-> Clean up includes so that osdep.h is included first and headers
-> which it implies are not included manually.
+On 01/31/2018 07:21 AM, Alberto Garcia wrote:
+> The align_offset() function is equivalent to the ROUND_UP() macro so
+> there's no need to use the former. The ROUND_UP() name is also a bit
+> more explicit.
 > 
-> This commit was created with scripts/clean-includes, with the change
-> to target/s390x/gen-features.c manually reverted, and blank lines
-> around deletions collapsed.
+> This patch uses ROUND_UP() instead of the slower QEMU_ALIGN_UP()
+> because align_offset() already requires that the second parameter is a
+> power of two.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  block/parallels.h                                     |  1 -
->  hw/block/vhost-user-blk.c                             |  1 -
->  hw/nvram/eeprom_at24c.c                               |  3 +--
->  hw/tpm/tpm_emulator.c                                 |  5 -----
->  hw/tpm/tpm_int.h                                      |  2 --
->  hw/tpm/tpm_ioctl.h                                    |  2 --
->  hw/xtensa/xtensa_memory.h                             |  1 -
->  include/exec/tb-lookup.h                              |  2 --
->  include/hw/intc/xlnx-pmu-iomod-intc.h                 |  1 -
->  include/hw/intc/xlnx-zynqmp-ipi.h                     |  1 -
->  include/hw/nvram/fw_cfg.h                             |  1 -
->  include/hw/pci-bridge/simba.h                         |  1 -
->  include/hw/xtensa/xtensa-isa.h                        |  2 --
->  include/qapi/clone-visitor.h                          |  1 -
->  include/sysemu/hvf.h                                  |  2 --
->  include/ui/console.h                                  |  1 -
->  io/channel-websock.c                                  |  3 ---
->  linux-user/syscall.c                                  |  1 -
->  scsi/pr-helper.h                                      |  2 --
->  target/i386/hax-all.c                                 |  1 -
->  target/i386/hvf/hvf.c                                 |  1 -
->  target/i386/hvf/vmx.h                                 |  1 -
->  target/i386/hvf/x86_decode.c                          |  1 -
->  target/i386/hvf/x86_mmu.c                             |  1 -
->  target/i386/hvf/x86_task.c                            |  1 -
->  target/i386/hvf/x86hvf.c                              |  3 ---
->  target/xtensa/core-dc232b/xtensa-modules.c            |  1 +
->  target/xtensa/core-dc233c/xtensa-modules.c            |  1 +
->  target/xtensa/core-de212/xtensa-modules.c             |  1 +
->  target/xtensa/core-fsf/xtensa-modules.c               |  1 +
->  target/xtensa/core-sample_controller/xtensa-modules.c |  1 +
->  target/xtensa/xtensa-isa.c                            |  4 +---
->  tests/migration/stress.c                              | 10 +---------
->  tests/ptimer-test.c                                   |  4 ++--
->  trace/control-internal.h                              |  2 --
->  35 files changed, 10 insertions(+), 57 deletions(-)
+>  block/qcow2-bitmap.c   |  4 ++--
+>  block/qcow2-cluster.c  |  4 ++--
+>  block/qcow2-refcount.c |  4 ++--
+>  block/qcow2-snapshot.c | 10 +++++-----
+>  block/qcow2.c          | 14 +++++++-------
+>  block/qcow2.h          |  6 ------
+>  6 files changed, 18 insertions(+), 24 deletions(-)
 > 
-> diff --git a/block/parallels.h b/block/parallels.h
-> index 4b044079ef..5aa101cfc8 100644
-> --- a/block/parallels.h
-> +++ b/block/parallels.h
-> @@ -32,7 +32,6 @@
->  #ifndef BLOCK_PARALLELS_H
->  #define BLOCK_PARALLELS_H
->  #include "qemu/coroutine.h"
-> -#include "qemu/typedefs.h"
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index efa10c6663..0a3803aa34 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -413,8 +413,8 @@ static inline void bitmap_dir_entry_to_be(Qcow2BitmapDirEntry *entry)
 >  
->  #define HEADS_NUMBER 16
->  #define SEC_IN_CYL 32
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index b53b4c9c57..f840f07dfe 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -19,7 +19,6 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
-> -#include "qemu/typedefs.h"
->  #include "qemu/cutils.h"
->  #include "qom/object.h"
->  #include "hw/qdev-core.h"
-> diff --git a/hw/nvram/eeprom_at24c.c b/hw/nvram/eeprom_at24c.c
-> index efa3621ac6..22183f5360 100644
-> --- a/hw/nvram/eeprom_at24c.c
-> +++ b/hw/nvram/eeprom_at24c.c
-> @@ -7,9 +7,8 @@
->   * the LICENSE file in the top-level directory.
->   */
+>  static inline int calc_dir_entry_size(size_t name_size, size_t extra_data_size)
+>  {
+> -    return align_offset(sizeof(Qcow2BitmapDirEntry) +
+> -                        name_size + extra_data_size, 8);
+> +    int size = sizeof(Qcow2BitmapDirEntry) + name_size + extra_data_size;
+> +    return ROUND_UP(size, 8);
+>  }
 >  
-> -#include <string.h>
+>  static inline int dir_entry_size(Qcow2BitmapDirEntry *entry)
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index a3fec27bf9..29d70e1f3e 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -127,11 +127,11 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+>  
+>      new_l1_size2 = sizeof(uint64_t) * new_l1_size;
+>      new_l1_table = qemu_try_blockalign(bs->file->bs,
+> -                                       align_offset(new_l1_size2, 512));
+> +                                       ROUND_UP(new_l1_size2, 512));
+>      if (new_l1_table == NULL) {
+>          return -ENOMEM;
+>      }
+> -    memset(new_l1_table, 0, align_offset(new_l1_size2, 512));
+> +    memset(new_l1_table, 0, ROUND_UP(new_l1_size2, 512));
+>  
+>      if (s->l1_size) {
+>          memcpy(new_l1_table, s->l1_table, s->l1_size * sizeof(uint64_t));
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 92701ab7af..1d520615a8 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -1202,7 +1202,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
+>       * l1_table_offset when it is the current s->l1_table_offset! Be careful
+>       * when changing this! */
+>      if (l1_table_offset != s->l1_table_offset) {
+> -        l1_table = g_try_malloc0(align_offset(l1_size2, 512));
+> +        l1_table = g_try_malloc0(ROUND_UP(l1_size2, 512));
+>          if (l1_size2 && l1_table == NULL) {
+>              ret = -ENOMEM;
+>              goto fail;
+> @@ -2545,7 +2545,7 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+>      }
+>  
+>      /* align range to test to cluster boundaries */
+> -    size = align_offset(offset_into_cluster(s, offset) + size, s->cluster_size);
+> +    size = ROUND_UP(offset_into_cluster(s, offset) + size, s->cluster_size);
+>      offset = start_of_cluster(s, offset);
+>  
+>      if ((chk & QCOW2_OL_ACTIVE_L1) && s->l1_size) {
+> diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+> index 44243e0e95..cee25f582b 100644
+> --- a/block/qcow2-snapshot.c
+> +++ b/block/qcow2-snapshot.c
+> @@ -66,7 +66,7 @@ int qcow2_read_snapshots(BlockDriverState *bs)
+>  
+>      for(i = 0; i < s->nb_snapshots; i++) {
+>          /* Read statically sized part of the snapshot header */
+> -        offset = align_offset(offset, 8);
+> +        offset = ROUND_UP(offset, 8);
+>          ret = bdrv_pread(bs->file, offset, &h, sizeof(h));
+>          if (ret < 0) {
+>              goto fail;
+> @@ -155,7 +155,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
+>      offset = 0;
+>      for(i = 0; i < s->nb_snapshots; i++) {
+>          sn = s->snapshots + i;
+> -        offset = align_offset(offset, 8);
+> +        offset = ROUND_UP(offset, 8);
+>          offset += sizeof(h);
+>          offset += sizeof(extra);
+>          offset += strlen(sn->id_str);
+> @@ -215,7 +215,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
+>          assert(id_str_size <= UINT16_MAX && name_size <= UINT16_MAX);
+>          h.id_str_size = cpu_to_be16(id_str_size);
+>          h.name_size = cpu_to_be16(name_size);
+> -        offset = align_offset(offset, 8);
+> +        offset = ROUND_UP(offset, 8);
+>  
+>          ret = bdrv_pwrite(bs->file, offset, &h, sizeof(h));
+>          if (ret < 0) {
+> @@ -441,7 +441,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+>      /* The VM state isn't needed any more in the active L1 table; in fact, it
+>       * hurts by causing expensive COW for the next snapshot. */
+>      qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
+> -                          align_offset(sn->vm_state_size, s->cluster_size),
+> +                          ROUND_UP(sn->vm_state_size, s->cluster_size),
+>                            QCOW2_DISCARD_NEVER, false);
+>  
+>  #ifdef DEBUG_ALLOC
+> @@ -710,7 +710,7 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
+>      }
+>      new_l1_bytes = sn->l1_size * sizeof(uint64_t);
+>      new_l1_table = qemu_try_blockalign(bs->file->bs,
+> -                                       align_offset(new_l1_bytes, 512));
+> +                                       ROUND_UP(new_l1_bytes, 512));
+>      if (new_l1_table == NULL) {
+>          return -ENOMEM;
+>      }
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 1f80961e1b..7f0fe00d49 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1354,7 +1354,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+>  
+>      if (s->l1_size > 0) {
+>          s->l1_table = qemu_try_blockalign(bs->file->bs,
+> -            align_offset(s->l1_size * sizeof(uint64_t), 512));
+> +            ROUND_UP(s->l1_size * sizeof(uint64_t), 512));
+>          if (s->l1_table == NULL) {
+>              error_setg(errp, "Could not allocate L1 table");
+>              ret = -ENOMEM;
+> @@ -2615,19 +2615,19 @@ static int64_t qcow2_calc_prealloc_size(int64_t total_size,
+>  {
+>      int64_t meta_size = 0;
+>      uint64_t nl1e, nl2e;
+> -    int64_t aligned_total_size = align_offset(total_size, cluster_size);
+> +    int64_t aligned_total_size = ROUND_UP(total_size, cluster_size);
+>  
+>      /* header: 1 cluster */
+>      meta_size += cluster_size;
+>  
+>      /* total size of L2 tables */
+>      nl2e = aligned_total_size / cluster_size;
+> -    nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
+> +    nl2e = ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
+>      meta_size += nl2e * sizeof(uint64_t);
+>  
+>      /* total size of L1 tables */
+>      nl1e = nl2e * sizeof(uint64_t) / cluster_size;
+> -    nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
+> +    nl1e = ROUND_UP(nl1e, cluster_size / sizeof(uint64_t));
+>      meta_size += nl1e * sizeof(uint64_t);
+>  
+>      /* total size of refcount table and blocks */
+> @@ -3681,8 +3681,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+>      has_backing_file = !!optstr;
+>      g_free(optstr);
+>  
+> -    virtual_size = align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+> -                                cluster_size);
+> +    virtual_size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
+> +    virtual_size = ROUND_UP(virtual_size, cluster_size);
+>  
+>      /* Check that virtual disk size is valid */
+>      l2_tables = DIV_ROUND_UP(virtual_size / cluster_size,
+> @@ -3702,7 +3702,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+>              goto err;
+>          }
+>  
+> -        virtual_size = align_offset(ssize, cluster_size);
+> +        virtual_size = ROUND_UP(ssize, cluster_size);
+>  
+>          if (has_backing_file) {
+>              /* We don't how much of the backing chain is shared by the input
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index 46c8cf44ec..33d2eb0ead 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -468,12 +468,6 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
+>      return (offset >> s->cluster_bits) & (s->l2_size - 1);
+>  }
+>  
+> -static inline int64_t align_offset(int64_t offset, int n)
+> -{
+> -    offset = (offset + n - 1) & ~(n - 1);
+> -    return offset;
+> -}
 > -
->  #include "qemu/osdep.h"
-> +
->  #include "qapi/error.h"
->  #include "hw/hw.h"
->  #include "hw/i2c/i2c.h"
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index 35c78de5a9..1a2bd5a0b8 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -40,11 +40,6 @@
->  #include "qapi/clone-visitor.h"
->  #include "chardev/char-fe.h"
->  
-> -#include <fcntl.h>
-> -#include <sys/types.h>
-> -#include <sys/stat.h>
-> -#include <stdio.h>
-> -
->  #define DEBUG_TPM 0
->  
->  #define DPRINTF(fmt, ...) do { \
-> diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
-> index abbca5191a..a4c77fbd7e 100644
-> --- a/hw/tpm/tpm_int.h
-> +++ b/hw/tpm/tpm_int.h
-> @@ -12,8 +12,6 @@
->  #ifndef TPM_TPM_INT_H
->  #define TPM_TPM_INT_H
->  
-> -#include "qemu/osdep.h"
-> -
->  #define TPM_STANDARD_CMDLINE_OPTS \
->      { \
->          .name = "type", \
-> diff --git a/hw/tpm/tpm_ioctl.h b/hw/tpm/tpm_ioctl.h
-> index 54c8d345ad..59a0b0595d 100644
-> --- a/hw/tpm/tpm_ioctl.h
-> +++ b/hw/tpm/tpm_ioctl.h
-> @@ -8,9 +8,7 @@
->  #ifndef _TPM_IOCTL_H_
->  #define _TPM_IOCTL_H_
->  
-> -#include <stdint.h>
->  #include <sys/uio.h>
-> -#include <sys/types.h>
->  #include <sys/ioctl.h>
->  
->  /*
-> diff --git a/hw/xtensa/xtensa_memory.h b/hw/xtensa/xtensa_memory.h
-> index cab4d172d4..e9aa08749d 100644
-> --- a/hw/xtensa/xtensa_memory.h
-> +++ b/hw/xtensa/xtensa_memory.h
-> @@ -28,7 +28,6 @@
->  #ifndef _XTENSA_MEMORY_H
->  #define _XTENSA_MEMORY_H
->  
-> -#include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
->  #include "exec/memory.h"
-> diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
-> index 296138591a..492cb68289 100644
-> --- a/include/exec/tb-lookup.h
-> +++ b/include/exec/tb-lookup.h
-> @@ -7,8 +7,6 @@
->  #ifndef EXEC_TB_LOOKUP_H
->  #define EXEC_TB_LOOKUP_H
->  
-> -#include "qemu/osdep.h"
-> -
->  #ifdef NEED_CPU_H
->  #include "cpu.h"
->  #else
-> diff --git a/include/hw/intc/xlnx-pmu-iomod-intc.h b/include/hw/intc/xlnx-pmu-iomod-intc.h
-> index 1fdba73b9f..01c9d040b8 100644
-> --- a/include/hw/intc/xlnx-pmu-iomod-intc.h
-> +++ b/include/hw/intc/xlnx-pmu-iomod-intc.h
-> @@ -25,7 +25,6 @@
->  #ifndef XLNX_PMU_IO_INTC_H
->  #define XLNX_PMU_IO_INTC_H
->  
-> -#include "qemu/osdep.h"
->  #include "hw/sysbus.h"
->  #include "hw/register.h"
->  
-> diff --git a/include/hw/intc/xlnx-zynqmp-ipi.h b/include/hw/intc/xlnx-zynqmp-ipi.h
-> index 4afa4ff313..866c719c6f 100644
-> --- a/include/hw/intc/xlnx-zynqmp-ipi.h
-> +++ b/include/hw/intc/xlnx-zynqmp-ipi.h
-> @@ -25,7 +25,6 @@
->  #ifndef XLNX_ZYNQMP_IPI_H
->  #define XLNX_ZYNQMP_IPI_H
->  
-> -#include "qemu/osdep.h"
->  #include "hw/sysbus.h"
->  #include "hw/register.h"
->  
-> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index 7ccbae5fba..b2259cc4a3 100644
-> --- a/include/hw/nvram/fw_cfg.h
-> +++ b/include/hw/nvram/fw_cfg.h
-> @@ -1,7 +1,6 @@
->  #ifndef FW_CFG_H
->  #define FW_CFG_H
->  
-> -#include "qemu/typedefs.h"
->  #include "exec/hwaddr.h"
->  #include "hw/nvram/fw_cfg_keys.h"
->  #include "hw/sysbus.h"
-> diff --git a/include/hw/pci-bridge/simba.h b/include/hw/pci-bridge/simba.h
-> index fac56ab1cf..e13ba27d0b 100644
-> --- a/include/hw/pci-bridge/simba.h
-> +++ b/include/hw/pci-bridge/simba.h
-> @@ -24,7 +24,6 @@
->   * THE SOFTWARE.
->   */
->  
-> -#include "qemu/osdep.h"
->  #include "hw/pci/pci_bridge.h"
->  
->  
-> diff --git a/include/hw/xtensa/xtensa-isa.h b/include/hw/xtensa/xtensa-isa.h
-> index 353f82ba25..bd68ada640 100644
-> --- a/include/hw/xtensa/xtensa-isa.h
-> +++ b/include/hw/xtensa/xtensa-isa.h
-> @@ -25,8 +25,6 @@
->  #ifndef XTENSA_LIBISA_H
->  #define XTENSA_LIBISA_H
->  
-> -#include <stdint.h>
-> -
->  #ifdef __cplusplus
->  extern "C" {
->  #endif
-> diff --git a/include/qapi/clone-visitor.h b/include/qapi/clone-visitor.h
-> index a4915c7d57..b119d3daa9 100644
-> --- a/include/qapi/clone-visitor.h
-> +++ b/include/qapi/clone-visitor.h
-> @@ -11,7 +11,6 @@
->  #ifndef QAPI_CLONE_VISITOR_H
->  #define QAPI_CLONE_VISITOR_H
->  
-> -#include "qemu/typedefs.h"
->  #include "qapi/visitor.h"
->  #include "qapi-visit.h"
->  
-> diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-> index e4e43f6468..241118845c 100644
-> --- a/include/sysemu/hvf.h
-> +++ b/include/sysemu/hvf.h
-> @@ -12,8 +12,6 @@
->  #ifndef _HVF_H
->  #define _HVF_H
->  
-> -#include "config-host.h"
-> -#include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "qemu/bitops.h"
->  #include "exec/memory.h"
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index 7b35778444..b153a584da 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -5,7 +5,6 @@
->  #include "qom/object.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qemu/notify.h"
-> -#include "qemu/typedefs.h"
->  #include "qapi-types.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> diff --git a/io/channel-websock.c b/io/channel-websock.c
-> index 87ebdebfc0..7fd6bb68ba 100644
-> --- a/io/channel-websock.c
-> +++ b/io/channel-websock.c
-> @@ -26,9 +26,6 @@
->  #include "trace.h"
->  #include "qemu/iov.h"
->  
-> -#include <time.h>
-> -
-> -
->  /* Max amount to allow in rawinput/encoutput buffers */
->  #define QIO_CHANNEL_WEBSOCK_MAX_BUFFER 8192
->  
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 74378947f0..779e590726 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -48,7 +48,6 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
->  #include <sys/shm.h>
->  #include <sys/sem.h>
->  #include <sys/statfs.h>
-> -#include <time.h>
->  #include <utime.h>
->  #include <sys/sysinfo.h>
->  #include <sys/signalfd.h>
-> diff --git a/scsi/pr-helper.h b/scsi/pr-helper.h
-> index 96c50a9e5f..096d1f1df6 100644
-> --- a/scsi/pr-helper.h
-> +++ b/scsi/pr-helper.h
-> @@ -26,8 +26,6 @@
->  #ifndef QEMU_PR_HELPER_H
->  #define QEMU_PR_HELPER_H 1
->  
-> -#include <stdint.h>
-> -
->  #define PR_HELPER_CDB_SIZE     16
->  #define PR_HELPER_SENSE_SIZE   96
->  #define PR_HELPER_DATA_SIZE    8192
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index 6874018738..bc9a12c1ee 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -30,7 +30,6 @@
->  #include "exec/ioport.h"
->  
->  #include "qemu-common.h"
-> -#include <strings.h>
->  #include "hax-i386.h"
->  #include "sysemu/accel.h"
->  #include "sysemu/sysemu.h"
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index 5d00c58129..aef3d83bb9 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -43,7 +43,6 @@
->  #include "hw/i386/apic_internal.h"
->  #include "hw/boards.h"
->  #include "qemu/main-loop.h"
-> -#include <strings.h>
->  #include "sysemu/accel.h"
->  #include "sysemu/sysemu.h"
->  #include "target/i386/cpu.h"
-> diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
-> index 9dfcd2f2eb..f3e6e86999 100644
-> --- a/target/i386/hvf/vmx.h
-> +++ b/target/i386/hvf/vmx.h
-> @@ -22,7 +22,6 @@
->  #ifndef VMX_H
->  #define VMX_H
->  
-> -#include <stdint.h>
->  #include <Hypervisor/hv.h>
->  #include <Hypervisor/hv_vmx.h>
->  #include "vmcs.h"
-> diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
-> index dcff2073a7..2d7540fe7c 100644
-> --- a/target/i386/hvf/x86_decode.c
-> +++ b/target/i386/hvf/x86_decode.c
-> @@ -21,7 +21,6 @@
->  #include "qemu-common.h"
->  #include "panic.h"
->  #include "x86_decode.h"
-> -#include <string.h>
->  #include "vmx.h"
->  #include "x86_mmu.h"
->  #include "x86_descr.h"
-> diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
-> index 2ad8fcdf70..c6be2cca35 100644
-> --- a/target/i386/hvf/x86_mmu.c
-> +++ b/target/i386/hvf/x86_mmu.c
-> @@ -23,7 +23,6 @@
->  #include "cpu.h"
->  #include "x86.h"
->  #include "x86_mmu.h"
-> -#include <string.h>
->  #include "vmcs.h"
->  #include "vmx.h"
->  #include "exec/address-spaces.h"
-> diff --git a/target/i386/hvf/x86_task.c b/target/i386/hvf/x86_task.c
-> index 452fad6b2d..4abf3db25e 100644
-> --- a/target/i386/hvf/x86_task.c
-> +++ b/target/i386/hvf/x86_task.c
-> @@ -32,7 +32,6 @@
->  #include "hw/i386/apic_internal.h"
->  #include "hw/boards.h"
->  #include "qemu/main-loop.h"
-> -#include <strings.h>
->  #include "sysemu/accel.h"
->  #include "sysemu/sysemu.h"
->  #include "target/i386/cpu.h"
-> diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-> index 7803e09a28..6c88939b96 100644
-> --- a/target/i386/hvf/x86hvf.c
-> +++ b/target/i386/hvf/x86hvf.c
-> @@ -29,11 +29,8 @@
->  
->  #include "hw/i386/apic_internal.h"
->  
-> -#include <stdio.h>
-> -#include <stdlib.h>
->  #include <Hypervisor/hv.h>
->  #include <Hypervisor/hv_vmx.h>
-> -#include <stdint.h>
->  
->  void hvf_set_segment(struct CPUState *cpu, struct vmx_segment *vmx_seg,
->                       SegmentCache *qseg, bool is_tr)
-> diff --git a/target/xtensa/core-dc232b/xtensa-modules.c b/target/xtensa/core-dc232b/xtensa-modules.c
-> index 0af43c84bb..d322c3f52a 100644
-> --- a/target/xtensa/core-dc232b/xtensa-modules.c
-> +++ b/target/xtensa/core-dc232b/xtensa-modules.c
-> @@ -18,6 +18,7 @@
->     Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
->     02110-1301, USA.  */
->  
-> +#include "qemu/osdep.h"
->  #include "xtensa-isa.h"
->  #include "xtensa-isa-internal.h"
->  
-> diff --git a/target/xtensa/core-dc233c/xtensa-modules.c b/target/xtensa/core-dc233c/xtensa-modules.c
-> index 8a41e73659..7c20f82349 100644
-> --- a/target/xtensa/core-dc233c/xtensa-modules.c
-> +++ b/target/xtensa/core-dc233c/xtensa-modules.c
-> @@ -21,6 +21,7 @@
->     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
->     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
->  
-> +#include "qemu/osdep.h"
->  #include "xtensa-isa.h"
->  #include "xtensa-isa-internal.h"
->  
-> diff --git a/target/xtensa/core-de212/xtensa-modules.c b/target/xtensa/core-de212/xtensa-modules.c
-> index 21f3bd8797..ef7674de3a 100644
-> --- a/target/xtensa/core-de212/xtensa-modules.c
-> +++ b/target/xtensa/core-de212/xtensa-modules.c
-> @@ -21,6 +21,7 @@
->     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
->     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
->  
-> +#include "qemu/osdep.h"
->  #include "xtensa-isa.h"
->  #include "xtensa-isa-internal.h"
->  
-> diff --git a/target/xtensa/core-fsf/xtensa-modules.c b/target/xtensa/core-fsf/xtensa-modules.c
-> index 9621f5142a..f7de2dec15 100644
-> --- a/target/xtensa/core-fsf/xtensa-modules.c
-> +++ b/target/xtensa/core-fsf/xtensa-modules.c
-> @@ -18,6 +18,7 @@
->     Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
->     02110-1301, USA.  */
->  
-> +#include "qemu/osdep.h"
->  #include "xtensa-isa.h"
->  #include "xtensa-isa-internal.h"
->  
-> diff --git a/target/xtensa/core-sample_controller/xtensa-modules.c b/target/xtensa/core-sample_controller/xtensa-modules.c
-> index 39810e532a..fba41b99ae 100644
-> --- a/target/xtensa/core-sample_controller/xtensa-modules.c
-> +++ b/target/xtensa/core-sample_controller/xtensa-modules.c
-> @@ -21,6 +21,7 @@
->     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
->     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
->  
-> +#include "qemu/osdep.h"
->  #include "xtensa-isa.h"
->  #include "xtensa-isa-internal.h"
->  
-> diff --git a/target/xtensa/xtensa-isa.c b/target/xtensa/xtensa-isa.c
-> index e0076a694f..630b4f9da1 100644
-> --- a/target/xtensa/xtensa-isa.c
-> +++ b/target/xtensa/xtensa-isa.c
-> @@ -22,9 +22,7 @@
->   * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
->   */
->  
-> -#include <stdio.h>
-> -#include <stdlib.h>
-> -#include <string.h>
-> +#include "qemu/osdep.h"
->  #include "xtensa-isa.h"
->  #include "xtensa-isa-internal.h"
->  
-> diff --git a/tests/migration/stress.c b/tests/migration/stress.c
-> index cf8ce8b16d..49a03aab7b 100644
-> --- a/tests/migration/stress.c
-> +++ b/tests/migration/stress.c
-> @@ -17,21 +17,13 @@
->   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
-> -#include <stdio.h>
-> +#include "qemu/osdep.h"
->  #include <getopt.h>
-> -#include <string.h>
-> -#include <stdlib.h>
-> -#include <errno.h>
-> -#include <unistd.h>
->  #include <sys/reboot.h>
->  #include <sys/syscall.h>
->  #include <linux/random.h>
-> -#include <sys/time.h>
->  #include <pthread.h>
-> -#include <fcntl.h>
->  #include <sys/mount.h>
-> -#include <sys/stat.h>
-> -#include <sys/mman.h>
->  
->  const char *argv0;
->  
-> diff --git a/tests/ptimer-test.c b/tests/ptimer-test.c
-> index 5d1a2a8188..41488896f7 100644
-> --- a/tests/ptimer-test.c
-> +++ b/tests/ptimer-test.c
-> @@ -8,9 +8,9 @@
->   *
->   */
->  
-> -#include <glib/gprintf.h>
-> -
->  #include "qemu/osdep.h"
-> +#include <glib/gprintf.h>
-> +
->  #include "qemu/main-loop.h"
->  #include "hw/ptimer.h"
->  
-> diff --git a/trace/control-internal.h b/trace/control-internal.h
-> index a9d395a587..c7fbe2d3bf 100644
-> --- a/trace/control-internal.h
-> +++ b/trace/control-internal.h
-> @@ -10,8 +10,6 @@
->  #ifndef TRACE__CONTROL_INTERNAL_H
->  #define TRACE__CONTROL_INTERNAL_H
->  
-> -#include <stddef.h>                     /* size_t */
-> -
->  #include "qom/cpu.h"
->  
->  
+>  static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+>  {
+>      return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bits);
 > 
