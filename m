@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egn7w-0007xb-3T
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:48:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1egn8r-0000AN-HK
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:49:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egn7s-00081Z-Rv
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:48:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51362)
+	(envelope-from <armbru@redhat.com>) id 1egn8o-0008PI-Fa
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:49:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egn7s-00081P-LX
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:48:12 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egn8o-0008Od-9C
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:49:10 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 781FE3AD8E
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 07:49:09 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180130102202.28519-1-armbru@redhat.com>
-	<20180130102202.28519-2-armbru@redhat.com>
-	<alpine.BSF.2.21.1801301417470.81470@zero.eik.bme.hu>
-Date: Wed, 31 Jan 2018 08:48:05 +0100
-In-Reply-To: <alpine.BSF.2.21.1801301417470.81470@zero.eik.bme.hu> (BALATON
-	Zoltan's message of "Tue, 30 Jan 2018 14:22:29 +0100 (CET)")
-Message-ID: <87lgge79l6.fsf@dusky.pond.sub.org>
+	<20180130102202.28519-3-armbru@redhat.com>
+	<32879051-3924-b8ec-d2e9-5765d1bb6ac8@redhat.com>
+Date: Wed, 31 Jan 2018 08:49:07 +0100
+In-Reply-To: <32879051-3924-b8ec-d2e9-5765d1bb6ac8@redhat.com> (Eric Blake's
+	message of "Tue, 30 Jan 2018 09:46:34 -0600")
+Message-ID: <87h8r279jg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 01/18] Clean up includes
+Subject: Re: [Qemu-devel] [PATCH 02/18] Drop superfluous includes of
+ qapi-types.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
+To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> On Tue, 30 Jan 2018, Markus Armbruster wrote:
->> Clean up includes so that osdep.h is included first and headers
->> which it implies are not included manually.
->>
->> This commit was created with scripts/clean-includes, with the change
->> to target/s390x/gen-features.c manually reverted, and blank lines
->> around deletions collapsed.
->>
+> On 01/30/2018 04:21 AM, Markus Armbruster wrote:
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-[...]
->> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
->> index 17aa930e39..a5d1776756 100644
->> --- a/hw/ide/sii3112.c
->> +++ b/hw/ide/sii3112.c
->> @@ -12,6 +12,7 @@
->>  * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
->>  */
->>
->> +#include "qemu/osdep.h"
->> #include <qemu/osdep.h>
->> #include <hw/ide/pci.h>
->> #include "trace.h"
+>> ---
 >
-> This is wrong. I've sent a patch instead to change angle brackets to
-> quotes for these two includes. This wasn't catched either by
-> checkpatch nor review though so maybe it could be added to checkpatch
-> if quotes are the preferred style for these includes.
+>> +++ b/tests/test-clone-visitor.c
+>> @@ -11,7 +11,6 @@
+>>  
+>>  #include "qemu-common.h"
+>>  #include "qapi/clone-visitor.h"
+>> -#include "test-qapi-types.h"
+>
+> Overactive sed pattern?  This is a different header.  While the tests
+> still pass after deleting this include, removal of the test-qapi-types.h
+> line here and in other tests/ files should be a separate patch, or else
+> the commit message updated to mention it.
 
-Good catch!  There's more than these two in the tree.  I'll stick in a
-suitable cleanup patch.
+Intentional.  I'll amend the commit message.
