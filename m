@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egxcD-0003ym-TX
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 14:00:20 -0500
+	(envelope-from <jsnow@redhat.com>) id 1egxe6-0005JB-2B
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 14:02:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egxcC-0004MB-Rz
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 14:00:14 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:43580)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1egxcC-0004Ld-Lq
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 14:00:12 -0500
-Received: by mail-ot0-x244.google.com with SMTP id p36so14401754otd.10
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 11:00:12 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1egxe0-0005Sz-75
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 14:02:10 -0500
+References: <20180118105841.GA1897@liangdeMacBook-Pro.local>
+	<fc921c84-f068-db12-f054-b38049013a9c@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b80e6451-fafe-8975-f71a-ac05f4521df8@redhat.com>
+Date: Wed, 31 Jan 2018 14:01:39 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKP+V+G8XrcdxHifhcCBSt5iquV=kUC=V=A6GQ1o==j8LA@mail.gmail.com>
-References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-	<8942a41a-a924-f626-3613-3c74b9db0da6@redhat.com>
-	<CAKmqyKN+VD9NV6oy0USJ0ChLXodw3k7J4uRqyW41+iSRzr4G_A@mail.gmail.com>
-	<CAFEAcA_YWx9wsRjHuBXnfyXOKA34YR+bfgoLeP-y1AwgpEj6+Q@mail.gmail.com>
-	<CAKmqyKP+V+G8XrcdxHifhcCBSt5iquV=kUC=V=A6GQ1o==j8LA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 31 Jan 2018 18:59:50 +0000
-Message-ID: <CAFEAcA85EhTa_9j4vWitZSXXBsHUiZPrA=hFUiXmqtUHaVY_Hg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] MTTCG External Halt
+In-Reply-To: <fc921c84-f068-db12-f054-b38049013a9c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ACYWsYnYIwIOVUtIQ6H6e52Gp2zjtVyUo"
+Subject: Re: [Qemu-devel] [PATCH] hbitmap: fix missing restore count when
+ finish deserialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: Max Reitz <mreitz@redhat.com>, Liang Li <liliangleo@didichuxing.com>, vsementsov@virtuozzo.com, famz@redhat.com
+Cc: qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 
-On 31 January 2018 at 18:51, Alistair Francis <alistair23@gmail.com> wrote:
-> On Wed, Jan 31, 2018 at 10:48 AM, Peter Maydell
-> <peter.maydell@linaro.org> wrote:
->> On 31 January 2018 at 18:17, Alistair Francis <alistair23@gmail.com> wrote:
->>> On Wed, Jan 31, 2018 at 9:13 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> cpu->halted = false likewise should not be needed here, but you cannot
->>>> just clear CPU_INTERRUPT_HALT either.  You need to set a *different*
->>>> interrupt request bit (the dummy CPU_INTERRUPT_EXITTB will do) and
->>>> cpu_handle_halt will clear cpu->halted.
->>>
->>> The problem with that is that I hit this assert for ARM CPUs:
->>>
->>> qemu-system-aarch64: ./target/arm/cpu.h:1446: arm_el_is_aa64:
->>> Assertion `el >= 1 && el <= 3' failed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ACYWsYnYIwIOVUtIQ6H6e52Gp2zjtVyUo
+From: John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Liang Li <liliangleo@didichuxing.com>,
+ vsementsov@virtuozzo.com, famz@redhat.com
+Cc: qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
+Message-ID: <b80e6451-fafe-8975-f71a-ac05f4521df8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hbitmap: fix missing restore count when
+ finish deserialization
+References: <20180118105841.GA1897@liangdeMacBook-Pro.local>
+ <fc921c84-f068-db12-f054-b38049013a9c@redhat.com>
+In-Reply-To: <fc921c84-f068-db12-f054-b38049013a9c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+
+On 01/31/2018 01:54 PM, Max Reitz wrote:
+> On 2018-01-18 11:58, Liang Li wrote:
+>> The .count of HBitmap is forgot to set in function
+>> hbitmap_deserialize_finish, let's set it to the right value.
 >>
->> Backtrace from when you hit that might be useful...
->
-> Here it is:
->
-> (gdb) bt
-> #0  0x00007ffff1a030bb in __GI_raise (sig=sig@entry=6) at
-> ../sysdeps/unix/sysv/linux/raise.c:51
-> #1  0x00007ffff1a04f5d in __GI_abort () at abort.c:90
-> #2  0x00007ffff19faf17 in __assert_fail_base (fmt=<optimized out>,
-> assertion=assertion@entry=0x555555cf86c4 "el >= 1 && el <= 3",
-> file=file@entry=0x555555cf8660
-> "/scratch/alistai/master-qemu/target/arm/cpu.h", line=line@entry=1446,
-> function=function@entry=0x555555d314e8 <__PRETTY_FUNCTION__.24916>
-> "arm_el_is_aa64") at assert.c:92
-> #3  0x00007ffff19fafc2 in __GI___assert_fail
-> (assertion=assertion@entry=0x555555cf86c4 "el >= 1 && el <= 3",
-> file=file@entry=0x555555cf8660
-> "/scratch/alistai/master-qemu/target/arm/cpu.h", line=line@entry=1446,
-> function=function@entry=0x555555d314e8 <__PRETTY_FUNCTION__.24916>
-> "arm_el_is_aa64") at assert.c:101
-> #4  0x00005555557eb872 in arm_el_is_aa64 (el=0, env=0x55555723c7f8) at
-> /scratch/alistai/master-qemu/target/arm/cpu.h:1446
-> #5  0x0000555555951233 in arm_el_is_aa64 (el=0, env=0x55555723c7f8) at
-> /scratch/alistai/master-qemu/target/arm/cpu.h:1838
-> #6  0x0000555555951233 in arm_cpu_do_interrupt (cs=0x555557234550) at
-> /scratch/alistai/master-qemu/target/arm/helper.c:8020
+>> Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Cc: Fam Zheng <famz@redhat.com>
+>> Cc: Max Reitz <mreitz@redhat.com>
+>> Cc: John Snow <jsnow@redhat.com>
+>> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+>> Signed-off-by: Liang Li <liliangleo@didichuxing.com>
+>> ---
+>>  util/hbitmap.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/util/hbitmap.c b/util/hbitmap.c
+>> index 289778a..58a2c93 100644
+>> --- a/util/hbitmap.c
+>> +++ b/util/hbitmap.c
+>> @@ -630,6 +630,7 @@ void hbitmap_deserialize_finish(HBitmap *bitmap)
+>>      }
+>> =20
+>>      bitmap->levels[0][0] |=3D 1UL << (BITS_PER_LONG - 1);
+>> +    bitmap->count =3D hb_count_between(bitmap, 0, bitmap->size - 1);
+>>  }
+>> =20
+>>  void hbitmap_free(HBitmap *hb)
+>=20
+> Actually CC-ing John...
+>=20
+> (Looks good to me, though.)
+>=20
+> Max
+>=20
 
-The problem is here (or further down the callstack) -- you
-definitely don't want to be trying to take an interrupt from
-the guest's perspective, which is what arm_cpu_do_interrupt()
-is for...
+Staged already, sorry. Will send the PR this Friday.
 
-This is probably happening because cpu->exception_index isn't
-right at this point (though the arm code has a habit of leaving
-it set to whatever its value was last...)
+https://github.com/jnsnow/qemu/commit/78ad6913bd34a54f658d5182990fe149614=
+d6402
 
-> #7  0x000055555585e75b in cpu_handle_exception (ret=<synthetic
-> pointer>, cpu=0x555556c64200)
->     at /scratch/alistai/master-qemu/accel/tcg/cpu-exec.c:532
-> #8  0x000055555585e75b in cpu_exec (cpu=cpu@entry=0x555557234550) at
-> /scratch/alistai/master-qemu/accel/tcg/cpu-exec.c:748
-> #9  0x000055555582d963 in tcg_cpu_exec (cpu=0x555557234550) at
-> /scratch/alistai/master-qemu/cpus.c:1297
-> #10 0x000055555582d963 in qemu_tcg_cpu_thread_fn (arg=0x555557234550)
-> at /scratch/alistai/master-qemu/cpus.c:1502
-> #11 0x00007ffff1db37fc in start_thread (arg=0x7ffef6b43700) at
-> pthread_create.c:465
-> #12 0x00007ffff1ae0b5f in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
 
-thanks
--- PMM
+--ACYWsYnYIwIOVUtIQ6H6e52Gp2zjtVyUo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE+ber27ys35W+dsvQfe+BBqr8OQ4FAlpyEp4ACgkQfe+BBqr8
+OQ5qEA//WGXX1pozy5mY6PFq5XCfJooOieefCuMx9d6pDFQT2zTd6nj+ySE3ZltQ
+7YmZxJ2Nf+Dh3mHqzy5o5VyTqPPHhS6EzBWrrFNlohb5o/EuOdVFxni+HPcUrFLw
+cHktHx66cO6pQkLEzHekgjK3izA8dl3boJ5ChmrAxYR0Fyr+X8h7bcGMet18zzVM
+grHph3+W03YIoQYWY36IwoZTg6CT3qr2vuorP8mexWIz6E9SIUIdAN6pvowDIU2U
+Si3o6X5ANBaQFqzLkAIwo7NPC6Al+ZPf5HrC8gXhv0JS5ifQl3/YK7FdNtjmtobg
+wF4xVUGJ3hMnnbO0CAfRybzdWfKXnScb2O1y+ewqFCHdumAdwsngyHlxIG8EYoeL
+ZuJ5I8HSx14J27noL6eZGSoFKFiOMcRpwkWLjKe/CYZggxlooINCqXCIkaB6uiwQ
+wZ+WgWUhWuRiXo02d7Nglj6VRk5B1FFW3gs6KM0XYkF1yC+TH+9igRwAxOIkL4HJ
+fjZasHBiWV9JlJsusEJe9G2UaWGzs+uMXBUA9ufHOJBoL0Vk52IXNAMW1J+geo5u
+8Zbkj5P8alMDk5DaklXrSzBVTNkxu74KvXAslMZ9MSInN6y6q6zmN834kNnWh8ac
+Rv8uCGMd89FB818RCn/HqlBpTLpxXC3XSS27mzgecnRYCXcuDhM=
+=klRv
+-----END PGP SIGNATURE-----
+
+--ACYWsYnYIwIOVUtIQ6H6e52Gp2zjtVyUo--
