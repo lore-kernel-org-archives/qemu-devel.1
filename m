@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egthB-0000Ag-04
+	(envelope-from <armbru@redhat.com>) id 1egthC-0000CE-8T
 	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:49:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egth3-0003hS-H9
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:49:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59114)
+	(envelope-from <armbru@redhat.com>) id 1egth0-0003fO-Vi
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:49:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egth3-0003gi-7w
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:48:57 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egth0-0003en-NS
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:48:54 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 31 Jan 2018 15:48:38 +0100
-Message-Id: <20180131144846.31697-12-armbru@redhat.com>
+Date: Wed, 31 Jan 2018 15:48:35 +0100
+Message-Id: <20180131144846.31697-9-armbru@redhat.com>
 In-Reply-To: <20180131144846.31697-1-armbru@redhat.com>
 References: <20180131144846.31697-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 11/19] Include qapi/qmp/qlist.h exactly
- where needed
+Subject: [Qemu-devel] [PATCH v2 08/19] Eliminate qapi/qmp/types.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,393 +29,477 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: balaton@eik.bme.hu, eblake@redhat.com, f4bug@amsat.org
 
-This cleanup makes the number of objects depending on qapi/qmp/qlist.h
-drop from 4551 (out of 4743) to 16 in my "build everything" tree.
+qapi/qmp/types.h is a convenience header to include a number of
+qapi/qmp/ headers.  Since we rarely need all of the headers
+qapi/qmp/types.h includes, we bypass it most of the time.  Most of the
+places that use it don't need all the headers, either.
 
-While there, separate #include from file comment with a blank line.
+Include the necessary headers directly, and drop qapi/qmp/types.h.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/qapi.c                        | 1 +
- block/rbd.c                         | 1 +
- blockdev.c                          | 1 +
- include/qapi/qmp/json-parser.h      | 1 -
- include/qapi/qmp/qdict.h            | 1 -
- qapi/qobject-input-visitor.c        | 1 +
- qapi/qobject-output-visitor.c       | 1 +
- qobject/json-parser.c               | 1 +
- qobject/qdict.c                     | 1 +
- qobject/qjson.c                     | 1 +
- qobject/qlit.c                      | 1 +
- qobject/qobject.c                   | 1 +
- tests/check-qdict.c                 | 3 ++-
- tests/check-qlit.c                  | 1 +
- tests/check-qobject.c               | 3 ++-
- tests/device-introspect-test.c      | 1 +
- tests/libqtest.c                    | 3 ++-
- tests/numa-test.c                   | 1 +
- tests/qmp-test.c                    | 1 +
- tests/qom-test.c                    | 1 +
- tests/test-keyval.c                 | 1 +
- tests/test-qga.c                    | 1 +
- tests/test-qobject-output-visitor.c | 1 +
- tests/test-x86-cpuid-compat.c       | 1 +
- ui/vnc-palette.h                    | 1 -
- util/keyval.c                       | 1 +
- util/qemu-config.c                  | 1 +
- 27 files changed, 27 insertions(+), 6 deletions(-)
+ block/qapi.c                        |  3 ++-
+ block/qcow2.c                       |  3 ++-
+ blockdev.c                          |  2 +-
+ hw/pci/pcie_aer.c                   |  1 -
+ hw/watchdog/watchdog.c              |  1 -
+ include/qapi/qmp/types.h            | 24 ------------------------
+ monitor.c                           |  2 +-
+ qapi/qapi-dealloc-visitor.c         |  1 -
+ qapi/qmp-dispatch.c                 |  1 -
+ qapi/qobject-input-visitor.c        |  2 +-
+ qapi/qobject-output-visitor.c       |  3 ++-
+ qobject/json-parser.c               |  3 ++-
+ qobject/qjson.c                     |  2 +-
+ qobject/qlit.c                      |  4 +++-
+ qobject/qobject.c                   |  4 +++-
+ scripts/qapi-commands.py            |  1 -
+ target/i386/cpu.c                   |  1 -
+ tests/check-qjson.c                 |  2 +-
+ tests/check-qobject.c               |  3 ++-
+ tests/cpu-plug-test.c               |  1 -
+ tests/qom-test.c                    |  1 -
+ tests/test-clone-visitor.c          |  1 -
+ tests/test-qmp-commands.c           |  3 ++-
+ tests/test-qmp-event.c              |  3 ++-
+ tests/test-qobject-input-visitor.c  |  2 +-
+ tests/test-qobject-output-visitor.c |  2 +-
+ tests/test-string-input-visitor.c   |  1 -
+ tests/test-string-output-visitor.c  |  1 -
+ tests/test-visitor-serialization.c  |  1 -
+ ui/vnc.c                            |  1 -
+ util/qemu-option.c                  |  4 +++-
+ 31 files changed, 30 insertions(+), 54 deletions(-)
+ delete mode 100644 include/qapi/qmp/types.h
 
 diff --git a/block/qapi.c b/block/qapi.c
-index 1e0cb2743d..12a8cb5a82 100644
+index 4fc9fd8082..1ab4372519 100644
 --- a/block/qapi.c
 +++ b/block/qapi.c
-@@ -32,6 +32,7 @@
+@@ -31,7 +31,8 @@
+ #include "qapi-visit.h"
  #include "qapi/error.h"
  #include "qapi/qobject-output-visitor.h"
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qstring.h"
  #include "sysemu/block-backend.h"
-diff --git a/block/rbd.c b/block/rbd.c
-index a76a5e8755..76b9e83cea 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -21,6 +21,7 @@
  #include "qemu/cutils.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qlist.h"
 =20
- /*
-  * When specifying the image filename use:
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7645b3c6ae..700c06245b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -32,7 +32,8 @@
+ #include "qapi/error.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/qmp/qbool.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
+ #include "qapi-event.h"
+ #include "trace.h"
+ #include "qemu/option_int.h"
 diff --git a/blockdev.c b/blockdev.c
-index c487cf0e4b..90ef3166de 100644
+index ad82dbbeee..8a47459937 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -45,6 +45,7 @@
+@@ -40,7 +40,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qstring.h"
  #include "qapi-visit.h"
  #include "qapi/error.h"
  #include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qobject-output-visitor.h"
+diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
+index b009be7f17..071e5e9bbb 100644
+--- a/hw/pci/pcie_aer.c
++++ b/hw/pci/pcie_aer.c
+@@ -20,7 +20,6 @@
+=20
+ #include "qemu/osdep.h"
  #include "sysemu/sysemu.h"
- #include "sysemu/iothread.h"
-diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parse=
-r.h
-index 9987f8ca85..102f5c0068 100644
---- a/include/qapi/qmp/json-parser.h
-+++ b/include/qapi/qmp/json-parser.h
-@@ -15,7 +15,6 @@
- #define QEMU_JSON_PARSER_H
-=20
- #include "qemu-common.h"
--#include "qapi/qmp/qlist.h"
-=20
- QObject *json_parser_parse(GQueue *tokens, va_list *ap);
- QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp=
-);
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index 3c1def00f7..ff6f7842c3 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -14,7 +14,6 @@
- #define QDICT_H
-=20
- #include "qapi/qmp/qobject.h"
--#include "qapi/qmp/qlist.h"
+-#include "qapi/qmp/types.h"
+ #include "qapi/qmp/qjson.h"
+ #include "monitor/monitor.h"
+ #include "hw/pci/pci_bridge.h"
+diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
+index 25dcb25ff1..98a5dd6689 100644
+--- a/hw/watchdog/watchdog.c
++++ b/hw/watchdog/watchdog.c
+@@ -24,7 +24,6 @@
+ #include "qemu/config-file.h"
  #include "qemu/queue.h"
+ #include "qapi/error.h"
+-#include "qapi/qmp/types.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/watchdog.h"
+ #include "qapi-event.h"
+diff --git a/include/qapi/qmp/types.h b/include/qapi/qmp/types.h
+deleted file mode 100644
+index 749ac44dcb..0000000000
+--- a/include/qapi/qmp/types.h
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/*
+- * Include all QEMU objects.
+- *
+- * Copyright (C) 2009 Red Hat Inc.
+- *
+- * Authors:
+- *  Luiz Capitulino <lcapitulino@redhat.com>
+- *
+- * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
+- * See the COPYING.LIB file in the top-level directory.
+- */
+-
+-#ifndef QAPI_QMP_TYPES_H
+-#define QAPI_QMP_TYPES_H
+-
+-#include "qapi/qmp/qobject.h"
+-#include "qapi/qmp/qnum.h"
+-#include "qapi/qmp/qbool.h"
+-#include "qapi/qmp/qstring.h"
+-#include "qapi/qmp/qdict.h"
+-#include "qapi/qmp/qlist.h"
+-#include "qapi/qmp/qnull.h"
+-
+-#endif /* QAPI_QMP_TYPES_H */
+diff --git a/monitor.c b/monitor.c
+index 2de69f648f..f38640c1e4 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -53,7 +53,7 @@
+ #include "qemu/acl.h"
+ #include "sysemu/tpm.h"
+ #include "qapi/qmp/qerror.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/json-streamer.h"
+ #include "qapi/qmp/json-parser.h"
+diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
+index ed70a0158b..c7d5f80302 100644
+--- a/qapi/qapi-dealloc-visitor.c
++++ b/qapi/qapi-dealloc-visitor.c
+@@ -16,7 +16,6 @@
+ #include "qapi/dealloc-visitor.h"
+ #include "qemu/queue.h"
+ #include "qemu-common.h"
+-#include "qapi/qmp/types.h"
+ #include "qapi/visitor-impl.h"
 =20
- #define QDICT_BUCKET_MAX 512
+ struct QapiDeallocVisitor
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 8829c4a45a..92f957f40e 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -13,7 +13,6 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qapi/qmp/types.h"
+ #include "qapi/qmp/dispatch.h"
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/qjson.h"
 diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 31183dcb62..3e235a1eee 100644
+index ee9e47d911..8fb34c472e 100644
 --- a/qapi/qobject-input-visitor.c
 +++ b/qapi/qobject-input-visitor.c
-@@ -22,6 +22,7 @@
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qemu/cutils.h"
-diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.=
-c
-index f0cc46b3cf..52634b9725 100644
---- a/qapi/qobject-output-visitor.c
-+++ b/qapi/qobject-output-visitor.c
-@@ -18,6 +18,7 @@
+@@ -20,7 +20,7 @@
  #include "qemu/queue.h"
  #include "qemu-common.h"
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qjson.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.=
+c
+index d325163e55..60398765df 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -17,7 +17,8 @@
+ #include "qapi/visitor-impl.h"
+ #include "qemu/queue.h"
+ #include "qemu-common.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qstring.h"
+=20
+ typedef struct QStackEntry {
+     QObject *value;
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 8f4badc6d9..ee0cbba6a5 100644
+index 724ca240e4..30dfb9dc41 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -16,6 +16,7 @@
+@@ -15,7 +15,8 @@
+ #include "qemu/cutils.h"
  #include "qapi/error.h"
  #include "qemu-common.h"
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 88f87d2527..23df84f9cd 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -14,6 +14,7 @@
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/error.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/json-lexer.h"
+ #include "qapi/qmp/json-streamer.h"
 diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 7fbb68b6ba..527b5bb571 100644
+index 2e0930884e..fe89213247 100644
 --- a/qobject/qjson.c
 +++ b/qobject/qjson.c
-@@ -18,6 +18,7 @@
- #include "qapi/qmp/json-streamer.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnum.h"
- #include "qemu/unicode.h"
-=20
-diff --git a/qobject/qlit.c b/qobject/qlit.c
-index c2d0303425..948e0b860c 100644
---- a/qobject/qlit.c
-+++ b/qobject/qlit.c
-@@ -17,6 +17,7 @@
-=20
- #include "qapi/qmp/qlit.h"
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/qobject/qobject.c b/qobject/qobject.c
-index 5bbcd04812..23600aa1c1 100644
---- a/qobject/qobject.c
-+++ b/qobject/qobject.c
-@@ -13,6 +13,7 @@
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qstring.h"
-=20
- static void (*qdestroy[QTYPE__MAX])(QObject *) =3D {
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index 1b1173634f..ec628f3453 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -9,9 +9,10 @@
-  * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-  * See the COPYING.LIB file in the top-level directory.
-  */
-+
- #include "qemu/osdep.h"
--
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/error.h"
-diff --git a/tests/check-qlit.c b/tests/check-qlit.c
-index c59ec1ab88..b8b5016af7 100644
---- a/tests/check-qlit.c
-+++ b/tests/check-qlit.c
-@@ -11,6 +11,7 @@
-=20
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qlit.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/tests/check-qobject.c b/tests/check-qobject.c
-index 9e1e82045f..885d0e3de6 100644
---- a/tests/check-qobject.c
-+++ b/tests/check-qobject.c
-@@ -6,9 +6,10 @@
-  * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
- later.
-  * See the COPYING.LIB file in the top-level directory.
-  */
-+
- #include "qemu/osdep.h"
--
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-tes=
-t.c
-index f7162c023f..2b3d01174d 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -22,6 +22,7 @@
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
- #include "libqtest.h"
-=20
- const char common_args[] =3D "-nodefaults -machine none";
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 0ec8af2923..16d60818a7 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -12,8 +12,8 @@
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-  * See the COPYING file in the top-level directory.
-- *
-  */
-+
- #include "qemu/osdep.h"
- #include "libqtest.h"
-=20
-@@ -25,6 +25,7 @@
+@@ -17,7 +17,7 @@
  #include "qapi/qmp/json-parser.h"
  #include "qapi/qmp/json-streamer.h"
  #include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qlist.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
+ #include "qemu/unicode.h"
 =20
- #define MAX_IRQ 256
- #define SOCKET_TIMEOUT 50
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index e1b6152244..8158854e17 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -11,6 +11,7 @@
-=20
+ typedef struct JSONParsingState
+diff --git a/qobject/qlit.c b/qobject/qlit.c
+index 3c4882c784..dbf19225c8 100644
+--- a/qobject/qlit.c
++++ b/qobject/qlit.c
+@@ -16,7 +16,9 @@
  #include "qemu/osdep.h"
- #include "libqtest.h"
-+#include "qapi/qmp/qlist.h"
 =20
- static char *make_cli(const char *generic_cli, const char *test_cli)
+ #include "qapi/qmp/qlit.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
+=20
+ static bool qlit_equal_qdict(const QLitObject *lhs, const QDict *qdict)
  {
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 36feb2204b..cc9661af47 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -14,6 +14,7 @@
- #include "libqtest.h"
- #include "qapi-visit.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/util.h"
- #include "qapi/visitor.h"
-diff --git a/tests/qom-test.c b/tests/qom-test.c
-index 0ee990710c..847703cb14 100644
---- a/tests/qom-test.c
-+++ b/tests/qom-test.c
-@@ -10,6 +10,7 @@
+diff --git a/qobject/qobject.c b/qobject/qobject.c
+index b2a536041d..9b61ece06b 100644
+--- a/qobject/qobject.c
++++ b/qobject/qobject.c
+@@ -9,7 +9,9 @@
+=20
  #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
+=20
+ static void (*qdestroy[QTYPE__MAX])(QObject *) =3D {
+     [QTYPE_NONE] =3D NULL,               /* No such object exists */
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index dc7c418923..26c56c5062 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -293,7 +293,6 @@ fdef.write(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/module.h"
+-#include "qapi/qmp/types.h"
+ #include "qapi/visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi/qobject-input-visitor.h"
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ae44c9d8ad..6627e98bdf 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -32,7 +32,6 @@
+ #include "qemu/config-file.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qerror.h"
+-#include "qapi/qmp/types.h"
+=20
+ #include "qapi-visit.h"
+ #include "qapi/visitor.h"
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 59227934ce..7881009f1c 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -14,7 +14,7 @@
+ #include "qemu/osdep.h"
+=20
+ #include "qapi/error.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qlit.h"
+ #include "qemu-common.h"
+diff --git a/tests/check-qobject.c b/tests/check-qobject.c
+index 710f9e6b0a..06b9c6ec34 100644
+--- a/tests/check-qobject.c
++++ b/tests/check-qobject.c
+@@ -8,7 +8,8 @@
+  */
+ #include "qemu/osdep.h"
+=20
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qstring.h"
+ #include "qemu-common.h"
+=20
+ #include <math.h>
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index 05d82f76c4..65456c9e37 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -11,7 +11,6 @@
 =20
  #include "qemu-common.h"
-+#include "qapi/qmp/qlist.h"
+ #include "libqtest.h"
+-#include "qapi/qmp/types.h"
+=20
+ struct PlugTestData {
+     char *machine;
+diff --git a/tests/qom-test.c b/tests/qom-test.c
+index ab0595dc75..0ee990710c 100644
+--- a/tests/qom-test.c
++++ b/tests/qom-test.c
+@@ -12,7 +12,6 @@
+ #include "qemu-common.h"
  #include "qemu/cutils.h"
  #include "libqtest.h"
+-#include "qapi/qmp/types.h"
 =20
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index baf7e339ab..d0c4bf2b9d 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -12,6 +12,7 @@
-=20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qobject-input-visitor.h"
+ static const char *blacklist_x86[] =3D {
+     "xenfv", "xenpv", NULL
+diff --git a/tests/test-clone-visitor.c b/tests/test-clone-visitor.c
+index 6b6d4aaeba..9aeaf86a07 100644
+--- a/tests/test-clone-visitor.c
++++ b/tests/test-clone-visitor.c
+@@ -12,7 +12,6 @@
+ #include "qemu-common.h"
+ #include "qapi/clone-visitor.h"
  #include "test-qapi-visit.h"
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index fd6bc7690f..e67c7289eb 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -5,6 +5,7 @@
- #include <sys/un.h>
+-#include "qapi/qmp/types.h"
 =20
- #include "libqtest.h"
-+#include "qapi/qmp/qlist.h"
-=20
- typedef struct {
-     char *test_dir;
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
-put-visitor.c
-index 4a24e12121..7cf86707ec 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -17,6 +17,7 @@
- #include "qapi/qobject-output-visitor.h"
- #include "test-qapi-visit.h"
- #include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qjson.h"
-diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.=
-c
-index c594b5bd97..495dd1e7ef 100644
---- a/tests/test-x86-cpuid-compat.c
-+++ b/tests/test-x86-cpuid-compat.c
+ static void test_clone_struct(void)
+ {
+diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
+index 52c1802eaf..4794d1a9d8 100644
+--- a/tests/test-qmp-commands.c
++++ b/tests/test-qmp-commands.c
 @@ -1,6 +1,7 @@
  #include "qemu/osdep.h"
  #include "qemu-common.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qbool.h"
- #include "libqtest.h"
-diff --git a/ui/vnc-palette.h b/ui/vnc-palette.h
-index 1bd4318f53..e9f0eaf73b 100644
---- a/ui/vnc-palette.h
-+++ b/ui/vnc-palette.h
-@@ -29,7 +29,6 @@
- #ifndef VNC_PALETTE_H
- #define VNC_PALETTE_H
-=20
--#include "qapi/qmp/qlist.h"
- #include "qemu/queue.h"
-=20
- #define VNC_PALETTE_HASH_SIZE 256
-diff --git a/util/keyval.c b/util/keyval.c
-index 7dfc75cf01..4085282a7a 100644
---- a/util/keyval.c
-+++ b/util/keyval.c
-@@ -81,6 +81,7 @@
-=20
- #include "qemu/osdep.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
+ #include "test-qmp-commands.h"
  #include "qapi/error.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/cutils.h"
- #include "qemu/option.h"
-diff --git a/util/qemu-config.c b/util/qemu-config.c
-index 26ea248062..230c699a51 100644
---- a/util/qemu-config.c
-+++ b/util/qemu-config.c
-@@ -1,5 +1,6 @@
- #include "qemu/osdep.h"
+ #include "qapi/qmp/dispatch.h"
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index 5be2d8efcf..b197dff453 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -17,8 +17,9 @@
+ #include "test-qapi-visit.h"
+ #include "test-qapi-event.h"
  #include "qapi/error.h"
-+#include "qapi/qmp/qlist.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qstring.h"
+ #include "qapi/qmp-event.h"
+=20
+ typedef struct TestEventData {
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
+t-visitor.c
+index ade6062e2c..96405991bb 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -17,7 +17,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "test-qapi-visit.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qjson.h"
+ #include "test-qmp-introspect.h"
+ #include "qmp-introspect.h"
+diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
+put-visitor.c
+index 1cff769b15..a0b7fe6add 100644
+--- a/tests/test-qobject-output-visitor.c
++++ b/tests/test-qobject-output-visitor.c
+@@ -16,7 +16,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "test-qapi-visit.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qjson.h"
+=20
+ typedef struct TestOutputVisitorData {
+diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-=
+visitor.c
+index 4473944f3f..88e0e1aa9a 100644
+--- a/tests/test-string-input-visitor.c
++++ b/tests/test-string-input-visitor.c
+@@ -16,7 +16,6 @@
+ #include "qapi/error.h"
+ #include "qapi/string-input-visitor.h"
+ #include "test-qapi-visit.h"
+-#include "qapi/qmp/types.h"
+=20
+ typedef struct TestInputVisitorData {
+     Visitor *v;
+diff --git a/tests/test-string-output-visitor.c b/tests/test-string-outpu=
+t-visitor.c
+index facb76ffc3..fa4b4ca288 100644
+--- a/tests/test-string-output-visitor.c
++++ b/tests/test-string-output-visitor.c
+@@ -16,7 +16,6 @@
+ #include "qapi/error.h"
+ #include "qapi/string-output-visitor.h"
+ #include "test-qapi-visit.h"
+-#include "qapi/qmp/types.h"
+=20
+ typedef struct TestOutputVisitorData {
+     Visitor *ov;
+diff --git a/tests/test-visitor-serialization.c b/tests/test-visitor-seri=
+alization.c
+index a3407d205d..928a82b2e6 100644
+--- a/tests/test-visitor-serialization.c
++++ b/tests/test-visitor-serialization.c
+@@ -17,7 +17,6 @@
+ #include "qemu-common.h"
+ #include "test-qapi-visit.h"
+ #include "qapi/error.h"
+-#include "qapi/qmp/types.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 9bcc2c0db9..8458e6d9fe 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -35,7 +35,6 @@
+ #include "qemu/acl.h"
+ #include "qemu/config-file.h"
+ #include "qapi/error.h"
+-#include "qapi/qmp/types.h"
+ #include "qmp-commands.h"
+ #include "ui/input.h"
+ #include "qapi-event.h"
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 553d3dc552..d790c1b85a 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -28,7 +28,9 @@
+ #include "qapi/error.h"
  #include "qemu-common.h"
  #include "qemu/error-report.h"
- #include "qemu/option.h"
+-#include "qapi/qmp/types.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/option_int.h"
+ #include "qemu/cutils.h"
 --=20
 2.13.6
