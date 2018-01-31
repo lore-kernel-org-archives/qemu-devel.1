@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egvH6-0000wd-5R
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:30:20 -0500
+	(envelope-from <alistair23@gmail.com>) id 1egvHZ-0001Op-Mo
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egvH1-0006OC-F2
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:30:16 -0500
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:42212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egvH1-0006LO-4d
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:30:11 -0500
-Received: from player778.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 211F3AC8A9
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 17:30:08 +0100 (CET)
-Date: Wed, 31 Jan 2018 17:30:06 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180131173006.2597a490@bahia.lan>
-In-Reply-To: <CAFEAcA-q3K-6zVVjU3gxKjd6a4kYd0RLfVLfMhPgwskY=qb-hg@mail.gmail.com>
-References: <20180130173935.5172-1-groug@kaod.org>
-	<CAFEAcA-q3K-6zVVjU3gxKjd6a4kYd0RLfVLfMhPgwskY=qb-hg@mail.gmail.com>
+	(envelope-from <alistair23@gmail.com>) id 1egvHR-0006b0-M3
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:30:45 -0500
+Received: from mail-lf0-x230.google.com ([2a00:1450:4010:c07::230]:34307)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1egvHR-0006aY-Ed
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:30:37 -0500
+Received: by mail-lf0-x230.google.com with SMTP id k19so21674392lfj.1
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:30:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/10] 9p patches for 2.12 20180130
+Sender: alistair23@gmail.com
+In-Reply-To: <20180123035837.16578-3-f4bug@amsat.org>
+References: <20180123035837.16578-1-f4bug@amsat.org>
+	<20180123035837.16578-3-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 31 Jan 2018 08:30:05 -0800
+Message-ID: <CAKmqyKN-Cc9cJESWm-Vb9t5t2=KK_byNqAR1BgW6+BgBitsg_Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] hw/sd/milkymist-memcard: split
+ realize() out of SysBusDevice init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,160 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Wed, 31 Jan 2018 10:14:46 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Mon, Jan 22, 2018 at 7:58 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Create the SDCard in the realize() function.
+>
+> Suggested-by: Michael Walle <michael@walle.cc>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-> On 30 January 2018 at 17:39, Greg Kurz <groug@kaod.org> wrote:
-> > The following changes since commit 30d9fefe1aca1e92c785214aa9201fd7c2287d56:
-> >
-> >   Merge remote-tracking branch 'remotes/kraxel/tags/input-20180129-v2-pull-request' into staging (2018-01-29 15:52:27 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   https://github.com/gkurz/qemu.git tags/for-upstream
-> >
-> > for you to fetch changes up to 0dfef72861261bdfd30f2cc53d61c12c097af11a:
-> >
-> >   tests/virtio-9p: explicitly handle potential integer overflows (2018-01-30 15:28:56 +0100)
-> >
-> > ----------------------------------------------------------------
-> > This series is mostly about 9p request cancellation. It fixes a
-> > long standing bug (read "specification violation") where the server
-> > would send an invalid response when the client has cancelled an
-> > in-flight request. This was causing annoying spurious EINTR returns
-> > in linux. The fix comes with some related testing in QTEST.
-> >
-> > Other patches are code cleanup and improvements.
-> >
-> > ----------------------------------------------------------------
-> > Greg Kurz (9):
-> >       9pfs: drop v9fs_register_transport()
-> >       tests: virtio-9p: move request tag to the test functions
-> >       tests: virtio-9p: wait for completion in the test code
-> >       tests: virtio-9p: use the synth backend
-> >       tests: virtio-9p: add LOPEN operation test
-> >       tests: virtio-9p: add WRITE operation test
-> >       libqos/virtio: return length written into used descriptor
-> >       tests: virtio-9p: add FLUSH operation test
-> >       tests/virtio-9p: explicitly handle potential integer overflows
-> >
-> > Keno Fischer (1):
-> >       9pfs: Correctly handle cancelled requests  
-> 
-> Hi. This fails 'make check' on sparc hosts:
-> 
-> TEST: tests/virtio-9p-test... (pid=21410)
->   /ppc64/virtio/9p/pci/nop:                                            OK
->   /ppc64/virtio/9p/pci/config:                                         OK
->   /ppc64/virtio/9p/pci/fs/version/basic:                               OK
->   /ppc64/virtio/9p/pci/fs/attach/basic:                                OK
->   /ppc64/virtio/9p/pci/fs/walk/basic:                                  OK
->   /ppc64/virtio/9p/pci/fs/walk/no_slash:                               OK
->   /ppc64/virtio/9p/pci/fs/walk/dotdot_from_root:                       OK
->   /ppc64/virtio/9p/pci/fs/lopen/basic:                                 OK
->   /ppc64/virtio/9p/pci/fs/write/basic:                                 OK
->   /ppc64/virtio/9p/pci/fs/flush/success:
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02S3152e3829aa0155ecb8ed934af62a54f
-> (pid=21546)
->   /ppc64/virtio/9p/pci/fs/flush/ignored:
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sd8d854ef25a0afc00dfe43cdab8f8bc7
-> (pid=21552)
-> FAIL: tests/virtio-9p-test
-> 
-> On x86 with the clang runtime sanitizer it gives errors about
-> misaligned loads:
-> 
-> /home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-> runtime error: member access within misaligned address 0x7fb933502017
-> for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
-> 0x7fb933502017: note: pointer points here
->  04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-> 00 00 00 00 00 00 00  00 00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-> runtime error: load of misaligned address 0x7fb933502017 for type
-> 'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
-> 0x7fb933502017: note: pointer points here
->  04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-> 00 00 00 00 00 00 00  00 00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:532:22:
-> runtime error: member access within misaligned address 0x7fb933502017
-> for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
-> 0x7fb933502017: note: pointer points here
->  04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-> 00 00 00 00 00 00 00  00 00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:532:22:
-> runtime error: load of misaligned address 0x7fb933502017 for type
-> 'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
-> 0x7fb933502017: note: pointer points here
->  04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-> 00 00 00 00 00 00 00  00 00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-> runtime error: member access within misaligned address 0x7f33bb102017
-> for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
-> 0x7f33bb102017: note: pointer points here
->  04 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-> 00 00 00 00 00 00 00  00 00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-> runtime error: load of misaligned address 0x7f33bb102017 for type
-> 'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
-> 0x7f33bb102017: note: pointer points here
->  04 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-> 00 00 00 00 00 00 00  00 00 00
->              ^
-> 
-> which is probably what is causing the sparc failure.
-> 
-> This code looks suspicious:
-> 
-> static ssize_t v9fs_synth_qtest_flush_write(void *buf, int len, off_t offset,
->                                             void *arg)
-> {
->     QtestV9fsSynthFlushData *data = buf;
-> 
->     assert(len == sizeof(*data));
-> 
->     if (data->usec_timeout) {
-> 
-> as you can't in general cast an arbitrary pointer into a
-> structure and use it like that.
-> 
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-... which is likely to happen if it points to some data coming from
-a QTEST originated stream of bytes... :-\
+Alistair
 
-> Given that the only thing in the data stream is a 32-bit value,
-> it would be simpler just to say
->   uint32_t usec_timeout = ldl_XX_p(buf);
-> 
-
-Well, at the present time there's only a 32-bit value but this
-may change. So I'd prefer to copy the bytes into an aligned
-structure.
-
-> I put 'XX' there because the other thing that looks weird here
-> is the handling of endianness. The code as written is doing
-> a "load a host-order 32-bit value", which would be ldl_he_p().
-> But should a buffer in the 9pfs code really have anything
-> in host-order rather than a fixed-by-protocol order?
-> Using ldl_le_p() or ldl_be_p() seems more plausible. (Whatever
-> code is generating this byte stream might also need attention.)
-> 
-
-The code at the other end is test code in QTEST, the goal of
-which is to simulate a blocking 9P "write" request. Is it safe
-to assume that this test code does "host-order" stores ?
-
-> thanks
-> -- PMM
+> ---
+>  hw/sd/milkymist-memcard.c | 28 ++++++++++++++++------------
+>  1 file changed, 16 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+> index 1292c0c099..a8e65892c7 100644
+> --- a/hw/sd/milkymist-memcard.c
+> +++ b/hw/sd/milkymist-memcard.c
+> @@ -257,27 +257,31 @@ static void milkymist_memcard_reset(DeviceState *d)
+>      device_reset(DEVICE(s->card));
+>  }
+>
+> -static int milkymist_memcard_init(SysBusDevice *dev)
+> +static void milkymist_memcard_init(Object *obj)
+> +{
+> +    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(obj);
+> +    SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops,=
+ s,
+> +            "milkymist-memcard", R_MAX * 4);
+> +    sysbus_init_mmio(dev, &s->regs_region);
+> +}
+> +
+> +static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+>  {
+>      MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
+> -    DriveInfo *dinfo;
+>      BlockBackend *blk;
+> +    DriveInfo *dinfo;
+>
+>      /* FIXME use a qdev drive property instead of drive_get_next() */
+>      dinfo =3D drive_get_next(IF_SD);
+>      blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
+>      s->card =3D sd_init(blk, false);
+>      if (s->card =3D=3D NULL) {
+> -        return -1;
+> +        error_setg(errp, "failed to init SD card");
+> +        return;
+>      }
+> -
+>      s->enabled =3D blk && blk_is_inserted(blk);
+> -
+> -    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops,=
+ s,
+> -            "milkymist-memcard", R_MAX * 4);
+> -    sysbus_init_mmio(dev, &s->regs_region);
+> -
+> -    return 0;
+>  }
+>
+>  static const VMStateDescription vmstate_milkymist_memcard =3D {
+> @@ -300,9 +304,8 @@ static const VMStateDescription vmstate_milkymist_mem=
+card =3D {
+>  static void milkymist_memcard_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+>
+> -    k->init =3D milkymist_memcard_init;
+> +    dc->realize =3D milkymist_memcard_realize;
+>      dc->reset =3D milkymist_memcard_reset;
+>      dc->vmsd =3D &vmstate_milkymist_memcard;
+>      /* Reason: init() method uses drive_get_next() */
+> @@ -313,6 +316,7 @@ static const TypeInfo milkymist_memcard_info =3D {
+>      .name          =3D TYPE_MILKYMIST_MEMCARD,
+>      .parent        =3D TYPE_SYS_BUS_DEVICE,
+>      .instance_size =3D sizeof(MilkymistMemcardState),
+> +    .instance_init =3D milkymist_memcard_init,
+>      .class_init    =3D milkymist_memcard_class_init,
+>  };
+>
+> --
+> 2.15.1
+>
+>
