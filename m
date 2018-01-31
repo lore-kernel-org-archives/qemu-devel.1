@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1egvIW-00027A-Oa
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:31:48 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1egvQ5-0005hg-4V
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:39:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1egvIQ-0007Ry-6k
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:31:44 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:41331)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1egvQ0-0004tw-Rs
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:39:33 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35571)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1egvIP-0007QF-Qn
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:31:38 -0500
-Received: by mail-lf0-x243.google.com with SMTP id f136so21635098lff.8
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:31:37 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1egvQ0-0004tD-M4
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:39:28 -0500
+Received: by mail-qt0-x242.google.com with SMTP id g14so22637613qti.2
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:39:28 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180131144846.31697-1-armbru@redhat.com>
+	<20180131144846.31697-3-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <796659b8-78e3-735a-2f89-81d951863c1d@amsat.org>
+Date: Wed, 31 Jan 2018 13:39:25 -0300
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180123035837.16578-4-f4bug@amsat.org>
-References: <20180123035837.16578-1-f4bug@amsat.org>
-	<20180123035837.16578-4-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 31 Jan 2018 08:31:05 -0800
-Message-ID: <CAKmqyKPRX=wB-JsWY8Tt+SYh_6PO5JFoKcr2B7h6achxaRf1qw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] hw/sd/milkymist-memcard: expose a
- SDBus and connect the SDCard to it
+In-Reply-To: <20180131144846.31697-3-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] Clean up includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,119 +35,519 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Jan 22, 2018 at 7:58 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> using the sdbus_*() API.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 01/31/2018 11:48 AM, Markus Armbruster wrote:
+> Clean up includes so that osdep.h is included first and headers
+> which it implies are not included manually.
+> 
+> This commit was created with scripts/clean-includes, with the change
+> to target/s390x/gen-features.c manually reverted, and blank lines
+> around deletions collapsed.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Alistair
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/sd/milkymist-memcard.c | 38 +++++++++++++++++++++-----------------
->  1 file changed, 21 insertions(+), 17 deletions(-)
->
-> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-> index a8e65892c7..5570c1e9a0 100644
-> --- a/hw/sd/milkymist-memcard.c
-> +++ b/hw/sd/milkymist-memcard.c
-> @@ -69,7 +69,7 @@ struct MilkymistMemcardState {
->      SysBusDevice parent_obj;
->
->      MemoryRegion regs_region;
-> -    SDState *card;
-> +    SDBus sdbus;
->
->      int command_write_ptr;
->      int response_read_ptr;
-> @@ -105,7 +105,7 @@ static void memcard_sd_command(MilkymistMemcardState =
-*s)
->      req.crc =3D s->command[5];
->
->      s->response[0] =3D req.cmd;
-> -    s->response_len =3D sd_do_command(s->card, &req, s->response+1);
-> +    s->response_len =3D sdbus_do_command(&s->sdbus, &req, s->response + =
-1);
->      s->response_read_ptr =3D 0;
->
->      if (s->response_len =3D=3D 16) {
-> @@ -150,10 +150,10 @@ static uint64_t memcard_read(void *opaque, hwaddr a=
-ddr,
->              r =3D 0xffffffff;
->          } else {
->              r =3D 0;
-> -            r |=3D sd_read_data(s->card) << 24;
-> -            r |=3D sd_read_data(s->card) << 16;
-> -            r |=3D sd_read_data(s->card) << 8;
-> -            r |=3D sd_read_data(s->card);
-> +            r |=3D sdbus_read_data(&s->sdbus) << 24;
-> +            r |=3D sdbus_read_data(&s->sdbus) << 16;
-> +            r |=3D sdbus_read_data(&s->sdbus) << 8;
-> +            r |=3D sdbus_read_data(&s->sdbus);
->          }
->          break;
->      case R_CLK2XDIV:
-> @@ -207,10 +207,10 @@ static void memcard_write(void *opaque, hwaddr addr=
-, uint64_t value,
->          if (!s->enabled) {
->              break;
->          }
-> -        sd_write_data(s->card, (value >> 24) & 0xff);
-> -        sd_write_data(s->card, (value >> 16) & 0xff);
-> -        sd_write_data(s->card, (value >> 8) & 0xff);
-> -        sd_write_data(s->card, value & 0xff);
-> +        sdbus_write_data(&s->sdbus, (value >> 24) & 0xff);
-> +        sdbus_write_data(&s->sdbus, (value >> 16) & 0xff);
-> +        sdbus_write_data(&s->sdbus, (value >> 8) & 0xff);
-> +        sdbus_write_data(&s->sdbus, value & 0xff);
->          break;
->      case R_ENABLE:
->          s->regs[addr] =3D value;
-> @@ -251,10 +251,6 @@ static void milkymist_memcard_reset(DeviceState *d)
->      for (i =3D 0; i < R_MAX; i++) {
->          s->regs[i] =3D 0;
->      }
-> -    /* Since we're still using the legacy SD API the card is not plugged
-> -     * into any bus, and we must reset it manually.
-> -     */
-> -    device_reset(DEVICE(s->card));
->  }
->
->  static void milkymist_memcard_init(Object *obj)
-> @@ -270,15 +266,23 @@ static void milkymist_memcard_init(Object *obj)
->  static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
->  {
->      MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
-> +    DeviceState *carddev;
->      BlockBackend *blk;
->      DriveInfo *dinfo;
-> +    Error *err =3D NULL;
->
-> +    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
-> +                        dev, "sd-bus");
+>  block/parallels.h                                     |  1 -
+>  hw/block/vhost-user-blk.c                             |  1 -
+>  hw/nvram/eeprom_at24c.c                               |  3 +--
+>  hw/tpm/tpm_emulator.c                                 |  5 -----
+>  hw/tpm/tpm_int.h                                      |  2 --
+>  hw/tpm/tpm_ioctl.h                                    |  2 --
+>  hw/xtensa/xtensa_memory.h                             |  1 -
+>  include/exec/tb-lookup.h                              |  2 --
+>  include/hw/intc/xlnx-pmu-iomod-intc.h                 |  1 -
+>  include/hw/intc/xlnx-zynqmp-ipi.h                     |  1 -
+>  include/hw/nvram/fw_cfg.h                             |  1 -
+>  include/hw/pci-bridge/simba.h                         |  1 -
+>  include/hw/xtensa/xtensa-isa.h                        |  2 --
+>  include/qapi/clone-visitor.h                          |  1 -
+>  include/sysemu/hvf.h                                  |  2 --
+>  include/ui/console.h                                  |  1 -
+>  io/channel-websock.c                                  |  3 ---
+>  linux-user/syscall.c                                  |  1 -
+>  scsi/pr-helper.h                                      |  2 --
+>  target/i386/hax-all.c                                 |  1 -
+>  target/i386/hvf/hvf.c                                 |  1 -
+>  target/i386/hvf/vmx.h                                 |  1 -
+>  target/i386/hvf/x86_decode.c                          |  1 -
+>  target/i386/hvf/x86_mmu.c                             |  1 -
+>  target/i386/hvf/x86_task.c                            |  1 -
+>  target/i386/hvf/x86hvf.c                              |  3 ---
+>  target/xtensa/core-dc232b/xtensa-modules.c            |  1 +
+>  target/xtensa/core-dc233c/xtensa-modules.c            |  1 +
+>  target/xtensa/core-de212/xtensa-modules.c             |  1 +
+>  target/xtensa/core-fsf/xtensa-modules.c               |  1 +
+>  target/xtensa/core-sample_controller/xtensa-modules.c |  1 +
+>  target/xtensa/xtensa-isa.c                            |  4 +---
+>  tests/migration/stress.c                              | 10 +---------
+>  tests/ptimer-test.c                                   |  4 ++--
+>  trace/control-internal.h                              |  2 --
+>  35 files changed, 10 insertions(+), 57 deletions(-)
+> 
+> diff --git a/block/parallels.h b/block/parallels.h
+> index 4b044079ef..5aa101cfc8 100644
+> --- a/block/parallels.h
+> +++ b/block/parallels.h
+> @@ -32,7 +32,6 @@
+>  #ifndef BLOCK_PARALLELS_H
+>  #define BLOCK_PARALLELS_H
+>  #include "qemu/coroutine.h"
+> -#include "qemu/typedefs.h"
+>  
+>  #define HEADS_NUMBER 16
+>  #define SEC_IN_CYL 32
+> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> index b53b4c9c57..f840f07dfe 100644
+> --- a/hw/block/vhost-user-blk.c
+> +++ b/hw/block/vhost-user-blk.c
+> @@ -19,7 +19,6 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+> -#include "qemu/typedefs.h"
+>  #include "qemu/cutils.h"
+>  #include "qom/object.h"
+>  #include "hw/qdev-core.h"
+> diff --git a/hw/nvram/eeprom_at24c.c b/hw/nvram/eeprom_at24c.c
+> index efa3621ac6..22183f5360 100644
+> --- a/hw/nvram/eeprom_at24c.c
+> +++ b/hw/nvram/eeprom_at24c.c
+> @@ -7,9 +7,8 @@
+>   * the LICENSE file in the top-level directory.
+>   */
+>  
+> -#include <string.h>
+> -
+>  #include "qemu/osdep.h"
 > +
-> +    /* Create and plug in the sd card */
->      /* FIXME use a qdev drive property instead of drive_get_next() */
->      dinfo =3D drive_get_next(IF_SD);
->      blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
-> -    s->card =3D sd_init(blk, false);
-> -    if (s->card =3D=3D NULL) {
-> -        error_setg(errp, "failed to init SD card");
-> +    carddev =3D qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
-> +    qdev_prop_set_drive(carddev, "drive", blk, &err);
-> +    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
-> +    if (err) {
-> +        error_setg(errp, "failed to init SD card: %s", error_get_pretty(=
-err));
->          return;
->      }
->      s->enabled =3D blk && blk_is_inserted(blk);
-> --
-> 2.15.1
->
->
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+>  #include "hw/i2c/i2c.h"
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> index 35c78de5a9..1a2bd5a0b8 100644
+> --- a/hw/tpm/tpm_emulator.c
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -40,11 +40,6 @@
+>  #include "qapi/clone-visitor.h"
+>  #include "chardev/char-fe.h"
+>  
+> -#include <fcntl.h>
+> -#include <sys/types.h>
+> -#include <sys/stat.h>
+> -#include <stdio.h>
+> -
+>  #define DEBUG_TPM 0
+>  
+>  #define DPRINTF(fmt, ...) do { \
+> diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+> index abbca5191a..a4c77fbd7e 100644
+> --- a/hw/tpm/tpm_int.h
+> +++ b/hw/tpm/tpm_int.h
+> @@ -12,8 +12,6 @@
+>  #ifndef TPM_TPM_INT_H
+>  #define TPM_TPM_INT_H
+>  
+> -#include "qemu/osdep.h"
+> -
+>  #define TPM_STANDARD_CMDLINE_OPTS \
+>      { \
+>          .name = "type", \
+> diff --git a/hw/tpm/tpm_ioctl.h b/hw/tpm/tpm_ioctl.h
+> index 54c8d345ad..59a0b0595d 100644
+> --- a/hw/tpm/tpm_ioctl.h
+> +++ b/hw/tpm/tpm_ioctl.h
+> @@ -8,9 +8,7 @@
+>  #ifndef _TPM_IOCTL_H_
+>  #define _TPM_IOCTL_H_
+>  
+> -#include <stdint.h>
+>  #include <sys/uio.h>
+> -#include <sys/types.h>
+>  #include <sys/ioctl.h>
+>  
+>  /*
+> diff --git a/hw/xtensa/xtensa_memory.h b/hw/xtensa/xtensa_memory.h
+> index cab4d172d4..e9aa08749d 100644
+> --- a/hw/xtensa/xtensa_memory.h
+> +++ b/hw/xtensa/xtensa_memory.h
+> @@ -28,7 +28,6 @@
+>  #ifndef _XTENSA_MEMORY_H
+>  #define _XTENSA_MEMORY_H
+>  
+> -#include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+>  #include "exec/memory.h"
+> diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
+> index 296138591a..492cb68289 100644
+> --- a/include/exec/tb-lookup.h
+> +++ b/include/exec/tb-lookup.h
+> @@ -7,8 +7,6 @@
+>  #ifndef EXEC_TB_LOOKUP_H
+>  #define EXEC_TB_LOOKUP_H
+>  
+> -#include "qemu/osdep.h"
+> -
+>  #ifdef NEED_CPU_H
+>  #include "cpu.h"
+>  #else
+> diff --git a/include/hw/intc/xlnx-pmu-iomod-intc.h b/include/hw/intc/xlnx-pmu-iomod-intc.h
+> index 1fdba73b9f..01c9d040b8 100644
+> --- a/include/hw/intc/xlnx-pmu-iomod-intc.h
+> +++ b/include/hw/intc/xlnx-pmu-iomod-intc.h
+> @@ -25,7 +25,6 @@
+>  #ifndef XLNX_PMU_IO_INTC_H
+>  #define XLNX_PMU_IO_INTC_H
+>  
+> -#include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/register.h"
+>  
+> diff --git a/include/hw/intc/xlnx-zynqmp-ipi.h b/include/hw/intc/xlnx-zynqmp-ipi.h
+> index 4afa4ff313..866c719c6f 100644
+> --- a/include/hw/intc/xlnx-zynqmp-ipi.h
+> +++ b/include/hw/intc/xlnx-zynqmp-ipi.h
+> @@ -25,7 +25,6 @@
+>  #ifndef XLNX_ZYNQMP_IPI_H
+>  #define XLNX_ZYNQMP_IPI_H
+>  
+> -#include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/register.h"
+>  
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index 7ccbae5fba..b2259cc4a3 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -1,7 +1,6 @@
+>  #ifndef FW_CFG_H
+>  #define FW_CFG_H
+>  
+> -#include "qemu/typedefs.h"
+>  #include "exec/hwaddr.h"
+>  #include "hw/nvram/fw_cfg_keys.h"
+>  #include "hw/sysbus.h"
+> diff --git a/include/hw/pci-bridge/simba.h b/include/hw/pci-bridge/simba.h
+> index fac56ab1cf..e13ba27d0b 100644
+> --- a/include/hw/pci-bridge/simba.h
+> +++ b/include/hw/pci-bridge/simba.h
+> @@ -24,7 +24,6 @@
+>   * THE SOFTWARE.
+>   */
+>  
+> -#include "qemu/osdep.h"
+>  #include "hw/pci/pci_bridge.h"
+>  
+>  
+> diff --git a/include/hw/xtensa/xtensa-isa.h b/include/hw/xtensa/xtensa-isa.h
+> index 353f82ba25..bd68ada640 100644
+> --- a/include/hw/xtensa/xtensa-isa.h
+> +++ b/include/hw/xtensa/xtensa-isa.h
+> @@ -25,8 +25,6 @@
+>  #ifndef XTENSA_LIBISA_H
+>  #define XTENSA_LIBISA_H
+>  
+> -#include <stdint.h>
+> -
+>  #ifdef __cplusplus
+>  extern "C" {
+>  #endif
+> diff --git a/include/qapi/clone-visitor.h b/include/qapi/clone-visitor.h
+> index a4915c7d57..b119d3daa9 100644
+> --- a/include/qapi/clone-visitor.h
+> +++ b/include/qapi/clone-visitor.h
+> @@ -11,7 +11,6 @@
+>  #ifndef QAPI_CLONE_VISITOR_H
+>  #define QAPI_CLONE_VISITOR_H
+>  
+> -#include "qemu/typedefs.h"
+>  #include "qapi/visitor.h"
+>  #include "qapi-visit.h"
+>  
+> diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+> index e4e43f6468..241118845c 100644
+> --- a/include/sysemu/hvf.h
+> +++ b/include/sysemu/hvf.h
+> @@ -12,8 +12,6 @@
+>  #ifndef _HVF_H
+>  #define _HVF_H
+>  
+> -#include "config-host.h"
+> -#include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "qemu/bitops.h"
+>  #include "exec/memory.h"
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index 7b35778444..b153a584da 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -5,7 +5,6 @@
+>  #include "qom/object.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/notify.h"
+> -#include "qemu/typedefs.h"
+>  #include "qapi-types.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> index 87ebdebfc0..7fd6bb68ba 100644
+> --- a/io/channel-websock.c
+> +++ b/io/channel-websock.c
+> @@ -26,9 +26,6 @@
+>  #include "trace.h"
+>  #include "qemu/iov.h"
+>  
+> -#include <time.h>
+> -
+> -
+>  /* Max amount to allow in rawinput/encoutput buffers */
+>  #define QIO_CHANNEL_WEBSOCK_MAX_BUFFER 8192
+>  
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 74378947f0..779e590726 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -48,7 +48,6 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
+>  #include <sys/shm.h>
+>  #include <sys/sem.h>
+>  #include <sys/statfs.h>
+> -#include <time.h>
+>  #include <utime.h>
+>  #include <sys/sysinfo.h>
+>  #include <sys/signalfd.h>
+> diff --git a/scsi/pr-helper.h b/scsi/pr-helper.h
+> index 96c50a9e5f..096d1f1df6 100644
+> --- a/scsi/pr-helper.h
+> +++ b/scsi/pr-helper.h
+> @@ -26,8 +26,6 @@
+>  #ifndef QEMU_PR_HELPER_H
+>  #define QEMU_PR_HELPER_H 1
+>  
+> -#include <stdint.h>
+> -
+>  #define PR_HELPER_CDB_SIZE     16
+>  #define PR_HELPER_SENSE_SIZE   96
+>  #define PR_HELPER_DATA_SIZE    8192
+> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+> index 6874018738..bc9a12c1ee 100644
+> --- a/target/i386/hax-all.c
+> +++ b/target/i386/hax-all.c
+> @@ -30,7 +30,6 @@
+>  #include "exec/ioport.h"
+>  
+>  #include "qemu-common.h"
+> -#include <strings.h>
+>  #include "hax-i386.h"
+>  #include "sysemu/accel.h"
+>  #include "sysemu/sysemu.h"
+> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+> index 5d00c58129..aef3d83bb9 100644
+> --- a/target/i386/hvf/hvf.c
+> +++ b/target/i386/hvf/hvf.c
+> @@ -43,7 +43,6 @@
+>  #include "hw/i386/apic_internal.h"
+>  #include "hw/boards.h"
+>  #include "qemu/main-loop.h"
+> -#include <strings.h>
+>  #include "sysemu/accel.h"
+>  #include "sysemu/sysemu.h"
+>  #include "target/i386/cpu.h"
+> diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
+> index 9dfcd2f2eb..f3e6e86999 100644
+> --- a/target/i386/hvf/vmx.h
+> +++ b/target/i386/hvf/vmx.h
+> @@ -22,7 +22,6 @@
+>  #ifndef VMX_H
+>  #define VMX_H
+>  
+> -#include <stdint.h>
+>  #include <Hypervisor/hv.h>
+>  #include <Hypervisor/hv_vmx.h>
+>  #include "vmcs.h"
+> diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
+> index dcff2073a7..2d7540fe7c 100644
+> --- a/target/i386/hvf/x86_decode.c
+> +++ b/target/i386/hvf/x86_decode.c
+> @@ -21,7 +21,6 @@
+>  #include "qemu-common.h"
+>  #include "panic.h"
+>  #include "x86_decode.h"
+> -#include <string.h>
+>  #include "vmx.h"
+>  #include "x86_mmu.h"
+>  #include "x86_descr.h"
+> diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
+> index 2ad8fcdf70..c6be2cca35 100644
+> --- a/target/i386/hvf/x86_mmu.c
+> +++ b/target/i386/hvf/x86_mmu.c
+> @@ -23,7 +23,6 @@
+>  #include "cpu.h"
+>  #include "x86.h"
+>  #include "x86_mmu.h"
+> -#include <string.h>
+>  #include "vmcs.h"
+>  #include "vmx.h"
+>  #include "exec/address-spaces.h"
+> diff --git a/target/i386/hvf/x86_task.c b/target/i386/hvf/x86_task.c
+> index 452fad6b2d..4abf3db25e 100644
+> --- a/target/i386/hvf/x86_task.c
+> +++ b/target/i386/hvf/x86_task.c
+> @@ -32,7 +32,6 @@
+>  #include "hw/i386/apic_internal.h"
+>  #include "hw/boards.h"
+>  #include "qemu/main-loop.h"
+> -#include <strings.h>
+>  #include "sysemu/accel.h"
+>  #include "sysemu/sysemu.h"
+>  #include "target/i386/cpu.h"
+> diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+> index 7803e09a28..6c88939b96 100644
+> --- a/target/i386/hvf/x86hvf.c
+> +++ b/target/i386/hvf/x86hvf.c
+> @@ -29,11 +29,8 @@
+>  
+>  #include "hw/i386/apic_internal.h"
+>  
+> -#include <stdio.h>
+> -#include <stdlib.h>
+>  #include <Hypervisor/hv.h>
+>  #include <Hypervisor/hv_vmx.h>
+> -#include <stdint.h>
+>  
+>  void hvf_set_segment(struct CPUState *cpu, struct vmx_segment *vmx_seg,
+>                       SegmentCache *qseg, bool is_tr)
+> diff --git a/target/xtensa/core-dc232b/xtensa-modules.c b/target/xtensa/core-dc232b/xtensa-modules.c
+> index 0af43c84bb..d322c3f52a 100644
+> --- a/target/xtensa/core-dc232b/xtensa-modules.c
+> +++ b/target/xtensa/core-dc232b/xtensa-modules.c
+> @@ -18,6 +18,7 @@
+>     Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
+>     02110-1301, USA.  */
+>  
+> +#include "qemu/osdep.h"
+>  #include "xtensa-isa.h"
+>  #include "xtensa-isa-internal.h"
+>  
+> diff --git a/target/xtensa/core-dc233c/xtensa-modules.c b/target/xtensa/core-dc233c/xtensa-modules.c
+> index 8a41e73659..7c20f82349 100644
+> --- a/target/xtensa/core-dc233c/xtensa-modules.c
+> +++ b/target/xtensa/core-dc233c/xtensa-modules.c
+> @@ -21,6 +21,7 @@
+>     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+>     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+>  
+> +#include "qemu/osdep.h"
+>  #include "xtensa-isa.h"
+>  #include "xtensa-isa-internal.h"
+>  
+> diff --git a/target/xtensa/core-de212/xtensa-modules.c b/target/xtensa/core-de212/xtensa-modules.c
+> index 21f3bd8797..ef7674de3a 100644
+> --- a/target/xtensa/core-de212/xtensa-modules.c
+> +++ b/target/xtensa/core-de212/xtensa-modules.c
+> @@ -21,6 +21,7 @@
+>     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+>     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+>  
+> +#include "qemu/osdep.h"
+>  #include "xtensa-isa.h"
+>  #include "xtensa-isa-internal.h"
+>  
+> diff --git a/target/xtensa/core-fsf/xtensa-modules.c b/target/xtensa/core-fsf/xtensa-modules.c
+> index 9621f5142a..f7de2dec15 100644
+> --- a/target/xtensa/core-fsf/xtensa-modules.c
+> +++ b/target/xtensa/core-fsf/xtensa-modules.c
+> @@ -18,6 +18,7 @@
+>     Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
+>     02110-1301, USA.  */
+>  
+> +#include "qemu/osdep.h"
+>  #include "xtensa-isa.h"
+>  #include "xtensa-isa-internal.h"
+>  
+> diff --git a/target/xtensa/core-sample_controller/xtensa-modules.c b/target/xtensa/core-sample_controller/xtensa-modules.c
+> index 39810e532a..fba41b99ae 100644
+> --- a/target/xtensa/core-sample_controller/xtensa-modules.c
+> +++ b/target/xtensa/core-sample_controller/xtensa-modules.c
+> @@ -21,6 +21,7 @@
+>     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+>     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+>  
+> +#include "qemu/osdep.h"
+>  #include "xtensa-isa.h"
+>  #include "xtensa-isa-internal.h"
+>  
+> diff --git a/target/xtensa/xtensa-isa.c b/target/xtensa/xtensa-isa.c
+> index e0076a694f..630b4f9da1 100644
+> --- a/target/xtensa/xtensa-isa.c
+> +++ b/target/xtensa/xtensa-isa.c
+> @@ -22,9 +22,7 @@
+>   * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+>   */
+>  
+> -#include <stdio.h>
+> -#include <stdlib.h>
+> -#include <string.h>
+> +#include "qemu/osdep.h"
+>  #include "xtensa-isa.h"
+>  #include "xtensa-isa-internal.h"
+>  
+> diff --git a/tests/migration/stress.c b/tests/migration/stress.c
+> index cf8ce8b16d..49a03aab7b 100644
+> --- a/tests/migration/stress.c
+> +++ b/tests/migration/stress.c
+> @@ -17,21 +17,13 @@
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  
+> -#include <stdio.h>
+> +#include "qemu/osdep.h"
+>  #include <getopt.h>
+> -#include <string.h>
+> -#include <stdlib.h>
+> -#include <errno.h>
+> -#include <unistd.h>
+>  #include <sys/reboot.h>
+>  #include <sys/syscall.h>
+>  #include <linux/random.h>
+> -#include <sys/time.h>
+>  #include <pthread.h>
+> -#include <fcntl.h>
+>  #include <sys/mount.h>
+> -#include <sys/stat.h>
+> -#include <sys/mman.h>
+>  
+>  const char *argv0;
+>  
+> diff --git a/tests/ptimer-test.c b/tests/ptimer-test.c
+> index 5d1a2a8188..41488896f7 100644
+> --- a/tests/ptimer-test.c
+> +++ b/tests/ptimer-test.c
+> @@ -8,9 +8,9 @@
+>   *
+>   */
+>  
+> -#include <glib/gprintf.h>
+> -
+>  #include "qemu/osdep.h"
+> +#include <glib/gprintf.h>
+> +
+>  #include "qemu/main-loop.h"
+>  #include "hw/ptimer.h"
+>  
+> diff --git a/trace/control-internal.h b/trace/control-internal.h
+> index a9d395a587..c7fbe2d3bf 100644
+> --- a/trace/control-internal.h
+> +++ b/trace/control-internal.h
+> @@ -10,8 +10,6 @@
+>  #ifndef TRACE__CONTROL_INTERNAL_H
+>  #define TRACE__CONTROL_INTERNAL_H
+>  
+> -#include <stddef.h>                     /* size_t */
+> -
+>  #include "qom/cpu.h"
+>  
+>  
+> 
