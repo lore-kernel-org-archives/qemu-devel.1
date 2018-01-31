@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvS8-0006pk-3R
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:41:41 -0500
+	(envelope-from <alistair23@gmail.com>) id 1egvSq-0007Gn-CV
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:42:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvS3-0007n1-GQ
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:41:40 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180131102152.16902-1-berto@igalia.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <95d66e5c-bc7e-e42f-6121-2b786ad77963@amsat.org>
-Date: Wed, 31 Jan 2018 13:41:26 -0300
+	(envelope-from <alistair23@gmail.com>) id 1egvSp-0000I5-A2
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:42:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180131102152.16902-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] qcow2: Replace align_offset() with
- ROUND_UP()
+Sender: alistair23@gmail.com
+In-Reply-To: <20180123035837.16578-5-f4bug@amsat.org>
+References: <20180123035837.16578-1-f4bug@amsat.org>
+	<20180123035837.16578-5-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 31 Jan 2018 08:41:51 -0800
+Message-ID: <CAKmqyKMoUcPhkr8bM1DU1QeBaRbJ9kAfOp_j-vFxf1y8p=1AbA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] hw/sd/pl181: expose a SDBus and
+ connect the SDCard to it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,206 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>
 
-On 01/31/2018 07:21 AM, Alberto Garcia wrote:
-> The align_offset() function is equivalent to the ROUND_UP() macro so
-> there's no need to use the former. The ROUND_UP() name is also a bit
-> more explicit.
-> 
-> This patch uses ROUND_UP() instead of the slower QEMU_ALIGN_UP()
-> because align_offset() already requires that the second parameter is a
-> power of two.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On Mon, Jan 22, 2018 at 7:58 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> using the sdbus_*() API.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  block/qcow2-bitmap.c   |  4 ++--
->  block/qcow2-cluster.c  |  4 ++--
->  block/qcow2-refcount.c |  4 ++--
->  block/qcow2-snapshot.c | 10 +++++-----
->  block/qcow2.c          | 14 +++++++-------
->  block/qcow2.h          |  6 ------
->  6 files changed, 18 insertions(+), 24 deletions(-)
-> 
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index efa10c6663..0a3803aa34 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -413,8 +413,8 @@ static inline void bitmap_dir_entry_to_be(Qcow2BitmapDirEntry *entry)
->  
->  static inline int calc_dir_entry_size(size_t name_size, size_t extra_data_size)
->  {
-> -    return align_offset(sizeof(Qcow2BitmapDirEntry) +
-> -                        name_size + extra_data_size, 8);
-> +    int size = sizeof(Qcow2BitmapDirEntry) + name_size + extra_data_size;
-> +    return ROUND_UP(size, 8);
->  }
->  
->  static inline int dir_entry_size(Qcow2BitmapDirEntry *entry)
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index a3fec27bf9..29d70e1f3e 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -127,11 +127,11 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
->  
->      new_l1_size2 = sizeof(uint64_t) * new_l1_size;
->      new_l1_table = qemu_try_blockalign(bs->file->bs,
-> -                                       align_offset(new_l1_size2, 512));
-> +                                       ROUND_UP(new_l1_size2, 512));
->      if (new_l1_table == NULL) {
->          return -ENOMEM;
->      }
-> -    memset(new_l1_table, 0, align_offset(new_l1_size2, 512));
-> +    memset(new_l1_table, 0, ROUND_UP(new_l1_size2, 512));
->  
->      if (s->l1_size) {
->          memcpy(new_l1_table, s->l1_table, s->l1_size * sizeof(uint64_t));
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 92701ab7af..1d520615a8 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -1202,7 +1202,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
->       * l1_table_offset when it is the current s->l1_table_offset! Be careful
->       * when changing this! */
->      if (l1_table_offset != s->l1_table_offset) {
-> -        l1_table = g_try_malloc0(align_offset(l1_size2, 512));
-> +        l1_table = g_try_malloc0(ROUND_UP(l1_size2, 512));
->          if (l1_size2 && l1_table == NULL) {
->              ret = -ENOMEM;
->              goto fail;
-> @@ -2545,7 +2545,7 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
->      }
->  
->      /* align range to test to cluster boundaries */
-> -    size = align_offset(offset_into_cluster(s, offset) + size, s->cluster_size);
-> +    size = ROUND_UP(offset_into_cluster(s, offset) + size, s->cluster_size);
->      offset = start_of_cluster(s, offset);
->  
->      if ((chk & QCOW2_OL_ACTIVE_L1) && s->l1_size) {
-> diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-> index 44243e0e95..cee25f582b 100644
-> --- a/block/qcow2-snapshot.c
-> +++ b/block/qcow2-snapshot.c
-> @@ -66,7 +66,7 @@ int qcow2_read_snapshots(BlockDriverState *bs)
->  
->      for(i = 0; i < s->nb_snapshots; i++) {
->          /* Read statically sized part of the snapshot header */
-> -        offset = align_offset(offset, 8);
-> +        offset = ROUND_UP(offset, 8);
->          ret = bdrv_pread(bs->file, offset, &h, sizeof(h));
->          if (ret < 0) {
->              goto fail;
-> @@ -155,7 +155,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
->      offset = 0;
->      for(i = 0; i < s->nb_snapshots; i++) {
->          sn = s->snapshots + i;
-> -        offset = align_offset(offset, 8);
-> +        offset = ROUND_UP(offset, 8);
->          offset += sizeof(h);
->          offset += sizeof(extra);
->          offset += strlen(sn->id_str);
-> @@ -215,7 +215,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
->          assert(id_str_size <= UINT16_MAX && name_size <= UINT16_MAX);
->          h.id_str_size = cpu_to_be16(id_str_size);
->          h.name_size = cpu_to_be16(name_size);
-> -        offset = align_offset(offset, 8);
-> +        offset = ROUND_UP(offset, 8);
->  
->          ret = bdrv_pwrite(bs->file, offset, &h, sizeof(h));
->          if (ret < 0) {
-> @@ -441,7 +441,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
->      /* The VM state isn't needed any more in the active L1 table; in fact, it
->       * hurts by causing expensive COW for the next snapshot. */
->      qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
-> -                          align_offset(sn->vm_state_size, s->cluster_size),
-> +                          ROUND_UP(sn->vm_state_size, s->cluster_size),
->                            QCOW2_DISCARD_NEVER, false);
->  
->  #ifdef DEBUG_ALLOC
-> @@ -710,7 +710,7 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
->      }
->      new_l1_bytes = sn->l1_size * sizeof(uint64_t);
->      new_l1_table = qemu_try_blockalign(bs->file->bs,
-> -                                       align_offset(new_l1_bytes, 512));
-> +                                       ROUND_UP(new_l1_bytes, 512));
->      if (new_l1_table == NULL) {
->          return -ENOMEM;
->      }
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 1f80961e1b..7f0fe00d49 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1354,7 +1354,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
->  
->      if (s->l1_size > 0) {
->          s->l1_table = qemu_try_blockalign(bs->file->bs,
-> -            align_offset(s->l1_size * sizeof(uint64_t), 512));
-> +            ROUND_UP(s->l1_size * sizeof(uint64_t), 512));
->          if (s->l1_table == NULL) {
->              error_setg(errp, "Could not allocate L1 table");
->              ret = -ENOMEM;
-> @@ -2615,19 +2615,19 @@ static int64_t qcow2_calc_prealloc_size(int64_t total_size,
->  {
->      int64_t meta_size = 0;
->      uint64_t nl1e, nl2e;
-> -    int64_t aligned_total_size = align_offset(total_size, cluster_size);
-> +    int64_t aligned_total_size = ROUND_UP(total_size, cluster_size);
->  
->      /* header: 1 cluster */
->      meta_size += cluster_size;
->  
->      /* total size of L2 tables */
->      nl2e = aligned_total_size / cluster_size;
-> -    nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
-> +    nl2e = ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
->      meta_size += nl2e * sizeof(uint64_t);
->  
->      /* total size of L1 tables */
->      nl1e = nl2e * sizeof(uint64_t) / cluster_size;
-> -    nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
-> +    nl1e = ROUND_UP(nl1e, cluster_size / sizeof(uint64_t));
->      meta_size += nl1e * sizeof(uint64_t);
->  
->      /* total size of refcount table and blocks */
-> @@ -3681,8 +3681,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
->      has_backing_file = !!optstr;
->      g_free(optstr);
->  
-> -    virtual_size = align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-> -                                cluster_size);
-> +    virtual_size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-> +    virtual_size = ROUND_UP(virtual_size, cluster_size);
->  
->      /* Check that virtual disk size is valid */
->      l2_tables = DIV_ROUND_UP(virtual_size / cluster_size,
-> @@ -3702,7 +3702,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
->              goto err;
+>  hw/sd/pl181.c | 31 ++++++++++++++++++++-----------
+>  1 file changed, 20 insertions(+), 11 deletions(-)
+>
+> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+> index 3ba1f7dd23..ce696c5d7d 100644
+> --- a/hw/sd/pl181.c
+> +++ b/hw/sd/pl181.c
+> @@ -33,6 +33,7 @@ typedef struct PL181State {
+>      SysBusDevice parent_obj;
+>
+>      MemoryRegion iomem;
+> +    SDBus sdbus;
+>      SDState *card;
+
+Shouludn't card be removed?
+
+Alistair
+
+>      uint32_t clock;
+>      uint32_t power;
+> @@ -179,7 +180,7 @@ static void pl181_send_command(PL181State *s)
+>      request.cmd =3D s->cmd & PL181_CMD_INDEX;
+>      request.arg =3D s->cmdarg;
+>      DPRINTF("Command %d %08x\n", request.cmd, request.arg);
+> -    rlen =3D sd_do_command(s->card, &request, response);
+> +    rlen =3D sdbus_do_command(&s->sdbus, &request, response);
+>      if (rlen < 0)
+>          goto error;
+>      if (s->cmd & PL181_CMD_RESPONSE) {
+> @@ -223,12 +224,12 @@ static void pl181_fifo_run(PL181State *s)
+>      int is_read;
+>
+>      is_read =3D (s->datactrl & PL181_DATA_DIRECTION) !=3D 0;
+> -    if (s->datacnt !=3D 0 && (!is_read || sd_data_ready(s->card))
+> +    if (s->datacnt !=3D 0 && (!is_read || sdbus_data_ready(&s->sdbus))
+>              && !s->linux_hack) {
+>          if (is_read) {
+>              n =3D 0;
+>              while (s->datacnt && s->fifo_len < PL181_FIFO_LEN) {
+> -                value |=3D (uint32_t)sd_read_data(s->card) << (n * 8);
+> +                value |=3D (uint32_t)sdbus_read_data(&s->sdbus) << (n * =
+8);
+>                  s->datacnt--;
+>                  n++;
+>                  if (n =3D=3D 4) {
+> @@ -249,7 +250,7 @@ static void pl181_fifo_run(PL181State *s)
+>                  }
+>                  n--;
+>                  s->datacnt--;
+> -                sd_write_data(s->card, value & 0xff);
+> +                sdbus_write_data(&s->sdbus, value & 0xff);
+>                  value >>=3D 8;
+>              }
 >          }
->  
-> -        virtual_size = align_offset(ssize, cluster_size);
-> +        virtual_size = ROUND_UP(ssize, cluster_size);
->  
->          if (has_backing_file) {
->              /* We don't how much of the backing chain is shared by the input
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 46c8cf44ec..33d2eb0ead 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -468,12 +468,6 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
->      return (offset >> s->cluster_bits) & (s->l2_size - 1);
+> @@ -480,10 +481,6 @@ static void pl181_reset(DeviceState *d)
+>
+>      /* We can assume our GPIO outputs have been wired up now */
+>      sd_set_cb(s->card, s->cardstatus[0], s->cardstatus[1]);
+> -    /* Since we're still using the legacy SD API the card is not plugged
+> -     * into any bus, and we must reset it manually.
+> -     */
+> -    device_reset(DEVICE(s->card));
 >  }
->  
-> -static inline int64_t align_offset(int64_t offset, int n)
-> -{
-> -    offset = (offset + n - 1) & ~(n - 1);
-> -    return offset;
-> -}
-> -
->  static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+>
+>  static void pl181_init(Object *obj)
+> @@ -502,14 +499,26 @@ static void pl181_init(Object *obj)
+>  static void pl181_realize(DeviceState *dev, Error **errp)
 >  {
->      return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bits);
-> 
+>      PL181State *s =3D PL181(dev);
+> +    DeviceState *carddev;
+>      DriveInfo *dinfo;
+> +    Error *err =3D NULL;
+> +
+> +    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+> +                        dev, "sd-bus");
+>
+> +    /* Create and plug in the sd card */
+>      /* FIXME use a qdev drive property instead of drive_get_next() */
+>      dinfo =3D drive_get_next(IF_SD);
+> -    s->card =3D sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, false=
+);
+> -    if (s->card =3D=3D NULL) {
+> -        error_setg(errp, "sd_init failed");
+> +    carddev =3D qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
+> +    if (dinfo) {
+> +        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo)=
+, &err);
+> +    }
+> +    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+> +    if (err) {
+> +        error_setg(errp, "failed to init SD card: %s", error_get_pretty(=
+err));
+> +        return;
+>      }
+> +    s->card =3D SD_CARD(carddev);
+>  }
+>
+>  static void pl181_class_init(ObjectClass *klass, void *data)
+> --
+> 2.15.1
+>
+>
