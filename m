@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egoaz-00019B-Ss
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:22:27 -0500
+	(envelope-from <peterx@redhat.com>) id 1egohE-000439-MT
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:28:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egoau-0002TW-Q3
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:22:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46496)
+	(envelope-from <peterx@redhat.com>) id 1egoh9-0007Gx-Mn
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:28:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52694)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egoau-0002Sm-Ij
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:22:16 -0500
-Date: Wed, 31 Jan 2018 10:22:13 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180131092213.srlhijglevhha6jw@sirius.home.kraxel.org>
-References: <20180130051837.8725-1-programmingkidx@gmail.com>
-	<20180130094140.67xjf26jcymuz2bb@sirius.home.kraxel.org>
-	<167881EE-F694-46C3-A15B-94B1733D2E40@gmail.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1egoh9-0007GB-Ho
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:28:43 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A487E8E700
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 09:28:42 +0000 (UTC)
+Date: Wed, 31 Jan 2018 17:28:35 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180131092835.GA31397@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <167881EE-F694-46C3-A15B-94B1733D2E40@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/audio/sb16.c: Convert file to new
- logging API
+Subject: [Qemu-devel] Windows balloon driver PFN issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Tue, Jan 30, 2018 at 10:30:46AM -0500, Programmingkid wrote:
-> 
-> > On Jan 30, 2018, at 4:41 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > 
-> >> @@ -148,15 +142,16 @@ static int irq_of_magic (int magic)
-> >> #if 0
-> >> static void log_dsp (SB16State *dsp)
-> >> {
-> >> -    ldebug ("%s:%s:%d:%s:dmasize=%d:freq=%d:const=%d:speaker=%d\n",
-> >> -            dsp->fmt_stereo ? "Stereo" : "Mono",
-> >> -            dsp->fmt_signed ? "Signed" : "Unsigned",
-> >> -            dsp->fmt_bits,
-> >> -            dsp->dma_auto ? "Auto" : "Single",
-> >> -            dsp->block_size,
-> >> -            dsp->freq,
-> >> -            dsp->time_const,
-> >> -            dsp->speaker);
-> >> +    qemu_log_mask(LOG_UNIMP, "%s:%s:%d:%s:dmasize=%d:freq=%d:const=%d:"
-> >> +                  "speaker=%d\n",
-> >> +                  dsp->fmt_stereo ? "Stereo" : "Mono",
-> >> +                  dsp->fmt_signed ? "Signed" : "Unsigned",
-> >> +                  dsp->fmt_bits,
-> >> +                  dsp->dma_auto ? "Auto" : "Single",
-> >> +                  dsp->block_size,
-> >> +                  dsp->freq,
-> >> +                  dsp->time_const,
-> >> +                  dsp->speaker);
-> >> }
-> >> #endif
-> > 
-> > Hmm, dead code.  Any places which call log_dsp() ?
-> 
-> There are several places but they are all dead code. Do you want this removed?
+Hi, Michael and the list,
 
-So it is still used but not compiled in by default.
+I observed this on windows 8 enterprise guests, when doing memory ballooning:
 
-Looking at all of this again, I think "qemu_log_mask(LOG_UNIMP, ...)"
-should only be used in case there *really* is some soundblaster feature
-unimplemented.  Otherwise converting to a tracepoint is probably more
-useful, so the debug messages can be enabled/disabled individually at
-runtime.
+23892@1517298572.328354:virtio_balloon_to_target balloon target: 0x80000000 num_pages: 524288
+23892@1517298638.542819:virtio_balloon_get_config num_pages: 524288 actual: 0
+23892@1517298638.542974:virtio_balloon_handle_output section name: pc.ram gpa: 0x174604000
+23892@1517298638.543059:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+23892@1517298638.543135:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460a000
+23892@1517298638.543140:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+23892@1517298638.543143:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460b000
+23892@1517298638.543146:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+23892@1517298638.543148:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460c000
+23892@1517298638.543152:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+23892@1517298638.543154:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460d000
+23892@1517298638.543159:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+23892@1517298638.543162:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460e000
+23892@1517298638.543165:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+23892@1517298638.543167:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460f000
+23892@1517298638.543170:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+...
 
-The "#if 0" seems to be there to limit the flood of debug messages.  So
-once they all are converted to trace points this is not needed any more
-and I think we should just enable all this code.
+I think it's very possible that these zero addresses (please let me
+know what the first 4K page is used for if anyone knows, since IIUC
+that's what we throw away now) are half of the 64bit PFN.  Or say, not
+sure whether this means a windows guest driver bug that is using
+64bits for PFN rather than 32bits (and I suppose the protocol is using
+32bit for PFNs).
 
-dolog() seems to be mostly cases where the code warns about
-unimplemented featues or incomplete emulation, so using LOG_UNIMP looks
-sensible.
+Michael, do you know what to do with this?
 
-ldebug() should probably trace points.
+Thanks,
 
-Probably makes sense to split this patch up into a small series.
-
-cheers,
-  Gerd
+-- 
+Peter Xu
