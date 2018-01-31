@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33178)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvoA-0003PI-Ky
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:04:32 -0500
+	id 1egvrd-0006EG-MM
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvo7-00050I-TL
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:04:26 -0500
+	id 1egvrX-0008Oi-D0
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:08:01 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-3-andrew.smirnov@gmail.com>
+	<20180116013709.13830-5-andrew.smirnov@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <05796947-7765-f662-0827-2ac9d2f018ce@amsat.org>
-Date: Wed, 31 Jan 2018 14:04:20 -0300
+Message-ID: <ec9fd964-d572-c1b2-82f9-8257975166d1@amsat.org>
+Date: Wed, 31 Jan 2018 14:07:51 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180116013709.13830-3-andrew.smirnov@gmail.com>
+In-Reply-To: <20180116013709.13830-5-andrew.smirnov@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 02/14] hw: i.MX: Convert i.MX6 to use
- TYPE_IMX_USDHC
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] i.MX: Add code to emulate i.MX2
+ watchdog IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,8 +33,8 @@ To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
 On 01/15/2018 10:36 PM, Andrey Smirnov wrote:
-> Convert i.MX6 to use TYPE_IMX_USDHC since that's what real HW comes
-> with.
+> Add enough code to emulate i.MX2 watchdog IP block so it would be
+> possible to reboot the machine running Linux Guest.
 > 
 > Cc: Peter Maydell <peter.maydell@linaro.org>
 > Cc: Jason Wang <jasowang@redhat.com>
@@ -42,25 +42,163 @@ On 01/15/2018 10:36 PM, Andrey Smirnov wrote:
 > Cc: qemu-devel@nongnu.org
 > Cc: qemu-arm@nongnu.org
 > Cc: yurovsky@gmail.com
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->  hw/arm/fsl-imx6.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/misc/Makefile.objs      |  1 +
+>  hw/misc/imx2_wdt.c         | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/misc/imx2_wdt.h | 33 +++++++++++++++++
+>  3 files changed, 123 insertions(+)
+>  create mode 100644 hw/misc/imx2_wdt.c
+>  create mode 100644 include/hw/misc/imx2_wdt.h
 > 
-> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-> index b0d4088290..e6559a8b12 100644
-> --- a/hw/arm/fsl-imx6.c
-> +++ b/hw/arm/fsl-imx6.c
-> @@ -93,7 +93,7 @@ static void fsl_imx6_init(Object *obj)
->      }
->  
->      for (i = 0; i < FSL_IMX6_NUM_ESDHCS; i++) {
-> -        object_initialize(&s->esdhc[i], sizeof(s->esdhc[i]), TYPE_SYSBUS_SDHCI);
-> +        object_initialize(&s->esdhc[i], sizeof(s->esdhc[i]), TYPE_IMX_USDHC);
->          qdev_set_parent_bus(DEVICE(&s->esdhc[i]), sysbus_get_default());
->          snprintf(name, NAME_SIZE, "sdhc%d", i + 1);
->          object_property_add_child(obj, name, OBJECT(&s->esdhc[i]), NULL);
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index a28e5e49b0..4b2b705a6c 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -34,6 +34,7 @@ obj-$(CONFIG_IMX) += imx25_ccm.o
+>  obj-$(CONFIG_IMX) += imx6_ccm.o
+>  obj-$(CONFIG_IMX) += imx6_src.o
+>  obj-$(CONFIG_IMX) += imx7_ccm.o
+> +obj-$(CONFIG_IMX) += imx2_wdt.o
+>  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+>  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+>  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+> diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+> new file mode 100644
+> index 0000000000..76bb98a525
+> --- /dev/null
+> +++ b/hw/misc/imx2_wdt.c
+> @@ -0,0 +1,89 @@
+> +/*
+> + * Copyright (c) 2017, Impinj, Inc.
+> + *
+> + * i.MX2 Watchdog IP block
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/bitops.h"
+> +#include "qemu/osdep.h"
+> +#include "sysemu/watchdog.h"
+> +
+> +#include "hw/misc/imx2_wdt.h"
+> +
+> +#define IMX2_WDT_WCR_WDA    BIT(5)      /* -> External Reset WDOG_B */
+> +#define IMX2_WDT_WCR_SRS    BIT(4)      /* -> Software Reset Signal */
+> +
+> +static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
+> +                              unsigned int size)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void imx2_wdt_write(void *opaque, hwaddr addr,
+> +                           uint64_t value, unsigned int size)
+> +{
+> +    if (addr == IMX2_WDT_WCR &&
+> +        (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))) {
+> +        watchdog_perform_action();
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps imx2_wdt_ops = {
+> +    .read  = imx2_wdt_read,
+
+Maybe you can just drop the .read entry and imx2_wdt_read().
+
+> +    .write = imx2_wdt_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .impl = {
+> +        /*
+> +         * Our device would not work correctly if the guest was doing
+> +         * unaligned access. This might not be a limitation on the
+> +         * real device but in practice there is no reason for a guest
+> +         * to access this device unaligned.
+> +         */
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +        .unaligned = false,
+> +    },
+> +};
+> +
+> +static void imx2_wdt_realize(DeviceState *dev, Error **errp)
+> +{
+> +    IMX2WdtState *s = IMX2_WDT(dev);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(dev),
+> +                          &imx2_wdt_ops, s,
+> +                          TYPE_IMX2_WDT".mmio",
+> +                          IMX2_WDT_REG_NUM * sizeof(uint16_t));
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
+> +}
+> +
+> +static void imx2_wdt_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = imx2_wdt_realize;
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +}
+> +
+> +static const TypeInfo imx2_wdt_info = {
+> +    .name          = TYPE_IMX2_WDT,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(IMX2WdtState),
+> +    .class_init    = imx2_wdt_class_init,
+> +};
+> +
+> +static WatchdogTimerModel model = {
+> +    .wdt_name = "imx2-watchdog",
+> +    .wdt_description = "i.MX2 Watchdog",
+> +};
+> +
+> +static void imx2_wdt_register_type(void)
+> +{
+> +    watchdog_add_model(&model);
+> +    type_register_static(&imx2_wdt_info);
+> +}
+> +type_init(imx2_wdt_register_type)
+> diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+> new file mode 100644
+> index 0000000000..8afc99a10e
+> --- /dev/null
+> +++ b/include/hw/misc/imx2_wdt.h
+> @@ -0,0 +1,33 @@
+> +/*
+> + * Copyright (c) 2017, Impinj, Inc.
+> + *
+> + * i.MX2 Watchdog IP block
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef IMX2_WDT_H
+> +#define IMX2_WDT_H
+> +
+> +#include "hw/sysbus.h"
+> +
+> +#define TYPE_IMX2_WDT "imx2.wdt"
+> +#define IMX2_WDT(obj) OBJECT_CHECK(IMX2WdtState, (obj), TYPE_IMX2_WDT)
+> +
+> +enum IMX2WdtRegisters {
+> +    IMX2_WDT_WCR     = 0x0000,
+> +    IMX2_WDT_REG_NUM = 0x0008 / sizeof(uint16_t) + 1,
+> +};
+> +
+> +
+> +typedef struct IMX2WdtState {
+> +    /* <private> */
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion mmio;
+> +} IMX2WdtState;
+> +
+> +#endif /* IMX7_SNVS_H */
 > 
