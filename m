@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1egvCa-00058V-25
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:25:37 -0500
+	(envelope-from <alistair23@gmail.com>) id 1egvEP-0006iX-8g
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1egvCX-00047a-A1
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:25:36 -0500
-Received: from mail-eopbgr50137.outbound.protection.outlook.com
-	([40.107.5.137]:64185
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <klim.kireev@virtuozzo.com>)
-	id 1egvCW-00045e-KN
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:25:33 -0500
-From: Klim Kireev <klim.kireev@virtuozzo.com>
-Date: Wed, 31 Jan 2018 19:25:21 +0300
-Message-Id: <20180131162521.31210-1-klim.kireev@virtuozzo.com>
+	(envelope-from <alistair23@gmail.com>) id 1egvEN-00056q-Sg
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:27:29 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:39541)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1egvEN-00056Y-Gm
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:27:27 -0500
+Received: by mail-lf0-x244.google.com with SMTP id w27so21622233lfd.6
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:27:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] vnc: fix segfault in closed connection
- handling
+Sender: alistair23@gmail.com
+In-Reply-To: <0090cd85-3277-3c8c-5399-0681bbe2ab86@amsat.org>
+References: <20180123020820.1288-1-f4bug@amsat.org>
+	<0090cd85-3277-3c8c-5399-0681bbe2ab86@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 31 Jan 2018 08:26:55 -0800
+Message-ID: <CAKmqyKMA9RteZfQruGj9zhtOe_Sm4XnL7U-CtkXW4Pjd7pRVRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 00/16] SDHCI: clean v1/v2 Specs (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +31,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Krzysztof Kozlowski <krzk@kernel.org>, Kevin O'Connor <kevin@koconnor.net>, Marcel Apfelbaum <marcel@redhat.com>
 
-On one of our client's node, due to trying to read from closed ioc,
-a segmentation fault occured. Corresponding backtrace:
+On Wed, Jan 31, 2018 at 6:09 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> ping?
+>
+> Patches missing review: 2 (PCI qtesting),11,13,15
 
-0  object_get_class (obj=obj@entry=0x0)
-1  qio_channel_readv_full (ioc=0x0, iov=0x7ffe55277180 ...
-2  qio_channel_read (ioc=<optimized out> ...
-3  vnc_client_read_buf (vs=vs@entry=0x55625f3c6000, ...
-4  vnc_client_read_plain (vs=0x55625f3c6000)
-5  vnc_client_read (vs=0x55625f3c6000)
-6  vnc_client_io (ioc=<optimized out>, condition=G_IO_IN, ...
-7  g_main_dispatch (context=0x556251568a50)
-8  g_main_context_dispatch (context=context@entry=0x556251568a50)
-9  glib_pollfds_poll ()
-10 os_host_main_loop_wait (timeout=<optimized out>)
-11 main_loop_wait (nonblocking=nonblocking@entry=0)
-12 main_loop () at vl.c:1909
-13 main (argc=<optimized out>, argv=<optimized out>, ...
+Sorry about the slowness. Besides 2 they should be all reviewed now,
+let me know if anything else needs to be done.
 
-Having analyzed the coredump, I understood that the reason is that
-ioc_tag is reset on vnc_disconnect_start and ioc is cleaned
-in vnc_disconnect_finish. Between these two events due to some
-reasons the ioc_tag was set again and after vnc_disconnect_finish
-the handler is running with freed ioc,
-which led to the segmentation fault.
+As for 2 I don't have much experience with Qtest, I'll try to go over
+it, but ideally someone who knows Qtest should look at it.
 
-The patch checks vs->disconnecting in places where we call
-qio_channel_add_watch to prevent such an occurrence.
+Thanks,
+Alistair
 
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
----
-Changelog:
-v2: Attach the backtrace
-
-v3: Change checks
-
- ui/vnc.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 33b087221f..708204fa7e 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1407,13 +1407,19 @@ static void vnc_client_write_locked(VncState *vs)
-     } else
- #endif /* CONFIG_VNC_SASL */
-     {
--        vnc_client_write_plain(vs);
-+        if (vs->disconnecting == FALSE) {
-+            vnc_client_write_plain(vs);
-+        } else {
-+            if (vs->ioc_tag != 0) {
-+                g_source_remove(vs->ioc_tag);
-+                vs->ioc_tag = 0;
-+            }
-+        }
-     }
- }
- 
- static void vnc_client_write(VncState *vs)
- {
--
-     vnc_lock_output(vs);
-     if (vs->output.offset) {
-         vnc_client_write_locked(vs);
-@@ -1421,8 +1427,12 @@ static void vnc_client_write(VncState *vs)
-         if (vs->ioc_tag) {
-             g_source_remove(vs->ioc_tag);
-         }
--        vs->ioc_tag = qio_channel_add_watch(
--            vs->ioc, G_IO_IN, vnc_client_io, vs, NULL);
-+        if (vs->disconnecting == FALSE) {
-+            vs->ioc_tag = qio_channel_add_watch(
-+                vs->ioc, G_IO_IN, vnc_client_io, vs, NULL);
-+        } else {
-+            vs->ioc_tag = 0;
-+        }
-     }
-     vnc_unlock_output(vs);
- }
--- 
-2.14.3
+>
+> On 01/22/2018 11:08 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Since v8:
+>> - we keep the 'capareg' property, this simplify a lot the series
+>> - the Zynq 7000 uses the datasheet CAPAREG
+>> - reset R-b/A-b
+>>
+>> Since v7:
+>> - use error_propagate()
+>>
+>> Since v6:
+>> - rebased on upstream to use DEFINE_SDHCI_COMMON_PROPERTIES
+>> - included qtests back
+>> - add PCI qtests
+>> - series was getting big, splitting again; next one is "implement Spec v=
+3"
+>> - following Alistair advice, new properties default to current
+>>   SDHC_CAPAB_REG_DEFAULT (probably 'default' for historical reason, bein=
+g
+>>   the first capabilities set). This leads to weird properties imho, i.e.
+>>   defaulting 'max-frequency' to 52 MHz, the Exynos SoC has to set this
+>>   property to 0.
+>> - addressed Alistair reviews
+>> - confirmed the Exynos4210 specs after chatting on IRC with Krzysztof
+>>   Kozlowski who kindly verified in the datasheet.
+>>
+>> Since v5:
+>> - addressed Alistair reviews
+>> - dropped "abstract generic-sdhci"
+>> - dropped Linux Device Tree names
+>> - split qtests in another series
+>> - change the bcm2835 minimum blocksize to 1KB (Andrew Baumann)
+>> - added Alistair R-b
+>> - based on Alistair work:
+>>   - add SD tunning sequence via Host Control 2 to use UHS-I cards
+>>   - add CMD/DAT[] fields in the Present State (used in next series
+>>     to switch card voltage)
+>>
+>> based on Alistair work:
+>> - add SD tunning sequence via Host Control 2 to use UHS-I cards
+>> - add CMD/DAT[] fields in the Present State (used in next series
+>>   to switch card voltage)
+>>
+>> Since v4 ("SDHCI: add qtests and fix few issues"):
+>> - spec_version default to v2 (current behaviour)
+>> - addressed Alistair review (no v1, tell user about valid version)
+>>
+>> Since v3:
+>> - no change, but split back in 2 series, 1st part is "SDHCI: housekeepin=
+g v5",
+>>
+>> Since v2:
+>> - more detailed 'capabilities', all boards converted to use these proper=
+ties
+>> - since all qtests pass, removed the previous 'capareg' property
+>> - added Stefan/Alistair R-b
+>> - corrected 'access' LED behavior (Alistair's review)
+>> - more uses of the registerfields API
+>> - remove some dead code
+>> - cosmetix:
+>>   - added more comments
+>>   - renamed a pair of registers
+>>   - reordered few struct members
+>>
+>> Since v1:
+>> - addressed Alistair Francis review comments, added some R-b
+>> - only move register defines to "sd-internal.h"
+>> - fixed deposit64() arguments
+>> - dropped unuseful s->fifo_buffer =3D NULL
+>> - use a qemu_irq for the LED, restrict the logging to ON/OFF
+>> - fixed a trace format string error
+>> - included Andrey Smirnov ACMD12ERRSTS write patch
+>> - dropped few unuseful patches, and separate the Python polemical ones f=
+or later
+>>
+>> From the "SDHCI housekeeping" series:
+>> - 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
+>> - 2,3: we somehow beautiful the code, no logical changes,
+>> - 4-7: we refactor the common sysbus/pci qdev code,
+>> - 8-10: we add plenty of trace events which will result useful later,
+>> - 11: we finally expose a "dma-memory" property.
+>> From the "SDHCI: add a qtest and fix few issues" series:
+>> - 12,13: fix registers
+>> - 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
+>> - 15-20: HCI qtest
+>>
+>> Regards,
+>>
+>> Phil.
+>>
+>> $ git backport-diff with v8
+>> 001/16:[----] [--] 'sdhci: use error_propagate(local_err) in realize()'
+>> 002/16:[0004] [FC] 'sdhci: add qtest to check the SD capabilities regist=
+er'
+>> 003/16:[----] [--] 'sdhci: add check_capab_readonly() qtest'
+>> 004/16:[----] [--] 'sdhci: add a check_capab_baseclock() qtest'
+>> 005/16:[----] [--] 'sdhci: add a check_capab_sdma() qtest'
+>> 006/16:[----] [--] 'sdhci: add qtest to check the SD Spec version'
+>> 007/16:[0022] [FC] 'sdhci: add a 'spec_version property' (default to v2)=
+'
+>> 008/16:[down] 'sdhci: use a numeric value for the default CAPAB register=
+'
+>> 009/16:[down] 'sdhci: simplify sdhci_get_fifolen()'
+>> 010/16:[down] 'sdhci: check the Spec v1 capabilities correctness'
+>> 011/16:[----] [--] 'sdhci: add BLOCK_SIZE_MASK for DMA'
+>> 012/16:[----] [--] 'sdhci: Fix 64-bit ADMA2'
+>> 013/16:[down] 'sdhci: check Spec v2 capabilities (DMA and 64-bit bus)'
+>> 014/16:[down] 'hw/arm/exynos4210: access the 64-bit capareg with qdev_pr=
+op_set_uint64()'
+>> 015/16:[down] 'hw/arm/exynos4210: add a comment about a very similar SDH=
+CI (Spec. v2)'
+>> 016/16:[down] 'hw/arm/xilinx_zynq: fix the capabilities register to matc=
+h the datasheet'
+>>
+>> Philippe Mathieu-Daud=C3=A9 (15):
+>>   sdhci: use error_propagate(local_err) in realize()
+>>   sdhci: add qtest to check the SD capabilities register
+>>   sdhci: add check_capab_readonly() qtest
+>>   sdhci: add a check_capab_baseclock() qtest
+>>   sdhci: add a check_capab_sdma() qtest
+>>   sdhci: add qtest to check the SD Spec version
+>>   sdhci: add a 'spec_version property' (default to v2)
+>>   sdhci: use a numeric value for the default CAPAB register
+>>   sdhci: simplify sdhci_get_fifolen()
+>>   sdhci: check the Spec v1 capabilities correctness
+>>   sdhci: add BLOCK_SIZE_MASK for DMA
+>>   sdhci: check Spec v2 capabilities (DMA and 64-bit bus)
+>>   hw/arm/exynos4210: access the 64-bit capareg with qdev_prop_set_uint64=
+()
+>>   hw/arm/exynos4210: add a comment about a very similar SDHCI (Spec. v2)
+>>   hw/arm/xilinx_zynq: fix the capabilities register to match the datashe=
+et
+>>
+>> Sai Pavan Boddu (1):
+>>   sdhci: Fix 64-bit ADMA2
+>>
+>>  include/hw/sd/sdhci.h  |   2 +
+>>  hw/sd/sdhci-internal.h |  43 ++++++---
+>>  hw/arm/exynos4210.c    |  14 ++-
+>>  hw/arm/xilinx_zynq.c   |  53 +++++-----
+>>  hw/sd/sdhci.c          | 257 ++++++++++++++++++++++++++++++++----------=
+-------
+>>  tests/sdhci-test.c     | 216 +++++++++++++++++++++++++++++++++++++++++
+>>  hw/sd/trace-events     |   1 +
+>>  tests/Makefile.include |   3 +
+>>  8 files changed, 464 insertions(+), 125 deletions(-)
+>>  create mode 100644 tests/sdhci-test.c
+>>
+>
