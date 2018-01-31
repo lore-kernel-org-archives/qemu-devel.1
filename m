@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1egud7-0002rH-KS
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:48:59 -0500
+	(envelope-from <berto@igalia.com>) id 1eguqr-0007Eb-5R
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:03:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1egud5-0002gg-1z
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:48:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1egud4-0002gQ-SD
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:48:54 -0500
-References: <20180131144846.31697-1-armbru@redhat.com>
-	<20180131144846.31697-3-armbru@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d5aec275-0c13-00fb-2116-10e3c5ed2b37@redhat.com>
-Date: Wed, 31 Jan 2018 16:48:42 +0100
+	(envelope-from <berto@igalia.com>) id 1eguql-0005yC-Kd
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:03:09 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180120154412.9990-2-mreitz@redhat.com>
+References: <20180120154412.9990-1-mreitz@redhat.com>
+	<20180120154412.9990-2-mreitz@redhat.com>
+Date: Wed, 31 Jan 2018 17:02:52 +0100
+Message-ID: <w51vafixbgz.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180131144846.31697-3-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/19] Clean up includes
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qapi: Add qobject_to()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +22,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: f4bug@amsat.org, Fam Zheng <famz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 31.01.2018 15:48, Markus Armbruster wrote:
-> Clean up includes so that osdep.h is included first and headers
-> which it implies are not included manually.
-> 
-> This commit was created with scripts/clean-includes, with the change
-> to target/s390x/gen-features.c manually reverted, and blank lines
-> around deletions collapsed.
+On Sat 20 Jan 2018 04:44:07 PM CET, Max Reitz wrote:
+> This is a dynamic casting macro that, given a QObject type, returns an
+> object as that type or NULL if the object is of a different type (or
+> NULL itself).
+>
+> The macro uses lower-case letters because:
+> 1. There does not seem to be a hard rule on whether qemu macros have to
+>    be upper-cased,
+> 2. The current situation in qapi/qmp is inconsistent (compare e.g.
+>    QINCREF() vs. qdict_put()),
+> 3. qobject_to() will evaluate its @obj parameter only once, thus it is
+>    generally not important to the caller whether it is a macro or not,
+> 4. I prefer it aesthetically.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-I wonder whether it would make sense to add a check based on
-scripts/clean-includes to patchew already, so that these includes do not
-sneak in so easily again...?
-
- Thomas
+Berto
