@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egw3m-0003u7-Ht
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:20:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1egw5P-0004pg-9O
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egw3l-000135-Oi
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:20:34 -0500
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516297747-107232-2-git-send-email-anton.nefedov@virtuozzo.com>
-	<3f0a7d0a-cc3b-7d24-8539-74271c7b956d@redhat.com>
-	<563acc14-1b0a-94d5-a12a-67640929e1ec@redhat.com>
-	<f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e349960e-686c-a48e-f6a1-c4857ff58a64@redhat.com>
-Date: Wed, 31 Jan 2018 18:20:18 +0100
+	(envelope-from <armbru@redhat.com>) id 1egw5K-0001nn-S8
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egw5K-0001ms-J7
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:10 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180119050906.18930-1-aik@ozlabs.ru>
+Date: Wed, 31 Jan 2018 18:22:00 +0100
+In-Reply-To: <20180119050906.18930-1-aik@ozlabs.ru> (Alexey Kardashevskiy's
+	message of "Fri, 19 Jan 2018 16:09:06 +1100")
+Message-ID: <871si6vt8n.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="icVesgj1uqWZiquELlvQV1qGNyayAawF8"
-Subject: Re: [Qemu-devel] [PATCH v7 1/9] mirror: inherit supported
- write/zero flags
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +27,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com, berto@igalia.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---icVesgj1uqWZiquELlvQV1qGNyayAawF8
-From: Max Reitz <mreitz@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com,
- berto@igalia.com
-Message-ID: <e349960e-686c-a48e-f6a1-c4857ff58a64@redhat.com>
-Subject: Re: [PATCH v7 1/9] mirror: inherit supported write/zero flags
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1516297747-107232-2-git-send-email-anton.nefedov@virtuozzo.com>
- <3f0a7d0a-cc3b-7d24-8539-74271c7b956d@redhat.com>
- <563acc14-1b0a-94d5-a12a-67640929e1ec@redhat.com>
- <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
-In-Reply-To: <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 
-On 2018-01-30 13:15, Anton Nefedov wrote:
->=20
->=20
-> On 29/1/2018 10:26 PM, Eric Blake wrote:
->> On 01/29/2018 01:21 PM, Max Reitz wrote:
->>> On 2018-01-18 18:48, Anton Nefedov wrote:
->>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
->>>> ---
->>>> =C2=A0 block/mirror.c | 5 +++++
->>>> =C2=A0 1 file changed, 5 insertions(+)
->>>>
->>>> diff --git a/block/mirror.c b/block/mirror.c
->>>> index c9badc1..d18ec65 100644
->>>> --- a/block/mirror.c
->>>> +++ b/block/mirror.c
->>>> @@ -1064,6 +1064,11 @@ static void
->>>> bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_refresh_filename(bs->backing->bs=
-);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pstrcpy(bs->exact_filename, sizeof(bs=
-->exact_filename),
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 bs->backing->bs->filename);
->>>> +=C2=A0=C2=A0=C2=A0 bs->supported_write_flags =3D BDRV_REQ_FUA &
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->backing->bs->support=
-ed_write_flags;
->>>> +=C2=A0=C2=A0=C2=A0 bs->supported_zero_flags =3D
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (BDRV_REQ_FUA | BDRV_REQ=
-_MAY_UNMAP) &
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->backing->bs->support=
-ed_zero_flags;
->>>> =C2=A0 }
->>>> =C2=A0 =C2=A0 static void bdrv_mirror_top_close(BlockDriverState *bs=
-)
->>>
->>> Fundamentally OK, but why is this in *_refresh_filename()?
->>
->> Indeed, I missed that (or maybe it got moved during a botched rebase?)=
-=2E
->> For comparison, blkdebug sets it during blkdebug_open(), and nbd sets =
-it
->> during nbd_client_init() (called during nbd_open()).
->>
->=20
-> We need a backing bs here and I believe it's not generally set at the
-> time of .bdrv_open().
+> There is already 'device-list-properties' which does most of the job,
+> however it does not handle everything returned by qom-list-types such
+> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+>
+> This adds a new qom-list-properties command which prints properties
+> of a specific class and its instance. It is pretty much a simplified copy
+> of the device-list-properties handler.
+>
+> Since it creates an object instance, device properties should appear
+> in the output as they are copied to QOM properties at the instance_init
+> hook.
+>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Well, but *_refresh_filename() is just wrong.
+Related: qom-list, which lists "any properties of a object given a path
+in the object model."  qom-list-properties takes a type name, which
+qom-list takes the path to an instance.  In other words,
+qom-list-properties is like instantiate with default configuration and
+without realizing + qom-list + destroy.
 
-This driver doesn't have .bdrv_open() at all, and we create it fully
-manually in mirror_start_job() anyway (as Eric has said).  Therefore, we
-can just do this right after bdrv_append() there has succeeded.
+We need to instantiate because QOM properties are dynamic: they aren't
+specified by data (which qom-list-properties could simply read), they
+are created by (instantiation) code (which qom-list-properties has to
+run).
 
-Max
+Properties created only after instantiation (by realize, perhaps) aren't
+visible in qom-list-properties.  Do such properties exist?
 
+Properties created only in non-default configuration aren't visible
+either.  Such properties have to exist, or else dynamic property
+creation would be idiotic.
 
---icVesgj1uqWZiquELlvQV1qGNyayAawF8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Likewise for properties created differently (say with a different type)
+in non-default configuration.  We can hope that no such beasts exist.
+Since properties get created by code, and code can do anything, we're
+reduced to hope.  Data is so much easier to reason about than code.
 
------BEGIN PGP SIGNATURE-----
+Three building blocks: instantiate, qom-list, destroy.  Do we want the
+building blocks, or do we want their combination qom-list-properties?
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpx+tISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A0GcH/01WlK0EATZjeKSnMg3T9SToBwOfGSyy
-2fsNwmEU7e4mOQLHYM/g7S8niIW7ZySoH3HuFebqbPjEA2x4+RomsDQkQcz9zqHW
-hCwc36u9ADe0eC9fObYL2JAXWlT+LsNx06aFlmfYqjycnq2h3U5JqIkB9HUC7SGN
-P2pmtjjzvkr0+0Ng9Gonvc3PEqxJVIMLo+P15dwKVrt+sEyplwUo9wmNuFkiLoWQ
-E0SNE7OJ75ZYgQmvxpBUh1Nht7kCyhQe/MQ82n3eei5cGdF+O5tUbFPhVTFaggfz
-RNhvfugO7wZUMKtpTXdF5BWBEvR3nRw4mK7X1Mzy3sS/jOkSNp2JNkw=
-=feos
------END PGP SIGNATURE-----
+> ---
+>
+> I am missing the point of make_device_property_info().
+> qmp_device_list_properties() creates the instance which copies everything
+> to QOM properties hashtable and commenting out the do{}while() in
+> make_device_property_info() does not seem to change a thing, what case
+> am I missing here?
 
---icVesgj1uqWZiquELlvQV1qGNyayAawF8--
+git-blame points to Stefan.  Stefan, can you help?
+
+> ---
+>  qapi-schema.json | 29 +++++++++++++++++++++++++++++
+>  qmp.c            | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 81 insertions(+)
+>
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 5c06745..9d73501 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -1455,6 +1455,35 @@
+>    'returns': [ 'DevicePropertyInfo' ] }
+>  
+>  ##
+> +# @QOMPropertyInfo:
+> +#
+> +# Information about object properties.
+> +#
+> +# @name: the name of the property
+> +# @type: the typename of the property
+> +# @description: if specified, the description of the property.
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'QOMPropertyInfo',
+> +  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
+> +
+> +##
+> +# @qom-list-properties:
+> +#
+> +# List properties associated with a QOM object.
+> +#
+> +# @typename: the type name of an object
+> +#
+> +# Returns: a list of QOMPropertyInfo describing object properties
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'qom-list-properties',
+> +  'data': { 'typename': 'str'},
+> +  'returns': [ 'QOMPropertyInfo' ] }
+> +
+> +##
+>  # @xen-set-global-dirty-log:
+>  #
+>  # Enable or disable the global dirty log mode.
+> diff --git a/qmp.c b/qmp.c
+> index 52cfd2d..20cb662 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -574,6 +574,58 @@ DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
+>      return prop_list;
+>  }
+>  
+> +QOMPropertyInfoList *qmp_qom_list_properties(const char *typename,
+> +                                             Error **errp)
+> +{
+> +    ObjectClass *klass;
+> +    Object *obj;
+> +    ObjectProperty *prop;
+> +    ObjectPropertyIterator iter;
+> +    QOMPropertyInfoList *prop_list = NULL;
+> +
+> +    klass = object_class_by_name(typename);
+> +    if (klass == NULL) {
+> +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> +                  "Class '%s' not found", typename);
+> +        return NULL;
+> +    }
+> +
+> +    klass = object_class_dynamic_cast(klass, TYPE_OBJECT);
+> +    if (klass == NULL) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_OBJECT);
+> +        return NULL;
+> +    }
+> +
+> +    if (object_class_is_abstract(klass)) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename",
+> +                   "non-abstract class");
+> +        return NULL;
+> +    }
+> +
+> +    obj = object_new(typename);
+> +
+> +    object_property_iter_init(&iter, obj);
+> +    while ((prop = object_property_iter_next(&iter))) {
+> +        QOMPropertyInfo *info;
+> +        QOMPropertyInfoList *entry;
+> +
+> +        info = g_malloc0(sizeof(*info));
+> +        info->name = g_strdup(prop->name);
+> +        info->type = g_strdup(prop->type);
+> +        info->has_description = !!prop->description;
+> +        info->description = g_strdup(prop->description);
+> +
+> +        entry = g_malloc0(sizeof(*entry));
+> +        entry->value = info;
+> +        entry->next = prop_list;
+> +        prop_list = entry;
+> +    }
+> +
+> +    object_unref(obj);
+> +
+> +    return prop_list;
+> +}
+> +
+>  CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+>  {
+>      return arch_query_cpu_definitions(errp);
