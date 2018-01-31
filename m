@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egrFm-0004cR-D9
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:48 -0500
+	(envelope-from <kraxel@redhat.com>) id 1egrFu-0004jV-Sb
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1egrFj-00084X-Q9
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41858)
+	(envelope-from <kraxel@redhat.com>) id 1egrFk-00085C-OU
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egrFj-000844-I5
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:35 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1egrFk-00084w-Gn
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 07:12:36 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 31 Jan 2018 13:12:13 +0100
-Message-Id: <20180131121217.13557-2-kraxel@redhat.com>
+Date: Wed, 31 Jan 2018 13:12:16 +0100
+Message-Id: <20180131121217.13557-5-kraxel@redhat.com>
 In-Reply-To: <20180131121217.13557-1-kraxel@redhat.com>
 References: <20180131121217.13557-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [RfC PATCH v2 1/5] headers: update
- linux-headers/linux/vfio.h (intel-gvt kernel patches, v17)
+Subject: [Qemu-devel] [RfC PATCH v2 4/5] vfio/display: core & wireup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +26,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>
 
+Infrastructure for display support.  Must be enabled
+using 'display' property.
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- linux-headers/linux/vfio.h | 64 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ hw/vfio/pci.h         |  3 +++
+ hw/vfio/display.c     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.c         |  9 +++++++++
+ hw/vfio/Makefile.objs |  2 +-
+ 4 files changed, 64 insertions(+), 1 deletion(-)
+ create mode 100644 hw/vfio/display.c
 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 4312e961ff..c433d6542b 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -503,6 +503,70 @@ struct vfio_pci_hot_reset {
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index a8fb3b3422..8f3295188c 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -130,6 +130,7 @@ typedef struct VFIOPCIDevice {
+ #define VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT 2
+ #define VFIO_FEATURE_ENABLE_IGD_OPREGION \
+                                 (1 << VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT)
++    OnOffAuto display;
+     int32_t bootindex;
+     uint32_t igd_gms;
+     uint8_t pm_cap;
+@@ -169,4 +170,6 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
+                                struct vfio_region_info *info,
+                                Error **errp);
  
- #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
- 
-+/**
-+ * VFIO_DEVICE_QUERY_GFX_PLANE - _IOW(VFIO_TYPE, VFIO_BASE + 14,
-+ *                                    struct vfio_device_query_gfx_plane)
-+ *
-+ * Set the drm_plane_type and flags, then retrieve the gfx plane info.
-+ *
-+ * flags supported:
-+ * - VFIO_GFX_PLANE_TYPE_PROBE and VFIO_GFX_PLANE_TYPE_DMABUF are set
-+ *   to ask if the mdev supports dma-buf. 0 on support, -EINVAL on no
-+ *   support for dma-buf.
-+ * - VFIO_GFX_PLANE_TYPE_PROBE and VFIO_GFX_PLANE_TYPE_REGION are set
-+ *   to ask if the mdev supports region. 0 on support, -EINVAL on no
-+ *   support for region.
-+ * - VFIO_GFX_PLANE_TYPE_DMABUF or VFIO_GFX_PLANE_TYPE_REGION is set
-+ *   with each call to query the plane info.
-+ * - Others are invalid and return -EINVAL.
-+ *
-+ * Note:
-+ * 1. Plane could be disabled by guest. In that case, success will be
-+ *    returned with zero-initialized drm_format, size, width and height
-+ *    fields.
-+ * 2. x_hot/y_hot is set to 0xFFFFFFFF if no hotspot information available
-+ *
-+ * Return: 0 on success, -errno on other failure.
-+ */
-+struct vfio_device_gfx_plane_info {
-+	__u32 argsz;
-+	__u32 flags;
-+#define VFIO_GFX_PLANE_TYPE_PROBE (1 << 0)
-+#define VFIO_GFX_PLANE_TYPE_DMABUF (1 << 1)
-+#define VFIO_GFX_PLANE_TYPE_REGION (1 << 2)
-+	/* in */
-+	__u32 drm_plane_type;	/* type of plane: DRM_PLANE_TYPE_* */
-+	/* out */
-+	__u32 drm_format;	/* drm format of plane */
-+	__u64 drm_format_mod;   /* tiled mode */
-+	__u32 width;	/* width of plane */
-+	__u32 height;	/* height of plane */
-+	__u32 stride;	/* stride of plane */
-+	__u32 size;	/* size of plane in bytes, align on page*/
-+	__u32 x_pos;	/* horizontal position of cursor plane */
-+	__u32 y_pos;	/* vertical position of cursor plane*/
-+	__u32 x_hot;    /* horizontal position of cursor hotspot */
-+	__u32 y_hot;    /* vertical position of cursor hotspot */
-+	union {
-+		__u32 region_index;	/* region index */
-+		__u32 dmabuf_id;	/* dma-buf id */
-+	};
-+};
++int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
 +
-+#define VFIO_DEVICE_QUERY_GFX_PLANE _IO(VFIO_TYPE, VFIO_BASE + 14)
-+
-+/**
-+ * VFIO_DEVICE_GET_GFX_DMABUF - _IOW(VFIO_TYPE, VFIO_BASE + 15, __u32)
+ #endif /* HW_VFIO_VFIO_PCI_H */
+diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+new file mode 100644
+index 0000000000..4ba93ea251
+--- /dev/null
++++ b/hw/vfio/display.c
+@@ -0,0 +1,51 @@
++/*
++ * display support for mdev based vgpu devices
 + *
-+ * Retrieve a dmabuf fd of an exposed guest framebuffer referenced by
-+ * dmabuf_id which is returned from VFIO_DEVICE_QUERY_GFX_PLANE as a token
-+ * of the exposed guest framebuffer.
++ * Copyright Red Hat, Inc. 2017
 + *
-+ * Return: 0 on success, -errno on failure.
++ * Authors:
++ *    Gerd Hoffmann
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
 + */
 +
-+#define VFIO_DEVICE_GET_GFX_DMABUF _IO(VFIO_TYPE, VFIO_BASE + 15)
++#include "qemu/osdep.h"
++#include <linux/vfio.h>
++#include <sys/ioctl.h>
 +
- /* -------- API for Type1 VFIO IOMMU -------- */
++#include "sysemu/sysemu.h"
++#include "ui/console.h"
++#include "pci.h"
++
++int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
++{
++    struct vfio_device_gfx_plane_info probe;
++    int ret;
++
++    memset(&probe, 0, sizeof(probe));
++    probe.argsz = sizeof(probe);
++    probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_DMABUF;
++    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
++    if (ret == 0) {
++        error_setg(errp, "vfio-display: dmabuf support not implemented yet");
++        return -1;
++    }
++
++    memset(&probe, 0, sizeof(probe));
++    probe.argsz = sizeof(probe);
++    probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_REGION;
++    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
++    if (ret == 0) {
++        error_setg(errp, "vfio-display: region support not implemented yet");
++        return -1;
++    }
++
++    if (vdev->display == ON_OFF_AUTO_AUTO) {
++        /* not an error in automatic mode */
++        return 0;
++    }
++
++    error_setg(errp, "vfio: device doesn't support any (known) display method");
++    return -1;
++}
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 2c71295125..cd5310c7ce 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2873,6 +2873,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         }
+     }
  
- /**
++    if (vdev->display != ON_OFF_AUTO_OFF) {
++        ret = vfio_display_probe(vdev, errp);
++        if (ret) {
++            goto out_teardown;
++        }
++    }
++
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
+@@ -2977,6 +2984,8 @@ static void vfio_instance_init(Object *obj)
+ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_PCI_HOST_DEVADDR("host", VFIOPCIDevice, host),
+     DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
++    DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
++                            display, ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
+                        intx.mmap_timeout, 1100),
+     DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+index c3ab9097f1..a2e7a0a7cf 100644
+--- a/hw/vfio/Makefile.objs
++++ b/hw/vfio/Makefile.objs
+@@ -1,6 +1,6 @@
+ ifeq ($(CONFIG_LINUX), y)
+ obj-$(CONFIG_SOFTMMU) += common.o
+-obj-$(CONFIG_PCI) += pci.o pci-quirks.o
++obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o
+ obj-$(CONFIG_VFIO_CCW) += ccw.o
+ obj-$(CONFIG_SOFTMMU) += platform.o
+ obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
 -- 
 2.9.3
