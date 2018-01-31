@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egyjg-0000Hv-BU
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:12:01 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egymM-000283-VL
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:14:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egyjf-0000G4-EY
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:12:00 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egymM-0002C4-2k
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:14:46 -0500
 References: <cover.1516978645.git.berto@igalia.com>
-	<5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
+	<9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d21ddbab-921c-3cc9-05dd-5113cb16fd8f@redhat.com>
-Date: Wed, 31 Jan 2018 21:11:48 +0100
+Message-ID: <36b4f1c1-3e19-d428-f91a-5466a2117d95@redhat.com>
+Date: Wed, 31 Jan 2018 21:14:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
+In-Reply-To: <9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Lt0z4CcnPv0D5pJL5gw19HNUZyoUnJuwg"
-Subject: Re: [Qemu-devel] [PATCH v3 18/39] qcow2: Refactor
- get_cluster_table()
+	boundary="w5ZCXzdA5eJnIqmT8jqgfDn1gLAL3LFPV"
+Subject: Re: [Qemu-devel] [PATCH v3 19/39] qcow2: Update get_cluster_table()
+ to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +29,52 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lt0z4CcnPv0D5pJL5gw19HNUZyoUnJuwg
+--w5ZCXzdA5eJnIqmT8jqgfDn1gLAL3LFPV
 From: Max Reitz <mreitz@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
  "Denis V . Lunev" <den@openvz.org>
-Message-ID: <d21ddbab-921c-3cc9-05dd-5113cb16fd8f@redhat.com>
-Subject: Re: [PATCH v3 18/39] qcow2: Refactor get_cluster_table()
+Message-ID: <36b4f1c1-3e19-d428-f91a-5466a2117d95@redhat.com>
+Subject: Re: [PATCH v3 19/39] qcow2: Update get_cluster_table() to support L2
+ slices
 References: <cover.1516978645.git.berto@igalia.com>
- <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
-In-Reply-To: <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
+ <9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
+In-Reply-To: <9c3d818ac202b776dbe73080d017e2c179c5babd.1516978645.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2018-01-26 15:59, Alberto Garcia wrote:
-> After the previous patch we're now always using l2_load() in
-> get_cluster_table() regardless of whether a new L2 table has to be
-> allocated or not.
+> This patch updates get_cluster_table() to return L2 slices instead of
+> full L2 tables.
 >=20
-> This patch refactors that part of the code to use one single l2_load()
-> call.
+> The code itself needs almost no changes, it only needs to call
+> offset_to_l2_slice_index() instead of offset_to_l2_index(). This patch
+> also renames all the relevant variables and the documentation.
 >=20
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/qcow2-cluster.c | 21 +++++++--------------
->  1 file changed, 7 insertions(+), 14 deletions(-)
->=20
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index 2a53c1dc5f..0c0cab85e8 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -695,15 +695,7 @@ static int get_cluster_table(BlockDriverState *bs,=
- uint64_t offset,
->          return -EIO;
->      }
-> =20
-> -    /* seek the l2 table of the given l2 offset */
-> -
-> -    if (s->l1_table[l1_index] & QCOW_OFLAG_COPIED) {
-> -        /* load the l2 table in memory */
-> -        ret =3D l2_load(bs, offset, l2_offset, &l2_table);
-> -        if (ret < 0) {
-> -            return ret;
-> -        }
-> -    } else {
-> +    if (!(s->l1_table[l1_index] & QCOW_OFLAG_COPIED)) {
->          /* First allocate a new L2 table (and do COW if needed) */
->          ret =3D l2_allocate(bs, l1_index);
->          if (ret < 0) {
-> @@ -719,11 +711,12 @@ static int get_cluster_table(BlockDriverState *bs=
-, uint64_t offset,
->          /* Get the offset of the newly-allocated l2 table */
->          l2_offset =3D s->l1_table[l1_index] & L1E_OFFSET_MASK;
->          assert(offset_into_cluster(s, l2_offset) =3D=3D 0);
-> -        /* Load the l2 table in memory */
-> -        ret =3D l2_load(bs, offset, l2_offset, &l2_table);
-> -        if (ret < 0) {
-> -            return ret;
-> -        }
-> +    }
-> +
-> +    /* load the l2 table in memory */
-> +    ret =3D l2_load(bs, offset, l2_offset, &l2_table);
-> +    if (ret < 0) {
-> +        return ret;
->      }
+>  block/qcow2-cluster.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 
-I'd pull the l2_offset assignment (and alignment check) down below the
-QCOW_OFLAG_COPIED check, saving us another two lines (!!1!) which we
-could then spend on an
-
-assert(s->l1_table[l1_index] & QCOW_OFLAG_COPIED);
-
-Max
-
-> =20
->      /* find the cluster offset for the given disk offset */
->=20
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-
---Lt0z4CcnPv0D5pJL5gw19HNUZyoUnJuwg
+--w5ZCXzdA5eJnIqmT8jqgfDn1gLAL3LFPV
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpyIwQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AamoH/jmQRJSA9Fia1nbqa3ceOiIzD0pCOSag
-t1douuJu0iiZcyvvsjaPxXUhCWDDAy/bpUbOy4jxqPnNmsy1LON649UMQ1gHl0/q
-9aI0KwASh0TamLx73quS4ogUt4xOqik399K15Wfz0cH1EQa+JxvTc1U2Z+Shugl3
-MxsRDABDONIQG5uC1e4/HsXthANQRQ/rt6YcIb0J5SaNbTp9f1Ydw5GxuFGvtPnp
-N1YFUSV0Lhn0MGu4fLut5n5GU3a/poiIJrVfY4m1xNgovw/xhWEi6ME+3LDbAnXi
-xYJ8YjvGa8WrvgehVS0G44rbxidWODn4DdlbUXVfxGGaCkM//PMCVJA=
-=CH3h
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpyI6wSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9An5EH/RuurgDwzfGrZFuwJbpkRpPL45RNddWg
+sl3mUK/gRoE2rEj3lPL5LGiWKgGrpJ0hUJ4rQwBIoJbXetSe1HJ3h6xnjo+PTIwN
+WGYv0H2hoyYYHVf0mLE5b9WCsLmDpzNlhfbuZd/ETUOZJSVz4aCe2IytwP1RyJ3O
+4DDFMORij0qSQuu4jOY1q0z4kuC5PLdIb+/F3UUjsvlZxY7I1bEEl/q4hiL5SU2n
+8ggvoOv+P33iwzVHtwaBaq7jlS66hNlxaSVYoOKAEOhsWd8Q8ZH4EKjCkRP/tyLw
+LYsj4hsF/qesgDWRWk9dZKs08EgbGoAhfaFuT49FyJYnPD+qA2IWETc=
+=tQ+I
 -----END PGP SIGNATURE-----
 
---Lt0z4CcnPv0D5pJL5gw19HNUZyoUnJuwg--
+--w5ZCXzdA5eJnIqmT8jqgfDn1gLAL3LFPV--
