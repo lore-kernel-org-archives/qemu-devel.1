@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eh0ur-000130-6O
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 17:31:42 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eh1Di-0007UF-Mt
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 17:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eh0uq-0004tu-9Q
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 17:31:41 -0500
-Received: from mail-lf0-x233.google.com ([2a00:1450:4010:c07::233]:47055)
+	(envelope-from <programmingkidx@gmail.com>) id 1eh1Df-0001tF-Jd
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 17:51:10 -0500
+Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:46440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eh0uq-0004st-2B
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 17:31:40 -0500
-Received: by mail-lf0-x233.google.com with SMTP id q194so23139505lfe.13
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 14:31:39 -0800 (PST)
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <87tvv1ydjl.fsf@linaro.org>
-References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-	<87lghd3mq6.fsf@linaro.org>
-	<CAKmqyKMgrU+4ABijd0SgomyZriVjVFMYt=TXs5b9--w_kenZ+Q@mail.gmail.com>
-	<CAKmqyKMopCi5jaDstAX0Q3CzLdQ9wRgKWT2ggR_Or8Yh09zkrQ@mail.gmail.com>
-	<0b0a9968-02bf-9273-e5fe-a69e04cf7f5e@redhat.com>
-	<CAKmqyKMAy3qjjTFdtw4ksa=wJQYVzYZqvSopQ_cHbqwd0tr2cg@mail.gmail.com>
-	<87tvv1ydjl.fsf@linaro.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 31 Jan 2018 14:31:08 -0800
-Message-ID: <CAKmqyKM10j7yyyhJn8SAv7K3EkZbmL-ckiv5_qQrFqiHvJ2z8g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eh1Df-0001su-Co
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 17:51:07 -0500
+Received: by mail-io0-x235.google.com with SMTP id f34so17009075ioi.13
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 14:51:07 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20180131090310.e4jlhu7euyeompkh@sirius.home.kraxel.org>
+Date: Wed, 31 Jan 2018 17:51:04 -0500
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] MTTCG External Halt
+Message-Id: <655BB356-66E8-4AC4-8EC4-47E3E2DA6B36@gmail.com>
+References: <20180126214731.23506-1-programmingkidx@gmail.com>
+	<20180130121823.7h4brwivh7653znu@sirius.home.kraxel.org>
+	<F79229CE-D35E-4895-A632-4211A7C526D8@gmail.com>
+	<20180131090310.e4jlhu7euyeompkh@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v5] cocoa.m: Add ability for user to
+ specify mouse ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,78 +33,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Jan 31, 2018 at 12:32 PM, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->
-> Alistair Francis <alistair.francis@xilinx.com> writes:
->
->> On Tue, Jan 30, 2018 at 8:26 PM, Paolo Bonzini <pbonzini@redhat.com> wro=
-te:
->>> On 30/01/2018 18:56, Alistair Francis wrote:
->>>>
->>>> I don't have a good solution though, as setting CPU_INTERRUPT_RESET
->>>> doesn't help (that isn't handled while we are halted) and
->>>> async_run_on_cpu()/run_on_cpu() doesn't reliably reset the CPU when we
->>>> want.
->>>>
->>>> I've ever tried pausing all CPUs before reseting the CPU and them
->>>> resuming them all but that doesn't seem to to work either.
->>>
->>> async_safe_run_on_cpu would be like async_run_on_cpu, except that it
->>> takes care of stopping all other CPUs while the function runs.
->>>
->>>> Is there
->>>> anything I'm missing? Is there no reliable way to reset a CPU?
->>>
->>> What do you mean by reliable?  Executing no instruction after the one
->>> you were at?
->>
->> The reset is called by a GPIO line, so I need the reset to be called
->> basically as quickly as the GPIO line changes. The async_ and
->> async_safe_ functions seem to not run quickly enough, even if I run a
->> process_work_queue() function afterwards.
->>
->> Is there a way to kick the CPU to act on the async_*?
->
-> Define quickly enough? The async_(safe) functions kick the vCPUs so they
-> will all exit the run loop as they enter the next TB (even if they loop
-> to themselves).
 
-We have a special power controller CPU that wakes all the CPUs up and
-at boot the async_* functions don't wake the CPUs up. If I just use
-the cpu_rest() function directly everything starts fine (but then I
-hit issues later).
+> On Jan 31, 2018, at 4:03 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>=20
+>>> What about the other hotkeys?
+>>>=20
+>>> There is fullscreen.  Ctrl-Alt-F for SDL and GTK.  Cmd-F for cocoa, =
+but
+>>> it works only if the grab is not active.
+>>=20
+>> If has to be that way because the meta (command) key is sent to the
+>> guest when the mouse grab is in effect. I actually suggest the SDL =
+and
+>> GTK interfaces send the meta (windows key on PC keyboard) key to the
+>> guest when a mouse grab is in effect. This way guest operating =
+systems
+>> like Mac OS X can use keyboard shortcuts.=20
+>=20
+> Well, the modifier key changes are actually sent to the guest, but
+> usually they have no effect there.
+>=20
+> So, if you press Ctrl-Alt-F, the guest will see the keydown and keyup
+> events for ctrl and alt.  It will not see the 'f', because SDL hijacks
+> that.
 
-If I forcefully run process_queued_cpu_work() then I can get the CPUs
-up, but I don't think that is the right solution.
+Maybe the f could be sent to the guest directly via =
+qemu_input_event_send_key_qcode().
 
->
-> From an external vCPUs point of view those extra instructions have
-> already executed. If the resetting vCPU needs them to have reset by the
-> time it executes it's next instruction it should either cpu_loop_exit at
-> that point or ensure it is the last instruction in it's TB (which is
-> what we do for the MMU flush cases in ARM, they all end the TB at that
-> point).
+>=20
+>>> Console select (Ctrl-Alt-<nr>), works for SDL and GTK.  When I read =
+the
+>>> code correctly it should work for cocoa the same way, but it doesn't
+>>> work for me.  Dunno why.=20
+>>=20
+>> I know this code was broken in cocoa for a while but I made the patch
+>> that fixes this problem. Console selection does work correctly using =
+a
+>> recent git version of QEMU.
+>=20
+> Just pulled latest master and recompiled, still not working for me.
+> This is sierra in a vm.
 
-cpu_loop_exit() sounds like it would help, but as I'm not in the CPU
-context it just seg faults.
+What software do you use to run the VM? It could be possible the VM =
+software is interfering with the ungrab keys.
 
-Alistair
+> Unrelated side note: hvf doesn't work for me too (nested on kvm).
 
->
->
->>
->> Thanks,
->> Alistair
->>
->>>
->>> Paolo
->>>
->
->
-> --
-> Alex Benn=C3=A9e
->
+I haven't played with this new feature yet. Maybe I will try it out one =
+day.
+
+>=20
+>>> Quit. Ctrl-Alt-Q on gtk.  Cmd-Q on cocoa, again only working without
+>>> keyboard grab.  Nothing on SDL.  Just closing the window to quit =
+works
+>>> on GTK and SDL, both have a switch to turn it off.
+>>=20
+>> I know Command-Q is the standard Macintosh keyboard short for =
+quitting
+>> an application. With GTK I would imagine it would depend on how the
+>> host operating system expects applications to be built. I don't think
+>> Windows and Linux have a standard keyboard shortcut for quitting an
+>> application.=20
+>=20
+> On Linux Ctrl-Q seems to be common (maybe only in the gnome world).
+> On Windows Alt-F4 should be standard.
+>=20
+> Qemu picked two-modifier hot-keys (like Ctrl-Alt-Q) to avoid overlaps
+> with guest hot keys, so both qemu and guest hotkeys can be used =
+without
+> having to deal with keyboard/mouse grabs all the time.
+>=20
+>> Ok I see what you want:
+>>=20
+>> -display =
+gtk,hotkey-modifiers=3Dctrl+shift,hotkey-grab=3Df12,hotkey-fullscreen=3Df1=
+1
+>>=20
+>> -display =
+cocoa,hotkey-modifiers=3DCommand,hotkey-grab=3Df13,hotkey-fullscreen=3Df14=
+
+>=20
+> I think that would be "super" not "Command" because that is the name =
+for
+> the key in the pc world so this is what the key got as QKeyCode name.
+>=20
+>> I assume hotkey-modifiers is used to set the meta key.
+>=20
+> Yes.
+>=20
+>> Is hotkey-grab the key used to ungrab the mouse?
+>=20
+> Yes (keyboard grab too).
+>=20
+>> If it is shouldn't it be called hotkey-ungrab?
+>=20
+> Good question.  On gtk/sdl Ctrl-Alt-G actually toggles the grab, i.e.
+> can do *both* grab and ungrab.  But I expect most users use it for
+> ungrab only, due to mouse clicks activating the grab too.
+>=20
+>>>> Example usage:  -ungrab home
+>>>> 	        -ungrab shift-ctrl
+>>>=20
+>>> Modifier-only hotkeys are tricky with gtk (doable, but no support =
+for
+>>> that in the toolkit).
+>>>=20
+>>>> 		-ungrab ctrl-x
+>>>> 		-ungrab pgup-pgdn
+>>>=20
+>>> Really?  Two non-modifier keys?
+>> Yes. The ungrab sequence could be a-b-c and still allow these keys to =
+be used in the guest.
+>>=20
+>>> How is that implemented?  Do you queue
+>>> up the pgup keypress, waiting to see whenever pgdn is pressed too, =
+then
+>>> only in case that didn't happen forward the queued pgup key to the =
+guest?
+>>=20
+>> Basically there is a array that acts as a check list. It checks off
+>> keys that belong to the ungrab sequence as they are detected. Once a
+>> non-ungrab key is detected, the check list is cleared. If all the
+>> ungrab keys are detected the ungrab code is executed. This only
+>> happens on keyup events. That way if Control-ALT were the ungrab =
+keys,
+>> sending Control-ALT-Delete to the guest is still possible because
+>> these are the keys detected on the keyup event. The Delete key would
+>> have cleared the check list. Daniel Berrange is the one I can thank
+>> for this idea. He might be able to explain it better than me.
+>=20
+> Hmm, ok.
+>=20
+> Doing the same for gtk would basically imply to not use any toolkit
+> support for hotkeys ...
+>=20
+> It'll also become more difficuilt if we use that for multiple hotkeys.
+>=20
+> But possibly we can share the code across all UIs, now that =
+keycodemapdb
+> is used by qemu.  So first translate the keycode from the UI toolkit =
+to
+> a QKeyCode, then feed that into shared hotkey detection code.
+
+Sounds like a good idea. I will be more than happy to help. My cocoa =
+code
+uses sets to implement keeping track of key presses. A set is a =
+collection of data=20
+that only allows for unique values. So no two items in a set can be the =
+same
+value. My patch uses cocoa's NSSet so the shared code would probably not =
+be
+able to use it. I don't currently know of an implementation of a set =
+that is
+in C and available for us to use, so we may have to implement it =
+ourselves.=20
+
+>=20
+>>> I think we should limit ourself to key combinations which have one
+>>> non-modifier key and optionally one or more modifier keys.  That
+>>> should be supportable in all user interfaces we have.  Except
+>>> curses, modifier key handling in unix terminals is a completely
+>>> different world ...
+>>>=20
+>>> When it comes to defining hotkeys I see basically two possible ways
+>>> to do it:
+>>>=20
+>>> (1) Have a fixed (set of) modifier keys for all hot keys, i.e.
+>>> something like this:
+>>>=20
+>>>        -display =
+gtk,hotkey-modifiers=3Dctrl+shift,hotkey-grab=3Df12,hotkey-fullscreen=3Df1=
+1
+>>>=20
+>>> (2) Allow complete freedom when defining hotkeys, i.e.
+>>>=20
+>>>        -display gtk,hotkey-grab=3Dshift+f12,hotkey-fullscreen=3Dctrl+f=
+11
+>>>=20
+>>> Variant (1) provides a simple way to use other modifiers for all
+>>> hotkeys, simliar to the existing -alt-grab switch.  I also expect it
+>>> is easier to implement.
+>>=20
+>> Choice 2 sounds really nice. It does give the user total freedom to
+>> customize QEMU as seen fit.
+>=20
+> But on the other hand switching all hotkeys from ctrl-alt-<key> to
+> ctrl-shift-<key> is alot of work with choice (2) because you have to
+> redefine all hotkeys.  With choice (1) it is a simple
+> "hotkey-modifiers=3Dctrl+shift".
+>=20
+> So both approaches have their specific advantages ...
+>=20
+>>> Another question is whenever we want allow defining different
+>>> hotkeys for the same thing.  So fullscreen could have both F11
+>>> (which is a common hotkey in various apps, for example firefox) and
+>>> Ctrl-Alt-F.  Might be useful, but also makes the implementation more
+>>> complex.
+>>=20
+>> Assigning two different keyboard shortcuts to the same feature might
+>> be problematic.  Keeping things to one keyboard shortcut is probably
+>> the simple thing to do.
+>=20
+> Yes.  I also think the added complexity needed isn't worth the =
+benefits.
+>=20
+> cheers,
+>  Gerd
+>=20
