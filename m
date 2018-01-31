@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egt6A-0002qY-0a
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:10:54 -0500
+	(envelope-from <stefanha@redhat.com>) id 1egt8J-0004Ob-MW
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:13:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egt64-0001YD-7S
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:10:49 -0500
-References: <20180131102152.16902-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <efe28ca0-aa46-3b8b-4d3c-84e886f575e5@redhat.com>
-Date: Wed, 31 Jan 2018 08:10:15 -0600
+	(envelope-from <stefanha@redhat.com>) id 1egt8I-0003GX-N0
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:13:03 -0500
+Date: Wed, 31 Jan 2018 14:12:47 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180131141247.GC23336@stefanha-x1.localdomain>
+References: <20180130063433.11605-1-famz@redhat.com>
+	<20180130063433.11605-3-famz@redhat.com>
+	<b552c5fb-f79a-98f1-bac7-26cf6e106f06@redhat.com>
+	<20180130163820.GC4503@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180131102152.16902-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OtT2Uhnypn9owDs2zSUpEckQe6grGSGDR"
-Subject: Re: [Qemu-devel] [PATCH v2] qcow2: Replace align_offset() with
- ROUND_UP()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tqI+Z3u+9OQ7kwn0"
+Content-Disposition: inline
+In-Reply-To: <20180130163820.GC4503@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] qemu-img: Document --force-share /
+ -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, kchamart@redhat.com, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OtT2Uhnypn9owDs2zSUpEckQe6grGSGDR
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <efe28ca0-aa46-3b8b-4d3c-84e886f575e5@redhat.com>
-Subject: Re: [PATCH v2] qcow2: Replace align_offset() with ROUND_UP()
-References: <20180131102152.16902-1-berto@igalia.com>
-In-Reply-To: <20180131102152.16902-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
+
+--tqI+Z3u+9OQ7kwn0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 01/31/2018 04:21 AM, Alberto Garcia wrote:
-> The align_offset() function is equivalent to the ROUND_UP() macro so
-> there's no need to use the former. The ROUND_UP() name is also a bit
-> more explicit.
+On Tue, Jan 30, 2018 at 05:38:20PM +0100, Kevin Wolf wrote:
+> Am 30.01.2018 um 15:23 hat Eric Blake geschrieben:
+> > On 01/30/2018 12:34 AM, Fam Zheng wrote:
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > > ---
+> > >  qemu-img.texi | 7 +++++++
+> > >  1 file changed, 7 insertions(+)
+> > >=20
+> > > diff --git a/qemu-img.texi b/qemu-img.texi
+> > > index 60a0e080c6..ec7e2f5d1e 100644
+> > > --- a/qemu-img.texi
+> > > +++ b/qemu-img.texi
+> > > @@ -86,6 +86,13 @@ exclusive with the @var{-O} parameters. It is curr=
+ently required to also use
+> > >  the @var{-n} parameter to skip image creation. This restriction may =
+be relaxed
+> > >  in a future release.
+> > > =20
+> > > +@item --force-share (-U)
+> > > +If specified, @code{qemu-img} will open the image in shared mode, al=
+lowing
+> > > +concurrent writers. For example, this can be used to get the image i=
+nformation
+> >=20
+> > Actually, we only permit one writer at a time.  Would it be better to
+> > say "allowing a concurrent writer"?
 >=20
-> This patch uses ROUND_UP() instead of the slower QEMU_ALIGN_UP()
-> because align_offset() already requires that the second parameter is a
-> power of two.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
+> As far as qemu-img is concerned, multiple writers to the image are
+> allowed. There may be further restrictions imposed by a writer so that a
+> second writer isn't allowed, but with raw images and share-rw=3Don nothing
+> prevents two qemu instances writing to the same image while qemu-img is
+> accessing it read-only.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I agree with what you wrote and it's technically correct, but this is a
+confusing place to mention concurrent writers.  They are a common source
+of user error and that's why locking was introduced in the first place.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+There should be a separate paragraph in docs/qemu-block-drivers.texi
+explaining that share-rw=3Don can be used safely with format=3Draw if the
+guests are configured to safely access a shared disk.  It should also
+mention that share-rw=3Don is unsafe for image formats.
 
+Stefan
 
---OtT2Uhnypn9owDs2zSUpEckQe6grGSGDR
+--tqI+Z3u+9OQ7kwn0
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEyBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpxzkcACgkQp6FrSiUn
-Q2qBFAf49LFzjnj5C8c2cRdBd5tSEPAw5yQFs1VqHxhBhZJjUeNtvOHnVwz6BzBu
-0gfeEpmFW8IPJMkbN6h6I7P/mRKACC+kw6T1DoMfJmOFhtHBuAbhreEMStIFlFwn
-fzdr3O4voEwCIN6OuYpjXWsaHtrhXYAqiLiDGxDg8wPRmevI8iGAu1xGCENk+onf
-IjeenU44i2GS8V6C6IfqvXblRzSzS2vbT42Ho7PKVlooYmCF8C3ObNSmgrlsHFQd
-DpIONpnybvGs2xOP+X4JdDwhTWLK5QX9Cy/hBSGQJ6xMkvm8DRXgUt+AgMrLrnMl
-nZsJKNACSravOYX9tvOdsnBpfu5Z
-=2MFw
+iQEcBAEBAgAGBQJacc7fAAoJEJykq7OBq3PIT5AH/0w4DK0g6OQtF2V7InP7BBn1
+PQaG8FtRyu93BMZ5N2r1qy8CL3GRwSyyPUU9L33g0p/Cgsp9QkaAVgaW2NFod8U/
+nhTess6SzJMUVtNx3vZZRA3tzjGlHjBLxxFNZNguP/FaUtPaFnBE323jcVKiGdqu
++YAINkM+nmIcEoxao+YWAbHcXav/yoMLCamNHSmtZrVNPCE69IBc3T+X0GYdoztj
+bcPixFnVodGLFnpAaGG4Bzzgrzke/yaC0FFYV3d7iWSKyXlaLRK8fo+DBsgiDSiu
+aqYXwlzNUUwwGc6eBMMe/QiRjx7tHXpQ8035p+1qwzsWng/OyrZCWPxjRs0N8y0=
+=1cYR
 -----END PGP SIGNATURE-----
 
---OtT2Uhnypn9owDs2zSUpEckQe6grGSGDR--
+--tqI+Z3u+9OQ7kwn0--
