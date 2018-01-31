@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egx6s-0002cH-F4
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:27:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1egxC3-0004rQ-95
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:33:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1egx6r-00083Q-Gy
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:27:50 -0500
-References: <20180118103143.11780-1-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <23d13ff3-adfb-05ee-e09a-6ba072f1ff76@redhat.com>
-Date: Wed, 31 Jan 2018 19:27:38 +0100
+	(envelope-from <eblake@redhat.com>) id 1egxBy-0003BA-JH
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:33:11 -0500
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
+	<7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
+	<2e58f0a9-7db4-b562-e1d0-b8c712a67b21@virtuozzo.com>
+	<4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cfcdb124-b343-ae2f-726d-5b084c9b86bb@redhat.com>
+Date: Wed, 31 Jan 2018 12:32:27 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180118103143.11780-1-berrange@redhat.com>
+In-Reply-To: <4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="9kJAtokKuiUCCViANGTGFtLIyNRBm60dd"
-Subject: Re: [Qemu-devel] [PATCH] block: implement the bdrv_reopen_prepare
- helper for LUKS driver
+	boundary="MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0"
+Subject: Re: [Qemu-devel] [PATCH v7 8/9] qcow2: skip writing zero buffers to
+ empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +28,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com, berto@igalia.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9kJAtokKuiUCCViANGTGFtLIyNRBm60dd
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <23d13ff3-adfb-05ee-e09a-6ba072f1ff76@redhat.com>
-Subject: Re: [PATCH] block: implement the bdrv_reopen_prepare helper for LUKS
- driver
-References: <20180118103143.11780-1-berrange@redhat.com>
-In-Reply-To: <20180118103143.11780-1-berrange@redhat.com>
+--MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Anton Nefedov
+ <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com,
+ berto@igalia.com
+Message-ID: <cfcdb124-b343-ae2f-726d-5b084c9b86bb@redhat.com>
+Subject: Re: [PATCH v7 8/9] qcow2: skip writing zero buffers to empty COW
+ areas
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
+ <7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
+ <2e58f0a9-7db4-b562-e1d0-b8c712a67b21@virtuozzo.com>
+ <4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
+In-Reply-To: <4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-01-18 11:31, Daniel P. Berrange wrote:
-> If the bdrv_reopen_prepare helper isn't provided, the qemu-img commit
-> command fails to re-open the base layer after committing changes into
-> it. Provide a no-op implementation for the LUKS driver, since there
-> is not any custom work that needs doing to re-open it.
+On 01/31/2018 11:40 AM, Max Reitz wrote:
+
+>> Maybe it's good enough to cover these cases:
+>> =C2=A01. no backing
+>> =C2=A02. beyond bdrv_getlength() in backing
+>> =C2=A03. unallocated in backing qcow2 (covers 'beyond bdrv_getlength()=
+
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 in backing->file')
+>>
+>> 1 & 2 are easy to check;
 >=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/crypto.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+> Not sure how useful 2 is, though.  (I don't know.  I always hear about
+> people wanting to optimize for such a case where a backing file is
+> shorter than the overlay, but I can't imagine a real use case for that.=
+)
+
+I can; here's what's happened to me personally.  I created an image, and
+took internal snapshots (yeah, I know those aren't in fashion these
+days, but this was long ago).  Later, I ran out of space.  I wanted to
+resize the image, but am not convinced whether resizing the image will
+play nicely with the internal snapshots (in fact, I don't recall
+off-hand whether this was something we prevented in the past and now
+support, or if it is still unsupported now...) - so the easiest way is
+to create a larger overlay image.
+
 >=20
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 60ddf8623e..bb9a8f5376 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -382,6 +382,12 @@ static void block_crypto_close(BlockDriverState *b=
-s)
->      qcrypto_block_free(crypto->block);
->  }
-> =20
-> +static int block_crypto_reopen_prepare(BDRVReopenState *state,
-> +                                       BlockReopenQueue *queue, Error =
-**errp)
-> +{
-> +    /* nothing needs checking */
-> +    return 0;
-> +}
-
-Unfortunately I have to admit I'm not quite an expert on reopen
-myself...  But generally it is used to change options, so in theory one
-could provide a new key-secret here.  It's up to you whether you want to
-support that or not (with this implementation the user will get an error
-when they want to change the key-secret).
-
-Apart from that, I think a no-op should be OK.
-
-Max
-
-> =20
->  /*
->   * 1 MB bounce buffer gives good performance / memory tradeoff
-> @@ -620,6 +626,7 @@ BlockDriver bdrv_crypto_luks =3D {
->      .bdrv_truncate      =3D block_crypto_truncate,
->      .create_opts        =3D &block_crypto_create_opts_luks,
-> =20
-> +    .bdrv_reopen_prepare =3D block_crypto_reopen_prepare,
->      .bdrv_refresh_limits =3D block_crypto_refresh_limits,
->      .bdrv_co_preadv     =3D block_crypto_co_preadv,
->      .bdrv_co_pwritev    =3D block_crypto_co_pwritev,
+>> 3: if that's not too hacky maybe we can do the bdrv_is_allocated() che=
+ck
+>> for qcow2 exclusively and if there is raw (or any other format) backin=
+g
+>> image - do the COW
 >=20
+> Yes, well, it seems useful in principle...  But it would require genera=
+l
+> block layer work indeed.  Maybe a new flag for bdrv_block_status*() tha=
+t
+> says only to look into the format layer?
+
+Maybe indeed - but first I want my byte-based block_status stuff to land =
+;)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-
---9kJAtokKuiUCCViANGTGFtLIyNRBm60dd
+--MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpyCpoSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ADowH+gKq1PKu9MUp5dzfHnZAQjgMK8c71hv/
-UO4stX5APP4ye/UGTtjrRw6V116BRcAG132mAqv5Q/DbdqBH5yNE76oeFCq8OJz1
-8dVSkmBO+bxUOxxAXQgzHEyr8cEDia1KsoNBoXQVwHXOkKieEmD3IbFwk9l8jOW9
-UCWbKwAoyWzdZhT1QXxdRAX1vJEo2z3eEEync6I4I7sGgwVORwrTOvlvXQSCUW4W
-NgcLYsRP8tOWa9E6WELCt9Q9/C/eug4bWStLLai+vjMeQab6u2PnzmyYvEu7xsmd
-yLdf5mKGICLZStAlu88qbETuPeoFWQcnXaWlJDwxH7iOZCDRVNtTSkw=
-=iwRB
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpyC7sACgkQp6FrSiUn
+Q2qHZwgAmuVnZ2PRsMfMF7xsd+ozP2kxc10/nrO7rZ3cyhK2uR1GuQzGagaEZAn6
+CV2QRQ9hkjfpD3vAutCKzvgijDGbjZNbwEHmjy69TiMmZbNAaHU5DHsMkwwzSB4C
+GPugx+Vi/vtLB8jKnS1jQzGW6GDWiDBBofswElOfDg2bUmbzwsBK8mAE9MLu8tsM
+AP3gak5sjFEVeOF833V8AaB5U4qhRePb498M8YRN7/rrD8iIO1bV1qO0tWdQqANf
+2rYdCUwWz2+a4uoHb6h00gon+hTZ8DGQHdcpM2Ro/y/zHqq9Rx2xo+dMbT4HbiJS
+3bE0xKCrlcHevuIg8N7qlqg7KHZPJA==
+=cToS
 -----END PGP SIGNATURE-----
 
---9kJAtokKuiUCCViANGTGFtLIyNRBm60dd--
+--MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0--
