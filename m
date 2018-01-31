@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egpQB-0003GN-46
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:15:18 -0500
+	(envelope-from <berto@igalia.com>) id 1egpX4-0005KT-NJ
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:22:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egpQ4-0002Cs-N0
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:15:15 -0500
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:46732)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1egpQ4-0002Ca-GT
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:15:08 -0500
-Received: by mail-oi0-x233.google.com with SMTP id l6so3942419oii.13
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 02:15:08 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180130173935.5172-1-groug@kaod.org>
-References: <20180130173935.5172-1-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 31 Jan 2018 10:14:46 +0000
-Message-ID: <CAFEAcA-q3K-6zVVjU3gxKjd6a4kYd0RLfVLfMhPgwskY=qb-hg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/10] 9p patches for 2.12 20180130
+	(envelope-from <berto@igalia.com>) id 1egpX1-0006XU-HR
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:22:22 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed, 31 Jan 2018 12:21:52 +0200
+Message-Id: <20180131102152.16902-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2] qcow2: Replace align_offset() with
+ ROUND_UP()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +18,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 30 January 2018 at 17:39, Greg Kurz <groug@kaod.org> wrote:
-> The following changes since commit 30d9fefe1aca1e92c785214aa9201fd7c2287d56:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/input-20180129-v2-pull-request' into staging (2018-01-29 15:52:27 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/gkurz/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 0dfef72861261bdfd30f2cc53d61c12c097af11a:
->
->   tests/virtio-9p: explicitly handle potential integer overflows (2018-01-30 15:28:56 +0100)
->
-> ----------------------------------------------------------------
-> This series is mostly about 9p request cancellation. It fixes a
-> long standing bug (read "specification violation") where the server
-> would send an invalid response when the client has cancelled an
-> in-flight request. This was causing annoying spurious EINTR returns
-> in linux. The fix comes with some related testing in QTEST.
->
-> Other patches are code cleanup and improvements.
->
-> ----------------------------------------------------------------
-> Greg Kurz (9):
->       9pfs: drop v9fs_register_transport()
->       tests: virtio-9p: move request tag to the test functions
->       tests: virtio-9p: wait for completion in the test code
->       tests: virtio-9p: use the synth backend
->       tests: virtio-9p: add LOPEN operation test
->       tests: virtio-9p: add WRITE operation test
->       libqos/virtio: return length written into used descriptor
->       tests: virtio-9p: add FLUSH operation test
->       tests/virtio-9p: explicitly handle potential integer overflows
->
-> Keno Fischer (1):
->       9pfs: Correctly handle cancelled requests
+The align_offset() function is equivalent to the ROUND_UP() macro so
+there's no need to use the former. The ROUND_UP() name is also a bit
+more explicit.
 
-Hi. This fails 'make check' on sparc hosts:
+This patch uses ROUND_UP() instead of the slower QEMU_ALIGN_UP()
+because align_offset() already requires that the second parameter is a
+power of two.
 
-TEST: tests/virtio-9p-test... (pid=21410)
-  /ppc64/virtio/9p/pci/nop:                                            OK
-  /ppc64/virtio/9p/pci/config:                                         OK
-  /ppc64/virtio/9p/pci/fs/version/basic:                               OK
-  /ppc64/virtio/9p/pci/fs/attach/basic:                                OK
-  /ppc64/virtio/9p/pci/fs/walk/basic:                                  OK
-  /ppc64/virtio/9p/pci/fs/walk/no_slash:                               OK
-  /ppc64/virtio/9p/pci/fs/walk/dotdot_from_root:                       OK
-  /ppc64/virtio/9p/pci/fs/lopen/basic:                                 OK
-  /ppc64/virtio/9p/pci/fs/write/basic:                                 OK
-  /ppc64/virtio/9p/pci/fs/flush/success:
-Broken pipe
-FAIL
-GTester: last random seed: R02S3152e3829aa0155ecb8ed934af62a54f
-(pid=21546)
-  /ppc64/virtio/9p/pci/fs/flush/ignored:
-Broken pipe
-FAIL
-GTester: last random seed: R02Sd8d854ef25a0afc00dfe43cdab8f8bc7
-(pid=21552)
-FAIL: tests/virtio-9p-test
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-bitmap.c   |  4 ++--
+ block/qcow2-cluster.c  |  4 ++--
+ block/qcow2-refcount.c |  4 ++--
+ block/qcow2-snapshot.c | 10 +++++-----
+ block/qcow2.c          | 14 +++++++-------
+ block/qcow2.h          |  6 ------
+ 6 files changed, 18 insertions(+), 24 deletions(-)
 
-On x86 with the clang runtime sanitizer it gives errors about
-misaligned loads:
-
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-runtime error: member access within misaligned address 0x7fb933502017
-for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
-0x7fb933502017: note: pointer points here
- 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-00 00 00 00 00 00 00  00 00 00
-             ^
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-runtime error: load of misaligned address 0x7fb933502017 for type
-'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
-0x7fb933502017: note: pointer points here
- 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-00 00 00 00 00 00 00  00 00 00
-             ^
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:532:22:
-runtime error: member access within misaligned address 0x7fb933502017
-for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
-0x7fb933502017: note: pointer points here
- 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-00 00 00 00 00 00 00  00 00 00
-             ^
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:532:22:
-runtime error: load of misaligned address 0x7fb933502017 for type
-'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
-0x7fb933502017: note: pointer points here
- 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-00 00 00 00 00 00 00  00 00 00
-             ^
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-runtime error: member access within misaligned address 0x7f33bb102017
-for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
-0x7f33bb102017: note: pointer points here
- 04 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-00 00 00 00 00 00 00  00 00 00
-             ^
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
-runtime error: load of misaligned address 0x7f33bb102017 for type
-'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
-0x7f33bb102017: note: pointer points here
- 04 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
-00 00 00 00 00 00 00  00 00 00
-             ^
-
-which is probably what is causing the sparc failure.
-
-This code looks suspicious:
-
-static ssize_t v9fs_synth_qtest_flush_write(void *buf, int len, off_t offset,
-                                            void *arg)
-{
-    QtestV9fsSynthFlushData *data = buf;
-
-    assert(len == sizeof(*data));
-
-    if (data->usec_timeout) {
-
-as you can't in general cast an arbitrary pointer into a
-structure and use it like that.
-
-Given that the only thing in the data stream is a 32-bit value,
-it would be simpler just to say
-  uint32_t usec_timeout = ldl_XX_p(buf);
-
-I put 'XX' there because the other thing that looks weird here
-is the handling of endianness. The code as written is doing
-a "load a host-order 32-bit value", which would be ldl_he_p().
-But should a buffer in the 9pfs code really have anything
-in host-order rather than a fixed-by-protocol order?
-Using ldl_le_p() or ldl_be_p() seems more plausible. (Whatever
-code is generating this byte stream might also need attention.)
-
-thanks
--- PMM
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index efa10c6663..0a3803aa34 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -413,8 +413,8 @@ static inline void bitmap_dir_entry_to_be(Qcow2BitmapDirEntry *entry)
+ 
+ static inline int calc_dir_entry_size(size_t name_size, size_t extra_data_size)
+ {
+-    return align_offset(sizeof(Qcow2BitmapDirEntry) +
+-                        name_size + extra_data_size, 8);
++    int size = sizeof(Qcow2BitmapDirEntry) + name_size + extra_data_size;
++    return ROUND_UP(size, 8);
+ }
+ 
+ static inline int dir_entry_size(Qcow2BitmapDirEntry *entry)
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index a3fec27bf9..29d70e1f3e 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -127,11 +127,11 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+ 
+     new_l1_size2 = sizeof(uint64_t) * new_l1_size;
+     new_l1_table = qemu_try_blockalign(bs->file->bs,
+-                                       align_offset(new_l1_size2, 512));
++                                       ROUND_UP(new_l1_size2, 512));
+     if (new_l1_table == NULL) {
+         return -ENOMEM;
+     }
+-    memset(new_l1_table, 0, align_offset(new_l1_size2, 512));
++    memset(new_l1_table, 0, ROUND_UP(new_l1_size2, 512));
+ 
+     if (s->l1_size) {
+         memcpy(new_l1_table, s->l1_table, s->l1_size * sizeof(uint64_t));
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 92701ab7af..1d520615a8 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1202,7 +1202,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
+      * l1_table_offset when it is the current s->l1_table_offset! Be careful
+      * when changing this! */
+     if (l1_table_offset != s->l1_table_offset) {
+-        l1_table = g_try_malloc0(align_offset(l1_size2, 512));
++        l1_table = g_try_malloc0(ROUND_UP(l1_size2, 512));
+         if (l1_size2 && l1_table == NULL) {
+             ret = -ENOMEM;
+             goto fail;
+@@ -2545,7 +2545,7 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+     }
+ 
+     /* align range to test to cluster boundaries */
+-    size = align_offset(offset_into_cluster(s, offset) + size, s->cluster_size);
++    size = ROUND_UP(offset_into_cluster(s, offset) + size, s->cluster_size);
+     offset = start_of_cluster(s, offset);
+ 
+     if ((chk & QCOW2_OL_ACTIVE_L1) && s->l1_size) {
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 44243e0e95..cee25f582b 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -66,7 +66,7 @@ int qcow2_read_snapshots(BlockDriverState *bs)
+ 
+     for(i = 0; i < s->nb_snapshots; i++) {
+         /* Read statically sized part of the snapshot header */
+-        offset = align_offset(offset, 8);
++        offset = ROUND_UP(offset, 8);
+         ret = bdrv_pread(bs->file, offset, &h, sizeof(h));
+         if (ret < 0) {
+             goto fail;
+@@ -155,7 +155,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
+     offset = 0;
+     for(i = 0; i < s->nb_snapshots; i++) {
+         sn = s->snapshots + i;
+-        offset = align_offset(offset, 8);
++        offset = ROUND_UP(offset, 8);
+         offset += sizeof(h);
+         offset += sizeof(extra);
+         offset += strlen(sn->id_str);
+@@ -215,7 +215,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
+         assert(id_str_size <= UINT16_MAX && name_size <= UINT16_MAX);
+         h.id_str_size = cpu_to_be16(id_str_size);
+         h.name_size = cpu_to_be16(name_size);
+-        offset = align_offset(offset, 8);
++        offset = ROUND_UP(offset, 8);
+ 
+         ret = bdrv_pwrite(bs->file, offset, &h, sizeof(h));
+         if (ret < 0) {
+@@ -441,7 +441,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+     /* The VM state isn't needed any more in the active L1 table; in fact, it
+      * hurts by causing expensive COW for the next snapshot. */
+     qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
+-                          align_offset(sn->vm_state_size, s->cluster_size),
++                          ROUND_UP(sn->vm_state_size, s->cluster_size),
+                           QCOW2_DISCARD_NEVER, false);
+ 
+ #ifdef DEBUG_ALLOC
+@@ -710,7 +710,7 @@ int qcow2_snapshot_load_tmp(BlockDriverState *bs,
+     }
+     new_l1_bytes = sn->l1_size * sizeof(uint64_t);
+     new_l1_table = qemu_try_blockalign(bs->file->bs,
+-                                       align_offset(new_l1_bytes, 512));
++                                       ROUND_UP(new_l1_bytes, 512));
+     if (new_l1_table == NULL) {
+         return -ENOMEM;
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 1f80961e1b..7f0fe00d49 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1354,7 +1354,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     if (s->l1_size > 0) {
+         s->l1_table = qemu_try_blockalign(bs->file->bs,
+-            align_offset(s->l1_size * sizeof(uint64_t), 512));
++            ROUND_UP(s->l1_size * sizeof(uint64_t), 512));
+         if (s->l1_table == NULL) {
+             error_setg(errp, "Could not allocate L1 table");
+             ret = -ENOMEM;
+@@ -2615,19 +2615,19 @@ static int64_t qcow2_calc_prealloc_size(int64_t total_size,
+ {
+     int64_t meta_size = 0;
+     uint64_t nl1e, nl2e;
+-    int64_t aligned_total_size = align_offset(total_size, cluster_size);
++    int64_t aligned_total_size = ROUND_UP(total_size, cluster_size);
+ 
+     /* header: 1 cluster */
+     meta_size += cluster_size;
+ 
+     /* total size of L2 tables */
+     nl2e = aligned_total_size / cluster_size;
+-    nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
++    nl2e = ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
+     meta_size += nl2e * sizeof(uint64_t);
+ 
+     /* total size of L1 tables */
+     nl1e = nl2e * sizeof(uint64_t) / cluster_size;
+-    nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
++    nl1e = ROUND_UP(nl1e, cluster_size / sizeof(uint64_t));
+     meta_size += nl1e * sizeof(uint64_t);
+ 
+     /* total size of refcount table and blocks */
+@@ -3681,8 +3681,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     has_backing_file = !!optstr;
+     g_free(optstr);
+ 
+-    virtual_size = align_offset(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+-                                cluster_size);
++    virtual_size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
++    virtual_size = ROUND_UP(virtual_size, cluster_size);
+ 
+     /* Check that virtual disk size is valid */
+     l2_tables = DIV_ROUND_UP(virtual_size / cluster_size,
+@@ -3702,7 +3702,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+             goto err;
+         }
+ 
+-        virtual_size = align_offset(ssize, cluster_size);
++        virtual_size = ROUND_UP(ssize, cluster_size);
+ 
+         if (has_backing_file) {
+             /* We don't how much of the backing chain is shared by the input
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 46c8cf44ec..33d2eb0ead 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -468,12 +468,6 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
+     return (offset >> s->cluster_bits) & (s->l2_size - 1);
+ }
+ 
+-static inline int64_t align_offset(int64_t offset, int n)
+-{
+-    offset = (offset + n - 1) & ~(n - 1);
+-    return offset;
+-}
+-
+ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+ {
+     return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bits);
+-- 
+2.11.0
