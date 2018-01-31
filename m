@@ -1,41 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1egyn0-0002Yq-Lg
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:15:28 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1egyoI-0003ZB-Es
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:16:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1egymy-0002cn-LD
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:15:26 -0500
-Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:40468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1egymy-0002c9-7p
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:15:24 -0500
-Received: by mail-it0-x230.google.com with SMTP id 196so1051229iti.5
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 12:15:24 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAMJs5B8CWm2bj-Be_j4p9Y_3wXr=W2K7zE8593ke-97QR20qcA@mail.gmail.com>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-	<20180126194559.GI2610@work-vm>
-	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
-	<20180129095330.GA2408@work-vm>
-	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
-	<a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
-	<20180131095351.GY21802@cbox>
-	<CAKv+Gu-NAcUTpEUXCLudHTCFAf=Yb28q3AET9d4ED9A9z7dMfQ@mail.gmail.com>
-	<CAMJs5B8jctfTEEhui3XRCTW1La2HCoVd1Jzaz4p7jy=8vqw=0A@mail.gmail.com>
-	<CAKv+Gu80p5G_gWp0Dg7HJ2SAgc3WCQe+g9ear9oM44bt-KmSFA@mail.gmail.com>
-	<CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
-	<CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
-	<CAMJs5B8CWm2bj-Be_j4p9Y_3wXr=W2K7zE8593ke-97QR20qcA@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 31 Jan 2018 20:15:22 +0000
-Message-ID: <CAKv+Gu935vi1wCRAKqC-nscXa+=CKX6P=HPO-3dNA4fx0Fm-NA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+	(envelope-from <dgilbert@redhat.com>) id 1egyoF-0003Wa-A3
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:16:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1egyoE-0003VU-VP
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 15:16:43 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 31 Jan 2018 20:16:33 +0000
+Message-Id: <20180131201633.28446-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests/migration: Add source to PC boot block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,210 +21,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org
+Cc: wei@redhat.com, peterx@redhat.com
 
-On 31 January 2018 at 19:12, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Wed, Jan 31, 2018 at 7:00 PM, Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
->> On 31 January 2018 at 17:39, Christoffer Dall
->> <christoffer.dall@linaro.org> wrote:
->>> On Wed, Jan 31, 2018 at 5:59 PM, Ard Biesheuvel
->>> <ard.biesheuvel@linaro.org> wrote:
->>>> On 31 January 2018 at 16:53, Christoffer Dall
->>>> <christoffer.dall@linaro.org> wrote:
->>>>> On Wed, Jan 31, 2018 at 4:18 PM, Ard Biesheuvel
->>>>> <ard.biesheuvel@linaro.org> wrote:
->>>>>> On 31 January 2018 at 09:53, Christoffer Dall
->>>>>> <christoffer.dall@linaro.org> wrote:
->>>>>>> On Mon, Jan 29, 2018 at 10:32:12AM +0000, Marc Zyngier wrote:
->>>>>>>> On 29/01/18 10:04, Peter Maydell wrote:
->>>>>>>> > On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>>>>>>> >> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>>>>>>> >>> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>>>>>>> >>>> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>>>>>>> >>>>> I think the correct fix here is that your test code should turn
->>>>>>>> >>>>> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
->>>>>>>> >>>>> for Arm KVM guests (for the same reason that VGA device video memory
->>>>>>>> >>>>> doesn't work). If it's RAM your guest has to arrange to map it as
->>>>>>>> >>>>> Normal Cacheable, and then everything should work fine.
->>>>>>>> >>>>
->>>>>>>> >>>> Does this cause problems with migrating at just the wrong point during
->>>>>>>> >>>> a VM boot?
->>>>>>>> >>>
->>>>>>>> >>> It wouldn't surprise me if it did, but I don't think I've ever
->>>>>>>> >>> tried to provoke that problem...
->>>>>>>> >>
->>>>>>>> >> If you think it'll get the RAM contents wrong, it might be best to fail
->>>>>>>> >> the migration if you can detect the cache is disabled in the guest.
->>>>>>>> >
->>>>>>>> > I guess QEMU could look at the value of the "MMU disabled/enabled" bit
->>>>>>>> > in the guest's system registers, and refuse migration if it's off...
->>>>>>>> >
->>>>>>>> > (cc'd Marc, Christoffer to check that I don't have the wrong end
->>>>>>>> > of the stick about how thin the ice is in the period before the
->>>>>>>> > guest turns on its MMU...)
->>>>>>>>
->>>>>>>> Once MMU and caches are on, we should be in a reasonable place for QEMU
->>>>>>>> to have a consistent view of the memory. The trick is to prevent the
->>>>>>>> vcpus from changing that. A guest could perfectly turn off its MMU at
->>>>>>>> any given time if it needs to (and it is actually required on some HW if
->>>>>>>> you want to mitigate headlining CVEs), and KVM won't know about that.
->>>>>>>>
->>>>>>>
->>>>>>> (Clarification: KVM can detect this is it bother to check the VCPU's
->>>>>>> system registers, but we don't trap to KVM when the VCPU turns off its
->>>>>>> caches, right?)
->>>>>>>
->>>>>>>> You may have to pause the vcpus before starting the migration, or
->>>>>>>> introduce a new KVM feature that would automatically pause a vcpu that
->>>>>>>> is trying to disable its MMU while the migration is on. This would
->>>>>>>> involve trapping all the virtual memory related system registers, with
->>>>>>>> an obvious cost. But that cost would be limited to the time it takes to
->>>>>>>> migrate the memory, so maybe that's acceptable.
->>>>>>>>
->>>>>>> Is that even sufficient?
->>>>>>>
->>>>>>> What if the following happened. (1) guest turns off MMU, (2) guest
->>>>>>> writes some data directly to ram (3) qemu stops the vcpu (4) qemu reads
->>>>>>> guest ram.  QEMU's view of guest ram is now incorrect (stale,
->>>>>>> incoherent, ...).
->>>>>>>
->>>>>>> I'm also not really sure if pausing one VCPU because it turned off its
->>>>>>> MMU will go very well when trying to migrate a large VM (wouldn't this
->>>>>>> ask for all the other VCPUs beginning to complain that the stopped VCPU
->>>>>>> appears to be dead?).  As a short-term 'fix' it's probably better to
->>>>>>> refuse migration if you detect that a VCPU had begun turning off its
->>>>>>> MMU.
->>>>>>>
->>>>>>> On the larger scale of thins; this appears to me to be another case of
->>>>>>> us really needing some way to coherently access memory between QEMU and
->>>>>>> the VM, but in the case of the VCPU turning off the MMU prior to
->>>>>>> migration, we don't even know where it may have written data, and I'm
->>>>>>> therefore not really sure what the 'proper' solution would be.
->>>>>>>
->>>>>>> (cc'ing Ard who has has thought about this problem before in the context
->>>>>>> of UEFI and VGA.)
->>>>>>>
->>>>>>
->>>>>> Actually, the VGA case is much simpler because the host is not
->>>>>> expected to write to the framebuffer, only read from it, and the guest
->>>>>> is not expected to create a cacheable mapping for it, so any
->>>>>> incoherency can be trivially solved by cache invalidation on the host
->>>>>> side. (Note that this has nothing to do with DMA coherency, but only
->>>>>> with PCI MMIO BARs that are backed by DRAM in the host)
->>>>>
->>>>> In case of the running guest, the host will also only read from the
->>>>> cached mapping.  Of course, at restore, the host will also write
->>>>> through a cached mapping, but shouldn't the latter case be solvable by
->>>>> having KVM clean the cache lines when faulting in any page?
->>>>>
->>>>
->>>> We are still talking about the contents of the framebuffer, right? In
->>>> that case, yes, afaict
->>>>
->>>
->>> I was talking about normal RAM actually... not sure if that changes anything?
->>>
->>
->> The main difference is that with a framebuffer BAR, it is pointless
->> for the guest to map it cacheable, given that the purpose of a
->> framebuffer is its side effects, which are not guaranteed to occur
->> timely if the mapping is cacheable.
->>
->> If we are talking about normal RAM, then why are we discussing it here
->> and not down there?
->>
->
-> Because I was trying to figure out how the challenge of accessing the
-> VGA framebuffer differs from the challenge of accessing guest RAM
-> which may have been written by the guest with the MMU off.
->
-> First approximation, they are extremely similar because the guest is
-> writing uncached to memory, which the host now has to access via a
-> cached mapping.
->
-> But I'm guessing that a "clean+invalidate before read on the host"
-> solution will result in terrible performance for a framebuffer and
-> therefore isn't a good solution for that problem...
->
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-That highly depends on where 'not working' resides on the performance
-scale. Currently, VGA on KVM simply does not work at all, and so
-working but slow would be a huge improvement over the current
-situation.
+The boot block used in the migration test is currently only
+shipped as a hex (with the source in the git commit message),
+change this to actually include the source.
 
-Also, the performance hit is caused by the fact that the data needs to
-make a round trip to memory, and the invalidation (without cleaning)
-performed by the host shouldn't make that much worse than it
-fundamentally is to begin with.
+A makefile rule is added, but the expectation is that
+the generated hex is shipped as well as the .s, so that
+there's no requirement to have just the right assembler etc.
 
-A paravirtualized framebuffer (as was proposed recently by Gerd I
-think?) would solve this, since the guest can just map it as
-cacheable.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ tests/Makefile.include              | 18 ++++++++
+ tests/migration-test.c              | 46 +------------------
+ tests/migration/x86-a-b-bootblock.h | 52 +++++++++++++++++++++
+ tests/migration/x86-a-b-bootblock.s | 92 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 163 insertions(+), 45 deletions(-)
+ create mode 100644 tests/migration/x86-a-b-bootblock.h
+ create mode 100644 tests/migration/x86-a-b-bootblock.s
 
->>
->>
->>>>>>
->>>>>> In the migration case, it is much more complicated, and I think
->>>>>> capturing the state of the VM in a way that takes incoherency between
->>>>>> caches and main memory into account is simply infeasible (i.e., the
->>>>>> act of recording the state of guest RAM via a cached mapping may evict
->>>>>> clean cachelines that are out of sync, and so it is impossible to
->>>>>> record both the cached *and* the delta with the uncached state)
->>>>>
->>>>> This may be an incredibly stupid question (and I may have asked it
->>>>> before), but why can't we clean+invalidate the guest page before
->>>>> reading it and thereby obtain a coherent view of a page?
->>>>>
->>>>
->>>> Because cleaning from the host will clobber whatever the guest wrote
->>>> directly to memory with the MMU off, if there is a dirty cacheline
->>>> shadowing that memory.
->>>
->>> If the host never wrote anything to that memory (it shouldn't mess
->>> with the guest's memory) there will only be clean cache lines (even if
->>> they contain content shadowing the memory) and cleaning them would be
->>> equivalent to an invalidate.  Am I misremembering how this works?
->>>
->>
->> Cleaning doesn't actually invalidate, but it should be a no-op for
->> clean cachelines.
->>
->>>> However, that same cacheline could be dirty
->>>> because the guest itself wrote to memory with the MMU on.
->>>
->>> Yes, but the guest would have no control over when such a cache line
->>> gets flushed to main memory by the hardware, and can have no
->>> reasonable expectation that the cache lines don't get cleaned behind
->>> its back.  The fact that a migration triggers this, is reasonable.  A
->>> guest that wants hand-off from main memory that its accessing with the
->>> MMU off, must invalidate the appropriate cache lines or ensure they're
->>> clean.  There's very likely some subtle aspect to all of this that I'm
->>> forgetting.
->>>
->>
->> OK, so if the only way cachelines covering guest memory could be dirty
->> is after the guest wrote to that memory itself via a cacheable
->> mapping, I guess it would be reasonable to do clean+invalidate before
->> reading the memory. Then, the only way for the guest to lose anything
->> is in cases where it could not reasonably expect it to be retained
->> anyway.
->
-> Right, that's what I'm thinking.
->
->>
->> However, that does leave a window, between the invalidate and the
->> read, where the guest could modify memory without it being visible to
->> the host.
->
-> Is that a problem specific to the coherency challenge?  I thought this
-> problem was already addressed by dirty page tracking, but there's like
-> some interaction with the cache maintenance that we'd have to figure
-> out.
->
-
-I don't know how dirty page tracking works exactly, but if it that can
-track direct writes to memory as easily as cached writes, it would
-probably cover this as well.
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 851aafe9d1..2a0889479c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -831,6 +831,24 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 	rm $(INITRD_WORK_DIR)/init
+ 	rmdir $(INITRD_WORK_DIR)
+ 
++ASM_WORK_DIR=tests/asm-temp
++$(SRC_PATH)/tests/migration/x86-a-b-bootblock.h: $(SRC_PATH)/tests/migration/x86-a-b-bootblock.s
++	mkdir $(ASM_WORK_DIR)
++	as --32 -march=i486 $< -o $(ASM_WORK_DIR).o
++	objcopy -O binary $(ASM_WORK_DIR).o $(ASM_WORK_DIR).boot
++	dd if=$(ASM_WORK_DIR).boot of=$(ASM_WORK_DIR).bootsect bs=256 count=2 skip=124
++	xxd -i $(ASM_WORK_DIR).bootsect | \
++            sed -e 's/tests_asm_temp_bootsect/bootsect/' -e 's/.*int.*//' > $(ASM_WORK_DIR).hex
++	echo -e "/* This file is automatically generated from\n" \
++             " * tests/migration/x86-a-b-bootblock.s, edit that and then\n" \
++             " * make tests/migration/x86-a-b-bootblock.h to update,\n" \
++             " * and then remember to send both in your patch submission.\n" \
++             " */\n" | cat - $(ASM_WORK_DIR).hex > $@
++	rm $(ASM_WORK_DIR).hex $(ASM_WORK_DIR).bootsect $(ASM_WORK_DIR).boot
++	rm $(ASM_WORK_DIR).o
++	rmdir $(ASM_WORK_DIR)
++
++
+ ifeq ($(CONFIG_POSIX),y)
+ LIBS += -lutil
+ endif
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 799e24ebc6..7550fd8d56 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -79,51 +79,7 @@ static const char *tmpfs;
+ /* A simple PC boot sector that modifies memory (1-100MB) quickly
+  * outputing a 'B' every so often if it's still running.
+  */
+-unsigned char bootsect[] = {
+-  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
+-  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
+-  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
+-  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
+-  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
+-  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
+-  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
+-  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
+-};
++#include "tests/migration/x86-a-b-bootblock.h"
+ 
+ static void init_bootfile_x86(const char *bootpath)
+ {
+diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
+new file mode 100644
+index 0000000000..e45c8dd5b3
+--- /dev/null
++++ b/tests/migration/x86-a-b-bootblock.h
+@@ -0,0 +1,52 @@
++/* This file is automatically generated from
++  * tests/migration/x86-a-b-bootblock.s, edit that and then
++  * make tests/migration/x86-a-b-bootblock.h to update,
++  * and then remember to send both in your patch submission.
++  */
++
++unsigned char bootsect[] = {
++  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
++  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
++  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
++  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
++  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
++  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
++  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
++  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
++};
++
+diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
+new file mode 100644
+index 0000000000..7f290014af
+--- /dev/null
++++ b/tests/migration/x86-a-b-bootblock.s
+@@ -0,0 +1,92 @@
++# x86 bootblock used in migration test
++#  repeatedly increments the first byte of each page in a 100MB
++#  range.
++#  Outputs an initial 'A' on serial followed by repeated 'B's
++#
++# run   make tests/migration/x86-a-b-bootblock.h
++#   to regenerate the hex, and remember to include both the .h and .s
++#   in any patches.
++#
++# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
++# This work is licensed under the terms of the GNU GPL, version 2 or later.
++# See the COPYING file in the top-level directory.
++#
++# Author: dgilbert@redhat.com
++
++
++.code16
++.org 0x7c00
++        .file   "fill.s"
++        .text
++        .globl  start
++        .type   start, @function
++start:             # at 0x7c00 ?
++        cli
++        lgdt gdtdesc
++        mov $1,%eax
++        mov %eax,%cr0  # Protected mode enable
++        data32 ljmp $8,$0x7c20
++
++.org 0x7c20
++.code32
++        # A20 enable - not sure I actually need this
++        inb $0x92,%al
++        or  $2,%al
++        outb %al, $0x92
++
++        # set up DS for the whole of RAM (needed on KVM)
++        mov $16,%eax
++        mov %eax,%ds
++
++        mov $65,%ax
++        mov $0x3f8,%dx
++        outb %al,%dx
++
++        # bl keeps a counter so we limit the output speed
++        mov $0, %bl
++mainloop:
++        # Start from 1MB
++        mov $(1024*1024),%eax
++innerloop:
++        incb (%eax)
++        add $4096,%eax
++        cmp $(100*1024*1024),%eax
++        jl innerloop
++
++        inc %bl
++        jnz mainloop
++
++        mov $66,%ax
++        mov $0x3f8,%dx
++        outb %al,%dx
++
++        jmp mainloop
++
++        # GDT magic from old (GPLv2)  Grub startup.S
++        .p2align        2       /* force 4-byte alignment */
++gdt:
++        .word   0, 0
++        .byte   0, 0, 0, 0
++
++        /* -- code segment --
++         * base = 0x00000000, limit = 0xFFFFF (4 KiB Granularity), present
++         * type = 32bit code execute/read, DPL = 0
++         */
++        .word   0xFFFF, 0
++        .byte   0, 0x9A, 0xCF, 0
++
++        /* -- data segment --
++         * base = 0x00000000, limit 0xFFFFF (4 KiB Granularity), present
++         * type = 32 bit data read/write, DPL = 0
++         */
++        .word   0xFFFF, 0
++        .byte   0, 0x92, 0xCF, 0
++
++gdtdesc:
++        .word   0x27                    /* limit */
++        .long   gdt                     /* addr */
++
++/* I'm a bootable disk */
++.org 0x7dfe
++        .byte 0x55
++        .byte 0xAA
+-- 
+2.14.3
