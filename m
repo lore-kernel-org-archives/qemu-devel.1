@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1egsxP-00065p-Fi
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:01:51 -0500
+	(envelope-from <mst@redhat.com>) id 1egsyz-0007Ce-Jd
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:03:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1egsxH-0003mw-N6
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:01:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58162)
+	(envelope-from <mst@redhat.com>) id 1egsyt-0004N2-O3
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:03:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46184)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1egsxH-0003mM-G2
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:01:39 -0500
-Date: Wed, 31 Jan 2018 16:01:35 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1egsyt-0004MU-IL
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:03:19 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B78FC67733
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 14:03:18 +0000 (UTC)
+Date: Wed, 31 Jan 2018 16:03:12 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180131160104-mutt-send-email-mst@kernel.org>
-References: <1517367668-25048-1-git-send-email-wangxinxin.wang@huawei.com>
+Message-ID: <20180131160214-mutt-send-email-mst@kernel.org>
+References: <20180131092835.GA31397@xz-mi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1517367668-25048-1-git-send-email-wangxinxin.wang@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: correct misspelled CPU model-id for pc
- 2.2
+In-Reply-To: <20180131092835.GA31397@xz-mi>
+Subject: Re: [Qemu-devel] Windows balloon driver PFN issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wang Xin <wangxinxin.wang@huawei.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, arei.gonglei@huawei.com
+To: Peter Xu <peterx@redhat.com>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-On Wed, Jan 31, 2018 at 11:01:08AM +0800, Wang Xin wrote:
-> Signed-off-by: Wang Xin <wangxinxin.wang@huawei.com>
-
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-Eduardo, will you take this?
-
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index bb49165..635c8b2 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -617,7 +617,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  
->  #define PC_COMPAT_2_2 \
->      HW_COMPAT_2_2 \
-> -    PC_CPU_MODEL_IDS("2.3.0") \
-> +    PC_CPU_MODEL_IDS("2.2.0") \
->      {\
->          .driver = "kvm64" "-" TYPE_X86_CPU,\
->          .property = "vme",\
-> -- 
-> 2.8.1.windows.1
+On Wed, Jan 31, 2018 at 05:28:35PM +0800, Peter Xu wrote:
+> Hi, Michael and the list,
 > 
+> I observed this on windows 8 enterprise guests, when doing memory ballooning:
+> 
+> 23892@1517298572.328354:virtio_balloon_to_target balloon target: 0x80000000 num_pages: 524288
+> 23892@1517298638.542819:virtio_balloon_get_config num_pages: 524288 actual: 0
+> 23892@1517298638.542974:virtio_balloon_handle_output section name: pc.ram gpa: 0x174604000
+> 23892@1517298638.543059:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> 23892@1517298638.543135:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460a000
+> 23892@1517298638.543140:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> 23892@1517298638.543143:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460b000
+> 23892@1517298638.543146:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> 23892@1517298638.543148:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460c000
+> 23892@1517298638.543152:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> 23892@1517298638.543154:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460d000
+> 23892@1517298638.543159:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> 23892@1517298638.543162:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460e000
+> 23892@1517298638.543165:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> 23892@1517298638.543167:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460f000
+> 23892@1517298638.543170:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> ...
+> 
+> I think it's very possible that these zero addresses (please let me
+> know what the first 4K page is used for if anyone knows, since IIUC
+> that's what we throw away now) are half of the 64bit PFN.  Or say, not
+> sure whether this means a windows guest driver bug that is using
+> 64bits for PFN rather than 32bits (and I suppose the protocol is using
+> 32bit for PFNs).
+> 
+> Michael, do you know what to do with this?
+> 
+> Thanks,
+
+PFN is GPA>>12.  Do you have more than 1<<44 bytes of memory in this VM then?
+
+> -- 
+> Peter Xu
