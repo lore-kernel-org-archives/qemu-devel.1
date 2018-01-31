@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvuV-000077-Gu
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:11:01 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1egvvE-0000VF-Az
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:11:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvuR-000148-44
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:10:59 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-6-andrew.smirnov@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <24dcdefa-51f6-c3c1-61a2-c0f3eff7a800@amsat.org>
-Date: Wed, 31 Jan 2018 14:10:51 -0300
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1egvvD-0001R2-DG
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:11:44 -0500
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516297747-107232-5-git-send-email-anton.nefedov@virtuozzo.com>
+	<w51y3kexdv9.fsf@maestria.local.igalia.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <934f18f7-0ded-6c36-a982-1613aae7b650@virtuozzo.com>
+Date: Wed, 31 Jan 2018 20:11:27 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180116013709.13830-6-andrew.smirnov@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <w51y3kexdv9.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 05/14] i.MX: Add code to emulate i.MX7
- SNVS IP-block
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 4/9] block: treat BDRV_REQ_ALLOCATE as
+ serialising
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,173 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com
 
-On 01/15/2018 10:37 PM, Andrey Smirnov wrote:
-> Add code to emulate SNVS IP-block. Currently only the bits needed to
-> be able to emulate machine shutdown are implemented.
+
+
+On 31/1/2018 6:11 PM, Alberto Garcia wrote:
+> On Thu 18 Jan 2018 06:49:02 PM CET, Anton Nefedov wrote:
 > 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> ---
->  hw/misc/Makefile.objs       |  1 +
->  hw/misc/imx7_snvs.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
->  3 files changed, 119 insertions(+)
->  create mode 100644 hw/misc/imx7_snvs.c
->  create mode 100644 include/hw/misc/imx7_snvs.h
+>> -static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+>> +static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self,
+>> +                                                   bool nowait)
 > 
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index 4b2b705a6c..019886912c 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx6_ccm.o
->  obj-$(CONFIG_IMX) += imx6_src.o
->  obj-$(CONFIG_IMX) += imx7_ccm.o
->  obj-$(CONFIG_IMX) += imx2_wdt.o
-> +obj-$(CONFIG_IMX) += imx7_snvs.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
->  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-> diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
-> new file mode 100644
-> index 0000000000..670b9f4639
-> --- /dev/null
-> +++ b/hw/misc/imx7_snvs.c
-> @@ -0,0 +1,83 @@
-> +/*
-> + * IMX7 Secure Non-Volatile Storage
-> + *
-> + * Copyright (c) 2017, Impinj, Inc.
-> + *
-> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + * Bare minimum emulation code needed to support being able to shut
-> + * down linux guest gracefully.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/misc/imx7_snvs.h"
-> +#include "qemu/log.h"
-> +#include "sysemu/sysemu.h"
-> +
-> +static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
-> +{
-> +    return 0;
-> +}
-> +
-> +static void imx7_snvs_write(void *opaque, hwaddr offset,
-> +                            uint64_t v, unsigned size)
-> +{
-> +    const uint32_t value = v;
-> +    const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
-> +
-> +    if (offset == SNVS_LPCR && ((value & mask) == mask)) {
-> +        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-> +    }
-> +}
-> +
-> +static const struct MemoryRegionOps imx7_snvs_ops = {
-> +    .read = imx7_snvs_read,
+> It's a bit confusing to have a function called wait_foo() with a
+> parameter that says "don't wait"...
+> 
+> How about
+> 
+>       check_serialising_requests(BdrvTrackedRequest *self, bool wait)
+> 
 
-Same here, you can remove the imx7_snvs_read() function since
-memory_region_dispatch_read() takes care of this and return 0.
+I think it might be more important to emphasize in the name that the
+function _might_ wait.
 
-> +    .write = imx7_snvs_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .impl = {
-> +        /*
-> +         * Our device would not work correctly if the guest was doing
-> +         * unaligned access. This might not be a limitation on the real
-> +         * device but in practice there is no reason for a guest to access
-> +         * this device unaligned.
-> +         */
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +        .unaligned = false,
-> +    },
-> +};
-> +
-> +static void imx7_snvs_init(Object *obj)
-> +{
-> +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-> +    IMX7SNVSState *s = IMX7_SNVS(obj);
-> +
-> +    memory_region_init_io(&s->mmio, obj, &imx7_snvs_ops, s,
-> +                          TYPE_IMX7_SNVS, 0x1000);
-> +
-> +    sysbus_init_mmio(sd, &s->mmio);
-> +}
-> +
-> +static void imx7_snvs_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->desc  = "i.MX7 Secure Non-Volatile Storage Module";
-> +}
-> +
-> +static const TypeInfo imx7_snvs_info = {
-> +    .name          = TYPE_IMX7_SNVS,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(IMX7SNVSState),
-> +    .instance_init = imx7_snvs_init,
-> +    .class_init    = imx7_snvs_class_init,
-> +};
-> +
-> +static void imx7_snvs_register_type(void)
-> +{
-> +    type_register_static(&imx7_snvs_info);
-> +}
-> +type_init(imx7_snvs_register_type)
-> diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
-> new file mode 100644
-> index 0000000000..255f8f26f9
-> --- /dev/null
-> +++ b/include/hw/misc/imx7_snvs.h
-> @@ -0,0 +1,35 @@
-> +/*
-> + * Copyright (c) 2017, Impinj, Inc.
-> + *
-> + * i.MX7 SNVS block emulation code
-> + *
-> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef IMX7_SNVS_H
-> +#define IMX7_SNVS_H
-> +
-> +#include "qemu/bitops.h"
-> +#include "hw/sysbus.h"
-> +
-> +
-> +enum IMX7SNVSRegisters {
-> +    SNVS_LPCR = 0x38,
-> +    SNVS_LPCR_TOP   = BIT(6),
-> +    SNVS_LPCR_DP_EN = BIT(5)
-> +};
-> +
-> +#define TYPE_IMX7_SNVS "imx7.snvs"
-> +#define IMX7_SNVS(obj) OBJECT_CHECK(IMX7SNVSState, (obj), TYPE_IMX7_SNVS)
-> +
-> +typedef struct IMX7SNVSState {
-> +    /* <private> */
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion mmio;
-> +} IMX7SNVSState;
-> +
-> +#endif /* IMX7_SNVS_H */
+i.e. it feels worse to read
+   check_serialising_requests(req, true);
+when one needs to follow the function to find out that it might yield.
+
+Personally I'd vote for
+
+     static int check_or_wait_serialising_requests(
+         BdrvTrackedRequest *self, bool wait) {}
+
+and maybe even:
+
+     static int check_serialising_requests(BdrvTrackedRequest *self) {
+         return check_or_wait_serialising_requests(self, false);
+
+     static int wait_serialising_requests(BdrvTrackedRequest *self) {
+         return check_or_wait_serialising_requests(self, true);
+     }
+
+>> -    waited = wait_serialising_requests(req);
+>> +    waited = wait_serialising_requests(req, flags & BDRV_REQ_ALLOCATE);
+>> +    if (waited && flags & BDRV_REQ_ALLOCATE) {
+>> +        return -EAGAIN;
+>> +    }
+> 
+> I find this more readable (even if not strictly necessary):
+> 
+>         if (waited && (flags & BDRV_REQ_ALLOCATE)) {
+> 
+
+Done!
+
+> None of my two comments are blockers, though, so
+> 
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> 
+> Berto
 > 
