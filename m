@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1egv0b-0004u9-Cm
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:13:19 -0500
+	(envelope-from <alistair23@gmail.com>) id 1egv1g-0005e7-Dt
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:14:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1egv0Z-0004U9-Vp
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:13:13 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:41084)
+	(envelope-from <alistair23@gmail.com>) id 1egv1W-0005FM-P8
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:14:20 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:46087)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1egv0Z-0004Sa-Jm
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:13:11 -0500
-Received: by mail-lf0-x242.google.com with SMTP id f136so21542744lff.8
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:13:11 -0800 (PST)
+	id 1egv1W-0005Ec-Hb
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 11:14:10 -0500
+Received: by mail-lf0-x241.google.com with SMTP id q194so21520774lfe.13
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:14:10 -0800 (PST)
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180123032135.28863-3-f4bug@amsat.org>
+In-Reply-To: <20180123032135.28863-4-f4bug@amsat.org>
 References: <20180123032135.28863-1-f4bug@amsat.org>
-	<20180123032135.28863-3-f4bug@amsat.org>
+	<20180123032135.28863-4-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 31 Jan 2018 08:12:39 -0800
-Message-ID: <CAKmqyKODDDKU0yjQrZC8a80MM2qPkMD-0uxc8LeGxUW8PWNpMg@mail.gmail.com>
+Date: Wed, 31 Jan 2018 08:13:37 -0800
+Message-ID: <CAKmqyKPACwC3M2MOqA8gr2MYcwPn0o+TPZAhXpguiWZ1DKyY2A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 02/12] sdcard: replace DPRINTF() by
- trace events
+Subject: Re: [Qemu-devel] [PATCH v3 03/12] sdcard: add a trace event for
+ command responses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,148 +39,85 @@ On Mon, Jan 22, 2018 at 7:21 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/sd/sd.c         | 33 ++++++++++++++++++++++++++-------
->  hw/sd/trace-events |  6 ++++++
->  2 files changed, 32 insertions(+), 7 deletions(-)
+>  hw/sd/sd.c         | 26 +++++++++++++++++++++++---
+>  hw/sd/trace-events |  1 +
+>  2 files changed, 24 insertions(+), 3 deletions(-)
 >
 > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 55d2ba2dd7..f876973a2b 100644
+> index f876973a2b..3590099ce8 100644
 > --- a/hw/sd/sd.c
 > +++ b/hw/sd/sd.c
-> @@ -40,6 +40,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/timer.h"
->  #include "qemu/log.h"
-> +#include "trace.h"
+> @@ -152,6 +152,26 @@ static const char *sd_state_name(enum SDCardStates s=
+tate)
+>      return state_name[state];
+>  }
 >
->  //#define DEBUG_SD 1
->
-> @@ -132,6 +133,25 @@ struct SDState {
->      bool cmd_line;
->  };
->
-> +static const char *sd_state_name(enum SDCardStates state)
+> +static const char *sd_response_name(sd_rsp_type_t rsp)
 > +{
-> +    static const char *state_name[] =3D {
-> +        [sd_idle_state]             =3D "idle",
-> +        [sd_ready_state]            =3D "ready",
-> +        [sd_identification_state]   =3D "identification",
-> +        [sd_standby_state]          =3D "standby",
-> +        [sd_transfer_state]         =3D "transfer",
-> +        [sd_sendingdata_state]      =3D "sendingdata",
-> +        [sd_receivingdata_state]    =3D "receivingdata",
-> +        [sd_programming_state]      =3D "programming",
-> +        [sd_disconnect_state]       =3D "disconnect",
+> +    static const char *response_name[] =3D {
+> +        [sd_r0]     =3D "RESP#0 (no response)",
+> +        [sd_r1]     =3D "RESP#1 (normal cmd)",
+> +        [sd_r2_i]   =3D "RESP#2 (CID reg)",
+> +        [sd_r2_s]   =3D "RESP#2 (CSD reg)",
+> +        [sd_r3]     =3D "RESP#3 (OCR reg)",
+> +        [sd_r6]     =3D "RESP#6 (RCA)",
+> +        [sd_r7]     =3D "RESP#7 (operating voltage)",
 > +    };
-> +    if (state =3D=3D sd_inactive_state) {
-> +        return "inactive";
+> +    if (rsp =3D=3D sd_illegal) {
+> +        return "ILLEGAL RESP";
+> +    }
+> +    if (rsp =3D=3D sd_r1b) {
+> +        rsp =3D sd_r1;
 > +    }
 
-There should be an assert here to make sure we never go off the end of
-this array.
+Same comments as patch number 2.
 
-Is this used in future? It seems like a lot of work for one caller.
+Alistair
 
-> +    return state_name[state];
+> +    return response_name[rsp];
 > +}
 > +
 >  static uint8_t sd_get_dat_lines(SDState *sd)
 >  {
 >      return sd->enable ? sd->dat_lines : 0;
-> @@ -776,6 +796,8 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->      uint32_t rca =3D 0x0000;
->      uint64_t addr =3D (sd->ocr & (1 << 30)) ? (uint64_t) req.arg << 9 : =
-req.arg;
+> @@ -1595,10 +1615,12 @@ send_response:
 >
-> +    trace_sdcard_normal_command(req.cmd, req.arg, sd_state_name(sd->stat=
-e));
-> +
->      /* Not interpreting this as an app command */
->      sd->card_status &=3D ~APP_CMD;
->
-> @@ -790,7 +812,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->          sd->multi_blk_cnt =3D 0;
+>      case sd_r0:
+>      case sd_illegal:
+> -    default:
+>          rsplen =3D 0;
+>          break;
+> +    default:
+> +        g_assert_not_reached();
 >      }
+> +    trace_sdcard_response(sd_response_name(rtype), rsplen);
 >
-> -    DPRINTF("CMD%d 0x%08x state %d\n", req.cmd, req.arg, sd->state);
->      switch (req.cmd) {
->      /* Basic commands (Class 0 and Class 1) */
->      case 0:    /* CMD0:   GO_IDLE_STATE */
-> @@ -1310,8 +1331,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->          return sd_r1;
->
->      case 56:   /* CMD56:  GEN_CMD */
-> -        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
-> -
->          switch (sd->state) {
->          case sd_transfer_state:
->              sd->data_offset =3D 0;
-> @@ -1345,7 +1364,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->  static sd_rsp_type_t sd_app_command(SDState *sd,
->                                      SDRequest req)
->  {
-> -    DPRINTF("ACMD%d 0x%08x\n", req.cmd, req.arg);
-> +    trace_sdcard_app_command(req.cmd, req.arg);
->      sd->card_status |=3D APP_CMD;
->      switch (req.cmd) {
->      case 6:    /* ACMD6:  SET_BUS_WIDTH */
-> @@ -1594,7 +1613,7 @@ send_response:
->          DPRINTF("Response:");
+>      if (rtype !=3D sd_illegal) {
+>          /* Clear the "clear on valid command" status bits now we've
+> @@ -1614,8 +1636,6 @@ send_response:
 >          for (i =3D 0; i < rsplen; i++)
 >              fprintf(stderr, " %02x", response[i]);
-> -        fprintf(stderr, " state %d\n", sd->state);
-> +        fputc('\n', stderr);
-
-Why change this?
-
-Alistair
-
->      } else {
->          DPRINTF("No response %d\n", sd->state);
+>          fputc('\n', stderr);
+> -    } else {
+> -        DPRINTF("No response %d\n", sd->state);
 >      }
-> @@ -1605,8 +1624,7 @@ send_response:
+>  #endif
 >
->  static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
->  {
-> -    DPRINTF("sd_blk_read: addr =3D 0x%08llx, len =3D %d\n",
-> -            (unsigned long long) addr, len);
-> +    trace_sdcard_read_block(addr, len);
->      if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
->          fprintf(stderr, "sd_blk_read: read error on host side\n");
->      }
-> @@ -1614,6 +1632,7 @@ static void sd_blk_read(SDState *sd, uint64_t addr,=
- uint32_t len)
->
->  static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
->  {
-> +    trace_sdcard_write_block(addr, len);
->      if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
->          fprintf(stderr, "sd_blk_write: write error on host side\n");
->      }
 > diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-> index 0f8536db32..75dac5a2cd 100644
+> index 75dac5a2cd..b2aa19ec0d 100644
 > --- a/hw/sd/trace-events
 > +++ b/hw/sd/trace-events
-> @@ -23,6 +23,12 @@ sdhci_read_dataport(uint16_t data_count) "all %u bytes=
- of data have been read fr
->  sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u b=
-ytes of data"
->  sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
->
-> +# hw/sd/sd.c
-> +sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD=
+> @@ -26,6 +26,7 @@ sdhci_capareg(const char *desc, uint16_t val) "%s: %u"
+>  # hw/sd/sd.c
+>  sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD=
 %d arg 0x%08x (state %s)"
-> +sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
-> +sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size =
+>  sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
+> +sdcard_response(const char *rspdesc, int rsplen) "%s (sz:%d)"
+>  sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size =
 0x%x"
-> +sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size=
+>  sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size=
  0x%x"
-> +
->  # hw/sd/milkymist-memcard.c
->  milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08=
-x value 0x%08x"
->  milkymist_memcard_memory_write(uint32_t addr, uint32_t value) "addr 0x%0=
-8x value 0x%08x"
+>
 > --
 > 2.15.1
 >
