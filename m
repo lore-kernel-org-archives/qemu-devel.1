@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33848)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvrd-0006EG-MM
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:08:11 -0500
+	id 1egvuV-000077-Gu
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1egvrX-0008Oi-D0
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:08:01 -0500
+	id 1egvuR-000148-44
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:10:59 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-5-andrew.smirnov@gmail.com>
+	<20180116013709.13830-6-andrew.smirnov@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ec9fd964-d572-c1b2-82f9-8257975166d1@amsat.org>
-Date: Wed, 31 Jan 2018 14:07:51 -0300
+Message-ID: <24dcdefa-51f6-c3c1-61a2-c0f3eff7a800@amsat.org>
+Date: Wed, 31 Jan 2018 14:10:51 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180116013709.13830-5-andrew.smirnov@gmail.com>
+In-Reply-To: <20180116013709.13830-6-andrew.smirnov@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] i.MX: Add code to emulate i.MX2
- watchdog IP block
+Subject: Re: [Qemu-devel] [PATCH v4 05/14] i.MX: Add code to emulate i.MX7
+ SNVS IP-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,9 +32,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-On 01/15/2018 10:36 PM, Andrey Smirnov wrote:
-> Add enough code to emulate i.MX2 watchdog IP block so it would be
-> possible to reboot the machine running Linux Guest.
+On 01/15/2018 10:37 PM, Andrey Smirnov wrote:
+> Add code to emulate SNVS IP-block. Currently only the bits needed to
+> be able to emulate machine shutdown are implemented.
 > 
 > Cc: Peter Maydell <peter.maydell@linaro.org>
 > Cc: Jason Wang <jasowang@redhat.com>
@@ -45,79 +45,80 @@ On 01/15/2018 10:36 PM, Andrey Smirnov wrote:
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 > ---
->  hw/misc/Makefile.objs      |  1 +
->  hw/misc/imx2_wdt.c         | 89 ++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/misc/imx2_wdt.h | 33 +++++++++++++++++
->  3 files changed, 123 insertions(+)
->  create mode 100644 hw/misc/imx2_wdt.c
->  create mode 100644 include/hw/misc/imx2_wdt.h
+>  hw/misc/Makefile.objs       |  1 +
+>  hw/misc/imx7_snvs.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
+>  3 files changed, 119 insertions(+)
+>  create mode 100644 hw/misc/imx7_snvs.c
+>  create mode 100644 include/hw/misc/imx7_snvs.h
 > 
 > diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index a28e5e49b0..4b2b705a6c 100644
+> index 4b2b705a6c..019886912c 100644
 > --- a/hw/misc/Makefile.objs
 > +++ b/hw/misc/Makefile.objs
-> @@ -34,6 +34,7 @@ obj-$(CONFIG_IMX) += imx25_ccm.o
->  obj-$(CONFIG_IMX) += imx6_ccm.o
+> @@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx6_ccm.o
 >  obj-$(CONFIG_IMX) += imx6_src.o
 >  obj-$(CONFIG_IMX) += imx7_ccm.o
-> +obj-$(CONFIG_IMX) += imx2_wdt.o
+>  obj-$(CONFIG_IMX) += imx2_wdt.o
+> +obj-$(CONFIG_IMX) += imx7_snvs.o
 >  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
 >  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
 >  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-> diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+> diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
 > new file mode 100644
-> index 0000000000..76bb98a525
+> index 0000000000..670b9f4639
 > --- /dev/null
-> +++ b/hw/misc/imx2_wdt.c
-> @@ -0,0 +1,89 @@
+> +++ b/hw/misc/imx7_snvs.c
+> @@ -0,0 +1,83 @@
 > +/*
-> + * Copyright (c) 2017, Impinj, Inc.
+> + * IMX7 Secure Non-Volatile Storage
 > + *
-> + * i.MX2 Watchdog IP block
+> + * Copyright (c) 2017, Impinj, Inc.
 > + *
 > + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 > + *
 > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 > + * See the COPYING file in the top-level directory.
+> + *
+> + * Bare minimum emulation code needed to support being able to shut
+> + * down linux guest gracefully.
 > + */
 > +
-> +#include "qemu/bitops.h"
 > +#include "qemu/osdep.h"
-> +#include "sysemu/watchdog.h"
+> +#include "hw/misc/imx7_snvs.h"
+> +#include "qemu/log.h"
+> +#include "sysemu/sysemu.h"
 > +
-> +#include "hw/misc/imx2_wdt.h"
-> +
-> +#define IMX2_WDT_WCR_WDA    BIT(5)      /* -> External Reset WDOG_B */
-> +#define IMX2_WDT_WCR_SRS    BIT(4)      /* -> Software Reset Signal */
-> +
-> +static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
-> +                              unsigned int size)
+> +static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
 > +{
 > +    return 0;
 > +}
 > +
-> +static void imx2_wdt_write(void *opaque, hwaddr addr,
-> +                           uint64_t value, unsigned int size)
+> +static void imx7_snvs_write(void *opaque, hwaddr offset,
+> +                            uint64_t v, unsigned size)
 > +{
-> +    if (addr == IMX2_WDT_WCR &&
-> +        (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))) {
-> +        watchdog_perform_action();
+> +    const uint32_t value = v;
+> +    const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
+> +
+> +    if (offset == SNVS_LPCR && ((value & mask) == mask)) {
+> +        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
 > +    }
 > +}
 > +
-> +static const MemoryRegionOps imx2_wdt_ops = {
-> +    .read  = imx2_wdt_read,
+> +static const struct MemoryRegionOps imx7_snvs_ops = {
+> +    .read = imx7_snvs_read,
 
-Maybe you can just drop the .read entry and imx2_wdt_read().
+Same here, you can remove the imx7_snvs_read() function since
+memory_region_dispatch_read() takes care of this and return 0.
 
-> +    .write = imx2_wdt_write,
+> +    .write = imx7_snvs_write,
 > +    .endianness = DEVICE_NATIVE_ENDIAN,
 > +    .impl = {
 > +        /*
 > +         * Our device would not work correctly if the guest was doing
-> +         * unaligned access. This might not be a limitation on the
-> +         * real device but in practice there is no reason for a guest
-> +         * to access this device unaligned.
+> +         * unaligned access. This might not be a limitation on the real
+> +         * device but in practice there is no reason for a guest to access
+> +         * this device unaligned.
 > +         */
 > +        .min_access_size = 4,
 > +        .max_access_size = 4,
@@ -125,53 +126,47 @@ Maybe you can just drop the .read entry and imx2_wdt_read().
 > +    },
 > +};
 > +
-> +static void imx2_wdt_realize(DeviceState *dev, Error **errp)
+> +static void imx7_snvs_init(Object *obj)
 > +{
-> +    IMX2WdtState *s = IMX2_WDT(dev);
+> +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
+> +    IMX7SNVSState *s = IMX7_SNVS(obj);
 > +
-> +    memory_region_init_io(&s->mmio, OBJECT(dev),
-> +                          &imx2_wdt_ops, s,
-> +                          TYPE_IMX2_WDT".mmio",
-> +                          IMX2_WDT_REG_NUM * sizeof(uint16_t));
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
+> +    memory_region_init_io(&s->mmio, obj, &imx7_snvs_ops, s,
+> +                          TYPE_IMX7_SNVS, 0x1000);
+> +
+> +    sysbus_init_mmio(sd, &s->mmio);
 > +}
 > +
-> +static void imx2_wdt_class_init(ObjectClass *klass, void *data)
+> +static void imx7_snvs_class_init(ObjectClass *klass, void *data)
 > +{
 > +    DeviceClass *dc = DEVICE_CLASS(klass);
 > +
-> +    dc->realize = imx2_wdt_realize;
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +    dc->desc  = "i.MX7 Secure Non-Volatile Storage Module";
 > +}
 > +
-> +static const TypeInfo imx2_wdt_info = {
-> +    .name          = TYPE_IMX2_WDT,
+> +static const TypeInfo imx7_snvs_info = {
+> +    .name          = TYPE_IMX7_SNVS,
 > +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(IMX2WdtState),
-> +    .class_init    = imx2_wdt_class_init,
+> +    .instance_size = sizeof(IMX7SNVSState),
+> +    .instance_init = imx7_snvs_init,
+> +    .class_init    = imx7_snvs_class_init,
 > +};
 > +
-> +static WatchdogTimerModel model = {
-> +    .wdt_name = "imx2-watchdog",
-> +    .wdt_description = "i.MX2 Watchdog",
-> +};
-> +
-> +static void imx2_wdt_register_type(void)
+> +static void imx7_snvs_register_type(void)
 > +{
-> +    watchdog_add_model(&model);
-> +    type_register_static(&imx2_wdt_info);
+> +    type_register_static(&imx7_snvs_info);
 > +}
-> +type_init(imx2_wdt_register_type)
-> diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+> +type_init(imx7_snvs_register_type)
+> diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
 > new file mode 100644
-> index 0000000000..8afc99a10e
+> index 0000000000..255f8f26f9
 > --- /dev/null
-> +++ b/include/hw/misc/imx2_wdt.h
-> @@ -0,0 +1,33 @@
+> +++ b/include/hw/misc/imx7_snvs.h
+> @@ -0,0 +1,35 @@
 > +/*
 > + * Copyright (c) 2017, Impinj, Inc.
 > + *
-> + * i.MX2 Watchdog IP block
+> + * i.MX7 SNVS block emulation code
 > + *
 > + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 > + *
@@ -179,26 +174,28 @@ Maybe you can just drop the .read entry and imx2_wdt_read().
 > + * See the COPYING file in the top-level directory.
 > + */
 > +
-> +#ifndef IMX2_WDT_H
-> +#define IMX2_WDT_H
+> +#ifndef IMX7_SNVS_H
+> +#define IMX7_SNVS_H
 > +
+> +#include "qemu/bitops.h"
 > +#include "hw/sysbus.h"
 > +
-> +#define TYPE_IMX2_WDT "imx2.wdt"
-> +#define IMX2_WDT(obj) OBJECT_CHECK(IMX2WdtState, (obj), TYPE_IMX2_WDT)
 > +
-> +enum IMX2WdtRegisters {
-> +    IMX2_WDT_WCR     = 0x0000,
-> +    IMX2_WDT_REG_NUM = 0x0008 / sizeof(uint16_t) + 1,
+> +enum IMX7SNVSRegisters {
+> +    SNVS_LPCR = 0x38,
+> +    SNVS_LPCR_TOP   = BIT(6),
+> +    SNVS_LPCR_DP_EN = BIT(5)
 > +};
 > +
+> +#define TYPE_IMX7_SNVS "imx7.snvs"
+> +#define IMX7_SNVS(obj) OBJECT_CHECK(IMX7SNVSState, (obj), TYPE_IMX7_SNVS)
 > +
-> +typedef struct IMX2WdtState {
+> +typedef struct IMX7SNVSState {
 > +    /* <private> */
 > +    SysBusDevice parent_obj;
 > +
 > +    MemoryRegion mmio;
-> +} IMX2WdtState;
+> +} IMX7SNVSState;
 > +
 > +#endif /* IMX7_SNVS_H */
 > 
