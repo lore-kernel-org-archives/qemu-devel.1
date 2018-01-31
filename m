@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egwin-0000IQ-69
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:03:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1egwnp-0001tY-6C
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egwii-0006ym-JB
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:02:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:13196)
+	(envelope-from <armbru@redhat.com>) id 1egwnl-0002KY-W9
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:08:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51222)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egwii-0006y5-Bb
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:02:52 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egwnl-0002J7-Kn
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:08:05 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7351F2C9DCE
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 18:02:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 73D49A0C34
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 18:08:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180129162408.415-1-kraxel@redhat.com>
-	<20180129162408.415-5-kraxel@redhat.com>
-Date: Wed, 31 Jan 2018 19:02:42 +0100
-In-Reply-To: <20180129162408.415-5-kraxel@redhat.com> (Gerd Hoffmann's message
-	of "Mon, 29 Jan 2018 17:24:00 +0100")
-Message-ID: <87d11pvrct.fsf@dusky.pond.sub.org>
+	<20180129162408.415-12-kraxel@redhat.com>
+Date: Wed, 31 Jan 2018 19:07:57 +0100
+In-Reply-To: <20180129162408.415-12-kraxel@redhat.com> (Gerd Hoffmann's
+	message of "Mon, 29 Jan 2018 17:24:07 +0100")
+Message-ID: <878tcdvr42.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 04/12] gtk: add and use DisplayOptions +
- DisplayGTK
+Subject: Re: [Qemu-devel] [PATCH v2 11/12] vl: drop display_type variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,338 +34,217 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
-
-Got a QAPI remark, cc: Eric.
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 Gerd Hoffmann <kraxel@redhat.com> writes:
 
-> Add QAPI DisplayType enum, DisplayOptions union and DisplayGTK struct.
-> Switch gtk configuration to use the qapi type.
->
-> Some bookkeeping (fullscreen for example) is done twice now, this is
-> temporary until more/all UIs are switched over to qapi configuration.
+> Switch over all leftover users to qapi DisplayType.
+> Then delete the unused display_type variable.
 >
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  include/ui/console.h |  9 ++++----
->  ui/gtk.c             | 32 +++++++++++++++-------------
->  vl.c                 | 23 +++++++++++++++-----
->  qapi/ui.json         | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 99 insertions(+), 24 deletions(-)
+>  vl.c | 54 ++++++++++++++----------------------------------------
+>  1 file changed, 14 insertions(+), 40 deletions(-)
 >
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index 7b35778444..58d1a3d27c 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -511,18 +511,17 @@ int index_from_key(const char *key, size_t key_length);
->  
->  /* gtk.c */
->  #ifdef CONFIG_GTK
-> -void early_gtk_display_init(int opengl);
-> -void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover);
-> +void early_gtk_display_init(DisplayOptions *opts);
-> +void gtk_display_init(DisplayState *ds, DisplayOptions *opts);
->  #else
-> -static inline void gtk_display_init(DisplayState *ds, bool full_screen,
-> -                                    bool grab_on_hover)
-> +static inline void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
->  {
->      /* This must never be called if CONFIG_GTK is disabled */
->      error_report("GTK support is disabled");
->      abort();
->  }
->  
-> -static inline void early_gtk_display_init(int opengl)
-> +static inline void early_gtk_display_init(DisplayOptions *opts)
->  {
->      /* This must never be called if CONFIG_GTK is disabled */
->      error_report("GTK support is disabled");
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index f0ad63e431..c12d5e020c 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -229,6 +229,8 @@ struct GtkDisplayState {
->  
->      bool modifier_pressed[ARRAY_SIZE(modifier_keycode)];
->      bool ignore_keys;
-> +
-> +    DisplayOptions *opts;
->  };
->  
->  typedef struct VCChardev {
-> @@ -777,9 +779,14 @@ static gboolean gd_window_close(GtkWidget *widget, GdkEvent *event,
->                                  void *opaque)
->  {
->      GtkDisplayState *s = opaque;
-> +    bool allow_close = true;
->      int i;
->  
-> -    if (!no_quit) {
-> +    if (s->opts->has_window_close && !s->opts->window_close) {
-> +        allow_close = false;
-> +    }
-> +
-> +    if (allow_close) {
->          for (i = 0; i < s->nb_vcs; i++) {
->              if (s->vc[i].type != GD_VC_GFX) {
->                  continue;
-> @@ -2289,7 +2296,7 @@ static void gd_create_menus(GtkDisplayState *s)
->  
->  static gboolean gtkinit;
->  
-> -void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
-> +void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
->  {
->      VirtualConsole *vc;
->  
-> @@ -2301,6 +2308,8 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
->          fprintf(stderr, "gtk initialization failed\n");
->          exit(1);
->      }
-> +    assert(opts->type == DISPLAY_TYPE_GTK);
-> +    s->opts = opts;
->  
->  #if !GTK_CHECK_VERSION(3, 0, 0)
->      g_printerr("Running QEMU with GTK 2.x is deprecated, and will be removed\n"
-> @@ -2387,15 +2396,17 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
->                               vc && vc->type == GD_VC_VTE);
->  #endif
->  
-> -    if (full_screen) {
-> +    if (opts->has_full_screen &&
-> +        opts->full_screen) {
->          gtk_menu_item_activate(GTK_MENU_ITEM(s->full_screen_item));
->      }
-> -    if (grab_on_hover) {
-> +    if (opts->u.gtk.has_grab_on_hover &&
-> +        opts->u.gtk.grab_on_hover) {
->          gtk_menu_item_activate(GTK_MENU_ITEM(s->grab_on_hover_item));
->      }
->  }
->  
-> -void early_gtk_display_init(int opengl)
-> +void early_gtk_display_init(DisplayOptions *opts)
->  {
->      /* The QEMU code relies on the assumption that it's always run in
->       * the C locale. Therefore it is not prepared to deal with
-> @@ -2421,11 +2432,8 @@ void early_gtk_display_init(int opengl)
->          return;
->      }
->  
-> -    switch (opengl) {
-> -    case -1: /* default */
-> -    case 0:  /* off */
-> -        break;
-> -    case 1: /* on */
-> +    assert(opts->type == DISPLAY_TYPE_GTK);
-> +    if (opts->has_gl && opts->gl) {
->  #if defined(CONFIG_OPENGL)
->  #if defined(CONFIG_GTK_GL)
->          gtk_gl_area_init();
-> @@ -2433,10 +2441,6 @@ void early_gtk_display_init(int opengl)
->          gtk_egl_init();
->  #endif
->  #endif
-> -        break;
-> -    default:
-> -        g_assert_not_reached();
-> -        break;
->      }
->  
->      keycode_map = gd_get_keymap(&keycode_maplen);
 > diff --git a/vl.c b/vl.c
-> index a2478412c7..4a555de0cf 100644
+> index 899fcad75e..827ab2a3b0 100644
 > --- a/vl.c
 > +++ b/vl.c
-> @@ -150,9 +150,9 @@ static int rtc_date_offset = -1; /* -1 means no change */
->  QEMUClockType rtc_clock;
->  int vga_interface_type = VGA_NONE;
->  static int full_screen = 0;
-> +static DisplayOptions dpy;
->  int no_frame;
->  int no_quit = 0;
-> -static bool grab_on_hover;
->  Chardev *serial_hds[MAX_SERIAL_PORTS];
->  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
->  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
-> @@ -2191,24 +2191,29 @@ static LegacyDisplayType select_display(const char *p)
->      } else if (strstart(p, "gtk", &opts)) {
->  #ifdef CONFIG_GTK
->          display = DT_GTK;
-> +        dpy.type = DISPLAY_TYPE_GTK;
+> @@ -2080,24 +2080,12 @@ static void select_vgahw(const char *p)
+>      }
+>  }
+>  
+> -typedef enum LegacyDisplayType {
+> -    DT_DEFAULT,
+> -    DT_CURSES,
+> -    DT_SDL,
+> -    DT_COCOA,
+> -    DT_GTK,
+> -    DT_EGL,
+> -    DT_NONE,
+> -} LegacyDisplayType;
+> -
+> -static LegacyDisplayType select_display(const char *p)
+> +static void parse_display(const char *p)
+>  {
+>      const char *opts;
+> -    LegacyDisplayType display = DT_DEFAULT;
+>  
+>      if (strstart(p, "sdl", &opts)) {
+>  #ifdef CONFIG_SDL
+> -        display = DT_SDL;
+>          dpy.type = DISPLAY_TYPE_SDL;
 >          while (*opts) {
 >              const char *nextopt;
->  
->              if (strstart(opts, ",grab_on_hover=", &nextopt)) {
->                  opts = nextopt;
-> +                dpy.u.gtk.has_grab_on_hover = true;
->                  if (strstart(opts, "on", &nextopt)) {
-> -                    grab_on_hover = true;
-> +                    dpy.u.gtk.grab_on_hover = true;
->                  } else if (strstart(opts, "off", &nextopt)) {
-> -                    grab_on_hover = false;
-> +                    dpy.u.gtk.grab_on_hover = false;
->                  } else {
->                      goto invalid_gtk_args;
->                  }
->              } else if (strstart(opts, ",gl=", &nextopt)) {
->                  opts = nextopt;
-> +                dpy.has_gl = true;
->                  if (strstart(opts, "on", &nextopt)) {
->                      request_opengl = 1;
-> +                    dpy.gl = true;
->                  } else if (strstart(opts, "off", &nextopt)) {
->                      request_opengl = 0;
-> +                    dpy.gl = false;
->                  } else {
->                      goto invalid_gtk_args;
->                  }
-> @@ -2225,6 +2230,7 @@ static LegacyDisplayType select_display(const char *p)
+> @@ -2179,7 +2167,6 @@ static LegacyDisplayType select_display(const char *p)
+>  #ifdef CONFIG_OPENGL_DMABUF
+>          request_opengl = 1;
+>          display_opengl = 1;
+> -        display = DT_EGL;
+>          dpy.type = DISPLAY_TYPE_EGL_HEADLESS;
+>  #else
+>          fprintf(stderr, "egl support is disabled\n");
+> @@ -2187,7 +2174,6 @@ static LegacyDisplayType select_display(const char *p)
+>  #endif
+>      } else if (strstart(p, "curses", &opts)) {
+>  #ifdef CONFIG_CURSES
+> -        display = DT_CURSES;
+>          dpy.type = DISPLAY_TYPE_CURSES;
+>  #else
+>          error_report("curses support is disabled");
+> @@ -2195,7 +2181,6 @@ static LegacyDisplayType select_display(const char *p)
+>  #endif
+>      } else if (strstart(p, "gtk", &opts)) {
+>  #ifdef CONFIG_GTK
+> -        display = DT_GTK;
+>          dpy.type = DISPLAY_TYPE_GTK;
+>          while (*opts) {
+>              const char *nextopt;
+> @@ -2234,14 +2219,11 @@ static LegacyDisplayType select_display(const char *p)
+>          exit(1);
 >  #endif
 >      } else if (strstart(p, "none", &opts)) {
->          display = DT_NONE;
-> +        dpy.type = DISPLAY_TYPE_NONE;
+> -        display = DT_NONE;
+>          dpy.type = DISPLAY_TYPE_NONE;
 >      } else {
 >          error_report("unknown display type");
 >          exit(1);
-> @@ -3259,6 +3265,7 @@ int main(int argc, char **argv, char **envp)
+>      }
+> -
+> -    return display;
+>  }
+>  
+>  static int balloon_parse(const char *arg)
+> @@ -3069,7 +3051,6 @@ int main(int argc, char **argv, char **envp)
+>      const char *incoming = NULL;
+>      bool userconfig = true;
+>      bool nographic = false;
+> -    LegacyDisplayType display_type = DT_DEFAULT;
+>      int display_remote = 0;
+>      const char *log_mask = NULL;
+>      const char *log_file = NULL;
+> @@ -3263,18 +3244,16 @@ int main(int argc, char **argv, char **envp)
+>                  }
+>                  break;
+>              case QEMU_OPTION_display:
+> -                display_type = select_display(optarg);
+> +                parse_display(optarg);
+>                  break;
+>              case QEMU_OPTION_nographic:
+>                  olist = qemu_find_opts("machine");
 >                  qemu_opts_parse_noisily(olist, "graphics=off", false);
 >                  nographic = true;
->                  display_type = DT_NONE;
-> +                dpy.type = DISPLAY_TYPE_NONE;
+> -                display_type = DT_NONE;
+>                  dpy.type = DISPLAY_TYPE_NONE;
 >                  break;
 >              case QEMU_OPTION_curses:
 >  #ifdef CONFIG_CURSES
-> @@ -3646,6 +3653,8 @@ int main(int argc, char **argv, char **envp)
->                  break;
->              case QEMU_OPTION_full_screen:
->                  full_screen = 1;
-> +                dpy.has_full_screen = true;
-> +                dpy.full_screen = true;
->                  break;
->              case QEMU_OPTION_no_frame:
->                  g_printerr("The -no-frame switch is deprecated, and will be\n"
-> @@ -3664,6 +3673,8 @@ int main(int argc, char **argv, char **envp)
->                  break;
->              case QEMU_OPTION_no_quit:
->                  no_quit = 1;
-> +                dpy.has_window_close = true;
-> +                dpy.window_close = false;
+> -                display_type = DT_CURSES;
+>                  dpy.type = DISPLAY_TYPE_CURSES;
+>  #else
+>                  error_report("curses support is disabled");
+> @@ -3682,7 +3661,6 @@ int main(int argc, char **argv, char **envp)
 >                  break;
 >              case QEMU_OPTION_sdl:
 >  #ifdef CONFIG_SDL
-> @@ -4331,6 +4342,7 @@ int main(int argc, char **argv, char **envp)
->      if (display_type == DT_DEFAULT && !display_remote) {
+> -                display_type = DT_SDL;
+>                  dpy.type = DISPLAY_TYPE_SDL;
+>                  break;
+>  #else
+> @@ -4298,7 +4276,7 @@ int main(int argc, char **argv, char **envp)
+>              exit(1);
+>          }
+>  #ifdef CONFIG_CURSES
+> -        if (display_type == DT_CURSES) {
+> +        if (dpy.type == DISPLAY_TYPE_CURSES) {
+>              error_report("curses display cannot be used with -daemonize");
+>              exit(1);
+>          }
+> @@ -4344,39 +4322,35 @@ int main(int argc, char **argv, char **envp)
+>          display_remote++;
+>      }
+>  #endif
+> -    if (display_type == DT_DEFAULT && !display_remote) {
+> +    if (dpy.type == DISPLAY_TYPE_DEFAULT && !display_remote) {
+
+This is the only use of QAPI enum DisplayType's member 'default'.  Let's
+see...
+
 >  #if defined(CONFIG_GTK)
->          display_type = DT_GTK;
-> +        dpy.type = DISPLAY_TYPE_GTK;
+> -        display_type = DT_GTK;
+>          dpy.type = DISPLAY_TYPE_GTK;
 >  #elif defined(CONFIG_SDL)
->          display_type = DT_SDL;
+> -        display_type = DT_SDL;
+>          dpy.type = DISPLAY_TYPE_SDL;
 >  #elif defined(CONFIG_COCOA)
-> @@ -4339,6 +4351,7 @@ int main(int argc, char **argv, char **envp)
+> -        display_type = DT_COCOA;
+>          dpy.type = DISPLAY_TYPE_COCOA;
+>  #elif defined(CONFIG_VNC)
 >          vnc_parse("localhost:0,to=99,id=default", &error_abort);
 >  #else
->          display_type = DT_NONE;
-> +        dpy.type = DISPLAY_TYPE_NONE;
+> -        display_type = DT_NONE;
+>          dpy.type = DISPLAY_TYPE_NONE;
 >  #endif
+
+As I expected, it is immediately replaced by a "real" display type.
+Therefore, it can't occur as a tag value of QAPI union DisplayOptions.
+
+Recommend to add the enum member in this patch instead of PATCH 04, with
+a suitable comment explaining that it doesn't occur as tag value.
+
 >      }
 >  
-> @@ -4352,7 +4365,7 @@ int main(int argc, char **argv, char **envp)
+> -    if ((no_frame || alt_grab || ctrl_grab) && display_type != DT_SDL) {
+> +    if ((no_frame || alt_grab || ctrl_grab) && dpy.type != DISPLAY_TYPE_SDL) {
+>          error_report("-no-frame, -alt-grab and -ctrl-grab are only valid "
+>                       "for SDL, ignoring option");
+>      }
+>      if (dpy.has_window_close &&
+> -        (display_type != DT_GTK && display_type != DT_SDL)) {
+> +        (dpy.type != DISPLAY_TYPE_GTK && dpy.type != DISPLAY_TYPE_SDL)) {
+>          error_report("-no-quit is only valid for GTK and SDL, "
+>                       "ignoring option");
 >      }
 >  
->      if (display_type == DT_GTK) {
-> -        early_gtk_display_init(request_opengl);
-> +        early_gtk_display_init(&dpy);
+> -    if (display_type == DT_GTK) {
+> +    if (dpy.type == DISPLAY_TYPE_GTK) {
+>          early_gtk_display_init(&dpy);
 >      }
 >  
->      if (display_type == DT_SDL) {
-> @@ -4697,7 +4710,7 @@ int main(int argc, char **argv, char **envp)
->          cocoa_display_init(ds, full_screen);
+> -    if (display_type == DT_SDL) {
+> +    if (dpy.type == DISPLAY_TYPE_SDL) {
+>          sdl_display_early_init(&dpy);
+>      }
+>  
+> @@ -4707,17 +4681,17 @@ int main(int argc, char **argv, char **envp)
+>      ds = init_displaystate();
+>  
+>      /* init local displays */
+> -    switch (display_type) {
+> -    case DT_CURSES:
+> +    switch (dpy.type) {
+> +    case DISPLAY_TYPE_CURSES:
+>          curses_display_init(ds, &dpy);
 >          break;
->      case DT_GTK:
-> -        gtk_display_init(ds, full_screen, grab_on_hover);
-> +        gtk_display_init(ds, &dpy);
+> -    case DT_SDL:
+> +    case DISPLAY_TYPE_SDL:
+>          sdl_display_init(ds, &dpy);
+>          break;
+> -    case DT_COCOA:
+> +    case DISPLAY_TYPE_COCOA:
+>          cocoa_display_init(ds, &dpy);
+>          break;
+> -    case DT_GTK:
+> +    case DISPLAY_TYPE_GTK:
+>          gtk_display_init(ds, &dpy);
 >          break;
 >      default:
->          break;
-> diff --git a/qapi/ui.json b/qapi/ui.json
-> index 07b468f625..2a0772a53a 100644
-> --- a/qapi/ui.json
-> +++ b/qapi/ui.json
-> @@ -982,3 +982,62 @@
->    'data': { '*device': 'str',
->              '*head'  : 'int',
->              'events' : [ 'InputEvent' ] } }
-> +
-> +
-> +##
-> +# @DisplayNoOpts:
-> +#
-> +# Empty struct for displays without config options.
-> +#
-> +# Since: 2.12
-> +#
-> +##
-> +{ 'struct'  : 'DisplayNoOpts',
-> +  'data'    : { } }
-
-This is the fifth empty struct (QCryptoBlockInfoQCow, NetdevNoneOptions,
-Abort, CpuInfoOther), not counting the QAPI frontend's internal one.
-Perhaps we should make the internal one a full built-in type.  Not this
-patch's problem, of course.
-
-> +
-> +##
-> +# @DisplayGTK:
-> +#
-> +# GTK display options.
-> +#
-> +# @grab-on-hover: Grab keyboard input on mouse hover.
-> +#
-> +# Since: 2.12
-> +#
-> +##
-> +{ 'struct'  : 'DisplayGTK',
-> +  'data'    : { '*grab-on-hover' : 'bool' } }
-> +
-> +##
-> +# @DisplayType:
-> +#
-> +# Display (user interface) type.
-> +#
-> +# Since: 2.12
-> +#
-> +##
-> +{ 'enum'    : 'DisplayType',
-> +  'data'    : [ 'default', 'none', 'gtk' ] }
-
-Member 'default' is not used in this patch.  Suggest to introduce it
-with the patch that uses it.
-
-> +
-> +##
-> +# @DisplayOptions:
-> +#
-> +# Display (user interface) options.
-> +#
-> +# @type:          Which DisplayType qemu should use.
-> +# @full-screen:   Start user interface in fullscreen mode (default: off).
-> +# @window-close:  Allow to quit qemu with window close button (default: on).
-> +# @gl:            Enable OpenGL support (default: off).
-> +#
-> +# Since: 2.12
-> +#
-> +##
-> +{ 'union'   : 'DisplayOptions',
-> +  'base'    : { 'type'           : 'DisplayType',
-> +                '*full-screen'   : 'bool',
-> +                '*window-close'  : 'bool',
-> +                '*gl'            : 'bool' },
-> +  'discriminator' : 'type',
-> +  'data'    : { 'default'        : 'DisplayNoOpts',
-> +                'none'           : 'DisplayNoOpts',
-> +                'gtk'            : 'DisplayGTK' } }
-
-Case 'default' might be slightly awkward.  Can't say, because it isn't
-visible in this patch.  No biggie anyway.
+> @@ -4738,7 +4712,7 @@ int main(int argc, char **argv, char **envp)
+>      }
+>  
+>  #ifdef CONFIG_OPENGL_DMABUF
+> -    if (display_type == DT_EGL) {
+> +    if (dpy.type == DISPLAY_TYPE_EGL_HEADLESS) {
+>          egl_headless_init(&dpy);
+>      }
+>  #endif
