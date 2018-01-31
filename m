@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1egpHU-0000bi-VR
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:06:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1egpQB-0003GN-46
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1egpHL-0003lY-CO
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:06:16 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35799)
+	(envelope-from <peter.maydell@linaro.org>) id 1egpQ4-0002Cs-N0
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:15:15 -0500
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:46732)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1egpHL-0003l8-3y
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:06:07 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r78so6825490wme.0
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 02:06:07 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1egpQ4-0002Ca-GT
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 05:15:08 -0500
+Received: by mail-oi0-x233.google.com with SMTP id l6so3942419oii.13
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 02:15:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180131053318.13109-1-famz@redhat.com>
-References: <20180131053318.13109-1-famz@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 31 Jan 2018 11:06:05 +0100
-Message-ID: <CAJ+F1C+v8B4STJS6v7ujGfu83oYFG6x9gcbu4D3T5VaDg382kg@mail.gmail.com>
+In-Reply-To: <20180130173935.5172-1-groug@kaod.org>
+References: <20180130173935.5172-1-groug@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 31 Jan 2018 10:14:46 +0000
+Message-ID: <CAFEAcA-q3K-6zVVjU3gxKjd6a4kYd0RLfVLfMhPgwskY=qb-hg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Add a git-publish configuration file
+Subject: Re: [Qemu-devel] [PULL 00/10] 9p patches for 2.12 20180130
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi
-
-On Wed, Jan 31, 2018 at 6:33 AM, Fam Zheng <famz@redhat.com> wrote:
-> git-publish [1] is a convenient tool to send patches and has been
-> popular among QEMU developers.  Recently it has been made available in
-> Fedora official repo thanks to Stefan's work.
+On 30 January 2018 at 17:39, Greg Kurz <groug@kaod.org> wrote:
+> The following changes since commit 30d9fefe1aca1e92c785214aa9201fd7c2287d56:
 >
-> One nice feature of the tool is a per-project configuration with
-> profiles, especially in which the cccmd option is a handy method to
-> create the Cc list.
+>   Merge remote-tracking branch 'remotes/kraxel/tags/input-20180129-v2-pull-request' into staging (2018-01-29 15:52:27 +0000)
 >
-> [1]: https://github.com/stefanha/git-publish
-
-It would be worth to update README "Submitting patches" with an example
+> are available in the git repository at:
 >
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  .gitpublish | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++
->  1 file changed, 57 insertions(+)
->  create mode 100644 .gitpublish
+>   https://github.com/gkurz/qemu.git tags/for-upstream
 >
-> diff --git a/.gitpublish b/.gitpublish
-> new file mode 100644
-> index 0000000000..2099c1520f
-> --- /dev/null
-> +++ b/.gitpublish
-> @@ -0,0 +1,57 @@
-> +#
-> +# Common git-publish profiles that can be used to send patches to QEMU u=
-pstream.
-> +#
-> +# See https://github.com/stefanha/git-publish for more information
-> +#
-> +[gitpublishprofile "qemu"]
-> +base =3D master
-> +prefix =3D PATCH
-> +to =3D qemu-devel@nongnu.org
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> +
-> +[gitpublishprofile "qemu-rfc"]
-> +base =3D master
-> +prefix =3D RFC PATCH
-> +to =3D qemu-devel@nongnu.org
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> +
-> +[gitpublishprofile "qemu-stable"]
-> +base =3D master
-> +prefix =3D PATCH
-> +to =3D qemu-devel@nongnu.org
-> +cc =3D qemu-stable@nongnu.org
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> +
-> +[gitpublishprofile "qemu-trivial"]
-> +base =3D master
-> +prefix =3D PATCH
-> +to =3D qemu-devel@nongnu.org
-
-cc qemu-trivial@nongnu.org ?
-
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> +
-> +[gitpublishprofile "qemu-block"]
-> +base =3D master
-> +prefix =3D PATCH
-> +to =3D qemu-devel@nongnu.org
-> +cc =3D qemu-block@nongnu.org
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> +
-> +[gitpublishprofile "qemu-arm"]
-> +base =3D master
-> +prefix =3D PATCH
-> +to =3D qemu-devel@nongnu.org
-> +cc =3D qemu-arm@nongnu.org
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> +
-> +[gitpublishprofile "qemu-s390"]
-> +base =3D master
-> +prefix =3D PATCH
-> +to =3D qemu-devel@nongnu.org
-> +cc =3D qemu-s390@nongnu.org
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> +
-> +[gitpublishprofile "qemu-ppc"]
-> +base =3D master
-> +prefix =3D PATCH
-> +to =3D qemu-devel@nongnu.org
-> +cc =3D qemu-pcc@nongnu.org
-> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
-git-fallback 2>/dev/null
-> --
-> 2.14.3
+> for you to fetch changes up to 0dfef72861261bdfd30f2cc53d61c12c097af11a:
 >
+>   tests/virtio-9p: explicitly handle potential integer overflows (2018-01-30 15:28:56 +0100)
 >
+> ----------------------------------------------------------------
+> This series is mostly about 9p request cancellation. It fixes a
+> long standing bug (read "specification violation") where the server
+> would send an invalid response when the client has cancelled an
+> in-flight request. This was causing annoying spurious EINTR returns
+> in linux. The fix comes with some related testing in QTEST.
+>
+> Other patches are code cleanup and improvements.
+>
+> ----------------------------------------------------------------
+> Greg Kurz (9):
+>       9pfs: drop v9fs_register_transport()
+>       tests: virtio-9p: move request tag to the test functions
+>       tests: virtio-9p: wait for completion in the test code
+>       tests: virtio-9p: use the synth backend
+>       tests: virtio-9p: add LOPEN operation test
+>       tests: virtio-9p: add WRITE operation test
+>       libqos/virtio: return length written into used descriptor
+>       tests: virtio-9p: add FLUSH operation test
+>       tests/virtio-9p: explicitly handle potential integer overflows
+>
+> Keno Fischer (1):
+>       9pfs: Correctly handle cancelled requests
 
+Hi. This fails 'make check' on sparc hosts:
 
+TEST: tests/virtio-9p-test... (pid=21410)
+  /ppc64/virtio/9p/pci/nop:                                            OK
+  /ppc64/virtio/9p/pci/config:                                         OK
+  /ppc64/virtio/9p/pci/fs/version/basic:                               OK
+  /ppc64/virtio/9p/pci/fs/attach/basic:                                OK
+  /ppc64/virtio/9p/pci/fs/walk/basic:                                  OK
+  /ppc64/virtio/9p/pci/fs/walk/no_slash:                               OK
+  /ppc64/virtio/9p/pci/fs/walk/dotdot_from_root:                       OK
+  /ppc64/virtio/9p/pci/fs/lopen/basic:                                 OK
+  /ppc64/virtio/9p/pci/fs/write/basic:                                 OK
+  /ppc64/virtio/9p/pci/fs/flush/success:
+Broken pipe
+FAIL
+GTester: last random seed: R02S3152e3829aa0155ecb8ed934af62a54f
+(pid=21546)
+  /ppc64/virtio/9p/pci/fs/flush/ignored:
+Broken pipe
+FAIL
+GTester: last random seed: R02Sd8d854ef25a0afc00dfe43cdab8f8bc7
+(pid=21552)
+FAIL: tests/virtio-9p-test
 
---=20
-Marc-Andr=C3=A9 Lureau
+On x86 with the clang runtime sanitizer it gives errors about
+misaligned loads:
+
+/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
+runtime error: member access within misaligned address 0x7fb933502017
+for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
+0x7fb933502017: note: pointer points here
+ 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+00 00 00 00 00 00 00  00 00 00
+             ^
+/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
+runtime error: load of misaligned address 0x7fb933502017 for type
+'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
+0x7fb933502017: note: pointer points here
+ 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+00 00 00 00 00 00 00  00 00 00
+             ^
+/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:532:22:
+runtime error: member access within misaligned address 0x7fb933502017
+for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
+0x7fb933502017: note: pointer points here
+ 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+00 00 00 00 00 00 00  00 00 00
+             ^
+/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:532:22:
+runtime error: load of misaligned address 0x7fb933502017 for type
+'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
+0x7fb933502017: note: pointer points here
+ 04 00 00 00 0a  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+00 00 00 00 00 00 00  00 00 00
+             ^
+/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
+runtime error: member access within misaligned address 0x7f33bb102017
+for type 'QtestV9fsSynthFlushData', which requires 4 byte alignment
+0x7f33bb102017: note: pointer points here
+ 04 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+00 00 00 00 00 00 00  00 00 00
+             ^
+/home/petmay01/linaro/qemu-for-merges/hw/9pfs/9p-synth.c:531:15:
+runtime error: load of misaligned address 0x7f33bb102017 for type
+'uint32_t' (aka 'unsigned int'), which requires 4 byte alignment
+0x7f33bb102017: note: pointer points here
+ 04 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00
+00 00 00 00 00 00 00  00 00 00
+             ^
+
+which is probably what is causing the sparc failure.
+
+This code looks suspicious:
+
+static ssize_t v9fs_synth_qtest_flush_write(void *buf, int len, off_t offset,
+                                            void *arg)
+{
+    QtestV9fsSynthFlushData *data = buf;
+
+    assert(len == sizeof(*data));
+
+    if (data->usec_timeout) {
+
+as you can't in general cast an arbitrary pointer into a
+structure and use it like that.
+
+Given that the only thing in the data stream is a 32-bit value,
+it would be simpler just to say
+  uint32_t usec_timeout = ldl_XX_p(buf);
+
+I put 'XX' there because the other thing that looks weird here
+is the handling of endianness. The code as written is doing
+a "load a host-order 32-bit value", which would be ldl_he_p().
+But should a buffer in the 9pfs code really have anything
+in host-order rather than a fixed-by-protocol order?
+Using ldl_le_p() or ldl_be_p() seems more plausible. (Whatever
+code is generating this byte stream might also need attention.)
+
+thanks
+-- PMM
