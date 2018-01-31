@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eguIo-0003dY-SV
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:28:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1eguUt-0007jP-84
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eguIf-0005Dr-6Q
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:27:58 -0500
-Date: Wed, 31 Jan 2018 15:26:30 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180131152630.GM3255@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1517253224-14361-1-git-send-email-whois.zihan.yang@gmail.com>
-	<1517253224-14361-3-git-send-email-whois.zihan.yang@gmail.com>
-	<20180131095118.GE3255@redhat.com>
-	<CAKwiv-hsjACjNqPSz36JGPv17UAQr0Utga7Krw7iZ-iCEC9gmQ@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1eguUp-0006q4-Bx
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:40:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eguUp-0006mX-5h
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 10:40:23 -0500
+References: <20180131144846.31697-1-armbru@redhat.com>
+	<20180131144846.31697-2-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1fed5cb6-e8c7-e289-ef56-08abca0913c9@redhat.com>
+Date: Wed, 31 Jan 2018 16:40:08 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180131144846.31697-2-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAKwiv-hsjACjNqPSz36JGPv17UAQr0Utga7Krw7iZ-iCEC9gmQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] Fwd: [RFC 2/4] qemu-socket: Allow custom socket
- options in socket_connect
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/19] Use #include "..." for our own
+ headers, <...> for others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zihan Yang <whois.zihan.yang@gmail.com>
-Cc: qemu-devel@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Sheepdog" <qemu-block@nongnu.org>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: f4bug@amsat.org
 
-On Wed, Jan 31, 2018 at 11:20:16PM +0800, Zihan Yang wrote:
-> Hi, Daniel
-> 
-> >You've added all this extra functionality to pass arbitrary
-> >options, but then not used it in any of the later patches.
-> >We've been trying to remove complexity from this code, so
-> >I'm not in favour of adding new functionality that is not
-> >even used.
-> 
-> You are right, unused functionality should not be added. I was thinking
-> about future usage, but that seems really unnecessary now.
-> 
-> >I'm not seeing the point of adding the support for the O_NONBLOCK
-> >in the listener socket either - that can easily be turned on after
-> >you have the listener socket created.
-> 
-> I don't quite understand how I can turn it on in socket_listen, because
-> socket_listen will create a listener socket inside it, then bind and listen.
-> Are there other ways than passing some kind of 'config parameter'?
+On 31.01.2018 15:48, Markus Armbruster wrote:
+> System headers should be included with <...>, our own headers with
+> "...". Offenders tracked down with an ugly, brittle and probably
+> buggy Perl script.  Previous iteration was commit a9c94277f0.
+>=20
+> Put the cleaned up system header includes first, except for the ones
+> the next commit will delete.
 
-You don't need to turn it on in socket_listen(). You can just do
+That's a little bit of code churn ... why not delete them here
+immediately, or simply ignore these headers here and just delete them in
+the next patch?
 
-   fd = socket_listen()
-   qemu_set_nonblock(fd)
-   ...do stuff...
+> While there, separate #include from file comment with a blank line,
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+[...]
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 0570f597ec..9968974fbe 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -13,8 +13,8 @@
+>   */
+> =20
+> =20
 
-> >The O_NONBLOCK functionality makes more sense in this context
-> >but the implementation is really broken.
-> 
-> Well.. sorry for the broken implementation, I guess I need more practice.
-> 
-> >These functions do hostname lookups, so can never do non-blocking
-> >mode correctly as the hostname lookup itself does blocking I/O
-> >to the nameserver(s).  Ignoring that, the way you handle the
-> >connect() is wrong too. You're iterating over many addresses
-> >returned by getaddrinfo() and doing a non-blocking connect
-> >on each of them. These will essentially all fail with EAGAIN
-> >and you'll skip onto the next address which is wrong.
-> 
-> Why would the hostname lookup affect the listener socket
-> afterwards? The socket is created after the lookup procedure is done.
-> Therefore, the config should only affect the listener socket, not the
-> hostname lookup process. Would you explain in more detail? I'm not
-> an expert in socket programming, so I'm confused.
-> 
-> Also, connect() indeed could return EAGAIN, however, the continue
-> expression is inside the do-while loop of inet_connect_addr(),
-> rather than the for loop inside inet_connect_saddr(), which is the
-> caller of inet_connect_addr(). So it would just try to connect again
-> instead of skipping to next address.
+While you're at it, remove one of the two blank lines?
 
-The point of using  O_NONBLOCK is so that the caller does not get
-delayed for a long time while network traffic runs.  There are two
-places network traffic is used in socket_connect(). First it is
-used to resolve the hostname to an IP address via DNS servers, and
-second it is used in the TCP connection handshake.
+> -#include "inttypes.h"
+> -#include "stdio.h"
+> +#include <inttypes.h>
+> +#include <stdio.h>
+>  #include "cpu_features_def.h"
 
-The O_NONBLOCK code only affects the connection handshake, so the
-caller can still be delayed an abitrary amount of time by the DNS
-lookup.
+Above remarks are just nits, anyway patch looks fine, so:
 
-IOW, if the caller must *not* be delayed, then simply using O_NONBLOCK
-is not sufficient to avoid the delay. If the caller can tolerate
-delays, then using O_NONBLOCK is pointless.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Reviewed-by: Thomas Huth <thuth@redhat.com>
