@@ -1,39 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1egwgF-00078q-4z
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:00:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1egwin-0000IQ-69
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:03:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1egwg8-0005d1-Sn
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:00:19 -0500
-Received: from mail-it0-x22c.google.com ([2607:f8b0:4001:c0b::22c]:39834)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1egwg8-0005cc-Ly
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:00:12 -0500
-Received: by mail-it0-x22c.google.com with SMTP id 68so586050ite.4
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 10:00:12 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1egwii-0006ym-JB
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:02:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:13196)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egwii-0006y5-Bb
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:02:52 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7351F2C9DCE
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 18:02:51 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180129162408.415-1-kraxel@redhat.com>
+	<20180129162408.415-5-kraxel@redhat.com>
+Date: Wed, 31 Jan 2018 19:02:42 +0100
+In-Reply-To: <20180129162408.415-5-kraxel@redhat.com> (Gerd Hoffmann's message
+	of "Mon, 29 Jan 2018 17:24:00 +0100")
+Message-ID: <87d11pvrct.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-	<20180126194559.GI2610@work-vm>
-	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
-	<20180129095330.GA2408@work-vm>
-	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
-	<a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
-	<20180131095351.GY21802@cbox>
-	<CAKv+Gu-NAcUTpEUXCLudHTCFAf=Yb28q3AET9d4ED9A9z7dMfQ@mail.gmail.com>
-	<CAMJs5B8jctfTEEhui3XRCTW1La2HCoVd1Jzaz4p7jy=8vqw=0A@mail.gmail.com>
-	<CAKv+Gu80p5G_gWp0Dg7HJ2SAgc3WCQe+g9ear9oM44bt-KmSFA@mail.gmail.com>
-	<CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 31 Jan 2018 18:00:10 +0000
-Message-ID: <CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 04/12] gtk: add and use DisplayOptions +
+ DisplayGTK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,166 +34,339 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 31 January 2018 at 17:39, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Wed, Jan 31, 2018 at 5:59 PM, Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
->> On 31 January 2018 at 16:53, Christoffer Dall
->> <christoffer.dall@linaro.org> wrote:
->>> On Wed, Jan 31, 2018 at 4:18 PM, Ard Biesheuvel
->>> <ard.biesheuvel@linaro.org> wrote:
->>>> On 31 January 2018 at 09:53, Christoffer Dall
->>>> <christoffer.dall@linaro.org> wrote:
->>>>> On Mon, Jan 29, 2018 at 10:32:12AM +0000, Marc Zyngier wrote:
->>>>>> On 29/01/18 10:04, Peter Maydell wrote:
->>>>>> > On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>>>>> >> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>>>>> >>> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>>>>> >>>> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>>>>> >>>>> I think the correct fix here is that your test code should turn
->>>>>> >>>>> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
->>>>>> >>>>> for Arm KVM guests (for the same reason that VGA device video memory
->>>>>> >>>>> doesn't work). If it's RAM your guest has to arrange to map it as
->>>>>> >>>>> Normal Cacheable, and then everything should work fine.
->>>>>> >>>>
->>>>>> >>>> Does this cause problems with migrating at just the wrong point during
->>>>>> >>>> a VM boot?
->>>>>> >>>
->>>>>> >>> It wouldn't surprise me if it did, but I don't think I've ever
->>>>>> >>> tried to provoke that problem...
->>>>>> >>
->>>>>> >> If you think it'll get the RAM contents wrong, it might be best to fail
->>>>>> >> the migration if you can detect the cache is disabled in the guest.
->>>>>> >
->>>>>> > I guess QEMU could look at the value of the "MMU disabled/enabled" bit
->>>>>> > in the guest's system registers, and refuse migration if it's off...
->>>>>> >
->>>>>> > (cc'd Marc, Christoffer to check that I don't have the wrong end
->>>>>> > of the stick about how thin the ice is in the period before the
->>>>>> > guest turns on its MMU...)
->>>>>>
->>>>>> Once MMU and caches are on, we should be in a reasonable place for QEMU
->>>>>> to have a consistent view of the memory. The trick is to prevent the
->>>>>> vcpus from changing that. A guest could perfectly turn off its MMU at
->>>>>> any given time if it needs to (and it is actually required on some HW if
->>>>>> you want to mitigate headlining CVEs), and KVM won't know about that.
->>>>>>
->>>>>
->>>>> (Clarification: KVM can detect this is it bother to check the VCPU's
->>>>> system registers, but we don't trap to KVM when the VCPU turns off its
->>>>> caches, right?)
->>>>>
->>>>>> You may have to pause the vcpus before starting the migration, or
->>>>>> introduce a new KVM feature that would automatically pause a vcpu that
->>>>>> is trying to disable its MMU while the migration is on. This would
->>>>>> involve trapping all the virtual memory related system registers, with
->>>>>> an obvious cost. But that cost would be limited to the time it takes to
->>>>>> migrate the memory, so maybe that's acceptable.
->>>>>>
->>>>> Is that even sufficient?
->>>>>
->>>>> What if the following happened. (1) guest turns off MMU, (2) guest
->>>>> writes some data directly to ram (3) qemu stops the vcpu (4) qemu reads
->>>>> guest ram.  QEMU's view of guest ram is now incorrect (stale,
->>>>> incoherent, ...).
->>>>>
->>>>> I'm also not really sure if pausing one VCPU because it turned off its
->>>>> MMU will go very well when trying to migrate a large VM (wouldn't this
->>>>> ask for all the other VCPUs beginning to complain that the stopped VCPU
->>>>> appears to be dead?).  As a short-term 'fix' it's probably better to
->>>>> refuse migration if you detect that a VCPU had begun turning off its
->>>>> MMU.
->>>>>
->>>>> On the larger scale of thins; this appears to me to be another case of
->>>>> us really needing some way to coherently access memory between QEMU and
->>>>> the VM, but in the case of the VCPU turning off the MMU prior to
->>>>> migration, we don't even know where it may have written data, and I'm
->>>>> therefore not really sure what the 'proper' solution would be.
->>>>>
->>>>> (cc'ing Ard who has has thought about this problem before in the context
->>>>> of UEFI and VGA.)
->>>>>
->>>>
->>>> Actually, the VGA case is much simpler because the host is not
->>>> expected to write to the framebuffer, only read from it, and the guest
->>>> is not expected to create a cacheable mapping for it, so any
->>>> incoherency can be trivially solved by cache invalidation on the host
->>>> side. (Note that this has nothing to do with DMA coherency, but only
->>>> with PCI MMIO BARs that are backed by DRAM in the host)
->>>
->>> In case of the running guest, the host will also only read from the
->>> cached mapping.  Of course, at restore, the host will also write
->>> through a cached mapping, but shouldn't the latter case be solvable by
->>> having KVM clean the cache lines when faulting in any page?
->>>
->>
->> We are still talking about the contents of the framebuffer, right? In
->> that case, yes, afaict
->>
+Got a QAPI remark, cc: Eric.
+
+Gerd Hoffmann <kraxel@redhat.com> writes:
+
+> Add QAPI DisplayType enum, DisplayOptions union and DisplayGTK struct.
+> Switch gtk configuration to use the qapi type.
 >
-> I was talking about normal RAM actually... not sure if that changes anything?
+> Some bookkeeping (fullscreen for example) is done twice now, this is
+> temporary until more/all UIs are switched over to qapi configuration.
 >
-
-The main difference is that with a framebuffer BAR, it is pointless
-for the guest to map it cacheable, given that the purpose of a
-framebuffer is its side effects, which are not guaranteed to occur
-timely if the mapping is cacheable.
-
-If we are talking about normal RAM, then why are we discussing it here
-and not down there?
-
-vvv
-
-
->>>>
->>>> In the migration case, it is much more complicated, and I think
->>>> capturing the state of the VM in a way that takes incoherency between
->>>> caches and main memory into account is simply infeasible (i.e., the
->>>> act of recording the state of guest RAM via a cached mapping may evict
->>>> clean cachelines that are out of sync, and so it is impossible to
->>>> record both the cached *and* the delta with the uncached state)
->>>
->>> This may be an incredibly stupid question (and I may have asked it
->>> before), but why can't we clean+invalidate the guest page before
->>> reading it and thereby obtain a coherent view of a page?
->>>
->>
->> Because cleaning from the host will clobber whatever the guest wrote
->> directly to memory with the MMU off, if there is a dirty cacheline
->> shadowing that memory.
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/ui/console.h |  9 ++++----
+>  ui/gtk.c             | 32 +++++++++++++++-------------
+>  vl.c                 | 23 +++++++++++++++-----
+>  qapi/ui.json         | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 99 insertions(+), 24 deletions(-)
 >
-> If the host never wrote anything to that memory (it shouldn't mess
-> with the guest's memory) there will only be clean cache lines (even if
-> they contain content shadowing the memory) and cleaning them would be
-> equivalent to an invalidate.  Am I misremembering how this works?
->
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index 7b35778444..58d1a3d27c 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -511,18 +511,17 @@ int index_from_key(const char *key, size_t key_length);
+>  
+>  /* gtk.c */
+>  #ifdef CONFIG_GTK
+> -void early_gtk_display_init(int opengl);
+> -void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover);
+> +void early_gtk_display_init(DisplayOptions *opts);
+> +void gtk_display_init(DisplayState *ds, DisplayOptions *opts);
+>  #else
+> -static inline void gtk_display_init(DisplayState *ds, bool full_screen,
+> -                                    bool grab_on_hover)
+> +static inline void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
+>  {
+>      /* This must never be called if CONFIG_GTK is disabled */
+>      error_report("GTK support is disabled");
+>      abort();
+>  }
+>  
+> -static inline void early_gtk_display_init(int opengl)
+> +static inline void early_gtk_display_init(DisplayOptions *opts)
+>  {
+>      /* This must never be called if CONFIG_GTK is disabled */
+>      error_report("GTK support is disabled");
+> diff --git a/ui/gtk.c b/ui/gtk.c
+> index f0ad63e431..c12d5e020c 100644
+> --- a/ui/gtk.c
+> +++ b/ui/gtk.c
+> @@ -229,6 +229,8 @@ struct GtkDisplayState {
+>  
+>      bool modifier_pressed[ARRAY_SIZE(modifier_keycode)];
+>      bool ignore_keys;
+> +
+> +    DisplayOptions *opts;
+>  };
+>  
+>  typedef struct VCChardev {
+> @@ -777,9 +779,14 @@ static gboolean gd_window_close(GtkWidget *widget, GdkEvent *event,
+>                                  void *opaque)
+>  {
+>      GtkDisplayState *s = opaque;
+> +    bool allow_close = true;
+>      int i;
+>  
+> -    if (!no_quit) {
+> +    if (s->opts->has_window_close && !s->opts->window_close) {
+> +        allow_close = false;
+> +    }
+> +
+> +    if (allow_close) {
+>          for (i = 0; i < s->nb_vcs; i++) {
+>              if (s->vc[i].type != GD_VC_GFX) {
+>                  continue;
+> @@ -2289,7 +2296,7 @@ static void gd_create_menus(GtkDisplayState *s)
+>  
+>  static gboolean gtkinit;
+>  
+> -void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
+> +void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
+>  {
+>      VirtualConsole *vc;
+>  
+> @@ -2301,6 +2308,8 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
+>          fprintf(stderr, "gtk initialization failed\n");
+>          exit(1);
+>      }
+> +    assert(opts->type == DISPLAY_TYPE_GTK);
+> +    s->opts = opts;
+>  
+>  #if !GTK_CHECK_VERSION(3, 0, 0)
+>      g_printerr("Running QEMU with GTK 2.x is deprecated, and will be removed\n"
+> @@ -2387,15 +2396,17 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
+>                               vc && vc->type == GD_VC_VTE);
+>  #endif
+>  
+> -    if (full_screen) {
+> +    if (opts->has_full_screen &&
+> +        opts->full_screen) {
+>          gtk_menu_item_activate(GTK_MENU_ITEM(s->full_screen_item));
+>      }
+> -    if (grab_on_hover) {
+> +    if (opts->u.gtk.has_grab_on_hover &&
+> +        opts->u.gtk.grab_on_hover) {
+>          gtk_menu_item_activate(GTK_MENU_ITEM(s->grab_on_hover_item));
+>      }
+>  }
+>  
+> -void early_gtk_display_init(int opengl)
+> +void early_gtk_display_init(DisplayOptions *opts)
+>  {
+>      /* The QEMU code relies on the assumption that it's always run in
+>       * the C locale. Therefore it is not prepared to deal with
+> @@ -2421,11 +2432,8 @@ void early_gtk_display_init(int opengl)
+>          return;
+>      }
+>  
+> -    switch (opengl) {
+> -    case -1: /* default */
+> -    case 0:  /* off */
+> -        break;
+> -    case 1: /* on */
+> +    assert(opts->type == DISPLAY_TYPE_GTK);
+> +    if (opts->has_gl && opts->gl) {
+>  #if defined(CONFIG_OPENGL)
+>  #if defined(CONFIG_GTK_GL)
+>          gtk_gl_area_init();
+> @@ -2433,10 +2441,6 @@ void early_gtk_display_init(int opengl)
+>          gtk_egl_init();
+>  #endif
+>  #endif
+> -        break;
+> -    default:
+> -        g_assert_not_reached();
+> -        break;
+>      }
+>  
+>      keycode_map = gd_get_keymap(&keycode_maplen);
+> diff --git a/vl.c b/vl.c
+> index a2478412c7..4a555de0cf 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -150,9 +150,9 @@ static int rtc_date_offset = -1; /* -1 means no change */
+>  QEMUClockType rtc_clock;
+>  int vga_interface_type = VGA_NONE;
+>  static int full_screen = 0;
+> +static DisplayOptions dpy;
+>  int no_frame;
+>  int no_quit = 0;
+> -static bool grab_on_hover;
+>  Chardev *serial_hds[MAX_SERIAL_PORTS];
+>  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+>  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
+> @@ -2191,24 +2191,29 @@ static LegacyDisplayType select_display(const char *p)
+>      } else if (strstart(p, "gtk", &opts)) {
+>  #ifdef CONFIG_GTK
+>          display = DT_GTK;
+> +        dpy.type = DISPLAY_TYPE_GTK;
+>          while (*opts) {
+>              const char *nextopt;
+>  
+>              if (strstart(opts, ",grab_on_hover=", &nextopt)) {
+>                  opts = nextopt;
+> +                dpy.u.gtk.has_grab_on_hover = true;
+>                  if (strstart(opts, "on", &nextopt)) {
+> -                    grab_on_hover = true;
+> +                    dpy.u.gtk.grab_on_hover = true;
+>                  } else if (strstart(opts, "off", &nextopt)) {
+> -                    grab_on_hover = false;
+> +                    dpy.u.gtk.grab_on_hover = false;
+>                  } else {
+>                      goto invalid_gtk_args;
+>                  }
+>              } else if (strstart(opts, ",gl=", &nextopt)) {
+>                  opts = nextopt;
+> +                dpy.has_gl = true;
+>                  if (strstart(opts, "on", &nextopt)) {
+>                      request_opengl = 1;
+> +                    dpy.gl = true;
+>                  } else if (strstart(opts, "off", &nextopt)) {
+>                      request_opengl = 0;
+> +                    dpy.gl = false;
+>                  } else {
+>                      goto invalid_gtk_args;
+>                  }
+> @@ -2225,6 +2230,7 @@ static LegacyDisplayType select_display(const char *p)
+>  #endif
+>      } else if (strstart(p, "none", &opts)) {
+>          display = DT_NONE;
+> +        dpy.type = DISPLAY_TYPE_NONE;
+>      } else {
+>          error_report("unknown display type");
+>          exit(1);
+> @@ -3259,6 +3265,7 @@ int main(int argc, char **argv, char **envp)
+>                  qemu_opts_parse_noisily(olist, "graphics=off", false);
+>                  nographic = true;
+>                  display_type = DT_NONE;
+> +                dpy.type = DISPLAY_TYPE_NONE;
+>                  break;
+>              case QEMU_OPTION_curses:
+>  #ifdef CONFIG_CURSES
+> @@ -3646,6 +3653,8 @@ int main(int argc, char **argv, char **envp)
+>                  break;
+>              case QEMU_OPTION_full_screen:
+>                  full_screen = 1;
+> +                dpy.has_full_screen = true;
+> +                dpy.full_screen = true;
+>                  break;
+>              case QEMU_OPTION_no_frame:
+>                  g_printerr("The -no-frame switch is deprecated, and will be\n"
+> @@ -3664,6 +3673,8 @@ int main(int argc, char **argv, char **envp)
+>                  break;
+>              case QEMU_OPTION_no_quit:
+>                  no_quit = 1;
+> +                dpy.has_window_close = true;
+> +                dpy.window_close = false;
+>                  break;
+>              case QEMU_OPTION_sdl:
+>  #ifdef CONFIG_SDL
+> @@ -4331,6 +4342,7 @@ int main(int argc, char **argv, char **envp)
+>      if (display_type == DT_DEFAULT && !display_remote) {
+>  #if defined(CONFIG_GTK)
+>          display_type = DT_GTK;
+> +        dpy.type = DISPLAY_TYPE_GTK;
+>  #elif defined(CONFIG_SDL)
+>          display_type = DT_SDL;
+>  #elif defined(CONFIG_COCOA)
+> @@ -4339,6 +4351,7 @@ int main(int argc, char **argv, char **envp)
+>          vnc_parse("localhost:0,to=99,id=default", &error_abort);
+>  #else
+>          display_type = DT_NONE;
+> +        dpy.type = DISPLAY_TYPE_NONE;
+>  #endif
+>      }
+>  
+> @@ -4352,7 +4365,7 @@ int main(int argc, char **argv, char **envp)
+>      }
+>  
+>      if (display_type == DT_GTK) {
+> -        early_gtk_display_init(request_opengl);
+> +        early_gtk_display_init(&dpy);
+>      }
+>  
+>      if (display_type == DT_SDL) {
+> @@ -4697,7 +4710,7 @@ int main(int argc, char **argv, char **envp)
+>          cocoa_display_init(ds, full_screen);
+>          break;
+>      case DT_GTK:
+> -        gtk_display_init(ds, full_screen, grab_on_hover);
+> +        gtk_display_init(ds, &dpy);
+>          break;
+>      default:
+>          break;
+> diff --git a/qapi/ui.json b/qapi/ui.json
+> index 07b468f625..2a0772a53a 100644
+> --- a/qapi/ui.json
+> +++ b/qapi/ui.json
+> @@ -982,3 +982,62 @@
+>    'data': { '*device': 'str',
+>              '*head'  : 'int',
+>              'events' : [ 'InputEvent' ] } }
+> +
+> +
+> +##
+> +# @DisplayNoOpts:
+> +#
+> +# Empty struct for displays without config options.
+> +#
+> +# Since: 2.12
+> +#
+> +##
+> +{ 'struct'  : 'DisplayNoOpts',
+> +  'data'    : { } }
 
-Cleaning doesn't actually invalidate, but it should be a no-op for
-clean cachelines.
+This is the fifth empty struct (QCryptoBlockInfoQCow, NetdevNoneOptions,
+Abort, CpuInfoOther), not counting the QAPI frontend's internal one.
+Perhaps we should make the internal one a full built-in type.  Not this
+patch's problem, of course.
 
->> However, that same cacheline could be dirty
->> because the guest itself wrote to memory with the MMU on.
->
-> Yes, but the guest would have no control over when such a cache line
-> gets flushed to main memory by the hardware, and can have no
-> reasonable expectation that the cache lines don't get cleaned behind
-> its back.  The fact that a migration triggers this, is reasonable.  A
-> guest that wants hand-off from main memory that its accessing with the
-> MMU off, must invalidate the appropriate cache lines or ensure they're
-> clean.  There's very likely some subtle aspect to all of this that I'm
-> forgetting.
->
+> +
+> +##
+> +# @DisplayGTK:
+> +#
+> +# GTK display options.
+> +#
+> +# @grab-on-hover: Grab keyboard input on mouse hover.
+> +#
+> +# Since: 2.12
+> +#
+> +##
+> +{ 'struct'  : 'DisplayGTK',
+> +  'data'    : { '*grab-on-hover' : 'bool' } }
+> +
+> +##
+> +# @DisplayType:
+> +#
+> +# Display (user interface) type.
+> +#
+> +# Since: 2.12
+> +#
+> +##
+> +{ 'enum'    : 'DisplayType',
+> +  'data'    : [ 'default', 'none', 'gtk' ] }
 
-OK, so if the only way cachelines covering guest memory could be dirty
-is after the guest wrote to that memory itself via a cacheable
-mapping, I guess it would be reasonable to do clean+invalidate before
-reading the memory. Then, the only way for the guest to lose anything
-is in cases where it could not reasonably expect it to be retained
-anyway.
+Member 'default' is not used in this patch.  Suggest to introduce it
+with the patch that uses it.
 
-However, that does leave a window, between the invalidate and the
-read, where the guest could modify memory without it being visible to
-the host.
+> +
+> +##
+> +# @DisplayOptions:
+> +#
+> +# Display (user interface) options.
+> +#
+> +# @type:          Which DisplayType qemu should use.
+> +# @full-screen:   Start user interface in fullscreen mode (default: off).
+> +# @window-close:  Allow to quit qemu with window close button (default: on).
+> +# @gl:            Enable OpenGL support (default: off).
+> +#
+> +# Since: 2.12
+> +#
+> +##
+> +{ 'union'   : 'DisplayOptions',
+> +  'base'    : { 'type'           : 'DisplayType',
+> +                '*full-screen'   : 'bool',
+> +                '*window-close'  : 'bool',
+> +                '*gl'            : 'bool' },
+> +  'discriminator' : 'type',
+> +  'data'    : { 'default'        : 'DisplayNoOpts',
+> +                'none'           : 'DisplayNoOpts',
+> +                'gtk'            : 'DisplayGTK' } }
+
+Case 'default' might be slightly awkward.  Can't say, because it isn't
+visible in this patch.  No biggie anyway.
