@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egolS-0005kp-S7
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:33:11 -0500
+	(envelope-from <berrange@redhat.com>) id 1egozF-0002Hu-4n
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:47:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1egolO-0004zN-JI
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:33:10 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:32779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1egolO-0004yR-E7
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:33:06 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id q9so1807568oti.0
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 01:33:06 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1egozA-0005kD-BQ
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:47:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1egozA-0005hZ-4P
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:47:20 -0500
+Date: Wed, 31 Jan 2018 09:47:10 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180131094710.GD3255@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1517253224-14361-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1517253224-14361-2-git-send-email-whois.zihan.yang@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAATJJ0+f0hzN_EGqs=z=pBAMY1KmsQH0wLBnQ-A55-qYj_P_tQ@mail.gmail.com>
-References: <CAFEAcA9qyg-J5UcGZu5XJyUnn799-V4HXSGfyCYNYE9_eK-a0Q@mail.gmail.com>
-	<CAATJJ0+f0hzN_EGqs=z=pBAMY1KmsQH0wLBnQ-A55-qYj_P_tQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 31 Jan 2018 09:32:45 +0000
-Message-ID: <CAFEAcA8FT1NexCtWBvOxwgMN1ZQueuqocT1G+oH1O0P4jB7Qaw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] proposed release schedule for QEMU 2.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1517253224-14361-2-git-send-email-whois.zihan.yang@gmail.com>
+Subject: Re: [Qemu-devel] [RFC 1/4] qemu-socket: Allow custom socket option
+ in socket_listen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Zihan Yang <whois.zihan.yang@gmail.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 31 January 2018 at 08:19, Christian Ehrhardt
-<christian.ehrhardt@canonical.com> wrote:
-> On Tue, Jan 30, 2018 at 5:25 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> It seems like it's about time we settled on the dates for the
->> 2.12 release. I've sketched in a suggestion at:
->>   https://wiki.qemu.org/Planning/2.12
->>
->> which puts softfreeze on the 13th March, hardfreeze a
->> week later on the 20th, and final release on the 17th April.
->
-> Hi Peter,
-> 2.12 looks good to me FWIW, but I wanted to ask if there are
-> discussions on a 2.11.1 timing as well?
-> Especially in regard to [1] at least agreeing and defining a date
-> would be great IMHO.
-> I haven't seen any date-talk on 2.11.1 and doesn't say anything about it yet.
+On Tue, Jan 30, 2018 at 03:13:41AM +0800, Zihan Yang wrote:
+> Currently, socket_listen does not allow caller to set custom
+> socket options, which is inconvenient when the caller wants
+> a non-blocking socket or wants to set TCP_NODELAY. Therefore,
+> two new structs are added and an extra parameter is provided
+> to socket_listen. Existing functions are unaffected by
+> providing a NULL pointer.
 
-I don't have anything to do with the stable branch releases:
-you should ask the stable maintainers about that...
+You've added all this extra functionality to pass arbitrary
+options, but then not used it in any of the later patches.
+We've been trying to remove complexity from this code, so
+I'm not in favour of adding new functionality that is not
+even used.
 
-thanks
--- PMM
+I'm not seeing the point of adding the support for the O_NONBLOCK
+in the listener socket either - that can easily be turned on after
+you have the listener socket created.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
