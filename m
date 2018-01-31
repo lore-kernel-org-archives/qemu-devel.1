@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egxIY-0000ON-6T
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:39:55 -0500
+	(envelope-from <jsnow@redhat.com>) id 1egxJZ-0001Bv-Fw
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1egxIX-0007qm-6T
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:39:54 -0500
-References: <20180119224735.12169-1-jsnow@redhat.com>
-	<086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1egxJY-0008IA-Cy
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:40:57 -0500
+References: <151372207410.18061.3050483309114042068.malonedeb@chaenomeles.canonical.com>
+	<151376591662.17755.1284403896485862270.malone@chaenomeles.canonical.com>
+	<1a65c254-64b7-5a41-1c15-823f5d30779d@redhat.com>
+	<20180131193613.3512fbaa@kitsune.suse.cz>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <c331f51a-f5d0-5d9b-186e-a5fd81b67f58@redhat.com>
-Date: Wed, 31 Jan 2018 13:39:48 -0500
+Message-ID: <4ed6f5b0-1a8c-4ac9-a2b1-8a8d8750521c@redhat.com>
+Date: Wed, 31 Jan 2018 13:40:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <086ccaa6-eefb-47e4-a865-78075ddd827d@redhat.com>
+In-Reply-To: <20180131193613.3512fbaa@kitsune.suse.cz>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] file-posix: specify expected filetypes
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1739304] Re: Passing a directory to (eg.)
+ -cdrom results in misleading error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+Cc: Bug 1739304 <1739304@bugs.launchpad.net>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Qemu-block <qemu-block@nongnu.org>
 
-ping
 
-On 01/19/2018 06:03 PM, Eric Blake wrote:
-> On 01/19/2018 04:47 PM, John Snow wrote:
->> Adjust each caller of raw_open_common to specify if they are expecting
->> host and character devices or not. Tighten expectations of file types upon
->> open in the common code and refuse types that are not expected.
+
+On 01/31/2018 01:36 PM, Michal Such=C3=A1nek wrote:
+> On Wed, 20 Dec 2017 21:57:00 -0500
+> John Snow <jsnow@redhat.com> wrote:
+>=20
+>> On 12/20/2017 05:31 AM, Dr. David Alan Gilbert wrote:
+>>> Yep, can repeat it here, it seems pretty random which error it
+>>> gives:
+>>>
+>>> [dgilbert@dgilbert-t530 try]$ ./x86_64-softmmu/qemu-system-x86_64
+>>> -cdrom /tmp qemu-system-x86_64: -cdrom /tmp: Could not refresh
+>>> total sector count: Invalid argument [dgilbert@dgilbert-t530
+>>> try]$ ./x86_64-softmmu/qemu-system-x86_64 -cdrom /var
+>>> qemu-system-x86_64: -cdrom /var: Could not read image for
+>>> determining its format: File too large
+>>>
+>>>
+>>> ** Changed in: qemu
+>>>        Status: New =3D> Confirmed
+>>>  =20
 >>
->> This has two effects:
+>> Looks like directories play funny games.
 >>
->> (1) Character and block devices are now considered deprecated for the
->>     'file' driver, which expects only S_IFREG, and
->> (2) no file-posix driver (file, host_cdrom, or host_device) can open
->>     directories now.
+>=20
+> ...
+>=20
+>> specifically:
 >>
->> I don't think there's a legitimate reason to open directories as if
->> they were files. This prevents QEMU from opening and attempting to probe
->> a directory inode, which can break in exciting ways. One of those ways
->> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
->> size instead of EISDIR. This can coax QEMU into responding with a
->> confusing "file too big" instead of "Hey, that's not a file".
+>> (gdb) s
+>> 1963	    size =3D lseek(s->fd, 0, SEEK_END);
+>> (gdb) s
+>> 1964	    if (size < 0) {
+>> (gdb) print size
+>> $37 =3D 9223372036854775807
 >>
->> See: https://bugs.launchpad.net/qemu/+bug/1739304/
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
+>> cool, cool, cool. This value is 0x7fffffffffffffff and errno isn't
+>> set. cool and good function.
+>=20
+> Indeed: The behavior of lseek() on devices which are incapable of
+> seeking is implementation-defined.
+>=20
+>>
+>> so, lseek on a folder returns crazy nonsense. Perhaps we ought to
+>> actually specifically disallow folders, we don't appear to.
+>=20
+> It probably returns -1 which it is supposed to do on error. It should
+> also set errno in that case, though.
+>=20
+> So this is probably bug in the error handling code in lseek.
+>=20
+> Thanks
+>=20
+> Michal
+>=20
+
+Thanks. It looks like we can't make stronger guarantees about the
+behavior of lseek, so I submitted a patch to ratchet down QEMU's
+acceptable file types:
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg05055.html
+
+Thanks,
+--John
