@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egwYs-0003XZ-EJ
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:52:43 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1egwgF-00078q-4z
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:00:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1egwYm-00009U-7z
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:52:39 -0500
-Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:58036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1egwYm-0008W1-1f
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:52:36 -0500
-Received: from player778.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6289BA3B3C
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 18:52:31 +0100 (CET)
-Date: Wed, 31 Jan 2018 18:52:25 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180131185225.21762f12@bahia.lan>
-In-Reply-To: <09678455-2c70-ff07-7f2a-f4135e28e75f@gmail.com>
-References: <1516064279-14816-1-git-send-email-minyard@acm.org>
-	<09678455-2c70-ff07-7f2a-f4135e28e75f@gmail.com>
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1egwg8-0005d1-Sn
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:00:19 -0500
+Received: from mail-it0-x22c.google.com ([2607:f8b0:4001:c0b::22c]:39834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1egwg8-0005cc-Ly
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:00:12 -0500
+Received: by mail-it0-x22c.google.com with SMTP id 68so586050ite.4
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 10:00:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] Small IPMI fixes
+In-Reply-To: <CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
+References: <20180124212246.2352-1-wei@redhat.com>
+	<20180125200525.GC2442@work-vm>
+	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
+	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
+	<20180126194559.GI2610@work-vm>
+	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
+	<20180129095330.GA2408@work-vm>
+	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
+	<a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
+	<20180131095351.GY21802@cbox>
+	<CAKv+Gu-NAcUTpEUXCLudHTCFAf=Yb28q3AET9d4ED9A9z7dMfQ@mail.gmail.com>
+	<CAMJs5B8jctfTEEhui3XRCTW1La2HCoVd1Jzaz4p7jy=8vqw=0A@mail.gmail.com>
+	<CAKv+Gu80p5G_gWp0Dg7HJ2SAgc3WCQe+g9ear9oM44bt-KmSFA@mail.gmail.com>
+	<CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Wed, 31 Jan 2018 18:00:10 +0000
+Message-ID: <CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +42,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <tcminyard@gmail.com>
-Cc: minyard@acm.org, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-On Tue, 23 Jan 2018 10:55:15 -0600
-Corey Minyard <tcminyard@gmail.com> wrote:
+On 31 January 2018 at 17:39, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Wed, Jan 31, 2018 at 5:59 PM, Ard Biesheuvel
+> <ard.biesheuvel@linaro.org> wrote:
+>> On 31 January 2018 at 16:53, Christoffer Dall
+>> <christoffer.dall@linaro.org> wrote:
+>>> On Wed, Jan 31, 2018 at 4:18 PM, Ard Biesheuvel
+>>> <ard.biesheuvel@linaro.org> wrote:
+>>>> On 31 January 2018 at 09:53, Christoffer Dall
+>>>> <christoffer.dall@linaro.org> wrote:
+>>>>> On Mon, Jan 29, 2018 at 10:32:12AM +0000, Marc Zyngier wrote:
+>>>>>> On 29/01/18 10:04, Peter Maydell wrote:
+>>>>>> > On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>>>>>> >> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>>>>>> >>> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>>>>>> >>>> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>>>>>> >>>>> I think the correct fix here is that your test code should turn
+>>>>>> >>>>> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
+>>>>>> >>>>> for Arm KVM guests (for the same reason that VGA device video memory
+>>>>>> >>>>> doesn't work). If it's RAM your guest has to arrange to map it as
+>>>>>> >>>>> Normal Cacheable, and then everything should work fine.
+>>>>>> >>>>
+>>>>>> >>>> Does this cause problems with migrating at just the wrong point during
+>>>>>> >>>> a VM boot?
+>>>>>> >>>
+>>>>>> >>> It wouldn't surprise me if it did, but I don't think I've ever
+>>>>>> >>> tried to provoke that problem...
+>>>>>> >>
+>>>>>> >> If you think it'll get the RAM contents wrong, it might be best to fail
+>>>>>> >> the migration if you can detect the cache is disabled in the guest.
+>>>>>> >
+>>>>>> > I guess QEMU could look at the value of the "MMU disabled/enabled" bit
+>>>>>> > in the guest's system registers, and refuse migration if it's off...
+>>>>>> >
+>>>>>> > (cc'd Marc, Christoffer to check that I don't have the wrong end
+>>>>>> > of the stick about how thin the ice is in the period before the
+>>>>>> > guest turns on its MMU...)
+>>>>>>
+>>>>>> Once MMU and caches are on, we should be in a reasonable place for QEMU
+>>>>>> to have a consistent view of the memory. The trick is to prevent the
+>>>>>> vcpus from changing that. A guest could perfectly turn off its MMU at
+>>>>>> any given time if it needs to (and it is actually required on some HW if
+>>>>>> you want to mitigate headlining CVEs), and KVM won't know about that.
+>>>>>>
+>>>>>
+>>>>> (Clarification: KVM can detect this is it bother to check the VCPU's
+>>>>> system registers, but we don't trap to KVM when the VCPU turns off its
+>>>>> caches, right?)
+>>>>>
+>>>>>> You may have to pause the vcpus before starting the migration, or
+>>>>>> introduce a new KVM feature that would automatically pause a vcpu that
+>>>>>> is trying to disable its MMU while the migration is on. This would
+>>>>>> involve trapping all the virtual memory related system registers, with
+>>>>>> an obvious cost. But that cost would be limited to the time it takes to
+>>>>>> migrate the memory, so maybe that's acceptable.
+>>>>>>
+>>>>> Is that even sufficient?
+>>>>>
+>>>>> What if the following happened. (1) guest turns off MMU, (2) guest
+>>>>> writes some data directly to ram (3) qemu stops the vcpu (4) qemu reads
+>>>>> guest ram.  QEMU's view of guest ram is now incorrect (stale,
+>>>>> incoherent, ...).
+>>>>>
+>>>>> I'm also not really sure if pausing one VCPU because it turned off its
+>>>>> MMU will go very well when trying to migrate a large VM (wouldn't this
+>>>>> ask for all the other VCPUs beginning to complain that the stopped VCPU
+>>>>> appears to be dead?).  As a short-term 'fix' it's probably better to
+>>>>> refuse migration if you detect that a VCPU had begun turning off its
+>>>>> MMU.
+>>>>>
+>>>>> On the larger scale of thins; this appears to me to be another case of
+>>>>> us really needing some way to coherently access memory between QEMU and
+>>>>> the VM, but in the case of the VCPU turning off the MMU prior to
+>>>>> migration, we don't even know where it may have written data, and I'm
+>>>>> therefore not really sure what the 'proper' solution would be.
+>>>>>
+>>>>> (cc'ing Ard who has has thought about this problem before in the context
+>>>>> of UEFI and VGA.)
+>>>>>
+>>>>
+>>>> Actually, the VGA case is much simpler because the host is not
+>>>> expected to write to the framebuffer, only read from it, and the guest
+>>>> is not expected to create a cacheable mapping for it, so any
+>>>> incoherency can be trivially solved by cache invalidation on the host
+>>>> side. (Note that this has nothing to do with DMA coherency, but only
+>>>> with PCI MMIO BARs that are backed by DRAM in the host)
+>>>
+>>> In case of the running guest, the host will also only read from the
+>>> cached mapping.  Of course, at restore, the host will also write
+>>> through a cached mapping, but shouldn't the latter case be solvable by
+>>> having KVM clean the cache lines when faulting in any page?
+>>>
+>>
+>> We are still talking about the contents of the framebuffer, right? In
+>> that case, yes, afaict
+>>
+>
+> I was talking about normal RAM actually... not sure if that changes anything?
+>
 
-> Michael?=C2=A0 Anyone?=C2=A0 Can we get these in?
->=20
+The main difference is that with a framebuffer BAR, it is pointless
+for the guest to map it cacheable, given that the purpose of a
+framebuffer is its side effects, which are not guaranteed to occur
+timely if the mapping is cacheable.
 
-Since you're adding yourself as a maintainer for IPMI, why not just sending
-a pull request ?
+If we are talking about normal RAM, then why are we discussing it here
+and not down there?
 
-> Thanks
->=20
-> -corey
->=20
-> On 01/15/2018 06:57 PM, minyard@acm.org wrote:
-> > These are some fixes I've had for a while (mostly).  They are small
-> > fixes and additions for various things.  It would be nice to be able
-> > to get these into the upcoming release.
-> >
-> > I also add myself as the maintainer for the IPMI code, since that
-> > seemed appropriate.
-> >
-> > Changes in v2:
-> >
-> > I removed the "other" fixes (the one to vl.c) from the previous patch
-> > set, these are all IPMI-related changes.  I also moved adding myself
-> > as the IPMI maintainer to the first patch, per Marc-Andr=C3=A9.
-> > =20
->=20
->=20
+vvv
+
+
+>>>>
+>>>> In the migration case, it is much more complicated, and I think
+>>>> capturing the state of the VM in a way that takes incoherency between
+>>>> caches and main memory into account is simply infeasible (i.e., the
+>>>> act of recording the state of guest RAM via a cached mapping may evict
+>>>> clean cachelines that are out of sync, and so it is impossible to
+>>>> record both the cached *and* the delta with the uncached state)
+>>>
+>>> This may be an incredibly stupid question (and I may have asked it
+>>> before), but why can't we clean+invalidate the guest page before
+>>> reading it and thereby obtain a coherent view of a page?
+>>>
+>>
+>> Because cleaning from the host will clobber whatever the guest wrote
+>> directly to memory with the MMU off, if there is a dirty cacheline
+>> shadowing that memory.
+>
+> If the host never wrote anything to that memory (it shouldn't mess
+> with the guest's memory) there will only be clean cache lines (even if
+> they contain content shadowing the memory) and cleaning them would be
+> equivalent to an invalidate.  Am I misremembering how this works?
+>
+
+Cleaning doesn't actually invalidate, but it should be a no-op for
+clean cachelines.
+
+>> However, that same cacheline could be dirty
+>> because the guest itself wrote to memory with the MMU on.
+>
+> Yes, but the guest would have no control over when such a cache line
+> gets flushed to main memory by the hardware, and can have no
+> reasonable expectation that the cache lines don't get cleaned behind
+> its back.  The fact that a migration triggers this, is reasonable.  A
+> guest that wants hand-off from main memory that its accessing with the
+> MMU off, must invalidate the appropriate cache lines or ensure they're
+> clean.  There's very likely some subtle aspect to all of this that I'm
+> forgetting.
+>
+
+OK, so if the only way cachelines covering guest memory could be dirty
+is after the guest wrote to that memory itself via a cacheable
+mapping, I guess it would be reasonable to do clean+invalidate before
+reading the memory. Then, the only way for the guest to lose anything
+is in cases where it could not reasonably expect it to be retained
+anyway.
+
+However, that does leave a window, between the invalidate and the
+read, where the guest could modify memory without it being visible to
+the host.
