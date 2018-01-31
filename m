@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1egp5b-00057N-6I
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:54:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1egp91-0006SI-Dn
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:57:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1egp5X-0004FX-4h
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:53:59 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:40182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
-	id 1egp5W-0004Ey-Tl
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:53:55 -0500
-Received: by mail-wm0-x236.google.com with SMTP id v123so6681302wmd.5
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 01:53:54 -0800 (PST)
-Date: Wed, 31 Jan 2018 10:53:51 +0100
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Message-ID: <20180131095351.GY21802@cbox>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-	<20180126194559.GI2610@work-vm>
-	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
-	<20180129095330.GA2408@work-vm>
-	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
-	<a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
+	(envelope-from <dgilbert@redhat.com>) id 1egp8w-00066x-6g
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:57:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1egp8v-00065A-TS
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 04:57:26 -0500
+Date: Wed, 31 Jan 2018 09:57:16 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180131095715.GA2521@work-vm>
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-6-brijesh.singh@amd.com>
+	<20180130174957.GD2536@work-vm>
+	<c60b5f53-2f50-1866-a2b9-fda8b7c2be39@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+In-Reply-To: <c60b5f53-2f50-1866-a2b9-fda8b7c2be39@amd.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 05/23] target/i386: add memory
+ encryption feature cpuid support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,77 +31,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Jan 29, 2018 at 10:32:12AM +0000, Marc Zyngier wrote:
-> On 29/01/18 10:04, Peter Maydell wrote:
-> > On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> >> * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >>> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> >>>> * Peter Maydell (peter.maydell@linaro.org) wrote:
-> >>>>> I think the correct fix here is that your test code should turn
-> >>>>> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
-> >>>>> for Arm KVM guests (for the same reason that VGA device video memory
-> >>>>> doesn't work). If it's RAM your guest has to arrange to map it as
-> >>>>> Normal Cacheable, and then everything should work fine.
-> >>>>
-> >>>> Does this cause problems with migrating at just the wrong point during
-> >>>> a VM boot?
-> >>>
-> >>> It wouldn't surprise me if it did, but I don't think I've ever
-> >>> tried to provoke that problem...
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+>=20
+>=20
+> On 1/30/18 11:49 AM, Dr. David Alan Gilbert wrote:
+> > * Brijesh Singh (brijesh.singh@amd.com) wrote:
+> >> AMD EPYC processors support memory encryption feature. The feature
+> >> is reported through CPUID 8000_001F[EAX].
 > >>
-> >> If you think it'll get the RAM contents wrong, it might be best to fail
-> >> the migration if you can detect the cache is disabled in the guest.
-> > 
-> > I guess QEMU could look at the value of the "MMU disabled/enabled" bit
-> > in the guest's system registers, and refuse migration if it's off...
-> > 
-> > (cc'd Marc, Christoffer to check that I don't have the wrong end
-> > of the stick about how thin the ice is in the period before the
-> > guest turns on its MMU...)
-> 
-> Once MMU and caches are on, we should be in a reasonable place for QEMU
-> to have a consistent view of the memory. The trick is to prevent the
-> vcpus from changing that. A guest could perfectly turn off its MMU at
-> any given time if it needs to (and it is actually required on some HW if
-> you want to mitigate headlining CVEs), and KVM won't know about that.
-> 
+> >> Fn8000_001F [EAX]:
+> >>  Bit 0   Secure Memory Encryption (SME) supported
+> >>  Bit 1   Secure Encrypted Virtualization (SEV) supported
+> >>  Bit 2   Page flush MSR supported
+> >>  Bit 3   Ecrypted State (SEV-ES) support
+> >>
+> >> when memory encryption feature is reported, CPUID 8000_001F[EBX] sho=
+uld
+> >> provide additional information regarding the feature (such as which =
+page
+> >> table bit is used to mark pages as encrypted etc). The information i=
+n EBX
+> >> and ECX may vary from one family to another hence we use the host cp=
+uid
+> >> to populate the EBX information.
+> > That's going to make it interesting for migration.  If the guest need=
+s
+> > to know that C-bit position then you presumably can't migrate between
+> > those two host types, but we wouldn't have anything that currently
+> > stops us.
+> > We already have similar problems with variations in physical address
+> > size but normally get away with that, especially on smaller VMs.
+>=20
+> Dave,
+>=20
+> While building the page tables guest need to know the C-bit position.
+> The C-bit position in the guest is same as C-bit position on the host.
+> For migration case, we should be able to migrate SEV guest on same host
+> type (i.e all EPYC and Ryzen CPUs are based on family 17 and we should
+> be okay migrating the SEV guests among those host types).=A0 Since C-bi=
+t
+> position is not fixed hence migrating to different host family will be
+> an issue.
 
-(Clarification: KVM can detect this is it bother to check the VCPU's
-system registers, but we don't trap to KVM when the VCPU turns off its
-caches, right?)
+Sure; so the interesting question is how would a management layer like
+libvirt know when it's safe to migrate a guest between EPYC and a later
+family that has the C-bit in a different location?
 
-> You may have to pause the vcpus before starting the migration, or
-> introduce a new KVM feature that would automatically pause a vcpu that
-> is trying to disable its MMU while the migration is on. This would
-> involve trapping all the virtual memory related system registers, with
-> an obvious cost. But that cost would be limited to the time it takes to
-> migrate the memory, so maybe that's acceptable.
-> 
-Is that even sufficient?
+Dave
 
-What if the following happened. (1) guest turns off MMU, (2) guest
-writes some data directly to ram (3) qemu stops the vcpu (4) qemu reads
-guest ram.  QEMU's view of guest ram is now incorrect (stale,
-incoherent, ...).
-
-I'm also not really sure if pausing one VCPU because it turned off its
-MMU will go very well when trying to migrate a large VM (wouldn't this
-ask for all the other VCPUs beginning to complain that the stopped VCPU
-appears to be dead?).  As a short-term 'fix' it's probably better to
-refuse migration if you detect that a VCPU had begun turning off its
-MMU.
-
-On the larger scale of thins; this appears to me to be another case of
-us really needing some way to coherently access memory between QEMU and
-the VM, but in the case of the VCPU turning off the MMU prior to
-migration, we don't even know where it may have written data, and I'm
-therefore not really sure what the 'proper' solution would be.
-
-(cc'ing Ard who has has thought about this problem before in the context
-of UEFI and VGA.)
-
-Thanks,
--Christoffer
+> -Brijesh
+> > Dave
+> >
+> >
+> >> The details for memory encryption CPUID is available in AMD APM
+> >> (http://support.amd.com/TechDocs/24593.pdf) Section 15.34.1
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Cc: Richard Henderson <rth@twiddle.net>
+> >> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> >> ---
+> >>  target/i386/cpu.c | 36 ++++++++++++++++++++++++++++++++++++
+> >>  target/i386/cpu.h |  6 ++++++
+> >>  2 files changed, 42 insertions(+)
+> >>
+> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> >> index a49d2221adc9..4147eb6e18a9 100644
+> >> --- a/target/i386/cpu.c
+> >> +++ b/target/i386/cpu.c
+> >> @@ -234,6 +234,7 @@ static void x86_cpu_vendor_words2str(char *dst, =
+uint32_t vendor1,
+> >>  #define TCG_EXT4_FEATURES 0
+> >>  #define TCG_SVM_FEATURES 0
+> >>  #define TCG_KVM_FEATURES 0
+> >> +#define TCG_MEM_ENCRYPT_FEATURES 0
+> >>  #define TCG_7_0_EBX_FEATURES (CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_SM=
+AP | \
+> >>            CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_A=
+DX | \
+> >>            CPUID_7_0_EBX_PCOMMIT | CPUID_7_0_EBX_CLFLUSHOPT |       =
+     \
+> >> @@ -545,6 +546,20 @@ static FeatureWordInfo feature_word_info[FEATUR=
+E_WORDS] =3D {
+> >>          .cpuid_reg =3D R_EDX,
+> >>          .tcg_features =3D ~0U,
+> >>      },
+> >> +    [FEAT_MEM_ENCRYPT] =3D {
+> >> +        .feat_names =3D {
+> >> +            "sme", "sev", "page-flush-msr", "sev-es",
+> >> +            NULL, NULL, NULL, NULL,
+> >> +            NULL, NULL, NULL, NULL,
+> >> +            NULL, NULL, NULL, NULL,
+> >> +            NULL, NULL, NULL, NULL,
+> >> +            NULL, NULL, NULL, NULL,
+> >> +            NULL, NULL, NULL, NULL,
+> >> +            NULL, NULL, NULL, NULL,
+> >> +        },
+> >> +        .cpuid_eax =3D 0x8000001F, .cpuid_reg =3D R_EAX,
+> >> +        .tcg_features =3D TCG_MEM_ENCRYPT_FEATURES,
+> >> +    }
+> >>  };
+> >> =20
+> >>  typedef struct X86RegisterInfo32 {
+> >> @@ -1965,6 +1980,9 @@ static X86CPUDefinition builtin_x86_defs[] =3D=
+ {
+> >>              CPUID_XSAVE_XGETBV1,
+> >>          .features[FEAT_6_EAX] =3D
+> >>              CPUID_6_EAX_ARAT,
+> >> +        /* Missing: SEV_ES */
+> >> +        .features[FEAT_MEM_ENCRYPT] =3D
+> >> +            CPUID_8000_001F_EAX_SME | CPUID_8000_001F_EAX_SEV,
+> >>          .xlevel =3D 0x8000000A,
+> >>          .model_id =3D "AMD EPYC Processor",
+> >>      },
+> >> @@ -3589,6 +3607,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t=
+ index, uint32_t count,
+> >>              *edx =3D 0;
+> >>          }
+> >>          break;
+> >> +    case 0x8000001F:
+> >> +        if (env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_S=
+EV) {
+> >> +            *eax =3D env->features[FEAT_MEM_ENCRYPT];
+> >> +            host_cpuid(0x8000001F, 0, NULL, ebx, NULL, NULL);
+> >> +            *ecx =3D 0;
+> >> +            *edx =3D 0;
+> >> +        } else {
+> >> +            *eax =3D 0;
+> >> +            *ebx =3D 0;
+> >> +            *ecx =3D 0;
+> >> +            *edx =3D 0;
+> >> +        }
+> >> +        break;
+> >>      case 0xC0000000:
+> >>          *eax =3D env->cpuid_xlevel2;
+> >>          *ebx =3D 0;
+> >> @@ -4036,10 +4067,15 @@ static void x86_cpu_expand_features(X86CPU *=
+cpu, Error **errp)
+> >>          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+> >>          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+> >>          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+> >> +        x86_cpu_adjust_feat_level(cpu, FEAT_MEM_ENCRYPT);
+> >>          /* SVM requires CPUID[0x8000000A] */
+> >>          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+> >>              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800=
+0000A);
+> >>          }
+> >> +        /* SEV requires CPUID[0x8000001F] */
+> >> +        if ((env->features[FEAT_MEM_ENCRYPT] & CPUID_8000_001F_EAX_=
+SEV)) {
+> >> +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800=
+0001F);
+> >> +        }
+> >>      }
+> >> =20
+> >>      /* Set cpuid_*level* based on cpuid_min_*level, if not explicit=
+ly set */
+> >> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> >> index f91e37d25dea..f7a0ab20fdd1 100644
+> >> --- a/target/i386/cpu.h
+> >> +++ b/target/i386/cpu.h
+> >> @@ -483,6 +483,7 @@ typedef enum FeatureWord {
+> >>      FEAT_6_EAX,         /* CPUID[6].EAX */
+> >>      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=3D0xd,ECX=3D0].EAX */
+> >>      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=3D0xd,ECX=3D0].EDX */
+> >> +    FEAT_MEM_ENCRYPT,   /* CPUID[8000_001F].EAX */
+> >>      FEATURE_WORDS,
+> >>  } FeatureWord;
+> >> =20
+> >> @@ -679,6 +680,11 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS=
+];
+> >> =20
+> >>  #define CPUID_6_EAX_ARAT       (1U << 2)
+> >> =20
+> >> +#define CPUID_8000_001F_EAX_SME             (1U << 0) /* SME */
+> >> +#define CPUID_8000_001F_EAX_SEV             (1U << 1) /* SEV */
+> >> +#define CPUID_8000_001F_EAX_PAGE_FLUSH_MSR  (1U << 2) /* Page flush=
+ MSR */
+> >> +#define CPUID_8000_001F_EAX_SEV_ES          (1U << 3) /* SEV-ES */
+> >> +
+> >>  /* CPUID[0x80000007].EDX flags: */
+> >>  #define CPUID_APM_INVTSC       (1U << 8)
+> >> =20
+> >> --=20
+> >> 2.9.5
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
