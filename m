@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1egwxF-00065g-BR
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:54 -0500
+	(envelope-from <cohuck@redhat.com>) id 1egwxH-00067x-O0
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1egwxC-0002S5-5R
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:53 -0500
+	(envelope-from <cohuck@redhat.com>) id 1egwxF-0002UL-LU
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:55 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 31 Jan 2018 19:17:40 +0100
-Message-Id: <20180131181742.2037-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] s390x: support zpci in tcg
+Date: Wed, 31 Jan 2018 19:17:41 +0100
+Message-Id: <20180131181742.2037-2-cohuck@redhat.com>
+In-Reply-To: <20180131181742.2037-1-cohuck@redhat.com>
+References: <20180131181742.2037-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] s390x/tcg: wire up pci instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +22,303 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: rth@twiddle.net, agraf@suse.de, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-<blurb from last cover letter>
-This patch set (available at git://github.com/cohuck/qemu pci-tcg)
-wires up zpci under tcg. A guest started with
+On s390x, pci support is implemented via a set of instructions
+(no mmio). Unfortunately, none of them are documented in the
+PoP; the code is based upon the existing implementation for KVM
+and the Linux zpci driver.
 
-qemu-system-s390x -M s390-ccw-virtio,accel=tcg -cpu qemu,zpci=on -device virtio-net-pci (...)
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/helper.h      |   9 ++++
+ target/s390x/insn-data.def |  15 +++++++
+ target/s390x/misc_helper.c | 109 +++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   | 101 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 234 insertions(+)
 
-and a 4.15 kernel in the guest (needed because the requirement for ais
-was dropped with
-
-commit 48070c73058be6de9c0d754d441ed7092dfc8f12
-Author: Christian Borntraeger <borntraeger@de.ibm.com>
-Date:   Mon Oct 30 14:38:58 2017 +0100
-
-    s390/pci: do not require AIS facility
-
-and we don't have a working ais with tcg yet), I get sensible output
-out of lspci.
-</blurb>
-
-Looks much nicer now after implementing feedback from David (thanks!)
-
-Changes RFC->v2:
-- no need to check for the zpci feature in the helpers
-- SIC does not set a condition code
-- SIC also should not depend on zpci
-- use tcg magic to improve the code in translate.c
-- clear zpci feature from supported set for !CONFIG_PCI
-
-Cornelia Huck (2):
-  s390x/tcg: wire up pci instructions
-  s390x/cpumodel: allow zpci features in qemu model
-
- target/s390x/cpu_models.c   |   6 +++
- target/s390x/gen-features.c |   3 ++
- target/s390x/helper.h       |   9 ++++
- target/s390x/insn-data.def  |  15 ++++++
- target/s390x/misc_helper.c  | 109 ++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c    | 101 ++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 243 insertions(+)
-
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 59a1d9869b..9887efbb3a 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -172,4 +172,13 @@ DEF_HELPER_2(stcrw, void, env, i64)
+ DEF_HELPER_3(stsch, void, env, i64, i64)
+ DEF_HELPER_3(tsch, void, env, i64, i64)
+ DEF_HELPER_2(chsc, void, env, i64)
++
++DEF_HELPER_2(clp, void, env, i32)
++DEF_HELPER_3(pcilg, void, env, i32, i32)
++DEF_HELPER_3(pcistg, void, env, i32, i32)
++DEF_HELPER_4(stpcifc, void, env, i32, i64, i32)
++DEF_HELPER_3(sic, void, env, i64, i64)
++DEF_HELPER_3(rpcit, void, env, i32, i32)
++DEF_HELPER_5(pcistb, void, env, i32, i32, i64, i32)
++DEF_HELPER_4(mpcifc, void, env, i32, i64, i32)
+ #endif
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 11ee43dcbc..b9841631a8 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1067,4 +1067,19 @@
+     /* ??? Not listed in PoO ninth edition, but there's a linux driver that
+        uses it: "A CHSC subchannel is usually present on LPAR only."  */
+     C(0xb25f, CHSC,  RRE,     Z,   0, insn, 0, 0, chsc, 0)
++
++/* zPCI Instructions */
++    /* None of these instructions are documented in the PoP, so this is all
++       based upon target/s390x/kvm.c and Linux code and likely incomplete */
++    C(0xebd0, PCISTB, RSY_a, PCI, la2, 0, 0, 0, pcistb, 0)
++    /* SIC does not really depend on pci, but it is unclear from the code
++       with which facility it becomes available */
++    C(0xebd1, SIC, RSY_a, Z, r1, r3, 0, 0, sic, 0)
++    C(0xb9a0, CLP, RRF_c, PCI, 0, 0, 0, 0, clp, 0)
++    C(0xb9d0, PCISTG, RRE, PCI, 0, 0, 0, 0, pcistg, 0)
++    C(0xb9d2, PCILG, RRE, PCI, 0, 0, 0, 0, pcilg, 0)
++    C(0xb9d3, RPCIT, RRE, PCI, 0, 0, 0, 0, rpcit, 0)
++    C(0xe3d0, MPCIFC, RXY_a, PCI, la2, 0, 0, 0, mpcifc, 0)
++    C(0xe3d4, STPCIFC, RXY_a, PCI, la2, 0, 0, 0, stpcifc, 0)
++
+ #endif /* CONFIG_USER_ONLY */
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 86da6aab7e..6f5103f3b5 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -36,6 +36,7 @@
+ #include "hw/s390x/ebcdic.h"
+ #include "hw/s390x/s390-virtio-hcall.h"
+ #include "hw/s390x/sclp.h"
++#include "hw/s390x/s390-pci-inst.h"
+ #endif
+ 
+ /* #define DEBUG_HELPER */
+@@ -560,3 +561,111 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
+     env->regs[0] = deposit64(env->regs[0], 0, 8, (max_bytes / 8) - 1);
+     return count_bytes >= max_bytes ? 0 : 3;
+ }
++
++#ifndef CONFIG_USER_ONLY
++void HELPER(clp)(CPUS390XState *env, uint32_t r2)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = clp_service_call(cpu, r2, GETPC());
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++
++void HELPER(pcilg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = pcilg_service_call(cpu, r1, r2, GETPC());
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++
++void HELPER(pcistg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = pcistg_service_call(cpu, r1, r2, GETPC());
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++
++void HELPER(stpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
++                     uint32_t ar)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = stpcifc_service_call(cpu, r1, fiba, ar, GETPC());
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++
++void HELPER(sic)(CPUS390XState *env, uint64_t r1, uint64_t r3)
++{
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = css_do_sic(env, r1 & 0xffff, (r3 >> 27) & 0x7);
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++
++void HELPER(rpcit)(CPUS390XState *env, uint32_t r1, uint32_t r2)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = rpcit_service_call(cpu, r1, r2, GETPC());
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++
++void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
++                    uint64_t gaddr, uint32_t ar)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = pcistb_service_call(cpu, r1, r3, gaddr, ar, GETPC());
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++
++void HELPER(mpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
++                    uint32_t ar)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    int r;
++
++    qemu_mutex_lock_iothread();
++    r = mpcifc_service_call(cpu, r1, fiba, ar, GETPC());
++    qemu_mutex_unlock_iothread();
++    if (r) {
++        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
++    }
++}
++#endif
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index df0b41606d..2a3314601a 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4777,6 +4777,106 @@ static ExitStatus op_zero2(DisasContext *s, DisasOps *o)
+     return NO_EXIT;
+ }
+ 
++#ifndef CONFIG_USER_ONLY
++static ExitStatus op_clp(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
++
++    check_privileged(s);
++    gen_helper_clp(cpu_env, r2);
++    tcg_temp_free_i32(r2);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
++static ExitStatus op_pcilg(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
++
++    check_privileged(s);
++    gen_helper_pcilg(cpu_env, r1, r2);
++    tcg_temp_free_i32(r1);
++    tcg_temp_free_i32(r2);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
++static ExitStatus op_pcistg(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
++
++    check_privileged(s);
++    gen_helper_pcistg(cpu_env, r1, r2);
++    tcg_temp_free_i32(r1);
++    tcg_temp_free_i32(r2);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
++static ExitStatus op_stpcifc(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGv_i32 ar = tcg_const_i32(get_field(s->fields, b2));
++
++    check_privileged(s);
++    gen_helper_stpcifc(cpu_env, r1, o->addr1, ar);
++    tcg_temp_free_i32(ar);
++    tcg_temp_free_i32(r1);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
++static ExitStatus op_sic(DisasContext *s, DisasOps *o)
++{
++    check_privileged(s);
++    gen_helper_sic(cpu_env, o->in1, o->in2);
++    return NO_EXIT;
++}
++
++static ExitStatus op_rpcit(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
++
++    check_privileged(s);
++    gen_helper_rpcit(cpu_env, r1, r2);
++    tcg_temp_free_i32(r1);
++    tcg_temp_free_i32(r2);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
++static ExitStatus op_pcistb(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
++    TCGv_i32 ar = tcg_const_i32(get_field(s->fields, b2));
++
++    check_privileged(s);
++    gen_helper_pcistb(cpu_env, r1, r3, o->addr1, ar);
++    tcg_temp_free_i32(ar);
++    tcg_temp_free_i32(r1);
++    tcg_temp_free_i32(r3);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
++static ExitStatus op_mpcifc(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGv_i32 ar = tcg_const_i32(get_field(s->fields, b2));
++
++    check_privileged(s);
++    gen_helper_mpcifc(cpu_env, r1, o->addr1, ar);
++    tcg_temp_free_i32(ar);
++    tcg_temp_free_i32(r1);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++#endif
++
+ /* ====================================================================== */
+ /* The "Cc OUTput" generators.  Given the generated output (and in some cases
+    the original inputs), update the various cc data structures in order to
+@@ -5708,6 +5808,7 @@ enum DisasInsnEnum {
+ #define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
+ #define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
+ #define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
++#define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
+ 
+ static const DisasInsn insn_info[] = {
+ #include "insn-data.def"
 -- 
 2.13.6
