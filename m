@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egth4-000058-H5
+	(envelope-from <armbru@redhat.com>) id 1egth1-0008Un-V2
 	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:49:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egtgz-0003dp-80
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:48:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50191)
+	(envelope-from <armbru@redhat.com>) id 1egtgw-0003bu-RQ
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:48:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egtgy-0003ck-Un
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:48:53 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egtgw-0003aO-Fc
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:48:50 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 31 Jan 2018 15:48:33 +0100
-Message-Id: <20180131144846.31697-7-armbru@redhat.com>
-In-Reply-To: <20180131144846.31697-1-armbru@redhat.com>
-References: <20180131144846.31697-1-armbru@redhat.com>
+Date: Wed, 31 Jan 2018 15:48:27 +0100
+Message-Id: <20180131144846.31697-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 06/19] Include qmp-commands.h exactly where
- needed
+Subject: [Qemu-devel] [PATCH v2 00/19] Clean up includes to reduce compile
+ time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,169 +28,445 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: balaton@eik.bme.hu, eblake@redhat.com, f4bug@amsat.org
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- block.c                    | 1 -
- blockjob.c                 | 1 -
- hw/acpi/acpi-stub.c        | 1 -
- hw/ppc/spapr.c             | 1 -
- hw/s390x/s390-stattrib.c   | 1 -
- hw/smbios/smbios-stub.c    | 1 -
- hw/xen/xen-common.c        | 1 -
- include/sysemu/arch_init.h | 1 -
- qga/guest-agent-core.h     | 2 +-
- qga/main.c                 | 1 +
- stubs/dump.c               | 1 -
- ui/cocoa.m                 | 1 -
- 12 files changed, 2 insertions(+), 11 deletions(-)
+We have awfully many "touch it, recompile the world" headers.  Right
+now, I count about fifty that are prerequisites of more than half the
+objects in my "build everything" tree.
 
-diff --git a/block.c b/block.c
-index 2a8bc276c7..a97f709252 100644
---- a/block.c
-+++ b/block.c
-@@ -39,7 +39,6 @@
- #include "qemu/notify.h"
- #include "qemu/coroutine.h"
- #include "block/qapi.h"
--#include "qmp-commands.h"
- #include "qemu/timer.h"
- #include "qapi-event.h"
- #include "qemu/cutils.h"
-diff --git a/blockjob.c b/blockjob.c
-index d766fdc4ce..081f1d2b91 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -34,7 +34,6 @@
- #include "qapi/qmp/qjson.h"
- #include "qemu/coroutine.h"
- #include "qemu/id.h"
--#include "qmp-commands.h"
- #include "qemu/timer.h"
- #include "qapi-event.h"
-=20
-diff --git a/hw/acpi/acpi-stub.c b/hw/acpi/acpi-stub.c
-index 7dfc8af316..4c9d081ed4 100644
---- a/hw/acpi/acpi-stub.c
-+++ b/hw/acpi/acpi-stub.c
-@@ -21,7 +21,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
--#include "qmp-commands.h"
- #include "hw/acpi/acpi.h"
-=20
- void acpi_table_add(const QemuOpts *opts, Error **errp)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 88a78d31eb..7474d6eeeb 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -74,7 +74,6 @@
- #include "hw/compat.h"
- #include "qemu/cutils.h"
- #include "hw/ppc/spapr_cpu_core.h"
--#include "qmp-commands.h"
-=20
- #include <libfdt.h>
-=20
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index 2902f54f11..c6c06b2780 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -12,7 +12,6 @@
- #include "qemu/osdep.h"
- #include "hw/boards.h"
- #include "cpu.h"
--#include "qmp-commands.h"
- #include "migration/qemu-file.h"
- #include "migration/register.h"
- #include "hw/s390x/storage-attributes.h"
-diff --git a/hw/smbios/smbios-stub.c b/hw/smbios/smbios-stub.c
-index 61becef4ae..d3a385441a 100644
---- a/hw/smbios/smbios-stub.c
-+++ b/hw/smbios/smbios-stub.c
-@@ -23,7 +23,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
--#include "qmp-commands.h"
- #include "hw/smbios/smbios.h"
-=20
- void smbios_entry_add(QemuOpts *opts, Error **errp)
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 632a938dcc..78c18f34a7 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -10,7 +10,6 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/xen/xen_backend.h"
--#include "qmp-commands.h"
- #include "chardev/char.h"
- #include "sysemu/accel.h"
- #include "migration/misc.h"
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 8751c468ed..90b38aecdd 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -1,7 +1,6 @@
- #ifndef QEMU_ARCH_INIT_H
- #define QEMU_ARCH_INIT_H
-=20
--#include "qmp-commands.h"
- #include "qemu/option.h"
-=20
- enum {
-diff --git a/qga/guest-agent-core.h b/qga/guest-agent-core.h
-index 3e8a4acff2..6f4d214cb9 100644
---- a/qga/guest-agent-core.h
-+++ b/qga/guest-agent-core.h
-@@ -12,7 +12,7 @@
-  */
- #include "qapi/qmp/dispatch.h"
- #include "qemu-common.h"
--#include "qga-qmp-commands.h"
-+#include "qga-qapi-types.h"
-=20
- #define QGA_READ_COUNT_DEFAULT 4096
-=20
-diff --git a/qga/main.c b/qga/main.c
-index 57083ca10c..804cc4c1a0 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -23,6 +23,7 @@
- #include "qapi/qmp/qjson.h"
- #include "qga/guest-agent-core.h"
- #include "qemu/module.h"
-+#include "qga-qmp-commands.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/error.h"
- #include "qapi/qmp/dispatch.h"
-diff --git a/stubs/dump.c b/stubs/dump.c
-index d9ee23f1eb..8e5032c3af 100644
---- a/stubs/dump.c
-+++ b/stubs/dump.c
-@@ -14,7 +14,6 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "sysemu/dump-arch.h"
--#include "qmp-commands.h"
-=20
- int cpu_get_dump_info(ArchDumpInfo *info,
-                       const struct GuestPhysBlockList *guest_phys_blocks=
-)
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 6be9848391..19e1e827d2 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -31,7 +31,6 @@
- #include "ui/console.h"
- #include "ui/input.h"
- #include "sysemu/sysemu.h"
--#include "qmp-commands.h"
- #include "sysemu/blockdev.h"
- #include "qemu-version.h"
- #include <Carbon/Carbon.h>
+Some of them are that way by necessity.  Many of them are not.  This
+series takes care of six I happen to touch, because serve as their
+maintainer:
+
+    include/qapi/qmp/qdict.h
+    include/qapi/qmp/qlist.h
+    include/qapi/qmp/qnull.h
+    include/qapi/qmp/qnum.h
+    include/qapi/qmp/qobject.h
+    include/qemu/option.h
+
+Before this series, touching any of these recompiles more than 95% of
+my objects.  That's more than 4500 compiler runs.  After this series,
+only 0.3% - 8% of my objects get recompiled.
+
+v2:
+* PATCH 01: New [BALATON Zoltan]
+* PATCH 02: Clean up a few more (hw/ide/sii3112.c
+  target/i386/hax-all.c target/i386/hvf/ target/xtensa/); R-bys
+  dropped
+* PATCH 02,04,10: Commit message improved [Eric]
+* PATCH 04: Unbreak include/ui/console.h for !CONFIG_VNC, and
+  target/s390x/kvm.c [Patchew]
+* PATCH 04,11,12,19: Additional whitespace cleanup
+* PATCH 04,09,11,12,19: Commit message numbers updated
+
+Markus Armbruster (19):
+  Use #include "..." for our own headers, <...> for others
+  Clean up includes
+  Drop superfluous includes of qapi-types.h and test-qapi-types.h
+  Include qapi/error.h exactly where needed
+  Drop superfluous includes of qapi/qmp/qerror.h
+  Include qmp-commands.h exactly where needed
+  Typedef the subtypes of QObject in qemu/typedefs.h, too
+  Eliminate qapi/qmp/types.h
+  qdict qlist: Make most helper macros functions
+  Include qapi/qmp/qobject.h exactly where needed
+  Include qapi/qmp/qlist.h exactly where needed
+  Include qapi/qmp/qdict.h exactly where needed
+  Include qapi/qmp/qstring.h exactly where needed
+  Include qapi/qmp/qbool.h exactly where needed
+  Include qapi/qmp/qnum.h exactly where needed
+  Include qapi/qmp/qnull.h exactly where needed
+  Drop superfluous includes of qapi/qmp/dispatch.h
+  Drop superfluous includes of qapi/qmp/qjson.h
+  Move include qemu/option.h from qemu-common.h to actual users
+
+ accel/accel.c                                      |  2 +-
+ audio/wavcapture.c                                 |  1 +
+ backends/cryptodev.c                               |  1 -
+ backends/hostmem.c                                 |  1 -
+ backends/tpm.c                                     |  1 -
+ balloon.c                                          |  2 +-
+ block.c                                            |  6 ++++--
+ block/blkdebug.c                                   |  2 +-
+ block/blkverify.c                                  |  1 +
+ block/block-backend.c                              |  2 ++
+ block/crypto.c                                     |  2 ++
+ block/curl.c                                       |  5 +++--
+ block/file-posix.c                                 |  2 ++
+ block/file-win32.c                                 |  3 +++
+ block/gluster.c                                    |  3 +++
+ block/iscsi-opts.c                                 |  1 +
+ block/iscsi.c                                      |  3 ++-
+ block/nbd.c                                        |  2 +-
+ block/nfs.c                                        |  2 +-
+ block/null.c                                       |  1 +
+ block/parallels.c                                  |  3 ++-
+ block/parallels.h                                  |  1 -
+ block/qapi.c                                       |  6 +++++-
+ block/qcow.c                                       |  5 +++--
+ block/qcow2-cluster.c                              |  1 -
+ block/qcow2.c                                      |  6 ++++--
+ block/qed.c                                        |  2 +-
+ block/quorum.c                                     |  4 ++--
+ block/rbd.c                                        |  3 +++
+ block/replication.c                                |  2 +-
+ block/sheepdog.c                                   |  1 +
+ block/snapshot.c                                   |  2 ++
+ block/ssh.c                                        |  2 ++
+ block/throttle.c                                   |  1 +
+ block/vdi.c                                        |  1 +
+ block/vhdx.c                                       |  2 +-
+ block/vmdk.c                                       |  1 +
+ block/vpc.c                                        |  3 ++-
+ block/vvfat.c                                      |  4 +++-
+ block/write-threshold.c                            |  1 +
+ blockdev-nbd.c                                     |  2 +-
+ blockdev.c                                         |  5 ++++-
+ blockjob.c                                         |  3 +--
+ chardev/char-file.c                                |  3 ++-
+ chardev/char-mux.c                                 |  3 ++-
+ chardev/char-parallel.c                            |  2 ++
+ chardev/char-pipe.c                                |  2 ++
+ chardev/char-ringbuf.c                             |  3 +++
+ chardev/char-serial.c                              |  2 ++
+ chardev/char-socket.c                              |  2 ++
+ chardev/char-stdio.c                               |  3 ++-
+ chardev/char-udp.c                                 |  2 ++
+ chardev/char.c                                     |  3 +++
+ chardev/spice.c                                    |  2 ++
+ contrib/ivshmem-server/main.c                      |  2 +-
+ contrib/vhost-user-scsi/vhost-user-scsi.c          |  4 ++--
+ cpus.c                                             |  4 ++--
+ crypto/hash.c                                      |  1 -
+ crypto/hmac.c                                      |  1 -
+ crypto/ivgen-essiv.c                               |  1 -
+ crypto/ivgen-plain.c                               |  1 -
+ crypto/ivgen-plain64.c                             |  1 -
+ crypto/random-gnutls.c                             |  1 +
+ crypto/random-platform.c                           |  1 +
+ device-hotplug.c                                   |  2 ++
+ device_tree.c                                      |  2 +-
+ docs/devel/qapi-code-gen.txt                       |  2 --
+ dump.c                                             |  1 +
+ fsdev/qemu-fsdev-throttle.c                        |  1 +
+ fsdev/qemu-fsdev-throttle.h                        |  1 -
+ fsdev/qemu-fsdev.c                                 |  5 +++--
+ fsdev/qemu-fsdev.h                                 |  1 -
+ hmp.c                                              |  1 +
+ hmp.h                                              |  2 --
+ hw/9pfs/9p-handle.c                                |  1 +
+ hw/9pfs/9p-local.c                                 |  3 ++-
+ hw/9pfs/9p-proxy.c                                 |  3 +++
+ hw/9pfs/xen-9p-backend.c                           |  1 +
+ hw/acpi/acpi-stub.c                                |  2 +-
+ hw/acpi/core.c                                     |  3 +++
+ hw/acpi/memory_hotplug.c                           |  1 +
+ hw/acpi/vmgenid.c                                  |  1 +
+ hw/adc/stm32f2xx_adc.c                             |  1 -
+ hw/arm/boot.c                                      |  1 +
+ hw/block/vhost-user-blk.c                          |  1 -
+ hw/char/mcf_uart.c                                 |  1 -
+ hw/char/virtio-console.c                           |  1 +
+ hw/core/qdev.c                                     |  3 ++-
+ hw/display/milkymist-tmu2.c                        |  1 +
+ hw/display/qxl.c                                   |  1 +
+ hw/display/virtio-gpu-3d.c                         |  1 -
+ hw/display/xlnx_dp.c                               |  1 +
+ hw/i2c/ppc4xx_i2c.c                                |  1 -
+ hw/i386/acpi-build.c                               |  1 +
+ hw/i386/multiboot.c                                |  2 +-
+ hw/i386/pc.c                                       |  3 +++
+ hw/i386/pc_piix.c                                  |  1 +
+ hw/i386/pc_q35.c                                   |  2 ++
+ hw/i386/pc_sysfw.c                                 |  1 +
+ hw/i386/xen/xen-hvm.c                              |  2 +-
+ hw/ide/core.c                                      |  2 ++
+ hw/ide/sii3112.c                                   |  4 ++--
+ hw/intc/xics_pnv.c                                 |  1 -
+ hw/intc/xics_spapr.c                               |  1 -
+ hw/ipmi/ipmi.c                                     |  1 +
+ hw/mips/mips_jazz.c                                |  1 +
+ hw/mips/mips_malta.c                               |  1 +
+ hw/misc/exynos4210_rng.c                           |  1 +
+ hw/misc/mips_cmgcr.c                               |  1 -
+ hw/misc/mps2-scc.c                                 |  1 -
+ hw/net/rocker/qmp-norocker.c                       |  1 +
+ hw/net/rocker/rocker.c                             |  1 +
+ hw/net/rocker/rocker_of_dpa.c                      |  1 +
+ hw/net/virtio-net.c                                |  2 +-
+ hw/nios2/cpu_pic.c                                 |  1 -
+ hw/nvram/eeprom_at24c.c                            |  3 +--
+ hw/nvram/fw_cfg.c                                  |  2 ++
+ hw/pci-bridge/i82801b11.c                          |  1 -
+ hw/pci-bridge/ioh3420.c                            |  1 -
+ hw/pci-bridge/xio3130_upstream.c                   |  1 -
+ hw/pci-host/sabre.c                                |  1 -
+ hw/pci/pci-stub.c                                  |  1 +
+ hw/pci/pci.c                                       |  2 ++
+ hw/pci/pcie_aer.c                                  |  3 +--
+ hw/ppc/e500.c                                      |  2 +-
+ hw/ppc/fdt.c                                       |  1 -
+ hw/ppc/pnv_bmc.c                                   |  1 -
+ hw/ppc/pnv_xscom.c                                 |  1 -
+ hw/ppc/ppc.c                                       |  1 -
+ hw/ppc/spapr.c                                     |  1 -
+ hw/ppc/spapr_drc.c                                 |  1 +
+ hw/ppc/spapr_pci_vfio.c                            |  1 -
+ hw/ppc/spapr_rtc.c                                 |  3 ++-
+ hw/ppc/virtex_ml507.c                              |  1 +
+ hw/s390x/s390-ccw.c                                |  3 ++-
+ hw/s390x/s390-skeys.c                              |  1 +
+ hw/s390x/s390-stattrib.c                           |  2 +-
+ hw/s390x/s390-virtio-ccw.c                         |  3 +--
+ hw/scsi/esp.c                                      |  1 -
+ hw/scsi/scsi-bus.c                                 |  1 +
+ hw/scsi/vhost-scsi-common.c                        |  1 -
+ hw/sd/sdhci.c                                      |  1 -
+ hw/smbios/smbios-stub.c                            |  2 +-
+ hw/smbios/smbios.c                                 |  1 +
+ hw/sparc64/niagara.c                               |  1 -
+ hw/sparc64/sun4u_iommu.c                           |  1 -
+ hw/ssi/stm32f2xx_spi.c                             |  1 -
+ hw/timer/m48t59.c                                  |  1 -
+ hw/timer/mc146818rtc.c                             |  2 ++
+ hw/tpm/tpm_emulator.c                              |  5 -----
+ hw/tpm/tpm_int.h                                   |  2 --
+ hw/tpm/tpm_ioctl.h                                 |  2 --
+ hw/usb/ccid-card-passthru.c                        |  1 -
+ hw/usb/xen-usb.c                                   |  4 ++--
+ hw/vfio/pci.c                                      |  1 +
+ hw/virtio/virtio-balloon.c                         |  1 +
+ hw/watchdog/watchdog.c                             |  2 +-
+ hw/xen/xen-common.c                                |  1 -
+ hw/xen/xen_devconfig.c                             |  1 +
+ hw/xtensa/xtensa_memory.h                          |  1 -
+ hw/xtensa/xtfpga.c                                 |  2 +-
+ include/block/block.h                              |  4 +---
+ include/block/block_int.h                          |  2 --
+ include/block/dirty-bitmap.h                       |  1 +
+ include/block/nbd.h                                |  2 --
+ include/block/qapi.h                               |  1 -
+ include/block/snapshot.h                           |  2 --
+ include/chardev/char.h                             |  2 --
+ include/crypto/random.h                            |  1 -
+ include/crypto/xts.h                               |  1 -
+ include/exec/tb-lookup.h                           |  2 --
+ include/hw/acpi/acpi.h                             |  1 -
+ include/hw/acpi/acpi_dev_interface.h               |  1 -
+ include/hw/block/block.h                           |  1 +
+ include/hw/block/fdc.h                             |  1 +
+ include/hw/ide/internal.h                          |  1 -
+ include/hw/intc/xlnx-pmu-iomod-intc.h              |  1 -
+ include/hw/intc/xlnx-zynqmp-ipi.h                  |  1 -
+ include/hw/loader-fit.h                            |  2 +-
+ include/hw/loader.h                                |  1 -
+ include/hw/nvram/fw_cfg.h                          |  1 -
+ include/hw/pci-bridge/simba.h                      |  1 -
+ include/hw/qdev-core.h                             |  1 -
+ include/hw/registerfields.h                        |  2 +-
+ include/hw/s390x/storage-attributes.h              |  2 +-
+ include/hw/smbios/smbios.h                         |  1 -
+ include/hw/xtensa/xtensa-isa.h                     |  2 --
+ include/migration/colo.h                           |  1 +
+ include/monitor/monitor.h                          |  1 -
+ include/net/net.h                                  |  5 +----
+ include/net/slirp.h                                |  4 ----
+ include/net/tap.h                                  |  1 -
+ include/qapi/clone-visitor.h                       |  1 -
+ include/qapi/opts-visitor.h                        |  1 -
+ include/qapi/qmp-event.h                           |  1 -
+ include/qapi/qmp/dispatch.h                        |  3 +--
+ include/qapi/qmp/json-parser.h                     |  1 -
+ include/qapi/qmp/qbool.h                           |  4 ++--
+ include/qapi/qmp/qdict.h                           | 21 ++++++----------=
+--
+ include/qapi/qmp/qjson.h                           |  3 ---
+ include/qapi/qmp/qlist.h                           | 19 ++++++----------
+ include/qapi/qmp/qlit.h                            |  1 -
+ include/qapi/qmp/qnum.h                            |  4 ++--
+ include/qapi/qmp/qstring.h                         |  4 ++--
+ include/qapi/qmp/types.h                           | 24 ----------------=
+-----
+ include/qapi/qobject-input-visitor.h               |  1 -
+ include/qapi/qobject-output-visitor.h              |  1 -
+ include/qapi/visitor.h                             |  2 +-
+ include/qemu-common.h                              |  2 --
+ include/qemu/config-file.h                         |  2 --
+ include/qemu/option.h                              |  1 -
+ include/qemu/throttle.h                            |  1 +
+ include/qemu/typedefs.h                            |  7 +++++-
+ include/qom/object_interfaces.h                    |  1 -
+ include/scsi/pr-manager.h                          |  1 -
+ include/sysemu/arch_init.h                         |  3 +--
+ include/sysemu/dump.h                              |  1 -
+ include/sysemu/hostmem.h                           |  1 -
+ include/sysemu/hvf.h                               |  2 --
+ include/sysemu/numa.h                              |  1 -
+ include/sysemu/replay.h                            |  1 -
+ include/sysemu/sysemu.h                            |  2 --
+ include/sysemu/tpm.h                               |  1 -
+ include/sysemu/tpm_backend.h                       |  1 -
+ include/ui/console.h                               |  5 ++---
+ include/ui/qemu-spice.h                            |  1 -
+ io/channel-websock.c                               |  3 ---
+ iothread.c                                         |  1 +
+ linux-user/syscall.c                               |  1 -
+ migration/colo-failover.c                          |  1 +
+ migration/colo.c                                   |  1 +
+ migration/exec.c                                   |  1 -
+ migration/fd.c                                     |  1 -
+ migration/migration.c                              |  2 ++
+ migration/migration.h                              |  1 -
+ migration/ram.c                                    |  2 ++
+ migration/ram.h                                    |  1 +
+ migration/savevm.c                                 |  1 +
+ monitor.c                                          |  8 ++++---
+ nbd/common.c                                       |  1 -
+ net/clients.h                                      |  1 -
+ net/colo-compare.c                                 |  1 -
+ net/filter-mirror.c                                |  1 -
+ net/filter-replay.c                                |  1 -
+ net/filter-rewriter.c                              |  2 --
+ net/net.c                                          |  4 +++-
+ net/slirp.c                                        |  2 ++
+ net/vhost-user.c                                   |  2 ++
+ numa.c                                             |  1 +
+ qapi/qapi-dealloc-visitor.c                        |  2 +-
+ qapi/qapi-visit-core.c                             |  1 -
+ qapi/qmp-dispatch.c                                |  4 +---
+ qapi/qmp-event.c                                   |  1 +
+ qapi/qobject-input-visitor.c                       |  7 +++++-
+ qapi/qobject-output-visitor.c                      |  7 +++++-
+ qdev-monitor.c                                     |  2 ++
+ qemu-img.c                                         |  5 +++--
+ qemu-io-cmds.c                                     |  1 +
+ qemu-io.c                                          |  3 ++-
+ qemu-keymap.c                                      |  1 -
+ qemu-nbd.c                                         |  3 ++-
+ qga/commands-posix.c                               |  1 +
+ qga/commands-win32.c                               |  2 ++
+ qga/commands.c                                     |  1 +
+ qga/guest-agent-core.h                             |  2 +-
+ qga/main.c                                         |  5 ++++-
+ qga/vss-win32.c                                    |  1 +
+ qmp.c                                              |  3 ++-
+ qobject/json-parser.c                              |  7 +++++-
+ qobject/qbool.c                                    |  1 -
+ qobject/qdict.c                                    | 23 ++++++++++++++++=
++++-
+ qobject/qjson.c                                    |  6 +++++-
+ qobject/qlist.c                                    | 25 ++++++++++++++++=
++++++-
+ qobject/qlit.c                                     |  6 +++++-
+ qobject/qnum.c                                     |  2 --
+ qobject/qobject.c                                  |  7 +++++-
+ qobject/qstring.c                                  |  1 -
+ qom/object.c                                       |  2 +-
+ qom/object_interfaces.c                            |  2 ++
+ replay/replay-input.c                              |  1 -
+ replay/replay.c                                    |  2 +-
+ scripts/qapi-commands.py                           |  4 ++--
+ scripts/qapi-event.py                              |  2 +-
+ scsi/pr-helper.h                                   |  2 --
+ stubs/arch-query-cpu-def.c                         |  1 +
+ stubs/arch-query-cpu-model-baseline.c              |  1 +
+ stubs/arch-query-cpu-model-comparison.c            |  1 +
+ stubs/arch-query-cpu-model-expansion.c             |  1 +
+ stubs/dump.c                                       |  1 -
+ stubs/vmgenid.c                                    |  1 +
+ target/i386/cpu.c                                  |  5 +++--
+ target/i386/hax-all.c                              |  1 -
+ target/i386/hvf/hvf.c                              |  1 -
+ target/i386/hvf/vmx.h                              |  1 -
+ target/i386/hvf/x86_decode.c                       |  1 -
+ target/i386/hvf/x86_mmu.c                          |  6 ++----
+ target/i386/hvf/x86_task.c                         |  1 -
+ target/i386/hvf/x86hvf.c                           |  3 ---
+ target/i386/monitor.c                              |  2 ++
+ target/i386/xsave_helper.c                         |  1 -
+ target/nios2/helper.c                              |  1 -
+ target/ppc/mmu-book3s-v3.c                         |  1 -
+ target/ppc/mmu-hash64.c                            |  1 -
+ target/ppc/mmu-radix64.c                           |  1 -
+ target/ppc/mmu_helper.c                            |  1 -
+ target/ppc/translate_init.c                        |  2 ++
+ target/s390x/cpu_models.c                          |  2 +-
+ target/s390x/excp_helper.c                         |  1 -
+ target/s390x/gen-features.c                        |  4 ++--
+ target/s390x/helper.c                              |  1 -
+ target/s390x/kvm.c                                 |  2 +-
+ target/xtensa/core-dc232b/xtensa-modules.c         |  3 ++-
+ target/xtensa/core-dc233c/xtensa-modules.c         |  3 ++-
+ target/xtensa/core-de212/xtensa-modules.c          |  3 ++-
+ target/xtensa/core-fsf/xtensa-modules.c            |  3 ++-
+ .../xtensa/core-sample_controller/xtensa-modules.c |  3 ++-
+ target/xtensa/xtensa-isa.c                         |  4 +---
+ target/xtensa/xtensa-isa.h                         |  2 +-
+ tests/ahci-test.c                                  |  1 +
+ tests/check-qdict.c                                |  4 +++-
+ tests/check-qjson.c                                |  5 ++++-
+ tests/check-qlist.c                                |  1 -
+ tests/check-qlit.c                                 |  3 +--
+ tests/check-qnum.c                                 |  1 -
+ tests/check-qobject.c                              |  9 ++++++--
+ tests/cpu-plug-test.c                              |  2 +-
+ tests/device-introspect-test.c                     |  2 +-
+ tests/drive_del-test.c                             |  1 +
+ tests/io-channel-helpers.c                         |  1 -
+ tests/libqos/libqos.c                              |  1 +
+ tests/libqos/pci-pc.c                              |  2 +-
+ tests/libqtest.c                                   |  5 ++++-
+ tests/libqtest.h                                   |  2 --
+ tests/migration-test.c                             |  1 +
+ tests/migration/stress.c                           | 10 +--------
+ tests/numa-test.c                                  |  2 ++
+ tests/ptimer-test.c                                |  4 ++--
+ tests/pvpanic-test.c                               |  1 +
+ tests/q35-test.c                                   |  1 +
+ tests/qmp-test.c                                   |  2 ++
+ tests/qom-test.c                                   |  3 ++-
+ tests/tco-test.c                                   |  2 ++
+ tests/test-aio-multithread.c                       |  1 -
+ tests/test-char.c                                  |  2 +-
+ tests/test-clone-visitor.c                         |  2 --
+ tests/test-keyval.c                                |  2 ++
+ tests/test-netfilter.c                             |  1 +
+ tests/test-qapi-util.c                             |  1 -
+ tests/test-qemu-opts.c                             |  2 ++
+ tests/test-qga.c                                   |  2 ++
+ tests/test-qmp-commands.c                          |  6 ++++--
+ tests/test-qmp-event.c                             |  8 ++++---
+ tests/test-qobject-input-visitor.c                 |  7 ++++--
+ tests/test-qobject-output-visitor.c                |  9 +++++---
+ tests/test-replication.c                           |  2 ++
+ tests/test-string-input-visitor.c                  |  2 --
+ tests/test-string-output-visitor.c                 |  2 --
+ tests/test-visitor-serialization.c                 |  4 +---
+ tests/test-x86-cpuid-compat.c                      |  2 +-
+ tests/tmp105-test.c                                |  1 +
+ tests/vhost-user-test.c                            |  1 +
+ tests/virtio-net-test.c                            |  1 +
+ tests/vmgenid-test.c                               |  1 +
+ tests/wdt_ib700-test.c                             |  1 +
+ tpm.c                                              |  2 ++
+ trace/control-internal.h                           |  2 --
+ trace/control.c                                    |  1 +
+ trace/qmp.c                                        |  1 +
+ ui/cocoa.m                                         |  1 -
+ ui/console.c                                       |  4 +++-
+ ui/gtk.c                                           |  1 +
+ ui/input-legacy.c                                  |  1 -
+ ui/input.c                                         |  2 +-
+ ui/spice-core.c                                    |  6 ++----
+ ui/spice-display.c                                 |  2 +-
+ ui/vnc-palette.h                                   |  1 -
+ ui/vnc.c                                           |  4 ++--
+ ui/vnc.h                                           |  1 -
+ util/keyval.c                                      |  2 ++
+ util/qemu-config.c                                 |  2 ++
+ util/qemu-option.c                                 |  5 ++++-
+ vl.c                                               |  5 +++--
+ 382 files changed, 487 insertions(+), 407 deletions(-)
+ delete mode 100644 include/qapi/qmp/types.h
+
 --=20
 2.13.6
