@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1egmlx-00009h-TA
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:25:38 -0500
+	(envelope-from <no-reply@patchew.org>) id 1egn23-0005Ez-Mr
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:42:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1egmln-0003Ru-O4
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:25:33 -0500
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 31 Jan 2018 18:24:45 +1100
-Message-Id: <20180131072445.22783-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [RFC PATCH qemu v6] vfio-pci: Allow mmap of MSIX BAR
+	(envelope-from <no-reply@patchew.org>) id 1egn22-0001jW-Mx
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 02:42:11 -0500
+Resent-Message-Id: <E1egn22-0001jW-Mx@eggs.gnu.org>
+In-Reply-To: <20180131072445.22783-1-aik@ozlabs.ru>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151738449819.2430.18043177344228679051@272c24dfa8ec>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 30 Jan 2018 23:41:39 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH qemu v6] vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,253 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Auger Eric <eric.auger@redhat.com>
+To: aik@ozlabs.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, eric.auger@redhat.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org
 
-This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
-which tells that a region with MSIX data can be mapped entirely, i.e.
-the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
-
-With this change, all BARs are mapped in a single chunk and MSIX vectors
-are emulated on top unless the machine requests not to by defining and
-enabling a new "vfio-no-msix-emulation" property. At the moment only
-sPAPR machine does so - it prohibits MSIX emulation and does not allow
-enabling it as it does not define the "set" callback for the new property;
-the new property also does not appear in "-machine pseries,help".
-
-This change may affect machines which are using MSIX emulation and
-mapping MMIO RAM regions for DMA as previously MSIX containing BAR
-would be split in chunks aligned to the system page size and we would
-only see aligned RAM memory sections in vfio_listener_region_add/del.
-As the system page size is usually is equal or bigger than the IOMMU
-page size, vfio_dma_map() did not have a legitimate reason to fail so
-mapping failures were fatal. Note that this behaviour silently skips
-parts of BARs adjacent to the MSIX data.
-
-With this change, we map entire MSIX BAR and emulate MSIX on top of it
-so vfio_listener_region_add/del may be called with unaligned MMIO RAM
-regions and vfio_dma_map() will fail&exit on these. In order to mitigate
-this, this changes vfio_listener_region_add() not to try vfio_dma_map() if
-the memory section is not aligned to the minimal IOMMU page; an error
-is printed instead. This also treats all errors from vfio_dma_map()
-non fatal when the listener is called on the MMIO RAM region.
-vfio_listener_region_del() is adjusted accordingly.
-
-If the amount of errors printed is overwhelming, the MSIX relocation
-could be used to avoid excessive error output.
-
-This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
-for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v6:
-* dropped that stupid p2p property patch
-
-v5:
-* rebased on top of 'p2p' proposed patch
-
-v4:
-* silenced dma map errors if unaligned mapping is attempted - they are going
-to fail anyway
-
-v3:
-* vfio_listener_region_add() won't make qemu exit if failed on MMIO MR
----
- include/hw/vfio/vfio-common.h |  1 +
- linux-headers/linux/vfio.h    |  5 ++++
- hw/ppc/spapr.c                |  7 +++++
- hw/vfio/common.c              | 66 +++++++++++++++++++++++++++++++++++++++----
- hw/vfio/pci.c                 | 10 +++++++
- 5 files changed, 83 insertions(+), 6 deletions(-)
-
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9..927d600 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
-                          struct vfio_region_info **info);
- int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-                              uint32_t subtype, struct vfio_region_info **info);
-+bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
- #endif
- extern const MemoryListener vfio_prereg_listener;
- 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 4312e96..b45182e 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
- 
-+/*
-+ * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
-+ */
-+#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
-+
- /**
-  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-  *				    struct vfio_irq_info)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 32a876b..6d333e2 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2830,6 +2830,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
-     spapr->use_hotplug_event_source = value;
- }
- 
-+static bool spapr_get_msix_emulation(Object *obj, Error **errp)
-+{
-+    return true;
-+}
-+
- static char *spapr_get_resize_hpt(Object *obj, Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-@@ -2911,6 +2916,8 @@ static void spapr_instance_init(Object *obj)
-     object_property_set_description(obj, "vsmt",
-                                     "Virtual SMT: KVM behaves as if this were"
-                                     " the host's SMT mode", &error_abort);
-+    object_property_add_bool(obj, "vfio-no-msix-emulation",
-+                             spapr_get_msix_emulation, NULL, NULL);
- }
- 
- static void spapr_machine_finalizefn(Object *obj)
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 3d652c8..9100a42 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -508,6 +508,18 @@ static void vfio_listener_region_add(MemoryListener *listener,
-     }
- 
-     /* Here we assume that memory_region_is_ram(section->mr)==true */
-+    if (memory_region_is_ram_device(section->mr)) {
-+        hwaddr pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-+
-+        if ((section->offset_within_region & pgmask) ||
-+            (int128_getlo(section->size) & pgmask)) {
-+            error_report("Region %"HWADDR_PRIx"..%"HWADDR_PRIx" is not aligned to %"HWADDR_PRIx" and cannot be mapped for DMA",
-+                         section->offset_within_region,
-+                         int128_getlo(section->size),
-+                         pgmask + 1);
-+            return;
-+        }
-+    }
- 
-     vaddr = memory_region_get_ram_ptr(section->mr) +
-             section->offset_within_region +
-@@ -523,6 +535,9 @@ static void vfio_listener_region_add(MemoryListener *listener,
-         error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-                      "0x%"HWADDR_PRIx", %p) = %d (%m)",
-                      container, iova, int128_get64(llsize), vaddr, ret);
-+        if (memory_region_is_ram_device(section->mr)) {
-+            return;
-+        }
-         goto fail;
-     }
- 
-@@ -550,6 +565,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
-     hwaddr iova, end;
-     Int128 llend, llsize;
-     int ret;
-+    bool try_unmap = true;
- 
-     if (vfio_listener_skipped_section(section)) {
-         trace_vfio_listener_region_del_skip(
-@@ -602,13 +618,36 @@ static void vfio_listener_region_del(MemoryListener *listener,
- 
-     trace_vfio_listener_region_del(iova, end);
- 
--    ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-+    if (memory_region_is_ram_device(section->mr)) {
-+        hwaddr pgmask;
-+        VFIOHostDMAWindow *hostwin;
-+        bool hostwin_found;
-+
-+        hostwin_found = false;
-+        QLIST_FOREACH(hostwin, &container->hostwin_list, hostwin_next) {
-+            if (hostwin->min_iova <= iova && end <= hostwin->max_iova) {
-+                hostwin_found = true;
-+                break;
-+            }
-+        }
-+        assert(hostwin_found);
-+
-+        pgmask = (1ULL << ctz64(hostwin->iova_pgsizes)) - 1;
-+
-+        try_unmap = !(section->offset_within_region & pgmask) &&
-+            !(int128_getlo(section->size) & pgmask);
-+    }
-+
-+    if (try_unmap) {
-+        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-+        if (ret) {
-+            error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-+                         "0x%"HWADDR_PRIx") = %d (%m)",
-+                         container, iova, int128_get64(llsize), ret);
-+        }
-+    }
-+
-     memory_region_unref(section->mr);
--    if (ret) {
--        error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
--                     "0x%"HWADDR_PRIx") = %d (%m)",
--                     container, iova, int128_get64(llsize), ret);
--    }
- 
-     if (container->iommu_type == VFIO_SPAPR_TCE_v2_IOMMU) {
-         vfio_spapr_remove_window(container,
-@@ -1386,6 +1425,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-     return -ENODEV;
- }
- 
-+bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
-+{
-+    struct vfio_region_info *info = NULL;
-+    bool ret = false;
-+
-+    if (!vfio_get_region_info(vbasedev, region, &info)) {
-+        if (vfio_get_region_info_cap(info, cap_type)) {
-+            ret = true;
-+        }
-+        g_free(info);
-+    }
-+
-+    return ret;
-+}
-+
- /*
-  * Interfaces for IBM EEH (Enhanced Error Handling)
-  */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 2c71295..e23f5cf 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
-     off_t start, end;
-     VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
- 
-+    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
-+                            vdev->msix->table_bar)) {
-+        return;
-+    }
-+
-     /*
-      * We expect to find a single mmap covering the whole BAR, anything else
-      * means it's either unsupported or already setup.
-@@ -1473,6 +1478,11 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
-      */
-     memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
- 
-+    if (object_property_get_bool(OBJECT(qdev_get_machine()),
-+                                 "vfio-no-msix-emulation", NULL)) {
-+        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
-+    }
-+
-     return 0;
- }
- 
--- 
-2.11.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTMxMDcyNDQ1LjIyNzgzLTEtYWlrQG96bGFicy5ydQpTdWJqZWN0OiBb
+UWVtdS1kZXZlbF0gW1JGQyBQQVRDSCBxZW11IHY2XSB2ZmlvLXBjaTogQWxsb3cgbW1hcCBvZiBN
+U0lYIEJBUgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTg5MWU2OTY0NSB2ZmlvLXBjaTogQWxsb3cgbW1hcCBv
+ZiBNU0lYIEJBUgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiB2Zmlv
+LXBjaTogQWxsb3cgbW1hcCBvZiBNU0lYIEJBUi4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJh
+Y3RlcnMKIzgyOiBGSUxFOiBody92ZmlvL2NvbW1vbi5jOjUxNzoKKyAgICAgICAgICAgIGVycm9y
+X3JlcG9ydCgiUmVnaW9uICUiSFdBRERSX1BSSXgiLi4lIkhXQUREUl9QUkl4IiBpcyBub3QgYWxp
+Z25lZCB0byAlIkhXQUREUl9QUkl4IiBhbmQgY2Fubm90IGJlIG1hcHBlZCBmb3IgRE1BIiwKCnRv
+dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTU3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
