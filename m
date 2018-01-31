@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eglUQ-0006SV-LL
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:23 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eglUT-0006Tj-BV
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eglUN-0007Zc-45
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:22 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eglUS-0007g1-Bo
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:25 -0500
 Received: from mga12.intel.com ([192.55.52.136]:50362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eglUM-0007QP-Pg
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:19 -0500
+	id 1eglUR-0007QP-Vu
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 01:03:24 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Wed, 31 Jan 2018 14:02:23 +0800
-Message-Id: <20180131060229.9294-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v4 0/6] nvdimm: support MAP_SYNC for
- memory-backend-file
+Date: Wed, 31 Jan 2018 14:02:28 +0800
+Message-Id: <20180131060229.9294-6-haozhong.zhang@intel.com>
+In-Reply-To: <20180131060229.9294-1-haozhong.zhang@intel.com>
+References: <20180131060229.9294-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v4 5/6] hostmem: add more information in error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +28,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-files on ext4/xfs file system mounted with '-o dax').
+When there are multiple memory backends in use, including the object type
+name, ID and the property name in the error message can help users to
+locate the error.
 
-A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
-    https://patchwork.kernel.org/patch/10028151/
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Suggested-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ backends/hostmem-file.c |  9 ++++++---
+ backends/hostmem.c      | 11 +++++++----
+ 2 files changed, 13 insertions(+), 7 deletions(-)
 
-This patchset enables QEMU to use MAP_SYNC flag for memory-backend-file,
-in order to guarantee the guest write persistence to backend files
-supporting DAX.
-
-A new auto on/off option 'sync' is added to memory-backend-file:
- - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-        'share=off', QEMU will abort
- - off: never pass MAP_SYNC to mmap(2)
- - auto (default): if MAP_SYNC is supported and 'share=on', work as if
-        'sync=on'; otherwise, work as if 'sync=off'
-
-Changes in v4:
- * Add patch 1-3 to switch some functions to a single 'flags'
-   parameters. (Michael S. Tsirkin)
- * v3 patch 1-3 become v4 patch 4-6.
- * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
-   new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
- * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
-
-Changes in v3:
- * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
-   cases, and add back the retry mechanism. MAP_SYNC will be ignored
-   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
- * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
-   platforms in order to make qemu_ram_mmap() compile on those platforms.
- * Patch 2&3: include more information in error messages of
-   memory-backend in hope to help user to identify the error.
-   (Dr. David Alan Gilbert)
- * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
-
-Changes in v2:
- * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
- * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
-   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
- * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
-   to osdep.h. (Michael S. Tsirkin)
-
-
-Haozhong Zhang (6):
-  util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
-  exec: switch qemu_ram_alloc_from_{file,fd} to the 'flags' parameter
-  memory: switch memory_region_init_ram_from_file() to 'flags' parameter
-  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
-  hostmem: add more information in error messages
-  hostmem-file: add 'sync' option
-
- backends/hostmem-file.c               | 51 ++++++++++++++++++++++++++++++++---
- backends/hostmem.c                    | 11 +++++---
- docs/nvdimm.txt                       | 20 +++++++++++++-
- exec.c                                | 15 ++++++-----
- include/exec/memory.h                 | 36 +++++++++++++++++++++++--
- include/exec/ram_addr.h               | 29 ++++++++++++++++++--
- include/qemu/mmap-alloc.h             | 23 +++++++++++++++-
- include/standard-headers/linux/mman.h | 42 +++++++++++++++++++++++++++++
- memory.c                              |  8 +++---
- numa.c                                |  2 +-
- qemu-options.hx                       | 22 ++++++++++++++-
- util/mmap-alloc.c                     | 31 ++++++++++++++++++---
- util/oslib-posix.c                    |  2 +-
- 13 files changed, 261 insertions(+), 31 deletions(-)
- create mode 100644 include/standard-headers/linux/mman.h
-
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 67ecfed895..df06b547a6 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -80,7 +80,8 @@ static void set_mem_path(Object *o, const char *str, Error **errp)
+     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+ 
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(errp, "cannot change property value");
++        error_setg(errp, "cannot change property 'mem-path' of %s '%s'",
++                   object_get_typename(o), backend->id);
+         return;
+     }
+     g_free(fb->mem_path);
+@@ -100,7 +101,8 @@ static void file_memory_backend_set_share(Object *o, bool value, Error **errp)
+     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+ 
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(errp, "cannot change property value");
++        error_setg(errp, "cannot change property 'share' of %s '%s'",
++                   object_get_typename(o), backend->id);
+         return;
+     }
+     fb->share = value;
+@@ -137,7 +139,8 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+     uint64_t val;
+ 
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(&local_err, "cannot change property value");
++        error_setg(&local_err, "cannot change property '%s' of %s '%s'",
++                   name, object_get_typename(o), backend->id);
+         goto out;
+     }
+ 
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index ee2c2d5bfd..6853d19bc5 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -46,7 +46,8 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
+     uint64_t value;
+ 
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(&local_err, "cannot change property value");
++        error_setg(&local_err, "cannot change property %s of %s '%s'",
++                   name, object_get_typename(obj), backend->id);
+         goto out;
+     }
+ 
+@@ -55,8 +56,9 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
+         goto out;
+     }
+     if (!value) {
+-        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
+-                   PRIu64 "'", object_get_typename(obj), name, value);
++        error_setg(&local_err,
++                   "property '%s' of %s '%s' doesn't take value '%" PRIu64 "'",
++                   name, object_get_typename(obj), backend->id, value);
+         goto out;
+     }
+     backend->size = value;
+@@ -363,7 +365,8 @@ static void set_id(Object *o, const char *str, Error **errp)
+     HostMemoryBackend *backend = MEMORY_BACKEND(o);
+ 
+     if (backend->id) {
+-        error_setg(errp, "cannot change property value");
++        error_setg(errp, "cannot change property 'id' of %s '%s'",
++                   object_get_typename(o), backend->id);
+         return;
+     }
+     backend->id = g_strdup(str);
 -- 
 2.14.1
