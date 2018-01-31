@@ -1,43 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1egscc-0003Pd-VQ
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 08:40:24 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1egsdb-0003xC-Hk
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 08:41:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1egscT-0003JD-Fs
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 08:40:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39788)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1egscT-0003HM-6R
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 08:40:09 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0VDd4wd105666
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:40:06 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fuc88fusd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 08:40:06 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 31 Jan 2018 13:40:04 -0000
-References: <20180130133828.77336-1-borntraeger@de.ibm.com>
-	<20180130133828.77336-2-borntraeger@de.ibm.com>
-	<fb70731d-b857-8adb-0dc7-cd072a2c50b1@redhat.com>
-	<34c2cdf6-b773-61b6-64de-943cb2cf8ace@de.ibm.com>
-	<CAFEAcA9yaR2Ha4-8cSgO7dsCZaZVayyOuO7MGcQpZNa1C6K6uA@mail.gmail.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 31 Jan 2018 14:40:00 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1egsdW-0004Ab-NF
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 08:41:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1egsdW-00049a-GC
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 08:41:14 -0500
+Date: Wed, 31 Jan 2018 11:41:02 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180131134102.GI26425@localhost.localdomain>
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-6-brijesh.singh@amd.com>
+	<20180130174957.GD2536@work-vm>
+	<c60b5f53-2f50-1866-a2b9-fda8b7c2be39@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9yaR2Ha4-8cSgO7dsCZaZVayyOuO7MGcQpZNa1C6K6uA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <181748c7-c6e3-56b8-4aad-8c93cf4ebe08@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] Fix configure for s390 qemu on
- alpine and other busybox environments
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <c60b5f53-2f50-1866-a2b9-fda8b7c2be39@amd.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 05/23] target/i386: add memory
+ encryption feature cpuid support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,44 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alice Frosi <alice@linux.vnet.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 01/31/2018 01:51 PM, Peter Maydell wrote:
-> On 31 January 2018 at 12:14, Christian Borntraeger
-> <borntraeger@de.ibm.com> wrote:
->> On 01/30/2018 04:41 PM, Eric Blake wrote:
->>> On 01/30/2018 07:38 AM, Christian Borntraeger wrote:
->>>> +++ b/configure
->>>> @@ -1906,9 +1906,9 @@ int main(int argc, char *argv[]) {
->>>>  EOF
->>>>
->>>>  if compile_object ; then
->>>> -    if grep -q BiGeNdIaN $TMPO ; then
->>>> +    if strings -a $TMPO | grep -q BiGeNdIaN ; then
->>>>          bigendian="yes"
->>>> -    elif grep -q LiTtLeEnDiAn $TMPO ; then
->>>> +    elif strings -a $TMPO | grep -q LiTtLeEnDiAn ; then
->>>
->>> Yes, this is indeed a more portable way to grep binary files (it's also
->>> possible to do:
->>>
->>> tr -d '\0' < $TMPO | grep -q ...
->>>
->>> if we're worried about the availability of strings, but I don't see that
->>> being a problem if no one reports it actually failing).
->>>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
->> Peter, does that patch work on MacOS and Windows? If yes we could
->> get this patch in via the s390 tree.
-> 
-> I haven't tested but I think it should be fine. OSX provides
-> a strings binary that supports -a, and Windows cross-builds
-> so it will use the Linux strings.
-> 
-> thanks
-> -- PMM
-> 
+On Tue, Jan 30, 2018 at 03:46:45PM -0600, Brijesh Singh wrote:
+>=20
+>=20
+> On 1/30/18 11:49 AM, Dr. David Alan Gilbert wrote:
+> > * Brijesh Singh (brijesh.singh@amd.com) wrote:
+> >> AMD EPYC processors support memory encryption feature. The feature
+> >> is reported through CPUID 8000_001F[EAX].
+> >>
+> >> Fn8000_001F [EAX]:
+> >>  Bit 0   Secure Memory Encryption (SME) supported
+> >>  Bit 1   Secure Encrypted Virtualization (SEV) supported
+> >>  Bit 2   Page flush MSR supported
+> >>  Bit 3   Ecrypted State (SEV-ES) support
+> >>
+> >> when memory encryption feature is reported, CPUID 8000_001F[EBX] sho=
+uld
+> >> provide additional information regarding the feature (such as which =
+page
+> >> table bit is used to mark pages as encrypted etc). The information i=
+n EBX
+> >> and ECX may vary from one family to another hence we use the host cp=
+uid
+> >> to populate the EBX information.
+> > That's going to make it interesting for migration.  If the guest need=
+s
+> > to know that C-bit position then you presumably can't migrate between
+> > those two host types, but we wouldn't have anything that currently
+> > stops us.
+> > We already have similar problems with variations in physical address
+> > size but normally get away with that, especially on smaller VMs.
+>=20
+> Dave,
+>=20
+> While building the page tables guest need to know the C-bit position.
+> The C-bit position in the guest is same as C-bit position on the host.
+> For migration case, we should be able to migrate SEV guest on same host
+> type (i.e all EPYC and Ryzen CPUs are based on family 17 and we should
+> be okay migrating the SEV guests among those host types).=A0 Since C-bi=
+t
+> position is not fixed hence migrating to different host family will be
+> an issue.
 
-Conny, can you take this patch via s390-next?
+Thanks for the explanation.  If this affects ability to migrate,
+you need to either:
+a) not report the "sev" property on
+   query-cpu-model-expansion type=3Dstatic output (because the
+   feature is not migration-safe); or
+b) make the C-bit position configurable, and let management
+   explicitly specify it.  In this case, you need to validate the
+   configured C-bit position and prevent the VM from running if
+   it doesn't match the host.  This is more work, but would make
+   the feature migration-safe and more useful for management
+   software.
+
+Option (b) is preferred because it lets management software
+ensure the VM is migratable to a host before starting migration.
+
+There was a very recent discussion about migration-safe features
+and the problems with relaying host CPUID data directly to the
+guest.  Look for the "i386: Add Intel Processor Trace feature
+support" threads in qemu-devel for more info.
+
+I'm looking for a way to document these rules concisely so people
+touching the CPUID code are aware of the available options.
+
+--=20
+Eduardo
