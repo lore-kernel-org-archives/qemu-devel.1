@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egtJw-0000Xq-M7
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:25:05 -0500
+	(envelope-from <kwolf@redhat.com>) id 1egtRQ-000322-1D
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:32:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egtJr-0004Nz-Rp
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:25:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1egtJr-0004Mw-JA
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:24:59 -0500
-References: <20180131032800.25578-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5c8b634a-0edd-52af-3f9f-aef0205526c8@redhat.com>
-Date: Wed, 31 Jan 2018 08:24:24 -0600
+	(envelope-from <kwolf@redhat.com>) id 1egtRM-00020m-2v
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 09:32:48 -0500
+Date: Wed, 31 Jan 2018 15:31:27 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180131143127.GC3598@localhost.localdomain>
+References: <20180130153835.7372-1-stefanha@redhat.com>
+	<20180130165456.GD4503@localhost.localdomain>
+	<20180131135628.GB23336@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180131032800.25578-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ulYOmwnXuNLQ817LfBNVsnT86WsLwgwge"
-Subject: Re: [Qemu-devel] [PATCH v2] docs: Add docs/devel/testing.rst
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="CdrF4e02JqNVZeln"
+Content-Disposition: inline
+In-Reply-To: <20180131135628.GB23336@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] vl: pause vcpus before stopping iothreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +25,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, thuth@redhat.com, berrange@redhat.com, f4bug@amsat.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, armbru@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ulYOmwnXuNLQ817LfBNVsnT86WsLwgwge
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, thuth@redhat.com, berrange@redhat.com, f4bug@amsat.org,
- mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
- alex.bennee@linaro.org, armbru@redhat.com
-Message-ID: <5c8b634a-0edd-52af-3f9f-aef0205526c8@redhat.com>
-Subject: Re: [PATCH v2] docs: Add docs/devel/testing.rst
-References: <20180131032800.25578-1-famz@redhat.com>
-In-Reply-To: <20180131032800.25578-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--CdrF4e02JqNVZeln
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 01/30/2018 09:28 PM, Fam Zheng wrote:
-> To make our efforts on QEMU testing easier to consume by contributors,
-> let's add a document. For example, Patchew reports build errors on
-> patches that should be relatively easy to reproduce with a few steps, a=
-nd
-> it is much nicer if there is such a documentation that it can refer to.=
-
+Am 31.01.2018 um 14:56 hat Stefan Hajnoczi geschrieben:
+> On Tue, Jan 30, 2018 at 05:54:56PM +0100, Kevin Wolf wrote:
+> > Am 30.01.2018 um 16:38 hat Stefan Hajnoczi geschrieben:
+> > > Commit dce8921b2baaf95974af8176406881872067adfa ("iothread: Stop thre=
+ads
+> > > before main() quits") introduced iothread_stop_all() to avoid the
+> > > following virtio-scsi assertion failure:
+> > >=20
+> > >   assert(blk_get_aio_context(d->conf.blk) =3D=3D s->ctx);
+> > >=20
+> > > Back then the assertion failed because when bdrv_close_all() made
+> > > d->conf.blk NULL, blk_get_aio_context() returned the global AioContext
+> > > instead of s->ctx.
+> > >=20
+> > > The same assertion can still fail today when vcpus submit new I/O
+> > > requests after iothread_stop_all() has moved the BDS to the global
+> > > AioContext.
+> > >=20
+> > > This patch hardens the iothread_stop_all() approach by pausing vcpus
+> > > before calling iothread_stop_all().
+> > >=20
+> > > Note that the assertion failure is a race condition.  It is not possi=
+ble
+> > > to reproduce it reliably.
+> > >=20
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >=20
+> > Does pausing the vcpus actually make sure that the iothread isn't active
+> > any more, or do we still have a small window where the vcpu is already
+> > stopped, but the iothread is still processing requests?
+> >=20
+> > Essentially, I think the bdrv_set_aio_context() in iothread_stop_all()
+> > does either not have any effect, or if it does have an effect, it's
+> > wrong. You can't just force an in-use BDS into a different AioContext
+> > when the user that set the AioContext is still there.
+> >=20
+> > At the very least, do we need a blk_drain_all() before stopping the
+> > iothreads?
 >=20
-> This focuses on how to run existing tests and how to write new test
-> cases, without going into the frameworks themselves.
+> bdrv_set_aio_context() contains aio_disable_external() +
+> bdrv_parent_drained_begin() + bdrv_drain(bs).  This should complete all
+> requests, even those sitting in a descriptor ring that hasn't been
+> processed yet.
+
+Ah, yes. Not very obvious, so I wouldn't mind a comment, but you can
+have my R-b either way then:
+
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+
+> > It would still just be a hack, the proper way seens to be
+> > getting the virtio device out of dataplane mode so that the iothread is
+> > actually unused and doesn't just happen to not process something at the
+> > moment.
 >=20
-> The VM based testing section is moved from tests/vm/README which now
-> is a single line pointing to the new doc.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
->=20
+> Agreed, the existing approach is a hack.  I'm not keen on implementing
+> a proper device<->IOThread detach operation because vl.c:main() seems to
+> be the only place that needs it - and it can get away with just
+> quiescing requests and the IOThread instead.
 
-> +Testing with "make check"
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> +
-> +The "make check" testing family includes most of the C based tests in =
-QEMU. For
-> +a quick help, run ``make check-help`` from the source tree.
-> +
-> +The usual way to run these tests is:
-> +
-> +.. code::
-> +
-> +  make check
-> +
-> +which includes QAPI schema tests, unit tests, and QTests. Different su=
-b-types
-> +of "make check" testings will be explained below.
+As long as we don't want to switch devices between iothreads at runtime
+(and create/delete iothreads over QMP), we probably won't really need
+it, yes.
 
-s/testings/tests/ or even s/testings//
+Kevin
 
-
-> +Since unit tests don't require environment variables, the simplest way=
- to debug
-> +a unit test failure is often directly invoking it or even running it u=
-nder
-> +``gdb``. However there can still be differences in behavior between ``=
-make``
-> +invocations and your manual run, due to ``$MALLOC_PERTURB_`` environme=
-nt
-> +variable (which affects memory reclaimation and catches invalid pointe=
-rs
-
-s/reclaimation/reclamation/
-
-
-> +  $ sudo groupadd docker
-> +  $ sudo usermod $USER -G docker
-> +  $ sudo chown :docker /var/run/docker.sock
-> +
-> +Note that any one of above configurations makes it possible for the us=
-er to
-> +exploit the whole host with Docker bind mounting or other privileged
-> +operations.  So only do it on developement machines.
-
-s/developement/development/
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ulYOmwnXuNLQ817LfBNVsnT86WsLwgwge
+--CdrF4e02JqNVZeln
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpx0ZgACgkQp6FrSiUn
-Q2rFzwgAnjG6dCAwZHrSCpAEnqMHLliUfbRxDCBlaWXnMD3UrJjKySyZAXk+/8St
-OEjliNnr3yKCKqjE9iPKmeo2uvo7P+h8tm7zm8lRrMCAM4vXJjOUHAsJh5PyYNu0
-K97OmvtLQDHdNJWVlpRRuo63zXG+PjxNw5XvPHE+sKCRUc13FndRBVoG9jTEt/nD
-ktyD71Fnn61p5eFk65pfBcbJRMWiDgPyYC4NttTXQ6XpQq8OwnpBWoWIKSVLNUOF
-L5AazpClfTsgHYepjHHdGz+lMonOPBKEAOZPjrKDwnde0xE4KppRY3zqb26ZYaEF
-Of24Ti6V2g86Md8tGsV3LN9P9rUWyQ==
-=AHpS
+iQIcBAEBAgAGBQJacdM+AAoJEH8JsnLIjy/WMzkP/2xbybgt7GN5feQSLh7SfOay
+gUmpc1BBixdnKeWZN1QUnhPqabKusGeNgfBHqY0P3THFcNlFi1e2bNm93n/xzZYv
+xImyrgv9CLmH57HDisgKErC9s0j6X2qS2jd4xqejoH6HJaQjRxrOuybBYiJit8A6
+2SASMsBOeaLPyQAElJ/D1ZqWJFersw7+j6vYaOsMNmClBRDc3UMKQ/oLTOPzSPvT
+NWErWR2UMoLWDjlkz3xtEG4n+a6fV8cKaUfpYOM+HAmRBdSV65ww8lQgATBOwoed
+yCw7beoSrFtNBey+0ofYmLIueQ6+s/3UZK8As6g1JWFDWSM96rQLORvxEmYYXl1J
+8LG3FoM0i+7uHUOnyH+6wmyqV04JXzF0RKWryRyw3TMpWck4Px4MhDKcSF6Lk1Ex
+vd3A8xk857SRs+oi8zUX8A9RLjil2BZ/drSsvzEU/W++WBcBZv4oj7YAIW0kXlup
+Z9XJYpuYiQD5+N2bWY9r9853kC1pM3g9cF5fQMXxWB8n4mbMLnAIKVAY+yb6H2IL
+WvESX+qPLuJFushkiGtZHvbaHszwfgkr1qnBF872g5alt/gGBiPG9CWWVkNJNGUY
+yuObKRdhvTWCuMg213Zn9xrW267MxPAwzZWgqHuSUeG8w9DsTJglPS1vrJsNDhuE
+DwBa0HSASKYGEFT9J/ag
+=sZbk
 -----END PGP SIGNATURE-----
 
---ulYOmwnXuNLQ817LfBNVsnT86WsLwgwge--
+--CdrF4e02JqNVZeln--
