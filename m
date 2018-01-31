@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1egwx3-0005xJ-Lz
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:42 -0500
+	(envelope-from <cohuck@redhat.com>) id 1egwxF-00065g-BR
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1egwx2-0002Jd-OQ
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:41 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36991)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1egwx2-0002IK-G3
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:40 -0500
-Received: by mail-lf0-x243.google.com with SMTP id 63so22144391lfv.4
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 10:17:40 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <8942a41a-a924-f626-3613-3c74b9db0da6@redhat.com>
-References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-	<8942a41a-a924-f626-3613-3c74b9db0da6@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 31 Jan 2018 10:17:08 -0800
-Message-ID: <CAKmqyKN+VD9NV6oy0USJ0ChLXodw3k7J4uRqyW41+iSRzr4G_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] MTTCG External Halt
+	(envelope-from <cohuck@redhat.com>) id 1egwxC-0002S5-5R
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:17:53 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Wed, 31 Jan 2018 19:17:40 +0100
+Message-Id: <20180131181742.2037-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] s390x: support zpci in tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +17,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, agraf@suse.de, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-On Wed, Jan 31, 2018 at 9:13 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 03/01/2018 17:10, Alistair Francis wrote:
->> Hey guys, I'm super stuck with an ugly MTTCG issue and was wondering
->> if anyone had any ideas.
->>
->> In the Xilinx fork of QEMU (based on 2.11) we have a way for CPUs to
->> halt other CPUs. This is used for example when the power control unit
->> halts the ARM A53s. To do this we have internal GPIO signals that end
->> up calling a function that basically does this:
->>
->> To halt:
->>     cpu->halted = true;
->>     cpu_interrupt(cpu, CPU_INTERRUPT_HALT);
->
-> cpu->halted = true should not be needed here.  It will be set by
-> cpu_handle_interrupt when processing CPU_INTERRUPT_HALT.
->
->> To un-halt
->>     cpu->halted = false;
->>     cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
->
-> cpu->halted = false likewise should not be needed here, but you cannot
-> just clear CPU_INTERRUPT_HALT either.  You need to set a *different*
-> interrupt request bit (the dummy CPU_INTERRUPT_EXITTB will do) and
-> cpu_handle_halt will clear cpu->halted.
+<blurb from last cover letter>
+This patch set (available at git://github.com/cohuck/qemu pci-tcg)
+wires up zpci under tcg. A guest started with
 
-The problem with that is that I hit this assert for ARM CPUs:
+qemu-system-s390x -M s390-ccw-virtio,accel=tcg -cpu qemu,zpci=on -device virtio-net-pci (...)
 
-qemu-system-aarch64: ./target/arm/cpu.h:1446: arm_el_is_aa64:
-Assertion `el >= 1 && el <= 3' failed.
+and a 4.15 kernel in the guest (needed because the requirement for ais
+was dropped with
 
-Alistair
+commit 48070c73058be6de9c0d754d441ed7092dfc8f12
+Author: Christian Borntraeger <borntraeger@de.ibm.com>
+Date:   Mon Oct 30 14:38:58 2017 +0100
 
->
-> Paolo
->
->> We also have the standard ARM WFI (Wait For Interrupt) implementation
->> in op_helper.c:
->>     cs->halted = 1;
->>     cs->exception_index = EXCP_HLT;
->>     cpu_loop_exit(cs);
->>
->> Before MTTCG this used to work great, but now either we end up with
->> the guest Linux complaining about CPU stalls or we hit:
->> ERROR:/scratch/alistai/master-qemu/cpus.c:1516:qemu_tcg_cpu_thread_fn:
->> assertion failed: (cpu->halted)
->>
->> If I remove the instances of manually setting cpu->halted then I don't
->> see the asserts(), but the the WFI instruction doesn't work correctly.
->> So it seems like setting the halted status externally from the CPU
->> causes the issue. I have tried setting it inside a lock, using atomic
->> operations and running the setter async on the CPU, but nothing works.
->>
->> Any chance any one has some insight into a way to externally set a
->> vCPU as halted/un-halted?
->>
->> Thanks,
->> Alistair
->>
->
+    s390/pci: do not require AIS facility
+
+and we don't have a working ais with tcg yet), I get sensible output
+out of lspci.
+</blurb>
+
+Looks much nicer now after implementing feedback from David (thanks!)
+
+Changes RFC->v2:
+- no need to check for the zpci feature in the helpers
+- SIC does not set a condition code
+- SIC also should not depend on zpci
+- use tcg magic to improve the code in translate.c
+- clear zpci feature from supported set for !CONFIG_PCI
+
+Cornelia Huck (2):
+  s390x/tcg: wire up pci instructions
+  s390x/cpumodel: allow zpci features in qemu model
+
+ target/s390x/cpu_models.c   |   6 +++
+ target/s390x/gen-features.c |   3 ++
+ target/s390x/helper.h       |   9 ++++
+ target/s390x/insn-data.def  |  15 ++++++
+ target/s390x/misc_helper.c  | 109 ++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c    | 101 ++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 243 insertions(+)
+
+-- 
+2.13.6
