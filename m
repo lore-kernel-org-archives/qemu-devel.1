@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egw5P-0004pg-9O
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:21 -0500
+	(envelope-from <armbru@redhat.com>) id 1egw5a-0004xE-AZ
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1egw5K-0001nn-S8
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35834)
+	(envelope-from <armbru@redhat.com>) id 1egw5W-0001sU-8t
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egw5K-0001ms-J7
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:10 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1egw5W-0001sD-2P
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:22:22 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180119050906.18930-1-aik@ozlabs.ru>
-Date: Wed, 31 Jan 2018 18:22:00 +0100
-In-Reply-To: <20180119050906.18930-1-aik@ozlabs.ru> (Alexey Kardashevskiy's
-	message of "Fri, 19 Jan 2018 16:09:06 +1100")
-Message-ID: <871si6vt8n.fsf@dusky.pond.sub.org>
+	<20180119051926.GI30352@umbus.fritz.box>
+	<6a3fac69-c1e5-36cf-4781-5bb82b890efa@ozlabs.ru>
+	<1516372482.3278.29.camel@redhat.com>
+	<1516702111.31897.2.camel@redhat.com> <20180123112025.GI11419@umbus>
+	<1516709019.31897.4.camel@redhat.com> <20180123124922.GB14832@umbus>
+	<52a52f21-2946-b004-17be-53178ae60a08@ozlabs.ru>
+Date: Wed, 31 Jan 2018 18:22:19 +0100
+In-Reply-To: <52a52f21-2946-b004-17be-53178ae60a08@ozlabs.ru> (Alexey
+	Kardashevskiy's message of "Wed, 31 Jan 2018 20:03:21 +1100")
+Message-ID: <87wozyueno.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
@@ -28,165 +34,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Andrea Bolognani <abologna@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
 Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 
-> There is already 'device-list-properties' which does most of the job,
-> however it does not handle everything returned by qom-list-types such
-> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+> On 23/01/18 23:49, David Gibson wrote:
+>> On Tue, Jan 23, 2018 at 01:03:39PM +0100, Andrea Bolognani wrote:
+>>> On Tue, 2018-01-23 at 22:20 +1100, David Gibson wrote:
+>>>>> David, I know you're busy with linux.conf.au, but it would be
+>>>>> really helpful if you could carve out five minutes to look over
+>>>>> Alexey's proposal again, with my reply above in mind, and let us
+>>>>> know whether it looks a reasonable design. Doesn't have to be a
+>>>>> review, just a quick feedback on the high-level idea.
+>>>>
+>>>> It looks ok, I think, but I don't think I'm really the right person to
+>>>> ask.  I do wonder if creating a throwaway instance could cause
+>>>> trouble, especially for something like machine that might well have
+>>>> gotten away with having global side-effects in the past.  I think we
+>>>> need to talk with someone who knows more about qom and qapi - Markus
+>>>> seems the obvious choice.
+>>>
+>>> Good point. CC'ing Markus to try and grab his attention :)
+>> 
+>> It's also occurred to me that making a spapr specific approach to this
+>> might not be quite as horrible as I initially thought.  The
+>> capabilities table is global (and immutable) so coding up a
+>> "get-spapr-caps" qapi entry point which encodes the stuff there into
+>> json giving the names and allowed values of each cap would be fairly
+>> straightforward.
+>> 
+>> Accurately retreiving default values would be trickier, not sure if
+>> that's important or not.
 >
-> This adds a new qom-list-properties command which prints properties
-> of a specific class and its instance. It is pretty much a simplified copy
-> of the device-list-properties handler.
 >
-> Since it creates an object instance, device properties should appear
-> in the output as they are copied to QOM properties at the instance_init
-> hook.
 >
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-Related: qom-list, which lists "any properties of a object given a path
-in the object model."  qom-list-properties takes a type name, which
-qom-list takes the path to an instance.  In other words,
-qom-list-properties is like instantiate with default configuration and
-without realizing + qom-list + destroy.
-
-We need to instantiate because QOM properties are dynamic: they aren't
-specified by data (which qom-list-properties could simply read), they
-are created by (instantiation) code (which qom-list-properties has to
-run).
-
-Properties created only after instantiation (by realize, perhaps) aren't
-visible in qom-list-properties.  Do such properties exist?
-
-Properties created only in non-default configuration aren't visible
-either.  Such properties have to exist, or else dynamic property
-creation would be idiotic.
-
-Likewise for properties created differently (say with a different type)
-in non-default configuration.  We can hope that no such beasts exist.
-Since properties get created by code, and code can do anything, we're
-reduced to hope.  Data is so much easier to reason about than code.
-
-Three building blocks: instantiate, qom-list, destroy.  Do we want the
-building blocks, or do we want their combination qom-list-properties?
-
-> ---
+> So, do we want to push it further? Markus has not reacted, added Paolo.
 >
-> I am missing the point of make_device_property_info().
-> qmp_device_list_properties() creates the instance which copies everything
-> to QOM properties hashtable and commenting out the do{}while() in
-> make_device_property_info() does not seem to change a thing, what case
-> am I missing here?
+> http://patchwork.ozlabs.org/patch/863325/
 
-git-blame points to Stefan.  Stefan, can you help?
-
-> ---
->  qapi-schema.json | 29 +++++++++++++++++++++++++++++
->  qmp.c            | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 81 insertions(+)
->
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 5c06745..9d73501 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1455,6 +1455,35 @@
->    'returns': [ 'DevicePropertyInfo' ] }
->  
->  ##
-> +# @QOMPropertyInfo:
-> +#
-> +# Information about object properties.
-> +#
-> +# @name: the name of the property
-> +# @type: the typename of the property
-> +# @description: if specified, the description of the property.
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'QOMPropertyInfo',
-> +  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
-> +
-> +##
-> +# @qom-list-properties:
-> +#
-> +# List properties associated with a QOM object.
-> +#
-> +# @typename: the type name of an object
-> +#
-> +# Returns: a list of QOMPropertyInfo describing object properties
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'command': 'qom-list-properties',
-> +  'data': { 'typename': 'str'},
-> +  'returns': [ 'QOMPropertyInfo' ] }
-> +
-> +##
->  # @xen-set-global-dirty-log:
->  #
->  # Enable or disable the global dirty log mode.
-> diff --git a/qmp.c b/qmp.c
-> index 52cfd2d..20cb662 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -574,6 +574,58 @@ DevicePropertyInfoList *qmp_device_list_properties(const char *typename,
->      return prop_list;
->  }
->  
-> +QOMPropertyInfoList *qmp_qom_list_properties(const char *typename,
-> +                                             Error **errp)
-> +{
-> +    ObjectClass *klass;
-> +    Object *obj;
-> +    ObjectProperty *prop;
-> +    ObjectPropertyIterator iter;
-> +    QOMPropertyInfoList *prop_list = NULL;
-> +
-> +    klass = object_class_by_name(typename);
-> +    if (klass == NULL) {
-> +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-> +                  "Class '%s' not found", typename);
-> +        return NULL;
-> +    }
-> +
-> +    klass = object_class_dynamic_cast(klass, TYPE_OBJECT);
-> +    if (klass == NULL) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename", TYPE_OBJECT);
-> +        return NULL;
-> +    }
-> +
-> +    if (object_class_is_abstract(klass)) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "typename",
-> +                   "non-abstract class");
-> +        return NULL;
-> +    }
-> +
-> +    obj = object_new(typename);
-> +
-> +    object_property_iter_init(&iter, obj);
-> +    while ((prop = object_property_iter_next(&iter))) {
-> +        QOMPropertyInfo *info;
-> +        QOMPropertyInfoList *entry;
-> +
-> +        info = g_malloc0(sizeof(*info));
-> +        info->name = g_strdup(prop->name);
-> +        info->type = g_strdup(prop->type);
-> +        info->has_description = !!prop->description;
-> +        info->description = g_strdup(prop->description);
-> +
-> +        entry = g_malloc0(sizeof(*entry));
-> +        entry->value = info;
-> +        entry->next = prop_list;
-> +        prop_list = entry;
-> +    }
-> +
-> +    object_unref(obj);
-> +
-> +    return prop_list;
-> +}
-> +
->  CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
->  {
->      return arch_query_cpu_definitions(errp);
+I now have.  Sorry for the long delay.
