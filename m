@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egxC3-0004rQ-95
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:33:15 -0500
+	(envelope-from <jsnow@redhat.com>) id 1egxED-0005wX-8A
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:35:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1egxBy-0003BA-JH
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:33:11 -0500
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
-	<7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
-	<2e58f0a9-7db4-b562-e1d0-b8c712a67b21@virtuozzo.com>
-	<4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cfcdb124-b343-ae2f-726d-5b084c9b86bb@redhat.com>
-Date: Wed, 31 Jan 2018 12:32:27 -0600
+	(envelope-from <jsnow@redhat.com>) id 1egxE9-0004Ow-9P
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:35:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35114)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1egxE9-0004On-1T
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 13:35:21 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5188BC05FEC2
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 18:35:20 +0000 (UTC)
+References: <20180131053318.13109-1-famz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <585d73f5-859a-c5d8-9f40-bf3abcccad77@redhat.com>
+Date: Wed, 31 Jan 2018 13:35:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0"
-Subject: Re: [Qemu-devel] [PATCH v7 8/9] qcow2: skip writing zero buffers to
- empty COW areas
+In-Reply-To: <20180131053318.13109-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Add a git-publish configuration file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +33,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com, berto@igalia.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Anton Nefedov
- <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com,
- berto@igalia.com
-Message-ID: <cfcdb124-b343-ae2f-726d-5b084c9b86bb@redhat.com>
-Subject: Re: [PATCH v7 8/9] qcow2: skip writing zero buffers to empty COW
- areas
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1516297747-107232-9-git-send-email-anton.nefedov@virtuozzo.com>
- <7b84e8fe-2141-5609-3f86-1890fc314b6d@redhat.com>
- <2e58f0a9-7db4-b562-e1d0-b8c712a67b21@virtuozzo.com>
- <4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
-In-Reply-To: <4b7846c3-bec4-b1a0-50e3-58aa337028ac@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/31/2018 11:40 AM, Max Reitz wrote:
-
->> Maybe it's good enough to cover these cases:
->> =C2=A01. no backing
->> =C2=A02. beyond bdrv_getlength() in backing
->> =C2=A03. unallocated in backing qcow2 (covers 'beyond bdrv_getlength()=
-
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 in backing->file')
->>
->> 1 & 2 are easy to check;
->=20
-> Not sure how useful 2 is, though.  (I don't know.  I always hear about
-> people wanting to optimize for such a case where a backing file is
-> shorter than the overlay, but I can't imagine a real use case for that.=
-)
-
-I can; here's what's happened to me personally.  I created an image, and
-took internal snapshots (yeah, I know those aren't in fashion these
-days, but this was long ago).  Later, I ran out of space.  I wanted to
-resize the image, but am not convinced whether resizing the image will
-play nicely with the internal snapshots (in fact, I don't recall
-off-hand whether this was something we prevented in the past and now
-support, or if it is still unsupported now...) - so the easiest way is
-to create a larger overlay image.
-
->=20
->> 3: if that's not too hacky maybe we can do the bdrv_is_allocated() che=
-ck
->> for qcow2 exclusively and if there is raw (or any other format) backin=
-g
->> image - do the COW
->=20
-> Yes, well, it seems useful in principle...  But it would require genera=
-l
-> block layer work indeed.  Maybe a new flag for bdrv_block_status*() tha=
-t
-> says only to look into the format layer?
-
-Maybe indeed - but first I want my byte-based block_status stuff to land =
-;)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com
 
 
---MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 01/31/2018 12:33 AM, Fam Zheng wrote:
+> git-publish [1] is a convenient tool to send patches and has been
+> popular among QEMU developers.  Recently it has been made available in
+> Fedora official repo thanks to Stefan's work.
+> 
+> One nice feature of the tool is a per-project configuration with
+> profiles, especially in which the cccmd option is a handy method to
+> create the Cc list.
+> 
+> [1]: https://github.com/stefanha/git-publish
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  .gitpublish | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 57 insertions(+)
+>  create mode 100644 .gitpublish
+> 
+> diff --git a/.gitpublish b/.gitpublish
+> new file mode 100644
+> index 0000000000..2099c1520f
+> --- /dev/null
+> +++ b/.gitpublish
+> @@ -0,0 +1,57 @@
+> +#
+> +# Common git-publish profiles that can be used to send patches to QEMU upstream.
+> +#
+> +# See https://github.com/stefanha/git-publish for more information
+> +#
+> +[gitpublishprofile "qemu"]
+> +base = master
+> +prefix = PATCH
+> +to = qemu-devel@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "qemu-rfc"]
+> +base = master
+> +prefix = RFC PATCH
+> +to = qemu-devel@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "qemu-stable"]
+> +base = master
+> +prefix = PATCH
+> +to = qemu-devel@nongnu.org
+> +cc = qemu-stable@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "qemu-trivial"]
+> +base = master
+> +prefix = PATCH
+> +to = qemu-devel@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "qemu-block"]
+> +base = master
+> +prefix = PATCH
+> +to = qemu-devel@nongnu.org
+> +cc = qemu-block@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "qemu-arm"]
+> +base = master
+> +prefix = PATCH
+> +to = qemu-devel@nongnu.org
+> +cc = qemu-arm@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "qemu-s390"]
+> +base = master
+> +prefix = PATCH
+> +to = qemu-devel@nongnu.org
+> +cc = qemu-s390@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "qemu-ppc"]
+> +base = master
+> +prefix = PATCH
+> +to = qemu-devel@nongnu.org
+> +cc = qemu-pcc@nongnu.org
+> +cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpyC7sACgkQp6FrSiUn
-Q2qHZwgAmuVnZ2PRsMfMF7xsd+ozP2kxc10/nrO7rZ3cyhK2uR1GuQzGagaEZAn6
-CV2QRQ9hkjfpD3vAutCKzvgijDGbjZNbwEHmjy69TiMmZbNAaHU5DHsMkwwzSB4C
-GPugx+Vi/vtLB8jKnS1jQzGW6GDWiDBBofswElOfDg2bUmbzwsBK8mAE9MLu8tsM
-AP3gak5sjFEVeOF833V8AaB5U4qhRePb498M8YRN7/rrD8iIO1bV1qO0tWdQqANf
-2rYdCUwWz2+a4uoHb6h00gon+hTZ8DGQHdcpM2Ro/y/zHqq9Rx2xo+dMbT4HbiJS
-3bE0xKCrlcHevuIg8N7qlqg7KHZPJA==
-=cToS
------END PGP SIGNATURE-----
-
---MdDCa1m1AuDmJVXhKrSijv8ghM2OAOqU0--
+Awesome!!
