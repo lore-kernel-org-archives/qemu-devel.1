@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1egvwv-0001kz-GE
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:13:30 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egw3m-0003u7-Ht
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:20:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1egvwq-00037Z-O3
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:13:29 -0500
-Received: from mail-wr0-f172.google.com ([209.85.128.172]:34360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1egvwq-00035i-Gz
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:13:24 -0500
-Received: by mail-wr0-f172.google.com with SMTP id 36so15835727wrh.1
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 09:13:23 -0800 (PST)
-References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8942a41a-a924-f626-3613-3c74b9db0da6@redhat.com>
-Date: Wed, 31 Jan 2018 12:13:19 -0500
+	(envelope-from <mreitz@redhat.com>) id 1egw3l-000135-Oi
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 12:20:34 -0500
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1516297747-107232-2-git-send-email-anton.nefedov@virtuozzo.com>
+	<3f0a7d0a-cc3b-7d24-8539-74271c7b956d@redhat.com>
+	<563acc14-1b0a-94d5-a12a-67640929e1ec@redhat.com>
+	<f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e349960e-686c-a48e-f6a1-c4857ff58a64@redhat.com>
+Date: Wed, 31 Jan 2018 18:20:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] MTTCG External Halt
+In-Reply-To: <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="icVesgj1uqWZiquELlvQV1qGNyayAawF8"
+Subject: Re: [Qemu-devel] [PATCH v7 1/9] mirror: inherit supported
+ write/zero flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com, berto@igalia.com
 
-On 03/01/2018 17:10, Alistair Francis wrote:
-> Hey guys, I'm super stuck with an ugly MTTCG issue and was wondering
-> if anyone had any ideas.
-> 
-> In the Xilinx fork of QEMU (based on 2.11) we have a way for CPUs to
-> halt other CPUs. This is used for example when the power control unit
-> halts the ARM A53s. To do this we have internal GPIO signals that end
-> up calling a function that basically does this:
-> 
-> To halt:
->     cpu->halted = true;
->     cpu_interrupt(cpu, CPU_INTERRUPT_HALT);
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--icVesgj1uqWZiquELlvQV1qGNyayAawF8
+From: Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, den@virtuozzo.com,
+ berto@igalia.com
+Message-ID: <e349960e-686c-a48e-f6a1-c4857ff58a64@redhat.com>
+Subject: Re: [PATCH v7 1/9] mirror: inherit supported write/zero flags
+References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1516297747-107232-2-git-send-email-anton.nefedov@virtuozzo.com>
+ <3f0a7d0a-cc3b-7d24-8539-74271c7b956d@redhat.com>
+ <563acc14-1b0a-94d5-a12a-67640929e1ec@redhat.com>
+ <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+In-Reply-To: <f591d261-108e-9e35-f021-b5934c278b23@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-cpu->halted = true should not be needed here.  It will be set by
-cpu_handle_interrupt when processing CPU_INTERRUPT_HALT.
+On 2018-01-30 13:15, Anton Nefedov wrote:
+>=20
+>=20
+> On 29/1/2018 10:26 PM, Eric Blake wrote:
+>> On 01/29/2018 01:21 PM, Max Reitz wrote:
+>>> On 2018-01-18 18:48, Anton Nefedov wrote:
+>>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>>> ---
+>>>> =C2=A0 block/mirror.c | 5 +++++
+>>>> =C2=A0 1 file changed, 5 insertions(+)
+>>>>
+>>>> diff --git a/block/mirror.c b/block/mirror.c
+>>>> index c9badc1..d18ec65 100644
+>>>> --- a/block/mirror.c
+>>>> +++ b/block/mirror.c
+>>>> @@ -1064,6 +1064,11 @@ static void
+>>>> bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_refresh_filename(bs->backing->bs=
+);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pstrcpy(bs->exact_filename, sizeof(bs=
+->exact_filename),
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 bs->backing->bs->filename);
+>>>> +=C2=A0=C2=A0=C2=A0 bs->supported_write_flags =3D BDRV_REQ_FUA &
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->backing->bs->support=
+ed_write_flags;
+>>>> +=C2=A0=C2=A0=C2=A0 bs->supported_zero_flags =3D
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (BDRV_REQ_FUA | BDRV_REQ=
+_MAY_UNMAP) &
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->backing->bs->support=
+ed_zero_flags;
+>>>> =C2=A0 }
+>>>> =C2=A0 =C2=A0 static void bdrv_mirror_top_close(BlockDriverState *bs=
+)
+>>>
+>>> Fundamentally OK, but why is this in *_refresh_filename()?
+>>
+>> Indeed, I missed that (or maybe it got moved during a botched rebase?)=
+=2E
+>> For comparison, blkdebug sets it during blkdebug_open(), and nbd sets =
+it
+>> during nbd_client_init() (called during nbd_open()).
+>>
+>=20
+> We need a backing bs here and I believe it's not generally set at the
+> time of .bdrv_open().
 
-> To un-halt
->     cpu->halted = false;
->     cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
+Well, but *_refresh_filename() is just wrong.
 
-cpu->halted = false likewise should not be needed here, but you cannot
-just clear CPU_INTERRUPT_HALT either.  You need to set a *different*
-interrupt request bit (the dummy CPU_INTERRUPT_EXITTB will do) and
-cpu_handle_halt will clear cpu->halted.
+This driver doesn't have .bdrv_open() at all, and we create it fully
+manually in mirror_start_job() anyway (as Eric has said).  Therefore, we
+can just do this right after bdrv_append() there has succeeded.
 
-Paolo
+Max
 
-> We also have the standard ARM WFI (Wait For Interrupt) implementation
-> in op_helper.c:
->     cs->halted = 1;
->     cs->exception_index = EXCP_HLT;
->     cpu_loop_exit(cs);
-> 
-> Before MTTCG this used to work great, but now either we end up with
-> the guest Linux complaining about CPU stalls or we hit:
-> ERROR:/scratch/alistai/master-qemu/cpus.c:1516:qemu_tcg_cpu_thread_fn:
-> assertion failed: (cpu->halted)
-> 
-> If I remove the instances of manually setting cpu->halted then I don't
-> see the asserts(), but the the WFI instruction doesn't work correctly.
-> So it seems like setting the halted status externally from the CPU
-> causes the issue. I have tried setting it inside a lock, using atomic
-> operations and running the setter async on the CPU, but nothing works.
-> 
-> Any chance any one has some insight into a way to externally set a
-> vCPU as halted/un-halted?
-> 
-> Thanks,
-> Alistair
-> 
+
+--icVesgj1uqWZiquELlvQV1qGNyayAawF8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpx+tISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A0GcH/01WlK0EATZjeKSnMg3T9SToBwOfGSyy
+2fsNwmEU7e4mOQLHYM/g7S8niIW7ZySoH3HuFebqbPjEA2x4+RomsDQkQcz9zqHW
+hCwc36u9ADe0eC9fObYL2JAXWlT+LsNx06aFlmfYqjycnq2h3U5JqIkB9HUC7SGN
+P2pmtjjzvkr0+0Ng9Gonvc3PEqxJVIMLo+P15dwKVrt+sEyplwUo9wmNuFkiLoWQ
+E0SNE7OJ75ZYgQmvxpBUh1Nht7kCyhQe/MQ82n3eei5cGdF+O5tUbFPhVTFaggfz
+RNhvfugO7wZUMKtpTXdF5BWBEvR3nRw4mK7X1Mzy3sS/jOkSNp2JNkw=
+=feos
+-----END PGP SIGNATURE-----
+
+--icVesgj1uqWZiquELlvQV1qGNyayAawF8--
