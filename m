@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51736)
+Received: from eggs.gnu.org ([208.118.235.92]:46957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehKbU-0002xL-1J
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:34:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ehKf0-0004YT-3F
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:37:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehKaQ-0006xO-0p
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:32:59 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8b5794fe-51ca-d05c-4f2a-d2ca29676a51@redhat.com>
-Date: Thu, 1 Feb 2018 20:29:33 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1ehKdw-0001eu-60
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:36:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ehKdv-0001eL-Q5
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:35:31 -0500
+References: <20180201040608-mutt-send-email-mst@kernel.org>
+	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
+	<20180201121009.GR26425@localhost.localdomain>
+	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
+	<20180201135340.GU26425@localhost.localdomain>
+	<db40e5ca-9a15-4faf-4675-f29b0ee4ab22@redhat.com>
+	<20180201182108.GE26425@localhost.localdomain>
+	<f87b5810-6d87-bd92-be70-dd620501a29d@redhat.com>
+	<20180201185129.GI21702@localhost.localdomain>
+	<3e5610ec-16d7-2a00-267e-935c1b3ea3af@redhat.com>
+	<20180201192108.GF26425@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5deb74db-19c7-6c5c-2089-22578cf17ad5@redhat.com>
+Date: Thu, 1 Feb 2018 14:35:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jEQ3nau8mJn8XcNY1noluQCgFbcdmaEg0"
-Subject: Re: [Qemu-devel] [PATCH v3 28/39] qcow2: Read refcount before L2
- table in expand_zero_clusters_in_l1()
+In-Reply-To: <20180201192108.GF26425@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +38,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, imammedo@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jEQ3nau8mJn8XcNY1noluQCgFbcdmaEg0
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <8b5794fe-51ca-d05c-4f2a-d2ca29676a51@redhat.com>
-Subject: Re: [PATCH v3 28/39] qcow2: Read refcount before L2 table in
- expand_zero_clusters_in_l1()
-References: <cover.1516978645.git.berto@igalia.com>
- <4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
-In-Reply-To: <4bd645eb4a81eb2009fab318dfca6d47e657655c.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 01/02/2018 14:21, Eduardo Habkost wrote:
+>> The device looks at its own private page tables, and not
+>> to the OS ones.
+> I'm still confused by your statement that the device builds its
+> own [IOVA->PA] page table.  How would the device do that if it
+> doesn't have access to the CPU MMU state?  Isn't the IOVA->PA
+> translation table built by the OS?
 
-On 2018-01-26 15:59, Alberto Garcia wrote:
-> At the moment it doesn't really make a difference whether we call
-> qcow2_get_refcount() before of after reading the L2 table, but if we
-> want to support L2 slices we'll need to read the refcount first.
->=20
-> This patch simply changes the order of those two operations to prepare
-> for that. The patch with the actual semantic changes will be easier to
-> read because of this.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+The driver builds a page table for the device, either when it pins the
+pages or by using MMU notifiers.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---jEQ3nau8mJn8XcNY1noluQCgFbcdmaEg0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzap0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AO/UH/0C3ZLItlSyDPLVAlqappGdJ62k+mJpY
-g8U1zeDv3lKczAZL4ZLNY67k9MQBt2nInXwuWYO073gl8TtySHUl2B6WmG6Px71w
-3P4Us2Ek6ojm3KTT/cexZm+OMinRymDsEa9lUGFSFpS1/3Jv0uknKAwPoEvXXZJB
-DFSMWblb13X65B5DjX4cpTXS5npFX+QsNh/NS/zrTxQXv1Mv6EAr6gyAAEy6tc/H
-mupRwlBSbbv2hVkoVsKK73oTm0jIHifkhIHScUVtFlNeVBhC05rCaYZpXPPvJveR
-3p1vj7pCnx5pMiYDJswn0TAGLMBTLvuOhyxwWeKZUCf50MrXhIXcxP0=
-=cFMi
------END PGP SIGNATURE-----
-
---jEQ3nau8mJn8XcNY1noluQCgFbcdmaEg0--
+Paolo
