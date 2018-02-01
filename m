@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sridhar_kulk@yahoo.com>) id 1ehIn0-0001YH-By
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:36:47 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ehIo6-0002O9-8U
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sridhar_kulk@yahoo.com>) id 1ehImv-0001QX-VO
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:36:46 -0500
-Received: from sonic309-14.consmr.mail.bf2.yahoo.com ([74.6.129.124]:38243)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sridhar_kulk@yahoo.com>)
-	id 1ehImv-0001OY-QB
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:36:41 -0500
-Date: Thu, 1 Feb 2018 17:36:35 +0000 (UTC)
-From: sridhar kulkarni <sridhar_kulk@yahoo.com>
-Reply-To: sridhar kulkarni <sridhar_kulk@yahoo.com>
-Message-ID: <1484301432.1457228.1517506595503@mail.yahoo.com>
-In-Reply-To: <CAFEAcA-OSN4MVVr6hbMVwiFs-tYVFH8hW5QvF3KvyXZPsEZpKQ@mail.gmail.com>
-References: <1972503886.3523325.1517308471375.ref@mail.yahoo.com>
-	<1972503886.3523325.1517308471375@mail.yahoo.com>
-	<20180130115510.GA13988@xz-mi>
-	<75114832.1210415.1517487560355@mail.yahoo.com>
-	<CAFEAcA-OSN4MVVr6hbMVwiFs-tYVFH8hW5QvF3KvyXZPsEZpKQ@mail.gmail.com>
+	(envelope-from <ehabkost@redhat.com>) id 1ehIo2-0006mv-Al
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:37:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59142)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehIo2-0006gs-1r
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:37:50 -0500
+Date: Thu, 1 Feb 2018 15:36:55 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180201173655.GC26425@localhost.localdomain>
+References: <8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
+	<20180201121009.GR26425@localhost.localdomain>
+	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
+	<20180201150254-mutt-send-email-mst@kernel.org>
+	<20180201163132.GV26425@localhost.localdomain>
+	<20180201184655-mutt-send-email-mst@kernel.org>
+	<20180201165739.GY26425@localhost.localdomain>
+	<20180201185830-mutt-send-email-mst@kernel.org>
+	<20180201170136.GA26425@localhost.localdomain>
+	<20180201190902-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Savevm and loadvm not working
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180201190902-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +36,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Peter Xu <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
 
- 
+On Thu, Feb 01, 2018 at 07:12:45PM +0200, Michael S. Tsirkin wrote:
+> On Thu, Feb 01, 2018 at 03:01:36PM -0200, Eduardo Habkost wrote:
+> > On Thu, Feb 01, 2018 at 06:59:07PM +0200, Michael S. Tsirkin wrote:
+> > > On Thu, Feb 01, 2018 at 02:57:39PM -0200, Eduardo Habkost wrote:
+> > > > On Thu, Feb 01, 2018 at 06:48:54PM +0200, Michael S. Tsirkin wrote:
+> > > > > On Thu, Feb 01, 2018 at 02:31:32PM -0200, Eduardo Habkost wrote:
+> > > > > > On Thu, Feb 01, 2018 at 04:24:30PM +0200, Michael S. Tsirkin wrote:
+> > > > > > [...]
+> > > > > > > The full fix would be to allow QEMU to map a list of
+> > > > > > > pages to a guest supplied IOVA.
+> > > > > > 
+> > > > > > Thanks, that's what I expected.
+> > > > > > 
+> > > > > > While this is not possible, the only requests I have for this
+> > > > > > patch is that we clearly document:
+> > > > > > * What's the only purpose of share=on on a host-memory-backend
+> > > > > >   object (due to pvrdma limitations).
+> > > > > > * The potential undesirable side-effects of setting share=on.
+> > > > > > * On the commit message and other comments, clearly distinguish
+> > > > > >   HVAs in the QEMU address-space from IOVAs, to avoid confusion.
+> > > > > 
+> > > > > Looking forward, when we do support it, how will management find out
+> > > > > it no longer needs to pass the share parameter?
+> > > > > 
+> > > > > Further, if the side effects of the share parameter go away,
+> > > > > how will it know these no longer hold?
+> > > > 
+> > > > A query-host-capabilities or similar QMP command seems necessary
+> > > > for that.
+> > > 
+> > > Is anyone working on that?
+> > 
+> > Not yet.
+> > 
+> > -- 
+> > Eduardo
+> 
+> Do these patches need to wait until we do have that command?
 
-    On Thursday, February 1, 2018 5:56 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
- 
+I don't think so.  The command will be needed only when
+support for pvrdma without share=on gets implemented.
 
- On 1 February 2018 at 12:19, sridhar kulkarni via Qemu-devel
-<qemu-devel@nongnu.org> wrote:
-> I thought that RAM contents are not saved because of return value RAM_SAVE_CONTROL_NOT_SUPP. Now that you clarified about this, I debugged this further. After doing loadvm operation, I am getting following error,qemu-system-arm: error while loading state for instance 0x0 of device 'cpu'
-> qemu-system-arm: Error -1 while loading VM state
-> I figured out that, this error is because of following function returning FALSE. "write_raw_cp_reg" writes a value and "read_raw_cp_reg" reads the value back. There is mismatch between what we write and what is being read back, and hence function returns FALSE.
-> Between I want to mention that, I am trying the snapshot on a VM which runs ARM 7 core. I am not sure if this snapshot feature is fully function for ARM targets.
+Right now, all we need is clear documentation.
 
-It is supposed to work for ARM, and it does for
-the CPUs I've tested it with. Which exact CPU
-model are you using? (Do you really mean "ARM 7"?
-We don't support that. We have ARMv7 architecture
-CPUs like the cortex-a9 -- did you mean one of those?)
+> 
+> I'm thinking it's better to have "share=on required with rdma"
+> and "hugetlbfs not supported with rdma"
+> than the reverse, this way new hosts do not need to carry
+> thus stuff around forever.
 
-Are you using an unmodified upstream QEMU? We don't
-have an "arm-machine" board model which is what your
-command line is using with "-M arm-machine", so if
-you're using a modified QEMU it's possible those
-modifications haven't been written to support VM
-state saving.
+What do you mean by "the reverse"?
 
-The next step in debugging would be to run QEMU under
-gdb or add tracing printfs so that you can identify
-which emulated system register it is that is causing the
-failure.
+IIUC, the requirements/limitations are:
 
-Sorry I meant to say arm a7. We are using a custom board "arm-machine" which is based on Vexpress-a15 but we use a7 core. I learnt reading through web sources that A7 emulation is not supported in qemu. Is this causing this behaviour? But in general we are able to run all our code on this virtual board without any issues. While doing snapshot, this problem is seen.
+* share=on required for pvrdma.  Already documented and enforced
+  by pvrdma code in this series.
+* hugetlbfs not supported with rdma. Is this detected/reported by
+  QEMU?  Is it documented?
+* side-effects of share=on.  This is not detected nor documented,
+  and probably already applies to other memory backends.
+  * Nice to have: document when share=on is useful (answer:
+    because of pvrdma), when adding share=on support to
+    host-memory-backend.
 
-thanks
--- PMM
+> 
+> Also, how does management know which devices are affected?
 
-   
+Right now?  By reading documentation.
+
+-- 
+Eduardo
