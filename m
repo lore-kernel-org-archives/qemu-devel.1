@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehJKK-0006h8-9l
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:11:13 -0500
+	(envelope-from <marcel@redhat.com>) id 1ehJKx-0007Ce-1M
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:11:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehJKJ-0003tJ-69
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:11:12 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
-	<d21ddbab-921c-3cc9-05dd-5113cb16fd8f@redhat.com>
-	<w51tvv156xi.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3fd568fa-3b42-fff7-d531-bce6d938f1de@redhat.com>
-Date: Thu, 1 Feb 2018 19:10:58 +0100
+	(envelope-from <marcel@redhat.com>) id 1ehJKs-0004ZA-1e
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:11:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehJKr-0004Yd-Q9
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:11:45 -0500
+References: <20180117095421.124787-1-marcel@redhat.com>
+	<20180117095421.124787-2-marcel@redhat.com>
+	<20180131204059.GG21702@localhost.localdomain>
+	<20180131230607-mutt-send-email-mst@kernel.org>
+	<20180131233422.GP26425@localhost.localdomain>
+	<20180201040608-mutt-send-email-mst@kernel.org>
+	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
+	<20180201145228-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <091dd9c2-f912-34a0-0e80-fb65de9f2780@redhat.com>
+Date: Thu, 1 Feb 2018 20:11:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <w51tvv156xi.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nYCSnklABRzIlGtyqktzSmFh4e9vaREeF"
-Subject: Re: [Qemu-devel] [PATCH v3 18/39] qcow2: Refactor
- get_cluster_table()
+In-Reply-To: <20180201145228-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,120 +35,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nYCSnklABRzIlGtyqktzSmFh4e9vaREeF
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <3fd568fa-3b42-fff7-d531-bce6d938f1de@redhat.com>
-Subject: Re: [PATCH v3 18/39] qcow2: Refactor get_cluster_table()
-References: <cover.1516978645.git.berto@igalia.com>
- <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
- <d21ddbab-921c-3cc9-05dd-5113cb16fd8f@redhat.com>
- <w51tvv156xi.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51tvv156xi.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-02-01 11:40, Alberto Garcia wrote:
-> On Wed 31 Jan 2018 09:11:48 PM CET, Max Reitz wrote:
->> On 2018-01-26 15:59, Alberto Garcia wrote:
->>> After the previous patch we're now always using l2_load() in
->>> get_cluster_table() regardless of whether a new L2 table has to be
->>> allocated or not.
+On 01/02/2018 14:57, Michael S. Tsirkin wrote:
+> On Thu, Feb 01, 2018 at 07:36:50AM +0200, Marcel Apfelbaum wrote:
+>> On 01/02/2018 4:22, Michael S. Tsirkin wrote:
+>>> On Wed, Jan 31, 2018 at 09:34:22PM -0200, Eduardo Habkost wrote:
+>>>> On Wed, Jan 31, 2018 at 11:10:07PM +0200, Michael S. Tsirkin wrote:
+>>>>> On Wed, Jan 31, 2018 at 06:40:59PM -0200, Eduardo Habkost wrote:
+>>>>>> On Wed, Jan 17, 2018 at 11:54:18AM +0200, Marcel Apfelbaum wrote:
+>>>>>>> Currently only file backed memory backend can
+>>>>>>> be created with a "share" flag in order to allow
+>>>>>>> sharing guest RAM with other processes in the host.
+>>>>>>>
+>>>>>>> Add the "share" flag also to RAM Memory Backend
+>>>>>>> in order to allow remapping parts of the guest RAM
+>>>>>>> to different host virtual addresses. This is needed
+>>>>>>> by the RDMA devices in order to remap non-contiguous
+>>>>>>> QEMU virtual addresses to a contiguous virtual address range.
+>>>>>>>
+>>>>>>
+>>>>>> Why do we need to make this configurable?  Would anything break
+>>>>>> if MAP_SHARED was always used if possible?
+>>>>>
+>>>>> See Documentation/vm/numa_memory_policy.txt for a list
+>>>>> of complications.
+>>>>
+>>>> Ew.
+>>>>
+>>>>>
+>>>>> Maybe we should more of an effort to detect and report these
+>>>>> issues.
+>>>>
+>>>> Probably.  Having other features breaking silently when using
+>>>> pvrdma doesn't sound good.  We must at least document those
+>>>> problems in the documentation for memory-backend-ram.
+>>>>
+>>>> BTW, what's the root cause for requiring HVAs in the buffer?
 >>>
->>> This patch refactors that part of the code to use one single l2_load(=
-)
->>> call.
+>>> It's a side effect of the kernel/userspace API which always wants
+>>> a single HVA/len pair to map memory for the application.
 >>>
->>> Signed-off-by: Alberto Garcia <berto@igalia.com>
->>> ---
->>>  block/qcow2-cluster.c | 21 +++++++--------------
->>>  1 file changed, 7 insertions(+), 14 deletions(-)
 >>>
->>> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
->>> index 2a53c1dc5f..0c0cab85e8 100644
->>> --- a/block/qcow2-cluster.c
->>> +++ b/block/qcow2-cluster.c
->>> @@ -695,15 +695,7 @@ static int get_cluster_table(BlockDriverState *b=
-s, uint64_t offset,
->>>          return -EIO;
->>>      }
->>> =20
->>> -    /* seek the l2 table of the given l2 offset */
->>> -
->>> -    if (s->l1_table[l1_index] & QCOW_OFLAG_COPIED) {
->>> -        /* load the l2 table in memory */
->>> -        ret =3D l2_load(bs, offset, l2_offset, &l2_table);
->>> -        if (ret < 0) {
->>> -            return ret;
->>> -        }
->>> -    } else {
->>> +    if (!(s->l1_table[l1_index] & QCOW_OFLAG_COPIED)) {
->>>          /* First allocate a new L2 table (and do COW if needed) */
->>>          ret =3D l2_allocate(bs, l1_index);
->>>          if (ret < 0) {
->>> @@ -719,11 +711,12 @@ static int get_cluster_table(BlockDriverState *=
-bs, uint64_t offset,
->>>          /* Get the offset of the newly-allocated l2 table */
->>>          l2_offset =3D s->l1_table[l1_index] & L1E_OFFSET_MASK;
->>>          assert(offset_into_cluster(s, l2_offset) =3D=3D 0);
->>> -        /* Load the l2 table in memory */
->>> -        ret =3D l2_load(bs, offset, l2_offset, &l2_table);
->>> -        if (ret < 0) {
->>> -            return ret;
->>> -        }
->>> +    }
->>> +
->>> +    /* load the l2 table in memory */
->>> +    ret =3D l2_load(bs, offset, l2_offset, &l2_table);
->>> +    if (ret < 0) {
->>> +        return ret;
->>>      }
 >>
->> I'd pull the l2_offset assignment (and alignment check) down below the=
-
->> QCOW_OFLAG_COPIED check, saving us another two lines (!!1!) which we
->> could then spend on an
+>> Hi Eduardo and Michael,
 >>
->> assert(s->l1_table[l1_index] & QCOW_OFLAG_COPIED);
->=20
-> I'm not sure if I'm following you. We need to set l2_offset before and
-> after allocating a new L2 table.
->=20
-> Before, because we need the offset of the old table (if there was one)
-> in order to decrease its refcount.
->=20
-> And after, because we need the offset of the new table in order to load=
+>>>>  Can
+>>>> this be fixed?
+>>>
+>>> I think yes.  It'd need to be a kernel patch for the RDMA subsystem
+>>> mapping an s/g list with actual memory. The HVA/len pair would then just
+>>> be used to refer to the region, without creating the two mappings.
+>>>
+>>> Something like splitting the register mr into
+>>>
+>>> mr = create mr (va/len) - allocate a handle and record the va/len
+>>>
+>>> addmemory(mr, offset, hva, len) - pin memory
+>>>
+>>> register mr - pass it to HW
+>>>
+>>> As a nice side effect we won't burn so much virtual address space.
+>>>
+>>
+>> We would still need a contiguous virtual address space range (for post-send)
+>> which we don't have since guest contiguous virtual address space
+>> will always end up as non-contiguous host virtual address space.
+> 
+> It just needs to be contiguous in the HCA virtual address space.
+> Software never accesses through this pointer.
+> In other words - basically expose register physical mr to userspace.
+> 
+> 
+>>
+>> I am not sure the RDMA HW can handle a large VA with holes.
+>>
+>> An alternative would be 0-based MR, QEMU intercepts the post-send
+>> operations and can substract the guest VA base address.
+>> However I didn't see the implementation in kernel for 0 based MRs
+>> and also the RDMA maintainer said it would work for local keys
+>> and not for remote keys.
+>>
+>>> This will fix rdma with hugetlbfs as well which is currently broken.
+>>>
+>>>
+>>
+>> There is already a discussion on the linux-rdma list:
+>>     https://www.spinics.net/lists/linux-rdma/msg60079.html
+>> But it will take some (actually a lot of) time, we are currently talking about
+>> a possible API.
+> 
+> You probably need to pass the s/g piece by piece since it might exceed
+> any reasonable array size.
 
-> it.
+Right. They say the new API is ioctl based but so this is not a limitation.
+We proposed also a bitmap representation of a large range,
+but what we really need is what you mentioned:
+  to pass the Guest VA directly to reg_mr.
 
-Ah, right, yeah... Well, too bad.  Then I probably can't ask for the
-assert() that badly.
+Thanks,
+Marcel
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---nYCSnklABRzIlGtyqktzSmFh4e9vaREeF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzWDISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AVJkH/jjkswnCVukcERlvkhaEuF8Beb+U7y6I
-02nKtxFR6yr2ozgW9X+OebQgpUS6M47Gdti2kk0qI7KxICkdoV7F5Bq67fn2Wd0r
-N0ias3t0WHVHInVKWo+MLDoTvKtq5PjNcH/0xyaSItjLaTHA+lRyBGTCyNq+YOln
-LRhY/ua4Zrc7LORHMEeQWgumtZI6SwMfwUjuDAn+q4CK6/s3BmxOqiEeMvkhNaHa
-osCG6G0EPclYyRkkIqQCC9CtIR9INS84yV9K1gxJSOnMudpjN2VKnKCvEm2Bg/fg
-2Doody+juf8A1XIachIefr2pdKk9Z/nkpyLeWKKz4U7gHRMop8tQ3Xk=
-=K2+p
------END PGP SIGNATURE-----
-
---nYCSnklABRzIlGtyqktzSmFh4e9vaREeF--
+> 
+>> And it does not solve the re-mapping...
+>>
+>> Thanks,
+>> Marcel
+> 
+> Haven't read through that discussion. But at least what I posted solves
+> it since you do not need it contiguous in HVA any longer.
+> 
+>>>> -- 
+>>>> Eduardo
