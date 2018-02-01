@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehL3t-0001r8-6D
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:03:27 -0500
+	(envelope-from <marcel@redhat.com>) id 1ehL4O-0002Gv-AH
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:03:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehL2p-00025n-6m
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:02:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59746)
+	(envelope-from <marcel@redhat.com>) id 1ehL3K-0002QE-8P
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:02:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ehL2o-00025M-OA
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:01:15 -0500
-Date: Thu, 1 Feb 2018 20:01:09 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180201200108.GP2457@work-vm>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehL3J-0002Pb-Rf
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:01:46 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EB1CCC05178F
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 20:01:44 +0000 (UTC)
+References: <20180201112028.23552-1-peterx@redhat.com>
+	<90b4bc63-94cd-ec0f-32c8-c16df8ee84cf@redhat.com>
+	<20180201211652-mutt-send-email-mst@kernel.org>
+	<20180201194845.GN2457@work-vm>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <33142d67-92b6-e1b1-b906-716a06efb1fa@redhat.com>
+Date: Thu, 1 Feb 2018 22:01:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+In-Reply-To: <20180201194845.GN2457@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
+ priority
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,263 +37,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, drjones@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-* Wei Huang (wei@redhat.com) wrote:
+On 01/02/2018 21:48, Dr. David Alan Gilbert wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+>> On Thu, Feb 01, 2018 at 02:24:15PM +0200, Marcel Apfelbaum wrote:
+>>> Hi Peter,
+>>>
+>>> On 01/02/2018 13:20, Peter Xu wrote:
+>>>> In the past, we prioritized IOMMU migration so that we have such a
+>>>> priority order:
+>>>>
+>>>>     IOMMU > PCI Devices
+>>>>
+>>>> When migrating a guest with both vIOMMU and pcie-root-port, we'll always
+>>>> migrate vIOMMU first, since pcie-root-port will be seen to have the same
+>>>> priority of general PCI devices.
+>>>>
+>>>> That's problematic.
+>>>>
+>>>> The thing is that PCI bus number information is stored in the root port,
+>>>> and that is needed by vIOMMU during post_load(), e.g., to figure out
+>>>> context entry for a device.  If we don't have correct bus numbers for
+>>>> devices, we won't be able to recover device state of the DMAR memory
+>>>> regions, and things will be messed up.
+>>>>
+>>>> So let's boost the PCIe root ports to be even with higher priority:
+>>>>
+>>>>    PCIe Root Port > IOMMU > PCI Devices
+>>>>
+>>>> A smoke test shows that this patch fixes bug 1538953.
+>>>>
+>>>> CC: Alex Williamson <alex.williamson@redhat.com>
+>>>> CC: Marcel Apfelbaum <marcel@redhat.com>
+>>>> CC: Michael S. Tsirkin <mst@redhat.com>
+>>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> CC: Juan Quintela <quintela@redhat.com>
+>>>> CC: Laurent Vivier <lvivier@redhat.com>
+>>>> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1538953
+>>>> Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>>>> ---
+>>>> Marcel & all,
+>>>>
+>>>> I think it's possible that we need similar thing for other bridge-like
+>>>> devices, but I'm not that familiar.  Would you help confirm?  Thanks,
+>>>
+>>> Is a pity we don't have a way to mark the migration priority
+>>> in a base class. Dave, maybe we do have a way?
+>>>
+>>> In the meantime you would need to add it also to:
+>>> - ioh3420 (Intel root port)
+>>> - xio3130_downstream (Intel switch downstream port)
+>>> - xio3130_upstream (The counterpart of the above, you want the whole
+>>>   switch to be migrated before loading the IOMMU device state)
+>>> - pcie_pci_bridge (for pci devices)
+>>> - pci-pci bridge (if for some reason you have one attached to the pcie_pci_brdge)
+>>> - i82801b11 (dmi-pci bridge, we want to deprecate it bu is there for now)
+>>>
+>>> Thanks,
+>>> Marcel
+>>
+>> It's kind of strange that we need to set the priority manually.
+>> Can't migration figure it out itself?
 > 
+>> I think bus
+>> must always be migrated before the devices behind it ...
 > 
-> On 01/25/2018 02:05 PM, Dr. David Alan Gilbert wrote:
-> > * Wei Huang (wei@redhat.com) wrote:
-> >> This patch adds the migration test support for aarch64. The test code,
-> >> which implements the same functionality as x86, is compiled into a binary
-> >> and booted as a kernel in qemu. Here are the design ideas:
-> >>
-> >>  * We choose this -kernel design because aarch64 QEMU doesn't provide a
-> >>    built-in fw like x86 does. So instead of relying on a boot loader, we
-> >>    use -kernel approach for aarch64.
-> >>  * The serial output is sent to PL011 directly.
-> >>  * The physical memory base for mach-virt machine is 0x40000000. We change
-> >>    the start_address and end_address for aarch64.
-> >>
-> >> RFC->V1:
-> >>  * aarch64 kernel blob is defined as an uint32_t array
-> >>  * The test code is re-written to address a data caching issue under KVM.
-> >>    Tests passed under both x86 and aarch64.
-> >>  * Re-use init_bootfile_x86() for both x86 and aarch64
-> >>  * Other minor fixes
-> >>
-> >> Note that the test code is as the following:
-> >>
-> >> .section .text
-> >>
-> >>         .globl  start
-> >>         
-> >> start:
-> >>         /* disable MMU to use phys mem address */
-> >>         mrs     x0, sctlr_el1
-> >>         bic     x0, x0, #(1<<0)
-> >>         msr     sctlr_el1, x0
-> >>         isb
-> >>
-> >>         /* output char 'A' to PL011 */
-> >>         mov     w4, #65
-> >>         mov     x5, #0x9000000
-> >>         strb    w4, [x5]
-> >>
-> >>         /* w6 keeps a counter so we can limit the output speed */
-> >>         mov     w6, #0
-> >>
-> >>         /* phys mem base addr = 0x40000000 */
-> >>         mov     x3, #(0x40000000 + 100 *1024*1024) /* traverse 1M-100M */
-> >>         mov     x2, #(0x40000000 + 1 * 1024*1024)
-> >>
-> >>         /* clean up memory first */
-> >>         mov     w1, #0  
-> >> clean:
-> >>         strb    w1, [x2]
-> >>         add     x2, x2, #(4096)
-> >>         cmp     x2, x3
-> >>         ble     clean
-> >>
-> >>         /* main body */
-> >> mainloop:
-> >>         mov     x2, #(0x40000000 + 1 * 1024*1024)
-> >>         
-> >> innerloop:
-> >>         /* clean cache because el2 might still cache guest data under KVM */
-> >>         dc      civac, x2
-> > 
-> > Can you explain a bit more about that please;  if it's guest
-> > visible acorss migration, doesn't that suggest we need the cache clear
-> > in KVM or QEMU?
-> 
-> I think this is ARM specific. This is caused by the inconsistency
-> between guest VM's data accesses and userspace's accesses (in
-> check_guest_ram) at the destination:
-> 
-> 1) Because uncacheable (guest) + cacheable (host) ==> uncacheable. So
-> the data accesses from guest VM go directly into memory.
-> 2) QEMU user space will use the cacheable version. So it is possible
-> that data can come from cache, instead of RAM. The difference between
-> (1) and (2) obviously can cause check_guest_ram() to fail sometimes.
-> 
-> x86's EPT has the capability to ignore guest-provided memory type. So it
-> is possible to have consistent data views between guest and QEMU user-space.
+> I think that's true; but:
+>   a) Is the iommu a child of any of the PCI busses?
 
-I'll admit to not quite understanding where this thread ended up;
-it seems to have fallen into other ARM consistency questions.
-Other than that it looks fine to me, but see the separate patch I posted
-yesterday that includes the x86 source.
+No, is a sysbus device.
 
-Peter: What's your view on the ight fix for hte memory consistency?
+>   b) does anything ensure that the bridge that's a parent of a bus
+>      gets migrated before the bus it provides?
 
-Dave
+I think this was Michael's question :)
 
+>   c) What happens with more htan one root port?
 > 
-> > 
-> > Dave
-> > 
-> >>         ldrb    w1, [x2]
-> >>         add     w1, w1, #1
-> >>         and     w1, w1, #(0xff)
-> >>         strb    w1, [x2]
-> >>
-> >>         add     x2, x2, #(4096)
-> >>         cmp     x2, x3
-> >>         blt     innerloop
-> >>
-> >>         add     w6, w6, #1
-> >>         and     w6, w6, #(0xff)
-> >>         cmp     w6, #0
-> >>         bne     mainloop
-> >>         
-> >>         /* output char 'B' to PL011 */
-> >>         mov     w4, #66
-> >>         mov     x5, #0x9000000
-> >>         strb    w4, [x5]
-> >>
-> >>         bl      mainloop
-> >>
-> >> The code is compiled with the following commands:
-> >>  > gcc -c -o fill.o fill.s
-> >>  > gcc -O2 -o fill.elf -Wl,-T,/tmp/flat.lds,--build-id=none,-Ttext=40080000 \
-> >>    -nostdlib fill.o
-> >>  > objcopy -O binary fill.elf fill.flat
-> >>  > truncate -c -s 144 ./fill.flat
-> >>  > xxd -g 4 -c 24 -e fill.flat | awk '{print "0x"$2 ", " "0x"$3 ", " "0x"C$4 ", " "0x"C$5 ", " "0x"$6 ", " "0x"C$7 "," }'
-> >>
-> >> The linker file (borrowed from KVM unit test) is defined as:
-> >>
-> >> SECTIONS
-> >> {
-> >>     .text : { *(.init) *(.text) *(.text.*) }
-> >>     . = ALIGN(64K);
-> >>     etext = .;
-> >>     .data : {
-> >>         *(.data)
-> >>     }
-> >>     . = ALIGN(16);
-> >>     .rodata : { *(.rodata) }
-> >>     . = ALIGN(16);
-> >>     .bss : { *(.bss) }
-> >>     . = ALIGN(64K);
-> >>     edata = .;
-> >>     . += 64K;
-> >>     . = ALIGN(64K);
-> >>     /*
-> >>      * stack depth is 16K for arm and PAGE_SIZE for arm64, see THREAD_SIZE
-> >>      * sp must be 16 byte aligned for arm64, and 8 byte aligned for arm
-> >>      * sp must always be strictly less than the true stacktop
-> >>      */
-> >>     stackptr = . - 16;
-> >>     stacktop = .;
-> >> }
-> >>
-> >> ENTRY(start)
-> >>
-> >> Signed-off-by: Wei Huang <wei@redhat.com>
-> >> ---
-> >>  tests/Makefile.include |  1 +
-> >>  tests/migration-test.c | 37 +++++++++++++++++++++++++++++++------
-> >>  2 files changed, 32 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> >> index b4bcc872f2..2a520e53ab 100644
-> >> --- a/tests/Makefile.include
-> >> +++ b/tests/Makefile.include
-> >> @@ -357,6 +357,7 @@ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
-> >>  gcov-files-arm-y += hw/timer/arm_mptimer.c
-> >>  
-> >>  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
-> >> +check-qtest-aarch64-y += tests/migration-test$(EXESUF)
-> >>  
-> >>  check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
-> >>  
-> >> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> >> index be598d3257..3237fe93b2 100644
-> >> --- a/tests/migration-test.c
-> >> +++ b/tests/migration-test.c
-> >> @@ -22,8 +22,8 @@
-> >>  
-> >>  #define MIN_NVRAM_SIZE 8192 /* from spapr_nvram.c */
-> >>  
-> >> -const unsigned start_address = 1024 * 1024;
-> >> -const unsigned end_address = 100 * 1024 * 1024;
-> >> +unsigned start_address = 1024 * 1024;
-> >> +unsigned end_address = 100 * 1024 * 1024;
-> >>  bool got_stop;
-> >>  
-> >>  #if defined(__linux__)
-> >> @@ -79,7 +79,7 @@ static const char *tmpfs;
-> >>  /* A simple PC boot sector that modifies memory (1-100MB) quickly
-> >>   * outputing a 'B' every so often if it's still running.
-> >>   */
-> >> -unsigned char bootsect[] = {
-> >> +unsigned char x86_bootsect[] = {
-> >>    0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-> >>    0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
-> >>    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
-> >> @@ -125,11 +125,20 @@ unsigned char bootsect[] = {
-> >>    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
-> >>  };
-> >>  
-> >> -static void init_bootfile_x86(const char *bootpath)
-> >> +uint32_t aarch64_kernel[] = {
-> >> +    0xd5381000, 0x927ff800, 0xd5181000, 0xd5033fdf, 0x52800824, 0xd2a12005,
-> >> +    0x390000a4, 0x52800006, 0xd2a8c803, 0xd2a80202, 0x52800001, 0x39000041,
-> >> +    0x91400442, 0xeb03005f, 0x54ffffad, 0xd2a80202, 0xd50b7e22, 0x39400041,
-> >> +    0x11000421, 0x12001c21, 0x39000041, 0x91400442, 0xeb03005f, 0x54ffff2b,
-> >> +    0x110004c6, 0x12001cc6, 0x710000df, 0x54fffe81, 0x52800844, 0xd2a12005,
-> >> +    0x390000a4, 0x97fffff0, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-> >> +};
-> >> +
-> >> +static void init_bootfile(const char *bootpath, void *content)
-> >>  {
-> >>      FILE *bootfile = fopen(bootpath, "wb");
-> >>  
-> >> -    g_assert_cmpint(fwrite(bootsect, 512, 1, bootfile), ==, 1);
-> >> +    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
-> >>      fclose(bootfile);
-> >>  }
-> >>  
-> >> @@ -442,7 +451,7 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-> >>      got_stop = false;
-> >>  
-> >>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> >> -        init_bootfile_x86(bootpath);
-> >> +        init_bootfile(bootpath, x86_bootsect);
-> >>          cmd_src = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
-> >>                                    " -name pcsource,debug-threads=on"
-> >>                                    " -serial file:%s/src_serial"
-> >> @@ -470,6 +479,22 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-> >>                                    " -serial file:%s/dest_serial"
-> >>                                    " -incoming %s",
-> >>                                    accel, tmpfs, uri);
-> >> +    } else if (strcmp(arch, "aarch64") == 0) {
-> >> +        init_bootfile(bootpath, aarch64_kernel);
-> >> +        cmd_src = g_strdup_printf("-machine virt,accel=kvm:tcg -m 150M "
-> >> +                                  "-name vmsource,debug-threads=on -cpu host "
-> >> +                                  "-serial file:%s/src_serial "
-> >> +                                  "-kernel %s ",
-> >> +                                  tmpfs, bootpath);
-> >> +        cmd_dst = g_strdup_printf("-machine virt,accel=kvm:tcg -m 150M "
-> >> +                                  "-name vmdest,debug-threads=on -cpu host "
-> >> +                                  "-serial file:%s/dest_serial "
-> >> +                                  "-kernel %s "
-> >> +                                  "-incoming %s ",
-> >> +                                  tmpfs, bootpath, uri);
-> >> +        /* aarch64 virt machine physical mem started from 0x40000000 */
-> >> +        start_address += 0x40000000;
-> >> +        end_address += 0x40000000;
-> >>      } else {
-> >>          g_assert_not_reached();
-> >>      }
-> >> -- 
-> >> 2.14.3
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Root ports can't be nested, anyway, I suppose the migration should
+follow the bus numbering order.
+
+The question now is what happens if the migration is happening before
+the guest firmware finishes assigning numbers to buses...
+
+Still, QEMU has enough information to decide the right ordering,
+the question is if the current migration mechanism has some ordering
+or the only one is the "VMStateFlags".
+
+Thanks,
+Marcel
+
+> Dave
+> 
+> 
+>>>>  hw/pci-bridge/gen_pcie_root_port.c | 1 +
+>>>>  include/migration/vmstate.h        | 1 +
+>>>>  2 files changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+>>>> index 0e2f2e8bf1..e6ff1effd8 100644
+>>>> --- a/hw/pci-bridge/gen_pcie_root_port.c
+>>>> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+>>>> @@ -101,6 +101,7 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
+>>>>  
+>>>>  static const VMStateDescription vmstate_rp_dev = {
+>>>>      .name = "pcie-root-port",
+>>>> +    .priority = MIG_PRI_PCIE_ROOT_PORT,
+>>>>      .version_id = 1,
+>>>>      .minimum_version_id = 1,
+>>>>      .post_load = pcie_cap_slot_post_load,
+>>>> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+>>>> index 8c3889433c..491449db9f 100644
+>>>> --- a/include/migration/vmstate.h
+>>>> +++ b/include/migration/vmstate.h
+>>>> @@ -148,6 +148,7 @@ enum VMStateFlags {
+>>>>  typedef enum {
+>>>>      MIG_PRI_DEFAULT = 0,
+>>>>      MIG_PRI_IOMMU,              /* Must happen before PCI devices */
+>>>> +    MIG_PRI_PCIE_ROOT_PORT,     /* Must happen before IOMMU */
+>>>>      MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
+>>>>      MIG_PRI_GICV3,              /* Must happen before the ITS */
+>>>>      MIG_PRI_MAX,
+>>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
