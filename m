@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehJIc-0005LF-7P
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:09:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ehJJt-0006PQ-Tw
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehJIb-0002gt-En
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:09:26 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<e2cb85926f1f4910c7d18fcc902be60109592381.1516978645.git.berto@igalia.com>
-	<4361f774-7d2e-1a67-bde9-da421df554f9@redhat.com>
-	<w51wozx597l.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <372299e3-6efe-aa6c-85ae-ccb26e1c6f3e@redhat.com>
-Date: Thu, 1 Feb 2018 19:09:09 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1ehJJr-0003XJ-9C
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:10:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ehJJr-0003X0-1t
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:10:43 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 393207854C
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 18:10:42 +0000 (UTC)
+References: <20180125143218.29528-1-kraxel@redhat.com>
+	<20180125143218.29528-3-kraxel@redhat.com>
+	<65124689-6705-71ee-561c-8d4b25b30e16@redhat.com>
+	<20180201173529.GX22810@redhat.com>
+	<6199d545-e7ae-ad95-6695-a63a714cb45c@redhat.com>
+	<20180201175444.GY22810@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1f7763b2-44ec-0663-d721-7a71782592a6@redhat.com>
+Date: Thu, 1 Feb 2018 13:10:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <w51wozx597l.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5"
-Subject: Re: [Qemu-devel] [PATCH v3 13/39] qcow2: Add l2_slice_size field to
- BDRVQcow2State
+In-Reply-To: <20180201175444.GY22810@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 2/8] ui: convert the SDL2 frontend to
+ keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +39,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <372299e3-6efe-aa6c-85ae-ccb26e1c6f3e@redhat.com>
-Subject: Re: [PATCH v3 13/39] qcow2: Add l2_slice_size field to BDRVQcow2State
-References: <cover.1516978645.git.berto@igalia.com>
- <e2cb85926f1f4910c7d18fcc902be60109592381.1516978645.git.berto@igalia.com>
- <4361f774-7d2e-1a67-bde9-da421df554f9@redhat.com>
- <w51wozx597l.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51wozx597l.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-02-01 10:51, Alberto Garcia wrote:
-> On Wed 31 Jan 2018 08:48:08 PM CET, Max Reitz wrote:
->> On 2018-01-26 15:59, Alberto Garcia wrote:
->>> The BDRVQcow2State structure contains an l2_size field, which stores
->>> the number of 64-bit entries in an L2 table.
+On 01/02/2018 12:54, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Feb 01, 2018 at 12:37:26PM -0500, Paolo Bonzini wrote:
+>> On 01/02/2018 12:35, Daniel P. Berrang=C3=A9 wrote:
+>>> On Thu, Feb 01, 2018 at 12:28:02PM -0500, Paolo Bonzini wrote:
+>>>> On 25/01/2018 09:32, Gerd Hoffmann wrote:
+>>>>> --- a/include/ui/input.h
+>>>>> +++ b/include/ui/input.h
+>>>>> @@ -80,4 +80,7 @@ extern const guint16 qemu_input_map_qnum_to_qcode=
+[];
+>>>>>  extern const guint qemu_input_map_qcode_to_linux_len;
+>>>>>  extern const guint16 qemu_input_map_qcode_to_linux[];
+>>>>
+>>>> Is there any reason to use the length variables rather than just
+>>>> ARRAY_SIZE()?  Coverity isn't able to see through the initializer an=
+d
+>>>> incorrectly complains that
 >>>
->>> For efficiency reasons we want to be able to load slices instead of
->>> full L2 tables, so we need to know how many entries an L2 slice can
->>> hold.
+>>> ARRAY_SIZE can only be used if you can see the array variable
+>>> initialization, but this is the header file so all we have is
+>>> the extern declaration and thus the array size is unknown from
+>>> the places that need to use the _len variable.
 >>>
->>> An L2 slice is the portion of an L2 table that is loaded by the qcow2=
-
->>> cache. At the moment that cache can only load complete tables,
->>> therefore an L2 slice has the same size as an L2 table (one cluster)
->>> and l2_size =3D=3D l2_slice_size.
->>>
->>> Later we'll allow smaller slices, but until then we have to use this
->>> new l2_slice_size field to make the rest of the code ready for that.
->>>
->>> Signed-off-by: Alberto Garcia <berto@igalia.com>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>  block/qcow2.c | 3 +++
->>>  block/qcow2.h | 1 +
->>>  2 files changed, 4 insertions(+)
+>>> We do in fact initalize the _len variable based on the ARRAY_SIZE,
+>>> but that's in the .c files.
 >>
->> Am I missing something or does this patch miss setting l2_slice_size
->> in qcow2_do_open()?
+>> Would it make sense for keymap-gen to also generate the header file, s=
+o
+>> that we can use an "extern const guint x[NNN]" declaration rather
+>> instead of "x[]"?
 >=20
-> qcow2_do_open() calls qcow2_update_options() which is what reads
-> l2-cache-entry-size and sets s->l2_slice_size.
+> I could probably add such a feature to it....
 
-So I was missing something, good.
+I could too if I know it will be accepted!  I'll send you a patch.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Thanks,
 
-
---my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzV8USHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AgPEH/iWA2sXzrUP70gHfZQmCimrLoz+FgJcn
-/yidYtJ3WmkMM43x8YHqfmZLWmq3OSgV1qYSSiMhd4MO+b6rrmByBUq68Zi99JT9
-6GPJTcKQgybzQUtoyE6HjDaQYHAjGPN0bKGC7GQVlEhYE0O9+f5QkBQ5dY/qQtKk
-0CNs73qNPLic5uC2s0I6QtkXpVCR+kAYg/or75J9oU2WeQZAY9Mh/QWDk3u+Axza
-8f8xqnnTFxr/+9DNhx1UUCCbXU9Bol08/VweJ566129WWAIHQlxjGeBVhE/KHZN8
-EkaQdkKCO/0JiCyAMaaYo2PjhmvTbivmTbWG0LgByl0AdOlNGiEKlPo=
-=cbUe
------END PGP SIGNATURE-----
-
---my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5--
+Paolo
