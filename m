@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ehD2P-0006E4-M9
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:28:18 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ehDIK-0006xO-8I
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:44:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ehD2K-0003XW-Nz
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:28:17 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36442
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1ehD2K-0003Wf-Ib
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:28:12 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w11BOViO079930
-	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 06:28:10 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fv0fjcn9a-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 06:28:09 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Thu, 1 Feb 2018 06:28:09 -0500
-References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-	<20180130094715.11578-2-zyimin@linux.vnet.ibm.com>
-	<20180131115824.7329b8ee.cohuck@redhat.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Thu, 1 Feb 2018 19:28:02 +0800
+	(envelope-from <stefanha@redhat.com>) id 1ehDIF-0007sy-NV
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:44:44 -0500
+Date: Thu, 1 Feb 2018 11:44:25 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180201114425.GD5783@stefanha-x1.localdomain>
+References: <20180130063433.11605-1-famz@redhat.com>
+	<20180130063433.11605-3-famz@redhat.com>
+	<b552c5fb-f79a-98f1-bac7-26cf6e106f06@redhat.com>
+	<20180130163820.GC4503@localhost.localdomain>
+	<20180131141247.GC23336@stefanha-x1.localdomain>
+	<20180131142249.GB3598@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180131115824.7329b8ee.cohuck@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <a048761a-7dbc-80e2-8b57-2b5b0fc35ff0@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] s390x/pci: fixup the code walking
- IOMMU tables
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="yudcn1FV7Hsu/q59"
+Content-Disposition: inline
+In-Reply-To: <20180131142249.GB3598@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] qemu-img: Document --force-share /
+ -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,111 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, kchamart@redhat.com, Max Reitz <mreitz@redhat.com>
 
 
+--yudcn1FV7Hsu/q59
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-=D4=DA 2018/1/31 =CF=C2=CE=E76:58, Cornelia Huck =D0=B4=B5=C0:
-> On Tue, 30 Jan 2018 10:47:13 +0100
-> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->
->> Current s390x PCI IOMMU code is lack of flags' checking, including:
->> 1) protection bit
->> 2) table length
->> 3) table offset
->> 4) intermediate tables' invalid bit
->> 5) format control bit
->>
->> This patch introduces a new struct named S390IOTLBEntry, and makes up
->> these missed checkings. At the same time, inform the guest with the
->> corresponding error number when the check fails.
-> There are a lot of things in this patch I cannot review due to -ENODOC,
-> but some comments below.
->
->> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->> ---
->>   hw/s390x/s390-pci-bus.c  | 223 +++++++++++++++++++++++++++++++++++++=
-+---------
->>   hw/s390x/s390-pci-bus.h  |  10 +++
->>   hw/s390x/s390-pci-inst.c |  10 ---
->>   3 files changed, 190 insertions(+), 53 deletions(-)
-> (...)
->
->> +/* ett is expected table type, -1 page table, 0 segment table, 1 regi=
-on table */
->> +static uint64_t get_table_index(uint64_t iova, int8_t ett)
->> +{
->> +    switch (ett) {
->> +    case -1:
->> +        return calc_px(iova);
->> +    case 0:
->> +        return calc_sx(iova);
->> +    case 1:
->> +        return calc_rtx(iova);
->> +    }
->> +
->> +    return -1;
-> You use ett to differentiate between the three table types a lot. Is
-> this an architectured value, or an internal construct?
-It's an architectured value to some degree, because it's used to descript
-the translation more clearly in the doc.
->
-> If you introduced it yourself, it might make sense to switch to an enum
-> instead. Otherwise, using some #defines would improve readability of
-> the code.
-OK. I will add macros in next version.
->
->> +}
-> (...)
->
->> +/**
->> + * table_translate: do translation within one table and return the fo=
-llowing
->> + *                  table origin
->> + *
->> + * @entry: the entry being traslated, the result is stored in this.
-> s/traslated/translated/
-OK.
->
->> + * @to: the address of table origin.
->> + * @ett: expected table type, 1 region table, 0 segment table and -1 =
-page table.
->> + * @error: error code
->> + */
->> +static uint64_t table_translate(S390IOTLBEntry *entry, uint64_t to, i=
-nt8_t ett,
->> +                                uint16_t *error)
-> (...)
->
->> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->> index be449210d9..63fa06fb97 100644
->> --- a/hw/s390x/s390-pci-inst.c
->> +++ b/hw/s390x/s390-pci-inst.c
->> @@ -644,16 +644,6 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, =
-uint8_t r2, uintptr_t ra)
->>  =20
->>       while (start < end) {
->>           entry =3D imrc->translate(iommu_mr, start, IOMMU_NONE);
->> -
->> -        if (!entry.translated_addr) {
->> -            pbdev->state =3D ZPCI_FS_ERROR;
->> -            setcc(cpu, ZPCI_PCI_LS_ERR);
->> -            s390_set_status_code(env, r1, ZPCI_PCI_ST_INSUF_RES);
->> -            s390_pci_generate_error_event(ERR_EVENT_SERR, pbdev->fh, =
-pbdev->fid,
->> -                                          start, ERR_EVENT_Q_BIT);
->> -            goto out;
->> -        }
->> -
->>           memory_region_notify_iommu(iommu_mr, entry);
->>           start +=3D entry.addr_mask + 1;
-> You're now progressing even though you might have generated an error
-> event. Is that what's intended?
-Yes, this is wrong. The right thing is only delete the code generating=20
-error event,
-and keep the if check here in this patch.
->
->>       }
->
+On Wed, Jan 31, 2018 at 03:22:49PM +0100, Kevin Wolf wrote:
+> Am 31.01.2018 um 15:12 hat Stefan Hajnoczi geschrieben:
+> > There should be a separate paragraph in docs/qemu-block-drivers.texi
+> > explaining that share-rw=3Don can be used safely with format=3Draw if t=
+he
+> > guests are configured to safely access a shared disk.  It should also
+> > mention that share-rw=3Don is unsafe for image formats.
+>=20
+> share-rw=3Don is a -device option and only about the guest, not about the
+> backend. It is never unsafe if the guest can cope with external writers.
+> It just doesn't prevent qemu from locking the image file for image
+> formats.
+
+Thanks for the explanation.  Documentation on share-rw=3Don|off would be
+nice.
+
+Maybe something like:
+
+  By default the guest has exclusive write access to its disk image.
+  This is enforced by QEMU via file locking.  If the guest can safely
+  share the disk image with other writers the -device ...,share-rw=3Don
+  parameter can be used.  This is only safe if the guest is running
+  software, such as a cluster file system, that coordinates disk
+  accesses to avoid corruption.
+
+  Note that share-rw=3Don only declares the guest's ability to share the
+  disk.  Some QEMU features, such as image file formats, require
+  exclusive write access to the disk image and this is unaffected by the
+  share-rw=3Don option.
+
+For anyone else reading this, here is the code that protects qcow2 and
+other image formats:
+
+  void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                 const BdrvChildRole *role,
+                                 BlockReopenQueue *reopen_queue,
+                                 uint64_t perm, uint64_t shared,
+                                 uint64_t *nperm, uint64_t *nshared)
+  {
+      ...
+
+      /* bs->file always needs to be consistent because of the metadata. We
+       * can never allow other users to resize or write to it. */
+      if (!(flags & BDRV_O_NO_IO)) {
+          perm |=3D BLK_PERM_CONSISTENT_READ;
+      }
+      shared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
+
+Stefan
+
+--yudcn1FV7Hsu/q59
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJacv2ZAAoJEJykq7OBq3PIvwMH+gMw9TcVCP78cSpGy3+zUiGx
+2tNChzDdjK/I+iGgqMq78EFoftjlFZu2GbLu6y/ew1JnyM3Rey3JWgf9qx1S4HmC
+MP4KqBhPqKPDiOiIzufDGcOg5tJR8JsMuhwkcupiTDk4uwp8UFqee547kDPId3Im
+xnuUYtdudwXCaxKeS9TyBwNlJ0BMRKlpDJKjIjoMD7x7coFkGiviDb1nVr9asMKv
+fPcQp7udN0lefrfqyGsmS728SXrwjUp4iCKkH69of2r1roBAiMGVhStiy83s+H7N
+l+GhNhejMM78R6lhpx7TwrN1LIV2RSPaIfugDY6FocctymD13njEI9SBYN6Ylkg=
+=OZPn
+-----END PGP SIGNATURE-----
+
+--yudcn1FV7Hsu/q59--
