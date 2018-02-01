@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eh4YT-0008FM-SS
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:24:50 -0500
+	(envelope-from <mst@redhat.com>) id 1eh4ZF-0000Ia-91
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eh4YQ-0004Ix-K0
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:24:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55442)
+	(envelope-from <mst@redhat.com>) id 1eh4ZB-0004ly-Um
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:25:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eh4YQ-0004IS-B9
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:24:46 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A96997CB8B
-	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 02:24:45 +0000 (UTC)
-Date: Thu, 1 Feb 2018 04:24:40 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eh4ZB-0004lY-JH
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:25:33 -0500
+Date: Thu, 1 Feb 2018 04:25:27 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180201042234-mutt-send-email-mst@kernel.org>
-References: <20180131092835.GA31397@xz-mi>
-	<20180131160214-mutt-send-email-mst@kernel.org>
-	<20180201021853.GD31397@xz-mi>
+Message-ID: <20180201042505-mutt-send-email-mst@kernel.org>
+References: <1516064279-14816-1-git-send-email-minyard@acm.org>
+	<09678455-2c70-ff07-7f2a-f4135e28e75f@gmail.com>
+	<20180131185225.21762f12@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180201021853.GD31397@xz-mi>
-Subject: Re: [Qemu-devel] Windows balloon driver PFN issue
+In-Reply-To: <20180131185225.21762f12@bahia.lan>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] Small IPMI fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,61 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: Corey Minyard <tcminyard@gmail.com>, minyard@acm.org, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
-On Thu, Feb 01, 2018 at 10:18:53AM +0800, Peter Xu wrote:
-> On Wed, Jan 31, 2018 at 04:03:12PM +0200, Michael S. Tsirkin wrote:
-> > On Wed, Jan 31, 2018 at 05:28:35PM +0800, Peter Xu wrote:
-> > > Hi, Michael and the list,
-> > > 
-> > > I observed this on windows 8 enterprise guests, when doing memory ballooning:
-> > > 
-> > > 23892@1517298572.328354:virtio_balloon_to_target balloon target: 0x80000000 num_pages: 524288
-> > > 23892@1517298638.542819:virtio_balloon_get_config num_pages: 524288 actual: 0
-> > > 23892@1517298638.542974:virtio_balloon_handle_output section name: pc.ram gpa: 0x174604000
-> > > 23892@1517298638.543059:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > > 23892@1517298638.543135:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460a000
-> > > 23892@1517298638.543140:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > > 23892@1517298638.543143:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460b000
-> > > 23892@1517298638.543146:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > > 23892@1517298638.543148:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460c000
-> > > 23892@1517298638.543152:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > > 23892@1517298638.543154:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460d000
-> > > 23892@1517298638.543159:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > > 23892@1517298638.543162:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460e000
-> > > 23892@1517298638.543165:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > > 23892@1517298638.543167:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460f000
-> > > 23892@1517298638.543170:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > > ...
-> > > 
-> > > I think it's very possible that these zero addresses (please let me
-> > > know what the first 4K page is used for if anyone knows, since IIUC
-> > > that's what we throw away now) are half of the 64bit PFN.  Or say, not
-> > > sure whether this means a windows guest driver bug that is using
-> > > 64bits for PFN rather than 32bits (and I suppose the protocol is using
-> > > 32bit for PFNs).
-> > > 
-> > > Michael, do you know what to do with this?
-> > > 
-> > > Thanks,
-> > 
-> > PFN is GPA>>12.  Do you have more than 1<<44 bytes of memory in this VM then?
-> 
-> No.  But isn't it still not good to drop the page at offset zero (and
-> drop it NNN times)?
+On Wed, Jan 31, 2018 at 06:52:25PM +0100, Greg Kurz wrote:
+> On Tue, 23 Jan 2018 10:55:15 -0600
+> Corey Minyard <tcminyard@gmail.com> wrote:
+>=20
+> > Michael?=A0 Anyone?=A0 Can we get these in?
+> >=20
+>=20
+> Since you're adding yourself as a maintainer for IPMI, why not just sen=
+ding
+> a pull request ?
 
-Absolutely - looks like a bug. I just don't know why does this happen.
+Alternatively if you want others to merge it, pls Cc the relevant people.
 
->  And I'm not sure what will happen if guest has
-> 1<<44 bytes; then we'll possibly drop very random addresses since a
-> real address will be splitted?
-> 
-> Thanks,
-
-The balloon won't work, period. There was an interface change to fix
-that but implementation issues remained and contributor seems to be busy
-with page hints.
-
-> -- 
-> Peter Xu
+> > Thanks
+> >=20
+> > -corey
+> >=20
+> > On 01/15/2018 06:57 PM, minyard@acm.org wrote:
+> > > These are some fixes I've had for a while (mostly).  They are small
+> > > fixes and additions for various things.  It would be nice to be abl=
+e
+> > > to get these into the upcoming release.
+> > >
+> > > I also add myself as the maintainer for the IPMI code, since that
+> > > seemed appropriate.
+> > >
+> > > Changes in v2:
+> > >
+> > > I removed the "other" fixes (the one to vl.c) from the previous pat=
+ch
+> > > set, these are all IPMI-related changes.  I also moved adding mysel=
+f
+> > > as the IPMI maintainer to the first patch, per Marc-Andr=E9.
+> > > =20
+> >=20
+> >=20
