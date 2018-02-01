@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ehFR5-0007kB-66
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:01:58 -0500
+	(envelope-from <christoffer.dall@linaro.org>) id 1ehFTR-0000bA-RD
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ehFQv-0006D2-LA
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:01:55 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <934f18f7-0ded-6c36-a982-1613aae7b650@virtuozzo.com>
-References: <1516297747-107232-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516297747-107232-5-git-send-email-anton.nefedov@virtuozzo.com>
-	<w51y3kexdv9.fsf@maestria.local.igalia.com>
-	<934f18f7-0ded-6c36-a982-1613aae7b650@virtuozzo.com>
-Date: Thu, 01 Feb 2018 15:01:42 +0100
-Message-ID: <w51o9l86c6x.fsf@maestria.local.igalia.com>
+	(envelope-from <christoffer.dall@linaro.org>) id 1ehFTL-0007j0-V5
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:04:21 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
+	id 1ehFTL-0007ie-MD
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:04:15 -0500
+Received: by mail-wm0-x242.google.com with SMTP id b21so5892269wme.4
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 06:04:15 -0800 (PST)
+Date: Thu, 1 Feb 2018 15:04:11 +0100
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Message-ID: <20180201140411.GD21802@cbox>
+References: <CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
+	<CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
+	<CAMJs5B8CWm2bj-Be_j4p9Y_3wXr=W2K7zE8593ke-97QR20qcA@mail.gmail.com>
+	<CAKv+Gu935vi1wCRAKqC-nscXa+=CKX6P=HPO-3dNA4fx0Fm-NA@mail.gmail.com>
+	<CAMJs5B-S=qVWYP2eTN1qsOQctmfUR8jCXBaz2DKyaKRT7LrAyA@mail.gmail.com>
+	<CAKv+Gu-7d5jbt9V8bORkrZXxNmshMNjsqg+EiwhA-CYrNLFotA@mail.gmail.com>
+	<CAMJs5B8W7-yfco1qkWBY0FU4hiner05jp1jBycWwT6wCTegBfA@mail.gmail.com>
+	<20180201104222.bwbrsfp2kmkwd7zp@kamzik.brq.redhat.com>
+	<20180201104831.GB21802@cbox>
+	<20180201122520.b2o75bmjaqwukuqs@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 4/9] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180201122520.b2o75bmjaqwukuqs@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +39,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed 31 Jan 2018 06:11:27 PM CET, Anton Nefedov wrote:
-> On 31/1/2018 6:11 PM, Alberto Garcia wrote:
->> On Thu 18 Jan 2018 06:49:02 PM CET, Anton Nefedov wrote:
->> 
->>> -static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
->>> +static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self,
->>> +                                                   bool nowait)
->> 
->> It's a bit confusing to have a function called wait_foo() with a
->> parameter that says "don't wait"...
->> 
->> How about
->> 
->>       check_serialising_requests(BdrvTrackedRequest *self, bool wait)
->> 
->
-> I think it might be more important to emphasize in the name that the
-> function _might_ wait.
->
-> i.e. it feels worse to read
->    check_serialising_requests(req, true);
-> when one needs to follow the function to find out that it might yield.
->
-> Personally I'd vote for
->
->      static int check_or_wait_serialising_requests(
->          BdrvTrackedRequest *self, bool wait) {}
->
-> and maybe even:
->
->      static int check_serialising_requests(BdrvTrackedRequest *self) {
->          return check_or_wait_serialising_requests(self, false);
->
->      static int wait_serialising_requests(BdrvTrackedRequest *self) {
->          return check_or_wait_serialising_requests(self, true);
->      }
+On Thu, Feb 01, 2018 at 01:25:20PM +0100, Andrew Jones wrote:
+> On Thu, Feb 01, 2018 at 11:48:31AM +0100, Christoffer Dall wrote:
+> > On Thu, Feb 01, 2018 at 11:42:22AM +0100, Andrew Jones wrote:
+> > > On Thu, Feb 01, 2018 at 10:59:54AM +0100, Christoffer Dall wrote:
+> > > > On Thu, Feb 1, 2018 at 10:33 AM, Ard Biesheuvel
+> > > > > If you could use dirty page tracking to only perform the cache
+> > > > > invalidation when the framebuffer memory has been updated, you can at
+> > > > > least limit the impact to cases where the framebuffer is actually
+> > > > > used, rather than sitting idle with a nice wallpaper image.
+> > > 
+> > > Yes, this is the exact approach I took back when I experimented with
+> > > this. I must have screwed up my PoC in some way (like using the gcc
+> > > builtin), because it wasn't working for me...
+> > > 
+> > Does that mean you have some code you feel like reviving and use to send
+> > out an RFC based on? ;)
+> >
+> 
+> I don't usually delete things, but I do do some sort of copy on use
+> from old homedirs to new ones from time to time, letting stuff that
+> gets really old completely drop at some point. I might be able to
+> find the old work, or just hack a quick and ugly version from my
+> memory to share - hopefully whatever I did to cause it to fail last
+> time has been forgotten :-)
+> 
 
-You're right. Either approach works for me though, also keeping the
-current solution, wait_serialising_requests(req, true).
+If you have bandwidth to look at this that's great.  Otherwise let us
+know, and I'll see if I can devote some time to it.
 
-Berto
+Thanks,
+-Christoffer
