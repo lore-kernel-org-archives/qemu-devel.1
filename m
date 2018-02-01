@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40138)
+Received: from eggs.gnu.org ([208.118.235.92]:36489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ehL4O-0002Gv-AH
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:03:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehLAx-0006EO-9d
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:10:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ehL3K-0002QE-8P
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:02:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehL3J-0002Pb-Rf
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:01:46 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EB1CCC05178F
-	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 20:01:44 +0000 (UTC)
-References: <20180201112028.23552-1-peterx@redhat.com>
-	<90b4bc63-94cd-ec0f-32c8-c16df8ee84cf@redhat.com>
-	<20180201211652-mutt-send-email-mst@kernel.org>
-	<20180201194845.GN2457@work-vm>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <33142d67-92b6-e1b1-b906-716a06efb1fa@redhat.com>
-Date: Thu, 1 Feb 2018 22:01:31 +0200
+	(envelope-from <mreitz@redhat.com>) id 1ehL9e-000730-5n
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:09:24 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<c034843507c57cc91762702070307d0aa88e56b1.1516978645.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <dc89a69f-03ef-81a6-3186-1c6981e41069@redhat.com>
+Date: Thu, 1 Feb 2018 21:05:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180201194845.GN2457@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
- priority
+In-Reply-To: <c034843507c57cc91762702070307d0aa88e56b1.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RDqdtY6ElkBkS6miMmXDvuhziEpvNEOaI"
+Subject: Re: [Qemu-devel] [PATCH v3 37/39] iotests: Test valid values of
+ l2-cache-entry-size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,132 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 01/02/2018 21:48, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
->> On Thu, Feb 01, 2018 at 02:24:15PM +0200, Marcel Apfelbaum wrote:
->>> Hi Peter,
->>>
->>> On 01/02/2018 13:20, Peter Xu wrote:
->>>> In the past, we prioritized IOMMU migration so that we have such a
->>>> priority order:
->>>>
->>>>     IOMMU > PCI Devices
->>>>
->>>> When migrating a guest with both vIOMMU and pcie-root-port, we'll always
->>>> migrate vIOMMU first, since pcie-root-port will be seen to have the same
->>>> priority of general PCI devices.
->>>>
->>>> That's problematic.
->>>>
->>>> The thing is that PCI bus number information is stored in the root port,
->>>> and that is needed by vIOMMU during post_load(), e.g., to figure out
->>>> context entry for a device.  If we don't have correct bus numbers for
->>>> devices, we won't be able to recover device state of the DMAR memory
->>>> regions, and things will be messed up.
->>>>
->>>> So let's boost the PCIe root ports to be even with higher priority:
->>>>
->>>>    PCIe Root Port > IOMMU > PCI Devices
->>>>
->>>> A smoke test shows that this patch fixes bug 1538953.
->>>>
->>>> CC: Alex Williamson <alex.williamson@redhat.com>
->>>> CC: Marcel Apfelbaum <marcel@redhat.com>
->>>> CC: Michael S. Tsirkin <mst@redhat.com>
->>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>> CC: Juan Quintela <quintela@redhat.com>
->>>> CC: Laurent Vivier <lvivier@redhat.com>
->>>> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1538953
->>>> Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>> Signed-off-by: Peter Xu <peterx@redhat.com>
->>>> ---
->>>> Marcel & all,
->>>>
->>>> I think it's possible that we need similar thing for other bridge-like
->>>> devices, but I'm not that familiar.  Would you help confirm?  Thanks,
->>>
->>> Is a pity we don't have a way to mark the migration priority
->>> in a base class. Dave, maybe we do have a way?
->>>
->>> In the meantime you would need to add it also to:
->>> - ioh3420 (Intel root port)
->>> - xio3130_downstream (Intel switch downstream port)
->>> - xio3130_upstream (The counterpart of the above, you want the whole
->>>   switch to be migrated before loading the IOMMU device state)
->>> - pcie_pci_bridge (for pci devices)
->>> - pci-pci bridge (if for some reason you have one attached to the pcie_pci_brdge)
->>> - i82801b11 (dmi-pci bridge, we want to deprecate it bu is there for now)
->>>
->>> Thanks,
->>> Marcel
->>
->> It's kind of strange that we need to set the priority manually.
->> Can't migration figure it out itself?
-> 
->> I think bus
->> must always be migrated before the devices behind it ...
-> 
-> I think that's true; but:
->   a) Is the iommu a child of any of the PCI busses?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RDqdtY6ElkBkS6miMmXDvuhziEpvNEOaI
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <dc89a69f-03ef-81a6-3186-1c6981e41069@redhat.com>
+Subject: Re: [PATCH v3 37/39] iotests: Test valid values of
+ l2-cache-entry-size
+References: <cover.1516978645.git.berto@igalia.com>
+ <c034843507c57cc91762702070307d0aa88e56b1.1516978645.git.berto@igalia.com>
+In-Reply-To: <c034843507c57cc91762702070307d0aa88e56b1.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-No, is a sysbus device.
+On 2018-01-26 16:00, Alberto Garcia wrote:
+> The l2-cache-entry-size setting can only contain values that are
+> powers of two between 512 and the cluster size.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  tests/qemu-iotests/103     | 17 +++++++++++++++++
+>  tests/qemu-iotests/103.out |  3 +++
+>  2 files changed, 20 insertions(+)
 
->   b) does anything ensure that the bridge that's a parent of a bus
->      gets migrated before the bus it provides?
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-I think this was Michael's question :)
 
->   c) What happens with more htan one root port?
-> 
+--RDqdtY6ElkBkS6miMmXDvuhziEpvNEOaI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Root ports can't be nested, anyway, I suppose the migration should
-follow the bus numbering order.
+-----BEGIN PGP SIGNATURE-----
 
-The question now is what happens if the migration is happening before
-the guest firmware finishes assigning numbers to buses...
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzcyMSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ads0H/3zb0zFsUvxGClnQtDy1g7zyjQOiaxdF
+oYKy+cNedktFKjV/zfReViFnjlV1DLXcuu0nJ2QKj0GNTudAUdpYgyb0b4L9tlO3
+edzHtA9uUqKsEIymMMOfcOjk6D60+0/Mt29H7xsF1GijgcXBDf1g1sf24ZhN50ug
+l9WztNbTX0ZbzNe2AkmhKIlYK3J4QeX/fGk+BGrg/WELKf8h7cP+OMTXur5dBYVW
+jpZaa1ZZ5ESIVNrcwTntbZ5AdYevL2r+oTLxKvQP1PNxVhiHhHSo3hfH05ca6jWu
+RYp5oSzEqzhjK94EJgjZOlCoEcShDaiW578bQ1em86jXaDOHuLOUv6A=
+=L+vv
+-----END PGP SIGNATURE-----
 
-Still, QEMU has enough information to decide the right ordering,
-the question is if the current migration mechanism has some ordering
-or the only one is the "VMStateFlags".
-
-Thanks,
-Marcel
-
-> Dave
-> 
-> 
->>>>  hw/pci-bridge/gen_pcie_root_port.c | 1 +
->>>>  include/migration/vmstate.h        | 1 +
->>>>  2 files changed, 2 insertions(+)
->>>>
->>>> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
->>>> index 0e2f2e8bf1..e6ff1effd8 100644
->>>> --- a/hw/pci-bridge/gen_pcie_root_port.c
->>>> +++ b/hw/pci-bridge/gen_pcie_root_port.c
->>>> @@ -101,6 +101,7 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
->>>>  
->>>>  static const VMStateDescription vmstate_rp_dev = {
->>>>      .name = "pcie-root-port",
->>>> +    .priority = MIG_PRI_PCIE_ROOT_PORT,
->>>>      .version_id = 1,
->>>>      .minimum_version_id = 1,
->>>>      .post_load = pcie_cap_slot_post_load,
->>>> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
->>>> index 8c3889433c..491449db9f 100644
->>>> --- a/include/migration/vmstate.h
->>>> +++ b/include/migration/vmstate.h
->>>> @@ -148,6 +148,7 @@ enum VMStateFlags {
->>>>  typedef enum {
->>>>      MIG_PRI_DEFAULT = 0,
->>>>      MIG_PRI_IOMMU,              /* Must happen before PCI devices */
->>>> +    MIG_PRI_PCIE_ROOT_PORT,     /* Must happen before IOMMU */
->>>>      MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
->>>>      MIG_PRI_GICV3,              /* Must happen before the ITS */
->>>>      MIG_PRI_MAX,
->>>>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+--RDqdtY6ElkBkS6miMmXDvuhziEpvNEOaI--
