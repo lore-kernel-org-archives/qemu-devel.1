@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ehEQz-0005aF-QF
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:57:47 -0500
+	(envelope-from <david@redhat.com>) id 1ehESV-0006fl-2N
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:59:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ehEQu-00028U-RN
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:57:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32834)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ehEQu-00027x-Ig
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:57:40 -0500
-Date: Thu, 1 Feb 2018 14:57:35 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180201145228-mutt-send-email-mst@kernel.org>
-References: <20180117095421.124787-1-marcel@redhat.com>
-	<20180117095421.124787-2-marcel@redhat.com>
-	<20180131204059.GG21702@localhost.localdomain>
-	<20180131230607-mutt-send-email-mst@kernel.org>
-	<20180131233422.GP26425@localhost.localdomain>
-	<20180201040608-mutt-send-email-mst@kernel.org>
-	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
+	(envelope-from <david@redhat.com>) id 1ehESS-0002tX-Rl
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:59:19 -0500
+References: <20180131181742.2037-1-cohuck@redhat.com>
+	<20180131181742.2037-2-cohuck@redhat.com>
+	<de34c0e5-002e-f461-bc4d-498548424177@redhat.com>
+	<20180201134803.78ef2b65.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <240bb71f-7d10-bc54-1bb7-23df6bc51081@redhat.com>
+Date: Thu, 1 Feb 2018 13:59:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
- memory-backend-ram
+In-Reply-To: <20180201134803.78ef2b65.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390x/tcg: wire up pci instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,106 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de
 
-On Thu, Feb 01, 2018 at 07:36:50AM +0200, Marcel Apfelbaum wrote:
-> On 01/02/2018 4:22, Michael S. Tsirkin wrote:
-> > On Wed, Jan 31, 2018 at 09:34:22PM -0200, Eduardo Habkost wrote:
-> >> On Wed, Jan 31, 2018 at 11:10:07PM +0200, Michael S. Tsirkin wrote:
-> >>> On Wed, Jan 31, 2018 at 06:40:59PM -0200, Eduardo Habkost wrote:
-> >>>> On Wed, Jan 17, 2018 at 11:54:18AM +0200, Marcel Apfelbaum wrote:
-> >>>>> Currently only file backed memory backend can
-> >>>>> be created with a "share" flag in order to allow
-> >>>>> sharing guest RAM with other processes in the host.
-> >>>>>
-> >>>>> Add the "share" flag also to RAM Memory Backend
-> >>>>> in order to allow remapping parts of the guest RAM
-> >>>>> to different host virtual addresses. This is needed
-> >>>>> by the RDMA devices in order to remap non-contiguous
-> >>>>> QEMU virtual addresses to a contiguous virtual address range.
-> >>>>>
-> >>>>
-> >>>> Why do we need to make this configurable?  Would anything break
-> >>>> if MAP_SHARED was always used if possible?
-> >>>
-> >>> See Documentation/vm/numa_memory_policy.txt for a list
-> >>> of complications.
-> >>
-> >> Ew.
-> >>
-> >>>
-> >>> Maybe we should more of an effort to detect and report these
-> >>> issues.
-> >>
-> >> Probably.  Having other features breaking silently when using
-> >> pvrdma doesn't sound good.  We must at least document those
-> >> problems in the documentation for memory-backend-ram.
-> >>
-> >> BTW, what's the root cause for requiring HVAs in the buffer?
-> > 
-> > It's a side effect of the kernel/userspace API which always wants
-> > a single HVA/len pair to map memory for the application.
-> > 
-> > 
-> 
-> Hi Eduardo and Michael,
-> 
-> >>  Can
-> >> this be fixed?
-> > 
-> > I think yes.  It'd need to be a kernel patch for the RDMA subsystem
-> > mapping an s/g list with actual memory. The HVA/len pair would then just
-> > be used to refer to the region, without creating the two mappings.
-> > 
-> > Something like splitting the register mr into
-> > 
-> > mr = create mr (va/len) - allocate a handle and record the va/len
-> > 
-> > addmemory(mr, offset, hva, len) - pin memory
-> > 
-> > register mr - pass it to HW
-> > 
-> > As a nice side effect we won't burn so much virtual address space.
-> >
-> 
-> We would still need a contiguous virtual address space range (for post-send)
-> which we don't have since guest contiguous virtual address space
-> will always end up as non-contiguous host virtual address space.
+On 01.02.2018 13:48, Cornelia Huck wrote:
+> On Thu, 1 Feb 2018 13:42:52 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 31.01.2018 19:17, Cornelia Huck wrote:
+>=20
+>>> +#ifndef CONFIG_USER_ONLY
+>>> +void HELPER(clp)(CPUS390XState *env, uint32_t r2)
+>>> +{
+>>> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+>>> +    int r;
+>>> +
+>>> +    qemu_mutex_lock_iothread();
+>>> +    r =3D clp_service_call(cpu, r2, GETPC());
+>>> +    qemu_mutex_unlock_iothread();
+>>> +    if (r) {
+>>> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+>>> +    } =20
+>>
+>> We don't need the if (r) ... so I suggest dropping all these. (as I
+>> said, will be handled later via the generic flag checking in translati=
+on
+>> code). We can ignore any error from these functions.
+>=20
+> I did not check the instruction implementations in detail... was the
+> error really only for the !CONFIG_PCI case?
 
-It just needs to be contiguous in the HCA virtual address space.
-Software never accesses through this pointer.
-In other words - basically expose register physical mr to userspace.
+!FEATURE_ZPCI (which includes !CONFIG_PCI)
+
+Yes, that's how I remember.
+
+>=20
+> (I really should know that...)
+>=20
+>> A sane guest will newer trigger this. (if we have no CONFIG_PCI, the
+>> also the ZPCI feature will not be available)
+>=20
+> Hopefully we can also handle non-sane guests correctly...
+
+Usually, if you call instructions that are not indicated via STFL, there
+is no guarantee what will happen. Some time in the future, we will
+handle this globally (but haven't done so to allow new applications to
+run with old CPU models - which was necessary before we bumped the CPU
+model to a z12).
+
+If you don't want to wait until that support is added, you should be
+save with something like this:
 
 
-> 
-> I am not sure the RDMA HW can handle a large VA with holes.
-> 
-> An alternative would be 0-based MR, QEMU intercepts the post-send
-> operations and can substract the guest VA base address.
-> However I didn't see the implementation in kernel for 0 based MRs
-> and also the RDMA maintainer said it would work for local keys
-> and not for remote keys.
-> 
-> > This will fix rdma with hugetlbfs as well which is currently broken.
-> > 
-> > 
-> 
-> There is already a discussion on the linux-rdma list:
->     https://www.spinics.net/lists/linux-rdma/msg60079.html
-> But it will take some (actually a lot of) time, we are currently talking about
-> a possible API.
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 02cd4b2627..a5db014730 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -5907,6 +5907,10 @@ static ExitStatus translate_one(CPUS390XState
+*env, DisasContext *s)
+         gen_illegal_opcode(s);
+         return EXIT_NORETURN;
+     }
++    if (insn->fac =3D=3D FAC_PCI && !s390_has_feat(FAC_PCI)) {
++        gen_illegal_opcode(s);
++        return EXIT_NORETURN;
++    }
 
-You probably need to pass the s/g piece by piece since it might exceed
-any reasonable array size.
+ #ifndef CONFIG_USER_ONLY
+     if (s->tb->flags & FLAG_MASK_PER) {
 
-> And it does not solve the re-mapping...
-> 
-> Thanks,
-> Marcel
+--=20
 
-Haven't read through that discussion. But at least what I posted solves
-it since you do not need it contiguous in HVA any longer.
+Thanks,
 
-> >> -- 
-> >> Eduardo
+David / dhildenb
