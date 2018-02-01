@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehG93-0004XS-GS
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:47:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ehG9q-0005JZ-Py
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:48:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehG8z-00058m-Ga
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:47:21 -0500
-Date: Thu, 1 Feb 2018 15:47:05 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180201154705.604d8dd9.cohuck@redhat.com>
-In-Reply-To: <20180131181742.2037-2-cohuck@redhat.com>
-References: <20180131181742.2037-1-cohuck@redhat.com>
-	<20180131181742.2037-2-cohuck@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ehG9n-0005T1-N5
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:48:10 -0500
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:33649)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ehG9n-0005Sh-GJ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:48:07 -0500
+Received: by mail-wm0-f44.google.com with SMTP id x4-v6so421007wmc.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 06:48:07 -0800 (PST)
+References: <1516279431-30424-1-git-send-email-pbonzini@redhat.com>
+	<1516279431-30424-5-git-send-email-pbonzini@redhat.com>
+	<76f78388-fb2a-4e39-29a1-338da45b0c32@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <760cf253-96ea-2244-c7de-7e123ceb92eb@redhat.com>
+Date: Thu, 1 Feb 2018 09:48:03 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <76f78388-fb2a-4e39-29a1-338da45b0c32@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390x/tcg: wire up pci instructions
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/7] qed: make
+ bdrv_qed_do_open a coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, david@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Wed, 31 Jan 2018 19:17:41 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 18/01/2018 15:19, Eric Blake wrote:
+> On 01/18/2018 06:43 AM, Paolo Bonzini wrote:
+>> It is called from qcow2_invalidate_cache in coroutine context (incoming
+> Why is a qcow2 function calling qed code?  Definitely a copy-paste bug,
+> but I'm not sure of the right fix.
 
-> +void HELPER(sic)(CPUS390XState *env, uint64_t r1, uint64_t r3)
-> +{
-> +    int r;
-> +
-> +    qemu_mutex_lock_iothread();
-> +    r = css_do_sic(env, r1 & 0xffff, (r3 >> 27) & 0x7);
+This reference was of course meant to be qed_invalidate_cache.
 
-Here, the arguments have to be swapped around...
+Thanks,
 
-> +    qemu_mutex_unlock_iothread();
-> +    if (r) {
-> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+Paolo
 
-...and here we have to pass -r instead of PGM_OPERATION. (Thanks to
-David for spotting those!)
-
-> +    }
-> +}
-
-With that fixed (and rebased upon current s390-next, which contains
-David's latest changes), I can also turn on ais for tcg (which means
-pre-4.15 kernels can see pci devices as well.)
+>> migration runs in a coroutine), so it's cleaner if metadata is always
+>> loaded from a coroutine.
