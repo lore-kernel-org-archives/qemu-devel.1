@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJz0-0003Fw-E4
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:15 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1ehJz2-0003HT-Os
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJyz-0000A6-Fg
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:14 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:45712)
+	(envelope-from <tcminyard@gmail.com>) id 1ehJz0-0000B6-Am
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:16 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:35261)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJyz-00009R-BD
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:13 -0500
-Received: by mail-ot0-x242.google.com with SMTP id 73so8756343oti.12
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:13 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJz0-0000AT-6S
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:14 -0500
+Received: by mail-ot0-x243.google.com with SMTP id a2so6527186otf.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:14 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu,  1 Feb 2018 12:52:58 -0600
-Message-Id: <1517511182-9944-4-git-send-email-minyard@acm.org>
+Date: Thu,  1 Feb 2018 12:53:01 -0600
+Message-Id: <1517511182-9944-7-git-send-email-minyard@acm.org>
 In-Reply-To: <1517511182-9944-1-git-send-email-minyard@acm.org>
 References: <1517511182-9944-1-git-send-email-minyard@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 3/7] ipmi: Don't set the timestamp on add
- events that don't have it
+Subject: [Qemu-devel] [PATCH 6/7] ipmi: disable IRQ and ATN on an external
+ disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +32,29 @@ Cc: Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-According to the spec, from section "32.3 OEM SEL Record - Type
-E0h-FFh", event types from 0x0e to 0xff do not have a timestamp.
-So don't set it when adding those types.  This required putting
-the timestamp in a temporary buffer, since it's still required
-to set the last addition time.
+Otherwise there's no way to clear them without an external command,
+and it could lock the OS in the VM if they were stuck.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/ipmi/ipmi_bmc_sim.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/ipmi/ipmi_bmc_extern.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index cc068f2..a0bbfd5 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -443,16 +443,21 @@ static void sel_inc_reservation(IPMISel *sel)
- /* Returns 1 if the SEL is full and can't hold the event. */
- static int sel_add_event(IPMIBmcSim *ibs, uint8_t *event)
- {
-+    uint8_t ts[4];
-+
-     event[0] = 0xff;
-     event[1] = 0xff;
--    set_timestamp(ibs, event + 3);
-+    set_timestamp(ibs, ts);
-+    if (event[2] < 0xe0) { /* Don't set timestamps for type 0xe0-0xff. */
-+        memcpy(event + 3, ts, 4);
-+    }
-     if (ibs->sel.next_free == MAX_SEL_SIZE) {
-         ibs->sel.overflow = 1;
-         return 1;
-     }
-     event[0] = ibs->sel.next_free & 0xff;
-     event[1] = (ibs->sel.next_free >> 8) & 0xff;
--    memcpy(ibs->sel.last_addition, event + 3, 4);
-+    memcpy(ibs->sel.last_addition, ts, 4);
-     memcpy(ibs->sel.sel[ibs->sel.next_free], event, 16);
-     ibs->sel.next_free++;
-     sel_inc_reservation(&ibs->sel);
+diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+index 8c0535d..bf0b7ee 100644
+--- a/hw/ipmi/ipmi_bmc_extern.c
++++ b/hw/ipmi/ipmi_bmc_extern.c
+@@ -425,6 +425,11 @@ static void chr_event(void *opaque, int event)
+             return;
+         }
+         ibe->connected = false;
++        /*
++         * Don't hang the OS trying to handle the ATN bit, other end will
++         * resend on a reconnect.
++         */
++        k->set_atn(s, 0, 0);
+         if (ibe->waiting_rsp) {
+             ibe->waiting_rsp = false;
+             ibe->inbuf[1] = ibe->outbuf[1] | 0x04;
 -- 
 2.7.4
