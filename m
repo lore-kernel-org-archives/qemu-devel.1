@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ehDXK-0004rI-DZ
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:00:22 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ehDYw-0005kn-3i
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:01:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ehDXB-0004wm-72
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:00:14 -0500
-Received: from [45.249.212.32] (port=43922 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1ehDXA-0004qY-RT
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:00:05 -0500
-From: Gonglei <arei.gonglei@huawei.com>
-Date: Thu, 1 Feb 2018 19:59:32 +0800
-Message-ID: <1517486372-22868-1-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ehDYs-0006Wa-2A
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:01:54 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ehDYr-0006Vf-S0
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:01:50 -0500
+Received: by mail-wr0-x231.google.com with SMTP id 36so18684957wrh.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 04:01:49 -0800 (PST)
+References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
+	<87lghd3mq6.fsf@linaro.org>
+	<CAKmqyKMgrU+4ABijd0SgomyZriVjVFMYt=TXs5b9--w_kenZ+Q@mail.gmail.com>
+	<CAKmqyKMopCi5jaDstAX0Q3CzLdQ9wRgKWT2ggR_Or8Yh09zkrQ@mail.gmail.com>
+	<0b0a9968-02bf-9273-e5fe-a69e04cf7f5e@redhat.com>
+	<CAKmqyKMAy3qjjTFdtw4ksa=wJQYVzYZqvSopQ_cHbqwd0tr2cg@mail.gmail.com>
+	<87tvv1ydjl.fsf@linaro.org>
+	<CAKmqyKM10j7yyyhJn8SAv7K3EkZbmL-ckiv5_qQrFqiHvJ2z8g@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAKmqyKM10j7yyyhJn8SAv7K3EkZbmL-ckiv5_qQrFqiHvJ2z8g@mail.gmail.com>
+Date: Thu, 01 Feb 2018 12:01:46 +0000
+Message-ID: <87r2q4yl3p.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] vl: fix possible int overflow for
- qemu_timedate_diff()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] MTTCG External Halt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +36,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, shenghualong <shenghualong@huawei.com>, Gonglei <arei.gonglei@huawei.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-From: shenghualong <shenghualong@huawei.com>
 
-When the Windows guest users set the time to year 2099,
-the return value of qemu_timedate_diff() will overflow
-with variable clock mode as below format:
+Alistair Francis <alistair.francis@xilinx.com> writes:
 
- <clock offset='variable' adjustment='-1201568405' basis='utc'>
+> On Wed, Jan 31, 2018 at 12:32 PM, Alex Benn=C3=A9e <alex.bennee@linaro.or=
+g> wrote:
+>>
+>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>>
+>>> On Tue, Jan 30, 2018 at 8:26 PM, Paolo Bonzini <pbonzini@redhat.com> wr=
+ote:
+>>>> On 30/01/2018 18:56, Alistair Francis wrote:
+>>>>>
+>>>>> I don't have a good solution though, as setting CPU_INTERRUPT_RESET
+>>>>> doesn't help (that isn't handled while we are halted) and
+>>>>> async_run_on_cpu()/run_on_cpu() doesn't reliably reset the CPU when we
+>>>>> want.
+>>>>>
+>>>>> I've ever tried pausing all CPUs before reseting the CPU and them
+>>>>> resuming them all but that doesn't seem to to work either.
+>>>>
+>>>> async_safe_run_on_cpu would be like async_run_on_cpu, except that it
+>>>> takes care of stopping all other CPUs while the function runs.
+>>>>
+>>>>> Is there
+>>>>> anything I'm missing? Is there no reliable way to reset a CPU?
+>>>>
+>>>> What do you mean by reliable?  Executing no instruction after the one
+>>>> you were at?
+>>>
+>>> The reset is called by a GPIO line, so I need the reset to be called
+>>> basically as quickly as the GPIO line changes. The async_ and
+>>> async_safe_ functions seem to not run quickly enough, even if I run a
+>>> process_work_queue() function afterwards.
+>>>
+>>> Is there a way to kick the CPU to act on the async_*?
+>>
+>> Define quickly enough? The async_(safe) functions kick the vCPUs so they
+>> will all exit the run loop as they enter the next TB (even if they loop
+>> to themselves).
+>
+> We have a special power controller CPU that wakes all the CPUs up and
+> at boot the async_* functions don't wake the CPUs up. If I just use
+> the cpu_rest() function directly everything starts fine (but then I
+> hit issues later).
+>
+> If I forcefully run process_queued_cpu_work() then I can get the CPUs
+> up, but I don't think that is the right solution.
+>
+>>
+>> From an external vCPUs point of view those extra instructions have
+>> already executed. If the resetting vCPU needs them to have reset by the
+>> time it executes it's next instruction it should either cpu_loop_exit at
+>> that point or ensure it is the last instruction in it's TB (which is
+>> what we do for the MMU flush cases in ARM, they all end the TB at that
+>> point).
+>
+> cpu_loop_exit() sounds like it would help, but as I'm not in the CPU
+> context it just seg faults.
 
-Let's change the return value of qemu_timedate_diff() from
-int to time_t to fix the possible overflow problem.
+What context are you in? gdb-stub does have to something like this.
 
-Signed-off-by: shenghualong <shenghualong@huawei.com>
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- include/qemu-common.h | 2 +-
- vl.c                  | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> Alistair
+>
+>>
+>>
+>>>
+>>> Thanks,
+>>> Alistair
+>>>
+>>>>
+>>>> Paolo
+>>>>
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 05319b9..6fb80aa 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -33,7 +33,7 @@ int qemu_main(int argc, char **argv, char **envp);
- #endif
- 
- void qemu_get_timedate(struct tm *tm, int offset);
--int qemu_timedate_diff(struct tm *tm);
-+time_t qemu_timedate_diff(struct tm *tm);
- 
- #define qemu_isalnum(c)		isalnum((unsigned char)(c))
- #define qemu_isalpha(c)		isalpha((unsigned char)(c))
-diff --git a/vl.c b/vl.c
-index e517a8d..9d225da 100644
---- a/vl.c
-+++ b/vl.c
-@@ -146,7 +146,7 @@ int nb_nics;
- NICInfo nd_table[MAX_NICS];
- int autostart;
- static int rtc_utc = 1;
--static int rtc_date_offset = -1; /* -1 means no change */
-+static time_t rtc_date_offset = -1; /* -1 means no change */
- QEMUClockType rtc_clock;
- int vga_interface_type = VGA_NONE;
- static int full_screen = 0;
-@@ -812,7 +812,7 @@ void qemu_get_timedate(struct tm *tm, int offset)
-     }
- }
- 
--int qemu_timedate_diff(struct tm *tm)
-+time_t qemu_timedate_diff(struct tm *tm)
- {
-     time_t seconds;
- 
--- 
-1.8.3.1
+
+--
+Alex Benn=C3=A9e
