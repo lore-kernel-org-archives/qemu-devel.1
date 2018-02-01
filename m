@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ehBwf-0005cP-Ne
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:18:19 -0500
+	(envelope-from <berrange@redhat.com>) id 1ehC5z-0001kb-Lt
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:28:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1ehBwc-0007gZ-Hc
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:18:17 -0500
-Received: from mga18.intel.com ([134.134.136.126]:3541)
+	(envelope-from <berrange@redhat.com>) id 1ehC5l-0006EJ-D1
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:27:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1ehBwc-0007cz-4H
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:18:14 -0500
-Date: Thu, 1 Feb 2018 18:17:44 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180201101744.wkkqcag5dfcwxjak@hz-desktop>
-References: <20180131060229.9294-1-haozhong.zhang@intel.com>
-	<CAPcyv4gJyS=yiXg6SHxdiHT9vzmLx2yXsfdyOe3+qTLwzrMDQQ@mail.gmail.com>
-	<20180201000240.zmwa6wwnthg2su36@hz-desktop>
-	<CAPcyv4gZSGtPLt7ED0eOngYApHM8=9CTTjOHKpDCG-GfBes4xQ@mail.gmail.com>
-	<20180201002457.hgyvph7z6iys5yvy@hz-desktop>
-	<CAPcyv4g=1FQYWTAjrrm9DmZaP3nZEZJKXc6JC=f8GSWhccv+wg@mail.gmail.com>
-	<20180201022900.4znup2fovqr7bu5m@hz-desktop>
-	<CAPcyv4i0UFoq-ot0KPBeNaDhENUZJs9iFdjotKny=kSnOHXeMw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ehC5l-0006Cy-4d
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:27:41 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8417C0587DB
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 10:27:39 +0000 (UTC)
+Date: Thu, 1 Feb 2018 10:27:34 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180201102734.GF22810@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180201084535.26721-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAPcyv4i0UFoq-ot0KPBeNaDhENUZJs9iFdjotKny=kSnOHXeMw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] nvdimm: support MAP_SYNC for
- memory-backend-file
+In-Reply-To: <20180201084535.26721-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vnc: use stubs for CONFIG_VNC=n dummy
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +34,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, Qemu Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 01/31/18 19:02 -0800, Dan Williams wrote:
-> On Wed, Jan 31, 2018 at 6:29 PM, Haozhong Zhang
-> <haozhong.zhang@intel.com> wrote:
-> > + vfio maintainer Alex Williamson in case my understanding of vfio is incorrect.
-> >
-> > On 01/31/18 16:32 -0800, Dan Williams wrote:
-> >> On Wed, Jan 31, 2018 at 4:24 PM, Haozhong Zhang
-> >> <haozhong.zhang@intel.com> wrote:
-> >> > On 01/31/18 16:08 -0800, Dan Williams wrote:
-> >> >> On Wed, Jan 31, 2018 at 4:02 PM, Haozhong Zhang
-> >> >> <haozhong.zhang@intel.com> wrote:
-> >> >> > On 01/31/18 14:25 -0800, Dan Williams wrote:
-> >> >> >> On Tue, Jan 30, 2018 at 10:02 PM, Haozhong Zhang
-> >> >> >> <haozhong.zhang@intel.com> wrote:
-> >> >> >> > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> >> >> >> > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> >> >> >> > files on ext4/xfs file system mounted with '-o dax').
-> >> >> >>
-> >> >> >> Wait, MAP_SYNC does not guarantee persistence. It makes sure that the
-> >> >> >> metadata is in sync after a fault. However, that does not make
-> >> >> >> filesystem-DAX safe for use with QEMU, because we still need to
-> >> >> >> coordinate DMA with fileystem operations. There is no way to do that
-> >> >> >> coordination from within a guest. QEMU needs to use device-dax if the
-> >> >> >> guest might ever perform DMA to a virtual-pmem range. See this patch
-> >> >> >> set for more details on the DAX vs DMA problem [1]. I think we need to
-> >> >> >> enforce this in the host kernel. I.e. do not allow file backed DAX
-> >> >> >> pages to be mapped in EPT entries unless / until we have a solution to
-> >> >> >> the DMA synchronization problem. Apologies for not noticing this
-> >> >> >> earlier.
-> >> >> >
-> >> >> > QEMU does not truncate or punch holes of the file once it has been
-> >> >> > mmap()'ed. Does the problem [1] still exist in such case?
-> >> >>
-> >> >> Something else on the system might. The only agent that could enforce
-> >> >> protection is the kernel, and the kernel will likely just disallow
-> >> >> passing addresses from filesystem-dax vmas through to a guest
-> >> >> altogether. I think there's even a problem in the non-DAX case unless
-> >> >> KVM is pinning pages while they are handed out to a guest. The problem
-> >> >> is that we don't have a page cache page to pin in the DAX case.
-> >> >>
-> >> >
-> >> > Does it mean any user-space code like
-> >> >   ptr = mmap(..., fd, ...); // fd refers to a file on DAX filesystem
-> >> >   // make DMA to ptr
-> >> > is unsafe?
-> >>
-> >> Yes, it is currently unsafe because there is no coordination with the
-> >> filesytem if it decides to make block layout changes. We can fix that
-> >> in the non-virtualization case by having the filesystem wait for DMA
-> >> completion callbacks (i.e. what for all pages to be idle), but as far
-> >> as I can see we can't do the same coordination for DMA initiated by a
-> >> guest device driver.
-> >>
-> >
-> > I think that fix [1] also works for KVM/QEMU. The guest DMA are
-> > performed on two types of devices:
-> >
-> > 1. For emulated devices, the guest DMA requests are trapped and
-> >    actually performed by QEMU on the host side. The host side fix [1]
-> >    can cover this case.
-> >
-> > 2. For passthrough devices, vfio pins all pages, including those
-> >    backed by dax mode files, used by the guest if any device is
-> >    passthroughed to it. If I read the commit message in [2] correctly,
-> >    operations that change the page-to-file offset association of pages
-> >    from dax mode files will be deferred until the reference count of
-> >    the affected pages becomes 1.  That is, if any passthrough device
-> >    is used with a VM, the changes of page-to-file offset will not be
-> >    able to happen until the VM is shutdown, so the fix [1] still takes
-> >    effect here.
-> 
-> This sounds like a longterm mapping under control of vfio and not the
-> filesystem. See get_user_pages_longterm(), it is a problem if pages
-> are pinned indefinitely especially DAX. It sounds like vfio is in the
-> same boat as RDMA and cannot support long lived pins of DAX pages. As
-> of 4.15 RDMA to filesystem-DAX pages has been disabled. The eventual
-> fix will be to create a "memory-registration with lease" semantic
-> available for RDMA so that the kernel can forcibly revoke page pinning
-> to perform physical layout changes. In the near it seems
-> vaddr_get_pfn() needs to be fixed to use get_user_pages_longterm() so
-> that filesystem-dax mappings are explicitly disallowed.
+On Thu, Feb 01, 2018 at 09:45:35AM +0100, Gerd Hoffmann wrote:
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/ui/console.h | 21 ---------------------
+>  ui/vnc-stubs.c       | 21 +++++++++++++++++++++
+>  ui/Makefile.objs     |  1 +
+>  3 files changed, 22 insertions(+), 21 deletions(-)
+>  create mode 100644 ui/vnc-stubs.c
 
-It seems that KVM and VFIO need to switch to get_user_pages_longterm()
-which fails getting pages backed by dax mode files.
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-However, as get_user_pages() and its variants in the current KVM and
-VFIO may be called after a VM starts running, e.g., handling EPT
-violation on demand, and hotplugging a passthrough device to VM,
-simply switching to the longterm version would cause VM crash in those
-cases. Therefore, it also needs to patch or document in QEMU to not
-use dax files with memory-backend-file. Paolo, Radim and Alex, what do
-you think?
-
-Thanks,
-Haozhong
 
 > 
-> > Another question is how a user-space application (e.g., QEMU) knows
-> > whether it's safe to mmap a file on the DAX file system?
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index 7b35778444..de57e8363a 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -468,31 +468,10 @@ static inline void cocoa_display_init(DisplayState *ds, int full_screen)
+>  void vnc_display_init(const char *id);
+>  void vnc_display_open(const char *id, Error **errp);
+>  void vnc_display_add_client(const char *id, int csock, bool skipauth);
+> -#ifdef CONFIG_VNC
+>  int vnc_display_password(const char *id, const char *password);
+>  int vnc_display_pw_expire(const char *id, time_t expires);
+>  QemuOpts *vnc_parse(const char *str, Error **errp);
+>  int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp);
+> -#else
+> -static inline int vnc_display_password(const char *id, const char *password)
+> -{
+> -    return -ENODEV;
+> -}
+> -static inline int vnc_display_pw_expire(const char *id, time_t expires)
+> -{
+> -    return -ENODEV;
+> -};
+> -static inline QemuOpts *vnc_parse(const char *str, Error **errp)
+> -{
+> -    error_setg(errp, "VNC support is disabled");
+> -    return NULL;
+> -}
+> -static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+> -{
+> -    error_setg(errp, "VNC support is disabled");
+> -    return -1;
+> -}
+> -#endif
+>  
+>  /* curses.c */
+>  #ifdef CONFIG_CURSES
+> diff --git a/ui/vnc-stubs.c b/ui/vnc-stubs.c
+> new file mode 100644
+> index 0000000000..f51280549a
+> --- /dev/null
+> +++ b/ui/vnc-stubs.c
+> @@ -0,0 +1,21 @@
+> +#include "qemu/osdep.h"
+> +#include "ui/console.h"
+> +
+> +int vnc_display_password(const char *id, const char *password)
+> +{
+> +    return -ENODEV;
+> +}
+> +int vnc_display_pw_expire(const char *id, time_t expires)
+> +{
+> +    return -ENODEV;
+> +};
+> +QemuOpts *vnc_parse(const char *str, Error **errp)
+> +{
+> +    error_setg(errp, "VNC support is disabled");
+> +    return NULL;
+> +}
+> +int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+> +{
+> +    error_setg(errp, "VNC support is disabled");
+> +    return -1;
+> +}
+> diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+> index 99195884b0..09a275aed1 100644
+> --- a/ui/Makefile.objs
+> +++ b/ui/Makefile.objs
+> @@ -6,6 +6,7 @@ vnc-obj-y += vnc-auth-vencrypt.o
+>  vnc-obj-$(CONFIG_VNC_SASL) += vnc-auth-sasl.o
+>  vnc-obj-y += vnc-ws.o
+>  vnc-obj-y += vnc-jobs.o
+> +stub-obj-y += vnc-stubs.o
+>  
+>  common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
+>  common-obj-y += input.o input-keymap.o input-legacy.o
+> -- 
+> 2.9.3
 > 
-> I think we fix vaddr_get_pfn() to start failing for DAX mappings
-> unless/until we can add a "with lease" mechanism. Userspace will know
-> when it is safe again when vfio stops failing.
->
+> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
