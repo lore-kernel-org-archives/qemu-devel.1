@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJz2-0003HJ-Ix
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:17 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJyx-00006o-Sj
+	(envelope-from <tcminyard@gmail.com>) id 1ehJz0-0003G8-MA
 	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:16 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34088)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <tcminyard@gmail.com>) id 1ehJyv-0008Ve-MA
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:14 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:40623)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJyx-00005r-NY
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:11 -0500
-Received: by mail-ot0-x243.google.com with SMTP id x15so17898983ote.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJyv-0008UG-HP
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:09 -0500
+Received: by mail-ot0-x244.google.com with SMTP id x4so17887548otg.7
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:09 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu,  1 Feb 2018 12:52:55 -0600
-Message-Id: <1517511182-9944-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PULL 0/7] Small IPMI fixes
+Date: Thu,  1 Feb 2018 12:52:59 -0600
+Message-Id: <1517511182-9944-5-git-send-email-minyard@acm.org>
+In-Reply-To: <1517511182-9944-1-git-send-email-minyard@acm.org>
+References: <1517511182-9944-1-git-send-email-minyard@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 4/7] ipmi: Add the platform event message
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +31,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Corey Minyard <cminyard@mvista.com>
 
-The following changes since commit 6521130b0a7f699fdb82446d57df5627bfa7ed3c:
+From: Corey Minyard <cminyard@mvista.com>
 
-  Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2018-01-26-2' into staging (2018-01-30 15:20:01 +0000)
+This lets an event be added to the SEL as if a sensor had generated
+it.  The OpenIPMI driver uses it for storing panic event information.
 
-are available in the git repository at:
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+---
+ hw/ipmi/ipmi_bmc_sim.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-  https://github.com/cminyard/qemu.git tags/for-release-20180201
-
-for you to fetch changes up to 20b233641d76cc1812064304798ffeb530dc112d:
-
-  ipmi: Allow BMC device properties to be set (2018-01-30 15:52:53 -0600)
-
-----------------------------------------------------------------
-Lots of litte miscellaneous fixes for the IPMI code, plus
-add me as the IPMI maintainer.
-
-----------------------------------------------------------------
-Corey Minyard (7):
-      Add maintainer for the IPMI code
-      ipmi: Fix SEL get/set time commands
-      ipmi: Don't set the timestamp on add events that don't have it
-      ipmi: Add the platform event message command
-      ipmi: Fix macro issues
-      ipmi: disable IRQ and ATN on an external disconnect
-      ipmi: Allow BMC device properties to be set
-
- MAINTAINERS               |  9 ++++++++
- hw/ipmi/ipmi_bmc_extern.c |  5 ++++
- hw/ipmi/ipmi_bmc_sim.c    | 58 ++++++++++++++++++++++++++++++++++++++---------
- hw/ipmi/isa_ipmi_bt.c     | 12 +++++-----
- 4 files changed, 67 insertions(+), 17 deletions(-)
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index a0bbfd5..e84d710 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -38,6 +38,7 @@
+ 
+ #define IPMI_NETFN_SENSOR_EVENT       0x04
+ 
++#define IPMI_CMD_PLATFORM_EVENT_MSG       0x02
+ #define IPMI_CMD_SET_SENSOR_EVT_ENABLE    0x28
+ #define IPMI_CMD_GET_SENSOR_EVT_ENABLE    0x29
+ #define IPMI_CMD_REARM_SENSOR_EVTS        0x2a
+@@ -1581,6 +1582,28 @@ static void set_sel_time(IPMIBmcSim *ibs,
+     ibs->sel.time_offset = now.tv_sec - ((long) val);
+ }
+ 
++static void platform_event_msg(IPMIBmcSim *ibs,
++                               uint8_t *cmd, unsigned int cmd_len,
++                               RspBuffer *rsp)
++{
++    uint8_t event[16];
++
++    event[2] = 2; /* System event record */
++    event[7] = cmd[2]; /* Generator ID */
++    event[8] = 0;
++    event[9] = cmd[3]; /* EvMRev */
++    event[10] = cmd[4]; /* Sensor type */
++    event[11] = cmd[5]; /* Sensor number */
++    event[12] = cmd[6]; /* Event dir / Event type */
++    event[13] = cmd[7]; /* Event data 1 */
++    event[14] = cmd[8]; /* Event data 2 */
++    event[15] = cmd[9]; /* Event data 3 */
++
++    if (sel_add_event(ibs, event)) {
++        rsp_buffer_set_error(rsp, IPMI_CC_OUT_OF_SPACE);
++    }
++}
++
+ static void set_sensor_evt_enable(IPMIBmcSim *ibs,
+                                   uint8_t *cmd, unsigned int cmd_len,
+                                   RspBuffer *rsp)
+@@ -1757,6 +1780,7 @@ static const IPMINetfn chassis_netfn = {
+ };
+ 
+ static const IPMICmdHandler sensor_event_cmds[] = {
++    [IPMI_CMD_PLATFORM_EVENT_MSG] = { platform_event_msg, 10 },
+     [IPMI_CMD_SET_SENSOR_EVT_ENABLE] = { set_sensor_evt_enable, 4 },
+     [IPMI_CMD_GET_SENSOR_EVT_ENABLE] = { get_sensor_evt_enable, 3 },
+     [IPMI_CMD_REARM_SENSOR_EVTS] = { rearm_sensor_evts, 4 },
+-- 
+2.7.4
