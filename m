@@ -1,44 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1ehBew-0008GQ-W4
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:00:07 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehBfN-0000FV-Is
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:00:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1ehBeu-0005hT-Qt
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:59:59 -0500
-Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:38690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
-	id 1ehBeu-0005fR-Fu
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:59:56 -0500
-Received: by mail-pf0-x229.google.com with SMTP id k19so15145608pfj.5
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 01:59:56 -0800 (PST)
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehBfG-0006BA-38
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:00:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1ehBfF-00068i-I6
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:00:17 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w119xx4B123629
+	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 05:00:15 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fuxahejfh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 05:00:15 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Thu, 1 Feb 2018 10:00:12 -0000
+References: <20180131181742.2037-1-cohuck@redhat.com>
+	<20180131181742.2037-2-cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Thu, 1 Feb 2018 11:00:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu-7d5jbt9V8bORkrZXxNmshMNjsqg+EiwhA-CYrNLFotA@mail.gmail.com>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-	<20180126194559.GI2610@work-vm>
-	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
-	<20180129095330.GA2408@work-vm>
-	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
-	<a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
-	<20180131095351.GY21802@cbox>
-	<CAKv+Gu-NAcUTpEUXCLudHTCFAf=Yb28q3AET9d4ED9A9z7dMfQ@mail.gmail.com>
-	<CAMJs5B8jctfTEEhui3XRCTW1La2HCoVd1Jzaz4p7jy=8vqw=0A@mail.gmail.com>
-	<CAKv+Gu80p5G_gWp0Dg7HJ2SAgc3WCQe+g9ear9oM44bt-KmSFA@mail.gmail.com>
-	<CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
-	<CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
-	<CAMJs5B8CWm2bj-Be_j4p9Y_3wXr=W2K7zE8593ke-97QR20qcA@mail.gmail.com>
-	<CAKv+Gu935vi1wCRAKqC-nscXa+=CKX6P=HPO-3dNA4fx0Fm-NA@mail.gmail.com>
-	<CAMJs5B-S=qVWYP2eTN1qsOQctmfUR8jCXBaz2DKyaKRT7LrAyA@mail.gmail.com>
-	<CAKv+Gu-7d5jbt9V8bORkrZXxNmshMNjsqg+EiwhA-CYrNLFotA@mail.gmail.com>
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Date: Thu, 1 Feb 2018 10:59:54 +0100
-Message-ID: <CAMJs5B8W7-yfco1qkWBY0FU4hiner05jp1jBycWwT6wCTegBfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+In-Reply-To: <20180131181742.2037-2-cohuck@redhat.com>
+Content-Language: en-US
+Message-Id: <7cefb712-9af5-7a01-3a94-0bd02a2563d1@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390x/tcg: wire up pci instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,277 +42,339 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: david@redhat.com, agraf@suse.de, rth@twiddle.net
 
-On Thu, Feb 1, 2018 at 10:33 AM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> On 1 February 2018 at 09:17, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
->> On Wed, Jan 31, 2018 at 9:15 PM, Ard Biesheuvel
->> <ard.biesheuvel@linaro.org> wrote:
->>> On 31 January 2018 at 19:12, Christoffer Dall
->>> <christoffer.dall@linaro.org> wrote:
->>>> On Wed, Jan 31, 2018 at 7:00 PM, Ard Biesheuvel
->>>> <ard.biesheuvel@linaro.org> wrote:
->>>>> On 31 January 2018 at 17:39, Christoffer Dall
->>>>> <christoffer.dall@linaro.org> wrote:
->>>>>> On Wed, Jan 31, 2018 at 5:59 PM, Ard Biesheuvel
->>>>>> <ard.biesheuvel@linaro.org> wrote:
->>>>>>> On 31 January 2018 at 16:53, Christoffer Dall
->>>>>>> <christoffer.dall@linaro.org> wrote:
->>>>>>>> On Wed, Jan 31, 2018 at 4:18 PM, Ard Biesheuvel
->>>>>>>> <ard.biesheuvel@linaro.org> wrote:
->>>>>>>>> On 31 January 2018 at 09:53, Christoffer Dall
->>>>>>>>> <christoffer.dall@linaro.org> wrote:
->>>>>>>>>> On Mon, Jan 29, 2018 at 10:32:12AM +0000, Marc Zyngier wrote:
->>>>>>>>>>> On 29/01/18 10:04, Peter Maydell wrote:
->>>>>>>>>>> > On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>>>>>>>>>> >> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>>>>>>>>>> >>> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>>>>>>>>>> >>>> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>>>>>>>>>> >>>>> I think the correct fix here is that your test code should turn
->>>>>>>>>>> >>>>> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
->>>>>>>>>>> >>>>> for Arm KVM guests (for the same reason that VGA device video memory
->>>>>>>>>>> >>>>> doesn't work). If it's RAM your guest has to arrange to map it as
->>>>>>>>>>> >>>>> Normal Cacheable, and then everything should work fine.
->>>>>>>>>>> >>>>
->>>>>>>>>>> >>>> Does this cause problems with migrating at just the wrong point during
->>>>>>>>>>> >>>> a VM boot?
->>>>>>>>>>> >>>
->>>>>>>>>>> >>> It wouldn't surprise me if it did, but I don't think I've ever
->>>>>>>>>>> >>> tried to provoke that problem...
->>>>>>>>>>> >>
->>>>>>>>>>> >> If you think it'll get the RAM contents wrong, it might be best to fail
->>>>>>>>>>> >> the migration if you can detect the cache is disabled in the guest.
->>>>>>>>>>> >
->>>>>>>>>>> > I guess QEMU could look at the value of the "MMU disabled/enabled" bit
->>>>>>>>>>> > in the guest's system registers, and refuse migration if it's off...
->>>>>>>>>>> >
->>>>>>>>>>> > (cc'd Marc, Christoffer to check that I don't have the wrong end
->>>>>>>>>>> > of the stick about how thin the ice is in the period before the
->>>>>>>>>>> > guest turns on its MMU...)
->>>>>>>>>>>
->>>>>>>>>>> Once MMU and caches are on, we should be in a reasonable place for QEMU
->>>>>>>>>>> to have a consistent view of the memory. The trick is to prevent the
->>>>>>>>>>> vcpus from changing that. A guest could perfectly turn off its MMU at
->>>>>>>>>>> any given time if it needs to (and it is actually required on some HW if
->>>>>>>>>>> you want to mitigate headlining CVEs), and KVM won't know about that.
->>>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> (Clarification: KVM can detect this is it bother to check the VCPU's
->>>>>>>>>> system registers, but we don't trap to KVM when the VCPU turns off its
->>>>>>>>>> caches, right?)
->>>>>>>>>>
->>>>>>>>>>> You may have to pause the vcpus before starting the migration, or
->>>>>>>>>>> introduce a new KVM feature that would automatically pause a vcpu that
->>>>>>>>>>> is trying to disable its MMU while the migration is on. This would
->>>>>>>>>>> involve trapping all the virtual memory related system registers, with
->>>>>>>>>>> an obvious cost. But that cost would be limited to the time it takes to
->>>>>>>>>>> migrate the memory, so maybe that's acceptable.
->>>>>>>>>>>
->>>>>>>>>> Is that even sufficient?
->>>>>>>>>>
->>>>>>>>>> What if the following happened. (1) guest turns off MMU, (2) guest
->>>>>>>>>> writes some data directly to ram (3) qemu stops the vcpu (4) qemu reads
->>>>>>>>>> guest ram.  QEMU's view of guest ram is now incorrect (stale,
->>>>>>>>>> incoherent, ...).
->>>>>>>>>>
->>>>>>>>>> I'm also not really sure if pausing one VCPU because it turned off its
->>>>>>>>>> MMU will go very well when trying to migrate a large VM (wouldn't this
->>>>>>>>>> ask for all the other VCPUs beginning to complain that the stopped VCPU
->>>>>>>>>> appears to be dead?).  As a short-term 'fix' it's probably better to
->>>>>>>>>> refuse migration if you detect that a VCPU had begun turning off its
->>>>>>>>>> MMU.
->>>>>>>>>>
->>>>>>>>>> On the larger scale of thins; this appears to me to be another case of
->>>>>>>>>> us really needing some way to coherently access memory between QEMU and
->>>>>>>>>> the VM, but in the case of the VCPU turning off the MMU prior to
->>>>>>>>>> migration, we don't even know where it may have written data, and I'm
->>>>>>>>>> therefore not really sure what the 'proper' solution would be.
->>>>>>>>>>
->>>>>>>>>> (cc'ing Ard who has has thought about this problem before in the context
->>>>>>>>>> of UEFI and VGA.)
->>>>>>>>>>
->>>>>>>>>
->>>>>>>>> Actually, the VGA case is much simpler because the host is not
->>>>>>>>> expected to write to the framebuffer, only read from it, and the guest
->>>>>>>>> is not expected to create a cacheable mapping for it, so any
->>>>>>>>> incoherency can be trivially solved by cache invalidation on the host
->>>>>>>>> side. (Note that this has nothing to do with DMA coherency, but only
->>>>>>>>> with PCI MMIO BARs that are backed by DRAM in the host)
->>>>>>>>
->>>>>>>> In case of the running guest, the host will also only read from the
->>>>>>>> cached mapping.  Of course, at restore, the host will also write
->>>>>>>> through a cached mapping, but shouldn't the latter case be solvable by
->>>>>>>> having KVM clean the cache lines when faulting in any page?
->>>>>>>>
->>>>>>>
->>>>>>> We are still talking about the contents of the framebuffer, right? In
->>>>>>> that case, yes, afaict
->>>>>>>
->>>>>>
->>>>>> I was talking about normal RAM actually... not sure if that changes anything?
->>>>>>
->>>>>
->>>>> The main difference is that with a framebuffer BAR, it is pointless
->>>>> for the guest to map it cacheable, given that the purpose of a
->>>>> framebuffer is its side effects, which are not guaranteed to occur
->>>>> timely if the mapping is cacheable.
->>>>>
->>>>> If we are talking about normal RAM, then why are we discussing it here
->>>>> and not down there?
->>>>>
->>>>
->>>> Because I was trying to figure out how the challenge of accessing the
->>>> VGA framebuffer differs from the challenge of accessing guest RAM
->>>> which may have been written by the guest with the MMU off.
->>>>
->>>> First approximation, they are extremely similar because the guest is
->>>> writing uncached to memory, which the host now has to access via a
->>>> cached mapping.
->>>>
->>>> But I'm guessing that a "clean+invalidate before read on the host"
->>>> solution will result in terrible performance for a framebuffer and
->>>> therefore isn't a good solution for that problem...
->>>>
->>>
->>> That highly depends on where 'not working' resides on the performance
->>> scale. Currently, VGA on KVM simply does not work at all, and so
->>> working but slow would be a huge improvement over the current
->>> situation.
->>>
->>> Also, the performance hit is caused by the fact that the data needs to
->>> make a round trip to memory, and the invalidation (without cleaning)
->>> performed by the host shouldn't make that much worse than it
->>> fundamentally is to begin with.
->>>
->>
->> True, but Marc pointed out (on IRC) that the cache maintenance
->> instructions are broadcast across all CPUs and may therefore adversely
->> affect the performance of your entire system by running an emulated
->> VGA framebuffer on a subset of the host CPUs.  However, he also
->> pointed out that the necessary cache maintenance can be done in EL0
->> and we wouldn't even need a new ioctl or anything else from KVM or the
->> kernel to do this.  I think we should measure the effect of this
->> before dismissing it though.
->>
+On 31/01/2018 19:17, Cornelia Huck wrote:
+> On s390x, pci support is implemented via a set of instructions
+> (no mmio). Unfortunately, none of them are documented in the
+> PoP; the code is based upon the existing implementation for KVM
+> and the Linux zpci driver.
 >
-> If you could use dirty page tracking to only perform the cache
-> invalidation when the framebuffer memory has been updated, you can at
-> least limit the impact to cases where the framebuffer is actually
-> used, rather than sitting idle with a nice wallpaper image.
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   target/s390x/helper.h      |   9 ++++
+>   target/s390x/insn-data.def |  15 +++++++
+>   target/s390x/misc_helper.c | 109 ++++++++++++++++++++++++++++++++++++=
++++++++++
+>   target/s390x/translate.c   | 101 ++++++++++++++++++++++++++++++++++++=
++++++
+>   4 files changed, 234 insertions(+)
 >
+> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+> index 59a1d9869b..9887efbb3a 100644
+> --- a/target/s390x/helper.h
+> +++ b/target/s390x/helper.h
+> @@ -172,4 +172,13 @@ DEF_HELPER_2(stcrw, void, env, i64)
+>   DEF_HELPER_3(stsch, void, env, i64, i64)
+>   DEF_HELPER_3(tsch, void, env, i64, i64)
+>   DEF_HELPER_2(chsc, void, env, i64)
+> +
+> +DEF_HELPER_2(clp, void, env, i32)
+> +DEF_HELPER_3(pcilg, void, env, i32, i32)
+> +DEF_HELPER_3(pcistg, void, env, i32, i32)
+> +DEF_HELPER_4(stpcifc, void, env, i32, i64, i32)
+> +DEF_HELPER_3(sic, void, env, i64, i64)
+> +DEF_HELPER_3(rpcit, void, env, i32, i32)
+> +DEF_HELPER_5(pcistb, void, env, i32, i32, i64, i32)
+> +DEF_HELPER_4(mpcifc, void, env, i32, i64, i32)
+>   #endif
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index 11ee43dcbc..b9841631a8 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -1067,4 +1067,19 @@
+>       /* ??? Not listed in PoO ninth edition, but there's a linux drive=
+r that
+>          uses it: "A CHSC subchannel is usually present on LPAR only." =
+ */
+>       C(0xb25f, CHSC,  RRE,     Z,   0, insn, 0, 0, chsc, 0)
+> +
+> +/* zPCI Instructions */
+> +    /* None of these instructions are documented in the PoP, so this i=
+s all
+> +       based upon target/s390x/kvm.c and Linux code and likely incompl=
+ete */
+> +    C(0xebd0, PCISTB, RSY_a, PCI, la2, 0, 0, 0, pcistb, 0)
+> +    /* SIC does not really depend on pci, but it is unclear from the c=
+ode
+> +       with which facility it becomes available */
+> +    C(0xebd1, SIC, RSY_a, Z, r1, r3, 0, 0, sic, 0)
+> +    C(0xb9a0, CLP, RRF_c, PCI, 0, 0, 0, 0, clp, 0)
+> +    C(0xb9d0, PCISTG, RRE, PCI, 0, 0, 0, 0, pcistg, 0)
+> +    C(0xb9d2, PCILG, RRE, PCI, 0, 0, 0, 0, pcilg, 0)
+> +    C(0xb9d3, RPCIT, RRE, PCI, 0, 0, 0, 0, rpcit, 0)
+> +    C(0xe3d0, MPCIFC, RXY_a, PCI, la2, 0, 0, 0, mpcifc, 0)
+> +    C(0xe3d4, STPCIFC, RXY_a, PCI, la2, 0, 0, 0, stpcifc, 0)
+> +
+>   #endif /* CONFIG_USER_ONLY */
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index 86da6aab7e..6f5103f3b5 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -36,6 +36,7 @@
+>   #include "hw/s390x/ebcdic.h"
+>   #include "hw/s390x/s390-virtio-hcall.h"
+>   #include "hw/s390x/sclp.h"
+> +#include "hw/s390x/s390-pci-inst.h"
+>   #endif
 >
->>> A paravirtualized framebuffer (as was proposed recently by Gerd I
->>> think?) would solve this, since the guest can just map it as
->>> cacheable.
->>>
->>
->> Yes, but it seems to me that the problem of incoherent views of memory
->> between the guest and QEMU keeps coming up, and we therefore need to
->> have a fix for this in software.
->>
+>   /* #define DEBUG_HELPER */
+> @@ -560,3 +561,111 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64=
+_t addr)
+>       env->regs[0] =3D deposit64(env->regs[0], 0, 8, (max_bytes / 8) - =
+1);
+>       return count_bytes >=3D max_bytes ? 0 : 3;
+>   }
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +void HELPER(clp)(CPUS390XState *env, uint32_t r2)
+> +{
+> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D clp_service_call(cpu, r2, GETPC());
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +
+> +void HELPER(pcilg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+> +{
+> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D pcilg_service_call(cpu, r1, r2, GETPC());
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +
+> +void HELPER(pcistg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+> +{
+> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D pcistg_service_call(cpu, r1, r2, GETPC());
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +
+> +void HELPER(stpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
+> +                     uint32_t ar)
+> +{
+> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D stpcifc_service_call(cpu, r1, fiba, ar, GETPC());
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +
+> +void HELPER(sic)(CPUS390XState *env, uint64_t r1, uint64_t r3)
+> +{
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D css_do_sic(env, r1 & 0xffff, (r3 >> 27) & 0x7);
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +
+> +void HELPER(rpcit)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+> +{
+> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D rpcit_service_call(cpu, r1, r2, GETPC());
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +
+> +void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
+> +                    uint64_t gaddr, uint32_t ar)
+> +{
+> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D pcistb_service_call(cpu, r1, r3, gaddr, ar, GETPC());
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +
+> +void HELPER(mpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
+> +                    uint32_t ar)
+> +{
+> +    S390CPU *cpu =3D s390_env_get_cpu(env);
+> +    int r;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    r =3D mpcifc_service_call(cpu, r1, fiba, ar, GETPC());
+> +    qemu_mutex_unlock_iothread();
+> +    if (r) {
+> +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
+> +    }
+> +}
+> +#endif
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index df0b41606d..2a3314601a 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -4777,6 +4777,106 @@ static ExitStatus op_zero2(DisasContext *s, Dis=
+asOps *o)
+>       return NO_EXIT;
+>   }
 >
-> Agreed.
+> +#ifndef CONFIG_USER_ONLY
+> +static ExitStatus op_clp(DisasContext *s, DisasOps *o)
+> +{
+> +    TCGv_i32 r2 =3D tcg_const_i32(get_field(s->fields, r2));
+> +
+> +    check_privileged(s);
+> +    gen_helper_clp(cpu_env, r2);
+> +    tcg_temp_free_i32(r2);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +
+> +static ExitStatus op_pcilg(DisasContext *s, DisasOps *o)
+> +{
+> +    TCGv_i32 r1 =3D tcg_const_i32(get_field(s->fields, r1));
+> +    TCGv_i32 r2 =3D tcg_const_i32(get_field(s->fields, r2));
+> +
+> +    check_privileged(s);
+> +    gen_helper_pcilg(cpu_env, r1, r2);
+> +    tcg_temp_free_i32(r1);
+> +    tcg_temp_free_i32(r2);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +
+> +static ExitStatus op_pcistg(DisasContext *s, DisasOps *o)
+> +{
+> +    TCGv_i32 r1 =3D tcg_const_i32(get_field(s->fields, r1));
+> +    TCGv_i32 r2 =3D tcg_const_i32(get_field(s->fields, r2));
+> +
+> +    check_privileged(s);
+> +    gen_helper_pcistg(cpu_env, r1, r2);
+> +    tcg_temp_free_i32(r1);
+> +    tcg_temp_free_i32(r2);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +
+> +static ExitStatus op_stpcifc(DisasContext *s, DisasOps *o)
+> +{
+> +    TCGv_i32 r1 =3D tcg_const_i32(get_field(s->fields, r1));
+> +    TCGv_i32 ar =3D tcg_const_i32(get_field(s->fields, b2));
+> +
+> +    check_privileged(s);
+> +    gen_helper_stpcifc(cpu_env, r1, o->addr1, ar);
+> +    tcg_temp_free_i32(ar);
+> +    tcg_temp_free_i32(r1);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +
+> +static ExitStatus op_sic(DisasContext *s, DisasOps *o)
+> +{
+> +    check_privileged(s);
+> +    gen_helper_sic(cpu_env, o->in1, o->in2);
+> +    return NO_EXIT;
+> +}
+> +
+> +static ExitStatus op_rpcit(DisasContext *s, DisasOps *o)
+> +{
+> +    TCGv_i32 r1 =3D tcg_const_i32(get_field(s->fields, r1));
+> +    TCGv_i32 r2 =3D tcg_const_i32(get_field(s->fields, r2));
+> +
+> +    check_privileged(s);
+> +    gen_helper_rpcit(cpu_env, r1, r2);
+> +    tcg_temp_free_i32(r1);
+> +    tcg_temp_free_i32(r2);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +
+> +static ExitStatus op_pcistb(DisasContext *s, DisasOps *o)
+> +{
+> +    TCGv_i32 r1 =3D tcg_const_i32(get_field(s->fields, r1));
+> +    TCGv_i32 r3 =3D tcg_const_i32(get_field(s->fields, r3));
+> +    TCGv_i32 ar =3D tcg_const_i32(get_field(s->fields, b2));
+> +
+> +    check_privileged(s);
+> +    gen_helper_pcistb(cpu_env, r1, r3, o->addr1, ar);
+> +    tcg_temp_free_i32(ar);
+> +    tcg_temp_free_i32(r1);
+> +    tcg_temp_free_i32(r3);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +
+> +static ExitStatus op_mpcifc(DisasContext *s, DisasOps *o)
+> +{
+> +    TCGv_i32 r1 =3D tcg_const_i32(get_field(s->fields, r1));
+> +    TCGv_i32 ar =3D tcg_const_i32(get_field(s->fields, b2));
+> +
+> +    check_privileged(s);
+> +    gen_helper_mpcifc(cpu_env, r1, o->addr1, ar);
+> +    tcg_temp_free_i32(ar);
+> +    tcg_temp_free_i32(r1);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +#endif
+> +
+>   /* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
+>   /* The "Cc OUTput" generators.  Given the generated output (and in so=
+me cases
+>      the original inputs), update the various cc data structures in ord=
+er to
+> @@ -5708,6 +5808,7 @@ enum DisasInsnEnum {
+>   #define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facili=
+ty */
+>   #define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facili=
+ty */
+>   #define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
+> +#define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
 >
->>>>>
->>>>>
->>>>>>>>>
->>>>>>>>> In the migration case, it is much more complicated, and I think
->>>>>>>>> capturing the state of the VM in a way that takes incoherency between
->>>>>>>>> caches and main memory into account is simply infeasible (i.e., the
->>>>>>>>> act of recording the state of guest RAM via a cached mapping may evict
->>>>>>>>> clean cachelines that are out of sync, and so it is impossible to
->>>>>>>>> record both the cached *and* the delta with the uncached state)
->>>>>>>>
->>>>>>>> This may be an incredibly stupid question (and I may have asked it
->>>>>>>> before), but why can't we clean+invalidate the guest page before
->>>>>>>> reading it and thereby obtain a coherent view of a page?
->>>>>>>>
->>>>>>>
->>>>>>> Because cleaning from the host will clobber whatever the guest wrote
->>>>>>> directly to memory with the MMU off, if there is a dirty cacheline
->>>>>>> shadowing that memory.
->>>>>>
->>>>>> If the host never wrote anything to that memory (it shouldn't mess
->>>>>> with the guest's memory) there will only be clean cache lines (even if
->>>>>> they contain content shadowing the memory) and cleaning them would be
->>>>>> equivalent to an invalidate.  Am I misremembering how this works?
->>>>>>
->>>>>
->>>>> Cleaning doesn't actually invalidate, but it should be a no-op for
->>>>> clean cachelines.
->>>>>
->>>>>>> However, that same cacheline could be dirty
->>>>>>> because the guest itself wrote to memory with the MMU on.
->>>>>>
->>>>>> Yes, but the guest would have no control over when such a cache line
->>>>>> gets flushed to main memory by the hardware, and can have no
->>>>>> reasonable expectation that the cache lines don't get cleaned behind
->>>>>> its back.  The fact that a migration triggers this, is reasonable.  A
->>>>>> guest that wants hand-off from main memory that its accessing with the
->>>>>> MMU off, must invalidate the appropriate cache lines or ensure they're
->>>>>> clean.  There's very likely some subtle aspect to all of this that I'm
->>>>>> forgetting.
->>>>>>
->>>>>
->>>>> OK, so if the only way cachelines covering guest memory could be dirty
->>>>> is after the guest wrote to that memory itself via a cacheable
->>>>> mapping, I guess it would be reasonable to do clean+invalidate before
->>>>> reading the memory. Then, the only way for the guest to lose anything
->>>>> is in cases where it could not reasonably expect it to be retained
->>>>> anyway.
->>>>
->>>> Right, that's what I'm thinking.
->>>>
->>>>>
->>>>> However, that does leave a window, between the invalidate and the
->>>>> read, where the guest could modify memory without it being visible to
->>>>> the host.
->>>>
->>>> Is that a problem specific to the coherency challenge?  I thought this
->>>> problem was already addressed by dirty page tracking, but there's like
->>>> some interaction with the cache maintenance that we'd have to figure
->>>> out.
->>>>
->>>
->>> I don't know how dirty page tracking works exactly, but if it that can
->>> track direct writes to memory as easily as cached writes, it would
->>> probably cover this as well.
->>
->> I don't see why it shouldn't.  Guest pages get mapped as read-only in
->> stage 2, and their memory attributes shouldn't be able to affect
->> permission checks (one can only hope).
->>
->> Unless I'm missing something fundamental, I think we should add
->> functionality in QEMU to clean+invalidate pages on aarch64 hosts and
->> see if that solves both VGA and migration, and if so, what the
->> potential performance impacts are.
->>
->
-> Indeed.
->
-> Identifying the framebuffer region is easy for QEMU, so there we can
-> invalidate (without clean) selectively.
+>   static const DisasInsn insn_info[] =3D {
+>   #include "insn-data.def"
 
-Do you think there's a material win of doing invalidate rather than
-clean+invalidate or could we just aim for "access coherent" ==
-"clean+invalidate" and we don't have to make any assumptions about how
-the guest is accessing a particular piece of memory?
+Hi,
 
-> However, although we'd
-> probably need to capture the state of the MMU bit anyway when handling
-> the stage 2 fault for the dirty page tracking, I don't think we can
-> generally infer whether a faulting access was made via an uncached
-> mapping while the MMU was on, and so this would require
-> clean+invalidate on all dirty pages when doing a migration.
+I am not an expert for TCG but the patches are looking clean to me.
 
-My gut feeling here is that there might be some very clever scheme to
-optimize cache maintenance of the 'hot pages' when dirty page tracking
-is enabled, but since the set of hot pages by virtue of migration
-algorithms has to be small, the win is not likely to impact anything
-real-life, and it's therefore not worth looking into.
+And since I also rapidly tested with multibus, virtio_pci_block, and all=20
+went good so:
 
-Thanks,
--Christoffer
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+
+Regards,
+
+Pierre
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
