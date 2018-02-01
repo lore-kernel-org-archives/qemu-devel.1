@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehM1E-0004Na-SB
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:04:46 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehMR9-00078V-D3
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehM0A-00019O-Sf
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:03:40 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<9f551b36d688079dcda4838c788f41a190b5219c.1516978645.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4720ac9c-b259-ebca-f9a7-2bd0b73c6193@redhat.com>
-Date: Thu, 1 Feb 2018 21:12:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <9f551b36d688079dcda4838c788f41a190b5219c.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="yCkf1jnv5BJae7eJItP4eeCfzdmCVoOmi"
-Subject: Re: [Qemu-devel] [PATCH v3 39/39] iotests: Add l2-cache-entry-size
- to iotest 137
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehMQ4-0003kH-MA
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:30:26 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  1 Feb 2018 16:29:12 -0500
+Message-Id: <20180201212917.18131-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/5] coroutine-lock: polymorphic CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +18,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yCkf1jnv5BJae7eJItP4eeCfzdmCVoOmi
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <4720ac9c-b259-ebca-f9a7-2bd0b73c6193@redhat.com>
-Subject: Re: [PATCH v3 39/39] iotests: Add l2-cache-entry-size to iotest 137
-References: <cover.1516978645.git.berto@igalia.com>
- <9f551b36d688079dcda4838c788f41a190b5219c.1516978645.git.berto@igalia.com>
-In-Reply-To: <9f551b36d688079dcda4838c788f41a190b5219c.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+There are cases in which a queued coroutine must be restarted from
+non-coroutine context (with qemu_co_enter_next).  In this cases,
+qemu_co_enter_next also needs to be thread-safe, but it cannot use a
+CoMutex and so cannot qemu_co_queue_wait.  This happens in curl (which
+right now is rolling its own list of Coroutines) and will happen in
+Fam's NVMe driver as well.
 
-On 2018-01-26 16:00, Alberto Garcia wrote:
-> This test tries reopening a qcow2 image with valid and invalid
-> options. This patch adds l2-cache-entry-size to the set.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  tests/qemu-iotests/137     | 5 +++++
->  tests/qemu-iotests/137.out | 2 ++
->  2 files changed, 7 insertions(+)
+This series extracts the idea of a polymorphic lockable object
+from my "scoped lock guard" proposal, and applies it to CoQueue.
+The implementation of QemuLockable is similar to C11 _Generic, but
+redone using the preprocessor and GCC builtins for compatibility.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+In general, while a bit on the esoteric side, the functionality used
+to emulate _Generic is fairly old in GCC, and the builtins are already
+used by include/qemu/atomic.h; the series was tested with Fedora 27 (boot
+Damn Small Linux via http) and CentOS 6 (compiled only).
 
+Paolo
 
---yCkf1jnv5BJae7eJItP4eeCfzdmCVoOmi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+v3->v4: fix -O0 compilation [Fam]
+        typos and copyright dates [Eric, Fam]
+        improve CoQueue comments [Stefan]
 
------BEGIN PGP SIGNATURE-----
+Paolo Bonzini (5):
+  test-coroutine: add simple CoMutex test
+  lockable: add QemuLockable
+  coroutine-lock: convert CoQueue to use QemuLockable
+  coroutine-lock: make qemu_co_enter_next thread-safe
+  curl: convert to CoQueue
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzdMYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Au2MIAIh9ZkoChT6IfodJGgyFs2T6zkPgz2tg
-GOE/Gs3bONpUWNkyjsFtXX9xj8LcKZVaxtspw2E57DXKpuqpJPiRZQVnhy+iCeW9
-DFOSe0XfXxp+NDPtsvwJcAM8RIVwm2bwK2YV1lGQcBzLmpGfTjdf01qDntMTFnNI
-D9NT97flYzSl7qm5Doa5ok3SBJuVD23T86RgZ03mVZeW6LkaVvWltSL6JtBdVxnv
-ECTxO9jCWOuVru8s+NI/xL2PW+1bkmPzEfyTDQjevhNFBSwYZepd0SLc+B4r4T8x
-sjYUPzNHwLjt/OUmGmBnGl+u7qMqPQxLLPf/w0VpTUeVjTWNYWuKeRM=
-=o3CE
------END PGP SIGNATURE-----
+ block/curl.c                | 20 ++--------
+ fsdev/qemu-fsdev-throttle.c |  4 +-
+ include/qemu/compiler.h     | 40 +++++++++++++++++++
+ include/qemu/coroutine.h    | 29 +++++++++-----
+ include/qemu/lockable.h     | 96 +++++++++++++++++++++++++++++++++++++++++++++
+ include/qemu/thread.h       |  5 +--
+ include/qemu/typedefs.h     |  4 ++
+ tests/test-coroutine.c      | 75 ++++++++++++++++++++++++++++++++++-
+ util/qemu-coroutine-lock.c  | 22 +++++++----
+ 9 files changed, 256 insertions(+), 39 deletions(-)
+ create mode 100644 include/qemu/lockable.h
 
---yCkf1jnv5BJae7eJItP4eeCfzdmCVoOmi--
+-- 
+2.14.3
