@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eh4ZF-0000Ia-91
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:25:38 -0500
+	(envelope-from <peterx@redhat.com>) id 1eh4b4-0001LU-E7
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:27:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eh4ZB-0004ly-Um
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:25:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55790)
+	(envelope-from <peterx@redhat.com>) id 1eh4b1-0005yh-82
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:27:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eh4ZB-0004lY-JH
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:25:33 -0500
-Date: Thu, 1 Feb 2018 04:25:27 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180201042505-mutt-send-email-mst@kernel.org>
-References: <1516064279-14816-1-git-send-email-minyard@acm.org>
-	<09678455-2c70-ff07-7f2a-f4135e28e75f@gmail.com>
-	<20180131185225.21762f12@bahia.lan>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eh4b1-0005yB-2D
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:27:27 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 626DB4ACAC
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 02:27:26 +0000 (UTC)
+Date: Thu, 1 Feb 2018 10:27:22 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180201022722.GE31397@xz-mi>
+References: <20180129121754.13033-1-quintela@redhat.com>
+	<20180129121754.13033-3-quintela@redhat.com>
+	<20180131120339.GC31397@xz-mi> <87lgge9pey.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180131185225.21762f12@bahia.lan>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] Small IPMI fixes
+In-Reply-To: <87lgge9pey.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] migration: Set the migration tcp
+ port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +35,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Corey Minyard <tcminyard@gmail.com>, minyard@acm.org, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On Wed, Jan 31, 2018 at 06:52:25PM +0100, Greg Kurz wrote:
-> On Tue, 23 Jan 2018 10:55:15 -0600
-> Corey Minyard <tcminyard@gmail.com> wrote:
->=20
-> > Michael?=A0 Anyone?=A0 Can we get these in?
-> >=20
->=20
-> Since you're adding yourself as a maintainer for IPMI, why not just sen=
-ding
-> a pull request ?
+On Wed, Jan 31, 2018 at 01:35:33PM +0100, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > On Mon, Jan 29, 2018 at 01:17:51PM +0100, Juan Quintela wrote:
+> >> We can set the port parameter as zero.  This patch lets us know what
+> >> port the system was choosen for us.  Now we can migrate to this place.
+> >> 
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >> 
+> >> --
+> >> 
+> >> This was migrate_set_uri(), but as we only need the tcp_port, change
+> >> to that one.
+> >> ---
+> >>  migration/migration.c | 10 ++++++++++
+> >>  migration/migration.h |  2 ++
+> >>  migration/socket.c    | 35 ++++++++++++++++++++++++++++++-----
+> >>  3 files changed, 42 insertions(+), 5 deletions(-)
+> >> 
+> >> diff --git a/migration/migration.c b/migration/migration.c
+> >> index eb6958dcda..53818a87af 100644
+> >> --- a/migration/migration.c
+> >> +++ b/migration/migration.c
+> >> @@ -245,6 +245,16 @@ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+> >>      }
+> >>  }
+> >>  
+> >> +void migrate_set_port(const uint16_t port, Error **errp)
+> >> +{
+> >> +    MigrateSetParameters p = {
+> >> +        .has_x_tcp_port = true,
+> >> +        .x_tcp_port = port,
+> >> +    };
+> >> +
+> >> +    qmp_migrate_set_parameters(&p, errp);
+> >
+> > If we are calling qmp_migrate_set_parameters() here, does it mean that
+> > user can also set this parameter via QMP?
+> 
+> Yeap.  We do that, or we invent yet another mechanism to update the
+> tcp_port parameter :-(
+> 
+> You can't have both.
+> 
+> if the user modifies it, it just shots itself it its feet, no?
 
-Alternatively if you want others to merge it, pls Cc the relevant people.
+How about set this directly? :)  Like:
 
-> > Thanks
-> >=20
-> > -corey
-> >=20
-> > On 01/15/2018 06:57 PM, minyard@acm.org wrote:
-> > > These are some fixes I've had for a while (mostly).  They are small
-> > > fixes and additions for various things.  It would be nice to be abl=
-e
-> > > to get these into the upcoming release.
-> > >
-> > > I also add myself as the maintainer for the IPMI code, since that
-> > > seemed appropriate.
-> > >
-> > > Changes in v2:
-> > >
-> > > I removed the "other" fixes (the one to vl.c) from the previous pat=
-ch
-> > > set, these are all IPMI-related changes.  I also moved adding mysel=
-f
-> > > as the IPMI maintainer to the first patch, per Marc-Andr=E9.
-> > > =20
-> >=20
-> >=20
+  migrate_get_current()->parameters.x_tcp_port = xxx;
+
+Maybe also add a comment showing that this is a special case.  I just
+feel strange that if user can set it, but I'll follow your decision
+even if you really want to keep the qmp_*() call since after all this
+is for debugging, and QEMU itself won't use this value now.
+
+Thanks,
+
+-- 
+Peter Xu
