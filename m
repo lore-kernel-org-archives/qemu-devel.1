@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehKxF-0001vK-SI
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:00:18 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehKxG-0005XU-7R
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:00:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehKr3-0003M6-Fw
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:50:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ehKr3-0003LT-1j
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:49:05 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22BF872699
-	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 19:49:04 +0000 (UTC)
-Date: Thu, 1 Feb 2018 19:48:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180201194845.GN2457@work-vm>
-References: <20180201112028.23552-1-peterx@redhat.com>
-	<90b4bc63-94cd-ec0f-32c8-c16df8ee84cf@redhat.com>
-	<20180201211652-mutt-send-email-mst@kernel.org>
+	(envelope-from <mreitz@redhat.com>) id 1ehKtp-00051Y-4p
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:55:30 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <06131f65-28d8-44fb-ee96-2d8e78fe4b3c@redhat.com>
+Date: Thu, 1 Feb 2018 20:46:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180201211652-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
- priority
+In-Reply-To: <896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BdYraulc6RLarsF0fEOTAZSHneY4q7Obm"
+Subject: Re: [Qemu-devel] [PATCH v3 31/39] qcow2: Update qcow2_truncate() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Thu, Feb 01, 2018 at 02:24:15PM +0200, Marcel Apfelbaum wrote:
-> > Hi Peter,
-> > 
-> > On 01/02/2018 13:20, Peter Xu wrote:
-> > > In the past, we prioritized IOMMU migration so that we have such a
-> > > priority order:
-> > > 
-> > >     IOMMU > PCI Devices
-> > > 
-> > > When migrating a guest with both vIOMMU and pcie-root-port, we'll always
-> > > migrate vIOMMU first, since pcie-root-port will be seen to have the same
-> > > priority of general PCI devices.
-> > > 
-> > > That's problematic.
-> > > 
-> > > The thing is that PCI bus number information is stored in the root port,
-> > > and that is needed by vIOMMU during post_load(), e.g., to figure out
-> > > context entry for a device.  If we don't have correct bus numbers for
-> > > devices, we won't be able to recover device state of the DMAR memory
-> > > regions, and things will be messed up.
-> > > 
-> > > So let's boost the PCIe root ports to be even with higher priority:
-> > > 
-> > >    PCIe Root Port > IOMMU > PCI Devices
-> > > 
-> > > A smoke test shows that this patch fixes bug 1538953.
-> > > 
-> > > CC: Alex Williamson <alex.williamson@redhat.com>
-> > > CC: Marcel Apfelbaum <marcel@redhat.com>
-> > > CC: Michael S. Tsirkin <mst@redhat.com>
-> > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > CC: Juan Quintela <quintela@redhat.com>
-> > > CC: Laurent Vivier <lvivier@redhat.com>
-> > > Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1538953
-> > > Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > > Marcel & all,
-> > > 
-> > > I think it's possible that we need similar thing for other bridge-like
-> > > devices, but I'm not that familiar.  Would you help confirm?  Thanks,
-> > 
-> > Is a pity we don't have a way to mark the migration priority
-> > in a base class. Dave, maybe we do have a way?
-> > 
-> > In the meantime you would need to add it also to:
-> > - ioh3420 (Intel root port)
-> > - xio3130_downstream (Intel switch downstream port)
-> > - xio3130_upstream (The counterpart of the above, you want the whole
-> >   switch to be migrated before loading the IOMMU device state)
-> > - pcie_pci_bridge (for pci devices)
-> > - pci-pci bridge (if for some reason you have one attached to the pcie_pci_brdge)
-> > - i82801b11 (dmi-pci bridge, we want to deprecate it bu is there for now)
-> > 
-> > Thanks,
-> > Marcel
-> 
-> It's kind of strange that we need to set the priority manually.
-> Can't migration figure it out itself?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BdYraulc6RLarsF0fEOTAZSHneY4q7Obm
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <06131f65-28d8-44fb-ee96-2d8e78fe4b3c@redhat.com>
+Subject: Re: [PATCH v3 31/39] qcow2: Update qcow2_truncate() to support L2
+ slices
+References: <cover.1516978645.git.berto@igalia.com>
+ <896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
+In-Reply-To: <896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> I think bus
-> must always be migrated before the devices behind it ...
+On 2018-01-26 15:59, Alberto Garcia wrote:
+> The qcow2_truncate() code is mostly independent from whether
+> we're using L2 slices or full L2 tables, but in full and
+> falloc preallocation modes new L2 tables are allocated using
+> qcow2_alloc_cluster_link_l2().  Therefore the code needs to be
+> modified to ensure that all nb_clusters that are processed in each
+> call can be allocated with just one L2 slice.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 78f067cae7..529becfa30 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3261,8 +3261,9 @@ static int qcow2_truncate(BlockDriverState *bs, i=
+nt64_t offset,
+>          guest_offset =3D old_length;
+>          while (nb_new_data_clusters) {
+>              int64_t guest_cluster =3D guest_offset >> s->cluster_bits;=
 
-I think that's true; but:
-  a) Is the iommu a child of any of the PCI busses?
-  b) does anything ensure that the bridge that's a parent of a bus
-     gets migrated before the bus it provides?
-  c) What happens with more htan one root port?
+> -            int64_t nb_clusters =3D MIN(nb_new_data_clusters,
+> -                                      s->l2_size - guest_cluster % s->=
+l2_size);
+> +            int64_t nb_clusters =3D MIN(
+> +                nb_new_data_clusters,
+> +                s->l2_slice_size - guest_cluster % s->l2_slice_size);
 
-Dave
+An alternative would be the
+"s->l2_slice_size - offset_to_l2_slice_index(s, guest_offset)" we
+basically have elsewhere, but that's longer and doesn't really matter:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+>              QCowL2Meta allocation =3D {
+>                  .offset       =3D guest_offset,
+>                  .alloc_offset =3D host_offset,
+>=20
 
 
-> > >  hw/pci-bridge/gen_pcie_root_port.c | 1 +
-> > >  include/migration/vmstate.h        | 1 +
-> > >  2 files changed, 2 insertions(+)
-> > > 
-> > > diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> > > index 0e2f2e8bf1..e6ff1effd8 100644
-> > > --- a/hw/pci-bridge/gen_pcie_root_port.c
-> > > +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> > > @@ -101,6 +101,7 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
-> > >  
-> > >  static const VMStateDescription vmstate_rp_dev = {
-> > >      .name = "pcie-root-port",
-> > > +    .priority = MIG_PRI_PCIE_ROOT_PORT,
-> > >      .version_id = 1,
-> > >      .minimum_version_id = 1,
-> > >      .post_load = pcie_cap_slot_post_load,
-> > > diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> > > index 8c3889433c..491449db9f 100644
-> > > --- a/include/migration/vmstate.h
-> > > +++ b/include/migration/vmstate.h
-> > > @@ -148,6 +148,7 @@ enum VMStateFlags {
-> > >  typedef enum {
-> > >      MIG_PRI_DEFAULT = 0,
-> > >      MIG_PRI_IOMMU,              /* Must happen before PCI devices */
-> > > +    MIG_PRI_PCIE_ROOT_PORT,     /* Must happen before IOMMU */
-> > >      MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
-> > >      MIG_PRI_GICV3,              /* Must happen before the ITS */
-> > >      MIG_PRI_MAX,
-> > > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--BdYraulc6RLarsF0fEOTAZSHneY4q7Obm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzbqYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AiJYIAL8xnLzbaL4A4KPnItACzxy6pKRjqHrh
+1MIopaN1Ju9GuOhhi1ZIy6+RIjIYAZ1AfFT+eEA59/KlS90S4yusGojjbnzV6vgM
+X1HzHYDhXlFmV6JypCl7xCzb72Uk8+J8y5l5rjVCPfIZOpwph4N4Pfp5/31oLufw
+5HU63MQgj/dfw9A7IJSN5H7tcUXqJsYiYoAm1AB5XRiUC/QSDB3qwkDIi3ZmQMaR
+1/xVixGJxNjwKiHzMvwblNH1HGA8g/ryFMKeyG85qQ87TLkUawodk41N7nunzYoi
+uzFOKMtGf2BlnYN1jAhLAFZFvZnAg2u4//UJgiMs6Fv8AalkbGtlquc=
+=a86A
+-----END PGP SIGNATURE-----
+
+--BdYraulc6RLarsF0fEOTAZSHneY4q7Obm--
