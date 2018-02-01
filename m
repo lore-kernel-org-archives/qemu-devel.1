@@ -1,42 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehDTQ-0002hp-5K
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:56:13 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1ehDXK-0004rI-DZ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:00:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehDTN-00010F-2M
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:56:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1ehDTM-0000zk-Pj
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:56:09 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w11BsVDX134329
-	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 06:56:07 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fv1m5jd43-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 06:56:07 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Thu, 1 Feb 2018 11:56:04 -0000
-References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-	<20180130094715.11578-2-zyimin@linux.vnet.ibm.com>
-	<20180131115824.7329b8ee.cohuck@redhat.com>
-	<a048761a-7dbc-80e2-8b57-2b5b0fc35ff0@linux.vnet.ibm.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Thu, 1 Feb 2018 12:56:01 +0100
+	(envelope-from <arei.gonglei@huawei.com>) id 1ehDXB-0004wm-72
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:00:14 -0500
+Received: from [45.249.212.32] (port=43922 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1ehDXA-0004qY-RT
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:00:05 -0500
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Thu, 1 Feb 2018 19:59:32 +0800
+Message-ID: <1517486372-22868-1-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <a048761a-7dbc-80e2-8b57-2b5b0fc35ff0@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Message-Id: <76ce13fe-f5e1-8b31-7f62-58c9d6b0271a@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] s390x/pci: fixup the code walking
- IOMMU tables
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] vl: fix possible int overflow for
+ qemu_timedate_diff()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,143 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, shenghualong <shenghualong@huawei.com>, Gonglei <arei.gonglei@huawei.com>
 
-On 01/02/2018 12:28, Yi Min Zhao wrote:
->
->
-> =E5=9C=A8 2018/1/31 =E4=B8=8B=E5=8D=886:58, Cornelia Huck =E5=86=99=E9=81=
-=93:
->> On Tue, 30 Jan 2018 10:47:13 +0100
->> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->>
->>> Current s390x PCI IOMMU code is lack of flags' checking, including:
->>> 1) protection bit
->>> 2) table length
->>> 3) table offset
->>> 4) intermediate tables' invalid bit
->>> 5) format control bit
->>>
->>> This patch introduces a new struct named S390IOTLBEntry, and makes up
->>> these missed checkings. At the same time, inform the guest with the
->>> corresponding error number when the check fails.
->> There are a lot of things in this patch I cannot review due to -ENODOC=
-,
->> but some comments below.
->>
->>> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>> ---
->>> =C2=A0 hw/s390x/s390-pci-bus.c=C2=A0 | 223=20
->>> ++++++++++++++++++++++++++++++++++++++---------
->>> =C2=A0 hw/s390x/s390-pci-bus.h=C2=A0 |=C2=A0 10 +++
->>> =C2=A0 hw/s390x/s390-pci-inst.c |=C2=A0 10 ---
->>> =C2=A0 3 files changed, 190 insertions(+), 53 deletions(-)
->> (...)
->>
->>> +/* ett is expected table type, -1 page table, 0 segment table, 1=20
->>> region table */
->>> +static uint64_t get_table_index(uint64_t iova, int8_t ett)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 switch (ett) {
->>> +=C2=A0=C2=A0=C2=A0 case -1:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return calc_px(iova);
->>> +=C2=A0=C2=A0=C2=A0 case 0:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return calc_sx(iova);
->>> +=C2=A0=C2=A0=C2=A0 case 1:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return calc_rtx(iova);
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 return -1;
->> You use ett to differentiate between the three table types a lot. Is
->> this an architectured value, or an internal construct?
-> It's an architectured value to some degree, because it's used to descri=
-pt
-> the translation more clearly in the doc.
->>
->> If you introduced it yourself, it might make sense to switch to an enu=
-m
->> instead. Otherwise, using some #defines would improve readability of
->> the code.
-> OK. I will add macros in next version.
->>
->>> +}
->> (...)
->>
->>> +/**
->>> + * table_translate: do translation within one table and return the=20
->>> following
->>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 table origin
->>> + *
->>> + * @entry: the entry being traslated, the result is stored in this.
->> s/traslated/translated/
-> OK.
->>
->>> + * @to: the address of table origin.
->>> + * @ett: expected table type, 1 region table, 0 segment table and=20
->>> -1 page table.
->>> + * @error: error code
->>> + */
->>> +static uint64_t table_translate(S390IOTLBEntry *entry, uint64_t to,=20
->>> int8_t ett,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint16_t *error)
->> (...)
->>
->>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->>> index be449210d9..63fa06fb97 100644
->>> --- a/hw/s390x/s390-pci-inst.c
->>> +++ b/hw/s390x/s390-pci-inst.c
->>> @@ -644,16 +644,6 @@ int rpcit_service_call(S390CPU *cpu, uint8_t=20
->>> r1, uint8_t r2, uintptr_t ra)
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (start < end) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 entry =3D imrc=
-->translate(iommu_mr, start, IOMMU_NONE);
->>> -
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!entry.translated_add=
-r) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-bdev->state =3D ZPCI_FS_ERROR;
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-etcc(cpu, ZPCI_PCI_LS_ERR);
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-390_set_status_code(env, r1, ZPCI_PCI_ST_INSUF_RES);
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-390_pci_generate_error_event(ERR_EVENT_SERR,=20
->>> pbdev->fh, pbdev->fid,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 start, ERR_EVENT_Q_BIT);
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g=
-oto out;
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> -
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memory_region_=
-notify_iommu(iommu_mr, entry);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 start +=3D ent=
-ry.addr_mask + 1;
->> You're now progressing even though you might have generated an error
->> event. Is that what's intended?
-> Yes, this is wrong. The right thing is only delete the code generating=20
-> error event,
-> and keep the if check here in this patch.
+From: shenghualong <shenghualong@huawei.com>
 
-Hum, I do not see any problem with having a translated address being 0.
+When the Windows guest users set the time to year 2099,
+the return value of qemu_timedate_diff() will overflow
+with variable clock mode as below format:
 
-I would say it is one of the fixup ;) .
+ <clock offset='variable' adjustment='-1201568405' basis='utc'>
 
-Regards,
-Pierre
+Let's change the return value of qemu_timedate_diff() from
+int to time_t to fix the possible overflow problem.
 
->>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->
+Signed-off-by: shenghualong <shenghualong@huawei.com>
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+---
+ include/qemu-common.h | 2 +-
+ vl.c                  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index 05319b9..6fb80aa 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -33,7 +33,7 @@ int qemu_main(int argc, char **argv, char **envp);
+ #endif
+ 
+ void qemu_get_timedate(struct tm *tm, int offset);
+-int qemu_timedate_diff(struct tm *tm);
++time_t qemu_timedate_diff(struct tm *tm);
+ 
+ #define qemu_isalnum(c)		isalnum((unsigned char)(c))
+ #define qemu_isalpha(c)		isalpha((unsigned char)(c))
+diff --git a/vl.c b/vl.c
+index e517a8d..9d225da 100644
+--- a/vl.c
++++ b/vl.c
+@@ -146,7 +146,7 @@ int nb_nics;
+ NICInfo nd_table[MAX_NICS];
+ int autostart;
+ static int rtc_utc = 1;
+-static int rtc_date_offset = -1; /* -1 means no change */
++static time_t rtc_date_offset = -1; /* -1 means no change */
+ QEMUClockType rtc_clock;
+ int vga_interface_type = VGA_NONE;
+ static int full_screen = 0;
+@@ -812,7 +812,7 @@ void qemu_get_timedate(struct tm *tm, int offset)
+     }
+ }
+ 
+-int qemu_timedate_diff(struct tm *tm)
++time_t qemu_timedate_diff(struct tm *tm)
+ {
+     time_t seconds;
+ 
+-- 
+1.8.3.1
