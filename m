@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJyz-0003Eg-9U
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:14 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1ehJz0-0003Fw-E4
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJyy-00008e-Jj
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:13 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45711)
+	(envelope-from <tcminyard@gmail.com>) id 1ehJyz-0000A6-Fg
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:14 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:45712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJyy-00007N-Em
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:12 -0500
-Received: by mail-ot0-x241.google.com with SMTP id 73so8756299oti.12
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJyz-00009R-BD
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:13 -0500
+Received: by mail-ot0-x242.google.com with SMTP id 73so8756343oti.12
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:13 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu,  1 Feb 2018 12:52:57 -0600
-Message-Id: <1517511182-9944-3-git-send-email-minyard@acm.org>
+Date: Thu,  1 Feb 2018 12:52:58 -0600
+Message-Id: <1517511182-9944-4-git-send-email-minyard@acm.org>
 In-Reply-To: <1517511182-9944-1-git-send-email-minyard@acm.org>
 References: <1517511182-9944-1-git-send-email-minyard@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/7] ipmi: Fix SEL get/set time commands
+Subject: [Qemu-devel] [PATCH 3/7] ipmi: Don't set the timestamp on add
+ events that don't have it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +35,45 @@ Cc: Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-The minimum message size was on the wrong commands, for getting
-the time it's zero and for setting the time it's 6.
+According to the spec, from section "32.3 OEM SEL Record - Type
+E0h-FFh", event types from 0x0e to 0xff do not have a timestamp.
+So don't set it when adding those types.  This required putting
+the timestamp in a temporary buffer, since it's still required
+to set the last addition time.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/ipmi/ipmi_bmc_sim.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/ipmi/ipmi_bmc_sim.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index 277c28c..cc068f2 100644
+index cc068f2..a0bbfd5 100644
 --- a/hw/ipmi/ipmi_bmc_sim.c
 +++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -1802,8 +1802,8 @@ static const IPMICmdHandler storage_cmds[] = {
-     [IPMI_CMD_GET_SEL_ENTRY] = { get_sel_entry, 8 },
-     [IPMI_CMD_ADD_SEL_ENTRY] = { add_sel_entry, 18 },
-     [IPMI_CMD_CLEAR_SEL] = { clear_sel, 8 },
--    [IPMI_CMD_GET_SEL_TIME] = { get_sel_time, 6 },
--    [IPMI_CMD_SET_SEL_TIME] = { set_sel_time },
-+    [IPMI_CMD_GET_SEL_TIME] = { get_sel_time },
-+    [IPMI_CMD_SET_SEL_TIME] = { set_sel_time, 6 },
- };
- 
- static const IPMINetfn storage_netfn = {
+@@ -443,16 +443,21 @@ static void sel_inc_reservation(IPMISel *sel)
+ /* Returns 1 if the SEL is full and can't hold the event. */
+ static int sel_add_event(IPMIBmcSim *ibs, uint8_t *event)
+ {
++    uint8_t ts[4];
++
+     event[0] = 0xff;
+     event[1] = 0xff;
+-    set_timestamp(ibs, event + 3);
++    set_timestamp(ibs, ts);
++    if (event[2] < 0xe0) { /* Don't set timestamps for type 0xe0-0xff. */
++        memcpy(event + 3, ts, 4);
++    }
+     if (ibs->sel.next_free == MAX_SEL_SIZE) {
+         ibs->sel.overflow = 1;
+         return 1;
+     }
+     event[0] = ibs->sel.next_free & 0xff;
+     event[1] = (ibs->sel.next_free >> 8) & 0xff;
+-    memcpy(ibs->sel.last_addition, event + 3, 4);
++    memcpy(ibs->sel.last_addition, ts, 4);
+     memcpy(ibs->sel.sel[ibs->sel.next_free], event, 16);
+     ibs->sel.next_free++;
+     sel_inc_reservation(&ibs->sel);
 -- 
 2.7.4
