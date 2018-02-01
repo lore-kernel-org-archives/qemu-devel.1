@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ehDYw-0005kn-3i
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:01:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ehDZe-0006ES-Be
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:02:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ehDYs-0006Wa-2A
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:01:54 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34702)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ehDYr-0006Vf-S0
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:01:50 -0500
-Received: by mail-wr0-x231.google.com with SMTP id 36so18684957wrh.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 04:01:49 -0800 (PST)
-References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-	<87lghd3mq6.fsf@linaro.org>
-	<CAKmqyKMgrU+4ABijd0SgomyZriVjVFMYt=TXs5b9--w_kenZ+Q@mail.gmail.com>
-	<CAKmqyKMopCi5jaDstAX0Q3CzLdQ9wRgKWT2ggR_Or8Yh09zkrQ@mail.gmail.com>
-	<0b0a9968-02bf-9273-e5fe-a69e04cf7f5e@redhat.com>
-	<CAKmqyKMAy3qjjTFdtw4ksa=wJQYVzYZqvSopQ_cHbqwd0tr2cg@mail.gmail.com>
-	<87tvv1ydjl.fsf@linaro.org>
-	<CAKmqyKM10j7yyyhJn8SAv7K3EkZbmL-ckiv5_qQrFqiHvJ2z8g@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAKmqyKM10j7yyyhJn8SAv7K3EkZbmL-ckiv5_qQrFqiHvJ2z8g@mail.gmail.com>
-Date: Thu, 01 Feb 2018 12:01:46 +0000
-Message-ID: <87r2q4yl3p.fsf@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1ehDZb-0007Q0-8Y
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:02:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ehDZb-0007PR-2W
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:02:35 -0500
+Date: Thu, 1 Feb 2018 13:02:26 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180201130226.364e6c76.cohuck@redhat.com>
+In-Reply-To: <b779846e-3e25-5c33-217b-1d9f5e85ec70@linux.vnet.ibm.com>
+References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
+	<20180130094715.11578-4-zyimin@linux.vnet.ibm.com>
+	<20180131124400.4f74cf1c.cohuck@redhat.com>
+	<b779846e-3e25-5c33-217b-1d9f5e85ec70@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] MTTCG External Halt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/pci: use the right pal and pba
+ in reg_ioat()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,88 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
 
+On Thu, 1 Feb 2018 12:33:01 +0100
+Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
+> On 31/01/2018 12:44, Cornelia Huck wrote:
+> > On Tue, 30 Jan 2018 10:47:15 +0100
+> > Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> >  
+> >> When registering ioat, pba should be comprised of leftmost 52 bits and
+> >> rightmost 12 binary zeros, and pal should be comprised of leftmost 52
+> >> bits and right most 12 binary ones. Let's fixup this.
+> >>
+> >> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> >> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> >> ---
+> >>   hw/s390x/s390-pci-inst.c | 2 ++
+> >>   1 file changed, 2 insertions(+)
+> >>
+> >> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+> >> index 997a9cc2e9..3fcc330fe3 100644
+> >> --- a/hw/s390x/s390-pci-inst.c
+> >> +++ b/hw/s390x/s390-pci-inst.c
+> >> @@ -865,6 +865,8 @@ static int reg_ioat(CPUS390XState *env, S390PCIIOMMU *iommu, ZpciFib fib,
+> >>       uint8_t dt = (g_iota >> 2) & 0x7;
+> >>       uint8_t t = (g_iota >> 11) & 0x1;
+> >>   
+> >> +    pba &= ~0xfff;
+> >> +    pal |= 0xfff;
+> >>       if (pba > pal || pba < ZPCI_SDMA_ADDR || pal > ZPCI_EDMA_ADDR) {
+> >>           s390_program_interrupt(env, PGM_OPERAND, 6, ra);
+> >>           return -EINVAL;  
+> > It seems like pba and pal are part of the fib, which in turn seems to
+> > be provided by the caller. Is that correct? If yes, is it valid for
+> > them to not have the rightmost 12 bits as 0s resp. 1s?
+> >
+> > (Probably answered in the architecture, I know. Might make sense to be
+> > a tad more explicit in the description.)
+> >  
+> Yes it is, only word6 and the bits 0-19 of word 7 are used for PAL and
+> the zPCI facility treats the right most 12 bits of the PAL as containing 
+> ones.
+> 
+> For PBA words 4 and 0-19 bits of word 5 with 12 0 append on the right 
+> provides the PBA.
+> 
+> The lower 12 bits of words 5 and 7 of the FIB are ignored by the facility.
+> 
+> @Yi Min: may be add the last sentence to the commit message.
+> 
+> @Conny: Is it clearer?
 
-> On Wed, Jan 31, 2018 at 12:32 PM, Alex Benn=C3=A9e <alex.bennee@linaro.or=
-g> wrote:
->>
->> Alistair Francis <alistair.francis@xilinx.com> writes:
->>
->>> On Tue, Jan 30, 2018 at 8:26 PM, Paolo Bonzini <pbonzini@redhat.com> wr=
-ote:
->>>> On 30/01/2018 18:56, Alistair Francis wrote:
->>>>>
->>>>> I don't have a good solution though, as setting CPU_INTERRUPT_RESET
->>>>> doesn't help (that isn't handled while we are halted) and
->>>>> async_run_on_cpu()/run_on_cpu() doesn't reliably reset the CPU when we
->>>>> want.
->>>>>
->>>>> I've ever tried pausing all CPUs before reseting the CPU and them
->>>>> resuming them all but that doesn't seem to to work either.
->>>>
->>>> async_safe_run_on_cpu would be like async_run_on_cpu, except that it
->>>> takes care of stopping all other CPUs while the function runs.
->>>>
->>>>> Is there
->>>>> anything I'm missing? Is there no reliable way to reset a CPU?
->>>>
->>>> What do you mean by reliable?  Executing no instruction after the one
->>>> you were at?
->>>
->>> The reset is called by a GPIO line, so I need the reset to be called
->>> basically as quickly as the GPIO line changes. The async_ and
->>> async_safe_ functions seem to not run quickly enough, even if I run a
->>> process_work_queue() function afterwards.
->>>
->>> Is there a way to kick the CPU to act on the async_*?
->>
->> Define quickly enough? The async_(safe) functions kick the vCPUs so they
->> will all exit the run loop as they enter the next TB (even if they loop
->> to themselves).
->
-> We have a special power controller CPU that wakes all the CPUs up and
-> at boot the async_* functions don't wake the CPUs up. If I just use
-> the cpu_rest() function directly everything starts fine (but then I
-> hit issues later).
->
-> If I forcefully run process_queued_cpu_work() then I can get the CPUs
-> up, but I don't think that is the right solution.
->
->>
->> From an external vCPUs point of view those extra instructions have
->> already executed. If the resetting vCPU needs them to have reset by the
->> time it executes it's next instruction it should either cpu_loop_exit at
->> that point or ensure it is the last instruction in it's TB (which is
->> what we do for the MMU flush cases in ARM, they all end the TB at that
->> point).
->
-> cpu_loop_exit() sounds like it would help, but as I'm not in the CPU
-> context it just seg faults.
-
-What context are you in? gdb-stub does have to something like this.
-
->
-> Alistair
->
->>
->>
->>>
->>> Thanks,
->>> Alistair
->>>
->>>>
->>>> Paolo
->>>>
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
-
-
---
-Alex Benn=C3=A9e
+Yes, adding the last sentence makes it clearer. Thanks!
