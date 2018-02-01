@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42030)
+Received: from eggs.gnu.org ([208.118.235.92]:42979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1ehLsB-0005aG-E5
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:55:25 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ehLt3-00069G-RJ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:56:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1ehLr7-0007Cm-BG
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:54:19 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36633)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
-	id 1ehLr6-0007Bc-Ut
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:53:13 -0500
-Received: by mail-wm0-x243.google.com with SMTP id f3so8327446wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 12:53:12 -0800 (PST)
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Date: Thu,  1 Feb 2018 21:53:07 +0100
-Message-Id: <20180201205307.30343-1-christoffer.dall@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/arm/kvm: gic: Prevent creating
- userspace GICv3 with KVM
+	(envelope-from <ehabkost@redhat.com>) id 1ehLrz-00089Y-RE
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:55:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53454)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehLrz-00087o-A5
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:54:07 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1562783F42
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 20:54:06 +0000 (UTC)
+Date: Thu, 1 Feb 2018 18:53:57 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180201205357.GL21702@localhost.localdomain>
+References: <20180122205033.24893-1-apahim@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180122205033.24893-1-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 0/6] scripts/qemu.py fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +32,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Bennee <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, crosa@redhat.com
 
-KVM doesn't support emulating a GICv3 in userspace, only GICv2.  We
-currently attempt this anyway, and as a result a KVM guest doesn't
-receive interrupts and the user is left wondering why.  Report an error
-to the user if this particular combination is requested.
+Queued on python-next, thanks!
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- target/arm/kvm_arm.h | 4 ++++
- 1 file changed, 4 insertions(+)
+On Mon, Jan 22, 2018 at 09:50:27PM +0100, Amador Pahim wrote:
+> Changes v11->v12:
+>  - Rebase.
+>  - Drop the already queued commit (qemu.py: remove unused import)
+>  - Fix code filling the _monitor_address when it's None.
+>  - Drop the redundant commit checking whether VM was running on launch()
+>  - Improve the exception message when launch() is called twice with no
+>    shutdown() in between.
+> Changes v10->v11:
+>  - Fix messed indentation.
+>  - Rename self._qemu_log_fd to self._qemu_log_file.
+>  - Patch changelog in reverse order.
+> Changes v9->v10:
+>  - Keep method _remove_if_exists().
+> Changes v8->v9:
+>  - Some commits were already merged. Rebased the remaining ones.
+>  - New commit to remove unused import.
+>  - VM files control logic changed to use a temporary directory.
+>  - Better naming for variable controlling the need of a shutdown before
+>    next launch.
+> Changes v7->v8:
+>  - Rebased.
+>  - Reorder commits to avoid break->fix sequence.
+>  - Split commits "use poll() instead of 'returncode'" and "refactor
+>    launch()".
+>  - Don't ignore errors in _load_io_log(). Instead, check if we created
+>    the file before reading it.
+>  - Use LOG.warn() instead of LOG.debug() for the negative exit code
+>    message.
+>  - Fix the exception name called in commits "launch vm only if it's not
+>    running" and "don't launch again before shutdown()".
+>  - Minor style fixes.
+> Changes v6->v7:
+>  - Split commits in self-contained/atomic changes.
+>  - Addressed the comments from previous version, basically improving the
+>    logging messages and the control over created files. See individual
+>    commit messages for details.
+> Changes v5->v6:
+>  - Remove the commit to rename self._args.
+>  - Fix is_running() return before first call to maunch().
+>  - Use python logging system.
+>  - Include the full command line on negative exit code error message.
+>  - Use os.path.null instead of /dev/null.
+>  - Improve the control over the created/deleted files.
+> Changes v4->v5:
+>  - Break the cleanup commit into logical changes and include in the
+>    commit messages the rationale for making them.
+> Changes v3->v4:
+>  - Squash the 2 first commits since they are co-dependant.
+>  - Cleanup launch() and shutdown().
+>  - Reorder the commits, putting the rename of self._args first.
+>  - Rebased.
+> Changes v2->v3:
+>  - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
+> Changes v1->v2:
+>  - Style fixes to make checkpatch.pl happy.
+>  - Rebased.
+> 
+> *** SUBJECT HERE ***
+> 
+> *** BLURB HERE ***
+> 
+> Amador Pahim (6):
+>   qemu.py: better control of created files
+>   qemu.py: refactor launch()
+>   qemu.py: always cleanup on shutdown()
+>   qemu.py: use poll() instead of 'returncode'
+>   qemu.py: cleanup redundant calls in launch()
+>   qemu.py: don't launch again before shutdown()
+> 
+>  scripts/qemu.py | 93 ++++++++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 62 insertions(+), 31 deletions(-)
+> 
+> -- 
+> 2.14.3
+> 
+> 
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index ff53e9fafb..cfb7e5af72 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -234,6 +234,10 @@ static inline const char *gicv3_class_name(void)
-         exit(1);
- #endif
-     } else {
-+        if (kvm_enabled()) {
-+            error_report("Userspace GICv3 is not supported with KVM");
-+            exit(1);
-+        }
-         return "arm-gicv3";
-     }
- }
 -- 
-2.14.2
+Eduardo
