@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ehGf8-0002wJ-7Q
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:20:35 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ehGgI-0003Xa-6H
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ehGey-0002Ha-Qc
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:20:30 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <87883f3d-9098-2233-b643-c310c9ae2d23@redhat.com>
-References: <1517494591-39369-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<3ad2256a-01cd-6c9b-9a34-663aa077f26f@redhat.com>
-	<87883f3d-9098-2233-b643-c310c9ae2d23@redhat.com>
-Date: Thu, 01 Feb 2018 16:19:38 +0100
-Message-ID: <w514ln068l1.fsf@maestria.local.igalia.com>
+	(envelope-from <brijesh.singh@amd.com>) id 1ehGgD-00046d-8w
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:21:42 -0500
+Received: from mail-sn1nam01on0063.outbound.protection.outlook.com
+	([104.47.32.63]:31808
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ehGgC-000434-Vr
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:21:37 -0500
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-14-brijesh.singh@amd.com>
+	<87r2q5vs8c.fsf@dusky.pond.sub.org>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <c37ea75a-8eb0-e896-8751-96b10bce278a@amd.com>
+Date: Thu, 1 Feb 2018 09:21:26 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: fix write with zero
- flag set and iovector provided
+In-Reply-To: <87r2q5vs8c.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 13/23] hmp: display memory encryption
+ support in 'info kvm'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu 01 Feb 2018 03:40:51 PM CET, Eric Blake wrote:
->>> --- a/block/io.c
->>> +++ b/block/io.c
->>> @@ -1701,7 +1701,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
->>>       */
->>>      tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_WRITE);
->>>  
->>> -    if (!qiov) {
->>> +    if (flags & BDRV_REQ_ZERO_WRITE) {
->>>          ret = bdrv_co_do_zero_pwritev(child, offset, bytes, flags, &req);
->> 
->> So now, the flag rules, but we assert that !qiov (so it would only break
->> a caller that passed the flag but used qiov, which you argued shouldn't
->> exist).
->
-> Sorry, I hit send too soon.  I'm asking if we should have
-> assert(!qiov) right before calling bdrv_co_do_zero_pwritev (it would
-> break a caller that passed the flag and qiov, but you were arguing
-> that such callers previously misbehaved, so we don't want such
-> callers).
 
-Those callers do exist as a matter of fact: bdrv_rw_co_entry() always
-passes a qiov to bdrv_co_pwritev() regardless of the flags (the request
-size is actually taken from the very qiov).
 
-bdrv_pwrite_zeroes() is one example:
+On 01/31/2018 11:43 AM, Markus Armbruster wrote:
+> Brijesh Singh <brijesh.singh@amd.com> writes:
+> 
+>> update 'info kvm' to display the memory encryption support.
+>>
+>> (qemu) info kvm
+>> kvm support: enabled
+>> memory encryption: disabled
+>>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>   hmp.c            | 2 ++
+>>   qapi-schema.json | 5 ++++-
+>>   qmp.c            | 1 +
+>>   3 files changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index 056bf70cf1e2..6ceb6b30af75 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -88,6 +88,8 @@ void hmp_info_kvm(Monitor *mon, const QDict *qdict)
+>>       monitor_printf(mon, "kvm support: ");
+>>       if (info->present) {
+>>           monitor_printf(mon, "%s\n", info->enabled ? "enabled" : "disabled");
+>> +        monitor_printf(mon, "memory encryption: %s\n",
+>> +                       info->mem_encryption ? "enabled" : "disabled");
+>>       } else {
+>>           monitor_printf(mon, "not compiled\n");
+>>       }
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 5c06745c7927..2046c96669bf 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -314,9 +314,12 @@
+>>   #
+>>   # @present: true if KVM acceleration is built into this executable
+>>   #
+>> +# @mem-encryption: true if Memory Encryption is active (since 2.12)
+>> +#
+>>   # Since: 0.14.0
+>>   ##
+>> -{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool'} }
+>> +{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool',
+>> +            'mem-encryption' : 'bool'} }
+> 
+> This extends QMP's query-kvm.  Your commit message claims the patch
+> affects only HMP.  Needs fixing.  The cleanest way is to split the patch
+> into its QMP part (hunks #2 and #3) and its HMP part (hunk #1).
+> 
 
-$ qemu-img create -f qcow2 base.img 100M
-$ qemu-img create -f qcow2 -b base.img active.img
-$ qemu-io -c 'write -z 0 128k' -f qcow2 active.img 
-$ qemu-img amend -o compat=0.10 active.img 
 
-It even uses an iovec with iov_base = NULL but iov_len != 0, which looks
-like an abuse of the data structure.
-
-Berto
+Noted, I will break this into two patches in next series. Thanks for 
+feedback.
