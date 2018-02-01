@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:58311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ehMvv-0004Uo-Uf
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 17:03:22 -0500
+	(envelope-from <dongli.zhang@oracle.com>) id 1ehNyY-0008Af-JZ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:10:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ehMur-0002zq-WA
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 17:02:15 -0500
-Resent-Message-Id: <E1ehMur-0002zq-WA@eggs.gnu.org>
-In-Reply-To: <20180201212917.18131-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151752246058.3252.5362449406959598939@b81a8a9ec60f>
+	(envelope-from <dongli.zhang@oracle.com>) id 1ehNxU-0006A2-Br
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:09:02 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:52374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dongli.zhang@oracle.com>)
+	id 1ehNxT-0004h4-RG
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:07:56 -0500
+References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
+From: Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <07d824ee-da96-8b7e-afda-d5c92f38553b@oracle.com>
+Date: Fri, 2 Feb 2018 07:07:43 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 1 Feb 2018 14:01:01 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] coroutine-lock: polymorphic CoQueue
+In-Reply-To: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Qemu Trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: Nesrine Zouari <nesrine.zouari@enis.tn>, qemu-devel@nongnu.org
+Cc: vilanova@ac.upc.edu, stefanha@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjAxMjEyOTE3LjE4MTMxLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNV0gY29yb3V0aW5lLWxvY2s6IHBvbHltb3Jw
-aGljIENvUXVldWUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg3ZGEyNGQ5ZWEgY3VybDogY29udmVydCB0byBD
-b1F1ZXVlCmE5NGMyYWYzNTAgY29yb3V0aW5lLWxvY2s6IG1ha2UgcWVtdV9jb19lbnRlcl9uZXh0
-IHRocmVhZC1zYWZlCjU3ZWJhMDk3MDggY29yb3V0aW5lLWxvY2s6IGNvbnZlcnQgQ29RdWV1ZSB0
-byB1c2UgUWVtdUxvY2thYmxlCjZlZmE2MTdjNjcgbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUK
-MTQyM2NiMGFiNCB0ZXN0LWNvcm91dGluZTogYWRkIHNpbXBsZSBDb011dGV4IHRlc3QKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogdGVzdC1jb3JvdXRpbmU6IGFkZCBz
-aW1wbGUgQ29NdXRleCB0ZXN0Li4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRv
-IDAgb3IgTlVMTAojMzA6IEZJTEU6IHRlc3RzL3Rlc3QtY29yb3V0aW5lLmM6MTk4Ogorc3RhdGlj
-IGJvb2wgbG9ja2VkID0gZmFsc2U7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDc0IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDIvNTogbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUuLi4KV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzU4OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDox
-NDQ6CisjZGVmaW5lIFFFTVVfR0VORVJJQzIoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgs
-IGEwLCBRRU1VX0dFTkVSSUMxKHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiM1OTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTQ1OgorI2Rl
-ZmluZSBRRU1VX0dFTkVSSUMzKHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVN
-VV9HRU5FUklDMih4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNjA6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE0NjoKKyNkZWZpbmUgUUVN
-VV9HRU5FUklDNCh4LCBhMCwgLi4uKSBRRU1VX0dFTkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJ
-QzMoeCwgX19WQV9BUkdTX18pKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzYx
-OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDoxNDc6CisjZGVmaW5lIFFFTVVfR0VORVJJ
-QzUoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBRRU1VX0dFTkVSSUM0KHgsIF9f
-VkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MjogRklMRTog
-aW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTQ4OgorI2RlZmluZSBRRU1VX0dFTkVSSUM2KHgsIGEw
-LCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVNVV9HRU5FUklDNSh4LCBfX1ZBX0FSR1Nf
-XykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjM6IEZJTEU6IGluY2x1ZGUv
-cWVtdS9jb21waWxlci5oOjE0OToKKyNkZWZpbmUgUUVNVV9HRU5FUklDNyh4LCBhMCwgLi4uKSBR
-RU1VX0dFTkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJQzYoeCwgX19WQV9BUkdTX18pKQoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY0OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29t
-cGlsZXIuaDoxNTA6CisjZGVmaW5lIFFFTVVfR0VORVJJQzgoeCwgYTAsIC4uLikgUUVNVV9HRU5F
-UklDX0lGKHgsIGEwLCBRRU1VX0dFTkVSSUM3KHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2NTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6
-MTUxOgorI2RlZmluZSBRRU1VX0dFTkVSSUM5KHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4
-LCBhMCwgUUVNVV9HRU5FUklDOCh4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojNjY6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE1MjoKKyNk
-ZWZpbmUgUUVNVV9HRU5FUklDMTAoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBR
-RU1VX0dFTkVSSUM5KHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxMjQ6IEZJTEU6IGluY2x1ZGUvcWVtdS9sb2NrYWJsZS5oOjI4OgorICogdG8gUUVN
-VV9NQUtFX0xPQ0tBQkxFLiAgRm9yIG9wdGltaXplZCBidWlsZHMsIHdlIGNhbiByZWx5IG9uIGRl
-YWQtY29kZSBlbGltaW5hdGlvbgoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmlu
-ZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzEyNzogRklMRTogaW5jbHVkZS9xZW11L2xvY2thYmxlLmg6
-MzE6CisjaWZkZWYgX19PUFRJTUlaRV9fCgp0b3RhbDogMCBlcnJvcnMsIDExIHdhcm5pbmdzLCAy
-NDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpD
-aGVja2luZyBQQVRDSCAzLzU6IGNvcm91dGluZS1sb2NrOiBjb252ZXJ0IENvUXVldWUgdG8gdXNl
-IFFlbXVMb2NrYWJsZS4uLgpDaGVja2luZyBQQVRDSCA0LzU6IGNvcm91dGluZS1sb2NrOiBtYWtl
-IHFlbXVfY29fZW50ZXJfbmV4dCB0aHJlYWQtc2FmZS4uLgpDaGVja2luZyBQQVRDSCA1LzU6IGN1
-cmw6IGNvbnZlcnQgdG8gQ29RdWV1ZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Hi Nesrine,
+
+On 02/01/2018 11:30 PM, Nesrine Zouari wrote:
+> Hello,
+> 
+> I am a computer engineering student and I am actually working on my
+> graduation project at Lauterbach company. The project is about Qemu Trace
+> and as a future I would like to contribute this work to the main line.
+> 
+> My project is divided into two parts:
+> 
+> 1/ Collecting the Guest trace data : The trace solution should be able to
+> provide:
+> 
+>             a/ Instruction flow Trace
+> 
+>             b/ Memory read/write access
+
+About mem read/write, there is a project panda:
+
+https://github.com/panda-re/panda
+
+> 
+>             c/ Time Stamps.
+> 
+>             d/ For tracing rich operating systems that are using MMU, we
+> additionally need to trace the task switches.
+> 
+> 2/ Sending the collected data to a third party tool for analysis.
+> 
+> My question is about the first part. I would like to know, which trace
+> backend that better fit my use case.
+> 
+> 
+> Regards,
+> 
+> -----------------------------------------------------------------------------------------
+> 
+> Nesrine ZOUARI
+> Computer Engineering Student
+> Department of Computer Engineering and Applied Mathematics
+> National Engineering School of Sfax (ENIS)
+> University of Sfax-Tunisia
+> Tel: +216 52 620 475
+> 
+
+Dongli Zhang
