@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhunxun@gmail.com>) id 1ehBvp-00058u-Nw
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:17:26 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1ehBwf-0005cP-Ne
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:18:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhunxun@gmail.com>) id 1ehBvj-0006gD-NP
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:17:25 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42717)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhunxun@gmail.com>) id 1ehBvj-0006fc-I6
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:17:19 -0500
-Received: by mail-ot0-x244.google.com with SMTP id a7so13497047otk.9
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 02:17:19 -0800 (PST)
+	(envelope-from <haozhong.zhang@intel.com>) id 1ehBwc-0007gZ-Hc
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:18:17 -0500
+Received: from mga18.intel.com ([134.134.136.126]:3541)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1ehBwc-0007cz-4H
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:18:14 -0500
+Date: Thu, 1 Feb 2018 18:17:44 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20180201101744.wkkqcag5dfcwxjak@hz-desktop>
+References: <20180131060229.9294-1-haozhong.zhang@intel.com>
+	<CAPcyv4gJyS=yiXg6SHxdiHT9vzmLx2yXsfdyOe3+qTLwzrMDQQ@mail.gmail.com>
+	<20180201000240.zmwa6wwnthg2su36@hz-desktop>
+	<CAPcyv4gZSGtPLt7ED0eOngYApHM8=9CTTjOHKpDCG-GfBes4xQ@mail.gmail.com>
+	<20180201002457.hgyvph7z6iys5yvy@hz-desktop>
+	<CAPcyv4g=1FQYWTAjrrm9DmZaP3nZEZJKXc6JC=f8GSWhccv+wg@mail.gmail.com>
+	<20180201022900.4znup2fovqr7bu5m@hz-desktop>
+	<CAPcyv4i0UFoq-ot0KPBeNaDhENUZJs9iFdjotKny=kSnOHXeMw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180201095118.GA2457@work-vm>
-References: <CADUDsAo6ku+WT1+DTG6u6CUjdg6xzG6LwBt8RwHK4eR_UWY=Jg@mail.gmail.com>
-	<20180131173154.GA2520@work-vm>
-	<CADUDsArE1tfNyiHB13a_GoizMn7pEoT2_s8JX7OeDuK_=xcB=A@mail.gmail.com>
-	<20180201095118.GA2457@work-vm>
-From: "jack.chen" <zhunxun@gmail.com>
-Date: Thu, 1 Feb 2018 18:17:18 +0800
-Message-ID: <CADUDsApj9ScOSNq0PJfH7XdFxbZau_=yuBbBNFc9vaEQrr3B3g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vhost-user question
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4i0UFoq-ot0KPBeNaDhENUZJs9iFdjotKny=kSnOHXeMw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +35,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu <qemu-devel@nongnu.org>, maxime.coquelin@redhat.com
+To: Dan Williams <dan.j.williams@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, Qemu Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Thanks,But my question is how the fd belonging to qemu can be used in
-another process such as DPDK=EF=BC=9Fis fd just effective within one proces=
-s?
-for example ,if process A open file a.txt,and it gets one fd=E3=80=82the fd
-can only be used in process A ,can it be used in process B?
+On 01/31/18 19:02 -0800, Dan Williams wrote:
+> On Wed, Jan 31, 2018 at 6:29 PM, Haozhong Zhang
+> <haozhong.zhang@intel.com> wrote:
+> > + vfio maintainer Alex Williamson in case my understanding of vfio is incorrect.
+> >
+> > On 01/31/18 16:32 -0800, Dan Williams wrote:
+> >> On Wed, Jan 31, 2018 at 4:24 PM, Haozhong Zhang
+> >> <haozhong.zhang@intel.com> wrote:
+> >> > On 01/31/18 16:08 -0800, Dan Williams wrote:
+> >> >> On Wed, Jan 31, 2018 at 4:02 PM, Haozhong Zhang
+> >> >> <haozhong.zhang@intel.com> wrote:
+> >> >> > On 01/31/18 14:25 -0800, Dan Williams wrote:
+> >> >> >> On Tue, Jan 30, 2018 at 10:02 PM, Haozhong Zhang
+> >> >> >> <haozhong.zhang@intel.com> wrote:
+> >> >> >> > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> >> >> >> > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> >> >> >> > files on ext4/xfs file system mounted with '-o dax').
+> >> >> >>
+> >> >> >> Wait, MAP_SYNC does not guarantee persistence. It makes sure that the
+> >> >> >> metadata is in sync after a fault. However, that does not make
+> >> >> >> filesystem-DAX safe for use with QEMU, because we still need to
+> >> >> >> coordinate DMA with fileystem operations. There is no way to do that
+> >> >> >> coordination from within a guest. QEMU needs to use device-dax if the
+> >> >> >> guest might ever perform DMA to a virtual-pmem range. See this patch
+> >> >> >> set for more details on the DAX vs DMA problem [1]. I think we need to
+> >> >> >> enforce this in the host kernel. I.e. do not allow file backed DAX
+> >> >> >> pages to be mapped in EPT entries unless / until we have a solution to
+> >> >> >> the DMA synchronization problem. Apologies for not noticing this
+> >> >> >> earlier.
+> >> >> >
+> >> >> > QEMU does not truncate or punch holes of the file once it has been
+> >> >> > mmap()'ed. Does the problem [1] still exist in such case?
+> >> >>
+> >> >> Something else on the system might. The only agent that could enforce
+> >> >> protection is the kernel, and the kernel will likely just disallow
+> >> >> passing addresses from filesystem-dax vmas through to a guest
+> >> >> altogether. I think there's even a problem in the non-DAX case unless
+> >> >> KVM is pinning pages while they are handed out to a guest. The problem
+> >> >> is that we don't have a page cache page to pin in the DAX case.
+> >> >>
+> >> >
+> >> > Does it mean any user-space code like
+> >> >   ptr = mmap(..., fd, ...); // fd refers to a file on DAX filesystem
+> >> >   // make DMA to ptr
+> >> > is unsafe?
+> >>
+> >> Yes, it is currently unsafe because there is no coordination with the
+> >> filesytem if it decides to make block layout changes. We can fix that
+> >> in the non-virtualization case by having the filesystem wait for DMA
+> >> completion callbacks (i.e. what for all pages to be idle), but as far
+> >> as I can see we can't do the same coordination for DMA initiated by a
+> >> guest device driver.
+> >>
+> >
+> > I think that fix [1] also works for KVM/QEMU. The guest DMA are
+> > performed on two types of devices:
+> >
+> > 1. For emulated devices, the guest DMA requests are trapped and
+> >    actually performed by QEMU on the host side. The host side fix [1]
+> >    can cover this case.
+> >
+> > 2. For passthrough devices, vfio pins all pages, including those
+> >    backed by dax mode files, used by the guest if any device is
+> >    passthroughed to it. If I read the commit message in [2] correctly,
+> >    operations that change the page-to-file offset association of pages
+> >    from dax mode files will be deferred until the reference count of
+> >    the affected pages becomes 1.  That is, if any passthrough device
+> >    is used with a VM, the changes of page-to-file offset will not be
+> >    able to happen until the VM is shutdown, so the fix [1] still takes
+> >    effect here.
+> 
+> This sounds like a longterm mapping under control of vfio and not the
+> filesystem. See get_user_pages_longterm(), it is a problem if pages
+> are pinned indefinitely especially DAX. It sounds like vfio is in the
+> same boat as RDMA and cannot support long lived pins of DAX pages. As
+> of 4.15 RDMA to filesystem-DAX pages has been disabled. The eventual
+> fix will be to create a "memory-registration with lease" semantic
+> available for RDMA so that the kernel can forcibly revoke page pinning
+> to perform physical layout changes. In the near it seems
+> vaddr_get_pfn() needs to be fixed to use get_user_pages_longterm() so
+> that filesystem-dax mappings are explicitly disallowed.
 
-2018-02-01 17:51 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
-> * jack.chen (zhunxun@gmail.com) wrote:
->> thanks,but I really can not understand how the fd works,can someone
->> explain it or give me some  reference material??
+It seems that KVM and VFIO need to switch to get_user_pages_longterm()
+which fails getting pages backed by dax mode files.
+
+However, as get_user_pages() and its variants in the current KVM and
+VFIO may be called after a VM starts running, e.g., handling EPT
+violation on demand, and hotplugging a passthrough device to VM,
+simply switching to the longterm version would cause VM crash in those
+cases. Therefore, it also needs to patch or document in QEMU to not
+use dax files with memory-backend-file. Paolo, Radim and Alex, what do
+you think?
+
+Thanks,
+Haozhong
+
+> 
+> > Another question is how a user-space application (e.g., QEMU) knows
+> > whether it's safe to mmap a file on the DAX file system?
+> 
+> I think we fix vaddr_get_pfn() to start failing for DAX mappings
+> unless/until we can add a "with lease" mechanism. Userspace will know
+> when it is safe again when vfio stops failing.
 >
-> Probably the man page for the mmap system call, or an introduction to
-> linux/unix syscalls.  Just remember that any shared memory will be
-> 'backed' by a file (or something that works like a file), and if it's a
-> file, when you open it you get a file descriptor.  Once you have that fd
-> you can map it somewhere else.
->
-> Dave
->
->>
->> 2018-02-01 1:31 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
->> > * jack.chen (zhunxun@gmail.com) wrote:
->> >> hello,I am confused when I read vhost-user source code in qemu.I know
->> >> vhost-user app shared memory with qemu by mmap,but why it can use fd =
-which
->> >> is belong to qemu?
->> >> relative code:
->> >>  qemu code in function vhost_user_set_mem_table
->> >> fd =3D memory_region_get_fd(mr);
->> >>         if (fd > 0) {
->> >>             msg.payload.memory.regions[fd_num].userspace_addr =3D
->> >> reg->userspace_addr;
->> >>             msg.payload.memory.regions[fd_num].memory_size  =3D
->> >> reg->memory_size;
->> >>             msg.payload.memory.regions[fd_num].guest_phys_addr =3D
->> >> reg->guest_phys_addr;
->> >>             msg.payload.memory.regions[fd_num].mmap_offset =3D offset=
-;
->> >>             assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
->> >>             fds[fd_num++] =3D fd;
->> >>         }
->> >>
->> >> =E2=80=A6=E2=80=A6
->> >> DPDK code in vhost_user_set_mem_table
->> >>
->> >> mmap_addr =3D mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
->> >> MAP_SHARED | MAP_POPULATE, fd, 0);
->> >> =E2=80=A6=E2=80=A6
->> >>
->> >> thanks a lot!
->> >
->> > Because that's how the dpdk/vhost-user binary knows what to mmap;
->> > each fd corresponds to the backing file of the memory area that's bein=
-g
->> > shared.  This way the dpdk/vhost doesn't need to open those files itse=
-lf
->> > or try and match the exact memory configuration of qemu; QEMU just giv=
-es
->> > it the exact thing it needs to mmap - which is just the fd and offsets=
-.
->> >
->> > Dave
->> >
->> > --
->> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
