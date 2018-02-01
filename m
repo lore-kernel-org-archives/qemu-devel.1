@@ -1,41 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehD7D-0000NE-N9
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:33:16 -0500
+	(envelope-from <marcel@redhat.com>) id 1ehDur-0003WJ-Lr
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:24:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehD78-0006Fz-Qk
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:33:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56414)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1ehD78-0006FH-Hg
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:33:10 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w11BTToF059956
-	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 06:33:09 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fv1m5hj7n-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 06:33:08 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Thu, 1 Feb 2018 11:33:06 -0000
-References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-	<20180130094715.11578-4-zyimin@linux.vnet.ibm.com>
-	<20180131124400.4f74cf1c.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Thu, 1 Feb 2018 12:33:01 +0100
+	(envelope-from <marcel@redhat.com>) id 1ehDun-0000HN-MR
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:24:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33554)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehDun-0000Gf-Cd
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:24:29 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 154F72815B
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 12:24:28 +0000 (UTC)
+References: <20180201112028.23552-1-peterx@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <90b4bc63-94cd-ec0f-32c8-c16df8ee84cf@redhat.com>
+Date: Thu, 1 Feb 2018 14:24:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180131124400.4f74cf1c.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180201112028.23552-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <b779846e-3e25-5c33-217b-1d9f5e85ec70@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/pci: use the right pal and pba
- in reg_ioat()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
+ priority
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,62 +34,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On 31/01/2018 12:44, Cornelia Huck wrote:
-> On Tue, 30 Jan 2018 10:47:15 +0100
-> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->
->> When registering ioat, pba should be comprised of leftmost 52 bits and
->> rightmost 12 binary zeros, and pal should be comprised of leftmost 52
->> bits and right most 12 binary ones. Let's fixup this.
->>
->> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->> ---
->>   hw/s390x/s390-pci-inst.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->> index 997a9cc2e9..3fcc330fe3 100644
->> --- a/hw/s390x/s390-pci-inst.c
->> +++ b/hw/s390x/s390-pci-inst.c
->> @@ -865,6 +865,8 @@ static int reg_ioat(CPUS390XState *env, S390PCIIOM=
-MU *iommu, ZpciFib fib,
->>       uint8_t dt =3D (g_iota >> 2) & 0x7;
->>       uint8_t t =3D (g_iota >> 11) & 0x1;
->>  =20
->> +    pba &=3D ~0xfff;
->> +    pal |=3D 0xfff;
->>       if (pba > pal || pba < ZPCI_SDMA_ADDR || pal > ZPCI_EDMA_ADDR) {
->>           s390_program_interrupt(env, PGM_OPERAND, 6, ra);
->>           return -EINVAL;
-> It seems like pba and pal are part of the fib, which in turn seems to
-> be provided by the caller. Is that correct? If yes, is it valid for
-> them to not have the rightmost 12 bits as 0s resp. 1s?
->
-> (Probably answered in the architecture, I know. Might make sense to be
-> a tad more explicit in the description.)
->
-Yes it is, only word6 and the bits 0-19 of word 7 are used for PAL and
-the zPCI facility treats the right most 12 bits of the PAL as containing=20
-ones.
+Hi Peter,
 
-For PBA words 4 and 0-19 bits of word 5 with 12 0 append on the right=20
-provides the PBA.
+On 01/02/2018 13:20, Peter Xu wrote:
+> In the past, we prioritized IOMMU migration so that we have such a
+> priority order:
+> 
+>     IOMMU > PCI Devices
+> 
+> When migrating a guest with both vIOMMU and pcie-root-port, we'll always
+> migrate vIOMMU first, since pcie-root-port will be seen to have the same
+> priority of general PCI devices.
+> 
+> That's problematic.
+> 
+> The thing is that PCI bus number information is stored in the root port,
+> and that is needed by vIOMMU during post_load(), e.g., to figure out
+> context entry for a device.  If we don't have correct bus numbers for
+> devices, we won't be able to recover device state of the DMAR memory
+> regions, and things will be messed up.
+> 
+> So let's boost the PCIe root ports to be even with higher priority:
+> 
+>    PCIe Root Port > IOMMU > PCI Devices
+> 
+> A smoke test shows that this patch fixes bug 1538953.
+> 
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Marcel Apfelbaum <marcel@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Laurent Vivier <lvivier@redhat.com>
+> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1538953
+> Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+> Marcel & all,
+> 
+> I think it's possible that we need similar thing for other bridge-like
+> devices, but I'm not that familiar.  Would you help confirm?  Thanks,
 
-The lower 12 bits of words 5 and 7 of the FIB are ignored by the facility.
+Is a pity we don't have a way to mark the migration priority
+in a base class. Dave, maybe we do have a way?
 
-@Yi Min: may be add the last sentence to the commit message.
+In the meantime you would need to add it also to:
+- ioh3420 (Intel root port)
+- xio3130_downstream (Intel switch downstream port)
+- xio3130_upstream (The counterpart of the above, you want the whole
+  switch to be migrated before loading the IOMMU device state)
+- pcie_pci_bridge (for pci devices)
+- pci-pci bridge (if for some reason you have one attached to the pcie_pci_brdge)
+- i82801b11 (dmi-pci bridge, we want to deprecate it bu is there for now)
 
-@Conny: Is it clearer?
+Thanks,
+Marcel
 
-Regards,
-
-Pierre
-
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+>  hw/pci-bridge/gen_pcie_root_port.c | 1 +
+>  include/migration/vmstate.h        | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+> index 0e2f2e8bf1..e6ff1effd8 100644
+> --- a/hw/pci-bridge/gen_pcie_root_port.c
+> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+> @@ -101,6 +101,7 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
+>  
+>  static const VMStateDescription vmstate_rp_dev = {
+>      .name = "pcie-root-port",
+> +    .priority = MIG_PRI_PCIE_ROOT_PORT,
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+>      .post_load = pcie_cap_slot_post_load,
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 8c3889433c..491449db9f 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -148,6 +148,7 @@ enum VMStateFlags {
+>  typedef enum {
+>      MIG_PRI_DEFAULT = 0,
+>      MIG_PRI_IOMMU,              /* Must happen before PCI devices */
+> +    MIG_PRI_PCIE_ROOT_PORT,     /* Must happen before IOMMU */
+>      MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
+>      MIG_PRI_GICV3,              /* Must happen before the ITS */
+>      MIG_PRI_MAX,
+> 
