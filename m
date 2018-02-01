@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eh9Td-0006tD-0V
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 02:40:10 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eh9vJ-0006y8-BN
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 03:08:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eh9TX-00012R-21
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 02:40:09 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33711)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eh9TW-00012E-TL
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 02:40:02 -0500
-Received: by mail-qt0-x243.google.com with SMTP id d8so25269491qtm.0
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 23:40:02 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180123033034.29493-1-f4bug@amsat.org>
-	<20180123033034.29493-10-f4bug@amsat.org>
-	<CAKmqyKM1FEgja40SQkOo9zHtx2Qv6GQcA=4VLSgnteGp3f4ZpA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e51b6842-27ed-3646-d122-fa152dec736f@amsat.org>
-Date: Thu, 1 Feb 2018 04:39:58 -0300
+	(envelope-from <kraxel@redhat.com>) id 1eh9vE-0002xd-7s
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 03:08:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eh9vD-0002x8-Vz
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 03:08:40 -0500
+Date: Thu, 1 Feb 2018 09:08:37 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180201080837.ym5nv57wnex45q52@sirius.home.kraxel.org>
+References: <20180126214731.23506-1-programmingkidx@gmail.com>
+	<20180130121823.7h4brwivh7653znu@sirius.home.kraxel.org>
+	<F79229CE-D35E-4895-A632-4211A7C526D8@gmail.com>
+	<20180131090310.e4jlhu7euyeompkh@sirius.home.kraxel.org>
+	<655BB356-66E8-4AC4-8EC4-47E3E2DA6B36@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKM1FEgja40SQkOo9zHtx2Qv6GQcA=4VLSgnteGp3f4ZpA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 09/18] sdcard: handles more commands in
- SPI mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <655BB356-66E8-4AC4-8EC4-47E3E2DA6B36@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5] cocoa.m: Add ability for user to
+ specify mouse ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,147 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, qemu-devel@nongnu.org
 
-On 01/31/2018 09:11 PM, Alistair Francis wrote:
-> On Mon, Jan 22, 2018 at 7:30 PM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/sd/sd.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 54 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> index 2eca999bc3..07424aa56e 100644
->> --- a/hw/sd/sd.c
->> +++ b/hw/sd/sd.c
->> @@ -1390,9 +1390,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
->>
->>      /* Application specific commands (Class 8) */
->>      case 55:   /* CMD55:  APP_CMD */
->> -        if (sd->rca != rca)
->> -            return sd_r0;
->> -
->> +        if (!sd->spi) {
->> +            if (sd->rca != rca) {
->> +                return sd_r0;
->> +            }
->> +        }
->>          sd->expecting_acmd = true;
->>          sd->card_status |= APP_CMD;
->>          return sd_r1;
->> @@ -1412,6 +1414,18 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
->>          }
->>          break;
->>
->> +    case 58:    /* CMD58:   READ_OCR (SPI) */
->> +        if (!sd->spi) {
->> +            goto bad_cmd;
->> +        }
->> +        return sd_r3;
->> +
->> +    case 59:    /* CMD59:   CRC_ON_OFF (SPI) */
->> +        if (!sd->spi) {
->> +            goto bad_cmd;
->> +        }
->> +        goto unimplemented_cmd;
->> +
->>      default:
->>      bad_cmd:
->>          qemu_log_mask(LOG_GUEST_ERROR, "SD: Unknown CMD%i\n", req.cmd);
->> @@ -1436,6 +1450,9 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
->>      sd->card_status |= APP_CMD;
->>      switch (req.cmd) {
->>      case 6:    /* ACMD6:  SET_BUS_WIDTH */
->> +        if (sd->spi) {
->> +            goto unimplemented_cmd;
->> +        }
->>          switch (sd->state) {
->>          case sd_transfer_state:
->>              sd->sd_status[0] &= 0x3f;
->> @@ -1460,6 +1477,12 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
->>          }
->>          break;
->>
->> +    case 18:
+  Hi,
+
+> > Well, the modifier key changes are actually sent to the guest, but
+> > usually they have no effect there.
+> > 
+> > So, if you press Ctrl-Alt-F, the guest will see the keydown and keyup
+> > events for ctrl and alt.  It will not see the 'f', because SDL hijacks
+> > that.
 > 
-> These should all have a comment describing what they are and for the
-> others as well.
+> Maybe the f could be sent to the guest directly via qemu_input_event_send_key_qcode().
 
-This is backported from a patch of you or Peter Crosthwaite =)
+Why?  If the user presses the ctrl-alt-f hotkey it expects qemu react on
+it (and toggle fullscreen mode), so it the 'f' keydown is
+*intentionally* not sent to the guest.  But the guest still can see the
+modifier (ctrl and alt) key events.
 
-I'll check the specs and add documentation.
-
+> > Just pulled latest master and recompiled, still not working for me.
+> > This is sierra in a vm.
 > 
->> +        if (sd->spi) {
->> +            goto unimplemented_cmd;
->> +        }
->> +        break;
->> +
->>      case 22:   /* ACMD22: SEND_NUM_WR_BLOCKS */
->>          switch (sd->state) {
->>          case sd_transfer_state:
->> @@ -1485,6 +1508,19 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
->>          }
->>          break;
->>
->> +    case 25:
->> +    case 26:
->> +        if (sd->spi) {
->> +            goto unimplemented_cmd;
->> +        }
->> +        break;
->> +
->> +    case 38:
->> +        if (sd->spi) {
->> +            goto unimplemented_cmd;
->> +        }
->> +        break;
->> +
->>      case 41:   /* ACMD41: SD_APP_OP_COND */
->>          if (sd->spi) {
->>              /* SEND_OP_CMD */
->> @@ -1542,6 +1578,12 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
->>          }
->>          break;
->>
->> +    case 43 ... 49:
->> +        if (sd->spi) {
->> +            goto unimplemented_cmd;
->> +        }
->> +        break;
->> +
->>      case 51:   /* ACMD51: SEND_SCR */
->>          switch (sd->state) {
->>          case sd_transfer_state:
->> @@ -1555,9 +1597,18 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
->>          }
->>          break;
->>
->> +    case 55:    /* Not exist */
->> +        break;
->> +
->>      default:
->>          /* Fall back to standard commands.  */
->>          return sd_normal_command(sd, req);
->> +
->> +    unimplemented_cmd:
->> +        /* Commands that are recognised but not yet implemented in SPI mode.  */
-> 
-> This should be unimplemented_spi_cmd then, to be more clear.
+> What software do you use to run the VM? It could be possible the VM
+> software is interfering with the ungrab keys.
 
-Good idea.
+qemu, with vnc and virt-viewer.  Ahem, right, the qemu vnc server reacts
+on ctrl-alt-<nr> too, so that is probably the reason.  The joy of nested
+virtualization ...
 
+> >> Basically there is a array that acts as a check list. It checks off
+> >> keys that belong to the ungrab sequence as they are detected. Once a
+> >> non-ungrab key is detected, the check list is cleared. If all the
+> >> ungrab keys are detected the ungrab code is executed. This only
+> >> happens on keyup events. That way if Control-ALT were the ungrab keys,
+> >> sending Control-ALT-Delete to the guest is still possible because
+> >> these are the keys detected on the keyup event. The Delete key would
+> >> have cleared the check list. Daniel Berrange is the one I can thank
+> >> for this idea. He might be able to explain it better than me.
+> > 
+> > Hmm, ok.
+> > 
+> > Doing the same for gtk would basically imply to not use any toolkit
+> > support for hotkeys ...
+> > 
+> > It'll also become more difficuilt if we use that for multiple hotkeys.
+> > 
+> > But possibly we can share the code across all UIs, now that keycodemapdb
+> > is used by qemu.  So first translate the keycode from the UI toolkit to
+> > a QKeyCode, then feed that into shared hotkey detection code.
 > 
-> Alistair
-> 
->> +        qemu_log_mask(LOG_UNIMP, "SD: CMD%i not implemented in SPI mode\n",
->> +                      req.cmd);
->> +        return sd_illegal;
->>      }
->>
->>      qemu_log_mask(LOG_GUEST_ERROR, "SD: ACMD%i in a wrong state\n", req.cmd);
->> --
->> 2.15.1
->>
->>
+> Sounds like a good idea. I will be more than happy to help. My cocoa code
+> uses sets to implement keeping track of key presses. A set is a collection of data 
+> that only allows for unique values. So no two items in a set can be the same
+> value. My patch uses cocoa's NSSet so the shared code would probably not be
+> able to use it. I don't currently know of an implementation of a set that is
+> in C and available for us to use, so we may have to implement it ourselves. 
+
+Yes, probably.  Using cocoa (or objc) features for shared code isn't
+going to work.  Also I'm not sure a set is a good coice here, it looses
+the ordering of the keydown events.  Which doesn't matter in case the
+hotkey is pressed, but in case it turns out it wasn't the hotkey and we
+have to forward the recorded events to the guest we should not re-order
+them.
+
+cheers,
+  Gerd
