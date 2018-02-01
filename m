@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJz2-0003HT-Os
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:17 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJz0-0000B6-Am
+	(envelope-from <tcminyard@gmail.com>) id 1ehJz0-0003GH-Uy
 	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:16 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:35261)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <tcminyard@gmail.com>) id 1ehJyx-00005B-2n
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:15 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39371)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJz0-0000AT-6S
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:14 -0500
-Received: by mail-ot0-x243.google.com with SMTP id a2so6527186otf.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJyw-0008WF-TZ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:11 -0500
+Received: by mail-oi0-x242.google.com with SMTP id j188so12763872oib.6
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:10 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu,  1 Feb 2018 12:53:01 -0600
-Message-Id: <1517511182-9944-7-git-send-email-minyard@acm.org>
+Date: Thu,  1 Feb 2018 12:52:56 -0600
+Message-Id: <1517511182-9944-2-git-send-email-minyard@acm.org>
 In-Reply-To: <1517511182-9944-1-git-send-email-minyard@acm.org>
 References: <1517511182-9944-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 6/7] ipmi: disable IRQ and ATN on an external
- disconnect
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/7] Add maintainer for the IPMI code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +34,31 @@ Cc: Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Otherwise there's no way to clear them without an external command,
-and it could lock the OS in the VM if they were stuck.
-
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Acked-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/ipmi/ipmi_bmc_extern.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ MAINTAINERS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
-index 8c0535d..bf0b7ee 100644
---- a/hw/ipmi/ipmi_bmc_extern.c
-+++ b/hw/ipmi/ipmi_bmc_extern.c
-@@ -425,6 +425,11 @@ static void chr_event(void *opaque, int event)
-             return;
-         }
-         ibe->connected = false;
-+        /*
-+         * Don't hang the OS trying to handle the ATN bit, other end will
-+         * resend on a reconnect.
-+         */
-+        k->set_atn(s, 0, 0);
-         if (ibe->waiting_rsp) {
-             ibe->waiting_rsp = false;
-             ibe->inbuf[1] = ibe->outbuf[1] | 0x04;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fe39b30..192d8b8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -940,6 +940,15 @@ F: tests/ahci-test.c
+ F: tests/libqos/ahci*
+ T: git git://github.com/jnsnow/qemu.git ide
+ 
++IPMI
++M: Corey Minyard <minyard@acm.org>
++S: Maintained
++F: include/hw/ipmi/*
++F: hw/ipmi/*
++F: hw/smbios/smbios_type_38.c
++F: tests/ipmi*
++T: git git://github.com/cminyard/qemu.git master-ipmi-rebase
++
+ Floppy
+ M: John Snow <jsnow@redhat.com>
+ L: qemu-block@nongnu.org
 -- 
 2.7.4
