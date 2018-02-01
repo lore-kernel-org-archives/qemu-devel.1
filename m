@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ehEv3-00054X-Gp
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:28:51 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1ehF05-00019N-FB
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:34:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ehEv2-0000S7-4B
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:28:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ehEv1-0000Ri-Rr
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:28:48 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2E1038046E
-	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 13:28:47 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  1 Feb 2018 14:27:57 +0100
-Message-Id: <20180201132757.23063-8-marcandre.lureau@redhat.com>
-In-Reply-To: <20180201132757.23063-1-marcandre.lureau@redhat.com>
-References: <20180201132757.23063-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 7/7] tests: use memfd in vhost-user-test
+	(envelope-from <programmingkidx@gmail.com>) id 1ehF02-0003hZ-2H
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:34:01 -0500
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:35186)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1ehF01-0003hJ-Re
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:33:57 -0500
+Received: by mail-io0-x241.google.com with SMTP id m11so19182974iob.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 05:33:57 -0800 (PST)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Thu,  1 Feb 2018 08:33:47 -0500
+Message-Id: <20180201133347.3146-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH] hw/audio/sb16.c: change dolog() to
+ qemu_log_mask()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,230 +25,332 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-This will exercise the memfd memory backend and should generally be
-better for testing than memory-backend-file (thanks to anonymous files
-and sealing).
+Changes all the occurrances of dolog() to qemu_log_mask().
 
-If memfd is available, it is preferred.
-
-However, in order to check that file & memfd backends both work
-correctly, the read-guest-mem test is checked explicitly for each.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 ---
- tests/vhost-user-test.c | 90 +++++++++++++++++++++++++++++++++++--------=
-------
- 1 file changed, 64 insertions(+), 26 deletions(-)
+ hw/audio/sb16.c | 105 ++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 53 insertions(+), 52 deletions(-)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index a22075ff26..95eb449cfc 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -17,6 +17,7 @@
- #include "qemu/range.h"
- #include "qemu/sockets.h"
- #include "chardev/char-fe.h"
-+#include "qemu/memfd.h"
- #include "sysemu/sysemu.h"
- #include "libqos/libqos.h"
- #include "libqos/pci-pc.h"
-@@ -39,23 +40,14 @@
- #define HAVE_MONOTONIC_TIME
- #endif
-=20
--#define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=3Dmem,siz=
-e=3D%dM,"\
-+#define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=3Dmem,siz=
-e=3D%dM," \
-                         "mem-path=3D%s,share=3Don -numa node,memdev=3Dme=
-m"
-+#define QEMU_CMD_MEMFD  " -m %d -object memory-backend-memfd,id=3Dmem,si=
-ze=3D%dM," \
-+                        " -numa node,memdev=3Dmem"
- #define QEMU_CMD_CHR    " -chardev socket,id=3D%s,path=3D%s%s"
- #define QEMU_CMD_NETDEV " -netdev vhost-user,id=3Dnet0,chardev=3D%s,vhos=
-tforce"
- #define QEMU_CMD_NET    " -device virtio-net-pci,netdev=3Dnet0"
-=20
--#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
--                        QEMU_CMD_NETDEV QEMU_CMD_NET
--
--#define GET_QEMU_CMD(s)                                         \
--    g_strdup_printf(QEMU_CMD, 512, 512, (root), (s)->chr_name,  \
--                    (s)->socket_path, "", (s)->chr_name)
--
--#define GET_QEMU_CMDE(s, mem, chr_opts, extra, ...)                     =
-\
--    g_strdup_printf(QEMU_CMD extra, (mem), (mem), (root), (s)->chr_name,=
- \
--                    (s)->socket_path, (chr_opts), (s)->chr_name, ##__VA_=
-ARGS__)
--
- #define HUGETLBFS_MAGIC       0x958458f6
-=20
- /*********** FROM hw/virtio/vhost-user.c *******************************=
-******/
-@@ -174,6 +166,33 @@ static void test_server_listen(TestServer *server);
- static const char *tmpfs;
- static const char *root;
-=20
-+enum test_memfd {
-+    TEST_MEMFD_AUTO,
-+    TEST_MEMFD_YES,
-+    TEST_MEMFD_NO,
-+};
-+
-+static char *get_qemu_cmd(TestServer *s,
-+                          int mem, enum test_memfd memfd, const char *me=
-m_path,
-+                          const char *chr_opts, const char *extra)
-+{
-+    if (memfd =3D=3D TEST_MEMFD_AUTO && qemu_memfd_check()) {
-+        memfd =3D TEST_MEMFD_YES;
-+    }
-+
-+    if (memfd =3D=3D TEST_MEMFD_YES) {
-+        return g_strdup_printf(QEMU_CMD_MEMFD QEMU_CMD_CHR
-+                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, m=
-em,
-+                               s->chr_name, s->socket_path,
-+                               chr_opts, s->chr_name, extra);
-+    } else {
-+        return g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR
-+                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, m=
-em,
-+                               mem_path, s->chr_name, s->socket_path,
-+                               chr_opts, s->chr_name, extra);
-+    }
-+}
-+
- static void init_virtio_dev(TestServer *s, uint32_t features_mask)
- {
-     uint32_t features;
-@@ -639,8 +658,9 @@ GSourceFuncs test_migrate_source_funcs =3D {
-     .check =3D test_migrate_source_check,
- };
-=20
--static void test_read_guest_mem(void)
-+static void test_read_guest_mem(const void *arg)
- {
-+    enum test_memfd memfd =3D GPOINTER_TO_INT(arg);
-     TestServer *server =3D NULL;
-     char *qemu_cmd =3D NULL;
-     QTestState *s =3D NULL;
-@@ -648,7 +668,7 @@ static void test_read_guest_mem(void)
-     server =3D test_server_new("test");
-     test_server_listen(server);
-=20
--    qemu_cmd =3D GET_QEMU_CMD(server);
-+    qemu_cmd =3D get_qemu_cmd(server, 512, memfd, root, "", "");
-=20
-     s =3D qtest_start(qemu_cmd);
-     g_free(qemu_cmd);
-@@ -670,7 +690,7 @@ static void test_migrate(void)
-     char *uri =3D g_strdup_printf("%s%s", "unix:", dest->mig_path);
-     QTestState *global =3D global_qtest, *from, *to;
-     GSource *source;
--    gchar *cmd;
-+    gchar *cmd, *tmp;
-     QDict *rsp;
-     guint8 *log;
-     guint64 size;
-@@ -678,7 +698,7 @@ static void test_migrate(void)
-     test_server_listen(s);
-     test_server_listen(dest);
-=20
--    cmd =3D GET_QEMU_CMDE(s, 2, "", "");
-+    cmd =3D get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, "", "");
-     from =3D qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -687,7 +707,9 @@ static void test_migrate(void)
-     size =3D get_log_size(s);
-     g_assert_cmpint(size, =3D=3D, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * =
-8));
-=20
--    cmd =3D GET_QEMU_CMDE(dest, 2, "", " -incoming %s", uri);
-+    tmp =3D g_strdup_printf(" -incoming %s", uri);
-+    cmd =3D get_qemu_cmd(dest, 2, TEST_MEMFD_AUTO, root, "", tmp);
-+    g_free(tmp);
-     to =3D qtest_init(cmd);
-     g_free(cmd);
-=20
-@@ -800,7 +822,7 @@ static void test_reconnect_subprocess(void)
-     char *cmd;
-=20
-     g_thread_new("connect", connect_thread, s);
--    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
-+    cmd =3D get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -838,7 +860,7 @@ static void test_connect_fail_subprocess(void)
-=20
-     s->test_fail =3D true;
-     g_thread_new("connect", connect_thread, s);
--    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
-+    cmd =3D get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -868,7 +890,7 @@ static void test_flags_mismatch_subprocess(void)
-=20
-     s->test_flags =3D TEST_FLAGS_DISCONNECT;
-     g_thread_new("connect", connect_thread, s);
--    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
-+    cmd =3D get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -903,11 +925,21 @@ static void test_multiqueue(void)
-     s->queues =3D 2;
-     test_server_listen(s);
-=20
--    cmd =3D g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",=
-queues=3D%d "
--                          "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,=
-vectors=3D%d",
--                          512, 512, root, s->chr_name,
--                          s->socket_path, "", s->chr_name,
--                          s->queues, s->queues * 2 + 2);
-+    if (qemu_memfd_check()) {
-+        cmd =3D g_strdup_printf(
-+            QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d "
-+            "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d",
-+            512, 512, s->chr_name,
-+            s->socket_path, "", s->chr_name,
-+            s->queues, s->queues * 2 + 2);
-+    } else {
-+        cmd =3D g_strdup_printf(
-+            QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d "
-+            "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d",
-+            512, 512, root, s->chr_name,
-+            s->socket_path, "", s->chr_name,
-+            s->queues, s->queues * 2 + 2);
-+    }
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -953,7 +985,13 @@ int main(int argc, char **argv)
-     /* run the main loop thread so the chardev may operate */
-     thread =3D g_thread_new(NULL, thread_function, loop);
-=20
--    qtest_add_func("/vhost-user/read-guest-mem", test_read_guest_mem);
-+    if (qemu_memfd_check()) {
-+        qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
-+                            GINT_TO_POINTER(TEST_MEMFD_YES),
-+                            test_read_guest_mem);
-+    }
-+    qtest_add_data_func("/vhost-user/read-guest-mem/memfile",
-+                        GINT_TO_POINTER(TEST_MEMFD_NO), test_read_guest_=
-mem);
-     qtest_add_func("/vhost-user/migrate", test_migrate);
-     qtest_add_func("/vhost-user/multiqueue", test_multiqueue);
-=20
---=20
-2.16.0.rc1.1.gef27df75a1
+diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
+index 6ab2f6f89a..d32c568650 100644
+--- a/hw/audio/sb16.c
++++ b/hw/audio/sb16.c
+@@ -29,6 +29,7 @@
+ #include "hw/qdev.h"
+ #include "qemu/timer.h"
+ #include "qemu/host-utils.h"
++#include "qemu/log.h"
+ 
+ #define dolog(...) AUD_log ("sb16", __VA_ARGS__)
+ 
+@@ -123,7 +124,7 @@ static int magic_of_irq (int irq)
+     case 10:
+         return 8;
+     default:
+-        dolog ("bad irq %d\n", irq);
++        qemu_log_mask(LOG_UNIMP, "bad irq %d\n", irq);
+         return 2;
+     }
+ }
+@@ -140,7 +141,7 @@ static int irq_of_magic (int magic)
+     case 8:
+         return 10;
+     default:
+-        dolog ("bad irq magic %d\n", magic);
++        qemu_log_mask(LOG_UNIMP, "bad irq magic %d\n", magic);
+         return -1;
+     }
+ }
+@@ -258,8 +259,8 @@ static void dma_cmd8 (SB16State *s, int mask, int dma_len)
+     s->align = (1 << s->fmt_stereo) - 1;
+ 
+     if (s->block_size & s->align) {
+-        dolog ("warning: misaligned block size %d, alignment %d\n",
+-               s->block_size, s->align + 1);
++        qemu_log_mask(LOG_UNIMP, "warning: misaligned block size %d, alignment"
++                      " %d\n", s->block_size, s->align + 1);
+     }
+ 
+     ldebug ("freq %d, stereo %d, sign %d, bits %d, "
+@@ -338,8 +339,8 @@ static void dma_cmd (SB16State *s, uint8_t cmd, uint8_t d0, int dma_len)
+     s->highspeed = 0;
+     s->align = (1 << (s->fmt_stereo + (s->fmt_bits == 16))) - 1;
+     if (s->block_size & s->align) {
+-        dolog ("warning: misaligned block size %d, alignment %d\n",
+-               s->block_size, s->align + 1);
++        qemu_log_mask(LOG_UNIMP, "warning: misaligned block size %d, alignment"
++                      " %d\n", s->block_size, s->align + 1);
+     }
+ 
+     if (s->freq) {
+@@ -380,7 +381,7 @@ static inline uint8_t dsp_get_data (SB16State *s)
+         return s->in2_data[--s->in_index];
+     }
+     else {
+-        dolog ("buffer underflow\n");
++        qemu_log_mask(LOG_UNIMP, "buffer underflow\n");
+         return 0;
+     }
+ }
+@@ -391,7 +392,8 @@ static void command (SB16State *s, uint8_t cmd)
+ 
+     if (cmd > 0xaf && cmd < 0xd0) {
+         if (cmd & 8) {
+-            dolog ("ADC not yet supported (command %#x)\n", cmd);
++            qemu_log_mask(LOG_UNIMP, "ADC not yet supported (command %#x)\n",
++                          cmd);
+         }
+ 
+         switch (cmd >> 4) {
+@@ -399,7 +401,7 @@ static void command (SB16State *s, uint8_t cmd)
+         case 12:
+             break;
+         default:
+-            dolog ("%#x wrong bits\n", cmd);
++            qemu_log_mask(LOG_UNIMP, "%#x wrong bits\n", cmd);
+         }
+         s->needed_bytes = 3;
+     }
+@@ -453,7 +455,7 @@ static void command (SB16State *s, uint8_t cmd)
+             goto warn;
+ 
+         case 0x35:
+-            dolog ("0x35 - MIDI command not implemented\n");
++            qemu_log_mask(LOG_UNIMP, "0x35 - MIDI command not implemented\n");
+             break;
+ 
+         case 0x40:
+@@ -487,34 +489,38 @@ static void command (SB16State *s, uint8_t cmd)
+ 
+         case 0x74:
+             s->needed_bytes = 2; /* DMA DAC, 4-bit ADPCM */
+-            dolog ("0x75 - DMA DAC, 4-bit ADPCM not implemented\n");
++            qemu_log_mask(LOG_UNIMP, "0x75 - DMA DAC, 4-bit ADPCM not"
++                          " implemented\n");
+             break;
+ 
+         case 0x75:              /* DMA DAC, 4-bit ADPCM Reference */
+             s->needed_bytes = 2;
+-            dolog ("0x74 - DMA DAC, 4-bit ADPCM Reference not implemented\n");
++            qemu_log_mask(LOG_UNIMP, "0x74 - DMA DAC, 4-bit ADPCM Reference not"
++                          " implemented\n");
+             break;
+ 
+         case 0x76:              /* DMA DAC, 2.6-bit ADPCM */
+             s->needed_bytes = 2;
+-            dolog ("0x74 - DMA DAC, 2.6-bit ADPCM not implemented\n");
++            qemu_log_mask(LOG_UNIMP, "0x74 - DMA DAC, 2.6-bit ADPCM not"
++                          " implemented\n");
+             break;
+ 
+         case 0x77:              /* DMA DAC, 2.6-bit ADPCM Reference */
+             s->needed_bytes = 2;
+-            dolog ("0x74 - DMA DAC, 2.6-bit ADPCM Reference not implemented\n");
++            qemu_log_mask(LOG_UNIMP, "0x74 - DMA DAC, 2.6-bit ADPCM Reference"
++                          " not implemented\n");
+             break;
+ 
+         case 0x7d:
+-            dolog ("0x7d - Autio-Initialize DMA DAC, 4-bit ADPCM Reference\n");
+-            dolog ("not implemented\n");
++            qemu_log_mask(LOG_UNIMP, "0x7d - Autio-Initialize DMA DAC, 4-bit"
++                          " ADPCM Reference\n");
++            qemu_log_mask(LOG_UNIMP, "not implemented\n");
+             break;
+ 
+         case 0x7f:
+-            dolog (
+-                "0x7d - Autio-Initialize DMA DAC, 2.6-bit ADPCM Reference\n"
+-                );
+-            dolog ("not implemented\n");
++            qemu_log_mask(LOG_UNIMP, "0x7d - Autio-Initialize DMA DAC, 2.6-bit"
++                          " ADPCM Reference\n");
++            qemu_log_mask(LOG_UNIMP, "not implemented\n");
+             break;
+ 
+         case 0x80:
+@@ -586,7 +592,7 @@ static void command (SB16State *s, uint8_t cmd)
+             break;
+ 
+         case 0xe7:
+-            dolog ("Attempt to probe for ESS (0xe7)?\n");
++            qemu_log_mask(LOG_UNIMP, "Attempt to probe for ESS (0xe7)?\n");
+             break;
+ 
+         case 0xe8:              /* read test reg */
+@@ -613,7 +619,7 @@ static void command (SB16State *s, uint8_t cmd)
+             goto warn;
+ 
+         default:
+-            dolog ("Unrecognized command %#x\n", cmd);
++            qemu_log_mask(LOG_UNIMP, "Unrecognized command %#x\n", cmd);
+             break;
+         }
+     }
+@@ -632,8 +638,8 @@ static void command (SB16State *s, uint8_t cmd)
+     return;
+ 
+  warn:
+-    dolog ("warning: command %#x,%d is not truly understood yet\n",
+-           cmd, s->needed_bytes);
++    qemu_log_mask(LOG_UNIMP, "warning: command %#x,%d is not truly understood"
++                  " yet\n", cmd, s->needed_bytes);
+     goto exit;
+ 
+ }
+@@ -664,8 +670,8 @@ static void complete (SB16State *s)
+         d0 = dsp_get_data (s);
+ 
+         if (s->cmd & 8) {
+-            dolog ("ADC params cmd = %#x d0 = %d, d1 = %d, d2 = %d\n",
+-                   s->cmd, d0, d1, d2);
++            qemu_log_mask(LOG_UNIMP, "ADC params cmd = %#x d0 = %d, d1 = %d,"
++                          " d2 = %d\n", s->cmd, d0, d1, d2);
+         }
+         else {
+             ldebug ("cmd = %#x d0 = %d, d1 = %d, d2 = %d\n",
+@@ -722,7 +728,7 @@ static void complete (SB16State *s)
+ 
+         case 0x10:
+             d0 = dsp_get_data (s);
+-            dolog ("cmd 0x10 d0=%#x\n", d0);
++            qemu_log_mask(LOG_UNIMP, "cmd 0x10 d0=%#x\n", d0);
+             break;
+ 
+         case 0x14:
+@@ -735,9 +741,8 @@ static void complete (SB16State *s)
+             break;
+ 
+         case 0x42:              /* FT2 sets output freq with this, go figure */
+-#if 0
+-            dolog ("cmd 0x42 might not do what it think it should\n");
+-#endif
++            qemu_log_mask(LOG_UNIMP, "cmd 0x42 might not do what it think it"
++                          " should\n");
+         case 0x41:
+             s->freq = dsp_get_hilo (s);
+             ldebug ("set freq %d\n", s->freq);
+@@ -787,10 +792,8 @@ static void complete (SB16State *s)
+             break;
+ 
+         case 0xe2:
+-#ifdef DEBUG
+             d0 = dsp_get_data (s);
+-            dolog ("E2 = %#x\n", d0);
+-#endif
++            qemu_log_mask(LOG_UNIMP, "E2 = %#x\n", d0);
+             break;
+ 
+         case 0xe4:
+@@ -820,7 +823,8 @@ static void complete (SB16State *s)
+             break;
+ 
+         default:
+-            dolog ("complete: unrecognized command %#x\n", s->cmd);
++            qemu_log_mask(LOG_UNIMP, "complete: unrecognized command %#x\n",
++                          s->cmd);
+             return;
+         }
+     }
+@@ -939,7 +943,7 @@ static void dsp_write(void *opaque, uint32_t nport, uint32_t val)
+         }
+         else {
+             if (s->in_index == sizeof (s->in2_data)) {
+-                dolog ("in data overrun\n");
++                qemu_log_mask(LOG_UNIMP, "in data overrun\n");
+             }
+             else {
+                 s->in2_data[s->in_index++] = val;
+@@ -979,8 +983,8 @@ static uint32_t dsp_read(void *opaque, uint32_t nport)
+         }
+         else {
+             if (s->cmd != -1) {
+-                dolog ("empty output buffer for command %#x\n",
+-                       s->cmd);
++                qemu_log_mask(LOG_UNIMP, "empty output buffer for command"
++                              " %#x\n", s->cmd);
+             }
+             retval = s->last_read_byte;
+             /* goto error; */
+@@ -992,7 +996,7 @@ static uint32_t dsp_read(void *opaque, uint32_t nport)
+         break;
+ 
+     case 0x0d:                  /* timer interrupt clear */
+-        /* dolog ("timer interrupt clear\n"); */
++        /* qemu_log_mask(LOG_UNIMP, "timer interrupt clear\n"); */
+         retval = 0;
+         break;
+ 
+@@ -1025,7 +1029,7 @@ static uint32_t dsp_read(void *opaque, uint32_t nport)
+     return retval;
+ 
+  error:
+-    dolog ("warning: dsp_read %#x error\n", nport);
++    qemu_log_mask(LOG_UNIMP, "warning: dsp_read %#x error\n", nport);
+     return 0xff;
+ }
+ 
+@@ -1095,10 +1099,9 @@ static void mixer_write_datab(void *opaque, uint32_t nport, uint32_t val)
+             dma = ctz32 (val & 0xf);
+             hdma = ctz32 (val & 0xf0);
+             if (dma != s->dma || hdma != s->hdma) {
+-                dolog (
+-                    "attempt to change DMA "
+-                    "8bit %d(%d), 16bit %d(%d) (val=%#x)\n",
+-                    dma, s->dma, hdma, s->hdma, val);
++                qemu_log_mask(LOG_UNIMP, "attempt to change DMA 8bit %d(%d),"
++                              " 16bit %d(%d) (val=%#x)\n", dma, s->dma, hdma,
++                              s->hdma, val);
+             }
+ #if 0
+             s->dma = dma;
+@@ -1108,8 +1111,8 @@ static void mixer_write_datab(void *opaque, uint32_t nport, uint32_t val)
+         break;
+ 
+     case 0x82:
+-        dolog ("attempt to write into IRQ status register (val=%#x)\n",
+-               val);
++        qemu_log_mask(LOG_UNIMP, "attempt to write into IRQ status register"
++                      " (val=%#x)\n", val);
+         return;
+ 
+     default:
+@@ -1181,8 +1184,8 @@ static int SB_read_DMA (void *opaque, int nchan, int dma_pos, int dma_len)
+     int till, copy, written, free;
+ 
+     if (s->block_size <= 0) {
+-        dolog ("invalid block size=%d nchan=%d dma_pos=%d dma_len=%d\n",
+-               s->block_size, nchan, dma_pos, dma_len);
++        qemu_log_mask(LOG_UNIMP, "invalid block size=%d nchan=%d dma_pos=%d"
++                      " dma_len=%d\n", s->block_size, nchan, dma_pos, dma_len);
+         return dma_pos;
+     }
+ 
+@@ -1203,10 +1206,8 @@ static int SB_read_DMA (void *opaque, int nchan, int dma_pos, int dma_len)
+     copy = free;
+     till = s->left_till_irq;
+ 
+-#ifdef DEBUG_SB16_MOST
+-    dolog ("pos:%06d %d till:%d len:%d\n",
+-           dma_pos, free, till, dma_len);
+-#endif
++    qemu_log_mask(LOG_UNIMP, "pos:%06d %d till:%d len:%d\n", dma_pos, free,
++                  till, dma_len);
+ 
+     if (till <= copy) {
+         if (s->dma_auto == 0) {
+@@ -1376,7 +1377,7 @@ static void sb16_realizefn (DeviceState *dev, Error **errp)
+     reset_mixer (s);
+     s->aux_ts = timer_new_ns(QEMU_CLOCK_VIRTUAL, aux_timer, s);
+     if (!s->aux_ts) {
+-        dolog ("warning: Could not create auxiliary timer\n");
++        qemu_log_mask(LOG_UNIMP, "warning: Could not create auxiliary timer\n");
+     }
+ 
+     isa_register_portio_list(isadev, &s->portio_list, s->port,
+-- 
+2.14.3 (Apple Git-98)
