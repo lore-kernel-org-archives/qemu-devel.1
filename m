@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehIWg-00041W-8u
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:19:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ehIX0-0004Kv-TV
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehIWf-0006n7-5G
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:19:54 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  1 Feb 2018 18:19:35 +0100
-Message-Id: <20180201171935.29403-3-cohuck@redhat.com>
-In-Reply-To: <20180201171935.29403-1-cohuck@redhat.com>
-References: <20180201171935.29403-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] s390x/cpumodel: allow zpci features in
- qemu model
+	(envelope-from <pbonzini@redhat.com>) id 1ehIWx-0006wA-9P
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:14 -0500
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:36240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ehIWx-0006uQ-3K
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:11 -0500
+Received: by mail-wr0-f194.google.com with SMTP id y3so9989616wrh.3
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 09:20:10 -0800 (PST)
+References: <20180201084535.26721-1-kraxel@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1c09ffc0-0a85-d2c3-fd94-7753ee3ca74d@redhat.com>
+Date: Thu, 1 Feb 2018 12:20:05 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180201084535.26721-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vnc: use stubs for CONFIG_VNC=n dummy
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,72 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-AEN and AIS can be provided unconditionally, ZPCI should be turned on
-manually.
+On 01/02/2018 03:45, Gerd Hoffmann wrote:
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/ui/console.h | 21 ---------------------
+>  ui/vnc-stubs.c       | 21 +++++++++++++++++++++
+>  ui/Makefile.objs     |  1 +
+>  3 files changed, 22 insertions(+), 21 deletions(-)
+>  create mode 100644 ui/vnc-stubs.c
+> 
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index 7b35778444..de57e8363a 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -468,31 +468,10 @@ static inline void cocoa_display_init(DisplayState *ds, int full_screen)
+>  void vnc_display_init(const char *id);
+>  void vnc_display_open(const char *id, Error **errp);
+>  void vnc_display_add_client(const char *id, int csock, bool skipauth);
+> -#ifdef CONFIG_VNC
+>  int vnc_display_password(const char *id, const char *password);
+>  int vnc_display_pw_expire(const char *id, time_t expires);
+>  QemuOpts *vnc_parse(const char *str, Error **errp);
+>  int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp);
+> -#else
+> -static inline int vnc_display_password(const char *id, const char *password)
+> -{
+> -    return -ENODEV;
+> -}
+> -static inline int vnc_display_pw_expire(const char *id, time_t expires)
+> -{
+> -    return -ENODEV;
+> -};
+> -static inline QemuOpts *vnc_parse(const char *str, Error **errp)
+> -{
+> -    error_setg(errp, "VNC support is disabled");
+> -    return NULL;
+> -}
+> -static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+> -{
+> -    error_setg(errp, "VNC support is disabled");
+> -    return -1;
+> -}
+> -#endif
+>  
+>  /* curses.c */
+>  #ifdef CONFIG_CURSES
+> diff --git a/ui/vnc-stubs.c b/ui/vnc-stubs.c
+> new file mode 100644
+> index 0000000000..f51280549a
+> --- /dev/null
+> +++ b/ui/vnc-stubs.c
+> @@ -0,0 +1,21 @@
+> +#include "qemu/osdep.h"
+> +#include "ui/console.h"
+> +
+> +int vnc_display_password(const char *id, const char *password)
+> +{
+> +    return -ENODEV;
+> +}
+> +int vnc_display_pw_expire(const char *id, time_t expires)
+> +{
+> +    return -ENODEV;
+> +};
+> +QemuOpts *vnc_parse(const char *str, Error **errp)
+> +{
+> +    error_setg(errp, "VNC support is disabled");
+> +    return NULL;
+> +}
+> +int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+> +{
+> +    error_setg(errp, "VNC support is disabled");
+> +    return -1;
+> +}
+> diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+> index 99195884b0..09a275aed1 100644
+> --- a/ui/Makefile.objs
+> +++ b/ui/Makefile.objs
+> @@ -6,6 +6,7 @@ vnc-obj-y += vnc-auth-vencrypt.o
+>  vnc-obj-$(CONFIG_VNC_SASL) += vnc-auth-sasl.o
+>  vnc-obj-y += vnc-ws.o
+>  vnc-obj-y += vnc-jobs.o
+> +stub-obj-y += vnc-stubs.o
 
-With -cpu qemu,zpci=on, the guest kernel can now successfully detect
-virtio-pci devices under tcg.
+Better, since vnc need not be linked into tools or user-mode emulation:
 
-Also fixup the order of the MSA_EXT_{3,4} flags while at it.
+common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
+common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/cpu_models.c   | 6 ++++++
- target/s390x/gen-features.c | 6 +++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+Paolo
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 212a5f0697..250d931d7e 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -23,6 +23,7 @@
- #include "qapi/qmp/qbool.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/arch_init.h"
-+#include "hw/pci/pci.h"
- #endif
- 
- #define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc) \
-@@ -1271,6 +1272,11 @@ static void register_types(void)
- 
-     /* init all bitmaps from gnerated data initially */
-     s390_init_feat_bitmap(qemu_max_cpu_feat_init, qemu_max_cpu_feat);
-+#ifndef CONFIG_USER_ONLY
-+    if (!pci_available) {
-+        clear_bit(S390_FEAT_ZPCI, qemu_max_cpu_feat);
-+    }
-+#endif
-     for (i = 0; i < ARRAY_SIZE(s390_cpu_defs); i++) {
-         s390_init_feat_bitmap(s390_cpu_defs[i].base_init,
-                               s390_cpu_defs[i].base_feat);
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 0570f597ec..89a140c9a7 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -572,8 +572,10 @@ static uint16_t qemu_LATEST[] = {
-     S390_FEAT_STFLE_49,
-     S390_FEAT_LOCAL_TLB_CLEARING,
-     S390_FEAT_INTERLOCKED_ACCESS_2,
--    S390_FEAT_MSA_EXT_4,
-+    S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
-+    S390_FEAT_ADAPTER_INT_SUPPRESSION,
-     S390_FEAT_MSA_EXT_3,
-+    S390_FEAT_MSA_EXT_4,
- };
- 
- /* add all new definitions before this point */
-@@ -582,6 +584,8 @@ static uint16_t qemu_MAX[] = {
-     S390_FEAT_STFLE_53,
-     /* generates a dependency warning, leave it out for now */
-     S390_FEAT_MSA_EXT_5,
-+    /* only with CONFIG_PCI */
-+    S390_FEAT_ZPCI,
- };
- 
- /****** END FEATURE DEFS ******/
--- 
-2.13.6
+>  common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
+>  common-obj-y += input.o input-keymap.o input-legacy.o
+> 
