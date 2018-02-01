@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehMRC-00079F-7A
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:31:36 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehMRE-00079f-Kx
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:34:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehMQ8-0003oC-2c
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:30:30 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehMQA-0003r0-JI
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:30:32 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Feb 2018 16:29:15 -0500
-Message-Id: <20180201212917.18131-4-pbonzini@redhat.com>
+Date: Thu,  1 Feb 2018 16:29:17 -0500
+Message-Id: <20180201212917.18131-6-pbonzini@redhat.com>
 In-Reply-To: <20180201212917.18131-1-pbonzini@redhat.com>
 References: <20180201212917.18131-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] coroutine-lock: convert CoQueue to use
- QemuLockable
+Subject: [Qemu-devel] [PATCH 5/5] curl: convert to CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-There are cases in which a queued coroutine must be restarted from
-non-coroutine context (with qemu_co_enter_next).  In this cases,
-qemu_co_enter_next also needs to be thread-safe, but it cannot use
-a CoMutex and so cannot qemu_co_queue_wait.  Use QemuLockable so
-that the CoQueue can interchangeably use CoMutex or QemuMutex.
+Now that CoQueues can use a QemuMutex for thread-safety, there is no
+need for curl to roll its own coroutine queue.  Coroutines can be
+placed directly on the queue instead of using a list of CURLAIOCBs.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/coroutine.h   |  6 +++++-
- util/qemu-coroutine-lock.c | 12 +++++++-----
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ block/curl.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index 8a5129741c..1e5f0957e6 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -183,7 +183,9 @@ void qemu_co_queue_init(CoQueue *queue);
-  * caller of the coroutine.  The mutex is unlocked during the wait and
-  * locked again afterwards.
-  */
--void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex);
-+#define qemu_co_queue_wait(queue, lock) \
-+    qemu_co_queue_wait_impl(queue, QEMU_MAKE_LOCKABLE(lock))
-+void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock);
+diff --git a/block/curl.c b/block/curl.c
+index 35cf417f59..cd578d3d14 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -101,8 +101,6 @@ typedef struct CURLAIOCB {
  
- /**
-  * Restarts the next coroutine in the CoQueue and removes it from the queue.
-@@ -271,4 +273,6 @@ void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
-  */
- void coroutine_fn yield_until_fd_readable(int fd);
+     size_t start;
+     size_t end;
+-
+-    QSIMPLEQ_ENTRY(CURLAIOCB) next;
+ } CURLAIOCB;
  
-+#include "qemu/lockable.h"
-+
- #endif /* QEMU_COROUTINE_H */
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 846ff9167f..2a66fc1467 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -40,13 +40,13 @@ void qemu_co_queue_init(CoQueue *queue)
-     QSIMPLEQ_INIT(&queue->entries);
- }
- 
--void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
-+void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock)
+ typedef struct CURLSocket {
+@@ -138,7 +136,7 @@ typedef struct BDRVCURLState {
+     bool accept_range;
+     AioContext *aio_context;
+     QemuMutex mutex;
+-    QSIMPLEQ_HEAD(, CURLAIOCB) free_state_waitq;
++    CoQueue free_state_waitq;
+     char *username;
+     char *password;
+     char *proxyusername;
+@@ -538,7 +536,6 @@ static int curl_init_state(BDRVCURLState *s, CURLState *state)
+ /* Called with s->mutex held.  */
+ static void curl_clean_state(CURLState *s)
  {
-     Coroutine *self = qemu_coroutine_self();
-     QSIMPLEQ_INSERT_TAIL(&queue->entries, self, co_queue_next);
+-    CURLAIOCB *next;
+     int j;
+     for (j = 0; j < CURL_NUM_ACB; j++) {
+         assert(!s->acb[j]);
+@@ -556,13 +553,7 @@ static void curl_clean_state(CURLState *s)
  
--    if (mutex) {
--        qemu_co_mutex_unlock(mutex);
-+    if (lock) {
-+        qemu_lockable_unlock(lock);
-     }
+     s->in_use = 0;
  
-     /* There is no race condition here.  Other threads will call
-@@ -60,9 +60,11 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
-     /* TODO: OSv implements wait morphing here, where the wakeup
-      * primitive automatically places the woken coroutine on the
-      * mutex's queue.  This avoids the thundering herd effect.
-+     * This could be implemented for CoMutexes, but not really for
-+     * other cases of QemuLockable.
-      */
--    if (mutex) {
--        qemu_co_mutex_lock(mutex);
-+    if (lock) {
-+        qemu_lockable_lock(lock);
-     }
+-    next = QSIMPLEQ_FIRST(&s->s->free_state_waitq);
+-    if (next) {
+-        QSIMPLEQ_REMOVE_HEAD(&s->s->free_state_waitq, next);
+-        qemu_mutex_unlock(&s->s->mutex);
+-        aio_co_wake(next->co);
+-        qemu_mutex_lock(&s->s->mutex);
+-    }
++    qemu_co_enter_next(&s->s->free_state_waitq, &s->s->mutex);
  }
  
+ static void curl_parse_filename(const char *filename, QDict *options,
+@@ -784,7 +775,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     DPRINTF("CURL: Opening %s\n", file);
+-    QSIMPLEQ_INIT(&s->free_state_waitq);
++    qemu_co_queue_init(&s->free_state_waitq);
+     s->aio_context = bdrv_get_aio_context(bs);
+     s->url = g_strdup(file);
+     qemu_mutex_lock(&s->mutex);
+@@ -888,10 +879,7 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+         if (state) {
+             break;
+         }
+-        QSIMPLEQ_INSERT_TAIL(&s->free_state_waitq, acb, next);
+-        qemu_mutex_unlock(&s->mutex);
+-        qemu_coroutine_yield();
+-        qemu_mutex_lock(&s->mutex);
++        qemu_co_queue_wait(&s->free_state_waitq, &s->mutex);
+     }
+ 
+     if (curl_init_state(s, state) < 0) {
 -- 
 2.14.3
