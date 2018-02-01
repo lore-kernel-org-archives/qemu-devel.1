@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehGnW-0007CC-Rm
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:29:15 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ehGrx-000133-SI
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:33:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehGnS-0007T4-5t
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:29:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehGnR-0007Sf-Td
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:29:06 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ehGru-0002kv-C6
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:33:45 -0500
+Received: from mail-sn1nam01on0068.outbound.protection.outlook.com
+	([104.47.32.68]:14992
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ehGrt-0002iz-Q0
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:33:42 -0500
 References: <20180129174132.108925-1-brijesh.singh@amd.com>
-	<20180129174132.108925-18-brijesh.singh@amd.com>
-	<87mv0tvs6a.fsf@dusky.pond.sub.org>
-	<315572b0-2893-2247-c20b-717becd9661c@amd.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b35e4ea1-92f8-78c6-ea07-fde07667427f@redhat.com>
-Date: Thu, 1 Feb 2018 09:28:50 -0600
+	<20180129174132.108925-11-brijesh.singh@amd.com>
+	<20180201121324.GD2457@work-vm>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <ea80d75d-3ccb-9643-656e-f644d7e891f9@amd.com>
+Date: Thu, 1 Feb 2018 09:33:35 -0600
 MIME-Version: 1.0
-In-Reply-To: <315572b0-2893-2247-c20b-717becd9661c@amd.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bKRDeOFmNCqxXsz0l5zfweeCobkEqKJnQ"
-Subject: Re: [Qemu-devel] [PATCH v6 17/23] qapi: add SEV_MEASUREMENT event
+In-Reply-To: <20180201121324.GD2457@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 10/23] sev: add command to initialize
+ the memory encryption context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +33,311 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, Markus Armbruster <armbru@redhat.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bKRDeOFmNCqxXsz0l5zfweeCobkEqKJnQ
-From: Eric Blake <eblake@redhat.com>
-To: Brijesh Singh <brijesh.singh@amd.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Tom Lendacky <Thomas.Lendacky@amd.com>, Stefan Hajnoczi
- <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b35e4ea1-92f8-78c6-ea07-fde07667427f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 17/23] qapi: add SEV_MEASUREMENT event
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
- <20180129174132.108925-18-brijesh.singh@amd.com>
- <87mv0tvs6a.fsf@dusky.pond.sub.org>
- <315572b0-2893-2247-c20b-717becd9661c@amd.com>
-In-Reply-To: <315572b0-2893-2247-c20b-717becd9661c@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 02/01/2018 09:25 AM, Brijesh Singh wrote:
 
->>> +{ 'event' : 'SEV_MEASUREMENT',
->>> +=C2=A0 'data' : { 'value' : 'str' } }
+On 02/01/2018 06:13 AM, Dr. David Alan Gilbert wrote:
+> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+>> When memory encryption is enabled, KVM_SEV_INIT command is used to
+>> initialize the platform. The command loads the SEV related persistent
+>> data from non-volatile storage and initializes the platform context.
+>> This command should be first issued before invoking any other guest
+>> commands provided by the SEV firmware.
+> 
+> Some minor comments rather than full review.
+> 
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>   accel/kvm/kvm-all.c    |  15 ++++++
+>>   accel/kvm/sev.c        | 124 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>   accel/kvm/trace-events |   2 +
+>>   include/sysemu/sev.h   |  10 ++++
+>>   4 files changed, 151 insertions(+)
 >>
->> New event -> automatic question: do we need a way to poll for this
->> information?=C2=A0 Say when an event could get lost during a libvirt r=
-estart.
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index f290f487a573..a9b16846675e 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -38,6 +38,7 @@
+>>   #include "qemu/event_notifier.h"
+>>   #include "trace.h"
+>>   #include "hw/irq.h"
+>> +#include "sysemu/sev.h"
+>>   
+>>   #include "hw/boards.h"
+>>   
+>> @@ -103,6 +104,9 @@ struct KVMState
+>>   #endif
+>>       KVMMemoryListener memory_listener;
+>>       QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
+>> +
+>> +    /* memory encryption */
+>> +    void *memcrypt_handle;
+>>   };
+>>   
+>>   KVMState *kvm_state;
+>> @@ -1632,6 +1636,17 @@ static int kvm_init(MachineState *ms)
+>>   
+>>       kvm_state = s;
+>>   
+>> +    /*
+>> +     * if memory encryption object is specified then initialize the memory
+>> +     * encryption context.
+>> +     * */
+> 
+> Style: should be */
+
+
+Ah noted, I will fix this.
+
+
+> 
+>> +    if (ms->memory_encryption) {
+>> +        kvm_state->memcrypt_handle = sev_guest_init(ms->memory_encryption);
+>> +        if (!kvm_state->memcrypt_handle) {
+>> +            goto err;
+>> +        }
+>> +    }
+>> +
+>>       ret = kvm_arch_init(ms, s);
+>>       if (ret < 0) {
+>>           goto err;
+>> diff --git a/accel/kvm/sev.c b/accel/kvm/sev.c
+>> index e93fdfeb0c8f..be1791e510b3 100644
+>> --- a/accel/kvm/sev.c
+>> +++ b/accel/kvm/sev.c
+>> @@ -18,10 +18,72 @@
+>>   #include "sysemu/kvm.h"
+>>   #include "sysemu/sev.h"
+>>   #include "sysemu/sysemu.h"
+>> +#include "trace.h"
+>>   
+>>   #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+>>   #define DEFAULT_SEV_DEVICE      "/dev/sev"
+>>   
+>> +static int sev_fd;
+>> +
+>> +#define SEV_FW_MAX_ERROR      0x17
+>> +
+>> +static char sev_fw_errlist[SEV_FW_MAX_ERROR][100] = {
+> 
+> Perhaps:
+>     static const char *sev_few_errlist[] = {
+> ?
+> 
+
+Sure, we can make it const, i will take care of this in next rev.
+
+
+>> +    "",
+>> +    "Platform state is invalid",
+>> +    "Guest state is invalid",
+>> +    "Platform configuration is invalid",
+>> +    "Buffer too small",
+>> +    "Platform is already owned",
+>> +    "Certificate is invalid",
+>> +    "Policy is not allowed",
+>> +    "Guest is not active",
+>> +    "Invalid address",
+>> +    "Bad signature",
+>> +    "Bad measurement",
+>> +    "Asid is already owned",
+>> +    "Invalid ASID",
+>> +    "WBINVD is required",
+>> +    "DF_FLUSH is required",
+>> +    "Guest handle is invalid",
+>> +    "Invalid command",
+>> +    "Guest is active",
+>> +    "Hardware error",
+>> +    "Hardware unsafe",
+>> +    "Feature not supported",
+>> +    "Invalid parameter"
+>> +};
+>> +
+>> +static int
+>> +sev_ioctl(int cmd, void *data, int *error)
+>> +{
+>> +    int r;
+>> +    struct kvm_sev_cmd input;
+>> +
+>> +    memset(&input, 0x0, sizeof(input));
+>> +
+>> +    input.id = cmd;
+>> +    input.sev_fd = sev_fd;
+>> +    input.data = (__u64)data;
+>> +
+>> +    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &input);
+>> +
+>> +    if (error) {
+>> +        *error = input.error;
+>> +    }
+>> +
+>> +    return r;
+>> +}
+>> +
+>> +static char *
+>> +fw_error_to_str(int code)
+>> +{
+>> +    if (code > SEV_FW_MAX_ERROR) {
+> 
+> I'm trying to convince myself whether that should be >= and whether the
+> maximum error is really 0x16 ?  Your list up there has 23 entries
+> so I think trying to access error 0x17 would be bad.
+> 
+
+Good catch, it should be >=.
+
+
+>> +        return NULL;
+> 
+> It might be better to return 'No error' or the like unless you're going
+> to be testing for NULL; that way you never end up with a Null getting
+> out.
+> 
+
+Sure, I can do that.
+
+
+>> +    }
+>> +
+>> +    return sev_fw_errlist[code];
+>> +}
+>> +
+>>   static void
+>>   qsev_guest_finalize(Object *obj)
+>>   {
+>> @@ -170,6 +232,68 @@ static const TypeInfo qsev_guest_info = {
+>>       }
+>>   };
+>>   
+>> +static QSevGuestInfo *
+>> +lookup_sev_guest_info(const char *id)
+>> +{
+>> +    Object *obj;
+>> +    QSevGuestInfo *info;
+>> +
+>> +    obj = object_resolve_path_component(object_get_objects_root(), id);
+>> +    if (!obj) {
+>> +        return NULL;
+>> +    }
+>> +
+>> +    info = (QSevGuestInfo *)
+>> +            object_dynamic_cast(obj, TYPE_QSEV_GUEST_INFO);
+>> +    if (!info) {
+>> +        return NULL;
+>> +    }
+>> +
+>> +    return info;
+>> +}
+>> +
+>> +void *
+>> +sev_guest_init(const char *id)
+>> +{
+>> +    SEVState *s;
+>> +    char *devname;
+>> +    int ret, fw_error;
+>> +
+>> +    s = g_malloc0(sizeof(SEVState));
+> 
+> g_new0 is easier.
+
+
+Sure, I can switch to using g_new0.
+
+
+> 
+>> +    if (!s) {
+>> +        return NULL;
+>> +    }
+> 
+> and allocation aborts rather than returning NULL (unless you use the
+> _try_ version of g_new)
+
+
+Agreed, I will abort on allocation failure.
+
+
+> 
+>> +
+>> +    s->sev_info = lookup_sev_guest_info(id);
+>> +    if (!s->sev_info) {
+>> +        error_report("%s: '%s' is not a valid '%s' object",
+>> +                     __func__, id, TYPE_QSEV_GUEST_INFO);
+>> +        goto err;
+>> +    }
+>> +
+>> +    devname = object_property_get_str(OBJECT(s->sev_info), "sev-device", NULL);
+>> +    sev_fd = open(devname, O_RDWR);
+>> +    if (sev_fd < 0) {
+>> +        error_report("%s: Failed to open %s '%s'", __func__,
+>> +                     devname, strerror(errno));
+>> +        goto err;
+>> +    }
+>> +    g_free(devname);
+>> +
+>> +    trace_kvm_sev_init();
+>> +    ret = sev_ioctl(KVM_SEV_INIT, NULL, &fw_error);
+>> +    if (ret) {
+>> +        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+>> +                     __func__, ret, fw_error, fw_error_to_str(fw_error));
+>> +        goto err;
+>> +    }
+>> +
+>> +    return s;
+>> +err:
+>> +    g_free(s);
+>> +    return NULL;
+>> +}
+>> +
+>>   static void
+>>   sev_register_types(void)
+>>   {
+>> diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
+>> index f89ba5578dc1..ea487e5a5913 100644
+>> --- a/accel/kvm/trace-events
+>> +++ b/accel/kvm/trace-events
+>> @@ -13,3 +13,5 @@ kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d vi
+>>   kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
+>>   kvm_irqchip_release_virq(int virq) "virq %d"
+>>   
+>> +# sev.c
+>> +kvm_sev_init(void) ""
+>> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+>> index d2621a9d1100..6aec25bc05e5 100644
+>> --- a/include/sysemu/sev.h
+>> +++ b/include/sysemu/sev.h
+>> @@ -14,6 +14,8 @@
+>>   #ifndef QEMU_SEV_H
+>>   #define QEMU_SEV_H
+>>   
+>> +#include <linux/kvm.h>
+>> +
+>>   #include "qom/object.h"
+>>   #include "qapi/error.h"
+>>   #include "sysemu/kvm.h"
+>> @@ -49,5 +51,13 @@ struct QSevGuestInfoClass {
+>>       ObjectClass parent_class;
+>>   };
+>>   
+>> +struct SEVState {
+>> +    QSevGuestInfo *sev_info;
+>> +};
+>> +
+>> +typedef struct SEVState SEVState;
+>> +
+>> +void *sev_guest_init(const char *id);
+>> +
+>>   #endif
+>>   
+>> -- 
+>> 2.9.5
 >>
->=20
->=20
-> In our initial SEV patches for libvirt we ran into similar cases where
-> the event was dropped on restart, and now leaning towards dropping this=
-
-> event patch and add a new QMP command which can be used by libvirt to
-> retrieve the measurement.
-
-An event may still be useful to minimize the amount of polling required
-when the connection is not broken.  It's just that any setup that ONLY
-permits events (and not also polling) is fragile.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---bKRDeOFmNCqxXsz0l5zfweeCobkEqKJnQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpzMjIACgkQp6FrSiUn
-Q2qmcgf/Wbjb1pHzEZamCpKSJ8aWG6oRnLCm9Ncmt3dDZmHS8Chx/ie9DR4bKNF9
-XwGjlbcxrVMOj1jipMXI+SEe8YV6FDmiMLOKb9CZJa3Yxu/YdpFaz3TzFRwmu4wM
-+C0GYKspAQRiDfTlzqVUBy5ZLZ4ufBzstSx5j0hCFx2LhTD9Cc9VJxUFIF8yMrMc
-Z0sTZJuH+gy+lFM4ytC/fG1Zi4woryQF3Yer+QCxTBW3l8zG+a3e+koN8MFWXeSL
-wxpSlaZkB2ZAXMmWOwDCwCK+m7sPpRVwx/mvcP3+J+3gkLEFzGZSV4QohXbiEVM8
-dim4m3Wj+5NP6BrH7wQGc0JcY//SoQ==
-=Qss6
------END PGP SIGNATURE-----
-
---bKRDeOFmNCqxXsz0l5zfweeCobkEqKJnQ--
+> 
+> Dave
+> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
