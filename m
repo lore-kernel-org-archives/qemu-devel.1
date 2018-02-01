@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ehBgY-0001AD-CY
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:01:51 -0500
+	(envelope-from <thuth@redhat.com>) id 1ehBnw-0008RF-Gw
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ehBgP-0007zh-PQ
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:01:38 -0500
-Resent-Message-Id: <E1ehBgP-0007zh-PQ@eggs.gnu.org>
-In-Reply-To: <20180201093545.33741-1-aik@ozlabs.ru>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151747927318.1947.5058007890698507461@b81a8a9ec60f>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 1 Feb 2018 02:01:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH qemu] slirp/debug: Print IP addresses in
- human readable form
+	(envelope-from <thuth@redhat.com>) id 1ehBnt-0001mX-Co
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:09:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ehBnt-0001lA-7g
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:09:13 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  1 Feb 2018 11:09:07 +0100
+Message-Id: <1517479750-16770-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] Add more tests to the boot-serial tester
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +21,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aik@ozlabs.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjAxMDkzNTQ1LjMzNzQxLTEtYWlrQG96bGFicy5ydQpTdWJqZWN0OiBb
-UWVtdS1kZXZlbF0gW1BBVENIIHFlbXVdIHNsaXJwL2RlYnVnOiBQcmludCBJUCBhZGRyZXNzZXMg
-aW4gaHVtYW4gcmVhZGFibGUgZm9ybQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
-b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
-aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
-JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
-ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmQ1YjBhOTIzZSBzbGlycC9k
-ZWJ1ZzogUHJpbnQgSVAgYWRkcmVzc2VzIGluIGh1bWFuIHJlYWRhYmxlIGZvcm0KCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogc2xpcnAvZGVidWc6IFByaW50IElQIGFk
-ZHJlc3NlcyBpbiBodW1hbiByZWFkYWJsZSBmb3JtLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzQzOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo3MDQ6CiteSURFQlVH
-X0FSRygiaGFkZHIgPSAlcyIsIGluZXRfbnRvYSgqKHN0cnVjdCBpbl9hZGRyICopJmhhZGRyKSk7
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IHNs
-aXJwL3NvY2tldC5jOjcwNToKK15JREVCVUdfQVJHKCJocG9ydCA9ICVkIiwgbnRvaHMoaHBvcnQp
-KTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0NTogRklMRTog
-c2xpcnAvc29ja2V0LmM6NzA2OgorXklERUJVR19BUkcoImxhZGRyID0gJXMiLCBpbmV0X250b2Eo
-KihzdHJ1Y3QgaW5fYWRkciAqKSZsYWRkcikpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzQ2OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo3MDc6CiteSURFQlVHX0FS
-RygibHBvcnQgPSAlZCIsIG50b2hzKGxwb3J0KSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojNjA6IEZJTEU6IHNsaXJwL3VkcC5jOjI0NDoKK15JREVCVUdfQVJH
-KCJzYWRkciA9ICVzIiwgaW5ldF9udG9hKHNhZGRyLT5zaW5fYWRkcikpOyQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzYxOiBGSUxFOiBzbGlycC91ZHAuYzoyNDU6
-CiteSURFQlVHX0FSRygiZGFkZHIgPSAlcyIsIGluZXRfbnRvYShkYWRkci0+c2luX2FkZHIpKTsk
-Cgp0b3RhbDogNiBlcnJvcnMsIDAgd2FybmluZ3MsIDQwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+First patch adds new tests for the SPARC machines, second patch
+enables the Mac machines, too, and the third patch adds a test
+for the brand-new hppa softmmu machine.
+
+Thomas Huth (3):
+  tests/boot-serial: Enable the boot-serial test on SPARC machines, too
+  tests/boot-serial: Add tests for PowerPC Mac machines
+  tests/boot-serial: Add a test for the new hppa-softmmu target
+
+ tests/Makefile.include   | 4 ++++
+ tests/boot-serial-test.c | 8 ++++++++
+ 2 files changed, 12 insertions(+)
+
+-- 
+1.8.3.1
