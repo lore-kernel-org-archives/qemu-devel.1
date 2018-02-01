@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nesrine.zouari@enis.tn>) id 1ehGp6-0008RF-LR
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:30:55 -0500
+	(envelope-from <berrange@redhat.com>) id 1ehHGO-0001qg-0i
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:59:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nesrine.zouari@enis.tn>) id 1ehGp0-00008G-Li
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:30:48 -0500
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:44166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nesrine.zouari@enis.tn>)
-	id 1ehGp0-00007w-Fh
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:30:42 -0500
-Received: by mail-qk0-x22a.google.com with SMTP id n188so8475083qkn.11
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 07:30:41 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1ehHGK-0000x6-V5
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:59:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36795)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ehHGK-0000wo-P6
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:58:56 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AC6874B702
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 15:58:55 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu,  1 Feb 2018 15:58:41 +0000
+Message-Id: <20180201155841.27509-1-berrange@redhat.com>
 MIME-Version: 1.0
-From: Nesrine Zouari <nesrine.zouari@enis.tn>
-Date: Thu, 1 Feb 2018 16:30:10 +0100
-Message-ID: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Qemu Trace
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1] ui: correctly advance output buffer when
+ writing SASL data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +32,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vilanova@ac.upc.edu, stefanha@redhat.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-Hello,
+In this previous commit:
 
-I am a computer engineering student and I am actually working on my
-graduation project at Lauterbach company. The project is about Qemu Trace
-and as a future I would like to contribute this work to the main line.
+  commit 8f61f1c5a6bc06438a1172efa80bc7606594fa07
+  Author: Daniel P. Berrange <berrange@redhat.com>
+  Date:   Mon Dec 18 19:12:20 2017 +0000
 
-My project is divided into two parts:
+    ui: track how much decoded data we consumed when doing SASL encoding
 
-1/ Collecting the Guest trace data : The trace solution should be able to
-provide:
+I attempted to fix a flaw with tracking how much data had actually been
+processed when encoding with SASL. With that flaw, the VNC server could
+mistakenly discard queued data that had not been sent.
 
-            a/ Instruction flow Trace
+The fix was not quite right though, because it merely decremented the
+vs->output.offset value. This is effectively to discarding data from the
+end of the pending output buffer. We actually need to discard data from
+the start of the pending output buffer. We also want to free memory that
+is no longer required. The correct way to handle this is to use the
+buffer_advance() helper method instead of directly manipulating the
+offset value.
 
-            b/ Memory read/write access
+Reported-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ ui/vnc-auth-sasl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-            c/ Time Stamps.
-
-            d/ For tracing rich operating systems that are using MMU, we
-additionally need to trace the task switches.
-
-2/ Sending the collected data to a third party tool for analysis.
-
-My question is about the first part. I would like to know, which trace
-backend that better fit my use case.
-
-
-Regards,
-
------------------------------------------------------------------------------------------
-
-Nesrine ZOUARI
-Computer Engineering Student
-Department of Computer Engineering and Applied Mathematics
-National Engineering School of Sfax (ENIS)
-University of Sfax-Tunisia
-Tel: +216 52 620 475
+diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
+index 74a5f513f2..fbccca8c8a 100644
+--- a/ui/vnc-auth-sasl.c
++++ b/ui/vnc-auth-sasl.c
+@@ -84,7 +84,7 @@ size_t vnc_client_write_sasl(VncState *vs)
+         } else {
+             vs->force_update_offset -=3D vs->sasl.encodedRawLength;
+         }
+-        vs->output.offset -=3D vs->sasl.encodedRawLength;
++        buffer_advance(&vs->output, vs->sasl.encodedRawLength);
+         vs->sasl.encoded =3D NULL;
+         vs->sasl.encodedOffset =3D vs->sasl.encodedLength =3D 0;
+     }
+--=20
+2.14.3
