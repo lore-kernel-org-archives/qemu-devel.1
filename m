@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehJ9C-0004aA-Pu
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:59:43 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ehJA2-0005MQ-DO
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:00:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehJ9B-0002W4-VG
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:59:42 -0500
-References: <20180130062503.32596-1-famz@redhat.com>
-	<7d94ad09-9c3e-da10-3f15-2c15147fb837@redhat.com>
-	<CAK1Eb9k_x9guD5L2EPBEx1ipjuUmFAA0FbLsAHkgp==z+=r7dA@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8f78f816-a37e-e968-e844-a7088e87b9e4@redhat.com>
-Date: Thu, 1 Feb 2018 18:59:29 +0100
+	(envelope-from <stefanha@redhat.com>) id 1ehJA0-0003Ki-Q6
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:00:34 -0500
+Date: Thu, 1 Feb 2018 18:00:25 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180201180025.GI5578@stefanha-x1.localdomain>
+References: <1516633309-20803-1-git-send-email-mark.kanda@oracle.com>
+	<20180124113123.GB17193@stefanha-x1.localdomain>
+	<20180129154107.GI6141@localhost.localdomain>
+	<20180130123823.GE15551@stefanha-x1.localdomain>
+	<20180130155612.GA4503@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <CAK1Eb9k_x9guD5L2EPBEx1ipjuUmFAA0FbLsAHkgp==z+=r7dA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eTXquTiLWH4lIcgtzJYc1qRMPT38BklIe"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix CID for VMDK afl image
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="STPqjqpCrtky8aYs"
+Content-Disposition: inline
+In-Reply-To: <20180130155612.GA4503@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] virtio-blk: check for NULL
+ BlockDriverState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +28,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Mark Kanda <mark.kanda@oracle.com>, ameya.more@oracle.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eTXquTiLWH4lIcgtzJYc1qRMPT38BklIe
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org
-Message-ID: <8f78f816-a37e-e968-e844-a7088e87b9e4@redhat.com>
-Subject: Re: [PATCH] iotests: Fix CID for VMDK afl image
-References: <20180130062503.32596-1-famz@redhat.com>
- <7d94ad09-9c3e-da10-3f15-2c15147fb837@redhat.com>
- <CAK1Eb9k_x9guD5L2EPBEx1ipjuUmFAA0FbLsAHkgp==z+=r7dA@mail.gmail.com>
-In-Reply-To: <CAK1Eb9k_x9guD5L2EPBEx1ipjuUmFAA0FbLsAHkgp==z+=r7dA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+
+--STPqjqpCrtky8aYs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-02-01 01:55, Fam Zheng wrote:
-> On Thu, Feb 1, 2018 at 2:58 AM, Max Reitz <mreitz@redhat.com> wrote:
->> On 2018-01-30 07:25, Fam Zheng wrote:
->>> This reverts commit 76bf133c4 which updated the reference output, and=
-
->>> fixed the reference image, because the code path we want to exercise =
-is
->>> actually the invalid image size.
->>>
->>> The descriptor block in the image, which includes the CID to verify, =
-has been
->>> invalid since the reference image was added. Since commit 9877860e7bd=
- we report
->>> this error earlier than the "file too large", so 059.out mismatches.
->>>
->>> The binary change is generated along the operations of:
->>>
->>>   $ bunzip2 afl9.vmdk.bz2
->>>   $ qemu-img create -f vmdk fix.vmdk 1G
->>>   $ dd if=3Dafl9.vmdk.bz2 of=3Dfix.vmdk bs=3D512 count=3D1 conv=3Dnot=
-runc
->>>   $ mv fix.vmdk afl9.vmdk
->>>   $ bzip2 afl9.vmdk
->>>
->>> Signed-off-by: Fam Zheng <famz@redhat.com>
->>>
->>> ---
->>>
->>> v2: Fix commit message "qcow2 -> vmdk". [Kevin]
->>>     Revert 76bf133c4.
->>
->> Hmmmm, now this fails again on my 32 bit build. :-(
->>
->> The issue there is that you get a "Cannot allocate memory" when trying=
-
->> to open the file.  My current fix was 2291712c39111a732 which simply
->> converted that to "Invalid argument", but now it's getting a bit more
->> complicated...  Should I just continue to play the game and check the
->> output for "Cannot allocate memory" and print exactly what the referen=
-ce
->> output is expecting...?
+On Tue, Jan 30, 2018 at 04:56:12PM +0100, Kevin Wolf wrote:
+> Am 30.01.2018 um 13:38 hat Stefan Hajnoczi geschrieben:
+> > On Mon, Jan 29, 2018 at 04:41:07PM +0100, Kevin Wolf wrote:
+> > > Am 24.01.2018 um 12:31 hat Stefan Hajnoczi geschrieben:
+> > > > On Mon, Jan 22, 2018 at 09:01:49AM -0600, Mark Kanda wrote:
+> > > > > Add a BlockDriverState NULL check to virtio_blk_handle_request()
+> > > > > to prevent a segfault if the drive is forcibly removed using HMP
+> > > > > 'drive_del' (without performing a hotplug 'device_del' first).
+> > > > >=20
+> > > > > Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
+> > > > > Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> > > > > Reviewed-by: Ameya More <ameya.more@oracle.com>
+> > > > > ---
+> > > > >  hw/block/virtio-blk.c | 7 +++++++
+> > > > >  1 file changed, 7 insertions(+)
+> > > > >=20
+> > > > > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> > > > > index b1532e4..76ddbbf 100644
+> > > > > --- a/hw/block/virtio-blk.c
+> > > > > +++ b/hw/block/virtio-blk.c
+> > > > > @@ -507,6 +507,13 @@ static int virtio_blk_handle_request(VirtIOB=
+lockReq *req, MultiReqBuffer *mrb)
+> > > > >          return -1;
+> > > > >      }
+> > > > > =20
+> > > > > +    /* If the drive was forcibly removed (e.g. HMP 'drive_del'),=
+ the block
+> > > > > +     * driver state may be NULL and there is nothing left to do.=
+ */
+> > > > > +    if (!blk_bs(req->dev->blk)) {
+> > > >=20
+> > > > Adding Markus Armbruster to check my understanding of drive_del:
+> > > >=20
+> > > > 1. If id is a node name (e.g. created via blockdev-add) then attemp=
+ting
+> > > >    to remove the root node produces the "Node %s is in use" error. =
+ In
+> > > >    that case this patch isn't needed.
+> > > >=20
+> > > > 2. If id is a BlockBackend (e.g. created via -drive) then removing =
+the
+> > > >    root node is allowed.  The BlockBackend stays in place but blk->=
+root
+> > > >    becomes NULL, hence this patch is needed.
+> > > >=20
+> > > > Markus: What are the valid use cases for #2?  If blk->bs becomes NU=
+LL I
+> > > > would think a lot more code beyond virtio-blk can segfault.
+> > >=20
+> > > blk->root =3D NULL is completely normal, it is what happens with remo=
+vable
+> > > media when the drive is empty.
+> > >=20
+> > > The problem, which was first reported during the 2.10 RC phase and was
+> > > worked around in IDE code then, is that Paolo's commit 99723548561 ad=
+ded
+> > > unconditional bdrv_inc/dec_in_flight() calls. I am pretty sure that a=
+ny
+> > > segfaults that Mark is seeing have the same cause.
+> > >=20
+> > > We do need an in-flight counter even for those requests so that
+> > > blk_drain() works correctly, so just making the calls condition would=
+n't
+> > > be right. However, this needs to become a separate counter in
+> > > BlockBackend, and the drain functions must be changed to make use of =
+it.
+> > >=20
+> > > I did post rough patches back then, but they weren't quite ready, and
+> > > since then they have fallen through the cracks.
+> >=20
+> > Will you send a new version of that patch series?
 >=20
-> Ahhh. OK, then, with a big comment.
+> I would like to continue my work on the drain functions (which this
+> would be a part of) sooner or later, but the work to enable libvirt to
+> use blockdev-add is at a higher priority at the moment.
 >=20
-> I'd say let's just _notrun on 32 bit.
+> So if you can wait, I'll get to it eventually. If not, feel free to pick
+> up the patches.
 
-Sounds OK, but how would we test that? uname? Or just _notrun when we
-see the ENOMEM message?
+Okay, I'll let you know early next week whether I am able to work on it.
 
-Max
+Stefan
 
-
---eTXquTiLWH4lIcgtzJYc1qRMPT38BklIe
+--STPqjqpCrtky8aYs
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFFBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzVYESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AK7cH9i/k/wd51BTv0fwBjbHGNyNb1AgwVo/N
-pvWltfQl2Wb/E3xdqZVcnJ1sitkgtVK0IkW3okKlsHL4n7xhK+CM87nfVH20tkNp
-isan7zIEtUE/QeIOZy3y59OOiT4OSkKUP6W1+u85hn+5GUm2qhDzOIalZ3ixy179
-a2c4cthfJQegf4WsSW00naCpa3rtBbAxRAPN8txrB+o+gz/hhJ4U5hJqUAQDg98Z
-pxq98SftsYEGdMjazbrPsvN5nokYZnw36OX2HbtQpvMiYNYlZiuVjEo21DXkJ+v0
-0Jd8ZfSgq2SShcFnbakvaCy0uB7rHAjKiFMe1Dzp1cQBb/iWCVwSfA==
-=f7uG
+iQEcBAEBAgAGBQJac1W5AAoJEJykq7OBq3PIvN8IALZnlQplOOqtwLt0WpqKixJ/
+C6b9PcZtKV2AF0LIJV1n0xeqddRhf4Ks1kqCwKb5b0YuxCOVxKrQWaBKcSd8Ex2W
+hgpDICGnDsj/PBJ0FgADmDPFg40OeSQhcrGdCyKm8Pr4P6aUQcst+08flAwAaviX
+6+G3mcyQ1nv/SpodVkEzFcsboWg4OY/OqqBhsOfJ3CKrWuywzZdRR8PamJRcdZ96
+7o+BDNKeewl5cXpYdiBMDeNk7iPftc0gRb4ByRJ7dOSw9g+XS6VxAogaWPF3XEwq
+rPTco7KRx00p0wAZm933uBeD/9oNDY30K58T8tnC5fNgd/C5qPdrKUj4aAaGrYQ=
+=5djt
 -----END PGP SIGNATURE-----
 
---eTXquTiLWH4lIcgtzJYc1qRMPT38BklIe--
+--STPqjqpCrtky8aYs--
