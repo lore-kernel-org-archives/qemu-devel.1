@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJz2-0003H7-AO
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehJzw-0004AD-64
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:54:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehJz1-0000CA-7Q
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:16 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:34090)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehJz1-0000BX-2g
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:53:15 -0500
-Received: by mail-ot0-x244.google.com with SMTP id x15so17899154ote.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:53:14 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Thu,  1 Feb 2018 12:53:02 -0600
-Message-Id: <1517511182-9944-8-git-send-email-minyard@acm.org>
-In-Reply-To: <1517511182-9944-1-git-send-email-minyard@acm.org>
-References: <1517511182-9944-1-git-send-email-minyard@acm.org>
+	(envelope-from <mreitz@redhat.com>) id 1ehJzv-0001FB-D0
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:54:12 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<2d458349144f49c68b903e77d383c18071e4cdae.1516978645.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <404747be-25a7-7937-1f6b-f3597200832d@redhat.com>
+Date: Thu, 1 Feb 2018 19:54:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 7/7] ipmi: Allow BMC device properties to be set
+In-Reply-To: <2d458349144f49c68b903e77d383c18071e4cdae.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jW1qBZb4LNxAbzwbeOHbV4qHr8E4TE3fz"
+Subject: Re: [Qemu-devel] [PATCH v3 22/39] qcow2: Update handle_copied() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-From: Corey Minyard <cminyard@mvista.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jW1qBZb4LNxAbzwbeOHbV4qHr8E4TE3fz
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <404747be-25a7-7937-1f6b-f3597200832d@redhat.com>
+Subject: Re: [PATCH v3 22/39] qcow2: Update handle_copied() to support L2
+ slices
+References: <cover.1516978645.git.berto@igalia.com>
+ <2d458349144f49c68b903e77d383c18071e4cdae.1516978645.git.berto@igalia.com>
+In-Reply-To: <2d458349144f49c68b903e77d383c18071e4cdae.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- hw/ipmi/ipmi_bmc_sim.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+On 2018-01-26 15:59, Alberto Garcia wrote:
+> handle_copied() loads an L2 table and limits the number of checked
+> clusters to the amount that fits inside that table. Since we'll be
+> loading L2 slices instead of full tables we need to update that limit.
+>=20
+> Apart from that, this function doesn't need any additional changes, so
+> this patch simply updates the variable name from l2_table to l2_slice.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2-cluster.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index e84d710..9b509f8 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -214,8 +214,8 @@ struct IPMIBmcSim {
-     uint8_t device_rev;
-     uint8_t fwrev1;
-     uint8_t fwrev2;
--    uint8_t mfg_id[3];
--    uint8_t product_id[2];
-+    uint32_t mfg_id;
-+    uint16_t product_id;
- 
-     uint8_t restart_cause;
- 
-@@ -867,11 +867,11 @@ static void get_device_id(IPMIBmcSim *ibs,
-     rsp_buffer_push(rsp, ibs->fwrev2);
-     rsp_buffer_push(rsp, ibs->ipmi_version);
-     rsp_buffer_push(rsp, 0x07); /* sensor, SDR, and SEL. */
--    rsp_buffer_push(rsp, ibs->mfg_id[0]);
--    rsp_buffer_push(rsp, ibs->mfg_id[1]);
--    rsp_buffer_push(rsp, ibs->mfg_id[2]);
--    rsp_buffer_push(rsp, ibs->product_id[0]);
--    rsp_buffer_push(rsp, ibs->product_id[1]);
-+    rsp_buffer_push(rsp, ibs->mfg_id & 0xff);
-+    rsp_buffer_push(rsp, (ibs->mfg_id >> 8) & 0xff);
-+    rsp_buffer_push(rsp, (ibs->mfg_id >> 16) & 0xff);
-+    rsp_buffer_push(rsp, ibs->product_id & 0xff);
-+    rsp_buffer_push(rsp, (ibs->product_id >> 8) & 0xff);
- }
- 
- static void set_global_enables(IPMIBmcSim *ibs, uint8_t val)
-@@ -1997,6 +1997,13 @@ static Property ipmi_sim_properties[] = {
-     DEFINE_PROP_UINT16("fruareasize", IPMIBmcSim, fru.areasize, 1024),
-     DEFINE_PROP_STRING("frudatafile", IPMIBmcSim, fru.filename),
-     DEFINE_PROP_STRING("sdrfile", IPMIBmcSim, sdr_filename),
-+    DEFINE_PROP_UINT8("device_id", IPMIBmcSim, device_id, 0x20),
-+    DEFINE_PROP_UINT8("ipmi_version", IPMIBmcSim, ipmi_version, 0x02),
-+    DEFINE_PROP_UINT8("device_rev", IPMIBmcSim, device_rev, 0),
-+    DEFINE_PROP_UINT8("fwrev1", IPMIBmcSim, fwrev1, 0),
-+    DEFINE_PROP_UINT8("fwrev2", IPMIBmcSim, fwrev2, 0),
-+    DEFINE_PROP_UINT32("mfg_id", IPMIBmcSim, mfg_id, 0),
-+    DEFINE_PROP_UINT16("product_id", IPMIBmcSim, product_id, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--- 
-2.7.4
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--jW1qBZb4LNxAbzwbeOHbV4qHr8E4TE3fz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzYkgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AzYoH/iozZg/GJOGT+G7szp/6M+bBh6CyebRR
+gTbXpM1iPwLwOSbm0cbgsyLoUbwvAWk7pqkRDY4RhNRisurngb6EK840hqtOhcbc
+46/cJZLnHNLflv+Ro7u/MVxcc0YgAbgtNFE2E08gJ6hnZq4hzplG15lyiBnHLPNv
+l8H3DwLQPGpxSvMqgnkcJSkACqsxtlcwGM466c3sI6hu4HhtQZTDrSBfJ8A14FpN
+gHWybgZHBFArjMLXpyD0C+R6fiyYklm+10F4bUR56YOvRgFW0IeM2wAGOFzMPNu/
+h+eROl/aW+ZVx6RaRP5BkNkv6oLoK2yPnGw8FWD0Bz6RCdr9AVil+sQ=
+=mUJc
+-----END PGP SIGNATURE-----
+
+--jW1qBZb4LNxAbzwbeOHbV4qHr8E4TE3fz--
