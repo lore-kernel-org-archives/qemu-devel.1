@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehHmB-0007hq-Uh
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:31:52 -0500
+	(envelope-from <berrange@redhat.com>) id 1ehHzH-00033o-ND
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:45:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehHm6-000678-D1
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:31:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44805)
+	(envelope-from <berrange@redhat.com>) id 1ehHzE-0006Rj-5V
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:45:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehHm6-00065O-7I
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:31:46 -0500
-Date: Thu, 1 Feb 2018 14:31:32 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180201163132.GV26425@localhost.localdomain>
-References: <20180117095421.124787-1-marcel@redhat.com>
-	<20180117095421.124787-2-marcel@redhat.com>
-	<20180131204059.GG21702@localhost.localdomain>
-	<20180131230607-mutt-send-email-mst@kernel.org>
-	<20180131233422.GP26425@localhost.localdomain>
-	<20180201040608-mutt-send-email-mst@kernel.org>
-	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
-	<20180201121009.GR26425@localhost.localdomain>
-	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
-	<20180201150254-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180201150254-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
- memory-backend-ram
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ehHzD-0006RN-Td
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:45:20 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D17E52CE935
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 16:45:18 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu,  1 Feb 2018 16:45:14 +0000
+Message-Id: <20180201164514.10330-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] ui: convert VNC server to QIONetListener
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +27,333 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Thu, Feb 01, 2018 at 04:24:30PM +0200, Michael S. Tsirkin wrote:
-[...]
-> The full fix would be to allow QEMU to map a list of
-> pages to a guest supplied IOVA.
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Thanks, that's what I expected.
+The VNC server already has the ability to listen on multiple sockets.
+Converting it to use the QIONetListener APIs though, will reduce the
+amount of code in the VNC server and improve the clarity of what is
+left.
 
-While this is not possible, the only requests I have for this
-patch is that we clearly document:
-* What's the only purpose of share=on on a host-memory-backend
-  object (due to pvrdma limitations).
-* The potential undesirable side-effects of setting share=on.
-* On the commit message and other comments, clearly distinguish
-  HVAs in the QEMU address-space from IOVAs, to avoid confusion.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ ui/vnc.c | 195 ++++++++++++++++++---------------------------------------------
+ ui/vnc.h |   9 +--
+ 2 files changed, 58 insertions(+), 146 deletions(-)
 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 33b087221f..93731accb6 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -228,12 +228,12 @@ static VncServerInfo *vnc_server_info_get(VncDisplay *vd)
+     VncServerInfo *info;
+     Error *err = NULL;
+ 
+-    if (!vd->nlsock) {
++    if (!vd->listener || !vd->listener->nsioc) {
+         return NULL;
+     }
+ 
+     info = g_malloc0(sizeof(*info));
+-    vnc_init_basic_info_from_server_addr(vd->lsock[0],
++    vnc_init_basic_info_from_server_addr(vd->listener->sioc[0],
+                                          qapi_VncServerInfo_base(info), &err);
+     info->has_auth = true;
+     info->auth = g_strdup(vnc_auth_name(vd));
+@@ -379,7 +379,7 @@ VncInfo *qmp_query_vnc(Error **errp)
+     VncDisplay *vd = vnc_display_find(NULL);
+     SocketAddress *addr = NULL;
+ 
+-    if (vd == NULL || !vd->nlsock) {
++    if (vd == NULL || !vd->listener || !vd->listener->nsioc) {
+         info->enabled = false;
+     } else {
+         info->enabled = true;
+@@ -388,11 +388,8 @@ VncInfo *qmp_query_vnc(Error **errp)
+         info->has_clients = true;
+         info->clients = qmp_query_client_list(vd);
+ 
+-        if (vd->lsock == NULL) {
+-            return info;
+-        }
+-
+-        addr = qio_channel_socket_get_local_address(vd->lsock[0], errp);
++        addr = qio_channel_socket_get_local_address(vd->listener->sioc[0],
++                                                    errp);
+         if (!addr) {
+             goto out_error;
+         }
+@@ -572,13 +569,14 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+             info->has_display = true;
+             info->display = g_strdup(dev->id);
+         }
+-        for (i = 0; i < vd->nlsock; i++) {
++        for (i = 0; vd->listener != NULL && i < vd->listener->nsioc; i++) {
+             info->server = qmp_query_server_entry(
+-                vd->lsock[i], false, vd->auth, vd->subauth, info->server);
++                vd->listener->sioc[i], false, vd->auth, vd->subauth,
++                info->server);
+         }
+-        for (i = 0; i < vd->nlwebsock; i++) {
++        for (i = 0; vd->wslistener != NULL && i < vd->wslistener->nsioc; i++) {
+             info->server = qmp_query_server_entry(
+-                vd->lwebsock[i], true, vd->ws_auth,
++                vd->wslistener->sioc[i], true, vd->ws_auth,
+                 vd->ws_subauth, info->server);
+         }
+ 
+@@ -3143,36 +3141,18 @@ void vnc_start_protocol(VncState *vs)
+     qemu_add_mouse_mode_change_notifier(&vs->mouse_mode_notifier);
+ }
+ 
+-static gboolean vnc_listen_io(QIOChannel *ioc,
+-                              GIOCondition condition,
+-                              void *opaque)
++static void vnc_listen_io(QIONetListener *listener,
++                          QIOChannelSocket *cioc,
++                          void *opaque)
+ {
+     VncDisplay *vd = opaque;
+-    QIOChannelSocket *sioc = NULL;
+-    Error *err = NULL;
+-    bool isWebsock = false;
+-    size_t i;
+-
+-    for (i = 0; i < vd->nlwebsock; i++) {
+-        if (ioc == QIO_CHANNEL(vd->lwebsock[i])) {
+-            isWebsock = true;
+-            break;
+-        }
+-    }
++    bool isWebsock = listener == vd->wslistener;
+ 
+-    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc), &err);
+-    if (sioc != NULL) {
+-        qio_channel_set_name(QIO_CHANNEL(sioc),
+-                             isWebsock ? "vnc-ws-server" : "vnc-server");
+-        qio_channel_set_delay(QIO_CHANNEL(sioc), false);
+-        vnc_connect(vd, sioc, false, isWebsock);
+-        object_unref(OBJECT(sioc));
+-    } else {
+-        /* client probably closed connection before we got there */
+-        error_free(err);
+-    }
+-
+-    return TRUE;
++    qio_channel_set_name(QIO_CHANNEL(cioc),
++                         isWebsock ? "vnc-ws-server" : "vnc-server");
++    qio_channel_set_delay(QIO_CHANNEL(cioc), false);
++    vnc_connect(vd, cioc, false, isWebsock);
++    object_unref(OBJECT(cioc));
+ }
+ 
+ static const DisplayChangeListenerOps dcl_ops = {
+@@ -3224,34 +3204,22 @@ void vnc_display_init(const char *id)
+ 
+ static void vnc_display_close(VncDisplay *vd)
+ {
+-    size_t i;
+     if (!vd) {
+         return;
+     }
+     vd->is_unix = false;
+-    for (i = 0; i < vd->nlsock; i++) {
+-        if (vd->lsock_tag[i]) {
+-            g_source_remove(vd->lsock_tag[i]);
+-        }
+-        object_unref(OBJECT(vd->lsock[i]));
++
++    if (vd->listener) {
++        qio_net_listener_disconnect(vd->listener);
++        object_unref(OBJECT(vd->listener));
+     }
+-    g_free(vd->lsock);
+-    g_free(vd->lsock_tag);
+-    vd->lsock = NULL;
+-    vd->lsock_tag = NULL;
+-    vd->nlsock = 0;
++    vd->listener = NULL;
+ 
+-    for (i = 0; i < vd->nlwebsock; i++) {
+-        if (vd->lwebsock_tag[i]) {
+-            g_source_remove(vd->lwebsock_tag[i]);
+-        }
+-        object_unref(OBJECT(vd->lwebsock[i]));
++    if (vd->wslistener) {
++        qio_net_listener_disconnect(vd->wslistener);
++        object_unref(OBJECT(vd->wslistener));
+     }
+-    g_free(vd->lwebsock);
+-    g_free(vd->lwebsock_tag);
+-    vd->lwebsock = NULL;
+-    vd->lwebsock_tag = NULL;
+-    vd->nlwebsock = 0;
++    vd->wslistener = NULL;
+ 
+     vd->auth = VNC_AUTH_INVALID;
+     vd->subauth = VNC_AUTH_INVALID;
+@@ -3303,11 +3271,11 @@ static void vnc_display_print_local_addr(VncDisplay *vd)
+     SocketAddress *addr;
+     Error *err = NULL;
+ 
+-    if (!vd->nlsock) {
++    if (!vd->listener || !vd->listener->nsioc) {
+         return;
+     }
+ 
+-    addr = qio_channel_socket_get_local_address(vd->lsock[0], &err);
++    addr = qio_channel_socket_get_local_address(vd->listener->sioc[0], &err);
+     if (!addr) {
+         return;
+     }
+@@ -3815,68 +3783,6 @@ static int vnc_display_connect(VncDisplay *vd,
+ }
+ 
+ 
+-static int vnc_display_listen_addr(VncDisplay *vd,
+-                                   SocketAddress *addr,
+-                                   const char *name,
+-                                   QIOChannelSocket ***lsock,
+-                                   guint **lsock_tag,
+-                                   size_t *nlsock,
+-                                   Error **errp)
+-{
+-    QIODNSResolver *resolver = qio_dns_resolver_get_instance();
+-    SocketAddress **rawaddrs = NULL;
+-    size_t nrawaddrs = 0;
+-    Error *listenerr = NULL;
+-    bool listening = false;
+-    size_t i;
+-
+-    if (qio_dns_resolver_lookup_sync(resolver, addr, &nrawaddrs,
+-                                     &rawaddrs, errp) < 0) {
+-        return -1;
+-    }
+-
+-    for (i = 0; i < nrawaddrs; i++) {
+-        QIOChannelSocket *sioc = qio_channel_socket_new();
+-
+-        qio_channel_set_name(QIO_CHANNEL(sioc), name);
+-        if (qio_channel_socket_listen_sync(
+-                sioc, rawaddrs[i], listenerr == NULL ? &listenerr : NULL) < 0) {
+-            object_unref(OBJECT(sioc));
+-            continue;
+-        }
+-        listening = true;
+-        (*nlsock)++;
+-        *lsock = g_renew(QIOChannelSocket *, *lsock, *nlsock);
+-        *lsock_tag = g_renew(guint, *lsock_tag, *nlsock);
+-
+-        (*lsock)[*nlsock - 1] = sioc;
+-        (*lsock_tag)[*nlsock - 1] = 0;
+-    }
+-
+-    for (i = 0; i < nrawaddrs; i++) {
+-        qapi_free_SocketAddress(rawaddrs[i]);
+-    }
+-    g_free(rawaddrs);
+-
+-    if (listenerr) {
+-        if (!listening) {
+-            error_propagate(errp, listenerr);
+-            return -1;
+-        } else {
+-            error_free(listenerr);
+-        }
+-    }
+-
+-    for (i = 0; i < *nlsock; i++) {
+-        (*lsock_tag)[i] = qio_channel_add_watch(
+-            QIO_CHANNEL((*lsock)[i]),
+-            G_IO_IN, vnc_listen_io, vd, NULL);
+-    }
+-
+-    return 0;
+-}
+-
+-
+ static int vnc_display_listen(VncDisplay *vd,
+                               SocketAddress **saddr,
+                               size_t nsaddr,
+@@ -3886,25 +3792,34 @@ static int vnc_display_listen(VncDisplay *vd,
+ {
+     size_t i;
+ 
+-    for (i = 0; i < nsaddr; i++) {
+-        if (vnc_display_listen_addr(vd, saddr[i],
+-                                    "vnc-listen",
+-                                    &vd->lsock,
+-                                    &vd->lsock_tag,
+-                                    &vd->nlsock,
+-                                    errp) < 0) {
+-            return -1;
++    if (nsaddr) {
++        vd->listener = qio_net_listener_new();
++        qio_net_listener_set_name(vd->listener, "vnc-listen");
++        for (i = 0; i < nsaddr; i++) {
++            if (qio_net_listener_open_sync(vd->listener,
++                                           saddr[i],
++                                           errp) < 0)  {
++                return -1;
++            }
+         }
++
++        qio_net_listener_set_client_func(vd->listener,
++                                         vnc_listen_io, vd, NULL);
+     }
+-    for (i = 0; i < nwsaddr; i++) {
+-        if (vnc_display_listen_addr(vd, wsaddr[i],
+-                                    "vnc-ws-listen",
+-                                    &vd->lwebsock,
+-                                    &vd->lwebsock_tag,
+-                                    &vd->nlwebsock,
+-                                    errp) < 0) {
+-            return -1;
++
++    if (nwsaddr) {
++        vd->wslistener = qio_net_listener_new();
++        qio_net_listener_set_name(vd->wslistener, "vnc-ws-listen");
++        for (i = 0; i < nwsaddr; i++) {
++            if (qio_net_listener_open_sync(vd->wslistener,
++                                           wsaddr[i],
++                                           errp) < 0)  {
++                return -1;
++            }
+         }
++
++        qio_net_listener_set_client_func(vd->wslistener,
++                                         vnc_listen_io, vd, NULL);
+     }
+ 
+     return 0;
+diff --git a/ui/vnc.h b/ui/vnc.h
+index bbda0540a7..23b4dbbe72 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -37,6 +37,7 @@
+ #include "qemu/buffer.h"
+ #include "io/channel-socket.h"
+ #include "io/channel-tls.h"
++#include "io/net-listener.h"
+ #include <zlib.h>
+ 
+ #include "keymaps.h"
+@@ -146,12 +147,8 @@ struct VncDisplay
+     int num_exclusive;
+     int connections_limit;
+     VncSharePolicy share_policy;
+-    size_t nlsock;
+-    QIOChannelSocket **lsock;
+-    guint *lsock_tag;
+-    size_t nlwebsock;
+-    QIOChannelSocket **lwebsock;
+-    guint *lwebsock_tag;
++    QIONetListener *listener;
++    QIONetListener *wslistener;
+     DisplaySurface *ds;
+     DisplayChangeListener dcl;
+     kbd_layout_t *kbd_layout;
 -- 
-Eduardo
+2.14.3
