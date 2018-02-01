@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1ehEet-0004N3-3L
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:12:08 -0500
+	(envelope-from <berto@igalia.com>) id 1ehEgX-0005Rp-Pt
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:13:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1ehEek-00053H-S9
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:12:07 -0500
-Received: from mail-it0-x22c.google.com ([2607:f8b0:4001:c0b::22c]:36179)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1ehEek-00052o-Mw
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:11:58 -0500
-Received: by mail-it0-x22c.google.com with SMTP id n206so3778423itg.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 05:11:58 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <alpine.BSF.2.21.1802011314580.39992@zero.eik.bme.hu>
-Date: Thu, 1 Feb 2018 08:11:55 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <10A8BD0F-5070-41F9-975A-086460BFC995@gmail.com>
-References: <20180126214731.23506-1-programmingkidx@gmail.com>
-	<20180130121823.7h4brwivh7653znu@sirius.home.kraxel.org>
-	<F79229CE-D35E-4895-A632-4211A7C526D8@gmail.com>
-	<20180131090310.e4jlhu7euyeompkh@sirius.home.kraxel.org>
-	<655BB356-66E8-4AC4-8EC4-47E3E2DA6B36@gmail.com>
-	<alpine.BSF.2.21.1802011314580.39992@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v5] cocoa.m: Add ability for user to
- specify mouse ungrab key
+	(envelope-from <berto@igalia.com>) id 1ehEgT-0006XO-NU
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:13:49 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <c57f7978-d54d-75f8-58f3-32d8fa5284a6@redhat.com>
+References: <cover.1516978645.git.berto@igalia.com>
+	<07a984cef4f1c97dcca44e365aa90ba5b6881e09.1516978645.git.berto@igalia.com>
+	<c57f7978-d54d-75f8-58f3-32d8fa5284a6@redhat.com>
+Date: Thu, 01 Feb 2018 14:13:01 +0100
+Message-ID: <w51r2q46eg2.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 17/39] qcow2: Update l2_allocate() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
+On Wed 31 Jan 2018 09:07:48 PM CET, Max Reitz wrote:
+> On 2018-01-26 15:59, Alberto Garcia wrote:
+>> This patch updates l2_allocate() to support the qcow2 cache returning
+>> L2 slices instead of full L2 tables.
+>> 
+>> The old code simply gets an L2 table from the cache and initializes it
+>> with zeroes or with the contents of an existing table. With a cache
+>> that returns slices instead of tables the idea remains the same, but
+>> the code must now iterate over all the slices that are contained in an
+>> L2 table.
+>> 
+>> Since now we're operating with slices the function can no longer
+>> return the newly-allocated table, so it's up to the caller to retrieve
+>> the appropriate L2 slice after calling l2_allocate() (note that with
+>> this patch the caller is still loading full L2 tables, but we'll deal
+>> with that in a separate patch).
+>> 
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  block/qcow2-cluster.c | 56 +++++++++++++++++++++++++++++++--------------------
+>>  1 file changed, 34 insertions(+), 22 deletions(-)
+>> 
+>> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+>> index 57349928a9..2a53c1dc5f 100644
+>> --- a/block/qcow2-cluster.c
+>> +++ b/block/qcow2-cluster.c
+>> @@ -264,11 +264,12 @@ int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index)
+>>   *
+>>   */
+>>  
+>> -static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
+>> +static int l2_allocate(BlockDriverState *bs, int l1_index)
+>>  {
+>>      BDRVQcow2State *s = bs->opaque;
+>>      uint64_t old_l2_offset;
+>> -    uint64_t *l2_table = NULL;
+>> +    uint64_t *l2_slice = NULL;
+>> +    unsigned slice, slice_size2, n_slices;
+>
+> I'd personally prefer size_t, but oh well.
 
-> On Feb 1, 2018, at 7:16 AM, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->=20
-> On Wed, 31 Jan 2018, Programmingkid wrote:
->>>> Basically there is a array that acts as a check list. It checks off
->>>> keys that belong to the ungrab sequence as they are detected. Once =
-a
->>>> non-ungrab key is detected, the check list is cleared. If all the
->>>> ungrab keys are detected the ungrab code is executed. This only
->>>> happens on keyup events. That way if Control-ALT were the ungrab =
-keys,
->>>> sending Control-ALT-Delete to the guest is still possible because
->>>> these are the keys detected on the keyup event. The Delete key =
-would
->>>> have cleared the check list. Daniel Berrange is the one I can thank
->>>> for this idea. He might be able to explain it better than me.
->>>=20
->>> Hmm, ok.
->>>=20
->>> Doing the same for gtk would basically imply to not use any toolkit
->>> support for hotkeys ...
->>>=20
->>> It'll also become more difficuilt if we use that for multiple =
-hotkeys.
->>>=20
->>> But possibly we can share the code across all UIs, now that =
-keycodemapdb
->>> is used by qemu.  So first translate the keycode from the UI toolkit =
-to
->>> a QKeyCode, then feed that into shared hotkey detection code.
->>=20
->> Sounds like a good idea. I will be more than happy to help. My cocoa =
-code
->> uses sets to implement keeping track of key presses. A set is a =
-collection of data
->> that only allows for unique values. So no two items in a set can be =
-the same
->> value. My patch uses cocoa's NSSet so the shared code would probably =
-not be
->> able to use it. I don't currently know of an implementation of a set =
-that is
->> in C and available for us to use, so we may have to implement it =
-ourselves.
->=20
-> I think we already depend on glib so maybe you could find something =
-useful for this here:
->=20
-> https://developer.gnome.org/glib/stable/glib-data-types.html
->=20
-> Regards,
-> BALATON Zoltan
+I don't see any reason not to use int / unsigned. The size of a slice is
+always <= cluster_size (an int), and both slice and n_slices are smaller
+than that.
 
-Thanks BALATON for the help, but I didn't see anything that was a good =
-fit for the patch.
+> However, I'm wondering whether this is the best approach.  The old L2
+> table is probably not going to be used after this function, so we're
+> basically polluting the cache here.  That was bad enough so far, but
+> now that actually means wasting multiple cache entries on it.
+>
+> Sure, the code is simpler this way.  But maybe it would still be
+> better to manually copy the data over from the old offset...  (As long
+> as it's not much more complicated.)
+
+You mean bypassing the cache altogether?
+
+    qcow2_cache_flush(bs, s->l2_table_cache);
+    new_table = g_malloc(s->cluster_size);
+    if (old_l2_offset & L1E_OFFSET_MASK) {
+        bdrv_pread(bs->file, old_l2_offset, new_table, s->cluster_size);
+    } else {
+        memset(new_table, 0, s->cluster_size);
+    }
+    bdrv_pwrite(bs->file, new_l2_offset, new_table, s->cluster_size);
+    g_free(new_table);
+
+??
+
+Berto
