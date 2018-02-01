@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ehFHc-0004G6-12
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:52:12 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ehFJI-0005Ny-Tk
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:53:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ehFHZ-0000Qo-6X
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:52:08 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2159 helo=huawei.com)
+	(envelope-from <ehabkost@redhat.com>) id 1ehFJF-0001Rd-Sx
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:53:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1ehFHY-0000Pi-Rf
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:52:05 -0500
-From: Gonglei <arei.gonglei@huawei.com>
-Date: Thu, 1 Feb 2018 21:51:31 +0800
-Message-ID: <1517493091-23620-1-git-send-email-arei.gonglei@huawei.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehFJF-0001Ph-LW
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:53:49 -0500
+Date: Thu, 1 Feb 2018 11:53:40 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180201135340.GU26425@localhost.localdomain>
+References: <20180117095421.124787-1-marcel@redhat.com>
+	<20180117095421.124787-2-marcel@redhat.com>
+	<20180131204059.GG21702@localhost.localdomain>
+	<20180131230607-mutt-send-email-mst@kernel.org>
+	<20180131233422.GP26425@localhost.localdomain>
+	<20180201040608-mutt-send-email-mst@kernel.org>
+	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
+	<20180201121009.GR26425@localhost.localdomain>
+	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] rtc: placing RTC memory region outside BQL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +35,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, weidong.huang@huawei.com, Gonglei <arei.gonglei@huawei.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
 
-As windows guest use rtc as the clock source device,
-and access rtc frequently. Let's move the rtc memory
-region outside BQL to decrease overhead for windows guests.
+On Thu, Feb 01, 2018 at 02:29:25PM +0200, Marcel Apfelbaum wrote:
+> On 01/02/2018 14:10, Eduardo Habkost wrote:
+> > On Thu, Feb 01, 2018 at 07:36:50AM +0200, Marcel Apfelbaum wrote:
+> >> On 01/02/2018 4:22, Michael S. Tsirkin wrote:
+> >>> On Wed, Jan 31, 2018 at 09:34:22PM -0200, Eduardo Habkost wrote:
+> > [...]
+> >>>> BTW, what's the root cause for requiring HVAs in the buffer?
+> >>>
+> >>> It's a side effect of the kernel/userspace API which always wants
+> >>> a single HVA/len pair to map memory for the application.
+> >>>
+> >>>
+> >>
+> >> Hi Eduardo and Michael,
+> >>
+> >>>>  Can
+> >>>> this be fixed?
+> >>>
+> >>> I think yes.  It'd need to be a kernel patch for the RDMA subsystem
+> >>> mapping an s/g list with actual memory. The HVA/len pair would then just
+> >>> be used to refer to the region, without creating the two mappings.
+> >>>
+> >>> Something like splitting the register mr into
+> >>>
+> >>> mr = create mr (va/len) - allocate a handle and record the va/len
+> >>>
+> >>> addmemory(mr, offset, hva, len) - pin memory
+> >>>
+> >>> register mr - pass it to HW
+> >>>
+> >>> As a nice side effect we won't burn so much virtual address space.
+> >>>
+> >>
+> >> We would still need a contiguous virtual address space range (for post-send)
+> >> which we don't have since guest contiguous virtual address space
+> >> will always end up as non-contiguous host virtual address space.
+> >>
+> >> I am not sure the RDMA HW can handle a large VA with holes.
+> > 
+> > I'm confused.  Why would the hardware see and care about virtual
+> > addresses? 
+> 
+> The post-send operations bypasses the kernel, and the process
+> puts in the work request GVA addresses.
+> 
+> > How exactly does the hardware translates VAs to
+> > PAs? 
+> 
+> The HW maintains a page-directory like structure different form MMU
+> VA -> phys pages
+> 
+> > What if the process page tables change?
+> > 
+> 
+> Since the page tables the HW uses are their own, we just need the phys
+> page to be pinned.
 
-$ cat strace_c.sh
-strace -tt -p $1 -c -o result_$1.log &
-sleep $2
-pid=$(pidof strace)
-kill $pid
-cat result_$1.log
+So there's no hardware-imposed requirement that the hardware VAs
+(mapped by the HW page directory) match the VAs in QEMU
+address-space, right?  If the RDMA API is updated to remove this
+requirement, couldn't you just use the untranslated guest VAs
+directly?
 
-Before appling this change:
-$ ./strace_c.sh 10528 30
-% time     seconds  usecs/call     calls    errors syscall
------- ----------- ----------- --------- --------- ----------------
- 93.87    0.119070          30      4000           ppoll
-  3.27    0.004148           2      2038           ioctl
-  2.66    0.003370           2      2014           futex
-  0.09    0.000113           1       106           read
-  0.09    0.000109           1       104           io_getevents
-  0.02    0.000029           1        30           poll
-  0.00    0.000000           0         1           write
------- ----------- ----------- --------- --------- ----------------
-100.00    0.126839                  8293           total
-
-After appling the change:
-$ ./strace_c.sh 23829 30
-% time     seconds  usecs/call     calls    errors syscall
------- ----------- ----------- --------- --------- ----------------
- 92.86    0.067441          16      4094           ppoll
-  4.85    0.003522           2      2136           ioctl
-  1.17    0.000850           4       189           futex
-  0.54    0.000395           2       202           read
-  0.52    0.000379           2       202           io_getevents
-  0.05    0.000037           1        30           poll
------- ----------- ----------- --------- --------- ----------------
-100.00    0.072624                  6853           total
-
-The futex call number decreases ~90.6% on an idle windows 7 guest.
-
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- hw/timer/mc146818rtc.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 35a05a6..d9d99c5 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -986,6 +986,7 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
-     qemu_register_suspend_notifier(&s->suspend_notifier);
- 
-     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
-+    memory_region_clear_global_locking(&s->io);
-     isa_register_ioport(isadev, &s->io, base);
- 
-     qdev_set_legacy_instance_id(dev, base, 3);
 -- 
-1.8.3.1
+Eduardo
