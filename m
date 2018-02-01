@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehKxG-0005XU-7R
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:00:29 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ehKyl-0006Oh-Q9
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:01:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehKtp-00051Y-4p
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:55:30 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <06131f65-28d8-44fb-ee96-2d8e78fe4b3c@redhat.com>
-Date: Thu, 1 Feb 2018 20:46:46 +0100
+	(envelope-from <brijesh.singh@amd.com>) id 1ehKxh-0007Aa-NL
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:57:03 -0500
+Received: from mail-bn3nam01on0055.outbound.protection.outlook.com
+	([104.47.33.55]:46928
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ehKxh-00079m-8g
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:55:57 -0500
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-14-brijesh.singh@amd.com>
+	<20180201175802.GK2457@work-vm>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <7c3c7a89-04ef-016e-c9a5-4f4d4be1c449@amd.com>
+Date: Thu, 1 Feb 2018 13:55:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BdYraulc6RLarsF0fEOTAZSHneY4q7Obm"
-Subject: Re: [Qemu-devel] [PATCH v3 31/39] qcow2: Update qcow2_truncate() to
- support L2 slices
+In-Reply-To: <20180201175802.GK2457@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v6 13/23] hmp: display memory encryption
+ support in 'info kvm'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BdYraulc6RLarsF0fEOTAZSHneY4q7Obm
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <06131f65-28d8-44fb-ee96-2d8e78fe4b3c@redhat.com>
-Subject: Re: [PATCH v3 31/39] qcow2: Update qcow2_truncate() to support L2
- slices
-References: <cover.1516978645.git.berto@igalia.com>
- <896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
-In-Reply-To: <896a464d5933927db49c968682de8c2b6e59635f.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-01-26 15:59, Alberto Garcia wrote:
-> The qcow2_truncate() code is mostly independent from whether
-> we're using L2 slices or full L2 tables, but in full and
-> falloc preallocation modes new L2 tables are allocated using
-> qcow2_alloc_cluster_link_l2().  Therefore the code needs to be
-> modified to ensure that all nb_clusters that are processed in each
-> call can be allocated with just one L2 slice.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow2.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 78f067cae7..529becfa30 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3261,8 +3261,9 @@ static int qcow2_truncate(BlockDriverState *bs, i=
-nt64_t offset,
->          guest_offset =3D old_length;
->          while (nb_new_data_clusters) {
->              int64_t guest_cluster =3D guest_offset >> s->cluster_bits;=
-
-> -            int64_t nb_clusters =3D MIN(nb_new_data_clusters,
-> -                                      s->l2_size - guest_cluster % s->=
-l2_size);
-> +            int64_t nb_clusters =3D MIN(
-> +                nb_new_data_clusters,
-> +                s->l2_slice_size - guest_cluster % s->l2_slice_size);
-
-An alternative would be the
-"s->l2_slice_size - offset_to_l2_slice_index(s, guest_offset)" we
-basically have elsewhere, but that's longer and doesn't really matter:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
->              QCowL2Meta allocation =3D {
->                  .offset       =3D guest_offset,
->                  .alloc_offset =3D host_offset,
->=20
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
 
---BdYraulc6RLarsF0fEOTAZSHneY4q7Obm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On 2/1/18 11:58 AM, Dr. David Alan Gilbert wrote:
+> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+>> update 'info kvm' to display the memory encryption support.
+>>
+>> (qemu) info kvm
+>> kvm support: enabled
+>> memory encryption: disabled
+> As Markus said, this should be split qmp/hmp; but something else to
+> think about is whether this is a boolean or needs to be an enum;  do
+> you have one version of encryption or are we going to need to flag up
+> versions or the features of the encryption?
 
------BEGIN PGP SIGNATURE-----
+In future I could see us providing encrypted state status when we
+implement SEV-ES support, something like
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzbqYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AiJYIAL8xnLzbaL4A4KPnItACzxy6pKRjqHrh
-1MIopaN1Ju9GuOhhi1ZIy6+RIjIYAZ1AfFT+eEA59/KlS90S4yusGojjbnzV6vgM
-X1HzHYDhXlFmV6JypCl7xCzb72Uk8+J8y5l5rjVCPfIZOpwph4N4Pfp5/31oLufw
-5HU63MQgj/dfw9A7IJSN5H7tcUXqJsYiYoAm1AB5XRiUC/QSDB3qwkDIi3ZmQMaR
-1/xVixGJxNjwKiHzMvwblNH1HGA8g/ryFMKeyG85qQ87TLkUawodk41N7nunzYoi
-uzFOKMtGf2BlnYN1jAhLAFZFvZnAg2u4//UJgiMs6Fv8AalkbGtlquc=
-=a86A
------END PGP SIGNATURE-----
+(qemu) info kvm
+kvm support: enabled
+memory encryption: enabled
+cpu register state: encrypted
 
---BdYraulc6RLarsF0fEOTAZSHneY4q7Obm--
+but so far I do not see need to provide the version string. If user
+wants to know the SEV version then it can open /dev/sev device to get
+platform status and more.
+
+> Dave
+>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>  hmp.c            | 2 ++
+>>  qapi-schema.json | 5 ++++-
+>>  qmp.c            | 1 +
+>>  3 files changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index 056bf70cf1e2..6ceb6b30af75 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -88,6 +88,8 @@ void hmp_info_kvm(Monitor *mon, const QDict *qdict)
+>>      monitor_printf(mon, "kvm support: ");
+>>      if (info->present) {
+>>          monitor_printf(mon, "%s\n", info->enabled ? "enabled" : "disabled");
+>> +        monitor_printf(mon, "memory encryption: %s\n",
+>> +                       info->mem_encryption ? "enabled" : "disabled");
+>>      } else {
+>>          monitor_printf(mon, "not compiled\n");
+>>      }
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 5c06745c7927..2046c96669bf 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -314,9 +314,12 @@
+>>  #
+>>  # @present: true if KVM acceleration is built into this executable
+>>  #
+>> +# @mem-encryption: true if Memory Encryption is active (since 2.12)
+>> +#
+>>  # Since: 0.14.0
+>>  ##
+>> -{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool'} }
+>> +{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool',
+>> +            'mem-encryption' : 'bool'} }
+>>  
+>>  ##
+>>  # @query-kvm:
+>> diff --git a/qmp.c b/qmp.c
+>> index 52cfd2d81c0f..3a527bc8c39c 100644
+>> --- a/qmp.c
+>> +++ b/qmp.c
+>> @@ -69,6 +69,7 @@ KvmInfo *qmp_query_kvm(Error **errp)
+>>  
+>>      info->enabled = kvm_enabled();
+>>      info->present = kvm_available();
+>> +    info->mem_encryption = kvm_memcrypt_enabled();
+>>  
+>>      return info;
+>>  }
+>> -- 
+>> 2.9.5
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
