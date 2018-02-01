@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehCtP-0006Pm-N8
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:19:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehCtI-0006Iv-NW
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:19:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehCtH-0004yr-Mb
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:18:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49318)
+	(envelope-from <armbru@redhat.com>) id 1ehCtF-0004wE-FK
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:18:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehCtH-0004xm-D2
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:18:51 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehCtF-0004vR-6R
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 06:18:49 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  1 Feb 2018 12:18:41 +0100
-Message-Id: <20180201111846.21846-15-armbru@redhat.com>
+Date: Thu,  1 Feb 2018 12:18:28 +0100
+Message-Id: <20180201111846.21846-2-armbru@redhat.com>
 In-Reply-To: <20180201111846.21846-1-armbru@redhat.com>
 References: <20180201111846.21846-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 14/19] Include qapi/qmp/qbool.h exactly
- where needed
+Subject: [Qemu-devel] [PATCH v3 01/19] Use #include "..." for our own
+ headers, <...> for others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,194 +27,314 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: balaton@eik.bme.hu, eblake@redhat.com, f4bug@amsat.org
 
+System headers should be included with <...>, our own headers with
+"...".  Offenders tracked down with an ugly, brittle and probably
+buggy Perl script.  Previous iteration was commit a9c94277f0.
+
+Delete inclusions of "string.h" and "strings.h" instead of fixing them
+to <string.h> and <strings.h>, because we always include these via
+osdep.h.
+
+Put the cleaned up system header includes first.
+
+While there, separate #include from file comment with exactly one
+blank line.
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block.c                        | 1 -
- block/blkdebug.c               | 1 -
- block/curl.c                   | 1 -
- block/qcow2.c                  | 1 -
- block/quorum.c                 | 1 -
- block/vvfat.c                  | 1 -
- hw/usb/xen-usb.c               | 1 -
- monitor.c                      | 1 -
- qemu-img.c                     | 1 -
- qemu-io.c                      | 1 -
- target/s390x/cpu_models.c      | 1 -
- tests/check-qlit.c             | 1 -
- tests/device-introspect-test.c | 1 -
- ui/spice-core.c                | 1 -
- 14 files changed, 14 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c             | 4 ++--
+ hw/ide/sii3112.c                                      | 4 ++--
+ hw/s390x/s390-ccw.c                                   | 3 ++-
+ include/hw/loader-fit.h                               | 2 +-
+ include/hw/registerfields.h                           | 2 +-
+ include/hw/s390x/storage-attributes.h                 | 2 +-
+ target/i386/hax-all.c                                 | 1 -
+ target/i386/hvf/hvf.c                                 | 1 -
+ target/i386/hvf/x86_decode.c                          | 1 -
+ target/i386/hvf/x86_mmu.c                             | 6 ++----
+ target/i386/hvf/x86_task.c                            | 1 -
+ target/s390x/gen-features.c                           | 6 ++----
+ target/xtensa/core-dc232b/xtensa-modules.c            | 2 +-
+ target/xtensa/core-dc233c/xtensa-modules.c            | 2 +-
+ target/xtensa/core-de212/xtensa-modules.c             | 2 +-
+ target/xtensa/core-fsf/xtensa-modules.c               | 2 +-
+ target/xtensa/core-sample_controller/xtensa-modules.c | 2 +-
+ target/xtensa/xtensa-isa.h                            | 2 +-
+ vl.c                                                  | 2 +-
+ 19 files changed, 20 insertions(+), 27 deletions(-)
 
-diff --git a/block.c b/block.c
-index 71d2dfb55e..924b084436 100644
---- a/block.c
-+++ b/block.c
-@@ -32,7 +32,6 @@
- #include "qemu/module.h"
+diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
+index 54c1191db0..02c29019d1 100644
+--- a/contrib/vhost-user-scsi/vhost-user-scsi.c
++++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
+@@ -11,10 +11,10 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include <iscsi/iscsi.h>
++#include <iscsi/scsi-lowlevel.h>
+ #include "contrib/libvhost-user/libvhost-user-glib.h"
+ #include "standard-headers/linux/virtio_scsi.h"
+-#include "iscsi/iscsi.h"
+-#include "iscsi/scsi-lowlevel.h"
+ 
+ #include <glib.h>
+ 
+diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+index 17aa930e39..e3896c65b4 100644
+--- a/hw/ide/sii3112.c
++++ b/hw/ide/sii3112.c
+@@ -12,8 +12,8 @@
+  * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
+  */
+ 
+-#include <qemu/osdep.h>
+-#include <hw/ide/pci.h>
++#include "qemu/osdep.h"
++#include "hw/ide/pci.h"
+ #include "trace.h"
+ 
+ #define TYPE_SII3112_PCI "sii3112"
+diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+index 4a9d4d2534..7fc1c603c0 100644
+--- a/hw/s390x/s390-ccw.c
++++ b/hw/s390x/s390-ccw.c
+@@ -10,10 +10,11 @@
+  * or (at your option) any later version. See the COPYING file in the
+  * top-level directory.
+  */
++
+ #include "qemu/osdep.h"
++#include <libgen.h>
  #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qstring.h"
- #include "sysemu/block-backend.h"
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index e21669979d..356538482d 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -29,7 +29,6 @@
- #include "qemu/config-file.h"
- #include "block/block_int.h"
- #include "qemu/module.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "sysemu/qtest.h"
-diff --git a/block/curl.c b/block/curl.c
-index e0eb8ebb78..fbd62b3864 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -27,7 +27,6 @@
+ #include "hw/sysbus.h"
+-#include "libgen.h"
+ #include "hw/s390x/css.h"
+ #include "hw/s390x/css-bridge.h"
+ #include "hw/s390x/s390-ccw.h"
+diff --git a/include/hw/loader-fit.h b/include/hw/loader-fit.h
+index 9e2a068a20..0284c3e02c 100644
+--- a/include/hw/loader-fit.h
++++ b/include/hw/loader-fit.h
+@@ -20,7 +20,7 @@
+ #ifndef HW_LOADER_FIT_H
+ #define HW_LOADER_FIT_H
+ 
+-#include <exec/hwaddr.h>
++#include "exec/hwaddr.h"
+ 
+ struct fit_loader_match {
+     const char *compatible;
+diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+index 44e0b94edf..2659a58737 100644
+--- a/include/hw/registerfields.h
++++ b/include/hw/registerfields.h
+@@ -11,7 +11,7 @@
+ #ifndef REGISTERFIELDS_H
+ #define REGISTERFIELDS_H
+ 
+-#include <qemu/bitops.h>
++#include "qemu/bitops.h"
+ 
+ /* Define constants for a 32 bit register */
+ 
+diff --git a/include/hw/s390x/storage-attributes.h b/include/hw/s390x/storage-attributes.h
+index 9be954d163..d6403a0a7e 100644
+--- a/include/hw/s390x/storage-attributes.h
++++ b/include/hw/s390x/storage-attributes.h
+@@ -12,7 +12,7 @@
+ #ifndef S390_STORAGE_ATTRIBUTES_H
+ #define S390_STORAGE_ATTRIBUTES_H
+ 
+-#include <hw/qdev.h>
++#include "hw/qdev.h"
+ #include "monitor/monitor.h"
+ 
+ #define TYPE_S390_STATTRIB "s390-storage_attributes"
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index 934ec4afd1..bc9a12c1ee 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -30,7 +30,6 @@
+ #include "exec/ioport.h"
+ 
  #include "qemu-common.h"
- #include "qemu/error-report.h"
- #include "block/block_int.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "crypto/secret.h"
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 700c06245b..a64a572785 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -31,7 +31,6 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi-event.h"
-diff --git a/block/quorum.c b/block/quorum.c
-index ec427c39e7..980403f63e 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -17,7 +17,6 @@
- #include "qemu/cutils.h"
- #include "block/block_int.h"
- #include "qapi/error.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/qmp/qjson.h"
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 93e76580b0..5dca227311 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -30,7 +30,6 @@
- #include "qemu/module.h"
- #include "qemu/bswap.h"
- #include "migration/blocker.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/cutils.h"
-diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
-index 3b678685e1..e9eb1e902f 100644
---- a/hw/usb/xen-usb.c
-+++ b/hw/usb/xen-usb.c
-@@ -29,7 +29,6 @@
- #include "hw/usb.h"
- #include "hw/xen/xen_backend.h"
- #include "monitor/qdev.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-=20
-diff --git a/monitor.c b/monitor.c
-index 69737f2d9a..02d9dd8708 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -53,7 +53,6 @@
- #include "qemu/acl.h"
- #include "sysemu/tpm.h"
- #include "qapi/qmp/qerror.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qjson.h"
-diff --git a/qemu-img.c b/qemu-img.c
-index 6ead3b7c3d..778fab9979 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -30,7 +30,6 @@
- #include "qapi-visit.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/qmp/qjson.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/cutils.h"
-diff --git a/qemu-io.c b/qemu-io.c
-index 2e5737ce9c..f554ab614b 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
+-#include "strings.h"
+ #include "hax-i386.h"
+ #include "sysemu/accel.h"
+ #include "sysemu/sysemu.h"
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index 010866ed22..aef3d83bb9 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -43,7 +43,6 @@
+ #include "hw/i386/apic_internal.h"
+ #include "hw/boards.h"
+ #include "qemu/main-loop.h"
+-#include "strings.h"
+ #include "sysemu/accel.h"
+ #include "sysemu/sysemu.h"
+ #include "target/i386/cpu.h"
+diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
+index bf93e8207d..2d7540fe7c 100644
+--- a/target/i386/hvf/x86_decode.c
++++ b/target/i386/hvf/x86_decode.c
 @@ -21,7 +21,6 @@
- #include "qemu/readline.h"
- #include "qemu/log.h"
- #include "qapi/qmp/qstring.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qom/object_interfaces.h"
- #include "sysemu/block-backend.h"
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 27201c4f91..584c409a19 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -20,7 +20,6 @@
- #include "qemu/error-report.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/qobject-input-visitor.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/arch_init.h"
-diff --git a/tests/check-qlit.c b/tests/check-qlit.c
-index b8b5016af7..f012885534 100644
---- a/tests/check-qlit.c
-+++ b/tests/check-qlit.c
-@@ -9,7 +9,6 @@
-=20
- #include "qemu/osdep.h"
-=20
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qlit.h"
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-tes=
-t.c
-index 2b3d01174d..b80058fe98 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -20,7 +20,6 @@
- #include "qemu/osdep.h"
  #include "qemu-common.h"
- #include "qapi/qmp/qstring.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
- #include "libqtest.h"
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index c4d67e678c..03f9e83456 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -31,7 +31,6 @@
- #include "qemu/sockets.h"
- #include "qmp-commands.h"
- #include "qapi/error.h"
--#include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qjson.h"
- #include "qemu/notify.h"
- #include "migration/misc.h"
---=20
+ #include "panic.h"
+ #include "x86_decode.h"
+-#include "string.h"
+ #include "vmx.h"
+ #include "x86_mmu.h"
+ #include "x86_descr.h"
+diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
+index 5c1f35acd0..c6be2cca35 100644
+--- a/target/i386/hvf/x86_mmu.c
++++ b/target/i386/hvf/x86_mmu.c
+@@ -15,18 +15,16 @@
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++
+ #include "qemu/osdep.h"
++#include <memory.h>
+ #include "panic.h"
+-
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "x86.h"
+ #include "x86_mmu.h"
+-#include "string.h"
+ #include "vmcs.h"
+ #include "vmx.h"
+-
+-#include "memory.h"
+ #include "exec/address-spaces.h"
+ 
+ #define pte_present(pte) (pte & PT_PRESENT)
+diff --git a/target/i386/hvf/x86_task.c b/target/i386/hvf/x86_task.c
+index d7f665f8fa..4abf3db25e 100644
+--- a/target/i386/hvf/x86_task.c
++++ b/target/i386/hvf/x86_task.c
+@@ -32,7 +32,6 @@
+ #include "hw/i386/apic_internal.h"
+ #include "hw/boards.h"
+ #include "qemu/main-loop.h"
+-#include "strings.h"
+ #include "sysemu/accel.h"
+ #include "sysemu/sysemu.h"
+ #include "target/i386/cpu.h"
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 0570f597ec..bd483333ae 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -9,12 +9,10 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or (at
+  * your option) any later version. See the COPYING file in the top-level
+  * directory.
+- *
+  */
+ 
+-
+-#include "inttypes.h"
+-#include "stdio.h"
++#include <inttypes.h>
++#include <stdio.h>
+ #include "cpu_features_def.h"
+ 
+ #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+diff --git a/target/xtensa/core-dc232b/xtensa-modules.c b/target/xtensa/core-dc232b/xtensa-modules.c
+index 2e103cd2f5..0af43c84bb 100644
+--- a/target/xtensa/core-dc232b/xtensa-modules.c
++++ b/target/xtensa/core-dc232b/xtensa-modules.c
+@@ -18,7 +18,7 @@
+    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
+    02110-1301, USA.  */
+ 
+-#include <xtensa-isa.h>
++#include "xtensa-isa.h"
+ #include "xtensa-isa-internal.h"
+ 
+ 
+
+diff --git a/target/xtensa/core-dc233c/xtensa-modules.c b/target/xtensa/core-dc233c/xtensa-modules.c
+index 2728311c9a..8a41e73659 100644
+--- a/target/xtensa/core-dc233c/xtensa-modules.c
++++ b/target/xtensa/core-dc233c/xtensa-modules.c
+@@ -21,7 +21,7 @@
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+-#include <xtensa-isa.h>
++#include "xtensa-isa.h"
+ #include "xtensa-isa-internal.h"
+ 
+ 
+
+diff --git a/target/xtensa/core-de212/xtensa-modules.c b/target/xtensa/core-de212/xtensa-modules.c
+index 4a8735889e..21f3bd8797 100644
+--- a/target/xtensa/core-de212/xtensa-modules.c
++++ b/target/xtensa/core-de212/xtensa-modules.c
+@@ -21,7 +21,7 @@
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+-#include <xtensa-isa.h>
++#include "xtensa-isa.h"
+ #include "xtensa-isa-internal.h"
+ 
+ 
+
+diff --git a/target/xtensa/core-fsf/xtensa-modules.c b/target/xtensa/core-fsf/xtensa-modules.c
+index 238800d823..9621f5142a 100644
+--- a/target/xtensa/core-fsf/xtensa-modules.c
++++ b/target/xtensa/core-fsf/xtensa-modules.c
+@@ -18,7 +18,7 @@
+    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
+    02110-1301, USA.  */
+ 
+-#include <xtensa-isa.h>
++#include "xtensa-isa.h"
+ #include "xtensa-isa-internal.h"
+ 
+ 
+
+diff --git a/target/xtensa/core-sample_controller/xtensa-modules.c b/target/xtensa/core-sample_controller/xtensa-modules.c
+index 2f000199b8..39810e532a 100644
+--- a/target/xtensa/core-sample_controller/xtensa-modules.c
++++ b/target/xtensa/core-sample_controller/xtensa-modules.c
+@@ -21,7 +21,7 @@
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+-#include <xtensa-isa.h>
++#include "xtensa-isa.h"
+ #include "xtensa-isa-internal.h"
+ 
+ 
+
+diff --git a/target/xtensa/xtensa-isa.h b/target/xtensa/xtensa-isa.h
+index d06614c187..0f0211f841 100644
+--- a/target/xtensa/xtensa-isa.h
++++ b/target/xtensa/xtensa-isa.h
+@@ -1 +1 @@
+-#include <hw/xtensa/xtensa-isa.h>
++#include "hw/xtensa/xtensa-isa.h"
+diff --git a/vl.c b/vl.c
+index e517a8d995..d7e4d97814 100644
+--- a/vl.c
++++ b/vl.c
+@@ -28,8 +28,8 @@
+ #include "qemu/uuid.h"
+ 
+ #ifdef CONFIG_SECCOMP
++#include <sys/prctl.h>
+ #include "sysemu/seccomp.h"
+-#include "sys/prctl.h"
+ #endif
+ 
+ #ifdef CONFIG_SDL
+-- 
 2.13.6
