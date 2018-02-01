@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ehFmq-0001Bf-Al
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:24:29 -0500
+	(envelope-from <mst@redhat.com>) id 1ehFnM-0001e9-4c
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:24:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ehFmm-0005ZF-5W
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:24:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54192)
+	(envelope-from <mst@redhat.com>) id 1ehFnI-000696-4n
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:24:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ehFml-0005YO-VL
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:24:20 -0500
-References: <20180201134831.17709-1-klim.kireev@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <288c0d60-d927-d25c-4538-2183b9e28856@redhat.com>
-Date: Thu, 1 Feb 2018 09:24:03 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ehFnH-00067W-SH
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:24:52 -0500
+Date: Thu, 1 Feb 2018 16:24:30 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180201150254-mutt-send-email-mst@kernel.org>
+References: <20180117095421.124787-1-marcel@redhat.com>
+	<20180117095421.124787-2-marcel@redhat.com>
+	<20180131204059.GG21702@localhost.localdomain>
+	<20180131230607-mutt-send-email-mst@kernel.org>
+	<20180131233422.GP26425@localhost.localdomain>
+	<20180201040608-mutt-send-email-mst@kernel.org>
+	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
+	<20180201121009.GR26425@localhost.localdomain>
+	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180201134831.17709-1-klim.kireev@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/test-filter-redirector: move close()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +35,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Klim Kireev <klim.kireev@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
 
-On 01/02/2018 08:48, Klim Kireev wrote:
-> Since we have separate handler on POLLHUP, which drops data
-> after closing the connection we need to fix this test, because
-> it sends data and instantly close the socket creating race condition.
-> In some cases on other end of socket client closes it faster than
-> reads data. To prevent it I suggest to close socket after recieving.
+On Thu, Feb 01, 2018 at 02:29:25PM +0200, Marcel Apfelbaum wrote:
+> On 01/02/2018 14:10, Eduardo Habkost wrote:
+> > On Thu, Feb 01, 2018 at 07:36:50AM +0200, Marcel Apfelbaum wrote:
+> >> On 01/02/2018 4:22, Michael S. Tsirkin wrote:
+> >>> On Wed, Jan 31, 2018 at 09:34:22PM -0200, Eduardo Habkost wrote:
+> > [...]
+> >>>> BTW, what's the root cause for requiring HVAs in the buffer?
+> >>>
+> >>> It's a side effect of the kernel/userspace API which always wants
+> >>> a single HVA/len pair to map memory for the application.
+> >>>
+> >>>
+> >>
+> >> Hi Eduardo and Michael,
+> >>
+> >>>>  Can
+> >>>> this be fixed?
+> >>>
+> >>> I think yes.  It'd need to be a kernel patch for the RDMA subsystem
+> >>> mapping an s/g list with actual memory. The HVA/len pair would then just
+> >>> be used to refer to the region, without creating the two mappings.
+> >>>
+> >>> Something like splitting the register mr into
+> >>>
+> >>> mr = create mr (va/len) - allocate a handle and record the va/len
+> >>>
+> >>> addmemory(mr, offset, hva, len) - pin memory
+> >>>
+> >>> register mr - pass it to HW
+> >>>
+> >>> As a nice side effect we won't burn so much virtual address space.
+> >>>
+> >>
+> >> We would still need a contiguous virtual address space range (for post-send)
+> >> which we don't have since guest contiguous virtual address space
+> >> will always end up as non-contiguous host virtual address space.
+> >>
+> >> I am not sure the RDMA HW can handle a large VA with holes.
+> > 
+> > I'm confused.  Why would the hardware see and care about virtual
+> > addresses? 
 > 
-> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-> ---
->  tests/test-filter-redirector.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirector.c
-> index f2566144cf..fbaf19bbd8 100644
-> --- a/tests/test-filter-redirector.c
-> +++ b/tests/test-filter-redirector.c
-> @@ -186,7 +186,6 @@ static void test_redirector_rx(void)
->  
->      ret = iov_send(send_sock, iov, 2, 0, sizeof(size) + sizeof(send_buf));
->      g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
-> -    close(send_sock);
->  
->      ret = qemu_recv(backend_sock[0], &len, sizeof(len), 0);
->      g_assert_cmpint(ret, ==, sizeof(len));
-> @@ -197,6 +196,7 @@ static void test_redirector_rx(void)
->      ret = qemu_recv(backend_sock[0], recv_buf, len, 0);
->      g_assert_cmpstr(recv_buf, ==, send_buf);
->  
-> +    close(send_sock);
->      g_free(recv_buf);
->      unlink(sock_path0);
->      unlink(sock_path1);
-> 
+> The post-send operations bypasses the kernel, and the process
+> puts in the work request GVA addresses.
 
-Queued, thanks.
+To be more precise, it's the guest supplied IOVA that is sent to the card.
 
-Paolo
+> > How exactly does the hardware translates VAs to
+> > PAs? 
+> 
+> The HW maintains a page-directory like structure different form MMU
+> VA -> phys pages
+> 
+> > What if the process page tables change?
+> > 
+> 
+> Since the page tables the HW uses are their own, we just need the phys
+> page to be pinned.
+> 
+> >>
+> >> An alternative would be 0-based MR, QEMU intercepts the post-send
+> >> operations and can substract the guest VA base address.
+> >> However I didn't see the implementation in kernel for 0 based MRs
+> >> and also the RDMA maintainer said it would work for local keys
+> >> and not for remote keys.
+> > 
+> > This is also unexpected: are GVAs visible to the virtual RDMA
+> > hardware? 
+> 
+> Yes, explained above
+> 
+> > Where does the QEMU pvrdma code translates GVAs to
+> > GPAs?
+> > 
+> 
+> During reg_mr (memory registration commands)
+> Then it registers the same addresses to the real HW.
+> (as Host virtual addresses)
+> 
+> Thanks,
+> Marcel
+
+
+The full fix would be to allow QEMU to map a list of
+pages to a guest supplied IOVA.
+
+> >>
+> >>> This will fix rdma with hugetlbfs as well which is currently broken.
+> >>>
+> >>>
+> >>
+> >> There is already a discussion on the linux-rdma list:
+> >>     https://www.spinics.net/lists/linux-rdma/msg60079.html
+> >> But it will take some (actually a lot of) time, we are currently talking about
+> >> a possible API. And it does not solve the re-mapping...
+> >>
+> >> Thanks,
+> >> Marcel
+> >>
+> >>>> -- 
+> >>>> Eduardo
+> >>
+> > 
