@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ehJAJ-0005cS-BW
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:00:57 -0500
+	(envelope-from <mst@redhat.com>) id 1ehJAs-00063X-5W
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ehJAF-0003Vo-GG
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:00:51 -0500
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:35139)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ehJAF-0003VJ-9o
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:00:47 -0500
-Received: by mail-oi0-x22a.google.com with SMTP id e15so3934766oiy.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:00:46 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1ehJAp-00043L-3y
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:01:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ehJAo-00042l-S8
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:01:23 -0500
+Date: Thu, 1 Feb 2018 20:01:13 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180201194000-mutt-send-email-mst@kernel.org>
+References: <20180201121009.GR26425@localhost.localdomain>
+	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
+	<20180201150254-mutt-send-email-mst@kernel.org>
+	<20180201163132.GV26425@localhost.localdomain>
+	<20180201184655-mutt-send-email-mst@kernel.org>
+	<20180201165739.GY26425@localhost.localdomain>
+	<20180201185830-mutt-send-email-mst@kernel.org>
+	<20180201170136.GA26425@localhost.localdomain>
+	<20180201190902-mutt-send-email-mst@kernel.org>
+	<20180201173655.GC26425@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <1484301432.1457228.1517506595503@mail.yahoo.com>
-References: <1972503886.3523325.1517308471375.ref@mail.yahoo.com>
-	<1972503886.3523325.1517308471375@mail.yahoo.com>
-	<20180130115510.GA13988@xz-mi>
-	<75114832.1210415.1517487560355@mail.yahoo.com>
-	<CAFEAcA-OSN4MVVr6hbMVwiFs-tYVFH8hW5QvF3KvyXZPsEZpKQ@mail.gmail.com>
-	<1484301432.1457228.1517506595503@mail.yahoo.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Feb 2018 18:00:24 +0000
-Message-ID: <CAFEAcA8psfu6PMDjxG-CRODEx2fP8e2N-EB84E-Y8CunkfYi5g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Savevm and loadvm not working
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180201173655.GC26425@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sridhar kulkarni <sridhar_kulk@yahoo.com>
-Cc: Peter Xu <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
 
-On 1 February 2018 at 17:36, sridhar kulkarni <sridhar_kulk@yahoo.com> wrote:
-> Sorry I meant to say arm a7. We are using a custom board "arm-machine" which
-> is based on Vexpress-a15 but we use a7 core. I learnt reading through web
-> sources that A7 emulation is not supported in qemu. Is this causing this
-> behaviour? But in general we are able to run all our code on this virtual
-> board without any issues. While doing snapshot, this problem is seen.
+On Thu, Feb 01, 2018 at 03:36:55PM -0200, Eduardo Habkost wrote:
+> On Thu, Feb 01, 2018 at 07:12:45PM +0200, Michael S. Tsirkin wrote:
+> > On Thu, Feb 01, 2018 at 03:01:36PM -0200, Eduardo Habkost wrote:
+> > > On Thu, Feb 01, 2018 at 06:59:07PM +0200, Michael S. Tsirkin wrote:
+> > > > On Thu, Feb 01, 2018 at 02:57:39PM -0200, Eduardo Habkost wrote:
+> > > > > On Thu, Feb 01, 2018 at 06:48:54PM +0200, Michael S. Tsirkin wrote:
+> > > > > > On Thu, Feb 01, 2018 at 02:31:32PM -0200, Eduardo Habkost wrote:
+> > > > > > > On Thu, Feb 01, 2018 at 04:24:30PM +0200, Michael S. Tsirkin wrote:
+> > > > > > > [...]
+> > > > > > > > The full fix would be to allow QEMU to map a list of
+> > > > > > > > pages to a guest supplied IOVA.
+> > > > > > > 
+> > > > > > > Thanks, that's what I expected.
+> > > > > > > 
+> > > > > > > While this is not possible, the only requests I have for this
+> > > > > > > patch is that we clearly document:
+> > > > > > > * What's the only purpose of share=on on a host-memory-backend
+> > > > > > >   object (due to pvrdma limitations).
+> > > > > > > * The potential undesirable side-effects of setting share=on.
+> > > > > > > * On the commit message and other comments, clearly distinguish
+> > > > > > >   HVAs in the QEMU address-space from IOVAs, to avoid confusion.
+> > > > > > 
+> > > > > > Looking forward, when we do support it, how will management find out
+> > > > > > it no longer needs to pass the share parameter?
+> > > > > > 
+> > > > > > Further, if the side effects of the share parameter go away,
+> > > > > > how will it know these no longer hold?
+> > > > > 
+> > > > > A query-host-capabilities or similar QMP command seems necessary
+> > > > > for that.
+> > > > 
+> > > > Is anyone working on that?
+> > > 
+> > > Not yet.
+> > > 
+> > > -- 
+> > > Eduardo
+> > 
+> > Do these patches need to wait until we do have that command?
+> 
+> I don't think so.  The command will be needed only when
+> support for pvrdma without share=on gets implemented.
+> 
+> Right now, all we need is clear documentation.
+> 
+> > 
+> > I'm thinking it's better to have "share=on required with rdma"
+> > and "hugetlbfs not supported with rdma"
+> > than the reverse, this way new hosts do not need to carry
+> > thus stuff around forever.
+> 
+> What do you mean by "the reverse"?
+> 
+> IIUC, the requirements/limitations are:
+> 
+> * share=on required for pvrdma.  Already documented and enforced
+>   by pvrdma code in this series.
+> * hugetlbfs not supported with rdma. Is this detected/reported by
+>   QEMU?  Is it documented?
 
-I can't really help if you're using a custom QEMU. If you
-can reproduce this with upstream QEMU then we can certainly
-take a look at it. Otherwise, the problem is very likely
-in whatever the custom modifications are. It should not
-be too hard for whoever is responsible for those changes
-to track down the problem (which is probably a new coprocessor
-register definition that doesn't have the right flags on it),
-so I would talk to them about this issue.
+Probably should be.
 
-thanks
--- PMM
+> * side-effects of share=on.  This is not detected nor documented,
+>   and probably already applies to other memory backends.
+>   * Nice to have: document when share=on is useful (answer:
+>     because of pvrdma), when adding share=on support to
+>     host-memory-backend.
+> 
+> > 
+> > Also, how does management know which devices are affected?
+> 
+> Right now?  By reading documentation.
+
+
+> -- 
+> Eduardo
