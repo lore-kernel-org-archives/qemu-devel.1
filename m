@@ -1,46 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55794)
+Received: from eggs.gnu.org ([208.118.235.92]:40511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ehOLs-00006s-1h
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:34:14 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehOby-0004Js-PS
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:50:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ehOKo-0004y2-0Z
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:33:08 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49606)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1ehOKn-0004vn-CJ
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:32:01 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w11NTopg018958
-	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 18:32:00 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvaxbbpy6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 18:31:59 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 1 Feb 2018 16:31:59 -0700
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <mreitz@redhat.com>) id 1ehOau-0001mv-Ns
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:49:46 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ef6ce6f7-954f-7c88-0885-9258adaf94b4@redhat.com>
+Date: Thu, 1 Feb 2018 21:04:06 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180126180816.GI25150@localhost.localdomain>
-References: <20180118020157.25401-1-ehabkost@redhat.com>
-	<CAFEAcA_WdJnYnZUoABB1yWZUO81ag2cMMZRAw106VL_GFM6ZcQ@mail.gmail.com>
-	<CAATJJ0Kwf=qMQ8Sax8d4ieFXfFrqaisd6wUSLTTLBxvSdgb5Jw@mail.gmail.com>
-	<1d3ee391-bbb2-3c49-b3b0-8f189e0fd096@de.ibm.com>
-	<151673132716.4211.15090159170244596259@sif>
-	<20180123193118.GA4298@localhost.localdomain>
-	<151674323649.4211.10355855473647907818@sif>
-	<20180126012950.GA25150@localhost.localdomain>
-	<151698413254.4211.16734336801467103275@sif>
-	<20180126180816.GI25150@localhost.localdomain>
-Date: Fri, 26 Jan 2018 12:23:06 -0600
-Message-Id: <151699098657.4211.3890575797150661062@sif>
-Subject: Re: [Qemu-devel] [PULL 0/8] x86 queue, 2018-01-17
+In-Reply-To: <b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw"
+Subject: Re: [Qemu-devel] [PATCH v3 36/39] qcow2: Allow configuring the L2
+ slice size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,21 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-ppc@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-Quoting Eduardo Habkost (2018-01-26 12:08:16)
-> It looks like there's some confusion here: I don't have
-> additional proposed changes; the flag names and MSR code I
-> mentioned are already merged on master (through this pull
-> request).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <ef6ce6f7-954f-7c88-0885-9258adaf94b4@redhat.com>
+Subject: Re: [PATCH v3 36/39] qcow2: Allow configuring the L2 slice size
+References: <cover.1516978645.git.berto@igalia.com>
+ <b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
+In-Reply-To: <b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ah, my mistake, I thought the flags were being proposed as follow-up.
-Will pull these in as is then. Thanks!
-
-> =
-
-> -- =
-
-> Eduardo
+On 2018-01-26 16:00, Alberto Garcia wrote:
+> Now that the code is ready to handle L2 slices we can finally add an
+> option to allow configuring their size.
 >=20
+> An L2 slice is the portion of an L2 table that is read by the qcow2
+> cache. Until now the cache was always reading full L2 tables, and
+> since the L2 table size is equal to the cluster size this was not very
+> efficient with large clusters. Here's a more detailed explanation of
+> why it makes sense to have smaller cache entries in order to load L2
+> data:
+>=20
+>    https://lists.gnu.org/archive/html/qemu-block/2017-09/msg00635.html
+>=20
+> This patch introduces a new command-line option to the qcow2 driver
+> named l2-cache-entry-size (cf. l2-cache-size). The cache entry size
+> has the same restrictions as the cluster size: it must be a power of
+> two and it has the same range of allowed values, with the additional
+> requirement that it must not be larger than the cluster size.
+>=20
+> The L2 cache entry size (L2 slice size) remains equal to the cluster
+> size for now by default, so this feature must be explicitly enabled.
+> Although my tests show that 4KB slices consistently improve
+> performance and give the best results, let's wait and make more tests
+> with different cluster sizes before deciding on an optimal default.
+>=20
+> Now that the cache entry size is not necessarily equal to the cluster
+> size we need to reflect that in the MIN_L2_CACHE_SIZE documentation.
+> That minimum value is a requirement of the COW algorithm: we need to
+> read two L2 slices (and not two L2 tables) in order to do COW, see
+> l2_allocate() for the actual code.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cache.c  | 10 ++++++++--
+>  block/qcow2.c        | 34 +++++++++++++++++++++++++++-------
+>  block/qcow2.h        |  6 ++++--
+>  qapi/block-core.json |  6 ++++++
+>  4 files changed, 45 insertions(+), 11 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzcrYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AG+4H/11diP7oesV+aDgG9zMWc70YY4nmpRzw
+KdwimZb9UR5sHo+DG9aVT6aCThfGxW66Tsifaf57MF2A8oeEu9oOQthKianVSPFb
+gnWguDDEsK1bg7caaB5d2YeD+eTSIIVqIr/6yQeN4YRe4kDI20GQALQWPZbrVoO5
+XLD8VISjf7A2riQeK/cgKBM5agA2LZgTqrchdbOven2pFd3XcupusnpVdHIvb6le
+CBNPYyjMP6eU1nuNdPLEbZGBAcGFGRTjAodstY9CXjumQfcWfOVUdtJ1W1nYFkEA
+aobEkgqKn9R8KySbeKM79/YCkq43+9Z3kVl+Tv+VntIV0muuqOyP0KE=
+=mMZQ
+-----END PGP SIGNATURE-----
+
+--3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw--
