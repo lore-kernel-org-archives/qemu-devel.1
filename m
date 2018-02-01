@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:41675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehLJc-0002Pq-7r
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:19:42 -0500
+	(envelope-from <groug@kaod.org>) id 1ehLfS-0000tv-Iu
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:42:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehLIX-0003qb-KD
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:18:36 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fe709884-2202-75fc-4daa-77bf57b1f55a@redhat.com>
-Date: Thu, 1 Feb 2018 21:11:48 +0100
+	(envelope-from <groug@kaod.org>) id 1ehLeM-0003fK-2j
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:41:08 -0500
+Received: from 1.mo1.mail-out.ovh.net ([178.32.127.22]:38493)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehKq3-0002ed-KJ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:48:03 -0500
+Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id EAD9FD41ED
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 20:47:53 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 01 Feb 2018 20:47:41 +0100
+Message-ID: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN"
-Subject: Re: [Qemu-devel] [PATCH v3 38/39] iotests: Test downgrading an
- image using a small L2 slice size
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] spapr: add missing break in
+ h_get_cpu_characteristics()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <fe709884-2202-75fc-4daa-77bf57b1f55a@redhat.com>
-Subject: Re: [PATCH v3 38/39] iotests: Test downgrading an image using a small
- L2 slice size
-References: <cover.1516978645.git.berto@igalia.com>
- <f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
-In-Reply-To: <f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Detected by Coverity (CID 1385702). This fixes the recently added hypercall
+to let guests properly apply Spectre and Meltdown workarounds.
 
-On 2018-01-26 16:00, Alberto Garcia wrote:
-> expand_zero_clusters_in_l1() is used when downgrading qcow2 images
-> from v3 to v2 (compat=3D0.10). This is one of the functions that needed=
+Fixes: c59704b25473 "target/ppc/spapr: Add H-Call H_GET_CPU_CHARACTERISTICS"
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_hcall.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-> more changes to support L2 slices, so this patch extends iotest 061 to
-> test downgrading a qcow2 image using a smaller slice size.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  tests/qemu-iotests/061     | 16 ++++++++++++
->  tests/qemu-iotests/061.out | 61 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 77 insertions(+)
-
-Well, it would be better if we could just specify this option for all of
-the qcow2 tests, but I can see that that's not really feasible...
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzdIQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AHJgIAI5IR0H6Ci3fm0xpNYdpGLmxzviKMZNT
-0IxSd9mKmlOUcmEYp7jj6drqsbrmAx4c8YuJ2R6aKigGZGM69sgXJdqk1FQXE9hr
-ydERXJ4nKz7A7DkvXMQW+y5zePkPs0SJR7irIalO51MkSAOMDoN3Ty+LmNWBvBGF
-L/F7zlKfJS+WFYeUYBjUqPo+msqVuHXFsHYuNe0KMRQVi8+D6uQsCT7AaUbE/X1h
-trY2AP/J7hkjnfYCEP5YzfVv4B5mXo3A+MIr0ffRxUzPnQA1ERi1Yf1nOoGgWFBK
-mAAKpP9RIQSbZ78hlGFwesMK8zvttCm9f0MJUYziJksRGt60/YWmW8U=
-=Z/ue
------END PGP SIGNATURE-----
-
---eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN--
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 4d0e6eb0cf1d..596f58378a40 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1697,6 +1697,7 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+     switch (safe_indirect_branch) {
+     case SPAPR_CAP_FIXED:
+         characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
++        break;
+     default: /* broken */
+         assert(safe_indirect_branch == SPAPR_CAP_BROKEN);
+         break;
