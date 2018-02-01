@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1ehAq9-0006qL-Uu
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:07:31 -0500
+	(envelope-from <michael@walle.cc>) id 1ehAqm-0007CL-7p
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1ehAq6-000622-Pp
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:07:29 -0500
-Received: from ssl.serverraum.org ([213.133.101.245]:59723)
+	(envelope-from <michael@walle.cc>) id 1ehAqk-0006Z0-ST
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:08:08 -0500
+Received: from ssl.serverraum.org ([2a01:4f8:222:d45::1:2]:57983)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1ehAq6-00061f-GM
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:07:26 -0500
+	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1ehAqk-0006Xg-J5
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:08:06 -0500
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8;
  format=flowed
-Date: Thu, 01 Feb 2018 10:07:25 +0100
+Date: Thu, 01 Feb 2018 10:08:05 +0100
 From: Michael Walle <michael@walle.cc>
-In-Reply-To: <20180123035837.16578-3-f4bug@amsat.org>
+In-Reply-To: <20180123035837.16578-4-f4bug@amsat.org>
 References: <20180123035837.16578-1-f4bug@amsat.org>
-	<20180123035837.16578-3-f4bug@amsat.org>
-Message-ID: <468b247ac5f94147e5136d71f6a953d7@walle.cc>
+	<20180123035837.16578-4-f4bug@amsat.org>
+Message-ID: <79fd3ee5e64caf962d20375d1966ed10@walle.cc>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] hw/sd/milkymist-memcard: split
- realize() out of SysBusDevice init()
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] hw/sd/milkymist-memcard: expose a
+ SDBus and connect the SDCard to it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +33,112 @@ To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philippe.mathieu.daude@gmail.com>
 
 Am 2018-01-23 04:58, schrieb Philippe Mathieu-Daud=C3=A9:
-> Create the SDCard in the realize() function.
+> using the sdbus_*() API.
 >=20
-> Suggested-by: Michael Walle <michael@walle.cc>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Acked-by: Michael Walle <michael@walle.cc>
 
 > ---
->  hw/sd/milkymist-memcard.c | 28 ++++++++++++++++------------
->  1 file changed, 16 insertions(+), 12 deletions(-)
+>  hw/sd/milkymist-memcard.c | 38 +++++++++++++++++++++-----------------
+>  1 file changed, 21 insertions(+), 17 deletions(-)
 >=20
 > diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-> index 1292c0c099..a8e65892c7 100644
+> index a8e65892c7..5570c1e9a0 100644
 > --- a/hw/sd/milkymist-memcard.c
 > +++ b/hw/sd/milkymist-memcard.c
-> @@ -257,27 +257,31 @@ static void milkymist_memcard_reset(DeviceState=20
+> @@ -69,7 +69,7 @@ struct MilkymistMemcardState {
+>      SysBusDevice parent_obj;
+>=20
+>      MemoryRegion regs_region;
+> -    SDState *card;
+> +    SDBus sdbus;
+>=20
+>      int command_write_ptr;
+>      int response_read_ptr;
+> @@ -105,7 +105,7 @@ static void=20
+> memcard_sd_command(MilkymistMemcardState *s)
+>      req.crc =3D s->command[5];
+>=20
+>      s->response[0] =3D req.cmd;
+> -    s->response_len =3D sd_do_command(s->card, &req, s->response+1);
+> +    s->response_len =3D sdbus_do_command(&s->sdbus, &req, s->response =
++=20
+> 1);
+>      s->response_read_ptr =3D 0;
+>=20
+>      if (s->response_len =3D=3D 16) {
+> @@ -150,10 +150,10 @@ static uint64_t memcard_read(void *opaque, hwaddr=
+=20
+> addr,
+>              r =3D 0xffffffff;
+>          } else {
+>              r =3D 0;
+> -            r |=3D sd_read_data(s->card) << 24;
+> -            r |=3D sd_read_data(s->card) << 16;
+> -            r |=3D sd_read_data(s->card) << 8;
+> -            r |=3D sd_read_data(s->card);
+> +            r |=3D sdbus_read_data(&s->sdbus) << 24;
+> +            r |=3D sdbus_read_data(&s->sdbus) << 16;
+> +            r |=3D sdbus_read_data(&s->sdbus) << 8;
+> +            r |=3D sdbus_read_data(&s->sdbus);
+>          }
+>          break;
+>      case R_CLK2XDIV:
+> @@ -207,10 +207,10 @@ static void memcard_write(void *opaque, hwaddr
+> addr, uint64_t value,
+>          if (!s->enabled) {
+>              break;
+>          }
+> -        sd_write_data(s->card, (value >> 24) & 0xff);
+> -        sd_write_data(s->card, (value >> 16) & 0xff);
+> -        sd_write_data(s->card, (value >> 8) & 0xff);
+> -        sd_write_data(s->card, value & 0xff);
+> +        sdbus_write_data(&s->sdbus, (value >> 24) & 0xff);
+> +        sdbus_write_data(&s->sdbus, (value >> 16) & 0xff);
+> +        sdbus_write_data(&s->sdbus, (value >> 8) & 0xff);
+> +        sdbus_write_data(&s->sdbus, value & 0xff);
+>          break;
+>      case R_ENABLE:
+>          s->regs[addr] =3D value;
+> @@ -251,10 +251,6 @@ static void milkymist_memcard_reset(DeviceState=20
 > *d)
->      device_reset(DEVICE(s->card));
+>      for (i =3D 0; i < R_MAX; i++) {
+>          s->regs[i] =3D 0;
+>      }
+> -    /* Since we're still using the legacy SD API the card is not=20
+> plugged
+> -     * into any bus, and we must reset it manually.
+> -     */
+> -    device_reset(DEVICE(s->card));
 >  }
 >=20
-> -static int milkymist_memcard_init(SysBusDevice *dev)
-> +static void milkymist_memcard_init(Object *obj)
-> +{
-> +    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(obj);
-> +    SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
-> +
-> +    memory_region_init_io(&s->regs_region, OBJECT(s),=20
-> &memcard_mmio_ops, s,
-> +            "milkymist-memcard", R_MAX * 4);
-> +    sysbus_init_mmio(dev, &s->regs_region);
-> +}
-> +
-> +static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+>  static void milkymist_memcard_init(Object *obj)
+> @@ -270,15 +266,23 @@ static void milkymist_memcard_init(Object *obj)
+>  static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
 >  {
 >      MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
-> -    DriveInfo *dinfo;
+> +    DeviceState *carddev;
 >      BlockBackend *blk;
-> +    DriveInfo *dinfo;
+>      DriveInfo *dinfo;
+> +    Error *err =3D NULL;
 >=20
+> +    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+> +                        dev, "sd-bus");
+> +
+> +    /* Create and plug in the sd card */
 >      /* FIXME use a qdev drive property instead of drive_get_next() */
 >      dinfo =3D drive_get_next(IF_SD);
 >      blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
->      s->card =3D sd_init(blk, false);
->      if (s->card =3D=3D NULL) {
-> -        return -1;
-> +        error_setg(errp, "failed to init SD card");
-> +        return;
+> -    s->card =3D sd_init(blk, false);
+> -    if (s->card =3D=3D NULL) {
+> -        error_setg(errp, "failed to init SD card");
+> +    carddev =3D qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
+> +    qdev_prop_set_drive(carddev, "drive", blk, &err);
+> +    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+> +    if (err) {
+> +        error_setg(errp, "failed to init SD card: %s",=20
+> error_get_pretty(err));
+>          return;
 >      }
-> -
 >      s->enabled =3D blk && blk_is_inserted(blk);
-> -
-> -    memory_region_init_io(&s->regs_region, OBJECT(s),=20
-> &memcard_mmio_ops, s,
-> -            "milkymist-memcard", R_MAX * 4);
-> -    sysbus_init_mmio(dev, &s->regs_region);
-> -
-> -    return 0;
->  }
->=20
->  static const VMStateDescription vmstate_milkymist_memcard =3D {
-> @@ -300,9 +304,8 @@ static const VMStateDescription
-> vmstate_milkymist_memcard =3D {
->  static void milkymist_memcard_class_init(ObjectClass *klass, void=20
-> *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
->=20
-> -    k->init =3D milkymist_memcard_init;
-> +    dc->realize =3D milkymist_memcard_realize;
->      dc->reset =3D milkymist_memcard_reset;
->      dc->vmsd =3D &vmstate_milkymist_memcard;
->      /* Reason: init() method uses drive_get_next() */
-> @@ -313,6 +316,7 @@ static const TypeInfo milkymist_memcard_info =3D {
->      .name          =3D TYPE_MILKYMIST_MEMCARD,
->      .parent        =3D TYPE_SYS_BUS_DEVICE,
->      .instance_size =3D sizeof(MilkymistMemcardState),
-> +    .instance_init =3D milkymist_memcard_init,
->      .class_init    =3D milkymist_memcard_class_init,
->  };
