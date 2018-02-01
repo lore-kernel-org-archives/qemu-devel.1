@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehETC-0007D3-E6
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:00:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehEbD-0002Kw-6z
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:08:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1ehET7-0003Dt-G4
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:00:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1ehET7-0003DK-77
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:59:57 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w11CxrOZ134371
-	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 07:59:55 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fv119xtss-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 07:59:55 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Thu, 1 Feb 2018 12:55:46 -0000
-References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-	<20180130094715.11578-3-zyimin@linux.vnet.ibm.com>
-	<20180131123533.52c47971.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Thu, 1 Feb 2018 13:55:42 +0100
+	(envelope-from <eblake@redhat.com>) id 1ehEb9-0001B8-0r
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:08:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39488)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehEb8-0001Aa-NB
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 08:08:14 -0500
+References: <20180131144846.31697-1-armbru@redhat.com>
+	<20180131144846.31697-2-armbru@redhat.com>
+	<fd604c0a-bf97-edba-f648-820294447fa5@redhat.com>
+	<87fu6lrxoc.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d0ac1a47-2878-74d0-fe3a-f2974d876e6b@redhat.com>
+Date: Thu, 1 Feb 2018 07:08:11 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180131123533.52c47971.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <b889ea29-1f04-ac11-b523-dff3ce863b1e@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/pci: fixup global refresh
+In-Reply-To: <87fu6lrxoc.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vkiw24sOEbfoNK3ZjdccPE0aXkdqbqYbX"
+Subject: Re: [Qemu-devel] [PATCH v2 01/19] Use #include "..." for our own
+ headers, <...> for others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,77 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org
 
-On 31/01/2018 12:35, Cornelia Huck wrote:
-> On Tue, 30 Jan 2018 10:47:14 +0100
-> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->
->> The VFIO common code doesn't provide the possibility to modify a
->> previous mapping entry in another way than unmapping and mapping again
->> with new properties.
-> I'm wondering why other architectures don't need that. Is this
-> refreshing an unique ability on s390 (due to that instruction)?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vkiw24sOEbfoNK3ZjdccPE0aXkdqbqYbX
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org
+Message-ID: <d0ac1a47-2878-74d0-fe3a-f2974d876e6b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/19] Use #include "..." for our own
+ headers, <...> for others
+References: <20180131144846.31697-1-armbru@redhat.com>
+ <20180131144846.31697-2-armbru@redhat.com>
+ <fd604c0a-bf97-edba-f648-820294447fa5@redhat.com>
+ <87fu6lrxoc.fsf@dusky.pond.sub.org>
+In-Reply-To: <87fu6lrxoc.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It is not specific to S390 but to the iommu_type1.
+On 02/01/2018 01:12 AM, Markus Armbruster wrote:
 
-May be we should have different VFIO_IOMMU for mediated devices and
-architectures with SR_IOV capabilities to suppress this restriction.
+>>> +
+>>>  #include "qemu/osdep.h"
+>>> +#include <memory.h>
+>>
+>> <memory.h> is an obsolete spelling for the now-universal <string.h>.  =
+We
+>> should NEVER need to include it; scripts/clean-includes should be taug=
+ht
+>> to blacklist this one.
+>=20
+> "Programming today is a race between software engineers striving to
+> build bigger and better idiot-proof programs, and the Universe trying t=
+o
+> produce bigger and better idiots.  So far, the Universe is winning."
+>=20
+> My point is: if we extended our tooling every time we see a mistake,
+> we'll drown in tooling.  I think we should limit ourselves to *common*
+> mistakes.  Is this one common?
 
-Other architectures using vfio_iommu_spapr_tce do not seem to have
-the problem (AFAIU the code).
-
->
->> To avoid -EEXIST DMA mapping error, this we introduce a GHashTable to
-> s/this//
->
->> store S390IOTLBEntry instances in order to cache the mapped entries.
->> When intercepting rpcit instruction, ignore the identical mapped
->> entries to avoid doing map operations multiple times and do unmap and
->> re-map operations for the case of updating the valid entries. To
->> achieve that goal, we also export the DMA walking function and
->> optimize the code handling errors in rpcit handler.
-> How often does such a thing happen in practice?
-
-It depends on the size of the guest memory and of the guest OS.
-Linux allows an IOMMU IOVA size up to the minimal of high_memory, iommu=20
-aperture
-and maximal size of RT IOMMU entry.
-Linux guest use lazy TLB flush and waits for the allowed IOMMU size is=20
-used to
-flush the TLB.
-When the flush is done it is a global flush not a global invalidation,=20
-it follows
-that some entries in the IOTLB are still valid and must be kept while oth=
-er
-are to be invalidated.
-
-Since we have no possibility to know which the entries of the IOMMU TLB
-have been modified, we must check all entries.
-
-When does the -EEXIST error happen?
-- Linux before lazy flush : (c60d1ae4e 2014... we did not have zPCI at=20
-that time)
- =C2=A0=C2=A0=C2=A0 never
-- Linux with lazy flush and new IOMMU_TYPE1:
- =C2=A0=C2=A0=C2=A0 always as soon as the global flush occurs
- =C2=A0=C2=A0=C2=A0 which depends of the number of allowed IOMMU IOVA siz=
-e and mapped=20
-entries in IOTLB
-
-When does the implemented cache be used and avoid errors?
-- an entry in the cache exist for all mapped IOTLB entries
-- a miss -> add the entry and issue a DMA_MAP to the host
-- a hit for IOMMU_NONE -> issue a DMA_UNMAP and remove the entry
-- a hit for valid unmodified entry -> do nothing (already mapped)
-- hit for a valid but nmodified entry -> issue UNMAP/MAP update the entry
-
-Regards,
-
-Pierre
-
+Perhaps not; a tendency when writing a new file is to copy-and-paste a
+list of includes from another file, then add more if things still don't
+compile.  Since adding memory.h never changes whether compilation will
+work (unless you forgot osdep.h in the first place, and thereby missed
+string.h), and if we eradicate all current uses of memory.h, new uses
+won't have the bad example to copy from.
 
 --=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--vkiw24sOEbfoNK3ZjdccPE0aXkdqbqYbX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpzETsACgkQp6FrSiUn
+Q2rzAAgAhCindnIv47Me+zL+b2sc4cgPe1LGVOJb9mYTpsrmbWWwAJjHkApihC1m
+U1akd1YdJ1NrFM7PAHeheElsTq/1FZuARwEIyuuu4VZg3RyiL1qu2ijgcLkYWZuB
+YudNiqM2+T6uYEqMK8tj+eMpnPZTRRrdGS6it2LB50zmD/LCkzc6+e3X2zqWZg0x
+0ND5NmulDcwMC39FQOXiDZMBYH9B6Hu6gZkRuBfpIGivXqpWdZ4+CV7J1amPh8DA
+I84VWVizj85Pb59kIA4wntPxGG7WlhcC20vM/RR6Pq59DOKr4tL2Ue6AZxGCuo8V
+YhH5itMjcN2I/p42KqjtqIR6VUJxXw==
+=Jiy5
+-----END PGP SIGNATURE-----
+
+--vkiw24sOEbfoNK3ZjdccPE0aXkdqbqYbX--
