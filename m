@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57428)
+Received: from eggs.gnu.org ([208.118.235.92]:58311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ehMo1-0001bk-M0
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:55:11 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ehMvv-0004Uo-Uf
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 17:03:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ehMmx-0004XO-OK
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 16:54:05 -0500
-References: <1517506091-10396-1-git-send-email-wei@redhat.com>
-	<1517506091-10396-2-git-send-email-wei@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b27de831-936a-39e3-6335-b21cb78d05d6@redhat.com>
-Date: Thu, 1 Feb 2018 22:51:45 +0100
+	(envelope-from <no-reply@patchew.org>) id 1ehMur-0002zq-WA
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 17:02:15 -0500
+Resent-Message-Id: <E1ehMur-0002zq-WA@eggs.gnu.org>
+In-Reply-To: <20180201212917.18131-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151752246058.3252.5362449406959598939@b81a8a9ec60f>
 MIME-Version: 1.0
-In-Reply-To: <1517506091-10396-2-git-send-email-wei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] tests/boot-serial-test: Add support
- for the aarch64 virt machine
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 1 Feb 2018 14:01:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] coroutine-lock: polymorphic CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-arm@nongnu.org
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-On 01.02.2018 18:28, Wei Huang wrote:
-> This patch adds a small binary kernel to test aarch64 virt machine's
-> UART.
-> 
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  tests/Makefile.include   | 1 +
->  tests/boot-serial-test.c | 9 +++++++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index ca82e0c..ebdb151 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -367,6 +367,7 @@ gcov-files-arm-y += hw/timer/arm_mptimer.c
->  check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
->  
->  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
-> +check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
->  
->  check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
->  
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index 418c5b9..66f7a84 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -55,6 +55,13 @@ static const uint8_t bios_raspi2[] = {
->      0x00, 0x10, 0x20, 0x3f,                 /* 0x3f201000 = UART0 base addr */
->  };
->  
-> +static const uint8_t kernel_aarch64[] = {
-> +    0x81, 0x0a, 0x80, 0x52,                 /* mov     w1, #0x54 */
-> +    0x02, 0x20, 0xa1, 0xd2,                 /* mov     x2, #0x9000000 */
-> +    0x41, 0x00, 0x00, 0x39,                 /* strb    w1, [x2] */
-> +    0xfd, 0xff, 0xff, 0x17,                 /* b       -12 (loop) */
-> +};
-> +
->  typedef struct testdef {
->      const char *arch;       /* Target architecture */
->      const char *machine;    /* Name of the machine */
-> @@ -87,6 +94,8 @@ static testdef_t tests[] = {
->        sizeof(kernel_plml605), kernel_plml605 },
->      { "moxie", "moxiesim", "", "TT", sizeof(bios_moxiesim), 0, bios_moxiesim },
->      { "arm", "raspi2", "", "TT", sizeof(bios_raspi2), 0, bios_raspi2 },
-> +    { "aarch64", "virt", "-cpu cortex-a57", "TT", sizeof(kernel_aarch64),
-> +      kernel_aarch64 },
->  
->      { NULL }
->  };
-> 
-
-Acked-by: Thomas Huth <thuth@redhat.com>
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjAxMjEyOTE3LjE4MTMxLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNV0gY29yb3V0aW5lLWxvY2s6IHBvbHltb3Jw
+aGljIENvUXVldWUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg3ZGEyNGQ5ZWEgY3VybDogY29udmVydCB0byBD
+b1F1ZXVlCmE5NGMyYWYzNTAgY29yb3V0aW5lLWxvY2s6IG1ha2UgcWVtdV9jb19lbnRlcl9uZXh0
+IHRocmVhZC1zYWZlCjU3ZWJhMDk3MDggY29yb3V0aW5lLWxvY2s6IGNvbnZlcnQgQ29RdWV1ZSB0
+byB1c2UgUWVtdUxvY2thYmxlCjZlZmE2MTdjNjcgbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUK
+MTQyM2NiMGFiNCB0ZXN0LWNvcm91dGluZTogYWRkIHNpbXBsZSBDb011dGV4IHRlc3QKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogdGVzdC1jb3JvdXRpbmU6IGFkZCBz
+aW1wbGUgQ29NdXRleCB0ZXN0Li4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRv
+IDAgb3IgTlVMTAojMzA6IEZJTEU6IHRlc3RzL3Rlc3QtY29yb3V0aW5lLmM6MTk4Ogorc3RhdGlj
+IGJvb2wgbG9ja2VkID0gZmFsc2U7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDc0IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDIvNTogbG9ja2FibGU6IGFkZCBRZW11TG9ja2FibGUuLi4KV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzU4OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDox
+NDQ6CisjZGVmaW5lIFFFTVVfR0VORVJJQzIoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgs
+IGEwLCBRRU1VX0dFTkVSSUMxKHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM1OTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTQ1OgorI2Rl
+ZmluZSBRRU1VX0dFTkVSSUMzKHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVN
+VV9HRU5FUklDMih4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNjA6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE0NjoKKyNkZWZpbmUgUUVN
+VV9HRU5FUklDNCh4LCBhMCwgLi4uKSBRRU1VX0dFTkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJ
+QzMoeCwgX19WQV9BUkdTX18pKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzYx
+OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29tcGlsZXIuaDoxNDc6CisjZGVmaW5lIFFFTVVfR0VORVJJ
+QzUoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBRRU1VX0dFTkVSSUM0KHgsIF9f
+VkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MjogRklMRTog
+aW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6MTQ4OgorI2RlZmluZSBRRU1VX0dFTkVSSUM2KHgsIGEw
+LCAuLi4pIFFFTVVfR0VORVJJQ19JRih4LCBhMCwgUUVNVV9HRU5FUklDNSh4LCBfX1ZBX0FSR1Nf
+XykpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjM6IEZJTEU6IGluY2x1ZGUv
+cWVtdS9jb21waWxlci5oOjE0OToKKyNkZWZpbmUgUUVNVV9HRU5FUklDNyh4LCBhMCwgLi4uKSBR
+RU1VX0dFTkVSSUNfSUYoeCwgYTAsIFFFTVVfR0VORVJJQzYoeCwgX19WQV9BUkdTX18pKQoKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY0OiBGSUxFOiBpbmNsdWRlL3FlbXUvY29t
+cGlsZXIuaDoxNTA6CisjZGVmaW5lIFFFTVVfR0VORVJJQzgoeCwgYTAsIC4uLikgUUVNVV9HRU5F
+UklDX0lGKHgsIGEwLCBRRU1VX0dFTkVSSUM3KHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2NTogRklMRTogaW5jbHVkZS9xZW11L2NvbXBpbGVyLmg6
+MTUxOgorI2RlZmluZSBRRU1VX0dFTkVSSUM5KHgsIGEwLCAuLi4pIFFFTVVfR0VORVJJQ19JRih4
+LCBhMCwgUUVNVV9HRU5FUklDOCh4LCBfX1ZBX0FSR1NfXykpCgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojNjY6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjE1MjoKKyNk
+ZWZpbmUgUUVNVV9HRU5FUklDMTAoeCwgYTAsIC4uLikgUUVNVV9HRU5FUklDX0lGKHgsIGEwLCBR
+RU1VX0dFTkVSSUM5KHgsIF9fVkFfQVJHU19fKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiMxMjQ6IEZJTEU6IGluY2x1ZGUvcWVtdS9sb2NrYWJsZS5oOjI4OgorICogdG8gUUVN
+VV9NQUtFX0xPQ0tBQkxFLiAgRm9yIG9wdGltaXplZCBidWlsZHMsIHdlIGNhbiByZWx5IG9uIGRl
+YWQtY29kZSBlbGltaW5hdGlvbgoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmlu
+ZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzEyNzogRklMRTogaW5jbHVkZS9xZW11L2xvY2thYmxlLmg6
+MzE6CisjaWZkZWYgX19PUFRJTUlaRV9fCgp0b3RhbDogMCBlcnJvcnMsIDExIHdhcm5pbmdzLCAy
+NDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpD
+aGVja2luZyBQQVRDSCAzLzU6IGNvcm91dGluZS1sb2NrOiBjb252ZXJ0IENvUXVldWUgdG8gdXNl
+IFFlbXVMb2NrYWJsZS4uLgpDaGVja2luZyBQQVRDSCA0LzU6IGNvcm91dGluZS1sb2NrOiBtYWtl
+IHFlbXVfY29fZW50ZXJfbmV4dCB0aHJlYWQtc2FmZS4uLgpDaGVja2luZyBQQVRDSCA1LzU6IGN1
+cmw6IGNvbnZlcnQgdG8gQ29RdWV1ZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
