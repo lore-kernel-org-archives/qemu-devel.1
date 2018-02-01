@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42979)
+Received: from eggs.gnu.org ([208.118.235.92]:42030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehLt3-00069G-RJ
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:56:19 -0500
+	(envelope-from <marcel@redhat.com>) id 1ehLuK-0005aG-Gv
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:57:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehLrz-00089Y-RE
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:55:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53454)
+	(envelope-from <marcel@redhat.com>) id 1ehLtE-00018f-5R
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:56:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehLrz-00087o-A5
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:54:07 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1562783F42
-	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 20:54:06 +0000 (UTC)
-Date: Thu, 1 Feb 2018 18:53:57 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180201205357.GL21702@localhost.localdomain>
-References: <20180122205033.24893-1-apahim@redhat.com>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehLtD-00016c-29
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:55:23 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Thu,  1 Feb 2018 22:55:07 +0200
+Message-Id: <20180201205511.19198-1-marcel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180122205033.24893-1-apahim@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v12 0/6] scripts/qemu.py fixes and cleanups
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH V9 0/4] hw/pvrdma: PVRDMA device implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +24,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, crosa@redhat.com
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, yuval.shaia@oracle.com, marcel@redhat.com, pbonzini@redhat.com, mst@redhat.com, cohuck@redhat.com, dotanb75@yahoo.com
 
-Queued on python-next, thanks!
+V8 -> V9:
+ - Addressed Dotan's Barak (offline) comments:
+   - use g_malloc instead of malloc
+   - re-arrange structs for better padding
+   - some cosmetic changes
+   - do not try to fetch CQE when CQ is going down
+   - init state of QP changed to RESET
+   - modify poll_cq
+   - add fix to qkey handling so now qkey=3D0 is also supported
+   - add validation to gid_index
+   - fix memory leak with ah_key ref
+ - Addressed Eduardo Habkost comments:
+   - Add the mem-backed-ram "share" option to qemu-options.hx.
+ - Rebased on latest master
 
-On Mon, Jan 22, 2018 at 09:50:27PM +0100, Amador Pahim wrote:
-> Changes v11->v12:
->  - Rebase.
->  - Drop the already queued commit (qemu.py: remove unused import)
->  - Fix code filling the _monitor_address when it's None.
->  - Drop the redundant commit checking whether VM was running on launch()
->  - Improve the exception message when launch() is called twice with no
->    shutdown() in between.
-> Changes v10->v11:
->  - Fix messed indentation.
->  - Rename self._qemu_log_fd to self._qemu_log_file.
->  - Patch changelog in reverse order.
-> Changes v9->v10:
->  - Keep method _remove_if_exists().
-> Changes v8->v9:
->  - Some commits were already merged. Rebased the remaining ones.
->  - New commit to remove unused import.
->  - VM files control logic changed to use a temporary directory.
->  - Better naming for variable controlling the need of a shutdown before
->    next launch.
-> Changes v7->v8:
->  - Rebased.
->  - Reorder commits to avoid break->fix sequence.
->  - Split commits "use poll() instead of 'returncode'" and "refactor
->    launch()".
->  - Don't ignore errors in _load_io_log(). Instead, check if we created
->    the file before reading it.
->  - Use LOG.warn() instead of LOG.debug() for the negative exit code
->    message.
->  - Fix the exception name called in commits "launch vm only if it's not
->    running" and "don't launch again before shutdown()".
->  - Minor style fixes.
-> Changes v6->v7:
->  - Split commits in self-contained/atomic changes.
->  - Addressed the comments from previous version, basically improving the
->    logging messages and the control over created files. See individual
->    commit messages for details.
-> Changes v5->v6:
->  - Remove the commit to rename self._args.
->  - Fix is_running() return before first call to maunch().
->  - Use python logging system.
->  - Include the full command line on negative exit code error message.
->  - Use os.path.null instead of /dev/null.
->  - Improve the control over the created/deleted files.
-> Changes v4->v5:
->  - Break the cleanup commit into logical changes and include in the
->    commit messages the rationale for making them.
-> Changes v3->v4:
->  - Squash the 2 first commits since they are co-dependant.
->  - Cleanup launch() and shutdown().
->  - Reorder the commits, putting the rename of self._args first.
->  - Rebased.
-> Changes v2->v3:
->  - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
-> Changes v1->v2:
->  - Style fixes to make checkpatch.pl happy.
->  - Rebased.
-> 
-> *** SUBJECT HERE ***
-> 
-> *** BLURB HERE ***
-> 
-> Amador Pahim (6):
->   qemu.py: better control of created files
->   qemu.py: refactor launch()
->   qemu.py: always cleanup on shutdown()
->   qemu.py: use poll() instead of 'returncode'
->   qemu.py: cleanup redundant calls in launch()
->   qemu.py: don't launch again before shutdown()
-> 
->  scripts/qemu.py | 93 ++++++++++++++++++++++++++++++++++++++-------------------
->  1 file changed, 62 insertions(+), 31 deletions(-)
-> 
-> -- 
-> 2.14.3
-> 
-> 
+V7 -> V8:
+ - Addressed Michael S. Tsirkin comments:
+   - fail to init the pvrdma device if target page size is different
+     from the host size, or if the guest RAM is not backed by memory
+     and shared.
+   - Update documentation to include a note on huge memory regions
+     registration and remove not needed info.
+ - Removed "pci/shpc: Move function to generic header file" since it
+   appears in latest maintainer pull request
+ - Rebased on master
 
--- 
-Eduardo
+V6 -> V7:
+ - Addressed Philippe Mathieu-Daud=C3=A9 comments
+   - modified pow2roundup32 signature
+   - added his RB tag (thanks)
+ - Addressed Corenlia Huck comments:
+   - Compiled the pvrdma for all archs and not only x86/arm (thanks)
+   - Fixed typo in documentation
+ - Rebased on latest master
+
+V5 -> V6:
+ - Found a ppc machine and solved ppc compilation issues
+ - Tried to fix the s390x issue (still looking of a machine)
+
+V4 -> V5:
+ - Fixed (at least tried to) compilation issues
+
+V3 -> V4:
+ - Fixed documentation (added more impl details)
+ - Fixed compilation errors discovered by patchew.
+ - Addressed Michael S. Tsirkin comments:
+   - Removed unnecessary typedefs and replace them with
+     macros in VMware header files, together with explanations.
+   - Moved more code from vmw specific to rdma generic code.
+   - Added page size limitations to the documentation.
+
+V2 -> V3:
+ - Addressed Michael S. Tsirkin and Philippe Mathieu-Daud=C3=A9 comments:
+   - Moved the device to hw/rdma
+ - Addressed Michael S. Tsirkin comments:
+   - Split the code into generic (hw/rdma) and VMWare
+     specific (hw/rdma/vmw)
+   - Added more details to documentation - VMware guest-host protocol.
+   - Remove mad processing
+   - limited the memory the Guest can pin.
+ - Addressed Philippe Mathieu-Daud=C3=A9 comment:
+   - s/roundup_pow_of_two/pow2roundup32 and move it to qemu/host-utils.h=20
+ - Added Shamit Rabinovici's review to documentation
+ - Rebased to latest master=20
+
+RFC -> V2:
+ - Full implementation of the pvrdma device
+ - Backend is an ibdevice interface, no need for the KDBR module
+
+
+General description
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device=
+.
+It works with its Linux Kernel driver AS IS, no need for any special gues=
+t
+modifications.
+
+While it complies with the VMware device, it can also communicate with ba=
+re
+metal RDMA-enabled machines and does not require an RDMA HCA in the host,=
+ it
+can work with Soft-RoCE (rxe).
+
+It does not require the whole guest RAM to be pinned allowing memory
+over-commit and, even if not implemented yet, migration support will be
+possible with some HW assistance.
+
+
+ Design
+ =3D=3D=3D=3D=3D=3D
+ - Follows the behavior of VMware's pvrdma device, however is not tightly
+   coupled with it and most of the code can be reused if we decide to
+   continue to a Virtio based RDMA device.
+
+ - It exposes 3 BARs:
+    BAR 0 - MSIX, utilize 3 vectors for command ring, async events and
+            completions
+    BAR 1 - Configuration of registers
+    BAR 2 - UAR, used to pass HW commands from driver.
+
+ - The device performs internal management of the RDMA
+   resources (PDs, CQs, QPs, ...), meaning the objects
+   are not directly coupled to a physical RDMA device resources.
+
+The pvrdma backend is an ibdevice interface that can be exposed
+either by a Soft-RoCE(rxe) device on machines with no RDMA device,
+or an HCA SRIOV function(VF/PF).
+Note that ibdevice interfaces can't be shared between pvrdma devices,
+each one requiring a separate instance (rxe or SRIOV VF).
+
+
+Tests and performance
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Tested with SoftRoCE backend (rxe)/Mellanox ConnectX3,
+and Mellanox ConnectX4 HCAs with:
+  - VMs in the same host
+  - VMs in different hosts=20
+  - VMs to bare metal.
+
+The best performance achieved with ConnectX HCAs and buffer size
+bigger than 1MB which was the line rate ~ 50Gb/s.
+The conclusion is that using the PVRDMA device there are no
+actual performance penalties compared to bare metal for big enough
+buffers (which is quite common when using RDMA), while allowing
+memory overcommit.
+
+Marcel Apfelbaum (3):
+  mem: add share parameter to memory-backend-ram
+  docs: add pvrdma device documentation.
+  MAINTAINERS: add entry for hw/rdma
+
+Yuval Shaia (1):
+  pvrdma: initial implementation
+
+ MAINTAINERS                   |   8 +
+ Makefile.objs                 |   2 +
+ backends/hostmem-file.c       |  25 +-
+ backends/hostmem-ram.c        |   4 +-
+ backends/hostmem.c            |  21 ++
+ configure                     |   9 +-
+ docs/pvrdma.txt               | 255 +++++++++++++
+ exec.c                        |  26 +-
+ hw/Makefile.objs              |   1 +
+ hw/rdma/Makefile.objs         |   6 +
+ hw/rdma/rdma_backend.c        | 818 ++++++++++++++++++++++++++++++++++++=
+++++++
+ hw/rdma/rdma_backend.h        |  99 +++++
+ hw/rdma/rdma_backend_defs.h   |  62 ++++
+ hw/rdma/rdma_rm.c             | 544 ++++++++++++++++++++++++++++
+ hw/rdma/rdma_rm.h             |  69 ++++
+ hw/rdma/rdma_rm_defs.h        | 104 ++++++
+ hw/rdma/rdma_utils.c          |  52 +++
+ hw/rdma/rdma_utils.h          |  43 +++
+ hw/rdma/trace-events          |   5 +
+ hw/rdma/vmw/pvrdma.h          | 122 +++++++
+ hw/rdma/vmw/pvrdma_cmd.c      | 656 +++++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_api.h  | 602 +++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_ring.c | 140 ++++++++
+ hw/rdma/vmw/pvrdma_dev_ring.h |  42 +++
+ hw/rdma/vmw/pvrdma_ib_verbs.h | 433 ++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_main.c     | 653 +++++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.c   | 212 +++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.h   |  27 ++
+ hw/rdma/vmw/pvrdma_ring.h     | 134 +++++++
+ hw/rdma/vmw/trace-events      |   5 +
+ hw/rdma/vmw/vmw_pvrdma-abi.h  | 311 ++++++++++++++++
+ include/exec/memory.h         |  23 ++
+ include/exec/ram_addr.h       |   3 +-
+ include/hw/pci/pci_ids.h      |   3 +
+ include/qemu/osdep.h          |   2 +-
+ include/sysemu/hostmem.h      |   2 +-
+ include/sysemu/kvm.h          |   2 +-
+ memory.c                      |  16 +-
+ qemu-options.hx               |  10 +-
+ target/s390x/kvm.c            |   4 +-
+ util/oslib-posix.c            |   4 +-
+ util/oslib-win32.c            |   2 +-
+ 42 files changed, 5507 insertions(+), 54 deletions(-)
+ create mode 100644 docs/pvrdma.txt
+ create mode 100644 hw/rdma/Makefile.objs
+ create mode 100644 hw/rdma/rdma_backend.c
+ create mode 100644 hw/rdma/rdma_backend.h
+ create mode 100644 hw/rdma/rdma_backend_defs.h
+ create mode 100644 hw/rdma/rdma_rm.c
+ create mode 100644 hw/rdma/rdma_rm.h
+ create mode 100644 hw/rdma/rdma_rm_defs.h
+ create mode 100644 hw/rdma/rdma_utils.c
+ create mode 100644 hw/rdma/rdma_utils.h
+ create mode 100644 hw/rdma/trace-events
+ create mode 100644 hw/rdma/vmw/pvrdma.h
+ create mode 100644 hw/rdma/vmw/pvrdma_cmd.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_api.h
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ib_verbs.h
+ create mode 100644 hw/rdma/vmw/pvrdma_main.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ring.h
+ create mode 100644 hw/rdma/vmw/trace-events
+ create mode 100644 hw/rdma/vmw/vmw_pvrdma-abi.h
+
+--=20
+2.13.5
