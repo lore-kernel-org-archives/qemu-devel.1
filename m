@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36601)
+Received: from eggs.gnu.org ([208.118.235.92]:39136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehLCF-0006K9-Mw
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:12:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ehLF2-00007S-7K
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:14:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehL6L-0004dp-3y
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:05:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37812)
+	(envelope-from <dgilbert@redhat.com>) id 1ehLDy-0001Cc-2W
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:13:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ehL6K-0004dA-IV
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:04:52 -0500
-Date: Thu, 1 Feb 2018 20:04:43 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ehLDx-0001Bx-KE
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:12:45 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C80A6C0223
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 20:12:44 +0000 (UTC)
+Date: Thu, 1 Feb 2018 20:10:32 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180201200442.GQ2457@work-vm>
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
-	<20180129174132.108925-14-brijesh.singh@amd.com>
-	<20180201175802.GK2457@work-vm>
-	<7c3c7a89-04ef-016e-c9a5-4f4d4be1c449@amd.com>
+Message-ID: <20180201201032.GR2457@work-vm>
+References: <20180201112028.23552-1-peterx@redhat.com>
+	<90b4bc63-94cd-ec0f-32c8-c16df8ee84cf@redhat.com>
+	<20180201211652-mutt-send-email-mst@kernel.org>
+	<20180201194845.GN2457@work-vm>
+	<33142d67-92b6-e1b1-b906-716a06efb1fa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7c3c7a89-04ef-016e-c9a5-4f4d4be1c449@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v6 13/23] hmp: display memory encryption
- support in 'info kvm'
+In-Reply-To: <33142d67-92b6-e1b1-b906-716a06efb1fa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
+ priority
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +37,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> 
-> 
-> On 2/1/18 11:58 AM, Dr. David Alan Gilbert wrote:
-> > * Brijesh Singh (brijesh.singh@amd.com) wrote:
-> >> update 'info kvm' to display the memory encryption support.
+* Marcel Apfelbaum (marcel@redhat.com) wrote:
+> On 01/02/2018 21:48, Dr. David Alan Gilbert wrote:
+> > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> >> On Thu, Feb 01, 2018 at 02:24:15PM +0200, Marcel Apfelbaum wrote:
+> >>> Hi Peter,
+> >>>
+> >>> On 01/02/2018 13:20, Peter Xu wrote:
+> >>>> In the past, we prioritized IOMMU migration so that we have such a
+> >>>> priority order:
+> >>>>
+> >>>>     IOMMU > PCI Devices
+> >>>>
+> >>>> When migrating a guest with both vIOMMU and pcie-root-port, we'll always
+> >>>> migrate vIOMMU first, since pcie-root-port will be seen to have the same
+> >>>> priority of general PCI devices.
+> >>>>
+> >>>> That's problematic.
+> >>>>
+> >>>> The thing is that PCI bus number information is stored in the root port,
+> >>>> and that is needed by vIOMMU during post_load(), e.g., to figure out
+> >>>> context entry for a device.  If we don't have correct bus numbers for
+> >>>> devices, we won't be able to recover device state of the DMAR memory
+> >>>> regions, and things will be messed up.
+> >>>>
+> >>>> So let's boost the PCIe root ports to be even with higher priority:
+> >>>>
+> >>>>    PCIe Root Port > IOMMU > PCI Devices
+> >>>>
+> >>>> A smoke test shows that this patch fixes bug 1538953.
+> >>>>
+> >>>> CC: Alex Williamson <alex.williamson@redhat.com>
+> >>>> CC: Marcel Apfelbaum <marcel@redhat.com>
+> >>>> CC: Michael S. Tsirkin <mst@redhat.com>
+> >>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >>>> CC: Juan Quintela <quintela@redhat.com>
+> >>>> CC: Laurent Vivier <lvivier@redhat.com>
+> >>>> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1538953
+> >>>> Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> >>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+> >>>> ---
+> >>>> Marcel & all,
+> >>>>
+> >>>> I think it's possible that we need similar thing for other bridge-like
+> >>>> devices, but I'm not that familiar.  Would you help confirm?  Thanks,
+> >>>
+> >>> Is a pity we don't have a way to mark the migration priority
+> >>> in a base class. Dave, maybe we do have a way?
+> >>>
+> >>> In the meantime you would need to add it also to:
+> >>> - ioh3420 (Intel root port)
+> >>> - xio3130_downstream (Intel switch downstream port)
+> >>> - xio3130_upstream (The counterpart of the above, you want the whole
+> >>>   switch to be migrated before loading the IOMMU device state)
+> >>> - pcie_pci_bridge (for pci devices)
+> >>> - pci-pci bridge (if for some reason you have one attached to the pcie_pci_brdge)
+> >>> - i82801b11 (dmi-pci bridge, we want to deprecate it bu is there for now)
+> >>>
+> >>> Thanks,
+> >>> Marcel
 > >>
-> >> (qemu) info kvm
-> >> kvm support: enabled
-> >> memory encryption: disabled
-> > As Markus said, this should be split qmp/hmp; but something else to
-> > think about is whether this is a boolean or needs to be an enum;  do
-> > you have one version of encryption or are we going to need to flag up
-> > versions or the features of the encryption?
+> >> It's kind of strange that we need to set the priority manually.
+> >> Can't migration figure it out itself?
+> > 
+> >> I think bus
+> >> must always be migrated before the devices behind it ...
+> > 
+> > I think that's true; but:
+> >   a) Is the iommu a child of any of the PCI busses?
 > 
-> In future I could see us providing encrypted state status when we
-> implement SEV-ES support, something like
+> No, is a sysbus device.
+
+OK, so even if we were arguing about whether PCI busses got migrated in
+order, that doesn't help Peter's case, because there's nothing that
+orders the iommu relative to the PCI.
+
+> >   b) does anything ensure that the bridge that's a parent of a bus
+> >      gets migrated before the bus it provides?
 > 
-> (qemu) info kvm
-> kvm support: enabled
-> memory encryption: enabled
-> cpu register state: encrypted
+> I think this was Michael's question :)
 > 
-> but so far I do not see need to provide the version string. If user
-> wants to know the SEV version then it can open /dev/sev device to get
-> platform status and more.
+> >   c) What happens with more htan one root port?
+> > 
+> 
+> Root ports can't be nested, anyway, I suppose the migration should
+> follow the bus numbering order.
+> 
+> The question now is what happens if the migration is happening before
+> the guest firmware finishes assigning numbers to buses...
+> 
+> Still, QEMU has enough information to decide the right ordering,
+> the question is if the current migration mechanism has some ordering
+> or the only one is the "VMStateFlags".
 
-Yes, I was worried a bit more about how general that was going to be
-or whether we're collecting a lot of architecture specific fields here.
-So I wondered, if it was an enum, whether that would be come:
+It's ordered on two things:
+  a) The priority field that Peter is using
+  b) The order of registration of the device.
 
-memory encryption: none
-
-memory encryption: SEV
-
-memory encryption: SEV-ES
-
-(I'm not too sure whether that's better or not, just a suggestion)
+(b) is of course dangerously unstable.
 
 Dave
 
+> Thanks,
+> Marcel
 > 
 > > Dave
-> >
-> >> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >> Cc: Eric Blake <eblake@redhat.com>
-> >> Cc: Markus Armbruster <armbru@redhat.com>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> >> ---
-> >>  hmp.c            | 2 ++
-> >>  qapi-schema.json | 5 ++++-
-> >>  qmp.c            | 1 +
-> >>  3 files changed, 7 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hmp.c b/hmp.c
-> >> index 056bf70cf1e2..6ceb6b30af75 100644
-> >> --- a/hmp.c
-> >> +++ b/hmp.c
-> >> @@ -88,6 +88,8 @@ void hmp_info_kvm(Monitor *mon, const QDict *qdict)
-> >>      monitor_printf(mon, "kvm support: ");
-> >>      if (info->present) {
-> >>          monitor_printf(mon, "%s\n", info->enabled ? "enabled" : "disabled");
-> >> +        monitor_printf(mon, "memory encryption: %s\n",
-> >> +                       info->mem_encryption ? "enabled" : "disabled");
-> >>      } else {
-> >>          monitor_printf(mon, "not compiled\n");
-> >>      }
-> >> diff --git a/qapi-schema.json b/qapi-schema.json
-> >> index 5c06745c7927..2046c96669bf 100644
-> >> --- a/qapi-schema.json
-> >> +++ b/qapi-schema.json
-> >> @@ -314,9 +314,12 @@
-> >>  #
-> >>  # @present: true if KVM acceleration is built into this executable
-> >>  #
-> >> +# @mem-encryption: true if Memory Encryption is active (since 2.12)
-> >> +#
-> >>  # Since: 0.14.0
-> >>  ##
-> >> -{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool'} }
-> >> +{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool',
-> >> +            'mem-encryption' : 'bool'} }
-> >>  
-> >>  ##
-> >>  # @query-kvm:
-> >> diff --git a/qmp.c b/qmp.c
-> >> index 52cfd2d81c0f..3a527bc8c39c 100644
-> >> --- a/qmp.c
-> >> +++ b/qmp.c
-> >> @@ -69,6 +69,7 @@ KvmInfo *qmp_query_kvm(Error **errp)
-> >>  
-> >>      info->enabled = kvm_enabled();
-> >>      info->present = kvm_available();
-> >> +    info->mem_encryption = kvm_memcrypt_enabled();
-> >>  
-> >>      return info;
-> >>  }
-> >> -- 
-> >> 2.9.5
-> >>
+> > 
+> > 
+> >>>>  hw/pci-bridge/gen_pcie_root_port.c | 1 +
+> >>>>  include/migration/vmstate.h        | 1 +
+> >>>>  2 files changed, 2 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+> >>>> index 0e2f2e8bf1..e6ff1effd8 100644
+> >>>> --- a/hw/pci-bridge/gen_pcie_root_port.c
+> >>>> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+> >>>> @@ -101,6 +101,7 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
+> >>>>  
+> >>>>  static const VMStateDescription vmstate_rp_dev = {
+> >>>>      .name = "pcie-root-port",
+> >>>> +    .priority = MIG_PRI_PCIE_ROOT_PORT,
+> >>>>      .version_id = 1,
+> >>>>      .minimum_version_id = 1,
+> >>>>      .post_load = pcie_cap_slot_post_load,
+> >>>> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> >>>> index 8c3889433c..491449db9f 100644
+> >>>> --- a/include/migration/vmstate.h
+> >>>> +++ b/include/migration/vmstate.h
+> >>>> @@ -148,6 +148,7 @@ enum VMStateFlags {
+> >>>>  typedef enum {
+> >>>>      MIG_PRI_DEFAULT = 0,
+> >>>>      MIG_PRI_IOMMU,              /* Must happen before PCI devices */
+> >>>> +    MIG_PRI_PCIE_ROOT_PORT,     /* Must happen before IOMMU */
+> >>>>      MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
+> >>>>      MIG_PRI_GICV3,              /* Must happen before the ITS */
+> >>>>      MIG_PRI_MAX,
+> >>>>
 > > --
 > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
 > 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
