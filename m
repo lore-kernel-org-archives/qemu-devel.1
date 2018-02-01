@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ehJJt-0006PQ-Tw
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:10:46 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehJKK-0006h8-9l
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:11:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ehJJr-0003XJ-9C
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:10:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ehJJr-0003X0-1t
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:10:43 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 393207854C
-	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 18:10:42 +0000 (UTC)
-References: <20180125143218.29528-1-kraxel@redhat.com>
-	<20180125143218.29528-3-kraxel@redhat.com>
-	<65124689-6705-71ee-561c-8d4b25b30e16@redhat.com>
-	<20180201173529.GX22810@redhat.com>
-	<6199d545-e7ae-ad95-6695-a63a714cb45c@redhat.com>
-	<20180201175444.GY22810@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1f7763b2-44ec-0663-d721-7a71782592a6@redhat.com>
-Date: Thu, 1 Feb 2018 13:10:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehJKJ-0003tJ-69
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:11:12 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
+	<d21ddbab-921c-3cc9-05dd-5113cb16fd8f@redhat.com>
+	<w51tvv156xi.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3fd568fa-3b42-fff7-d531-bce6d938f1de@redhat.com>
+Date: Thu, 1 Feb 2018 19:10:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180201175444.GY22810@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 2/8] ui: convert the SDL2 frontend to
- keycodemapdb
+In-Reply-To: <w51tvv156xi.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nYCSnklABRzIlGtyqktzSmFh4e9vaREeF"
+Subject: Re: [Qemu-devel] [PATCH v3 18/39] qcow2: Refactor
+ get_cluster_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,43 +27,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 01/02/2018 12:54, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Feb 01, 2018 at 12:37:26PM -0500, Paolo Bonzini wrote:
->> On 01/02/2018 12:35, Daniel P. Berrang=C3=A9 wrote:
->>> On Thu, Feb 01, 2018 at 12:28:02PM -0500, Paolo Bonzini wrote:
->>>> On 25/01/2018 09:32, Gerd Hoffmann wrote:
->>>>> --- a/include/ui/input.h
->>>>> +++ b/include/ui/input.h
->>>>> @@ -80,4 +80,7 @@ extern const guint16 qemu_input_map_qnum_to_qcode=
-[];
->>>>>  extern const guint qemu_input_map_qcode_to_linux_len;
->>>>>  extern const guint16 qemu_input_map_qcode_to_linux[];
->>>>
->>>> Is there any reason to use the length variables rather than just
->>>> ARRAY_SIZE()?  Coverity isn't able to see through the initializer an=
-d
->>>> incorrectly complains that
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nYCSnklABRzIlGtyqktzSmFh4e9vaREeF
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <3fd568fa-3b42-fff7-d531-bce6d938f1de@redhat.com>
+Subject: Re: [PATCH v3 18/39] qcow2: Refactor get_cluster_table()
+References: <cover.1516978645.git.berto@igalia.com>
+ <5e98f636670e1741b9bafae624efb0052d9d0b71.1516978645.git.berto@igalia.com>
+ <d21ddbab-921c-3cc9-05dd-5113cb16fd8f@redhat.com>
+ <w51tvv156xi.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51tvv156xi.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-02-01 11:40, Alberto Garcia wrote:
+> On Wed 31 Jan 2018 09:11:48 PM CET, Max Reitz wrote:
+>> On 2018-01-26 15:59, Alberto Garcia wrote:
+>>> After the previous patch we're now always using l2_load() in
+>>> get_cluster_table() regardless of whether a new L2 table has to be
+>>> allocated or not.
 >>>
->>> ARRAY_SIZE can only be used if you can see the array variable
->>> initialization, but this is the header file so all we have is
->>> the extern declaration and thus the array size is unknown from
->>> the places that need to use the _len variable.
+>>> This patch refactors that part of the code to use one single l2_load(=
+)
+>>> call.
 >>>
->>> We do in fact initalize the _len variable based on the ARRAY_SIZE,
->>> but that's in the .c files.
+>>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>>> ---
+>>>  block/qcow2-cluster.c | 21 +++++++--------------
+>>>  1 file changed, 7 insertions(+), 14 deletions(-)
+>>>
+>>> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+>>> index 2a53c1dc5f..0c0cab85e8 100644
+>>> --- a/block/qcow2-cluster.c
+>>> +++ b/block/qcow2-cluster.c
+>>> @@ -695,15 +695,7 @@ static int get_cluster_table(BlockDriverState *b=
+s, uint64_t offset,
+>>>          return -EIO;
+>>>      }
+>>> =20
+>>> -    /* seek the l2 table of the given l2 offset */
+>>> -
+>>> -    if (s->l1_table[l1_index] & QCOW_OFLAG_COPIED) {
+>>> -        /* load the l2 table in memory */
+>>> -        ret =3D l2_load(bs, offset, l2_offset, &l2_table);
+>>> -        if (ret < 0) {
+>>> -            return ret;
+>>> -        }
+>>> -    } else {
+>>> +    if (!(s->l1_table[l1_index] & QCOW_OFLAG_COPIED)) {
+>>>          /* First allocate a new L2 table (and do COW if needed) */
+>>>          ret =3D l2_allocate(bs, l1_index);
+>>>          if (ret < 0) {
+>>> @@ -719,11 +711,12 @@ static int get_cluster_table(BlockDriverState *=
+bs, uint64_t offset,
+>>>          /* Get the offset of the newly-allocated l2 table */
+>>>          l2_offset =3D s->l1_table[l1_index] & L1E_OFFSET_MASK;
+>>>          assert(offset_into_cluster(s, l2_offset) =3D=3D 0);
+>>> -        /* Load the l2 table in memory */
+>>> -        ret =3D l2_load(bs, offset, l2_offset, &l2_table);
+>>> -        if (ret < 0) {
+>>> -            return ret;
+>>> -        }
+>>> +    }
+>>> +
+>>> +    /* load the l2 table in memory */
+>>> +    ret =3D l2_load(bs, offset, l2_offset, &l2_table);
+>>> +    if (ret < 0) {
+>>> +        return ret;
+>>>      }
 >>
->> Would it make sense for keymap-gen to also generate the header file, s=
-o
->> that we can use an "extern const guint x[NNN]" declaration rather
->> instead of "x[]"?
+>> I'd pull the l2_offset assignment (and alignment check) down below the=
+
+>> QCOW_OFLAG_COPIED check, saving us another two lines (!!1!) which we
+>> could then spend on an
+>>
+>> assert(s->l1_table[l1_index] & QCOW_OFLAG_COPIED);
 >=20
-> I could probably add such a feature to it....
+> I'm not sure if I'm following you. We need to set l2_offset before and
+> after allocating a new L2 table.
+>=20
+> Before, because we need the offset of the old table (if there was one)
+> in order to decrease its refcount.
+>=20
+> And after, because we need the offset of the new table in order to load=
 
-I could too if I know it will be accepted!  I'll send you a patch.
+> it.
 
-Thanks,
+Ah, right, yeah... Well, too bad.  Then I probably can't ask for the
+assert() that badly.
 
-Paolo
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--nYCSnklABRzIlGtyqktzSmFh4e9vaREeF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzWDISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AVJkH/jjkswnCVukcERlvkhaEuF8Beb+U7y6I
+02nKtxFR6yr2ozgW9X+OebQgpUS6M47Gdti2kk0qI7KxICkdoV7F5Bq67fn2Wd0r
+N0ias3t0WHVHInVKWo+MLDoTvKtq5PjNcH/0xyaSItjLaTHA+lRyBGTCyNq+YOln
+LRhY/ua4Zrc7LORHMEeQWgumtZI6SwMfwUjuDAn+q4CK6/s3BmxOqiEeMvkhNaHa
+osCG6G0EPclYyRkkIqQCC9CtIR9INS84yV9K1gxJSOnMudpjN2VKnKCvEm2Bg/fg
+2Doody+juf8A1XIachIefr2pdKk9Z/nkpyLeWKKz4U7gHRMop8tQ3Xk=
+=K2+p
+-----END PGP SIGNATURE-----
+
+--nYCSnklABRzIlGtyqktzSmFh4e9vaREeF--
