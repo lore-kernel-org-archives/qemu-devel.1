@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehK4q-0000J4-Ra
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:59:19 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehKCp-0006nm-5b
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:07:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1ehK4n-0001OA-Ky
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:59:16 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41103)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ehK4n-0001NC-EM
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:59:13 -0500
-Received: by mail-oi0-x241.google.com with SMTP id m83so14179228oik.8
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 10:59:13 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Thu,  1 Feb 2018 12:59:06 -0600
-Message-Id: <1517511547-10147-2-git-send-email-minyard@acm.org>
-In-Reply-To: <1517511547-10147-1-git-send-email-minyard@acm.org>
-References: <1517511547-10147-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 1/2] ipmi: Use proper struct reference for KCS
- vmstate
+	(envelope-from <mreitz@redhat.com>) id 1ehKCo-0002M4-DQ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:07:31 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<395d808b99997ca8718bba951c5a2eebe6794650.1516978645.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <376f5dc1-6d47-5f47-713f-487712482cb0@redhat.com>
+Date: Thu, 1 Feb 2018 20:07:15 +0100
+MIME-Version: 1.0
+In-Reply-To: <395d808b99997ca8718bba951c5a2eebe6794650.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vk53xgDlypjIHEneZVxqZ5hAIFqblQPb2"
+Subject: Re: [Qemu-devel] [PATCH v3 24/39] qcow2: Update discard_single_l2()
+ to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-From: Corey Minyard <cminyard@mvista.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vk53xgDlypjIHEneZVxqZ5hAIFqblQPb2
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <376f5dc1-6d47-5f47-713f-487712482cb0@redhat.com>
+Subject: Re: [PATCH v3 24/39] qcow2: Update discard_single_l2() to support L2
+ slices
+References: <cover.1516978645.git.berto@igalia.com>
+ <395d808b99997ca8718bba951c5a2eebe6794650.1516978645.git.berto@igalia.com>
+In-Reply-To: <395d808b99997ca8718bba951c5a2eebe6794650.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The vmstate for isa_ipmi_kcs was referencing into the kcs structure,
-instead create a kcs structure separate and use that.
+On 2018-01-26 15:59, Alberto Garcia wrote:
+> discard_single_l2() limits the number of clusters to be discarded to
+> the amount that fits inside an L2 table. Since we'll be loading L2
+> slices instead of full tables we need to update that limit.
 
-There was also some issues in the state transfer.  The inlen field
-was not being transferred, so if a transaction was in process during
-the transfer it would be messed up.  And the use_irq field was
-transferred, but that should come from the configuration.  This
-also fixes those issues and is tested under heavy load.
+Hmmmm, maybe rename the function to discard_l2_slice() or
+discard_in_l2_slice() or discard_all_in_l2_slice() or
+discard_single_l2_slice()?
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/ipmi/isa_ipmi_kcs.c | 75 ++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 60 insertions(+), 15 deletions(-)
+> Apart from that, this function doesn't need any additional changes, so
+> this patch simply updates the variable name from l2_table to l2_slice.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2-cluster.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
-index 689587b..3c942d6 100644
---- a/hw/ipmi/isa_ipmi_kcs.c
-+++ b/hw/ipmi/isa_ipmi_kcs.c
-@@ -422,24 +422,69 @@ static void ipmi_isa_realize(DeviceState *dev, Error **errp)
-     isa_register_ioport(isadev, &iik->kcs.io, iik->kcs.io_base);
- }
- 
--const VMStateDescription vmstate_ISAIPMIKCSDevice = {
--    .name = TYPE_IPMI_INTERFACE,
-+static const VMStateDescription vmstate_IPMIKCS = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "kcs",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields      = (VMStateField[]) {
--        VMSTATE_BOOL(kcs.obf_irq_set, ISAIPMIKCSDevice),
--        VMSTATE_BOOL(kcs.atn_irq_set, ISAIPMIKCSDevice),
--        VMSTATE_BOOL(kcs.use_irq, ISAIPMIKCSDevice),
--        VMSTATE_BOOL(kcs.irqs_enabled, ISAIPMIKCSDevice),
--        VMSTATE_UINT32(kcs.outpos, ISAIPMIKCSDevice),
--        VMSTATE_UINT8_ARRAY(kcs.outmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
--        VMSTATE_UINT8_ARRAY(kcs.inmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
--        VMSTATE_BOOL(kcs.write_end, ISAIPMIKCSDevice),
--        VMSTATE_UINT8(kcs.status_reg, ISAIPMIKCSDevice),
--        VMSTATE_UINT8(kcs.data_out_reg, ISAIPMIKCSDevice),
--        VMSTATE_INT16(kcs.data_in_reg, ISAIPMIKCSDevice),
--        VMSTATE_INT16(kcs.cmd_reg, ISAIPMIKCSDevice),
--        VMSTATE_UINT8(kcs.waiting_rsp, ISAIPMIKCSDevice),
-+        VMSTATE_BOOL(obf_irq_set, IPMIKCS),
-+        VMSTATE_BOOL(atn_irq_set, IPMIKCS),
-+        VMSTATE_BOOL(use_irq, IPMIKCS),
-+        VMSTATE_BOOL(irqs_enabled, IPMIKCS),
-+        VMSTATE_UINT32(outpos, IPMIKCS),
-+        VMSTATE_UINT8_ARRAY(outmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT32(inlen, IPMIKCS),
-+        VMSTATE_UINT8_ARRAY(inmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_BOOL(write_end, IPMIKCS),
-+        VMSTATE_UINT8(status_reg, IPMIKCS),
-+        VMSTATE_UINT8(data_out_reg, IPMIKCS),
-+        VMSTATE_INT16(data_in_reg, IPMIKCS),
-+        VMSTATE_INT16(cmd_reg, IPMIKCS),
-+        VMSTATE_UINT8(waiting_rsp, IPMIKCS),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static int isa_ipmi_kcs_load_old(QEMUFile *f, void *opaque, int version_id)
-+{
-+    ISAIPMIKCSDevice *iik = opaque;
-+    IPMIKCS *k = &iik->kcs;
-+    unsigned int i;
-+
-+    if (version_id != 1) {
-+        return -EINVAL;
-+    }
-+
-+    k->obf_irq_set = qemu_get_byte(f);
-+    k->atn_irq_set = qemu_get_byte(f);
-+    qemu_get_byte(f); /* Used to be use_irq, but that's not a good idea. */
-+    k->irqs_enabled = qemu_get_byte(f);
-+    k->outpos = qemu_get_be32(f);
-+    for (i = 0; i < MAX_IPMI_MSG_SIZE; i++) {
-+        k->outmsg[i] = qemu_get_byte(f);
-+    }
-+    k->inlen = 0; /* This was forgotten on version 1, just reset it. */
-+    for (i = 0; i < MAX_IPMI_MSG_SIZE; i++) {
-+        k->inmsg[i] = qemu_get_byte(f);
-+    }
-+    k->write_end = qemu_get_byte(f);
-+    k->status_reg = qemu_get_byte(f);
-+    k->data_out_reg = qemu_get_byte(f);
-+    k->data_in_reg = qemu_get_be16(f);
-+    k->cmd_reg = qemu_get_be16(f);
-+    k->waiting_rsp = qemu_get_byte(f);
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_ISAIPMIKCSDevice = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-kcs",
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-+    .minimum_version_id_old = 1,
-+    .load_state_old = isa_ipmi_kcs_load_old,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_STRUCT(kcs, ISAIPMIKCSDevice, 1, vmstate_IPMIKCS, IPMIKCS),
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.7.4
+Anyway:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--vk53xgDlypjIHEneZVxqZ5hAIFqblQPb2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzZWMSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AgtIH/0v0FBu9oP/kBouMuEQRrVyh/wcl2q+/
+OvEkeoCTTAbUw07sKsChs0kEnB5bJkcrpqiCmELgm1kWR/RRx6JVwnaGoE6kegCX
++xluzE3AOrJS4jPJtUEALqgvHifYxkJXtgEBVfvEvUto7da33U67mkRPYZMK4rqs
+79OLAEgNBotmKmJDK4MyFuGJdiQEnSKhSAVOhYGu6kSaiUQPZRdrSTXeGrcTwq5j
+VczdwwyvlFOO2OgMZVKoxfqD9bpfZAUmRh6zh4WiP2DIxd7wLmRREatwKpD9hcan
+ozQxPpnbj0NTNAss6099VFr3yZMmubV9V7wlr47rrvkYzDHgqVLlyX4=
+=qu7N
+-----END PGP SIGNATURE-----
+
+--vk53xgDlypjIHEneZVxqZ5hAIFqblQPb2--
