@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eh2wy-0003vX-AW
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:42:01 -0500
+	(envelope-from <fzheng@redhat.com>) id 1eh3AT-0007yn-5N
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:55:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eh2wx-0008Gk-Hg
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:42:00 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:45247)
+	(envelope-from <fzheng@redhat.com>) id 1eh3AQ-0000q7-4t
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:55:57 -0500
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:33240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eh2wx-0008Fo-A6
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:41:59 -0500
-Received: by mail-lf0-x242.google.com with SMTP id x196so23522662lfd.12
-	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 16:41:59 -0800 (PST)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1eh3AP-0000pW-UE
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:55:54 -0500
+Received: by mail-wm0-f65.google.com with SMTP id x4so487687wmc.0
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 16:55:53 -0800 (PST)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180123033034.29493-19-f4bug@amsat.org>
-References: <20180123033034.29493-1-f4bug@amsat.org>
-	<20180123033034.29493-19-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 31 Jan 2018 16:41:27 -0800
-Message-ID: <CAKmqyKNXL1VjybGTd83SYAC0VybTXF2tJUi2n=sPaR2t9eRTMA@mail.gmail.com>
+In-Reply-To: <7d94ad09-9c3e-da10-3f15-2c15147fb837@redhat.com>
+References: <20180130062503.32596-1-famz@redhat.com>
+	<7d94ad09-9c3e-da10-3f15-2c15147fb837@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 1 Feb 2018 08:55:22 +0800
+Message-ID: <CAK1Eb9k_x9guD5L2EPBEx1ipjuUmFAA0FbLsAHkgp==z+=r7dA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 18/18] sdcard: add an enum for the SD
- PHY Spec version
+Subject: Re: [Qemu-devel] [PATCH] iotests: Fix CID for VMDK afl image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On Mon, Jan 22, 2018 at 7:30 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> So far this device intends to model the Spec v1.10
+On Thu, Feb 1, 2018 at 2:58 AM, Max Reitz <mreitz@redhat.com> wrote:
+> On 2018-01-30 07:25, Fam Zheng wrote:
+>> This reverts commit 76bf133c4 which updated the reference output, and
+>> fixed the reference image, because the code path we want to exercise is
+>> actually the invalid image size.
+>>
+>> The descriptor block in the image, which includes the CID to verify, has been
+>> invalid since the reference image was added. Since commit 9877860e7bd we report
+>> this error earlier than the "file too large", so 059.out mismatches.
+>>
+>> The binary change is generated along the operations of:
+>>
+>>   $ bunzip2 afl9.vmdk.bz2
+>>   $ qemu-img create -f vmdk fix.vmdk 1G
+>>   $ dd if=afl9.vmdk.bz2 of=fix.vmdk bs=512 count=1 conv=notrunc
+>>   $ mv fix.vmdk afl9.vmdk
+>>   $ bzip2 afl9.vmdk
+>>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>>
+>> ---
+>>
+>> v2: Fix commit message "qcow2 -> vmdk". [Kevin]
+>>     Revert 76bf133c4.
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Hmmmm, now this fails again on my 32 bit build. :-(
+>
+> The issue there is that you get a "Cannot allocate memory" when trying
+> to open the file.  My current fix was 2291712c39111a732 which simply
+> converted that to "Invalid argument", but now it's getting a bit more
+> complicated...  Should I just continue to play the game and check the
+> output for "Cannot allocate memory" and print exactly what the reference
+> output is expecting...?
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Ahhh. OK, then, with a big comment.
 
-Alistair
+I'd say let's just _notrun on 32 bit.
 
-> ---
->  hw/sd/sd.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 1f6c4ce2a4..9880a5d090 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -47,6 +47,11 @@
->
->  //#define DEBUG_SD 1
->
-> +typedef enum {
-> +    SD_PHY_SPEC_VER_1_10 =3D 110,
-> +    SD_PHY_SPEC_VER_2_00 =3D 200, /* not yet supported */
-> +} sd_phy_spec_ver_t;
-> +
->  typedef enum {
->      sd_r0 =3D 0,    /* no response */
->      sd_r1,        /* normal response command */
-> @@ -122,6 +127,7 @@ struct SDState {
->      qemu_irq inserted_cb;
->      QEMUTimer *ocr_power_timer;
->      const char *proto_name;
-> +    int spec_version;
->      bool enable;
->      uint8_t dat_lines;
->      bool cmd_line;
-> @@ -2191,6 +2197,7 @@ static void sd_realize(DeviceState *dev, Error **er=
-rp)
->      int ret;
->
->      sd->proto_name =3D sd->spi ? "SPI" : "SD";
-> +    sd->spec_version =3D SD_PHY_SPEC_VER_1_10;
->
->      if (sd->blk && blk_is_read_only(sd->blk)) {
->          error_setg(errp, "Cannot use read-only drive as SD card");
-> --
-> 2.15.1
->
->
+Fam
