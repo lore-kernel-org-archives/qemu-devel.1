@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1ehFTR-0000bA-RD
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:04:27 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ehFUB-0001Cd-Hl
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:05:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christoffer.dall@linaro.org>) id 1ehFTL-0007j0-V5
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:04:21 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39394)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
-	id 1ehFTL-0007ie-MD
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:04:15 -0500
-Received: by mail-wm0-x242.google.com with SMTP id b21so5892269wme.4
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 06:04:15 -0800 (PST)
-Date: Thu, 1 Feb 2018 15:04:11 +0100
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Message-ID: <20180201140411.GD21802@cbox>
-References: <CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
-	<CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
-	<CAMJs5B8CWm2bj-Be_j4p9Y_3wXr=W2K7zE8593ke-97QR20qcA@mail.gmail.com>
-	<CAKv+Gu935vi1wCRAKqC-nscXa+=CKX6P=HPO-3dNA4fx0Fm-NA@mail.gmail.com>
-	<CAMJs5B-S=qVWYP2eTN1qsOQctmfUR8jCXBaz2DKyaKRT7LrAyA@mail.gmail.com>
-	<CAKv+Gu-7d5jbt9V8bORkrZXxNmshMNjsqg+EiwhA-CYrNLFotA@mail.gmail.com>
-	<CAMJs5B8W7-yfco1qkWBY0FU4hiner05jp1jBycWwT6wCTegBfA@mail.gmail.com>
-	<20180201104222.bwbrsfp2kmkwd7zp@kamzik.brq.redhat.com>
-	<20180201104831.GB21802@cbox>
-	<20180201122520.b2o75bmjaqwukuqs@kamzik.brq.redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1ehFU6-00089e-TJ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 09:05:07 -0500
+Date: Thu, 1 Feb 2018 15:04:54 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180201150454.38c280d9.cohuck@redhat.com>
+In-Reply-To: <0542bcf4-fc37-cf4a-6bd1-4dafa3533772@redhat.com>
+References: <20180131181742.2037-1-cohuck@redhat.com>
+	<20180131181742.2037-3-cohuck@redhat.com>
+	<0542bcf4-fc37-cf4a-6bd1-4dafa3533772@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180201122520.b2o75bmjaqwukuqs@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] s390x/cpumodel: allow zpci features
+ in qemu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,37 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de
 
-On Thu, Feb 01, 2018 at 01:25:20PM +0100, Andrew Jones wrote:
-> On Thu, Feb 01, 2018 at 11:48:31AM +0100, Christoffer Dall wrote:
-> > On Thu, Feb 01, 2018 at 11:42:22AM +0100, Andrew Jones wrote:
-> > > On Thu, Feb 01, 2018 at 10:59:54AM +0100, Christoffer Dall wrote:
-> > > > On Thu, Feb 1, 2018 at 10:33 AM, Ard Biesheuvel
-> > > > > If you could use dirty page tracking to only perform the cache
-> > > > > invalidation when the framebuffer memory has been updated, you can at
-> > > > > least limit the impact to cases where the framebuffer is actually
-> > > > > used, rather than sitting idle with a nice wallpaper image.
-> > > 
-> > > Yes, this is the exact approach I took back when I experimented with
-> > > this. I must have screwed up my PoC in some way (like using the gcc
-> > > builtin), because it wasn't working for me...
-> > > 
-> > Does that mean you have some code you feel like reviving and use to send
-> > out an RFC based on? ;)
-> >
+On Thu, 1 Feb 2018 13:31:46 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 31.01.2018 19:17, Cornelia Huck wrote:
+> > AEN can be provided unconditionally, ZPCI should be turned on
+> > manually.
+> > 
+> > With -cpu qemu,zpci=on, a 4.15 guest kernel can now successfully
+> > detect virtio-pci devices under tcg.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  target/s390x/cpu_models.c   | 6 ++++++
+> >  target/s390x/gen-features.c | 3 +++
+> >  2 files changed, 9 insertions(+)
+> > 
+
+> > diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> > index 0570f597ec..c7083ed4a8 100644
+> > --- a/target/s390x/gen-features.c
+> > +++ b/target/s390x/gen-features.c
+> > @@ -574,6 +574,7 @@ static uint16_t qemu_LATEST[] = {
+> >      S390_FEAT_INTERLOCKED_ACCESS_2,
+> >      S390_FEAT_MSA_EXT_4,
+> >      S390_FEAT_MSA_EXT_3,
+> > +    S390_FEAT_ADAPTER_EVENT_NOTIFICATION,  
 > 
-> I don't usually delete things, but I do do some sort of copy on use
-> from old homedirs to new ones from time to time, letting stuff that
-> gets really old completely drop at some point. I might be able to
-> find the old work, or just hack a quick and ugly version from my
-> memory to share - hopefully whatever I did to cause it to fail last
-> time has been forgotten :-)
+> Minor nit, according to the order in target/s390x/cpu_features_def.h,
+> this should go before FEAT_MSA_EXT_3 (yes, the order of EXT3/EXT4 is
+> messed up)
+
+Will reorder.
+
+> 
+> >  };
+> >  
+> >  /* add all new definitions before this point */
+> > @@ -582,6 +583,8 @@ static uint16_t qemu_MAX[] = {
+> >      S390_FEAT_STFLE_53,
+> >      /* generates a dependency warning, leave it out for now */
+> >      S390_FEAT_MSA_EXT_5,
+> > +    /* only with CONFIG_PCI */
+> > +    S390_FEAT_ZPCI,
+> >  };
+> >  
+> >  /****** END FEATURE DEFS ******/
+> >   
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 > 
 
-If you have bandwidth to look at this that's great.  Otherwise let us
-know, and I'll see if I can devote some time to it.
-
-Thanks,
--Christoffer
+Thanks!
