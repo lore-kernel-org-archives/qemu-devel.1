@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ehIX0-0004Kv-TV
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:16 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ehIXU-0004gf-GY
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ehIWx-0006wA-9P
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:14 -0500
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:36240)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ehIWx-0006uQ-3K
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:11 -0500
-Received: by mail-wr0-f194.google.com with SMTP id y3so9989616wrh.3
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 09:20:10 -0800 (PST)
-References: <20180201084535.26721-1-kraxel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1c09ffc0-0a85-d2c3-fd94-7753ee3ca74d@redhat.com>
-Date: Thu, 1 Feb 2018 12:20:05 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ehIXS-0007Mv-QJ
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49505)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ehIXS-0007MJ-6S
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:20:42 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D0EA78552
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 17:20:41 +0000 (UTC)
+Date: Thu, 1 Feb 2018 17:20:39 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180201172039.GD5578@stefanha-x1.localdomain>
+References: <20180201162625.4276-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180201084535.26721-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vnc: use stubs for CONFIG_VNC=n dummy
- functions
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="TybLhxa8M7aNoW+V"
+Content-Disposition: inline
+In-Reply-To: <20180201162625.4276-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] trace: avoid SystemTap "char const"
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 01/02/2018 03:45, Gerd Hoffmann wrote:
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+--TybLhxa8M7aNoW+V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Feb 01, 2018 at 04:26:25PM +0000, Stefan Hajnoczi wrote:
+> SystemTap's dtrace(1) produces the following warning when it encounters
+> "char const" instead of "const char":
+>=20
+>   Warning: /usr/bin/dtrace:trace-dtrace-root.dtrace:66: syntax error near:
+>   probe flatview_destroy_rcu
+>=20
+>   Warning: Proceeding as if --no-pyparsing was given.
+>=20
+> This is a limitation in current SystemTap releases.  I have sent a patch
+> upstream to accept "char const" since it is valid C:
+>=20
+>   https://sourceware.org/ml/systemtap/2018-q1/msg00017.html
+>=20
+> In QEMU we still wish to avoid warnings in the current SystemTap
+> release.  It's simple enough to replace "char const" with "const char".
+>=20
+> I'm not changing the documentation or implementing checks to prevent
+> this from occurring again in the future.  The next release of SystemTap
+> will hopefully resolve this issue.
+>=20
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  include/ui/console.h | 21 ---------------------
->  ui/vnc-stubs.c       | 21 +++++++++++++++++++++
->  ui/Makefile.objs     |  1 +
->  3 files changed, 22 insertions(+), 21 deletions(-)
->  create mode 100644 ui/vnc-stubs.c
-> 
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index 7b35778444..de57e8363a 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -468,31 +468,10 @@ static inline void cocoa_display_init(DisplayState *ds, int full_screen)
->  void vnc_display_init(const char *id);
->  void vnc_display_open(const char *id, Error **errp);
->  void vnc_display_add_client(const char *id, int csock, bool skipauth);
-> -#ifdef CONFIG_VNC
->  int vnc_display_password(const char *id, const char *password);
->  int vnc_display_pw_expire(const char *id, time_t expires);
->  QemuOpts *vnc_parse(const char *str, Error **errp);
->  int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp);
-> -#else
-> -static inline int vnc_display_password(const char *id, const char *password)
-> -{
-> -    return -ENODEV;
-> -}
-> -static inline int vnc_display_pw_expire(const char *id, time_t expires)
-> -{
-> -    return -ENODEV;
-> -};
-> -static inline QemuOpts *vnc_parse(const char *str, Error **errp)
-> -{
-> -    error_setg(errp, "VNC support is disabled");
-> -    return NULL;
-> -}
-> -static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
-> -{
-> -    error_setg(errp, "VNC support is disabled");
-> -    return -1;
-> -}
-> -#endif
->  
->  /* curses.c */
->  #ifdef CONFIG_CURSES
-> diff --git a/ui/vnc-stubs.c b/ui/vnc-stubs.c
-> new file mode 100644
-> index 0000000000..f51280549a
-> --- /dev/null
-> +++ b/ui/vnc-stubs.c
-> @@ -0,0 +1,21 @@
-> +#include "qemu/osdep.h"
-> +#include "ui/console.h"
-> +
-> +int vnc_display_password(const char *id, const char *password)
-> +{
-> +    return -ENODEV;
-> +}
-> +int vnc_display_pw_expire(const char *id, time_t expires)
-> +{
-> +    return -ENODEV;
-> +};
-> +QemuOpts *vnc_parse(const char *str, Error **errp)
-> +{
-> +    error_setg(errp, "VNC support is disabled");
-> +    return NULL;
-> +}
-> +int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
-> +{
-> +    error_setg(errp, "VNC support is disabled");
-> +    return -1;
-> +}
-> diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-> index 99195884b0..09a275aed1 100644
-> --- a/ui/Makefile.objs
-> +++ b/ui/Makefile.objs
-> @@ -6,6 +6,7 @@ vnc-obj-y += vnc-auth-vencrypt.o
->  vnc-obj-$(CONFIG_VNC_SASL) += vnc-auth-sasl.o
->  vnc-obj-y += vnc-ws.o
->  vnc-obj-y += vnc-jobs.o
-> +stub-obj-y += vnc-stubs.o
+>  hw/block/trace-events |  4 ++--
+>  trace-events          | 12 ++++++------
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 
-Better, since vnc need not be linked into tools or user-mode emulation:
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
-common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
-common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
+Stefan
 
-Paolo
+--TybLhxa8M7aNoW+V
+Content-Type: application/pgp-signature; name="signature.asc"
 
->  common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
->  common-obj-y += input.o input-keymap.o input-legacy.o
-> 
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJac0xnAAoJEJykq7OBq3PIUuwH/jTbKJz1jzZlnYxWAgBcmlbE
+TEInfWk7ywqq95IyTgdQ5i9dySFc61ZsrwkCB76xZr4WOH59/uMPFaQ6im2V85S2
+m+T6vVoK3TGAqkYkuUDVwG4tClePUC+ZmTJhcNjG6eLdVCMBSxXNg6vbjerWe3DK
+Uc2z9gnSL3oe8dj5Ls4JesgZk0twt6f3df36MXu7lXHgvA8HanzAVp6ZXwhR66ER
+9ZO4nPoitj8RPFuLX3rRLZs7brdHvpHDwdD/ci5iWZc76eL9t+HmDTRjtDjotiIL
+ZhRtCVHuk+89ZtCw7/fWw5FlHnUGSASCgEaYWjGQHP0cRMr5VAJn9lvIXPyD/uc=
+=AQ5n
+-----END PGP SIGNATURE-----
+
+--TybLhxa8M7aNoW+V--
