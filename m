@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehEHm-0001vn-Pf
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:48:20 -0500
+	(envelope-from <mst@redhat.com>) id 1ehEHy-00020l-J6
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:48:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehEHj-0002SN-LK
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:48:14 -0500
-Date: Thu, 1 Feb 2018 13:48:03 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180201134803.78ef2b65.cohuck@redhat.com>
-In-Reply-To: <de34c0e5-002e-f461-bc4d-498548424177@redhat.com>
-References: <20180131181742.2037-1-cohuck@redhat.com>
-	<20180131181742.2037-2-cohuck@redhat.com>
-	<de34c0e5-002e-f461-bc4d-498548424177@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1ehEHx-0002Zp-8e
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:48:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ehEHx-0002ZR-0O
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 07:48:25 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 408127EA95
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 12:48:24 +0000 (UTC)
+Date: Thu, 1 Feb 2018 14:48:20 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180201144449-mutt-send-email-mst@kernel.org>
+References: <20180131092835.GA31397@xz-mi>
+	<20180131160214-mutt-send-email-mst@kernel.org>
+	<20180201021853.GD31397@xz-mi>
+	<20180201042234-mutt-send-email-mst@kernel.org>
+	<20180201023350.GF31397@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390x/tcg: wire up pci instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180201023350.GF31397@xz-mi>
+Subject: Re: [Qemu-devel] Windows balloon driver PFN issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de
+To: Peter Xu <peterx@redhat.com>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-On Thu, 1 Feb 2018 13:42:52 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 31.01.2018 19:17, Cornelia Huck wrote:
-
-> > +#ifndef CONFIG_USER_ONLY
-> > +void HELPER(clp)(CPUS390XState *env, uint32_t r2)
-> > +{
-> > +    S390CPU *cpu = s390_env_get_cpu(env);
-> > +    int r;
-> > +
-> > +    qemu_mutex_lock_iothread();
-> > +    r = clp_service_call(cpu, r2, GETPC());
-> > +    qemu_mutex_unlock_iothread();
-> > +    if (r) {
-> > +        s390_program_interrupt(env, PGM_OPERATION, 4, GETPC());
-> > +    }  
+On Thu, Feb 01, 2018 at 10:33:50AM +0800, Peter Xu wrote:
+> On Thu, Feb 01, 2018 at 04:24:40AM +0200, Michael S. Tsirkin wrote:
+> > On Thu, Feb 01, 2018 at 10:18:53AM +0800, Peter Xu wrote:
+> > > On Wed, Jan 31, 2018 at 04:03:12PM +0200, Michael S. Tsirkin wrote:
+> > > > On Wed, Jan 31, 2018 at 05:28:35PM +0800, Peter Xu wrote:
+> > > > > Hi, Michael and the list,
+> > > > > 
+> > > > > I observed this on windows 8 enterprise guests, when doing memory ballooning:
+> > > > > 
+> > > > > 23892@1517298572.328354:virtio_balloon_to_target balloon target: 0x80000000 num_pages: 524288
+> > > > > 23892@1517298638.542819:virtio_balloon_get_config num_pages: 524288 actual: 0
+> > > > > 23892@1517298638.542974:virtio_balloon_handle_output section name: pc.ram gpa: 0x174604000
+> > > > > 23892@1517298638.543059:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > > 23892@1517298638.543135:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460a000
+> > > > > 23892@1517298638.543140:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > > 23892@1517298638.543143:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460b000
+> > > > > 23892@1517298638.543146:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > > 23892@1517298638.543148:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460c000
+> > > > > 23892@1517298638.543152:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > > 23892@1517298638.543154:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460d000
+> > > > > 23892@1517298638.543159:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > > 23892@1517298638.543162:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460e000
+> > > > > 23892@1517298638.543165:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > > 23892@1517298638.543167:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460f000
+> > > > > 23892@1517298638.543170:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > > ...
+> > > > > 
+> > > > > I think it's very possible that these zero addresses (please let me
+> > > > > know what the first 4K page is used for if anyone knows, since IIUC
+> > > > > that's what we throw away now) are half of the 64bit PFN.  Or say, not
+> > > > > sure whether this means a windows guest driver bug that is using
+> > > > > 64bits for PFN rather than 32bits (and I suppose the protocol is using
+> > > > > 32bit for PFNs).
+> > > > > 
+> > > > > Michael, do you know what to do with this?
+> > > > > 
+> > > > > Thanks,
+> > > > 
+> > > > PFN is GPA>>12.  Do you have more than 1<<44 bytes of memory in this VM then?
+> > > 
+> > > No.  But isn't it still not good to drop the page at offset zero (and
+> > > drop it NNN times)?
+> > 
+> > Absolutely - looks like a bug. I just don't know why does this happen.
 > 
-> We don't need the if (r) ... so I suggest dropping all these. (as I
-> said, will be handled later via the generic flag checking in translation
-> code). We can ignore any error from these functions.
-
-I did not check the instruction implementations in detail... was the
-error really only for the !CONFIG_PCI case?
-
-(I really should know that...)
-
-> A sane guest will newer trigger this. (if we have no CONFIG_PCI, the
-> also the ZPCI feature will not be available)
-
-Hopefully we can also handle non-sane guests correctly...
-
+> IMHO if we are using a PFN array like this:
 > 
-> Makes the code even shorter :)
+>    u64 pfn_array[];
 > 
+> In the windows guest driver, then we'll see this (as mentioned
+> above).  But for sure this is wild guess of mine.
+
+I don't see code like this anywhere in the windows balloon
+driver. It's here:
+https://github.com/virtio-win/kvm-guest-drivers-windows.git
+
+> > 
+> > >  And I'm not sure what will happen if guest has
+> > > 1<<44 bytes; then we'll possibly drop very random addresses since a
+> > > real address will be splitted?
+> > > 
+> > > Thanks,
+> > 
+> > The balloon won't work, period. There was an interface change to fix
+> > that but implementation issues remained and contributor seems to be busy
+> > with page hints.
+> 
+> Okay.  So IIUC this is already a known issue for the driver owner.
+> Then it seems that there's nothing more I can do for now...
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
