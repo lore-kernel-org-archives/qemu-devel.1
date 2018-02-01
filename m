@@ -1,21 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ehBWq-0005Hs-RN
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:51:37 -0500
+	(envelope-from <christoffer.dall@linaro.org>) id 1ehBew-0008GQ-W4
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:00:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ehBWk-00027F-Rf
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:51:36 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <4361f774-7d2e-1a67-bde9-da421df554f9@redhat.com>
-References: <cover.1516978645.git.berto@igalia.com>
-	<e2cb85926f1f4910c7d18fcc902be60109592381.1516978645.git.berto@igalia.com>
-	<4361f774-7d2e-1a67-bde9-da421df554f9@redhat.com>
-Date: Thu, 01 Feb 2018 10:51:26 +0100
-Message-ID: <w51wozx597l.fsf@maestria.local.igalia.com>
+	(envelope-from <christoffer.dall@linaro.org>) id 1ehBeu-0005hT-Qt
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:59:59 -0500
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:38690)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <christoffer.dall@linaro.org>)
+	id 1ehBeu-0005fR-Fu
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 04:59:56 -0500
+Received: by mail-pf0-x229.google.com with SMTP id k19so15145608pfj.5
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 01:59:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 13/39] qcow2: Add l2_slice_size field to
- BDRVQcow2State
+In-Reply-To: <CAKv+Gu-7d5jbt9V8bORkrZXxNmshMNjsqg+EiwhA-CYrNLFotA@mail.gmail.com>
+References: <20180124212246.2352-1-wei@redhat.com>
+	<20180125200525.GC2442@work-vm>
+	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
+	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
+	<20180126194559.GI2610@work-vm>
+	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
+	<20180129095330.GA2408@work-vm>
+	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
+	<a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
+	<20180131095351.GY21802@cbox>
+	<CAKv+Gu-NAcUTpEUXCLudHTCFAf=Yb28q3AET9d4ED9A9z7dMfQ@mail.gmail.com>
+	<CAMJs5B8jctfTEEhui3XRCTW1La2HCoVd1Jzaz4p7jy=8vqw=0A@mail.gmail.com>
+	<CAKv+Gu80p5G_gWp0Dg7HJ2SAgc3WCQe+g9ear9oM44bt-KmSFA@mail.gmail.com>
+	<CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
+	<CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
+	<CAMJs5B8CWm2bj-Be_j4p9Y_3wXr=W2K7zE8593ke-97QR20qcA@mail.gmail.com>
+	<CAKv+Gu935vi1wCRAKqC-nscXa+=CKX6P=HPO-3dNA4fx0Fm-NA@mail.gmail.com>
+	<CAMJs5B-S=qVWYP2eTN1qsOQctmfUR8jCXBaz2DKyaKRT7LrAyA@mail.gmail.com>
+	<CAKv+Gu-7d5jbt9V8bORkrZXxNmshMNjsqg+EiwhA-CYrNLFotA@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Date: Thu, 1 Feb 2018 10:59:54 +0100
+Message-ID: <CAMJs5B8W7-yfco1qkWBY0FU4hiner05jp1jBycWwT6wCTegBfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +47,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-On Wed 31 Jan 2018 08:48:08 PM CET, Max Reitz wrote:
-> On 2018-01-26 15:59, Alberto Garcia wrote:
->> The BDRVQcow2State structure contains an l2_size field, which stores
->> the number of 64-bit entries in an L2 table.
->> 
->> For efficiency reasons we want to be able to load slices instead of
->> full L2 tables, so we need to know how many entries an L2 slice can
->> hold.
->> 
->> An L2 slice is the portion of an L2 table that is loaded by the qcow2
->> cache. At the moment that cache can only load complete tables,
->> therefore an L2 slice has the same size as an L2 table (one cluster)
->> and l2_size == l2_slice_size.
->> 
->> Later we'll allow smaller slices, but until then we have to use this
->> new l2_slice_size field to make the rest of the code ready for that.
->> 
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> ---
->>  block/qcow2.c | 3 +++
->>  block/qcow2.h | 1 +
->>  2 files changed, 4 insertions(+)
+On Thu, Feb 1, 2018 at 10:33 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> On 1 February 2018 at 09:17, Christoffer Dall
+> <christoffer.dall@linaro.org> wrote:
+>> On Wed, Jan 31, 2018 at 9:15 PM, Ard Biesheuvel
+>> <ard.biesheuvel@linaro.org> wrote:
+>>> On 31 January 2018 at 19:12, Christoffer Dall
+>>> <christoffer.dall@linaro.org> wrote:
+>>>> On Wed, Jan 31, 2018 at 7:00 PM, Ard Biesheuvel
+>>>> <ard.biesheuvel@linaro.org> wrote:
+>>>>> On 31 January 2018 at 17:39, Christoffer Dall
+>>>>> <christoffer.dall@linaro.org> wrote:
+>>>>>> On Wed, Jan 31, 2018 at 5:59 PM, Ard Biesheuvel
+>>>>>> <ard.biesheuvel@linaro.org> wrote:
+>>>>>>> On 31 January 2018 at 16:53, Christoffer Dall
+>>>>>>> <christoffer.dall@linaro.org> wrote:
+>>>>>>>> On Wed, Jan 31, 2018 at 4:18 PM, Ard Biesheuvel
+>>>>>>>> <ard.biesheuvel@linaro.org> wrote:
+>>>>>>>>> On 31 January 2018 at 09:53, Christoffer Dall
+>>>>>>>>> <christoffer.dall@linaro.org> wrote:
+>>>>>>>>>> On Mon, Jan 29, 2018 at 10:32:12AM +0000, Marc Zyngier wrote:
+>>>>>>>>>>> On 29/01/18 10:04, Peter Maydell wrote:
+>>>>>>>>>>> > On 29 January 2018 at 09:53, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>>>>>>>>>>> >> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>>>>>>>>>>> >>> On 26 January 2018 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>>>>>>>>>>> >>>> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>>>>>>>>>>> >>>>> I think the correct fix here is that your test code should turn
+>>>>>>>>>>> >>>>> its MMU on. Trying to treat guest RAM as uncacheable doesn't work
+>>>>>>>>>>> >>>>> for Arm KVM guests (for the same reason that VGA device video memory
+>>>>>>>>>>> >>>>> doesn't work). If it's RAM your guest has to arrange to map it as
+>>>>>>>>>>> >>>>> Normal Cacheable, and then everything should work fine.
+>>>>>>>>>>> >>>>
+>>>>>>>>>>> >>>> Does this cause problems with migrating at just the wrong point during
+>>>>>>>>>>> >>>> a VM boot?
+>>>>>>>>>>> >>>
+>>>>>>>>>>> >>> It wouldn't surprise me if it did, but I don't think I've ever
+>>>>>>>>>>> >>> tried to provoke that problem...
+>>>>>>>>>>> >>
+>>>>>>>>>>> >> If you think it'll get the RAM contents wrong, it might be best to fail
+>>>>>>>>>>> >> the migration if you can detect the cache is disabled in the guest.
+>>>>>>>>>>> >
+>>>>>>>>>>> > I guess QEMU could look at the value of the "MMU disabled/enabled" bit
+>>>>>>>>>>> > in the guest's system registers, and refuse migration if it's off...
+>>>>>>>>>>> >
+>>>>>>>>>>> > (cc'd Marc, Christoffer to check that I don't have the wrong end
+>>>>>>>>>>> > of the stick about how thin the ice is in the period before the
+>>>>>>>>>>> > guest turns on its MMU...)
+>>>>>>>>>>>
+>>>>>>>>>>> Once MMU and caches are on, we should be in a reasonable place for QEMU
+>>>>>>>>>>> to have a consistent view of the memory. The trick is to prevent the
+>>>>>>>>>>> vcpus from changing that. A guest could perfectly turn off its MMU at
+>>>>>>>>>>> any given time if it needs to (and it is actually required on some HW if
+>>>>>>>>>>> you want to mitigate headlining CVEs), and KVM won't know about that.
+>>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> (Clarification: KVM can detect this is it bother to check the VCPU's
+>>>>>>>>>> system registers, but we don't trap to KVM when the VCPU turns off its
+>>>>>>>>>> caches, right?)
+>>>>>>>>>>
+>>>>>>>>>>> You may have to pause the vcpus before starting the migration, or
+>>>>>>>>>>> introduce a new KVM feature that would automatically pause a vcpu that
+>>>>>>>>>>> is trying to disable its MMU while the migration is on. This would
+>>>>>>>>>>> involve trapping all the virtual memory related system registers, with
+>>>>>>>>>>> an obvious cost. But that cost would be limited to the time it takes to
+>>>>>>>>>>> migrate the memory, so maybe that's acceptable.
+>>>>>>>>>>>
+>>>>>>>>>> Is that even sufficient?
+>>>>>>>>>>
+>>>>>>>>>> What if the following happened. (1) guest turns off MMU, (2) guest
+>>>>>>>>>> writes some data directly to ram (3) qemu stops the vcpu (4) qemu reads
+>>>>>>>>>> guest ram.  QEMU's view of guest ram is now incorrect (stale,
+>>>>>>>>>> incoherent, ...).
+>>>>>>>>>>
+>>>>>>>>>> I'm also not really sure if pausing one VCPU because it turned off its
+>>>>>>>>>> MMU will go very well when trying to migrate a large VM (wouldn't this
+>>>>>>>>>> ask for all the other VCPUs beginning to complain that the stopped VCPU
+>>>>>>>>>> appears to be dead?).  As a short-term 'fix' it's probably better to
+>>>>>>>>>> refuse migration if you detect that a VCPU had begun turning off its
+>>>>>>>>>> MMU.
+>>>>>>>>>>
+>>>>>>>>>> On the larger scale of thins; this appears to me to be another case of
+>>>>>>>>>> us really needing some way to coherently access memory between QEMU and
+>>>>>>>>>> the VM, but in the case of the VCPU turning off the MMU prior to
+>>>>>>>>>> migration, we don't even know where it may have written data, and I'm
+>>>>>>>>>> therefore not really sure what the 'proper' solution would be.
+>>>>>>>>>>
+>>>>>>>>>> (cc'ing Ard who has has thought about this problem before in the context
+>>>>>>>>>> of UEFI and VGA.)
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Actually, the VGA case is much simpler because the host is not
+>>>>>>>>> expected to write to the framebuffer, only read from it, and the guest
+>>>>>>>>> is not expected to create a cacheable mapping for it, so any
+>>>>>>>>> incoherency can be trivially solved by cache invalidation on the host
+>>>>>>>>> side. (Note that this has nothing to do with DMA coherency, but only
+>>>>>>>>> with PCI MMIO BARs that are backed by DRAM in the host)
+>>>>>>>>
+>>>>>>>> In case of the running guest, the host will also only read from the
+>>>>>>>> cached mapping.  Of course, at restore, the host will also write
+>>>>>>>> through a cached mapping, but shouldn't the latter case be solvable by
+>>>>>>>> having KVM clean the cache lines when faulting in any page?
+>>>>>>>>
+>>>>>>>
+>>>>>>> We are still talking about the contents of the framebuffer, right? In
+>>>>>>> that case, yes, afaict
+>>>>>>>
+>>>>>>
+>>>>>> I was talking about normal RAM actually... not sure if that changes anything?
+>>>>>>
+>>>>>
+>>>>> The main difference is that with a framebuffer BAR, it is pointless
+>>>>> for the guest to map it cacheable, given that the purpose of a
+>>>>> framebuffer is its side effects, which are not guaranteed to occur
+>>>>> timely if the mapping is cacheable.
+>>>>>
+>>>>> If we are talking about normal RAM, then why are we discussing it here
+>>>>> and not down there?
+>>>>>
+>>>>
+>>>> Because I was trying to figure out how the challenge of accessing the
+>>>> VGA framebuffer differs from the challenge of accessing guest RAM
+>>>> which may have been written by the guest with the MMU off.
+>>>>
+>>>> First approximation, they are extremely similar because the guest is
+>>>> writing uncached to memory, which the host now has to access via a
+>>>> cached mapping.
+>>>>
+>>>> But I'm guessing that a "clean+invalidate before read on the host"
+>>>> solution will result in terrible performance for a framebuffer and
+>>>> therefore isn't a good solution for that problem...
+>>>>
+>>>
+>>> That highly depends on where 'not working' resides on the performance
+>>> scale. Currently, VGA on KVM simply does not work at all, and so
+>>> working but slow would be a huge improvement over the current
+>>> situation.
+>>>
+>>> Also, the performance hit is caused by the fact that the data needs to
+>>> make a round trip to memory, and the invalidation (without cleaning)
+>>> performed by the host shouldn't make that much worse than it
+>>> fundamentally is to begin with.
+>>>
+>>
+>> True, but Marc pointed out (on IRC) that the cache maintenance
+>> instructions are broadcast across all CPUs and may therefore adversely
+>> affect the performance of your entire system by running an emulated
+>> VGA framebuffer on a subset of the host CPUs.  However, he also
+>> pointed out that the necessary cache maintenance can be done in EL0
+>> and we wouldn't even need a new ioctl or anything else from KVM or the
+>> kernel to do this.  I think we should measure the effect of this
+>> before dismissing it though.
+>>
 >
-> Am I missing something or does this patch miss setting l2_slice_size
-> in qcow2_do_open()?
+> If you could use dirty page tracking to only perform the cache
+> invalidation when the framebuffer memory has been updated, you can at
+> least limit the impact to cases where the framebuffer is actually
+> used, rather than sitting idle with a nice wallpaper image.
+>
+>
+>>> A paravirtualized framebuffer (as was proposed recently by Gerd I
+>>> think?) would solve this, since the guest can just map it as
+>>> cacheable.
+>>>
+>>
+>> Yes, but it seems to me that the problem of incoherent views of memory
+>> between the guest and QEMU keeps coming up, and we therefore need to
+>> have a fix for this in software.
+>>
+>
+> Agreed.
+>
+>>>>>
+>>>>>
+>>>>>>>>>
+>>>>>>>>> In the migration case, it is much more complicated, and I think
+>>>>>>>>> capturing the state of the VM in a way that takes incoherency between
+>>>>>>>>> caches and main memory into account is simply infeasible (i.e., the
+>>>>>>>>> act of recording the state of guest RAM via a cached mapping may evict
+>>>>>>>>> clean cachelines that are out of sync, and so it is impossible to
+>>>>>>>>> record both the cached *and* the delta with the uncached state)
+>>>>>>>>
+>>>>>>>> This may be an incredibly stupid question (and I may have asked it
+>>>>>>>> before), but why can't we clean+invalidate the guest page before
+>>>>>>>> reading it and thereby obtain a coherent view of a page?
+>>>>>>>>
+>>>>>>>
+>>>>>>> Because cleaning from the host will clobber whatever the guest wrote
+>>>>>>> directly to memory with the MMU off, if there is a dirty cacheline
+>>>>>>> shadowing that memory.
+>>>>>>
+>>>>>> If the host never wrote anything to that memory (it shouldn't mess
+>>>>>> with the guest's memory) there will only be clean cache lines (even if
+>>>>>> they contain content shadowing the memory) and cleaning them would be
+>>>>>> equivalent to an invalidate.  Am I misremembering how this works?
+>>>>>>
+>>>>>
+>>>>> Cleaning doesn't actually invalidate, but it should be a no-op for
+>>>>> clean cachelines.
+>>>>>
+>>>>>>> However, that same cacheline could be dirty
+>>>>>>> because the guest itself wrote to memory with the MMU on.
+>>>>>>
+>>>>>> Yes, but the guest would have no control over when such a cache line
+>>>>>> gets flushed to main memory by the hardware, and can have no
+>>>>>> reasonable expectation that the cache lines don't get cleaned behind
+>>>>>> its back.  The fact that a migration triggers this, is reasonable.  A
+>>>>>> guest that wants hand-off from main memory that its accessing with the
+>>>>>> MMU off, must invalidate the appropriate cache lines or ensure they're
+>>>>>> clean.  There's very likely some subtle aspect to all of this that I'm
+>>>>>> forgetting.
+>>>>>>
+>>>>>
+>>>>> OK, so if the only way cachelines covering guest memory could be dirty
+>>>>> is after the guest wrote to that memory itself via a cacheable
+>>>>> mapping, I guess it would be reasonable to do clean+invalidate before
+>>>>> reading the memory. Then, the only way for the guest to lose anything
+>>>>> is in cases where it could not reasonably expect it to be retained
+>>>>> anyway.
+>>>>
+>>>> Right, that's what I'm thinking.
+>>>>
+>>>>>
+>>>>> However, that does leave a window, between the invalidate and the
+>>>>> read, where the guest could modify memory without it being visible to
+>>>>> the host.
+>>>>
+>>>> Is that a problem specific to the coherency challenge?  I thought this
+>>>> problem was already addressed by dirty page tracking, but there's like
+>>>> some interaction with the cache maintenance that we'd have to figure
+>>>> out.
+>>>>
+>>>
+>>> I don't know how dirty page tracking works exactly, but if it that can
+>>> track direct writes to memory as easily as cached writes, it would
+>>> probably cover this as well.
+>>
+>> I don't see why it shouldn't.  Guest pages get mapped as read-only in
+>> stage 2, and their memory attributes shouldn't be able to affect
+>> permission checks (one can only hope).
+>>
+>> Unless I'm missing something fundamental, I think we should add
+>> functionality in QEMU to clean+invalidate pages on aarch64 hosts and
+>> see if that solves both VGA and migration, and if so, what the
+>> potential performance impacts are.
+>>
+>
+> Indeed.
+>
+> Identifying the framebuffer region is easy for QEMU, so there we can
+> invalidate (without clean) selectively.
 
-qcow2_do_open() calls qcow2_update_options() which is what reads
-l2-cache-entry-size and sets s->l2_slice_size.
+Do you think there's a material win of doing invalidate rather than
+clean+invalidate or could we just aim for "access coherent" ==
+"clean+invalidate" and we don't have to make any assumptions about how
+the guest is accessing a particular piece of memory?
 
-Berto
+> However, although we'd
+> probably need to capture the state of the MMU bit anyway when handling
+> the stage 2 fault for the dirty page tracking, I don't think we can
+> generally infer whether a faulting access was made via an uncached
+> mapping while the MMU was on, and so this would require
+> clean+invalidate on all dirty pages when doing a migration.
+
+My gut feeling here is that there might be some very clever scheme to
+optimize cache maintenance of the 'hot pages' when dirty page tracking
+is enabled, but since the set of hot pages by virtue of migration
+algorithms has to be small, the win is not likely to impact anything
+real-life, and it's therefore not worth looking into.
+
+Thanks,
+-Christoffer
