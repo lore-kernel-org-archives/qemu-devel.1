@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eh4d2-0002mF-Bc
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:29:33 -0500
+	(envelope-from <peterx@redhat.com>) id 1eh4hM-0004SM-LA
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:34:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eh4cz-00071b-3t
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:29:32 -0500
-Received: from mga02.intel.com ([134.134.136.20]:10499)
+	(envelope-from <peterx@redhat.com>) id 1eh4hJ-00035z-Dy
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:34:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eh4cy-00070l-Qh
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:29:29 -0500
-Date: Thu, 1 Feb 2018 10:29:00 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180201022900.4znup2fovqr7bu5m@hz-desktop>
-References: <20180131060229.9294-1-haozhong.zhang@intel.com>
-	<CAPcyv4gJyS=yiXg6SHxdiHT9vzmLx2yXsfdyOe3+qTLwzrMDQQ@mail.gmail.com>
-	<20180201000240.zmwa6wwnthg2su36@hz-desktop>
-	<CAPcyv4gZSGtPLt7ED0eOngYApHM8=9CTTjOHKpDCG-GfBes4xQ@mail.gmail.com>
-	<20180201002457.hgyvph7z6iys5yvy@hz-desktop>
-	<CAPcyv4g=1FQYWTAjrrm9DmZaP3nZEZJKXc6JC=f8GSWhccv+wg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eh4hJ-00035c-61
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:33:57 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 56751793C9
+	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 02:33:56 +0000 (UTC)
+Date: Thu, 1 Feb 2018 10:33:50 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180201023350.GF31397@xz-mi>
+References: <20180131092835.GA31397@xz-mi>
+	<20180131160214-mutt-send-email-mst@kernel.org>
+	<20180201021853.GD31397@xz-mi>
+	<20180201042234-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAPcyv4g=1FQYWTAjrrm9DmZaP3nZEZJKXc6JC=f8GSWhccv+wg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] nvdimm: support MAP_SYNC for
- memory-backend-file
+In-Reply-To: <20180201042234-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] Windows balloon driver PFN issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-+ vfio maintainer Alex Williamson in case my understanding of vfio is incorrect.
-
-On 01/31/18 16:32 -0800, Dan Williams wrote:
-> On Wed, Jan 31, 2018 at 4:24 PM, Haozhong Zhang
-> <haozhong.zhang@intel.com> wrote:
-> > On 01/31/18 16:08 -0800, Dan Williams wrote:
-> >> On Wed, Jan 31, 2018 at 4:02 PM, Haozhong Zhang
-> >> <haozhong.zhang@intel.com> wrote:
-> >> > On 01/31/18 14:25 -0800, Dan Williams wrote:
-> >> >> On Tue, Jan 30, 2018 at 10:02 PM, Haozhong Zhang
-> >> >> <haozhong.zhang@intel.com> wrote:
-> >> >> > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> >> >> > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> >> >> > files on ext4/xfs file system mounted with '-o dax').
-> >> >>
-> >> >> Wait, MAP_SYNC does not guarantee persistence. It makes sure that the
-> >> >> metadata is in sync after a fault. However, that does not make
-> >> >> filesystem-DAX safe for use with QEMU, because we still need to
-> >> >> coordinate DMA with fileystem operations. There is no way to do that
-> >> >> coordination from within a guest. QEMU needs to use device-dax if the
-> >> >> guest might ever perform DMA to a virtual-pmem range. See this patch
-> >> >> set for more details on the DAX vs DMA problem [1]. I think we need to
-> >> >> enforce this in the host kernel. I.e. do not allow file backed DAX
-> >> >> pages to be mapped in EPT entries unless / until we have a solution to
-> >> >> the DMA synchronization problem. Apologies for not noticing this
-> >> >> earlier.
-> >> >
-> >> > QEMU does not truncate or punch holes of the file once it has been
-> >> > mmap()'ed. Does the problem [1] still exist in such case?
-> >>
-> >> Something else on the system might. The only agent that could enforce
-> >> protection is the kernel, and the kernel will likely just disallow
-> >> passing addresses from filesystem-dax vmas through to a guest
-> >> altogether. I think there's even a problem in the non-DAX case unless
-> >> KVM is pinning pages while they are handed out to a guest. The problem
-> >> is that we don't have a page cache page to pin in the DAX case.
-> >>
-> >
-> > Does it mean any user-space code like
-> >   ptr = mmap(..., fd, ...); // fd refers to a file on DAX filesystem
-> >   // make DMA to ptr
-> > is unsafe?
+On Thu, Feb 01, 2018 at 04:24:40AM +0200, Michael S. Tsirkin wrote:
+> On Thu, Feb 01, 2018 at 10:18:53AM +0800, Peter Xu wrote:
+> > On Wed, Jan 31, 2018 at 04:03:12PM +0200, Michael S. Tsirkin wrote:
+> > > On Wed, Jan 31, 2018 at 05:28:35PM +0800, Peter Xu wrote:
+> > > > Hi, Michael and the list,
+> > > > 
+> > > > I observed this on windows 8 enterprise guests, when doing memory ballooning:
+> > > > 
+> > > > 23892@1517298572.328354:virtio_balloon_to_target balloon target: 0x80000000 num_pages: 524288
+> > > > 23892@1517298638.542819:virtio_balloon_get_config num_pages: 524288 actual: 0
+> > > > 23892@1517298638.542974:virtio_balloon_handle_output section name: pc.ram gpa: 0x174604000
+> > > > 23892@1517298638.543059:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > 23892@1517298638.543135:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460a000
+> > > > 23892@1517298638.543140:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > 23892@1517298638.543143:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460b000
+> > > > 23892@1517298638.543146:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > 23892@1517298638.543148:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460c000
+> > > > 23892@1517298638.543152:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > 23892@1517298638.543154:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460d000
+> > > > 23892@1517298638.543159:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > 23892@1517298638.543162:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460e000
+> > > > 23892@1517298638.543165:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > 23892@1517298638.543167:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460f000
+> > > > 23892@1517298638.543170:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
+> > > > ...
+> > > > 
+> > > > I think it's very possible that these zero addresses (please let me
+> > > > know what the first 4K page is used for if anyone knows, since IIUC
+> > > > that's what we throw away now) are half of the 64bit PFN.  Or say, not
+> > > > sure whether this means a windows guest driver bug that is using
+> > > > 64bits for PFN rather than 32bits (and I suppose the protocol is using
+> > > > 32bit for PFNs).
+> > > > 
+> > > > Michael, do you know what to do with this?
+> > > > 
+> > > > Thanks,
+> > > 
+> > > PFN is GPA>>12.  Do you have more than 1<<44 bytes of memory in this VM then?
+> > 
+> > No.  But isn't it still not good to drop the page at offset zero (and
+> > drop it NNN times)?
 > 
-> Yes, it is currently unsafe because there is no coordination with the
-> filesytem if it decides to make block layout changes. We can fix that
-> in the non-virtualization case by having the filesystem wait for DMA
-> completion callbacks (i.e. what for all pages to be idle), but as far
-> as I can see we can't do the same coordination for DMA initiated by a
-> guest device driver.
+> Absolutely - looks like a bug. I just don't know why does this happen.
+
+IMHO if we are using a PFN array like this:
+
+   u64 pfn_array[];
+
+In the windows guest driver, then we'll see this (as mentioned
+above).  But for sure this is wild guess of mine.
+
 > 
+> >  And I'm not sure what will happen if guest has
+> > 1<<44 bytes; then we'll possibly drop very random addresses since a
+> > real address will be splitted?
+> > 
+> > Thanks,
+> 
+> The balloon won't work, period. There was an interface change to fix
+> that but implementation issues remained and contributor seems to be busy
+> with page hints.
 
-I think that fix [1] also works for KVM/QEMU. The guest DMA are
-performed on two types of devices:
-
-1. For emulated devices, the guest DMA requests are trapped and
-   actually performed by QEMU on the host side. The host side fix [1]
-   can cover this case.
-
-2. For passthrough devices, vfio pins all pages, including those
-   backed by dax mode files, used by the guest if any device is
-   passthroughed to it. If I read the commit message in [2] correctly,
-   operations that change the page-to-file offset association of pages
-   from dax mode files will be deferred until the reference count of
-   the affected pages becomes 1.  That is, if any passthrough device
-   is used with a VM, the changes of page-to-file offset will not be
-   able to happen until the VM is shutdown, so the fix [1] still takes
-   effect here.
-
-Another question is how a user-space application (e.g., QEMU) knows
-whether it's safe to mmap a file on the DAX file system?
-
-[1] https://lists.01.org/pipermail/linux-nvdimm/2017-December/013704.html
-[2] https://lists.01.org/pipermail/linux-nvdimm/2017-December/013713.html
-
+Okay.  So IIUC this is already a known issue for the driver owner.
+Then it seems that there's nothing more I can do for now...
 
 Thanks,
-Haozhong
+
+-- 
+Peter Xu
