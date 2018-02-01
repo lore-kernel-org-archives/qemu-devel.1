@@ -1,14 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eh695-0000W2-St
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 23:06:44 -0500
+	(envelope-from <marcel@redhat.com>) id 1eh7YX-0004V2-JD
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 00:37:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eh695-0008O4-03
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 23:06:43 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 31 Jan 2018 23:06:33 -0500
-Message-Id: <20180201040635.5749-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 0/2] Block patches
+	(envelope-from <marcel@redhat.com>) id 1eh7YU-0007uJ-GR
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 00:37:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eh7YU-0007td-7t
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 00:37:02 -0500
+References: <20180117095421.124787-1-marcel@redhat.com>
+	<20180117095421.124787-2-marcel@redhat.com>
+	<20180131204059.GG21702@localhost.localdomain>
+	<20180131230607-mutt-send-email-mst@kernel.org>
+	<20180131233422.GP26425@localhost.localdomain>
+	<20180201040608-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
+Date: Thu, 1 Feb 2018 07:36:50 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180201040608-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
+ memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,35 +33,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
 
-The following changes since commit b05631954d6dfe93340d516660397e2c1a2a5dd6:
+On 01/02/2018 4:22, Michael S. Tsirkin wrote:
+> On Wed, Jan 31, 2018 at 09:34:22PM -0200, Eduardo Habkost wrote:
+>> On Wed, Jan 31, 2018 at 11:10:07PM +0200, Michael S. Tsirkin wrote:
+>>> On Wed, Jan 31, 2018 at 06:40:59PM -0200, Eduardo Habkost wrote:
+>>>> On Wed, Jan 17, 2018 at 11:54:18AM +0200, Marcel Apfelbaum wrote:
+>>>>> Currently only file backed memory backend can
+>>>>> be created with a "share" flag in order to allow
+>>>>> sharing guest RAM with other processes in the host.
+>>>>>
+>>>>> Add the "share" flag also to RAM Memory Backend
+>>>>> in order to allow remapping parts of the guest RAM
+>>>>> to different host virtual addresses. This is needed
+>>>>> by the RDMA devices in order to remap non-contiguous
+>>>>> QEMU virtual addresses to a contiguous virtual address range.
+>>>>>
+>>>>
+>>>> Why do we need to make this configurable?  Would anything break
+>>>> if MAP_SHARED was always used if possible?
+>>>
+>>> See Documentation/vm/numa_memory_policy.txt for a list
+>>> of complications.
+>>
+>> Ew.
+>>
+>>>
+>>> Maybe we should more of an effort to detect and report these
+>>> issues.
+>>
+>> Probably.  Having other features breaking silently when using
+>> pvrdma doesn't sound good.  We must at least document those
+>> problems in the documentation for memory-backend-ram.
+>>
+>> BTW, what's the root cause for requiring HVAs in the buffer?
+> 
+> It's a side effect of the kernel/userspace API which always wants
+> a single HVA/len pair to map memory for the application.
+> 
+> 
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20180131' into staging (2018-01-31 15:50:29 +0000)
+Hi Eduardo and Michael,
 
-are available in the git repository at:
+>>  Can
+>> this be fixed?
+> 
+> I think yes.  It'd need to be a kernel patch for the RDMA subsystem
+> mapping an s/g list with actual memory. The HVA/len pair would then just
+> be used to refer to the region, without creating the two mappings.
+> 
+> Something like splitting the register mr into
+> 
+> mr = create mr (va/len) - allocate a handle and record the va/len
+> 
+> addmemory(mr, offset, hva, len) - pin memory
+> 
+> register mr - pass it to HW
+> 
+> As a nice side effect we won't burn so much virtual address space.
+>
 
-  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+We would still need a contiguous virtual address space range (for post-send)
+which we don't have since guest contiguous virtual address space
+will always end up as non-contiguous host virtual address space.
 
-for you to fetch changes up to 45a79646ea746fa3f32083d0aa70512aae29f6b3:
+I am not sure the RDMA HW can handle a large VA with holes.
 
-  iotests: Make 200 run on tmpfs (2018-01-31 22:37:00 -0500)
+An alternative would be 0-based MR, QEMU intercepts the post-send
+operations and can substract the guest VA base address.
+However I didn't see the implementation in kernel for 0 based MRs
+and also the RDMA maintainer said it would work for local keys
+and not for remote keys.
 
-----------------------------------------------------------------
-Block patches
-----------------------------------------------------------------
+> This will fix rdma with hugetlbfs as well which is currently broken.
+> 
+> 
 
-Max Reitz (1):
-  iotests: Make 200 run on tmpfs
+There is already a discussion on the linux-rdma list:
+    https://www.spinics.net/lists/linux-rdma/msg60079.html
+But it will take some (actually a lot of) time, we are currently talking about
+a possible API. And it does not solve the re-mapping...
 
-Murilo Opsfelder Araujo (1):
-  block/ssh: fix possible segmentation fault when .desc is not
-    null-terminated
+Thanks,
+Marcel
 
- block/ssh.c            | 1 +
- tests/qemu-iotests/200 | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
-
--- 
-2.9.5
+>> -- 
+>> Eduardo
