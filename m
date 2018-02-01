@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ehJH9-0003Of-C6
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:07:56 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehJIc-0005LF-7P
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:09:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ehJH6-0001Yp-71
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:07:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehJH5-0001YR-UE
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:07:52 -0500
-References: <20180117095421.124787-1-marcel@redhat.com>
-	<20180117095421.124787-2-marcel@redhat.com>
-	<20180131204059.GG21702@localhost.localdomain>
-	<20180131230607-mutt-send-email-mst@kernel.org>
-	<20180131233422.GP26425@localhost.localdomain>
-	<20180201040608-mutt-send-email-mst@kernel.org>
-	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
-	<20180201121009.GR26425@localhost.localdomain>
-	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
-	<20180201150254-mutt-send-email-mst@kernel.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <eae7cba7-20da-976f-bd47-d7d548ae7457@redhat.com>
-Date: Thu, 1 Feb 2018 20:07:35 +0200
+	(envelope-from <mreitz@redhat.com>) id 1ehJIb-0002gt-En
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 13:09:26 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<e2cb85926f1f4910c7d18fcc902be60109592381.1516978645.git.berto@igalia.com>
+	<4361f774-7d2e-1a67-bde9-da421df554f9@redhat.com>
+	<w51wozx597l.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <372299e3-6efe-aa6c-85ae-ccb26e1c6f3e@redhat.com>
+Date: Thu, 1 Feb 2018 19:09:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180201150254-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
- memory-backend-ram
+In-Reply-To: <w51wozx597l.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5"
+Subject: Re: [Qemu-devel] [PATCH v3 13/39] qcow2: Add l2_slice_size field to
+ BDRVQcow2State
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,117 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 01/02/2018 16:24, Michael S. Tsirkin wrote:
-> On Thu, Feb 01, 2018 at 02:29:25PM +0200, Marcel Apfelbaum wrote:
->> On 01/02/2018 14:10, Eduardo Habkost wrote:
->>> On Thu, Feb 01, 2018 at 07:36:50AM +0200, Marcel Apfelbaum wrote:
->>>> On 01/02/2018 4:22, Michael S. Tsirkin wrote:
->>>>> On Wed, Jan 31, 2018 at 09:34:22PM -0200, Eduardo Habkost wrote:
->>> [...]
->>>>>> BTW, what's the root cause for requiring HVAs in the buffer?
->>>>>
->>>>> It's a side effect of the kernel/userspace API which always wants
->>>>> a single HVA/len pair to map memory for the application.
->>>>>
->>>>>
->>>>
->>>> Hi Eduardo and Michael,
->>>>
->>>>>>  Can
->>>>>> this be fixed?
->>>>>
->>>>> I think yes.  It'd need to be a kernel patch for the RDMA subsystem
->>>>> mapping an s/g list with actual memory. The HVA/len pair would then just
->>>>> be used to refer to the region, without creating the two mappings.
->>>>>
->>>>> Something like splitting the register mr into
->>>>>
->>>>> mr = create mr (va/len) - allocate a handle and record the va/len
->>>>>
->>>>> addmemory(mr, offset, hva, len) - pin memory
->>>>>
->>>>> register mr - pass it to HW
->>>>>
->>>>> As a nice side effect we won't burn so much virtual address space.
->>>>>
->>>>
->>>> We would still need a contiguous virtual address space range (for post-send)
->>>> which we don't have since guest contiguous virtual address space
->>>> will always end up as non-contiguous host virtual address space.
->>>>
->>>> I am not sure the RDMA HW can handle a large VA with holes.
->>>
->>> I'm confused.  Why would the hardware see and care about virtual
->>> addresses? 
->>
->> The post-send operations bypasses the kernel, and the process
->> puts in the work request GVA addresses.
-> 
-> To be more precise, it's the guest supplied IOVA that is sent to the card.
-> 
->>> How exactly does the hardware translates VAs to
->>> PAs? 
->>
->> The HW maintains a page-directory like structure different form MMU
->> VA -> phys pages
->>
->>> What if the process page tables change?
->>>
->>
->> Since the page tables the HW uses are their own, we just need the phys
->> page to be pinned.
->>
->>>>
->>>> An alternative would be 0-based MR, QEMU intercepts the post-send
->>>> operations and can substract the guest VA base address.
->>>> However I didn't see the implementation in kernel for 0 based MRs
->>>> and also the RDMA maintainer said it would work for local keys
->>>> and not for remote keys.
->>>
->>> This is also unexpected: are GVAs visible to the virtual RDMA
->>> hardware? 
->>
->> Yes, explained above
->>
->>> Where does the QEMU pvrdma code translates GVAs to
->>> GPAs?
->>>
->>
->> During reg_mr (memory registration commands)
->> Then it registers the same addresses to the real HW.
->> (as Host virtual addresses)
->>
->> Thanks,
->> Marcel
-> 
-> 
-> The full fix would be to allow QEMU to map a list of
-> pages to a guest supplied IOVA.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <372299e3-6efe-aa6c-85ae-ccb26e1c6f3e@redhat.com>
+Subject: Re: [PATCH v3 13/39] qcow2: Add l2_slice_size field to BDRVQcow2State
+References: <cover.1516978645.git.berto@igalia.com>
+ <e2cb85926f1f4910c7d18fcc902be60109592381.1516978645.git.berto@igalia.com>
+ <4361f774-7d2e-1a67-bde9-da421df554f9@redhat.com>
+ <w51wozx597l.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51wozx597l.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Agreed, we are trying to influence the RDMA discussion
-on the new API in this direction.
-
-Thanks,
-Marcel
-
->>>>
->>>>> This will fix rdma with hugetlbfs as well which is currently broken.
->>>>>
->>>>>
->>>>
->>>> There is already a discussion on the linux-rdma list:
->>>>     https://www.spinics.net/lists/linux-rdma/msg60079.html
->>>> But it will take some (actually a lot of) time, we are currently talking about
->>>> a possible API. And it does not solve the re-mapping...
->>>>
->>>> Thanks,
->>>> Marcel
->>>>
->>>>>> -- 
->>>>>> Eduardo
->>>>
+On 2018-02-01 10:51, Alberto Garcia wrote:
+> On Wed 31 Jan 2018 08:48:08 PM CET, Max Reitz wrote:
+>> On 2018-01-26 15:59, Alberto Garcia wrote:
+>>> The BDRVQcow2State structure contains an l2_size field, which stores
+>>> the number of 64-bit entries in an L2 table.
 >>>
+>>> For efficiency reasons we want to be able to load slices instead of
+>>> full L2 tables, so we need to know how many entries an L2 slice can
+>>> hold.
+>>>
+>>> An L2 slice is the portion of an L2 table that is loaded by the qcow2=
+
+>>> cache. At the moment that cache can only load complete tables,
+>>> therefore an L2 slice has the same size as an L2 table (one cluster)
+>>> and l2_size =3D=3D l2_slice_size.
+>>>
+>>> Later we'll allow smaller slices, but until then we have to use this
+>>> new l2_slice_size field to make the rest of the code ready for that.
+>>>
+>>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>> ---
+>>>  block/qcow2.c | 3 +++
+>>>  block/qcow2.h | 1 +
+>>>  2 files changed, 4 insertions(+)
+>>
+>> Am I missing something or does this patch miss setting l2_slice_size
+>> in qcow2_do_open()?
+>=20
+> qcow2_do_open() calls qcow2_update_options() which is what reads
+> l2-cache-entry-size and sets s->l2_slice_size.
+
+So I was missing something, good.
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzV8USHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AgPEH/iWA2sXzrUP70gHfZQmCimrLoz+FgJcn
+/yidYtJ3WmkMM43x8YHqfmZLWmq3OSgV1qYSSiMhd4MO+b6rrmByBUq68Zi99JT9
+6GPJTcKQgybzQUtoyE6HjDaQYHAjGPN0bKGC7GQVlEhYE0O9+f5QkBQ5dY/qQtKk
+0CNs73qNPLic5uC2s0I6QtkXpVCR+kAYg/or75J9oU2WeQZAY9Mh/QWDk3u+Axza
+8f8xqnnTFxr/+9DNhx1UUCCbXU9Bol08/VweJ566129WWAIHQlxjGeBVhE/KHZN8
+EkaQdkKCO/0JiCyAMaaYo2PjhmvTbivmTbWG0LgByl0AdOlNGiEKlPo=
+=cbUe
+-----END PGP SIGNATURE-----
+
+--my0sKQG71G0tWZKR6vb3N6MdyQ0Iwn4p5--
