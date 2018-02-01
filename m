@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ehGhz-0004d2-Rj
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:23:31 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ehGke-0005nl-JS
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ehGhu-0005FI-Sc
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:23:27 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<07a984cef4f1c97dcca44e365aa90ba5b6881e09.1516978645.git.berto@igalia.com>
-	<c57f7978-d54d-75f8-58f3-32d8fa5284a6@redhat.com>
-	<w51r2q46eg2.fsf@maestria.local.igalia.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <d81eae0f-1481-9dd3-0df9-40063c215784@virtuozzo.com>
-Date: Thu, 1 Feb 2018 18:23:09 +0300
+	(envelope-from <brijesh.singh@amd.com>) id 1ehGkb-0006MH-3E
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:26:12 -0500
+Received: from mail-bn3nam01on0075.outbound.protection.outlook.com
+	([104.47.33.75]:12376
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ehGka-0006M1-Si
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:26:09 -0500
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-18-brijesh.singh@amd.com>
+	<87mv0tvs6a.fsf@dusky.pond.sub.org>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <315572b0-2893-2247-c20b-717becd9661c@amd.com>
+Date: Thu, 1 Feb 2018 09:25:59 -0600
 MIME-Version: 1.0
-In-Reply-To: <w51r2q46eg2.fsf@maestria.local.igalia.com>
+In-Reply-To: <87mv0tvs6a.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 17/39] qcow2: Update l2_allocate() to
- support L2 slices
+Subject: Re: [Qemu-devel] [PATCH v6 17/23] qapi: add SEV_MEASUREMENT event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
 
-On 1/2/2018 4:13 PM, Alberto Garcia wrote:
-> On Wed 31 Jan 2018 09:07:48 PM CET, Max Reitz wrote:
->> On 2018-01-26 15:59, Alberto Garcia wrote:
->>> This patch updates l2_allocate() to support the qcow2 cache returning
->>> L2 slices instead of full L2 tables.
->>>
->>> The old code simply gets an L2 table from the cache and initializes it
->>> with zeroes or with the contents of an existing table. With a cache
->>> that returns slices instead of tables the idea remains the same, but
->>> the code must now iterate over all the slices that are contained in an
->>> L2 table.
->>>
->>> Since now we're operating with slices the function can no longer
->>> return the newly-allocated table, so it's up to the caller to retrieve
->>> the appropriate L2 slice after calling l2_allocate() (note that with
->>> this patch the caller is still loading full L2 tables, but we'll deal
->>> with that in a separate patch).
->>>
->>> Signed-off-by: Alberto Garcia <berto@igalia.com>
->>> ---
->>>   block/qcow2-cluster.c | 56 +++++++++++++++++++++++++++++++--------------------
->>>   1 file changed, 34 insertions(+), 22 deletions(-)
->>>
->>> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
->>> index 57349928a9..2a53c1dc5f 100644
->>> --- a/block/qcow2-cluster.c
->>> +++ b/block/qcow2-cluster.c
->>> @@ -264,11 +264,12 @@ int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index)
->>>    *
->>>    */
->>>   
->>> -static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
->>> +static int l2_allocate(BlockDriverState *bs, int l1_index)
->>>   {
->>>       BDRVQcow2State *s = bs->opaque;
->>>       uint64_t old_l2_offset;
->>> -    uint64_t *l2_table = NULL;
->>> +    uint64_t *l2_slice = NULL;
->>> +    unsigned slice, slice_size2, n_slices;
+On 01/31/2018 11:45 AM, Markus Armbruster wrote:
+> Brijesh Singh <brijesh.singh@amd.com> writes:
+> 
+>> Add SEV_MEASUREMENT event which can be used by libvirt to get the
+>> measurement of the memory regions encrypted through the SEV launch
+>> flow. The measurement value is base64 encoded.
 >>
->> I'd personally prefer size_t, but oh well.
-> 
-> I don't see any reason not to use int / unsigned. The size of a slice is
-> always <= cluster_size (an int), and both slice and n_slices are smaller
-> than that.
-> 
->> However, I'm wondering whether this is the best approach.  The old L2
->> table is probably not going to be used after this function, so we're
->> basically polluting the cache here.  That was bad enough so far, but
->> now that actually means wasting multiple cache entries on it.
+>> Cc: Daniel P. Berrange <berrange@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>   qapi-schema.json | 13 +++++++++++++
+>>   1 file changed, 13 insertions(+)
 >>
->> Sure, the code is simpler this way.  But maybe it would still be
->> better to manually copy the data over from the old offset...  (As long
->> as it's not much more complicated.)
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 2046c96669bf..e1f5d14e2e3f 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -3192,3 +3192,16 @@
+>>   # Since: 2.11
+>>   ##
+>>   { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
+>> +
+>> +##
+>> +# @SEV_MEASUREMENT:
+>> +#
+>> +# Emitted when measurement is available for the SEV guest.
+>> +#
+>> +# @value: measurement value encoded in base64
+>> +#
+>> +# Since: 2.12
+>> +#
+>> +##
+>> +{ 'event' : 'SEV_MEASUREMENT',
+>> +  'data' : { 'value' : 'str' } }
 > 
-> You mean bypassing the cache altogether?
-> 
->      qcow2_cache_flush(bs, s->l2_table_cache);
->      new_table = g_malloc(s->cluster_size);
->      if (old_l2_offset & L1E_OFFSET_MASK) {
->          bdrv_pread(bs->file, old_l2_offset, new_table, s->cluster_size);
->      } else {
->          memset(new_table, 0, s->cluster_size);
->      }
->      bdrv_pwrite(bs->file, new_l2_offset, new_table, s->cluster_size);
->      g_free(new_table);
-> 
-> ??
-> 
-> Berto
+> New event -> automatic question: do we need a way to poll for this
+> information?  Say when an event could get lost during a libvirt restart.
 > 
 
-(I know it's a draft so you probably just skipped that but just in case)
-It seems ok to bypass the cache read - perhaps even a flush is
-not necessary: old_l2_offset must be read-only and flushed at this
-point; I believe new_l2_offset might be cached too, so it
-needs to be updated.
+
+In our initial SEV patches for libvirt we ran into similar cases where 
+the event was dropped on restart, and now leaning towards dropping this 
+event patch and add a new QMP command which can be used by libvirt to 
+retrieve the measurement.
