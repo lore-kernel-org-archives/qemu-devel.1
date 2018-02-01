@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehKQL-0005gZ-Ru
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:21:31 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehKQN-0005hU-Bg
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:21:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehKQJ-0005Kg-Gw
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:21:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50968)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehKQJ-0005Jy-3p
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:21:27 -0500
-Date: Thu, 1 Feb 2018 17:21:08 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180201192108.GF26425@localhost.localdomain>
-References: <20180201040608-mutt-send-email-mst@kernel.org>
-	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
-	<20180201121009.GR26425@localhost.localdomain>
-	<bac4ac10-72ef-679e-69e6-95cdda32d2ab@redhat.com>
-	<20180201135340.GU26425@localhost.localdomain>
-	<db40e5ca-9a15-4faf-4675-f29b0ee4ab22@redhat.com>
-	<20180201182108.GE26425@localhost.localdomain>
-	<f87b5810-6d87-bd92-be70-dd620501a29d@redhat.com>
-	<20180201185129.GI21702@localhost.localdomain>
-	<3e5610ec-16d7-2a00-267e-935c1b3ea3af@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ehKQM-0005MZ-43
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 14:21:31 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<0c81220cf2141a5b720629fb6eaff04f833e77a4.1516978645.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <256a246d-fb05-d60c-b06a-3ba7c31450a8@redhat.com>
+Date: Thu, 1 Feb 2018 20:21:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3e5610ec-16d7-2a00-267e-935c1b3ea3af@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
- memory-backend-ram
+In-Reply-To: <0c81220cf2141a5b720629fb6eaff04f833e77a4.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CEt3iZu7FOuiMHQwrC5qD7SVvx9ewl1LS"
+Subject: Re: [Qemu-devel] [PATCH v3 26/39] qcow2: Prepare
+ qcow2_update_snapshot_refcount() for adding L2 slice support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,127 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On Thu, Feb 01, 2018 at 08:58:32PM +0200, Marcel Apfelbaum wrote:
-> On 01/02/2018 20:51, Eduardo Habkost wrote:
-> > On Thu, Feb 01, 2018 at 08:31:09PM +0200, Marcel Apfelbaum wrote:
-> >> On 01/02/2018 20:21, Eduardo Habkost wrote:
-> >>> On Thu, Feb 01, 2018 at 08:03:53PM +0200, Marcel Apfelbaum wrote:
-> >>>> On 01/02/2018 15:53, Eduardo Habkost wrote:
-> >>>>> On Thu, Feb 01, 2018 at 02:29:25PM +0200, Marcel Apfelbaum wrote:
-> >>>>>> On 01/02/2018 14:10, Eduardo Habkost wrote:
-> >>>>>>> On Thu, Feb 01, 2018 at 07:36:50AM +0200, Marcel Apfelbaum wrote:
-> >>>>>>>> On 01/02/2018 4:22, Michael S. Tsirkin wrote:
-> >>>>>>>>> On Wed, Jan 31, 2018 at 09:34:22PM -0200, Eduardo Habkost wrote:
-> >>>>>>> [...]
-> >>>>>>>>>> BTW, what's the root cause for requiring HVAs in the buffer?
-> >>>>>>>>>
-> >>>>>>>>> It's a side effect of the kernel/userspace API which always wants
-> >>>>>>>>> a single HVA/len pair to map memory for the application.
-> >>>>>>>>>
-> >>>>>>>>>
-> >>>>>>>>
-> >>>>>>>> Hi Eduardo and Michael,
-> >>>>>>>>
-> >>>>>>>>>>  Can
-> >>>>>>>>>> this be fixed?
-> >>>>>>>>>
-> >>>>>>>>> I think yes.  It'd need to be a kernel patch for the RDMA subsystem
-> >>>>>>>>> mapping an s/g list with actual memory. The HVA/len pair would then just
-> >>>>>>>>> be used to refer to the region, without creating the two mappings.
-> >>>>>>>>>
-> >>>>>>>>> Something like splitting the register mr into
-> >>>>>>>>>
-> >>>>>>>>> mr = create mr (va/len) - allocate a handle and record the va/len
-> >>>>>>>>>
-> >>>>>>>>> addmemory(mr, offset, hva, len) - pin memory
-> >>>>>>>>>
-> >>>>>>>>> register mr - pass it to HW
-> >>>>>>>>>
-> >>>>>>>>> As a nice side effect we won't burn so much virtual address space.
-> >>>>>>>>>
-> >>>>>>>>
-> >>>>>>>> We would still need a contiguous virtual address space range (for post-send)
-> >>>>>>>> which we don't have since guest contiguous virtual address space
-> >>>>>>>> will always end up as non-contiguous host virtual address space.
-> >>>>>>>>
-> >>>>>>>> I am not sure the RDMA HW can handle a large VA with holes.
-> >>>>>>>
-> >>>>>>> I'm confused.  Why would the hardware see and care about virtual
-> >>>>>>> addresses? 
-> >>>>>>
-> >>>>>> The post-send operations bypasses the kernel, and the process
-> >>>>>> puts in the work request GVA addresses.
-> >>>>>>
-> >>>>>>> How exactly does the hardware translates VAs to
-> >>>>>>> PAs? 
-> >>>>>>
-> >>>>>> The HW maintains a page-directory like structure different form MMU
-> >>>>>> VA -> phys pages
-> >>>>>>
-> >>>>>>> What if the process page tables change?
-> >>>>>>>
-> >>>>>>
-> >>>>>> Since the page tables the HW uses are their own, we just need the phys
-> >>>>>> page to be pinned.
-> >>>>>
-> >>>>> So there's no hardware-imposed requirement that the hardware VAs
-> >>>>> (mapped by the HW page directory) match the VAs in QEMU
-> >>>>> address-space, right? 
-> >>>>
-> >>>> Actually there is. Today it works exactly as you described.
-> >>>
-> >>> Are you sure there's such hardware-imposed requirement?
-> >>>
-> >>
-> >> Yes.
-> >>
-> >>> Why would the hardware require VAs to match the ones in the
-> >>> userspace address-space, if it doesn't use the CPU MMU at all?
-> >>>
-> >>
-> >> It works like that:
-> >>
-> >> 1. We register a buffer from the process address space
-> >>    giving its base address and length.
-> >>    This call goes to kernel which in turn pins the phys pages
-> >>    and registers them with the device *together* with the base
-> >>    address (virtual address!)
-> >> 2. The device builds its own page tables to be able to translate
-> >>    the virtual addresses to actual phys pages.
-> > 
-> > How would the device be able to do that?  It would require the
-> > device to look at the process page tables, wouldn't it?  Isn't
-> > the HW IOVA->PA translation table built by the OS?
-> > 
-> 
-> As stated above, these are tables private for the device.
-> (They even have a hw vendor specific layout I think,
->  since the device holds some cache)
-> 
-> The device looks at its own private page tables, and not
-> to the OS ones.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CEt3iZu7FOuiMHQwrC5qD7SVvx9ewl1LS
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <256a246d-fb05-d60c-b06a-3ba7c31450a8@redhat.com>
+Subject: Re: [PATCH v3 26/39] qcow2: Prepare qcow2_update_snapshot_refcount()
+ for adding L2 slice support
+References: <cover.1516978645.git.berto@igalia.com>
+ <0c81220cf2141a5b720629fb6eaff04f833e77a4.1516978645.git.berto@igalia.com>
+In-Reply-To: <0c81220cf2141a5b720629fb6eaff04f833e77a4.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm still confused by your statement that the device builds its
-own [IOVA->PA] page table.  How would the device do that if it
-doesn't have access to the CPU MMU state?  Isn't the IOVA->PA
-translation table built by the OS?
+On 2018-01-26 15:59, Alberto Garcia wrote:
+> Adding support for L2 slices to qcow2_update_snapshot_refcount() needs
+> (among other things) an extra loop that iterates over all slices of
+> each L2 table.
+>=20
+> Putting all changes in one patch would make it hard to read because
+> all semantic changes would be mixed with pure indentation changes.
+>=20
+> To make things easier this patch simply creates a new block and
+> changes the indentation of all lines of code inside it. Thus, all
+> modifications in this patch are cosmetic. There are no semantic
+> changes and no variables are renamed yet. The next patch will take
+> care of that.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-refcount.c | 140 ++++++++++++++++++++++++++---------------=
+--------
+>  1 file changed, 73 insertions(+), 67 deletions(-)
 
-> 
-> > 
-> >> 3. The process executes post-send requests directly to hw by-passing
-> >>    the kernel giving process virtual addresses in work requests.
-> >> 4. The device uses its own page tables to translate the virtual
-> >>    addresses to phys pages and sending them.
-> >>
-> >> Theoretically is possible to send any contiguous IOVA instead of
-> >> process's one but is not how is working today.
-> >>
-> >> Makes sense?
-> > 
-> 
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
--- 
-Eduardo
+
+--CEt3iZu7FOuiMHQwrC5qD7SVvx9ewl1LS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzaK4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ArsUH/R5p/bKPRtTvlZwWhaRpbOL5Mx/294Pe
+QnoyB/DFb+rjjigiP9o/j1MoTa1zDAyg3JzPPCkBt1g1sEGafinxvFdws+qfk+ev
+8Kwq63GI2L4hC/EflsipdT/y4JegHL7wgqqhsZ5LKh4Hhr1MNzzFrCkT9GdJa+YB
+kmClZ0NlrT0m2YNGJCV0FmtX+WOTOgs13T9XrHMfpjJrl6zbHtkPVKxUz2N/FFd9
+ugJUQvpMpWbgN2vhZxp9v3gyIeISCaEFOl6EgGNr6SFFICo8U1qZqLi6nFHy5ymz
+ULIF0ZGE0bHEu4kR+orfMr9hzYpXM0TN8AhSJJruVU+wE4VGV9/u/sI=
+=BwTH
+-----END PGP SIGNATURE-----
+
+--CEt3iZu7FOuiMHQwrC5qD7SVvx9ewl1LS--
