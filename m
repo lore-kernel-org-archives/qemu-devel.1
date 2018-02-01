@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehGQq-0006t2-Nv
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:05:54 -0500
+	(envelope-from <berto@igalia.com>) id 1ehGf8-0002wJ-7Q
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:20:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehGQm-0002EB-09
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:05:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59140)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehGQl-0002Dt-QZ
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:05:39 -0500
-References: <20180201144430.14441-1-pbonzini@redhat.com>
-	<20180201144430.14441-5-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <495e389b-7fea-903c-6c40-1583ba85ef9f@redhat.com>
-Date: Thu, 1 Feb 2018 09:05:33 -0600
+	(envelope-from <berto@igalia.com>) id 1ehGey-0002Ha-Qc
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 10:20:30 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <87883f3d-9098-2233-b643-c310c9ae2d23@redhat.com>
+References: <1517494591-39369-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<3ad2256a-01cd-6c9b-9a34-663aa077f26f@redhat.com>
+	<87883f3d-9098-2233-b643-c310c9ae2d23@redhat.com>
+Date: Thu, 01 Feb 2018 16:19:38 +0100
+Message-ID: <w514ln068l1.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180201144430.14441-5-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RgPfK2iIQygZ1IpoQUVjPWdbUh8CeipLd"
-Subject: Re: [Qemu-devel] [PATCH 4/6] cpus: tcg: unregister thread with RCU,
- fix exiting of loop on unplug
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: fix write with zero
+ flag set and iovector provided
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: linzc@zju.edu.cn
+To: Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RgPfK2iIQygZ1IpoQUVjPWdbUh8CeipLd
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: linzc@zju.edu.cn
-Message-ID: <495e389b-7fea-903c-6c40-1583ba85ef9f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] cpus: tcg: unregister thread with RCU,
- fix exiting of loop on unplug
-References: <20180201144430.14441-1-pbonzini@redhat.com>
- <20180201144430.14441-5-pbonzini@redhat.com>
-In-Reply-To: <20180201144430.14441-5-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu 01 Feb 2018 03:40:51 PM CET, Eric Blake wrote:
+>>> --- a/block/io.c
+>>> +++ b/block/io.c
+>>> @@ -1701,7 +1701,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+>>>       */
+>>>      tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_WRITE);
+>>>  
+>>> -    if (!qiov) {
+>>> +    if (flags & BDRV_REQ_ZERO_WRITE) {
+>>>          ret = bdrv_co_do_zero_pwritev(child, offset, bytes, flags, &req);
+>> 
+>> So now, the flag rules, but we assert that !qiov (so it would only break
+>> a caller that passed the flag but used qiov, which you argued shouldn't
+>> exist).
+>
+> Sorry, I hit send too soon.  I'm asking if we should have
+> assert(!qiov) right before calling bdrv_co_do_zero_pwritev (it would
+> break a caller that passed the flag and qiov, but you were arguing
+> that such callers previously misbehaved, so we don't want such
+> callers).
 
-On 02/01/2018 08:44 AM, Paolo Bonzini wrote:
-> Keep running until cpu_can_run(cpu) becomes false, for consistency
-> with other acceslerators.
+Those callers do exist as a matter of fact: bdrv_rw_co_entry() always
+passes a qiov to bdrv_co_pwritev() regardless of the flags (the request
+size is actually taken from the very qiov).
 
-s/acceslerators/accelerators/
+bdrv_pwrite_zeroes() is one example:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+$ qemu-img create -f qcow2 base.img 100M
+$ qemu-img create -f qcow2 -b base.img active.img
+$ qemu-io -c 'write -z 0 128k' -f qcow2 active.img 
+$ qemu-img amend -o compat=0.10 active.img 
 
+It even uses an iovec with iov_base = NULL but iov_len != 0, which looks
+like an abuse of the data structure.
 
---RgPfK2iIQygZ1IpoQUVjPWdbUh8CeipLd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpzLL0ACgkQp6FrSiUn
-Q2rGFAf+N5sKmmasaZlYA4f37DZagUKVAtUyIlP01WFYPn5Lnn0gTnN2L1l3jrmt
-o1hQKnaVmI+z3DPY3+475WC0bZjrd/aMwSGGxjIqqiz8l/9xk4PxWc8gwQHkvUrM
-bRhLKQVneuhR6VFs4UxDy920iXxFEJT946p6iqnUVnYLiEi9TJXkxQCorwGLWgEq
-p2tbFehHu7fan/1qJ3Jy9q/R0BV9izL73ouOTAoYyCmvsEhIdVmNJ/NlZq2zk38P
-PW8l/HpvNTndx8LXBCaQnD4aQQZYCjkkw7q9JulGykIckvrymWh8NFYO/l3Gda7G
-huuRb7aGJUf/eYkshrGUcaEjO+bc/g==
-=a/Sh
------END PGP SIGNATURE-----
-
---RgPfK2iIQygZ1IpoQUVjPWdbUh8CeipLd--
+Berto
