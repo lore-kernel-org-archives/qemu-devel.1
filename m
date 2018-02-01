@@ -1,45 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ehBoT-0000Z7-34
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:09:58 -0500
+	(envelope-from <zhunxun@gmail.com>) id 1ehBvp-00058u-Nw
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:17:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ehBoS-0002cK-44
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:09:49 -0500
-Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:52864)
+	(envelope-from <zhunxun@gmail.com>) id 1ehBvj-0006gD-NP
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:17:25 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42717)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1ehBoR-0002bU-Tm
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:09:48 -0500
-Received: by mail-it0-x235.google.com with SMTP id u62so3505374ita.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 02:09:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <zhunxun@gmail.com>) id 1ehBvj-0006fc-I6
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 05:17:19 -0500
+Received: by mail-ot0-x244.google.com with SMTP id a7so13497047otk.9
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 02:17:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAMJs5B8W7-yfco1qkWBY0FU4hiner05jp1jBycWwT6wCTegBfA@mail.gmail.com>
-References: <20180124212246.2352-1-wei@redhat.com>
-	<20180125200525.GC2442@work-vm>
-	<6e27688f-1350-62f5-23ff-7855ea502be9@redhat.com>
-	<CAFEAcA_9HJBETLvsUs9dk=Hw-G_eswNt3R+o+fs70vM9buAeBA@mail.gmail.com>
-	<20180126194559.GI2610@work-vm>
-	<CAFEAcA_QgROXb-7ZbWhL6zM5RmqLK5hyU7Whh+-7REMsXghQmA@mail.gmail.com>
-	<20180129095330.GA2408@work-vm>
-	<CAFEAcA97sfayAEypoArqg4zt5eiv-D9_VoXkeTqz3wn2LutF5Q@mail.gmail.com>
-	<a7c01a48-786b-81d7-7af8-fe80a15283f6@arm.com>
-	<20180131095351.GY21802@cbox>
-	<CAKv+Gu-NAcUTpEUXCLudHTCFAf=Yb28q3AET9d4ED9A9z7dMfQ@mail.gmail.com>
-	<CAMJs5B8jctfTEEhui3XRCTW1La2HCoVd1Jzaz4p7jy=8vqw=0A@mail.gmail.com>
-	<CAKv+Gu80p5G_gWp0Dg7HJ2SAgc3WCQe+g9ear9oM44bt-KmSFA@mail.gmail.com>
-	<CAMJs5B_S0fO32=uh7iavn=BN1BC3=7qZAh1YcpVJFZoRC+GgOA@mail.gmail.com>
-	<CAKv+Gu-dmNOnZbfJzuJ8BauGKktO_TaDRS29PuAftccfySw6ig@mail.gmail.com>
-	<CAMJs5B8CWm2bj-Be_j4p9Y_3wXr=W2K7zE8593ke-97QR20qcA@mail.gmail.com>
-	<CAKv+Gu935vi1wCRAKqC-nscXa+=CKX6P=HPO-3dNA4fx0Fm-NA@mail.gmail.com>
-	<CAMJs5B-S=qVWYP2eTN1qsOQctmfUR8jCXBaz2DKyaKRT7LrAyA@mail.gmail.com>
-	<CAKv+Gu-7d5jbt9V8bORkrZXxNmshMNjsqg+EiwhA-CYrNLFotA@mail.gmail.com>
-	<CAMJs5B8W7-yfco1qkWBY0FU4hiner05jp1jBycWwT6wCTegBfA@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 1 Feb 2018 10:09:46 +0000
-Message-ID: <CAKv+Gu8BM8hAEJ8O+8N15aT0Unf1hvUcU5QCOzkx9OvWsnCFug@mail.gmail.com>
+In-Reply-To: <20180201095118.GA2457@work-vm>
+References: <CADUDsAo6ku+WT1+DTG6u6CUjdg6xzG6LwBt8RwHK4eR_UWY=Jg@mail.gmail.com>
+	<20180131173154.GA2520@work-vm>
+	<CADUDsArE1tfNyiHB13a_GoizMn7pEoT2_s8JX7OeDuK_=xcB=A@mail.gmail.com>
+	<20180201095118.GA2457@work-vm>
+From: "jack.chen" <zhunxun@gmail.com>
+Date: Thu, 1 Feb 2018 18:17:18 +0800
+Message-ID: <CADUDsApj9ScOSNq0PJfH7XdFxbZau_=yuBbBNFc9vaEQrr3B3g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V1 1/1] tests: Add migration test for
- aarch64
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] vhost-user question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,52 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu <qemu-devel@nongnu.org>, maxime.coquelin@redhat.com
 
-On 1 February 2018 at 09:59, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Thu, Feb 1, 2018 at 10:33 AM, Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
->> On 1 February 2018 at 09:17, Christoffer Dall
->> <christoffer.dall@linaro.org> wrote:
-...
->>>
->>> Unless I'm missing something fundamental, I think we should add
->>> functionality in QEMU to clean+invalidate pages on aarch64 hosts and
->>> see if that solves both VGA and migration, and if so, what the
->>> potential performance impacts are.
->>>
+Thanks,But my question is how the fd belonging to qemu can be used in
+another process such as DPDK=EF=BC=9Fis fd just effective within one proces=
+s?
+for example ,if process A open file a.txt,and it gets one fd=E3=80=82the fd
+can only be used in process A ,can it be used in process B?
+
+2018-02-01 17:51 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
+> * jack.chen (zhunxun@gmail.com) wrote:
+>> thanks,but I really can not understand how the fd works,can someone
+>> explain it or give me some  reference material??
+>
+> Probably the man page for the mmap system call, or an introduction to
+> linux/unix syscalls.  Just remember that any shared memory will be
+> 'backed' by a file (or something that works like a file), and if it's a
+> file, when you open it you get a file descriptor.  Once you have that fd
+> you can map it somewhere else.
+>
+> Dave
+>
 >>
->> Indeed.
->>
->> Identifying the framebuffer region is easy for QEMU, so there we can
->> invalidate (without clean) selectively.
->
-> Do you think there's a material win of doing invalidate rather than
-> clean+invalidate or could we just aim for "access coherent" ==
-> "clean+invalidate" and we don't have to make any assumptions about how
-> the guest is accessing a particular piece of memory?
->
-
-In general, invalidate should be cheaper than clean, given that just
-discarding the data involves less work than writing it back to memory.
-Whether that actually holds in current SMP designs, and whether it
-still applies when the memory can be assumed to be clean in the first
-place are things I can't really answer.
-
->> However, although we'd
->> probably need to capture the state of the MMU bit anyway when handling
->> the stage 2 fault for the dirty page tracking, I don't think we can
->> generally infer whether a faulting access was made via an uncached
->> mapping while the MMU was on, and so this would require
->> clean+invalidate on all dirty pages when doing a migration.
->
-> My gut feeling here is that there might be some very clever scheme to
-> optimize cache maintenance of the 'hot pages' when dirty page tracking
-> is enabled, but since the set of hot pages by virtue of migration
-> algorithms has to be small, the win is not likely to impact anything
-> real-life, and it's therefore not worth looking into.
->
-
-Sounds reasonable.
+>> 2018-02-01 1:31 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
+>> > * jack.chen (zhunxun@gmail.com) wrote:
+>> >> hello,I am confused when I read vhost-user source code in qemu.I know
+>> >> vhost-user app shared memory with qemu by mmap,but why it can use fd =
+which
+>> >> is belong to qemu?
+>> >> relative code:
+>> >>  qemu code in function vhost_user_set_mem_table
+>> >> fd =3D memory_region_get_fd(mr);
+>> >>         if (fd > 0) {
+>> >>             msg.payload.memory.regions[fd_num].userspace_addr =3D
+>> >> reg->userspace_addr;
+>> >>             msg.payload.memory.regions[fd_num].memory_size  =3D
+>> >> reg->memory_size;
+>> >>             msg.payload.memory.regions[fd_num].guest_phys_addr =3D
+>> >> reg->guest_phys_addr;
+>> >>             msg.payload.memory.regions[fd_num].mmap_offset =3D offset=
+;
+>> >>             assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
+>> >>             fds[fd_num++] =3D fd;
+>> >>         }
+>> >>
+>> >> =E2=80=A6=E2=80=A6
+>> >> DPDK code in vhost_user_set_mem_table
+>> >>
+>> >> mmap_addr =3D mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
+>> >> MAP_SHARED | MAP_POPULATE, fd, 0);
+>> >> =E2=80=A6=E2=80=A6
+>> >>
+>> >> thanks a lot!
+>> >
+>> > Because that's how the dpdk/vhost-user binary knows what to mmap;
+>> > each fd corresponds to the backing file of the memory area that's bein=
+g
+>> > shared.  This way the dpdk/vhost doesn't need to open those files itse=
+lf
+>> > or try and match the exact memory configuration of qemu; QEMU just giv=
+es
+>> > it the exact thing it needs to mmap - which is just the fd and offsets=
+.
+>> >
+>> > Dave
+>> >
+>> > --
+>> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
