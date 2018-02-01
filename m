@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eh4Su-0003t2-QJ
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:19:06 -0500
+	(envelope-from <liliang.opensource@gmail.com>) id 1eh4TF-00044i-Ts
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:19:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eh4Sq-0001FH-Qy
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:19:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47992)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eh4Sq-0001El-KM
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:19:00 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD5D7C0587C9
-	for <qemu-devel@nongnu.org>; Thu,  1 Feb 2018 02:18:59 +0000 (UTC)
-Date: Thu, 1 Feb 2018 10:18:53 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180201021853.GD31397@xz-mi>
-References: <20180131092835.GA31397@xz-mi>
-	<20180131160214-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180131160214-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] Windows balloon driver PFN issue
+	(envelope-from <liliang.opensource@gmail.com>) id 1eh4TE-0001V6-Ee
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 21:19:25 -0500
+From: Liang Li <liliang.opensource@gmail.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Message-Id: <153D07A7-F411-4EF4-A48D-D244621E97E9@gmail.com>
+Date: Thu, 1 Feb 2018 10:19:10 +0800
+Subject: Re: [Qemu-devel] [PATCH] block/mirror: change the semantic of
+ 'force' of block-job-cancel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +22,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: Liang Li <liliang.opensource@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Liang Li <liliangleo@didichuxing.com>, Huaitong Han <huanhuaitong@didichuxing.com>
 
-On Wed, Jan 31, 2018 at 04:03:12PM +0200, Michael S. Tsirkin wrote:
-> On Wed, Jan 31, 2018 at 05:28:35PM +0800, Peter Xu wrote:
-> > Hi, Michael and the list,
-> > 
-> > I observed this on windows 8 enterprise guests, when doing memory ballooning:
-> > 
-> > 23892@1517298572.328354:virtio_balloon_to_target balloon target: 0x80000000 num_pages: 524288
-> > 23892@1517298638.542819:virtio_balloon_get_config num_pages: 524288 actual: 0
-> > 23892@1517298638.542974:virtio_balloon_handle_output section name: pc.ram gpa: 0x174604000
-> > 23892@1517298638.543059:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > 23892@1517298638.543135:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460a000
-> > 23892@1517298638.543140:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > 23892@1517298638.543143:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460b000
-> > 23892@1517298638.543146:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > 23892@1517298638.543148:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460c000
-> > 23892@1517298638.543152:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > 23892@1517298638.543154:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460d000
-> > 23892@1517298638.543159:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > 23892@1517298638.543162:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460e000
-> > 23892@1517298638.543165:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > 23892@1517298638.543167:virtio_balloon_handle_output section name: pc.ram gpa: 0x17460f000
-> > 23892@1517298638.543170:virtio_balloon_handle_output section name: pc.ram gpa: 0x0
-> > ...
-> > 
-> > I think it's very possible that these zero addresses (please let me
-> > know what the first 4K page is used for if anyone knows, since IIUC
-> > that's what we throw away now) are half of the 64bit PFN.  Or say, not
-> > sure whether this means a windows guest driver bug that is using
-> > 64bits for PFN rather than 32bits (and I suppose the protocol is using
-> > 32bit for PFNs).
-> > 
-> > Michael, do you know what to do with this?
-> > 
-> > Thanks,
-> 
-> PFN is GPA>>12.  Do you have more than 1<<44 bytes of memory in this VM then?
+On Tue, Jan 30, 2018 at 03:18:31PM -0500, John Snow wrote:
+>=20
+>=20
+> On 01/30/2018 03:38 AM, Liang Li wrote:
+>> When doing drive mirror to a low speed shared storage, if there was =
+heavy
+>> BLK IO write workload in VM after the 'ready' event, drive mirror =
+block job
+>> can't be canceled immediately, it would keep running until the heavy =
+BLK IO
+>> workload stopped in the VM.
+>>=20
+>> Because libvirt depends on block-job-cancel for block live migration, =
+the
+>> current block-job-cancel has the semantic to make sure data is in =
+sync after
+>> the 'ready' event.  This semantic can't meet some requirement, for =
+example,
+>> people may use drive mirror for realtime backup while need the =
+ability of
+>> block live migration. If drive mirror can't not be cancelled =
+immediately,
+>> it means block live migration need to wait, because libvirt make use =
+drive
+>> mirror to implement block live migration and only one drive mirror =
+block
+>> job is allowed at the same time for a give block dev.
+>>=20
+>> We need a new interface for 'force cancel', which could quit block =
+job
+>> immediately if don't care about whether data is in sync or not.
+>>=20
+>> 'force' is not used by libvirt currently, to make things simple, =
+change
+>> it's semantic slightly, hope it will not break some use case which =
+need its
+>> original semantic.
+>>=20
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Jeff Cody <jcody@redhat.com>
+>> Cc: Kevin Wolf <kwolf@redhat.com>
+>> Cc: Max Reitz <mreitz@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: John Snow <jsnow@redhat.com>
+>> Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
+>> Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
+>> Signed-off-by: Liang Li <liliangleo@didichuxing.com>
+>> ---
+>> block/mirror.c            |  9 +++------
+>> blockdev.c                |  4 ++--
+>> blockjob.c                | 11 ++++++-----
+>> hmp-commands.hx           |  3 ++-
+>> include/block/blockjob.h  |  9 ++++++++-
+>> qapi/block-core.json      |  6 ++++--
+>> tests/test-blockjob-txn.c |  8 ++++----
+>> 7 files changed, 29 insertions(+), 21 deletions(-)
+>>=20
+>> diff --git a/block/mirror.c b/block/mirror.c
+>> index c9badc1..c22dff9 100644
+>> --- a/block/mirror.c
+>> +++ b/block/mirror.c
+>> @@ -869,11 +869,8 @@ static void coroutine_fn mirror_run(void =
+*opaque)
+>>=20
+>>         ret =3D 0;
+>>         trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
+>> -        if (!s->synced) {
+>> -            block_job_sleep_ns(&s->common, delay_ns);
+>> -            if (block_job_is_cancelled(&s->common)) {
+>> -                break;
+>> -            }
+>> +        if (block_job_is_cancelled(&s->common) && s->common.force) {
+>> +            break;
+>=20
+> what's the justification for removing the sleep in the case that
+> !s->synced && !block_job_is_cancelled(...) ?
+>=20
+if !block_job_is_cancelled() satisfied, the code in 'if =
+(!should_complete) {}'
+will execute, there is a block_job_sleep_ns there.
 
-No.  But isn't it still not good to drop the page at offset zero (and
-drop it NNN times)?  And I'm not sure what will happen if guest has
-1<<44 bytes; then we'll possibly drop very random addresses since a
-real address will be splitted?
+block_job_sleep_ns is for rate throttling, if there is no more data to =
+sync,=20
+sleep is not needed, right?
 
-Thanks,
+>>         } else if (!should_complete) {
+>>             delay_ns =3D (s->in_flight =3D=3D 0 && cnt =3D=3D 0 ? =
+SLICE_TIME : 0);
+>>             block_job_sleep_ns(&s->common, delay_ns);
+>> @@ -887,7 +884,7 @@ immediate_exit:
+>>          * or it was cancelled prematurely so that we do not =
+guarantee that
+>>          * the target is a copy of the source.
+>>          */
+>> -        assert(ret < 0 || (!s->synced && =
+block_job_is_cancelled(&s->common)));
+>> +        assert(ret < 0 || block_job_is_cancelled(&s->common));
+>=20
+> This assertion gets weaker in the case where force isn't provided, is
+> that desired?
+>=20
+yes. if force quit is used, the following condition can be true
 
--- 
-Peter Xu
+(ret >=3D 0) && (s->synced) && (block_job_is_cancelled(&s->common))=20
+
+so the above assert should be changed, or it will be failed.
+
+>>         assert(need_drain);
+>>         mirror_wait_for_all_io(s);
+>>     }
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 8e977ee..039f156 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -145,7 +145,7 @@ void blockdev_mark_auto_del(BlockBackend *blk)
+>>         aio_context_acquire(aio_context);
+>>=20
+>>         if (bs->job) {
+>> -            block_job_cancel(bs->job);
+>> +            block_job_cancel(bs->job, false);
+>>         }
+>>=20
+>>         aio_context_release(aio_context);
+>> @@ -3802,7 +3802,7 @@ void qmp_block_job_cancel(const char *device,
+>>     }
+>>=20
+>>     trace_qmp_block_job_cancel(job);
+>> -    block_job_cancel(job);
+>> +    block_job_cancel(job, force);
+>> out:
+>>     aio_context_release(aio_context);
+>> }
+>> diff --git a/blockjob.c b/blockjob.c
+>> index f5cea84..0aacb50 100644
+>> --- a/blockjob.c
+>> +++ b/blockjob.c
+>> @@ -365,7 +365,7 @@ static void block_job_completed_single(BlockJob =
+*job)
+>>     block_job_unref(job);
+>> }
+>>=20
+>> -static void block_job_cancel_async(BlockJob *job)
+>> +static void block_job_cancel_async(BlockJob *job, bool force)
+>> {
+>>     if (job->iostatus !=3D BLOCK_DEVICE_IO_STATUS_OK) {
+>>         block_job_iostatus_reset(job);
+>> @@ -376,6 +376,7 @@ static void block_job_cancel_async(BlockJob *job)
+>>         job->pause_count--;
+>>     }
+>>     job->cancelled =3D true;
+>> +    job->force =3D force;
+>> }
+>>=20
+>=20
+> I suppose this is okay; we're setting a permanent property of the job =
+as
+> part of a limited operation.
+>=20
+> Granted, the job should disappear afterwards, so it should never
+> conflict, but it made me wonder for a moment.
+>=20
+> What happens if we cancel with force =3D true and then immediately =
+cancel
+> again with force =3D false? What happens? Can it cause issues?
+>=20
+
+Indeed. It can be fixed by:
+
+if (!job->force)
+   job->force =3D force
+
+it's that ok ?
+
+>> static int block_job_finish_sync(BlockJob *job,
+>> @@ -437,7 +438,7 @@ static void =
+block_job_completed_txn_abort(BlockJob *job)
+>>      * on the caller, so leave it. */
+>>     QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
+>>         if (other_job !=3D job) {
+>> -            block_job_cancel_async(other_job);
+>> +            block_job_cancel_async(other_job, true);
+>=20
+> What's the rationale for deciding that transactional cancellations are
+> always force=3Dtrue?
+>=20
+
+no particular reason, just try to speed up the abort process. :)
+
+> Granted, this doesn't matter currently because mirror isn't a
+> transactional job, but that makes the decision all the more curious.
+>=20
+>>         }
+>>     }
+
+Thanks for your comments.
+
+Liang=
