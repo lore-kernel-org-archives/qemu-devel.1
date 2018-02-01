@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eh2h1-0004JY-2I
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:25:32 -0500
+	(envelope-from <fzheng@redhat.com>) id 1eh2ib-0005EG-Bs
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:27:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eh2gw-0004ei-Vi
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:25:30 -0500
-Received: from mga07.intel.com ([134.134.136.100]:2174)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eh2gw-0004dC-K8
-	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:25:26 -0500
-Date: Thu, 1 Feb 2018 08:24:58 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180201002457.hgyvph7z6iys5yvy@hz-desktop>
-References: <20180131060229.9294-1-haozhong.zhang@intel.com>
-	<CAPcyv4gJyS=yiXg6SHxdiHT9vzmLx2yXsfdyOe3+qTLwzrMDQQ@mail.gmail.com>
-	<20180201000240.zmwa6wwnthg2su36@hz-desktop>
-	<CAPcyv4gZSGtPLt7ED0eOngYApHM8=9CTTjOHKpDCG-GfBes4xQ@mail.gmail.com>
+	(envelope-from <fzheng@redhat.com>) id 1eh2iY-00062Q-49
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:27:09 -0500
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:51155)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1eh2iX-000600-Sc
+	for qemu-devel@nongnu.org; Wed, 31 Jan 2018 19:27:06 -0500
+Received: by mail-wm0-f67.google.com with SMTP id f71so2534410wmf.0
+	for <qemu-devel@nongnu.org>; Wed, 31 Jan 2018 16:27:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4gZSGtPLt7ED0eOngYApHM8=9CTTjOHKpDCG-GfBes4xQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] nvdimm: support MAP_SYNC for
- memory-backend-file
+In-Reply-To: <20180131134942.a2cupkloo4cp33bc@kamzik.brq.redhat.com>
+References: <20180131032800.25578-1-famz@redhat.com>
+	<20180131134942.a2cupkloo4cp33bc@kamzik.brq.redhat.com>
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 1 Feb 2018 08:26:33 +0800
+Message-ID: <CAK1Eb9mGKb3Noorr7KfJwe9ynz_5APTKRjMyuT12hg4T6JB_MQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] docs: Add docs/devel/testing.rst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, dgilbert@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 01/31/18 16:08 -0800, Dan Williams wrote:
-> On Wed, Jan 31, 2018 at 4:02 PM, Haozhong Zhang
-> <haozhong.zhang@intel.com> wrote:
-> > On 01/31/18 14:25 -0800, Dan Williams wrote:
-> >> On Tue, Jan 30, 2018 at 10:02 PM, Haozhong Zhang
-> >> <haozhong.zhang@intel.com> wrote:
-> >> > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> >> > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> >> > files on ext4/xfs file system mounted with '-o dax').
-> >>
-> >> Wait, MAP_SYNC does not guarantee persistence. It makes sure that the
-> >> metadata is in sync after a fault. However, that does not make
-> >> filesystem-DAX safe for use with QEMU, because we still need to
-> >> coordinate DMA with fileystem operations. There is no way to do that
-> >> coordination from within a guest. QEMU needs to use device-dax if the
-> >> guest might ever perform DMA to a virtual-pmem range. See this patch
-> >> set for more details on the DAX vs DMA problem [1]. I think we need to
-> >> enforce this in the host kernel. I.e. do not allow file backed DAX
-> >> pages to be mapped in EPT entries unless / until we have a solution to
-> >> the DMA synchronization problem. Apologies for not noticing this
-> >> earlier.
-> >
-> > QEMU does not truncate or punch holes of the file once it has been
-> > mmap()'ed. Does the problem [1] still exist in such case?
-> 
-> Something else on the system might. The only agent that could enforce
-> protection is the kernel, and the kernel will likely just disallow
-> passing addresses from filesystem-dax vmas through to a guest
-> altogether. I think there's even a problem in the non-DAX case unless
-> KVM is pinning pages while they are handed out to a guest. The problem
-> is that we don't have a page cache page to pin in the DAX case.
-> 
+On Wed, Jan 31, 2018 at 9:49 PM, Andrew Jones <drjones@redhat.com> wrote:
+> On Wed, Jan 31, 2018 at 11:28:00AM +0800, Fam Zheng wrote:
+>> +On top of libqtest, a higher level library, ``libqos``, was created to
+>> +encapsulate common tasks of device drivers, such as memory management and
+>> +communicating with system buses or devices. Many virtual device tests use
+>> +libqos instead of directly calling into libqos.
+>                                            ^^ libqtest?
 
-Does it mean any user-space code like
-  ptr = mmap(..., fd, ...); // fd refers to a file on DAX filesystem
-  // make DMA to ptr
-is unsafe?
+Yes, I've apparently made a mistake.
+
+Fam
+
+>
+> Thanks,
+> drew
