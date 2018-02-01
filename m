@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ehICp-0000ca-F4
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:59:26 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ehIFT-0002f2-An
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:02:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ehICl-00075w-LD
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:59:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46832)
+	(envelope-from <ehabkost@redhat.com>) id 1ehIFN-0000Jc-Ns
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:02:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ehICl-00074d-F3
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 11:59:19 -0500
-Date: Thu, 1 Feb 2018 18:59:07 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180201185830-mutt-send-email-mst@kernel.org>
-References: <20180131230607-mutt-send-email-mst@kernel.org>
-	<20180131233422.GP26425@localhost.localdomain>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehIFN-0000JG-Hf
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 12:02:01 -0500
+Date: Thu, 1 Feb 2018 15:01:36 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180201170136.GA26425@localhost.localdomain>
+References: <20180131233422.GP26425@localhost.localdomain>
 	<20180201040608-mutt-send-email-mst@kernel.org>
 	<8dbc7c99-84f6-0023-526b-359fdf2b5162@redhat.com>
 	<20180201121009.GR26425@localhost.localdomain>
@@ -22,10 +21,11 @@ References: <20180131230607-mutt-send-email-mst@kernel.org>
 	<20180201163132.GV26425@localhost.localdomain>
 	<20180201184655-mutt-send-email-mst@kernel.org>
 	<20180201165739.GY26425@localhost.localdomain>
+	<20180201185830-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180201165739.GY26425@localhost.localdomain>
+In-Reply-To: <20180201185830-mutt-send-email-mst@kernel.org>
 Subject: Re: [Qemu-devel] [PATCH V8 1/4] mem: add share parameter to
  memory-backend-ram
 List-Id: <qemu-devel.nongnu.org>
@@ -36,40 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, cohuck@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, borntraeger@de.ibm.com, pbonzini@redhat.com, imammedo@redhat.com
 
-On Thu, Feb 01, 2018 at 02:57:39PM -0200, Eduardo Habkost wrote:
-> On Thu, Feb 01, 2018 at 06:48:54PM +0200, Michael S. Tsirkin wrote:
-> > On Thu, Feb 01, 2018 at 02:31:32PM -0200, Eduardo Habkost wrote:
-> > > On Thu, Feb 01, 2018 at 04:24:30PM +0200, Michael S. Tsirkin wrote:
-> > > [...]
-> > > > The full fix would be to allow QEMU to map a list of
-> > > > pages to a guest supplied IOVA.
+On Thu, Feb 01, 2018 at 06:59:07PM +0200, Michael S. Tsirkin wrote:
+> On Thu, Feb 01, 2018 at 02:57:39PM -0200, Eduardo Habkost wrote:
+> > On Thu, Feb 01, 2018 at 06:48:54PM +0200, Michael S. Tsirkin wrote:
+> > > On Thu, Feb 01, 2018 at 02:31:32PM -0200, Eduardo Habkost wrote:
+> > > > On Thu, Feb 01, 2018 at 04:24:30PM +0200, Michael S. Tsirkin wrote:
+> > > > [...]
+> > > > > The full fix would be to allow QEMU to map a list of
+> > > > > pages to a guest supplied IOVA.
+> > > > 
+> > > > Thanks, that's what I expected.
+> > > > 
+> > > > While this is not possible, the only requests I have for this
+> > > > patch is that we clearly document:
+> > > > * What's the only purpose of share=on on a host-memory-backend
+> > > >   object (due to pvrdma limitations).
+> > > > * The potential undesirable side-effects of setting share=on.
+> > > > * On the commit message and other comments, clearly distinguish
+> > > >   HVAs in the QEMU address-space from IOVAs, to avoid confusion.
 > > > 
-> > > Thanks, that's what I expected.
+> > > Looking forward, when we do support it, how will management find out
+> > > it no longer needs to pass the share parameter?
 > > > 
-> > > While this is not possible, the only requests I have for this
-> > > patch is that we clearly document:
-> > > * What's the only purpose of share=on on a host-memory-backend
-> > >   object (due to pvrdma limitations).
-> > > * The potential undesirable side-effects of setting share=on.
-> > > * On the commit message and other comments, clearly distinguish
-> > >   HVAs in the QEMU address-space from IOVAs, to avoid confusion.
+> > > Further, if the side effects of the share parameter go away,
+> > > how will it know these no longer hold?
 > > 
-> > Looking forward, when we do support it, how will management find out
-> > it no longer needs to pass the share parameter?
-> > 
-> > Further, if the side effects of the share parameter go away,
-> > how will it know these no longer hold?
+> > A query-host-capabilities or similar QMP command seems necessary
+> > for that.
 > 
-> A query-host-capabilities or similar QMP command seems necessary
-> for that.
+> Is anyone working on that?
 
-Is anyone working on that?
+Not yet.
 
-> It would be useful for other stuff like MAP_SYNC.
-
-
-> -- 
-> Eduardo
+-- 
+Eduardo
