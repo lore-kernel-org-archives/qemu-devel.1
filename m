@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:39904)
+Received: from eggs.gnu.org ([208.118.235.92]:41675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1ehLGa-0000of-Bq
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:16:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehLJc-0002Pq-7r
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:19:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1ehLCR-0000Jc-Ds
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:15:28 -0500
-Received: from mout.gmx.net ([212.227.15.15]:63112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1ehLCQ-0000I0-TT
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:11:11 -0500
-Date: Thu, 1 Feb 2018 21:11:01 +0100
-From: Helge Deller <deller@gmx.de>
-Message-ID: <20180201201101.GA31191@ls3530.fritz.box>
-References: <20180130044621.10464-1-richard.henderson@linaro.org>
-	<20180130044621.10464-2-richard.henderson@linaro.org>
-	<90f0c9fa-ee0b-29d3-e39a-fc7391179e3d@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ehLIX-0003qb-KD
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 15:18:36 -0500
+References: <cover.1516978645.git.berto@igalia.com>
+	<f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <fe709884-2202-75fc-4daa-77bf57b1f55a@redhat.com>
+Date: Thu, 1 Feb 2018 21:11:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <90f0c9fa-ee0b-29d3-e39a-fc7391179e3d@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v5 39/43] hw/hppa: Implement DINO system
- board
+In-Reply-To: <f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN"
+Subject: Re: [Qemu-devel] [PATCH v3 38/39] iotests: Test downgrading an
+ image using a small L2 slice size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, Helge Deller <deller@gmx.de>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-* Thomas Huth <thuth@redhat.com>:
-> First kudos for the new hppa-softmmu target!
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <fe709884-2202-75fc-4daa-77bf57b1f55a@redhat.com>
+Subject: Re: [PATCH v3 38/39] iotests: Test downgrading an image using a small
+ L2 slice size
+References: <cover.1516978645.git.berto@igalia.com>
+ <f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
+In-Reply-To: <f797e0f6c697b2fce069bfafe22ee53f26aebce8.1516978645.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks Thomas!
+On 2018-01-26 16:00, Alberto Garcia wrote:
+> expand_zero_clusters_in_l1() is used when downgrading qcow2 images
+> from v3 to v2 (compat=3D0.10). This is one of the functions that needed=
 
-> But these debug messages now pop up during "make check-qtest":
-> 
-> Serial port created at 0xfff83800
-> Firmware loaded at 0xf0000000-0xf0023f29, entry at 0xf0000084.
-> 
-> That's a little bit annoying. Could you please either remove them or
-> silence them in qtest mode by adding a check for !qtest_enabled() ?
+> more changes to support L2 slices, so this patch extends iotest 061 to
+> test downgrading a qcow2 image using a smaller slice size.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  tests/qemu-iotests/061     | 16 ++++++++++++
+>  tests/qemu-iotests/061.out | 61 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 77 insertions(+)
 
-The patch below fixes it.
-Richard, can you apply it?
+Well, it would be better if we could just specify this option for all of
+the qcow2 tests, but I can see that that's not really feasible...
 
-Helge
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
--------
 
-target/hppa: Silence debug messages in qtest mode
+--eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Helge Deller <deller@gmx.de>
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index afd3867313..338aa87724 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -12,6 +12,7 @@
- #include "hw/boards.h"
- #include "qemu/error-report.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
- #include "hw/timer/mc146818rtc.h"
- #include "hw/ide.h"
- #include "hw/timer/i8254.h"
-@@ -111,7 +112,9 @@ static void machine_hppa_init(MachineState *machine)
-         uint32_t addr = DINO_UART_HPA + 0x800;
-         serial_mm_init(addr_space, addr, 0, serial_irq,
-                        115200, serial_hds[0], DEVICE_BIG_ENDIAN);
--        fprintf(stderr, "Serial port created at 0x%x\n", addr);
-+        if (!qtest_enabled()) {
-+            fprintf(stderr, "Serial port created at 0x%x\n", addr);
-+        }
-     }
- 
-     /* SCSI disk setup. */
-@@ -146,9 +149,11 @@ static void machine_hppa_init(MachineState *machine)
-         error_report("could not load firmware '%s'", firmware_filename);
-         exit(1);
-     }
--    fprintf(stderr, "Firmware loaded at 0x%08" PRIx64 "-0x%08" PRIx64
-+    if (!qtest_enabled()) {
-+        fprintf(stderr, "Firmware loaded at 0x%08" PRIx64 "-0x%08" PRIx64
-             ", entry at 0x%08" PRIx64 ".\n",
-             firmware_low, firmware_high, firmware_entry);
-+    }
-     if (firmware_low < ram_size || firmware_high >= FIRMWARE_END) {
-         error_report("Firmware overlaps with memory or IO space");
-         exit(1);
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzdIQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AHJgIAI5IR0H6Ci3fm0xpNYdpGLmxzviKMZNT
+0IxSd9mKmlOUcmEYp7jj6drqsbrmAx4c8YuJ2R6aKigGZGM69sgXJdqk1FQXE9hr
+ydERXJ4nKz7A7DkvXMQW+y5zePkPs0SJR7irIalO51MkSAOMDoN3Ty+LmNWBvBGF
+L/F7zlKfJS+WFYeUYBjUqPo+msqVuHXFsHYuNe0KMRQVi8+D6uQsCT7AaUbE/X1h
+trY2AP/J7hkjnfYCEP5YzfVv4B5mXo3A+MIr0ffRxUzPnQA1ERi1Yf1nOoGgWFBK
+mAAKpP9RIQSbZ78hlGFwesMK8zvttCm9f0MJUYziJksRGt60/YWmW8U=
+=Z/ue
+-----END PGP SIGNATURE-----
+
+--eYpdtKvgqlxfGeLUFdQ65XIZzp40eGpAN--
