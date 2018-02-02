@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehcXp-0007fs-VV
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:30 -0500
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1ehcYX-0008LH-7H
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehcXo-0001QE-UH
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:26 -0500
-References: <20180202052310.7870-1-famz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <12e310bb-02c9-8ef3-4657-014660d91b2a@redhat.com>
-Date: Fri, 2 Feb 2018 14:22:42 +0100
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1ehcYS-0001mT-VZ
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:43:09 -0500
+References: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
+	<1b55edad-f820-6898-1630-ccc76e6c4845@redhat.com>
+	<5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
+	<8b87f82d-2a90-d6cf-0fc4-aee0d704a403@redhat.com>
+	<4919379e-ee86-5032-ec1e-fea39912783b@virtuozzo.com>
+	<5f76135f-6a96-6446-7f48-0683e7674c32@redhat.com>
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Message-ID: <87738083-597b-5dcb-2c0e-a6c7aa639ec1@virtuozzo.com>
+Date: Fri, 2 Feb 2018 17:23:37 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180202052310.7870-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PBbfuMCCsUeBCwkVFQsxYapUm8HE76B6X"
-Subject: Re: [Qemu-devel] [PATCH v3] iotests: Fix CID for VMDK afl image
+In-Reply-To: <5f76135f-6a96-6446-7f48-0683e7674c32@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: implement bdrv_get_info callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PBbfuMCCsUeBCwkVFQsxYapUm8HE76B6X
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com
-Message-ID: <12e310bb-02c9-8ef3-4657-014660d91b2a@redhat.com>
-Subject: Re: [PATCH v3] iotests: Fix CID for VMDK afl image
-References: <20180202052310.7870-1-famz@redhat.com>
-In-Reply-To: <20180202052310.7870-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-02-02 06:23, Fam Zheng wrote:
-> This reverts commit 76bf133c4 which updated the reference output, and
-> fixed the reference image, because the code path we want to exercise is=
-
-> actually the invalid image size.
->=20
-> The descriptor block in the image, which includes the CID to verify, ha=
-s been
-> invalid since the reference image was added. Since commit 9877860e7bd w=
-e report
-> this error earlier than the "file too large", so 059.out mismatches.
->=20
-> The binary change is generated along the operations of:
->=20
->   $ bunzip2 afl9.vmdk.bz2
->   $ qemu-img create -f vmdk fix.vmdk 1G
->   $ dd if=3Dafl9.vmdk of=3Dfix.vmdk bs=3D512 count=3D1 conv=3Dnotrunc
->   $ mv fix.vmdk afl9.vmdk
->   $ bzip2 afl9.vmdk
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
->=20
-> ---
->=20
-> v3: Skip test when ENOMEM. [Max, Eric]
->=20
-> v2: Fix commit message "qcow2 -> vmdk". [Kevin]
->     Revert 76bf133c4.
-> ---
->  tests/qemu-iotests/059                         |   5 ++---
->  tests/qemu-iotests/059.out                     |   2 +-
->  tests/qemu-iotests/sample_images/afl9.vmdk.bz2 | Bin 178 -> 618 bytes
->  3 files changed, 3 insertions(+), 4 deletions(-)
-
-Nice, thanks.
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
 
---PBbfuMCCsUeBCwkVFQsxYapUm8HE76B6X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp0ZiMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AWyIIAJEp98uyPXgB34KkmoTNWy0MeApzGRfD
-GPz0IndBQFeSoVcKXgk0h9a/b8QBTURjFIZ9QrLj7wKvNN83+tqkzbsF6OvSWwqZ
-QsZzjQ5v3xBEafddPlQTEXt4szpUPvkhyLI7lXxTVWuYsywHAeWeKasiMe6mU+U5
-tPk6N/uhM1D8rXnvXuzkj5b0z9cC0Azw4SeUieMTrtgDwGVHohW0H+dpdLZZnh1U
-i84qobLK5zjS6PNmqpsGP0QXvWgmsxNOu9msqhF3z6cVXzZClJjURgUoX3gLk0Ve
-93EMmzJQiEMvprzEX8phZ+1sNewcRdoq8N93JaTWsE/zUJ7oX/1YJKI=
-=z3f/
------END PGP SIGNATURE-----
-
---PBbfuMCCsUeBCwkVFQsxYapUm8HE76B6X--
+On 02/02/2018 05:15 PM, Eric Blake wrote:
+> On 02/02/2018 08:06 AM, Edgar Kaziakhmedov wrote:
+>
+>>>>> However, it would be nice to remove can_write_zeroes_with_unmap from
+>>>>> BlockDriverInfo, and make bdrv_can_write_zeroes_with_unmap just retur=
+n
+>>>>> !!(bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP).=C2=A0 Kevin, what =
+do you
+>>>>> think?
+>>> Actually, I may even just give a shot at writing this alternative patch=
+,
+>>> to make Kevin's decision easier.
+>> But actually qcow2 performs some checks for version inside get_info
+>> callback before setting can_write_zeroes_with_unmap flag,
+>> so we can't take into account such checks in
+>> bdrv_can_write_zeroes_with_unmap subroutine. Therefore, I don't think it
+>> is possible to do it like that.
+> Here's the patch I proposed (it looks like I forgot to CC you):
+>
+> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg06471.html
+>
+Yes, it was possible to move check to open, ok, get it.
