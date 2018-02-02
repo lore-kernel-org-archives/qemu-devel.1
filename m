@@ -1,38 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ehcdJ-0004JX-3n
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:48:06 -0500
+	(envelope-from <agx@sigxcpu.org>) id 1ehcdZ-0004Xo-3B
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:48:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ehcdE-0005H9-2a
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:48:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58602)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ehcdD-0005GY-Qd
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:48:00 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w129ceKX129427
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 04:43:24 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvjdx7x6p-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 04:43:24 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 2 Feb 2018 09:43:22 -0000
-References: <20180202094241.59537-1-borntraeger@de.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 2 Feb 2018 10:43:18 +0100
+	(envelope-from <agx@sigxcpu.org>) id 1ehcdX-0005Pt-WD
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:48:21 -0500
+Date: Fri, 2 Feb 2018 11:02:25 +0100
+From: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
+Message-ID: <671eaa99f4e0bf3a58f76f9151f7cfa24662227f.1517565566.git.agx@sigxcpu.org>
 MIME-Version: 1.0
-In-Reply-To: <20180202094241.59537-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <8d3af693-3dd8-20b7-c7c1-38d7c6cce65d@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180124101358.GA5028@bogon.m.sigxcpu.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3] linux-user: Fix register used for 6th and
+ 7th syscall argument on aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,42 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
+This unbreaks the testcase from
 
+    http://lists.nongnu.org/archive/html/qemu-arm/2018-01/msg00514.html
 
-On 02/02/2018 10:42 AM, Christian Borntraeger wrote:
-> commit 67915de9f038 ("s390x/event-facility: variable-length event
-> masks") switches the sclp receive/send mask. This broke the sclp
-> lm console.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
-> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+Thanks to Laurent Vivier for spotting the 7th one.
 
-opps. Please fixup yourself Conny :-)
+Signed-off-by: Guido G=FCnther <agx@sigxcpu.org>
+Tested-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+Suggested-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v3 collects *-by: replies. Anything else I can do to get this applied?
 
-> Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> Cc: qemu-stable@nongnu.org
-> ---
->  hw/s390x/event-facility.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index b0f71f4554..155a69467b 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
->      ef->receive_mask = be32_to_cpu(tmp_mask);
-> 
->      /* return the SCLP's capability masks to the guest */
-> -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-> +    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
->      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
->                mask_length, sizeof(tmp_mask));
-> -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-> +    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
->      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
->                mask_length, sizeof(tmp_mask));
-> 
+ linux-user/host/aarch64/safe-syscall.inc.S | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/linux-user/host/aarch64/safe-syscall.inc.S b/linux-user/host=
+/aarch64/safe-syscall.inc.S
+index 58a2329b37..bc1f5a9792 100644
+--- a/linux-user/host/aarch64/safe-syscall.inc.S
++++ b/linux-user/host/aarch64/safe-syscall.inc.S
+@@ -36,7 +36,7 @@ safe_syscall_base:
+ 	 *               and return the result in x0
+ 	 * and the syscall instruction needs
+ 	 *               x8 =3D=3D syscall number
+-	 *               x0 ... x7 =3D=3D syscall arguments
++	 *               x0 ... x6 =3D=3D syscall arguments
+ 	 *               and returns the result in x0
+ 	 * Shuffle everything around appropriately.
+ 	 */
+@@ -47,8 +47,8 @@ safe_syscall_base:
+ 	mov	x2, x4
+ 	mov	x3, x5
+ 	mov	x4, x6
+-	mov	x6, x7
+-	ldr	x7, [sp]
++	mov	x5, x7
++	ldr	x6, [sp]
+=20
+ 	/* This next sequence of code works in conjunction with the
+ 	 * rewind_if_safe_syscall_function(). If a signal is taken
+--=20
+2.15.1
