@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53935)
+Received: from eggs.gnu.org ([208.118.235.92]:56754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehg0u-0003GC-4D
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:25:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1ehg34-0005Tl-El
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:27:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ehfzo-0003HH-Ir
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:24:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46066)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehfzo-0003Fm-8i
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:23:32 -0500
-Date: Fri, 2 Feb 2018 16:23:26 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180202182326.GB22556@localhost.localdomain>
-References: <cover.1517532021.git.alistair.francis@xilinx.com>
-	<56ba11cee61d769a9a2816fa990d472ab1480906.1517532021.git.alistair.francis@xilinx.com>
+	(envelope-from <bounces@canonical.com>) id 1ehg1m-0005CB-FO
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:26:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35544)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ehg1l-0005AW-TM
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:25:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ehg1k-0002Hp-RZ
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 18:25:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CC7F12E805D
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 18:25:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <56ba11cee61d769a9a2816fa990d472ab1480906.1517532021.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] machine: Convert the valid cpu
- types to use cpu_model
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Feb 2018 18:15:46 -0000
+From: Daniel Berrange <1747056@bugs.launchpad.net>
+Reply-To: Bug 1747056 <1747056@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151759534688.10002.1939402860055070584.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1747056] [NEW] FreeDOS / MS-Dos / Windows 3.11
+ cannot perform reboot with 'isapc' machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +36,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, imammedo@redhat.com, marcel@redhat.com, alistair23@gmail.com
+To: qemu-devel@nongnu.org
 
-On Thu, Feb 01, 2018 at 04:42:05PM -0800, Alistair Francis wrote:
-> As cpu_type is not a user visible string let's convert the
-> valid_cpu_types to compare against cpu_model instead. This way we have a
-> user friendly string to report back.
-> 
-> Once we have a cpu_type to cpu_model conversion this patch should be
-> reverted and we should use cpu_type instead.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> 
->  hw/core/machine.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index cdc1163dc6..de5bac1c84 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -776,13 +776,12 @@ void machine_run_board_init(MachineState *machine)
->      /* If the machine supports the valid_cpu_types check and the user
->       * specified a CPU with -cpu check here that the user CPU is supported.
->       */
-> -    if (machine_class->valid_cpu_types && machine->cpu_type) {
-> -        ObjectClass *class = object_class_by_name(machine->cpu_type);
-> +    if (machine_class->valid_cpu_types && machine->cpu_model) {
->          int i;
->  
->          for (i = 0; machine_class->valid_cpu_types[i]; i++) {
-> -            if (object_class_dynamic_cast(class,
-> -                                          machine_class->valid_cpu_types[i])) {
-> +            if (!strcmp(machine->cpu_model,
-> +                        machine_class->valid_cpu_types[i])) {
+Public bug reported:
 
-I would rename valid_cpu_types to valid_cpu_models to make the
-new semantics clearer.
+I was installing MS-Dos 6.22 + Windows 3.11 in preparation for running
+Microsoft Bob, and noticed that when they try to perform a reboot, they
+just get stuck. The console cursor stays flashing on/off, but the DOS
+prompt no longer responds to input.
 
-Anyway, I have bad and good news:
+It is fairly easy to reproduce, even FreeDOS is impacted - download the
+FreeDOS bootable CDROM image, then
 
-The bad news is Igor already sent patches last week that remove
-MachineState::cpu_model, so this conflicts with his series.  Now
-parse_cpu_model() will be the only place where the original CPU model name is
-available, but the function needs to work on *-user too.  See:
-"[PATCH v3 23/25] Use cpu_create(type) instead of cpu_init(cpu_model)".
+$ qemu-img create demo.img 100MB
 
-The good news is that I think we can fix this very easily if
-validation is done at the same place where parse_cpu_model() is
-called.  e.g.:
+$ qemu-system-x86_64 -machine isapc -cdrom ~/Downloads/FD12CD.iso  -hda
+demo.img  -monitor stdio
 
-    current_machine->cpu_type = machine_class->default_cpu_type;
-    if (cpu_model) {
-        current_machine->cpu_type = parse_cpu_model(cpu_model);
+Wait for the installer to startup, and then in the monitor console run
 
-        if (machine_class->valid_cpu_models) {
-            ObjectClass *class = object_class_by_name(machine->cpu_type);
-            int i;
+  sendkey ctrl-alt-delete
 
-            for (i = 0; machine_class->valid_cpu_models[i]; i++) {
-                const char *valid_model = machine_class->valid_cpu_models[i];
-                ObjectClass *valid_class = cpu_class_by_name(machine->cpu_type, valid_model);
-                if (object_class_dynamic_cast(class,
-                                              object_class_get_name(valid_class))) {
-                     /* Valid CPU type, we're good to go */
-                     break;
-                }
-            }
-            if (!machine_class->valid_cpu_models[i]) {
-                error_report("Invalid CPU model: %s", cpu_model);
-                error_printf("The valid CPU models are: %s",
-                             machine_class->valid_cpu_models[0]);
-                for (i = 1; machine_class->valid_cpu_models[i]; i++) {
-                    error_printf(", %s", machine_class->valid_cpu_models[i]);
-                }
-                error_printf("\n");
-                exit(1);
-            }
-        }
-    }
+It will fail to reboot
 
-This can be done inside main(), or moved inside
-machine_run_board_init() if main() pass cpu_model as argument to
-the function.
+Testing shows this is a regression from QEMU 2.8.0 onwards, and git
+bisect further narrowed it down to a SEABIOS update
 
-On either case, I think it's a good idea to do validation and
-printing of error messages closer to the code that parses the
-command-line options.  This way we separate parsing/validation
-from initialization.
+commit 6e99f5741ff1b408ea76e6caf2bd4f76df4060e9 (HEAD, tag: pull-seabios-20=
+161027-2, tag: pull-seabios-20161027-1, refs/bisect/bad)
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Thu Oct 27 16:42:28 2016 +0200
 
->                  /* The user specificed CPU is in the valid field, we are
->                   * good to go.
->                   */
-> @@ -792,8 +791,8 @@ void machine_run_board_init(MachineState *machine)
->  
->          if (!machine_class->valid_cpu_types[i]) {
->              /* The user specified CPU is not valid */
-> -            error_report("Invalid CPU type: %s", machine->cpu_type);
-> -            error_printf("The valid types are: %s",
-> +            error_report("Invalid CPU model: %s", machine->cpu_model);
-> +            error_printf("The valid models are: %s",
->                           machine_class->valid_cpu_types[0]);
->              for (i = 1; machine_class->valid_cpu_types[i]; i++) {
->                  error_printf(", %s", machine_class->valid_cpu_types[i]);
-> -- 
-> 2.14.1
-> 
-> 
+    seabios: update to 1.10.0 release.
 
--- 
-Eduardo
+Note that this seems particular to the "isapc" machine type - with the
+"pc" machine type, reboot still works
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1747056
+
+Title:
+  FreeDOS / MS-Dos / Windows 3.11 cannot perform reboot with 'isapc'
+  machine
+
+Status in QEMU:
+  New
+
+Bug description:
+  I was installing MS-Dos 6.22 + Windows 3.11 in preparation for running
+  Microsoft Bob, and noticed that when they try to perform a reboot,
+  they just get stuck. The console cursor stays flashing on/off, but the
+  DOS prompt no longer responds to input.
+
+  It is fairly easy to reproduce, even FreeDOS is impacted - download
+  the FreeDOS bootable CDROM image, then
+
+  $ qemu-img create demo.img 100MB
+
+  $ qemu-system-x86_64 -machine isapc -cdrom ~/Downloads/FD12CD.iso
+  -hda demo.img  -monitor stdio
+
+  Wait for the installer to startup, and then in the monitor console run
+
+    sendkey ctrl-alt-delete
+
+  It will fail to reboot
+
+  Testing shows this is a regression from QEMU 2.8.0 onwards, and git
+  bisect further narrowed it down to a SEABIOS update
+
+  commit 6e99f5741ff1b408ea76e6caf2bd4f76df4060e9 (HEAD, tag: pull-seabios-=
+20161027-2, tag: pull-seabios-20161027-1, refs/bisect/bad)
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Thu Oct 27 16:42:28 2016 +0200
+
+      seabios: update to 1.10.0 release.
+
+  Note that this seems particular to the "isapc" machine type - with the
+  "pc" machine type, reboot still works
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1747056/+subscriptions
