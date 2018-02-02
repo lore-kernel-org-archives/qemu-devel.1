@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehca6-0001Yw-Ml
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:44:47 -0500
+	(envelope-from <peterx@redhat.com>) id 1ehcaS-0001tX-4k
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehca2-000388-8y
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:44:46 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35762)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1ehca1-000379-Uy
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:44:42 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w12EhBGP051241
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 09:44:40 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvqccyvpp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:44:40 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 2 Feb 2018 07:44:39 -0700
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri,  2 Feb 2018 09:44:28 -0500
-In-Reply-To: <1517582668-10923-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1517582668-10923-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Message-Id: <1517582668-10923-5-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 4/4] tpm: tis: move one-line function into
- caller
+	(envelope-from <peterx@redhat.com>) id 1ehcaN-0003Ka-9d
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44640)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ehcaN-0003K9-3K
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:03 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 237AEC0587CB
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 09:57:01 +0000 (UTC)
+Date: Fri, 2 Feb 2018 17:56:43 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180202095643.GA4666@xz-mi>
+References: <20180201112028.23552-1-peterx@redhat.com>
+	<20180201195131.GO2457@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180201195131.GO2457@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
+ priority
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,38 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- hw/tpm/tpm_tis.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+On Thu, Feb 01, 2018 at 07:51:31PM +0000, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > In the past, we prioritized IOMMU migration so that we have such a
+> > priority order:
+> > 
+> >     IOMMU > PCI Devices
+> > 
+> > When migrating a guest with both vIOMMU and pcie-root-port, we'll always
+> > migrate vIOMMU first, since pcie-root-port will be seen to have the same
+> > priority of general PCI devices.
+> > 
+> > That's problematic.
+> > 
+> > The thing is that PCI bus number information is stored in the root port,
+> > and that is needed by vIOMMU during post_load(), e.g., to figure out
+> > context entry for a device.  If we don't have correct bus numbers for
+> > devices, we won't be able to recover device state of the DMAR memory
+> > regions, and things will be messed up.
+> > 
+> > So let's boost the PCIe root ports to be even with higher priority:
+> > 
+> >    PCIe Root Port > IOMMU > PCI Devices
+> > 
+> > A smoke test shows that this patch fixes bug 1538953.
+> 
+> Two questions (partially overlapping with what I replied to Michaels):
+>   a) What happens with multiple IOMMUs?
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 08f41d2..f81168a 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -946,11 +946,6 @@ static const MemoryRegionOps tpm_tis_memory_ops = {
-     },
- };
- 
--static int tpm_tis_do_startup_tpm(TPMState *s, size_t buffersize)
--{
--    return tpm_backend_startup_tpm(s->be_driver, buffersize);
--}
--
- /*
-  * Get the TPMVersion of the backend device being used
-  */
-@@ -1005,7 +1000,7 @@ static void tpm_tis_reset(DeviceState *dev)
-         s->rw_offset = 0;
-     }
- 
--    tpm_tis_do_startup_tpm(s, s->be_buffer_size);
-+    tpm_backend_startup_tpm(s->be_driver, s->be_buffer_size);
- }
- 
- static const VMStateDescription vmstate_tpm_tis = {
+If there are more IOMMUs, then the patch will let all the vIOMMUs be
+migrated after pcie root ports.
+
+But a more true answer is that: I don't really know. :)
+
+Because I even don't know how multiple vIOMMUs will coop with each
+other, especially nested.  In nested case, maybe there will be
+dependency between vIOMMUs, but I'll avoid thinking about that until
+we support more than one vIOMMUs.
+
+>   b) What happens with multiple root ports?
+
+Same answer as previous one: all of them will be migrated before any
+vIOMMUs.
+
+Note that IMHO we don't care which pcie root port is migrated first -
+IMHO they should not depend on each other, but Marcel may correct me.
+
+>   c) How correct is this ordering on different implementations 
+>     (e.g. ARM/Power/etc)
+
+Currently it won't affect since Intel IOMMU is the only user for
+MIG_PRI_IOMMU.  After SMMU is merged it may affect (if it uses this
+bit), but IMHO it's fine too as long as pcie root ports won't depend
+on anything related to SMMU.
+
+Thanks,
+
 -- 
-2.5.5
+Peter Xu
