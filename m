@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehdE9-0003wc-DR
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:27:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehdAf-0000aU-D0
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:27:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ehdD5-0003J1-By
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:26:09 -0500
-Date: Fri, 2 Feb 2018 11:35:13 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180202113513.15c37b32.cohuck@redhat.com>
-In-Reply-To: <20180202113301.0522c7bc.cohuck@redhat.com>
-References: <20180202094241.59537-1-borntraeger@de.ibm.com>
-	<8d3af693-3dd8-20b7-c7c1-38d7c6cce65d@de.ibm.com>
-	<20180202113301.0522c7bc.cohuck@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ehd8i-00063l-TA
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:22:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehd8i-00061f-0k
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:20:32 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2D860765BB
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 15:12:38 +0000 (UTC)
+References: <20180202111022.19269-1-kraxel@redhat.com>
+	<20180202111022.19269-3-kraxel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3d0177d1-130b-6528-30ae-7f21e4bb56dd@redhat.com>
+Date: Fri, 2 Feb 2018 09:12:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling
+In-Reply-To: <20180202111022.19269-3-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l"
+Subject: Re: [Qemu-devel] [PATCH v3 02/12] vl: deprecate -alt-grab and
+ -ctrl-grab
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 2 Feb 2018 11:33:01 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l
+From: Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <3d0177d1-130b-6528-30ae-7f21e4bb56dd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 02/12] vl: deprecate -alt-grab and
+ -ctrl-grab
+References: <20180202111022.19269-1-kraxel@redhat.com>
+ <20180202111022.19269-3-kraxel@redhat.com>
+In-Reply-To: <20180202111022.19269-3-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, 2 Feb 2018 10:43:18 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
-> > On 02/02/2018 10:42 AM, Christian Borntraeger wrote:  
-> > > commit 67915de9f038 ("s390x/event-facility: variable-length event
-> > > masks") switches the sclp receive/send mask. This broke the sclp
-> > > lm console.  
-> 
-> Hum. Probably should add sclp-lm to my test setup.
-> 
-> > > 
-> > > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > > Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
-> > > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>    
-> > 
-> > opps. Please fixup yourself Conny :-)  
-> 
-> Well, you did cc: the original author :)
-> 
-> >   
-> > > Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> > > Cc: qemu-stable@nongnu.org
-> > > ---
-> > >  hw/s390x/event-facility.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> > > index b0f71f4554..155a69467b 100644
-> > > --- a/hw/s390x/event-facility.c
-> > > +++ b/hw/s390x/event-facility.c
-> > > @@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
-> > >      ef->receive_mask = be32_to_cpu(tmp_mask);
-> > > 
-> > >      /* return the SCLP's capability masks to the guest */
-> > > -    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-> > > +    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-> > >      copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-> > >                mask_length, sizeof(tmp_mask));
-> > > -    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-> > > +    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-> > >      copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-> > >                mask_length, sizeof(tmp_mask));
-> > >     
-> >   
-> 
-> Thanks, applied.
+On 02/02/2018 05:10 AM, Gerd Hoffmann wrote:
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  vl.c          | 8 ++++++++
+>  qemu-doc.texi | 6 ++++++
+>  2 files changed, 14 insertions(+)
+>=20
 
-Oh, and as always, I still take R-bs until I prepare a pull req.
+>              case QEMU_OPTION_ctrl_grab:
+> +                g_printerr("The -ctrl-grab switch is deprecated, and w=
+ill be\n"
+> +                           "removed in a future release.\n");
+>                  ctrl_grab =3D 1;
+>                  break;
+>              case QEMU_OPTION_no_quit:
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index aa7180a3d9..5961c7a211 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2756,6 +2756,12 @@ support for frameless windows, and the other use=
+r interfaces never
+>  implemented this in the first place.  So this will be removed together=
+
+>  with SDL 1.2 support.
+> =20
+> +@subsection -alt-grab and -ctrl-grab (since 2.12.0)
+> +
+> +The ``-alt-grab'' and ``-ctrl-grab'' arguments are deprecated.  They
+> +work with SDL only.  They will eventually replaced with a new way to
+> +configure hotkeys which works consistently across all user interfaces.=
+
+
+Should the error message printed to the user document the new interface
+to be used instead? But that implies that we shouldn't deprecate this
+until the new interface for configuring hotkeys has been finalized...
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0f80ACgkQp6FrSiUn
+Q2o8OQf8DGWTG0HG+VYjD0b33Jk/5Fu9+OMXFmjhGrIbLM+9g1ZWFSAfKdTpAgJ7
+VzEhWHrP0OMdxNlb7bF3aXzFReoS0cy7IaEPfIBBowgYOtSHbfh12Nwrvcmy8PqA
+ntGxAsoGHZ0NO/EEHAzrDJZA6bNrCT9srb87u6kV/83kdIs36an+Jc9IfeBcuk2D
+4ffPk9j6IJyem76Rz59t0HnGkxXbBBJqppixAwvj5u0ztqZrwIIepsoo+QWOecp1
+uPL6RqZEhdIcWb1gcDOWGhz8f9KgKseB+7rkXRlVCMRB0SRngC5z3/EwKYwN26RX
+6sG//snpRLvkvWGnM7fRqfaAGTwBqA==
+=8LdJ
+-----END PGP SIGNATURE-----
+
+--OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l--
