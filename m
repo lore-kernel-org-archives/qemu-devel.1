@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46414)
+Received: from eggs.gnu.org ([208.118.235.92]:37052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1eheqF-0001oK-8H
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:10:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1eheQC-0003gm-7a
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <w.bumiller@proxmox.com>) id 1ehep9-0007n7-Iy
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:09:33 -0500
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:18011)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
-	id 1ehep8-0007bS-Fc
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:08:27 -0500
-Date: Fri, 2 Feb 2018 12:10:22 +0100
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Message-ID: <20180202111022.rtnvwmjs4r4jzttq@olga.proxmox.com>
+	(envelope-from <bounces@canonical.com>) id 1ehePU-0007ze-JK
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:42:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58500)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ehePU-0007uW-BL
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:41:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ehXWM-00037c-OC
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:20:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AE5942E806B
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 09:20:34 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] rate limiting issues
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Feb 2018 09:12:59 -0000
+From: cee1 <fykcee1@gmail.com>
+Reply-To: Bug 1746943 <1746943@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151756277928.2993.6454939775938128745.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1746943] [NEW] qemu-aarch64-static: qemu:
+ uncaught target signal 11 for ps/top cmd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,125 +37,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com
 
-Summary:
-Rate limit is effectively halved when the size of written chunks adds up to
-exceeding the quota of a slice only slightly. This is surprisingly reliable.
+Public bug reported:
 
-Explanation:
-The ratelimiting code in include/qemu/ratelimit.h currently uses slices with
-quotas. Finishing up the quota for one slice means it'll wait for the end of
-this _and_ the next slice before resetting the accounting and start over.
-If that first slice was exceeded by only a tiny bit, we effectively spend every
-second slice waiting around. before starting over.
+In a docker container created from an aarch64 image, injects qemu-aarch64-s=
+tatic (in /usr/bin)
+  run ps/top cmd  inside this container
 
-Here if I use a limit of 30000KiB/s I get 30000KiB/s.
-Increasing the limit to 30700KiB/s gives me 30700KiB/s.
-Increasing it to 30720KiB/s reliably gives me 15000KiB/s.
+  reports "qemu: uncaught target signal 11 (Segmentation fault)"
 
-Making it wait to the end of only the current slice means the excess data is not
-counted at all and we may go above the limit (though by at most one write-chunk,
-so I'm not sure if that's fine for most of the users, for backup jobs it seems
-to be 64k always).
+Tried qemu-aarch64-static from fedora 27 / ubuntu artful / debian
+unstable (i.e. qemu version 2.10 - 2.11)
 
-I'd like to fix this and am unsure about which way to go. On the one hand I
-think the old code (before f14a39ccb922) may be fixable in a better way by not
-resetting the accounting completely but subtracting the amount of data the
-wait-period would have added.
+The aarch64 dock image is fedora 27(and with qemu-aarch64-static Fedora
+27), hence I opened a related bug here
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1541252
 
-At the same time, though, this could be simplified to not using slices but
-always comparing the amount of actually written data to the amount of data
-which should at most have been written.
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Here are two approaches which seem to fix my issues:
+-- =
 
---- Old code revised:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1746943
 
-typedef struct {
-    int64_t next_slice_time;
-    uint64_t slice_quota;
-    uint64_t slice_ns;
-    int64_t dispatched;
-} RateLimit;
+Title:
+  qemu-aarch64-static: qemu: uncaught target signal 11 for ps/top cmd
 
-static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
-{
-    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+Status in QEMU:
+  New
 
-    assert(limit->slice_quota && limit->slice_ns);
+Bug description:
+  In a docker container created from an aarch64 image, injects qemu-aarch64=
+-static (in /usr/bin)
+    run ps/top cmd  inside this container
 
-    if (limit->next_slice_time == 0) { /* first call */
-        limit->dispatched = 0;
-        limit->next_slice_time = now + limit->slice_ns;
-        return 0;
-    }
+    reports "qemu: uncaught target signal 11 (Segmentation fault)"
 
-    if (limit->next_slice_time < now) {
-        uint64_t passed_slices = DIV_ROUND_UP(now - limit->next_slice_time,
-            limit->slice_ns);
-        limit->next_slice_time = now + limit->slice_ns;
-        limit->dispatched -= passed_slices * limit->slice_quota;
-    }
-    limit->dispatched += n;
-    if (limit->dispatched+n <= limit->slice_quota) {
-        return 0;
-    }
-    return limit->next_slice_time - now;
-}
+  Tried qemu-aarch64-static from fedora 27 / ubuntu artful / debian
+  unstable (i.e. qemu version 2.10 - 2.11)
 
-static inline void ratelimit_set_speed(RateLimit *limit, uint64_t speed,
-                                       uint64_t slice_ns)
-{
-    limit->slice_ns = slice_ns;
-    limit->slice_quota = MAX(((double)speed * slice_ns) / 1000000000ULL, 1);
-}
+  The aarch64 dock image is fedora 27(and with qemu-aarch64-static
+  Fedora 27), hence I opened a related bug here
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1541252
 
----
-
-And this is a short slice-less version. I wonder if there's any particular
-reason for sticking to slices?
-
---- Version without slices:
-
-typedef struct {
-    int64_t last_time;
-    uint64_t speed;
-    int64_t allowed;
-} RateLimit;
-
-static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
-{
-    int64_t delta, now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-
-    if (limit->last_time == 0) { /* first call */
-        limit->allowed = -n;
-        limit->last_time = now;
-        return (n * 1000000000ULL) / limit->speed;
-    }
-
-    delta = (now - limit->last_time);
-    limit->allowed += (delta * limit->speed)/1000000000ULL - n;
-    limit->last_time = now;
-    if (limit->allowed < 0) {
-        return ((uint64_t)-limit->allowed * 1000000000ULL) / limit->speed;
-    }
-    return 0;
-}
-
-static inline void ratelimit_set_speed(RateLimit *limit, uint64_t speed,
-                                       uint64_t slice_ns)
-{
-    (void)slice_ns; // TODO: remove
-    limit->speed = speed;
-}
-
----
-
-Numerical note: a small delta means 'allowed' is incremented by 0, which
-should be fine since when we hit the quota, we'll have a longer wait after
-which the delta is for sure big enough to produce positive values.
-(I tried larger and smaller values (1KiB/s to some MiB/s)).
-Alternatively we could set last_time and do the quota increment
-conditionally only when the delta is big enough, but I have not found
-this to be necessary in my tests.
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1746943/+subscriptions
