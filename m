@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehhrX-0001bO-QH
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 15:23:08 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ehhtR-00031Y-PM
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 15:25:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehhrU-0003qp-JX
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 15:23:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehhrU-0003po-9t
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 15:23:04 -0500
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-10-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
-Date: Fri, 2 Feb 2018 14:22:59 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ehhtO-000553-Kp
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 15:25:05 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ehhtO-00054j-E4
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 15:25:02 -0500
+Received: by mail-qk0-x242.google.com with SMTP id d21so25514068qkj.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 12:25:02 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180202183731.29990-1-armbru@redhat.com>
+	<20180202183731.29990-13-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <56dc5bfa-a28b-f088-c9b2-5253f9c31bcf@amsat.org>
+Date: Fri, 2 Feb 2018 17:24:03 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180202130336.24719-10-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lg4yQgbh53UtEg2LHLEBJAJLlGWkjDThC"
-Subject: Re: [Qemu-devel] [PATCH RFC 09/21] qapi: Don't absolutize include
- file name in error messages
+In-Reply-To: <20180202183731.29990-13-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 12/15] hw/timer: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +36,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, alistair.francis@xilinx.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lg4yQgbh53UtEg2LHLEBJAJLlGWkjDThC
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
-Subject: Re: [PATCH RFC 09/21] qapi: Don't absolutize include file name in
- error messages
-References: <20180202130336.24719-1-armbru@redhat.com>
- <20180202130336.24719-10-armbru@redhat.com>
-In-Reply-To: <20180202130336.24719-10-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 02/02/2018 07:03 AM, Markus Armbruster wrote:
-> Error messages print absolute filenames of included files even gave a
 
-s/even gave/even when given/
-
-> relative one on the command line:
->=20
->      PYTHONPATH=3Dscripts python -B tests/qapi-schema/test-qapi.py test=
-s/qapi-schema/include-cycle.json
->     In file included from tests/qapi-schema/include-cycle.json:1:
->     In file included from /work/armbru/qemu/tests/qapi-schema/include-c=
-ycle-b.json:1:
->     /work/armbru/qemu/tests/qapi-schema/include-cycle-c.json:1: Inclusi=
-on loop for include-cycle.json
->=20
-> Improve this to
->=20
->     In file included from tests/qapi-schema/include-cycle.json:1:
->     In file included from tests/qapi-schema/include-cycle-b.json:1:
->     tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for includ=
-e-cycle.json
-
-Nice, and makes developing new qapi tests a little less painful since
-it's less modification to qapi-schema/*.err additions.
-
->=20
+On 02/02/2018 03:37 PM, Markus Armbruster wrote:
+> From: Alistair Francis <alistair.francis@xilinx.com>
+> 
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then
+> compiler issues where manually fixed.
+> 
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> 
+> Some lines where then manually tweaked to pass checkpatch.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> 
+> Conversions that aren't followed by exit() dropped, because they might
+> be inappropriate.
+> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  scripts/qapi/common.py                | 12 ++++++------
->  tests/qapi-schema/include-no-file.err |  2 +-
->  2 files changed, 7 insertions(+), 7 deletions(-)
->=20
+>  hw/timer/xilinx_timer.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/timer/xilinx_timer.c b/hw/timer/xilinx_timer.c
+> index 59439c05be..2d658b5791 100644
+> --- a/hw/timer/xilinx_timer.c
+> +++ b/hw/timer/xilinx_timer.c
+> @@ -127,7 +127,7 @@ timer_read(void *opaque, hwaddr addr, unsigned int size)
+>              break;
+>  
+>      }
+> -    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
+> +    D(error_report("%s timer=%d %x=%x", __func__, timer, addr * 4, r));
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Not sure what we gain here, since those aren't error messages but trace
+event.
+Can you drop this patch from your series? I'll convert to tracepoints
+and send a patch for this file.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---lg4yQgbh53UtEg2LHLEBJAJLlGWkjDThC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0yKMACgkQp6FrSiUn
-Q2o7bAgAlffxHHxLQuLH/MiiNgrcJ+CS1AImC687Y/IDs2BCtOjlkwrAUZDIs8Tw
-zbGaWf5S5l3PJNT6hwZ3Rwk4ZaMaaf25lkcem6d/ms4m812kd77uoy0Ev2ReaSPU
-6s2T+NajpB3n1uhynFtilVO4sI7CLmY5d8ZD1dTt1CpongOloVmh3cDljPectGUA
-1vxN4imTRWRJ91PDlgTqj+fbXrkGChVLB/3tlcsMDdndgF9vKGdz+SY2+jf2rDqf
-dmg8ZeBjVfJU4DZswJFQTFVhtiWtYDoNzwDt9tARaif+BEyiHxzk4KNjJcJ318k7
-3csSRmbdiJCAj+GKh5XATl0PvuUl3w==
-=e1+R
------END PGP SIGNATURE-----
-
---lg4yQgbh53UtEg2LHLEBJAJLlGWkjDThC--
+>      return r;
+>  }
+>  
+> @@ -135,8 +135,8 @@ static void timer_enable(struct xlx_timer *xt)
+>  {
+>      uint64_t count;
+>  
+> -    D(fprintf(stderr, "%s timer=%d down=%d\n", __func__,
+> -              xt->nr, xt->regs[R_TCSR] & TCSR_UDT));
+> +    D(error_report("%s timer=%d down=%d", __func__,
+> +                   xt->nr, xt->regs[R_TCSR] & TCSR_UDT));
+>  
+>      ptimer_stop(xt->ptimer);
+>  
+> @@ -160,7 +160,7 @@ timer_write(void *opaque, hwaddr addr,
+>      addr >>= 2;
+>      timer = timer_from_addr(addr);
+>      xt = &t->timers[timer];
+> -    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d off=%d)\n",
+> +    D(error_report("%s addr=%x val=%x (timer=%d off=%d)",
+>               __func__, addr * 4, value, timer, addr & 3));
+>      /* Further decoding to address a specific timers reg.  */
+>      addr &= 3;
+> @@ -197,7 +197,7 @@ static void timer_hit(void *opaque)
+>  {
+>      struct xlx_timer *xt = opaque;
+>      struct timerblock *t = xt->parent;
+> -    D(fprintf(stderr, "%s %d\n", __func__, xt->nr));
+> +    D(error_report("%s %d", __func__, xt->nr));
+>      xt->regs[R_TCSR] |= TCSR_TINT;
+>  
+>      if (xt->regs[R_TCSR] & TCSR_ARHT)
+> 
