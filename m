@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50892)
+Received: from eggs.gnu.org ([208.118.235.92]:51071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nesrine.zouari@enis.tn>) id 1ehdlA-0000P1-Al
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:00:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehdlK-0000Yq-7f
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nesrine.zouari@enis.tn>) id 1ehdjy-0004T8-3T
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:00:16 -0500
-Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:35128)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nesrine.zouari@enis.tn>)
-	id 1ehdjx-0004Sm-Mo
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:59:01 -0500
-Received: by mail-qk0-x235.google.com with SMTP id 69so11314675qkz.2
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 07:59:01 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ehdkM-0004YP-2b
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:00:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdkL-0004Y8-JA
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:59:25 -0500
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-4-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1cb0a904-25ff-fcac-bfac-7376683ed80d@redhat.com>
+Date: Fri, 2 Feb 2018 09:59:19 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180202100843.GD13090@stefanha-x1.localdomain>
-References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
-	<20180202100843.GD13090@stefanha-x1.localdomain>
-From: Nesrine Zouari <nesrine.zouari@enis.tn>
-Date: Fri, 2 Feb 2018 11:45:31 +0100
-Message-ID: <CAPHFV4mveS_n1FyxwDut3S6q_jmMFBrMLn+HZ9a4SnZVG_rNPA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Qemu Trace
+In-Reply-To: <20180202130336.24719-4-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ZZt9N8tL16VT1xeuaxqRHcaURHf9K4cGs"
+Subject: Re: [Qemu-devel] [PATCH RFC 03/21] qapi: New classes QAPIGenC,
+ QAPIGenH, QAPIGenDoc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +29,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-Hello Mr. Stefan,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZZt9N8tL16VT1xeuaxqRHcaURHf9K4cGs
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <1cb0a904-25ff-fcac-bfac-7376683ed80d@redhat.com>
+Subject: Re: [PATCH RFC 03/21] qapi: New classes QAPIGenC, QAPIGenH,
+ QAPIGenDoc
+References: <20180202130336.24719-1-armbru@redhat.com>
+ <20180202130336.24719-4-armbru@redhat.com>
+In-Reply-To: <20180202130336.24719-4-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your response. To answer your question : the trace solution
-should be architecture independent.This is the best for us. We aim to test
-it at least for ARM/ARM64 , x86 and x64 architectures. But even if  there
-will be some differences , we can accept it.
+On 02/02/2018 07:03 AM, Markus Armbruster wrote:
+> These classes encapsulate accumulating and writing output.
+>=20
+> Convert C code generation to QAPIGenC and QAPIGenH.  The conversion is
+> rather shallow: most of the output accumulation is not converted.
+> Left for later.
+>=20
+> The indentation machinery uses a single global variable indent_level,
+> even though we generally interleave creation of a .c and its .h.  It
+> should become instance variable of QAPIGenC.  Also left for later.
+>=20
+> Documentation generation isn't converted, and QAPIGenDoc isn't used.
+> This will change shortly.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi-commands.py   | 27 ++++++-------
+>  scripts/qapi-event.py      | 26 +++++++------
+>  scripts/qapi-introspect.py | 22 ++++++-----
+>  scripts/qapi-types.py      | 26 +++++++------
+>  scripts/qapi-visit.py      | 26 +++++++------
+>  scripts/qapi.py            | 96 ++++++++++++++++++++++++++------------=
+--------
+>  6 files changed, 122 insertions(+), 101 deletions(-)
+>=20
 
-Regards,
+A little bit longer due to more structure, but reasonable diffstat in
+that it shows the conversion is fairly straightforward and opens the
+doors for later patches to use the new structures more effectively.
 
-On Fri, Feb 2, 2018 at 11:08 AM, Stefan Hajnoczi <stefanha@redhat.com>
-wrote:
+> =20
+>  schema =3D QAPISchema(input_file)
+> -gen =3D QAPISchemaGenEventVisitor()
+> -schema.visit(gen)
+> -fdef.write(gen.defn)
+> -fdecl.write(gen.decl)
+> +vis =3D QAPISchemaGenEventVisitor()
+> +schema.visit(vis)
+> +genc.body(vis.defn)
+> +genh.body(vis.decl)
 
-> On Thu, Feb 01, 2018 at 04:30:10PM +0100, Nesrine Zouari wrote:
-> > I am a computer engineering student and I am actually working on my
-> > graduation project at Lauterbach company. The project is about Qemu Tra=
-ce
-> > and as a future I would like to contribute this work to the main line.
-> >
-> > My project is divided into two parts:
-> >
-> > 1/ Collecting the Guest trace data : The trace solution should be able =
-to
-> > provide:
-> >
-> >             a/ Instruction flow Trace
-> >
-> >             b/ Memory read/write access
-> >
-> >             c/ Time Stamps.
-> >
-> >             d/ For tracing rich operating systems that are using MMU, w=
-e
-> > additionally need to trace the task switches.
->
-> Llu=C3=ACs has done the most instrumentation work in qemu.git and can exp=
-lain
-> the current status.
->
-> The focus in QEMU is more on functional simulation than on low-level
-> instrumentation.  Therefore the instrumentation facilities aren't very
-> rich.  Code changes will be required to get the information you need.
-> In order to be suitable for upstream they should not be too invasive or
-> impact performance significantly.
->
-> Which CPU architecture are you targeting?
->
-> > 2/ Sending the collected data to a third party tool for analysis.
-> >
-> > My question is about the first part. I would like to know, which trace
-> > backend that better fit my use case.
->
-> LTTng UST has the highest performance tracing interface.  It uses shared
-> memory to efficiently export trace data to a collector or analysis
-> process.
->
-> It is probably not necessary to invent your own tracer or interface for
-> capturing trace data.  I suggest looking into LTTng UST and trying it
-> out.
->
-> The basic idea would be:
->
-> 1. Add missing trace events to QEMU
-> 2. Build with ./configure --enable-trace-backend=3Dust && make
-> 3. Use LTTng tools or write your own collector using the LTTng libraries
-> 4. Enable the trace events that you need for instruction flow, memory
->    access, and task switching.
->
-> The QEMU code changes involved would be changes to trace-events and
-> placing those trace events into TCG and/or memory API code to record the
-> necessary information.
->
-> Stefan
->
+I don't know if it is worth a sentence in the commit message that the
+visitor variable is renamed from 'gen' to 'vis' for less confusion with
+the new class instances 'genc' and 'genh'.
 
+> +++ b/scripts/qapi-types.py
+> @@ -180,7 +180,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>          self.decl =3D ''
+>          self.defn =3D ''
+>          self._fwdecl =3D ''
+> -        self._btin =3D guardstart('QAPI_TYPES_BUILTIN')
+> +        self._btin =3D '\n' + guardstart('QAPI_TYPES_BUILTIN')
 
+Tweaks like this means you were paying attention to still producing
+identical generated files; always a good sign.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
----------------------------------------------------------------------------=
---------------
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Nesrine ZOUARI
-Computer Engineering Student
-Department of Computer Engineering and Applied Mathematics
-National Engineering School of Sfax (ENIS)
-University of Sfax-Tunisia
-Tel: +216 52 620 475
+
+--ZZt9N8tL16VT1xeuaxqRHcaURHf9K4cGs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0itcACgkQp6FrSiUn
+Q2p1Ngf/WJNdX27SklIjmzzoiaSX0Z4kY9dME2koABgLBaQumNAwuEhFnQUBZBJU
+plg7V4kvS0//h/Sp+MVocUUZbSVr9oEN0jasdQTboSbNBP+7ERCNg2NEQZBx+A5A
+Vk3GYYSu5suLEVWvZAvWflVlx93ez1K3d5WxLYIDot4XtElRxX4Oi/Own6lQ3oSj
+eDJ+NMpN1wEDAqiXuEOHqbDcEQ9SJk8uugE8yYuQ/UCMxH78kIVzcKU+LeGYE/c1
+dEp1PJMp7mHzhX9iaIjkrK3uHOkaupL3JEvBoIWHJBhEZV4M3MmgqQSp5rJHoxIe
+uZ6GjWk9iZEJG5G3lXT2y2U1CjZ0dw==
+=mxms
+-----END PGP SIGNATURE-----
+
+--ZZt9N8tL16VT1xeuaxqRHcaURHf9K4cGs--
