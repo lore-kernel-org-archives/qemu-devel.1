@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48108)
+Received: from eggs.gnu.org ([208.118.235.92]:50429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehfUk-00069C-3j
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:52:32 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ehfbr-0002aj-2b
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehfTf-0002u8-6V
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:51:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehfTe-0002qx-Il
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:50:18 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 562485B303
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 17:50:17 +0000 (UTC)
-References: <20180202071751.16316-1-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a9e4deb4-5162-19a1-324e-640abd272fc3@redhat.com>
-Date: Fri, 2 Feb 2018 11:49:55 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1ehfYH-0006f9-DC
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:58:25 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34244)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ehfYH-0006em-1w
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:55:05 -0500
+Received: by mail-ot0-x241.google.com with SMTP id x15so21075582ote.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:55:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180202071751.16316-1-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd"
-Subject: Re: [Qemu-devel] [PULL 0/3] Ui 20180202 patches
+In-Reply-To: <fde1ca29-873b-5e5c-76d3-d620301c924b@amsat.org>
+References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
+	<1512670493-18114-5-git-send-email-peter.maydell@linaro.org>
+	<d8c2c2ca-5046-f19b-9514-d3cbef3b7c3a@amsat.org>
+	<CAFEAcA9k2KKrXk+2LQd+X7-RFuDQO96bYSo8xi81zfb80+ApFg@mail.gmail.com>
+	<fde1ca29-873b-5e5c-76d3-d620301c924b@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Feb 2018 17:54:43 +0000
+Message-ID: <CAFEAcA-0wV+DDwFEEnB1=VvUSOsG2yQRCDFBHRF+O=gayPGLVQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/6] target/arm: Add "-cpu max" support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
- "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <a9e4deb4-5162-19a1-324e-640abd272fc3@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/3] Ui 20180202 patches
-References: <20180202071751.16316-1-kraxel@redhat.com>
-In-Reply-To: <20180202071751.16316-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 26 January 2018 at 15:44, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> On 01/26/2018 11:33 AM, Peter Maydell wrote:
+>> On 26 January 2018 at 14:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>>> Why not use arm_any_initfn() here?
+>>
+>> That function (and the 'any' cpu) are deliberately only
+>> included in the linux-user binaries, not the system-emulation binaries.
+>
+> why not use the V8 features?
 
-On 02/02/2018 01:17 AM, Gerd Hoffmann wrote:
-> The following changes since commit 11ed801d3df3c6e46b2f1f97dcfbf4ca3a2a=
-2f4f:
->=20
->   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-requ=
-est' into staging (2018-01-30 09:47:51 +0000)
->=20
-> are available in the git repository at:
->=20
->   git://git.kraxel.org/qemu tags/ui-20180202-pull-request
->=20
-> for you to fetch changes up to 627ebec208a8809818589e17f4fce55a59420ad2=
-:
->=20
->   ui: correctly advance output buffer when writing SASL data (2018-02-0=
-2 07:48:18 +0100)
->=20
-> ----------------------------------------------------------------
-> ui: use QIONetListener in vnc, bugfixes for sdl1 and vnc.
->=20
-> ----------------------------------------------------------------
->=20
-> Daniel P. Berrange (1):
->   ui: convert VNC server to QIONetListener
->=20
-> Daniel P. Berrang=C3=A9 (2):
+What v8 features?
 
-Odd effects based on choice of UTF-8 spellings.  Dan, do you want to add
-a .mailmap entry to consolidate on a single preferred form of your name?
+>> (Also arm_any_initfn() only initializes userspace-visible stuff, it
+>> doesn't provide ID register values etc for kernel-visible things.)
+>
+> I'd still use an unique arm_max_initfn() such
+>
+>   // initializes userspace-visible stuff
+> #ifndef CONFIG_USER_ONLY
+>   // initializes kernel-visible things
+> #endif
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>>> Actually what seems cleaner is to move "any" features here, and kill th=
+e
+>>> "any" cpu, using "max" for this purpose.
+>>
+>> We can't kill 'any', that would break back-compatibility
+>> of command lines.
+>
+> and use an alias for 'any' -> 'max' or just
+>
+>   { .name =3D "any", .initfn =3D arm_max_initfn }, /* backward compat */
 
+Yes, we could probably do something similar to this.
 
---4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0pMMACgkQp6FrSiUn
-Q2pNkgf/fK2mz/vF1OVVqmSQzCyiLq3HnzxYJdqgjQrMwb1bumJ3owIM2uzBMiwD
-M/FA/NjU3O7bkPzI1yP9lud28/I7YuEhI+uiuALCnIJZpW+0FK6+soURkioAXYbw
-47dz2pGnQAAeqeUEkmXgKKb6x41ghOurQmXaa7jJG5zUzsPvG56Spnz1pENJMsUv
-KmsrCcTxERBdQgWqtZl033A4Rofqnr2wUVN4l0bouA+xBJVbpC/AU1l5rOEiBu8S
-XyJmSGt/bKsYIJGhWi43D51yQ3I+eKu66aROTY3scdnI5JwGN7hmacNLBpu2ab56
-dXFmYu4RpLhW8oWmqUhqJ7gKpRvwFg==
-=xDl/
------END PGP SIGNATURE-----
-
---4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd--
+thanks
+-- PMM
