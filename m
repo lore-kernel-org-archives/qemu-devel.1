@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehdDr-0003eV-4b
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:26:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1ehdBt-0001gQ-Bc
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ehdCn-0002vb-1F
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:25:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ehdCm-0002tP-Im
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:24:44 -0500
-Date: Fri, 2 Feb 2018 15:24:34 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180202152433.GC2590@work-vm>
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
-	<20180129174132.108925-14-brijesh.singh@amd.com>
-	<20180201175802.GK2457@work-vm>
-	<7c3c7a89-04ef-016e-c9a5-4f4d4be1c449@amd.com>
-	<20180201200442.GQ2457@work-vm> <20180202130817.GE15403@redhat.com>
-	<3e6cf550-9bd8-daa7-e54a-d390354ffcb0@amd.com>
+	(envelope-from <thuth@redhat.com>) id 1ehdAp-0000S9-6T
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:23:49 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri,  2 Feb 2018 09:15:31 +0100
+Message-Id: <1517559331-6388-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <3e6cf550-9bd8-daa7-e54a-d390354ffcb0@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 13/23] hmp: display memory encryption
- support in 'info kvm'
+Subject: [Qemu-devel] [PATCH] hw/timer/mt48t59: Fix bit-rotten NVRAM_PRINTF
+ format strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +21,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
->=20
->=20
-> On 2/2/18 7:08 AM, Daniel P. Berrang=E9 wrote:
-> > On Thu, Feb 01, 2018 at 08:04:43PM +0000, Dr. David Alan Gilbert wrot=
-e:
-> >> * Brijesh Singh (brijesh.singh@amd.com) wrote:
-> >>>
-> >>> On 2/1/18 11:58 AM, Dr. David Alan Gilbert wrote:
-> >>>> * Brijesh Singh (brijesh.singh@amd.com) wrote:
-> >>>>> update 'info kvm' to display the memory encryption support.
-> >>>>>
-> >>>>> (qemu) info kvm
-> >>>>> kvm support: enabled
-> >>>>> memory encryption: disabled
-> >>>> As Markus said, this should be split qmp/hmp; but something else t=
-o
-> >>>> think about is whether this is a boolean or needs to be an enum;  =
-do
-> >>>> you have one version of encryption or are we going to need to flag=
- up
-> >>>> versions or the features of the encryption?
-> >>> In future I could see us providing encrypted state status when we
-> >>> implement SEV-ES support, something like
-> >>>
-> >>> (qemu) info kvm
-> >>> kvm support: enabled
-> >>> memory encryption: enabled
-> >>> cpu register state: encrypted
-> >>>
-> >>> but so far I do not see need to provide the version string. If user
-> >>> wants to know the SEV version then it can open /dev/sev device to g=
-et
-> >>> platform status and more.
-> >> Yes, I was worried a bit more about how general that was going to be
-> >> or whether we're collecting a lot of architecture specific fields he=
-re.
-> >> So I wondered, if it was an enum, whether that would be come:
-> >>
-> >> memory encryption: none
-> >>
-> >> memory encryption: SEV
-> >>
-> >> memory encryption: SEV-ES
-> >>
-> >> (I'm not too sure whether that's better or not, just a suggestion)
-> > I wonder if it is is even appropriate to have under 'info kvm', since
-> > 'info kvm' is architecture independant and SEV is specific to AMD x86=
-_64
-> > only. It might suggest an 'info sev' command is better ?
->=20
-> The reason I kept under 'info kvm' is because now KVM has a ioctl for
-> memory encryption operation, I like your suggestion for=A0 introducing
-> 'info sev' -- the command can be used to provide additional SEV specifi=
-c
-> details (e.g SEV FW state, SEV FW version, SEV active policy etc).
+When compiling with NVRAM_PRINTF enabled, gcc currently bails out with:
 
-Yes, that would be useful - I'm sure there's lots of information that
-will be useful to display for understanding the state of SEV, e.g. the
-policies etc.
+  CC      hw/timer/m48t59.o
+  CC      hw/timer/m48t59-isa.o
+hw/timer/m48t59.c: In function =E2=80=98NVRAM_writeb=E2=80=99:
+hw/timer/m48t59.c:460:5: error: format =E2=80=98%x=E2=80=99 expects argum=
+ent of type =E2=80=98unsigned int=E2=80=99, but argument 3 has type =E2=80=
+=98hwaddr=E2=80=99 [-Werror=3Dformat=3D]
+     NVRAM_PRINTF("%s: 0x%08x =3D> 0x%08x\n", __func__, addr, val);
+     ^
+hw/timer/m48t59.c:460:5: error: format =E2=80=98%x=E2=80=99 expects argum=
+ent of type =E2=80=98unsigned int=E2=80=99, but argument 4 has type =E2=80=
+=98uint64_t=E2=80=99 [-Werror=3Dformat=3D]
+hw/timer/m48t59.c: In function =E2=80=98NVRAM_readb=E2=80=99:
+hw/timer/m48t59.c:492:5: error: format =E2=80=98%x=E2=80=99 expects argum=
+ent of type =E2=80=98unsigned int=E2=80=99, but argument 3 has type =E2=80=
+=98hwaddr=E2=80=99 [-Werror=3Dformat=3D]
+     NVRAM_PRINTF("%s: 0x%08x <=3D 0x%08x\n", __func__, addr, retval);
 
-Dave
+Fix it by using the correct format strings and while we're at it,
+also change the definition of NVRAM_PRINTF so that this can not
+bit-rot so easily again.
 
-> >
-> > Regards,
-> > Daniel
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/timer/m48t59-internal.h | 9 +++------
+ hw/timer/m48t59.c          | 4 ++--
+ 2 files changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/hw/timer/m48t59-internal.h b/hw/timer/m48t59-internal.h
+index 32ae957..d0f0caf 100644
+--- a/hw/timer/m48t59-internal.h
++++ b/hw/timer/m48t59-internal.h
+@@ -25,13 +25,10 @@
+ #ifndef HW_M48T59_INTERNAL_H
+ #define HW_M48T59_INTERNAL_H 1
+=20
+-//#define DEBUG_NVRAM
++#define M48T59_DEBUG 0
+=20
+-#if defined(DEBUG_NVRAM)
+-#define NVRAM_PRINTF(fmt, ...) do { printf(fmt , ## __VA_ARGS__); } whil=
+e (0)
+-#else
+-#define NVRAM_PRINTF(fmt, ...) do { } while (0)
+-#endif
++#define NVRAM_PRINTF(fmt, ...) do { \
++    if (M48T59_DEBUG) { printf(fmt , ## __VA_ARGS__); } } while (0)
+=20
+ /*
+  * The M48T02, M48T08 and M48T59 chips are very similar. The newer '59 h=
+as
+diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+index 844aad5..4abb4ac 100644
+--- a/hw/timer/m48t59.c
++++ b/hw/timer/m48t59.c
+@@ -457,7 +457,7 @@ static void NVRAM_writeb(void *opaque, hwaddr addr, u=
+int64_t val,
+ {
+     M48t59State *NVRAM =3D opaque;
+=20
+-    NVRAM_PRINTF("%s: 0x%08x =3D> 0x%08x\n", __func__, addr, val);
++    NVRAM_PRINTF("%s: 0x%"HWADDR_PRIx" =3D> 0x%"PRIx64"\n", __func__, ad=
+dr, val);
+     switch (addr) {
+     case 0:
+         NVRAM->addr &=3D ~0x00FF;
+@@ -489,7 +489,7 @@ static uint64_t NVRAM_readb(void *opaque, hwaddr addr=
+, unsigned size)
+         retval =3D -1;
+         break;
+     }
+-    NVRAM_PRINTF("%s: 0x%08x <=3D 0x%08x\n", __func__, addr, retval);
++    NVRAM_PRINTF("%s: 0x%"HWADDR_PRIx" <=3D 0x%08x\n", __func__, addr, r=
+etval);
+=20
+     return retval;
+ }
+--=20
+1.8.3.1
