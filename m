@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57457)
+Received: from eggs.gnu.org ([208.118.235.92]:59221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ehfJu-0004H0-5H
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:41:20 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ehfKq-0005DL-Nx
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ehfIq-0004HS-4f
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:40:13 -0500
-Received: from [45.249.212.32] (port=55633 helo=huawei.com)
+	(envelope-from <ehabkost@redhat.com>) id 1ehfJm-0005oE-Iu
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:41:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:5771)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ehfIp-0004At-4k
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:39:07 -0500
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Fri, 2 Feb 2018 17:50:55 +0800
-Message-ID: <1517565055-14588-1-git-send-email-jianjay.zhou@huawei.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehfJl-0005l7-Qj
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:40:06 -0500
+Date: Fri, 2 Feb 2018 15:38:46 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180202173846.GN26425@localhost.localdomain>
+References: <20180201125441.2f5b4fdd@redhat.com> <20180201201514.GB660@flask>
+	<20180201202649.GG26425@localhost.localdomain>
+	<edc27e9a-9660-eed0-dd03-016fa2e966b7@linux.vnet.ibm.com>
+	<20180202141554.GH26425@localhost.localdomain>
+	<20180202141938.GJ15403@redhat.com>
+	<20180202092159.48d9bd4c@redhat.com>
+	<20180202145014.GI26425@localhost.localdomain>
+	<20180202172359.GA2591@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] tap: close fd conditionally when error
- occured
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180202172359.GA2591@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] kvm: x86: export vCPU halted state to sysfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, jianjay.zhou@huawei.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Luiz Capitulino <lcapitulino@redhat.com>, Peter Krempa <pkrempa@redhat.com>, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, John Ferlan <jferlan@redhat.com>, pbonzini@redhat.com
 
-If netdev_add tap,id=net0,...,vhost=on failed in net_init_tap_one(),
-the followed up device_add virtio-net-pci,netdev=net0 will fail
-too, prints:
+On Fri, Feb 02, 2018 at 05:23:59PM +0000, Dr. David Alan Gilbert wrote:
+> * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > (CCing qemu-devel)
+> >=20
+> > On Fri, Feb 02, 2018 at 09:21:59AM -0500, Luiz Capitulino wrote:
+> > > On Fri, 2 Feb 2018 14:19:38 +0000
+> > > Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+> > > > On Fri, Feb 02, 2018 at 12:15:54PM -0200, Eduardo Habkost wrote:
+> > [...]
+> > > > > It would be also interesting to update QEMU QMP documentation t=
+o
+> > > > > clarify the arch-specific semantics of "halted". =20
+> > > >=20
+> > > > Any also especially clarify the awful performance implications of=
+ running
+> > > > this particular query command. In general I would not expect quer=
+y-xxx
+> > > > monitor commands to interrupt all vcpus, so we should clearly war=
+n about
+> > > > this !
+> > >=20
+> > > Or deprecate it...
+> >=20
+> > We could deprecate the expensive fields on query-cpus, and move
+> > them to a more expensive query-cpu-state command.  I believe most
+> > users of query-cpus are only interested in qom_path, thread_id,
+> > and topology info.
+>=20
+> Would that data be available without the bql?  I ask because if it is
+> then a small advantage to having a separate command is that the command
+> could be marked OOB with Peter's new series and never take the lock.
 
-   TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
-   ioctl() failed: Bad file descriptor
+We would need a mechanism to safely walk the CPU list without the
+BQL, so I wouldn't bother trying to make a OOB-capable version of
+query-cpus unless really necessary.
 
-The reason is that the fd of tap is closed when error occured after
-calling net_init_tap_one().
-
-The fd should be closed when calling net_init_tap_one failed:
-   - if tap_set_sndbuf() failed
-   - if tap_set_sndbuf() succeeded but vhost failed to open or
-     initialize with vhostforce flag on
-The fd should not be closed just because vhost failed to open or
-initialize but without vhostforce flag. So the followed up
-device_add can fall back to userspace virtio successfully.
-
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
----
- net/tap.c | 44 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 32 insertions(+), 12 deletions(-)
-
-diff --git a/net/tap.c b/net/tap.c
-index 979e622..c46ab14 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -651,7 +651,7 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-     tap_set_sndbuf(s->fd, tap, &err);
-     if (err) {
-         error_propagate(errp, err);
--        return;
-+        goto error;
-     }
- 
-     if (tap->has_fd || tap->has_fds) {
-@@ -686,15 +686,26 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-         if (vhostfdname) {
-             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
-             if (vhostfd == -1) {
--                error_propagate(errp, err);
--                return;
-+                if (tap->has_vhostforce && tap->vhostforce) {
-+                    error_propagate(errp, err);
-+                    goto error;
-+                } else {
-+                    warn_report_err(err);
-+                    return;
-+                }
-             }
-         } else {
-             vhostfd = open("/dev/vhost-net", O_RDWR);
-             if (vhostfd < 0) {
--                error_setg_errno(errp, errno,
--                                 "tap: open vhost char device failed");
--                return;
-+                if (tap->has_vhostforce && tap->vhostforce) {
-+                    error_setg_errno(errp, errno,
-+                                     "tap: open vhost char device failed");
-+                    goto error;
-+                } else {
-+                    warn_report("tap: open vhost char device failed: %s",
-+                                strerror(errno));
-+                    return;
-+                }
-             }
-             fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-         }
-@@ -702,12 +713,23 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
- 
-         s->vhost_net = vhost_net_init(&options);
-         if (!s->vhost_net) {
--            error_setg(errp,
--                       "vhost-net requested but could not be initialized");
--            return;
-+            if (tap->has_vhostforce && tap->vhostforce) {
-+                error_setg(errp,
-+                           "vhost-net requested but could not be initialized");
-+                goto error;
-+            } else {
-+                warn_report("vhost-net requested but could not be initialized");
-+                return;
-+            }
-         }
-     } else if (vhostfdname) {
--        error_setg(errp, "vhostfd(s)= is not valid without vhost");
-+        warn_report("vhostfd(s)= is not valid without vhost");
-+        return;
-+    }
-+
-+error:
-+    if (!tap->has_fd && !tap->has_fds) {
-+        close(fd);
-     }
- }
- 
-@@ -877,7 +899,6 @@ free_fail:
-                          vnet_hdr, fd, &err);
-         if (err) {
-             error_propagate(errp, err);
--            close(fd);
-             return -1;
-         }
-     } else {
-@@ -916,7 +937,6 @@ free_fail:
-                              vhostfdname, vnet_hdr, fd, &err);
-             if (err) {
-                 error_propagate(errp, err);
--                close(fd);
-                 return -1;
-             }
-         }
--- 
-1.8.3.1
+--=20
+Eduardo
