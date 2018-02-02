@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43543)
+Received: from eggs.gnu.org ([208.118.235.92]:43235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehgEz-0008U5-JK
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:40:12 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehgEn-0008IG-3u
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:40:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehgDS-0005gL-44
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:39:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34380)
+	(envelope-from <armbru@redhat.com>) id 1ehgDb-00060O-R5
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:39:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehgDR-0005eq-Pw
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:37:37 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehgDb-0005yG-EO
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:37:47 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  2 Feb 2018 19:37:29 +0100
-Message-Id: <20180202183731.29990-14-armbru@redhat.com>
+Date: Fri,  2 Feb 2018 19:37:24 +0100
+Message-Id: <20180202183731.29990-9-armbru@redhat.com>
 In-Reply-To: <20180202183731.29990-1-armbru@redhat.com>
 References: <20180202183731.29990-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 13/15] hw/xen*: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v7 08/15] hw/pci*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,7 +25,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: alistair.francis@xilinx.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -69,91 +69,59 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-xen_pt_log() was left with an fprintf(stderr,
+A trailing '.' was removed in hw/pci/pci.c
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 
 Conversions that aren't followed by exit() dropped, because they might
 be inappropriate.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/xen/xen-common.c       | 5 +++--
- hw/xenpv/xen_machine_pv.c | 9 +++++----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ hw/pci-host/bonito.c | 6 +++---
+ hw/pci/pci.c         | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 632a938dcc..afa1e3f404 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -9,6 +9,7 @@
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index 0d8cacb884..2d25e9bf7c 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -38,7 +38,7 @@
   */
  
  #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/xen/xen_backend.h"
- #include "qmp-commands.h"
- #include "chardev/char.h"
-@@ -96,13 +97,13 @@ static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
-     char path[50];
- 
-     if (xs == NULL) {
--        fprintf(stderr, "xenstore connection not initialized\n");
-+        error_report("xenstore connection not initialized");
-         exit(1);
-     }
- 
-     snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
-     if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
--        fprintf(stderr, "error recording dm state\n");
-+        error_report("error recording dm state");
-         exit(1);
-     }
- }
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 69a52a9f93..44d67b87c4 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -23,6 +23,7 @@
-  */
- 
- #include "qemu/osdep.h"
+-
 +#include "qemu/error-report.h"
  #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/xen/xen_backend.h"
-@@ -36,7 +37,7 @@ static void xen_init_pv(MachineState *machine)
+ #include "hw/pci/pci.h"
+ #include "hw/i386/pc.h"
+@@ -449,8 +449,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
+     regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
  
-     /* Initialize backend core & drivers */
-     if (xen_be_init() != 0) {
--        fprintf(stderr, "%s: xen backend core setup failed\n", __func__);
-+        error_report("%s: xen backend core setup failed", __func__);
+     if (idsel == 0) {
+-        fprintf(stderr, "error in bonito pci config address " TARGET_FMT_plx
+-            ",pcimap_cfg=%x\n", addr, s->regs[BONITO_PCIMAP_CFG]);
++        error_report("error in bonito pci config address " TARGET_FMT_plx
++                     ",pcimap_cfg=%x", addr, s->regs[BONITO_PCIMAP_CFG]);
+         exit(1);
+     }
+     pciaddr = PCI_ADDR(pci_bus_num(phb->bus), devno, funno, regno);
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index e8f9fc1c27..fc25cdecba 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1115,8 +1115,8 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+     assert(region_num >= 0);
+     assert(region_num < PCI_NUM_REGIONS);
+     if (size & (size-1)) {
+-        fprintf(stderr, "ERROR: PCI region size must be pow2 "
+-                    "type=0x%x, size=0x%"FMT_PCIBUS"\n", type, size);
++        error_report("ERROR: PCI region size must be pow2 "
++                    "type=0x%x, size=0x%"FMT_PCIBUS"", type, size);
          exit(1);
      }
  
-@@ -51,18 +52,18 @@ static void xen_init_pv(MachineState *machine)
-         const char *initrd_filename = machine->initrd_filename;
-         if (xen_domain_build_pv(kernel_filename, initrd_filename,
-                                 kernel_cmdline) < 0) {
--            fprintf(stderr, "xen pv domain creation failed\n");
-+            error_report("xen pv domain creation failed");
-             exit(1);
-         }
-         break;
-     }
- #endif
-     case XEN_EMULATE:
--        fprintf(stderr, "xen emulation not implemented (yet)\n");
-+        error_report("xen emulation not implemented (yet)");
-         exit(1);
-         break;
-     default:
--        fprintf(stderr, "unhandled xen_mode %d\n", xen_mode);
-+        error_report("unhandled xen_mode %d", xen_mode);
-         exit(1);
-         break;
-     }
 -- 
 2.13.6
