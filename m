@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54752)
+Received: from eggs.gnu.org ([208.118.235.92]:55059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdKr-00027y-Um
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:34:12 -0500
+	(envelope-from <berto@igalia.com>) id 1ehdL3-0002HM-17
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:34:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdJn-0002cq-HI
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:33:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdJm-0002bC-Sm
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:31:59 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0303225C41
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 15:31:58 +0000 (UTC)
-References: <20180202111022.19269-1-kraxel@redhat.com>
-	<20180202111022.19269-6-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d20a0817-6df3-e066-af42-e61b481011ec@redhat.com>
-Date: Fri, 2 Feb 2018 09:31:29 -0600
+	(envelope-from <berto@igalia.com>) id 1ehdGE-000743-GR
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:33:16 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <4c401bce-cdc8-9c70-7d16-c101ef72e291@redhat.com>
+References: <cover.1516978645.git.berto@igalia.com>
+	<0c07738db12f556285f8db01d68c5d6b4304bde9.1516978645.git.berto@igalia.com>
+	<4c401bce-cdc8-9c70-7d16-c101ef72e291@redhat.com>
+Date: Fri, 02 Feb 2018 10:56:32 +0100
+Message-ID: <w51o9l7zpdb.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180202111022.19269-6-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LxbZyziKKXSmHJe59vewvXZWkznygiALs"
-Subject: Re: [Qemu-devel] [PATCH v3 05/12] sdl: use DisplayOptions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 27/39] qcow2: Update
+ qcow2_update_snapshot_refcount() to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +24,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LxbZyziKKXSmHJe59vewvXZWkznygiALs
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d20a0817-6df3-e066-af42-e61b481011ec@redhat.com>
-Subject: Re: [PATCH v3 05/12] sdl: use DisplayOptions
-References: <20180202111022.19269-1-kraxel@redhat.com>
- <20180202111022.19269-6-kraxel@redhat.com>
-In-Reply-To: <20180202111022.19269-6-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu 01 Feb 2018 08:26:26 PM CET, Max Reitz <mreitz@redhat.com> wrote:
+>> @@ -1273,12 +1276,13 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
+>>                      case QCOW2_CLUSTER_NORMAL:
+>>                      case QCOW2_CLUSTER_ZERO_ALLOC:
+>>                          if (offset_into_cluster(s, offset)) {
+>> +                            int l2_index = slice * s->l2_slice_size + j;
+>>                              qcow2_signal_corruption(
+>>                                  bs, true, -1, -1, "Cluster "
+>>                                  "allocation offset %#" PRIx64
+>>                                  " unaligned (L2 offset: %#"
+>>                                  PRIx64 ", L2 index: %#x)",
+>> -                                offset, l2_offset, j);
+>> +                                offset, l2_offset, l2_index);
+>
+> This makes it a bit weird that in other patches l2_index is now
+> generally the L2 slice index...
 
-On 02/02/2018 05:10 AM, Gerd Hoffmann wrote:
-> Switch sdl ui to use qapi DisplayOptions for configuration.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/ui/console.h |  8 ++++----
->  ui/sdl.c             | 19 +++++++++++++------
->  ui/sdl2.c            | 33 +++++++++++++++++++--------------
->  vl.c                 | 13 +++++++++++--
->  qapi/ui.json         |  5 +++--
->  5 files changed, 50 insertions(+), 28 deletions(-)
->=20
-Reviewed-by: Eric Blake <eblake@redhat.com>
+You're right, I can call it l2_table_index, I think this is the only
+case where it does not refer to the slice index.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---LxbZyziKKXSmHJe59vewvXZWkznygiALs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0hFEACgkQp6FrSiUn
-Q2rdxgf/Yj8ZHS2lxExVpuyn2Ji9T9mQ7slGvKc4wCm0bzzYZ+/6tsQ7r0E/LY2m
-ti6ClRbK4RXPAbETIU6G7o8PqrJdzDyDgdbYARWc71CUh00kF2Z8JzMYWaGHKYdY
-e9uJY+wcDFFhQF/igOsAu1Fu9nVJURtxZVL3SvcW0Hy4e9XRy289bju+qGUmItME
-L0Cn2U1hQesMhaAjJG3VfJGLL9ltwLWLNKlkfLSb3uKqJefVRJ6ekkYLncYSfgcg
-c7mm29MpGyP6tRh6IgXSyI28bOPpOC3TpBWdQwrrMu+RcvRS29N6ZKx5NcVIVWID
-StWskMaZQ63ov8io9j/WRkJAOiUjVQ==
-=zU+Z
------END PGP SIGNATURE-----
-
---LxbZyziKKXSmHJe59vewvXZWkznygiALs--
+Berto
