@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:40511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehOby-0004Js-PS
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:50:52 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ehOnH-0007yO-Cy
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 19:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehOau-0001mv-Ns
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 18:49:46 -0500
-References: <cover.1516978645.git.berto@igalia.com>
-	<b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ef6ce6f7-954f-7c88-0885-9258adaf94b4@redhat.com>
-Date: Thu, 1 Feb 2018 21:04:06 +0100
+	(envelope-from <alex.williamson@redhat.com>) id 1ehOmD-0001RX-CA
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 19:01:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56512)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ehOmC-0001Nm-DE
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 19:00:20 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AFF9BC05FF82
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 00:00:18 +0000 (UTC)
+Date: Thu, 1 Feb 2018 17:00:04 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180201170004.7287d079@w520.home>
+In-Reply-To: <1516112253-14480-18-git-send-email-pbonzini@redhat.com>
+References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
+	<1516112253-14480-18-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw"
-Subject: Re: [Qemu-devel] [PATCH v3 36/39] qcow2: Allow configuring the L2
- slice size
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 17/51] readline: add a free function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
-Message-ID: <ef6ce6f7-954f-7c88-0885-9258adaf94b4@redhat.com>
-Subject: Re: [PATCH v3 36/39] qcow2: Allow configuring the L2 slice size
-References: <cover.1516978645.git.berto@igalia.com>
- <b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
-In-Reply-To: <b21398747c4eb0c0a9c1ec3ac6b75f354d039026.1516978645.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 16 Jan 2018 15:16:59 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On 2018-01-26 16:00, Alberto Garcia wrote:
-> Now that the code is ready to handle L2 slices we can finally add an
-> option to allow configuring their size.
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >=20
-> An L2 slice is the portion of an L2 table that is read by the qcow2
-> cache. Until now the cache was always reading full L2 tables, and
-> since the L2 table size is equal to the cluster size this was not very
-> efficient with large clusters. Here's a more detailed explanation of
-> why it makes sense to have smaller cache entries in order to load L2
-> data:
+> Fixes leaks such as:
 >=20
->    https://lists.gnu.org/archive/html/qemu-block/2017-09/msg00635.html
+> Direct leak of 2 byte(s) in 1 object(s) allocated from:
+>     #0 0x7eff58beb850 in malloc (/lib64/libasan.so.4+0xde850)
+>     #1 0x7eff57942f0c in g_malloc ../glib/gmem.c:94
+>     #2 0x7eff579431cf in g_malloc_n ../glib/gmem.c:331
+>     #3 0x7eff5795f6eb in g_strdup ../glib/gstrfuncs.c:363
+>     #4 0x55db720f1d46 in readline_hist_add /home/elmarco/src/qq/util/read=
+line.c:258
+>     #5 0x55db720f2d34 in readline_handle_byte /home/elmarco/src/qq/util/r=
+eadline.c:387
+>     #6 0x55db71539d00 in monitor_read /home/elmarco/src/qq/monitor.c:3896
+>     #7 0x55db71f9be35 in qemu_chr_be_write_impl /home/elmarco/src/qq/char=
+dev/char.c:167
+>     #8 0x55db71f9bed3 in qemu_chr_be_write /home/elmarco/src/qq/chardev/c=
+har.c:179
+>     #9 0x55db71fa013c in fd_chr_read /home/elmarco/src/qq/chardev/char-fd=
+.c:66
+>     #10 0x55db71fe18a8 in qio_channel_fd_source_dispatch /home/elmarco/sr=
+c/qq/io/channel-watch.c:84
+>     #11 0x7eff5793a90b in g_main_dispatch ../glib/gmain.c:3182
+>     #12 0x7eff5793b7ac in g_main_context_dispatch ../glib/gmain.c:3847
+>     #13 0x55db720af3bd in glib_pollfds_poll /home/elmarco/src/qq/util/mai=
+n-loop.c:214
+>     #14 0x55db720af505 in os_host_main_loop_wait /home/elmarco/src/qq/uti=
+l/main-loop.c:261
+>     #15 0x55db720af6d6 in main_loop_wait /home/elmarco/src/qq/util/main-l=
+oop.c:515
+>     #16 0x55db7184e0de in main_loop /home/elmarco/src/qq/vl.c:1995
+>     #17 0x55db7185e956 in main /home/elmarco/src/qq/vl.c:4914
+>     #18 0x7eff4ea17039 in __libc_start_main (/lib64/libc.so.6+0x21039)
 >=20
-> This patch introduces a new command-line option to the qcow2 driver
-> named l2-cache-entry-size (cf. l2-cache-size). The cache entry size
-> has the same restrictions as the cluster size: it must be a power of
-> two and it has the same range of allowed values, with the additional
-> requirement that it must not be larger than the cluster size.
+> (while at it, use g_new0(ReadLineState), it's a bit easier to read)
 >=20
-> The L2 cache entry size (L2 slice size) remains equal to the cluster
-> size for now by default, so this feature must be explicitly enabled.
-> Although my tests show that 4KB slices consistently improve
-> performance and give the best results, let's wait and make more tests
-> with different cluster sizes before deciding on an optimal default.
->=20
-> Now that the cache entry size is not necessarily equal to the cluster
-> size we need to reflect that in the MIN_L2_CACHE_SIZE documentation.
-> That minimum value is a requirement of the COW algorithm: we need to
-> read two L2 slices (and not two L2 tables) in order to do COW, see
-> l2_allocate() for the actual code.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Message-Id: <20180104160523.22995-11-marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  block/qcow2-cache.c  | 10 ++++++++--
->  block/qcow2.c        | 34 +++++++++++++++++++++++++++-------
->  block/qcow2.h        |  6 ++++--
->  qapi/block-core.json |  6 ++++++
->  4 files changed, 45 insertions(+), 11 deletions(-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+I'm having some trouble with this patch, using b05631954d6d:
 
+# /usr/local/bin/qemu-system-x86_64 -m 1G -nodefaults -net none -monitor st=
+dio -serial none -parallel none -nographic=20
+QEMU 2.11.50 monitor - type 'help' for more information
+(qemu) sys<tab>
+system_powerdown  system_reset      system_wakeup    =20
+(qemu) system_p<tab>    # resulting in system_powerdown
+(qemu) quit
+Segmentation fault (core dumped)
 
---3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+gdb shows:
 
------BEGIN PGP SIGNATURE-----
+Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+0x00007f7d64d82927 in malloc () from /lib64/libc.so.6
+(gdb) bt
+#0  0x00007f7d64d82927 in malloc () at /lib64/libc.so.6
+#1  0x00007f7d6ef68359 in g_malloc () at /lib64/libglib-2.0.so.0
+#2  0x00007f7d6ef83004 in g_strsplit () at /lib64/libglib-2.0.so.0
+#3  0x000055e5ac0d549d in container_get (root=3D0x55e5ad570ee0, path=3Dpath=
+@entry=3D0x55e5ac2fa0f8 "/chardevs") at qom/container.c:34
+#4  0x000055e5ac14d102 in get_chardevs_root () at chardev/char.c:43
+#5  0x000055e5ac14ec4d in qemu_chr_cleanup () at chardev/char.c:1107
+#6  0x000055e5abeff1c4 in main (argc=3D<optimized out>, argv=3D<optimized o=
+ut>, envp=3D<optimized out>) at vl.c:4780
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpzcrYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AG+4H/11diP7oesV+aDgG9zMWc70YY4nmpRzw
-KdwimZb9UR5sHo+DG9aVT6aCThfGxW66Tsifaf57MF2A8oeEu9oOQthKianVSPFb
-gnWguDDEsK1bg7caaB5d2YeD+eTSIIVqIr/6yQeN4YRe4kDI20GQALQWPZbrVoO5
-XLD8VISjf7A2riQeK/cgKBM5agA2LZgTqrchdbOven2pFd3XcupusnpVdHIvb6le
-CBNPYyjMP6eU1nuNdPLEbZGBAcGFGRTjAodstY9CXjumQfcWfOVUdtJ1W1nYFkEA
-aobEkgqKn9R8KySbeKM79/YCkq43+9Z3kVl+Tv+VntIV0muuqOyP0KE=
-=mMZQ
------END PGP SIGNATURE-----
+Reverting this patch, commit e5dc1a6c6c435, I don't see the issue.
+Thanks,
 
---3I1uPoBchuRU2RvoZ6WAZ67BzQdPXFDgw--
+Alex
