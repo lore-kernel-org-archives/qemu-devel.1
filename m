@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehcfn-0006XM-Jy
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:45 -0500
+	(envelope-from <famz@redhat.com>) id 1ehcfp-0006Xt-Ge
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehcfZ-0006pf-CA
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42122)
+	(envelope-from <famz@redhat.com>) id 1ehcfg-0006sh-AO
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ehcfZ-0006pB-1S
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:25 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A82187624
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 11:10:26 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  2 Feb 2018 12:10:17 +0100
-Message-Id: <20180202111022.19269-8-kraxel@redhat.com>
-In-Reply-To: <20180202111022.19269-1-kraxel@redhat.com>
-References: <20180202111022.19269-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 07/12] egl-headless: use DisplayOptions
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ehcfg-0006rx-0G
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:32 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Fri,  2 Feb 2018 14:34:12 +0800
+Message-Id: <20180202063412.22466-3-famz@redhat.com>
+In-Reply-To: <20180202063412.22466-1-famz@redhat.com>
+References: <20180202063412.22466-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] README: Document 'git-publish' workflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +24,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: marcandre.lureau@gmail.com, stefanha@redhat.com
 
-Switch egl-headless ui to use qapi DisplayOptions for configuration.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- include/ui/console.h | 2 +-
- ui/egl-headless.c    | 2 +-
- vl.c                 | 3 ++-
- qapi/ui.json         | 5 +++--
- 4 files changed, 7 insertions(+), 5 deletions(-)
+ .gitpublish |  1 +
+ README      | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index deee5bb606..4cb623112e 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -530,6 +530,6 @@ static inline void early_gtk_display_init(DisplayOptions *opts)
- #endif
+diff --git a/.gitpublish b/.gitpublish
+index 170bd2ed48..7542e878fc 100644
+--- a/.gitpublish
++++ b/.gitpublish
+@@ -26,6 +26,7 @@ cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallba
+ base = master
+ prefix = PATCH
+ to = qemu-devel@nongnu.org
++cc = qemu-trivial@nongnu.org
+ cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
  
- /* egl-headless.c */
--void egl_headless_init(void);
-+void egl_headless_init(DisplayOptions *opts);
+ [gitpublishprofile "block"]
+diff --git a/README b/README
+index b92a07a61a..d1a944ce20 100644
+--- a/README
++++ b/README
+@@ -56,7 +56,7 @@ The QEMU source code is maintained under the GIT version control system.
  
- #endif
-diff --git a/ui/egl-headless.c b/ui/egl-headless.c
-index 5d50226869..38b3766548 100644
---- a/ui/egl-headless.c
-+++ b/ui/egl-headless.c
-@@ -154,7 +154,7 @@ static const DisplayChangeListenerOps egl_ops = {
-     .dpy_gl_update           = egl_scanout_flush,
- };
+    git clone git://git.qemu.org/qemu.git
  
--void egl_headless_init(void)
-+void egl_headless_init(DisplayOptions *opts)
- {
-     QemuConsole *con;
-     egl_dpy *edpy;
-diff --git a/vl.c b/vl.c
-index c17dedfa4e..1d801dd96d 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2181,6 +2181,7 @@ static LegacyDisplayType select_display(const char *p)
-         request_opengl = 1;
-         display_opengl = 1;
-         display = DT_EGL;
-+        dpy.type = DISPLAY_TYPE_EGL_HEADLESS;
- #else
-         fprintf(stderr, "egl support is disabled\n");
-         exit(1);
-@@ -4737,7 +4738,7 @@ int main(int argc, char **argv, char **envp)
+-When submitting patches, the preferred approach is to use 'git
++When submitting patches, one common approach is to use 'git
+ format-patch' and/or 'git send-email' to format & send the mail to the
+ qemu-devel@nongnu.org mailing list. All patches submitted must contain
+ a 'Signed-off-by' line from the author. Patches should follow the
+@@ -68,6 +68,34 @@ the QEMU website
+   https://qemu.org/Contribute/SubmitAPatch
+   https://qemu.org/Contribute/TrivialPatches
  
- #ifdef CONFIG_OPENGL_DMABUF
-     if (display_type == DT_EGL) {
--        egl_headless_init();
-+        egl_headless_init(&dpy);
-     }
- #endif
++A 'git-profile' utility was created to make above process less
++cumbersome, and is highly recommended for making regular contributions,
++or even just for sending consecutive patch series revisions. It also
++requires a working 'git send-email' setup, and by default doesn't
++automate everything, so you may want to go through the above steps
++manually for once.
++
++For installation instructions, please go to
++
++  https://github.com/stefanha/git-publish
++
++The workflow with 'git-publish' is:
++
++  $ git checkout master -b my-feature
++  $ # work on new commits, add your 'Signed-off-by' lines to each
++  $ git publish
++
++Your patch series will be sent and tagged as my-feature-v1 if you need to refer
++back to it in the future.
++
++Sending v2:
++
++  $ git checkout my-feature # same topic branch
++  $ # making changes to the commits (using 'git rebase', for example)
++  $ git publish
++
++Your patch series will be sent with 'v2' tag in the subject and the git tip
++will be tagged as my-feature-v2.
  
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 52220ed373..cc489b7856 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1017,7 +1017,7 @@
- #
- ##
- { 'enum'    : 'DisplayType',
--  'data'    : [ 'none', 'gtk', 'sdl' ] }
-+  'data'    : [ 'none', 'gtk', 'sdl', 'egl-headless' ] }
- 
- ##
- # @DisplayOptions:
-@@ -1040,4 +1040,5 @@
-   'discriminator' : 'type',
-   'data'    : { 'none'           : 'DisplayNoOpts',
-                 'gtk'            : 'DisplayGTK',
--                'sdl'            : 'DisplayNoOpts' } }
-+                'sdl'            : 'DisplayNoOpts',
-+                'egl-headless'   : 'DisplayNoOpts' } }
+ Bug reporting
+ =============
 -- 
-2.9.3
+2.14.3
