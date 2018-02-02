@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35325)
+Received: from eggs.gnu.org ([208.118.235.92]:36890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ehROU-0006me-9n
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:49:08 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ehRPw-0007XR-Ri
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:50:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ehRNQ-0001kY-6J
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:48:02 -0500
-Message-ID: <1517539284.2332.20.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ehROs-0004Ym-P4
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:49:32 -0500
+Message-ID: <1517539400.2332.22.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 02 Feb 2018 13:41:24 +1100
-In-Reply-To: <1517538846.2332.14.camel@gmail.com>
+Date: Fri, 02 Feb 2018 13:43:20 +1100
+In-Reply-To: <20180131082749.1803-4-clg@kaod.org>
 References: <20180131082749.1803-1-clg@kaod.org>
-	<20180131082749.1803-2-clg@kaod.org>
-	<1517538846.2332.14.camel@gmail.com>
+	<20180131082749.1803-4-clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/ppc: add basic support for PTCR
- on POWER9
+Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: generalize check on radix
+ when in HV mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,228 +26,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, 2018-02-02 at 13:34 +1100, Suraj Jitindar Singh wrote:
-> On Wed, 2018-01-31 at 09:27 +0100, Cédric Le Goater wrote:
-> > The Partition Table Control Register (PTCR) is a hypervisor
-> > privileged
-> > SPR. It contains the host real address of the Partition Table and
-> > its
-> > size.
-> > 
-> > Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> > ---
-> >  target/ppc/cpu.h            |  2 ++
-> >  target/ppc/helper.h         |  1 +
-> >  target/ppc/misc_helper.c    | 12 ++++++++++++
-> >  target/ppc/mmu-hash64.h     |  6 ++++++
-> >  target/ppc/mmu_helper.c     | 28 ++++++++++++++++++++++++++++
-> >  target/ppc/translate.c      |  3 +++
-> >  target/ppc/translate_init.c | 18 ++++++++++++++++++
-> >  7 files changed, 70 insertions(+)
-> > 
-> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> > index 9f8cbbe7aa4d..53061229a0a8 100644
-> > --- a/target/ppc/cpu.h
-> > +++ b/target/ppc/cpu.h
-> > @@ -1314,6 +1314,7 @@ int ppc_cpu_handle_mmu_fault(CPUState *cpu,
-> > vaddr address, int size, int rw,
-> >  
-> >  #if !defined(CONFIG_USER_ONLY)
-> >  void ppc_store_sdr1 (CPUPPCState *env, target_ulong value);
-> > +void ppc_store_ptcr(CPUPPCState *env, target_ulong value);
-> >  #endif /* !defined(CONFIG_USER_ONLY) */
-> >  void ppc_store_msr (CPUPPCState *env, target_ulong value);
-> >  
-> > @@ -1605,6 +1606,7 @@ void ppc_compat_add_property(Object *obj,
-> > const
-> > char *name,
-> >  #define SPR_BOOKE_GIVOR13     (0x1BC)
-> >  #define SPR_BOOKE_GIVOR14     (0x1BD)
-> >  #define SPR_TIR               (0x1BE)
-> > +#define SPR_PTCR              (0x1D0)
-> >  #define SPR_BOOKE_SPEFSCR     (0x200)
-> >  #define SPR_Exxx_BBEAR        (0x201)
-> >  #define SPR_Exxx_BBTAR        (0x202)
-> > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> > index 5b739179b8b5..19453c68138a 100644
-> > --- a/target/ppc/helper.h
-> > +++ b/target/ppc/helper.h
-> > @@ -709,6 +709,7 @@ DEF_HELPER_FLAGS_1(load_601_rtcu,
-> > TCG_CALL_NO_RWG, tl, env)
-> >  #if !defined(CONFIG_USER_ONLY)
-> >  #if defined(TARGET_PPC64)
-> >  DEF_HELPER_FLAGS_1(load_purr, TCG_CALL_NO_RWG, tl, env)
-> > +DEF_HELPER_2(store_ptcr, void, env, tl)
-> >  #endif
-> >  DEF_HELPER_2(store_sdr1, void, env, tl)
-> >  DEF_HELPER_2(store_pidr, void, env, tl)
-> > diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-> > index 0e4217821b8e..8c8cba5cc6f1 100644
-> > --- a/target/ppc/misc_helper.c
-> > +++ b/target/ppc/misc_helper.c
-> > @@ -88,6 +88,18 @@ void helper_store_sdr1(CPUPPCState *env,
-> > target_ulong val)
-> >      }
-> >  }
-> >  
-> > +#if defined(TARGET_PPC64)
-> > +void helper_store_ptcr(CPUPPCState *env, target_ulong val)
-> > +{
-> > +    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-> > +
-> > +    if (env->spr[SPR_PTCR] != val) {
-> > +        ppc_store_ptcr(env, val);
-> > +        tlb_flush(CPU(cpu));
-> > +    }
-> > +}
-> > +#endif /* defined(TARGET_PPC64) */
-> > +
-> >  void helper_store_pidr(CPUPPCState *env, target_ulong val)
-> >  {
-> >      PowerPCCPU *cpu = ppc_env_get_cpu(env);
-> > diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-> > index d297b97d3773..4fb00ac17abb 100644
-> > --- a/target/ppc/mmu-hash64.h
-> > +++ b/target/ppc/mmu-hash64.h
-> > @@ -98,6 +98,12 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
-> >  #define HPTE64_V_1TB_SEG        0x4000000000000000ULL
-> >  #define HPTE64_V_VRMA_MASK      0x4001ffffff000000ULL
-> >  
-> > +/*
-> > + * Partition table definitions
-> > + */
-> > +#define PTCR_PTAB               0x0FFFFFFFFFFFF000ULL /* Partition
-> > Table Base */
-> > +#define PTCR_PTAS               0x000000000000001FULL /* Partition
-> > Table Size */
-> > +
-> 
-> s/PTCR_PTAB/PTCR_PATB
-> s/PTCR_PTAS/PTCR_PATS
-> To match the ISA?
+On Wed, 2018-01-31 at 09:27 +0100, Cédric Le Goater wrote:
+> On a POWER9 processor, the first doubleword of the PTCR indicates
+> whether the partition uses HPT or Radix Trees translation. Use that
+> bit to check for radix mode on powernv QEMU machines.
 
-Also these should be in target/ppc/mmu-book3s-v3.h, they're not hash
-specific
+The above isn't quite right.
+
+On a POWER9 processor, the first doubleword of the partition table
+entry (as pointed to by the PTCR) indicates whether the host uses HPT
+or Radix Tree translation for that partition.
 
 > 
-> >  static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
-> >  {
-> >      return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
-> > diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> > index 16ef5acaa28f..b1e660a4d16a 100644
-> > --- a/target/ppc/mmu_helper.c
-> > +++ b/target/ppc/mmu_helper.c
-> > @@ -2029,6 +2029,34 @@ void ppc_store_sdr1(CPUPPCState *env,
-> > target_ulong value)
-> >      env->spr[SPR_SDR1] = value;
-> >  }
-> >  
-> > +#if defined(TARGET_PPC64)
-> > +void ppc_store_ptcr(CPUPPCState *env, target_ulong value)
-> > +{
-> > +    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-> > +    qemu_log_mask(CPU_LOG_MMU, "%s: " TARGET_FMT_lx "\n",
-> > __func__,
-> > value);
-> > +
-> > +    assert(!cpu->vhyp);
-> > +
-> > +    if (env->mmu_model & POWERPC_MMU_V3) {
-> > +        target_ulong ptcr_mask = PTCR_PTAB | PTCR_PTAS;
-> > +        target_ulong ptas = value & PTCR_PTAS;
-> > +
-> > +        if (value & ~ptcr_mask) {
-> > +            error_report("Invalid bits 0x"TARGET_FMT_lx" set in
-> > PTCR",
-> > +                         value & ~ptcr_mask);
-> > +            value &= ptcr_mask;
-> > +        }
-> > +        if (ptas > 28) {
-> > +            error_report("Invalid PTAS 0x" TARGET_FMT_lx" stored
-> > in
-> > PTCR",
-> > +                         ptas);
-> > +            return;
-> > +        }
-> > +    }
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> ---
+>  target/ppc/mmu-book3s-v3.c  | 17 ++++++++++++++++-
+>  target/ppc/mmu-book3s-v3.h  |  8 +-------
+>  target/ppc/mmu-hash64.h     |  1 +
+>  target/ppc/mmu_helper.c     |  4 ++--
+>  target/ppc/translate_init.c |  2 +-
+>  5 files changed, 21 insertions(+), 11 deletions(-)
 > 
-> Should we throw some error if the ptcr is being accessed on a non-
-> power9 machine?
-> 
-> > +    env->spr[SPR_PTCR] = value;
-> > +}
-> > +
-> > +#endif /* defined(TARGET_PPC64) */
-> > +
-> >  /* Segment registers load and store */
-> >  target_ulong helper_load_sr(CPUPPCState *env, target_ulong sr_num)
-> >  {
-> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > index 4132f67bb1f7..c2e6e3072799 100644
-> > --- a/target/ppc/translate.c
-> > +++ b/target/ppc/translate.c
-> > @@ -7130,6 +7130,9 @@ void ppc_cpu_dump_state(CPUState *cs, FILE
-> > *f,
-> > fprintf_function cpu_fprintf,
-> >          if (env->spr_cb[SPR_SDR1].name) { /* SDR1 Exists */
-> >              cpu_fprintf(f, " SDR1 " TARGET_FMT_lx " ", env-
-> > > spr[SPR_SDR1]);
-> > 
-> >          }
-> > +        if (env->spr_cb[SPR_PTCR].name) { /* PTCR Exists */
-> > +            cpu_fprintf(f, " PTCR " TARGET_FMT_lx " ", env-
-> > > spr[SPR_PTCR]);
-> > 
-> > +        }
-> >          cpu_fprintf(f, "  DAR " TARGET_FMT_lx "  DSISR "
-> > TARGET_FMT_lx "\n",
-> >                      env->spr[SPR_DAR], env->spr[SPR_DSISR]);
-> >          break;
-> > diff --git a/target/ppc/translate_init.c
-> > b/target/ppc/translate_init.c
-> > index 55c99c97e377..a6eaa74244ca 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -417,6 +417,11 @@ static void spr_write_hior(DisasContext *ctx,
-> > int sprn, int gprn)
-> >      tcg_gen_st_tl(t0, cpu_env, offsetof(CPUPPCState,
-> > excp_prefix));
-> >      tcg_temp_free(t0);
-> >  }
-> > +static void spr_write_ptcr(DisasContext *ctx, int sprn, int gprn)
-> > +{
-> > +    gen_helper_store_ptcr(cpu_env, cpu_gpr[gprn]);
-> > +}
-> > +
-> >  #endif
-> >  #endif
-> >  
-> > @@ -8164,6 +8169,18 @@ static void gen_spr_power8_rpr(CPUPPCState
-> > *env)
-> >  #endif
-> >  }
-> >  
-> > +/* Page Table */
-> > +static void gen_spr_power9_ptcr(CPUPPCState *env)
-> > +{
-> > +#if !defined(CONFIG_USER_ONLY)
-> > +    spr_register_hv(env, SPR_PTCR, "PTCR",
-> > +                    SPR_NOACCESS, SPR_NOACCESS,
-> > +                    SPR_NOACCESS, SPR_NOACCESS,
-> > +                    &spr_read_generic, &spr_write_ptcr,
-> > +                    0x00000000);
-> > +#endif
-> > +}
-> > +
-> >  static void init_proc_book3s_common(CPUPPCState *env)
-> >  {
-> >      gen_spr_ne_601(env);
-> > @@ -8756,6 +8773,7 @@ static void init_proc_POWER9(CPUPPCState
-> > *env)
-> >      gen_spr_power8_ic(env);
-> >      gen_spr_power8_book4(env);
-> >      gen_spr_power8_rpr(env);
-> > +    gen_spr_power9_ptcr(env);
-> >  
-> >      /* POWER9 Specific registers */
-> >      spr_register_kvm(env, SPR_TIDR, "TIDR", NULL, NULL,
+> diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
+> index e7798b3582b0..50b60fca3445 100644
+> --- a/target/ppc/mmu-book3s-v3.c
+> +++ b/target/ppc/mmu-book3s-v3.c
+> @@ -24,10 +24,25 @@
+>  #include "mmu-book3s-v3.h"
+>  #include "mmu-radix64.h"
+>  
+> +bool ppc64_radix(PowerPCCPU *cpu)
+> +{
+> +    CPUPPCState *env = &cpu->env;
+> +
+> +    if (msr_hv) {
+
+I would prefer something like:
+
+uint64_t prtbe0 = ldq_phys(...);
+return prtbe0 & HR;
+
+> +        return ldq_phys(CPU(cpu)->as, cpu->env.spr[SPR_PTCR] &
+> +                        PTCR_PTAB) & PTCR_PTAB_HR;
+> +    } else  {
+> +        PPCVirtualHypervisorClass *vhc =
+> +            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+> +
+> +        return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
+> +    }
+> +}
+> +
+>  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+>                                int mmu_idx)
+>  {
+> -    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
+> +    if (ppc64_radix(cpu)) { /* radix mode */
+>          return ppc_radix64_handle_mmu_fault(cpu, eaddr, rwx,
+> mmu_idx);
+>      } else { /* Guest uses hash */
+>          return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx,
+> mmu_idx);
+> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
+> index 56095dab522c..3876cb51b35c 100644
+> --- a/target/ppc/mmu-book3s-v3.h
+> +++ b/target/ppc/mmu-book3s-v3.h
+> @@ -37,13 +37,7 @@ static inline bool ppc64_use_proc_tbl(PowerPCCPU
+> *cpu)
+>      return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
+>  }
+>  
+> -static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
+> -{
+> -    PPCVirtualHypervisorClass *vhc =
+> -        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+> -
+> -    return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
+> -}
+> +bool ppc64_radix(PowerPCCPU *cpu);
+>  
+>  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+>                                int mmu_idx);
+> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+> index 4dc6b3968ec0..7e2ac64b6eeb 100644
+> --- a/target/ppc/mmu-hash64.h
+> +++ b/target/ppc/mmu-hash64.h
+> @@ -106,6 +106,7 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+>  /*
+>   * Partition table definitions
+>   */
+> +#define PTCR_PTAB_HR            PPC_BIT(0)            /* 1:Host 
+
+This isn't a bit in the partition table register, it is a bit in the
+partition table entry. It should be defined in target/ppc/mmu-book3s-
+v3.h as part of "/* Partition Table Entry Fields */"
+
+Also to follow the naming, please call it:
+#define PATBE0_HR	PPC_BIT(0)
+
+:)
+
+> Radix 0:HPT   */
+>  #define PTCR_PTAB               0x0FFFFFFFFFFFF000ULL /* Partition
+> Table Base */
+>  #define PTCR_PTAS               0x000000000000001FULL /* Partition
+> Table Size */
+>  
+> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+> index b1e660a4d16a..059863b99b2e 100644
+> --- a/target/ppc/mmu_helper.c
+> +++ b/target/ppc/mmu_helper.c
+> @@ -1286,7 +1286,7 @@ void dump_mmu(FILE *f, fprintf_function
+> cpu_fprintf, CPUPPCState *env)
+>          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+>          break;
+>      case POWERPC_MMU_VER_3_00:
+> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
+> +        if (ppc64_radix(ppc_env_get_cpu(env))) {
+>              /* TODO - Unsupported */
+>          } else {
+>              dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+> @@ -1432,7 +1432,7 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState
+> *cs, vaddr addr)
+>      case POWERPC_MMU_VER_2_07:
+>          return ppc_hash64_get_phys_page_debug(cpu, addr);
+>      case POWERPC_MMU_VER_3_00:
+> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
+> +        if (ppc64_radix(ppc_env_get_cpu(env))) {
+>              return ppc_radix64_get_phys_page_debug(cpu, addr);
+>          } else {
+>              return ppc_hash64_get_phys_page_debug(cpu, addr);
+> diff --git a/target/ppc/translate_init.c
+> b/target/ppc/translate_init.c
+> index a6eaa74244ca..07012ee75e81 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8965,7 +8965,7 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu,
+> PPCVirtualHypervisor *vhyp)
+>           * KVM but not under TCG. Update the default LPCR to keep
+> new
+>           * CPUs in sync when radix is enabled.
+>           */
+> -        if (ppc64_radix_guest(cpu)) {
+> +        if (ppc64_radix(cpu)) {
+>              lpcr->default_value |= LPCR_UPRT | LPCR_GTSE;
+>          } else {
+>              lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
