@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54536)
+Received: from eggs.gnu.org ([208.118.235.92]:54777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdpW-0004R5-MH
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:04:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehdq5-0004zt-9T
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdpR-0007MX-Nn
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:04:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36872)
+	(envelope-from <eblake@redhat.com>) id 1ehdpz-0007jX-TF
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:05:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:24501)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdpR-0007M7-DN
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:04:41 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdpz-0007ip-5S
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:05:15 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6A738C036743
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 16:05:14 +0000 (UTC)
 References: <20180202111022.19269-1-kraxel@redhat.com>
-	<20180202111022.19269-10-kraxel@redhat.com>
+	<20180202111022.19269-11-kraxel@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3d0d948f-aff3-8db5-09f8-c670e8a14e91@redhat.com>
-Date: Fri, 2 Feb 2018 10:04:35 -0600
+Message-ID: <57290fb5-dbc7-5dff-7686-6edaba480de9@redhat.com>
+Date: Fri, 2 Feb 2018 10:05:00 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180202111022.19269-10-kraxel@redhat.com>
+In-Reply-To: <20180202111022.19269-11-kraxel@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="x07X52jpT6JGzNpOIPNtd4vgunXpeuKX0"
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] cocoa: use DisplayOptions
+	boundary="d6skXPoXuMzrmVf6FLVH3xLseNSdBNq9L"
+Subject: Re: [Qemu-devel] [PATCH v3 10/12] vl: drop full_screen variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +35,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---x07X52jpT6JGzNpOIPNtd4vgunXpeuKX0
+--d6skXPoXuMzrmVf6FLVH3xLseNSdBNq9L
 From: Eric Blake <eblake@redhat.com>
 To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3d0d948f-aff3-8db5-09f8-c670e8a14e91@redhat.com>
-Subject: Re: [PATCH v3 09/12] cocoa: use DisplayOptions
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <57290fb5-dbc7-5dff-7686-6edaba480de9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 10/12] vl: drop full_screen variable
 References: <20180202111022.19269-1-kraxel@redhat.com>
- <20180202111022.19269-10-kraxel@redhat.com>
-In-Reply-To: <20180202111022.19269-10-kraxel@redhat.com>
+ <20180202111022.19269-11-kraxel@redhat.com>
+In-Reply-To: <20180202111022.19269-11-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 02/02/2018 05:10 AM, Gerd Hoffmann wrote:
-> Switch cocoa ui to use qapi DisplayOptions for configuration.
+> Not used any more, delete it.
 >=20
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  include/ui/console.h | 4 ++--
->  vl.c                 | 3 ++-
->  qapi/ui.json         | 6 ++++--
->  ui/cocoa.m           | 4 ++--
->  4 files changed, 10 insertions(+), 7 deletions(-)
->=20
+>  vl.c | 2 --
+>  1 file changed, 2 deletions(-)
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -64,7 +66,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---x07X52jpT6JGzNpOIPNtd4vgunXpeuKX0
+--d6skXPoXuMzrmVf6FLVH3xLseNSdBNq9L
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -73,14 +75,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0jBMACgkQp6FrSiUn
-Q2rX9gf/Z/bNavmcZPU5OJ3Zuwk0Kj/SceVKLB48/w956d7TrlVmzAZvi70SRivB
-IcDZ/vDonE0XaU0/kN4CUiY623CiWhOM1uTh65SK+SPlQK/RlgqMiyANqh/x4EFy
-2jmPmVef4QGDYMlkExH8jQEGwubDkUJvAAsAh8po67yUKNJ6bKnXZ1WugAnhF4ff
-Wijlk8TmEvHnL3hyiANxWIWeiRlW7Eu5ePUblZBtIQJbmmu7xNLRZHM0sKXI0v4t
-5lAkY24HonqVZDemQYRSdSTgIQWCuCX0wVxvX5W2Hx8/0MyIL0q127u+o0dxO828
-kX6h8t2WIhAXYUJE3iNnlTITYLvPKg==
-=GXMU
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0jCwACgkQp6FrSiUn
+Q2q0ywf8DDKw6r4hJnbSub8PpECd6jiuAWQ5Zq/6jaiDpzYo3j1pDOHdMwaWmu20
+PijWcdOux+06g+0BicBjgOliF25r1cvbPH5jxAkdbJvFXbqhOfEEmn3nYClluyMk
+MBMF0OQ42FjUSqjLAYfN0UdnA9rHd8wTR+MA2cZRhC8QdD7X0/p0+SI2HH6M6rZA
+5y+KvyMvSv3BneEgWG53G3BL28ss6ej4Xs151gul24MZmP18YstNdM+9xZ4mFtJC
+M8EW5PLD23jkVABobYfHllx9V6oic78OrWx4B1NDwUEoqkwwpZY89xvEoaD44GJa
+uQeKbJBVybgl/AA9Zu2RA1xtB5tObQ==
+=PN7f
 -----END PGP SIGNATURE-----
 
---x07X52jpT6JGzNpOIPNtd4vgunXpeuKX0--
+--d6skXPoXuMzrmVf6FLVH3xLseNSdBNq9L--
