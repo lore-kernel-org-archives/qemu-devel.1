@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ehRiE-0007X9-3O
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:09:32 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ehRmi-0001rR-Ao
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ehRcI-0006Az-7h
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:03:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37126)
+	(envelope-from <jasowang@redhat.com>) id 1ehRle-0000Sc-8R
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:13:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ehRcH-00068x-RH
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:02:18 -0500
-References: <1517473228-8402-1-git-send-email-whois.zihan.yang@gmail.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ehRld-0000RT-RT
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:11:58 -0500
+References: <1516936096-48900-1-git-send-email-jianjay.zhou@huawei.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c09a3dc1-fd15-5537-849a-2eda6b95e71e@redhat.com>
-Date: Fri, 2 Feb 2018 11:02:10 +0800
+Message-ID: <0a1502a8-cbba-cf91-bf6b-e6058a4878e5@redhat.com>
+Date: Fri, 2 Feb 2018 11:11:47 +0800
 MIME-Version: 1.0
-In-Reply-To: <1517473228-8402-1-git-send-email-whois.zihan.yang@gmail.com>
+In-Reply-To: <1516936096-48900-1-git-send-email-jianjay.zhou@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net/socket: change net_socket_listen_init
- to use qemu-socket functions
+Subject: Re: [Qemu-devel] [PATCH v2] tap: close fd conditionally when error
+ occured
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +28,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
+To: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org
+Cc: weidong.huang@huawei.com, mst@redhat.com, arei.gonglei@huawei.com, imammedo@redhat.com, wangxinxin.wang@huawei.com
 
 
 
-On 2018=E5=B9=B402=E6=9C=8801=E6=97=A5 16:20, Zihan Yang wrote:
-> net_socket_listen_init directly uses parse_host_port, bind and listen,
-> change it to use functions in include/qemu/sockets.h
+On 2018=E5=B9=B401=E6=9C=8826=E6=97=A5 11:08, Jay Zhou wrote:
+> If netdev_add tap,id=3Dnet0,...,vhost=3Don failed in net_init_tap_one()=
+,
+> the followed up device_add virtio-net-pci,netdev=3Dnet0 will fail
+> too, prints:
 >
-> Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+>    TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
+>    ioctl() failed: Bad file descriptor
+>
+> The reason is that the fd of tap is closed when error occured after
+> calling net_init_tap_one().
+>
+> The fd should be closed when calling net_init_tap_one failed:
+>    - if tap_set_sndbuf() failed
+>    - if tap_set_sndbuf() succeeded but vhost failed to initialize with
+>      vhostforce flag on
+> The fd should not be closed just because vhost failed to initialize
+> but without vhostforce flag. So the followed up device_add can fall
+> back to userspace virtio successfully.
+>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
 > ---
->   net/socket.c | 30 +++++++++---------------------
->   1 file changed, 9 insertions(+), 21 deletions(-)
+>   net/tap.c | 40 ++++++++++++++++++++++++++++++++--------
+>   1 file changed, 32 insertions(+), 8 deletions(-)
 >
-> diff --git a/net/socket.c b/net/socket.c
-> index 6917fbc..e4b1f47 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -494,36 +494,24 @@ static int net_socket_listen_init(NetClientState =
-*peer,
->   {
->       NetClientState *nc;
->       NetSocketState *s;
-> -    struct sockaddr_in saddr;
-> -    int fd, ret;
-> +    SocketAddress *saddr;
-> +    Error *local_err =3D NULL;
-> +    int fd;
+> diff --git a/net/tap.c b/net/tap.c
+> index 979e622..8042c7d 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -648,12 +648,6 @@ static void net_init_tap_one(const NetdevTapOption=
+s *tap, NetClientState *peer,
+>       TAPState *s =3D net_tap_fd_init(peer, model, name, fd, vnet_hdr);
+>       int vhostfd;
 >  =20
-> -    if (parse_host_port(&saddr, host_str, errp) < 0) {
-> +    saddr =3D socket_parse(host_str, &local_err);
-> +    if (NULL !=3D local_err) {
-> +        error_setg_errno(errp, errno, "socket_parse failed");
->           return -1;
->       }
->  =20
-> -    fd =3D qemu_socket(PF_INET, SOCK_STREAM, 0);
-> +    fd =3D socket_listen(saddr, errp);
->       if (fd < 0) {
-> -        error_setg_errno(errp, errno, "can't create stream socket");
-> +        error_setg_errno(errp, errno, "can't listen on address");
-> +        qapi_free_SocketAddress(saddr);
->           return -1;
->       }
->       qemu_set_nonblock(fd);
->  =20
-> -    socket_set_fast_reuse(fd);
-> -
-> -    ret =3D bind(fd, (struct sockaddr *)&saddr, sizeof(saddr));
-> -    if (ret < 0) {
-> -        error_setg_errno(errp, errno, "can't bind ip=3D%s to socket",
-> -                         inet_ntoa(saddr.sin_addr));
-> -        closesocket(fd);
-> -        return -1;
-> -    }
-> -    ret =3D listen(fd, 0);
-> -    if (ret < 0) {
-> -        error_setg_errno(errp, errno, "can't listen on socket");
-> -        closesocket(fd);
-> -        return -1;
+> -    tap_set_sndbuf(s->fd, tap, &err);
+> -    if (err) {
+> -        error_propagate(errp, err);
+> -        return;
 > -    }
 > -
->       nc =3D qemu_new_net_client(&net_socket_info, peer, model, name);
->       s =3D DO_UPCAST(NetSocketState, nc, nc);
->       s->fd =3D -1;
+>       if (tap->has_fd || tap->has_fds) {
+>           snprintf(s->nc.info_str, sizeof(s->nc.info_str), "fd=3D%d", f=
+d);
+>       } else if (tap->has_helper) {
+> @@ -781,6 +775,12 @@ int net_init_tap(const Netdev *netdev, const char =
+*name,
+>  =20
+>           vnet_hdr =3D tap_probe_vnet_hdr(fd);
+>  =20
+> +        tap_set_sndbuf(fd, tap, &err);
+> +        if (err) {
+> +            error_propagate(errp, err);
+> +            return -1;
+> +        }
+> +
+>           net_init_tap_one(tap, peer, "tap", name, NULL,
+>                            script, downscript,
+>                            vhostfdname, vnet_hdr, fd, &err);
+> @@ -832,6 +832,12 @@ int net_init_tap(const Netdev *netdev, const char =
+*name,
+>                   goto free_fail;
+>               }
+>  =20
+> +            tap_set_sndbuf(fd, tap, &err);
+> +            if (err) {
+> +                error_propagate(errp, err);
+> +                goto free_fail;
+> +            }
+> +
+>               net_init_tap_one(tap, peer, "tap", name, ifname,
+>                                script, downscript,
+>                                tap->has_vhostfds ? vhost_fds[i] : NULL,
+> @@ -872,12 +878,21 @@ free_fail:
+>           fcntl(fd, F_SETFL, O_NONBLOCK);
+>           vnet_hdr =3D tap_probe_vnet_hdr(fd);
+>  =20
+> +        tap_set_sndbuf(fd, tap, &err);
+> +        if (err) {
+> +            error_propagate(errp, err);
+> +            close(fd);
+> +            return -1;
+> +        }
+> +
+>           net_init_tap_one(tap, peer, "bridge", name, ifname,
+>                            script, downscript, vhostfdname,
+>                            vnet_hdr, fd, &err);
+>           if (err) {
+>               error_propagate(errp, err);
+> -            close(fd);
+> +            if (tap->has_vhostforce && tap->vhostforce) {
+> +                close(fd);
+> +            }
+>               return -1;
+>           }
+>       } else {
+> @@ -910,13 +925,22 @@ free_fail:
+>                   }
+>               }
+>  =20
+> +            tap_set_sndbuf(fd, tap, &err);
+> +            if (err) {
+> +                error_propagate(errp, err);
+> +                close(fd);
+> +                return -1;
+> +            }
+> +
+>               net_init_tap_one(tap, peer, "tap", name, ifname,
+>                                i >=3D 1 ? "no" : script,
+>                                i >=3D 1 ? "no" : downscript,
+>                                vhostfdname, vnet_hdr, fd, &err);
+>               if (err) {
+>                   error_propagate(errp, err);
+> -                close(fd);
+> +                if (tap->has_vhostforce && tap->vhostforce) {
+> +                    close(fd);
+> +                }
+>                   return -1;
+>               }
+>           }
 
-This allows more kinds of socket to be created with listen=3D e.g unix=20
-domain socket or vsock but it doesn't allow such kinds of socket to be=20
-created with connect=3D.
+Hi:
 
-And change to use socket_()* is tricky especially the connect part. You=20
-may have a look at:
-
-6701e5514bea Revert "Change net/socket.c to use socket_*() functions" aga=
-in
-616018352c24 Revert "Change net/socket.c to use socket_*() functions"
+I still fail to understand why not just pass force flag to=20
+net_tap_init_one(), and let it decide?
 
 Thanks
