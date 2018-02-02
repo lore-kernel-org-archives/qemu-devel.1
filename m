@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53354)
+Received: from eggs.gnu.org ([208.118.235.92]:36941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehe8V-0000wH-G1
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:27:58 -0500
+	(envelope-from <bounces@canonical.com>) id 1eheQ5-0003ad-Jd
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:43:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehe7Q-00087o-Ql
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:24:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehe7Q-00086H-6n
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:23:16 -0500
-References: <20180201125441.2f5b4fdd@redhat.com> <20180201201514.GB660@flask>
-	<20180201202649.GG26425@localhost.localdomain>
-	<edc27e9a-9660-eed0-dd03-016fa2e966b7@linux.vnet.ibm.com>
-	<20180202141554.GH26425@localhost.localdomain>
-	<20180202141938.GJ15403@redhat.com>
-	<20180202092159.48d9bd4c@redhat.com>
-	<20180202145014.GI26425@localhost.localdomain>
-	<20180202150718.GL15403@redhat.com>
-	<20180202152532.GL26425@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <97d2b544-f4d4-8d95-1904-f07963091aa2@redhat.com>
-Date: Fri, 2 Feb 2018 10:23:04 -0600
+	(envelope-from <bounces@canonical.com>) id 1ehePP-0007vw-VU
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:42:33 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58500)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ehePP-0007uW-ND
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:41:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ehaGG-0003As-CV
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 12:16:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5D0F62E80CE
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 12:16:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180202152532.GL26425@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MDcYcpckcN2pXVs3AAgXm9rTifSplqGz8"
-Subject: Re: [Qemu-devel] [RFC] kvm: x86: export vCPU halted state to sysfs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Feb 2018 12:08:03 -0000
+From: Gerd Hoffmann <1703795@bugs.launchpad.net>
+Reply-To: Bug 1703795 <1703795@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149985188503.15456.11517595781983565935.malonedeb@wampee.canonical.com>
+Message-Id: <20180202120803.11501-1-kraxel@redhat.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703795] [PATCH] sdl2: fix mouse grab
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Luiz Capitulino <lcapitulino@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvm@vger.kernel.org, pbonzini@redhat.com, Peter Krempa <pkrempa@redhat.com>, John Ferlan <jferlan@redhat.com>, libvir-list@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MDcYcpckcN2pXVs3AAgXm9rTifSplqGz8
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Luiz Capitulino <lcapitulino@redhat.com>,
- Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>,
- =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvm@vger.kernel.org,
- pbonzini@redhat.com, Peter Krempa <pkrempa@redhat.com>,
- John Ferlan <jferlan@redhat.com>, libvir-list@redhat.com,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <97d2b544-f4d4-8d95-1904-f07963091aa2@redhat.com>
-Subject: Re: [RFC] kvm: x86: export vCPU halted state to sysfs
-References: <20180201125441.2f5b4fdd@redhat.com> <20180201201514.GB660@flask>
- <20180201202649.GG26425@localhost.localdomain>
- <edc27e9a-9660-eed0-dd03-016fa2e966b7@linux.vnet.ibm.com>
- <20180202141554.GH26425@localhost.localdomain>
- <20180202141938.GJ15403@redhat.com> <20180202092159.48d9bd4c@redhat.com>
- <20180202145014.GI26425@localhost.localdomain>
- <20180202150718.GL15403@redhat.com>
- <20180202152532.GL26425@localhost.localdomain>
-In-Reply-To: <20180202152532.GL26425@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+When qemu mouse mode changes from relative to absolute
+we must turn off sdl relative mouse mode too.
 
-On 02/02/2018 09:25 AM, Eduardo Habkost wrote:
+Fixes: https://bugs.launchpad.net/qemu/+bug/1703795
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/sdl2.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->>> Markus, Eric: from the QAPI point of view, is it OK to remove
->>> fields between QEMU versions, as long as we follow our
->>> deprecation policy?
->>
->> I would expect that to not be OK.  A fully backwards compatible way to=
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 812c315891..858e04d7c0 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -249,6 +249,7 @@ static void sdl_mouse_mode_change(Notifier *notify, voi=
+d *data)
+     if (qemu_input_is_absolute()) {
+         if (!absolute_enabled) {
+             absolute_enabled =3D 1;
++            SDL_SetRelativeMouseMode(SDL_FALSE);
+             absolute_mouse_grab(&sdl2_console[0]);
+         }
+     } else if (absolute_enabled) {
+-- =
 
->> deal with this would just be to add a flag to the query-cpus command
->> eg something like
->>
->>     query-cpus arch-specific=3Dfalse
->>
->> to turn off all this arch specific state, and just report the cheap
->> generic info. If it defaults to arch-specific=3Dtrue when omitted, the=
-n
->> there's no compat problems.
->=20
-> This would work, too.  I would name it "full-state",
-> "extended-state" or something similar, though.  Not all
-> arch-specific data is expensive to fetch, and not all
-> non-arch-specific data is unexpensive.
->=20
-> But I'd like to confirm if it's OK to make existing non-optional
-> struct fields optional in the QAPI schema.  Markus, Eric?
+2.9.3
 
-If you add an optional bool/enum to opt-in to the command in order to
-provide different levels of reporting on output, and the default remains
-that when the new input field is absent, all information that was output
-in earlier versions of qemu is still output, then you are backwards
-compatible.  This is true even if you switched some fields from
-mandatory output to optional output, because of the use of the new input
-flag for opt-in semantics.  Newer callers that use the opt-in field get
-what they want, older callers get what they always expected.
+-- =
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703795
 
+Title:
+  Unable to release mouse in SDL2 mode
 
---MDcYcpckcN2pXVs3AAgXm9rTifSplqGz8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Status in QEMU:
+  New
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Bug description:
+  Starting with commit 8f4ea9cd0b770dbe496d9d24f0ef8813fdbfe0d0 "sdl:
+  prefer sdl2 over sdl1", I can no longer release mouse pointer grab
+  unless I use --with-sdlabi=3D1.2 configure option.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0kGgACgkQp6FrSiUn
-Q2pTiggAr8uMpM7pj82kh9ZDxf9jLvP6kgB8BGAt3WTsKFddwRXd64R80jJ+4/xk
-MhQFNfaP4B29fVwJXVxWi8Q92SkOMLkSB5y05VdRTv32WKw8bQ5QpmZD+mXHHyuP
-ABlxbdAp2ZF7S6MPJlONW8mOhm7x9WuqGvvXvHsTXNiQB0bow0PliC+/mGKzYccL
-jVwCLgQlNo/Cc1XqCVuAO1zXrHe9fFQVxUzhen0yy/u+6/arncXQoK8BIwQYzcXH
-QYbco7J7wfaAkEuOFLTMMFBmfOgrfGsVfGdjjaKyrE70T+3Kdx2Kjrzs5Alpnog9
-zWJQkIEg2LYfnwOJRqtrOi2qxt3gKA==
-=O8nS
------END PGP SIGNATURE-----
+  This easily reproduces in e.g. guest Kubuntu, when I let it start Xorg
+  and then click into the QEMU window. After this the mouse is trapped
+  and no matter how I combine Ctrl+Alt and motion of the cursor, the
+  pointer never goes out from the window. When at the border, QEMU
+  window switches from "Press Ctrl+Alt to exit grab" to "QEMU", i.e. it
+  thinks that it has released the grab. But it hasn't really, so I have
+  to go to VT1 and do "pkill qemu" from there to get my pointer back.
 
---MDcYcpckcN2pXVs3AAgXm9rTifSplqGz8--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703795/+subscriptions
