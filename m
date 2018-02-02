@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37005)
+Received: from eggs.gnu.org ([208.118.235.92]:37106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eheQA-0003eo-8k
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:43:06 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eheQF-0003ja-5E
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ehePT-0007zG-Vw
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:42:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58500)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ehePT-0007uW-KO
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:41:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ehaGF-0003CY-NH
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 12:16:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A56832E80CD
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 12:16:07 +0000 (UTC)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ehePA-0007lM-17
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:42:43 -0500
+References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
+	<ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <919e1755-e3d1-939b-2157-6d3b5896ea3a@virtuozzo.com>
+Date: Fri, 2 Feb 2018 19:29:45 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Feb 2018 12:07:02 -0000
-From: Gerd Hoffmann <1703795@bugs.launchpad.net>
-Reply-To: Bug 1703795 <1703795@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149985188503.15456.11517595781983565935.malonedeb@wampee.canonical.com>
-Message-Id: <151757322248.29329.2893406946545585686.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1703795] Re: Unable to release mouse in SDL2 mode
+In-Reply-To: <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3] block: maintain persistent disabled
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
-workaround: don't click into the guest window before the tablet driver
-loads.
+02.02.2018 19:18, Eric Blake wrote:
+> On 02/02/2018 10:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> To maintain load/store disabled bitmap there is new approach:
+>>
+>>   - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored
+>>   - store enabled bitmaps as "auto" to qcow2
+>>   - store disabled bitmaps without "auto" flag to qcow2
+>>   - on qcow2 open load "auto" bitmaps as enabled and others
+>>     as disabled (except in_use bitmaps)
+>>
+>> Also, adjust iotests 165 and 176 appropriately.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>> +++ b/qemu-doc.texi
+>> @@ -2749,6 +2749,13 @@ used and it will be removed with no replacement.
+>>   The ``convert -s snapshot_id_or_name'' argument is obsoleted
+>>   by the ``convert -l snapshot_param'' argument instead.
+>>   
+>> +@section QEMU Machine Protocol (QMP) commands
+>> +
+>> +@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+>> +
+>> +"autoload" parameter is now ignored. All bitmaps are automatically loaded
+>> +from qcow2 image.
+> Won't later patches be adding the ability to enable/disable bitmaps,
+> which then affects whether they are autoloaded?  So we don't forget to
+> revisit this text in that patch, a better wording might be:
+>
+> The "autoload" parameter is ignored; all enabled persistent dirty
+> bitmaps are automatically loaded from a qcow2 image, regardless of the
+> initial setting requested in this parameter.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1703795
+hmm.. no. all bitmaps are loaded, even disabled ones. Before this patch 
+there is
+no way to have disabled bitmap in qemu (by loading or by creating).
+After the patch, we have a theoretical way of creating such bitmap in 
+qcow2 image, then
+it will be loaded as disabled.
 
-Title:
-  Unable to release mouse in SDL2 mode
+Also, we can store bitmap with persistent=true and autoload=false before 
+this patch, and there is no way
+to load this bitmap before this patch, but after this patch it will be 
+loaded as disabled.
 
-Status in QEMU:
-  New
 
-Bug description:
-  Starting with commit 8f4ea9cd0b770dbe496d9d24f0ef8813fdbfe0d0 "sdl:
-  prefer sdl2 over sdl1", I can no longer release mouse pointer grab
-  unless I use --with-sdlabi=3D1.2 configure option.
+>
+>
+>> @@ -667,19 +662,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+>>   }
+>>   
+>>   /* Called with BQL taken. */
+>> -void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
+>> -{
+>> -    qemu_mutex_lock(bitmap->mutex);
+>> -    bitmap->autoload = autoload;
+>> -    qemu_mutex_unlock(bitmap->mutex);
+>> -}
+>> -
+>> -bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
+>> -{
+>> -    return bitmap->autoload;
+>> -}
+> Will later patches be reintroducing these functions for learning which
+> bitmaps are enabled/disabled?  But I'm okay with deleting them in this
+> patch, even if that is more churn.
+>
 
-  This easily reproduces in e.g. guest Kubuntu, when I let it start Xorg
-  and then click into the QEMU window. After this the mouse is trapped
-  and no matter how I combine Ctrl+Alt and motion of the cursor, the
-  pointer never goes out from the window. When at the border, QEMU
-  window switches from "Press Ctrl+Alt to exit grab" to "QEMU", i.e. it
-  thinks that it has released the grab. But it hasn't really, so I have
-  to go to VT1 and do "pkill qemu" from there to get my pointer back.
+no, actually the aim of the patch is to drop buggy relation between 
+autoload qmp parameter
+and auto qcow2 flag (which is more like "enabled" then "autoload"). Look 
+at "Reasoning" in head
+letter for details.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1703795/+subscriptions
+-- 
+Best regards,
+Vladimir
