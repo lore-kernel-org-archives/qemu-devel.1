@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56000)
+Received: from eggs.gnu.org ([208.118.235.92]:55980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehdLa-0002kI-84
+	(envelope-from <armbru@redhat.com>) id 1ehdLZ-0002k9-Tm
 	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:34:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehdKW-0003WV-5C
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:33:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49380)
+	(envelope-from <armbru@redhat.com>) id 1ehdKV-0003Vb-JM
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:33:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehdKV-0003TZ-9R
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehdKU-0003Ta-Uq
 	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:32:43 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  2 Feb 2018 14:03:15 +0100
-Message-Id: <20180202130336.24719-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RFC 00/21] Modularize generated QAPI code
+Date: Fri,  2 Feb 2018 14:03:17 +0100
+Message-Id: <20180202130336.24719-3-armbru@redhat.com>
+In-Reply-To: <20180202130336.24719-1-armbru@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 02/21] qapi: Generate up-to-date copyright
+ notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,160 +27,306 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-Our qapi-schema.json is composed of modules connected by include
-directives, but the generated code is monolithic all the same: one
-qapi-types.h with all the types, one qapi-visit.h with all the
-visitors, and so forth.  These monolithic headers get included all
-over the place.  In my "build everyhing" tree, adding a QAPI type
-recompiles about 4500 out of 4800 objects.
+Each generator carries a copyright notice for the generator itself,
+and another one for the files it generates.  Only the former have been
+updated along the way, the latter have not, and are all out of date.
 
-Nobody would write such monolithic headers by hand.  It stands to
-reason that one shouldn't generate them, either.
+Fix by copying the generator's copyright notice to the generated files
+instead.
 
-This series' basic idea is to split up generated headers to mirror the
-schema's modular structure: one header per module.  That way, you can
-include just what you need.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qapi-commands.py   | 34 +++++++++++++++-------------------
+ scripts/qapi-event.py      | 32 ++++++++++++++------------------
+ scripts/qapi-introspect.py | 25 ++++++++++++-------------
+ scripts/qapi-types.py      | 32 ++++++++++++++------------------
+ scripts/qapi-visit.py      | 34 +++++++++++++++-------------------
+ scripts/qapi.py            |  7 +++++--
+ 6 files changed, 75 insertions(+), 89 deletions(-)
 
-The series is RFC for a number of reasons:
-
-* The split is implemented only for qapi-types.h.  That one should
-  provide the biggest benefits, though.
-
-* There's a bit of code duplication.
-
-* I haven't re-read my patches, yet.
-
-Even in this incomplete state, the compile-time improvements can be
-massive.  Before this series, any QAPI schema change recompiles some
-4500 out of 4800 objects in my "build everything" tree.  Afterwards,
-adding a type to qapi/migration.json recompiles less than 400, adding
-a QMP event recompiles less than 200, and a documentation change no
-longer recompiles anything.
-
-Related: Marc-Andr=C3=A9's 'unit' pragma proposal.  That's a different wa=
-y
-to split off parts of the generated code, motivated by the desire to
-use poisoned identifiers such as TARGET_I386.  I noted in my review of
-v3 that I "can either accept it, or come up with a better solution."
-This is my attempt at a better solution.  It's a bit more ambitious,
-and thus more useful (I hope).  The pragma has one theoretical
-advantage, though: you can modularize the generated output in
-different ways than the input.  The patches using don't do that,
-however.
-
-Based-on: <20180201111846.21846-1-armbru@redhat.com>
-[PATCH v3 00/19] Clean up includes to reduce compile time
-
-Markus Armbruster (21):
-  qapi: Streamline boilerplate comment generation
-  qapi: Generate up-to-date copyright notice
-  qapi: New classes QAPIGenC, QAPIGenH, QAPIGenDoc
-  qapi: Reduce use of global variables in generators some
-  qapi: Turn generators into modules
-  qapi-gen: New common driver for code and doc generators
-  qapi: Move parse_command_line() next to its only use
-  qapi: Touch generated files only when they change
-  qapi: Don't absolutize include file name in error messages
-  qapi/common: Eliminate QAPISchema.exprs
-  qapi: Lift error reporting from QAPISchema.__init__() to callers
-  qapi: Concentrate QAPISchemaParser.exprs updates in .__init__()
-  qapi: Record 'include' directives in parse tree
-  qapi: Generate in source order
-  qapi: Record 'include' directives in intermediate representation
-  qapi/types qapi/visit: Make visitors use QAPIGen more
-  qapi/types qapi/visit: Generate built-in stuff into separate files
-  qapi/common: Fix guardname() for funny filenames
-  qapi/types: Generate separate .h, .c for each module
-  Include less of qapi-types.h
-  qapi: Empty out qapi-schema.json
-
- Makefile                                           |  131 +-
- Makefile.objs                                      |   20 +-
- crypto/cipherpriv.h                                |    2 +-
- hw/block/block.c                                   |    1 +
- hw/block/hd-geometry.c                             |    1 +
- hw/net/rocker/rocker_fp.c                          |    2 +-
- include/block/block.h                              |    2 +-
- include/block/dirty-bitmap.h                       |    2 +-
- include/chardev/char.h                             |    1 +
- include/crypto/cipher.h                            |    2 +-
- include/crypto/hash.h                              |    2 +-
- include/crypto/hmac.h                              |    2 +-
- include/crypto/secret.h                            |    1 +
- include/crypto/tlscreds.h                          |    1 +
- include/hw/block/block.h                           |    2 +-
- include/hw/block/fdc.h                             |    2 +-
- include/hw/ppc/spapr_drc.h                         |    1 +
- include/hw/qdev-properties.h                       |    2 +
- include/io/dns-resolver.h                          |    1 +
- include/migration/colo.h                           |    2 +-
- include/migration/failover.h                       |    2 +-
- include/migration/global_state.h                   |    1 +
- include/monitor/monitor.h                          |    1 +
- include/net/filter.h                               |    1 +
- include/net/net.h                                  |    2 +-
- include/qapi/error.h                               |    2 +-
- include/qapi/qmp/qobject.h                         |    2 +-
- include/qapi/visitor.h                             |    2 +-
- include/qemu/sockets.h                             |    2 +-
- include/qemu/throttle.h                            |    2 +-
- include/qom/cpu.h                                  |    1 +
- include/qom/object.h                               |    2 +-
- include/sysemu/arch_init.h                         |    2 +-
- include/sysemu/balloon.h                           |    2 +-
- include/sysemu/dump.h                              |    2 +
- include/sysemu/hostmem.h                           |    1 +
- include/sysemu/replay.h                            |    2 +
- include/sysemu/sysemu.h                            |    1 +
- include/sysemu/tpm.h                               |    1 +
- include/sysemu/watchdog.h                          |    2 +-
- include/ui/input.h                                 |    2 +-
- migration/migration.h                              |    1 +
- migration/ram.h                                    |    2 +-
- net/tap_int.h                                      |    2 +-
- qapi-schema.json                                   | 3098 +-------------=
-------
- qapi/misc.json                                     | 3090 ++++++++++++++=
-+++++
- qapi/run-state.json                                |   10 +
- replication.h                                      |    1 +
- scripts/qapi-gen.py                                |   95 +
- scripts/qapi/__init__.py                           |    0
- scripts/{qapi-commands.py =3D> qapi/commands.py}     |   98 +-
- scripts/{qapi.py =3D> qapi/common.py}                |  290 +-
- scripts/{qapi2texi.py =3D> qapi/doc.py}              |   28 +-
- scripts/{qapi-event.py =3D> qapi/events.py}          |  101 +-
- scripts/{qapi-introspect.py =3D> qapi/introspect.py} |   87 +-
- scripts/{qapi-types.py =3D> qapi/types.py}           |  218 +-
- scripts/{qapi-visit.py =3D> qapi/visit.py}           |  208 +-
- tests/Makefile.include                             |   56 +-
- tests/qapi-schema/comments.out                     |    3 +-
- tests/qapi-schema/doc-bad-section.out              |    5 +-
- tests/qapi-schema/doc-good.out                     |   33 +-
- tests/qapi-schema/doc-good.texi                    |    3 +-
- tests/qapi-schema/empty.out                        |    2 +-
- tests/qapi-schema/event-case.out                   |    3 +-
- tests/qapi-schema/ident-with-escape.out            |    7 +-
- tests/qapi-schema/include-no-file.err              |    2 +-
- tests/qapi-schema/include-relpath.out              |    7 +-
- tests/qapi-schema/include-repetition.out           |   12 +-
- tests/qapi-schema/include-simple.out               |    5 +-
- tests/qapi-schema/indented-expr.out                |    3 +-
- tests/qapi-schema/qapi-schema-test.out             |  321 +-
- tests/qapi-schema/test-qapi.py                     |   17 +-
- ui/vnc.h                                           |    1 +
- 73 files changed, 4040 insertions(+), 3984 deletions(-)
- create mode 100644 qapi/misc.json
- create mode 100755 scripts/qapi-gen.py
- create mode 100644 scripts/qapi/__init__.py
- rename scripts/{qapi-commands.py =3D> qapi/commands.py} (78%)
- rename scripts/{qapi.py =3D> qapi/common.py} (93%)
- rename scripts/{qapi2texi.py =3D> qapi/doc.py} (93%)
- mode change 100755 =3D> 100644
- rename scripts/{qapi-event.py =3D> qapi/events.py} (69%)
- rename scripts/{qapi-introspect.py =3D> qapi/introspect.py} (78%)
- rename scripts/{qapi-types.py =3D> qapi/types.py} (54%)
- rename scripts/{qapi-visit.py =3D> qapi/visit.py} (66%)
-
---=20
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index 25ac52503a..a861ac52e7 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -1,16 +1,17 @@
+-#
+-# QAPI command marshaller generator
+-#
+-# Copyright IBM, Corp. 2011
+-# Copyright (C) 2014-2016 Red Hat, Inc.
+-#
+-# Authors:
+-#  Anthony Liguori <aliguori@us.ibm.com>
+-#  Michael Roth    <mdroth@linux.vnet.ibm.com>
+-#  Markus Armbruster <armbru@redhat.com>
+-#
+-# This work is licensed under the terms of the GNU GPL, version 2.
+-# See the COPYING file in the top-level directory.
++"""
++QAPI command marshaller generator
++
++Copyright IBM, Corp. 2011
++Copyright (C) 2014-2018 Red Hat, Inc.
++
++Authors:
++ Anthony Liguori <aliguori@us.ibm.com>
++ Michael Roth <mdroth@linux.vnet.ibm.com>
++ Markus Armbruster <armbru@redhat.com>
++
++This work is licensed under the terms of the GNU GPL, version 2.
++See the COPYING file in the top-level directory.
++"""
+ 
+ from qapi import *
+ 
+@@ -257,16 +258,11 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+ 
+ blurb = '''
+  * Schema-defined QAPI/QMP commands
+- *
+- * Copyright IBM, Corp. 2011
+- *
+- * Authors:
+- *  Anthony Liguori   <aliguori@us.ibm.com>
+ '''
+ 
+ (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
+                             'qmp-marshal.c', 'qmp-commands.h',
+-                            blurb)
++                            blurb, __doc__)
+ 
+ fdef.write(mcgen('''
+ 
+diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+index 31faedc689..b1d611c5ea 100644
+--- a/scripts/qapi-event.py
++++ b/scripts/qapi-event.py
+@@ -1,15 +1,16 @@
+-#
+-# QAPI event generator
+-#
+-# Copyright (c) 2014 Wenchao Xia
+-# Copyright (c) 2015-2016 Red Hat Inc.
+-#
+-# Authors:
+-#  Wenchao Xia <wenchaoqemu@gmail.com>
+-#  Markus Armbruster <armbru@redhat.com>
+-#
+-# This work is licensed under the terms of the GNU GPL, version 2.
+-# See the COPYING file in the top-level directory.
++"""
++QAPI event generator
++
++Copyright (c) 2014 Wenchao Xia
++Copyright (c) 2015-2018 Red Hat Inc.
++
++Authors:
++ Wenchao Xia <wenchaoqemu@gmail.com>
++ Markus Armbruster <armbru@redhat.com>
++
++This work is licensed under the terms of the GNU GPL, version 2.
++See the COPYING file in the top-level directory.
++"""
+ 
+ from qapi import *
+ 
+@@ -173,16 +174,11 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+ 
+ blurb = '''
+  * Schema-defined QAPI/QMP events
+- *
+- * Copyright (c) 2014 Wenchao Xia
+- *
+- * Authors:
+- *  Wenchao Xia   <wenchaoqemu@gmail.com>
+ '''
+ 
+ (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
+                             'qapi-event.c', 'qapi-event.h',
+-                            blurb)
++                            blurb, __doc__)
+ 
+ fdef.write(mcgen('''
+ #include "qemu/osdep.h"
+diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+index 83da2bdb94..bd9253a172 100644
+--- a/scripts/qapi-introspect.py
++++ b/scripts/qapi-introspect.py
+@@ -1,13 +1,14 @@
+-#
+-# QAPI introspection generator
+-#
+-# Copyright (C) 2015-2016 Red Hat, Inc.
+-#
+-# Authors:
+-#  Markus Armbruster <armbru@redhat.com>
+-#
+-# This work is licensed under the terms of the GNU GPL, version 2.
+-# See the COPYING file in the top-level directory.
++"""
++QAPI introspection generator
++
++Copyright (C) 2015-2018 Red Hat, Inc.
++
++Authors:
++ Markus Armbruster <armbru@redhat.com>
++
++This work is licensed under the terms of the GNU GPL, version 2.
++See the COPYING file in the top-level directory.
++"""
+ 
+ from qapi import *
+ 
+@@ -178,13 +179,11 @@ for o, a in opts:
+ 
+ blurb = '''
+  * QAPI/QMP schema introspection
+- *
+- * Copyright (C) 2015 Red Hat, Inc.
+ '''
+ 
+ (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
+                             'qmp-introspect.c', 'qmp-introspect.h',
+-                            blurb)
++                            blurb, __doc__)
+ 
+ fdef.write(mcgen('''
+ #include "qemu/osdep.h"
+diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
+index 86afc57f92..1103dbda2d 100644
+--- a/scripts/qapi-types.py
++++ b/scripts/qapi-types.py
+@@ -1,15 +1,17 @@
+-#
+-# QAPI types generator
+-#
+-# Copyright IBM, Corp. 2011
+-# Copyright (c) 2013-2016 Red Hat Inc.
+-#
+-# Authors:
+-#  Anthony Liguori <aliguori@us.ibm.com>
+-#  Markus Armbruster <armbru@redhat.com>
+-#
+-# This work is licensed under the terms of the GNU GPL, version 2.
++"""
++QAPI types generator
++
++Copyright IBM, Corp. 2011
++Copyright (c) 2013-2018 Red Hat Inc.
++
++Authors:
++ Anthony Liguori <aliguori@us.ibm.com>
++ Michael Roth <mdroth@linux.vnet.ibm.com>
++ Markus Armbruster <armbru@redhat.com>
++
++This work is licensed under the terms of the GNU GPL, version 2.
+ # See the COPYING file in the top-level directory.
++"""
+ 
+ from qapi import *
+ 
+@@ -252,17 +254,11 @@ for o, a in opts:
+ 
+ blurb = '''
+  * Schema-defined QAPI types
+- *
+- * Copyright IBM, Corp. 2011
+- *
+- * Authors:
+- *  Anthony Liguori   <aliguori@us.ibm.com>
+- *  Michael Roth      <mdroth@linux.vnet.ibm.com>
+ '''
+ 
+ (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
+                             'qapi-types.c', 'qapi-types.h',
+-                            blurb)
++                            blurb, __doc__)
+ 
+ fdef.write(mcgen('''
+ #include "qemu/osdep.h"
+diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+index 9f7127e548..5231f89c36 100644
+--- a/scripts/qapi-visit.py
++++ b/scripts/qapi-visit.py
+@@ -1,16 +1,17 @@
+-#
+-# QAPI visitor generator
+-#
+-# Copyright IBM, Corp. 2011
+-# Copyright (C) 2014-2016 Red Hat, Inc.
+-#
+-# Authors:
+-#  Anthony Liguori <aliguori@us.ibm.com>
+-#  Michael Roth    <mdroth@linux.vnet.ibm.com>
+-#  Markus Armbruster <armbru@redhat.com>
+-#
+-# This work is licensed under the terms of the GNU GPL, version 2.
+-# See the COPYING file in the top-level directory.
++"""
++QAPI visitor generator
++
++Copyright IBM, Corp. 2011
++Copyright (C) 2014-2018 Red Hat, Inc.
++
++Authors:
++ Anthony Liguori <aliguori@us.ibm.com>
++ Michael Roth    <mdroth@linux.vnet.ibm.com>
++ Markus Armbruster <armbru@redhat.com>
++
++This work is licensed under the terms of the GNU GPL, version 2.
++See the COPYING file in the top-level directory.
++"""
+ 
+ from qapi import *
+ 
+@@ -336,16 +337,11 @@ for o, a in opts:
+ 
+ blurb = '''
+  * Schema-defined QAPI visitors
+- *
+- * Copyright IBM, Corp. 2011
+- *
+- * Authors:
+- *  Anthony Liguori   <aliguori@us.ibm.com>
+ '''
+ 
+ (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
+                             'qapi-visit.c', 'qapi-visit.h',
+-                            blurb)
++                            blurb, __doc__)
+ 
+ fdef.write(mcgen('''
+ #include "qemu/osdep.h"
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 2e4b2bc9eb..d0816f7479 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -1975,21 +1975,24 @@ def parse_command_line(extra_options='', extra_long_options=[]):
+ #
+ 
+ 
+-def open_output(output_dir, do_c, do_h, prefix, c_file, h_file, blurb):
++def open_output(output_dir, do_c, do_h, prefix, c_file, h_file, blurb, doc):
+     guard = guardname(prefix + h_file)
+     c_file = output_dir + prefix + c_file
+     h_file = output_dir + prefix + h_file
++    copyright = '\n * '.join(re.findall(r'^Copyright .*', doc, re.MULTILINE))
+     comment = mcgen('''/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
+ 
+ /*
+ %(blurb)s
+  *
++ * %(copyright)s
++ *
+  * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
+  * See the COPYING.LIB file in the top-level directory.
+  */
+ 
+ ''',
+-                    blurb=blurb.strip('\n'))
++                    blurb=blurb.strip('\n'), copyright=copyright)
+ 
+     if output_dir:
+         try:
+-- 
 2.13.6
