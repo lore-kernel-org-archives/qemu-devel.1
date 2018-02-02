@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
-	id 1ehcWy-0006yh-Qw
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:33 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ehcX2-0006zh-U6
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
-	id 1ehcWt-0000uI-Ok
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:32 -0500
-References: <20180118115158.17219-1-edgar.kaziakhmedov@virtuozzo.com>
-	<1b55edad-f820-6898-1630-ccc76e6c4845@redhat.com>
-	<5858df64-9495-1332-3c53-fab0204f79a9@virtuozzo.com>
-	<8b87f82d-2a90-d6cf-0fc4-aee0d704a403@redhat.com>
-From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Message-ID: <4919379e-ee86-5032-ec1e-fea39912783b@virtuozzo.com>
-Date: Fri, 2 Feb 2018 17:06:48 +0300
+	(envelope-from <brijesh.singh@amd.com>) id 1ehcWy-0000vu-10
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:36 -0500
+Received: from mail-bn3nam01on0064.outbound.protection.outlook.com
+	([104.47.33.64]:44896
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ehcWx-0000vB-MC
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:31 -0500
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-14-brijesh.singh@amd.com>
+	<20180201175802.GK2457@work-vm>
+	<7c3c7a89-04ef-016e-c9a5-4f4d4be1c449@amd.com>
+	<20180201200442.GQ2457@work-vm> <20180202130817.GE15403@redhat.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <3e6cf550-9bd8-daa7-e54a-d390354ffcb0@amd.com>
+Date: Fri, 2 Feb 2018 07:46:44 -0600
 MIME-Version: 1.0
-In-Reply-To: <8b87f82d-2a90-d6cf-0fc4-aee0d704a403@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180202130817.GE15403@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: implement bdrv_get_info callback
+Subject: Re: [Qemu-devel] [PATCH v6 13/23] hmp: display memory encryption
+ support in 'info kvm'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +35,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
 
-On 01/26/2018 05:28 PM, Eric Blake wrote:
-> On 01/26/2018 06:39 AM, Edgar Kaziakhmedov wrote:
->> PIng
->>
->> So, let me know if I need to make any changes in patch
->>
->> On 1/18/18 1:09 PM, Paolo Bonzini wrote:
->>> On 18/01/2018 12:51, Edgar Kaziakhmedov wrote:
->>>> +static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
->>>> +{
->>>> +=C2=A0=C2=A0=C2=A0 if (bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP)=
- {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdi->can_write_zeroes_with=
-_unmap =3D true;
->>>> +=C2=A0=C2=A0=C2=A0 }
->>>> +=C2=A0=C2=A0=C2=A0 return 0;
->>>> +}
->>>> +
->>> Other drivers set the flag always, while NBD only sets it if the server
->>> knows the flag.
-> Well, other drivers may be able to always implement it (NBD can only
-> implement it if the server supports WRITE_ZEROES - and I'm even in the
-> middle of working up an nbdkit patch [1] that makes it easier to write
-> an NBD server that specifically does not support WRITE_ZEROES to make
-> code paths like this easier to test)
->
-> [1]
->
->>> I think NBD is more correct, so:
+On 2/2/18 7:08 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Feb 01, 2018 at 08:04:43PM +0000, Dr. David Alan Gilbert wrote:
+>> * Brijesh Singh (brijesh.singh@amd.com) wrote:
 >>>
->>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Agreed; I'm fine queueing this on my NBD queue, except I'd first like to
-> hear Kevin's opinion:
+>>> On 2/1/18 11:58 AM, Dr. David Alan Gilbert wrote:
+>>>> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+>>>>> update 'info kvm' to display the memory encryption support.
+>>>>>
+>>>>> (qemu) info kvm
+>>>>> kvm support: enabled
+>>>>> memory encryption: disabled
+>>>> As Markus said, this should be split qmp/hmp; but something else to
+>>>> think about is whether this is a boolean or needs to be an enum;  do
+>>>> you have one version of encryption or are we going to need to flag up
+>>>> versions or the features of the encryption?
+>>> In future I could see us providing encrypted state status when we
+>>> implement SEV-ES support, something like
+>>>
+>>> (qemu) info kvm
+>>> kvm support: enabled
+>>> memory encryption: enabled
+>>> cpu register state: encrypted
+>>>
+>>> but so far I do not see need to provide the version string. If user
+>>> wants to know the SEV version then it can open /dev/sev device to get
+>>> platform status and more.
+>> Yes, I was worried a bit more about how general that was going to be
+>> or whether we're collecting a lot of architecture specific fields here.
+>> So I wondered, if it was an enum, whether that would be come:
+>>
+>> memory encryption: none
+>>
+>> memory encryption: SEV
+>>
+>> memory encryption: SEV-ES
+>>
+>> (I'm not too sure whether that's better or not, just a suggestion)
+> I wonder if it is is even appropriate to have under 'info kvm', since
+> 'info kvm' is architecture independant and SEV is specific to AMD x86_64
+> only. It might suggest an 'info sev' command is better ?
+
+The reason I kept under 'info kvm' is because now KVM has a ioctl for
+memory encryption operation, I like your suggestion for=C2=A0 introducing
+'info sev' -- the command can be used to provide additional SEV specific
+details (e.g SEV FW state, SEV FW version, SEV active policy etc).
+
 >
->>> However, it would be nice to remove can_write_zeroes_with_unmap from
->>> BlockDriverInfo, and make bdrv_can_write_zeroes_with_unmap just return
->>> !!(bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP).=C2=A0 Kevin, what do=
- you
->>> think?
-> Actually, I may even just give a shot at writing this alternative patch,
-> to make Kevin's decision easier.
-But actually qcow2 performs some checks for version inside get_info=20
-callback before setting can_write_zeroes_with_unmap flag,
-so we can't take into account such checks in=20
-bdrv_can_write_zeroes_with_unmap subroutine. Therefore, I don't think it=20
-is possible to do it like that.
+> Regards,
+> Daniel
