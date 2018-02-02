@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54858)
+Received: from eggs.gnu.org ([208.118.235.92]:55487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdqD-00056q-F8
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:05:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehdrX-00062n-Vr
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:06:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdq9-0007nR-26
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:05:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32890)
+	(envelope-from <eblake@redhat.com>) id 1ehdrT-0008Sm-DS
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:06:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37320)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdq8-0007mz-PF
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:05:24 -0500
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-3-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdrT-0008Sc-4D
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:06:47 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BB21629
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 16:06:46 +0000 (UTC)
+References: <20180202111022.19269-1-kraxel@redhat.com>
+	<20180202111022.19269-12-kraxel@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <05113113-5b7c-c094-2870-2eb4a5b09454@redhat.com>
-Date: Fri, 2 Feb 2018 09:47:21 -0600
+Message-ID: <fbe423b4-e5d6-ff72-5f5a-d287b141c278@redhat.com>
+Date: Fri, 2 Feb 2018 10:06:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180202130336.24719-3-armbru@redhat.com>
+In-Reply-To: <20180202111022.19269-12-kraxel@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="mAnrFAfDq3MU3F3sr0Rpn9dI7hqbL36Zi"
-Subject: Re: [Qemu-devel] [PATCH RFC 02/21] qapi: Generate up-to-date
- copyright notice
+	boundary="NliaYF1hhlSbeDBQmUDlKNUqUPexlhmgf"
+Subject: Re: [Qemu-devel] [PATCH v3 11/12] vl: drop request_opengl variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mAnrFAfDq3MU3F3sr0Rpn9dI7hqbL36Zi
+--NliaYF1hhlSbeDBQmUDlKNUqUPexlhmgf
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <05113113-5b7c-c094-2870-2eb4a5b09454@redhat.com>
-Subject: Re: [PATCH RFC 02/21] qapi: Generate up-to-date copyright notice
-References: <20180202130336.24719-1-armbru@redhat.com>
- <20180202130336.24719-3-armbru@redhat.com>
-In-Reply-To: <20180202130336.24719-3-armbru@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <fbe423b4-e5d6-ff72-5f5a-d287b141c278@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 11/12] vl: drop request_opengl variable
+References: <20180202111022.19269-1-kraxel@redhat.com>
+ <20180202111022.19269-12-kraxel@redhat.com>
+In-Reply-To: <20180202111022.19269-12-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/02/2018 07:03 AM, Markus Armbruster wrote:
-> Each generator carries a copyright notice for the generator itself,
-> and another one for the files it generates.  Only the former have been
-> updated along the way, the latter have not, and are all out of date.
+On 02/02/2018 05:10 AM, Gerd Hoffmann wrote:
+> Switch over the one leftover user to qapi DisplayType.
+> The delete the unused request_opengl variable.
 >=20
-> Fix by copying the generator's copyright notice to the generated files
-> instead.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
-
-> +++ b/scripts/qapi-commands.py
-> @@ -1,16 +1,17 @@
-> -#
-> -# QAPI command marshaller generator
-> -#
-> -# Copyright IBM, Corp. 2011
-> -# Copyright (C) 2014-2016 Red Hat, Inc.
-> -#
-> -# Authors:
-> -#  Anthony Liguori <aliguori@us.ibm.com>
-> -#  Michael Roth    <mdroth@linux.vnet.ibm.com>
-> -#  Markus Armbruster <armbru@redhat.com>
-> -#
-> -# This work is licensed under the terms of the GNU GPL, version 2.
-> -# See the COPYING file in the top-level directory.
-> +"""
-> +QAPI command marshaller generator
-> +
-> +Copyright IBM, Corp. 2011
-> +Copyright (C) 2014-2018 Red Hat, Inc.
-> +
-> +Authors:
-> + Anthony Liguori <aliguori@us.ibm.com>
-> + Michael Roth <mdroth@linux.vnet.ibm.com>
-> + Markus Armbruster <armbru@redhat.com>
-> +
-> +This work is licensed under the terms of the GNU GPL, version 2.
-> +See the COPYING file in the top-level directory.
-> +"""
-
-So python lets you start a file with a string constant that is not
-associated with any variable name?
+>  vl.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+>=20
 
 > =20
->  (fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
->                              'qmp-marshal.c', 'qmp-commands.h',
-> -                            blurb)
-> +                            blurb, __doc__)
+> -    if (request_opengl =3D=3D 1 && display_opengl =3D=3D 0) {
+> +    if (dpy.has_gl && dpy.gl && display_opengl =3D=3D 0) {
+>  #if defined(CONFIG_OPENGL)
+>          error_report("OpenGL is not supported by the display");
+>  #else
 
-Ah, and there's what I was missing - python auto-assigns such an initial
-string to a magic automatic variable.  Cool language feature I hadn't
-seen before!
+Maybe someday when QAPI supports conditionals we can make the exposure
+of the 'gl' field guarded by those conditionals, for better
+introspection, rather than the current series' approach of always
+exposing it then failing at runtime.  But that doesn't hold up this serie=
+s.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -107,7 +81,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---mAnrFAfDq3MU3F3sr0Rpn9dI7hqbL36Zi
+--NliaYF1hhlSbeDBQmUDlKNUqUPexlhmgf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -116,14 +90,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0iAkACgkQp6FrSiUn
-Q2p6IQf+I8/czfTlBDVyiIkILSHdCEu97fw/6qCHHfj+IcQzfUK9MLBjLULBuX0E
-teRv0SX+f+SEqrsIokyyYBRtc0MnVfxIJ7e1KukFUoo83UU/3yTn8sPaJBihFuLp
-qFkA3nazzfTarKf+WS23thA6R7t8cuwiYX9wwRPAw8X3Bm5VSrig0asf20Z3Q0Bp
-PJGGQTsD9SP3ZIWPMgMuPgb1vNHD6Qy8z7MKj7CwOAhItCKL8iWXaD8CZ8p4CjBd
-x//2z4vG/xUQFUWyEgil5ZigKKJRkqlC48BvRlHzNNgFldSLgpoTRkrvNVc7LzKj
-A/GmykEhSXx0TKEGPVpkInqY6goHqA==
-=MWCT
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0jJAACgkQp6FrSiUn
+Q2qM1wf/dU24aUv6jf8e78B9zwLAoX4S6w75197zwMooyrA/URqHw/Olyvw1zefo
+h13drzwkgqBYwTeS968IpYxkUbMmcPduRmbbRrsWKIS8iuxSyGOw7h8Gta+oMoc+
+qBekLqzNl2u5PWDy1cdDGHFvU8RJRORQl/j2x3pH53AYymP7EabB262zTjLM3h9u
+hx4Nr9AQrdq5cIoysvzNW1SdBkNocC+9NWdxK+3flNNMZQYzFpaK+11UvuO9q5SU
+ZsPBVIpdnMKppmBNmubOF6dcfsqWleoan+gcOOuZvw9dgkXuDrGP1pKaH7dmPTFH
+xrgn+bZWbK3HJigPCID0o+EU3Y0lQQ==
+=H+qm
 -----END PGP SIGNATURE-----
 
---mAnrFAfDq3MU3F3sr0Rpn9dI7hqbL36Zi--
+--NliaYF1hhlSbeDBQmUDlKNUqUPexlhmgf--
