@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38374)
+Received: from eggs.gnu.org ([208.118.235.92]:48108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ehfPF-0001AS-8j
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:46:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehfUk-00069C-3j
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ehfOB-0003nd-86
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:45:45 -0500
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:43116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1ehfOA-0003mL-AO
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:44:38 -0500
-Received: by mail-ua0-f193.google.com with SMTP id i5so14670281uai.10
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:44:38 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ehfTf-0002u8-6V
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:51:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehfTe-0002qx-Il
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:50:18 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 562485B303
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 17:50:17 +0000 (UTC)
+References: <20180202071751.16316-1-kraxel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a9e4deb4-5162-19a1-324e-640abd272fc3@redhat.com>
+Date: Fri, 2 Feb 2018 11:49:55 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+v8B4STJS6v7ujGfu83oYFG6x9gcbu4D3T5VaDg382kg@mail.gmail.com>
-References: <20180131053318.13109-1-famz@redhat.com>
-	<CAJ+F1C+v8B4STJS6v7ujGfu83oYFG6x9gcbu4D3T5VaDg382kg@mail.gmail.com>
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 2 Feb 2018 14:29:29 +0800
-Message-ID: <CAK1Eb9=o5MMrttK1+zG0oUOHd3z=UXLkaZeVomXODUDh1559DA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Add a git-publish configuration file
+In-Reply-To: <20180202071751.16316-1-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd"
+Subject: Re: [Qemu-devel] [PULL 0/3] Ui 20180202 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Wed, Jan 31, 2018 at 6:06 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
-> Hi
->
-> On Wed, Jan 31, 2018 at 6:33 AM, Fam Zheng <famz@redhat.com> wrote:
->> git-publish [1] is a convenient tool to send patches and has been
->> popular among QEMU developers.  Recently it has been made available in
->> Fedora official repo thanks to Stefan's work.
->>
->> One nice feature of the tool is a per-project configuration with
->> profiles, especially in which the cccmd option is a handy method to
->> create the Cc list.
->>
->> [1]: https://github.com/stefanha/git-publish
->
-> It would be worth to update README "Submitting patches" with an example
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd
+From: Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <a9e4deb4-5162-19a1-324e-640abd272fc3@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/3] Ui 20180202 patches
+References: <20180202071751.16316-1-kraxel@redhat.com>
+In-Reply-To: <20180202071751.16316-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Good idea. Thanks for reviewing!
+On 02/02/2018 01:17 AM, Gerd Hoffmann wrote:
+> The following changes since commit 11ed801d3df3c6e46b2f1f97dcfbf4ca3a2a=
+2f4f:
+>=20
+>   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-requ=
+est' into staging (2018-01-30 09:47:51 +0000)
+>=20
+> are available in the git repository at:
+>=20
+>   git://git.kraxel.org/qemu tags/ui-20180202-pull-request
+>=20
+> for you to fetch changes up to 627ebec208a8809818589e17f4fce55a59420ad2=
+:
+>=20
+>   ui: correctly advance output buffer when writing SASL data (2018-02-0=
+2 07:48:18 +0100)
+>=20
+> ----------------------------------------------------------------
+> ui: use QIONetListener in vnc, bugfixes for sdl1 and vnc.
+>=20
+> ----------------------------------------------------------------
+>=20
+> Daniel P. Berrange (1):
+>   ui: convert VNC server to QIONetListener
+>=20
+> Daniel P. Berrang=C3=A9 (2):
+
+Odd effects based on choice of UTF-8 spellings.  Dan, do you want to add
+a .mailmap entry to consolidate on a single preferred form of your name?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->> ---
->>  .gitpublish | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++
->>  1 file changed, 57 insertions(+)
->>  create mode 100644 .gitpublish
->>
->> diff --git a/.gitpublish b/.gitpublish
->> new file mode 100644
->> index 0000000000..2099c1520f
->> --- /dev/null
->> +++ b/.gitpublish
->> @@ -0,0 +1,57 @@
->> +#
->> +# Common git-publish profiles that can be used to send patches to QEMU =
-upstream.
->> +#
->> +# See https://github.com/stefanha/git-publish for more information
->> +#
->> +[gitpublishprofile "qemu"]
->> +base =3D master
->> +prefix =3D PATCH
->> +to =3D qemu-devel@nongnu.org
->> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --n=
-ogit-fallback 2>/dev/null
->> +
->> +[gitpublishprofile "qemu-rfc"]
->> +base =3D master
->> +prefix =3D RFC PATCH
->> +to =3D qemu-devel@nongnu.org
->> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --n=
-ogit-fallback 2>/dev/null
->> +
->> +[gitpublishprofile "qemu-stable"]
->> +base =3D master
->> +prefix =3D PATCH
->> +to =3D qemu-devel@nongnu.org
->> +cc =3D qemu-stable@nongnu.org
->> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --n=
-ogit-fallback 2>/dev/null
->> +
->> +[gitpublishprofile "qemu-trivial"]
->> +base =3D master
->> +prefix =3D PATCH
->> +to =3D qemu-devel@nongnu.org
->
-> cc qemu-trivial@nongnu.org ?
+--4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Good catch, I must have deleted it by mistake.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Fam
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0pMMACgkQp6FrSiUn
+Q2pNkgf/fK2mz/vF1OVVqmSQzCyiLq3HnzxYJdqgjQrMwb1bumJ3owIM2uzBMiwD
+M/FA/NjU3O7bkPzI1yP9lud28/I7YuEhI+uiuALCnIJZpW+0FK6+soURkioAXYbw
+47dz2pGnQAAeqeUEkmXgKKb6x41ghOurQmXaa7jJG5zUzsPvG56Spnz1pENJMsUv
+KmsrCcTxERBdQgWqtZl033A4Rofqnr2wUVN4l0bouA+xBJVbpC/AU1l5rOEiBu8S
+XyJmSGt/bKsYIJGhWi43D51yQ3I+eKu66aROTY3scdnI5JwGN7hmacNLBpu2ab56
+dXFmYu4RpLhW8oWmqUhqJ7gKpRvwFg==
+=xDl/
+-----END PGP SIGNATURE-----
+
+--4w5TDFA4poRu1tzohhdMT63W2PYgVLhkd--
