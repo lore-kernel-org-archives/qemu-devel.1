@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdug-0000JG-7U
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:10:16 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ehe0U-00067d-NK
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:17:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdua-0001fl-Q0
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:10:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36112)
+	(envelope-from <kraxel@redhat.com>) id 1ehdzQ-00077K-Kt
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:16:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdua-0001eq-Em
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:10:00 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ehdzQ-00075s-5J
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:15:00 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAF1376540
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 16:09:59 +0000 (UTC)
-References: <20180202111022.19269-1-kraxel@redhat.com>
-	<20180202111022.19269-13-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <728857ad-0d00-07b0-6d54-b62b572eebba@redhat.com>
-Date: Fri, 2 Feb 2018 10:09:51 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180202111022.19269-13-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EerXSBxr7nczp53gzaBgLTgCfXVlATFGt"
-Subject: Re: [Qemu-devel] [PATCH v3 12/12] vl: drop display_type variable
+	by mx1.redhat.com (Postfix) with ESMTPS id 980CF4E4C0
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 06:45:50 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  2 Feb 2018 07:45:46 +0100
+Message-Id: <20180202064546.21746-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] vnc: use stubs for CONFIG_VNC=n dummy
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EerXSBxr7nczp53gzaBgLTgCfXVlATFGt
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <728857ad-0d00-07b0-6d54-b62b572eebba@redhat.com>
-Subject: Re: [PATCH v3 12/12] vl: drop display_type variable
-References: <20180202111022.19269-1-kraxel@redhat.com>
- <20180202111022.19269-13-kraxel@redhat.com>
-In-Reply-To: <20180202111022.19269-13-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/console.h | 21 ---------------------
+ ui/vnc-stubs.c       | 21 +++++++++++++++++++++
+ ui/Makefile.objs     |  1 +
+ 3 files changed, 22 insertions(+), 21 deletions(-)
+ create mode 100644 ui/vnc-stubs.c
 
-On 02/02/2018 05:10 AM, Gerd Hoffmann wrote:
-> Switch over all leftover users to qapi DisplayType.
-> Then delete the unused display_type variable.
->=20
-> Add 'default' DisplayType, which isn't an actual display type but
-> a placeholder for "user didn't specify a display".  It will be replaced=
-
-> by the DisplayType actually used, which in turn depends on the
-> DisplayTypes availabel in the particular build.
-
-s/availabel/available/
-
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  vl.c         | 54 ++++++++++++++--------------------------------------=
---
->  qapi/ui.json |  5 +++--
->  2 files changed, 17 insertions(+), 42 deletions(-)
->=20
-
-> +++ b/qapi/ui.json
-> @@ -1017,7 +1017,7 @@
->  #
->  ##
->  { 'enum'    : 'DisplayType',
-> -  'data'    : [ 'none', 'gtk', 'sdl',
-> +  'data'    : [ 'default', 'none', 'gtk', 'sdl',
->                  'egl-headless', 'curses', 'cocoa' ] }
-
-Worth documenting that the 'default' value is special and will be
-converted to one of the other types, based on compile-time availability?
-
-> =20
->  ##
-> @@ -1039,7 +1039,8 @@
->                  '*window-close'  : 'bool',
->                  '*gl'            : 'bool' },
->    'discriminator' : 'type',
-> -  'data'    : { 'none'           : 'DisplayNoOpts',
-> +  'data'    : { 'default'        : 'DisplayNoOpts',
-> +                'none'           : 'DisplayNoOpts',
->                  'gtk'            : 'DisplayGTK',
->                  'sdl'            : 'DisplayNoOpts',
->                  'egl-headless'   : 'DisplayNoOpts',
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---EerXSBxr7nczp53gzaBgLTgCfXVlATFGt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0jU8ACgkQp6FrSiUn
-Q2pHWQgAiE/OZ/sHegNR6B35MQPVgPW+JW1kcqUpNi4yd+rHPEJowIKQegEidsrY
-+Gk50jjo8bP1xcDmYEbZiozH1/9a7iTWWKSyuWkjrB9LBOaiKfrbnX13ALRTNmp1
-P0WrTMWtAnpRaLwbDWoEgRenb5Sor6KV8fv3gIb+cOSgq1hjlan30OzizcKyKSry
-0yf+Y4Rg53vMRsO/Nj/JGDoRfedlY8l56vbeN7a+eycINGOp2S9lOcpoxqiuPv42
-8MYxwMLM2EHtz/Jgaf1X9x11ybW1VbtsuHKPIa2q7kgGk9bvfNnrMOJCckC8+HZX
-q8PFy+Mt+jX2BJruO6Ac3hZtgFnm0w==
-=bDhP
------END PGP SIGNATURE-----
-
---EerXSBxr7nczp53gzaBgLTgCfXVlATFGt--
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 7b35778444..de57e8363a 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -468,31 +468,10 @@ static inline void cocoa_display_init(DisplayState *ds, int full_screen)
+ void vnc_display_init(const char *id);
+ void vnc_display_open(const char *id, Error **errp);
+ void vnc_display_add_client(const char *id, int csock, bool skipauth);
+-#ifdef CONFIG_VNC
+ int vnc_display_password(const char *id, const char *password);
+ int vnc_display_pw_expire(const char *id, time_t expires);
+ QemuOpts *vnc_parse(const char *str, Error **errp);
+ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp);
+-#else
+-static inline int vnc_display_password(const char *id, const char *password)
+-{
+-    return -ENODEV;
+-}
+-static inline int vnc_display_pw_expire(const char *id, time_t expires)
+-{
+-    return -ENODEV;
+-};
+-static inline QemuOpts *vnc_parse(const char *str, Error **errp)
+-{
+-    error_setg(errp, "VNC support is disabled");
+-    return NULL;
+-}
+-static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+-{
+-    error_setg(errp, "VNC support is disabled");
+-    return -1;
+-}
+-#endif
+ 
+ /* curses.c */
+ #ifdef CONFIG_CURSES
+diff --git a/ui/vnc-stubs.c b/ui/vnc-stubs.c
+new file mode 100644
+index 0000000000..f51280549a
+--- /dev/null
++++ b/ui/vnc-stubs.c
+@@ -0,0 +1,21 @@
++#include "qemu/osdep.h"
++#include "ui/console.h"
++
++int vnc_display_password(const char *id, const char *password)
++{
++    return -ENODEV;
++}
++int vnc_display_pw_expire(const char *id, time_t expires)
++{
++    return -ENODEV;
++};
++QemuOpts *vnc_parse(const char *str, Error **errp)
++{
++    error_setg(errp, "VNC support is disabled");
++    return NULL;
++}
++int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
++{
++    error_setg(errp, "VNC support is disabled");
++    return -1;
++}
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index 99195884b0..ced7d91a63 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -15,6 +15,7 @@ common-obj-$(CONFIG_SDL) += sdl.mo
+ common-obj-$(CONFIG_COCOA) += cocoa.o
+ common-obj-$(CONFIG_CURSES) += curses.o
+ common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
++common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
+ common-obj-$(CONFIG_GTK) += gtk.o
+ common-obj-$(if $(CONFIG_WIN32),n,$(if $(CONFIG_SDL),y,$(CONFIG_GTK))) += x_keymap.o
+ 
+-- 
+2.9.3
