@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ehcfp-0006Xt-Ge
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehcgi-0007H7-G7
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:51:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ehcfg-0006sh-AO
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53292)
+	(envelope-from <armbru@redhat.com>) id 1ehcge-0007Ej-JX
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:51:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47170)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ehcfg-0006rx-0G
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:32 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  2 Feb 2018 14:34:12 +0800
-Message-Id: <20180202063412.22466-3-famz@redhat.com>
-In-Reply-To: <20180202063412.22466-1-famz@redhat.com>
-References: <20180202063412.22466-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] README: Document 'git-publish' workflow
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehcge-0007EQ-D2
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:51:32 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-25-marcandre.lureau@redhat.com>
+	<87609g6zh5.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJbzrhr5xSaLX5B2mR3oVJkjDLnQRL0Y2fOcSkitPj12Q@mail.gmail.com>
+Date: Fri, 02 Feb 2018 15:51:29 +0100
+In-Reply-To: <CAJ+F1CJbzrhr5xSaLX5B2mR3oVJkjDLnQRL0Y2fOcSkitPj12Q@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 11 Jan 2018
+	22:31:50 +0100")
+Message-ID: <87372jla1a.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 24/50] qapi: add some struct member tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com, stefanha@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- .gitpublish |  1 +
- README      | 30 +++++++++++++++++++++++++++++-
- 2 files changed, 30 insertions(+), 1 deletion(-)
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-diff --git a/.gitpublish b/.gitpublish
-index 170bd2ed48..7542e878fc 100644
---- a/.gitpublish
-+++ b/.gitpublish
-@@ -26,6 +26,7 @@ cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallba
- base = master
- prefix = PATCH
- to = qemu-devel@nongnu.org
-+cc = qemu-trivial@nongnu.org
- cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
- 
- [gitpublishprofile "block"]
-diff --git a/README b/README
-index b92a07a61a..d1a944ce20 100644
---- a/README
-+++ b/README
-@@ -56,7 +56,7 @@ The QEMU source code is maintained under the GIT version control system.
- 
-    git clone git://git.qemu.org/qemu.git
- 
--When submitting patches, the preferred approach is to use 'git
-+When submitting patches, one common approach is to use 'git
- format-patch' and/or 'git send-email' to format & send the mail to the
- qemu-devel@nongnu.org mailing list. All patches submitted must contain
- a 'Signed-off-by' line from the author. Patches should follow the
-@@ -68,6 +68,34 @@ the QEMU website
-   https://qemu.org/Contribute/SubmitAPatch
-   https://qemu.org/Contribute/TrivialPatches
- 
-+A 'git-profile' utility was created to make above process less
-+cumbersome, and is highly recommended for making regular contributions,
-+or even just for sending consecutive patch series revisions. It also
-+requires a working 'git send-email' setup, and by default doesn't
-+automate everything, so you may want to go through the above steps
-+manually for once.
-+
-+For installation instructions, please go to
-+
-+  https://github.com/stefanha/git-publish
-+
-+The workflow with 'git-publish' is:
-+
-+  $ git checkout master -b my-feature
-+  $ # work on new commits, add your 'Signed-off-by' lines to each
-+  $ git publish
-+
-+Your patch series will be sent and tagged as my-feature-v1 if you need to refer
-+back to it in the future.
-+
-+Sending v2:
-+
-+  $ git checkout my-feature # same topic branch
-+  $ # making changes to the commits (using 'git rebase', for example)
-+  $ git publish
-+
-+Your patch series will be sent with 'v2' tag in the subject and the git tip
-+will be tagged as my-feature-v2.
- 
- Bug reporting
- =============
--- 
-2.14.3
+> Hi
+>
+> On Sat, Dec 9, 2017 at 10:07 AM, Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+[...]
+>>> diff --git a/tests/qapi-schema/struct-member-type.json b/tests/qapi-sch=
+ema/struct-member-type.json
+>>> new file mode 100644
+>>> index 0000000000..8b33027817
+>>> --- /dev/null
+>>> +++ b/tests/qapi-schema/struct-member-type.json
+>>> @@ -0,0 +1,2 @@
+>>> +# check member 'a' with 'type' key only
+>>> +{ 'struct': 'foo', 'data': { 'a': { 'type': 'str' } } }
+>>> diff --git a/tests/qapi-schema/struct-member-type.out b/tests/qapi-sche=
+ma/struct-member-type.out
+>>> new file mode 100644
+>>> index 0000000000..04b969d2e3
+>>> --- /dev/null
+>>> +++ b/tests/qapi-schema/struct-member-type.out
+>>> @@ -0,0 +1,12 @@
+>>> +enum QType
+>>> +    prefix QTYPE
+>>> +    member none:
+>>> +    member qnull:
+>>> +    member qnum:
+>>> +    member qstring:
+>>> +    member qdict:
+>>> +    member qlist:
+>>> +    member qbool:
+>>> +object foo
+>>> +    member a: str optional=3DFalse
+>>> +object q_empty
+>>
+>> This is a positive test, isn't it?  Positive tests go into
+>> qapi-schema-test.json.
+>>
+>
+> Right, I wonder why we have .exit files then. Perhaps the few ones
+> that return 0 shouldn't exist.
+
+There are a few legitimate positive test cases, such as empty.json and
+doc-good.json.
+
+Moreover, we occasionally add negative test cases that fail to fail,
+demonstrating a bug.  Example: quoted-structural-chars in commit
+98626572f1, fixed in commit c7a3f25200.
