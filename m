@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehe5D-0008Ly-DX
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:22:05 -0500
+	(envelope-from <groug@kaod.org>) id 1ehe5F-0000wH-QV
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:22:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehe47-00046C-MF
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:20:58 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49106)
+	(envelope-from <groug@kaod.org>) id 1ehe4A-0004AG-Vk
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:21:00 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49428
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe47-00044D-0F
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:19:51 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w12GHqKE016597
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 11:19:49 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvsncndqx-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe4A-00049M-I7
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:19:54 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w12GBbIA113964
+	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 11:19:52 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fvqy6a45a-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 11:19:49 -0500
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 11:19:52 -0500
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 2 Feb 2018 16:19:46 -0000
+	Fri, 2 Feb 2018 16:19:50 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Fri,  2 Feb 2018 17:19:26 +0100
+Date: Fri,  2 Feb 2018 17:19:35 +0100
 In-Reply-To: <20180202161935.20803-1-groug@kaod.org>
 References: <20180202161935.20803-1-groug@kaod.org>
-Message-Id: <20180202161935.20803-2-groug@kaod.org>
-Subject: [Qemu-devel] [PULL v2 01/10] 9pfs: drop v9fs_register_transport()
+Message-Id: <20180202161935.20803-11-groug@kaod.org>
+Subject: [Qemu-devel] [PULL v2 10/10] tests/virtio-9p: explicitly handle
+ potential integer overflows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,111 +41,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-No good reasons to do this outside of v9fs_device_realize_common().
-
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/9pfs/9p.c               |  6 +++++-
- hw/9pfs/9p.h               | 10 ++--------
- hw/9pfs/virtio-9p-device.c |  8 ++------
- hw/9pfs/xen-9p-backend.c   |  3 +--
- 4 files changed, 10 insertions(+), 17 deletions(-)
+ tests/virtio-9p-test.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 909a61139405..364c7cb44628 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -3485,7 +3485,8 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
- }
- 
- /* Returns 0 on success, 1 on failure. */
--int v9fs_device_realize_common(V9fsState *s, Error **errp)
-+int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-+                               Error **errp)
+diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+index 0d3334a6ce17..54edcb995542 100644
+--- a/tests/virtio-9p-test.c
++++ b/tests/virtio-9p-test.c
+@@ -168,7 +168,7 @@ static uint16_t v9fs_string_size(const char *string)
  {
-     int i, len;
-     struct stat stat;
-@@ -3493,6 +3494,9 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
-     V9fsPath path;
-     int rc = 1;
+     size_t len = strlen(string);
  
-+    assert(!s->transport);
-+    s->transport = t;
-+
-     /* initialize pdu allocator */
-     QLIST_INIT(&s->free_list);
-     QLIST_INIT(&s->active_list);
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index ffe658ab8975..5ced427d861b 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -346,7 +346,8 @@ void v9fs_path_sprintf(V9fsPath *path, const char *fmt, ...);
- void v9fs_path_copy(V9fsPath *lhs, V9fsPath *rhs);
- int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
-                       const char *name, V9fsPath *path);
--int v9fs_device_realize_common(V9fsState *s, Error **errp);
-+int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-+                               Error **errp);
- void v9fs_device_unrealize_common(V9fsState *s, Error **errp);
+-    g_assert_cmpint(len, <=, UINT16_MAX);
++    g_assert_cmpint(len, <=, UINT16_MAX - 2);
  
- V9fsPDU *pdu_alloc(V9fsState *s);
-@@ -366,11 +367,4 @@ struct V9fsTransport {
-     void        (*push_and_notify)(V9fsPDU *pdu);
- };
- 
--static inline int v9fs_register_transport(V9fsState *s, const V9fsTransport *t)
--{
--    assert(!s->transport);
--    s->transport = t;
--    return 0;
--}
--
- #endif
-diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-index 43f4e53f336f..775e8ff76671 100644
---- a/hw/9pfs/virtio-9p-device.c
-+++ b/hw/9pfs/virtio-9p-device.c
-@@ -198,17 +198,13 @@ static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
-     V9fsVirtioState *v = VIRTIO_9P(dev);
-     V9fsState *s = &v->state;
- 
--    if (v9fs_device_realize_common(s, errp)) {
--        goto out;
-+    if (v9fs_device_realize_common(s, &virtio_9p_transport, errp)) {
-+        return;
-     }
- 
-     v->config_size = sizeof(struct virtio_9p_config) + strlen(s->fsconf.tag);
-     virtio_init(vdev, "virtio-9p", VIRTIO_ID_9P, v->config_size);
-     v->vq = virtio_add_queue(vdev, MAX_REQ, handle_9p_output);
--    v9fs_register_transport(s, &virtio_9p_transport);
--
--out:
--    return;
+     return 2 + len;
  }
+@@ -209,17 +209,20 @@ static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
+                             uint16_t tag)
+ {
+     P9Req *req = g_new0(P9Req, 1);
+-    uint32_t t_size = 7 + size; /* 9P header has well-known size of 7 bytes */
++    uint32_t total_size = 7; /* 9P header has well-known size of 7 bytes */
+     P9Hdr hdr = {
+-        .size = cpu_to_le32(t_size),
+         .id = id,
+         .tag = cpu_to_le16(tag)
+     };
  
- static void virtio_9p_device_unrealize(DeviceState *dev, Error **errp)
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index df2a4100bf55..14f0d6a50e75 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -446,7 +446,6 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
-     xen_9pdev->id = s->fsconf.fsdev_id =
-         g_strdup_printf("xen9p%d", xendev->dev);
-     xen_9pdev->tag = s->fsconf.tag = xenstore_read_fe_str(xendev, "tag");
--    v9fs_register_transport(s, &xen_9p_transport);
-     fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
-             s->fsconf.tag,
-             1, NULL);
-@@ -455,7 +454,7 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
-     qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
-     qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
-     qemu_fsdev_add(fsdev);
--    v9fs_device_realize_common(s, NULL);
-+    v9fs_device_realize_common(s, &xen_9p_transport, NULL);
+-    g_assert_cmpint(t_size, <=, P9_MAX_SIZE);
++    g_assert_cmpint(total_size, <=, UINT32_MAX - size);
++    total_size += size;
++    hdr.size = cpu_to_le32(total_size);
++
++    g_assert_cmpint(total_size, <=, P9_MAX_SIZE);
  
-     return 0;
+     req->v9p = v9p;
+-    req->t_size = t_size;
++    req->t_size = total_size;
+     req->t_msg = guest_alloc(v9p->qs->alloc, req->t_size);
+     v9fs_memwrite(req, &hdr, 7);
+     req->tag = tag;
+@@ -305,8 +308,13 @@ static void v9fs_rlerror(P9Req *req, uint32_t *err)
+ static P9Req *v9fs_tversion(QVirtIO9P *v9p, uint32_t msize, const char *version,
+                             uint16_t tag)
+ {
+-    P9Req *req = v9fs_req_init(v9p, 4 + v9fs_string_size(version), P9_TVERSION,
+-                               tag);
++    P9Req *req;
++    uint32_t body_size = 4;
++    uint16_t string_size = v9fs_string_size(version);
++
++    g_assert_cmpint(body_size, <=, UINT32_MAX - string_size);
++    body_size += string_size;
++    req = v9fs_req_init(v9p, body_size, P9_TVERSION, tag);
  
+     v9fs_uint32_write(req, msize);
+     v9fs_string_write(req, version);
+@@ -366,12 +374,15 @@ static P9Req *v9fs_twalk(QVirtIO9P *v9p, uint32_t fid, uint32_t newfid,
+ {
+     P9Req *req;
+     int i;
+-    uint32_t size = 4 + 4 + 2;
++    uint32_t body_size = 4 + 4 + 2;
+ 
+     for (i = 0; i < nwname; i++) {
+-        size += v9fs_string_size(wnames[i]);
++        uint16_t wname_size = v9fs_string_size(wnames[i]);
++
++        g_assert_cmpint(body_size, <=, UINT32_MAX - wname_size);
++        body_size += wname_size;
+     }
+-    req = v9fs_req_init(v9p,  size, P9_TWALK, tag);
++    req = v9fs_req_init(v9p,  body_size, P9_TWALK, tag);
+     v9fs_uint32_write(req, fid);
+     v9fs_uint32_write(req, newfid);
+     v9fs_uint16_write(req, nwname);
 -- 
 2.13.6
