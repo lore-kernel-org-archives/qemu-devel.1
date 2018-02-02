@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehcem-0005VY-8e
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:49:38 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ehcfE-00062R-3A
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehcei-00060x-1t
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:49:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46030)
+	(envelope-from <kraxel@redhat.com>) id 1ehcfA-0006TJ-36
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ehceh-000608-Nd
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:49:31 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ehcf9-0006Sr-RZ
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:50:00 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9BA7A80E45
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 11:10:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CA20A4E4C5
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 11:10:32 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  2 Feb 2018 12:10:14 +0100
-Message-Id: <20180202111022.19269-5-kraxel@redhat.com>
+Date: Fri,  2 Feb 2018 12:10:15 +0100
+Message-Id: <20180202111022.19269-6-kraxel@redhat.com>
 In-Reply-To: <20180202111022.19269-1-kraxel@redhat.com>
 References: <20180202111022.19269-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/12] gtk: add and use DisplayOptions +
- DisplayGTK
+Subject: [Qemu-devel] [PATCH v3 05/12] sdl: use DisplayOptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,174 +32,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Add QAPI DisplayType enum, DisplayOptions union and DisplayGTK struct.
-Switch gtk configuration to use the qapi type.
-
-Some bookkeeping (fullscreen for example) is done twice now, this is
-temporary until more/all UIs are switched over to qapi configuration.
+Switch sdl ui to use qapi DisplayOptions for configuration.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/ui/console.h |  9 ++++----
- ui/gtk.c             | 32 ++++++++++++++++-------------
- vl.c                 | 23 ++++++++++++++++-----
- qapi/ui.json         | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 98 insertions(+), 24 deletions(-)
+ include/ui/console.h |  8 ++++----
+ ui/sdl.c             | 19 +++++++++++++------
+ ui/sdl2.c            | 33 +++++++++++++++++++--------------
+ vl.c                 | 13 +++++++++++--
+ qapi/ui.json         |  5 +++--
+ 5 files changed, 50 insertions(+), 28 deletions(-)
 
 diff --git a/include/ui/console.h b/include/ui/console.h
-index 7b35778444..58d1a3d27c 100644
+index 58d1a3d27c..deee5bb606 100644
 --- a/include/ui/console.h
 +++ b/include/ui/console.h
-@@ -511,18 +511,17 @@ int index_from_key(const char *key, size_t key_length);
+@@ -435,16 +435,16 @@ void surface_gl_setup_viewport(QemuGLShader *gls,
  
- /* gtk.c */
- #ifdef CONFIG_GTK
--void early_gtk_display_init(int opengl);
--void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover);
-+void early_gtk_display_init(DisplayOptions *opts);
-+void gtk_display_init(DisplayState *ds, DisplayOptions *opts);
+ /* sdl.c */
+ #ifdef CONFIG_SDL
+-void sdl_display_early_init(int opengl);
+-void sdl_display_init(DisplayState *ds, int full_screen);
++void sdl_display_early_init(DisplayOptions *opts);
++void sdl_display_init(DisplayState *ds, DisplayOptions *opts);
  #else
--static inline void gtk_display_init(DisplayState *ds, bool full_screen,
--                                    bool grab_on_hover)
-+static inline void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
+-static inline void sdl_display_early_init(int opengl)
++static inline void sdl_display_early_init(DisplayOptions *opts)
  {
-     /* This must never be called if CONFIG_GTK is disabled */
-     error_report("GTK support is disabled");
+     /* This must never be called if CONFIG_SDL is disabled */
+     error_report("SDL support is disabled");
      abort();
  }
- 
--static inline void early_gtk_display_init(int opengl)
-+static inline void early_gtk_display_init(DisplayOptions *opts)
+-static inline void sdl_display_init(DisplayState *ds, int full_screen)
++static inline void sdl_display_init(DisplayState *ds, DisplayOptions *opts)
  {
-     /* This must never be called if CONFIG_GTK is disabled */
-     error_report("GTK support is disabled");
-diff --git a/ui/gtk.c b/ui/gtk.c
-index f0ad63e431..c12d5e020c 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -229,6 +229,8 @@ struct GtkDisplayState {
+     /* This must never be called if CONFIG_SDL is disabled */
+     error_report("SDL support is disabled");
+diff --git a/ui/sdl.c b/ui/sdl.c
+index c8f102bb9f..ca27e40299 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -41,6 +41,7 @@
  
-     bool modifier_pressed[ARRAY_SIZE(modifier_keycode)];
-     bool ignore_keys;
-+
-+    DisplayOptions *opts;
+ static DisplayChangeListener *dcl;
+ static DisplaySurface *surface;
++static DisplayOptions *opts;
+ static SDL_Surface *real_screen;
+ static SDL_Surface *guest_screen = NULL;
+ static int gui_grab; /* if true, all keyboard/mouse events are grabbed */
+@@ -762,6 +763,7 @@ static void handle_activation(SDL_Event *ev)
+ static void sdl_refresh(DisplayChangeListener *dcl)
+ {
+     SDL_Event ev1, *ev = &ev1;
++    bool allow_close = true;
+     int idle = 1;
+ 
+     if (last_vm_running != runstate_is_running()) {
+@@ -786,7 +788,10 @@ static void sdl_refresh(DisplayChangeListener *dcl)
+             handle_keyup(ev);
+             break;
+         case SDL_QUIT:
+-            if (!no_quit) {
++            if (opts->has_window_close && !opts->window_close) {
++                allow_close = false;
++            }
++            if (allow_close) {
+                 no_shutdown = 0;
+                 qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
+             }
+@@ -885,9 +890,9 @@ static const DisplayChangeListenerOps dcl_ops = {
+     .dpy_cursor_define    = sdl_mouse_define,
  };
  
- typedef struct VCChardev {
-@@ -777,9 +779,14 @@ static gboolean gd_window_close(GtkWidget *widget, GdkEvent *event,
-                                 void *opaque)
+-void sdl_display_early_init(int opengl)
++void sdl_display_early_init(DisplayOptions *opts)
  {
-     GtkDisplayState *s = opaque;
-+    bool allow_close = true;
-     int i;
- 
--    if (!no_quit) {
-+    if (s->opts->has_window_close && !s->opts->window_close) {
-+        allow_close = false;
-+    }
-+
-+    if (allow_close) {
-         for (i = 0; i < s->nb_vcs; i++) {
-             if (s->vc[i].type != GD_VC_GFX) {
-                 continue;
-@@ -2289,7 +2296,7 @@ static void gd_create_menus(GtkDisplayState *s)
- 
- static gboolean gtkinit;
- 
--void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
-+void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
- {
-     VirtualConsole *vc;
- 
-@@ -2301,6 +2308,8 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
-         fprintf(stderr, "gtk initialization failed\n");
-         exit(1);
-     }
-+    assert(opts->type == DISPLAY_TYPE_GTK);
-+    s->opts = opts;
- 
- #if !GTK_CHECK_VERSION(3, 0, 0)
-     g_printerr("Running QEMU with GTK 2.x is deprecated, and will be removed\n"
-@@ -2387,15 +2396,17 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
-                              vc && vc->type == GD_VC_VTE);
- #endif
- 
--    if (full_screen) {
-+    if (opts->has_full_screen &&
-+        opts->full_screen) {
-         gtk_menu_item_activate(GTK_MENU_ITEM(s->full_screen_item));
-     }
--    if (grab_on_hover) {
-+    if (opts->u.gtk.has_grab_on_hover &&
-+        opts->u.gtk.grab_on_hover) {
-         gtk_menu_item_activate(GTK_MENU_ITEM(s->grab_on_hover_item));
+-    if (opengl == 1 /* on */) {
++    if (opts->has_gl && opts->gl) {
+         fprintf(stderr,
+                 "SDL1 display code has no opengl support.\n"
+                 "Please recompile qemu with SDL2, using\n"
+@@ -895,7 +900,7 @@ void sdl_display_early_init(int opengl)
      }
  }
  
--void early_gtk_display_init(int opengl)
-+void early_gtk_display_init(DisplayOptions *opts)
+-void sdl_display_init(DisplayState *ds, int full_screen)
++void sdl_display_init(DisplayState *ds, DisplayOptions *o)
  {
-     /* The QEMU code relies on the assumption that it's always run in
-      * the C locale. Therefore it is not prepared to deal with
-@@ -2421,11 +2432,8 @@ void early_gtk_display_init(int opengl)
-         return;
+     int flags;
+     uint8_t data = 0;
+@@ -903,6 +908,8 @@ void sdl_display_init(DisplayState *ds, int full_screen)
+     SDL_SysWMinfo info;
+     char *filename;
+ 
++    assert(o->type == DISPLAY_TYPE_SDL);
++    opts = o;
+ #if defined(__APPLE__)
+     /* always use generic keymaps */
+     if (!keyboard_layout)
+@@ -917,7 +924,7 @@ void sdl_display_init(DisplayState *ds, int full_screen)
+     g_printerr("Running QEMU with SDL 1.2 is deprecated, and will be removed\n"
+                "in a future release. Please switch to SDL 2.0 instead\n");
+ 
+-    if (!full_screen) {
++    if (opts->has_full_screen && opts->full_screen) {
+         setenv("SDL_VIDEO_ALLOW_SCREENSAVER", "1", 0);
+     }
+ #ifdef __linux__
+@@ -960,7 +967,7 @@ void sdl_display_init(DisplayState *ds, int full_screen)
+         g_free(filename);
      }
  
+-    if (full_screen) {
++    if (opts->has_full_screen && opts->full_screen) {
+         gui_fullscreen = 1;
+         sdl_grab_start();
+     }
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 812c315891..094782e36c 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -32,6 +32,7 @@
+ 
+ static int sdl2_num_outputs;
+ static struct sdl2_console *sdl2_console;
++static DisplayOptions *opts;
+ 
+ static SDL_Surface *guest_sprite_surface;
+ static int gui_grab; /* if true, all keyboard/mouse events are grabbed */
+@@ -525,6 +526,7 @@ static void handle_mousewheel(SDL_Event *ev)
+ static void handle_windowevent(SDL_Event *ev)
+ {
+     struct sdl2_console *scon = get_scon_from_window(ev->window.windowID);
++    bool allow_close = true;
+ 
+     if (!scon) {
+         return;
+@@ -571,7 +573,10 @@ static void handle_windowevent(SDL_Event *ev)
+         break;
+     case SDL_WINDOWEVENT_CLOSE:
+         if (qemu_console_is_graphic(scon->dcl.con)) {
+-            if (!no_quit) {
++            if (opts->has_window_close && !opts->window_close) {
++                allow_close = false;
++            }
++            if (allow_close) {
+                 no_shutdown = 0;
+                 qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
+             }
+@@ -592,6 +597,7 @@ static void handle_windowevent(SDL_Event *ev)
+ void sdl2_poll_events(struct sdl2_console *scon)
+ {
+     SDL_Event ev1, *ev = &ev1;
++    bool allow_close = true;
+     int idle = 1;
+ 
+     if (scon->last_vm_running != runstate_is_running()) {
+@@ -614,7 +620,10 @@ void sdl2_poll_events(struct sdl2_console *scon)
+             handle_textinput(ev);
+             break;
+         case SDL_QUIT:
+-            if (!no_quit) {
++            if (opts->has_window_close && !opts->window_close) {
++                allow_close = false;
++            }
++            if (allow_close) {
+                 no_shutdown = 0;
+                 qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
+             }
+@@ -749,24 +758,17 @@ static const DisplayChangeListenerOps dcl_gl_ops = {
+ };
+ #endif
+ 
+-void sdl_display_early_init(int opengl)
++void sdl_display_early_init(DisplayOptions *o)
+ {
 -    switch (opengl) {
 -    case -1: /* default */
 -    case 0:  /* off */
 -        break;
 -    case 1: /* on */
-+    assert(opts->type == DISPLAY_TYPE_GTK);
-+    if (opts->has_gl && opts->gl) {
- #if defined(CONFIG_OPENGL)
- #if defined(CONFIG_GTK_GL)
-         gtk_gl_area_init();
-@@ -2433,10 +2441,6 @@ void early_gtk_display_init(int opengl)
-         gtk_egl_init();
- #endif
++    assert(o->type == DISPLAY_TYPE_SDL);
++    if (o->has_gl && o->gl) {
+ #ifdef CONFIG_OPENGL
+         display_opengl = 1;
  #endif
 -        break;
 -    default:
 -        g_assert_not_reached();
 -        break;
      }
+ }
  
-     keycode_map = gd_get_keymap(&keycode_maplen);
+-void sdl_display_init(DisplayState *ds, int full_screen)
++void sdl_display_init(DisplayState *ds, DisplayOptions *o)
+ {
+     int flags;
+     uint8_t data = 0;
+@@ -774,6 +776,9 @@ void sdl_display_init(DisplayState *ds, int full_screen)
+     int i;
+     SDL_SysWMinfo info;
+ 
++    assert(o->type == DISPLAY_TYPE_SDL);
++    opts = o;
++
+ #ifdef __linux__
+     /* on Linux, SDL may use fbcon|directfb|svgalib when run without
+      * accessible $DISPLAY to open X11 window.  This is often the case
+@@ -848,7 +853,7 @@ void sdl_display_init(DisplayState *ds, int full_screen)
+         g_free(filename);
+     }
+ 
+-    if (full_screen) {
++    if (opts->has_full_screen && opts->full_screen) {
+         gui_fullscreen = 1;
+         sdl_grab_start(0);
+     }
 diff --git a/vl.c b/vl.c
-index a2478412c7..4a555de0cf 100644
+index 4a555de0cf..25e784be63 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -150,9 +150,9 @@ static int rtc_date_offset = -1; /* -1 means no change */
- QEMUClockType rtc_clock;
- int vga_interface_type = VGA_NONE;
- static int full_screen = 0;
-+static DisplayOptions dpy;
- int no_frame;
- int no_quit = 0;
--static bool grab_on_hover;
- Chardev *serial_hds[MAX_SERIAL_PORTS];
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
- Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
-@@ -2191,24 +2191,29 @@ static LegacyDisplayType select_display(const char *p)
-     } else if (strstart(p, "gtk", &opts)) {
- #ifdef CONFIG_GTK
-         display = DT_GTK;
-+        dpy.type = DISPLAY_TYPE_GTK;
+@@ -2100,6 +2100,7 @@ static LegacyDisplayType select_display(const char *p)
+     if (strstart(p, "sdl", &opts)) {
+ #ifdef CONFIG_SDL
+         display = DT_SDL;
++        dpy.type = DISPLAY_TYPE_SDL;
          while (*opts) {
              const char *nextopt;
  
-             if (strstart(opts, ",grab_on_hover=", &nextopt)) {
+@@ -2138,19 +2139,25 @@ static LegacyDisplayType select_display(const char *p)
+                 }
+             } else if (strstart(opts, ",window_close=", &nextopt)) {
                  opts = nextopt;
-+                dpy.u.gtk.has_grab_on_hover = true;
++                dpy.has_window_close = true;
                  if (strstart(opts, "on", &nextopt)) {
--                    grab_on_hover = true;
-+                    dpy.u.gtk.grab_on_hover = true;
+                     no_quit = 0;
++                    dpy.window_close = true;
                  } else if (strstart(opts, "off", &nextopt)) {
--                    grab_on_hover = false;
-+                    dpy.u.gtk.grab_on_hover = false;
+                     no_quit = 1;
++                    dpy.window_close = false;
                  } else {
-                     goto invalid_gtk_args;
+                     goto invalid_sdl_args;
                  }
              } else if (strstart(opts, ",gl=", &nextopt)) {
                  opts = nextopt;
@@ -212,141 +284,61 @@ index a2478412c7..4a555de0cf 100644
                      request_opengl = 0;
 +                    dpy.gl = false;
                  } else {
-                     goto invalid_gtk_args;
+                     goto invalid_sdl_args;
                  }
-@@ -2225,6 +2230,7 @@ static LegacyDisplayType select_display(const char *p)
- #endif
-     } else if (strstart(p, "none", &opts)) {
-         display = DT_NONE;
-+        dpy.type = DISPLAY_TYPE_NONE;
-     } else {
-         error_report("unknown display type");
-         exit(1);
-@@ -3259,6 +3265,7 @@ int main(int argc, char **argv, char **envp)
-                 qemu_opts_parse_noisily(olist, "graphics=off", false);
-                 nographic = true;
-                 display_type = DT_NONE;
-+                dpy.type = DISPLAY_TYPE_NONE;
-                 break;
-             case QEMU_OPTION_curses:
- #ifdef CONFIG_CURSES
-@@ -3646,6 +3653,8 @@ int main(int argc, char **argv, char **envp)
-                 break;
-             case QEMU_OPTION_full_screen:
-                 full_screen = 1;
-+                dpy.has_full_screen = true;
-+                dpy.full_screen = true;
-                 break;
-             case QEMU_OPTION_no_frame:
-                 g_printerr("The -no-frame switch is deprecated, and will be\n"
-@@ -3664,6 +3673,8 @@ int main(int argc, char **argv, char **envp)
-                 break;
-             case QEMU_OPTION_no_quit:
-                 no_quit = 1;
-+                dpy.has_window_close = true;
-+                dpy.window_close = false;
-                 break;
+@@ -3679,6 +3686,7 @@ int main(int argc, char **argv, char **envp)
              case QEMU_OPTION_sdl:
  #ifdef CONFIG_SDL
-@@ -4331,6 +4342,7 @@ int main(int argc, char **argv, char **envp)
-     if (display_type == DT_DEFAULT && !display_remote) {
- #if defined(CONFIG_GTK)
-         display_type = DT_GTK;
-+        dpy.type = DISPLAY_TYPE_GTK;
+                 display_type = DT_SDL;
++                dpy.type = DISPLAY_TYPE_SDL;
+                 break;
+ #else
+                 error_report("SDL support is disabled");
+@@ -4345,6 +4353,7 @@ int main(int argc, char **argv, char **envp)
+         dpy.type = DISPLAY_TYPE_GTK;
  #elif defined(CONFIG_SDL)
          display_type = DT_SDL;
++        dpy.type = DISPLAY_TYPE_SDL;
  #elif defined(CONFIG_COCOA)
-@@ -4339,6 +4351,7 @@ int main(int argc, char **argv, char **envp)
-         vnc_parse("localhost:0,to=99,id=default", &error_abort);
- #else
-         display_type = DT_NONE;
-+        dpy.type = DISPLAY_TYPE_NONE;
- #endif
-     }
- 
-@@ -4352,7 +4365,7 @@ int main(int argc, char **argv, char **envp)
-     }
- 
-     if (display_type == DT_GTK) {
--        early_gtk_display_init(request_opengl);
-+        early_gtk_display_init(&dpy);
+         display_type = DT_COCOA;
+ #elif defined(CONFIG_VNC)
+@@ -4369,7 +4378,7 @@ int main(int argc, char **argv, char **envp)
      }
  
      if (display_type == DT_SDL) {
-@@ -4697,7 +4710,7 @@ int main(int argc, char **argv, char **envp)
+-        sdl_display_early_init(request_opengl);
++        sdl_display_early_init(&dpy);
+     }
+ 
+     qemu_console_early_init();
+@@ -4704,7 +4713,7 @@ int main(int argc, char **argv, char **envp)
+         curses_display_init(ds, full_screen);
+         break;
+     case DT_SDL:
+-        sdl_display_init(ds, full_screen);
++        sdl_display_init(ds, &dpy);
+         break;
+     case DT_COCOA:
          cocoa_display_init(ds, full_screen);
-         break;
-     case DT_GTK:
--        gtk_display_init(ds, full_screen, grab_on_hover);
-+        gtk_display_init(ds, &dpy);
-         break;
-     default:
-         break;
 diff --git a/qapi/ui.json b/qapi/ui.json
-index 07b468f625..bdb166a608 100644
+index bdb166a608..52220ed373 100644
 --- a/qapi/ui.json
 +++ b/qapi/ui.json
-@@ -982,3 +982,61 @@
-   'data': { '*device': 'str',
-             '*head'  : 'int',
-             'events' : [ 'InputEvent' ] } }
-+
-+
-+##
-+# @DisplayNoOpts:
-+#
-+# Empty struct for displays without config options.
-+#
-+# Since: 2.12
-+#
-+##
-+{ 'struct'  : 'DisplayNoOpts',
-+  'data'    : { } }
-+
-+##
-+# @DisplayGTK:
-+#
-+# GTK display options.
-+#
-+# @grab-on-hover: Grab keyboard input on mouse hover.
-+#
-+# Since: 2.12
-+#
-+##
-+{ 'struct'  : 'DisplayGTK',
-+  'data'    : { '*grab-on-hover' : 'bool' } }
-+
-+##
-+# @DisplayType:
-+#
-+# Display (user interface) type.
-+#
-+# Since: 2.12
-+#
-+##
-+{ 'enum'    : 'DisplayType',
-+  'data'    : [ 'none', 'gtk' ] }
-+
-+##
-+# @DisplayOptions:
-+#
-+# Display (user interface) options.
-+#
-+# @type:          Which DisplayType qemu should use.
-+# @full-screen:   Start user interface in fullscreen mode (default: off).
-+# @window-close:  Allow to quit qemu with window close button (default: on).
-+# @gl:            Enable OpenGL support (default: off).
-+#
-+# Since: 2.12
-+#
-+##
-+{ 'union'   : 'DisplayOptions',
-+  'base'    : { 'type'           : 'DisplayType',
-+                '*full-screen'   : 'bool',
-+                '*window-close'  : 'bool',
-+                '*gl'            : 'bool' },
-+  'discriminator' : 'type',
-+  'data'    : { 'none'           : 'DisplayNoOpts',
-+                'gtk'            : 'DisplayGTK' } }
+@@ -1017,7 +1017,7 @@
+ #
+ ##
+ { 'enum'    : 'DisplayType',
+-  'data'    : [ 'none', 'gtk' ] }
++  'data'    : [ 'none', 'gtk', 'sdl' ] }
+ 
+ ##
+ # @DisplayOptions:
+@@ -1039,4 +1039,5 @@
+                 '*gl'            : 'bool' },
+   'discriminator' : 'type',
+   'data'    : { 'none'           : 'DisplayNoOpts',
+-                'gtk'            : 'DisplayGTK' } }
++                'gtk'            : 'DisplayGTK',
++                'sdl'            : 'DisplayNoOpts' } }
 -- 
 2.9.3
