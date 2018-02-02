@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehdEe-0004QN-1f
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:27:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ehdEo-0004a4-5Z
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:27:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehdDa-0003uh-06
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:26:39 -0500
-References: <20180122104100.3674-1-vsementsov@virtuozzo.com>
-	<7a5ef265-c266-21e7-f82d-bee77062111c@redhat.com>
-	<9ac62cef-4331-a828-5c4d-b7a2fdd7b6b5@redhat.com>
-	<cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <90c3ab12-1bda-c3a4-fdbf-626fcefaa7ca@redhat.com>
-Date: Fri, 2 Feb 2018 16:23:06 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1ehdDk-00045s-2Q
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:26:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehdDj-00044j-Lf
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:25:43 -0500
+Date: Fri, 2 Feb 2018 13:25:32 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180202152532.GL26425@localhost.localdomain>
+References: <20180201125441.2f5b4fdd@redhat.com> <20180201201514.GB660@flask>
+	<20180201202649.GG26425@localhost.localdomain>
+	<edc27e9a-9660-eed0-dd03-016fa2e966b7@linux.vnet.ibm.com>
+	<20180202141554.GH26425@localhost.localdomain>
+	<20180202141938.GJ15403@redhat.com>
+	<20180202092159.48d9bd4c@redhat.com>
+	<20180202145014.GI26425@localhost.localdomain>
+	<20180202150718.GL15403@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM"
-Subject: Re: [Qemu-devel] [PATCH v2] block: maintain persistent disabled
- bitmaps
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180202150718.GL15403@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] kvm: x86: export vCPU halted state to sysfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +34,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Luiz Capitulino <lcapitulino@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvm@vger.kernel.org, pbonzini@redhat.com, Peter Krempa <pkrempa@redhat.com>, John Ferlan <jferlan@redhat.com>, libvir-list@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com,
- mnestratov@virtuozzo.com
-Message-ID: <90c3ab12-1bda-c3a4-fdbf-626fcefaa7ca@redhat.com>
-Subject: Re: [PATCH v2] block: maintain persistent disabled bitmaps
-References: <20180122104100.3674-1-vsementsov@virtuozzo.com>
- <7a5ef265-c266-21e7-f82d-bee77062111c@redhat.com>
- <9ac62cef-4331-a828-5c4d-b7a2fdd7b6b5@redhat.com>
- <cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
-In-Reply-To: <cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-02-02 16:18, Vladimir Sementsov-Ogievskiy wrote:
-> 31.01.2018 22:04, Max Reitz wrote:
->> On 2018-01-29 19:43, Max Reitz wrote:
->>> On 2018-01-22 11:41, Vladimir Sementsov-Ogievskiy wrote:
->>>> To maintain load/store disabled bitmap there is new approach:
->>>>
->>>> =C2=A0 - deprecate @autoload flag of block-dirty-bitmap-add, make it=
- ignored
->>>> =C2=A0 - store enabled bitmaps as "auto" to qcow2
->>>> =C2=A0 - store disabled bitmaps without "auto" flag to qcow2
->>>> =C2=A0 - on qcow2 open load "auto" bitmaps as enabled and others
->>>> =C2=A0=C2=A0=C2=A0 as disabled (except in_use bitmaps)
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>> Reviewed-by: John Snow <jsnow@redhat.com>
->>>> ---
->>> Thanks, looks very reasonable.=C2=A0 Applied to my block branch:
->>>
->>> https://github.com/XanClic/qemu/commits/block
->> ...aaand I've only just now seen that iotest 176 will need to be fixed=
-
->> along with this, so I'm going to unqueue this patch for now.
+On Fri, Feb 02, 2018 at 03:07:18PM +0000, Daniel P. Berrang=E9 wrote:
+> On Fri, Feb 02, 2018 at 12:50:14PM -0200, Eduardo Habkost wrote:
+> > (CCing qemu-devel)
+> >=20
+> > On Fri, Feb 02, 2018 at 09:21:59AM -0500, Luiz Capitulino wrote:
+> > > On Fri, 2 Feb 2018 14:19:38 +0000
+> > > Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+> > > > On Fri, Feb 02, 2018 at 12:15:54PM -0200, Eduardo Habkost wrote:
+> > [...]
+> > > > > It would be also interesting to update QEMU QMP documentation t=
+o
+> > > > > clarify the arch-specific semantics of "halted". =20
+> > > >=20
+> > > > Any also especially clarify the awful performance implications of=
+ running
+> > > > this particular query command. In general I would not expect quer=
+y-xxx
+> > > > monitor commands to interrupt all vcpus, so we should clearly war=
+n about
+> > > > this !
+> > >=20
+> > > Or deprecate it...
+> >=20
+> > We could deprecate the expensive fields on query-cpus, and move
+> > them to a more expensive query-cpu-state command.  I believe most
+> > users of query-cpus are only interested in qom_path, thread_id,
+> > and topology info.
+> >=20
+> > Markus, Eric: from the QAPI point of view, is it OK to remove
+> > fields between QEMU versions, as long as we follow our
+> > deprecation policy?
 >=20
-> ohh, sorry for that. Will resend today.
+> I would expect that to not be OK.  A fully backwards compatible way to
+> deal with this would just be to add a flag to the query-cpus command
+> eg something like
 >=20
->>
->> And when I'm already at it: Should we add deprecation information to
->> qemu-doc.texi?
+>     query-cpus arch-specific=3Dfalse
 >=20
-> didn't find anything in qemu-doc.texi about dirty bitmaps, so I think, =
-no.
+> to turn off all this arch specific state, and just report the cheap
+> generic info. If it defaults to arch-specific=3Dtrue when omitted, then
+> there's no compat problems.
 
-I mean in the "Deprecated features" appendix.  I think whenever we
-deprecate something, it should be noted there (as far as I've understood)=
-=2E
+This would work, too.  I would name it "full-state",
+"extended-state" or something similar, though.  Not all
+arch-specific data is expensive to fetch, and not all
+non-arch-specific data is unexpensive.
 
-(Also on the Wiki, I think.)
+But I'd like to confirm if it's OK to make existing non-optional
+struct fields optional in the QAPI schema.  Markus, Eric?
 
-> Is there a way to generate some documentation files from qapi comments?=
-
-> Where is it?
-
-There is docs/interop/qemu-qmp-qapi.texi in the build directory.
-
-Max
-
-
---HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp0gloSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Ap2cH/290GVQ0FXQj6JC0euSCPpe5iHAQbH1N
-O1puHfHTx9JDb83h7Gy+U9Rn9yf9P8cKbLTJvLo7IsK0H7wxYYFTUagZkCsvCw5a
-zLb3zMzAtsFZgEg/82f1BMe+KJT9BdgqaxyPJAPA5N+hhasj2S2C6gJzCyNgUcLH
-ndBJc4IJOISz4Pc6qfduOJ/lQ9Ld5yRxVlcvRqgY139Wth76Fz8YyGKqa+X1v1bE
-PaHNU1sXcgQbOgvQiqDn4gT2FLxIAs73x9aeeyKJTZmgaKNDdmXIZf+D9mjC8Dal
-0j193yKFAs/T5D+IU2R4uTLhD4S8AMWQA29xePQNk0UmXzQ0FbH6y3U=
-=d7VC
------END PGP SIGNATURE-----
-
---HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM--
+--=20
+Eduardo
