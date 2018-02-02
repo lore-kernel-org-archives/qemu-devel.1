@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43235)
+Received: from eggs.gnu.org ([208.118.235.92]:43480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehgEn-0008IG-3u
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:40:33 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehgFm-0008Ro-Cs
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:40:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehgDb-00060O-R5
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:39:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35762)
+	(envelope-from <armbru@redhat.com>) id 1ehgDO-0005ZM-EG
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:39:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehgDb-0005yG-EO
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:37:47 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehgDO-0005XW-2X
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:37:34 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  2 Feb 2018 19:37:24 +0100
-Message-Id: <20180202183731.29990-9-armbru@redhat.com>
+Date: Fri,  2 Feb 2018 19:37:19 +0100
+Message-Id: <20180202183731.29990-4-armbru@redhat.com>
 In-Reply-To: <20180202183731.29990-1-armbru@redhat.com>
 References: <20180202183731.29990-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 08/15] hw/pci*: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v7 03/15] hw/dma: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,7 +25,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: alistair.francis@xilinx.com
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -69,59 +69,90 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-A trailing '.' was removed in hw/pci/pci.c
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
 
 Conversions that aren't followed by exit() dropped, because they might
 be inappropriate.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/pci-host/bonito.c | 6 +++---
- hw/pci/pci.c         | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ hw/dma/soc_dma.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index 0d8cacb884..2d25e9bf7c 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -38,7 +38,7 @@
+diff --git a/hw/dma/soc_dma.c b/hw/dma/soc_dma.c
+index 9bb499bf9c..45516241c6 100644
+--- a/hw/dma/soc_dma.c
++++ b/hw/dma/soc_dma.c
+@@ -18,6 +18,7 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
   */
- 
  #include "qemu/osdep.h"
--
 +#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "hw/i386/pc.h"
-@@ -449,8 +449,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
-     regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+ #include "hw/arm/soc_dma.h"
+@@ -270,11 +271,11 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
+         if (entry->type == soc_dma_port_mem) {
+             if (entry->addr <= virt_base &&
+                             entry->addr + entry->u.mem.size > virt_base) {
+-                fprintf(stderr, "%s: FIFO at %"PRIx64
+-                                " collides with RAM region at %"PRIx64
+-                                "-%"PRIx64 "\n", __func__,
+-                                virt_base, entry->addr,
+-                                (entry->addr + entry->u.mem.size));
++                error_report("%s: FIFO at %"PRIx64
++                             " collides with RAM region at %"PRIx64
++                             "-%"PRIx64, __func__,
++                             virt_base, entry->addr,
++                             (entry->addr + entry->u.mem.size));
+                 exit(-1);
+             }
  
-     if (idsel == 0) {
--        fprintf(stderr, "error in bonito pci config address " TARGET_FMT_plx
--            ",pcimap_cfg=%x\n", addr, s->regs[BONITO_PCIMAP_CFG]);
-+        error_report("error in bonito pci config address " TARGET_FMT_plx
-+                     ",pcimap_cfg=%x", addr, s->regs[BONITO_PCIMAP_CFG]);
-         exit(1);
-     }
-     pciaddr = PCI_ADDR(pci_bus_num(phb->bus), devno, funno, regno);
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index e8f9fc1c27..fc25cdecba 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1115,8 +1115,8 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
-     assert(region_num >= 0);
-     assert(region_num < PCI_NUM_REGIONS);
-     if (size & (size-1)) {
--        fprintf(stderr, "ERROR: PCI region size must be pow2 "
--                    "type=0x%x, size=0x%"FMT_PCIBUS"\n", type, size);
-+        error_report("ERROR: PCI region size must be pow2 "
-+                    "type=0x%x, size=0x%"FMT_PCIBUS"", type, size);
-         exit(1);
-     }
+@@ -284,9 +285,9 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
+             while (entry < dma->memmap + dma->memmap_size &&
+                             entry->addr <= virt_base) {
+                 if (entry->addr == virt_base && entry->u.fifo.out == out) {
+-                    fprintf(stderr, "%s: FIFO at %"PRIx64
+-                                    " collides FIFO at %"PRIx64 "\n",
+-                                    __func__, virt_base, entry->addr);
++                    error_report("%s: FIFO at %"PRIx64
++                                 " collides FIFO at %"PRIx64,
++                                 __func__, virt_base, entry->addr);
+                     exit(-1);
+                 }
+ 
+@@ -321,11 +322,11 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
+             if ((entry->addr >= virt_base && entry->addr < virt_base + size) ||
+                             (entry->addr <= virt_base &&
+                              entry->addr + entry->u.mem.size > virt_base)) {
+-                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+-                                " collides with RAM region at %"PRIx64
+-                                "-%"PRIx64 "\n", __func__,
+-                                virt_base, virt_base + size,
+-                                entry->addr, entry->addr + entry->u.mem.size);
++                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
++                             " collides with RAM region at %"PRIx64
++                             "-%"PRIx64, __func__,
++                             virt_base, virt_base + size,
++                             entry->addr, entry->addr + entry->u.mem.size);
+                 exit(-1);
+             }
+ 
+@@ -334,11 +335,10 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
+         } else {
+             if (entry->addr >= virt_base &&
+                             entry->addr < virt_base + size) {
+-                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+-                                " collides with FIFO at %"PRIx64
+-                                "\n", __func__,
+-                                virt_base, virt_base + size,
+-                                entry->addr);
++                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
++                             " collides with FIFO at %"PRIx64,
++                             __func__, virt_base, virt_base + size,
++                             entry->addr);
+                 exit(-1);
+             }
  
 -- 
 2.13.6
