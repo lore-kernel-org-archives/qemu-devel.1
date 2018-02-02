@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehe6X-0000zW-Ia
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:23:27 -0500
+	(envelope-from <groug@kaod.org>) id 1ehe6l-0001LV-Nw
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehe4A-00049Q-D8
+	(envelope-from <groug@kaod.org>) id 1ehe4A-000494-5J
 	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:21:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56886
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe49-00047c-4f
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe48-00047J-SE
 	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:19:53 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w12GBcdm079742
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 11:19:50 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvtexjq1m-1
+	w12GBYxk041357
+	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 11:19:51 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvtexandb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 11:19:49 -0500
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 11:19:50 -0500
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
 	Fri, 2 Feb 2018 16:19:48 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Fri,  2 Feb 2018 17:19:29 +0100
+Date: Fri,  2 Feb 2018 17:19:27 +0100
 In-Reply-To: <20180202161935.20803-1-groug@kaod.org>
 References: <20180202161935.20803-1-groug@kaod.org>
-Message-Id: <20180202161935.20803-5-groug@kaod.org>
-Subject: [Qemu-devel] [PULL v2 04/10] tests: virtio-9p: wait for completion
- in the test code
+Message-Id: <20180202161935.20803-3-groug@kaod.org>
+Subject: [Qemu-devel] [PULL v2 02/10] 9pfs: Correctly handle cancelled
+ requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,89 +38,147 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>, Keno Fischer <keno@juliacomputing.com>
 
-In order to test request cancellation, we will need to send multiple
-requests and wait for the associated replies. Since we poll the ISR
-to know if a request completed, we may have several replies to parse
-when we detect ISR was set to 1.
+From: Keno Fischer <keno@juliacomputing.com>
 
-This patch moves the waiting out of the reply parsing path, up into
-the functional tests.
+# Background
 
+I was investigating spurious non-deterministic EINTR returns from
+various 9p file system operations in a Linux guest served from the
+qemu 9p server.
+
+ ## EINTR, ERESTARTSYS and the linux kernel
+
+When a signal arrives that the Linux kernel needs to deliver to user-space
+while a given thread is blocked (in the 9p case waiting for a reply to its
+request in 9p_client_rpc -> wait_event_interruptible), it asks whatever
+driver is currently running to abort its current operation (in the 9p case
+causing the submission of a TFLUSH message) and return to user space.
+In these situations, the error message reported is generally ERESTARTSYS.
+If the userspace processes specified SA_RESTART, this means that the
+system call will get restarted upon completion of the signal handler
+delivery (assuming the signal handler doesn't modify the process state
+in complicated ways not relevant here). If SA_RESTART is not specified,
+ERESTARTSYS gets translated to EINTR and user space is expected to handle
+the restart itself.
+
+ ## The 9p TFLUSH command
+
+The 9p TFLUSH commands requests that the server abort an ongoing operation.
+The man page [1] specifies:
+
+```
+If it recognizes oldtag as the tag of a pending transaction, it should
+abort any pending response and discard that tag.
+[...]
+When the client sends a Tflush, it must wait to receive the corresponding
+Rflush before reusing oldtag for subsequent messages. If a response to the
+flushed request is received before the Rflush, the client must honor the
+response as if it had not been flushed, since the completed request may
+signify a state change in the server
+```
+
+In particular, this means that the server must not send a reply with the
+orignal tag in response to the cancellation request, because the client is
+obligated to interpret such a reply as a coincidental reply to the original
+request.
+
+ # The bug
+
+When qemu receives a TFlush request, it sets the `cancelled` flag on the
+relevant pdu. This flag is periodically checked, e.g. in
+`v9fs_co_name_to_path`, and if set, the operation is aborted and the error
+is set to EINTR. However, the server then violates the spec, by returning
+to the client an Rerror response, rather than discarding the message
+entirely. As a result, the client is required to assume that said Rerror
+response is a result of the original request, not a result of the
+cancellation and thus passes the EINTR error back to user space.
+This is not the worst thing it could do, however as discussed above, the
+correct error code would have been ERESTARTSYS, such that user space
+programs with SA_RESTART set get correctly restarted upon completion of
+the signal handler.
+Instead, such programs get spurious EINTR results that they were not
+expecting to handle.
+
+It should be noted that there are plenty of user space programs that do not
+set SA_RESTART and do not correctly handle EINTR either. However, that is
+then a userspace bug. It should also be noted that this bug has been
+mitigated by a recent commit to the Linux kernel [2], which essentially
+prevents the kernel from sending Tflush requests unless the process is about
+to die (in which case the process likely doesn't care about the response).
+Nevertheless, for older kernels and to comply with the spec, I believe this
+change is beneficial.
+
+ # Implementation
+
+The fix is fairly simple, just skipping notification of a reply if
+the pdu was previously cancelled. We do however, also notify the transport
+layer that we're doing this, so it can clean up any resources it may be
+holding. I also added a new trace event to distinguish
+operations that caused an error reply from those that were cancelled.
+
+One complication is that we only omit sending the message on EINTR errors in
+order to avoid confusing the rest of the code (which may assume that a
+client knows about a fid if it sucessfully passed it off to pud_complete
+without checking for cancellation status). This does mean that if the server
+acts upon the cancellation flag, it always needs to set err to EINTR. I
+believe this is true of the current code.
+
+[1] https://9fans.github.io/plan9port/man/man9/flush.html
+[2] https://github.com/torvalds/linux/commit/9523feac272ccad2ad8186ba4fcc891
+
+Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+[groug, send a zero-sized reply instead of detaching the buffer]
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- tests/virtio-9p-test.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ hw/9pfs/9p.c         | 18 ++++++++++++++++++
+ hw/9pfs/trace-events |  1 +
+ 2 files changed, 19 insertions(+)
 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 5ada2839b9ae..cb086315a36e 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -246,13 +246,17 @@ static const char *rmessage_name(uint8_t id)
-         "<unknown>";
- }
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 364c7cb44628..e88bb50f1365 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -630,6 +630,24 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+     V9fsState *s = pdu->s;
+     int ret;
  
--static void v9fs_req_recv(P9Req *req, uint8_t id)
-+static void v9fs_req_wait_for_reply(P9Req *req)
- {
-     QVirtIO9P *v9p = req->v9p;
--    P9Hdr hdr;
- 
-     qvirtio_wait_used_elem(v9p->dev, v9p->vq, req->free_head,
-                            QVIRTIO_9P_TIMEOUT_US);
-+}
++    /*
++     * The 9p spec requires that successfully cancelled pdus receive no reply.
++     * Sending a reply would confuse clients because they would
++     * assume that any EINTR is the actual result of the operation,
++     * rather than a consequence of the cancellation. However, if
++     * the operation completed (succesfully or with an error other
++     * than caused be cancellation), we do send out that reply, both
++     * for efficiency and to avoid confusing the rest of the state machine
++     * that assumes passing a non-error here will mean a successful
++     * transmission of the reply.
++     */
++    bool discard = pdu->cancelled && len == -EINTR;
++    if (discard) {
++        trace_v9fs_rcancel(pdu->tag, pdu->id);
++        pdu->size = 0;
++        goto out_notify;
++    }
 +
-+static void v9fs_req_recv(P9Req *req, uint8_t id)
-+{
-+    P9Hdr hdr;
+     if (len < 0) {
+         int err = -len;
+         len = 7;
+diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
+index 08a4abf22ea4..1aee350c42f1 100644
+--- a/hw/9pfs/trace-events
++++ b/hw/9pfs/trace-events
+@@ -1,6 +1,7 @@
+ # See docs/devel/tracing.txt for syntax documentation.
  
-     v9fs_memread(req, &hdr, 7);
-     hdr.size = ldl_le_p(&hdr.size);
-@@ -398,6 +402,7 @@ static void fs_version(QVirtIO9P *v9p)
-     P9Req *req;
- 
-     req = v9fs_tversion(v9p, P9_MAX_SIZE, version, P9_NOTAG);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rversion(req, &server_len, &server_version);
- 
-     g_assert_cmpmem(server_version, server_len, version, strlen(version));
-@@ -411,6 +416,7 @@ static void fs_attach(QVirtIO9P *v9p)
- 
-     fs_version(v9p);
-     req = v9fs_tattach(v9p, 0, getuid(), 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rattach(req, NULL);
- }
- 
-@@ -431,6 +437,7 @@ static void fs_walk(QVirtIO9P *v9p)
- 
-     fs_attach(v9p);
-     req = v9fs_twalk(v9p, 0, 1, P9_MAXWELEM, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rwalk(req, &nwqid, &wqid);
- 
-     g_assert_cmpint(nwqid, ==, P9_MAXWELEM);
-@@ -452,6 +459,7 @@ static void fs_walk_no_slash(QVirtIO9P *v9p)
- 
-     fs_attach(v9p);
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rlerror(req, &err);
- 
-     g_assert_cmpint(err, ==, ENOENT);
-@@ -467,9 +475,11 @@ static void fs_walk_dotdot(QVirtIO9P *v9p)
- 
-     fs_version(v9p);
-     req = v9fs_tattach(v9p, 0, getuid(), 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rattach(req, &root_qid);
- 
-     req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-     v9fs_rwalk(req, NULL, &wqid); /* We now we'll get one qid */
- 
-     g_assert_cmpmem(&root_qid, 13, wqid[0], 13);
+ # hw/9pfs/virtio-9p.c
++v9fs_rcancel(uint16_t tag, uint8_t id) "tag %d id %d"
+ v9fs_rerror(uint16_t tag, uint8_t id, int err) "tag %d id %d err %d"
+ v9fs_version(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+ v9fs_version_return(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
 -- 
 2.13.6
