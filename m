@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36890)
+Received: from eggs.gnu.org ([208.118.235.92]:38584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ehRPw-0007XR-Ri
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:50:38 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ehRTc-0008UM-Ho
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:54:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ehROs-0004Ym-P4
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:49:32 -0500
-Message-ID: <1517539400.2332.22.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 02 Feb 2018 13:43:20 +1100
-In-Reply-To: <20180131082749.1803-4-clg@kaod.org>
-References: <20180131082749.1803-1-clg@kaod.org>
-	<20180131082749.1803-4-clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: generalize check on radix
- when in HV mode
+	(envelope-from <alex.williamson@redhat.com>) id 1ehRSX-0001FZ-2w
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:53:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ehQwy-0002LW-Rm
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 21:19:37 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Thu, 01 Feb 2018 19:19:30 -0700
+Message-ID: <20180202015121.25116.29469.stgit@gimli.home>
+In-Reply-To: <20180110190202.5389.39690.stgit@gimli.home>
+References: <20180110190202.5389.39690.stgit@gimli.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v3 2/5] vfio/pci: Add base BAR MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,150 +27,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: eric.auger@redhat.com, aik@ozlabs.ru
 
-On Wed, 2018-01-31 at 09:27 +0100, Cédric Le Goater wrote:
-> On a POWER9 processor, the first doubleword of the PTCR indicates
-> whether the partition uses HPT or Radix Trees translation. Use that
-> bit to check for radix mode on powernv QEMU machines.
+Add one more layer to our stack of MemoryRegions, this base region
+allows us to register BARs independently of the vfio region or to
+extend the size of BARs which do map to a region.  This will be
+useful when we want hypervisor defined BARs or sections of BARs,
+for purposes such as relocating MSI-X emulation.  We therefore call
+msix_init() based on this new base MemoryRegion, while the quirks,
+which only modify regions still operate on those sub-MemoryRegions.
 
-The above isn't quite right.
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
 
-On a POWER9 processor, the first doubleword of the partition table
-entry (as pointed to by the PTCR) indicates whether the host uses HPT
-or Radix Tree translation for that partition.
+Pre-pull request testing uncovered an error with this patch, one of my
+test VMs assigns USB host controllers with 1K MMIO BARs.  The host
+BIOS happens to align these BARs at 4K, so I make use of the sub-page
+code that extends these mappings without resizing the BARs.  With this
+patch we also need to extend the base BAR if it's undersized, and
+remove/re-add the base BAR MemoryRegion from the address space rather
+than the vfio region MemoryRegion.  v3 adds the first 4 chunks of the
+patch below to update the sub-page mapping support and is otherwise
+identical to v2.  I'm only posting this one patch from the series for
+v3, the others remain the same.  I dropped R-b/T-b here, but unless
+you're testing a sub-page BAR with host alignment to use this support,
+this code won't be executed and I'll be happy to re-add those.  Please
+review, thanks,
 
-> 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
->  target/ppc/mmu-book3s-v3.c  | 17 ++++++++++++++++-
->  target/ppc/mmu-book3s-v3.h  |  8 +-------
->  target/ppc/mmu-hash64.h     |  1 +
->  target/ppc/mmu_helper.c     |  4 ++--
->  target/ppc/translate_init.c |  2 +-
->  5 files changed, 21 insertions(+), 11 deletions(-)
-> 
-> diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
-> index e7798b3582b0..50b60fca3445 100644
-> --- a/target/ppc/mmu-book3s-v3.c
-> +++ b/target/ppc/mmu-book3s-v3.c
-> @@ -24,10 +24,25 @@
->  #include "mmu-book3s-v3.h"
->  #include "mmu-radix64.h"
->  
-> +bool ppc64_radix(PowerPCCPU *cpu)
-> +{
-> +    CPUPPCState *env = &cpu->env;
-> +
-> +    if (msr_hv) {
+Alex
 
-I would prefer something like:
+ hw/vfio/pci.c |   94 ++++++++++++++++++++++++++++++++++++++++++---------------
+ hw/vfio/pci.h |    3 ++
+ 2 files changed, 72 insertions(+), 25 deletions(-)
 
-uint64_t prtbe0 = ldq_phys(...);
-return prtbe0 & HR;
-
-> +        return ldq_phys(CPU(cpu)->as, cpu->env.spr[SPR_PTCR] &
-> +                        PTCR_PTAB) & PTCR_PTAB_HR;
-> +    } else  {
-> +        PPCVirtualHypervisorClass *vhc =
-> +            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-> +
-> +        return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
-> +    }
-> +}
-> +
->  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->                                int mmu_idx)
->  {
-> -    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
-> +    if (ppc64_radix(cpu)) { /* radix mode */
->          return ppc_radix64_handle_mmu_fault(cpu, eaddr, rwx,
-> mmu_idx);
->      } else { /* Guest uses hash */
->          return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx,
-> mmu_idx);
-> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-> index 56095dab522c..3876cb51b35c 100644
-> --- a/target/ppc/mmu-book3s-v3.h
-> +++ b/target/ppc/mmu-book3s-v3.h
-> @@ -37,13 +37,7 @@ static inline bool ppc64_use_proc_tbl(PowerPCCPU
-> *cpu)
->      return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
->  }
->  
-> -static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
-> -{
-> -    PPCVirtualHypervisorClass *vhc =
-> -        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-> -
-> -    return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
-> -}
-> +bool ppc64_radix(PowerPCCPU *cpu);
->  
->  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->                                int mmu_idx);
-> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-> index 4dc6b3968ec0..7e2ac64b6eeb 100644
-> --- a/target/ppc/mmu-hash64.h
-> +++ b/target/ppc/mmu-hash64.h
-> @@ -106,6 +106,7 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->  /*
->   * Partition table definitions
->   */
-> +#define PTCR_PTAB_HR            PPC_BIT(0)            /* 1:Host 
-
-This isn't a bit in the partition table register, it is a bit in the
-partition table entry. It should be defined in target/ppc/mmu-book3s-
-v3.h as part of "/* Partition Table Entry Fields */"
-
-Also to follow the naming, please call it:
-#define PATBE0_HR	PPC_BIT(0)
-
-:)
-
-> Radix 0:HPT   */
->  #define PTCR_PTAB               0x0FFFFFFFFFFFF000ULL /* Partition
-> Table Base */
->  #define PTCR_PTAS               0x000000000000001FULL /* Partition
-> Table Size */
->  
-> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> index b1e660a4d16a..059863b99b2e 100644
-> --- a/target/ppc/mmu_helper.c
-> +++ b/target/ppc/mmu_helper.c
-> @@ -1286,7 +1286,7 @@ void dump_mmu(FILE *f, fprintf_function
-> cpu_fprintf, CPUPPCState *env)
->          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
->          break;
->      case POWERPC_MMU_VER_3_00:
-> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> +        if (ppc64_radix(ppc_env_get_cpu(env))) {
->              /* TODO - Unsupported */
->          } else {
->              dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-> @@ -1432,7 +1432,7 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState
-> *cs, vaddr addr)
->      case POWERPC_MMU_VER_2_07:
->          return ppc_hash64_get_phys_page_debug(cpu, addr);
->      case POWERPC_MMU_VER_3_00:
-> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> +        if (ppc64_radix(ppc_env_get_cpu(env))) {
->              return ppc_radix64_get_phys_page_debug(cpu, addr);
->          } else {
->              return ppc_hash64_get_phys_page_debug(cpu, addr);
-> diff --git a/target/ppc/translate_init.c
-> b/target/ppc/translate_init.c
-> index a6eaa74244ca..07012ee75e81 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8965,7 +8965,7 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu,
-> PPCVirtualHypervisor *vhyp)
->           * KVM but not under TCG. Update the default LPCR to keep
-> new
->           * CPUs in sync when radix is enabled.
->           */
-> -        if (ppc64_radix_guest(cpu)) {
-> +        if (ppc64_radix(cpu)) {
->              lpcr->default_value |= LPCR_UPRT | LPCR_GTSE;
->          } else {
->              lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 2c7129512563..908b8dffca2b 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1087,7 +1087,7 @@ static void vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
+ {
+     VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+     VFIORegion *region = &vdev->bars[bar].region;
+-    MemoryRegion *mmap_mr, *mr;
++    MemoryRegion *mmap_mr, *region_mr, *base_mr;
+     PCIIORegion *r;
+     pcibus_t bar_addr;
+     uint64_t size = region->size;
+@@ -1100,7 +1100,8 @@ static void vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
+ 
+     r = &pdev->io_regions[bar];
+     bar_addr = r->addr;
+-    mr = region->mem;
++    base_mr = vdev->bars[bar].mr;
++    region_mr = region->mem;
+     mmap_mr = &region->mmaps[0].mem;
+ 
+     /* If BAR is mapped and page aligned, update to fill PAGE_SIZE */
+@@ -1111,12 +1112,15 @@ static void vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
+ 
+     memory_region_transaction_begin();
+ 
+-    memory_region_set_size(mr, size);
++    if (vdev->bars[bar].size < size) {
++        memory_region_set_size(base_mr, size);
++    }
++    memory_region_set_size(region_mr, size);
+     memory_region_set_size(mmap_mr, size);
+-    if (size != region->size && memory_region_is_mapped(mr)) {
+-        memory_region_del_subregion(r->address_space, mr);
++    if (size != vdev->bars[bar].size && memory_region_is_mapped(base_mr)) {
++        memory_region_del_subregion(r->address_space, base_mr);
+         memory_region_add_subregion_overlap(r->address_space,
+-                                            bar_addr, mr, 0);
++                                            bar_addr, base_mr, 0);
+     }
+ 
+     memory_region_transaction_commit();
+@@ -1218,8 +1222,8 @@ void vfio_pci_write_config(PCIDevice *pdev,
+ 
+         for (bar = 0; bar < PCI_ROM_SLOT; bar++) {
+             if (old_addr[bar] != pdev->io_regions[bar].addr &&
+-                pdev->io_regions[bar].size > 0 &&
+-                pdev->io_regions[bar].size < qemu_real_host_page_size) {
++                vdev->bars[bar].region.size > 0 &&
++                vdev->bars[bar].region.size < qemu_real_host_page_size) {
+                 vfio_sub_page_bar_update_mapping(pdev, bar);
+             }
+         }
+@@ -1440,9 +1444,9 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+     vdev->msix->pending = g_malloc0(BITS_TO_LONGS(vdev->msix->entries) *
+                                     sizeof(unsigned long));
+     ret = msix_init(&vdev->pdev, vdev->msix->entries,
+-                    vdev->bars[vdev->msix->table_bar].region.mem,
++                    vdev->bars[vdev->msix->table_bar].mr,
+                     vdev->msix->table_bar, vdev->msix->table_offset,
+-                    vdev->bars[vdev->msix->pba_bar].region.mem,
++                    vdev->bars[vdev->msix->pba_bar].mr,
+                     vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
+                     &err);
+     if (ret < 0) {
+@@ -1482,8 +1486,8 @@ static void vfio_teardown_msi(VFIOPCIDevice *vdev)
+ 
+     if (vdev->msix) {
+         msix_uninit(&vdev->pdev,
+-                    vdev->bars[vdev->msix->table_bar].region.mem,
+-                    vdev->bars[vdev->msix->pba_bar].region.mem);
++                    vdev->bars[vdev->msix->table_bar].mr,
++                    vdev->bars[vdev->msix->pba_bar].mr);
+         g_free(vdev->msix->pending);
+     }
+ }
+@@ -1500,12 +1504,11 @@ static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled)
+     }
+ }
+ 
+-static void vfio_bar_setup(VFIOPCIDevice *vdev, int nr)
++static void vfio_bar_prepare(VFIOPCIDevice *vdev, int nr)
+ {
+     VFIOBAR *bar = &vdev->bars[nr];
+ 
+     uint32_t pci_bar;
+-    uint8_t type;
+     int ret;
+ 
+     /* Skip both unimplemented BARs and the upper half of 64bit BARS. */
+@@ -1524,23 +1527,52 @@ static void vfio_bar_setup(VFIOPCIDevice *vdev, int nr)
+     pci_bar = le32_to_cpu(pci_bar);
+     bar->ioport = (pci_bar & PCI_BASE_ADDRESS_SPACE_IO);
+     bar->mem64 = bar->ioport ? 0 : (pci_bar & PCI_BASE_ADDRESS_MEM_TYPE_64);
+-    type = pci_bar & (bar->ioport ? ~PCI_BASE_ADDRESS_IO_MASK :
+-                                    ~PCI_BASE_ADDRESS_MEM_MASK);
++    bar->type = pci_bar & (bar->ioport ? ~PCI_BASE_ADDRESS_IO_MASK :
++                                         ~PCI_BASE_ADDRESS_MEM_MASK);
++    bar->size = bar->region.size;
++}
++
++static void vfio_bars_prepare(VFIOPCIDevice *vdev)
++{
++    int i;
++
++    for (i = 0; i < PCI_ROM_SLOT; i++) {
++        vfio_bar_prepare(vdev, i);
++    }
++}
++
++static void vfio_bar_register(VFIOPCIDevice *vdev, int nr)
++{
++    VFIOBAR *bar = &vdev->bars[nr];
++    char *name;
+ 
+-    if (vfio_region_mmap(&bar->region)) {
+-        error_report("Failed to mmap %s BAR %d. Performance may be slow",
+-                     vdev->vbasedev.name, nr);
++    if (!bar->size) {
++        return;
+     }
+ 
+-    pci_register_bar(&vdev->pdev, nr, type, bar->region.mem);
++    bar->mr = g_new0(MemoryRegion, 1);
++    name = g_strdup_printf("%s base BAR %d", vdev->vbasedev.name, nr);
++    memory_region_init_io(bar->mr, OBJECT(vdev), NULL, NULL, name, bar->size);
++    g_free(name);
++
++    if (bar->region.size) {
++        memory_region_add_subregion(bar->mr, 0, bar->region.mem);
++
++        if (vfio_region_mmap(&bar->region)) {
++            error_report("Failed to mmap %s BAR %d. Performance may be slow",
++                         vdev->vbasedev.name, nr);
++        }
++    }
++
++    pci_register_bar(&vdev->pdev, nr, bar->type, bar->mr);
+ }
+ 
+-static void vfio_bars_setup(VFIOPCIDevice *vdev)
++static void vfio_bars_register(VFIOPCIDevice *vdev)
+ {
+     int i;
+ 
+     for (i = 0; i < PCI_ROM_SLOT; i++) {
+-        vfio_bar_setup(vdev, i);
++        vfio_bar_register(vdev, i);
+     }
+ }
+ 
+@@ -1549,8 +1581,13 @@ static void vfio_bars_exit(VFIOPCIDevice *vdev)
+     int i;
+ 
+     for (i = 0; i < PCI_ROM_SLOT; i++) {
++        VFIOBAR *bar = &vdev->bars[i];
++
+         vfio_bar_quirk_exit(vdev, i);
+-        vfio_region_exit(&vdev->bars[i].region);
++        vfio_region_exit(&bar->region);
++        if (bar->region.size) {
++            memory_region_del_subregion(bar->mr, bar->region.mem);
++        }
+     }
+ 
+     if (vdev->vga) {
+@@ -1564,8 +1601,14 @@ static void vfio_bars_finalize(VFIOPCIDevice *vdev)
+     int i;
+ 
+     for (i = 0; i < PCI_ROM_SLOT; i++) {
++        VFIOBAR *bar = &vdev->bars[i];
++
+         vfio_bar_quirk_finalize(vdev, i);
+-        vfio_region_finalize(&vdev->bars[i].region);
++        vfio_region_finalize(&bar->region);
++        if (bar->size) {
++            object_unparent(OBJECT(bar->mr));
++            g_free(bar->mr);
++        }
+     }
+ 
+     if (vdev->vga) {
+@@ -2810,7 +2853,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         goto error;
+     }
+ 
+-    vfio_bars_setup(vdev);
++    vfio_bars_prepare(vdev);
++    vfio_bars_register(vdev);
+ 
+     ret = vfio_add_capabilities(vdev, errp);
+     if (ret) {
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 3d753222ca4c..dcdb1a806769 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -33,6 +33,9 @@ typedef struct VFIOQuirk {
+ 
+ typedef struct VFIOBAR {
+     VFIORegion region;
++    MemoryRegion *mr;
++    size_t size;
++    uint8_t type;
+     bool ioport;
+     bool mem64;
+     QLIST_HEAD(, VFIOQuirk) quirks;
