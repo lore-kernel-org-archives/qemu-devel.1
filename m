@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehdAf-0000aU-D0
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:27:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehdEe-0004QN-1f
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ehd8i-00063l-TA
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:22:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60048)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehd8i-00061f-0k
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:20:32 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D860765BB
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 15:12:38 +0000 (UTC)
-References: <20180202111022.19269-1-kraxel@redhat.com>
-	<20180202111022.19269-3-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3d0177d1-130b-6528-30ae-7f21e4bb56dd@redhat.com>
-Date: Fri, 2 Feb 2018 09:12:13 -0600
+	(envelope-from <mreitz@redhat.com>) id 1ehdDa-0003uh-06
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:26:39 -0500
+References: <20180122104100.3674-1-vsementsov@virtuozzo.com>
+	<7a5ef265-c266-21e7-f82d-bee77062111c@redhat.com>
+	<9ac62cef-4331-a828-5c4d-b7a2fdd7b6b5@redhat.com>
+	<cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <90c3ab12-1bda-c3a4-fdbf-626fcefaa7ca@redhat.com>
+Date: Fri, 2 Feb 2018 16:23:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180202111022.19269-3-kraxel@redhat.com>
+In-Reply-To: <cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l"
-Subject: Re: [Qemu-devel] [PATCH v3 02/12] vl: deprecate -alt-grab and
- -ctrl-grab
+	boundary="HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM"
+Subject: Re: [Qemu-devel] [PATCH v2] block: maintain persistent disabled
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,82 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <3d0177d1-130b-6528-30ae-7f21e4bb56dd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 02/12] vl: deprecate -alt-grab and
- -ctrl-grab
-References: <20180202111022.19269-1-kraxel@redhat.com>
- <20180202111022.19269-3-kraxel@redhat.com>
-In-Reply-To: <20180202111022.19269-3-kraxel@redhat.com>
+--HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com,
+ mnestratov@virtuozzo.com
+Message-ID: <90c3ab12-1bda-c3a4-fdbf-626fcefaa7ca@redhat.com>
+Subject: Re: [PATCH v2] block: maintain persistent disabled bitmaps
+References: <20180122104100.3674-1-vsementsov@virtuozzo.com>
+ <7a5ef265-c266-21e7-f82d-bee77062111c@redhat.com>
+ <9ac62cef-4331-a828-5c4d-b7a2fdd7b6b5@redhat.com>
+ <cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
+In-Reply-To: <cbeff34d-b676-3663-654c-e7a224b389b0@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/02/2018 05:10 AM, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  vl.c          | 8 ++++++++
->  qemu-doc.texi | 6 ++++++
->  2 files changed, 14 insertions(+)
+On 2018-02-02 16:18, Vladimir Sementsov-Ogievskiy wrote:
+> 31.01.2018 22:04, Max Reitz wrote:
+>> On 2018-01-29 19:43, Max Reitz wrote:
+>>> On 2018-01-22 11:41, Vladimir Sementsov-Ogievskiy wrote:
+>>>> To maintain load/store disabled bitmap there is new approach:
+>>>>
+>>>> =C2=A0 - deprecate @autoload flag of block-dirty-bitmap-add, make it=
+ ignored
+>>>> =C2=A0 - store enabled bitmaps as "auto" to qcow2
+>>>> =C2=A0 - store disabled bitmaps without "auto" flag to qcow2
+>>>> =C2=A0 - on qcow2 open load "auto" bitmaps as enabled and others
+>>>> =C2=A0=C2=A0=C2=A0 as disabled (except in_use bitmaps)
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+>>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>> Thanks, looks very reasonable.=C2=A0 Applied to my block branch:
+>>>
+>>> https://github.com/XanClic/qemu/commits/block
+>> ...aaand I've only just now seen that iotest 176 will need to be fixed=
+
+>> along with this, so I'm going to unqueue this patch for now.
 >=20
+> ohh, sorry for that. Will resend today.
+>=20
+>>
+>> And when I'm already at it: Should we add deprecation information to
+>> qemu-doc.texi?
+>=20
+> didn't find anything in qemu-doc.texi about dirty bitmaps, so I think, =
+no.
 
->              case QEMU_OPTION_ctrl_grab:
-> +                g_printerr("The -ctrl-grab switch is deprecated, and w=
-ill be\n"
-> +                           "removed in a future release.\n");
->                  ctrl_grab =3D 1;
->                  break;
->              case QEMU_OPTION_no_quit:
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index aa7180a3d9..5961c7a211 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2756,6 +2756,12 @@ support for frameless windows, and the other use=
-r interfaces never
->  implemented this in the first place.  So this will be removed together=
+I mean in the "Deprecated features" appendix.  I think whenever we
+deprecate something, it should be noted there (as far as I've understood)=
+=2E
 
->  with SDL 1.2 support.
-> =20
-> +@subsection -alt-grab and -ctrl-grab (since 2.12.0)
-> +
-> +The ``-alt-grab'' and ``-ctrl-grab'' arguments are deprecated.  They
-> +work with SDL only.  They will eventually replaced with a new way to
-> +configure hotkeys which works consistently across all user interfaces.=
+(Also on the Wiki, I think.)
 
+> Is there a way to generate some documentation files from qapi comments?=
 
-Should the error message printed to the user document the new interface
-to be used instead? But that implies that we shouldn't deprecate this
-until the new interface for configuring hotkeys has been finalized...
+> Where is it?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+There is docs/interop/qemu-qmp-qapi.texi in the build directory.
+
+Max
 
 
---OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l
+--HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0f80ACgkQp6FrSiUn
-Q2o8OQf8DGWTG0HG+VYjD0b33Jk/5Fu9+OMXFmjhGrIbLM+9g1ZWFSAfKdTpAgJ7
-VzEhWHrP0OMdxNlb7bF3aXzFReoS0cy7IaEPfIBBowgYOtSHbfh12Nwrvcmy8PqA
-ntGxAsoGHZ0NO/EEHAzrDJZA6bNrCT9srb87u6kV/83kdIs36an+Jc9IfeBcuk2D
-4ffPk9j6IJyem76Rz59t0HnGkxXbBBJqppixAwvj5u0ztqZrwIIepsoo+QWOecp1
-uPL6RqZEhdIcWb1gcDOWGhz8f9KgKseB+7rkXRlVCMRB0SRngC5z3/EwKYwN26RX
-6sG//snpRLvkvWGnM7fRqfaAGTwBqA==
-=8LdJ
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp0gloSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ap2cH/290GVQ0FXQj6JC0euSCPpe5iHAQbH1N
+O1puHfHTx9JDb83h7Gy+U9Rn9yf9P8cKbLTJvLo7IsK0H7wxYYFTUagZkCsvCw5a
+zLb3zMzAtsFZgEg/82f1BMe+KJT9BdgqaxyPJAPA5N+hhasj2S2C6gJzCyNgUcLH
+ndBJc4IJOISz4Pc6qfduOJ/lQ9Ld5yRxVlcvRqgY139Wth76Fz8YyGKqa+X1v1bE
+PaHNU1sXcgQbOgvQiqDn4gT2FLxIAs73x9aeeyKJTZmgaKNDdmXIZf+D9mjC8Dal
+0j193yKFAs/T5D+IU2R4uTLhD4S8AMWQA29xePQNk0UmXzQ0FbH6y3U=
+=d7VC
 -----END PGP SIGNATURE-----
 
---OCYkNWIIXFAP5WUaKGErIIRLPC6b5ld0l--
+--HUsaCP55T5miAth9EN3Lf9CuhmTuJD4qM--
