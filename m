@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eheZn-0003sR-NU
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:53:41 -0500
+	(envelope-from <berrange@redhat.com>) id 1eheaX-0004aX-Ux
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:54:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eheYj-0005Rl-JF
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:52:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34252
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eheYj-0005Qx-4T
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:51:29 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w12ETZIc121926
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 09:37:54 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvrwbb53p-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:37:52 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 2 Feb 2018 14:37:51 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri,  2 Feb 2018 14:37:45 +0000
-Message-Id: <20180202143746.204851-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 0/1] respin of s390 crash information
+	(envelope-from <berrange@redhat.com>) id 1eheZT-0006Gr-NL
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:53:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eheZT-0006F9-2B
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:52:15 -0500
+Date: Fri, 2 Feb 2018 13:13:14 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180202131314.GF15403@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180116134217.8725-1-berrange@redhat.com>
+	<20180116134217.8725-12-berrange@redhat.com>
+	<20180201204646.GK21702@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180201204646.GK21702@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v5 11/14] input: add missing JIS keys to
+ virtio input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,26 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x <qemu-s390x@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Miika S <miika9764@gmail.com>, Fam Zheng <famz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This patch - originally from Jing Liu - was still on my disk and 
-somehow dropped of my attention. Here is a fixed up version.
-It probably still needs some review and polish.
-One open aspect is migration. Right now QEMU switches from crashed
-back into running state after migration (even without this patch).
-Some fixup will be necessary. 
+On Thu, Feb 01, 2018 at 06:46:46PM -0200, Eduardo Habkost wrote:
+> On Tue, Jan 16, 2018 at 01:42:14PM +0000, Daniel P. Berrange wrote:
+> > From: Miika S <miika9764@gmail.com>
+> > 
+> > keycodemapdb updated to add the QKeyCodes muhenkan and katakanahiragana
+> > 
+> > Signed-off-by: Miika S <miika9764@gmail.com>
+> 
+> Oops, this conflicts with:
+> 
+> commit ae6b06ab655b21c19b234ce3422f694d11a013e0
+> Author: Daniel P. Berrange <berrange@redhat.com>
+> Date:   Wed Jan 17 16:41:18 2018 +0000
+> 
+>     hw: convert virtio-input-hid device to keycodemapdb
+>     
+>     [...]
+> 
+> Patch 11/14 and 12/14 need to be redone.  I'm removing patches
+> 11-14 from python-next until this is sorted out.
 
-Christian Borntraeger (1):
-  s390x/cpu: expose the guest crash information
+You can literally just drop the patch chunk which touches
+the hw/input/virtio-input-hid.c file entirely, as that table
+is now auto-generated.  I can resend the series with that if
+you prefer though ?
 
- qapi/run-state.json   | 29 ++++++++++++++++++++++++--
- target/s390x/cpu.c    | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/cpu.h    | 10 +++++++++
- target/s390x/helper.c |  5 ++++-
- target/s390x/kvm.c    | 27 +++++++++++++++++++-----
- vl.c                  |  6 ++++++
- 6 files changed, 126 insertions(+), 8 deletions(-)
-
+Regards,
+Daniel
 -- 
-2.14.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
