@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44783)
+Received: from eggs.gnu.org ([208.118.235.92]:53935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehfrp-0002sO-7e
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:17:19 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ehg0u-0003GC-4D
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:25:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehfqn-0004PE-4r
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:15:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52562
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe47-00045u-Lo
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:19:51 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w12GBc2K124438
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 11:19:51 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fvtvgsg56-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 11:19:50 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 2 Feb 2018 16:19:48 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Fri,  2 Feb 2018 17:19:30 +0100
-In-Reply-To: <20180202161935.20803-1-groug@kaod.org>
-References: <20180202161935.20803-1-groug@kaod.org>
-Message-Id: <20180202161935.20803-6-groug@kaod.org>
-Subject: [Qemu-devel] [PULL v2 05/10] tests: virtio-9p: use the synth backend
+	(envelope-from <ehabkost@redhat.com>) id 1ehfzo-0003HH-Ir
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:24:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ehfzo-0003Fm-8i
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 13:23:32 -0500
+Date: Fri, 2 Feb 2018 16:23:26 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180202182326.GB22556@localhost.localdomain>
+References: <cover.1517532021.git.alistair.francis@xilinx.com>
+	<56ba11cee61d769a9a2816fa990d472ab1480906.1517532021.git.alistair.francis@xilinx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <56ba11cee61d769a9a2816fa990d472ab1480906.1517532021.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] machine: Convert the valid cpu
+ types to use cpu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,153 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, imammedo@redhat.com, marcel@redhat.com, alistair23@gmail.com
 
-The purpose of virtio-9p-test is to test the virtio-9p device, especially
-the 9p server state machine. We don't really care what fsdev backend we're
-using. Moreover, if we want to be able to test the flush request or a
-device reset with in-flights I/O, it is close to impossible to achieve
-with a physical backend because we cannot ask it reliably to put an I/O
-on hold at a specific point in time.
+On Thu, Feb 01, 2018 at 04:42:05PM -0800, Alistair Francis wrote:
+> As cpu_type is not a user visible string let's convert the
+> valid_cpu_types to compare against cpu_model instead. This way we have a
+> user friendly string to report back.
+> 
+> Once we have a cpu_type to cpu_model conversion this patch should be
+> reverted and we should use cpu_type instead.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
+> 
+>  hw/core/machine.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index cdc1163dc6..de5bac1c84 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -776,13 +776,12 @@ void machine_run_board_init(MachineState *machine)
+>      /* If the machine supports the valid_cpu_types check and the user
+>       * specified a CPU with -cpu check here that the user CPU is supported.
+>       */
+> -    if (machine_class->valid_cpu_types && machine->cpu_type) {
+> -        ObjectClass *class = object_class_by_name(machine->cpu_type);
+> +    if (machine_class->valid_cpu_types && machine->cpu_model) {
+>          int i;
+>  
+>          for (i = 0; machine_class->valid_cpu_types[i]; i++) {
+> -            if (object_class_dynamic_cast(class,
+> -                                          machine_class->valid_cpu_types[i])) {
+> +            if (!strcmp(machine->cpu_model,
+> +                        machine_class->valid_cpu_types[i])) {
 
-Fortunately, we can do that with the synthetic backend, which allows to
-register callbacks on read/write accesses to a specific file. This will
-be used by a later patch to test the 9P flush request.
+I would rename valid_cpu_types to valid_cpu_models to make the
+new semantics clearer.
 
-The walk request test is converted to using the synth backend.
+Anyway, I have bad and good news:
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/9pfs/9p-synth.c     | 16 ++++++++++++++++
- hw/9pfs/9p-synth.h     |  4 ++++
- tests/virtio-9p-test.c | 22 ++++++----------------
- 3 files changed, 26 insertions(+), 16 deletions(-)
+The bad news is Igor already sent patches last week that remove
+MachineState::cpu_model, so this conflicts with his series.  Now
+parse_cpu_model() will be the only place where the original CPU model name is
+available, but the function needs to work on *-user too.  See:
+"[PATCH v3 23/25] Use cpu_create(type) instead of cpu_init(cpu_model)".
 
-diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
-index 8f255e91c00f..dcbd320da17a 100644
---- a/hw/9pfs/9p-synth.c
-+++ b/hw/9pfs/9p-synth.c
-@@ -19,6 +19,7 @@
- #include "qemu/rcu.h"
- #include "qemu/rcu_queue.h"
- #include "qemu/cutils.h"
-+#include "sysemu/qtest.h"
- 
- /* Root node for synth file system */
- static V9fsSynthNode synth_root = {
-@@ -527,6 +528,21 @@ static int synth_init(FsContext *ctx, Error **errp)
- 
-     /* Mark the subsystem is ready for use */
-     synth_fs = 1;
-+
-+    if (qtest_enabled()) {
-+        V9fsSynthNode *node = NULL;
-+        int i, ret;
-+
-+        /* Directory hierarchy for WALK test */
-+        for (i = 0; i < P9_MAXWELEM; i++) {
-+            char *name = g_strdup_printf(QTEST_V9FS_SYNTH_WALK_FILE, i);
-+
-+            ret = qemu_v9fs_synth_mkdir(node, 0700, name, &node);
-+            assert(!ret);
-+            g_free(name);
-+        }
-+    }
-+
-     return 0;
- }
- 
-diff --git a/hw/9pfs/9p-synth.h b/hw/9pfs/9p-synth.h
-index 49c2fc7b274e..876b4ef58288 100644
---- a/hw/9pfs/9p-synth.h
-+++ b/hw/9pfs/9p-synth.h
-@@ -49,4 +49,8 @@ int qemu_v9fs_synth_add_file(V9fsSynthNode *parent, int mode,
-                              const char *name, v9fs_synth_read read,
-                              v9fs_synth_write write, void *arg);
- 
-+/* qtest stuff */
-+
-+#define QTEST_V9FS_SYNTH_WALK_FILE "WALK%d"
-+
- #endif
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index cb086315a36e..652198156731 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -17,6 +17,7 @@
- #include "standard-headers/linux/virtio_ids.h"
- #include "standard-headers/linux/virtio_pci.h"
- #include "hw/9pfs/9p.h"
-+#include "hw/9pfs/9p-synth.h"
- 
- #define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
- 
-@@ -26,23 +27,19 @@ typedef struct {
-     QVirtioDevice *dev;
-     QOSState *qs;
-     QVirtQueue *vq;
--    char *test_share;
- } QVirtIO9P;
- 
- static QVirtIO9P *qvirtio_9p_start(const char *driver)
- {
-     const char *arch = qtest_get_arch();
--    const char *cmd = "-fsdev local,id=fsdev0,security_model=none,path=%s "
-+    const char *cmd = "-fsdev synth,id=fsdev0 "
-                       "-device %s,fsdev=fsdev0,mount_tag=%s";
-     QVirtIO9P *v9p = g_new0(QVirtIO9P, 1);
- 
--    v9p->test_share = g_strdup("/tmp/qtest.XXXXXX");
--    g_assert_nonnull(mkdtemp(v9p->test_share));
--
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        v9p->qs = qtest_pc_boot(cmd, v9p->test_share, driver, mount_tag);
-+        v9p->qs = qtest_pc_boot(cmd, driver, mount_tag);
-     } else if (strcmp(arch, "ppc64") == 0) {
--        v9p->qs = qtest_spapr_boot(cmd, v9p->test_share, driver, mount_tag);
-+        v9p->qs = qtest_spapr_boot(cmd, driver, mount_tag);
-     } else {
-         g_printerr("virtio-9p tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-@@ -54,8 +51,6 @@ static QVirtIO9P *qvirtio_9p_start(const char *driver)
- static void qvirtio_9p_stop(QVirtIO9P *v9p)
- {
-     qtest_shutdown(v9p->qs);
--    rmdir(v9p->test_share);
--    g_free(v9p->test_share);
-     g_free(v9p);
- }
- 
-@@ -422,17 +417,14 @@ static void fs_attach(QVirtIO9P *v9p)
- 
- static void fs_walk(QVirtIO9P *v9p)
- {
--    char *wnames[P9_MAXWELEM], *paths[P9_MAXWELEM];
--    char *last_path = v9p->test_share;
-+    char *wnames[P9_MAXWELEM];
-     uint16_t nwqid;
-     v9fs_qid *wqid;
-     int i;
-     P9Req *req;
- 
-     for (i = 0; i < P9_MAXWELEM; i++) {
--        wnames[i] = g_strdup_printf("%s%d", __func__, i);
--        last_path = paths[i] = g_strdup_printf("%s/%s", last_path, wnames[i]);
--        g_assert(!mkdir(paths[i], 0700));
-+        wnames[i] = g_strdup_printf(QTEST_V9FS_SYNTH_WALK_FILE, i);
-     }
- 
-     fs_attach(v9p);
-@@ -443,8 +435,6 @@ static void fs_walk(QVirtIO9P *v9p)
-     g_assert_cmpint(nwqid, ==, P9_MAXWELEM);
- 
-     for (i = 0; i < P9_MAXWELEM; i++) {
--        rmdir(paths[P9_MAXWELEM - i - 1]);
--        g_free(paths[P9_MAXWELEM - i - 1]);
-         g_free(wnames[i]);
-     }
- 
+The good news is that I think we can fix this very easily if
+validation is done at the same place where parse_cpu_model() is
+called.  e.g.:
+
+    current_machine->cpu_type = machine_class->default_cpu_type;
+    if (cpu_model) {
+        current_machine->cpu_type = parse_cpu_model(cpu_model);
+
+        if (machine_class->valid_cpu_models) {
+            ObjectClass *class = object_class_by_name(machine->cpu_type);
+            int i;
+
+            for (i = 0; machine_class->valid_cpu_models[i]; i++) {
+                const char *valid_model = machine_class->valid_cpu_models[i];
+                ObjectClass *valid_class = cpu_class_by_name(machine->cpu_type, valid_model);
+                if (object_class_dynamic_cast(class,
+                                              object_class_get_name(valid_class))) {
+                     /* Valid CPU type, we're good to go */
+                     break;
+                }
+            }
+            if (!machine_class->valid_cpu_models[i]) {
+                error_report("Invalid CPU model: %s", cpu_model);
+                error_printf("The valid CPU models are: %s",
+                             machine_class->valid_cpu_models[0]);
+                for (i = 1; machine_class->valid_cpu_models[i]; i++) {
+                    error_printf(", %s", machine_class->valid_cpu_models[i]);
+                }
+                error_printf("\n");
+                exit(1);
+            }
+        }
+    }
+
+This can be done inside main(), or moved inside
+machine_run_board_init() if main() pass cpu_model as argument to
+the function.
+
+On either case, I think it's a good idea to do validation and
+printing of error messages closer to the code that parses the
+command-line options.  This way we separate parsing/validation
+from initialization.
+
+>                  /* The user specificed CPU is in the valid field, we are
+>                   * good to go.
+>                   */
+> @@ -792,8 +791,8 @@ void machine_run_board_init(MachineState *machine)
+>  
+>          if (!machine_class->valid_cpu_types[i]) {
+>              /* The user specified CPU is not valid */
+> -            error_report("Invalid CPU type: %s", machine->cpu_type);
+> -            error_printf("The valid types are: %s",
+> +            error_report("Invalid CPU model: %s", machine->cpu_model);
+> +            error_printf("The valid models are: %s",
+>                           machine_class->valid_cpu_types[0]);
+>              for (i = 1; machine_class->valid_cpu_types[i]; i++) {
+>                  error_printf(", %s", machine_class->valid_cpu_types[i]);
+> -- 
+> 2.14.1
+> 
+> 
+
 -- 
-2.13.6
+Eduardo
