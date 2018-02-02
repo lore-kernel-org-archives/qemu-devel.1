@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ehcYb-0008QB-On
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:43:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehcYq-0000CV-JA
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:43:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ehcYa-0001pp-Li
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:43:13 -0500
-References: <20171130164750.47320-1-vsementsov@virtuozzo.com>
-	<20171130164750.47320-2-vsementsov@virtuozzo.com>
-	<8073fbad-e209-f7c7-d788-4f9eed529b56@redhat.com>
-	<8e702a93-0447-6a0d-ddb1-1b447962669a@virtuozzo.com>
-	<3fbf534f-fcbc-5cf5-4690-b0142a54a760@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <a32490e7-9e21-1b53-87b1-d5d503103765@virtuozzo.com>
-Date: Fri, 2 Feb 2018 16:48:22 +0300
+	(envelope-from <armbru@redhat.com>) id 1ehcYl-0001vI-OF
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:43:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:11663)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehcYl-0001uh-Fx
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:43:23 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-18-marcandre.lureau@redhat.com>
+	<87d13qo6c6.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJt5U9y1O2coL0Lb7-cF9Oe69Wwn_94Jv4g8emJ5ArQdg@mail.gmail.com>
+	<87zi6tirpa.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+y5ZLgGpa28bWGGopycpxnejNSsacfo5XFK_gDV4LwGA@mail.gmail.com>
+Date: Fri, 02 Feb 2018 15:43:20 +0100
+In-Reply-To: <CAJ+F1C+y5ZLgGpa28bWGGopycpxnejNSsacfo5XFK_gDV4LwGA@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 11 Jan 2018
+	22:24:03 +0100")
+Message-ID: <87a7wrlaev.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <3fbf534f-fcbc-5cf5-4690-b0142a54a760@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: add overlap check for bitmap
- directory
+Subject: Re: [Qemu-devel] [PATCH v3 17/50] qapi: do not define enumeration
+ value explicitely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +34,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-02.02.2018 16:00, Max Reitz wrote:
-> On 2018-02-02 13:07, Vladimir Sementsov-Ogievskiy wrote:
->> 29.01.2018 18:34, Max Reitz wrote:
->>> On 2017-11-30 17:47, Vladimir Sementsov-Ogievskiy wrote:
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>  =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 7 +++++--
->>>>  =C2=A0 block/qcow2-refcount.c | 12 ++++++++++++
->>>>  =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 6 ++++++
->>>>  =C2=A0 3 files changed, 23 insertions(+), 2 deletions(-)
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+
+> Hi
+>
+> On Fri, Dec 8, 2017 at 8:50 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>>
+>>> On Thu, Dec 7, 2017 at 5:23 PM, Markus Armbruster <armbru@redhat.com> w=
+rote:
+>>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >>>>
->>>> diff --git a/block/qcow2.h b/block/qcow2.h
->>>> index 6f0ff15dd0..8f226a3609 100644
->>>> --- a/block/qcow2.h
->>>> +++ b/block/qcow2.h
->>>> @@ -98,6 +98,7 @@
->>>>  =C2=A0 #define QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE
->>>> "overlap-check.snapshot-table"
->>>>  =C2=A0 #define QCOW2_OPT_OVERLAP_INACTIVE_L1 "overlap-check.inactive-=
-l1"
->>>>  =C2=A0 #define QCOW2_OPT_OVERLAP_INACTIVE_L2 "overlap-check.inactive-=
-l2"
->>>> +#define QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY
->>>> "overlap-check.bitmap-directory"
->>>>  =C2=A0 #define QCOW2_OPT_CACHE_SIZE "cache-size"
->>>>  =C2=A0 #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
->>>>  =C2=A0 #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
->>>> @@ -406,8 +407,9 @@ typedef enum QCow2MetadataOverlap {
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE_BITNR =3D 5,
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L1_BITNR=C2=A0=C2=A0=
-=C2=A0 =3D 6,
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L2_BITNR=C2=A0=C2=A0=
-=C2=A0 =3D 7,
->>>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_BITMAP_DIRECTORY_BITNR =3D 8,
->>>>  =C2=A0 -=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAX_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 8,
->>>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAX_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 9,
->>>>  =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_NONE=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0,
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAIN_HEADER=C2=A0=C2=A0=C2=A0=
- =3D (1 << QCOW2_OL_MAIN_HEADER_BITNR),
->>>> @@ -420,12 +422,13 @@ typedef enum QCow2MetadataOverlap {
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* NOTE: Checking overlaps with inacti=
-ve L2 tables will result
->>>> in bdrv
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * reads. */
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L2=C2=A0=C2=A0=C2=A0=
- =3D (1 << QCOW2_OL_INACTIVE_L2_BITNR),
->>>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_BITMAP_DIRECTORY =3D (1 << QCOW2_OL_BITMA=
-P_DIRECTORY_BITNR),
->>>>  =C2=A0 } QCow2MetadataOverlap;
->>>>  =C2=A0 =C2=A0 /* Perform all overlap checks which can be done in cons=
-tant time */
->>>>  =C2=A0 #define QCOW2_OL_CONSTANT \
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (QCOW2_OL_MAIN_HEADER | QCOW2_OL_ACTIV=
-E_L1 |
->>>> QCOW2_OL_REFCOUNT_TABLE | \
->>>> -=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE)
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE | QCOW2_OL_BITMAP_DI=
-RECTORY)
->>>>  =C2=A0 =C2=A0 /* Perform all overlap checks which don't require disk =
-access */
->>>>  =C2=A0 #define QCOW2_OL_CACHED \
->>>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->>>> index 3de1ab51ba..a7a2703f26 100644
->>>> --- a/block/qcow2-refcount.c
->>>> +++ b/block/qcow2-refcount.c
->>>> @@ -2585,6 +2585,18 @@ int
->>>> qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t
->>>> offset,
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>  =C2=A0 +=C2=A0=C2=A0=C2=A0 if ((chk & QCOW2_OL_BITMAP_DIRECTORY) &&
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (s->autoclear_features & Q=
-COW2_AUTOCLEAR_BITMAPS))
->>>> +=C2=A0=C2=A0=C2=A0 {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* update_ext_header_and_d=
-ir_in_place firstly drop autoclear
->>>> flag,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * so it will not fai=
-l */
->>> That's really not an argument.=C2=A0 bitmap_list_store() has to pass
->>> QCOW2_OL_BITMAP_DIRECTORY to @ign anyway.=C2=A0 (Because there is no re=
-ason
->>> not to.)
->> in_place is a reason. When we store directory in_place, it definitely
->> overlaps with current directory.
-> Well, then you just pass QCOW2_OL_BITMAP_DIRECTORY to @ign, which is
-> what that argument is for? :-)
-
-hmm. but actually, I should not, because of zeroed autoclear flag. So,
-do you think, it is better to pass it, anyway?
-
+>>>>> The C standard has the initial value at 0 and the subsequent values
+>>>>> incremented by 1. No need to set this explicitely.
+>>>>>
+>>>>> This will prevent from artificial "gaps" when compiling out some enum
+>>>>> values and having unnecessarily large MAX values & enums arrays.
+>>>>>
+>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>>> ---
+>>>>>  scripts/qapi.py | 7 ++-----
+>>>>>  1 file changed, 2 insertions(+), 5 deletions(-)
+>>>>>
+>>>>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>>>>> index 94b735d8d6..074ee221a1 100644
+>>>>> --- a/scripts/qapi.py
+>>>>> +++ b/scripts/qapi.py
+>>>>> @@ -1985,14 +1985,11 @@ typedef enum %(c_name)s {
+>>>>>  ''',
+>>>>>                  c_name=3Dc_name(name))
+>>>>>
+>>>>> -    i =3D 0
+>>>>>      for value in enum_values:
+>>>>>          ret +=3D mcgen('''
+>>>>> -    %(c_enum)s =3D %(i)d,
+>>>>> +    %(c_enum)s,
+>>>>>  ''',
+>>>>> -                     c_enum=3Dc_enum_const(name, value, prefix),
+>>>>> -                     i=3Di)
+>>>>> -        i +=3D 1
+>>>>> +                     c_enum=3Dc_enum_const(name, value, prefix))
+>>>>>
+>>>>>      ret +=3D mcgen('''
+>>>>>  } %(c_name)s;
+>>>>
+>>>> Recapitulate review of v2: this risks entertaining mishaps like
+>>>> compiling this one
+>>>>
+>>>>     typedef enum Color {
+>>>>         COLOR_WHITE,
+>>>> #if defined(NEED_CPU_H)
+>>>> #if defined(TARGET_S390X)
+>>>>         COLOR_BLUE,
+>>>> #endif /* defined(TARGET_S390X) */
+>>>> #endif /* defined(NEED_CPU_H) */
+>>>>         COLOR_BLACK,
+>>>>     } Color;
+>>>>
+>>>> in s390x-code (COLOR_BLACK =3D 2) and in target-independent code
+>>>> (COLOR_BLACK =3D 1), then linking the two together.
+>>>>
+>>>> Same issue for struct members and such (previous patch).
+>>>>
+>>>> What's our story on preventing disaster here?
+>>>>
+>>>> In the long run, we want to split the generated code so that
+>>>> target-specific and target-independent code are separate, and each part
+>>>> is always compiled with consistent preprocessor symbols.  But I'm afra=
+id
+>>>> that's not in the card right now.
+>>>
+>>> Eh, I need to refresh my memories about that series, but I think
+>>> that's what I did in v3
+>>>
+>>> It doesn't use the NEED_CPU_H trick. It has a seperate per-target targe=
+t.json
+>>
+>> Looking... aha!  target.json appears in PATCH 44 (which I haven't even
+>> glanced at, yet).  The problem appears in PATCH 16, though.  Perhaps a
+>> bit of patch reshuffling would do.
 >
-> Max
->
->> But this is done with cleared autoclear flag (to make it safe), so we
->> will skip this check and will not
->> fail.
+> What problem appears in patch 16? Some code could be introduced using
+> NEED_CPU_H and link arch & independent code together?
 
+It's been a while...
 
---=20
-Best regards,
-Vladimir
+Generated headers using conditionals must include the headers providing
+the symbols used in conditionals.  Not doing so is an open death trap.
+
+PATCH 16 sets up the first instance of the death trap.  Or maybe it's
+PATCH 13.
+
+However, including these headers only becomes possible *after* you split
+off the target-specific stuff in PATCH 44.
+
+Do I make any sense?
+
+>                                                       It is still true
+> after patch 44. If necessary, I can work on a split-qapi series before
+> the conditionals are added. But the real benefit is only apparent
+> after the conditional are introduced, so I am not motivated to
+> reorder.
+
+Understand.
+
+As a maintainer, I can ask for improvements, but the only lever I have
+is saying no.  Which should be reserved for cases that are actually
+wrong, or create inacceptable technical debt.  Temporary death traps
+don't count as either.  For cases I merely hate, when asking doesn't
+help, all I can do is do the work myself.  So I did:
+
+    [PATCH RFC 00/21] Modularize generated QAPI code
+    Message-Id: <20180202130336.24719-1-armbru@redhat.com>
+
+[...]
