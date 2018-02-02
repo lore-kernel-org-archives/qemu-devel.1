@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37106)
+Received: from eggs.gnu.org ([208.118.235.92]:38489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eheQF-0003ja-5E
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:43:11 -0500
+	(envelope-from <berrange@redhat.com>) id 1eheSS-0005qZ-VQ
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:45:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ehePA-0007lM-17
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:42:43 -0500
-References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
-	<ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <919e1755-e3d1-939b-2157-6d3b5896ea3a@virtuozzo.com>
-Date: Fri, 2 Feb 2018 19:29:45 +0300
+	(envelope-from <berrange@redhat.com>) id 1eheSN-0000sb-S5
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:45:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46214)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eheSN-0000rK-Bb
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:44:55 -0500
+Date: Fri, 2 Feb 2018 16:44:46 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180202164446.GP15403@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3] block: maintain persistent disabled
- bitmaps
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180202130336.24719-1-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 00/21] Modularize generated QAPI code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-02.02.2018 19:18, Eric Blake wrote:
-> On 02/02/2018 10:07 AM, Vladimir Sementsov-Ogievskiy wrote:
->> To maintain load/store disabled bitmap there is new approach:
->>
->>   - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored
->>   - store enabled bitmaps as "auto" to qcow2
->>   - store disabled bitmaps without "auto" flag to qcow2
->>   - on qcow2 open load "auto" bitmaps as enabled and others
->>     as disabled (except in_use bitmaps)
->>
->> Also, adjust iotests 165 and 176 appropriately.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> +++ b/qemu-doc.texi
->> @@ -2749,6 +2749,13 @@ used and it will be removed with no replacement.
->>   The ``convert -s snapshot_id_or_name'' argument is obsoleted
->>   by the ``convert -l snapshot_param'' argument instead.
->>   
->> +@section QEMU Machine Protocol (QMP) commands
->> +
->> +@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
->> +
->> +"autoload" parameter is now ignored. All bitmaps are automatically loaded
->> +from qcow2 image.
-> Won't later patches be adding the ability to enable/disable bitmaps,
-> which then affects whether they are autoloaded?  So we don't forget to
-> revisit this text in that patch, a better wording might be:
->
-> The "autoload" parameter is ignored; all enabled persistent dirty
-> bitmaps are automatically loaded from a qcow2 image, regardless of the
-> initial setting requested in this parameter.
+On Fri, Feb 02, 2018 at 02:03:15PM +0100, Markus Armbruster wrote:
+> Our qapi-schema.json is composed of modules connected by include
+> directives, but the generated code is monolithic all the same: one
+> qapi-types.h with all the types, one qapi-visit.h with all the
+> visitors, and so forth.  These monolithic headers get included all
+> over the place.  In my "build everyhing" tree, adding a QAPI type
+> recompiles about 4500 out of 4800 objects.
+> 
+> Nobody would write such monolithic headers by hand.  It stands to
+> reason that one shouldn't generate them, either.
+> 
+> This series' basic idea is to split up generated headers to mirror the
+> schema's modular structure: one header per module.  That way, you can
+> include just what you need.
+> 
+> The series is RFC for a number of reasons:
+> 
+> * The split is implemented only for qapi-types.h.  That one should
+>   provide the biggest benefits, though.
+> 
+> * There's a bit of code duplication.
+> 
+> * I haven't re-read my patches, yet.
+> 
+> Even in this incomplete state, the compile-time improvements can be
+> massive.  Before this series, any QAPI schema change recompiles some
+> 4500 out of 4800 objects in my "build everything" tree.  Afterwards,
+> adding a type to qapi/migration.json recompiles less than 400, adding
+> a QMP event recompiles less than 200, and a documentation change no
+> longer recompiles anything.
 
+Having gone through the same exercise for trace.h, I very much welcome
+this effort for QAPI too !
 
-hmm.. no. all bitmaps are loaded, even disabled ones. Before this patch 
-there is
-no way to have disabled bitmap in qemu (by loading or by creating).
-After the patch, we have a theoretical way of creating such bitmap in 
-qcow2 image, then
-it will be loaded as disabled.
+If I consider the crypto stuff I maintain, the QAPI definitions are
+in qapi/crypto.json.
 
-Also, we can store bitmap with persistent=true and autoload=false before 
-this patch, and there is no way
-to load this bitmap before this patch, but after this patch it will be 
-loaded as disabled.
+>From my POV, I feel it would be natural to have them move to instead
+be at  crypto/qapi.json, and have the generated headers/source files be
+crypto/qapi-types.h, crypto/qapi-visit.h, etc.
 
+This would mirror what we did with tracing, crypto/trace-events, and
+generating crypto/trace*.{c,h}
 
->
->
->> @@ -667,19 +662,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
->>   }
->>   
->>   /* Called with BQL taken. */
->> -void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
->> -{
->> -    qemu_mutex_lock(bitmap->mutex);
->> -    bitmap->autoload = autoload;
->> -    qemu_mutex_unlock(bitmap->mutex);
->> -}
->> -
->> -bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
->> -{
->> -    return bitmap->autoload;
->> -}
-> Will later patches be reintroducing these functions for learning which
-> bitmaps are enabled/disabled?  But I'm okay with deleting them in this
-> patch, even if that is more churn.
->
-
-no, actually the aim of the patch is to drop buggy relation between 
-autoload qmp parameter
-and auto qcow2 flag (which is more like "enabled" then "autoload"). Look 
-at "Reasoning" in head
-letter for details.
-
+Regards,
+Daniel
 -- 
-Best regards,
-Vladimir
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
