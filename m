@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ehcX2-0006zh-U6
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:38 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ehcXF-00078u-PI
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1ehcWy-0000vu-10
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:36 -0500
-Received: from mail-bn3nam01on0064.outbound.protection.outlook.com
-	([104.47.33.64]:44896
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1ehcXA-00010H-TI
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:49 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59096
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1ehcWx-0000vB-MC
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:31 -0500
-References: <20180129174132.108925-1-brijesh.singh@amd.com>
-	<20180129174132.108925-14-brijesh.singh@amd.com>
-	<20180201175802.GK2457@work-vm>
-	<7c3c7a89-04ef-016e-c9a5-4f4d4be1c449@amd.com>
-	<20180201200442.GQ2457@work-vm> <20180202130817.GE15403@redhat.com>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <3e6cf550-9bd8-daa7-e54a-d390354ffcb0@amd.com>
-Date: Fri, 2 Feb 2018 07:46:44 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180202130817.GE15403@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v6 13/23] hmp: display memory encryption
- support in 'info kvm'
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ehcXA-00010C-Nh
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:44 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w129d17S066003
+	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 04:42:47 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvm79utqn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 04:42:46 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 2 Feb 2018 09:42:45 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri,  2 Feb 2018 09:42:41 +0000
+Message-Id: <20180202094241.59537-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +36,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org
 
+commit 67915de9f038 ("s390x/event-facility: variable-length event
+masks") switches the sclp receive/send mask. This broke the sclp
+lm console.
 
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+Cc: qemu-stable@nongnu.org
+---
+ hw/s390x/event-facility.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 2/2/18 7:08 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Feb 01, 2018 at 08:04:43PM +0000, Dr. David Alan Gilbert wrote:
->> * Brijesh Singh (brijesh.singh@amd.com) wrote:
->>>
->>> On 2/1/18 11:58 AM, Dr. David Alan Gilbert wrote:
->>>> * Brijesh Singh (brijesh.singh@amd.com) wrote:
->>>>> update 'info kvm' to display the memory encryption support.
->>>>>
->>>>> (qemu) info kvm
->>>>> kvm support: enabled
->>>>> memory encryption: disabled
->>>> As Markus said, this should be split qmp/hmp; but something else to
->>>> think about is whether this is a boolean or needs to be an enum;  do
->>>> you have one version of encryption or are we going to need to flag up
->>>> versions or the features of the encryption?
->>> In future I could see us providing encrypted state status when we
->>> implement SEV-ES support, something like
->>>
->>> (qemu) info kvm
->>> kvm support: enabled
->>> memory encryption: enabled
->>> cpu register state: encrypted
->>>
->>> but so far I do not see need to provide the version string. If user
->>> wants to know the SEV version then it can open /dev/sev device to get
->>> platform status and more.
->> Yes, I was worried a bit more about how general that was going to be
->> or whether we're collecting a lot of architecture specific fields here.
->> So I wondered, if it was an enum, whether that would be come:
->>
->> memory encryption: none
->>
->> memory encryption: SEV
->>
->> memory encryption: SEV-ES
->>
->> (I'm not too sure whether that's better or not, just a suggestion)
-> I wonder if it is is even appropriate to have under 'info kvm', since
-> 'info kvm' is architecture independant and SEV is specific to AMD x86_64
-> only. It might suggest an 'info sev' command is better ?
-
-The reason I kept under 'info kvm' is because now KVM has a ioctl for
-memory encryption operation, I like your suggestion for=C2=A0 introducing
-'info sev' -- the command can be used to provide additional SEV specific
-details (e.g SEV FW state, SEV FW version, SEV active policy etc).
-
->
-> Regards,
-> Daniel
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index b0f71f4554..155a69467b 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+     ef->receive_mask = be32_to_cpu(tmp_mask);
+ 
+     /* return the SCLP's capability masks to the guest */
+-    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
++    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
+     copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+               mask_length, sizeof(tmp_mask));
+-    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
++    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
+     copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
+               mask_length, sizeof(tmp_mask));
+ 
+-- 
+2.14.3
