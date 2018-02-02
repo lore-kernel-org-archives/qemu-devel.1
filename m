@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehccd-0003nM-PK
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:47:24 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ehcce-0003o7-DP
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehccd-0004x5-2J
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:47:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60934)
+	(envelope-from <kraxel@redhat.com>) id 1ehccd-0004xO-6o
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:47:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ehccc-0004vw-RZ
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:47:22 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1951BDC1
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 11:10:25 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ehccc-0004vv-To
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:47:23 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  2 Feb 2018 12:10:16 +0100
-Message-Id: <20180202111022.19269-7-kraxel@redhat.com>
+Date: Fri,  2 Feb 2018 12:10:19 +0100
+Message-Id: <20180202111022.19269-10-kraxel@redhat.com>
 In-Reply-To: <20180202111022.19269-1-kraxel@redhat.com>
 References: <20180202111022.19269-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 06/12] vl: drop no_quit variable
+Subject: [Qemu-devel] [PATCH v3 09/12] cocoa: use DisplayOptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +24,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Not used any more, delete it.
+Switch cocoa ui to use qapi DisplayOptions for configuration.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- vl.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ include/ui/console.h | 4 ++--
+ vl.c                 | 3 ++-
+ qapi/ui.json         | 6 ++++--
+ ui/cocoa.m           | 4 ++--
+ 4 files changed, 10 insertions(+), 7 deletions(-)
 
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 9749503aa7..f96fd907d0 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -454,9 +454,9 @@ static inline void sdl_display_init(DisplayState *ds, DisplayOptions *opts)
+ 
+ /* cocoa.m */
+ #ifdef CONFIG_COCOA
+-void cocoa_display_init(DisplayState *ds, int full_screen);
++void cocoa_display_init(DisplayState *ds, DisplayOptions *opts);
+ #else
+-static inline void cocoa_display_init(DisplayState *ds, int full_screen)
++static inline void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+ {
+     /* This must never be called if CONFIG_COCOA is disabled */
+     error_report("Cocoa support is disabled");
 diff --git a/vl.c b/vl.c
-index 25e784be63..c17dedfa4e 100644
+index 6fa65c0dbd..eb8aca9479 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -152,7 +152,6 @@ int vga_interface_type = VGA_NONE;
- static int full_screen = 0;
- static DisplayOptions dpy;
- int no_frame;
--int no_quit = 0;
- Chardev *serial_hds[MAX_SERIAL_PORTS];
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
- Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
-@@ -2141,10 +2140,8 @@ static LegacyDisplayType select_display(const char *p)
-                 opts = nextopt;
-                 dpy.has_window_close = true;
-                 if (strstart(opts, "on", &nextopt)) {
--                    no_quit = 0;
-                     dpy.window_close = true;
-                 } else if (strstart(opts, "off", &nextopt)) {
--                    no_quit = 1;
-                     dpy.window_close = false;
-                 } else {
-                     goto invalid_sdl_args;
-@@ -3679,7 +3676,6 @@ int main(int argc, char **argv, char **envp)
-                 ctrl_grab = 1;
-                 break;
-             case QEMU_OPTION_no_quit:
--                no_quit = 1;
-                 dpy.has_window_close = true;
-                 dpy.window_close = false;
-                 break;
-@@ -4368,7 +4364,8 @@ int main(int argc, char **argv, char **envp)
-         error_report("-no-frame, -alt-grab and -ctrl-grab are only valid "
-                      "for SDL, ignoring option");
-     }
--    if (no_quit && (display_type != DT_GTK && display_type != DT_SDL)) {
-+    if (dpy.has_window_close &&
-+        (display_type != DT_GTK && display_type != DT_SDL)) {
-         error_report("-no-quit is only valid for GTK and SDL, "
-                      "ignoring option");
+@@ -4355,6 +4355,7 @@ int main(int argc, char **argv, char **envp)
+         dpy.type = DISPLAY_TYPE_SDL;
+ #elif defined(CONFIG_COCOA)
+         display_type = DT_COCOA;
++        dpy.type = DISPLAY_TYPE_COCOA;
+ #elif defined(CONFIG_VNC)
+         vnc_parse("localhost:0,to=99,id=default", &error_abort);
+ #else
+@@ -4716,7 +4717,7 @@ int main(int argc, char **argv, char **envp)
+         sdl_display_init(ds, &dpy);
+         break;
+     case DT_COCOA:
+-        cocoa_display_init(ds, full_screen);
++        cocoa_display_init(ds, &dpy);
+         break;
+     case DT_GTK:
+         gtk_display_init(ds, &dpy);
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 59597cfb3b..aca5402746 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -1017,7 +1017,8 @@
+ #
+ ##
+ { 'enum'    : 'DisplayType',
+-  'data'    : [ 'none', 'gtk', 'sdl', 'egl-headless', 'curses' ] }
++  'data'    : [ 'none', 'gtk', 'sdl',
++                'egl-headless', 'curses', 'cocoa' ] }
+ 
+ ##
+ # @DisplayOptions:
+@@ -1042,4 +1043,5 @@
+                 'gtk'            : 'DisplayGTK',
+                 'sdl'            : 'DisplayNoOpts',
+                 'egl-headless'   : 'DisplayNoOpts',
+-                'curses'         : 'DisplayNoOpts' } }
++                'curses'         : 'DisplayNoOpts',
++                'cocoa'          : 'DisplayNoOpts' } }
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 6be9848391..3e34d15716 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -1682,12 +1682,12 @@ static void addRemovableDevicesMenuItems(void)
+     qapi_free_BlockInfoList(pointerToFree);
+ }
+ 
+-void cocoa_display_init(DisplayState *ds, int full_screen)
++void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+ {
+     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
+ 
+     /* if fullscreen mode is to be used */
+-    if (full_screen == true) {
++    if (opts->has_full_screen && opts->full_screen) {
+         [NSApp activateIgnoringOtherApps: YES];
+         [(QemuCocoaAppController *)[[NSApplication sharedApplication] delegate] toggleFullScreen: nil];
      }
 -- 
 2.9.3
