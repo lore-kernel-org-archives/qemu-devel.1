@@ -1,43 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ehSQR-0001ab-MO
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:57:45 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ehT1n-00056U-Lb
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 23:33:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ehSMl-0003fV-8j
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:54:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53052
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1ehSMk-0003dm-7L
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:50:18 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w123hq7h043576
-	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 22:50:16 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvdxjwgec-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 22:50:16 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Thu, 1 Feb 2018 20:50:15 -0700
-References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
-	<20180130094715.11578-4-zyimin@linux.vnet.ibm.com>
-	<20180131124400.4f74cf1c.cohuck@redhat.com>
-	<b779846e-3e25-5c33-217b-1d9f5e85ec70@linux.vnet.ibm.com>
-	<20180201130226.364e6c76.cohuck@redhat.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Fri, 2 Feb 2018 11:50:09 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180201130226.364e6c76.cohuck@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <0c6a2235-8bca-82e3-203d-ba2f154a9a33@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/pci: use the right pal and pba
- in reg_ioat()
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ehT0j-0005iF-Gq
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 23:32:43 -0500
+Message-ID: <1517545890.2332.23.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Fri, 02 Feb 2018 15:31:30 +1100
+In-Reply-To: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
+References: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] spapr: add missing break in
+ h_get_cpu_characteristics()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,69 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
+On Thu, 2018-02-01 at 20:47 +0100, Greg Kurz wrote:
+> Detected by Coverity (CID 1385702). This fixes the recently added
+> hypercall
+> to let guests properly apply Spectre and Meltdown workarounds.
+> 
+> Fixes: c59704b25473 "target/ppc/spapr: Add H-Call
+> H_GET_CPU_CHARACTERISTICS"
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-=D4=DA 2018/2/1 =CF=C2=CE=E78:02, Cornelia Huck =D0=B4=B5=C0:
-> On Thu, 1 Feb 2018 12:33:01 +0100
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->
->> On 31/01/2018 12:44, Cornelia Huck wrote:
->>> On Tue, 30 Jan 2018 10:47:15 +0100
->>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->>>  =20
->>>> When registering ioat, pba should be comprised of leftmost 52 bits a=
-nd
->>>> rightmost 12 binary zeros, and pal should be comprised of leftmost 5=
-2
->>>> bits and right most 12 binary ones. Let's fixup this.
->>>>
->>>> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>>> ---
->>>>    hw/s390x/s390-pci-inst.c | 2 ++
->>>>    1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->>>> index 997a9cc2e9..3fcc330fe3 100644
->>>> --- a/hw/s390x/s390-pci-inst.c
->>>> +++ b/hw/s390x/s390-pci-inst.c
->>>> @@ -865,6 +865,8 @@ static int reg_ioat(CPUS390XState *env, S390PCII=
-OMMU *iommu, ZpciFib fib,
->>>>        uint8_t dt =3D (g_iota >> 2) & 0x7;
->>>>        uint8_t t =3D (g_iota >> 11) & 0x1;
->>>>   =20
->>>> +    pba &=3D ~0xfff;
->>>> +    pal |=3D 0xfff;
->>>>        if (pba > pal || pba < ZPCI_SDMA_ADDR || pal > ZPCI_EDMA_ADDR=
-) {
->>>>            s390_program_interrupt(env, PGM_OPERAND, 6, ra);
->>>>            return -EINVAL;
->>> It seems like pba and pal are part of the fib, which in turn seems to
->>> be provided by the caller. Is that correct? If yes, is it valid for
->>> them to not have the rightmost 12 bits as 0s resp. 1s?
->>>
->>> (Probably answered in the architecture, I know. Might make sense to b=
-e
->>> a tad more explicit in the description.)
->>>  =20
->> Yes it is, only word6 and the bits 0-19 of word 7 are used for PAL and
->> the zPCI facility treats the right most 12 bits of the PAL as containi=
-ng
->> ones.
->>
->> For PBA words 4 and 0-19 bits of word 5 with 12 0 append on the right
->> provides the PBA.
->>
->> The lower 12 bits of words 5 and 7 of the FIB are ignored by the facil=
-ity.
->>
->> @Yi Min: may be add the last sentence to the commit message.
->>
->> @Conny: Is it clearer?
-> Yes, adding the last sentence makes it clearer. Thanks!
->
->
-OK. Thanks!
+> ---
+>  hw/ppc/spapr_hcall.c |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 4d0e6eb0cf1d..596f58378a40 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1697,6 +1697,7 @@ static target_ulong
+> h_get_cpu_characteristics(PowerPCCPU *cpu,
+>      switch (safe_indirect_branch) {
+>      case SPAPR_CAP_FIXED:
+>          characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
+> +        break;
+>      default: /* broken */
+>          assert(safe_indirect_branch == SPAPR_CAP_BROKEN);
+>          break;
+> 
