@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehcan-0002Fd-A6
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:30 -0500
+	(envelope-from <groug@kaod.org>) id 1ehcbD-0002ba-7P
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehcai-0003a1-Vc
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37586)
+	(envelope-from <groug@kaod.org>) id 1ehcb8-0003ob-AK
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:55 -0500
+Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:46812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehcai-0003Zg-OH
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:24 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180119050906.18930-1-aik@ozlabs.ru>
-	<871si6vt8n.fsf@dusky.pond.sub.org>
-	<e3aca639-0c5c-8d10-a9f4-05a62284fb10@ozlabs.ru>
-Date: Fri, 02 Feb 2018 08:37:53 +0100
-In-Reply-To: <e3aca639-0c5c-8d10-a9f4-05a62284fb10@ozlabs.ru> (Alexey
-	Kardashevskiy's message of "Fri, 2 Feb 2018 13:02:21 +1100")
-Message-ID: <87r2q3n8oe.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehcb7-0003nT-SW
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:50 -0500
+Received: from player795.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 1A79CD472F
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 11:00:17 +0100 (CET)
+Date: Fri, 2 Feb 2018 11:00:07 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180202110007.039a451a@bahia.lan>
+In-Reply-To: <5f7250a8-6169-0afc-6ee9-fe1576aef9c7@linux.vnet.ibm.com>
+References: <151751446151.11348.15065690714406381610.stgit@bahia.lan>
+	<5f7250a8-6169-0afc-6ee9-fe1576aef9c7@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
- list QOM object properties
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr: add missing break in
+ h_get_cpu_characteristics()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+On Fri, 2 Feb 2018 07:11:08 -0200
+Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
 
-> On 01/02/18 04:22, Markus Armbruster wrote:
->> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
->> 
->>> There is already 'device-list-properties' which does most of the job,
->>> however it does not handle everything returned by qom-list-types such
->>> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
->>>
->>> This adds a new qom-list-properties command which prints properties
->>> of a specific class and its instance. It is pretty much a simplified copy
->>> of the device-list-properties handler.
->>>
->>> Since it creates an object instance, device properties should appear
->>> in the output as they are copied to QOM properties at the instance_init
->>> hook.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> 
->> Related: qom-list, which lists "any properties of a object given a path
->> in the object model."  qom-list-properties takes a type name, which
->> qom-list takes the path to an instance.  In other words,
->> qom-list-properties is like instantiate with default configuration and
->> without realizing + qom-list + destroy.
->
->
-> True. Same as device-list-properties.
+> On 02/01/2018 05:47 PM, Greg Kurz wrote:
+> > Detected by Coverity (CID 1385702). This fixes the recently added hypercall
+> > to let guests properly apply Spectre and Meltdown workarounds.  
+> 
+> Paolo Bonzini reported this error in a reply to the pull request that
+> added the patch:
+> 
+> "Re: [Qemu-ppc] [Qemu-devel] [PULL 12/12] target/ppc/spapr: Add H-Call 
+> H_GET_CPU_CHARACTERISTICS
+> 
+> On 28/01/2018 22:28, David Gibson wrote:
+> 
+> > +    switch (safe_indirect_branch) {
+> > +    case SPAPR_CAP_FIXED:
+> > +        characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;  
+> 
+> Missing "break;" here.
+> 
+> Paolo
+> 
+> "
+> 
+> I think it is nice to mention in the commit msg that Paolo also detected 
+> this same error,
+> specially given that his email was sent before this patch.
+> 
 
-device-list-properties does a bit more, like skipping "uninteresting"
-properties, and special magic for qdev properties (that's the
-make_device_property_info() you asked about below).  But that's detail.
+Heh, Paolo's mail landed in the pull req thread in my mail client and I saw
+it after sending the patch :P ... also I'm pretty sure Paolo was made aware
+of this issue by Coverity, just as I was :)
 
->> We need to instantiate because QOM properties are dynamic: they aren't
->> specified by data (which qom-list-properties could simply read), they
->> are created by (instantiation) code (which qom-list-properties has to
->> run).
->
-> Correct.
->
->> Properties created only after instantiation (by realize, perhaps) aren't
->> visible in qom-list-properties.  Do such properties exist?
->
-> No idea but if they do, then this issue already exists in
-> device-list-properties.
->
->> Properties created only in non-default configuration aren't visible
->> either.  Such properties have to exist, or else dynamic property
->> creation would be idiotic.
+From: scan-admin@coverity.com
+To: groug@kaod.org
+Subject: New Defects reported by Coverity Scan for QEMU
+Date: Thu, 01 Feb 2018 18:11:33 +0000 (UTC)
 
-Thus, qom-list-properties design limitation: the result need not reflect
-properties of instantiated objects.  It usually does, as most QOM
-properties behave as if they were static.  But when it doesn't, what
-then?  How are users of qom-list-properties supposed to deal with such
-inaccurate / incorrect information?  Do they just have to know which
-properties aren't visible in qom-list-properties, and which properties
-are, but cannot be trusted?
+Hi,
 
-I posit that right now *nobody* knows.
+Please find the latest report on new defect(s) introduced to QEMU found with
+Coverity Scan.
 
-Would such a command be useful anyway?
+...
 
->> Likewise for properties created differently (say with a different type)
->> in non-default configuration.  We can hope that no such beasts exist.
->> Since properties get created by code, and code can do anything, we're
->> reduced to hope.  Data is so much easier to reason about than code.
->> 
->> Three building blocks: instantiate, qom-list, destroy.  Do we want the
->> building blocks, or do we want their combination qom-list-properties?
->
->
-> Building blocks as QEMU internal helpers to split my
-> qmp_qom_list_properties() into? These are not going to be huge and
-> "destroy" is literally object_unref(obj) which does not seem very useful.
-> Or I missed the point here?
+*** CID 1385702:  Control flow issues  (MISSING_BREAK)
+/hw/ppc/spapr_hcall.c: 1700 in h_get_cpu_characteristics()
+1694             break;
+1695         }
+1696     
+1697         switch (safe_indirect_branch) {
+1698         case SPAPR_CAP_FIXED:
+1699             characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
+>>>     CID 1385702:  Control flow issues  (MISSING_BREAK)
+>>>     The above case falls through to this one.  
+1700         default: /* broken */
+1701             assert(safe_indirect_branch == SPAPR_CAP_BROKEN);
+1702             break;
+1703         }
+1704     
+1705         args[0] = characteristics;
 
-My question is whether the QMP interface should provide the building
-blocks, or only compositions.
 
->>> ---
->>>
->>> I am missing the point of make_device_property_info().
->>> qmp_device_list_properties() creates the instance which copies everything
->>> to QOM properties hashtable and commenting out the do{}while() in
->>> make_device_property_info() does not seem to change a thing, what case
->>> am I missing here?
->> 
->> git-blame points to Stefan.  Stefan, can you help?
+No big deal I guess :)
+
+> 
+> Thanks,
+> 
+> 
+> Daniel
+> 
+> 
+> >
+> > Fixes: c59704b25473 "target/ppc/spapr: Add H-Call H_GET_CPU_CHARACTERISTICS"
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >   hw/ppc/spapr_hcall.c |    1 +
+> >   1 file changed, 1 insertion(+)
+> >
+> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > index 4d0e6eb0cf1d..596f58378a40 100644
+> > --- a/hw/ppc/spapr_hcall.c
+> > +++ b/hw/ppc/spapr_hcall.c
+> > @@ -1697,6 +1697,7 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+> >       switch (safe_indirect_branch) {
+> >       case SPAPR_CAP_FIXED:
+> >           characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
+> > +        break;
+> >       default: /* broken */
+> >           assert(safe_indirect_branch == SPAPR_CAP_BROKEN);
+> >           break;
+> >
+> >  
+> 
