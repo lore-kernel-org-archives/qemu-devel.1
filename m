@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59702)
+Received: from eggs.gnu.org ([208.118.235.92]:55980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ehdOk-0004Xz-EG
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:38:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehdOp-0002k9-10
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:38:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ehdNW-0007Wp-Ui
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:36:56 -0500
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:44293)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ehdNW-0007Ua-8l
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:35:50 -0500
-Received: by mail-qt0-f194.google.com with SMTP id l20so31308759qtj.11
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 07:35:49 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ehdNh-0007m4-70
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:37:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ehdNg-0007jo-51
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:36:00 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3F3ED13AA0
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 15:35:59 +0000 (UTC)
+References: <20180202111022.19269-1-kraxel@redhat.com>
+	<20180202111022.19269-7-kraxel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0ef8a626-9623-b87a-b37e-ef4ebdfa8816@redhat.com>
+Date: Fri, 2 Feb 2018 09:35:52 -0600
 MIME-Version: 1.0
-In-Reply-To: <1517527416-31328-3-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1517527416-31328-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1517527416-31328-3-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Fri, 2 Feb 2018 10:32:36 +0100
-Message-ID: <CAMxuvawB1yNyg-Q8rPdgp=21kdVcZBSDhO3QQ5SSMQpA8RPmNw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] tpm: wrap stX_be_p in tpm_cmd_set_XYZ
- functions
+In-Reply-To: <20180202111022.19269-7-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="67QfVs3alyQpQ4l4FcMCSAOg2Y9SrOrqm"
+Subject: Re: [Qemu-devel] [PATCH v3 06/12] vl: drop no_quit variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +34,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, marcandre <marcandre.lureau@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--67QfVs3alyQpQ4l4FcMCSAOg2Y9SrOrqm
+From: Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <0ef8a626-9623-b87a-b37e-ef4ebdfa8816@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 06/12] vl: drop no_quit variable
+References: <20180202111022.19269-1-kraxel@redhat.com>
+ <20180202111022.19269-7-kraxel@redhat.com>
+In-Reply-To: <20180202111022.19269-7-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 2, 2018 at 12:23 AM, Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
-> Wrap the calls to stl_be_p and stw_be_p in tpm_cmd_set_XYZ functions
-> that are similar to existing getters.
-
-why not,
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+On 02/02/2018 05:10 AM, Gerd Hoffmann wrote:
+> Not used any more, delete it.
+>=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/tpm/tpm_util.c |  6 +++---
->  hw/tpm/tpm_util.h | 15 +++++++++++++++
->  2 files changed, 18 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index 8abde59..2de52a0 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -106,9 +106,9 @@ const PropertyInfo qdev_prop_tpm =3D {
->  void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
->  {
->      if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
-> -        stw_be_p(out, TPM_TAG_RSP_COMMAND);
-> -        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
-> -        stl_be_p(out + 6, TPM_FAIL);
-> +        tpm_cmd_set_tag(out, TPM_TAG_RSP_COMMAND);
-> +        tpm_cmd_set_size(out, sizeof(struct tpm_resp_hdr));
-> +        tpm_cmd_set_error(out, TPM_FAIL);
+>  vl.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/vl.c b/vl.c
+
+> @@ -4368,7 +4364,8 @@ int main(int argc, char **argv, char **envp)
+>          error_report("-no-frame, -alt-grab and -ctrl-grab are only val=
+id "
+>                       "for SDL, ignoring option");
 >      }
->  }
->
-> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-> index f003d15..f397ac2 100644
-> --- a/hw/tpm/tpm_util.h
-> +++ b/hw/tpm/tpm_util.h
-> @@ -36,11 +36,21 @@ static inline uint16_t tpm_cmd_get_tag(const void *b)
->      return lduw_be_p(b);
->  }
->
-> +static inline void tpm_cmd_set_tag(void *b, uint16_t tag)
-> +{
-> +    stw_be_p(b, tag);
-> +}
-> +
->  static inline uint32_t tpm_cmd_get_size(const void *b)
->  {
->      return ldl_be_p(b + 2);
->  }
->
-> +static inline void tpm_cmd_set_size(void *b, uint32_t size)
-> +{
-> +    stl_be_p(b + 2, size);
-> +}
-> +
->  static inline uint32_t tpm_cmd_get_ordinal(const void *b)
->  {
->      return ldl_be_p(b + 6);
-> @@ -51,6 +61,11 @@ static inline uint32_t tpm_cmd_get_errcode(const void =
-*b)
->      return ldl_be_p(b + 6);
->  }
->
-> +static inline void tpm_cmd_set_error(void *b, uint32_t error)
-> +{
-> +    stl_be_p(b + 6, error);
-> +}
-> +
->  int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
->                               size_t *buffersize);
->
-> --
-> 2.5.5
->
+> -    if (no_quit && (display_type !=3D DT_GTK && display_type !=3D DT_S=
+DL)) {
+> +    if (dpy.has_window_close &&
+> +        (display_type !=3D DT_GTK && display_type !=3D DT_SDL)) {
+>          error_report("-no-quit is only valid for GTK and SDL, "
+>                       "ignoring option");
+
+Does this mean we should move the 'window-close' field out of the common
+base type and into DisplayGTK/DisplaySDL instead (where sdl would need
+its own type instead of DisplayNoOpts)?  I guess the difference is how
+long we have been flagging this error message - if we rearrange the QAPI
+type, this code is dead and you've broken the command line that tries to
+do window type none combined with -no-quit; but if that command line has
+already been documented as broken, it is no real loss.  But if we
+haven't had enough of a deprecation period yet, then keeping
+window-close global to all variants of the union and doing the runtime
+rejection check lets us finish the deprecation period.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--67QfVs3alyQpQ4l4FcMCSAOg2Y9SrOrqm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0hVgACgkQp6FrSiUn
+Q2qbqQf/ZjF01OskYWC166Y5R2Ej+1XJ9DmJcZMZfxnnDTU7AOu1b53U9TgoZl+l
+YOIAhdEhWF6E1KP6rH4YhOSrh4oVahx86pR2KfwVqny92rs+3my9mvVI4U4uPTWi
+zAwjo8LpIgSDKTWqmFXkhYKRYhcmvoZPFy60B28A61przRZHhhr+nrlYaoqu+CK9
+WROMT1CODcJIRcP58UWSb+nbUi0EsEHSXowspj/SlMd2fe8h0fzMzw5VVWaYpCDf
+2DY0ZDTQsQRbt19zZMbB64uOwpZzrCbcywh/kTxb7O5I5SHfJ5T9yyDqsj6lEc5a
+x/n7ybcR6EJH6wFeSdvowGIRFYwzZw==
+=QByS
+-----END PGP SIGNATURE-----
+
+--67QfVs3alyQpQ4l4FcMCSAOg2Y9SrOrqm--
