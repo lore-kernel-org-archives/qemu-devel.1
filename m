@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehcp7-0006kB-QI
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:00:21 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1ehd2O-0001Nc-DQ
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:14:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehcp2-0003UT-Lt
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:00:17 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  2 Feb 2018 08:50:08 +0100
-Message-Id: <20180202075009.11653-2-kraxel@redhat.com>
-In-Reply-To: <20180202075009.11653-1-kraxel@redhat.com>
-References: <20180202075009.11653-1-kraxel@redhat.com>
+	(envelope-from <brijesh.singh@amd.com>) id 1ehd2L-00011X-4m
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:14:00 -0500
+Received: from mail-co1nam03on0075.outbound.protection.outlook.com
+	([104.47.40.75]:27274
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1ehd2K-00010s-Na
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:13:57 -0500
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-19-brijesh.singh@amd.com>
+	<20180130200838.GB2319@work-vm>
+	<0abe3fee-a970-dc82-fd92-ad923bfa863a@amd.com>
+	<20180201172709.GJ2457@work-vm>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <07d86670-e960-db04-52a9-5e6ecee18bc3@amd.com>
+Date: Fri, 2 Feb 2018 09:11:41 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180201172709.GJ2457@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] hw/audio/wm8750: move WM8750 declarations
- from i2c/i2c.h to audio/wm8750.h
+Subject: Re: [Qemu-devel] [PATCH v6 18/23] sev: emit the SEV_MEASUREMENT
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,197 +35,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>, Jan Kiszka <jan.kiszka@web.de>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, "open list:Musicpal" <qemu-arm@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Chen, Xiaogang" <Xiaogang.Chen@amd.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-while here use TYPE_WM8750 and declare a data_req_cb() typedef.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20170919123053.32675-1-f4bug@amsat.org
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/hw/audio/wm8750.h  | 30 ++++++++++++++++++++++++++++++
- include/hw/i2c/i2c.h       |  9 ---------
- hw/arm/musicpal.c          |  3 ++-
- hw/arm/spitz.c             |  3 ++-
- hw/arm/z2.c                |  3 ++-
- hw/audio/marvell_88w8618.c |  1 +
- hw/audio/wm8750.c          |  6 ++----
- 7 files changed, 39 insertions(+), 16 deletions(-)
- create mode 100644 include/hw/audio/wm8750.h
+On 02/01/2018 11:27 AM, Dr. David Alan Gilbert wrote:
+> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+>>
+>>
+>> On 1/30/18 2:08 PM, Dr. David Alan Gilbert wrote:
+>>> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+>>>> During machine creation we encrypted the guest bios image, the
+>>>> LAUNCH_MEASURE command can be used to retrieve the measurement of
+>>>> the encrypted memory region. Emit the SEV_MEASUREMENT event so that
+>>>> libvirt can grab the measurement value as soon as we are done with
+>>>> creating the encrypted machine.
+>>> Can you ust clarify what happens if the libvirt has disconnected and
+>>> reconnected to qemu and so didn't see the event?  Can the reconnecting
+>>> libvirt query it and find out it's ready/not ready yet?
+>>
+>> Dave,
+>>
+>> I have not looked into details between libvirt and qemu interaction to
+>> comment how and when the events will be delivered. Recently, one of my
+>> colleague was implementing libvirt interface for the SEV guest and ran
+>> into somewhat a similar challenge and posted question on libvirt mailing
+>> list [1].
+>>
+>> In previous discussion on qemu mailing list, we agreed to implement SEV
+>> MEASUREMENT event which can be seen by libvirt. That's what this patch
+>> is doing.
+>>
+>> But during the libvirt implementation it seems that qemu monitor
+>> silently drops all the events before it get the first qmp_capabilities
+>> command. At a quick glance it seems on reconnect, libvirt issues
+>> qmp_capabilities command and any event issued before the
+>> qmp_capabilities command will never to delivered to libvirt. we are
+>> looking for=C2=A0 help from libvirt/qemu monitor experts on how we solve=
+ this
+>> problem. Our goal is to provide the measurement to libvirt before
+>> libvirt issues "continue" command. Since event can't be seen by libvirt
+>> before it resumes the guest hence I was wondering if we should we should
+>> drop the SEV measurement event and consider adding a new QMP command to
+>> query the SEV measurement.
+>=20
+> Yep, I'll leave it to the libvirt contacts for the best way they'd like
+> to see that, as Eric says there's nothing wrong with having both the
+> command and event if useful.  Also keep in mind coping with a guest that
+> crashes early or that measurement never arrives.
+>=20
 
-diff --git a/include/hw/audio/wm8750.h b/include/hw/audio/wm8750.h
-new file mode 100644
-index 0000000000..84e7a119bb
---- /dev/null
-+++ b/include/hw/audio/wm8750.h
-@@ -0,0 +1,30 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef HW_DAC_WM8750_H
-+#define HW_DAC_WM8750_H
-+
-+#include "hw/hw.h"
-+
-+#define TYPE_WM8750 "wm8750"
-+
-+typedef void data_req_cb(void *opaque, int free_out, int free_in);
-+
-+void wm8750_data_req_set(DeviceState *dev, data_req_cb *data_req, void *=
-opaque);
-+void wm8750_dac_dat(void *opaque, uint32_t sample);
-+uint32_t wm8750_adc_dat(void *opaque);
-+void *wm8750_dac_buffer(void *opaque, int samples);
-+void wm8750_dac_commit(void *opaque);
-+void wm8750_set_bclk_in(void *opaque, int new_hz);
-+
-+#endif
-diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-index 2ce611d4c8..24e95d0155 100644
---- a/include/hw/i2c/i2c.h
-+++ b/include/hw/i2c/i2c.h
-@@ -70,15 +70,6 @@ int i2c_recv(I2CBus *bus);
-=20
- DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
-r);
-=20
--/* wm8750.c */
--void wm8750_data_req_set(DeviceState *dev,
--                void (*data_req)(void *, int, int), void *opaque);
--void wm8750_dac_dat(void *opaque, uint32_t sample);
--uint32_t wm8750_adc_dat(void *opaque);
--void *wm8750_dac_buffer(void *opaque, int samples);
--void wm8750_dac_commit(void *opaque);
--void wm8750_set_bclk_in(void *opaque, int new_hz);
--
- /* lm832x.c */
- void lm832x_key_event(DeviceState *dev, int key, int state);
-=20
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index b648770882..4172caf5db 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -25,6 +25,7 @@
- #include "hw/block/flash.h"
- #include "ui/console.h"
- #include "hw/i2c/i2c.h"
-+#include "hw/audio/wm8750.h"
- #include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "ui/pixel_ops.h"
-@@ -1691,7 +1692,7 @@ static void musicpal_init(MachineState *machine)
-         qdev_connect_gpio_out(key_dev, i, qdev_get_gpio_in(dev, i + 15))=
-;
-     }
-=20
--    wm8750_dev =3D i2c_create_slave(i2c, "wm8750", MP_WM_ADDR);
-+    wm8750_dev =3D i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
-     dev =3D qdev_create(NULL, "mv88w8618_audio");
-     s =3D SYS_BUS_DEVICE(dev);
-     qdev_prop_set_ptr(dev, "wm8750", wm8750_dev);
-diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-index ac1e15cbbc..e419e3c00e 100644
---- a/hw/arm/spitz.c
-+++ b/hw/arm/spitz.c
-@@ -24,6 +24,7 @@
- #include "hw/devices.h"
- #include "hw/arm/sharpsl.h"
- #include "ui/console.h"
-+#include "hw/audio/wm8750.h"
- #include "audio/audio.h"
- #include "hw/boards.h"
- #include "sysemu/block-backend.h"
-@@ -745,7 +746,7 @@ static void spitz_i2c_setup(PXA2xxState *cpu)
-     DeviceState *wm;
-=20
-     /* Attach a WM8750 to the bus */
--    wm =3D i2c_create_slave(bus, "wm8750", 0);
-+    wm =3D i2c_create_slave(bus, TYPE_WM8750, 0);
-=20
-     spitz_wm8750_addr(wm, 0, 0);
-     qdev_connect_gpio_out(cpu->gpio, SPITZ_GPIO_WM,
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 60561c7b7c..300e933c82 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -23,6 +23,7 @@
- #include "hw/block/flash.h"
- #include "sysemu/block-backend.h"
- #include "ui/console.h"
-+#include "hw/audio/wm8750.h"
- #include "audio/audio.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-@@ -346,7 +347,7 @@ static void z2_init(MachineState *machine)
-     z2_lcd =3D ssi_create_slave(mpu->ssp[1], "zipit-lcd");
-     bus =3D pxa2xx_i2c_bus(mpu->i2c[0]);
-     i2c_create_slave(bus, TYPE_AER915, 0x55);
--    wm =3D i2c_create_slave(bus, "wm8750", 0x1b);
-+    wm =3D i2c_create_slave(bus, TYPE_WM8750, 0x1b);
-     mpu->i2s->opaque =3D wm;
-     mpu->i2s->codec_out =3D wm8750_dac_dat;
-     mpu->i2s->codec_in =3D wm8750_adc_dat;
-diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
-index 4f65f8c199..e546892d3c 100644
---- a/hw/audio/marvell_88w8618.c
-+++ b/hw/audio/marvell_88w8618.c
-@@ -13,6 +13,7 @@
- #include "hw/sysbus.h"
- #include "hw/hw.h"
- #include "hw/i2c/i2c.h"
-+#include "hw/audio/wm8750.h"
- #include "audio/audio.h"
-=20
- #define MP_AUDIO_SIZE           0x00001000
-diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
-index 6d8b728923..416a78e869 100644
---- a/hw/audio/wm8750.c
-+++ b/hw/audio/wm8750.c
-@@ -8,8 +8,8 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "hw/hw.h"
- #include "hw/i2c/i2c.h"
-+#include "hw/audio/wm8750.h"
- #include "audio/audio.h"
-=20
- #define IN_PORT_N	3
-@@ -24,7 +24,6 @@ typedef struct {
-     int dac_hz;
- } WMRate;
-=20
--#define TYPE_WM8750 "wm8750"
- #define WM8750(obj) OBJECT_CHECK(WM8750State, (obj), TYPE_WM8750)
-=20
- typedef struct WM8750State {
-@@ -639,8 +638,7 @@ static void wm8750_fini(I2CSlave *i2c)
- }
- #endif
-=20
--void wm8750_data_req_set(DeviceState *dev,
--                void (*data_req)(void *, int, int), void *opaque)
-+void wm8750_data_req_set(DeviceState *dev, data_req_cb *data_req, void *=
-opaque)
- {
-     WM8750State *s =3D WM8750(dev);
-=20
---=20
-2.9.3
+Yep, lets see what libvirt experts say about it.
+
+Hi Daniel,
+
+Do you have any recommendation on whether we should consider adding a=20
+new QMP to retrieve the measurement or we do event or both? Please note=20
+that the launch measurement is generate only once for the lifetime of=20
+the guest. The measurement will be available after qmeu encrypts the=20
+guest bios during the machine initialization time.
+
+-Brijesh
