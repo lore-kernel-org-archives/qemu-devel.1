@@ -1,25 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44433)
+Received: from eggs.gnu.org ([208.118.235.92]:48440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ehRmi-0001rR-Ao
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:14:10 -0500
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ehSQR-0001ab-MO
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ehRle-0000Sc-8R
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:13:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54200)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ehRld-0000RT-RT
-	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:11:58 -0500
-References: <1516936096-48900-1-git-send-email-jianjay.zhou@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <0a1502a8-cbba-cf91-bf6b-e6058a4878e5@redhat.com>
-Date: Fri, 2 Feb 2018 11:11:47 +0800
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1ehSMl-0003fV-8j
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:54:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53052
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1ehSMk-0003dm-7L
+	for qemu-devel@nongnu.org; Thu, 01 Feb 2018 22:50:18 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w123hq7h043576
+	for <qemu-devel@nongnu.org>; Thu, 1 Feb 2018 22:50:16 -0500
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvdxjwgec-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 01 Feb 2018 22:50:16 -0500
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Thu, 1 Feb 2018 20:50:15 -0700
+References: <20180130094715.11578-1-zyimin@linux.vnet.ibm.com>
+	<20180130094715.11578-4-zyimin@linux.vnet.ibm.com>
+	<20180131124400.4f74cf1c.cohuck@redhat.com>
+	<b779846e-3e25-5c33-217b-1d9f5e85ec70@linux.vnet.ibm.com>
+	<20180201130226.364e6c76.cohuck@redhat.com>
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Fri, 2 Feb 2018 11:50:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <1516936096-48900-1-git-send-email-jianjay.zhou@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20180201130226.364e6c76.cohuck@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Message-Id: <0c6a2235-8bca-82e3-203d-ba2f154a9a33@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] tap: close fd conditionally when error
- occured
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/pci: use the right pal and pba
+ in reg_ioat()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +46,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org
-Cc: weidong.huang@huawei.com, mst@redhat.com, arei.gonglei@huawei.com, imammedo@redhat.com, wangxinxin.wang@huawei.com
+To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, marcel@redhat.com
 
 
 
-On 2018=E5=B9=B401=E6=9C=8826=E6=97=A5 11:08, Jay Zhou wrote:
-> If netdev_add tap,id=3Dnet0,...,vhost=3Don failed in net_init_tap_one()=
-,
-> the followed up device_add virtio-net-pci,netdev=3Dnet0 will fail
-> too, prints:
+=D4=DA 2018/2/1 =CF=C2=CE=E78:02, Cornelia Huck =D0=B4=B5=C0:
+> On Thu, 1 Feb 2018 12:33:01 +0100
+> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 >
->    TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
->    ioctl() failed: Bad file descriptor
+>> On 31/01/2018 12:44, Cornelia Huck wrote:
+>>> On Tue, 30 Jan 2018 10:47:15 +0100
+>>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+>>>  =20
+>>>> When registering ioat, pba should be comprised of leftmost 52 bits a=
+nd
+>>>> rightmost 12 binary zeros, and pal should be comprised of leftmost 5=
+2
+>>>> bits and right most 12 binary ones. Let's fixup this.
+>>>>
+>>>> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+>>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>>>> ---
+>>>>    hw/s390x/s390-pci-inst.c | 2 ++
+>>>>    1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+>>>> index 997a9cc2e9..3fcc330fe3 100644
+>>>> --- a/hw/s390x/s390-pci-inst.c
+>>>> +++ b/hw/s390x/s390-pci-inst.c
+>>>> @@ -865,6 +865,8 @@ static int reg_ioat(CPUS390XState *env, S390PCII=
+OMMU *iommu, ZpciFib fib,
+>>>>        uint8_t dt =3D (g_iota >> 2) & 0x7;
+>>>>        uint8_t t =3D (g_iota >> 11) & 0x1;
+>>>>   =20
+>>>> +    pba &=3D ~0xfff;
+>>>> +    pal |=3D 0xfff;
+>>>>        if (pba > pal || pba < ZPCI_SDMA_ADDR || pal > ZPCI_EDMA_ADDR=
+) {
+>>>>            s390_program_interrupt(env, PGM_OPERAND, 6, ra);
+>>>>            return -EINVAL;
+>>> It seems like pba and pal are part of the fib, which in turn seems to
+>>> be provided by the caller. Is that correct? If yes, is it valid for
+>>> them to not have the rightmost 12 bits as 0s resp. 1s?
+>>>
+>>> (Probably answered in the architecture, I know. Might make sense to b=
+e
+>>> a tad more explicit in the description.)
+>>>  =20
+>> Yes it is, only word6 and the bits 0-19 of word 7 are used for PAL and
+>> the zPCI facility treats the right most 12 bits of the PAL as containi=
+ng
+>> ones.
+>>
+>> For PBA words 4 and 0-19 bits of word 5 with 12 0 append on the right
+>> provides the PBA.
+>>
+>> The lower 12 bits of words 5 and 7 of the FIB are ignored by the facil=
+ity.
+>>
+>> @Yi Min: may be add the last sentence to the commit message.
+>>
+>> @Conny: Is it clearer?
+> Yes, adding the last sentence makes it clearer. Thanks!
 >
-> The reason is that the fd of tap is closed when error occured after
-> calling net_init_tap_one().
 >
-> The fd should be closed when calling net_init_tap_one failed:
->    - if tap_set_sndbuf() failed
->    - if tap_set_sndbuf() succeeded but vhost failed to initialize with
->      vhostforce flag on
-> The fd should not be closed just because vhost failed to initialize
-> but without vhostforce flag. So the followed up device_add can fall
-> back to userspace virtio successfully.
->
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> ---
->   net/tap.c | 40 ++++++++++++++++++++++++++++++++--------
->   1 file changed, 32 insertions(+), 8 deletions(-)
->
-> diff --git a/net/tap.c b/net/tap.c
-> index 979e622..8042c7d 100644
-> --- a/net/tap.c
-> +++ b/net/tap.c
-> @@ -648,12 +648,6 @@ static void net_init_tap_one(const NetdevTapOption=
-s *tap, NetClientState *peer,
->       TAPState *s =3D net_tap_fd_init(peer, model, name, fd, vnet_hdr);
->       int vhostfd;
->  =20
-> -    tap_set_sndbuf(s->fd, tap, &err);
-> -    if (err) {
-> -        error_propagate(errp, err);
-> -        return;
-> -    }
-> -
->       if (tap->has_fd || tap->has_fds) {
->           snprintf(s->nc.info_str, sizeof(s->nc.info_str), "fd=3D%d", f=
-d);
->       } else if (tap->has_helper) {
-> @@ -781,6 +775,12 @@ int net_init_tap(const Netdev *netdev, const char =
-*name,
->  =20
->           vnet_hdr =3D tap_probe_vnet_hdr(fd);
->  =20
-> +        tap_set_sndbuf(fd, tap, &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            return -1;
-> +        }
-> +
->           net_init_tap_one(tap, peer, "tap", name, NULL,
->                            script, downscript,
->                            vhostfdname, vnet_hdr, fd, &err);
-> @@ -832,6 +832,12 @@ int net_init_tap(const Netdev *netdev, const char =
-*name,
->                   goto free_fail;
->               }
->  =20
-> +            tap_set_sndbuf(fd, tap, &err);
-> +            if (err) {
-> +                error_propagate(errp, err);
-> +                goto free_fail;
-> +            }
-> +
->               net_init_tap_one(tap, peer, "tap", name, ifname,
->                                script, downscript,
->                                tap->has_vhostfds ? vhost_fds[i] : NULL,
-> @@ -872,12 +878,21 @@ free_fail:
->           fcntl(fd, F_SETFL, O_NONBLOCK);
->           vnet_hdr =3D tap_probe_vnet_hdr(fd);
->  =20
-> +        tap_set_sndbuf(fd, tap, &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            close(fd);
-> +            return -1;
-> +        }
-> +
->           net_init_tap_one(tap, peer, "bridge", name, ifname,
->                            script, downscript, vhostfdname,
->                            vnet_hdr, fd, &err);
->           if (err) {
->               error_propagate(errp, err);
-> -            close(fd);
-> +            if (tap->has_vhostforce && tap->vhostforce) {
-> +                close(fd);
-> +            }
->               return -1;
->           }
->       } else {
-> @@ -910,13 +925,22 @@ free_fail:
->                   }
->               }
->  =20
-> +            tap_set_sndbuf(fd, tap, &err);
-> +            if (err) {
-> +                error_propagate(errp, err);
-> +                close(fd);
-> +                return -1;
-> +            }
-> +
->               net_init_tap_one(tap, peer, "tap", name, ifname,
->                                i >=3D 1 ? "no" : script,
->                                i >=3D 1 ? "no" : downscript,
->                                vhostfdname, vnet_hdr, fd, &err);
->               if (err) {
->                   error_propagate(errp, err);
-> -                close(fd);
-> +                if (tap->has_vhostforce && tap->vhostforce) {
-> +                    close(fd);
-> +                }
->                   return -1;
->               }
->           }
-
-Hi:
-
-I still fail to understand why not just pass force flag to=20
-net_tap_init_one(), and let it decide?
-
-Thanks
+OK. Thanks!
