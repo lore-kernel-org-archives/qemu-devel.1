@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eheYm-0002to-2y
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:52:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1eheZ8-0003Fg-KL
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:53:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eheXi-0004QA-21
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:51:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43570)
+	(envelope-from <eblake@redhat.com>) id 1eheV0-00021g-S6
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:51:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eheXh-0004OK-EA
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:50:25 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B20A4F1CD
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 08:32:45 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  2 Feb 2018 09:32:29 +0100
-Message-Id: <20180202083229.6681-2-kraxel@redhat.com>
-In-Reply-To: <20180202083229.6681-1-kraxel@redhat.com>
-References: <20180202083229.6681-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] virtio-gpu: disallow vIOMMU
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eheV0-00020t-3v
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:47:38 -0500
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-6-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c6826946-cf8c-2cb2-0eec-73938e574b78@redhat.com>
+Date: Fri, 2 Feb 2018 10:47:30 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180202130336.24719-6-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CvFXuZiFcK7OPtccm30ysM6bATR6lsc68"
+Subject: Re: [Qemu-devel] [PATCH RFC 05/21] qapi: Turn generators into
+ modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-From: Peter Xu <peterx@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CvFXuZiFcK7OPtccm30ysM6bATR6lsc68
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <c6826946-cf8c-2cb2-0eec-73938e574b78@redhat.com>
+Subject: Re: [PATCH RFC 05/21] qapi: Turn generators into modules
+References: <20180202130336.24719-1-armbru@redhat.com>
+ <20180202130336.24719-6-armbru@redhat.com>
+In-Reply-To: <20180202130336.24719-6-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-virtio-gpu has special code path that bypassed vIOMMU protection.  So
-for now let's disable iommu_platform for the device until we fully
-support that (if needed).
-
-After the patch, both virtio-vga and virtio-gpu won't allow to boot with
-iommu_platform parameter set.
-
-CC: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-id: 20180131040401.3550-1-peterx@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+On 02/02/2018 07:03 AM, Markus Armbruster wrote:
+> The next commit will introduce a common driver program for all
+> generators.  The generators need to be modules for that.  qapi2texi.py
+> already is.  Make the other generators follow suit.
+>=20
+> The changes are actually trivial.  Obvious in the diffs once you view
+> them with whitespace changes ignored.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi-commands.py   | 43 ++++++++++++++++++--------------
+>  scripts/qapi-event.py      | 43 ++++++++++++++++++--------------
+>  scripts/qapi-introspect.py | 54 ++++++++++++++++++++++----------------=
+--
+>  scripts/qapi-types.py      | 56 ++++++++++++++++++++++----------------=
 ---
- hw/display/virtio-gpu-pci.c | 8 +++++++-
- hw/display/virtio-gpu.c     | 5 +++++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+>  scripts/qapi-visit.py      | 62 +++++++++++++++++++++++++-------------=
+--------
+>  5 files changed, 143 insertions(+), 115 deletions(-)
+>=20
 
-diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
-index ef92c4ad6f..3519dc80b1 100644
---- a/hw/display/virtio-gpu-pci.c
-+++ b/hw/display/virtio-gpu-pci.c
-@@ -28,10 +28,16 @@ static void virtio_gpu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     VirtIOGPU *g = &vgpu->vdev;
-     DeviceState *vdev = DEVICE(&vgpu->vdev);
-     int i;
-+    Error *local_error = NULL;
- 
-     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-     virtio_pci_force_virtio_1(vpci_dev);
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+    object_property_set_bool(OBJECT(vdev), true, "realized", &local_error);
-+
-+    if (local_error) {
-+        error_propagate(errp, local_error);
-+        return;
-+    }
- 
-     for (i = 0; i < g->conf.max_outputs; i++) {
-         object_property_set_link(OBJECT(g->scanout[i].con),
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 274e365713..6658f6c6a6 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -1173,6 +1173,11 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-     Error *local_err = NULL;
-     int i;
- 
-+    if (virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
-+        error_setg(errp, "virtio-gpu does not support vIOMMU yet");
-+        return;
-+    }
-+
-     if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
-         error_setg(errp, "invalid max_outputs > %d", VIRTIO_GPU_MAX_SCANOUTS);
-         return;
--- 
-2.9.3
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--CvFXuZiFcK7OPtccm30ysM6bATR6lsc68
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0liIACgkQp6FrSiUn
+Q2qPfAgAqQhqR8yLs5x60wCt04Ku6Tb4mFvwsv/07s0/JsVSL3zm4Df2gK4SAb7V
+vYYeGA+KcswwIsJT1KchDCVfw31qY/DWktMYHKHQQgo3oE/2Xe7w5rKfBefcZTvn
+ezh7QCNznz5j3MHhk0mL85zAGpEYRqCXCyft07DW30QNyvvypgCI4yQTdQmKzCTj
+jUaARrOckE93Ub91LqEALsVyeeNauLNSvy3GSLh4eQJj3fPwB6CDhs+jYyXj3bAL
+8qk95wcWHTFiUm2bOC9mcwhoAZg1bocrU9TEkyYsBTDwx7r+weR2EtRFGdm1zvrj
+4N7iyd2UzjKWqmJeLwoN7KCRZVtTuw==
+=htZX
+-----END PGP SIGNATURE-----
+
+--CvFXuZiFcK7OPtccm30ysM6bATR6lsc68--
