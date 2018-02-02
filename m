@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ehh7X-0005n6-Rv
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 14:35:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1ehh7x-00062x-Uh
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 14:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ehh7T-00059V-VA
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 14:35:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56212)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ehh7T-00057U-Ll
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 14:35:31 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ehh7R-0008Bg-UC
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 19:35:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E388C2E804C
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 19:35:29 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1ehh7w-0006TE-RE
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 14:36:01 -0500
+References: <20180202183731.29990-1-armbru@redhat.com>
+	<20180202183731.29990-3-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <11be568a-8c6d-3d45-8c32-dc41ea70c352@redhat.com>
+Date: Fri, 2 Feb 2018 13:35:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Feb 2018 19:28:41 -0000
-From: Ruslan <b7.10110111@gmail.com>
-Reply-To: Bug 1703795 <1703795@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149985188503.15456.11517595781983565935.malonedeb@wampee.canonical.com>
-Message-Id: <151759972158.29200.275303343104790361.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1703795] Re: Unable to release mouse in SDL2 mode
+In-Reply-To: <20180202183731.29990-3-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CGw1kQo0fq6QKF1oZjfwCzJcecJx55nuA"
+Subject: Re: [Qemu-devel] [PATCH v7 02/15] hw/arm: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, alistair.francis@xilinx.com
 
-I can confirm that the patch from comment #9 appears to fix the original
-problem.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CGw1kQo0fq6QKF1oZjfwCzJcecJx55nuA
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, alistair.francis@xilinx.com
+Message-ID: <11be568a-8c6d-3d45-8c32-dc41ea70c352@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 02/15] hw/arm: Replace fprintf(stderr,
+ "*\n" with error_report()
+References: <20180202183731.29990-1-armbru@redhat.com>
+ <20180202183731.29990-3-armbru@redhat.com>
+In-Reply-To: <20180202183731.29990-3-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 02/02/2018 12:37 PM, Markus Armbruster wrote:
+> From: Alistair Francis <alistair.francis@xilinx.com>
+>=20
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1703795
+> compiler issues where manually fixed.
+>=20
 
-Title:
-  Unable to release mouse in SDL2 mode
+>=20
+> Some lines where then manually tweaked to pass checkpatch.
+>=20
+> The 'qemu: ' prefix was manually removed from the hw/arm/boot.c file.
+>=20
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: qemu-arm@nongnu.org
+>=20
+> Conversions that aren't followed by exit() dropped, because they might
+> be inappropriate.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-Status in QEMU:
-  New
+> +++ b/hw/arm/gumstix.c
+> @@ -35,6 +35,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "hw/hw.h"
+>  #include "hw/arm/pxa.h"
+>  #include "net/net.h"
+> @@ -62,8 +63,8 @@ static void connex_init(MachineState *machine)
+> =20
+>      dinfo =3D drive_get(IF_PFLASH, 0, 0);
+>      if (!dinfo && !qtest_enabled()) {
+> -        fprintf(stderr, "A flash image must be given with the "
+> -                "'pflash' parameter\n");
+> +        error_report("A flash image must be given with the "
+> +                     "'pflash' parameter");
+>          exit(1);
+>      }
+> =20
+> @@ -76,7 +77,7 @@ static void connex_init(MachineState *machine)
+>                                 dinfo ? blk_by_legacy_dinfo(dinfo) : NU=
+LL,
+>                                 sector_len, connex_rom / sector_len,
+>                                 2, 0, 0, 0, 0, be)) {
+> -        fprintf(stderr, "qemu: Error registering flash memory.\n");
+> +        error_report("Error registering flash memory.");
 
-Bug description:
-  Starting with commit 8f4ea9cd0b770dbe496d9d24f0ef8813fdbfe0d0 "sdl:
-  prefer sdl2 over sdl1", I can no longer release mouse pointer grab
-  unless I use --with-sdlabi=3D1.2 configure option.
+Do we care about consistency on trailing dots in these conversions?
 
-  This easily reproduces in e.g. guest Kubuntu, when I let it start Xorg
-  and then click into the QEMU window. After this the mouse is trapped
-  and no matter how I combine Ctrl+Alt and motion of the cursor, the
-  pointer never goes out from the window. When at the border, QEMU
-  window switches from "Press Ctrl+Alt to exit grab" to "QEMU", i.e. it
-  thinks that it has released the grab. But it hasn't really, so I have
-  to go to VT1 and do "pkill qemu" from there to get my pointer back.
+At any rate, all of these are sane rewrites of existing patterns;
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1703795/+subscriptions
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--CGw1kQo0fq6QKF1oZjfwCzJcecJx55nuA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0vZgACgkQp6FrSiUn
+Q2rpOwf/dUEhAAL1i9cw+bW5Uj6njN4qg9Be9hbNIdmXIV6AQLQI1DKRZrjg9It3
+isRCe4kOmCtUvCRoqiQvjBI/eRJLqoS+5RtPTyumuyVqOdzOfy+m5oO4ewBIOFd/
+3JNT6fvlXj1BE81lfXuBHy57NUi4QFIhKuO/9Gzl6RZ4YHe+GgmMV7cotaaAj3i3
+h9BFsS8Smd0aUBQmworWnmDhFkX73d0AhBkhCJJ6PIr+f+BPLLJ1p/hcXZwmP6o3
+v1uxw7/lnqCzNEyQa7lzoq9YyyKxoplN1tH3ER6YuG7ezhBJz0ZhxhfcPi4yh6Hl
+oiQDgAYeT5naBjD3Nc5UpQzjoooStA==
+=9lWO
+-----END PGP SIGNATURE-----
+
+--CGw1kQo0fq6QKF1oZjfwCzJcecJx55nuA--
