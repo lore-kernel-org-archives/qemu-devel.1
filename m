@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehe6p-0001OK-0R
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:23:45 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ehe98-0004Dw-Ri
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:26:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ehe4A-00048o-43
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:21:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe48-00046m-I1
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:19:53 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w12GGxg4107654
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 11:19:51 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvrynq8q1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 11:19:51 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 2 Feb 2018 16:19:48 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Fri,  2 Feb 2018 17:19:31 +0100
-In-Reply-To: <20180202161935.20803-1-groug@kaod.org>
-References: <20180202161935.20803-1-groug@kaod.org>
-Message-Id: <20180202161935.20803-7-groug@kaod.org>
-Subject: [Qemu-devel] [PULL v2 06/10] tests: virtio-9p: add LOPEN operation
- test
+	(envelope-from <mreitz@redhat.com>) id 1ehe7l-0008U9-JF
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:24:43 -0500
+References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
+	<ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ab2503df-81e8-dd66-bedf-b0950744321b@redhat.com>
+Date: Fri, 2 Feb 2018 17:21:09 +0100
+MIME-Version: 1.0
+In-Reply-To: <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ"
+Subject: Re: [Qemu-devel] [PATCH v3] block: maintain persistent disabled
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,124 +25,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
-Trivial test of a successful open.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com,
+ den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
+Message-ID: <ab2503df-81e8-dd66-bedf-b0950744321b@redhat.com>
+Subject: Re: [PATCH v3] block: maintain persistent disabled bitmaps
+References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
+ <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
+In-Reply-To: <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/9pfs/9p-synth.c     |  5 +++++
- hw/9pfs/9p-synth.h     |  1 +
- tests/virtio-9p-test.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 53 insertions(+)
+On 2018-02-02 17:18, Eric Blake wrote:
+> On 02/02/2018 10:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> To maintain load/store disabled bitmap there is new approach:
+>>
+>>  - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored=
 
-diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
-index dcbd320da17a..f17b74f44461 100644
---- a/hw/9pfs/9p-synth.c
-+++ b/hw/9pfs/9p-synth.c
-@@ -541,6 +541,11 @@ static int synth_init(FsContext *ctx, Error **errp)
-             assert(!ret);
-             g_free(name);
-         }
-+
-+        /* File for LOPEN test */
-+        ret = qemu_v9fs_synth_add_file(NULL, 0, QTEST_V9FS_SYNTH_LOPEN_FILE,
-+                                       NULL, NULL, ctx);
-+        assert(!ret);
-     }
- 
-     return 0;
-diff --git a/hw/9pfs/9p-synth.h b/hw/9pfs/9p-synth.h
-index 876b4ef58288..2a8d6fd00d69 100644
---- a/hw/9pfs/9p-synth.h
-+++ b/hw/9pfs/9p-synth.h
-@@ -52,5 +52,6 @@ int qemu_v9fs_synth_add_file(V9fsSynthNode *parent, int mode,
- /* qtest stuff */
- 
- #define QTEST_V9FS_SYNTH_WALK_FILE "WALK%d"
-+#define QTEST_V9FS_SYNTH_LOPEN_FILE "LOPEN"
- 
- #endif
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 652198156731..6ba782e24f3a 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -238,6 +238,7 @@ static const char *rmessage_name(uint8_t id)
-         id == P9_RVERSION ? "RVERSION" :
-         id == P9_RATTACH ? "RATTACH" :
-         id == P9_RWALK ? "RWALK" :
-+        id == P9_RLOPEN ? "RLOPEN" :
-         "<unknown>";
- }
- 
-@@ -389,6 +390,34 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
-     v9fs_req_free(req);
- }
- 
-+/* size[4] Tlopen tag[2] fid[4] flags[4] */
-+static P9Req *v9fs_tlopen(QVirtIO9P *v9p, uint32_t fid, uint32_t flags,
-+                          uint16_t tag)
-+{
-+    P9Req *req;
-+
-+    req = v9fs_req_init(v9p,  4 + 4, P9_TLOPEN, tag);
-+    v9fs_uint32_write(req, fid);
-+    v9fs_uint32_write(req, flags);
-+    v9fs_req_send(req);
-+    return req;
-+}
-+
-+/* size[4] Rlopen tag[2] qid[13] iounit[4] */
-+static void v9fs_rlopen(P9Req *req, v9fs_qid *qid, uint32_t *iounit)
-+{
-+    v9fs_req_recv(req, P9_RLOPEN);
-+    if (qid) {
-+        v9fs_memread(req, qid, 13);
-+    } else {
-+        v9fs_memskip(req, 13);
-+    }
-+    if (iounit) {
-+        v9fs_uint32_read(req, iounit);
-+    }
-+    v9fs_req_free(req);
-+}
-+
- static void fs_version(QVirtIO9P *v9p)
- {
-     const char *version = "9P2000.L";
-@@ -478,6 +507,23 @@ static void fs_walk_dotdot(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
-+static void fs_lopen(QVirtIO9P *v9p)
-+{
-+    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_LOPEN_FILE) };
-+    P9Req *req;
-+
-+    fs_attach(v9p);
-+    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req);
-+    v9fs_rwalk(req, NULL, NULL);
-+
-+    req = v9fs_tlopen(v9p, 1, O_WRONLY, 0);
-+    v9fs_req_wait_for_reply(req);
-+    v9fs_rlopen(req, NULL, NULL);
-+
-+    g_free(wnames[0]);
-+}
-+
- typedef void (*v9fs_test_fn)(QVirtIO9P *v9p);
- 
- static void v9fs_run_pci_test(gconstpointer data)
-@@ -507,6 +553,7 @@ int main(int argc, char **argv)
-     v9fs_qtest_pci_add("/virtio/9p/pci/fs/walk/no_slash", fs_walk_no_slash);
-     v9fs_qtest_pci_add("/virtio/9p/pci/fs/walk/dotdot_from_root",
-                        fs_walk_dotdot);
-+    v9fs_qtest_pci_add("/virtio/9p/pci/fs/lopen/basic", fs_lopen);
- 
-     return g_test_run();
- }
--- 
-2.13.6
+>>  - store enabled bitmaps as "auto" to qcow2
+>>  - store disabled bitmaps without "auto" flag to qcow2
+>>  - on qcow2 open load "auto" bitmaps as enabled and others
+>>    as disabled (except in_use bitmaps)
+>>
+>> Also, adjust iotests 165 and 176 appropriately.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+
+>> ---
+>=20
+>> +++ b/qemu-doc.texi
+>> @@ -2749,6 +2749,13 @@ used and it will be removed with no replacement=
+=2E
+>>  The ``convert -s snapshot_id_or_name'' argument is obsoleted
+>>  by the ``convert -l snapshot_param'' argument instead.
+>> =20
+>> +@section QEMU Machine Protocol (QMP) commands
+>> +
+>> +@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0=
+)
+>> +
+>> +"autoload" parameter is now ignored. All bitmaps are automatically lo=
+aded
+>> +from qcow2 image.
+>=20
+> Won't later patches be adding the ability to enable/disable bitmaps,
+> which then affects whether they are autoloaded?  So we don't forget to
+> revisit this text in that patch, a better wording might be:
+>=20
+> The "autoload" parameter is ignored; all enabled persistent dirty
+> bitmaps are automatically loaded from a qcow2 image, regardless of the
+> initial setting requested in this parameter.
+>=20
+>=20
+>> @@ -667,19 +662,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *=
+bs)
+>>  }
+>> =20
+>>  /* Called with BQL taken. */
+>> -void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool aut=
+oload)
+>> -{
+>> -    qemu_mutex_lock(bitmap->mutex);
+>> -    bitmap->autoload =3D autoload;
+>> -    qemu_mutex_unlock(bitmap->mutex);
+>> -}
+>> -
+>> -bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
+>> -{
+>> -    return bitmap->autoload;
+>> -}
+>=20
+> Will later patches be reintroducing these functions for learning which
+> bitmaps are enabled/disabled?  But I'm okay with deleting them in this
+> patch, even if that is more churn.
+
+You mean bdrv_enable_dirty_bitmap(), bdrv_disable_dirty_bitmap(), and
+bdrv_dirty_bitmap_enabled()? ;-)
+
+Max
+
+
+--RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp0j/USHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AkfwH/0tG7cqKPk5WQWPoNiHpNdMOtJRSmwz/
+KM3Ew0KgIwMxGRJOAcTFeX0luyQOr8ukMF1f8xXFE7nIb/9S2bI7nslKN3nYmA3M
+YN7elyWva2BHKcoTJsQPmo21gdUna6pUWwc3VuMCRkQhyG5ok2ikE9cxID7CLs8g
+EXIWX1SZON75591V9nJL15G4jCTeiYjIceBc15OZpE+NMYYh7O36hULxsDng8RUt
+q3vYl0asXOeOHnhZf1EFmjt7Lw4AfM3xYaLneSJ8mMwn/w7DVANvorD6bCRH7+np
+ebc1Y4kxu2FNr/eRMrkE5ByIuFI5YzILrOstnRp0FlpfDWZdCabDvGc=
+=H80D
+-----END PGP SIGNATURE-----
+
+--RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ--
