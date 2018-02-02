@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ehcaS-0001tX-4k
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehcan-0002Fd-A6
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ehcaN-0003Ka-9d
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44640)
+	(envelope-from <armbru@redhat.com>) id 1ehcai-0003a1-Vc
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ehcaN-0003K9-3K
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:03 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 237AEC0587CB
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 09:57:01 +0000 (UTC)
-Date: Fri, 2 Feb 2018 17:56:43 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180202095643.GA4666@xz-mi>
-References: <20180201112028.23552-1-peterx@redhat.com>
-	<20180201195131.GO2457@work-vm>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehcai-0003Zg-OH
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:45:24 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180119050906.18930-1-aik@ozlabs.ru>
+	<871si6vt8n.fsf@dusky.pond.sub.org>
+	<e3aca639-0c5c-8d10-a9f4-05a62284fb10@ozlabs.ru>
+Date: Fri, 02 Feb 2018 08:37:53 +0100
+In-Reply-To: <e3aca639-0c5c-8d10-a9f4-05a62284fb10@ozlabs.ru> (Alexey
+	Kardashevskiy's message of "Fri, 2 Feb 2018 13:02:21 +1100")
+Message-ID: <87r2q3n8oe.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180201195131.GO2457@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
- priority
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
+ list QOM object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-On Thu, Feb 01, 2018 at 07:51:31PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > In the past, we prioritized IOMMU migration so that we have such a
-> > priority order:
-> > 
-> >     IOMMU > PCI Devices
-> > 
-> > When migrating a guest with both vIOMMU and pcie-root-port, we'll always
-> > migrate vIOMMU first, since pcie-root-port will be seen to have the same
-> > priority of general PCI devices.
-> > 
-> > That's problematic.
-> > 
-> > The thing is that PCI bus number information is stored in the root port,
-> > and that is needed by vIOMMU during post_load(), e.g., to figure out
-> > context entry for a device.  If we don't have correct bus numbers for
-> > devices, we won't be able to recover device state of the DMAR memory
-> > regions, and things will be messed up.
-> > 
-> > So let's boost the PCIe root ports to be even with higher priority:
-> > 
-> >    PCIe Root Port > IOMMU > PCI Devices
-> > 
-> > A smoke test shows that this patch fixes bug 1538953.
-> 
-> Two questions (partially overlapping with what I replied to Michaels):
->   a) What happens with multiple IOMMUs?
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 
-If there are more IOMMUs, then the patch will let all the vIOMMUs be
-migrated after pcie root ports.
+> On 01/02/18 04:22, Markus Armbruster wrote:
+>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+>> 
+>>> There is already 'device-list-properties' which does most of the job,
+>>> however it does not handle everything returned by qom-list-types such
+>>> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+>>>
+>>> This adds a new qom-list-properties command which prints properties
+>>> of a specific class and its instance. It is pretty much a simplified copy
+>>> of the device-list-properties handler.
+>>>
+>>> Since it creates an object instance, device properties should appear
+>>> in the output as they are copied to QOM properties at the instance_init
+>>> hook.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> 
+>> Related: qom-list, which lists "any properties of a object given a path
+>> in the object model."  qom-list-properties takes a type name, which
+>> qom-list takes the path to an instance.  In other words,
+>> qom-list-properties is like instantiate with default configuration and
+>> without realizing + qom-list + destroy.
+>
+>
+> True. Same as device-list-properties.
 
-But a more true answer is that: I don't really know. :)
+device-list-properties does a bit more, like skipping "uninteresting"
+properties, and special magic for qdev properties (that's the
+make_device_property_info() you asked about below).  But that's detail.
 
-Because I even don't know how multiple vIOMMUs will coop with each
-other, especially nested.  In nested case, maybe there will be
-dependency between vIOMMUs, but I'll avoid thinking about that until
-we support more than one vIOMMUs.
+>> We need to instantiate because QOM properties are dynamic: they aren't
+>> specified by data (which qom-list-properties could simply read), they
+>> are created by (instantiation) code (which qom-list-properties has to
+>> run).
+>
+> Correct.
+>
+>> Properties created only after instantiation (by realize, perhaps) aren't
+>> visible in qom-list-properties.  Do such properties exist?
+>
+> No idea but if they do, then this issue already exists in
+> device-list-properties.
+>
+>> Properties created only in non-default configuration aren't visible
+>> either.  Such properties have to exist, or else dynamic property
+>> creation would be idiotic.
 
->   b) What happens with multiple root ports?
+Thus, qom-list-properties design limitation: the result need not reflect
+properties of instantiated objects.  It usually does, as most QOM
+properties behave as if they were static.  But when it doesn't, what
+then?  How are users of qom-list-properties supposed to deal with such
+inaccurate / incorrect information?  Do they just have to know which
+properties aren't visible in qom-list-properties, and which properties
+are, but cannot be trusted?
 
-Same answer as previous one: all of them will be migrated before any
-vIOMMUs.
+I posit that right now *nobody* knows.
 
-Note that IMHO we don't care which pcie root port is migrated first -
-IMHO they should not depend on each other, but Marcel may correct me.
+Would such a command be useful anyway?
 
->   c) How correct is this ordering on different implementations 
->     (e.g. ARM/Power/etc)
+>> Likewise for properties created differently (say with a different type)
+>> in non-default configuration.  We can hope that no such beasts exist.
+>> Since properties get created by code, and code can do anything, we're
+>> reduced to hope.  Data is so much easier to reason about than code.
+>> 
+>> Three building blocks: instantiate, qom-list, destroy.  Do we want the
+>> building blocks, or do we want their combination qom-list-properties?
+>
+>
+> Building blocks as QEMU internal helpers to split my
+> qmp_qom_list_properties() into? These are not going to be huge and
+> "destroy" is literally object_unref(obj) which does not seem very useful.
+> Or I missed the point here?
 
-Currently it won't affect since Intel IOMMU is the only user for
-MIG_PRI_IOMMU.  After SMMU is merged it may affect (if it uses this
-bit), but IMHO it's fine too as long as pcie root ports won't depend
-on anything related to SMMU.
+My question is whether the QMP interface should provide the building
+blocks, or only compositions.
 
-Thanks,
-
--- 
-Peter Xu
+>>> ---
+>>>
+>>> I am missing the point of make_device_property_info().
+>>> qmp_device_list_properties() creates the instance which copies everything
+>>> to QOM properties hashtable and commenting out the do{}while() in
+>>> make_device_property_info() does not seem to change a thing, what case
+>>> am I missing here?
+>> 
+>> git-blame points to Stefan.  Stefan, can you help?
