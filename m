@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eheZ8-0003Fg-KL
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:53:00 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eheZn-0003sR-NU
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:53:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eheV0-00021g-S6
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:51:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eheV0-00020t-3v
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:47:38 -0500
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-6-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c6826946-cf8c-2cb2-0eec-73938e574b78@redhat.com>
-Date: Fri, 2 Feb 2018 10:47:30 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180202130336.24719-6-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CvFXuZiFcK7OPtccm30ysM6bATR6lsc68"
-Subject: Re: [Qemu-devel] [PATCH RFC 05/21] qapi: Turn generators into
- modules
+	(envelope-from <borntraeger@de.ibm.com>) id 1eheYj-0005Rl-JF
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:52:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34252
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eheYj-0005Qx-4T
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:51:29 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w12ETZIc121926
+	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 09:37:54 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvrwbb53p-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:37:52 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 2 Feb 2018 14:37:51 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri,  2 Feb 2018 14:37:45 +0000
+Message-Id: <20180202143746.204851-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/1] respin of s390 crash information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +36,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-s390x <qemu-s390x@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CvFXuZiFcK7OPtccm30ysM6bATR6lsc68
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <c6826946-cf8c-2cb2-0eec-73938e574b78@redhat.com>
-Subject: Re: [PATCH RFC 05/21] qapi: Turn generators into modules
-References: <20180202130336.24719-1-armbru@redhat.com>
- <20180202130336.24719-6-armbru@redhat.com>
-In-Reply-To: <20180202130336.24719-6-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch - originally from Jing Liu - was still on my disk and 
+somehow dropped of my attention. Here is a fixed up version.
+It probably still needs some review and polish.
+One open aspect is migration. Right now QEMU switches from crashed
+back into running state after migration (even without this patch).
+Some fixup will be necessary. 
 
-On 02/02/2018 07:03 AM, Markus Armbruster wrote:
-> The next commit will introduce a common driver program for all
-> generators.  The generators need to be modules for that.  qapi2texi.py
-> already is.  Make the other generators follow suit.
->=20
-> The changes are actually trivial.  Obvious in the diffs once you view
-> them with whitespace changes ignored.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi-commands.py   | 43 ++++++++++++++++++--------------
->  scripts/qapi-event.py      | 43 ++++++++++++++++++--------------
->  scripts/qapi-introspect.py | 54 ++++++++++++++++++++++----------------=
---
->  scripts/qapi-types.py      | 56 ++++++++++++++++++++++----------------=
----
->  scripts/qapi-visit.py      | 62 +++++++++++++++++++++++++-------------=
---------
->  5 files changed, 143 insertions(+), 115 deletions(-)
->=20
+Christian Borntraeger (1):
+  s390x/cpu: expose the guest crash information
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+ qapi/run-state.json   | 29 ++++++++++++++++++++++++--
+ target/s390x/cpu.c    | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/cpu.h    | 10 +++++++++
+ target/s390x/helper.c |  5 ++++-
+ target/s390x/kvm.c    | 27 +++++++++++++++++++-----
+ vl.c                  |  6 ++++++
+ 6 files changed, 126 insertions(+), 8 deletions(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---CvFXuZiFcK7OPtccm30ysM6bATR6lsc68
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp0liIACgkQp6FrSiUn
-Q2qPfAgAqQhqR8yLs5x60wCt04Ku6Tb4mFvwsv/07s0/JsVSL3zm4Df2gK4SAb7V
-vYYeGA+KcswwIsJT1KchDCVfw31qY/DWktMYHKHQQgo3oE/2Xe7w5rKfBefcZTvn
-ezh7QCNznz5j3MHhk0mL85zAGpEYRqCXCyft07DW30QNyvvypgCI4yQTdQmKzCTj
-jUaARrOckE93Ub91LqEALsVyeeNauLNSvy3GSLh4eQJj3fPwB6CDhs+jYyXj3bAL
-8qk95wcWHTFiUm2bOC9mcwhoAZg1bocrU9TEkyYsBTDwx7r+weR2EtRFGdm1zvrj
-4N7iyd2UzjKWqmJeLwoN7KCRZVtTuw==
-=htZX
------END PGP SIGNATURE-----
-
---CvFXuZiFcK7OPtccm30ysM6bATR6lsc68--
+-- 
+2.14.3
