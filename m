@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55980)
+Received: from eggs.gnu.org ([208.118.235.92]:57117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehdMe-0002k9-CO
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:36:03 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehdNI-0003Ev-FJ
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:36:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehdLV-0004dr-KC
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:34:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58932)
+	(envelope-from <armbru@redhat.com>) id 1ehdMC-0005ZV-La
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:35:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33006)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehdLU-0004cB-VR
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:33:45 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehdMB-0005Xj-Rg
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:34:28 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  2 Feb 2018 14:03:16 +0100
-Message-Id: <20180202130336.24719-2-armbru@redhat.com>
+Date: Fri,  2 Feb 2018 14:03:26 +0100
+Message-Id: <20180202130336.24719-12-armbru@redhat.com>
 In-Reply-To: <20180202130336.24719-1-armbru@redhat.com>
 References: <20180202130336.24719-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 01/21] qapi: Streamline boilerplate comment
- generation
+Subject: [Qemu-devel] [PATCH RFC 11/21] qapi: Lift error reporting from
+ QAPISchema.__init__() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,343 +27,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-Every generator has separate boilerplate for .h and .c, and their
-differences are boring.  All of them repeat the license note.
-
-Reduce the repetition as follows.  Move common text like the license
-note to common open_output(), next to the existintg common text there.
-For each generator, replace the two separate descriptions by a single
-one.
-
-While there, emit an "automatically generated" note into generated
-documentation, too.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi-commands.py        | 26 +++-----------------------
- scripts/qapi-event.py           | 26 +++-----------------------
- scripts/qapi-introspect.py      | 21 ++-------------------
- scripts/qapi-types.py           | 26 +++-----------------------
- scripts/qapi-visit.py           | 26 +++-----------------------
- scripts/qapi.py                 | 31 ++++++++++++++++++-------------
- scripts/qapi2texi.py            |  3 ++-
- tests/qapi-schema/doc-good.texi |  3 ++-
- 8 files changed, 36 insertions(+), 126 deletions(-)
+ scripts/qapi-gen.py            |  8 ++++++--
+ scripts/qapi/common.py         | 23 +++++++++--------------
+ tests/qapi-schema/test-qapi.py |  8 +++++++-
+ 3 files changed, 22 insertions(+), 17 deletions(-)
 
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 26c56c5062..25ac52503a 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -255,38 +255,18 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+index 6302fd0d55..ba82ca92cc 100755
+--- a/scripts/qapi-gen.py
++++ b/scripts/qapi-gen.py
+@@ -7,7 +7,7 @@
+ import getopt
+ import re
+ import sys
+-from qapi.common import QAPISchema
++from qapi.common import QAPIError, QAPISchema
+ from qapi.types import gen_types
+ from qapi.visit import gen_visit
+ from qapi.commands import gen_commands
+@@ -77,7 +77,11 @@ def main(argv):
+         if o in ('-u', '--unmask-non-abi-names'):
+             opt_unmask = True
  
- (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
+-    schema = QAPISchema(input_file)
++    try:
++        schema = QAPISchema(input_file)
++    except QAPIError as err:
++        print >>sys.stderr, err
++        exit(1)
  
--c_comment = '''
--/*
-- * schema-defined QMP->QAPI command dispatch
-+blurb = '''
-+ * Schema-defined QAPI/QMP commands
-  *
-  * Copyright IBM, Corp. 2011
-  *
-  * Authors:
-  *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment = '''
--/*
-- * schema-defined QAPI function prototypes
-- *
-- * Copyright IBM, Corp. 2011
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
+     gen_types(schema, output_dir, prefix, opt_builtins)
+     gen_visit(schema, output_dir, prefix, opt_builtins)
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 78e960d07c..d334e1db5a 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -15,7 +15,6 @@ import errno
+ import os
+ import re
+ import string
+-import sys
+ from ordereddict import OrderedDict
  
- (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
-                             'qmp-marshal.c', 'qmp-commands.h',
--                            c_comment, h_comment)
-+                            blurb)
+ builtin_types = {
+@@ -1455,19 +1454,15 @@ class QAPISchemaEvent(QAPISchemaEntity):
  
- fdef.write(mcgen('''
+ class QAPISchema(object):
+     def __init__(self, fname):
+-        try:
+-            parser = QAPISchemaParser(open(fname, 'r'))
+-            exprs = check_exprs(parser.exprs)
+-            self.docs = parser.docs
+-            self._entity_dict = {}
+-            self._predefining = True
+-            self._def_predefineds()
+-            self._predefining = False
+-            self._def_exprs(exprs)
+-            self.check()
+-        except QAPIError as err:
+-            print >>sys.stderr, err
+-            exit(1)
++        parser = QAPISchemaParser(open(fname, 'r'))
++        exprs = check_exprs(parser.exprs)
++        self.docs = parser.docs
++        self._entity_dict = {}
++        self._predefining = True
++        self._def_predefineds()
++        self._predefining = False
++        self._def_exprs(exprs)
++        self.check()
  
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index 9d7134658d..31faedc689 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -171,38 +171,18 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+     def _def_entity(self, ent):
+         # Only the predefined types are allowed to not have info
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
+index 7772d09919..d6bb8ec6a4 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -53,7 +53,13 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             for v in variants.variants:
+                 print '    case %s: %s' % (v.name, v.type.name)
  
- (input_file, output_dir, do_c, do_h, prefix, dummy) = parse_command_line()
- 
--c_comment = '''
--/*
-- * schema-defined QAPI event functions
-+blurb = '''
-+ * Schema-defined QAPI/QMP events
-  *
-  * Copyright (c) 2014 Wenchao Xia
-  *
-  * Authors:
-  *  Wenchao Xia   <wenchaoqemu@gmail.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment = '''
--/*
-- * schema-defined QAPI event functions
-- *
-- * Copyright (c) 2014 Wenchao Xia
-- *
-- * Authors:
-- *  Wenchao Xia  <wenchaoqemu@gmail.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
- 
- (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
-                             'qapi-event.c', 'qapi-event.h',
--                            c_comment, h_comment)
-+                            blurb)
- 
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index 032bcea491..83da2bdb94 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -176,32 +176,15 @@ for o, a in opts:
-     if o in ('-u', '--unmask-non-abi-names'):
-         opt_unmask = True
- 
--c_comment = '''
--/*
-+blurb = '''
-  * QAPI/QMP schema introspection
-  *
-  * Copyright (C) 2015 Red Hat, Inc.
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment = '''
--/*
-- * QAPI/QMP schema introspection
-- *
-- * Copyright (C) 2015 Red Hat, Inc.
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
- 
- (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
-                             'qmp-introspect.c', 'qmp-introspect.h',
--                            c_comment, h_comment)
-+                            blurb)
- 
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index 7e3051dbb9..86afc57f92 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -250,39 +250,19 @@ for o, a in opts:
-     if o in ('-b', '--builtins'):
-         do_builtins = True
- 
--c_comment = '''
--/*
-- * deallocation functions for schema-defined QAPI types
-+blurb = '''
-+ * Schema-defined QAPI types
-  *
-  * Copyright IBM, Corp. 2011
-  *
-  * Authors:
-  *  Anthony Liguori   <aliguori@us.ibm.com>
-  *  Michael Roth      <mdroth@linux.vnet.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment = '''
--/*
-- * schema-defined QAPI types
-- *
-- * Copyright IBM, Corp. 2011
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
- 
- (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
-                             'qapi-types.c', 'qapi-types.h',
--                            c_comment, h_comment)
-+                            blurb)
- 
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 7e1cfc13f0..9f7127e548 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -334,38 +334,18 @@ for o, a in opts:
-     if o in ('-b', '--builtins'):
-         do_builtins = True
- 
--c_comment = '''
--/*
-- * schema-defined QAPI visitor functions
-+blurb = '''
-+ * Schema-defined QAPI visitors
-  *
-  * Copyright IBM, Corp. 2011
-  *
-  * Authors:
-  *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
--'''
--h_comment = '''
--/*
-- * schema-defined QAPI visitor functions
-- *
-- * Copyright IBM, Corp. 2011
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-- * See the COPYING.LIB file in the top-level directory.
-- *
-- */
- '''
- 
- (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
-                             'qapi-visit.c', 'qapi-visit.h',
--                            c_comment, h_comment)
-+                            blurb)
- 
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 43a54bf40f..2e4b2bc9eb 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1975,11 +1975,21 @@ def parse_command_line(extra_options='', extra_long_options=[]):
- #
- 
- 
--def open_output(output_dir, do_c, do_h, prefix, c_file, h_file,
--                c_comment, h_comment):
-+def open_output(output_dir, do_c, do_h, prefix, c_file, h_file, blurb):
-     guard = guardname(prefix + h_file)
-     c_file = output_dir + prefix + c_file
-     h_file = output_dir + prefix + h_file
-+    comment = mcgen('''/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
+-schema = QAPISchema(sys.argv[1])
 +
-+/*
-+%(blurb)s
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ */
++try:
++    schema = QAPISchema(sys.argv[1])
++except QAPIError as err:
++    print >>sys.stderr, err
++    exit(1)
 +
-+''',
-+                    blurb=blurb.strip('\n'))
+ schema.visit(QAPISchemaTestVisitor())
  
-     if output_dir:
-         try:
-@@ -1998,27 +2008,22 @@ def open_output(output_dir, do_c, do_h, prefix, c_file, h_file,
-     fdef = maybe_open(do_c, c_file, 'w')
-     fdecl = maybe_open(do_h, h_file, 'w')
- 
--    fdef.write(mcgen('''
--/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
--%(comment)s
--''',
--                     comment=c_comment))
--
-+    fdef.write(comment)
-+    fdecl.write(comment)
-     fdecl.write(mcgen('''
--/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
--%(comment)s
- #ifndef %(guard)s
- #define %(guard)s
- 
- ''',
--                      comment=h_comment, guard=guard))
-+                      guard=guard))
- 
-     return (fdef, fdecl)
- 
- 
- def close_output(fdef, fdecl):
--    fdecl.write('''
-+    fdecl.write(mcgen('''
-+
- #endif
--''')
-+'''))
-     fdecl.close()
-     fdef.close()
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 92e2af2cd6..924b374cd3 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -282,7 +282,8 @@ def main(argv):
-         print >>sys.stderr, ("%s: need pragma 'doc-required' "
-                              "to generate documentation" % argv[0])
-         sys.exit(1)
--    print texi_schema(schema)
-+    print '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n'
-+    print texi_schema(schema),
- 
- 
- if __name__ == '__main__':
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
-index 1778312581..0aed2300a5 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -1,3 +1,5 @@
-+@c AUTOMATICALLY GENERATED, DO NOT MODIFY
-+
- @section Section
- 
- @subsection Subsection
-@@ -231,4 +233,3 @@ If you're bored enough to read this, go see a video of boxed cats
- 
- @end deftypefn
- 
--
+ for doc in schema.docs:
 -- 
 2.13.6
