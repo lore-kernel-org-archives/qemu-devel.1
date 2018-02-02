@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ehcXF-00078u-PI
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:50 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ehcXY-0007Ni-94
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ehcXA-00010H-TI
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:49 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59096
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ehcXA-00010C-Nh
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:41:44 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w129d17S066003
-	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 04:42:47 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvm79utqn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 04:42:46 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 2 Feb 2018 09:42:45 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri,  2 Feb 2018 09:42:41 +0000
-Message-Id: <20180202094241.59537-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH] s390x/sclp: fix event mask handling
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ehcXW-00018k-Le
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:08 -0500
+References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+	<8cb52056-e57c-ec72-60a1-adc41f21b9c3@redhat.com>
+	<d64cd344-bbcb-a088-f74d-a3e5446085f4@virtuozzo.com>
+	<ea632dcf-28f5-5f33-e22f-db7e622da823@virtuozzo.com>
+	<e4b81d10-eb5d-a988-3dbb-75ed1ee07850@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <ef46a83d-cd99-ba88-a2c1-8d03963882e1@virtuozzo.com>
+Date: Fri, 2 Feb 2018 14:56:46 +0300
+MIME-Version: 1.0
+In-Reply-To: <e4b81d10-eb5d-a988-3dbb-75ed1ee07850@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
 
-commit 67915de9f038 ("s390x/event-facility: variable-length event
-masks") switches the sclp receive/send mask. This broke the sclp
-lm console.
+22.01.2018 20:23, John Snow wrote:
+>
+> On 01/22/2018 07:22 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 22.01.2018 12:20, Vladimir Sementsov-Ogievskiy wrote:
+>>> 20.01.2018 02:30, John Snow wrote:
+>>>> On 01/16/2018 07:54 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Hi all.
+>>>>>
+>>>>> There are three qmp commands, needed to implement external backup API=
+.
+>>>>>
+>>>>> Using these three commands, client may do all needed bitmap
+>>>>> management by
+>>>>> hand:
+>>>>>
+>>>>> on backup start we need to do a transaction:
+>>>>>  =C2=A0 {disable old bitmap, create new bitmap}
+>>>>>
+>>>>> on backup success:
+>>>>>  =C2=A0 drop old bitmap
+>>>>>
+>>>>> on backup fail:
+>>>>>  =C2=A0 enable old bitmap
+>>>>>  =C2=A0 merge new bitmap to old bitmap
+>>>>>  =C2=A0 drop new bitmap
+>>>>>
+>>>>> v2: fix merge command deadlock
+>>>>>  =C2=A0=C2=A0 add new patches: 1 and 6
+>>>>>
+>>>>> Vladimir Sementsov-Ogievskiy (6):
+>>>>>  =C2=A0=C2=A0 block: maintain persistent disabled bitmaps
+>>>>>  =C2=A0=C2=A0 block/dirty-bitmap: add lock to bdrv_enable/disable_dir=
+ty_bitmap
+>>>>>  =C2=A0=C2=A0 qapi: add block-dirty-bitmap-enable/disable
+>>>>>  =C2=A0=C2=A0 qmp: transaction support for block-dirty-bitmap-enable/=
+disable
+>>>>>  =C2=A0=C2=A0 qapi: add block-dirty-bitmap-merge
+>>>>>  =C2=A0=C2=A0 qapi: add disabled parameter to block-dirty-bitmap-add
+>>>>>
+>>>>>  =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |=C2=A0 92 ++++++++++++++++++++++-
+>>>>>  =C2=A0 qapi/transaction.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0=C2=A0 4 +
+>>>>>  =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
+>>>>>  =C2=A0 include/block/dirty-bitmap.h |=C2=A0=C2=A0 3 +-
+>>>>>  =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |=C2=A0 42 ++++++-----
+>>>>>  =C2=A0 block/qcow2-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |=C2=A0 12 +--
+>>>>>  =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
+>>>>>  =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 169
+>>>>> +++++++++++++++++++++++++++++++++++++++++--
+>>>>>  =C2=A0 8 files changed, 287 insertions(+), 39 deletions(-)
+>>>>>
+>>>> Fails to apply to master (b384cd95) on patch four and five. Only
+>>>> contextual problems, I've patched it up and I'll review that.
+>>>>
+>>>> (mirrored here if you want to check my rebase work:
+>>>> https://github.com/jnsnow/qemu/tree/vlad-review)
+>>>>
+>>>> Since I was full of such bad and stupid ideas last time, I'd like
+>>>> someone else to look over this one for design and I'll just review it
+>>>> for accuracy.
+>>>>
+>>>> --js
+>>> Thank you for review, John!
+>>>
+>>> Ok, so, I'll going to:
+>>>
+>>> - take patch 1 into migration and respin it today (I hope) with test
+>>> about qcow2-based bitmap migration disabled.
+>>> - separate fixes and refactoring from here (locking + _bitmap_clear
+>>> transaction), send them separately
+>>> - than, make test for external backup and respin these series with it
+>>>
+>> changed to:
+>>
+>> 1. send patch 1/6 separately with the whole reasoning[done], as it
+>> blocks two series, wait for accepting
+>> 2. respin postcopy series
+>> 3. finish up discussion on bitmap locking under "[PATCH v9 03/13]
+>> block/dirty-bitmap: add _locked version of bdrv_reclaim_dirty_bitmap"
+>> 4. separate fixes and refactoring from here (locking + _bitmap_clear
+>> transaction), send them separately
+>> 5. make test for external backup and respin these series with it
+>>
+>> 2 depends on 1
+>> 4 depends on 3
+>> 5 depends on 1 and 4
+>>
+> Great, thanks!
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Fixes: commit 67915de9f038 ("s390x/event-facility: variable-length event masks")
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-Cc: qemu-stable@nongnu.org
----
- hw/s390x/event-facility.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Sorry for long delay, I was ill. Now I'm returning to these plans.
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index b0f71f4554..155a69467b 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -293,10 +293,10 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
-     ef->receive_mask = be32_to_cpu(tmp_mask);
- 
-     /* return the SCLP's capability masks to the guest */
--    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-+    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-     copy_mask(WEM_RECEIVE_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-               mask_length, sizeof(tmp_mask));
--    tmp_mask = cpu_to_be32(get_host_receive_mask(ef));
-+    tmp_mask = cpu_to_be32(get_host_send_mask(ef));
-     copy_mask(WEM_SEND_MASK(we_mask, mask_length), (uint8_t *)&tmp_mask,
-               mask_length, sizeof(tmp_mask));
- 
--- 
-2.14.3
+--=20
+Best regards,
+Vladimir
