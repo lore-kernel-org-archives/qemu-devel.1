@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ehcXY-0007Ni-94
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:10 -0500
+	(envelope-from <marcel@redhat.com>) id 1ehcXk-0007Zy-VB
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ehcXW-00018k-Le
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:08 -0500
-References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
-	<8cb52056-e57c-ec72-60a1-adc41f21b9c3@redhat.com>
-	<d64cd344-bbcb-a088-f74d-a3e5446085f4@virtuozzo.com>
-	<ea632dcf-28f5-5f33-e22f-db7e622da823@virtuozzo.com>
-	<e4b81d10-eb5d-a988-3dbb-75ed1ee07850@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ef46a83d-cd99-ba88-a2c1-8d03963882e1@virtuozzo.com>
-Date: Fri, 2 Feb 2018 14:56:46 +0300
+	(envelope-from <marcel@redhat.com>) id 1ehcXg-0001JG-1D
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33449)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehcXf-0001Hn-P5
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:42:15 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A48DC04AC50
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 13:25:41 +0000 (UTC)
+References: <20180201112028.23552-1-peterx@redhat.com>
+	<90b4bc63-94cd-ec0f-32c8-c16df8ee84cf@redhat.com>
+	<20180201211652-mutt-send-email-mst@kernel.org>
+	<20180201194845.GN2457@work-vm>
+	<33142d67-92b6-e1b1-b906-716a06efb1fa@redhat.com>
+	<20180202100459.GB4666@xz-mi>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <4ebca0b8-dbe9-01ed-053d-aad9d338cee0@redhat.com>
+Date: Fri, 2 Feb 2018 15:25:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <e4b81d10-eb5d-a988-3dbb-75ed1ee07850@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180202100459.GB4666@xz-mi>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] qmp dirty bitmap API
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
+ priority
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +39,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: Peter Xu <peterx@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-22.01.2018 20:23, John Snow wrote:
->
-> On 01/22/2018 07:22 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 22.01.2018 12:20, Vladimir Sementsov-Ogievskiy wrote:
->>> 20.01.2018 02:30, John Snow wrote:
->>>> On 01/16/2018 07:54 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Hi all.
->>>>>
->>>>> There are three qmp commands, needed to implement external backup API=
-.
->>>>>
->>>>> Using these three commands, client may do all needed bitmap
->>>>> management by
->>>>> hand:
->>>>>
->>>>> on backup start we need to do a transaction:
->>>>>  =C2=A0 {disable old bitmap, create new bitmap}
->>>>>
->>>>> on backup success:
->>>>>  =C2=A0 drop old bitmap
->>>>>
->>>>> on backup fail:
->>>>>  =C2=A0 enable old bitmap
->>>>>  =C2=A0 merge new bitmap to old bitmap
->>>>>  =C2=A0 drop new bitmap
->>>>>
->>>>> v2: fix merge command deadlock
->>>>>  =C2=A0=C2=A0 add new patches: 1 and 6
->>>>>
->>>>> Vladimir Sementsov-Ogievskiy (6):
->>>>>  =C2=A0=C2=A0 block: maintain persistent disabled bitmaps
->>>>>  =C2=A0=C2=A0 block/dirty-bitmap: add lock to bdrv_enable/disable_dir=
-ty_bitmap
->>>>>  =C2=A0=C2=A0 qapi: add block-dirty-bitmap-enable/disable
->>>>>  =C2=A0=C2=A0 qmp: transaction support for block-dirty-bitmap-enable/=
-disable
->>>>>  =C2=A0=C2=A0 qapi: add block-dirty-bitmap-merge
->>>>>  =C2=A0=C2=A0 qapi: add disabled parameter to block-dirty-bitmap-add
->>>>>
->>>>>  =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0 92 ++++++++++++++++++++++-
->>>>>  =C2=A0 qapi/transaction.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 4 +
->>>>>  =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
->>>>>  =C2=A0 include/block/dirty-bitmap.h |=C2=A0=C2=A0 3 +-
->>>>>  =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0 42 ++++++-----
->>>>>  =C2=A0 block/qcow2-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0 12 +--
->>>>>  =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
->>>>>  =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 169
->>>>> +++++++++++++++++++++++++++++++++++++++++--
->>>>>  =C2=A0 8 files changed, 287 insertions(+), 39 deletions(-)
->>>>>
->>>> Fails to apply to master (b384cd95) on patch four and five. Only
->>>> contextual problems, I've patched it up and I'll review that.
->>>>
->>>> (mirrored here if you want to check my rebase work:
->>>> https://github.com/jnsnow/qemu/tree/vlad-review)
->>>>
->>>> Since I was full of such bad and stupid ideas last time, I'd like
->>>> someone else to look over this one for design and I'll just review it
->>>> for accuracy.
->>>>
->>>> --js
->>> Thank you for review, John!
->>>
->>> Ok, so, I'll going to:
->>>
->>> - take patch 1 into migration and respin it today (I hope) with test
->>> about qcow2-based bitmap migration disabled.
->>> - separate fixes and refactoring from here (locking + _bitmap_clear
->>> transaction), send them separately
->>> - than, make test for external backup and respin these series with it
->>>
->> changed to:
->>
->> 1. send patch 1/6 separately with the whole reasoning[done], as it
->> blocks two series, wait for accepting
->> 2. respin postcopy series
->> 3. finish up discussion on bitmap locking under "[PATCH v9 03/13]
->> block/dirty-bitmap: add _locked version of bdrv_reclaim_dirty_bitmap"
->> 4. separate fixes and refactoring from here (locking + _bitmap_clear
->> transaction), send them separately
->> 5. make test for external backup and respin these series with it
->>
->> 2 depends on 1
->> 4 depends on 3
->> 5 depends on 1 and 4
->>
-> Great, thanks!
+On 02/02/2018 12:04, Peter Xu wrote:
+> On Thu, Feb 01, 2018 at 10:01:31PM +0200, Marcel Apfelbaum wrote:
+> 
+> [...]
+> 
+>> Root ports can't be nested, anyway, I suppose the migration should
+>> follow the bus numbering order.
+> 
+> Could I ask whether this is a must?  And if yes, why?
+> 
 
-Sorry for long delay, I was ill. Now I'm returning to these plans.
+Not sure. The above will ensure that if a device needs some parent/bus
+info at load time, the information will be valid.
+But if it worked until now, maybe most of the devices do not need that.
 
---=20
-Best regards,
-Vladimir
+>>
+>> The question now is what happens if the migration is happening before
+>> the guest firmware finishes assigning numbers to buses...
+> 
+> Do you mean that vIOMMU may fetch wrong context entries too?
+> 
+
+No, only that the bus number will not be available at load time.
+In this case is OK since the firmware will continue to
+assign bus numbers at target side.
+
+Thanks,
+Marcel
+
+> Note that as long as vIOMMU DMAR is off globally, vIOMMU will not
+> fetch context entries at all.  So IMHO this problem should not happen
+> during the firmware execution time (assuming that the firmware should
+> not enable vIOMMU at all).
+> 
+> Thanks,
+> 
