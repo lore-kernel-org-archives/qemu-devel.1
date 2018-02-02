@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dotanb75@yahoo.com>) id 1ehcel-0005VU-2F
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:49:38 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ehdfn-0003aT-Jk
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:55:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dotanb75@yahoo.com>) id 1ehceg-0005zb-Oj
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:49:35 -0500
-Received: from sonic314-13.consmr.mail.bf2.yahoo.com ([74.6.132.123]:38919)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dotanb75@yahoo.com>) id 1ehceg-0005yn-JI
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:49:30 -0500
-Date: Fri, 2 Feb 2018 12:08:59 +0000 (UTC)
-From: Dotan Barak <dotanb75@yahoo.com>
-Reply-To: Dotan Barak <dotanb75@yahoo.com>
-Message-ID: <2019319026.1970662.1517573339806@mail.yahoo.com>
-In-Reply-To: <20180201205511.19198-4-marcel@redhat.com>
-References: <20180201205511.19198-1-marcel@redhat.com>
-	<20180201205511.19198-4-marcel@redhat.com>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ehdcA-0000uV-FB
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:54:43 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2165 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1ehdc9-0000rk-L7
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:50:58 -0500
+References: <1516936096-48900-1-git-send-email-jianjay.zhou@huawei.com>
+	<0a1502a8-cbba-cf91-bf6b-e6058a4878e5@redhat.com>
+	<5A73E0BD.2030506@huawei.com>
+	<625ad708-cc73-65b6-7695-d1e93d11265b@redhat.com>
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Message-ID: <5A741B16.10903@huawei.com>
+Date: Fri, 2 Feb 2018 16:02:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V9 3/4] pvrdma: initial implementation
+In-Reply-To: <625ad708-cc73-65b6-7695-d1e93d11265b@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] tap: close fd conditionally when error
+ occured
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +31,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "yuval.shaia@oracle.com" <yuval.shaia@oracle.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "cohuck@redhat.com" <cohuck@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: weidong.huang@huawei.com, mst@redhat.com, arei.gonglei@huawei.com, imammedo@redhat.com, wangxinxin.wang@huawei.com
 
-Reviewed-by: Dotan Barak <dotanb@mellanox.com>
+Hi Jason,
 
-      From: Marcel Apfelbaum <marcel@redhat.com>
- To: qemu-devel@nongnu.org 
-Cc: ehabkost@redhat.com; yuval.shaia@oracle.com; marcel@redhat.com; pbonzini@redhat.com; mst@redhat.com; cohuck@redhat.com; dotanb75@yahoo.com
- Sent: Thursday, February 1, 2018 10:55 PM
- Subject: [Qemu-devel] [PATCH V9 3/4] pvrdma: initial implementation
-   
-From: Yuval Shaia <yuval.shaia@oracle.com>
+On 2018/2/2 14:56, Jason Wang wrote:
+>
+>
+> On 2018=E5=B9=B402=E6=9C=8802=E6=97=A5 11:53, Jay Zhou wrote:
+>> Hi Jason,
+>>
+>> On 2018/2/2 11:11, Jason Wang wrote:
+>>>
+>>>
+>>> On 2018=E5=B9=B401=E6=9C=8826=E6=97=A5 11:08, Jay Zhou wrote:
+>>>> If netdev_add tap,id=3Dnet0,...,vhost=3Don failed in net_init_tap_on=
+e(),
+>>>> the followed up device_add virtio-net-pci,netdev=3Dnet0 will fail
+>>>> too, prints:
+>>>>
+>>>>    TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
+>>>>    ioctl() failed: Bad file descriptor
+>>>>
+>>>> The reason is that the fd of tap is closed when error occured after
+>>>> calling net_init_tap_one().
+>>>>
+>>>> The fd should be closed when calling net_init_tap_one failed:
+>>>>    - if tap_set_sndbuf() failed
+>>>>    - if tap_set_sndbuf() succeeded but vhost failed to initialize wi=
+th
+>>>>      vhostforce flag on
+>>>> The fd should not be closed just because vhost failed to initialize
+>>>> but without vhostforce flag. So the followed up device_add can fall
+>>>> back to userspace virtio successfully.
+>>>>
+>>>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>>>> Suggested-by: Jason Wang <jasowang@redhat.com>
+>>>> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+>>>> ---
+>>>>   net/tap.c | 40 ++++++++++++++++++++++++++++++++--------
+>>>>   1 file changed, 32 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/net/tap.c b/net/tap.c
+>>>> index 979e622..8042c7d 100644
+>>>> --- a/net/tap.c
+>>>> +++ b/net/tap.c
+>>>> @@ -648,12 +648,6 @@ static void net_init_tap_one(const NetdevTapOpt=
+ions
+>>>> *tap, NetClientState *peer,
+>>>>       TAPState *s =3D net_tap_fd_init(peer, model, name, fd, vnet_hd=
+r);
+>>>>       int vhostfd;
+>>>> -    tap_set_sndbuf(s->fd, tap, &err);
+>>>> -    if (err) {
+>>>> -        error_propagate(errp, err);
+>>>> -        return;
+>>>> -    }
+>>>> -
+>>>>       if (tap->has_fd || tap->has_fds) {
+>>>>           snprintf(s->nc.info_str, sizeof(s->nc.info_str), "fd=3D%d"=
+, fd);
+>>>>       } else if (tap->has_helper) {
+>>>> @@ -781,6 +775,12 @@ int net_init_tap(const Netdev *netdev, const ch=
+ar *name,
+>>>>           vnet_hdr =3D tap_probe_vnet_hdr(fd);
+>>>> +        tap_set_sndbuf(fd, tap, &err);
+>>>> +        if (err) {
+>>>> +            error_propagate(errp, err);
+>>>> +            return -1;
+>>>> +        }
+>>>> +
+>>>>           net_init_tap_one(tap, peer, "tap", name, NULL,
+>>>>                            script, downscript,
+>>>>                            vhostfdname, vnet_hdr, fd, &err);
+>>>> @@ -832,6 +832,12 @@ int net_init_tap(const Netdev *netdev, const ch=
+ar *name,
+>>>>                   goto free_fail;
+>>>>               }
+>>>> +            tap_set_sndbuf(fd, tap, &err);
+>>>> +            if (err) {
+>>>> +                error_propagate(errp, err);
+>>>> +                goto free_fail;
+>>>> +            }
+>>>> +
+>>>>               net_init_tap_one(tap, peer, "tap", name, ifname,
+>>>>                                script, downscript,
+>>>>                                tap->has_vhostfds ? vhost_fds[i] : NU=
+LL,
+>>>> @@ -872,12 +878,21 @@ free_fail:
+>>>>           fcntl(fd, F_SETFL, O_NONBLOCK);
+>>>>           vnet_hdr =3D tap_probe_vnet_hdr(fd);
+>>>> +        tap_set_sndbuf(fd, tap, &err);
+>>>> +        if (err) {
+>>>> +            error_propagate(errp, err);
+>>>> +            close(fd);
+>>>> +            return -1;
+>>>> +        }
+>>>> +
+>>>>           net_init_tap_one(tap, peer, "bridge", name, ifname,
+>>>>                            script, downscript, vhostfdname,
+>>>>                            vnet_hdr, fd, &err);
+>>>>           if (err) {
+>>>>               error_propagate(errp, err);
+>>>> -            close(fd);
+>>>> +            if (tap->has_vhostforce && tap->vhostforce) {
+>>>> +                close(fd);
+>>>> +            }
+>>>>               return -1;
+>>>>           }
+>>>>       } else {
+>>>> @@ -910,13 +925,22 @@ free_fail:
+>>>>                   }
+>>>>               }
+>>>> +            tap_set_sndbuf(fd, tap, &err);
+>>>> +            if (err) {
+>>>> +                error_propagate(errp, err);
+>>>> +                close(fd);
+>>>> +                return -1;
+>>>> +            }
+>>>> +
+>>>>               net_init_tap_one(tap, peer, "tap", name, ifname,
+>>>>                                i >=3D 1 ? "no" : script,
+>>>>                                i >=3D 1 ? "no" : downscript,
+>>>>                                vhostfdname, vnet_hdr, fd, &err);
+>>>>               if (err) {
+>>>>                   error_propagate(errp, err);
+>>>> -                close(fd);
+>>>> +                if (tap->has_vhostforce && tap->vhostforce) {
+>>>> +                    close(fd);
+>>>> +                }
+>>>>                   return -1;
+>>>>               }
+>>>>           }
+>>>
+>>> Hi:
+>>>
+>>> I still fail to understand why not just pass force flag to net_tap_in=
+it_one(),
+>>> and let it decide?
+>>
+>> I'm a little confused here, as you suggested in version 1:
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg02933.html
+>>
+>> whether or not to close the fd should let the caller decide, so this i=
+s
+>> the version 2.
+>>
+>> If I misunderstood something, please let me know, thanks!
+>
+> I forgot some context here, sorry.
+>
+> Rethink about this, looks like do it inside net_tap_init_one() is bette=
+r. Just
+> no need to modify caller and set err only when:
+>
+> - sndbuf set fails
+> - vhost-net open or init fails and vhostforce set
+>
+> And warn when vhost fail but vhostforces does not set?
 
-PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
-It works with its Linux Kernel driver AS IS, no need for any special guest
-modifications.
+Okay, it seems reasonable and I agree with you. Will prepare for v3 soon.
 
-While it complies with the VMware device, it can also communicate with bare
-metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
-can work with Soft-RoCE (rxe).
-
-It does not require the whole guest RAM to be pinned allowing memory
-over-commit and, even if not implemented yet, migration support will be
-possible with some HW assistance.
-
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-
-
-   
+Regards,
+Jay
