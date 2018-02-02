@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehe98-0004Dw-Ri
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:26:08 -0500
+	(envelope-from <groug@kaod.org>) id 1ehe6v-0001Qp-Px
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:26:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehe7l-0008U9-JF
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:24:43 -0500
-References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
-	<ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ab2503df-81e8-dd66-bedf-b0950744321b@redhat.com>
-Date: Fri, 2 Feb 2018 17:21:09 +0100
-MIME-Version: 1.0
-In-Reply-To: <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ"
-Subject: Re: [Qemu-devel] [PATCH v3] block: maintain persistent disabled
- bitmaps
+	(envelope-from <groug@kaod.org>) id 1ehe47-00045b-3r
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:20:57 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58762)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe46-00043T-Dd
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:19:50 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w12GHweY036090
+	for <qemu-devel@nongnu.org>; Fri, 2 Feb 2018 11:19:49 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fvrmared3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 11:19:48 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Fri, 2 Feb 2018 16:19:46 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Fri,  2 Feb 2018 17:19:25 +0100
+Message-Id: <20180202161935.20803-1-groug@kaod.org>
+Subject: [Qemu-devel] [PULL v2 00/10] 9p patches for 2.12 20180202
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +34,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com,
- den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
-Message-ID: <ab2503df-81e8-dd66-bedf-b0950744321b@redhat.com>
-Subject: Re: [PATCH v3] block: maintain persistent disabled bitmaps
-References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
- <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
-In-Reply-To: <ee7b1763-3106-cda3-cecb-097bc6248737@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit b05631954d6dfe93340d516660397e2c1a2a5dd6:
 
-On 2018-02-02 17:18, Eric Blake wrote:
-> On 02/02/2018 10:07 AM, Vladimir Sementsov-Ogievskiy wrote:
->> To maintain load/store disabled bitmap there is new approach:
->>
->>  - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored=
+  Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20180131' into staging (2018-01-31 15:50:29 +0000)
 
->>  - store enabled bitmaps as "auto" to qcow2
->>  - store disabled bitmaps without "auto" flag to qcow2
->>  - on qcow2 open load "auto" bitmaps as enabled and others
->>    as disabled (except in_use bitmaps)
->>
->> Also, adjust iotests 165 and 176 appropriately.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+are available in the git repository at:
 
->> ---
->=20
->> +++ b/qemu-doc.texi
->> @@ -2749,6 +2749,13 @@ used and it will be removed with no replacement=
-=2E
->>  The ``convert -s snapshot_id_or_name'' argument is obsoleted
->>  by the ``convert -l snapshot_param'' argument instead.
->> =20
->> +@section QEMU Machine Protocol (QMP) commands
->> +
->> +@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0=
-)
->> +
->> +"autoload" parameter is now ignored. All bitmaps are automatically lo=
-aded
->> +from qcow2 image.
->=20
-> Won't later patches be adding the ability to enable/disable bitmaps,
-> which then affects whether they are autoloaded?  So we don't forget to
-> revisit this text in that patch, a better wording might be:
->=20
-> The "autoload" parameter is ignored; all enabled persistent dirty
-> bitmaps are automatically loaded from a qcow2 image, regardless of the
-> initial setting requested in this parameter.
->=20
->=20
->> @@ -667,19 +662,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *=
-bs)
->>  }
->> =20
->>  /* Called with BQL taken. */
->> -void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool aut=
-oload)
->> -{
->> -    qemu_mutex_lock(bitmap->mutex);
->> -    bitmap->autoload =3D autoload;
->> -    qemu_mutex_unlock(bitmap->mutex);
->> -}
->> -
->> -bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
->> -{
->> -    return bitmap->autoload;
->> -}
->=20
-> Will later patches be reintroducing these functions for learning which
-> bitmaps are enabled/disabled?  But I'm okay with deleting them in this
-> patch, even if that is more churn.
+  https://github.com/gkurz/qemu.git tags/for-upstream
 
-You mean bdrv_enable_dirty_bitmap(), bdrv_disable_dirty_bitmap(), and
-bdrv_dirty_bitmap_enabled()? ;-)
+for you to fetch changes up to 9ea776ee7d4061c043d0fbf89aa85f86ec0cf8a2:
 
-Max
+  tests/virtio-9p: explicitly handle potential integer overflows (2018-02-02 11:15:34 +0100)
 
+----------------------------------------------------------------
+This series is mostly about 9p request cancellation. It fixes a
+long standing bug (read "specification violation") where the server
+would send an invalid response when the client has cancelled an
+in-flight request. This was causing annoying spurious EINTR returns
+in linux. The fix comes with some related testing in QTEST.
 
---RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Other patches are code cleanup and improvements.
 
------BEGIN PGP SIGNATURE-----
+v2: fix the alignment issue that was presumably causing make check to
+    fail on sparc hosts
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp0j/USHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AkfwH/0tG7cqKPk5WQWPoNiHpNdMOtJRSmwz/
-KM3Ew0KgIwMxGRJOAcTFeX0luyQOr8ukMF1f8xXFE7nIb/9S2bI7nslKN3nYmA3M
-YN7elyWva2BHKcoTJsQPmo21gdUna6pUWwc3VuMCRkQhyG5ok2ikE9cxID7CLs8g
-EXIWX1SZON75591V9nJL15G4jCTeiYjIceBc15OZpE+NMYYh7O36hULxsDng8RUt
-q3vYl0asXOeOHnhZf1EFmjt7Lw4AfM3xYaLneSJ8mMwn/w7DVANvorD6bCRH7+np
-ebc1Y4kxu2FNr/eRMrkE5ByIuFI5YzILrOstnRp0FlpfDWZdCabDvGc=
-=H80D
------END PGP SIGNATURE-----
+----------------------------------------------------------------
+Greg Kurz (9):
+      9pfs: drop v9fs_register_transport()
+      tests: virtio-9p: move request tag to the test functions
+      tests: virtio-9p: wait for completion in the test code
+      tests: virtio-9p: use the synth backend
+      tests: virtio-9p: add LOPEN operation test
+      tests: virtio-9p: add WRITE operation test
+      libqos/virtio: return length written into used descriptor
+      tests: virtio-9p: add FLUSH operation test
+      tests/virtio-9p: explicitly handle potential integer overflows
 
---RPnW62Z2Gfmd30r7oqt7t7BoSuZXs6IRZ--
+Keno Fischer (1):
+      9pfs: Correctly handle cancelled requests
+
+ hw/9pfs/9p-synth.c         |  52 ++++++++
+ hw/9pfs/9p-synth.h         |  13 ++
+ hw/9pfs/9p.c               |  25 +++-
+ hw/9pfs/9p.h               |  10 +-
+ hw/9pfs/trace-events       |   1 +
+ hw/9pfs/virtio-9p-device.c |   8 +-
+ hw/9pfs/xen-9p-backend.c   |   3 +-
+ tests/libqos/virtio.c      |  25 ++--
+ tests/libqos/virtio.h      |   3 +-
+ tests/virtio-9p-test.c     | 294 ++++++++++++++++++++++++++++++++++++++-------
+ tests/virtio-blk-test.c    |  24 ++--
+ tests/virtio-net-test.c    |   6 +-
+ tests/virtio-scsi-test.c   |   3 +-
+ 13 files changed, 385 insertions(+), 82 deletions(-)
+-- 
+2.13.6
