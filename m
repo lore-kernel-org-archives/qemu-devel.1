@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ehdfn-0003aT-Jk
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:55:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ehdgH-00040V-E2
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:59:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ehdcA-0000uV-FB
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:54:43 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2165 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ehdc9-0000rk-L7
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:50:58 -0500
-References: <1516936096-48900-1-git-send-email-jianjay.zhou@huawei.com>
-	<0a1502a8-cbba-cf91-bf6b-e6058a4878e5@redhat.com>
-	<5A73E0BD.2030506@huawei.com>
-	<625ad708-cc73-65b6-7695-d1e93d11265b@redhat.com>
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Message-ID: <5A741B16.10903@huawei.com>
-Date: Fri, 2 Feb 2018 16:02:30 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1ehdfD-0002b7-F9
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:55:13 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:35406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ehdfC-0002aU-QL
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:54:07 -0500
+Received: by mail-ot0-x230.google.com with SMTP id a2so9324004otf.2
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 07:54:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <625ad708-cc73-65b6-7695-d1e93d11265b@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20180202100843.GD13090@stefanha-x1.localdomain>
+References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
+	<20180202100843.GD13090@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Feb 2018 15:53:45 +0000
+Message-ID: <CAFEAcA-5PwhJw9epXh+0_oe3E-vsVKkQDX3s1Go-FBzO=FA3zA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] tap: close fd conditionally when error
- occured
+Subject: Re: [Qemu-devel] Qemu Trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,169 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-Cc: weidong.huang@huawei.com, mst@redhat.com, arei.gonglei@huawei.com, imammedo@redhat.com, wangxinxin.wang@huawei.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Nesrine Zouari <nesrine.zouari@enis.tn>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
 
-Hi Jason,
+On 2 February 2018 at 10:08, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> On Thu, Feb 01, 2018 at 04:30:10PM +0100, Nesrine Zouari wrote:
+>> I am a computer engineering student and I am actually working on my
+>> graduation project at Lauterbach company. The project is about Qemu Trac=
+e
+>> and as a future I would like to contribute this work to the main line.
+>>
+>> My project is divided into two parts:
+>>
+>> 1/ Collecting the Guest trace data : The trace solution should be able t=
+o
+>> provide:
+>>
+>>             a/ Instruction flow Trace
+>>
+>>             b/ Memory read/write access
+>>
+>>             c/ Time Stamps.
+>>
+>>             d/ For tracing rich operating systems that are using MMU, we
+>> additionally need to trace the task switches.
+>
+> Llu=C3=ACs has done the most instrumentation work in qemu.git and can exp=
+lain
+> the current status.
 
-On 2018/2/2 14:56, Jason Wang wrote:
->
->
-> On 2018=E5=B9=B402=E6=9C=8802=E6=97=A5 11:53, Jay Zhou wrote:
->> Hi Jason,
->>
->> On 2018/2/2 11:11, Jason Wang wrote:
->>>
->>>
->>> On 2018=E5=B9=B401=E6=9C=8826=E6=97=A5 11:08, Jay Zhou wrote:
->>>> If netdev_add tap,id=3Dnet0,...,vhost=3Don failed in net_init_tap_on=
-e(),
->>>> the followed up device_add virtio-net-pci,netdev=3Dnet0 will fail
->>>> too, prints:
->>>>
->>>>    TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
->>>>    ioctl() failed: Bad file descriptor
->>>>
->>>> The reason is that the fd of tap is closed when error occured after
->>>> calling net_init_tap_one().
->>>>
->>>> The fd should be closed when calling net_init_tap_one failed:
->>>>    - if tap_set_sndbuf() failed
->>>>    - if tap_set_sndbuf() succeeded but vhost failed to initialize wi=
-th
->>>>      vhostforce flag on
->>>> The fd should not be closed just because vhost failed to initialize
->>>> but without vhostforce flag. So the followed up device_add can fall
->>>> back to userspace virtio successfully.
->>>>
->>>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
->>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->>>> Suggested-by: Jason Wang <jasowang@redhat.com>
->>>> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
->>>> ---
->>>>   net/tap.c | 40 ++++++++++++++++++++++++++++++++--------
->>>>   1 file changed, 32 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/net/tap.c b/net/tap.c
->>>> index 979e622..8042c7d 100644
->>>> --- a/net/tap.c
->>>> +++ b/net/tap.c
->>>> @@ -648,12 +648,6 @@ static void net_init_tap_one(const NetdevTapOpt=
-ions
->>>> *tap, NetClientState *peer,
->>>>       TAPState *s =3D net_tap_fd_init(peer, model, name, fd, vnet_hd=
-r);
->>>>       int vhostfd;
->>>> -    tap_set_sndbuf(s->fd, tap, &err);
->>>> -    if (err) {
->>>> -        error_propagate(errp, err);
->>>> -        return;
->>>> -    }
->>>> -
->>>>       if (tap->has_fd || tap->has_fds) {
->>>>           snprintf(s->nc.info_str, sizeof(s->nc.info_str), "fd=3D%d"=
-, fd);
->>>>       } else if (tap->has_helper) {
->>>> @@ -781,6 +775,12 @@ int net_init_tap(const Netdev *netdev, const ch=
-ar *name,
->>>>           vnet_hdr =3D tap_probe_vnet_hdr(fd);
->>>> +        tap_set_sndbuf(fd, tap, &err);
->>>> +        if (err) {
->>>> +            error_propagate(errp, err);
->>>> +            return -1;
->>>> +        }
->>>> +
->>>>           net_init_tap_one(tap, peer, "tap", name, NULL,
->>>>                            script, downscript,
->>>>                            vhostfdname, vnet_hdr, fd, &err);
->>>> @@ -832,6 +832,12 @@ int net_init_tap(const Netdev *netdev, const ch=
-ar *name,
->>>>                   goto free_fail;
->>>>               }
->>>> +            tap_set_sndbuf(fd, tap, &err);
->>>> +            if (err) {
->>>> +                error_propagate(errp, err);
->>>> +                goto free_fail;
->>>> +            }
->>>> +
->>>>               net_init_tap_one(tap, peer, "tap", name, ifname,
->>>>                                script, downscript,
->>>>                                tap->has_vhostfds ? vhost_fds[i] : NU=
-LL,
->>>> @@ -872,12 +878,21 @@ free_fail:
->>>>           fcntl(fd, F_SETFL, O_NONBLOCK);
->>>>           vnet_hdr =3D tap_probe_vnet_hdr(fd);
->>>> +        tap_set_sndbuf(fd, tap, &err);
->>>> +        if (err) {
->>>> +            error_propagate(errp, err);
->>>> +            close(fd);
->>>> +            return -1;
->>>> +        }
->>>> +
->>>>           net_init_tap_one(tap, peer, "bridge", name, ifname,
->>>>                            script, downscript, vhostfdname,
->>>>                            vnet_hdr, fd, &err);
->>>>           if (err) {
->>>>               error_propagate(errp, err);
->>>> -            close(fd);
->>>> +            if (tap->has_vhostforce && tap->vhostforce) {
->>>> +                close(fd);
->>>> +            }
->>>>               return -1;
->>>>           }
->>>>       } else {
->>>> @@ -910,13 +925,22 @@ free_fail:
->>>>                   }
->>>>               }
->>>> +            tap_set_sndbuf(fd, tap, &err);
->>>> +            if (err) {
->>>> +                error_propagate(errp, err);
->>>> +                close(fd);
->>>> +                return -1;
->>>> +            }
->>>> +
->>>>               net_init_tap_one(tap, peer, "tap", name, ifname,
->>>>                                i >=3D 1 ? "no" : script,
->>>>                                i >=3D 1 ? "no" : downscript,
->>>>                                vhostfdname, vnet_hdr, fd, &err);
->>>>               if (err) {
->>>>                   error_propagate(errp, err);
->>>> -                close(fd);
->>>> +                if (tap->has_vhostforce && tap->vhostforce) {
->>>> +                    close(fd);
->>>> +                }
->>>>                   return -1;
->>>>               }
->>>>           }
->>>
->>> Hi:
->>>
->>> I still fail to understand why not just pass force flag to net_tap_in=
-it_one(),
->>> and let it decide?
->>
->> I'm a little confused here, as you suggested in version 1:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg02933.html
->>
->> whether or not to close the fd should let the caller decide, so this i=
-s
->> the version 2.
->>
->> If I misunderstood something, please let me know, thanks!
->
-> I forgot some context here, sorry.
->
-> Rethink about this, looks like do it inside net_tap_init_one() is bette=
-r. Just
-> no need to modify caller and set err only when:
->
-> - sndbuf set fails
-> - vhost-net open or init fails and vhostforce set
->
-> And warn when vhost fail but vhostforces does not set?
+I think at the moment the status is that we're still discussing
+what the trace plugin API should be... there are some mailing
+list threads on the subject from I think last year some time.
 
-Okay, it seems reasonable and I agree with you. Will prepare for v3 soon.
-
-Regards,
-Jay
+thanks
+-- PMM
