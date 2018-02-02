@@ -1,38 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ehjE9-000850-7m
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 16:50:34 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ehjFm-0000YS-RS
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 16:52:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ehjE8-0004wr-8y
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 16:50:33 -0500
-Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:41663)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ehjE7-0004w9-SX
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 16:50:32 -0500
-Received: by mail-lf0-x236.google.com with SMTP id f136so33536360lff.8
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 13:50:31 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1ehjFl-00065Q-O7
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 16:52:14 -0500
+References: <20180202111022.rtnvwmjs4r4jzttq@olga.proxmox.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <89ac21c9-7d29-9333-6fe3-557b13ccf4e6@redhat.com>
+Date: Fri, 2 Feb 2018 16:52:00 -0500
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <87po5nxh5a.fsf@linaro.org>
-References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-	<87lghd3mq6.fsf@linaro.org>
-	<CAKmqyKMgrU+4ABijd0SgomyZriVjVFMYt=TXs5b9--w_kenZ+Q@mail.gmail.com>
-	<CAKmqyKMopCi5jaDstAX0Q3CzLdQ9wRgKWT2ggR_Or8Yh09zkrQ@mail.gmail.com>
-	<0b0a9968-02bf-9273-e5fe-a69e04cf7f5e@redhat.com>
-	<CAKmqyKMAy3qjjTFdtw4ksa=wJQYVzYZqvSopQ_cHbqwd0tr2cg@mail.gmail.com>
-	<87tvv1ydjl.fsf@linaro.org>
-	<CAKmqyKM10j7yyyhJn8SAv7K3EkZbmL-ckiv5_qQrFqiHvJ2z8g@mail.gmail.com>
-	<87r2q4yl3p.fsf@linaro.org>
-	<CAKmqyKPfE_Zrww5Ayc=bL4RLWpON14aoBkzTcUEafzikPrRohQ@mail.gmail.com>
-	<CAKmqyKOXV91ex4Ohqy54Df4nLVC5S51EXth9etK1Tudmt6h1vQ@mail.gmail.com>
-	<87po5nxh5a.fsf@linaro.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 2 Feb 2018 13:49:59 -0800
-Message-ID: <CAKmqyKNUYPJ68Ub-RbNL_C12vXyf+i=4FQbcvu16G0ErZVACPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] MTTCG External Halt
+In-Reply-To: <20180202111022.rtnvwmjs4r4jzttq@olga.proxmox.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] rate limiting issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,130 +23,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Wolfgang Bumiller <w.bumiller@proxmox.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, Qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
 
-On Fri, Feb 2, 2018 at 12:37 PM, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->
-> Alistair Francis <alistair.francis@xilinx.com> writes:
->
->> On Thu, Feb 1, 2018 at 9:13 AM, Alistair Francis
->> <alistair.francis@xilinx.com> wrote:
->>> On Thu, Feb 1, 2018 at 4:01 AM, Alex Benn=C3=A9e <alex.bennee@linaro.or=
-g> wrote:
->>>>
->>>> Alistair Francis <alistair.francis@xilinx.com> writes:
->>>>
->>>>> On Wed, Jan 31, 2018 at 12:32 PM, Alex Benn=C3=A9e <alex.bennee@linar=
-o.org> wrote:
->>>>>>
->>>>>> Alistair Francis <alistair.francis@xilinx.com> writes:
->>>>>>
->>>>>>> On Tue, Jan 30, 2018 at 8:26 PM, Paolo Bonzini <pbonzini@redhat.com=
-> wrote:
->>>>>>>> On 30/01/2018 18:56, Alistair Francis wrote:
->>>>>>>>>
->>>>>>>>> I don't have a good solution though, as setting CPU_INTERRUPT_RES=
-ET
->>>>>>>>> doesn't help (that isn't handled while we are halted) and
->>>>>>>>> async_run_on_cpu()/run_on_cpu() doesn't reliably reset the CPU wh=
-en we
->>>>>>>>> want.
->>>>>>>>>
->>>>>>>>> I've ever tried pausing all CPUs before reseting the CPU and them
->>>>>>>>> resuming them all but that doesn't seem to to work either.
->>>>>>>>
->>>>>>>> async_safe_run_on_cpu would be like async_run_on_cpu, except that =
-it
->>>>>>>> takes care of stopping all other CPUs while the function runs.
->>>>>>>>
->>>>>>>>> Is there
->>>>>>>>> anything I'm missing? Is there no reliable way to reset a CPU?
->>>>>>>>
->>>>>>>> What do you mean by reliable?  Executing no instruction after the =
-one
->>>>>>>> you were at?
->>>>>>>
->>>>>>> The reset is called by a GPIO line, so I need the reset to be calle=
-d
->>>>>>> basically as quickly as the GPIO line changes. The async_ and
->>>>>>> async_safe_ functions seem to not run quickly enough, even if I run=
- a
->>>>>>> process_work_queue() function afterwards.
->>>>>>>
->>>>>>> Is there a way to kick the CPU to act on the async_*?
->>>>>>
->>>>>> Define quickly enough? The async_(safe) functions kick the vCPUs so =
-they
->>>>>> will all exit the run loop as they enter the next TB (even if they l=
-oop
->>>>>> to themselves).
->>>>>
->>>>> We have a special power controller CPU that wakes all the CPUs up and
->>>>> at boot the async_* functions don't wake the CPUs up. If I just use
->>>>> the cpu_rest() function directly everything starts fine (but then I
->>>>> hit issues later).
->>>>>
->>>>> If I forcefully run process_queued_cpu_work() then I can get the CPUs
->>>>> up, but I don't think that is the right solution.
->>>>>
->>>>>>
->>>>>> From an external vCPUs point of view those extra instructions have
->>>>>> already executed. If the resetting vCPU needs them to have reset by =
-the
->>>>>> time it executes it's next instruction it should either cpu_loop_exi=
-t at
->>>>>> that point or ensure it is the last instruction in it's TB (which is
->>>>>> what we do for the MMU flush cases in ARM, they all end the TB at th=
-at
->>>>>> point).
->>>>>
->>>>> cpu_loop_exit() sounds like it would help, but as I'm not in the CPU
->>>>> context it just seg faults.
->>>>
->>>> What context are you in? gdb-stub does have to something like this.
->>>
->>> gdb-stub just seems to use vm_stop() and vm_start().
->>>
->>> That fixes all hangs/asserts, but now Linux only brings up 1 CPU (inste=
-ad of 4).
->>
->> Hmmm... Interesting if I do this on reset events:
->>
->>         pause_all_vcpus();
->>         cpu_reset(cpu);
->>         resume_all_vcpus();
->>
->> it hangs, while if I do this
->>
->>         if (runstate_is_running()) {
->>             vm_stop(RUN_STATE_PAUSED);
->>         }
->>         cpu_reset(cpu);
->>         if (!runstate_needs_reset()) {
->>             vm_start();
->>         }
->>
->> it doesn't hang but CPU bringup doesn't work.
->
-> Hmm I'm still confused what context you are in. Is this an externally
-> triggered reset via the (qemu) prompt or something?
+CCing qemu-block and Berto
 
-This gets called from a variety of places. But most likely it's called
-from a second QEMU process that is triggering an interrupt through a
-device.
-
-Alistair
-
->
->>
->> Alistair
->>
->>>
->>> Alistair
->
->
-> --
-> Alex Benn=C3=A9e
->
+On 02/02/2018 06:10 AM, Wolfgang Bumiller wrote:
+> Summary:
+> Rate limit is effectively halved when the size of written chunks adds up to
+> exceeding the quota of a slice only slightly. This is surprisingly reliable.
+> 
+> Explanation:
+> The ratelimiting code in include/qemu/ratelimit.h currently uses slices with
+> quotas. Finishing up the quota for one slice means it'll wait for the end of
+> this _and_ the next slice before resetting the accounting and start over.
+> If that first slice was exceeded by only a tiny bit, we effectively spend every
+> second slice waiting around. before starting over.
+> 
+> Here if I use a limit of 30000KiB/s I get 30000KiB/s.
+> Increasing the limit to 30700KiB/s gives me 30700KiB/s.
+> Increasing it to 30720KiB/s reliably gives me 15000KiB/s.
+> 
+> Making it wait to the end of only the current slice means the excess data is not
+> counted at all and we may go above the limit (though by at most one write-chunk,
+> so I'm not sure if that's fine for most of the users, for backup jobs it seems
+> to be 64k always).
+> 
+> I'd like to fix this and am unsure about which way to go. On the one hand I
+> think the old code (before f14a39ccb922) may be fixable in a better way by not
+> resetting the accounting completely but subtracting the amount of data the
+> wait-period would have added.
+> 
+> At the same time, though, this could be simplified to not using slices but
+> always comparing the amount of actually written data to the amount of data
+> which should at most have been written.
+> 
+> Here are two approaches which seem to fix my issues:
+> 
+> --- Old code revised:
+> 
+> typedef struct {
+>     int64_t next_slice_time;
+>     uint64_t slice_quota;
+>     uint64_t slice_ns;
+>     int64_t dispatched;
+> } RateLimit;
+> 
+> static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
+> {
+>     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> 
+>     assert(limit->slice_quota && limit->slice_ns);
+> 
+>     if (limit->next_slice_time == 0) { /* first call */
+>         limit->dispatched = 0;
+>         limit->next_slice_time = now + limit->slice_ns;
+>         return 0;
+>     }
+> 
+>     if (limit->next_slice_time < now) {
+>         uint64_t passed_slices = DIV_ROUND_UP(now - limit->next_slice_time,
+>             limit->slice_ns);
+>         limit->next_slice_time = now + limit->slice_ns;
+>         limit->dispatched -= passed_slices * limit->slice_quota;
+>     }
+>     limit->dispatched += n;
+>     if (limit->dispatched+n <= limit->slice_quota) {
+>         return 0;
+>     }
+>     return limit->next_slice_time - now;
+> }
+> 
+> static inline void ratelimit_set_speed(RateLimit *limit, uint64_t speed,
+>                                        uint64_t slice_ns)
+> {
+>     limit->slice_ns = slice_ns;
+>     limit->slice_quota = MAX(((double)speed * slice_ns) / 1000000000ULL, 1);
+> }
+> 
+> ---
+> 
+> And this is a short slice-less version. I wonder if there's any particular
+> reason for sticking to slices?
+> 
+> --- Version without slices:
+> 
+> typedef struct {
+>     int64_t last_time;
+>     uint64_t speed;
+>     int64_t allowed;
+> } RateLimit;
+> 
+> static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_t n)
+> {
+>     int64_t delta, now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> 
+>     if (limit->last_time == 0) { /* first call */
+>         limit->allowed = -n;
+>         limit->last_time = now;
+>         return (n * 1000000000ULL) / limit->speed;
+>     }
+> 
+>     delta = (now - limit->last_time);
+>     limit->allowed += (delta * limit->speed)/1000000000ULL - n;
+>     limit->last_time = now;
+>     if (limit->allowed < 0) {
+>         return ((uint64_t)-limit->allowed * 1000000000ULL) / limit->speed;
+>     }
+>     return 0;
+> }
+> 
+> static inline void ratelimit_set_speed(RateLimit *limit, uint64_t speed,
+>                                        uint64_t slice_ns)
+> {
+>     (void)slice_ns; // TODO: remove
+>     limit->speed = speed;
+> }
+> 
+> ---
+> 
+> Numerical note: a small delta means 'allowed' is incremented by 0, which
+> should be fine since when we hit the quota, we'll have a longer wait after
+> which the delta is for sure big enough to produce positive values.
+> (I tried larger and smaller values (1KiB/s to some MiB/s)).
+> Alternatively we could set last_time and do the quota increment
+> conditionally only when the delta is big enough, but I have not found
+> this to be necessary in my tests.
+> 
+> 
