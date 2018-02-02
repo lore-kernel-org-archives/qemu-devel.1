@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51439)
+Received: from eggs.gnu.org ([208.118.235.92]:51504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehdIw-0000Q1-NR
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:32:12 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehdIz-0000Sp-I0
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:32:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehdHs-0000Tq-IG
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:31:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42462)
+	(envelope-from <armbru@redhat.com>) id 1ehdHv-0000XY-Cs
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:31:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43722)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehdHr-0000S1-Ua
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:30:00 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehdHu-0000WA-U5
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:30:03 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  2 Feb 2018 14:03:21 +0100
-Message-Id: <20180202130336.24719-7-armbru@redhat.com>
+Date: Fri,  2 Feb 2018 14:03:29 +0100
+Message-Id: <20180202130336.24719-15-armbru@redhat.com>
 In-Reply-To: <20180202130336.24719-1-armbru@redhat.com>
 References: <20180202130336.24719-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 06/21] qapi-gen: New common driver for code
- and doc generators
+Subject: [Qemu-devel] [PATCH RFC 14/21] qapi: Generate in source order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,659 +26,599 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-Whenever qapi-schema.json changes, we run six programs eleven times to
-update eleven files.  This is silly.  Replace the six programs by a
-single program that spits out all eleven files.
+The generators' conversion to visitors (merge commit 9e72681d16)
+changed the processing order of entities from source order to
+alphabetical order.  The next commit needs source order, so change it
+back.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- Makefile                                           | 86 ++++++++++------------
- scripts/qapi-gen.py                                | 41 +++++++++++
- scripts/qapi/__init__.py                           |  0
- scripts/{qapi-commands.py => qapi/commands.py}     | 23 ++----
- scripts/{qapi.py => qapi/common.py}                |  0
- scripts/{qapi2texi.py => qapi/doc.py}              | 29 ++------
- scripts/{qapi-event.py => qapi/events.py}          | 23 ++----
- scripts/{qapi-introspect.py => qapi/introspect.py} | 32 ++------
- scripts/{qapi-types.py => qapi/types.py}           | 34 ++-------
- scripts/{qapi-visit.py => qapi/visit.py}           | 34 ++-------
- tests/Makefile.include                             | 56 +++++++-------
- tests/qapi-schema/test-qapi.py                     |  2 +-
- 12 files changed, 140 insertions(+), 220 deletions(-)
- create mode 100755 scripts/qapi-gen.py
- create mode 100644 scripts/qapi/__init__.py
- rename scripts/{qapi-commands.py => qapi/commands.py} (94%)
- rename scripts/{qapi.py => qapi/common.py} (100%)
- rename scripts/{qapi2texi.py => qapi/doc.py} (92%)
- mode change 100755 => 100644
- rename scripts/{qapi-event.py => qapi/events.py} (92%)
- rename scripts/{qapi-introspect.py => qapi/introspect.py} (90%)
- rename scripts/{qapi-types.py => qapi/types.py} (90%)
- rename scripts/{qapi-visit.py => qapi/visit.py} (92%)
+ scripts/qapi/common.py                   |   4 +-
+ tests/qapi-schema/comments.out           |   2 +-
+ tests/qapi-schema/doc-bad-section.out    |   4 +-
+ tests/qapi-schema/doc-good.out           |  32 ++--
+ tests/qapi-schema/empty.out              |   2 +-
+ tests/qapi-schema/event-case.out         |   2 +-
+ tests/qapi-schema/ident-with-escape.out  |   6 +-
+ tests/qapi-schema/include-relpath.out    |   2 +-
+ tests/qapi-schema/include-repetition.out |   2 +-
+ tests/qapi-schema/include-simple.out     |   2 +-
+ tests/qapi-schema/indented-expr.out      |   2 +-
+ tests/qapi-schema/qapi-schema-test.out   | 320 +++++++++++++++----------------
+ 12 files changed, 191 insertions(+), 189 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index af31e8981f..e02f0c13ef 100644
---- a/Makefile
-+++ b/Makefile
-@@ -92,6 +92,7 @@ GENERATED_FILES += qmp-commands.h qapi-types.h qapi-visit.h qapi-event.h
- GENERATED_FILES += qmp-marshal.c qapi-types.c qapi-visit.c qapi-event.c
- GENERATED_FILES += qmp-introspect.h
- GENERATED_FILES += qmp-introspect.c
-+GENERATED_FILES += qapi.texi
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index d5b93e7381..3b97bf8702 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1471,6 +1471,7 @@ class QAPISchema(object):
+         parser = QAPISchemaParser(open(fname, 'r'))
+         exprs = check_exprs(parser.exprs)
+         self.docs = parser.docs
++        self._entity_list = []
+         self._entity_dict = {}
+         self._predefining = True
+         self._def_predefineds()
+@@ -1482,6 +1483,7 @@ class QAPISchema(object):
+         # Only the predefined types are allowed to not have info
+         assert ent.info or self._predefining
+         assert ent.name not in self._entity_dict
++        self._entity_list.append(ent)
+         self._entity_dict[ent.name] = ent
  
- GENERATED_FILES += trace/generated-tcg-tracers.h
+     def lookup_entity(self, name, typ=None):
+@@ -1685,7 +1687,7 @@ class QAPISchema(object):
  
-@@ -477,25 +478,26 @@ qemu-ga$(EXESUF): QEMU_CFLAGS += -I qga/qapi-generated
- qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
- qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
- 
--gen-out-type = $(subst .,-,$(suffix $@))
-+qapi-py = $(SRC_PATH)/scripts/qapi/commands.py \
-+$(SRC_PATH)/scripts/qapi/events.py \
-+$(SRC_PATH)/scripts/qapi/introspect.py \
-+$(SRC_PATH)/scripts/qapi/types.py \
-+$(SRC_PATH)/scripts/qapi/visit.py \
-+$(SRC_PATH)/scripts/qapi/common.py \
-+$(SRC_PATH)/scripts/qapi/doc.py \
-+$(SRC_PATH)/scripts/ordereddict.py \
-+$(SRC_PATH)/scripts/qapi-gen.py
- 
--qapi-py = $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.py
--
--qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h :\
--$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
--		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
--		"GEN","$@")
--qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h :\
--$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py \
--		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
--		"GEN","$@")
--qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal.c :\
--$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.py \
--		$(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
--		"GEN","$@")
-+qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
-+qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h \
-+qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal.c \
-+qga/qapi-generated/qga-qapi.texi: \
-+qga/qapi-generated/qapi-gen-timestamp ;
-+qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
-+		-o qga/qapi-generated -p "qga-" $<, \
-+		"GEN","$(@:%-timestamp=%)")
-+	@>$@
- 
- qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.json \
-@@ -512,31 +514,18 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/transaction.json \
-                $(SRC_PATH)/qapi/ui.json
- 
--qapi-types.c qapi-types.h :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
--		$(gen-out-type) -o "." -b $<, \
--		"GEN","$@")
--qapi-visit.c qapi-visit.h :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py \
--		$(gen-out-type) -o "." -b $<, \
--		"GEN","$@")
--qapi-event.c qapi-event.h :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py \
--		$(gen-out-type) -o "." $<, \
--		"GEN","$@")
--qmp-commands.h qmp-marshal.c :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.py \
--		$(gen-out-type) -o "." $<, \
--		"GEN","$@")
--qmp-introspect.h qmp-introspect.c :\
--$(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspect.py \
--		$(gen-out-type) -o "." $<, \
--		"GEN","$@")
-+qapi-types.c qapi-types.h \
-+qapi-visit.c qapi-visit.h \
-+qmp-commands.h qmp-marshal.c \
-+qapi-event.c qapi-event.h \
-+qmp-introspect.h qmp-introspect.c \
-+qapi.texi: \
-+qapi-gen-timestamp ;
-+qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
-+		-o "." -b $<, \
-+		"GEN","$(@:%-timestamp=%)")
-+	@>$@
- 
- QGALIB_GEN=$(addprefix qga/qapi-generated/, qga-qapi-types.h qga-qapi-visit.h qga-qmp-commands.h)
- $(qga-obj-y): $(QGALIB_GEN)
-@@ -596,6 +585,7 @@ clean:
- 	rm -f trace/generated-tracers-dtrace.dtrace*
- 	rm -f trace/generated-tracers-dtrace.h*
- 	rm -f $(foreach f,$(GENERATED_FILES),$(f) $(f)-timestamp)
-+	rm -f qapi-gen-timestamp
- 	rm -rf qapi-generated
- 	rm -rf qga/qapi-generated
- 	for d in $(ALL_SUBDIRS); do \
-@@ -803,13 +793,11 @@ qemu-monitor-info.texi: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxt
- qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
- 
--docs/interop/qemu-qmp-qapi.texi docs/interop/qemu-ga-qapi.texi: $(SRC_PATH)/scripts/qapi2texi.py $(qapi-py)
-+docs/interop/qemu-qmp-qapi.texi: qapi.texi
-+	@cp -p $< $@
- 
--docs/interop/qemu-qmp-qapi.texi: $(qapi-modules)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@,"GEN","$@")
--
--docs/interop/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@,"GEN","$@")
-+docs/interop/qemu-ga-qapi.texi: qga/qapi-generated/qga-qapi.texi
-+	@cp -p $< $@
- 
- qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
- qemu.1: qemu-option-trace.texi
-diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
-new file mode 100755
-index 0000000000..575c938a1b
---- /dev/null
-+++ b/scripts/qapi-gen.py
-@@ -0,0 +1,41 @@
-+#!/usr/bin/env python
-+# QAPI generator
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+
-+import sys
-+from qapi.common import parse_command_line, QAPISchema
-+from qapi.types import gen_types
-+from qapi.visit import gen_visit
-+from qapi.commands import gen_commands
-+from qapi.events import gen_events
-+from qapi.introspect import gen_introspect
-+from qapi.doc import gen_doc
-+
-+
-+def main(argv):
-+    (input_file, output_dir, do_c, do_h, prefix, opts) = \
-+        parse_command_line('bu', ['builtins', 'unmask-non-abi-names'])
-+
-+    opt_builtins = False
-+    opt_unmask = False
-+
-+    for o, a in opts:
-+        if o in ('-b', '--builtins'):
-+            opt_builtins = True
-+        if o in ('-u', '--unmask-non-abi-names'):
-+            opt_unmask = True
-+
-+    schema = QAPISchema(input_file)
-+
-+    gen_types(schema, output_dir, prefix, opt_builtins)
-+    gen_visit(schema, output_dir, prefix, opt_builtins)
-+    gen_commands(schema, output_dir, prefix)
-+    gen_events(schema, output_dir, prefix)
-+    gen_introspect(schema, output_dir, prefix, opt_unmask)
-+    gen_doc(schema, output_dir, prefix)
-+
-+
-+if __name__ == '__main__':
-+    main(sys.argv)
-diff --git a/scripts/qapi/__init__.py b/scripts/qapi/__init__.py
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/scripts/qapi-commands.py b/scripts/qapi/commands.py
-similarity index 94%
-rename from scripts/qapi-commands.py
-rename to scripts/qapi/commands.py
-index 331b58670e..383a4dd426 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi/commands.py
-@@ -13,7 +13,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
- See the COPYING file in the top-level directory.
- """
- 
--from qapi import *
-+from qapi.common import *
- 
- 
- def gen_command_decl(name, arg_type, boxed, ret_type):
-@@ -255,13 +255,8 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-         self._regy += gen_register_command(name, success_response)
- 
- 
--def main(argv):
--    (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
--
--    blurb = '''
-- * Schema-defined QAPI/QMP commands
--'''
--
-+def gen_commands(schema, output_dir, prefix):
-+    blurb = ' * Schema-defined QAPI/QMP commands'
-     genc = QAPIGenC(blurb, __doc__)
-     genh = QAPIGenH(blurb, __doc__)
- 
-@@ -290,17 +285,9 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
- ''',
-                     prefix=prefix, c_prefix=c_name(prefix, protect=False)))
- 
--    schema = QAPISchema(input_file)
-     vis = QAPISchemaGenCommandVisitor(prefix)
-     schema.visit(vis)
-     genc.body(vis.defn)
-     genh.body(vis.decl)
--
--    if do_c:
--        genc.write(output_dir, prefix + 'qmp-marshal.c')
--    if do_h:
--        genh.write(output_dir, prefix + 'qmp-commands.h')
--
--
--if __name__ == '__main__':
--    main(sys.argv)
-+    genc.write(output_dir, prefix + 'qmp-marshal.c')
-+    genh.write(output_dir, prefix + 'qmp-commands.h')
-diff --git a/scripts/qapi.py b/scripts/qapi/common.py
-similarity index 100%
-rename from scripts/qapi.py
-rename to scripts/qapi/common.py
-diff --git a/scripts/qapi2texi.py b/scripts/qapi/doc.py
-old mode 100755
-new mode 100644
-similarity index 92%
-rename from scripts/qapi2texi.py
-rename to scripts/qapi/doc.py
-index 924b374cd3..1f57f6e1c2
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi/doc.py
-@@ -4,10 +4,9 @@
- # This work is licensed under the terms of the GNU LGPL, version 2+.
- # See the COPYING file in the top-level directory.
- """This script produces the documentation of a qapi schema in texinfo format"""
-+
- import re
--import sys
--
--import qapi
-+import qapi.common
- 
- MSG_FMT = """
- @deftypefn {type} {{}} {name}
-@@ -196,7 +195,7 @@ def texi_entity(doc, what, base=None, variants=None,
-             + texi_sections(doc))
- 
- 
--class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-+class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
-     def __init__(self):
-         self.out = None
-         self.cur_doc = None
-@@ -271,20 +270,8 @@ def texi_schema(schema):
-     return gen.out
- 
- 
--def main(argv):
--    """Takes schema argument, prints result to stdout"""
--    if len(argv) != 2:
--        print >>sys.stderr, "%s: need exactly 1 argument: SCHEMA" % argv[0]
--        sys.exit(1)
--
--    schema = qapi.QAPISchema(argv[1])
--    if not qapi.doc_required:
--        print >>sys.stderr, ("%s: need pragma 'doc-required' "
--                             "to generate documentation" % argv[0])
--        sys.exit(1)
--    print '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n'
--    print texi_schema(schema),
--
--
--if __name__ == '__main__':
--    main(sys.argv)
-+def gen_doc(schema, output_dir, prefix):
-+    if qapi.common.doc_required:
-+        gen = qapi.common.QAPIGenDoc()
-+        gen.body(texi_schema(schema))
-+        gen.write(output_dir, prefix + 'qapi.texi')
-diff --git a/scripts/qapi-event.py b/scripts/qapi/events.py
-similarity index 92%
-rename from scripts/qapi-event.py
-rename to scripts/qapi/events.py
-index 5b33c694d4..1f267686db 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi/events.py
-@@ -12,7 +12,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
- See the COPYING file in the top-level directory.
- """
- 
--from qapi import *
-+from qapi.common import *
- 
- 
- def build_event_send_proto(name, arg_type, boxed):
-@@ -171,13 +171,8 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
-         self._event_names.append(name)
- 
- 
--def main(argv):
--    (input_file, output_dir, do_c, do_h, prefix, dummy) = parse_command_line()
--
--    blurb = '''
-- * Schema-defined QAPI/QMP events
--'''
--
-+def gen_events(schema, output_dir, prefix):
-+    blurb = ' * Schema-defined QAPI/QMP events'
-     genc = QAPIGenC(blurb, __doc__)
-     genh = QAPIGenH(blurb, __doc__)
- 
-@@ -201,17 +196,9 @@ def main(argv):
- ''',
-                     prefix=prefix))
- 
--    schema = QAPISchema(input_file)
-     vis = QAPISchemaGenEventVisitor(prefix)
-     schema.visit(vis)
-     genc.body(vis.defn)
-     genh.body(vis.decl)
--
--    if do_c:
--        genc.write(output_dir, prefix + 'qapi-event.c')
--    if do_h:
--        genh.write(output_dir, prefix + 'qapi-event.h')
--
--
--if __name__ == '__main__':
--    main(sys.argv)
-+    genc.write(output_dir, prefix + 'qapi-event.c')
-+    genh.write(output_dir, prefix + 'qapi-event.h')
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi/introspect.py
-similarity index 90%
-rename from scripts/qapi-introspect.py
-rename to scripts/qapi/introspect.py
-index 09e7d1f140..2153060f2c 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -10,7 +10,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
- See the COPYING file in the top-level directory.
- """
- 
--from qapi import *
-+from qapi.common import *
- 
- 
- # Caveman's json.dumps() replacement (we're stuck at Python 2.4)
-@@ -168,22 +168,8 @@ const char %(c_name)s[] = %(c_string)s;
-         self._gen_json(name, 'event', {'arg-type': self._use_type(arg_type)})
- 
- 
--def main(argv):
--    # Debugging aid: unmask QAPI schema's type names
--    # We normally mask them, because they're not QMP wire ABI
--    opt_unmask = False
--
--    (input_file, output_dir, do_c, do_h, prefix, opts) = \
--        parse_command_line('u', ['unmask-non-abi-names'])
--
--    for o, a in opts:
--        if o in ('-u', '--unmask-non-abi-names'):
--            opt_unmask = True
--
--    blurb = '''
-- * QAPI/QMP schema introspection
--'''
--
-+def gen_introspect(schema, output_dir, prefix, opt_unmask):
-+    blurb = ' * QAPI/QMP schema introspection'
-     genc = QAPIGenC(blurb, __doc__)
-     genh = QAPIGenH(blurb, __doc__)
- 
-@@ -194,17 +180,9 @@ def main(argv):
- ''',
-                     prefix=prefix))
- 
--    schema = QAPISchema(input_file)
-     vis = QAPISchemaGenIntrospectVisitor(prefix, opt_unmask)
-     schema.visit(vis)
-     genc.body(vis.defn)
-     genh.body(vis.decl)
--
--    if do_c:
--        genc.write(output_dir, prefix + 'qmp-introspect.c')
--    if do_h:
--        genh.write(output_dir, prefix + 'qmp-introspect.h')
--
--
--if __name__ == '__main__':
--    main(sys.argv)
-+    genc.write(output_dir, prefix + 'qmp-introspect.c')
-+    genh.write(output_dir, prefix + 'qmp-introspect.h')
-diff --git a/scripts/qapi-types.py b/scripts/qapi/types.py
-similarity index 90%
-rename from scripts/qapi-types.py
-rename to scripts/qapi/types.py
-index f2ddde94b1..b2095120e0 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi/types.py
-@@ -13,7 +13,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
- # See the COPYING file in the top-level directory.
- """
- 
--from qapi import *
-+from qapi.common import *
- 
- 
- # variants must be emitted before their container; track what has already
-@@ -241,24 +241,8 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-         self._gen_type_cleanup(name)
- 
- 
--def main(argv):
--    # If you link code generated from multiple schemata, you want only one
--    # instance of the code for built-in types.  Generate it only when
--    # opt_builtins, enabled by command line option -b.  See also
--    # QAPISchemaGenTypeVisitor.visit_end().
--    opt_builtins = False
--
--    (input_file, output_dir, do_c, do_h, prefix, opts) = \
--        parse_command_line('b', ['builtins'])
--
--    for o, a in opts:
--        if o in ('-b', '--builtins'):
--            opt_builtins = True
--
--    blurb = '''
-- * Schema-defined QAPI types
--'''
--
-+def gen_types(schema, output_dir, prefix, opt_builtins):
-+    blurb = ' * Schema-defined QAPI types'
-     genc = QAPIGenC(blurb, __doc__)
-     genh = QAPIGenH(blurb, __doc__)
- 
-@@ -274,17 +258,9 @@ def main(argv):
- #include "qapi/util.h"
- '''))
- 
--    schema = QAPISchema(input_file)
-     vis = QAPISchemaGenTypeVisitor(opt_builtins)
-     schema.visit(vis)
-     genc.body(vis.defn)
-     genh.body(vis.decl)
--
--    if do_c:
--        genc.write(output_dir, prefix + 'qapi-types.c')
--    if do_h:
--        genh.write(output_dir, prefix + 'qapi-types.h')
--
--
--if __name__ == '__main__':
--    main(sys.argv)
-+    genc.write(output_dir, prefix + 'qapi-types.c')
-+    genh.write(output_dir, prefix + 'qapi-types.h')
-diff --git a/scripts/qapi-visit.py b/scripts/qapi/visit.py
-similarity index 92%
-rename from scripts/qapi-visit.py
-rename to scripts/qapi/visit.py
-index 473fa72574..80c0b85f8c 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi/visit.py
-@@ -13,7 +13,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
- See the COPYING file in the top-level directory.
- """
- 
--from qapi import *
-+from qapi.common import *
- 
- 
- def gen_visit_decl(name, scalar=False):
-@@ -324,24 +324,8 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-         self.defn += gen_visit_alternate(name, variants)
- 
- 
--def main(argv):
--    # If you link code generated from multiple schemata, you want only one
--    # instance of the code for built-in types.  Generate it only when
--    # opt_builtins, enabled by command line option -b.  See also
--    # QAPISchemaGenVisitVisitor.visit_end().
--    opt_builtins = False
--
--    (input_file, output_dir, do_c, do_h, prefix, opts) = \
--        parse_command_line('b', ['builtins'])
--
--    for o, a in opts:
--        if o in ('-b', '--builtins'):
--            opt_builtins = True
--
--    blurb = '''
-- * Schema-defined QAPI visitors
--'''
--
-+def gen_visit(schema, output_dir, prefix, opt_builtins):
-+    blurb = ' * Schema-defined QAPI visitors'
-     genc = QAPIGenC(blurb, __doc__)
-     genh = QAPIGenH(blurb, __doc__)
- 
-@@ -361,17 +345,9 @@ def main(argv):
- ''',
-                     prefix=prefix))
- 
--    schema = QAPISchema(input_file)
-     vis = QAPISchemaGenVisitVisitor(opt_builtins)
-     schema.visit(vis)
-     genc.body(vis.defn)
-     genh.body(vis.decl)
--
--    if do_c:
--        genc.write(output_dir, prefix + 'qapi-visit.c')
--    if do_h:
--        genh.write(output_dir, prefix + 'qapi-visit.h')
--
--
--if __name__ == '__main__':
--    main(sys.argv)
-+    genc.write(output_dir, prefix + 'qapi-visit.c')
-+    genh.write(output_dir, prefix + 'qapi-visit.h')
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 851aafe9d1..768655a810 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -23,7 +23,16 @@ check-help:
- ifneq ($(wildcard config-host.mak),)
- export SRC_PATH
- 
--qapi-py = $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.py
-+# TODO don't duplicate $(SRC_PATH)/Makefile's qapi-py here
-+qapi-py = $(SRC_PATH)/scripts/qapi/commands.py \
-+$(SRC_PATH)/scripts/qapi/events.py \
-+$(SRC_PATH)/scripts/qapi/introspect.py \
-+$(SRC_PATH)/scripts/qapi/types.py \
-+$(SRC_PATH)/scripts/qapi/visit.py \
-+$(SRC_PATH)/scripts/qapi/common.py \
-+$(SRC_PATH)/scripts/qapi/doc.py \
-+$(SRC_PATH)/scripts/ordereddict.py \
-+$(SRC_PATH)/scripts/qapi-gen.py
- 
- # Get the list of all supported sysemu targets
- SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
-@@ -642,34 +651,24 @@ tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
- tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-obj-y) \
- 	$(test-block-obj-y)
- 
--tests/test-qapi-types.c tests/test-qapi-types.h :\
--$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
--		$(gen-out-type) -o tests -p "test-" $<, \
--		"GEN","$@")
--tests/test-qapi-visit.c tests/test-qapi-visit.h :\
--$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py \
--		$(gen-out-type) -o tests -p "test-" $<, \
--		"GEN","$@")
--tests/test-qmp-commands.h tests/test-qmp-marshal.c :\
--$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.py \
--		$(gen-out-type) -o tests -p "test-" $<, \
--		"GEN","$@")
--tests/test-qapi-event.c tests/test-qapi-event.h :\
--$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/qapi-event.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py \
--		$(gen-out-type) -o tests -p "test-" $<, \
--		"GEN","$@")
--tests/test-qmp-introspect.c tests/test-qmp-introspect.h :\
--$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspect.py \
--		$(gen-out-type) -o tests -p "test-" $<, \
--		"GEN","$@")
-+tests/test-qapi-types.c tests/test-qapi-types.h \
-+tests/test-qapi-visit.c tests/test-qapi-visit.h \
-+tests/test-qmp-commands.h tests/test-qmp-marshal.c \
-+tests/test-qapi-event.c tests/test-qapi-event.h \
-+tests/test-qmp-introspect.c tests/test-qmp-introspect.h: \
-+tests/test-qapi-gen-timestamp ;
-+tests/test-qapi-gen-timestamp: $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(qapi-py)
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
-+		-o tests -p "test-" $<, \
-+		"GEN","$(@:%-timestamp=%)")
-+	@>$@
- 
--tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(SRC_PATH)/scripts/qapi2texi.py $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@,"GEN","$@")
-+tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
-+		-o tests/qapi-schema -p "doc-good-" $<, \
-+		"GEN","$@")
-+	@mv tests/qapi-schema/doc-good-qapi.texi $@
-+	@rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-schema/doc-good-qmp-*.[ch]
- 
- tests/test-string-output-visitor$(EXESUF): tests/test-string-output-visitor.o $(test-qapi-obj-y)
- tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visitor.o $(test-qapi-obj-y)
-@@ -937,6 +936,7 @@ check-clean:
- 	$(MAKE) -C tests/tcg clean
- 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
-+	rm -f tests/test-qapi-gen-timestamp
- 
- clean: check-clean
- 
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index fe0ca08d78..7772d09919 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -10,7 +10,7 @@
- # See the COPYING file in the top-level directory.
- #
- 
--from qapi import *
-+from qapi.common import *
- from pprint import pprint
- import os
- import sys
+     def visit(self, visitor):
+         visitor.visit_begin(self)
+-        for (name, entity) in sorted(self._entity_dict.items()):
++        for entity in self._entity_list:
+             if visitor.visit_needed(entity):
+                 entity.visit(visitor)
+         visitor.visit_end()
+diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.out
+index 17e652535c..0261ddf202 100644
+--- a/tests/qapi-schema/comments.out
++++ b/tests/qapi-schema/comments.out
+@@ -1,4 +1,4 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+ enum Status ['good', 'bad', 'ugly']
+-object q_empty
+diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/doc-bad-section.out
+index 089bde1381..23bf8c71ab 100644
+--- a/tests/qapi-schema/doc-bad-section.out
++++ b/tests/qapi-schema/doc-bad-section.out
+@@ -1,7 +1,7 @@
+-enum Enum ['one', 'two']
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+-object q_empty
++enum Enum ['one', 'two']
+ doc symbol=Enum
+     body=
+ == Produces *invalid* texinfo
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index 1d2c250527..0c07301f07 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -1,35 +1,35 @@
++object q_empty
++enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
++    prefix QTYPE
++enum Enum ['one', 'two']
+ object Base
+     member base1: Enum optional=False
+-enum Enum ['one', 'two']
++object Variant1
++    member var1: str optional=False
++object Variant2
+ object Object
+     base Base
+     tag base1
+     case one: Variant1
+     case two: Variant2
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+-    prefix QTYPE
++object q_obj_Variant1-wrapper
++    member data: Variant1 optional=False
++object q_obj_Variant2-wrapper
++    member data: Variant2 optional=False
++enum SugaredUnionKind ['one', 'two']
+ object SugaredUnion
+     member type: SugaredUnionKind optional=False
+     tag type
+     case one: q_obj_Variant1-wrapper
+     case two: q_obj_Variant2-wrapper
+-enum SugaredUnionKind ['one', 'two']
+-object Variant1
+-    member var1: str optional=False
+-object Variant2
+-command cmd q_obj_cmd-arg -> Object
+-   gen=True success_response=True boxed=False
+-command cmd-boxed Object -> None
+-   gen=True success_response=True boxed=True
+-object q_empty
+-object q_obj_Variant1-wrapper
+-    member data: Variant1 optional=False
+-object q_obj_Variant2-wrapper
+-    member data: Variant2 optional=False
+ object q_obj_cmd-arg
+     member arg1: int optional=False
+     member arg2: str optional=True
+     member arg3: bool optional=False
++command cmd q_obj_cmd-arg -> Object
++   gen=True success_response=True boxed=False
++command cmd-boxed Object -> None
++   gen=True success_response=True boxed=True
+ doc freeform
+     body=
+ = Section
+diff --git a/tests/qapi-schema/empty.out b/tests/qapi-schema/empty.out
+index 40b886ddae..0ec234eec4 100644
+--- a/tests/qapi-schema/empty.out
++++ b/tests/qapi-schema/empty.out
+@@ -1,3 +1,3 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+-object q_empty
+diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-case.out
+index 313c0fe7be..110571b793 100644
+--- a/tests/qapi-schema/event-case.out
++++ b/tests/qapi-schema/event-case.out
+@@ -1,5 +1,5 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+ event oops None
+    boxed=False
+-object q_empty
+diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/ident-with-escape.out
+index b5637cb2e0..8336aa7629 100644
+--- a/tests/qapi-schema/ident-with-escape.out
++++ b/tests/qapi-schema/ident-with-escape.out
+@@ -1,7 +1,7 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+-command fooA q_obj_fooA-arg -> None
+-   gen=True success_response=True boxed=False
+-object q_empty
+ object q_obj_fooA-arg
+     member bar1: str optional=False
++command fooA q_obj_fooA-arg -> None
++   gen=True success_response=True boxed=False
+diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/include-relpath.out
+index 17e652535c..0261ddf202 100644
+--- a/tests/qapi-schema/include-relpath.out
++++ b/tests/qapi-schema/include-relpath.out
+@@ -1,4 +1,4 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+ enum Status ['good', 'bad', 'ugly']
+-object q_empty
+diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema/include-repetition.out
+index 17e652535c..0261ddf202 100644
+--- a/tests/qapi-schema/include-repetition.out
++++ b/tests/qapi-schema/include-repetition.out
+@@ -1,4 +1,4 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+ enum Status ['good', 'bad', 'ugly']
+-object q_empty
+diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/include-simple.out
+index 17e652535c..0261ddf202 100644
+--- a/tests/qapi-schema/include-simple.out
++++ b/tests/qapi-schema/include-simple.out
+@@ -1,4 +1,4 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+ enum Status ['good', 'bad', 'ugly']
+-object q_empty
+diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/indented-expr.out
+index 586795f44d..34de8be426 100644
+--- a/tests/qapi-schema/indented-expr.out
++++ b/tests/qapi-schema/indented-expr.out
+@@ -1,7 +1,7 @@
++object q_empty
+ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+     prefix QTYPE
+ command eins None -> None
+    gen=True success_response=True boxed=False
+-object q_empty
+ command zwei None -> None
+    gen=True success_response=True boxed=False
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
+index 3b1e9082d3..50706b0136 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -1,87 +1,129 @@
+-alternate AltEnumBool
+-    tag type
+-    case e: EnumOne
+-    case b: bool
+-alternate AltEnumInt
+-    tag type
+-    case e: EnumOne
+-    case i: int
+-alternate AltEnumNum
+-    tag type
+-    case e: EnumOne
+-    case n: number
+-alternate AltNumEnum
+-    tag type
+-    case n: number
+-    case e: EnumOne
+-alternate AltStrObj
+-    tag type
+-    case s: str
+-    case o: TestStruct
+-event EVENT_A None
+-   boxed=False
+-event EVENT_B None
+-   boxed=False
+-event EVENT_C q_obj_EVENT_C-arg
+-   boxed=False
+-event EVENT_D q_obj_EVENT_D-arg
+-   boxed=False
+-event EVENT_E UserDefZero
+-   boxed=True
+-event EVENT_F UserDefAlternate
+-   boxed=True
++object q_empty
++enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
++    prefix QTYPE
++object TestStruct
++    member integer: int optional=False
++    member boolean: bool optional=False
++    member string: str optional=False
++object NestedEnumsOne
++    member enum1: EnumOne optional=False
++    member enum2: EnumOne optional=True
++    member enum3: EnumOne optional=False
++    member enum4: EnumOne optional=True
++enum MyEnum []
+ object Empty1
+ object Empty2
+     base Empty1
++command user_def_cmd0 Empty2 -> Empty2
++   gen=True success_response=True boxed=False
++enum QEnumTwo ['value1', 'value2']
++    prefix QENUM_TWO
++object UserDefOne
++    base UserDefZero
++    member string: str optional=False
++    member enum1: EnumOne optional=True
+ enum EnumOne ['value1', 'value2', 'value3']
+-object EventStructOne
+-    member struct1: UserDefOne optional=False
++object UserDefZero
++    member integer: int optional=False
++object UserDefTwoDictDict
++    member userdef: UserDefOne optional=False
+     member string: str optional=False
+-    member enum2: EnumOne optional=True
++object UserDefTwoDict
++    member string1: str optional=False
++    member dict2: UserDefTwoDictDict optional=False
++    member dict3: UserDefTwoDictDict optional=True
++object UserDefTwo
++    member string0: str optional=False
++    member dict1: UserDefTwoDict optional=False
+ object ForceArrays
+     member unused1: UserDefOneList optional=False
+     member unused2: UserDefTwoList optional=False
+     member unused3: TestStructList optional=False
+-enum MyEnum []
+-object NestedEnumsOne
+-    member enum1: EnumOne optional=False
+-    member enum2: EnumOne optional=True
+-    member enum3: EnumOne optional=False
+-    member enum4: EnumOne optional=True
+-enum QEnumTwo ['value1', 'value2']
+-    prefix QENUM_TWO
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
+-    prefix QTYPE
+-object TestStruct
+-    member integer: int optional=False
+-    member boolean: bool optional=False
+-    member string: str optional=False
+ object UserDefA
+     member boolean: bool optional=False
+     member a_b: int optional=True
+-alternate UserDefAlternate
+-    tag type
+-    case udfu: UserDefFlatUnion
+-    case e: EnumOne
+-    case i: int
+-    case n: null
+ object UserDefB
+     member intb: int optional=False
+     member a-b: bool optional=True
+-object UserDefC
+-    member string1: str optional=False
+-    member string2: str optional=False
+ object UserDefFlatUnion
+     base UserDefUnionBase
+     tag enum1
+     case value1: UserDefA
+     case value2: UserDefB
+     case value3: UserDefB
++object UserDefUnionBase
++    base UserDefZero
++    member string: str optional=False
++    member enum1: EnumOne optional=False
++object q_obj_UserDefFlatUnion2-base
++    member integer: int optional=True
++    member string: str optional=False
++    member enum1: QEnumTwo optional=False
+ object UserDefFlatUnion2
+     base q_obj_UserDefFlatUnion2-base
+     tag enum1
+     case value1: UserDefC
+     case value2: UserDefB
++object WrapAlternate
++    member alt: UserDefAlternate optional=False
++alternate UserDefAlternate
++    tag type
++    case udfu: UserDefFlatUnion
++    case e: EnumOne
++    case i: int
++    case n: null
++object UserDefC
++    member string1: str optional=False
++    member string2: str optional=False
++alternate AltEnumBool
++    tag type
++    case e: EnumOne
++    case b: bool
++alternate AltEnumNum
++    tag type
++    case e: EnumOne
++    case n: number
++alternate AltNumEnum
++    tag type
++    case n: number
++    case e: EnumOne
++alternate AltEnumInt
++    tag type
++    case e: EnumOne
++    case i: int
++alternate AltStrObj
++    tag type
++    case s: str
++    case o: TestStruct
++object q_obj_intList-wrapper
++    member data: intList optional=False
++object q_obj_int8List-wrapper
++    member data: int8List optional=False
++object q_obj_int16List-wrapper
++    member data: int16List optional=False
++object q_obj_int32List-wrapper
++    member data: int32List optional=False
++object q_obj_int64List-wrapper
++    member data: int64List optional=False
++object q_obj_uint8List-wrapper
++    member data: uint8List optional=False
++object q_obj_uint16List-wrapper
++    member data: uint16List optional=False
++object q_obj_uint32List-wrapper
++    member data: uint32List optional=False
++object q_obj_uint64List-wrapper
++    member data: uint64List optional=False
++object q_obj_numberList-wrapper
++    member data: numberList optional=False
++object q_obj_boolList-wrapper
++    member data: boolList optional=False
++object q_obj_strList-wrapper
++    member data: strList optional=False
++object q_obj_sizeList-wrapper
++    member data: sizeList optional=False
++object q_obj_anyList-wrapper
++    member data: anyList optional=False
++enum UserDefNativeListUnionKind ['integer', 's8', 's16', 's32', 's64', 'u8', 'u16', 'u32', 'u64', 'number', 'boolean', 'string', 'sizes', 'any']
+ object UserDefNativeListUnion
+     member type: UserDefNativeListUnionKind optional=False
+     tag type
+@@ -99,133 +141,91 @@ object UserDefNativeListUnion
+     case string: q_obj_strList-wrapper
+     case sizes: q_obj_sizeList-wrapper
+     case any: q_obj_anyList-wrapper
+-enum UserDefNativeListUnionKind ['integer', 's8', 's16', 's32', 's64', 'u8', 'u16', 'u32', 'u64', 'number', 'boolean', 'string', 'sizes', 'any']
+-object UserDefOne
+-    base UserDefZero
+-    member string: str optional=False
+-    member enum1: EnumOne optional=True
++command user_def_cmd None -> None
++   gen=True success_response=True boxed=False
++object q_obj_user_def_cmd1-arg
++    member ud1a: UserDefOne optional=False
++command user_def_cmd1 q_obj_user_def_cmd1-arg -> None
++   gen=True success_response=True boxed=False
++object q_obj_user_def_cmd2-arg
++    member ud1a: UserDefOne optional=False
++    member ud1b: UserDefOne optional=True
++command user_def_cmd2 q_obj_user_def_cmd2-arg -> UserDefTwo
++   gen=True success_response=True boxed=False
++object q_obj_guest-get-time-arg
++    member a: int optional=False
++    member b: int optional=True
++command guest-get-time q_obj_guest-get-time-arg -> int
++   gen=True success_response=True boxed=False
++object q_obj_guest-sync-arg
++    member arg: any optional=False
++command guest-sync q_obj_guest-sync-arg -> any
++   gen=True success_response=True boxed=False
++command boxed-struct UserDefZero -> None
++   gen=True success_response=True boxed=True
++command boxed-union UserDefNativeListUnion -> None
++   gen=True success_response=True boxed=True
+ object UserDefOptions
+     member i64: intList optional=True
+     member u64: uint64List optional=True
+     member u16: uint16List optional=True
+     member i64x: int optional=True
+     member u64x: uint64 optional=True
+-object UserDefTwo
+-    member string0: str optional=False
+-    member dict1: UserDefTwoDict optional=False
+-object UserDefTwoDict
+-    member string1: str optional=False
+-    member dict2: UserDefTwoDictDict optional=False
+-    member dict3: UserDefTwoDictDict optional=True
+-object UserDefTwoDictDict
+-    member userdef: UserDefOne optional=False
++object EventStructOne
++    member struct1: UserDefOne optional=False
+     member string: str optional=False
+-object UserDefUnionBase
+-    base UserDefZero
+-    member string: str optional=False
+-    member enum1: EnumOne optional=False
+-object UserDefZero
+-    member integer: int optional=False
+-object WrapAlternate
+-    member alt: UserDefAlternate optional=False
+-event __ORG.QEMU_X-EVENT __org.qemu_x-Struct
++    member enum2: EnumOne optional=True
++event EVENT_A None
++   boxed=False
++event EVENT_B None
++   boxed=False
++object q_obj_EVENT_C-arg
++    member a: int optional=True
++    member b: UserDefOne optional=True
++    member c: str optional=False
++event EVENT_C q_obj_EVENT_C-arg
++   boxed=False
++object q_obj_EVENT_D-arg
++    member a: EventStructOne optional=False
++    member b: str optional=False
++    member c: str optional=True
++    member enum3: EnumOne optional=True
++event EVENT_D q_obj_EVENT_D-arg
+    boxed=False
+-alternate __org.qemu_x-Alt
+-    tag type
+-    case __org.qemu_x-branch: str
+-    case b: __org.qemu_x-Base
++event EVENT_E UserDefZero
++   boxed=True
++event EVENT_F UserDefAlternate
++   boxed=True
++enum __org.qemu_x-Enum ['__org.qemu_x-value']
+ object __org.qemu_x-Base
+     member __org.qemu_x-member1: __org.qemu_x-Enum optional=False
+-enum __org.qemu_x-Enum ['__org.qemu_x-value']
+ object __org.qemu_x-Struct
+     base __org.qemu_x-Base
+     member __org.qemu_x-member2: str optional=False
+     member wchar-t: int optional=True
+-object __org.qemu_x-Struct2
+-    member array: __org.qemu_x-Union1List optional=False
++object q_obj_str-wrapper
++    member data: str optional=False
++enum __org.qemu_x-Union1Kind ['__org.qemu_x-branch']
+ object __org.qemu_x-Union1
+     member type: __org.qemu_x-Union1Kind optional=False
+     tag type
+     case __org.qemu_x-branch: q_obj_str-wrapper
+-enum __org.qemu_x-Union1Kind ['__org.qemu_x-branch']
++object __org.qemu_x-Struct2
++    member array: __org.qemu_x-Union1List optional=False
+ object __org.qemu_x-Union2
+     base __org.qemu_x-Base
+     tag __org.qemu_x-member1
+     case __org.qemu_x-value: __org.qemu_x-Struct2
+-command __org.qemu_x-command q_obj___org.qemu_x-command-arg -> __org.qemu_x-Union1
+-   gen=True success_response=True boxed=False
+-command boxed-struct UserDefZero -> None
+-   gen=True success_response=True boxed=True
+-command boxed-union UserDefNativeListUnion -> None
+-   gen=True success_response=True boxed=True
+-command guest-get-time q_obj_guest-get-time-arg -> int
+-   gen=True success_response=True boxed=False
+-command guest-sync q_obj_guest-sync-arg -> any
+-   gen=True success_response=True boxed=False
+-object q_empty
+-object q_obj_EVENT_C-arg
+-    member a: int optional=True
+-    member b: UserDefOne optional=True
+-    member c: str optional=False
+-object q_obj_EVENT_D-arg
+-    member a: EventStructOne optional=False
+-    member b: str optional=False
+-    member c: str optional=True
+-    member enum3: EnumOne optional=True
+-object q_obj_UserDefFlatUnion2-base
+-    member integer: int optional=True
+-    member string: str optional=False
+-    member enum1: QEnumTwo optional=False
++alternate __org.qemu_x-Alt
++    tag type
++    case __org.qemu_x-branch: str
++    case b: __org.qemu_x-Base
++event __ORG.QEMU_X-EVENT __org.qemu_x-Struct
++   boxed=False
+ object q_obj___org.qemu_x-command-arg
+     member a: __org.qemu_x-EnumList optional=False
+     member b: __org.qemu_x-StructList optional=False
+     member c: __org.qemu_x-Union2 optional=False
+     member d: __org.qemu_x-Alt optional=False
+-object q_obj_anyList-wrapper
+-    member data: anyList optional=False
+-object q_obj_boolList-wrapper
+-    member data: boolList optional=False
+-object q_obj_guest-get-time-arg
+-    member a: int optional=False
+-    member b: int optional=True
+-object q_obj_guest-sync-arg
+-    member arg: any optional=False
+-object q_obj_int16List-wrapper
+-    member data: int16List optional=False
+-object q_obj_int32List-wrapper
+-    member data: int32List optional=False
+-object q_obj_int64List-wrapper
+-    member data: int64List optional=False
+-object q_obj_int8List-wrapper
+-    member data: int8List optional=False
+-object q_obj_intList-wrapper
+-    member data: intList optional=False
+-object q_obj_numberList-wrapper
+-    member data: numberList optional=False
+-object q_obj_sizeList-wrapper
+-    member data: sizeList optional=False
+-object q_obj_str-wrapper
+-    member data: str optional=False
+-object q_obj_strList-wrapper
+-    member data: strList optional=False
+-object q_obj_uint16List-wrapper
+-    member data: uint16List optional=False
+-object q_obj_uint32List-wrapper
+-    member data: uint32List optional=False
+-object q_obj_uint64List-wrapper
+-    member data: uint64List optional=False
+-object q_obj_uint8List-wrapper
+-    member data: uint8List optional=False
+-object q_obj_user_def_cmd1-arg
+-    member ud1a: UserDefOne optional=False
+-object q_obj_user_def_cmd2-arg
+-    member ud1a: UserDefOne optional=False
+-    member ud1b: UserDefOne optional=True
+-command user_def_cmd None -> None
+-   gen=True success_response=True boxed=False
+-command user_def_cmd0 Empty2 -> Empty2
+-   gen=True success_response=True boxed=False
+-command user_def_cmd1 q_obj_user_def_cmd1-arg -> None
+-   gen=True success_response=True boxed=False
+-command user_def_cmd2 q_obj_user_def_cmd2-arg -> UserDefTwo
++command __org.qemu_x-command q_obj___org.qemu_x-command-arg -> __org.qemu_x-Union1
+    gen=True success_response=True boxed=False
 -- 
 2.13.6
