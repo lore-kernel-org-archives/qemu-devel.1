@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eheQC-0003gm-7a
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:43:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ehf5V-000885-CZ
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:26:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ehePU-0007ze-JK
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:42:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58500)
+	(envelope-from <peter.maydell@linaro.org>) id 1ehf4Q-0005vo-71
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:25:20 -0500
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:38130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ehePU-0007uW-BL
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:41:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ehXWM-00037c-OC
-	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:20:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AE5942E806B
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 09:20:34 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ehf4P-0005uw-Ig
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 12:24:13 -0500
+Received: by mail-ot0-x232.google.com with SMTP id v5so21003695oth.5
+	for <qemu-devel@nongnu.org>; Fri, 02 Feb 2018 09:24:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Feb 2018 09:12:59 -0000
-From: cee1 <fykcee1@gmail.com>
-Reply-To: Bug 1746943 <1746943@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151756277928.2993.6454939775938128745.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1746943] [NEW] qemu-aarch64-static: qemu:
- uncaught target signal 11 for ps/top cmd
+In-Reply-To: <20180202161935.20803-1-groug@kaod.org>
+References: <20180202161935.20803-1-groug@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Feb 2018 17:23:52 +0000
+Message-ID: <CAFEAcA-S+tLjgFJqS7pp93u0BfW9bJ=H4Lt=ymGk4Ze-Cyf-3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/10] 9p patches for 2.12 20180202
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Public bug reported:
+On 2 February 2018 at 16:19, Greg Kurz <groug@kaod.org> wrote:
+> The following changes since commit b05631954d6dfe93340d516660397e2c1a2a5dd6:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20180131' into staging (2018-01-31 15:50:29 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/gkurz/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 9ea776ee7d4061c043d0fbf89aa85f86ec0cf8a2:
+>
+>   tests/virtio-9p: explicitly handle potential integer overflows (2018-02-02 11:15:34 +0100)
+>
+> ----------------------------------------------------------------
+> This series is mostly about 9p request cancellation. It fixes a
+> long standing bug (read "specification violation") where the server
+> would send an invalid response when the client has cancelled an
+> in-flight request. This was causing annoying spurious EINTR returns
+> in linux. The fix comes with some related testing in QTEST.
+>
+> Other patches are code cleanup and improvements.
+>
+> v2: fix the alignment issue that was presumably causing make check to
+>     fail on sparc hosts
+>
 
-In a docker container created from an aarch64 image, injects qemu-aarch64-s=
-tatic (in /usr/bin)
-  run ps/top cmd  inside this container
+Applied, thanks.
 
-  reports "qemu: uncaught target signal 11 (Segmentation fault)"
-
-Tried qemu-aarch64-static from fedora 27 / ubuntu artful / debian
-unstable (i.e. qemu version 2.10 - 2.11)
-
-The aarch64 dock image is fedora 27(and with qemu-aarch64-static Fedora
-27), hence I opened a related bug here
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1541252
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1746943
-
-Title:
-  qemu-aarch64-static: qemu: uncaught target signal 11 for ps/top cmd
-
-Status in QEMU:
-  New
-
-Bug description:
-  In a docker container created from an aarch64 image, injects qemu-aarch64=
--static (in /usr/bin)
-    run ps/top cmd  inside this container
-
-    reports "qemu: uncaught target signal 11 (Segmentation fault)"
-
-  Tried qemu-aarch64-static from fedora 27 / ubuntu artful / debian
-  unstable (i.e. qemu version 2.10 - 2.11)
-
-  The aarch64 dock image is fedora 27(and with qemu-aarch64-static
-  Fedora 27), hence I opened a related bug here
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1541252
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1746943/+subscriptions
+-- PMM
