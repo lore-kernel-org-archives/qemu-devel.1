@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ehe10-0006YA-S0
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:17:44 -0500
+	(envelope-from <groug@kaod.org>) id 1ehe1h-00075l-DW
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:18:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ehdzw-0007Z3-Pf
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:16:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56542)
+	(envelope-from <groug@kaod.org>) id 1ehe0d-0008Dr-1w
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:17:21 -0500
+Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:33831)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ehdzw-0007YC-5O
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:15:32 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 27588C0AA0
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 12:40:04 +0000 (UTC)
-References: <20180201112028.23552-1-peterx@redhat.com>
-	<20180201195131.GO2457@work-vm> <20180202095643.GA4666@xz-mi>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <b1ba0462-96ec-463e-f7fa-062e1b04638f@redhat.com>
-Date: Fri, 2 Feb 2018 14:39:48 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ehe0c-0008C4-MP
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 11:16:14 -0500
+Received: from player795.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id D139AD4349
+	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 10:10:18 +0100 (CET)
+Date: Fri, 2 Feb 2018 10:05:23 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180202100523.3d2c0299@bahia.lan>
+In-Reply-To: <6affcea1-a56b-f518-8b4b-a196d5401e33@redhat.com>
+References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
+	<1516112253-14480-18-git-send-email-pbonzini@redhat.com>
+	<20180201170004.7287d079@w520.home>
+	<6affcea1-a56b-f518-8b4b-a196d5401e33@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180202095643.GA4666@xz-mi>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pcie-root-port: let it has higher migrate
- priority
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 17/51] readline: add a free function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +32,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On 02/02/2018 11:56, Peter Xu wrote:
-> On Thu, Feb 01, 2018 at 07:51:31PM +0000, Dr. David Alan Gilbert wrote:
->> * Peter Xu (peterx@redhat.com) wrote:
->>> In the past, we prioritized IOMMU migration so that we have such a
->>> priority order:
->>>
->>>     IOMMU > PCI Devices
->>>
->>> When migrating a guest with both vIOMMU and pcie-root-port, we'll always
->>> migrate vIOMMU first, since pcie-root-port will be seen to have the same
->>> priority of general PCI devices.
->>>
->>> That's problematic.
->>>
->>> The thing is that PCI bus number information is stored in the root port,
->>> and that is needed by vIOMMU during post_load(), e.g., to figure out
->>> context entry for a device.  If we don't have correct bus numbers for
->>> devices, we won't be able to recover device state of the DMAR memory
->>> regions, and things will be messed up.
->>>
->>> So let's boost the PCIe root ports to be even with higher priority:
->>>
->>>    PCIe Root Port > IOMMU > PCI Devices
->>>
->>> A smoke test shows that this patch fixes bug 1538953.
->>
->> Two questions (partially overlapping with what I replied to Michaels):
->>   a) What happens with multiple IOMMUs?
-> 
-> If there are more IOMMUs, then the patch will let all the vIOMMUs be
-> migrated after pcie root ports.
-> 
-> But a more true answer is that: I don't really know. :)
-> 
-> Because I even don't know how multiple vIOMMUs will coop with each
-> other, especially nested. 
+On Thu, 1 Feb 2018 19:10:06 -0500
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-I am not aware of "nested" IOMMUs. Multiple IOMMUs work together
-by dividing the bus ranges, when each of them declares in the
-corresponding ACPI table the bus/device/range is in charge of.
+> On 01/02/2018 19:00, Alex Williamson wrote:
+> > On Tue, 16 Jan 2018 15:16:59 +0100
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >  =20
+> >> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >>
+> >> Fixes leaks such as:
+> >>
+> >> Direct leak of 2 byte(s) in 1 object(s) allocated from:
+> >>     #0 0x7eff58beb850 in malloc (/lib64/libasan.so.4+0xde850)
+> >>     #1 0x7eff57942f0c in g_malloc ../glib/gmem.c:94
+> >>     #2 0x7eff579431cf in g_malloc_n ../glib/gmem.c:331
+> >>     #3 0x7eff5795f6eb in g_strdup ../glib/gstrfuncs.c:363
+> >>     #4 0x55db720f1d46 in readline_hist_add /home/elmarco/src/qq/util/r=
+eadline.c:258
+> >>     #5 0x55db720f2d34 in readline_handle_byte /home/elmarco/src/qq/uti=
+l/readline.c:387
+> >>     #6 0x55db71539d00 in monitor_read /home/elmarco/src/qq/monitor.c:3=
+896
+> >>     #7 0x55db71f9be35 in qemu_chr_be_write_impl /home/elmarco/src/qq/c=
+hardev/char.c:167
+> >>     #8 0x55db71f9bed3 in qemu_chr_be_write /home/elmarco/src/qq/charde=
+v/char.c:179
+> >>     #9 0x55db71fa013c in fd_chr_read /home/elmarco/src/qq/chardev/char=
+-fd.c:66
+> >>     #10 0x55db71fe18a8 in qio_channel_fd_source_dispatch /home/elmarco=
+/src/qq/io/channel-watch.c:84
+> >>     #11 0x7eff5793a90b in g_main_dispatch ../glib/gmain.c:3182
+> >>     #12 0x7eff5793b7ac in g_main_context_dispatch ../glib/gmain.c:3847
+> >>     #13 0x55db720af3bd in glib_pollfds_poll /home/elmarco/src/qq/util/=
+main-loop.c:214
+> >>     #14 0x55db720af505 in os_host_main_loop_wait /home/elmarco/src/qq/=
+util/main-loop.c:261
+> >>     #15 0x55db720af6d6 in main_loop_wait /home/elmarco/src/qq/util/mai=
+n-loop.c:515
+> >>     #16 0x55db7184e0de in main_loop /home/elmarco/src/qq/vl.c:1995
+> >>     #17 0x55db7185e956 in main /home/elmarco/src/qq/vl.c:4914
+> >>     #18 0x7eff4ea17039 in __libc_start_main (/lib64/libc.so.6+0x21039)
+> >>
+> >> (while at it, use g_new0(ReadLineState), it's a bit easier to read)
+> >>
+> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> Message-Id: <20180104160523.22995-11-marcandre.lureau@redhat.com>
+> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> >> --- =20
+> >=20
+> > I'm having some trouble with this patch, using b05631954d6d:
+> >=20
+> > # /usr/local/bin/qemu-system-x86_64 -m 1G -nodefaults -net none -monito=
+r stdio -serial none -parallel none -nographic=20
+> > QEMU 2.11.50 monitor - type 'help' for more information
+> > (qemu) sys<tab>
+> > system_powerdown  system_reset      system_wakeup    =20
+> > (qemu) system_p<tab>    # resulting in system_powerdown
+> > (qemu) quit
+> > Segmentation fault (core dumped)
+> >=20
+> > gdb shows:
+> >=20
+> > Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+> > 0x00007f7d64d82927 in malloc () from /lib64/libc.so.6
+> > (gdb) bt
+> > #0  0x00007f7d64d82927 in malloc () at /lib64/libc.so.6
+> > #1  0x00007f7d6ef68359 in g_malloc () at /lib64/libglib-2.0.so.0
+> > #2  0x00007f7d6ef83004 in g_strsplit () at /lib64/libglib-2.0.so.0
+> > #3  0x000055e5ac0d549d in container_get (root=3D0x55e5ad570ee0, path=3D=
+path@entry=3D0x55e5ac2fa0f8 "/chardevs") at qom/container.c:34
+> > #4  0x000055e5ac14d102 in get_chardevs_root () at chardev/char.c:43
+> > #5  0x000055e5ac14ec4d in qemu_chr_cleanup () at chardev/char.c:1107
+> > #6  0x000055e5abeff1c4 in main (argc=3D<optimized out>, argv=3D<optimiz=
+ed out>, envp=3D<optimized out>) at vl.c:4780
+> >=20
+> > Reverting this patch, commit e5dc1a6c6c435, I don't see the issue.
+> > Thanks, =20
+>=20
+> Yeah, I have a fix queued.  Unfortunately, I don't have the usual setup
+> to do pre-pull-request sets here so it will have to wait for next Monday.
+>=20
+> Paolo
+>=20
 
-However there was a kernel bug some time ago preventing several
-IOMMUs to work together, I am not sure the problem is solved yet.
+The queued fix is:
 
-
- In nested case, maybe there will be
-> dependency between vIOMMUs, but I'll avoid thinking about that until
-> we support more than one vIOMMUs.
-> 
->>   b) What happens with multiple root ports?
-> 
-> Same answer as previous one: all of them will be migrated before any
-> vIOMMUs.
-> 
-> Note that IMHO we don't care which pcie root port is migrated first -
-> IMHO they should not depend on each other, but Marcel may correct me.
-> 
-
-Right, each Root Port is independent from each other.
-
-Thanks,
-Marcel
-
->>   c) How correct is this ordering on different implementations 
->>     (e.g. ARM/Power/etc)
-> 
-> Currently it won't affect since Intel IOMMU is the only user for
-> MIG_PRI_IOMMU.  After SMMU is merged it may affect (if it uses this
-> bit), but IMHO it's fine too as long as pcie root ports won't depend
-> on anything related to SMMU.
-> 
-> Thanks,
-> 
+http://patchwork.ozlabs.org/patch/862816/
