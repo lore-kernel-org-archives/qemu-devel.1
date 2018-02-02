@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehcmF-0003qZ-35
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:57:20 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ehcmJ-0003vA-UH
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:57:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ehcmB-0001ZO-1L
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:57:19 -0500
-References: <1512254273-7567-1-git-send-email-shravan2x@utexas.edu>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <be898714-bffb-7fdf-0b91-e3c276559fc7@redhat.com>
-Date: Fri, 2 Feb 2018 14:37:29 +0100
+	(envelope-from <stefanha@redhat.com>) id 1ehcmJ-0001hu-3U
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:57:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43094)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ehcmI-0001hJ-RK
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 09:57:23 -0500
+Date: Fri, 2 Feb 2018 10:08:43 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180202100843.GD13090@stefanha-x1.localdomain>
+References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1512254273-7567-1-git-send-email-shravan2x@utexas.edu>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eZXqLa86VdqzCXcM2PheLQD9sCCVMmimv"
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fixed grammatical error in
- dump_human_image_check
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="mJm6k4Vb/yFcL9ZU"
+Content-Disposition: inline
+In-Reply-To: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
+Subject: Re: [Qemu-devel] Qemu Trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shravan Rajinikanth <shravan2x@utexas.edu>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Nesrine Zouari <nesrine.zouari@enis.tn>
+Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eZXqLa86VdqzCXcM2PheLQD9sCCVMmimv
-From: Max Reitz <mreitz@redhat.com>
-To: Shravan Rajinikanth <shravan2x@utexas.edu>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-Message-ID: <be898714-bffb-7fdf-0b91-e3c276559fc7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fixed grammatical error in
- dump_human_image_check
-References: <1512254273-7567-1-git-send-email-shravan2x@utexas.edu>
-In-Reply-To: <1512254273-7567-1-git-send-email-shravan2x@utexas.edu>
-Content-Type: text/plain; charset=utf-8
+
+--mJm6k4Vb/yFcL9ZU
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-12-02 23:37, Shravan Rajinikanth wrote:
-> Signed-off-by: Shravan Rajinikanth <shravan2x@utexas.edu>
-> ---
->  qemu-img.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Feb 01, 2018 at 04:30:10PM +0100, Nesrine Zouari wrote:
+> I am a computer engineering student and I am actually working on my
+> graduation project at Lauterbach company. The project is about Qemu Trace
+> and as a future I would like to contribute this work to the main line.
 >=20
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 68b375f..bea9268 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -580,7 +580,7 @@ static void dump_human_image_check(ImageCheck *chec=
-k, bool quiet)
->          if (check->leaks) {
->              qprintf(quiet,
->                      "\n%" PRId64 " leaked clusters were found on the i=
-mage.\n"
-> -                    "This means waste of disk space, but no harm to da=
-ta.\n",
-> +                    "This means disk space is wasted, but data is safe=
-=2E\n",
->                      check->leaks);
->          }
+> My project is divided into two parts:
+>=20
+> 1/ Collecting the Guest trace data : The trace solution should be able to
+> provide:
+>=20
+>             a/ Instruction flow Trace
+>=20
+>             b/ Memory read/write access
+>=20
+>             c/ Time Stamps.
+>=20
+>             d/ For tracing rich operating systems that are using MMU, we
+> additionally need to trace the task switches.
 
-Sorry, somehow I never applied this.  (Maybe I thought it would go
-through trivial...)
+Llu=ECs has done the most instrumentation work in qemu.git and can explain
+the current status.
 
-Applied to my block tree:
+The focus in QEMU is more on functional simulation than on low-level
+instrumentation.  Therefore the instrumentation facilities aren't very
+rich.  Code changes will be required to get the information you need.
+In order to be suitable for upstream they should not be too invasive or
+impact performance significantly.
 
-https://github.com/XanClic/qemu/commits/block
+Which CPU architecture are you targeting?
 
-Max
+> 2/ Sending the collected data to a third party tool for analysis.
+>=20
+> My question is about the first part. I would like to know, which trace
+> backend that better fit my use case.
 
+LTTng UST has the highest performance tracing interface.  It uses shared
+memory to efficiently export trace data to a collector or analysis
+process.
 
---eZXqLa86VdqzCXcM2PheLQD9sCCVMmimv
+It is probably not necessary to invent your own tracer or interface for
+capturing trace data.  I suggest looking into LTTng UST and trying it
+out.
+
+The basic idea would be:
+
+1. Add missing trace events to QEMU
+2. Build with ./configure --enable-trace-backend=3Dust && make
+3. Use LTTng tools or write your own collector using the LTTng libraries
+4. Enable the trace events that you need for instruction flow, memory
+   access, and task switching.
+
+The QEMU code changes involved would be changes to trace-events and
+placing those trace events into TCG and/or memory API code to record the
+necessary information.
+
+Stefan
+
+--mJm6k4Vb/yFcL9ZU
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp0aZkSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AvFAH/3sRKKws4yVA23nAYpoIbrlKnhq4EKTs
-KkMNiAWg9iOE5ZIJUgOxsp7TkWCqG1vbbpptP28Nu9OpbzW8KqqsikKtzZeHcxxf
-ywCVGQwy7h4ixhDypzHylxPjjvNjvjPzj9Dx9FHu/zH42hto3NdVGw+6nn4RdOxF
-nmcIDia+0tJUDGzjP+sLBn/n7RrokZesuw7gRq2LW5fmAplXjyuQet1VTw9P8WsK
-Up9fWsngIr6XlBIevTNcYuZrulseoSd1niwackz55T6BYbLHNUE+655krsnFKCtz
-G+/0JkhpNomA4WO21WeCbVxcIkUndCx2Ff+oyOJODa9jjETXc6vRzyY=
-=6Ao1
+iQEcBAEBAgAGBQJadDirAAoJEJykq7OBq3PITZgH/iVNx07yukt1YLsA7A2Ewb6D
+vpFFc5C6XmZPft2xp2qIYM2gCQ0unRMQZ7ggq+SoX6YcRxrK7jFZn0x8iM4aCd13
+4bcV2XztaffJe7iJqU4H2i15lBrTCDMvMQgVyZIjFCAxti7TmBbcFkULHRLfRcy5
+OwMjUZ7ESrYxKkpfLs1NiXfsGHTHdFdyUCZc5eF/mvdyqVooFGY6y9NB5VOHKA0n
+pyjJv1/YCRi2eWTOJodGjrNA0bPfBnhXnmUsINBMOS+cP98yCz5RBgC2qo/nb7we
+wznmijIryISi/Hcv9MuzzaLDS/rqeJ0V0e3wH/JBnQNWFSki1PSlayNepie+t10=
+=G8q1
 -----END PGP SIGNATURE-----
 
---eZXqLa86VdqzCXcM2PheLQD9sCCVMmimv--
+--mJm6k4Vb/yFcL9ZU--
