@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36331)
+Received: from eggs.gnu.org ([208.118.235.92]:36858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehdQQ-0006dz-3J
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:39:57 -0500
+	(envelope-from <berrange@redhat.com>) id 1ehdQi-0006vr-1g
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:40:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ehdPL-0001gQ-W5
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:38:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57018)
+	(envelope-from <berrange@redhat.com>) id 1ehdNE-0007Bl-S6
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:39:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ehdPL-0001eV-12
-	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:37:43 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA4853F738
-	for <qemu-devel@nongnu.org>; Fri,  2 Feb 2018 08:32:34 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  2 Feb 2018 09:32:28 +0100
-Message-Id: <20180202083229.6681-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] Vga 20180202 patches
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ehdND-00079E-WD
+	for qemu-devel@nongnu.org; Fri, 02 Feb 2018 10:35:32 -0500
+Date: Fri, 2 Feb 2018 13:08:17 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180202130817.GE15403@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180129174132.108925-1-brijesh.singh@amd.com>
+	<20180129174132.108925-14-brijesh.singh@amd.com>
+	<20180201175802.GK2457@work-vm>
+	<7c3c7a89-04ef-016e-c9a5-4f4d4be1c449@amd.com>
+	<20180201200442.GQ2457@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180201200442.GQ2457@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v6 13/23] hmp: display memory encryption
+ support in 'info kvm'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-The following changes since commit b05631954d6dfe93340d516660397e2c1a2a5dd6:
+On Thu, Feb 01, 2018 at 08:04:43PM +0000, Dr. David Alan Gilbert wrote:
+> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+> > 
+> > 
+> > On 2/1/18 11:58 AM, Dr. David Alan Gilbert wrote:
+> > > * Brijesh Singh (brijesh.singh@amd.com) wrote:
+> > >> update 'info kvm' to display the memory encryption support.
+> > >>
+> > >> (qemu) info kvm
+> > >> kvm support: enabled
+> > >> memory encryption: disabled
+> > > As Markus said, this should be split qmp/hmp; but something else to
+> > > think about is whether this is a boolean or needs to be an enum;  do
+> > > you have one version of encryption or are we going to need to flag up
+> > > versions or the features of the encryption?
+> > 
+> > In future I could see us providing encrypted state status when we
+> > implement SEV-ES support, something like
+> > 
+> > (qemu) info kvm
+> > kvm support: enabled
+> > memory encryption: enabled
+> > cpu register state: encrypted
+> > 
+> > but so far I do not see need to provide the version string. If user
+> > wants to know the SEV version then it can open /dev/sev device to get
+> > platform status and more.
+> 
+> Yes, I was worried a bit more about how general that was going to be
+> or whether we're collecting a lot of architecture specific fields here.
+> So I wondered, if it was an enum, whether that would be come:
+> 
+> memory encryption: none
+> 
+> memory encryption: SEV
+> 
+> memory encryption: SEV-ES
+> 
+> (I'm not too sure whether that's better or not, just a suggestion)
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-hppa-20180131' into staging (2018-01-31 15:50:29 +0000)
+I wonder if it is is even appropriate to have under 'info kvm', since
+'info kvm' is architecture independant and SEV is specific to AMD x86_64
+only. It might suggest an 'info sev' command is better ?
 
-are available in the git repository at:
-
-  git://git.kraxel.org/qemu tags/vga-20180202-pull-request
-
-for you to fetch changes up to 34e304e97576a9e17680c868c00ff524a981007b:
-
-  virtio-gpu: disallow vIOMMU (2018-02-02 08:53:22 +0100)
-
-----------------------------------------------------------------
-virtio-gpu: disallow vIOMMU
-
-----------------------------------------------------------------
-
-Peter Xu (1):
-  virtio-gpu: disallow vIOMMU
-
- hw/display/virtio-gpu-pci.c | 8 +++++++-
- hw/display/virtio-gpu.c     | 5 +++++
- 2 files changed, 12 insertions(+), 1 deletion(-)
-
+Regards,
+Daniel
 -- 
-2.9.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
