@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPw-0001w7-8z
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehtPt-0001t6-Gr
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPs-0000RL-5k
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34074)
+	(envelope-from <armbru@redhat.com>) id 1ehtPr-0000Qf-T5
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPr-0000Q4-Tx
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:20 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPr-0000Po-LR
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:19 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat,  3 Feb 2018 09:43:06 +0100
-Message-Id: <20180203084315.20497-6-armbru@redhat.com>
+Date: Sat,  3 Feb 2018 09:43:13 +0100
+Message-Id: <20180203084315.20497-13-armbru@redhat.com>
 In-Reply-To: <20180203084315.20497-1-armbru@redhat.com>
 References: <20180203084315.20497-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 05/14] hw/mips: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v8 12/14] hw/xen*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, Paul Burton <paul.burton@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -83,11 +83,11 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
+xen_pt_log() was left with an fprintf(stderr,
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Paul Burton <paul.burton@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: "Herv=C3=A9 Poussineau" <hpoussin@reactos.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 
 Conversions that aren't followed by exit() dropped, because they might
 be inappropriate.
@@ -95,233 +95,82 @@ be inappropriate.
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/mips/mips_fulong2e.c | 13 ++++++-------
- hw/mips/mips_jazz.c     |  4 ++--
- hw/mips/mips_malta.c    | 16 +++++++---------
- hw/mips/mips_mipssim.c  | 11 +++++------
- hw/mips/mips_r4k.c      | 16 +++++++---------
- 5 files changed, 27 insertions(+), 33 deletions(-)
+ hw/xen/xen-common.c       | 5 +++--
+ hw/xenpv/xen_machine_pv.c | 9 +++++----
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 725e25a134..f68c625666 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -120,7 +120,7 @@ static int64_t load_kernel (CPUMIPSState *env)
-                            (uint64_t *)&kernel_low, (uint64_t *)&kernel_=
-high,
-                            0, EM_MIPS, 1, 0);
-     if (kernel_size < 0) {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
-         exit(1);
-@@ -134,17 +134,16 @@ static int64_t load_kernel (CPUMIPSState *env)
-         if (initrd_size > 0) {
-             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
-_PAGE_MASK;
-             if (initrd_offset + initrd_size > ram_size) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-                                      initrd_offset, ram_size - initrd_of=
-fset);
-         }
-         if (initrd_size =3D=3D (target_ulong) -1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
-n",
--                    loaderparams.initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
-             exit(1);
-         }
-     }
-@@ -338,7 +337,7 @@ static void mips_fulong2e_init(MachineState *machine)
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 632a938dcc..afa1e3f404 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -9,6 +9,7 @@
+  */
 =20
-     isa_bus =3D vt82c686b_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 0))=
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/xen/xen_backend.h"
+ #include "qmp-commands.h"
+ #include "chardev/char.h"
+@@ -96,13 +97,13 @@ static void xenstore_record_dm_state(struct xs_handle=
+ *xs, const char *state)
+     char path[50];
+=20
+     if (xs =3D=3D NULL) {
+-        fprintf(stderr, "xenstore connection not initialized\n");
++        error_report("xenstore connection not initialized");
+         exit(1);
+     }
+=20
+     snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
+     if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
+-        fprintf(stderr, "error recording dm state\n");
++        error_report("error recording dm state");
+         exit(1);
+     }
+ }
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 69a52a9f93..44d67b87c4 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -23,6 +23,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/xen/xen_backend.h"
+@@ -36,7 +37,7 @@ static void xen_init_pv(MachineState *machine)
+=20
+     /* Initialize backend core & drivers */
+     if (xen_be_init() !=3D 0) {
+-        fprintf(stderr, "%s: xen backend core setup failed\n", __func__)=
 ;
-     if (!isa_bus) {
--        fprintf(stderr, "vt82c686b_init error\n");
-+        error_report("vt82c686b_init error");
++        error_report("%s: xen backend core setup failed", __func__);
          exit(1);
      }
 =20
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 0d2c0683ba..596f3c210e 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -268,10 +268,10 @@ static void mips_jazz_init(MachineState *machine,
-             sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(rc4030, 4));
-             break;
-         } else if (is_help_option(nd->model)) {
--            fprintf(stderr, "qemu: Supported NICs: dp83932\n");
-+            error_report("Supported NICs: dp83932");
-             exit(1);
-         } else {
--            fprintf(stderr, "qemu: Unsupported NIC: %s\n", nd->model);
-+            error_report("Unsupported NIC: %s", nd->model);
+@@ -51,18 +52,18 @@ static void xen_init_pv(MachineState *machine)
+         const char *initrd_filename =3D machine->initrd_filename;
+         if (xen_domain_build_pv(kernel_filename, initrd_filename,
+                                 kernel_cmdline) < 0) {
+-            fprintf(stderr, "xen pv domain creation failed\n");
++            error_report("xen pv domain creation failed");
              exit(1);
          }
+         break;
      }
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 37f19428d6..7ca8ba2086 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -812,7 +812,7 @@ static int64_t load_kernel (void)
-                            NULL, (uint64_t *)&kernel_entry, NULL,
-                            (uint64_t *)&kernel_high, big_endian, EM_MIPS=
-, 1, 0);
-     if (kernel_size < 0) {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
+ #endif
+     case XEN_EMULATE:
+-        fprintf(stderr, "xen emulation not implemented (yet)\n");
++        error_report("xen emulation not implemented (yet)");
          exit(1);
-@@ -846,9 +846,8 @@ static int64_t load_kernel (void)
-             initrd_offset =3D (loaderparams.ram_low_size - initrd_size -=
- 131072
-                              - ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
-             if (kernel_high >=3D initrd_offset) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-@@ -856,8 +855,8 @@ static int64_t load_kernel (void)
-                                               ram_size - initrd_offset);
-         }
-         if (initrd_size =3D=3D (target_ulong) -1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
-n",
--                    loaderparams.initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
-             exit(1);
-         }
-     }
-@@ -1034,9 +1033,8 @@ void mips_malta_init(MachineState *machine)
-=20
-     /* allocate RAM */
-     if (ram_size > (2048u << 20)) {
--        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d MB, maximum =
-2048 MB\n",
--                ((unsigned int)ram_size / (1 << 20)));
-+        error_report("Too much memory for this machine: %dMB, maximum 20=
-48MB",
-+                     ((unsigned int)ram_size / (1 << 20)));
+         break;
+     default:
+-        fprintf(stderr, "unhandled xen_mode %d\n", xen_mode);
++        error_report("unhandled xen_mode %d", xen_mode);
          exit(1);
+         break;
      }
-=20
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index e5d3654586..e0ba5efc84 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -78,7 +78,7 @@ static int64_t load_kernel(void)
-         if ((entry & ~0x7fffffffULL) =3D=3D 0x80000000)
-             entry =3D (int32_t)entry;
-     } else {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
-         exit(1);
-@@ -92,17 +92,16 @@ static int64_t load_kernel(void)
-         if (initrd_size > 0) {
-             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
-_PAGE_MASK;
-             if (initrd_offset + initrd_size > loaderparams.ram_size) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-                 initrd_offset, loaderparams.ram_size - initrd_offset);
-         }
-         if (initrd_size =3D=3D (target_ulong) -1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
-n",
--                    loaderparams.initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
-             exit(1);
-         }
-     }
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 244bd41813..830ee7732c 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -98,7 +98,7 @@ static int64_t load_kernel(void)
-         if ((entry & ~0x7fffffffULL) =3D=3D 0x80000000)
-             entry =3D (int32_t)entry;
-     } else {
--        error_report("qemu: could not load kernel '%s': %s",
-+        error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-                      load_elf_strerror(kernel_size));
-         exit(1);
-@@ -112,9 +112,8 @@ static int64_t load_kernel(void)
-         if (initrd_size > 0) {
-             initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) & INITRD=
-_PAGE_MASK;
-             if (initrd_offset + initrd_size > ram_size) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s=
-'\n",
--                        loaderparams.initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'=
-",
-+                             loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loaderparams.initrd_file=
-name,
-@@ -122,8 +121,8 @@ static int64_t load_kernel(void)
-                                               ram_size - initrd_offset);
-         }
-         if (initrd_size =3D=3D (target_ulong) -1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
-n",
--                    loaderparams.initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loaderparams.initrd_filename);
-             exit(1);
-         }
-     }
-@@ -196,9 +195,8 @@ void mips_r4k_init(MachineState *machine)
-=20
-     /* allocate RAM */
-     if (ram_size > (256 << 20)) {
--        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d MB, maximum =
-256 MB\n",
--                ((unsigned int)ram_size / (1 << 20)));
-+        error_report("Too much memory for this machine: %dMB, maximum 25=
-6MB",
-+                     ((unsigned int)ram_size / (1 << 20)));
-         exit(1);
-     }
-     memory_region_allocate_system_memory(ram, NULL, "mips_r4k.ram", ram_=
-size);
 --=20
 2.13.6
