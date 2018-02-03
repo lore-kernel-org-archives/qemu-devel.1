@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCi-0001zz-Eb
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:56 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCh-0001ym-NG
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCg-0008TD-Fj
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:52 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:36256
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCf-0008Sk-6h
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:51 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:36238
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1ehvCg-0008So-4j
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:50 -0500
+	id 1ehvCe-0008Pn-T3
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:49 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat,  3 Feb 2018 10:37:24 +0000
-Message-Id: <20180203103727.26457-8-mark.cave-ayland@ilande.co.uk>
+Date: Sat,  3 Feb 2018 10:37:18 +0000
+Message-Id: <20180203103727.26457-2-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
 References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 07/10] cuda: set timer 1 frequency property to
- CUDA_TIMER_FREQ
+Subject: [Qemu-devel] [PATCH 01/10] cuda: do not use old_mmio accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +27,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, lvivier@redhat.com
 
-Now that we have successfully decoupled the timebase frequency and the hardware
-timer frequency, set the timer 1 frequency property to CUDA_TIMER_FREQ and alter
-get_next_irq_time() to use it rather than the hard-coded constant.
-
-In addition to this we must now switch the tb_diff calculation over to use the
-timebase frequency now that the hardware clock frequency and the timebase
-frequency are different.
-
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/misc/macio/cuda.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/misc/macio/cuda.c | 40 ++++++++--------------------------------
+ 1 file changed, 8 insertions(+), 32 deletions(-)
 
 diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index 3336ed46b2..00e71fcd5e 100644
+index 008d8bd4d5..23b7e0f5b0 100644
 --- a/hw/misc/macio/cuda.c
 +++ b/hw/misc/macio/cuda.c
-@@ -158,8 +158,8 @@ static unsigned int get_counter(CUDAState *s, CUDATimer *ti)
-     uint64_t current_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+@@ -275,7 +275,7 @@ static void cuda_delay_set_sr_int(CUDAState *s)
+     timer_mod(s->sr_delay_timer, expire);
+ }
  
-     /* Reverse of the tb calculation algorithm that Mac OS X uses on bootup. */
--    tb_diff = get_tb(current_time, ti->tb_frequency) - ti->load_time;
--    d = (tb_diff * 0xBF401675E5DULL) / (ti->tb_frequency << 24);
-+    tb_diff = get_tb(current_time, s->tb_frequency) - ti->load_time;
-+    d = (tb_diff * 0xBF401675E5DULL) / (s->tb_frequency << 24);
+-static uint32_t cuda_readb(void *opaque, hwaddr addr)
++static uint64_t cuda_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     CUDAState *s = opaque;
+     uint32_t val;
+@@ -350,7 +350,7 @@ static uint32_t cuda_readb(void *opaque, hwaddr addr)
+     return val;
+ }
  
-     if (ti->index == 0) {
-         /* the timer goes down from latch to -1 (period of latch + 2) */
-@@ -191,7 +191,7 @@ static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
+-static void cuda_writeb(void *opaque, hwaddr addr, uint32_t val)
++static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+ {
+     CUDAState *s = opaque;
  
-     /* current counter value */
-     d = muldiv64(current_time - ti->load_time,
--                 CUDA_TIMER_FREQ, NANOSECONDS_PER_SECOND);
-+                 ti->frequency, NANOSECONDS_PER_SECOND);
-     /* the timer goes down from latch to -1 (period of latch + 2) */
-     if (d <= (ti->counter_value + 1)) {
-         counter = (ti->counter_value - d) & 0xffff;
-@@ -210,7 +210,7 @@ static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
+@@ -780,38 +780,14 @@ static void cuda_receive_packet_from_host(CUDAState *s,
      }
-     CUDA_DPRINTF("latch=%d counter=%" PRId64 " delta_next=%" PRId64 "\n",
-                  ti->latch, d, next_time - d);
--    next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, CUDA_TIMER_FREQ) +
-+    next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, ti->frequency) +
-                          ti->load_time;
-     if (next_time <= current_time) {
-         next_time = current_time + 1;
-@@ -879,7 +879,7 @@ static void cuda_realizefn(DeviceState *dev, Error **errp)
-     struct tm tm;
+ }
  
-     s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer1, s);
--    s->timers[0].frequency = s->tb_frequency;
-+    s->timers[0].frequency = CUDA_TIMER_FREQ;
-     s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer2, s);
-     s->timers[1].frequency = (SCALE_US * 6000) / 4700;
+-static void cuda_writew (void *opaque, hwaddr addr, uint32_t value)
+-{
+-}
+-
+-static void cuda_writel (void *opaque, hwaddr addr, uint32_t value)
+-{
+-}
+-
+-static uint32_t cuda_readw (void *opaque, hwaddr addr)
+-{
+-    return 0;
+-}
+-
+-static uint32_t cuda_readl (void *opaque, hwaddr addr)
+-{
+-    return 0;
+-}
+-
+ static const MemoryRegionOps cuda_ops = {
+-    .old_mmio = {
+-        .write = {
+-            cuda_writeb,
+-            cuda_writew,
+-            cuda_writel,
+-        },
+-        .read = {
+-            cuda_readb,
+-            cuda_readw,
+-            cuda_readl,
+-        },
+-    },
++    .read = cuda_read,
++    .write = cuda_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
+ };
  
+ static bool cuda_timer_exist(void *opaque, int version_id)
 -- 
 2.11.0
