@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPt-0001t6-Gr
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:23 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehtPt-0001t8-IS
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPr-0000Qf-T5
+	(envelope-from <armbru@redhat.com>) id 1ehtPr-0000QJ-LI
 	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPr-0000Po-LR
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:19 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat,  3 Feb 2018 09:43:13 +0100
-Message-Id: <20180203084315.20497-13-armbru@redhat.com>
+Date: Sat,  3 Feb 2018 09:43:10 +0100
+Message-Id: <20180203084315.20497-10-armbru@redhat.com>
 In-Reply-To: <20180203084315.20497-1-armbru@redhat.com>
 References: <20180203084315.20497-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 12/14] hw/xen*: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v8 09/14] hw/ppc: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +24,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, qemu-ppc@nongnu.org
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -81,96 +77,271 @@ find ./* -type f -exec sed -i \
  \
     {} +
 
-Some lines where then manually tweaked to pass checkpatch.
-
-xen_pt_log() was left with an fprintf(stderr,
+Some lines were then manually tweaked to pass checkpatch and some curly
+braces were added to match QEMU style.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: qemu-ppc@nongnu.org
 
 Conversions that aren't followed by exit() dropped, because they might
 be inappropriate.
 
+Also trim trailing punctuation from error messages.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/xen/xen-common.c       | 5 +++--
- hw/xenpv/xen_machine_pv.c | 9 +++++----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ hw/ppc/e500.c          | 16 ++++++++--------
+ hw/ppc/mac_newworld.c  |  2 +-
+ hw/ppc/mac_oldworld.c  |  2 +-
+ hw/ppc/ppc405_boards.c | 15 ++++++---------
+ hw/ppc/ppc440_bamboo.c | 16 ++++++++--------
+ hw/ppc/prep.c          |  4 ++--
+ hw/ppc/virtex_ml507.c  |  4 ++--
+ 7 files changed, 28 insertions(+), 31 deletions(-)
 
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 632a938dcc..afa1e3f404 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -9,6 +9,7 @@
-  */
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index c4fe06ea2a..343bba93ce 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -811,8 +811,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+         cs =3D CPU(cpu);
 =20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/xen/xen_backend.h"
- #include "qmp-commands.h"
- #include "chardev/char.h"
-@@ -96,13 +97,13 @@ static void xenstore_record_dm_state(struct xs_handle=
- *xs, const char *state)
-     char path[50];
-=20
-     if (xs =3D=3D NULL) {
--        fprintf(stderr, "xenstore connection not initialized\n");
-+        error_report("xenstore connection not initialized");
-         exit(1);
-     }
-=20
-     snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
-     if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
--        fprintf(stderr, "error recording dm state\n");
-+        error_report("error recording dm state");
-         exit(1);
-     }
- }
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 69a52a9f93..44d67b87c4 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -23,6 +23,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/xen/xen_backend.h"
-@@ -36,7 +37,7 @@ static void xen_init_pv(MachineState *machine)
-=20
-     /* Initialize backend core & drivers */
-     if (xen_be_init() !=3D 0) {
--        fprintf(stderr, "%s: xen backend core setup failed\n", __func__)=
-;
-+        error_report("%s: xen backend core setup failed", __func__);
-         exit(1);
-     }
-=20
-@@ -51,18 +52,18 @@ static void xen_init_pv(MachineState *machine)
-         const char *initrd_filename =3D machine->initrd_filename;
-         if (xen_domain_build_pv(kernel_filename, initrd_filename,
-                                 kernel_cmdline) < 0) {
--            fprintf(stderr, "xen pv domain creation failed\n");
-+            error_report("xen pv domain creation failed");
+         if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
+-            fprintf(stderr, "MMU model %i not supported by this machine.=
+\n",
+-                env->mmu_model);
++            error_report("MMU model %i not supported by this machine",
++                         env->mmu_model);
              exit(1);
          }
-         break;
+=20
+@@ -959,8 +959,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+                                           cur_base,
+                                           ram_size - cur_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    machine->kernel_filename);
++            error_report("could not load kernel '%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
+=20
+@@ -974,8 +974,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+                                           ram_size - initrd_base);
+=20
+         if (initrd_size < 0) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
+n",
+-                    machine->initrd_filename);
++            error_report("could not load initial ram disk '%s'",
++                         machine->initrd_filename);
+             exit(1);
+         }
+=20
+@@ -1016,7 +1016,7 @@ void ppce500_init(MachineState *machine, PPCE500Par=
+ams *params)
+         kernel_size =3D load_uimage(filename, &bios_entry, &loadaddr, NU=
+LL,
+                                   NULL, NULL);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load firmware '%s'\n", file=
+name);
++            error_report("could not load firmware '%s'", filename);
+             exit(1);
+         }
      }
+@@ -1029,7 +1029,7 @@ void ppce500_init(MachineState *machine, PPCE500Par=
+ams *params)
+                                        initrd_base, initrd_size,
+                                        kernel_base, kernel_size);
+     if (dt_size < 0) {
+-        fprintf(stderr, "couldn't load device tree\n");
++        error_report("couldn't load device tree");
+         exit(1);
+     }
+     assert(dt_size < DTB_MAX_SIZE);
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 3fa7c429d5..b832417a56 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -270,7 +270,7 @@ static void ppc_core99_init(MachineState *machine)
+             }
+         }
+         if (ppc_boot_device =3D=3D '\0') {
+-            fprintf(stderr, "No valid boot device for Mac99 machine\n");
++            error_report("No valid boot device for Mac99 machine");
+             exit(1);
+         }
+     }
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 010ea36bf2..d1f4546613 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -218,7 +218,7 @@ static void ppc_heathrow_init(MachineState *machine)
  #endif
-     case XEN_EMULATE:
--        fprintf(stderr, "xen emulation not implemented (yet)\n");
-+        error_report("xen emulation not implemented (yet)");
-         exit(1);
-         break;
-     default:
--        fprintf(stderr, "unhandled xen_mode %d\n", xen_mode);
-+        error_report("unhandled xen_mode %d", xen_mode);
-         exit(1);
-         break;
+         }
+         if (ppc_boot_device =3D=3D '\0') {
+-            fprintf(stderr, "No valid boot device for G3 Beige machine\n=
+");
++            error_report("No valid boot device for G3 Beige machine");
+             exit(1);
+         }
      }
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index e92db2c66a..fae9c76174 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -324,8 +324,7 @@ static void ref405ep_init(MachineState *machine)
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base=
+,
+                                           ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         printf("Load kernel size %ld at " TARGET_FMT_lx,
+@@ -336,8 +335,8 @@ static void ref405ep_init(MachineState *machine)
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_=
+base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '=
+%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
+         } else {
+@@ -607,8 +606,7 @@ static void taihu_405ep_init(MachineState *machine)
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base=
+,
+                                           ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         /* load initrd */
+@@ -617,9 +615,8 @@ static void taihu_405ep_init(MachineState *machine)
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_=
+base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+-                fprintf(stderr,
+-                        "qemu: could not load initial ram disk '%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
+         } else {
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 693c215108..e284062bf2 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -12,6 +12,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "net/net.h"
+ #include "hw/hw.h"
+@@ -186,8 +187,8 @@ static void bamboo_init(MachineState *machine)
+     env =3D &cpu->env;
+=20
+     if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+-        fprintf(stderr, "MMU model %i not supported by this machine.\n",
+-            env->mmu_model);
++        error_report("MMU model %i not supported by this machine",
++                     env->mmu_model);
+         exit(1);
+     }
+=20
+@@ -220,7 +221,7 @@ static void bamboo_init(MachineState *machine)
+                                 NULL);
+     pcibus =3D (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (!pcibus) {
+-        fprintf(stderr, "couldn't create PCI controller!\n");
++        error_report("couldn't create PCI controller");
+         exit(1);
+     }
+=20
+@@ -261,8 +262,7 @@ static void bamboo_init(MachineState *machine)
+         }
+         /* XXX try again as binary */
+         if (success < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+     }
+@@ -273,8 +273,8 @@ static void bamboo_init(MachineState *machine)
+                                           ram_size - RAMDISK_ADDR);
+=20
+         if (initrd_size < 0) {
+-            fprintf(stderr, "qemu: could not load ram disk '%s' at %x\n"=
+,
+-                    initrd_filename, RAMDISK_ADDR);
++            error_report("could not load ram disk '%s' at %x",
++                         initrd_filename, RAMDISK_ADDR);
+             exit(1);
+         }
+     }
+@@ -283,7 +283,7 @@ static void bamboo_init(MachineState *machine)
+     if (kernel_filename) {
+         if (bamboo_load_device_tree(FDT_ADDR, ram_size, RAMDISK_ADDR,
+                                     initrd_size, kernel_cmdline) < 0) {
+-            fprintf(stderr, "couldn't load device tree\n");
++            error_report("couldn't load device tree");
+             exit(1);
+         }
+     }
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index af08ac319a..096d4d4cfb 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -574,7 +574,7 @@ static void ppc_prep_init(MachineState *machine)
+             }
+         }
+         if (ppc_boot_device =3D=3D '\0') {
+-            fprintf(stderr, "No valid boot device for Mac99 machine\n");
++            error_report("No valid boot device for Mac99 machine");
+             exit(1);
+         }
+     }
+@@ -595,7 +595,7 @@ static void ppc_prep_init(MachineState *machine)
+     qdev_init_nofail(dev);
+     pci_bus =3D (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (pci_bus =3D=3D NULL) {
+-        fprintf(stderr, "Couldn't create PCI host controller.\n");
++        error_report("Couldn't create PCI host controller");
+         exit(1);
+     }
+     sysctrl->contiguous_map_irq =3D qdev_get_gpio_in(dev, 0);
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 5ac4f76613..f70a70ce82 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -215,8 +215,8 @@ static void virtex_init(MachineState *machine)
+     env =3D &cpu->env;
+=20
+     if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+-        fprintf(stderr, "MMU model %i not supported by this machine.\n",
+-            env->mmu_model);
++        error_report("MMU model %i not supported by this machine",
++                     env->mmu_model);
+         exit(1);
+     }
+=20
 --=20
 2.13.6
