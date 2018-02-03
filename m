@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPy-0001yu-QX
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:30 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehtPu-0001tM-0R
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPw-0000Yf-Pm
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehtPs-0000R9-2A
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPr-0000Pu-Qp
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:19 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat,  3 Feb 2018 09:43:03 +0100
-Message-Id: <20180203084315.20497-3-armbru@redhat.com>
+Date: Sat,  3 Feb 2018 09:43:12 +0100
+Message-Id: <20180203084315.20497-12-armbru@redhat.com>
 In-Reply-To: <20180203084315.20497-1-armbru@redhat.com>
 References: <20180203084315.20497-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 02/14] hw/arm: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v8 11/14] hw/sparc*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, qemu-arm@nongnu.org
+Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -79,398 +83,204 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-The 'qemu: ' prefix was manually removed from the hw/arm/boot.c file.
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-arm@nongnu.org
-
-Conversions that aren't followed by exit() dropped, because they might
-be inappropriate.
-
-Also trim trailing punctuation from error messages.
-
+Cc: Fabien Chouteau <chouteau@adacore.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/arm/armv7m.c    |  2 +-
- hw/arm/boot.c      | 16 ++++++++--------
- hw/arm/gumstix.c   | 13 +++++++------
- hw/arm/mainstone.c |  7 ++++---
- hw/arm/musicpal.c  |  2 +-
- hw/arm/omap1.c     |  5 +++--
- hw/arm/omap2.c     |  3 ++-
- hw/arm/omap_sx1.c  |  2 +-
- hw/arm/pxa2xx.c    |  7 ++++---
- hw/arm/vexpress.c  |  8 ++++----
- hw/arm/z2.c        |  6 +++---
- 11 files changed, 38 insertions(+), 33 deletions(-)
+ hw/sparc/leon3.c     | 16 +++++++---------
+ hw/sparc/sun4m.c     | 16 +++++++---------
+ hw/sparc64/niagara.c |  4 ++--
+ hw/sparc64/sun4u.c   | 10 +++++-----
+ 4 files changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index bb2dfc942b..56770a7048 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -278,7 +278,7 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kern=
-el_filename, int mem_size)
- #endif
-=20
-     if (!kernel_filename && !qtest_enabled()) {
--        fprintf(stderr, "Guest image must be specified (using -kernel)\n=
-");
-+        error_report("Guest image must be specified (using -kernel)");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index c2720c8046..bb244ec359 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -8,6 +8,7 @@
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 8c66d5af24..bba3aa3dee 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
   */
-=20
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
  #include "qapi/error.h"
- #include <libfdt.h>
- #include "hw/hw.h"
-@@ -690,7 +691,7 @@ static void load_image_to_fw_cfg(FWCfgState *fw_cfg, =
-uint16_t size_key,
-         gsize length;
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -139,9 +140,8 @@ static void leon3_generic_hw_init(MachineState *machi=
+ne)
 =20
-         if (!g_file_get_contents(image_name, &contents, &length, NULL)) =
-{
--            fprintf(stderr, "failed to load \"%s\"\n", image_name);
-+            error_report("failed to load \"%s\"", image_name);
-             exit(1);
-         }
-         size =3D length;
-@@ -956,8 +957,7 @@ static void arm_load_kernel_notify(Notifier *notifier=
-, void *data)
-         is_linux =3D 1;
-     }
-     if (kernel_size < 0) {
--        fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                info->kernel_filename);
-+        error_report("could not load kernel '%s'", info->kernel_filename=
-);
+     /* Allocate RAM */
+     if ((uint64_t)ram_size > (1UL << 30)) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d, maximum 1G\=
+n",
+-                (unsigned int)(ram_size / (1024 * 1024)));
++        error_report("Too much memory for this machine: %d, maximum 1G",
++                     (unsigned int)(ram_size / (1024 * 1024)));
          exit(1);
      }
-     info->entry =3D entry;
-@@ -976,8 +976,8 @@ static void arm_load_kernel_notify(Notifier *notifier=
-, void *data)
-                                                   info->initrd_start);
-             }
+=20
+@@ -167,19 +167,18 @@ static void leon3_generic_hw_init(MachineState *mac=
+hine)
+     }
+=20
+     if (bios_size > prom_size) {
+-        fprintf(stderr, "qemu: could not load prom '%s': file too big\n"=
+,
+-                filename);
++        error_report("could not load prom '%s': file too big", filename)=
+;
+         exit(1);
+     }
+=20
+     if (bios_size > 0) {
+         ret =3D load_image_targphys(filename, 0x00000000, bios_size);
+         if (ret < 0 || ret > prom_size) {
+-            fprintf(stderr, "qemu: could not load prom '%s'\n", filename=
+);
++            error_report("could not load prom '%s'", filename);
+             exit(1);
+         }
+     } else if (kernel_filename =3D=3D NULL && !qtest_enabled()) {
+-        fprintf(stderr, "Can't read bios image %s\n", filename);
++        error_report("Can't read bios image %s", filename);
+         exit(1);
+     }
+     g_free(filename);
+@@ -192,8 +191,7 @@ static void leon3_generic_hw_init(MachineState *machi=
+ne)
+         kernel_size =3D load_elf(kernel_filename, NULL, NULL, &entry, NU=
+LL, NULL,
+                                1 /* big endian */, EM_SPARC, 0, 0);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         if (bios_size <=3D 0) {
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index dd0038095b..f9892e38c3 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -259,8 +259,7 @@ static unsigned long sun4m_load_kernel(const char *ke=
+rnel_filename,
+                                               KERNEL_LOAD_ADDR,
+                                               RAM_size - KERNEL_LOAD_ADD=
+R);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+=20
+@@ -271,8 +270,8 @@ static unsigned long sun4m_load_kernel(const char *ke=
+rnel_filename,
+                                               INITRD_LOAD_ADDR,
+                                               RAM_size - INITRD_LOAD_ADD=
+R);
              if (initrd_size < 0) {
--                fprintf(stderr, "qemu: could not load initrd '%s'\n",
--                        info->initrd_filename);
-+                error_report("could not load initrd '%s'",
-+                             info->initrd_filename);
-                 exit(1);
-             }
-         } else {
-@@ -1021,9 +1021,9 @@ static void arm_load_kernel_notify(Notifier *notifi=
-er, void *data)
-         } else {
-             fixupcontext[FIXUP_ARGPTR] =3D info->loader_start + KERNEL_A=
-RGS_ADDR;
-             if (info->ram_size >=3D (1ULL << 32)) {
--                fprintf(stderr, "qemu: RAM size must be less than 4GB to=
- boot"
--                        " Linux kernel using ATAGS (try passing a device=
- tree"
--                        " using -dtb)\n");
-+                error_report("RAM size must be less than 4GB to boot"
-+                             " Linux kernel using ATAGS (try passing a d=
-evice tree"
-+                             " using -dtb)");
+-                fprintf(stderr, "qemu: could not load initial ram disk '=
+%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
                  exit(1);
              }
          }
-diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
-index bba9e9f57a..ea2a3c532d 100644
---- a/hw/arm/gumstix.c
-+++ b/hw/arm/gumstix.c
-@@ -35,6 +35,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
- #include "net/net.h"
-@@ -62,8 +63,8 @@ static void connex_init(MachineState *machine)
-=20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (!dinfo && !qtest_enabled()) {
--        fprintf(stderr, "A flash image must be given with the "
--                "'pflash' parameter\n");
-+        error_report("A flash image must be given with the "
-+                     "'pflash' parameter");
+@@ -680,7 +679,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
+ame)
+         ret =3D -1;
+     }
+     if (ret < 0 || ret > PROM_SIZE_MAX) {
+-        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
++        error_report("could not load prom '%s'", bios_name);
          exit(1);
      }
+ }
+@@ -746,10 +745,9 @@ static void ram_init(hwaddr addr, ram_addr_t RAM_siz=
+e,
 =20
-@@ -76,7 +77,7 @@ static void connex_init(MachineState *machine)
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
-,
-                                sector_len, connex_rom / sector_len,
-                                2, 0, 0, 0, 0, be)) {
--        fprintf(stderr, "qemu: Error registering flash memory.\n");
-+        error_report("Error registering flash memory");
+     /* allocate RAM */
+     if ((uint64_t)RAM_size > max_mem) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d, maximum %d\=
+n",
+-                (unsigned int)(RAM_size / (1024 * 1024)),
+-                (unsigned int)(max_mem / (1024 * 1024)));
++        error_report("Too much memory for this machine: %d, maximum %d",
++                     (unsigned int)(RAM_size / (1024 * 1024)),
++                     (unsigned int)(max_mem / (1024 * 1024)));
          exit(1);
      }
-=20
-@@ -99,8 +100,8 @@ static void verdex_init(MachineState *machine)
-=20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (!dinfo && !qtest_enabled()) {
--        fprintf(stderr, "A flash image must be given with the "
--                "'pflash' parameter\n");
-+        error_report("A flash image must be given with the "
-+                     "'pflash' parameter");
-         exit(1);
+     dev =3D qdev_create(NULL, "memory");
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index 7a723326c5..996ce2ada0 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -152,8 +152,8 @@ static void niagara_init(MachineState *machine)
+             dinfo->is_default =3D 1;
+             rom_add_file_fixed(blk_bs(blk)->filename, NIAGARA_VDISK_BASE=
+, -1);
+         } else {
+-            fprintf(stderr, "qemu: could not load ram disk '%s'\n",
+-                    blk_bs(blk)->filename);
++            error_report("could not load ram disk '%s'",
++                         blk_bs(blk)->filename);
+             exit(1);
+         }
      }
-=20
-@@ -113,7 +114,7 @@ static void verdex_init(MachineState *machine)
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
-,
-                                sector_len, verdex_rom / sector_len,
-                                2, 0, 0, 0, 0, be)) {
--        fprintf(stderr, "qemu: Error registering flash memory.\n");
-+        error_report("Error registering flash memory");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index d07972a966..4215c025fc 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -12,6 +12,7 @@
-  * GNU GPL, version 2 or (at your option) any later version.
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index a23cb26b0d..da28ab9413 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
   */
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
  #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
-@@ -143,8 +144,8 @@ static void mainstone_common_init(MemoryRegion *addre=
-ss_space_mem,
-             if (qtest_enabled()) {
-                 break;
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -168,8 +169,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
+filename,
+                                               RAM_size - KERNEL_LOAD_ADD=
+R);
+         }
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         /* load initrd above kernel */
+@@ -181,8 +181,8 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
+filename,
+                                                *initrd_addr,
+                                                RAM_size - *initrd_addr);
+             if ((int)*initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '=
+%s'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
              }
--            fprintf(stderr, "Two flash images must be given with the "
--                    "'pflash' parameter\n");
-+            error_report("Two flash images must be given with the "
-+                         "'pflash' parameter");
-             exit(1);
          }
-=20
-@@ -154,7 +155,7 @@ static void mainstone_common_init(MemoryRegion *addre=
-ss_space_mem,
-                                    blk_by_legacy_dinfo(dinfo),
-                                    sector_len, MAINSTONE_FLASH / sector_=
-len,
-                                    4, 0, 0, 0, 0, be)) {
--            fprintf(stderr, "qemu: Error registering flash memory.\n");
-+            error_report("Error registering flash memory");
-             exit(1);
-         }
+@@ -422,7 +422,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
+ame)
+         ret =3D -1;
      }
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index b648770882..06127a873d 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -1626,7 +1626,7 @@ static void musicpal_init(MachineState *machine)
-         flash_size =3D blk_getlength(blk);
-         if (flash_size !=3D 8*1024*1024 && flash_size !=3D 16*1024*1024 =
-&&
-             flash_size !=3D 32*1024*1024) {
--            fprintf(stderr, "Invalid flash image size\n");
-+            error_report("Invalid flash image size");
-             exit(1);
-         }
-=20
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 92e58f09c8..b3a23a83d1 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -2313,7 +2314,7 @@ void omap_uwire_attach(struct omap_uwire_s *s,
-                 uWireSlave *slave, int chipselect)
- {
-     if (chipselect < 0 || chipselect > 3) {
--        fprintf(stderr, "%s: Bad chipselect %i\n", __func__, chipselect)=
-;
-+        error_report("%s: Bad chipselect %i", __func__, chipselect);
-         exit(-1);
-     }
-=20
-@@ -3987,7 +3988,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryReg=
-ion *system_memory,
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
+     if (ret < 0 || ret > PROM_SIZE_MAX) {
+-        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
++        error_report("could not load prom '%s'", bios_name);
          exit(1);
      }
-     s->mmc =3D omap_mmc_init(0xfffb7800, system_memory,
-diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-index b53878b8b9..647b119ba9 100644
---- a/hw/arm/omap2.c
-+++ b/hw/arm/omap2.c
-@@ -19,6 +19,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -2486,7 +2487,7 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRe=
-gion *sysmem,
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
-         exit(1);
-     }
-     s->mmc =3D omap2_mmc_init(omap_l4tao(s->l4, 9),
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index 9a14270795..eccc19c77b 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -194,7 +194,7 @@ static void sx1_init(MachineState *machine, const int=
- version)
-     }
-=20
-     if (!machine->kernel_filename && !fl_idx && !qtest_enabled()) {
--        fprintf(stderr, "Kernel or Flash image must be specified\n");
-+        error_report("Kernel or Flash image must be specified");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index db860c238e..5805a2c858 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -8,6 +8,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -2062,7 +2063,7 @@ PXA2xxState *pxa270_init(MemoryRegion *address_spac=
-e,
-     s =3D g_new0(PXA2xxState, 1);
-=20
-     if (strncmp(cpu_type, "pxa27", 5)) {
--        fprintf(stderr, "Machine requires a PXA27x processor.\n");
-+        error_report("Machine requires a PXA27x processor");
-         exit(1);
-     }
-=20
-@@ -2095,7 +2096,7 @@ PXA2xxState *pxa270_init(MemoryRegion *address_spac=
-e,
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
-         exit(1);
-     }
-     s->mmc =3D pxa2xx_mmci_init(address_space, 0x41100000,
-@@ -2220,7 +2221,7 @@ PXA2xxState *pxa255_init(MemoryRegion *address_spac=
-e, unsigned int sdram_size)
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
-         exit(1);
-     }
-     s->mmc =3D pxa2xx_mmci_init(address_space, 0x41100000,
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index efb5a29475..dc5928ae1a 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -266,7 +266,7 @@ static void a9_daughterboard_init(const VexpressMachi=
-neState *vms,
-=20
-     if (ram_size > 0x40000000) {
-         /* 1GB is the maximum the address space permits */
--        fprintf(stderr, "vexpress-a9: cannot model more than 1GB RAM\n")=
-;
-+        error_report("vexpress-a9: cannot model more than 1GB RAM");
-         exit(1);
-     }
-=20
-@@ -355,7 +355,7 @@ static void a15_daughterboard_init(const VexpressMach=
-ineState *vms,
-          */
-         uint64_t rsz =3D ram_size;
-         if (rsz > (30ULL * 1024 * 1024 * 1024)) {
--            fprintf(stderr, "vexpress-a15: cannot model more than 30GB R=
-AM\n");
-+            error_report("vexpress-a15: cannot model more than 30GB RAM"=
-);
-             exit(1);
-         }
-     }
-@@ -640,7 +640,7 @@ static void vexpress_common_init(MachineState *machin=
-e)
-     pflash0 =3D ve_pflash_cfi01_register(map[VE_NORFLASH0], "vexpress.fl=
-ash0",
-                                        dinfo);
-     if (!pflash0) {
--        fprintf(stderr, "vexpress: error registering flash 0.\n");
-+        error_report("vexpress: error registering flash 0");
-         exit(1);
-     }
-=20
-@@ -655,7 +655,7 @@ static void vexpress_common_init(MachineState *machin=
-e)
-     dinfo =3D drive_get_next(IF_PFLASH);
-     if (!ve_pflash_cfi01_register(map[VE_NORFLASH1], "vexpress.flash1",
-                                   dinfo)) {
--        fprintf(stderr, "vexpress: error registering flash 1.\n");
-+        error_report("vexpress: error registering flash 1");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 60561c7b7c..2ce3dbde74 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -319,8 +319,8 @@ static void z2_init(MachineState *machine)
- #endif
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (!dinfo && !qtest_enabled()) {
--        fprintf(stderr, "Flash image must be given with the "
--                "'pflash' parameter\n");
-+        error_report("Flash image must be given with the "
-+                     "'pflash' parameter");
-         exit(1);
-     }
-=20
-@@ -329,7 +329,7 @@ static void z2_init(MachineState *machine)
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL=
-,
-                                sector_len, Z2_FLASH_SIZE / sector_len,
-                                4, 0, 0, 0, 0, be)) {
--        fprintf(stderr, "qemu: Error registering flash memory.\n");
-+        error_report("Error registering flash memory");
-         exit(1);
-     }
-=20
+ }
 --=20
 2.13.6
