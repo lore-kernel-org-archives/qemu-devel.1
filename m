@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ei0E2-00058Y-Cw
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:59:35 -0500
+	(envelope-from <armbru@redhat.com>) id 1ei0Ky-0008VC-EB
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 11:06:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ei0E1-0007EW-9R
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:59:34 -0500
+	(envelope-from <armbru@redhat.com>) id 1ei0Kx-0001G5-Fz
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 11:06:44 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
-	<b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com>
-Date: Sat, 03 Feb 2018 16:59:22 +0100
-In-Reply-To: <b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com> (Eric Blake's
-	message of "Mon, 22 Jan 2018 14:55:56 -0600")
-Message-ID: <87tvuyf4it.fsf@dusky.pond.sub.org>
+References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+	<20180116125427.18540-6-vsementsov@virtuozzo.com>
+Date: Sat, 03 Feb 2018 17:06:31 +0100
+In-Reply-To: <20180116125427.18540-6-vsementsov@virtuozzo.com> (Vladimir
+	Sementsov-Ogievskiy's message of "Tue, 16 Jan 2018 15:54:26 +0300")
+Message-ID: <87mv0qf46w.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] qapi: query-blockstat: add driver
- specific file-posix stats
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] qapi: add block-dirty-bitmap-merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +23,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org, jsnow@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-> On 01/19/2018 06:50 AM, Anton Nefedov wrote:
->> A block driver can provide a callback to report driver-specific
->> statistics.
->> 
->> file-posix driver now reports discard statistics
->> 
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block-core.json         | 38 ++++++++++++++++++++++++++++++++++++++
+>  include/block/dirty-bitmap.h |  2 ++
+>  block/dirty-bitmap.c         | 18 ++++++++++++++++++
+>  blockdev.c                   | 30 ++++++++++++++++++++++++++++++
+>  4 files changed, 88 insertions(+)
 >
->> +++ b/qapi/block-core.json
->> @@ -774,6 +774,40 @@
->>             'timed_stats': ['BlockDeviceTimedStats'] } }
->>  
->>  ##
->> +# @BlockDriverStatsFile:
->> +#
->> +# File driver statistics
->> +#
->> +# @discard_nb_ok: The number of succeeded discard operations performed by
->> +#                 the driver.
->> +#
->> +# @discard_nb_failed: The number of failed discard operations performed by
->> +#                     the driver.
->> +#
->> +# @discard_bytes_ok: The number of bytes discarded by the driver.
->> +#
->> +# Since 2.12
->> +##
->> +{ 'struct': 'BlockDriverStatsFile',
->> +  'data': {
->> +      'discard_nb_ok': 'int',
->> +      'discard_nb_failed': 'int',
->> +      'discard_bytes_ok': 'int'
->> +  } }
->
-> New interfaces should prefer '-' over '_', where possible (a reason for
-> using '_' is if the fields are alongside pre-existing fields that
-> already used '_').  Let's see how this gets used...[1]
->
->> +
->> +##
->> +# @BlockDriverStats:
->> +#
->> +# Statistics of a block driver (driver-specific)
->> +#
->> +# Since: 2.12
->> +##
->> +{ 'union': 'BlockDriverStats',
->> +  'data': {
->> +      'file': 'BlockDriverStatsFile'
->> +  } }
->
-> Markus has been adamant that we add no new "simple unions" (unions with
-> a 'discriminator' field) - because they are anything but simple in the
-> long run.
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index b3851ee760..9f9cfa0a44 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1604,6 +1604,20 @@
+>              '*persistent': 'bool', '*autoload': 'bool' } }
+>  
+>  ##
+> +# @BlockDirtyBitmapMerge:
+> +#
+> +# @node: name of device/node which the bitmap is tracking
+> +#
+> +# @dst_name: name of the destination dirty bitmap
+> +#
+> +# @src_name: name of the source dirty bitmap
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'struct': 'BlockDirtyBitmapMerge',
+> +  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
 
-Indeed.  You could make this a flat union, similar to BlockdevOptions:
+Please use '-' instead of '_' in QAPI.  Exceptions are possible for
+consistency with existing (mal-)practice.
 
-{ 'union': 'BlockDriverStats':
-  'base': { 'driver': 'BlockdevDriver' },
-  'discriminator': 'driver',
-  'data': {
-      'file': 'BlockDriverStatsFile',
-      ... } }
+> +
+> +##
+>  # @block-dirty-bitmap-add:
+>  #
+>  # Create a dirty bitmap with a name on the node, and start tracking the writes.
+> @@ -1714,6 +1728,30 @@
+>        'data': 'BlockDirtyBitmap' }
+>  
+>  ##
+> +# @block-dirty-bitmap-merge:
+> +#
+> +# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
+> +# bitmap is unchanged.
+> +#
+> +# Returns: nothing on success
+> +#          If @node is not a valid block device, DeviceNotFound
+> +#          If @dst_name or @src_name is not found, GenericError
+> +#          If bitmaps has different sizes or granularities, GenericError
 
-However: 
+The less error classes other than GenericError are used, the happier I
+am...  Do users really need to distinguish between the first error and
+other errors?
 
->> +
->> +##
->>  # @BlockStats:
->>  #
->>  # Statistics of a virtual block device or a block backing device.
->> @@ -785,6 +819,8 @@
->>  #
->>  # @stats:  A @BlockDeviceStats for the device.
->>  #
->> +# @driver-stats: Optional driver-specific statistics. (Since 2.12)
->> +#
->>  # @parent: This describes the file block device if it has one.
->>  #          Contains recursively the statistics of the underlying
->>  #          protocol (e.g. the host file for a qcow2 image). If there is
->> @@ -798,6 +834,7 @@
->>  { 'struct': 'BlockStats',
->>    'data': {'*device': 'str', '*node-name': 'str',
->>             'stats': 'BlockDeviceStats',
->> +           '*driver-stats': 'BlockDriverStats',
-
-You're adding a union of driver-specific stats to a struct of generic
-stats.  That's unnecessarily complicated.  Instead, turn the struct of
-generic stats into a flat union, like this:
-
-{ 'union': 'BlockStats',
-  'base': { ... the generic stats, i.e. the members of BlockStats
-            before this patch ...
-            'driver': 'BlockdevDriver' }
-  'discriminator': 'driver',
-  'data': {
-      'file': 'BlockDriverStatsFile',
-      ... } }
-
-> ...[1] You are using it alongside a struct that already uses '-'
-> (node-name), so you should use dashes.
->
-> So, the difference between your proposal (a simple union) and using a
-> "flat union", on the wire, is yours:
->
-> "return": { ..., "driver-stats": { "type": "file", "data": {
-> "discard_nb_ok: ... } } }
->
-> vs. a flat union:
->
-> "return": { ..., "driver-stats": { "driver": "file", "discard-nb-ok":
-> ... } }
->
-> where you can benefit from less nesting and a saner discriminator name.
-
-My proposal peels off yet another level of nesting.
+> +#
+> +# Since: 2.12
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "block-dirty-bitmap-merge",
+> +#      "arguments": { "node": "drive0", "dst_name": "bitmap0",
+> +#                     "src_name": "bitmap1" } }
+> +# <- { "return": {} }
+> +#
+> +##
+> +      { 'command': 'block-dirty-bitmap-merge',
+> +        'data': 'BlockDirtyBitmapMerge' }
+> +
+> +##
+>  # @BlockDirtyBitmapSha256:
+>  #
+>  # SHA256 hash of dirty bitmap data
+[...]
