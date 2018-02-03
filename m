@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPt-0001sk-4Y
+	(envelope-from <armbru@redhat.com>) id 1ehtPt-0001st-5x
 	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPq-0000OL-0B
+	(envelope-from <armbru@redhat.com>) id 1ehtPr-0000QD-HZ
 	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51742)
+Received: from mx1.redhat.com ([209.132.183.28]:38524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPp-0000N6-P6
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:17 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPr-0000Pj-AN
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:19 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat,  3 Feb 2018 09:43:05 +0100
-Message-Id: <20180203084315.20497-5-armbru@redhat.com>
+Date: Sat,  3 Feb 2018 09:43:07 +0100
+Message-Id: <20180203084315.20497-7-armbru@redhat.com>
 In-Reply-To: <20180203084315.20497-1-armbru@redhat.com>
 References: <20180203084315.20497-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 04/14] hw/lm32: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v8 06/14] hw/moxie: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, Michael Walle <michael@walle.cc>
+Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, Anthony Green <green@moxielogic.com>
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -84,80 +84,57 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Michael Walle <michael@walle.cc>
+Cc: Anthony Green <green@moxielogic.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Michael Walle <michael@walle.cc>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/lm32/lm32_boards.c | 7 +++----
- hw/lm32/milkymist.c   | 7 +++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
+ hw/moxie/moxiesim.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index 002d638edd..527bcc229c 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -18,6 +18,7 @@
-  */
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 6c200becab..0bbf770795 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -63,8 +63,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *lo=
+ader_params)
+                            0, 0);
 =20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
-@@ -148,8 +149,7 @@ static void lm32_evr_init(MachineState *machine)
-         }
-=20
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-     }
-@@ -242,8 +242,7 @@ static void lm32_uclinux_init(MachineState *machine)
-         }
-=20
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-     }
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index d4e765f2eb..85d64fe58d 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
-@@ -145,8 +146,7 @@ milkymist_init(MachineState *machine)
-=20
-     /* if no kernel is given no valid bios rom is a fatal error */
-     if (!kernel_filename && !dinfo && !bios_filename && !qtest_enabled()=
-) {
--        fprintf(stderr, "qemu: could not load Milkymist One bios '%s'\n"=
-,
--                bios_name);
-+        error_report("could not load Milkymist One bios '%s'", bios_name=
-);
+     if (kernel_size <=3D 0) {
+-        fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                loader_params->kernel_filename);
++        error_report("could not load kernel '%s'",
++                     loader_params->kernel_filename);
          exit(1);
      }
-     g_free(bios_filename);
-@@ -184,8 +184,7 @@ milkymist_init(MachineState *machine)
-         }
 =20
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
+@@ -77,9 +77,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *lo=
+ader_params)
+             initrd_offset =3D (kernel_high + ~TARGET_PAGE_MASK)
+               & TARGET_PAGE_MASK;
+             if (initrd_offset + initrd_size > loader_params->ram_size) {
+-                fprintf(stderr,
+-                        "qemu: memory too small for initial ram disk '%s=
+'\n",
+-                        loader_params->initrd_filename);
++                error_report("memory too small for initial ram disk '%s'=
+",
++                             loader_params->initrd_filename);
+                 exit(1);
+             }
+             initrd_size =3D load_image_targphys(loader_params->initrd_fi=
+lename,
+@@ -87,8 +86,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *lo=
+ader_params)
+                                               ram_size);
+         }
+         if (initrd_size =3D=3D (target_ulong)-1) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\=
+n",
+-                    loader_params->initrd_filename);
++            error_report("could not load initial ram disk '%s'",
++                         loader_params->initrd_filename);
              exit(1);
          }
      }
