@@ -1,15 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzun-0001f1-NK
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:42 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzup-0001g0-FY
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzuk-0003yW-Lo
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:41 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzuo-000459-HR
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:43 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  3 Feb 2018 10:39:30 -0500
-Message-Id: <20180203153935.8056-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 0/5] coroutine-lock: polymorphic CoQueue
+Date: Sat,  3 Feb 2018 10:39:33 -0500
+Message-Id: <20180203153935.8056-4-pbonzini@redhat.com>
+In-Reply-To: <20180203153935.8056-1-pbonzini@redhat.com>
+References: <20180203153935.8056-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/5] coroutine-lock: convert CoQueue to use
+ QemuLockable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +26,73 @@ Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
 There are cases in which a queued coroutine must be restarted from
 non-coroutine context (with qemu_co_enter_next).  In this cases,
-qemu_co_enter_next also needs to be thread-safe, but it cannot use a
-CoMutex and so cannot qemu_co_queue_wait.  This happens in curl (which
-right now is rolling its own list of Coroutines) and will happen in
-Fam's NVMe driver as well.
+qemu_co_enter_next also needs to be thread-safe, but it cannot use
+a CoMutex and so cannot qemu_co_queue_wait.  Use QemuLockable so
+that the CoQueue can interchangeably use CoMutex or QemuMutex.
 
-This series extracts the idea of a polymorphic lockable object
-from my "scoped lock guard" proposal, and applies it to CoQueue.
-The implementation of QemuLockable is similar to C11 _Generic, but
-redone using the preprocessor and GCC builtins for compatibility.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/qemu/coroutine.h   |  6 +++++-
+ util/qemu-coroutine-lock.c | 12 +++++++-----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-In general, while a bit on the esoteric side, the functionality used
-to emulate _Generic is fairly old in GCC, and the builtins are already
-used by include/qemu/atomic.h; the series was tested with Fedora 27 (boot
-Damn Small Linux via http) and CentOS 6 (compiled only).
-
-Paolo
-
-v4->v5: fix checkpatch complaints
-
-v3->v4: fix -O0 compilation [Fam]
-        typos and copyright dates [Eric, Fam]
-        improve CoQueue comments [Stefan]
-
-Paolo Bonzini (5):
-  test-coroutine: add simple CoMutex test
-  lockable: add QemuLockable
-  coroutine-lock: convert CoQueue to use QemuLockable
-  coroutine-lock: make qemu_co_enter_next thread-safe
-  curl: convert to CoQueue
-
- block/curl.c                | 20 ++--------
- fsdev/qemu-fsdev-throttle.c |  4 +-
- include/qemu/compiler.h     | 40 +++++++++++++++++++
- include/qemu/coroutine.h    | 29 +++++++++-----
- include/qemu/lockable.h     | 96 +++++++++++++++++++++++++++++++++++++++++++++
- include/qemu/thread.h       |  5 +--
- include/qemu/typedefs.h     |  4 ++
- tests/test-coroutine.c      | 75 ++++++++++++++++++++++++++++++++++-
- util/qemu-coroutine-lock.c  | 22 +++++++----
- 9 files changed, 256 insertions(+), 39 deletions(-)
- create mode 100644 include/qemu/lockable.h
-
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index 8a5129741c..1e5f0957e6 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -183,7 +183,9 @@ void qemu_co_queue_init(CoQueue *queue);
+  * caller of the coroutine.  The mutex is unlocked during the wait and
+  * locked again afterwards.
+  */
+-void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex);
++#define qemu_co_queue_wait(queue, lock) \
++    qemu_co_queue_wait_impl(queue, QEMU_MAKE_LOCKABLE(lock))
++void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock);
+ 
+ /**
+  * Restarts the next coroutine in the CoQueue and removes it from the queue.
+@@ -271,4 +273,6 @@ void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
+  */
+ void coroutine_fn yield_until_fd_readable(int fd);
+ 
++#include "qemu/lockable.h"
++
+ #endif /* QEMU_COROUTINE_H */
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index 846ff9167f..2a66fc1467 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -40,13 +40,13 @@ void qemu_co_queue_init(CoQueue *queue)
+     QSIMPLEQ_INIT(&queue->entries);
+ }
+ 
+-void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
++void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock)
+ {
+     Coroutine *self = qemu_coroutine_self();
+     QSIMPLEQ_INSERT_TAIL(&queue->entries, self, co_queue_next);
+ 
+-    if (mutex) {
+-        qemu_co_mutex_unlock(mutex);
++    if (lock) {
++        qemu_lockable_unlock(lock);
+     }
+ 
+     /* There is no race condition here.  Other threads will call
+@@ -60,9 +60,11 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
+     /* TODO: OSv implements wait morphing here, where the wakeup
+      * primitive automatically places the woken coroutine on the
+      * mutex's queue.  This avoids the thundering herd effect.
++     * This could be implemented for CoMutexes, but not really for
++     * other cases of QemuLockable.
+      */
+-    if (mutex) {
+-        qemu_co_mutex_lock(mutex);
++    if (lock) {
++        qemu_lockable_lock(lock);
+     }
+ }
+ 
 -- 
 2.14.3
