@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPu-0001tM-0R
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:24 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehtPv-0001ux-2E
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtPs-0000R9-2A
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40314)
+	(envelope-from <armbru@redhat.com>) id 1ehtPs-0000Sb-Vq
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPr-0000Pu-Qp
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:19 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtPs-0000RZ-Og
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:43:20 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat,  3 Feb 2018 09:43:12 +0100
-Message-Id: <20180203084315.20497-12-armbru@redhat.com>
+Date: Sat,  3 Feb 2018 09:43:15 +0100
+Message-Id: <20180203084315.20497-15-armbru@redhat.com>
 In-Reply-To: <20180203084315.20497-1-armbru@redhat.com>
 References: <20180203084315.20497-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 11/14] hw/sparc*: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: [Qemu-devel] [PATCH v8 14/14] target: Use qemu_log() instead of
+ fprintf(stderr, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,259 +28,155 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: alistair.francis@xilinx.com, eblake@redhat.com, f4bug@amsat.org
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
-Replace a large number of the fprintf(stderr, "*\n" calls with
-error_report(). The functions were renamed with these commands and then
-compiler issues where manually fixed.
-
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|erro=
-r_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
-report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_repo=
-rt("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
-("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
-\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
-"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
-2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
-;|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
-Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
-}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
- \
-    {} +
-
-Some lines where then manually tweaked to pass checkpatch.
+Convert fprintf(stderr, ...) to use qemu_log(). Double prints in
+target/ppc/translate.c were manually remove. A fprintf() in
+target/sh4/translate.c was kept as it's inside a #if 0. The #if 0 and
+fflush() was removed around the unimplemented log in
+target/sh4/translate.c as well.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Fabien Chouteau <chouteau@adacore.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+[Trivial conflict with 6f1c2af641d resolved]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/sparc/leon3.c     | 16 +++++++---------
- hw/sparc/sun4m.c     | 16 +++++++---------
- hw/sparc64/niagara.c |  4 ++--
- hw/sparc64/sun4u.c   | 10 +++++-----
- 4 files changed, 21 insertions(+), 25 deletions(-)
+ target/cris/translate.c      |  2 +-
+ target/ppc/translate.c       | 36 ++++++++++--------------------------
+ target/sh4/translate.c       |  7 ++-----
+ target/unicore32/translate.c |  2 +-
+ 4 files changed, 14 insertions(+), 33 deletions(-)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 8c66d5af24..bba3aa3dee 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -139,9 +140,8 @@ static void leon3_generic_hw_init(MachineState *machi=
-ne)
+diff --git a/target/cris/translate.c b/target/cris/translate.c
+index f51a731db9..ff31311ed0 100644
+--- a/target/cris/translate.c
++++ b/target/cris/translate.c
+@@ -137,7 +137,7 @@ typedef struct DisasContext {
 =20
-     /* Allocate RAM */
-     if ((uint64_t)ram_size > (1UL << 30)) {
--        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d, maximum 1G\=
-n",
--                (unsigned int)(ram_size / (1024 * 1024)));
-+        error_report("Too much memory for this machine: %d, maximum 1G",
-+                     (unsigned int)(ram_size / (1024 * 1024)));
-         exit(1);
+ static void gen_BUG(DisasContext *dc, const char *file, int line)
+ {
+-    fprintf(stderr, "BUG: pc=3D%x %s %d\n", dc->pc, file, line);
++    qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+     if (qemu_log_separate()) {
+         qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
      }
-=20
-@@ -167,19 +167,18 @@ static void leon3_generic_hw_init(MachineState *mac=
-hine)
-     }
-=20
-     if (bios_size > prom_size) {
--        fprintf(stderr, "qemu: could not load prom '%s': file too big\n"=
-,
--                filename);
-+        error_report("could not load prom '%s': file too big", filename)=
-;
-         exit(1);
-     }
-=20
-     if (bios_size > 0) {
-         ret =3D load_image_targphys(filename, 0x00000000, bios_size);
-         if (ret < 0 || ret > prom_size) {
--            fprintf(stderr, "qemu: could not load prom '%s'\n", filename=
-);
-+            error_report("could not load prom '%s'", filename);
-             exit(1);
-         }
-     } else if (kernel_filename =3D=3D NULL && !qtest_enabled()) {
--        fprintf(stderr, "Can't read bios image %s\n", filename);
-+        error_report("Can't read bios image %s", filename);
-         exit(1);
-     }
-     g_free(filename);
-@@ -192,8 +191,7 @@ static void leon3_generic_hw_init(MachineState *machi=
-ne)
-         kernel_size =3D load_elf(kernel_filename, NULL, NULL, &entry, NU=
-LL, NULL,
-                                1 /* big endian */, EM_SPARC, 0, 0);
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-         if (bios_size <=3D 0) {
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index dd0038095b..f9892e38c3 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -259,8 +259,7 @@ static unsigned long sun4m_load_kernel(const char *ke=
-rnel_filename,
-                                               KERNEL_LOAD_ADDR,
-                                               RAM_size - KERNEL_LOAD_ADD=
-R);
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-=20
-@@ -271,8 +270,8 @@ static unsigned long sun4m_load_kernel(const char *ke=
-rnel_filename,
-                                               INITRD_LOAD_ADDR,
-                                               RAM_size - INITRD_LOAD_ADD=
-R);
-             if (initrd_size < 0) {
--                fprintf(stderr, "qemu: could not load initial ram disk '=
-%s'\n",
--                        initrd_filename);
-+                error_report("could not load initial ram disk '%s'",
-+                             initrd_filename);
-                 exit(1);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 4132f67bb1..172c9f2001 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -3933,12 +3933,8 @@ static inline void gen_op_mfspr(DisasContext *ctx)
+              * allowing userland application to read the PVR
+              */
+             if (sprn !=3D SPR_PVR) {
+-                fprintf(stderr, "Trying to read privileged spr %d (0x%03=
+x) at "
+-                        TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-                if (qemu_log_separate()) {
+-                    qemu_log("Trying to read privileged spr %d (0x%03x) =
+at "
+-                             TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - =
+4);
+-                }
++                qemu_log("Trying to read privileged spr %d (0x%03x) at "
++                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
              }
+             gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
          }
-@@ -680,7 +679,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
-ame)
-         ret =3D -1;
-     }
-     if (ret < 0 || ret > PROM_SIZE_MAX) {
--        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
-+        error_report("could not load prom '%s'", bios_name);
-         exit(1);
-     }
- }
-@@ -746,10 +745,9 @@ static void ram_init(hwaddr addr, ram_addr_t RAM_siz=
-e,
+@@ -3950,12 +3946,8 @@ static inline void gen_op_mfspr(DisasContext *ctx)
+             return;
+         }
+         /* Not defined */
+-        fprintf(stderr, "Trying to read invalid spr %d (0x%03x) at "
+-                TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-        if (qemu_log_separate()) {
+-            qemu_log("Trying to read invalid spr %d (0x%03x) at "
+-                     TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-        }
++        qemu_log("Trying to read invalid spr %d (0x%03x) at "
++                 TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
 =20
-     /* allocate RAM */
-     if ((uint64_t)RAM_size > max_mem) {
--        fprintf(stderr,
--                "qemu: Too much memory for this machine: %d, maximum %d\=
-n",
--                (unsigned int)(RAM_size / (1024 * 1024)),
--                (unsigned int)(max_mem / (1024 * 1024)));
-+        error_report("Too much memory for this machine: %d, maximum %d",
-+                     (unsigned int)(RAM_size / (1024 * 1024)),
-+                     (unsigned int)(max_mem / (1024 * 1024)));
-         exit(1);
-     }
-     dev =3D qdev_create(NULL, "memory");
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index 7a723326c5..996ce2ada0 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -152,8 +152,8 @@ static void niagara_init(MachineState *machine)
-             dinfo->is_default =3D 1;
-             rom_add_file_fixed(blk_bs(blk)->filename, NIAGARA_VDISK_BASE=
-, -1);
+         /* The behaviour depends on MSR:PR and SPR# bit 0x10,
+          * it can generate a priv, a hv emu or a no-op
+@@ -4096,12 +4088,8 @@ static void gen_mtspr(DisasContext *ctx)
+             (*write_cb)(ctx, sprn, rS(ctx->opcode));
          } else {
--            fprintf(stderr, "qemu: could not load ram disk '%s'\n",
--                    blk_bs(blk)->filename);
-+            error_report("could not load ram disk '%s'",
-+                         blk_bs(blk)->filename);
+             /* Privilege exception */
+-            fprintf(stderr, "Trying to write privileged spr %d (0x%03x) =
+at "
+-                    TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-            if (qemu_log_separate()) {
+-                qemu_log("Trying to write privileged spr %d (0x%03x) at =
+"
+-                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-            }
++            qemu_log("Trying to write privileged spr %d (0x%03x) at "
++                     TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+             gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
+         }
+     } else {
+@@ -4113,12 +4101,8 @@ static void gen_mtspr(DisasContext *ctx)
+         }
+=20
+         /* Not defined */
+-        if (qemu_log_separate()) {
+-            qemu_log("Trying to write invalid spr %d (0x%03x) at "
+-                     TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-        }
+-        fprintf(stderr, "Trying to write invalid spr %d (0x%03x) at "
+-                TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
++        qemu_log("Trying to write invalid spr %d (0x%03x) at "
++                 TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+=20
+=20
+         /* The behaviour depends on MSR:PR and SPR# bit 0x10,
+@@ -7381,8 +7365,8 @@ void gen_intermediate_code(CPUState *cs, struct Tra=
+nslationBlock *tb)
+             break;
+         }
+         if (tcg_check_temp_count()) {
+-            fprintf(stderr, "Opcode %02x %02x %02x %02x (%08x) leaked "
+-                    "temporaries\n", opc1(ctx.opcode), opc2(ctx.opcode),
++            qemu_log("Opcode %02x %02x %02x %02x (%08x) leaked "
++                     "temporaries\n", opc1(ctx.opcode), opc2(ctx.opcode)=
+,
+                     opc3(ctx.opcode), opc4(ctx.opcode), ctx.opcode);
              exit(1);
          }
-     }
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index a23cb26b0d..da28ab9413 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -168,8 +169,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
-filename,
-                                               RAM_size - KERNEL_LOAD_ADD=
-R);
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 012156b97b..6c2dca5cf2 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -1827,11 +1827,8 @@ static void _decode_opc(DisasContext * ctx)
          }
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-         /* load initrd above kernel */
-@@ -181,8 +181,8 @@ static uint64_t sun4u_load_kernel(const char *kernel_=
-filename,
-                                                *initrd_addr,
-                                                RAM_size - *initrd_addr);
-             if ((int)*initrd_size < 0) {
--                fprintf(stderr, "qemu: could not load initial ram disk '=
-%s'\n",
--                        initrd_filename);
-+                error_report("could not load initial ram disk '%s'",
-+                             initrd_filename);
-                 exit(1);
-             }
-         }
-@@ -422,7 +422,7 @@ static void prom_init(hwaddr addr, const char *bios_n=
-ame)
-         ret =3D -1;
+         break;
      }
-     if (ret < 0 || ret > PROM_SIZE_MAX) {
--        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
-+        error_report("could not load prom '%s'", bios_name);
-         exit(1);
-     }
- }
+-#if 0
+-    fprintf(stderr, "unknown instruction 0x%04x at pc 0x%08x\n",
+-            ctx->opcode, ctx->base.pc_next);
+-    fflush(stderr);
+-#endif
++    qemu_log_mask(LOG_UNIMP, "unknown instruction 0x%04x at pc 0x%08x\n"=
+,
++                  ctx->opcode, ctx->base.pc_next);
+  do_illegal:
+     if (ctx->envflags & DELAY_SLOT_MASK) {
+  do_illegal_slot:
+diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
+index 5b51f2166d..4b3c0463da 100644
+--- a/target/unicore32/translate.c
++++ b/target/unicore32/translate.c
+@@ -1936,7 +1936,7 @@ void gen_intermediate_code(CPUState *cs, Translatio=
+nBlock *tb)
+         disas_uc32_insn(env, dc);
+=20
+         if (num_temps) {
+-            fprintf(stderr, "Internal resource leak before %08x\n", dc->=
+pc);
++            qemu_log("Internal resource leak before %08x\n", dc->pc);
+             num_temps =3D 0;
+         }
+=20
 --=20
 2.13.6
