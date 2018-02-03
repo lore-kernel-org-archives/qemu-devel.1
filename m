@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehxsH-00047D-Ox
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 08:28:58 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVy-00077w-GF
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehxsE-0006y1-Kp
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 08:28:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehxsE-0006xr-Ef
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 08:28:54 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180107122336.29333-1-richiejp@f-m.fm>
-	<fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
-	<87r2qxk7o6.fsf@rpws.prws.suse.cz>
-	<cb7ae03d-1249-e772-e7e9-99b777054bb3@redhat.com>
-Date: Sat, 03 Feb 2018 14:28:51 +0100
-In-Reply-To: <cb7ae03d-1249-e772-e7e9-99b777054bb3@redhat.com> (Eric Blake's
-	message of "Wed, 10 Jan 2018 10:48:08 -0600")
-Message-ID: <87po5m2odo.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVt-0003u3-Fs
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:09:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53634
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ehyVt-0003tq-AK
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:09:53 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w13E8p6M011991
+	for <qemu-devel@nongnu.org>; Sat, 3 Feb 2018 09:09:52 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fw849a6f2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 09:09:51 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Sat, 3 Feb 2018 09:09:51 -0500
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Sat,  3 Feb 2018 09:09:39 -0500
+In-Reply-To: <1517666981-9339-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1517666981-9339-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] Add save-snapshot,
- load-snapshot and delete-snapshot to QAPI
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1517666981-9339-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/4] tpm: wrap stX_be_p in tpm_cmd_set_XYZ
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +42,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: rpalethorpe@suse.de, Richard Palethorpe <richiejp@f-m.fm>, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com, peter.maydell@linaro.org
 
-Coming to this thread rather late, sorry.
+Wrap the calls to stl_be_p and stw_be_p in tpm_cmd_set_XYZ functions
+that are similar to existing getters.
 
-Eric Blake <eblake@redhat.com> writes:
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/tpm/tpm_util.c |  6 +++---
+ hw/tpm/tpm_util.h | 15 +++++++++++++++
+ 2 files changed, 18 insertions(+), 3 deletions(-)
 
-> On 01/10/2018 10:19 AM, Richard Palethorpe wrote:
->> Hello Eric & Peter,
->> 
->> Eric Blake writes:
->> 
->>> On 01/07/2018 06:23 AM, Richard Palethorpe wrote:
->>>> Add QAPI wrapper functions for the existing snapshot functionality. These
->>>> functions behave the same way as the HMP savevm, loadvm and delvm
->>>> commands. This will allow applications, such as OpenQA, to programmatically
->>>> revert the VM to a previous state with no dependence on HMP or qemu-img.
->>>
->>> That's already possible; libvirt uses QMP's human-monitor-command to
->>> access these HMP commands programmatically.
->> 
->> That is what we are currently doing and is an improvement over
->> programatically using HMP, but I wanted to improve upon
->> that. Occasionally saving or loading snapshots fails and it is not clear
->> why.
->
-> Straightforward mapping of the existing HMP commands into QMP without
-> any thought about the design won't make the errors any clearer. My
-> argument is that any QMP design for managing internal snapshots must be
-> well-designed, but that since we discourage internal snapshots, no one
-> has been actively working on that design.
-
-savevm and loadvm are HMP only precisely because an exact QMP equivalent
-wouldn't be a sane interface, and designing a sane QMP interface would
-be work.  Things that won't do for QMP include automatic selection of
-the block device receiving the VM state, and synchronous operation.
-
-Building blocks might be a better fit for QMP than a one-size-fits-all
-savevm command.
-
-Internal and external snapshots have different advantages.  Because
-external snapshots are more flexible, they've received a lot more
-attention[*] than internal ones.  I wouldn't let friends use internal
-snapshots for production.
-
-You're welcome to put in the work to push internal snapshots to parity
-with external ones.  Do not underestimate how much work that's going to
-be.  External snapshots' head start is years.
-
-[...]
-
-
-
-[*] "All the attention" would be a fair first order approximation, I
-think.
+diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+index 8abde59..2de52a0 100644
+--- a/hw/tpm/tpm_util.c
++++ b/hw/tpm/tpm_util.c
+@@ -106,9 +106,9 @@ const PropertyInfo qdev_prop_tpm =3D {
+ void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
+ {
+     if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+-        stw_be_p(out, TPM_TAG_RSP_COMMAND);
+-        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
+-        stl_be_p(out + 6, TPM_FAIL);
++        tpm_cmd_set_tag(out, TPM_TAG_RSP_COMMAND);
++        tpm_cmd_set_size(out, sizeof(struct tpm_resp_hdr));
++        tpm_cmd_set_error(out, TPM_FAIL);
+     }
+ }
+=20
+diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+index f003d15..f397ac2 100644
+--- a/hw/tpm/tpm_util.h
++++ b/hw/tpm/tpm_util.h
+@@ -36,11 +36,21 @@ static inline uint16_t tpm_cmd_get_tag(const void *b)
+     return lduw_be_p(b);
+ }
+=20
++static inline void tpm_cmd_set_tag(void *b, uint16_t tag)
++{
++    stw_be_p(b, tag);
++}
++
+ static inline uint32_t tpm_cmd_get_size(const void *b)
+ {
+     return ldl_be_p(b + 2);
+ }
+=20
++static inline void tpm_cmd_set_size(void *b, uint32_t size)
++{
++    stl_be_p(b + 2, size);
++}
++
+ static inline uint32_t tpm_cmd_get_ordinal(const void *b)
+ {
+     return ldl_be_p(b + 6);
+@@ -51,6 +61,11 @@ static inline uint32_t tpm_cmd_get_errcode(const void =
+*b)
+     return ldl_be_p(b + 6);
+ }
+=20
++static inline void tpm_cmd_set_error(void *b, uint32_t error)
++{
++    stl_be_p(b + 6, error);
++}
++
+ int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+                              size_t *buffersize);
+=20
+--=20
+2.5.5
