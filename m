@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzuo-0001fR-GF
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:44 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzur-0001hX-CI
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzum-00041r-NR
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:42 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzuq-00047g-Dw
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:45 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  3 Feb 2018 10:39:32 -0500
-Message-Id: <20180203153935.8056-3-pbonzini@redhat.com>
+Date: Sat,  3 Feb 2018 10:39:35 -0500
+Message-Id: <20180203153935.8056-6-pbonzini@redhat.com>
 In-Reply-To: <20180203153935.8056-1-pbonzini@redhat.com>
 References: <20180203153935.8056-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] lockable: add QemuLockable
+Subject: [Qemu-devel] [PATCH 5/5] curl: convert to CoQueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,306 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-QemuLockable is a polymorphic lock type that takes an object and
-knows which function to use for locking and unlocking.  The
-implementation could use C11 _Generic, but since the support is
-not very widespread I am instead using __builtin_choose_expr and
-__builtin_types_compatible_p, which are already used by
-include/qemu/atomic.h.
+Now that CoQueues can use a QemuMutex for thread-safety, there is no
+need for curl to roll its own coroutine queue.  Coroutines can be
+placed directly on the queue instead of using a list of CURLAIOCBs.
 
-QemuLockable can be used to implement lock guards, or to pass around
-a lock in such a way that a function can release it and re-acquire it.
-The next patch will do this for CoQueue.
-
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/compiler.h  | 40 ++++++++++++++++++++
- include/qemu/coroutine.h |  4 +-
- include/qemu/lockable.h  | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/qemu/thread.h    |  5 +--
- include/qemu/typedefs.h  |  4 ++
- tests/test-coroutine.c   | 25 +++++++++++++
- 6 files changed, 169 insertions(+), 5 deletions(-)
- create mode 100644 include/qemu/lockable.h
+ block/curl.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 340e5fdc09..5179bedb1e 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -111,4 +111,44 @@
- #define GCC_FMT_ATTR(n, m)
- #endif
+diff --git a/block/curl.c b/block/curl.c
+index 35cf417f59..cd578d3d14 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -101,8 +101,6 @@ typedef struct CURLAIOCB {
  
-+/* Implement C11 _Generic via GCC builtins.  Example:
-+ *
-+ *    QEMU_GENERIC(x, (float, sinf), (long double, sinl), sin) (x)
-+ *
-+ * The first argument is the discriminator.  The last is the default value.
-+ * The middle ones are tuples in "(type, expansion)" format.
-+ */
-+
-+/* First, find out the number of generic cases.  */
-+#define QEMU_GENERIC(x, ...) \
-+    QEMU_GENERIC_(typeof(x), __VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-+
-+/* There will be extra arguments, but they are not used.  */
-+#define QEMU_GENERIC_(x, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, count, ...) \
-+    QEMU_GENERIC##count(x, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9)
-+
-+/* Two more helper macros, this time to extract items from a parenthesized
-+ * list.
-+ */
-+#define QEMU_FIRST_(a, b) a
-+#define QEMU_SECOND_(a, b) b
-+
-+/* ... and a final one for the common part of the "recursion".  */
-+#define QEMU_GENERIC_IF(x, type_then, else_)                                   \
-+    __builtin_choose_expr(__builtin_types_compatible_p(x,                      \
-+                                                       QEMU_FIRST_ type_then), \
-+                          QEMU_SECOND_ type_then, else_)
-+
-+/* CPP poor man's "recursion".  */
-+#define QEMU_GENERIC1(x, a0, ...) (a0)
-+#define QEMU_GENERIC2(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC1(x, __VA_ARGS__))
-+#define QEMU_GENERIC3(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC2(x, __VA_ARGS__))
-+#define QEMU_GENERIC4(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC3(x, __VA_ARGS__))
-+#define QEMU_GENERIC5(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC4(x, __VA_ARGS__))
-+#define QEMU_GENERIC6(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC5(x, __VA_ARGS__))
-+#define QEMU_GENERIC7(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC6(x, __VA_ARGS__))
-+#define QEMU_GENERIC8(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC7(x, __VA_ARGS__))
-+#define QEMU_GENERIC9(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC8(x, __VA_ARGS__))
-+#define QEMU_GENERIC10(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC9(x, __VA_ARGS__))
-+
- #endif /* COMPILER_H */
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index ce2eb73670..8a5129741c 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -121,7 +121,7 @@ bool qemu_coroutine_entered(Coroutine *co);
-  * Provides a mutex that can be used to synchronise coroutines
-  */
- struct CoWaitRecord;
--typedef struct CoMutex {
-+struct CoMutex {
-     /* Count of pending lockers; 0 for a free mutex, 1 for an
-      * uncontended mutex.
-      */
-@@ -142,7 +142,7 @@ typedef struct CoMutex {
-     unsigned handoff, sequence;
+     size_t start;
+     size_t end;
+-
+-    QSIMPLEQ_ENTRY(CURLAIOCB) next;
+ } CURLAIOCB;
  
-     Coroutine *holder;
--} CoMutex;
-+};
- 
- /**
-  * Initialises a CoMutex. This must be called before any other operation is used
-diff --git a/include/qemu/lockable.h b/include/qemu/lockable.h
-new file mode 100644
-index 0000000000..826ac3f675
---- /dev/null
-+++ b/include/qemu/lockable.h
-@@ -0,0 +1,96 @@
-+/*
-+ * Polymorphic locking functions (aka poor man templates)
-+ *
-+ * Copyright Red Hat, Inc. 2017, 2018
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_LOCKABLE_H
-+#define QEMU_LOCKABLE_H
-+
-+#include "qemu/coroutine.h"
-+#include "qemu/thread.h"
-+
-+typedef void QemuLockUnlockFunc(void *);
-+
-+struct QemuLockable {
-+    void *object;
-+    QemuLockUnlockFunc *lock;
-+    QemuLockUnlockFunc *unlock;
-+};
-+
-+/* This function gives an error if an invalid, non-NULL pointer type is passed
-+ * to QEMU_MAKE_LOCKABLE.  For optimized builds, we can rely on dead-code elimination
-+ * from the compiler, and give the errors already at link time.
-+ */
-+#ifdef __OPTIMIZE__
-+void unknown_lock_type(void *);
-+#else
-+static inline void unknown_lock_type(void *unused)
-+{
-+    abort();
-+}
-+#endif
-+
-+static inline __attribute__((__always_inline__)) QemuLockable *
-+qemu_make_lockable(void *x, QemuLockable *lockable)
-+{
-+    /* We cannot test this in a macro, otherwise we get compiler
-+     * warnings like "the address of 'm' will always evaluate as 'true'".
-+     */
-+    return x ? lockable : NULL;
-+}
-+
-+/* Auxiliary macros to simplify QEMU_MAKE_LOCABLE.  */
-+#define QEMU_LOCK_FUNC(x) ((QemuLockUnlockFunc *)    \
-+    QEMU_GENERIC(x,                                  \
-+                 (QemuMutex *, qemu_mutex_lock),     \
-+                 (CoMutex *, qemu_co_mutex_lock),    \
-+                 (QemuSpin *, qemu_spin_lock),       \
-+                 unknown_lock_type))
-+
-+#define QEMU_UNLOCK_FUNC(x) ((QemuLockUnlockFunc *)  \
-+    QEMU_GENERIC(x,                                  \
-+                 (QemuMutex *, qemu_mutex_unlock),   \
-+                 (CoMutex *, qemu_co_mutex_unlock),  \
-+                 (QemuSpin *, qemu_spin_unlock),     \
-+                 unknown_lock_type))
-+
-+/* In C, compound literals have the lifetime of an automatic variable.
-+ * In C++ it would be different, but then C++ wouldn't need QemuLockable
-+ * either...
-+ */
-+#define QEMU_MAKE_LOCKABLE_(x) qemu_make_lockable((x), &(QemuLockable) {    \
-+        .object = (x),                               \
-+        .lock = QEMU_LOCK_FUNC(x),                   \
-+        .unlock = QEMU_UNLOCK_FUNC(x),               \
-+    })
-+
-+/* QEMU_MAKE_LOCKABLE - Make a polymorphic QemuLockable
-+ *
-+ * @x: a lock object (currently one of QemuMutex, CoMutex, QemuSpin).
-+ *
-+ * Returns a QemuLockable object that can be passed around
-+ * to a function that can operate with locks of any kind.
-+ */
-+#define QEMU_MAKE_LOCKABLE(x)                        \
-+    QEMU_GENERIC(x,                                  \
-+                 (QemuLockable *, (x)),              \
-+                 QEMU_MAKE_LOCKABLE_(x))
-+
-+static inline void qemu_lockable_lock(QemuLockable *x)
-+{
-+    x->lock(x->object);
-+}
-+
-+static inline void qemu_lockable_unlock(QemuLockable *x)
-+{
-+    x->unlock(x->object);
-+}
-+
-+#endif
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index 9af4e945aa..ef7bd16123 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -4,7 +4,6 @@
- #include "qemu/processor.h"
- #include "qemu/atomic.h"
- 
--typedef struct QemuMutex QemuMutex;
- typedef struct QemuCond QemuCond;
- typedef struct QemuSemaphore QemuSemaphore;
- typedef struct QemuEvent QemuEvent;
-@@ -97,9 +96,9 @@ struct Notifier;
- void qemu_thread_atexit_add(struct Notifier *notifier);
- void qemu_thread_atexit_remove(struct Notifier *notifier);
- 
--typedef struct QemuSpin {
-+struct QemuSpin {
-     int value;
--} QemuSpin;
-+};
- 
- static inline void qemu_spin_init(QemuSpin *spin)
+ typedef struct CURLSocket {
+@@ -138,7 +136,7 @@ typedef struct BDRVCURLState {
+     bool accept_range;
+     AioContext *aio_context;
+     QemuMutex mutex;
+-    QSIMPLEQ_HEAD(, CURLAIOCB) free_state_waitq;
++    CoQueue free_state_waitq;
+     char *username;
+     char *password;
+     char *proxyusername;
+@@ -538,7 +536,6 @@ static int curl_init_state(BDRVCURLState *s, CURLState *state)
+ /* Called with s->mutex held.  */
+ static void curl_clean_state(CURLState *s)
  {
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 9bd7a834ba..5923849cdd 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -19,6 +19,7 @@ typedef struct BusClass BusClass;
- typedef struct BusState BusState;
- typedef struct Chardev Chardev;
- typedef struct CompatProperty CompatProperty;
-+typedef struct CoMutex CoMutex;
- typedef struct CPUAddressSpace CPUAddressSpace;
- typedef struct CPUState CPUState;
- typedef struct DeviceListener DeviceListener;
-@@ -86,9 +87,12 @@ typedef struct QEMUBH QEMUBH;
- typedef struct QemuConsole QemuConsole;
- typedef struct QemuDmaBuf QemuDmaBuf;
- typedef struct QEMUFile QEMUFile;
-+typedef struct QemuLockable QemuLockable;
-+typedef struct QemuMutex QemuMutex;
- typedef struct QemuOpt QemuOpt;
- typedef struct QemuOpts QemuOpts;
- typedef struct QemuOptsList QemuOptsList;
-+typedef struct QemuSpin QemuSpin;
- typedef struct QEMUSGList QEMUSGList;
- typedef struct QEMUTimer QEMUTimer;
- typedef struct QEMUTimerListGroup QEMUTimerListGroup;
-diff --git a/tests/test-coroutine.c b/tests/test-coroutine.c
-index 010cb95ad6..6e4842bfda 100644
---- a/tests/test-coroutine.c
-+++ b/tests/test-coroutine.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu/coroutine.h"
- #include "qemu/coroutine_int.h"
-+#include "qemu/lockable.h"
+-    CURLAIOCB *next;
+     int j;
+     for (j = 0; j < CURL_NUM_ACB; j++) {
+         assert(!s->acb[j]);
+@@ -556,13 +553,7 @@ static void curl_clean_state(CURLState *s)
  
- /*
-  * Check that qemu_in_coroutine() works
-@@ -210,6 +211,18 @@ static void coroutine_fn mutex_fn(void *opaque)
-     done++;
+     s->in_use = 0;
+ 
+-    next = QSIMPLEQ_FIRST(&s->s->free_state_waitq);
+-    if (next) {
+-        QSIMPLEQ_REMOVE_HEAD(&s->s->free_state_waitq, next);
+-        qemu_mutex_unlock(&s->s->mutex);
+-        aio_co_wake(next->co);
+-        qemu_mutex_lock(&s->s->mutex);
+-    }
++    qemu_co_enter_next(&s->s->free_state_waitq, &s->s->mutex);
  }
  
-+static void coroutine_fn lockable_fn(void *opaque)
-+{
-+    QemuLockable *x = opaque;
-+    qemu_lockable_lock(x);
-+    assert(!locked);
-+    locked = true;
-+    qemu_coroutine_yield();
-+    locked = false;
-+    qemu_lockable_unlock(x);
-+    done++;
-+}
-+
- static void do_test_co_mutex(CoroutineEntry *entry, void *opaque)
- {
-     Coroutine *c1 = qemu_coroutine_create(entry, opaque);
-@@ -240,6 +253,17 @@ static void test_co_mutex(void)
-     do_test_co_mutex(mutex_fn, &m);
- }
+ static void curl_parse_filename(const char *filename, QDict *options,
+@@ -784,7 +775,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     }
  
-+static void test_co_mutex_lockable(void)
-+{
-+    CoMutex m;
-+    CoMutex *null_pointer = NULL;
-+
-+    qemu_co_mutex_init(&m);
-+    do_test_co_mutex(lockable_fn, QEMU_MAKE_LOCKABLE(&m));
-+
-+    g_assert(QEMU_MAKE_LOCKABLE(null_pointer) == NULL);
-+}
-+
- /*
-  * Check that creation, enter, and return work
-  */
-@@ -478,6 +502,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/basic/in_coroutine", test_in_coroutine);
-     g_test_add_func("/basic/order", test_order);
-     g_test_add_func("/locking/co-mutex", test_co_mutex);
-+    g_test_add_func("/locking/co-mutex/lockable", test_co_mutex_lockable);
-     if (g_test_perf()) {
-         g_test_add_func("/perf/lifecycle", perf_lifecycle);
-         g_test_add_func("/perf/nesting", perf_nesting);
+     DPRINTF("CURL: Opening %s\n", file);
+-    QSIMPLEQ_INIT(&s->free_state_waitq);
++    qemu_co_queue_init(&s->free_state_waitq);
+     s->aio_context = bdrv_get_aio_context(bs);
+     s->url = g_strdup(file);
+     qemu_mutex_lock(&s->mutex);
+@@ -888,10 +879,7 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+         if (state) {
+             break;
+         }
+-        QSIMPLEQ_INSERT_TAIL(&s->free_state_waitq, acb, next);
+-        qemu_mutex_unlock(&s->mutex);
+-        qemu_coroutine_yield();
+-        qemu_mutex_lock(&s->mutex);
++        qemu_co_queue_wait(&s->free_state_waitq, &s->mutex);
+     }
+ 
+     if (curl_init_state(s, state) < 0) {
 -- 
 2.14.3
