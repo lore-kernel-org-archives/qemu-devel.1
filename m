@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtUn-00063A-Pg
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:48:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1ehtVr-0006wh-6v
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:49:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ehtUk-0007CP-NV
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:48:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50846)
+	(envelope-from <armbru@redhat.com>) id 1ehtVq-0000A7-8j
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:49:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtUk-0007BO-HU
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:48:22 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ehtVq-00009B-2e
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 03:49:30 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-3-armbru@redhat.com>
-	<05113113-5b7c-c094-2870-2eb4a5b09454@redhat.com>
-Date: Sat, 03 Feb 2018 09:48:16 +0100
-In-Reply-To: <05113113-5b7c-c094-2870-2eb4a5b09454@redhat.com> (Eric Blake's
-	message of "Fri, 2 Feb 2018 09:47:21 -0600")
-Message-ID: <871si25ui7.fsf@dusky.pond.sub.org>
+	<20180202130336.24719-4-armbru@redhat.com>
+	<1cb0a904-25ff-fcac-bfac-7376683ed80d@redhat.com>
+Date: Sat, 03 Feb 2018 09:49:24 +0100
+In-Reply-To: <1cb0a904-25ff-fcac-bfac-7376683ed80d@redhat.com> (Eric Blake's
+	message of "Fri, 2 Feb 2018 09:59:19 -0600")
+Message-ID: <87vafe4fvv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 02/21] qapi: Generate up-to-date
- copyright notice
+Subject: Re: [Qemu-devel] [PATCH RFC 03/21] qapi: New classes QAPIGenC,
+ QAPIGenH, QAPIGenDoc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,61 +35,61 @@ Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.co
 Eric Blake <eblake@redhat.com> writes:
 
 > On 02/02/2018 07:03 AM, Markus Armbruster wrote:
->> Each generator carries a copyright notice for the generator itself,
->> and another one for the files it generates.  Only the former have been
->> updated along the way, the latter have not, and are all out of date.
+>> These classes encapsulate accumulating and writing output.
 >> 
->> Fix by copying the generator's copyright notice to the generated files
->> instead.
+>> Convert C code generation to QAPIGenC and QAPIGenH.  The conversion is
+>> rather shallow: most of the output accumulation is not converted.
+>> Left for later.
+>> 
+>> The indentation machinery uses a single global variable indent_level,
+>> even though we generally interleave creation of a .c and its .h.  It
+>> should become instance variable of QAPIGenC.  Also left for later.
+>> 
+>> Documentation generation isn't converted, and QAPIGenDoc isn't used.
+>> This will change shortly.
 >> 
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
+>>  scripts/qapi-commands.py   | 27 ++++++-------
+>>  scripts/qapi-event.py      | 26 +++++++------
+>>  scripts/qapi-introspect.py | 22 ++++++-----
+>>  scripts/qapi-types.py      | 26 +++++++------
+>>  scripts/qapi-visit.py      | 26 +++++++------
+>>  scripts/qapi.py            | 96 ++++++++++++++++++++++++++--------------------
+>>  6 files changed, 122 insertions(+), 101 deletions(-)
+>> 
 >
->> +++ b/scripts/qapi-commands.py
->> @@ -1,16 +1,17 @@
->> -#
->> -# QAPI command marshaller generator
->> -#
->> -# Copyright IBM, Corp. 2011
->> -# Copyright (C) 2014-2016 Red Hat, Inc.
->> -#
->> -# Authors:
->> -#  Anthony Liguori <aliguori@us.ibm.com>
->> -#  Michael Roth    <mdroth@linux.vnet.ibm.com>
->> -#  Markus Armbruster <armbru@redhat.com>
->> -#
->> -# This work is licensed under the terms of the GNU GPL, version 2.
->> -# See the COPYING file in the top-level directory.
->> +"""
->> +QAPI command marshaller generator
->> +
->> +Copyright IBM, Corp. 2011
->> +Copyright (C) 2014-2018 Red Hat, Inc.
->> +
->> +Authors:
->> + Anthony Liguori <aliguori@us.ibm.com>
->> + Michael Roth <mdroth@linux.vnet.ibm.com>
->> + Markus Armbruster <armbru@redhat.com>
->> +
->> +This work is licensed under the terms of the GNU GPL, version 2.
->> +See the COPYING file in the top-level directory.
->> +"""
+> A little bit longer due to more structure, but reasonable diffstat in
+> that it shows the conversion is fairly straightforward and opens the
+> doors for later patches to use the new structures more effectively.
 >
-> So python lets you start a file with a string constant that is not
-> associated with any variable name?
-
-It's the module's doc string, done the same way as function doc strings.
-
-https://www.python.org/dev/peps/pep-0257/#what-is-a-docstring
-
->>  (fdef, fdecl) = open_output(output_dir, do_c, do_h, prefix,
->>                              'qmp-marshal.c', 'qmp-commands.h',
->> -                            blurb)
->> +                            blurb, __doc__)
+>>  
+>>  schema = QAPISchema(input_file)
+>> -gen = QAPISchemaGenEventVisitor()
+>> -schema.visit(gen)
+>> -fdef.write(gen.defn)
+>> -fdecl.write(gen.decl)
+>> +vis = QAPISchemaGenEventVisitor()
+>> +schema.visit(vis)
+>> +genc.body(vis.defn)
+>> +genh.body(vis.decl)
 >
-> Ah, and there's what I was missing - python auto-assigns such an initial
-> string to a magic automatic variable.  Cool language feature I hadn't
-> seen before!
+> I don't know if it is worth a sentence in the commit message that the
+> visitor variable is renamed from 'gen' to 'vis' for less confusion with
+> the new class instances 'genc' and 'genh'.
+
+Did the rename give you pause when reviewing?
+
+>> +++ b/scripts/qapi-types.py
+>> @@ -180,7 +180,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>>          self.decl = ''
+>>          self.defn = ''
+>>          self._fwdecl = ''
+>> -        self._btin = guardstart('QAPI_TYPES_BUILTIN')
+>> +        self._btin = '\n' + guardstart('QAPI_TYPES_BUILTIN')
+>
+> Tweaks like this means you were paying attention to still producing
+> identical generated files; always a good sign.
 >
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 
