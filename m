@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ehr9f-0001CO-3D
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 01:18:27 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ehr9e-0001Ao-4u
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 01:18:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ehr9e-0004zD-8A
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 01:18:27 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ehr9c-0004y8-5x
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 01:18:26 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Sat,  3 Feb 2018 07:16:19 +0100
-Message-Id: <20180203061621.7033-2-stefanha@redhat.com>
-In-Reply-To: <20180203061621.7033-1-stefanha@redhat.com>
-References: <20180203061621.7033-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] block/iscsi: drop unused
- IscsiAIOCB->buf field
+Date: Sat,  3 Feb 2018 07:16:18 +0100
+Message-Id: <20180203061621.7033-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] block/iscsi: fix ioctl cancel
+ use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +21,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Felipe Franciosi <felipe@nutanix.com>, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The IscsiAIOCB->buf field has not been used since commit
-e49ab19fcaa617ad6cdfe1ac401327326b6a2552 ("block/iscsi: bump libiscsi
-requirement to 1.9.0").  It used to be a linear buffer for old libiscsi
-versions that didn't support scatter-gather.  The minimum libiscsi
-version supports scatter-gather so we don't linearize buffers anymore.
+v2:
+ * It was unnecessary to avoid duplicate iscsi_schedule_bh() calls since this
+   function already protects against duplicate calls internally [Stefan]
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/iscsi.c | 8 --------
- 1 file changed, 8 deletions(-)
+Patches 1 & 2 are cleanups.
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 6a1c53711a..cd0738942c 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -112,7 +112,6 @@ typedef struct IscsiAIOCB {
-     QEMUBH *bh;
-     IscsiLun *iscsilun;
-     struct scsi_task *task;
--    uint8_t *buf;
-     int status;
-     int64_t sector_num;
-     int nb_sectors;
-@@ -145,9 +144,6 @@ iscsi_bh_cb(void *p)
- 
-     qemu_bh_delete(acb->bh);
- 
--    g_free(acb->buf);
--    acb->buf = NULL;
--
-     acb->common.cb(acb->common.opaque, acb->status);
- 
-     if (acb->task != NULL) {
-@@ -925,9 +921,6 @@ iscsi_aio_ioctl_cb(struct iscsi_context *iscsi, int status,
- {
-     IscsiAIOCB *acb = opaque;
- 
--    g_free(acb->buf);
--    acb->buf = NULL;
--
-     acb->status = 0;
-     if (status < 0) {
-         error_report("Failed to ioctl(SG_IO) to iSCSI lun. %s",
-@@ -1002,7 +995,6 @@ static BlockAIOCB *iscsi_aio_ioctl(BlockDriverState *bs,
-     acb->iscsilun = iscsilun;
-     acb->bh          = NULL;
-     acb->status      = -EINPROGRESS;
--    acb->buf         = NULL;
-     acb->ioh         = buf;
- 
-     if (req != SG_IO) {
+Patch 3 fixes cancellation of ioctls.  Felipe showed me a trace where an acb is
+cancelled and then completes twice.  The second time around crashes QEMU.
+
+Compile-tested only.
+
+Felipe: Please let us know if this fixes the issue you are seeing.  Thanks!
+
+Stefan Hajnoczi (3):
+  block/iscsi: drop unused IscsiAIOCB->buf field
+  block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
+  block/iscsi: fix ioctl cancel use-after-free
+
+ block/iscsi.c | 33 ++++++++++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 11 deletions(-)
+
 -- 
 2.14.3
