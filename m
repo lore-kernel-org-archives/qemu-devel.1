@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCh-0001yn-Mf
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:53 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCn-00023i-HE
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:38:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCf-0008SS-2h
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:51 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:36253
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvCj-0008VS-Ju
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:57 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:36250
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1ehvCe-0008SC-Oa
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:48 -0500
+	id 1ehvCj-0008Ry-8T
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 05:37:53 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat,  3 Feb 2018 10:37:23 +0000
-Message-Id: <20180203103727.26457-7-mark.cave-ayland@ilande.co.uk>
+Date: Sat,  3 Feb 2018 10:37:22 +0000
+Message-Id: <20180203103727.26457-6-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
 References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 06/10] cuda: minor cosmetic tidy-ups to
- get_next_irq_time()
+Subject: [Qemu-devel] [PATCH 05/10] cuda: rename frequency property to
+ tb_frequency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +28,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, lvivier@redhat.com
 
+This allows us to more easily differentiate between the timebase frequency used
+to calibrate the MacOS timers and the actual frequency of the hardware clock as
+indicated by CUDA_TIMER_FREQ.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/misc/macio/cuda.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ hw/misc/macio/cuda.c  | 10 +++++-----
+ hw/misc/macio/macio.c |  2 +-
+ hw/ppc/mac.h          |  2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index a200320e7d..3336ed46b2 100644
+index f036e8d7e1..a200320e7d 100644
 --- a/hw/misc/macio/cuda.c
 +++ b/hw/misc/macio/cuda.c
-@@ -184,36 +184,37 @@ static void set_counter(CUDAState *s, CUDATimer *ti, unsigned int val)
+@@ -158,8 +158,8 @@ static unsigned int get_counter(CUDAState *s, CUDATimer *ti)
+     uint64_t current_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+ 
+     /* Reverse of the tb calculation algorithm that Mac OS X uses on bootup. */
+-    tb_diff = get_tb(current_time, ti->frequency) - ti->load_time;
+-    d = (tb_diff * 0xBF401675E5DULL) / (ti->frequency << 24);
++    tb_diff = get_tb(current_time, ti->tb_frequency) - ti->load_time;
++    d = (tb_diff * 0xBF401675E5DULL) / (ti->tb_frequency << 24);
+ 
+     if (ti->index == 0) {
+         /* the timer goes down from latch to -1 (period of latch + 2) */
+@@ -179,7 +179,7 @@ static void set_counter(CUDAState *s, CUDATimer *ti, unsigned int val)
+ {
+     CUDA_DPRINTF("T%d.counter=%d\n", 1 + ti->index, val);
+     ti->load_time = get_tb(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+-                           s->frequency);
++                           s->tb_frequency);
+     ti->counter_value = val;
      cuda_timer_update(s, ti, ti->load_time);
  }
+@@ -878,7 +878,7 @@ static void cuda_realizefn(DeviceState *dev, Error **errp)
+     struct tm tm;
  
--static int64_t get_next_irq_time(CUDATimer *s, int64_t current_time)
-+static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
- {
-     int64_t d, next_time;
-     unsigned int counter;
+     s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer1, s);
+-    s->timers[0].frequency = s->frequency;
++    s->timers[0].frequency = s->tb_frequency;
+     s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer2, s);
+     s->timers[1].frequency = (SCALE_US * 6000) / 4700;
  
-     /* current counter value */
--    d = muldiv64(current_time - s->load_time,
-+    d = muldiv64(current_time - ti->load_time,
-                  CUDA_TIMER_FREQ, NANOSECONDS_PER_SECOND);
-     /* the timer goes down from latch to -1 (period of latch + 2) */
--    if (d <= (s->counter_value + 1)) {
--        counter = (s->counter_value - d) & 0xffff;
-+    if (d <= (ti->counter_value + 1)) {
-+        counter = (ti->counter_value - d) & 0xffff;
-     } else {
--        counter = (d - (s->counter_value + 1)) % (s->latch + 2);
--        counter = (s->latch - counter) & 0xffff;
-+        counter = (d - (ti->counter_value + 1)) % (ti->latch + 2);
-+        counter = (ti->latch - counter) & 0xffff;
-     }
- 
-     /* Note: we consider the irq is raised on 0 */
-     if (counter == 0xffff) {
--        next_time = d + s->latch + 1;
-+        next_time = d + ti->latch + 1;
-     } else if (counter == 0) {
--        next_time = d + s->latch + 2;
-+        next_time = d + ti->latch + 2;
-     } else {
-         next_time = d + counter;
-     }
-     CUDA_DPRINTF("latch=%d counter=%" PRId64 " delta_next=%" PRId64 "\n",
--                 s->latch, d, next_time - d);
-+                 ti->latch, d, next_time - d);
-     next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, CUDA_TIMER_FREQ) +
--        s->load_time;
--    if (next_time <= current_time)
-+                         ti->load_time;
-+    if (next_time <= current_time) {
-         next_time = current_time + 1;
-+    }
-     return next_time;
+@@ -909,7 +909,7 @@ static void cuda_initfn(Object *obj)
  }
  
+ static Property cuda_properties[] = {
+-    DEFINE_PROP_UINT64("frequency", CUDAState, frequency, 0),
++    DEFINE_PROP_UINT64("timebase-frequency", CUDAState, tb_frequency, 0),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 44f91d1e7f..a639b09e00 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -451,7 +451,7 @@ void macio_init(PCIDevice *d,
+     macio_state->escc_mem = escc_mem;
+     /* Note: this code is strongly inspirated from the corresponding code
+        in PearPC */
+-    qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "frequency",
++    qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "timebase-frequency",
+                          macio_state->frequency);
+ 
+     qdev_init_nofail(DEVICE(d));
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index b501af1653..fa78115c95 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -99,7 +99,7 @@ typedef struct CUDAState {
+     CUDATimer timers[2];
+ 
+     uint32_t tick_offset;
+-    uint64_t frequency;
++    uint64_t tb_frequency;
+ 
+     uint8_t last_b;
+     uint8_t last_acr;
 -- 
 2.11.0
