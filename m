@@ -1,37 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVz-00077z-5g
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:10:01 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzun-0001f0-NK
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVu-0003uS-6R
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:09:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1ehyVt-0003tx-T3
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:09:54 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w13E8taZ141216
-	for <qemu-devel@nongnu.org>; Sat, 3 Feb 2018 09:09:52 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fwax3wkn1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 09:09:52 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Sat, 3 Feb 2018 09:09:51 -0500
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Sat,  3 Feb 2018 09:09:38 -0500
-In-Reply-To: <1517666981-9339-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1517666981-9339-1-git-send-email-stefanb@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1517666981-9339-2-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/4] tpm: Split off tpm_crb_reset function
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzul-0003zr-Bo
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:41 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat,  3 Feb 2018 10:39:31 -0500
+Message-Id: <20180203153935.8056-2-pbonzini@redhat.com>
+In-Reply-To: <20180203153935.8056-1-pbonzini@redhat.com>
+References: <20180203153935.8056-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/5] test-coroutine: add simple CoMutex test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,96 +21,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com, peter.maydell@linaro.org
+Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-Split off the tpm_crb_reset function part from tpm_crb_realize
-that we need to run every time the machine resets.
+In preparation for adding a similar test using QemuLockable, add a very
+simple testcase that has two interleaved calls to lock and unlock.
 
-Also register our reset function with the system since TYPE_DEVICE
-seems to not get a reset otherwise.
-
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/tpm/tpm_crb.c | 48 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 28 insertions(+), 20 deletions(-)
+ tests/test-coroutine.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index 687d255..b5b8256 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -26,6 +26,7 @@
- #include "hw/acpi/tpm.h"
- #include "migration/vmstate.h"
- #include "sysemu/tpm_backend.h"
-+#include "sysemu/reset.h"
- #include "tpm_int.h"
- #include "tpm_util.h"
-=20
-@@ -210,29 +211,10 @@ static Property tpm_crb_properties[] =3D {
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
--static void tpm_crb_realize(DeviceState *dev, Error **errp)
-+static void tpm_crb_reset(void *dev)
- {
-     CRBState *s =3D CRB(dev);
-=20
--    if (!tpm_find()) {
--        error_setg(errp, "at most one TPM device is permitted");
--        return;
--    }
--    if (!s->tpmbe) {
--        error_setg(errp, "'tpmdev' property is required");
--        return;
--    }
--
--    memory_region_init_io(&s->mmio, OBJECT(s), &tpm_crb_memory_ops, s,
--        "tpm-crb-mmio", sizeof(s->regs));
--    memory_region_init_ram(&s->cmdmem, OBJECT(s),
--        "tpm-crb-cmd", CRB_CTRL_CMD_SIZE, errp);
--
--    memory_region_add_subregion(get_system_memory(),
--        TPM_CRB_ADDR_BASE, &s->mmio);
--    memory_region_add_subregion(get_system_memory(),
--        TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
--
-     tpm_backend_reset(s->tpmbe);
-=20
-     ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID,
-@@ -267,6 +249,32 @@ static void tpm_crb_realize(DeviceState *dev, Error =
-**errp)
-     tpm_backend_startup_tpm(s->tpmbe, s->be_buffer_size);
+diff --git a/tests/test-coroutine.c b/tests/test-coroutine.c
+index 76c646107e..010cb95ad6 100644
+--- a/tests/test-coroutine.c
++++ b/tests/test-coroutine.c
+@@ -175,7 +175,7 @@ static void coroutine_fn c1_fn(void *opaque)
+     qemu_coroutine_enter(c2);
  }
-=20
-+static void tpm_crb_realize(DeviceState *dev, Error **errp)
+ 
+-static void test_co_queue(void)
++static void test_no_dangling_access(void)
+ {
+     Coroutine *c1;
+     Coroutine *c2;
+@@ -195,6 +195,51 @@ static void test_co_queue(void)
+     *c1 = tmp;
+ }
+ 
++static bool locked;
++static int done;
++
++static void coroutine_fn mutex_fn(void *opaque)
 +{
-+    CRBState *s =3D CRB(dev);
-+
-+    if (!tpm_find()) {
-+        error_setg(errp, "at most one TPM device is permitted");
-+        return;
-+    }
-+    if (!s->tpmbe) {
-+        error_setg(errp, "'tpmdev' property is required");
-+        return;
-+    }
-+
-+    memory_region_init_io(&s->mmio, OBJECT(s), &tpm_crb_memory_ops, s,
-+        "tpm-crb-mmio", sizeof(s->regs));
-+    memory_region_init_ram(&s->cmdmem, OBJECT(s),
-+        "tpm-crb-cmd", CRB_CTRL_CMD_SIZE, errp);
-+
-+    memory_region_add_subregion(get_system_memory(),
-+        TPM_CRB_ADDR_BASE, &s->mmio);
-+    memory_region_add_subregion(get_system_memory(),
-+        TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
-+
-+    qemu_register_reset(tpm_crb_reset, dev);
++    CoMutex *m = opaque;
++    qemu_co_mutex_lock(m);
++    assert(!locked);
++    locked = true;
++    qemu_coroutine_yield();
++    locked = false;
++    qemu_co_mutex_unlock(m);
++    done++;
 +}
 +
- static void tpm_crb_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
---=20
-2.5.5
++static void do_test_co_mutex(CoroutineEntry *entry, void *opaque)
++{
++    Coroutine *c1 = qemu_coroutine_create(entry, opaque);
++    Coroutine *c2 = qemu_coroutine_create(entry, opaque);
++
++    done = 0;
++    qemu_coroutine_enter(c1);
++    g_assert(locked);
++    qemu_coroutine_enter(c2);
++
++    /* Unlock queues c2.  It is then started automatically when c1 yields or
++     * terminates.
++     */
++    qemu_coroutine_enter(c1);
++    g_assert_cmpint(done, ==, 1);
++    g_assert(locked);
++
++    qemu_coroutine_enter(c2);
++    g_assert_cmpint(done, ==, 2);
++    g_assert(!locked);
++}
++
++static void test_co_mutex(void)
++{
++    CoMutex m;
++
++    qemu_co_mutex_init(&m);
++    do_test_co_mutex(mutex_fn, &m);
++}
++
+ /*
+  * Check that creation, enter, and return work
+  */
+@@ -422,7 +467,7 @@ int main(int argc, char **argv)
+      * crash, so skip it.
+      */
+     if (CONFIG_COROUTINE_POOL) {
+-        g_test_add_func("/basic/co_queue", test_co_queue);
++        g_test_add_func("/basic/no-dangling-access", test_no_dangling_access);
+     }
+ 
+     g_test_add_func("/basic/lifecycle", test_lifecycle);
+@@ -432,6 +477,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/basic/entered", test_entered);
+     g_test_add_func("/basic/in_coroutine", test_in_coroutine);
+     g_test_add_func("/basic/order", test_order);
++    g_test_add_func("/locking/co-mutex", test_co_mutex);
+     if (g_test_perf()) {
+         g_test_add_func("/perf/lifecycle", perf_lifecycle);
+         g_test_add_func("/perf/nesting", perf_nesting);
+-- 
+2.14.3
