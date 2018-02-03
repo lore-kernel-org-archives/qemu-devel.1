@@ -1,39 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVy-00077w-GF
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVy-00077t-FS
 	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVt-0003u3-Fs
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ehyVt-0003uG-Jx
 	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:09:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53634
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48648
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1ehyVt-0003tq-AK
+	id 1ehyVt-0003tt-DY
 	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 09:09:53 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w13E8p6M011991
+	w13E8q9r051171
 	for <qemu-devel@nongnu.org>; Sat, 3 Feb 2018 09:09:52 -0500
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fw849a6f2-1
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fw6w8m9ee-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 09:09:51 -0500
+	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 09:09:52 -0500
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Sat, 3 Feb 2018 09:09:51 -0500
+	Sat, 3 Feb 2018 09:09:52 -0500
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Sat,  3 Feb 2018 09:09:39 -0500
-In-Reply-To: <1517666981-9339-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1517666981-9339-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Date: Sat,  3 Feb 2018 09:09:37 -0500
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1517666981-9339-3-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/4] tpm: wrap stX_be_p in tpm_cmd_set_XYZ
- functions
+Content-Transfer-Encoding: 8bit
+Message-Id: <1517666981-9339-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL 0/4] Merge tpm 2018/02/03
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,71 +42,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com, peter.maydell@linaro.org
 
-Wrap the calls to stl_be_p and stw_be_p in tpm_cmd_set_XYZ functions
-that are similar to existing getters.
+The following patches do some cleanups and fix the resetting of the TPM
+CRB device and add my tpm-next git tree reference to MAINTAINERS.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
+The following changes since commit e486b528229ed4ed5dfdac790c8152bfb2a265c9:
+
+  Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request' into staging (2018-02-02 10:57:50 +0000)
+
+are available in the git repository at:
+
+  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-02-03-1
+
+for you to fetch changes up to 3bd9e16149de3965a9880a20826a28b7b94bd4a7:
+
+  tpm: tis: move one-line function into caller (2018-02-03 09:01:56 -0500)
+
+----------------------------------------------------------------
+Merge tpm 2018/02/03 v1
+
+----------------------------------------------------------------
+Stefan Berger (4):
+      tpm: Split off tpm_crb_reset function
+      tpm: wrap stX_be_p in tpm_cmd_set_XYZ functions
+      MAINTAINERS: add pointer to tpm-next repository
+      tpm: tis: move one-line function into caller
+
+ MAINTAINERS       |  1 +
+ hw/tpm/tpm_crb.c  | 48 ++++++++++++++++++++++++++++--------------------
+ hw/tpm/tpm_tis.c  |  7 +------
  hw/tpm/tpm_util.c |  6 +++---
  hw/tpm/tpm_util.h | 15 +++++++++++++++
- 2 files changed, 18 insertions(+), 3 deletions(-)
+ 5 files changed, 48 insertions(+), 29 deletions(-)
 
-diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-index 8abde59..2de52a0 100644
---- a/hw/tpm/tpm_util.c
-+++ b/hw/tpm/tpm_util.c
-@@ -106,9 +106,9 @@ const PropertyInfo qdev_prop_tpm =3D {
- void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
- {
-     if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
--        stw_be_p(out, TPM_TAG_RSP_COMMAND);
--        stl_be_p(out + 2, sizeof(struct tpm_resp_hdr));
--        stl_be_p(out + 6, TPM_FAIL);
-+        tpm_cmd_set_tag(out, TPM_TAG_RSP_COMMAND);
-+        tpm_cmd_set_size(out, sizeof(struct tpm_resp_hdr));
-+        tpm_cmd_set_error(out, TPM_FAIL);
-     }
- }
-=20
-diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-index f003d15..f397ac2 100644
---- a/hw/tpm/tpm_util.h
-+++ b/hw/tpm/tpm_util.h
-@@ -36,11 +36,21 @@ static inline uint16_t tpm_cmd_get_tag(const void *b)
-     return lduw_be_p(b);
- }
-=20
-+static inline void tpm_cmd_set_tag(void *b, uint16_t tag)
-+{
-+    stw_be_p(b, tag);
-+}
-+
- static inline uint32_t tpm_cmd_get_size(const void *b)
- {
-     return ldl_be_p(b + 2);
- }
-=20
-+static inline void tpm_cmd_set_size(void *b, uint32_t size)
-+{
-+    stl_be_p(b + 2, size);
-+}
-+
- static inline uint32_t tpm_cmd_get_ordinal(const void *b)
- {
-     return ldl_be_p(b + 6);
-@@ -51,6 +61,11 @@ static inline uint32_t tpm_cmd_get_errcode(const void =
-*b)
-     return ldl_be_p(b + 6);
- }
-=20
-+static inline void tpm_cmd_set_error(void *b, uint32_t error)
-+{
-+    stl_be_p(b + 6, error);
-+}
-+
- int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
-                              size_t *buffersize);
-=20
---=20
+-- 
 2.5.5
