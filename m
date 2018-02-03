@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzuq-0001gj-Fm
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:46 -0500
+	(envelope-from <armbru@redhat.com>) id 1ei04u-00016w-U3
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:50:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ehzup-000465-H8
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:39:44 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  3 Feb 2018 10:39:34 -0500
-Message-Id: <20180203153935.8056-5-pbonzini@redhat.com>
-In-Reply-To: <20180203153935.8056-1-pbonzini@redhat.com>
-References: <20180203153935.8056-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] coroutine-lock: make qemu_co_enter_next
- thread-safe
+	(envelope-from <armbru@redhat.com>) id 1ei04r-0003Mp-QX
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:50:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ei04r-0003Lt-KX
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 10:50:05 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1516369485-5374-1-git-send-email-zhangckid@gmail.com>
+	<1516369485-5374-11-git-send-email-zhangckid@gmail.com>
+Date: Sat, 03 Feb 2018 16:49:57 +0100
+In-Reply-To: <1516369485-5374-11-git-send-email-zhangckid@gmail.com> (Zhang
+	Chen's message of "Fri, 19 Jan 2018 21:44:39 +0800")
+Message-ID: <87zi4qf4yi.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH V4 10/16] qmp event: Add COLO_EXIT event to
+ notify users while exited COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,114 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-qemu_co_queue_next does not need to release and re-acquire the mutex,
-because the queued coroutine does not run immediately.  However, this
-does not hold for qemu_co_enter_next.  Now that qemu_co_queue_wait
-can synchronize (via QemuLockable) with code that is not running in
-coroutine context, it's important that code using qemu_co_enter_next
-can easily use a standardized locking idiom.
+Zhang Chen <zhangckid@gmail.com> writes:
 
-First of all, qemu_co_enter_next must use aio_co_wake to restart the
-coroutine.  Second, the function gains a second argument, a QemuLockable*,
-and the comments of qemu_co_queue_next and qemu_co_queue_restart_all
-are adjusted to clarify the difference.
+> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>
+> If some errors happen during VM's COLO FT stage, it's important to
+> notify the users of this event. Together with 'x-colo-lost-heartbeat',
+> Users can intervene in COLO's failover work immediately.
+> If users don't want to get involved in COLO's failover verdict,
+> it is still necessary to notify users that we exited COLO mode.
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+[...]
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 70e7b67..6fc95b7 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -869,6 +869,41 @@
+>    'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+>  
+>  ##
+> +# @COLO_EXIT:
+> +#
+> +# Emitted when VM finishes COLO mode due to some errors happening or
+> +# at the request of users.
+> +#
+> +# @mode: which COLO mode the VM was in when it exited.
+> +#
+> +# @reason: describes the reason for the COLO exit.
+> +#
+> +# Since: 2.12
+> +#
+> +# Example:
+> +#
+> +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
+> +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
+> +#
+> +##
+> +{ 'event': 'COLO_EXIT',
+> +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- fsdev/qemu-fsdev-throttle.c |  4 ++--
- include/qemu/coroutine.h    | 19 +++++++++++++------
- util/qemu-coroutine-lock.c  | 10 ++++++++--
- 3 files changed, 23 insertions(+), 10 deletions(-)
+Standard question when I see a new event: is there a way to poll for the
+event's information?  If not, why don't we need one?
 
-diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
-index 49eebb5412..1dc07fbc12 100644
---- a/fsdev/qemu-fsdev-throttle.c
-+++ b/fsdev/qemu-fsdev-throttle.c
-@@ -20,13 +20,13 @@
- static void fsdev_throttle_read_timer_cb(void *opaque)
- {
-     FsThrottle *fst = opaque;
--    qemu_co_enter_next(&fst->throttled_reqs[false]);
-+    qemu_co_enter_next(&fst->throttled_reqs[false], NULL);
- }
- 
- static void fsdev_throttle_write_timer_cb(void *opaque)
- {
-     FsThrottle *fst = opaque;
--    qemu_co_enter_next(&fst->throttled_reqs[true]);
-+    qemu_co_enter_next(&fst->throttled_reqs[true], NULL);
- }
- 
- void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index 1e5f0957e6..3afee7169b 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -188,21 +188,28 @@ void qemu_co_queue_init(CoQueue *queue);
- void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuLockable *lock);
- 
- /**
-- * Restarts the next coroutine in the CoQueue and removes it from the queue.
-- *
-- * Returns true if a coroutine was restarted, false if the queue is empty.
-+ * Removes the next coroutine from the CoQueue, and wake it up.
-+ * Returns true if a coroutine was removed, false if the queue is empty.
-  */
- bool coroutine_fn qemu_co_queue_next(CoQueue *queue);
- 
- /**
-- * Restarts all coroutines in the CoQueue and leaves the queue empty.
-+ * Empties the CoQueue; all coroutines are woken up.
-  */
- void coroutine_fn qemu_co_queue_restart_all(CoQueue *queue);
- 
- /**
-- * Enter the next coroutine in the queue
-+ * Removes the next coroutine from the CoQueue, and wake it up.  Unlike
-+ * qemu_co_queue_next, this function releases the lock during aio_co_wake
-+ * because it is meant to be used outside coroutine context; in that case, the
-+ * coroutine is entered immediately, before qemu_co_enter_next returns.
-+ *
-+ * If used in coroutine context, qemu_co_enter_next is equivalent to
-+ * qemu_co_queue_next.
-  */
--bool qemu_co_enter_next(CoQueue *queue);
-+#define qemu_co_enter_next(queue, lock) \
-+    qemu_co_enter_next_impl(queue, QEMU_MAKE_LOCKABLE(lock))
-+bool qemu_co_enter_next_impl(CoQueue *queue, QemuLockable *lock);
- 
- /**
-  * Checks if the CoQueue is empty.
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 2a66fc1467..78fb79acf8 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -132,7 +132,7 @@ void coroutine_fn qemu_co_queue_restart_all(CoQueue *queue)
-     qemu_co_queue_do_restart(queue, false);
- }
- 
--bool qemu_co_enter_next(CoQueue *queue)
-+bool qemu_co_enter_next_impl(CoQueue *queue, QemuLockable *lock)
- {
-     Coroutine *next;
- 
-@@ -142,7 +142,13 @@ bool qemu_co_enter_next(CoQueue *queue)
-     }
- 
-     QSIMPLEQ_REMOVE_HEAD(&queue->entries, co_queue_next);
--    qemu_coroutine_enter(next);
-+    if (lock) {
-+        qemu_lockable_unlock(lock);
-+    }
-+    aio_co_wake(next);
-+    if (lock) {
-+        qemu_lockable_lock(lock);
-+    }
-     return true;
- }
- 
--- 
-2.14.3
+Remember, management applications might miss events when they lose the
+connection and have to reconnect, say because the management application
+needs to be restarted.
+
+> +
+> +##
+> +# @COLOExitReason:
+> +#
+> +# The reason for a COLO exit
+> +#
+> +# @request: COLO exit is due to an external request
+> +#
+> +# @error: COLO exit is due to an internal error
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'enum': 'COLOExitReason',
+> +  'data': [ 'request', 'error' ] }
+> +
+> +##
+>  # @x-colo-lost-heartbeat:
+>  #
+>  # Tell qemu that heartbeat is lost, request it to do takeover procedures.
