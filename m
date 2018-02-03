@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1ei1Rx-0002J2-3j
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 12:18:07 -0500
+	(envelope-from <frederic.konrad@adacore.com>) id 1ei2S7-0006WP-6J
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 13:22:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1ei1Rt-0001n9-R5
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 12:18:01 -0500
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:41174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1ei1Rt-0001mv-JC
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 12:17:57 -0500
-Received: by mail-io0-x242.google.com with SMTP id f4so26187748ioh.8
-	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 09:17:57 -0800 (PST)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Sat,  3 Feb 2018 12:17:43 -0500
-Message-Id: <20180203171743.13612-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH v6] ui/cocoa.m: Add ability for user to specify
- mouse ungrab key
+	(envelope-from <frederic.konrad@adacore.com>) id 1ei2S5-0003Cb-LM
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 13:22:14 -0500
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:38613
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1ei2S5-00039P-FQ
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 13:22:13 -0500
+References: <CAE+d=qYwHiguvVD4+akOvQ2NYx=OQgSUGv14S6tFsb6bFfCBsQ@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <fa403bd1-283f-a643-63df-e31333a380a6@adacore.com>
+Date: Sat, 3 Feb 2018 19:22:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAE+d=qYwHiguvVD4+akOvQ2NYx=OQgSUGv14S6tFsb6bFfCBsQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] How to make memory mapped controller receive data?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,505 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: Fangda Cai <fdtsaid@gmail.com>
+Cc: qemu-devel@nongnu.org, Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
-This combination may not be very fun for the user to have to enter, so we
-now enable the user to specify their own key(s) as the ungrab key(s). The
-list of keys that can be used is found in the file qapi/ui.json under QKeyCode.
-The max number of keys that can be used is three.
+Hi,
 
-Syntax: -display cocoa,hotkey-grab=<key-key-key>
+There are no CAN bus support in QEMU yet but there is some work
+going on about CAN from Pavel (added in CC):
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00104.html
 
-Example usage:  -display cocoa,hotkey-grab=home
-	        -display cocoa,hotkey-grab=shift-ctrl
-		-display cocoa,hotkey-grab=ctrl-x
-		-display cocoa,hotkey-grab=pgup-pgdn
-		-display cocoa,hotkey-grab=kp_5-kp_6
-		-display cocoa,hotkey-grab=kp_4-kp_5-kp_6
-		-display cocoa,hotkey-grab=ctrl-alt
+He knows better than me what it does but basically the device
+will be able to be contacted by other CAN devices on the bus even
+outside QEMU.
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
-v6 changes:
-- changed ungrab command-line option to -display cocoa,hotkey-grab
-- Removed NSMutableSet code
-- Implemented C version of Set datatype
+If you have an SPI master _inside_ QEMU connected to your memory
+mapped SPI controller you can create a qemu_timer in the device
+which will send data to the SPI controller.
 
+Fred
 
-v5 changes:
-- Removed ungrab detection code from keydown event in handleEvent.
-- Removed console_ungrab_sequence_length().
-- Removed ability to always use the default ctrl-alt-g ungrab key sequence.
-- Added ability to actually send keys to the guest that might overlap ungrab keys. 
-Example for -ungrab ctrl-alt:
-down(ctrl)
-down(alt)
-up(ctrl)
-up(alt)
-..ungrab activates..
-
-down(ctrl)
-down(alt)
-down(f1)
-up(ctrl)
-up(alt)
-up(f1)
-..no ungrab activates..
-
-v4 changes:
-- Removed initialization code for key_value_array.
-- Added void keyword to console_ungrab_key_sequence(),
-  and console_ungrab_key_string() functions.
-
-v3 changes:
-- Added the ability for any "sendkey supported" key to be used.
-- Added ability for one to three key sequences to be used.
-
-v2 changes:
-- Removed the "int i" code from the for loops. 
-
- include/ui/console.h |  22 +++++++
- qemu-options.hx      |   1 +
- ui/cocoa.m           |  80 ++++++++++++++++++++----
- ui/console.c         | 169 +++++++++++++++++++++++++++++++++++++++++++++++++++
- vl.c                 |  17 ++++++
- 5 files changed, 277 insertions(+), 12 deletions(-)
-
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 7b35778444..4f5a881533 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -533,4 +533,26 @@ static inline void early_gtk_display_init(int opengl)
- /* egl-headless.c */
- void egl_headless_init(void);
- 
-+/* console.c */
-+/* max number of keys that can be used as the ungrab keys */
-+#define MAX_UNGRAB_KEYS 3
-+void set_ungrab_seq(const char *new_seq);
-+int *console_ungrab_key_sequence(void);
-+const char *console_ungrab_key_string(void);
-+void use_default_ungrab_keys(void);
-+void init_ungrab_keys(void);
-+
-+/* Set datatype related code */
-+typedef struct Set_struct {
-+    int size;   /* The size of the array */
-+    int *array; /* The array used to store the set's values */
-+} Set;
-+
-+Set *new_set(int max_size);
-+void add_number(Set *the_set, int the_number);
-+void remove_number(Set *the_set, int the_number);
-+bool contains_number(Set *the_set, int the_number);
-+void clear_set(Set *the_set);
-+bool are_sets_equal(Set *set1, Set *set2);
-+
- #endif
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 8ce427da78..878a4d5867 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1243,6 +1243,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
-     "            [,window_close=on|off][,gl=on|off]\n"
-     "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
-     "-display vnc=<display>[,<optargs>]\n"
-+    "-display cocoa[hotkey-grab=<key(s)>]\n"
-     "-display curses\n"
-     "-display none"
-     "                select display type\n"
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 6be9848391..097c7fd4ce 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -105,6 +105,8 @@
- bool stretch_video;
- NSTextField *pauseLabel;
- NSArray * supportedImageFileTypes;
-+Set *key_set, *ungrab_set;
-+int ungrab_sequence_length;
- 
- // Mac to QKeyCode conversion
- const int mac_to_qkeycode_map[] = {
-@@ -488,8 +490,6 @@ - (void) switchSurface:(DisplaySurface *)surface
-         [[fullScreenWindow contentView] setFrame:[[NSScreen mainScreen] frame]];
-         [normalWindow setFrame:NSMakeRect([normalWindow frame].origin.x, [normalWindow frame].origin.y - h + oldh, w, h + [normalWindow frame].size.height - oldh) display:NO animate:NO];
-     } else {
--        if (qemu_name)
--            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s", qemu_name]];
-         [normalWindow setFrame:NSMakeRect([normalWindow frame].origin.x, [normalWindow frame].origin.y - h + oldh, w, h + [normalWindow frame].size.height - oldh) display:YES animate:NO];
-     }
- 
-@@ -669,14 +669,29 @@ - (void) handleEvent:(NSEvent *)event
-                 if (keycode == Q_KEY_CODE_CAPS_LOCK ||
-                     keycode == Q_KEY_CODE_NUM_LOCK) {
-                     [self toggleStatefulModifier:keycode];
--                } else if (qemu_console_is_graphic(NULL)) {
-+                } else {
-                   [self toggleModifier:keycode];
-                 }
-             }
- 
-+            /*
-+             * This code has to be here because the user might use a modifier
-+             * key like shift as an ungrab key.
-+             */
-+            if (modifiers_state[keycode] == YES) { // if the key is down
-+                [self check_key: keycode];
-+            } else {                               // if the key is up
-+                if (are_sets_equal(ungrab_set, key_set)) {
-+                    [self ungrabMouse];
-+                    clear_set(key_set);
-+                    return;
-+                }
-+                remove_number(key_set, keycode);
-+            }
-             break;
-         case NSEventTypeKeyDown:
-             keycode = cocoa_keycode_to_qemu([event keyCode]);
-+            [self check_key: keycode];
- 
-             // forward command key combos to the host UI unless the mouse is grabbed
-             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
-@@ -686,7 +701,7 @@ - (void) handleEvent:(NSEvent *)event
- 
-             // default
- 
--            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is reserved for QEMU)
-+            // handle control + alt Key Combos (ctrl+alt+[1..9] is reserved for QEMU)
-             if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
-                 NSString *keychar = [event charactersIgnoringModifiers];
-                 if ([keychar length] == 1) {
-@@ -697,11 +712,6 @@ - (void) handleEvent:(NSEvent *)event
-                         case '1' ... '9':
-                             console_select(key - '0' - 1); /* ascii math */
-                             return;
--
--                        // release the mouse grab
--                        case 'g':
--                            [self ungrabMouse];
--                            return;
-                     }
-                 }
-             }
-@@ -715,6 +725,13 @@ - (void) handleEvent:(NSEvent *)event
-         case NSEventTypeKeyUp:
-             keycode = cocoa_keycode_to_qemu([event keyCode]);
- 
-+            if (are_sets_equal(ungrab_set, key_set)) {
-+                [self ungrabMouse];
-+                clear_set(key_set);
-+                return;
-+            }
-+            remove_number(key_set, keycode);
-+
-             // don't pass the guest a spurious key-up if we treated this
-             // command-key combo as a host UI action
-             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
-@@ -853,10 +870,13 @@ - (void) grabMouse
-     COCOA_DEBUG("QemuCocoaView: grabMouse\n");
- 
-     if (!isFullscreen) {
-+        NSString * message_string;
-+        message_string = [NSString stringWithFormat: @"- (Press %s to release Mouse)", console_ungrab_key_string()];
-+
-         if (qemu_name)
--            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
-+            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %s %@", qemu_name, message_string]];
-         else
--            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
-+            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %@", message_string]];
-     }
-     [self hideCursor];
-     if (!isAbsoluteEnabled) {
-@@ -909,6 +929,17 @@ - (void) raiseAllKeys
-        }
-    }
- }
-+
-+/* Check the keycode to see if it one of the ungrab keys */
-+- (void) check_key: (int) keycode
-+{
-+    if (contains_number(ungrab_set, keycode)) {
-+        add_number(key_set, keycode);
-+    } else {
-+        clear_set(key_set);
-+    }
-+}
-+
- @end
- 
- 
-@@ -1400,7 +1431,7 @@ int main (int argc, const char * argv[]) {
-                 !strcmp(opt, "-nographic") ||
-                 !strcmp(opt, "-version") ||
-                 !strcmp(opt, "-curses") ||
--                !strcmp(opt, "-display") ||
-+                !strcmp(opt, "-display cocoa") ||
-                 !strcmp(opt, "-qtest")) {
-                 return qemu_main(gArgc, gArgv, *_NSGetEnviron());
-             }
-@@ -1682,6 +1713,29 @@ static void addRemovableDevicesMenuItems(void)
-     qapi_free_BlockInfoList(pointerToFree);
- }
- 
-+/* initializes the mouse ungrab system */
-+static void ungrab_init(void)
-+{
-+    key_set = new_set(MAX_UNGRAB_KEYS);
-+    ungrab_set = new_set(MAX_UNGRAB_KEYS);
-+    init_ungrab_keys();
-+
-+    /* determine length of the mouse ungrab sequence */
-+    int index, *ungrab_seq;
-+    ungrab_sequence_length = 0;
-+    ungrab_seq = console_ungrab_key_sequence();
-+    for (index = 0; index < MAX_UNGRAB_KEYS; index++) {
-+        if (ungrab_seq[index] != 0) {
-+            ungrab_sequence_length++;
-+        }
-+    }
-+
-+    /* make the ungrab set */
-+    for (index = 0; index < ungrab_sequence_length; index++) {
-+        add_number(ungrab_set, ungrab_seq[index]);
-+    }
-+}
-+
- void cocoa_display_init(DisplayState *ds, int full_screen)
- {
-     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
-@@ -1711,4 +1765,6 @@ void cocoa_display_init(DisplayState *ds, int full_screen)
-      * find out what removable devices it has.
-      */
-     addRemovableDevicesMenuItems();
-+
-+    ungrab_init();
- }
-diff --git a/ui/console.c b/ui/console.c
-index c4c95abed7..8044ca17a9 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -30,9 +30,13 @@
- #include "chardev/char-fe.h"
- #include "trace.h"
- #include "exec/memory.h"
-+#include <stdio.h>
-+#include <memory.h>
-+#include <stdbool.h>
- 
- #define DEFAULT_BACKSCROLL 512
- #define CONSOLE_CURSOR_PERIOD 500
-+#define EMPTY_VALUE -1
- 
- typedef struct TextAttributes {
-     uint8_t fgcol:4;
-@@ -63,6 +67,12 @@ typedef struct QEMUFIFO {
-     int count, wptr, rptr;
- } QEMUFIFO;
- 
-+/* stores the ungrab keys' values */
-+static int key_value_array[MAX_UNGRAB_KEYS + 1];
-+
-+/* stores the string that is returned by console_ungrab_key_string */
-+static char *ungrab_key_string;
-+
- static int qemu_fifo_write(QEMUFIFO *f, const uint8_t *buf, int len1)
- {
-     int l, len;
-@@ -2239,4 +2249,163 @@ static void register_types(void)
-     type_register_static(&qemu_console_info);
- }
- 
-+/* Sets the mouse ungrab key sequence to what the user wants */
-+void set_ungrab_seq(const char *new_seq)
-+{
-+    const char *separator = "-";  /* What the user places between keys */
-+    gchar **key_array;
-+    int key_value, count;
-+
-+    count = 0;
-+    key_array = g_strsplit(new_seq, separator, -1);
-+    ungrab_key_string = g_strdup(new_seq);
-+
-+    for (; *key_array; key_array++) {
-+        key_value = index_from_key(*key_array, strlen(*key_array));
-+        if (key_value == Q_KEY_CODE__MAX) {
-+            error_report("-hotkey-grab: unknown key: %s", *key_array);
-+            exit(EXIT_FAILURE);
-+        }
-+        key_value_array[count] = key_value;
-+        count++;
-+    }
-+}
-+
-+/* Returns the user specified ungrab key sequence */
-+int *console_ungrab_key_sequence(void)
-+{
-+    return key_value_array;
-+}
-+
-+/* Returns the name of the user specified ungrab keys */
-+const char *console_ungrab_key_string(void)
-+{
-+    return ungrab_key_string;
-+}
-+
-+/* Sets the UI to use the default ungrab key sequence */
-+void use_default_ungrab_keys(void)
-+{
-+    /* Default ungrab keys: Control Alt g */
-+    ungrab_key_string = (char *) malloc(sizeof(char) * 14);
-+    sprintf(ungrab_key_string, "%s", "ctrl-alt-g");
-+    key_value_array[0] = Q_KEY_CODE_CTRL;
-+    key_value_array[1] = Q_KEY_CODE_ALT;
-+    key_value_array[2] = Q_KEY_CODE_G;
-+}
-+
-+/*
-+ * Initializes the ungrab key settings - should be called by the front-end on
-+ * startup.
-+ */
-+void init_ungrab_keys(void)
-+{
-+    if (console_ungrab_key_string() == NULL) {
-+        use_default_ungrab_keys();
-+    }
-+}
-+
-+/*
-+ * Set implements a set datatype. It is a collection of numbers with no
-+ * repeats.
-+ */
-+
-+/* Creates a new Set object with a size of max_size */
-+Set *new_set(int max_size)
-+{
-+    Set *new_set_obj;
-+    new_set_obj = (Set *) malloc(sizeof(Set));
-+
-+    int *array_obj;
-+    array_obj = (int *) malloc(sizeof(int) * max_size);
-+    new_set_obj->array = array_obj;
-+    new_set_obj->size = max_size;
-+
-+    /* initialize the array */
-+    int index;
-+    for (index = 0; index < max_size; index++) {
-+        new_set_obj->array[index] = EMPTY_VALUE;
-+    }
-+
-+    return new_set_obj;
-+}
-+
-+/* Adds a number to a set */
-+void add_number(Set *the_set, int the_number)
-+{
-+    int index;
-+
-+    /* Check if the number if already in the list */
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == the_number) {
-+            return;
-+        }
-+    }
-+
-+    /* Find an empty spot and place the number there */
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == EMPTY_VALUE) {
-+            the_set->array[index] = the_number;
-+            return;
-+        }
-+    }
-+    error_report("Failed to add number to set");
-+}
-+
-+/* Removes a number from a set */
-+void remove_number(Set *the_set, int the_number)
-+{
-+    int index;
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == the_number) {
-+            the_set->array[index] = EMPTY_VALUE;
-+        }
-+    }
-+}
-+
-+/* Determines if a number is in a set */
-+bool contains_number(Set *the_set, int the_number)
-+{
-+    int index;
-+    for (index = 0; index < the_set->size; index++) {
-+        if (the_set->array[index] == the_number) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+/* Clears a set of all values */
-+void clear_set(Set *the_set)
-+{
-+    int index;
-+    for (index = 0; index < the_set->size; index++) {
-+        the_set->array[index] = EMPTY_VALUE;
-+    }
-+}
-+
-+/* Determines if two sets contain the same values */
-+bool are_sets_equal(Set *set1, Set *set2)
-+{
-+    if (set1->size != set2->size) {
-+        return false;
-+    }
-+
-+    /* see if both sets contain the same numbers */
-+    int index1, index2, found_value;
-+    for (index1 = 0; index1 < set1->size; index1++) {
-+        found_value = 0;
-+        for (index2 = 0; index2 < set1->size; index2++) {
-+            if (set1->array[index1] == set2->array[index2]) {
-+                found_value = 1;
-+                break;
-+            }
-+        }
-+        if (found_value != 1) {
-+            return false;
-+        }
-+    }
-+    return true;
-+}
-+
- type_init(register_types);
-diff --git a/vl.c b/vl.c
-index e517a8d995..4180848712 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2219,6 +2219,23 @@ static DisplayType select_display(const char *p)
- #endif
-     } else if (strstart(p, "none", &opts)) {
-         display = DT_NONE;
-+    } else if (strstart(p, "cocoa", &opts)) {
-+#ifdef CONFIG_COCOA
-+        display = DT_COCOA;
-+        if (strstart(opts, ",hotkey-grab=", &opts)) {
-+            if (strcmp(opts, "") == 0) {
-+                error_report("Please add the key(s) argument");
-+                exit(1);
-+            }
-+            set_ungrab_seq(opts);
-+        } else {
-+            error_report("invalid Cocoa option");
-+            exit(1);
-+        }
-+#else
-+        error_report("Cocoa support is disabled");
-+        exit(1);
-+#endif
-     } else {
-         error_report("unknown display type");
-         exit(1);
--- 
-2.14.3 (Apple Git-98)
+On 02/02/2018 09:26 AM, Fangda Cai wrote:
+> Hi, I have built a virtual arm board that includes onboard memory-mapped
+> SPI controller and CAN controller. I also built a bare metal program that
+> can run on the virtual arm board. Is it possible to make the SPI/CAN
+> receive data during the bare-metal program running on the board? I don't
+> know how to achieve it, any ideas?
+> 
