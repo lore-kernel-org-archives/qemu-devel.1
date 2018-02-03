@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ehvjZ-0006zn-M4
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 06:11:50 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvma-0000Rp-BG
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 06:14:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ehvjW-0004KK-Fe
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 06:11:49 -0500
-Resent-Message-Id: <E1ehvjW-0004KK-Fe@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ehvmX-0005vn-1c
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 06:14:56 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:36375
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ehvjW-0004KA-9H
-	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 06:11:46 -0500
-In-Reply-To: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151765628012.7956.10328434781906082742@b81a8a9ec60f>
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ehvmW-0005vX-PQ
+	for qemu-devel@nongnu.org; Sat, 03 Feb 2018 06:14:52 -0500
+References: <151765628012.7956.10328434781906082742@b81a8a9ec60f>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <1f823744-92d8-5bc7-ad16-b43a343dce5d@ilande.co.uk>
+Date: Sat, 3 Feb 2018 11:14:42 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 3 Feb 2018 03:11:20 -0800 (PST)
+In-Reply-To: <151765628012.7956.10328434781906082742@b81a8a9ec60f>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH 00/10] cuda: various fixes,
  and move 6522 to separate device
 List-Id: <qemu-devel.nongnu.org>
@@ -29,55 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, lvivier@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjAzMTAzNzI3LjI2NDU3LTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
-Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMF0gY3VkYTogdmFyaW91cyBm
-aXhlcywgYW5kIG1vdmUgNjUyMiB0byBzZXBhcmF0ZSBkZXZpY2UKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU4
-YzNkYTEyMDYgY3VkYTogY29udmVydCB0byB1c2UgdGhlIHNoYXJlZCBtb3M2NTIyIGRldmljZQph
-MTEwZmViNzYxIG1pc2M6IGludHJvZHVjZSBuZXcgbW9zNjUyMiBWSUEgZGV2aWNlIGFuZCBlbmFi
-bGUgaXQgZm9yIHBwYyBidWlsZHMKMDBmZGJjMTEyNCBjdWRhOiBmYWN0b3Igb3V0IHRpbWViYXNl
-LWRlcml2ZWQgY291bnRlciB2YWx1ZSBhbmQgbG9hZCB0aW1lCjgyNzEzNDhkZDUgY3VkYTogc2V0
-IHRpbWVyIDEgZnJlcXVlbmN5IHByb3BlcnR5IHRvIENVREFfVElNRVJfRlJFUQo3ODU0M2ZmZTky
-IGN1ZGE6IG1pbm9yIGNvc21ldGljIHRpZHktdXBzIHRvIGdldF9uZXh0X2lycV90aW1lKCkKZWRh
-ZmM3Mzc4NiBjdWRhOiByZW5hbWUgZnJlcXVlbmN5IHByb3BlcnR5IHRvIHRiX2ZyZXF1ZW5jeQo1
-N2Q0ZGQ2ZmM4IGN1ZGE6IGludHJvZHVjZSBDVURBU3RhdGUgcGFyYW1ldGVyIHRvIGdldF9jb3Vu
-dGVyKCkKNjFmYjE4MTU4NyBjdWRhOiBkb24ndCBjYWxsIGN1ZGFfdXBkYXRlKCkgd2hlbiB3cml0
-aW5nIHRvIEFDUiByZWdpc3Rlcgo5OTQyNDBhMzQ2IGN1ZGE6IGRvbid0IGFsbG93IHdyaXRlcyB0
-byBwb3J0IG91dHB1dCBwaW5zCjVjYmJhMGRlOWIgY3VkYTogZG8gbm90IHVzZSBvbGRfbW1pbyBh
-Y2Nlc3NlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMDogY3VkYTog
-ZG8gbm90IHVzZSBvbGRfbW1pbyBhY2Nlc3Nlcy4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBjdWRh
-OiBkb24ndCBhbGxvdyB3cml0ZXMgdG8gcG9ydCBvdXRwdXQgcGlucy4uLgpDaGVja2luZyBQQVRD
-SCAzLzEwOiBjdWRhOiBkb24ndCBjYWxsIGN1ZGFfdXBkYXRlKCkgd2hlbiB3cml0aW5nIHRvIEFD
-UiByZWdpc3Rlci4uLgpDaGVja2luZyBQQVRDSCA0LzEwOiBjdWRhOiBpbnRyb2R1Y2UgQ1VEQVN0
-YXRlIHBhcmFtZXRlciB0byBnZXRfY291bnRlcigpLi4uCkNoZWNraW5nIFBBVENIIDUvMTA6IGN1
-ZGE6IHJlbmFtZSBmcmVxdWVuY3kgcHJvcGVydHkgdG8gdGJfZnJlcXVlbmN5Li4uCkNoZWNraW5n
-IFBBVENIIDYvMTA6IGN1ZGE6IG1pbm9yIGNvc21ldGljIHRpZHktdXBzIHRvIGdldF9uZXh0X2ly
-cV90aW1lKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMDogY3VkYTogc2V0IHRpbWVyIDEgZnJlcXVl
-bmN5IHByb3BlcnR5IHRvIENVREFfVElNRVJfRlJFUS4uLgpDaGVja2luZyBQQVRDSCA4LzEwOiBj
-dWRhOiBmYWN0b3Igb3V0IHRpbWViYXNlLWRlcml2ZWQgY291bnRlciB2YWx1ZSBhbmQgbG9hZCB0
-aW1lLi4uCkNoZWNraW5nIFBBVENIIDkvMTA6IG1pc2M6IGludHJvZHVjZSBuZXcgbW9zNjUyMiBW
-SUEgZGV2aWNlIGFuZCBlbmFibGUgaXQgZm9yIHBwYyBidWlsZHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTAvMTA6IGN1ZGE6IGNvbnZlcnQgdG8gdXNlIHRoZSBzaGFyZWQgbW9zNjUyMiBkZXZpY2UuLi4K
-RVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMzMTogRklMRTogaHcvbWlzYy9tYWNp
-by9jdWRhLmM6MzY6CisvLyNkZWZpbmUgREVCVUdfQ1VEQV9QQUNLRVQKCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgODk3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 03/02/18 11:11, no-reply@patchew.org wrote:
+
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Type: series
+> Message-id: 20180203103727.26457-1-mark.cave-ayland@ilande.co.uk
+> Subject: [Qemu-devel] [PATCH 00/10] cuda: various fixes, and move 6522 to separate device
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>      echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>      if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>          failed=1
+>          echo
+>      fi
+>      n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 58c3da1206 cuda: convert to use the shared mos6522 device
+> a110feb761 misc: introduce new mos6522 VIA device and enable it for ppc builds
+> 00fdbc1124 cuda: factor out timebase-derived counter value and load time
+> 8271348dd5 cuda: set timer 1 frequency property to CUDA_TIMER_FREQ
+> 78543ffe92 cuda: minor cosmetic tidy-ups to get_next_irq_time()
+> edafc73786 cuda: rename frequency property to tb_frequency
+> 57d4dd6fc8 cuda: introduce CUDAState parameter to get_counter()
+> 61fb181587 cuda: don't call cuda_update() when writing to ACR register
+> 994240a346 cuda: don't allow writes to port output pins
+> 5cbba0de9b cuda: do not use old_mmio accesses
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/10: cuda: do not use old_mmio accesses...
+> Checking PATCH 2/10: cuda: don't allow writes to port output pins...
+> Checking PATCH 3/10: cuda: don't call cuda_update() when writing to ACR register...
+> Checking PATCH 4/10: cuda: introduce CUDAState parameter to get_counter()...
+> Checking PATCH 5/10: cuda: rename frequency property to tb_frequency...
+> Checking PATCH 6/10: cuda: minor cosmetic tidy-ups to get_next_irq_time()...
+> Checking PATCH 7/10: cuda: set timer 1 frequency property to CUDA_TIMER_FREQ...
+> Checking PATCH 8/10: cuda: factor out timebase-derived counter value and load time...
+> Checking PATCH 9/10: misc: introduce new mos6522 VIA device and enable it for ppc builds...
+> Checking PATCH 10/10: cuda: convert to use the shared mos6522 device...
+> ERROR: do not use C99 // comments
+> #31: FILE: hw/misc/macio/cuda.c:36:
+> +//#define DEBUG_CUDA_PACKET
+> 
+> total: 1 errors, 0 warnings, 897 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> === OUTPUT END ===
+
+This is fine - it's old debug infrastructure in CUDA which is unrelated 
+to this patchset.
+
+
+ATB,
+
+Mark.
