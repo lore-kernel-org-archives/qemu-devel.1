@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiQlR-00005I-92
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 15:19:50 -0500
+	(envelope-from <rbraun@sceen.net>) id 1eiR6N-0002yl-V8
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 15:41:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiQlP-0006b0-SF
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 15:19:49 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39561)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiQlP-0006Zu-KM
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 15:19:47 -0500
-Received: by mail-oi0-x244.google.com with SMTP id j188so18413853oib.6
-	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 12:19:47 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180108143105.GC10273@lst.de>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-12-git-send-email-mjc@sifive.com>
-	<20180108143105.GC10273@lst.de>
-From: Michael Clark <mjc@sifive.com>
-Date: Mon, 5 Feb 2018 09:19:46 +1300
-Message-ID: <CAHNT7Nss8ewkpgo2OTPpBV11WaisgU5a-h22-AbotyKdVqjxwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 11/21] RISC-V HTIF Console
+	(envelope-from <rbraun@sceen.net>) id 1eiR6K-0003kh-1j
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 15:41:28 -0500
+Received: from shattrath.sceen.net ([151.80.19.218]:52867 helo=mail.sceen.net)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <rbraun@sceen.net>) id 1eiR6J-0003k5-Qq
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 15:41:23 -0500
+From: Richard Braun <rbraun@sceen.net>
+Date: Sun,  4 Feb 2018 21:41:21 +0100
+Message-Id: <1517776881-14115-1-git-send-email-rbraun@sceen.net>
+Subject: [Qemu-devel] [PATCH] hw/char/stm32f2xx_usart: improve TXE/TC bit
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +22,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christoph Hellwig <hch@lst.de>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: qemu-devel@nongnu.org
 
-On Tue, Jan 9, 2018 at 3:31 AM, Christoph Hellwig <hch@lst.de> wrote:
+Consider that data is always immediately sent. As a result, keep
+the SR_TXE and SR_TC bits always set. In addition, fix the reset value
+of the USART status register.
 
-> On Wed, Jan 03, 2018 at 01:44:15PM +1300, Michael Clark wrote:
-> > HTIF (Host Target Interface) provides console emulation for QEMU. HTIF
-> > allows identical copies of BBL (Berkeley Boot Loader) and linux to run
-> > on both Spike and QEMU. BBL provides HTIF console access via the
-> > SBI (Supervisor Binary Interface) and the linux kernel SBI console.
->
-> Do you have a current spec for the SBI?  I haven't been able to find
-> any current reference since it was removed from the privileged spec.
->
+Signed-off-by: Richard Braun <rbraun@sceen.net>
+---
+ hw/char/stm32f2xx_usart.c         | 4 ----
+ include/hw/char/stm32f2xx_usart.h | 7 ++++++-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-AFAIK it still needs to be documented.
-
-BTW I've created branches in my own personal trees for Privileged ISA
-v1.9.1. These trees are what I use for v1.9.1 backward compatibility
-testing in QEMU:
-
-- https://github.com/michaeljclark/riscv-linux/tree/riscv-linux-4.6.2
-- https://github.com/michaeljclark/riscv-pk/tree/bbl-1.9.1
-
-We need to be a little more disciplined with software releases, especially
-when there are backward incompatible changes in the specification. The
-repos need to be branched and tagged. It should be possible to somehow
-derive the conformance level. Perhaps the SBI should have an API for this.
-This is one of the driving reasons behind adding version conformance levels
-to QEMU. Previously we had repos in a state of flux and if you didn't have
-the magic commit ids you were out of luck. For example, when we have
-priv isa v1.11 released, we will still need a priv isa v1.10 mode which
-masks out all of the new features. Given there are no "feature bits"
-besides the extensions "IMAFDSU", all we have to go on presently is the
-privileged ISA spec version number.
+diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+index 07b462d4b6..a914f98a2a 100644
+--- a/hw/char/stm32f2xx_usart.c
++++ b/hw/char/stm32f2xx_usart.c
+@@ -96,12 +96,10 @@ static uint64_t stm32f2xx_usart_read(void *opaque, hwaddr addr,
+     switch (addr) {
+     case USART_SR:
+         retvalue = s->usart_sr;
+-        s->usart_sr &= ~USART_SR_TC;
+         qemu_chr_fe_accept_input(&s->chr);
+         return retvalue;
+     case USART_DR:
+         DB_PRINT("Value: 0x%" PRIx32 ", %c\n", s->usart_dr, (char) s->usart_dr);
+-        s->usart_sr |= USART_SR_TXE;
+         s->usart_sr &= ~USART_SR_RXNE;
+         qemu_chr_fe_accept_input(&s->chr);
+         qemu_set_irq(s->irq, 0);
+@@ -151,8 +149,6 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
+             /* XXX this blocks entire thread. Rewrite to use
+              * qemu_chr_fe_write and background I/O callbacks */
+             qemu_chr_fe_write_all(&s->chr, &ch, 1);
+-            s->usart_sr |= USART_SR_TC;
+-            s->usart_sr &= ~USART_SR_TXE;
+         }
+         return;
+     case USART_BRR:
+diff --git a/include/hw/char/stm32f2xx_usart.h b/include/hw/char/stm32f2xx_usart.h
+index 9d03a7527c..bbba3965a1 100644
+--- a/include/hw/char/stm32f2xx_usart.h
++++ b/include/hw/char/stm32f2xx_usart.h
+@@ -37,7 +37,12 @@
+ #define USART_CR3  0x14
+ #define USART_GTPR 0x18
+ 
+-#define USART_SR_RESET 0x00C00000
++/*
++ * XXX The reset value mentioned in 24.6.1 Status register seems bogus.
++ * Looking at Table 98 USART register map and reset values, it seems it
++ * should be 0xc0, and that's how real hardware behaves.
++ */
++#define USART_SR_RESET (USART_SR_TXE | USART_SR_TC)
+ 
+ #define USART_SR_TXE  (1 << 7)
+ #define USART_SR_TC   (1 << 6)
+-- 
+2.11.0
