@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eiE76-0006bp-I9
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:21 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eiE77-0006bw-3y
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eiE71-0003jb-Sv
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:20 -0500
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:41853)
+	(envelope-from <richard.henderson@linaro.org>) id 1eiE72-0003lV-VO
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:21 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:45061)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eiE71-0003iF-Lk
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:15 -0500
-Received: by mail-pl0-x242.google.com with SMTP id k8so7309369pli.8
-	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 22:49:15 -0800 (PST)
+	id 1eiE72-0003kG-Pc
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:16 -0500
+Received: by mail-pg0-x242.google.com with SMTP id m136so16071344pga.12
+	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 22:49:16 -0800 (PST)
 Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
 	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
-	c1sm10622114pfa.119.2018.02.03.22.49.12 for <qemu-devel@nongnu.org>
+	c1sm10622114pfa.119.2018.02.03.22.49.13 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 03 Feb 2018 22:49:12 -0800 (PST)
+	Sat, 03 Feb 2018 22:49:14 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  3 Feb 2018 22:49:10 -0800
-Message-Id: <20180204064911.9828-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/2] hw/hppa: Use qemu_log_mask instead of
- fprintf to stderr
+Date: Sat,  3 Feb 2018 22:49:11 -0800
+Message-Id: <20180204064911.9828-2-richard.henderson@linaro.org>
+In-Reply-To: <20180204064911.9828-1-richard.henderson@linaro.org>
+References: <20180204064911.9828-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/2] tests: Enable boot-serial-test for hppa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +33,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Reported-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/hppa/machine.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ tests/boot-serial-test.c | 1 +
+ tests/Makefile.include   | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index afd3867313..19033e268d 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -19,6 +19,7 @@
- #include "hw/hppa/hppa_sys.h"
- #include "qemu/cutils.h"
- #include "qapi/error.h"
-+#include "qemu/log.h"
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index 418c5b92dc..ea87a80be7 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -87,6 +87,7 @@ static testdef_t tests[] = {
+       sizeof(kernel_plml605), kernel_plml605 },
+     { "moxie", "moxiesim", "", "TT", sizeof(bios_moxiesim), 0, bios_moxiesim },
+     { "arm", "raspi2", "", "TT", sizeof(bios_raspi2), 0, bios_raspi2 },
++    { "hppa", "hppa", "", "SeaBIOS wants SYSTEM HALT" },
  
- #define MAX_IDE_BUS 2
+     { NULL }
+ };
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ca82e0c0cc..83def6994c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -299,6 +299,8 @@ gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y)
  
-@@ -111,7 +112,6 @@ static void machine_hppa_init(MachineState *machine)
-         uint32_t addr = DINO_UART_HPA + 0x800;
-         serial_mm_init(addr_space, addr, 0, serial_irq,
-                        115200, serial_hds[0], DEVICE_BIG_ENDIAN);
--        fprintf(stderr, "Serial port created at 0x%x\n", addr);
-     }
+ check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
  
-     /* SCSI disk setup. */
-@@ -146,9 +146,9 @@ static void machine_hppa_init(MachineState *machine)
-         error_report("could not load firmware '%s'", firmware_filename);
-         exit(1);
-     }
--    fprintf(stderr, "Firmware loaded at 0x%08" PRIx64 "-0x%08" PRIx64
--            ", entry at 0x%08" PRIx64 ".\n",
--            firmware_low, firmware_high, firmware_entry);
-+    qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x%08" PRIx64
-+                  "-0x%08" PRIx64 ", entry at 0x%08" PRIx64 ".\n",
-+                  firmware_low, firmware_high, firmware_entry);
-     if (firmware_low < ram_size || firmware_high >= FIRMWARE_END) {
-         error_report("Firmware overlaps with memory or IO space");
-         exit(1);
-@@ -163,7 +163,6 @@ static void machine_hppa_init(MachineState *machine)
++check-qtest-hppa-y = tests/boot-serial-test$(EXESUF)
++
+ check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
  
-     /* Load kernel */
-     if (kernel_filename) {
--        fprintf(stderr, "LOADING kernel '%s'\n", kernel_filename);
-         size = load_elf(kernel_filename, &cpu_hppa_to_phys,
-                         NULL, &kernel_entry, &kernel_low, &kernel_high,
-                         true, EM_PARISC, 0, 0);
-@@ -177,10 +176,10 @@ static void machine_hppa_init(MachineState *machine)
-             error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
--
--        fprintf(stderr, "Kernel loaded at 0x%08" PRIx64 "-0x%08" PRIx64
--                ", entry at 0x%08" PRIx64 ", size %ld kB.\n",
--                kernel_low, kernel_high, kernel_entry, size / 1024);
-+        qemu_log_mask(CPU_LOG_PAGE, "Kernel loaded at 0x%08" PRIx64
-+                      "-0x%08" PRIx64 ", entry at 0x%08" PRIx64
-+                      ", size %ld kB.\n",
-+                      kernel_low, kernel_high, kernel_entry, size / 1024);
- 
-         if (kernel_cmdline) {
-             cpu[0]->env.gr[24] = 0x4000;
+ check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
 -- 
 2.14.3
