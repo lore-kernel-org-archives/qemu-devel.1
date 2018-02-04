@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eiDf8-0006XZ-DS
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:20:27 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eiE76-0006bp-I9
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eiDf4-0000ip-Aa
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:20:26 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2312 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1eiDf3-0000UO-Tf
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:20:22 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Sun, 4 Feb 2018 06:20:08 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA53F6F7@DGGEMA505-MBX.china.huawei.com>
-References: <1517492876-28428-1-git-send-email-arei.gonglei@huawei.com>
-	<d2f644da-e6c8-da3a-55e4-13ae69c44fc4@redhat.com>
-In-Reply-To: <d2f644da-e6c8-da3a-55e4-13ae69c44fc4@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] rtc: placing RTC memory region outside BQL
+	(envelope-from <richard.henderson@linaro.org>) id 1eiE71-0003jb-Sv
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:20 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:41853)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eiE71-0003iF-Lk
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 01:49:15 -0500
+Received: by mail-pl0-x242.google.com with SMTP id k8so7309369pli.8
+	for <qemu-devel@nongnu.org>; Sat, 03 Feb 2018 22:49:15 -0800 (PST)
+Received: from cloudburst.twiddle.net (174-21-6-47.tukw.qwest.net.
+	[174.21.6.47]) by smtp.gmail.com with ESMTPSA id
+	c1sm10622114pfa.119.2018.02.03.22.49.12 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sat, 03 Feb 2018 22:49:12 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Sat,  3 Feb 2018 22:49:10 -0800
+Message-Id: <20180204064911.9828-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/2] hw/hppa: Use qemu_log_mask instead of
+ fprintf to stderr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>
+To: qemu-devel@nongnu.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
-dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEZlYnJ1YXJ5IDAxLCAy
-MDE4IDEwOjI0IFBNDQo+IFRvOiBHb25nbGVpIChBcmVpKTsgcWVtdS1kZXZlbEBub25nbnUub3Jn
-DQo+IENjOiBIdWFuZ3dlaWRvbmcgKEMpDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIHJ0YzogcGxh
-Y2luZyBSVEMgbWVtb3J5IHJlZ2lvbiBvdXRzaWRlIEJRTA0KPiANCj4gT24gMDEvMDIvMjAxOCAw
-ODo0NywgR29uZ2xlaSB3cm90ZToNCj4gPiBBcyB3aW5kb3dzIGd1ZXN0IHVzZSBydGMgYXMgdGhl
-IGNsb2NrIHNvdXJjZSBkZXZpY2UsDQo+ID4gYW5kIGFjY2VzcyBydGMgZnJlcXVlbnRseS4gTGV0
-J3MgbW92ZSB0aGUgcnRjIG1lbW9yeQ0KPiA+IHJlZ2lvbiBvdXRzaWRlIEJRTCB0byBkZWNyZWFz
-ZSBvdmVyaGVhZCBmb3Igd2luZG93cyBndWVzdHMuDQo+ID4NCj4gPiBzdHJhY2UgLXR0IC1wICQx
-IC1jIC1vIHJlc3VsdF8kMS5sb2cgJg0KPiA+IHNsZWVwICQyDQo+ID4gcGlkPSQocGlkb2Ygc3Ry
-YWNlKQ0KPiA+IGtpbGwgJHBpZA0KPiA+IGNhdCByZXN1bHRfJDEubG9nDQo+ID4NCj4gPiBCZWZv
-cmUgYXBwbGluZyB0aGlzIGNoYW5nZToNCj4gPg0KPiA+ICUgdGltZSAgICAgc2Vjb25kcyAgdXNl
-Y3MvY2FsbCAgICAgY2FsbHMgICAgZXJyb3JzIHN5c2NhbGwNCj4gPiAtLS0tLS0gLS0tLS0tLS0t
-LS0gLS0tLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLSAtLS0tLS0tLS0tLS0tLS0tDQo+ID4g
-IDkzLjg3ICAgIDAuMTE5MDcwICAgICAgICAgIDMwICAgICAgNDAwMCAgICAgICAgICAgcHBvbGwN
-Cj4gPiAgIDMuMjcgICAgMC4wMDQxNDggICAgICAgICAgIDIgICAgICAyMDM4ICAgICAgICAgICBp
-b2N0bA0KPiA+ICAgMi42NiAgICAwLjAwMzM3MCAgICAgICAgICAgMiAgICAgIDIwMTQgICAgICAg
-ICAgIGZ1dGV4DQo+ID4gICAwLjA5ICAgIDAuMDAwMTEzICAgICAgICAgICAxICAgICAgIDEwNiAg
-ICAgICAgICAgcmVhZA0KPiA+ICAgMC4wOSAgICAwLjAwMDEwOSAgICAgICAgICAgMSAgICAgICAx
-MDQgICAgICAgICAgIGlvX2dldGV2ZW50cw0KPiA+ICAgMC4wMiAgICAwLjAwMDAyOSAgICAgICAg
-ICAgMSAgICAgICAgMzAgICAgICAgICAgIHBvbGwNCj4gPiAgIDAuMDAgICAgMC4wMDAwMDAgICAg
-ICAgICAgIDAgICAgICAgICAxICAgICAgICAgICB3cml0ZQ0KPiA+IC0tLS0tLSAtLS0tLS0tLS0t
-LSAtLS0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0tLS0tLS0NCj4gPiAx
-MDAuMDAgICAgMC4xMjY4MzkgICAgICAgICAgICAgICAgICA4MjkzICAgICAgICAgICB0b3RhbA0K
-PiA+DQo+ID4gQWZ0ZXIgYXBwbGluZyB0aGUgY2hhbmdlOg0KPiA+DQo+ID4gJSB0aW1lICAgICBz
-ZWNvbmRzICB1c2Vjcy9jYWxsICAgICBjYWxscyAgICBlcnJvcnMgc3lzY2FsbA0KPiA+IC0tLS0t
-LSAtLS0tLS0tLS0tLSAtLS0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0t
-LS0tLS0NCj4gPiAgOTIuODYgICAgMC4wNjc0NDEgICAgICAgICAgMTYgICAgICA0MDk0ICAgICAg
-ICAgICBwcG9sbA0KPiA+ICAgNC44NSAgICAwLjAwMzUyMiAgICAgICAgICAgMiAgICAgIDIxMzYg
-ICAgICAgICAgIGlvY3RsDQo+ID4gICAxLjE3ICAgIDAuMDAwODUwICAgICAgICAgICA0ICAgICAg
-IDE4OSAgICAgICAgICAgZnV0ZXgNCj4gPiAgIDAuNTQgICAgMC4wMDAzOTUgICAgICAgICAgIDIg
-ICAgICAgMjAyICAgICAgICAgICByZWFkDQo+ID4gICAwLjUyICAgIDAuMDAwMzc5ICAgICAgICAg
-ICAyICAgICAgIDIwMiAgICAgICAgICAgaW9fZ2V0ZXZlbnRzDQo+ID4gICAwLjA1ICAgIDAuMDAw
-MDM3ICAgICAgICAgICAxICAgICAgICAzMCAgICAgICAgICAgcG9sbA0KPiA+IC0tLS0tLSAtLS0t
-LS0tLS0tLSAtLS0tLS0tLS0tLSAtLS0tLS0tLS0gLS0tLS0tLS0tIC0tLS0tLS0tLS0tLS0tLS0N
-Cj4gPiAxMDAuMDAgICAgMC4wNzI2MjQgICAgICAgICAgICAgICAgICA2ODUzICAgICAgICAgICB0
-b3RhbA0KPiA+DQo+ID4gVGhlIGZ1dGV4IGNhbGwgbnVtYmVyIGRlY3JlYXNlcyB+OTAuNiUgb24g
-YW4gaWRsZSB3aW5kb3dzIDcgZ3Vlc3QuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBHb25nbGVp
-IDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvdGltZXIvbWMxNDY4
-MThydGMuYyB8IDEgKw0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykNCj4gPg0K
-PiA+IGRpZmYgLS1naXQgYS9ody90aW1lci9tYzE0NjgxOHJ0Yy5jIGIvaHcvdGltZXIvbWMxNDY4
-MThydGMuYw0KPiA+IGluZGV4IDM1YTA1YTYuLmQ5ZDk5YzUgMTAwNjQ0DQo+ID4gLS0tIGEvaHcv
-dGltZXIvbWMxNDY4MThydGMuYw0KPiA+ICsrKyBiL2h3L3RpbWVyL21jMTQ2ODE4cnRjLmMNCj4g
-PiBAQCAtOTg2LDYgKzk4Niw3IEBAIHN0YXRpYyB2b2lkIHJ0Y19yZWFsaXplZm4oRGV2aWNlU3Rh
-dGUgKmRldiwgRXJyb3INCj4gKiplcnJwKQ0KPiA+ICAgICAgcWVtdV9yZWdpc3Rlcl9zdXNwZW5k
-X25vdGlmaWVyKCZzLT5zdXNwZW5kX25vdGlmaWVyKTsNCj4gPg0KPiA+ICAgICAgbWVtb3J5X3Jl
-Z2lvbl9pbml0X2lvKCZzLT5pbywgT0JKRUNUKHMpLCAmY21vc19vcHMsIHMsICJydGMiLCAyKTsN
-Cj4gPiArICAgIG1lbW9yeV9yZWdpb25fY2xlYXJfZ2xvYmFsX2xvY2tpbmcoJnMtPmlvKTsNCj4g
-PiAgICAgIGlzYV9yZWdpc3Rlcl9pb3BvcnQoaXNhZGV2LCAmcy0+aW8sIGJhc2UpOw0KPiA+DQo+
-ID4gICAgICBxZGV2X3NldF9sZWdhY3lfaW5zdGFuY2VfaWQoZGV2LCBiYXNlLCAzKTsNCj4gPg0K
-PiANCj4gVGhpcyBpcyBub3QgZW5vdWdoLCB5b3UgbmVlZCB0byBhZGQgYSBuZXcgbG9jayBvciBz
-b21ldGhpbmcgbGlrZSB0aGF0Lg0KPiBPdGhlcndpc2UgdHdvIHZDUFVzIGNhbiBhY2Nlc3MgdGhl
-IFJUQyB0b2dldGhlciBhbmQgbWFrZSBhIG1lc3MuDQo+IA0KDQpIaSBQYW9sbywNCg0KWWVzLCB0
-aGF0J3MgdHJ1ZSwgYWx0aG91Z2ggSSBoYXZlIG5vdCBlbmNvdW50ZXJlZCBhbnkgcHJvYmxlbXMg
-eWV0Lg0KTGV0IG1lIGVuaGFuY2UgaXQgaW4gdjIuDQoNClRoYW5rcywNCi1Hb25nbGVpDQo=
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ hw/hppa/machine.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index afd3867313..19033e268d 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -19,6 +19,7 @@
+ #include "hw/hppa/hppa_sys.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ 
+ #define MAX_IDE_BUS 2
+ 
+@@ -111,7 +112,6 @@ static void machine_hppa_init(MachineState *machine)
+         uint32_t addr = DINO_UART_HPA + 0x800;
+         serial_mm_init(addr_space, addr, 0, serial_irq,
+                        115200, serial_hds[0], DEVICE_BIG_ENDIAN);
+-        fprintf(stderr, "Serial port created at 0x%x\n", addr);
+     }
+ 
+     /* SCSI disk setup. */
+@@ -146,9 +146,9 @@ static void machine_hppa_init(MachineState *machine)
+         error_report("could not load firmware '%s'", firmware_filename);
+         exit(1);
+     }
+-    fprintf(stderr, "Firmware loaded at 0x%08" PRIx64 "-0x%08" PRIx64
+-            ", entry at 0x%08" PRIx64 ".\n",
+-            firmware_low, firmware_high, firmware_entry);
++    qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x%08" PRIx64
++                  "-0x%08" PRIx64 ", entry at 0x%08" PRIx64 ".\n",
++                  firmware_low, firmware_high, firmware_entry);
+     if (firmware_low < ram_size || firmware_high >= FIRMWARE_END) {
+         error_report("Firmware overlaps with memory or IO space");
+         exit(1);
+@@ -163,7 +163,6 @@ static void machine_hppa_init(MachineState *machine)
+ 
+     /* Load kernel */
+     if (kernel_filename) {
+-        fprintf(stderr, "LOADING kernel '%s'\n", kernel_filename);
+         size = load_elf(kernel_filename, &cpu_hppa_to_phys,
+                         NULL, &kernel_entry, &kernel_low, &kernel_high,
+                         true, EM_PARISC, 0, 0);
+@@ -177,10 +176,10 @@ static void machine_hppa_init(MachineState *machine)
+             error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+-
+-        fprintf(stderr, "Kernel loaded at 0x%08" PRIx64 "-0x%08" PRIx64
+-                ", entry at 0x%08" PRIx64 ", size %ld kB.\n",
+-                kernel_low, kernel_high, kernel_entry, size / 1024);
++        qemu_log_mask(CPU_LOG_PAGE, "Kernel loaded at 0x%08" PRIx64
++                      "-0x%08" PRIx64 ", entry at 0x%08" PRIx64
++                      ", size %ld kB.\n",
++                      kernel_low, kernel_high, kernel_entry, size / 1024);
+ 
+         if (kernel_cmdline) {
+             cpu[0]->env.gr[24] = 0x4000;
+-- 
+2.14.3
