@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiTdd-0000JU-4b
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 18:23:58 -0500
+	(envelope-from <mjc@sifive.com>) id 1eiTmd-0004gn-A7
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 18:33:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiTdb-0000rO-FW
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 18:23:57 -0500
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:33371)
+	(envelope-from <mjc@sifive.com>) id 1eiTmZ-0005nJ-E6
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 18:33:15 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:46341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiTdb-0000rA-84
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 18:23:55 -0500
-Received: by mail-oi0-x230.google.com with SMTP id l8so19983072oig.0
-	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 15:23:54 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20180204212932.GB24905@lst.de>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-12-git-send-email-mjc@sifive.com>
-	<20180108143105.GC10273@lst.de>
-	<CAHNT7Nss8ewkpgo2OTPpBV11WaisgU5a-h22-AbotyKdVqjxwg@mail.gmail.com>
-	<20180204212932.GB24905@lst.de>
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiTmZ-0005mo-56
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 18:33:11 -0500
+Received: by mail-pg0-x241.google.com with SMTP id s9so16899171pgq.13
+	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 15:33:11 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Mon, 5 Feb 2018 12:23:53 +1300
-Message-ID: <CAHNT7NuiD4jn2BoMy3KZGqd-8zxUs4K6XAi_hxUVp0BEjAXthw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 11/21] RISC-V HTIF Console
+Date: Mon,  5 Feb 2018 12:31:59 +1300
+Message-Id: <1517787119-74569-1-git-send-email-mjc@sifive.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 00/22] RISC-V QEMU Port Submission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +26,418 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christoph Hellwig <hch@lst.de>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: qemu-devel@nongnu.org
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-On Mon, Feb 5, 2018 at 10:29 AM, Christoph Hellwig <hch@lst.de> wrote:
+QEMU RISC-V Emulation Support (RV64GC, RV32GC)
 
-> On Mon, Feb 05, 2018 at 09:19:46AM +1300, Michael Clark wrote:
-> > BTW I've created branches in my own personal trees for Privileged ISA
-> > v1.9.1. These trees are what I use for v1.9.1 backward compatibility
-> > testing in QEMU:
-> >
-> > - https://github.com/michaeljclark/riscv-linux/tree/riscv-linux-4.6.2
-> > - https://github.com/michaeljclark/riscv-pk/tree/bbl-1.9.1
->
-> What MMU-enabled chips that implement 1.9.1 are out there?  If there
-> is enough we should support this with a compile time option in the
-> Linux kernel as well.
+This patch series contains a number of bug fixes and code cleanups
+incorporates changes from Richard Henderson's tree:
 
+- https://github.com/rth7680/qemu/tree/tgt-riscv
 
-It's very likely that there are only test chips that are not widely
-available. It's likely not worth supporting in the latest version of
-linux-kernel.
+The git tree for this v4 patch series (squashed and rebased):
 
-That said, we've kept priv 1.9.1 support in QEMU for other reasons. There
-are a lot of other OS ports and not all of them have necessarily updated to
-the new spec version at the same time. We have to draw a line in the sand
-somewhere, where we've decided that we're not going to break things for
-folk who don't have the magic set of commit hashes. i.e. how it was prior,
-at least for riscv-qemu. I know of other emulators that are still on priv
-v1.9.1.
+- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v4
 
-We are also going to need to be careful about backwards incompatible
-device-tree changes. i.e. if we change device tree, we should target these
-changes at priv v1.11 and version the device tree nodes and attributes. Non
-additive changes that are not optional need to go in the next version, not
-the current version.
+The git tree for the v1-v3 patch series with review commit history:
 
+- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v3
+- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v2
+- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v1
 
-> > We need to be a little more disciplined with software releases,
-> especially
-> > when there are backward incompatible changes in the specification. The
-> > repos need to be branched and tagged. It should be possible to somehow
-> > derive the conformance level. Perhaps the SBI should have an API for
-> this.
-> > This is one of the driving reasons behind adding version conformance
-> levels
-> > to QEMU. Previously we had repos in a state of flux and if you didn't
-> have
-> > the magic commit ids you were out of luck. For example, when we have
-> > priv isa v1.11 released, we will still need a priv isa v1.10 mode which
-> > masks out all of the new features. Given there are no "feature bits"
-> > besides the extensions "IMAFDSU", all we have to go on presently is the
-> > privileged ISA spec version number.
->
-> As far as I can tell privileged ISA changes post 1.10 should be backwards
-> compatible and only implemement detectable optional CSRs and instructions.
->
+*** Known Issues ***
 
-At present there is no way that I know of, other that trapping on illegal
-instructions, to detect whether a CSR is implemented or not. I've written a
-little tool called riscv-probe, that does such. I'll post the sources at
-some point. It may very well be possible to support priv v1.11 on priv
-v1.10 with trap and emulate, however it may require running the Supervisor
-in U mode. I guess we'll find out whether anything is missing if we tried
-to implement it. It would definately require shadow paging, given there is
-second level address translation.
+- Disassembler has some checkpatch warnings for the sake of code brevity
+- scripts/qemu-binfmt-conf.sh has checkpatch warnings due to line length
+- PMP (Physical Memory Protection) is as-of-yet unused and needs testing
 
+*** Changelog ***
 
-> That being said I started a thread on that on the privileged spec list
-> where I need to follow up on Andrews mail once I get back to my work
-> mail after a little vacation.
->
+v4
+
+- Add @riscv: since 2.12 to CpuInfoArch
+- Remove misleading little-endian comment from load_kernel
+- Rename cpu-model property to cpu-type
+- Drop some unnecessary inline function attributes
+- Don't allow GDB to set value of x0 register
+- Remove unnecessary empty property lists
+- Add Test Finisher device to implement poweroff in virt machine
+- Implement priv ISA v1.10 trap and sret/mret xPIE/xIE behavior
+- Store fflags data in fp_status
+- Purge runtime users of helper_raise_exception
+- Fix validate_csr
+- Tidy gen_jalr
+- Tidy immediate shifts
+- Add gen_exception_inst_addr_mis
+- Add gen_exception_debug
+- Add gen_exception_illegal
+- Tidy helper_fclass_*
+- Split rounding mode setting to a new function
+- Enforce MSTATUS_FS via TB flags
+- Implement acquire/release barrier semantics
+- Use atomic operations as required
+- Fix FENCE and FENCE_I
+- Remove commented code from spike machines
+- PAGE_WRITE permissions can be set on loads if page is already dirty
+- The result of format conversion on an NaN must be a quiet NaN
+- Add missing process_queued_cpu_work to riscv linux-user
+- Remove float(32|64)_classify from cpu.h
+- Removed nonsensical unions aliasing the same type
+- Use uintN_t instead of uintN_fast_t in fpu_helper.c
+- Use macros for FPU exception values in softfloat_flags_to_riscv
+- Move code to set round mode into set_fp_round_mode function
+- Convert set_fp_exceptions from a macro to an inline function
+- Convert round mode helper into an inline function
+- Make fpu_helper ieee_rm array static const
+- Include cpu_mmu_index in cpu_get_tb_cpu_state flags
+- Eliminate MPRV influence on mmu_index
+- Remove unrecoverable do_unassigned_access function
+- Only update PTE accessed and dirty bits if necessary
+- Remove unnecessary tlb_flush in set_mode as mode is in mmu_idx
+- Remove buggy support for misa writes. misa writes are optional
+  and are not implemented in any known hardware
+- Always set PTE read or execute permissions during page walk
+- Reorder helper function declarations to match order in helper.c
+- Remove redundant variable declaration in get_physical_address
+- Remove duplicated code from get_physical_address
+- Use mmu_idx instead of mem_idx in riscv_cpu_get_phys_page_debug
+
+v3
+
+- Fix indentation in PMP and HTIF debug macros
+- Fix disassembler checkpatch open brace '{' on next line errors
+- Fix trailing statements on next line in decode_inst_decompress
+- NOTE: the other checkpatch issues have been reviewed previously
+
+v2
+
+- Remove redundant NULL terminators from disassembler register arrays
+- Change disassembler register name arrays to const
+- Refine disassembler internal function names
+- Update dates in disassembler copyright message
+- Remove #ifdef CONFIG_USER_ONLY version of cpu_has_work
+- Use ULL suffix on 64-bit constants
+- Move riscv_cpu_mmu_index from cpu.h to helper.c
+- Move riscv_cpu_hw_interrupts_pending from cpu.h to helper.c
+- Remove redundant TARGET_HAS_ICE from cpu.h
+- Use qemu_irq instead of void* for irq definition in cpu.h
+- Remove duplicate typedef from struct CPURISCVState
+- Remove redundant g_strdup from cpu_register
+- Remove redundant tlb_flush from riscv_cpu_reset
+- Remove redundant mode calculation from get_physical_address
+- Remove redundant debug mode printf and dcsr comment
+- Remove redundant clearing of MSB for bare physical addresses
+- Use g_assert_not_reached for invalid mode in get_physical_address
+- Use g_assert_not_reached for unreachable checks in get_physical_address
+- Use g_assert_not_reached for unreachable type in raise_mmu_exception
+- Return exception instead of aborting for misaligned fetches
+- Move exception defines from cpu.h to cpu_bits.h
+- Remove redundant breakpoint control definitions from cpu_bits.h
+- Implement riscv_cpu_unassigned_access exception handling
+- Log and raise exceptions for unimplemented CSRs
+- Match Spike HTIF exit behavior - don’t print TEST-PASSED
+- Make frm,fflags,fcsr writes trap when mstatus.FS is clear
+- Use g_assert_not_reached for unreachable invalid mode
+- Make hret,uret,dret generate illegal instructions
+- Move riscv_cpu_dump_state and int/fpr regnames to cpu.c
+- Lift interrupt flag and mask into constants in cpu_bits.h
+- Change trap debugging to use qemu_log_mask LOG_TRACE 
+- Change CSR debugging to use qemu_log_mask LOG_TRACE
+- Change PMP debugging to use qemu_log_mask LOG_TRACE
+- Remove commented code from pmp.c
+- Change CpuInfoRISCV qapi schema docs to Since 2.12
+- Change RV feature macro to use target_ulong cast
+- Remove riscv_feature and instead use misa extension flags
+- Make riscv_flush_icache_syscall a no-op
+- Undo checkpatch whitespace fixes in unrelated linux-user code
+- Remove redudant constants and tidy up cpu_bits.h
+- Make helper_fence_i a no-op
+- Move include "exec/cpu-all" to end of cpu.h
+- Rename set_privilege to riscv_set_mode
+- Move redundant forward declaration for cpu_riscv_translate_address
+- Remove TCGV_UNUSED from riscv_translate_init
+- Add comment to pmp.c stating the code is untested and currently unused
+- Use ctz to simplify decoding of PMP NAPOT address ranges
+- Change pmp_is_in_range to use than equal for end addresses
+- Fix off by one error in pmp_update_rule
+- Rearrange PMP_DEBUG so that formatting is compile-time checked
+- Rearrange trap debugging so that formatting is compile-time checked
+- Rearrange PLIC debugging so that formatting is compile-time checked
+- Use qemu_log/qemu_log_mask for HTIF logging and debugging
+- Move exception and interrupt names into cpu.c
+- Add Palmer Dabbelt as a RISC-V Maintainer
+- Rebase against current qemu master branch
+
+v1
+
+- initial version based on forward port from riscv-qemu repository
+
+*** Background ***
+
+"RISC-V is an open, free ISA enabling a new era of processor innovation
+through open standard collaboration. Born in academia and research,
+RISC-V ISA delivers a new level of free, extensible software and
+hardware freedom on architecture, paving the way for the next 50 years
+of computing design and innovation."
+
+The QEMU RISC-V port has been developed and maintained out-of-tree for
+several years by Sagar Karandikar and Bastian Koppelmann. The RISC-V
+Privileged specification has evolved substantially over this period but
+has recently been solidifying. The RISC-V Base ISA has been frozon for
+some time and the Privileged ISA, GCC toolchain and Linux ABI are now
+quite stable. I have recently joined Sagar and Bastian as a RISC-V QEMU
+Maintainer and hope to support upstreaming the port. 
+
+There are multiple vendors taping out, preparing to ship, or shipping
+silicon that implements the RISC-V Privileged ISA Version 1.10. There
+are also several RISC-V Soft-IP cores implementing Privileged ISA
+Version 1.10 that run on FPGA such as SiFive's Freedom U500 Platform
+and the U54‑MC RISC-V Core IP, among many more implementations from a
+variety of vendors. See https://riscv.org/ for more details.
+
+RISC-V support was upstreamed in binutils 2.28 and GCC 7.1 in the first
+half of 2016. RISC-V support is now available in LLVM top-of-tree and
+the RISC-V Linux port was accepted into Linux 4.15-rc1 late last year
+and is available in the Linux 4.15 release. GLIBC 2.27 added support
+for the RISC-V ISA running on Linux (requires at least binutils-2.30,
+gcc-7.3.0, and linux-4.15). We believe it is timely to submit the
+RISC-V QEMU port for upstream review with the goal of incorporating
+RISC-V support into the upcoming QEMU 2.12 release.
+
+The RISC-V QEMU port is still under active development, mostly with
+respect to device emulation, the addition of Hypervisor support as
+specified in the RISC-V Draft Privileged ISA Version 1.11, and Vector
+support once the first draft is finalized later this year. We believe
+now is the appropriate time for RISC-V QEMU development to be carried
+out in the main QEMU repository as the code will benefit from more
+rigorous review. The RISC-V QEMU port currently supports all the ISA
+extensions that have been finalized and frozen in the Base ISA.
+
+Blog post about recent additions to RISC-V QEMU: https://goo.gl/fJ4zgk
+
+The RISC-V QEMU wiki: https://github.com/riscv/riscv-qemu/wiki
+
+Instructions for building a busybox+dropbear root image, BBL (Berkeley
+Boot Loader) and linux kernel image for use with the RISC-V QEMU
+'virt' machine: https://github.com/michaeljclark/busybear-linux
+
+*** Overview ***
+
+The RISC-V QEMU port implements the following specifications:
+
+- RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
+- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
+- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
+
+The RISC-V QEMU port supports the following instruction set extensions:
+
+- RV32GC with Supervisor-mode and User-mode (RV32IMAFDCSU)
+- RV64GC with Supervisor-mode and User-mode (RV64IMAFDCSU)
+
+The RISC-V QEMU port adds the following targets to QEMU:
+
+- riscv32-softmmu
+- riscv64-softmmu
+- riscv32-linux-user
+- riscv64-linux-user
+
+The RISC-V QEMU port supports the following hardware:
+
+- HTIF Console (Host Target Interface)
+- SiFive CLINT (Core Local Interruptor) for Timer interrupts and IPIs
+- SiFive PLIC (Platform Level Interrupt Controller)
+- SiFive Test (Test Finisher) for exiting simulation
+- SiFive UART, PRCI, AON, PWM, QSPI support is partially implemented
+- VirtIO MMIO (GPEX PCI support will be added in a future patch)
+- Generic 16550A UART emulation using 'hw/char/serial.c'
+- Experimental SMP support (PLIC and CLINT) on the 'virt' machine
+
+The RISC-V QEMU full system emulator supports 5 machines:
+
+- 'spike_v1.9';  CLINT, PLIC, HTIF console, config-string, Priv v1.9.1
+- 'spike_v1.10'; CLINT, PLIC, HTIF console, device-tree, Priv v1.10
+- 'sifive_e300'; CLINT, PLIC, SiFive UART, HiFive1 compat, Priv v1.10
+- 'sifive_u500'; CLINT, PLIC, SiFive UART, device-tree, Priv v1.10
+- 'virt'; CLINT, PLIC, 16550A UART, VirtIO, device-tree, Priv v1.10
+
+This is a list of RISC-V QEMU Port Contributors:
+
+- Alex Suykov
+- Andreas Schwab
+- Antony Pavlov
+- Bastian Koppelmann
+- Bruce Hoult
+- Chih-Min Chao
+- Daire McNamara
+- Darius Rad
+- David Abdurachmanov
+- Ivan Griffin
+- Jim Wilson
+- Kito Cheng
+- Michael Clark
+- Palmer Dabbelt
+- Richard Henderon
+- Sagar Karandikar
+- Stefan O'Rear
+
+Notes:
+
+- contributor email addresses available off-list on request.
+- checkpatch has been run on all 22 patches.
+- checkpatch exceptions are noted in 2 patches that have errors.
+- tested linux on 'spike_v1.9', 'spike_v1.10' and 'virt' machines
+- passes "make check" on full build for all targets
+
+This patch series includes the following patches:
+
+Michael Clark (22):
+  RISC-V Maintainers
+  RISC-V ELF Machine Definition
+  RISC-V CPU Core Definition
+  RISC-V Disassembler
+  RISC-V CPU Helpers
+  RISC-V FPU Support
+  RISC-V GDB Stub
+  RISC-V TCG Code Generation
+  RISC-V Physical Memory Protection
+  RISC-V Linux User Emulation
+  RISC-V HTIF Console
+  RISC-V HART Array
+  SiFive RISC-V CLINT Block
+  SiFive RISC-V PLIC Block
+  RISC-V Spike Machines
+  RISC-V VirtIO Machine
+  SiFive RISC-V UART Device
+  SiFive RISC-V PRCI Block
+  SiFive RISC-V Test Finisher
+  SiFive Freedom E300 RISC-V Machine
+  SiFive Freedom U500 RISC-V Machine
+  RISC-V Build Infrastructure
+
+ MAINTAINERS                            |   11 +
+ Makefile.objs                          |    1 +
+ arch_init.c                            |    2 +
+ configure                              |   11 +
+ cpus.c                                 |    6 +
+ default-configs/riscv32-linux-user.mak |    1 +
+ default-configs/riscv32-softmmu.mak    |    4 +
+ default-configs/riscv64-linux-user.mak |    1 +
+ default-configs/riscv64-softmmu.mak    |    4 +
+ disas.c                                |    2 +
+ disas/Makefile.objs                    |    1 +
+ disas/riscv.c                          | 3054 ++++++++++++++++++++++++++++++++
+ fpu/softfloat-specialize.h             |    7 +-
+ hw/riscv/Makefile.objs                 |   13 +
+ hw/riscv/riscv_elf.c                   |  244 +++
+ hw/riscv/riscv_hart.c                  |   95 +
+ hw/riscv/riscv_htif.c                  |  373 ++++
+ hw/riscv/sifive_clint.c                |  312 ++++
+ hw/riscv/sifive_e300.c                 |  232 +++
+ hw/riscv/sifive_plic.c                 |  554 ++++++
+ hw/riscv/sifive_prci.c                 |   95 +
+ hw/riscv/sifive_test.c                 |   99 ++
+ hw/riscv/sifive_u500.c                 |  338 ++++
+ hw/riscv/sifive_uart.c                 |  182 ++
+ hw/riscv/spike_v1_09.c                 |  204 +++
+ hw/riscv/spike_v1_10.c                 |  278 +++
+ hw/riscv/virt.c                        |  375 ++++
+ include/disas/bfd.h                    |    2 +
+ include/elf.h                          |    2 +
+ include/hw/riscv/riscv_elf.h           |   69 +
+ include/hw/riscv/riscv_hart.h          |   45 +
+ include/hw/riscv/riscv_htif.h          |   62 +
+ include/hw/riscv/sifive_clint.h        |   56 +
+ include/hw/riscv/sifive_e300.h         |   79 +
+ include/hw/riscv/sifive_plic.h         |   91 +
+ include/hw/riscv/sifive_prci.h         |   43 +
+ include/hw/riscv/sifive_test.h         |   48 +
+ include/hw/riscv/sifive_u500.h         |   69 +
+ include/hw/riscv/sifive_uart.h         |   76 +
+ include/hw/riscv/spike.h               |   51 +
+ include/hw/riscv/virt.h                |   74 +
+ include/sysemu/arch_init.h             |    1 +
+ linux-user/elfload.c                   |   22 +
+ linux-user/main.c                      |   97 +
+ linux-user/riscv/syscall_nr.h          |  275 +++
+ linux-user/riscv/target_cpu.h          |   18 +
+ linux-user/riscv/target_signal.h       |   23 +
+ linux-user/riscv/target_structs.h      |   46 +
+ linux-user/riscv/target_syscall.h      |   56 +
+ linux-user/riscv/termbits.h            |  220 +++
+ linux-user/signal.c                    |  203 ++-
+ linux-user/syscall.c                   |    2 +
+ linux-user/syscall_defs.h              |   13 +-
+ qapi-schema.json                       |   16 +-
+ scripts/qemu-binfmt-conf.sh            |   13 +-
+ target/riscv/Makefile.objs             |    1 +
+ target/riscv/cpu.c                     |  385 ++++
+ target/riscv/cpu.h                     |  256 +++
+ target/riscv/cpu_bits.h                |  417 +++++
+ target/riscv/cpu_user.h                |   16 +
+ target/riscv/fpu_helper.c              |  375 ++++
+ target/riscv/gdbstub.c                 |   60 +
+ target/riscv/helper.c                  |  464 +++++
+ target/riscv/helper.h                  |   78 +
+ target/riscv/instmap.h                 |  366 ++++
+ target/riscv/op_helper.c               |  644 +++++++
+ target/riscv/pmp.c                     |  386 ++++
+ target/riscv/pmp.h                     |   70 +
+ target/riscv/trace-events              |    1 +
+ target/riscv/translate.c               | 1964 ++++++++++++++++++++
+ 70 files changed, 13743 insertions(+), 11 deletions(-)
+ create mode 100644 default-configs/riscv32-linux-user.mak
+ create mode 100644 default-configs/riscv32-softmmu.mak
+ create mode 100644 default-configs/riscv64-linux-user.mak
+ create mode 100644 default-configs/riscv64-softmmu.mak
+ create mode 100644 disas/riscv.c
+ create mode 100644 hw/riscv/Makefile.objs
+ create mode 100644 hw/riscv/riscv_elf.c
+ create mode 100644 hw/riscv/riscv_hart.c
+ create mode 100644 hw/riscv/riscv_htif.c
+ create mode 100644 hw/riscv/sifive_clint.c
+ create mode 100644 hw/riscv/sifive_e300.c
+ create mode 100644 hw/riscv/sifive_plic.c
+ create mode 100644 hw/riscv/sifive_prci.c
+ create mode 100644 hw/riscv/sifive_test.c
+ create mode 100644 hw/riscv/sifive_u500.c
+ create mode 100644 hw/riscv/sifive_uart.c
+ create mode 100644 hw/riscv/spike_v1_09.c
+ create mode 100644 hw/riscv/spike_v1_10.c
+ create mode 100644 hw/riscv/virt.c
+ create mode 100644 include/hw/riscv/riscv_elf.h
+ create mode 100644 include/hw/riscv/riscv_hart.h
+ create mode 100644 include/hw/riscv/riscv_htif.h
+ create mode 100644 include/hw/riscv/sifive_clint.h
+ create mode 100644 include/hw/riscv/sifive_e300.h
+ create mode 100644 include/hw/riscv/sifive_plic.h
+ create mode 100644 include/hw/riscv/sifive_prci.h
+ create mode 100644 include/hw/riscv/sifive_test.h
+ create mode 100644 include/hw/riscv/sifive_u500.h
+ create mode 100644 include/hw/riscv/sifive_uart.h
+ create mode 100644 include/hw/riscv/spike.h
+ create mode 100644 include/hw/riscv/virt.h
+ create mode 100644 linux-user/riscv/syscall_nr.h
+ create mode 100644 linux-user/riscv/target_cpu.h
+ create mode 100644 linux-user/riscv/target_signal.h
+ create mode 100644 linux-user/riscv/target_structs.h
+ create mode 100644 linux-user/riscv/target_syscall.h
+ create mode 100644 linux-user/riscv/termbits.h
+ create mode 100644 target/riscv/Makefile.objs
+ create mode 100644 target/riscv/cpu.c
+ create mode 100644 target/riscv/cpu.h
+ create mode 100644 target/riscv/cpu_bits.h
+ create mode 100644 target/riscv/cpu_user.h
+ create mode 100644 target/riscv/fpu_helper.c
+ create mode 100644 target/riscv/gdbstub.c
+ create mode 100644 target/riscv/helper.c
+ create mode 100644 target/riscv/helper.h
+ create mode 100644 target/riscv/instmap.h
+ create mode 100644 target/riscv/op_helper.c
+ create mode 100644 target/riscv/pmp.c
+ create mode 100644 target/riscv/pmp.h
+ create mode 100644 target/riscv/trace-events
+ create mode 100644 target/riscv/translate.c
+
+-- 
+2.7.0
