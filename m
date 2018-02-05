@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39741)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eiqVA-0005IC-9y
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 18:48:45 -0500
+	id 1eiqaH-0008El-LW
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 18:54:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eiqV5-0003BV-JB
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 18:48:44 -0500
+	id 1eiqaD-0007vx-Nr
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 18:54:01 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
-	<1517324542-6607-6-git-send-email-peter.maydell@linaro.org>
+References: <20180205105720.14620-1-peter.maydell@linaro.org>
+	<20180205105720.14620-6-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7b9ed62e-7210-48a3-9c1d-8f16e3a16796@amsat.org>
-Date: Mon, 5 Feb 2018 20:48:34 -0300
+Message-ID: <b1112be1-c1bf-ee94-f786-84f248e223c5@amsat.org>
+Date: Mon, 5 Feb 2018 20:53:49 -0300
 MIME-Version: 1.0
-In-Reply-To: <1517324542-6607-6-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <20180205105720.14620-6-peter.maydell@linaro.org>
 Content-Type: multipart/signed; micalg=pgp-sha512;
 	protocol="application/pgp-signature";
-	boundary="zhP4fAd7UXZShWhLn9Sd0IbV600QjE0qa"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 5/7] target/arm: Make
- v7m_push_callee_stack() honour MPU
+	boundary="Y1hOvH8H8T7JIg63Sk7JtEYZy45gzejje"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 5/8] hw/intc/armv7m_nvic:
+ Implement cache ID registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,197 +33,222 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zhP4fAd7UXZShWhLn9Sd0IbV600QjE0qa
+--Y1hOvH8H8T7JIg63Sk7JtEYZy45gzejje
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 Cc: patches@linaro.org
-Message-ID: <7b9ed62e-7210-48a3-9c1d-8f16e3a16796@amsat.org>
-Subject: Re: [Qemu-arm] [PATCH 5/7] target/arm: Make v7m_push_callee_stack()
- honour MPU
-References: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
- <1517324542-6607-6-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1517324542-6607-6-git-send-email-peter.maydell@linaro.org>
+Message-ID: <b1112be1-c1bf-ee94-f786-84f248e223c5@amsat.org>
+Subject: Re: [Qemu-arm] [PATCH 5/8] hw/intc/armv7m_nvic: Implement cache ID
+ registers
+References: <20180205105720.14620-1-peter.maydell@linaro.org>
+ <20180205105720.14620-6-peter.maydell@linaro.org>
+In-Reply-To: <20180205105720.14620-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 01/30/2018 12:02 PM, Peter Maydell wrote:
-> Make v7m_push_callee_stack() honour the MPU by using the
-> new v7m_stack_write() function. We return a flag to indicate
-> whether the pushes failed, which we can then use in
-> v7m_exception_taken() to cause us to handle the derived
-> exception correctly.
+Hi Peter,
+
+On 02/05/2018 07:57 AM, Peter Maydell wrote:
+> M profile cores have a similar setup for cache ID registers
+> to A profile:
+>  * Cache Level ID Register (CLIDR) is a fixed value
+>  * Cache Type Register (CTR) is a fixed value
+>  * Cache Size ID Registers (CCSIDR) are a bank of registers;
+>    which one you see is selected by the Cache Size Selection
+>    Register (CSSELR)
+>=20
+> The only difference is that they're in the NVIC memory mapped
+> register space rather than being coprocessor registers.
+> Implement the M profile view of them.
+>=20
+> Since neither Cortex-M3 nor Cortex-M4 implement caches,
+> we don't need to update their init functions and can leave
+> the ctr/clidr/ccsidr[] fields in their ARMCPU structs at zero.
+> Newer cores (like the Cortex-M33) will want to be able to
+> set these ID registers to non-zero values, though.
 >=20
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/helper.c | 64 ++++++++++++++++++++++++++++++++++++++++-----=
---------
->  1 file changed, 49 insertions(+), 15 deletions(-)
+> The CSSELR/CCSIDR parts are a bit under-motivated, because
+> the Cortex-M33 doesn't implement caches either and so they
+> are RAZ/WI for that as well as M3/M4, though I'd written all
+> the code before I realized that. This will be helpful if
+> we ever need a Cortex-M7 model, though (which does have
+> a couple of CSSIDR array entries).
+
+I wonder if it is easier/faster to add a check for the "Instruction not
+Data" bit and the level value is not 7 (not permitted) or simple comments=
+=2E
+
+> ---
+>  target/arm/cpu.h      |  9 +++++++++
+>  hw/intc/armv7m_nvic.c | 13 +++++++++++++
+>  target/arm/machine.c  | 36 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 58 insertions(+)
 >=20
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 007e760..de0031b 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6473,7 +6473,7 @@ static uint32_t arm_v7m_load_vector(ARMCPU *cpu, =
-int exc, bool targets_secure)
->      return addr;
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index f21f68ec4a..99c7cb996f 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -453,6 +453,7 @@ typedef struct CPUARMState {
+>          uint32_t faultmask[M_REG_NUM_BANKS];
+>          uint32_t aircr; /* only holds r/w state if security extn imple=
+mented */
+>          uint32_t secure; /* Is CPU in Secure state? (not guest visible=
+) */
+> +        uint32_t csselr[M_REG_NUM_BANKS];
+>      } v7m;
+> =20
+>      /* Information associated with an exception about to be taken:
+> @@ -2443,6 +2444,14 @@ static inline int arm_debug_target_el(CPUARMStat=
+e *env)
+>      }
 >  }
 > =20
-> -static void v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotai=
-lchain,
-> +static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotai=
-lchain,
->                                    bool ignore_faults)
->  {
->      /* For v8M, push the callee-saves register part of the stack frame=
-=2E
-> @@ -6481,31 +6481,55 @@ static void v7m_push_callee_stack(ARMCPU *cpu, =
-uint32_t lr, bool dotailchain,
->       * In the tailchaining case this may not be the current stack.
->       */
->      CPUARMState *env =3D &cpu->env;
-> -    CPUState *cs =3D CPU(cpu);
->      uint32_t *frame_sp_p;
->      uint32_t frameptr;
-> +    ARMMMUIdx mmu_idx;
-> +    bool stacked_ok;
-> =20
->      if (dotailchain) {
-> -        frame_sp_p =3D get_v7m_sp_ptr(env, true,
-> -                                    lr & R_V7M_EXCRET_MODE_MASK,
-> +        bool mode =3D lr & R_V7M_EXCRET_MODE_MASK;
-> +        bool priv =3D !(env->v7m.control[M_REG_S] & R_V7M_CONTROL_NPRI=
-V_MASK) ||
-> +            !mode;
-> +
-> +        mmu_idx =3D arm_v7m_mmu_idx_for_secstate_and_priv(env, M_REG_S=
-, priv);
-> +        frame_sp_p =3D get_v7m_sp_ptr(env, M_REG_S, mode,
->                                      lr & R_V7M_EXCRET_SPSEL_MASK);
->      } else {
-> +        mmu_idx =3D core_to_arm_mmu_idx(env, cpu_mmu_index(env, false)=
-);
->          frame_sp_p =3D &env->regs[13];
->      }
-> =20
->      frameptr =3D *frame_sp_p - 0x28;
-> =20
-> -    stl_phys(cs->as, frameptr, 0xfefa125b);
-> -    stl_phys(cs->as, frameptr + 0x8, env->regs[4]);
-> -    stl_phys(cs->as, frameptr + 0xc, env->regs[5]);
-> -    stl_phys(cs->as, frameptr + 0x10, env->regs[6]);
-> -    stl_phys(cs->as, frameptr + 0x14, env->regs[7]);
-> -    stl_phys(cs->as, frameptr + 0x18, env->regs[8]);
-> -    stl_phys(cs->as, frameptr + 0x1c, env->regs[9]);
-> -    stl_phys(cs->as, frameptr + 0x20, env->regs[10]);
-> -    stl_phys(cs->as, frameptr + 0x24, env->regs[11]);
-> +    /* Write as much of the stack frame as we can. A write failure may=
-
-> +     * cause us to pend a derived exception.
+> +static inline bool arm_v7m_csselr_razwi(ARMCPU *cpu)
+> +{
+> +    /* If all the CLIDR.Ctypem bits are 0 there are no caches, and
+> +     * CSSELR is RAZ/WI.
 > +     */
-> +    stacked_ok =3D
-> +        v7m_stack_write(cpu, frameptr, 0xfefa125b, mmu_idx, ignore_fau=
-lts) &&
-> +        v7m_stack_write(cpu, frameptr + 0x8, env->regs[4], mmu_idx,
+> +    return (cpu->clidr & 0x001fffff) !=3D 0;
+> +}
 
-nice!
+Suggestion to be consistent with other bitfields:
+
+/* V7M Cache Level ID (CLIDR) */
+FIELD(V7M_CLIDR, CTYPE, 0, 7 * 3)
+
+So we can use:
+
+    return (cpu->clidr & R_V7M_CLIDR_CTYPE_MASK) !=3D 0;
+
+> +
+>  static inline bool aa64_generate_debug_exceptions(CPUARMState *env)
+>  {
+>      if (arm_is_secure(env)) {
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index eb49fd77c7..cc83c9e553 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -1025,6 +1025,14 @@ static uint32_t nvic_readl(NVICState *s, uint32_=
+t offset, MemTxAttrs attrs)
+>          return cpu->id_isar4;
+>      case 0xd74: /* ISAR5.  */
+>          return cpu->id_isar5;
+> +    case 0xd78: /* CLIDR */
+> +        return cpu->clidr;
+> +    case 0xd7c: /* CTR */
+> +        return cpu->ctr;
+> +    case 0xd80: /* CSSIDR */
+> +        return cpu->ccsidr[cpu->env.v7m.csselr[attrs.secure] & 0xf];
+
+/* V7M Cache Size Selection (CSSELR) */
+FIELD(V7M_CSSELR, LEVEL, 1, 3)
+
+> +    case 0xd84: /* CSSELR */
+> +        return cpu->env.v7m.csselr[attrs.secure];
+>      /* TODO: Implement debug registers.  */
+>      case 0xd90: /* MPU_TYPE */
+>          /* Unified MPU; if the MPU is not present this value is zero *=
+/
+> @@ -1385,6 +1393,11 @@ static void nvic_writel(NVICState *s, uint32_t o=
+ffset, uint32_t value,
+>          qemu_log_mask(LOG_UNIMP,
+>                        "NVIC: Aux fault status registers unimplemented\=
+n");
+>          break;
+> +    case 0xd84: /* CSSELR */
+> +        if (!arm_v7m_csselr_razwi(cpu)) {
+> +            cpu->env.v7m.csselr[attrs.secure] =3D value & 0xf;
+> +        }
+> +        break;
+>      case 0xd90: /* MPU_TYPE */
+>          return; /* RO */
+>      case 0xd94: /* MPU_CTRL */
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index a85c2430d3..968ec30b4a 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -108,6 +108,41 @@ static const VMStateDescription vmstate_m_faultmas=
+k_primask =3D {
+>      }
+>  };
+> =20
+> +/* CSSELR is in a subsection because we didn't implement it previously=
+=2E
+> + * Migration from an old implementation will leave it at zero, which
+> + * is OK since the only CPUs in the old implementation make the
+> + * register RAZ/WI.
+> + * Since there was no version of QEMU which implemented the CSSELR for=
+
+> + * just non-secure, we transfer both banks here rather than putting
+> + * the secure banked version in the m-security subsection.
+> + */
+> +static bool csselr_vmstate_validate(void *opaque, int version_id)
+> +{
+> +    ARMCPU *cpu =3D opaque;
+> +
+> +    return cpu->env.v7m.csselr[M_REG_NS] < sizeof(cpu->ccsidr)
+> +        && cpu->env.v7m.csselr[M_REG_S] < sizeof(cpu->ccsidr);
+> +}
+> +
+> +static bool m_csselr_needed(void *opaque)
+> +{
+> +    ARMCPU *cpu =3D opaque;
+> +
+> +    return !arm_v7m_csselr_razwi(cpu);
+> +}
+> +
+> +static const VMStateDescription vmstate_m_csselr =3D {
+> +    .name =3D "cpu/m/csselr",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D m_csselr_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(env.v7m.csselr, ARMCPU, M_REG_NUM_BANKS),=
+
+> +        VMSTATE_VALIDATE("CSSELR is valid", csselr_vmstate_validate),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_m =3D {
+>      .name =3D "cpu/m",
+>      .version_id =3D 4,
+> @@ -129,6 +164,7 @@ static const VMStateDescription vmstate_m =3D {
+>      },
+>      .subsections =3D (const VMStateDescription*[]) {
+>          &vmstate_m_faultmask_primask,
+> +        &vmstate_m_csselr,
+>          NULL
+>      }
+>  };
+>=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-> +                        ignore_faults) &&
-> +        v7m_stack_write(cpu, frameptr + 0xc, env->regs[5], mmu_idx,
-> +                        ignore_faults) &&
-> +        v7m_stack_write(cpu, frameptr + 0x10, env->regs[6], mmu_idx,
-> +                        ignore_faults) &&
-> +        v7m_stack_write(cpu, frameptr + 0x14, env->regs[7], mmu_idx,
-> +                        ignore_faults) &&
-> +        v7m_stack_write(cpu, frameptr + 0x18, env->regs[8], mmu_idx,
-> +                        ignore_faults) &&
-> +        v7m_stack_write(cpu, frameptr + 0x1c, env->regs[9], mmu_idx,
-> +                        ignore_faults) &&
-> +        v7m_stack_write(cpu, frameptr + 0x20, env->regs[10], mmu_idx,
-> +                        ignore_faults) &&
-> +        v7m_stack_write(cpu, frameptr + 0x24, env->regs[11], mmu_idx,
-> +                        ignore_faults);
-> =20
-> +    /* Update SP regardless of whether any of the stack accesses faile=
-d.
-> +     * When we implement v8M stack limit checking then this attempt to=
 
-> +     * update SP might also fail and result in a derived exception.
-> +     */
->      *frame_sp_p =3D frameptr;
-> +
-> +    return !stacked_ok;
->  }
-> =20
->  static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr, bool dotailc=
-hain,
-> @@ -6519,6 +6543,7 @@ static void v7m_exception_taken(ARMCPU *cpu, uint=
-32_t lr, bool dotailchain,
->      uint32_t addr;
->      bool targets_secure;
->      int exc;
-> +    bool push_failed =3D false;
-> =20
->      armv7m_nvic_get_pending_irq_info(env->nvic, &exc, &targets_secure)=
-;
-> =20
-> @@ -6546,8 +6571,8 @@ static void v7m_exception_taken(ARMCPU *cpu, uint=
-32_t lr, bool dotailchain,
->                   */
->                  if (lr & R_V7M_EXCRET_DCRS_MASK &&
->                      !(dotailchain && (lr & R_V7M_EXCRET_ES_MASK))) {
-> -                    v7m_push_callee_stack(cpu, lr, dotailchain,
-> -                                          ignore_stackfaults);
-> +                    push_failed =3D v7m_push_callee_stack(cpu, lr, dot=
-ailchain,
-> +                                                        ignore_stackfa=
-ults);
->                  }
->                  lr |=3D R_V7M_EXCRET_DCRS_MASK;
->              }
-> @@ -6589,6 +6614,15 @@ static void v7m_exception_taken(ARMCPU *cpu, uin=
-t32_t lr, bool dotailchain,
->          }
->      }
-> =20
-> +    if (push_failed && !ignore_stackfaults) {
-> +        /* Derived exception on callee-saves register stacking:
-> +         * we might now want to take a different exception which
-> +         * targets a different security state, so try again from the t=
-op.
-> +         */
-> +        v7m_exception_taken(cpu, lr, true, true);
-> +        return;
-> +    }
-> +
->      addr =3D arm_v7m_load_vector(cpu, exc, targets_secure);
-> =20
->      /* Now we've done everything that might cause a derived exception
->=20
-
-
---zhP4fAd7UXZShWhLn9Sd0IbV600QjE0qa
+--Y1hOvH8H8T7JIg63Sk7JtEYZy45gzejje
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp47VIACgkQ4+MsLN6t
-wN7wqBAAs6ZQweJcPjyJOJj6DDIfhMYZrpnlvRhE8C7cbfvPhhycVpYTaF6aI3t5
-Dfz76F6Zwt7EnODPrD7B1oRDg8NCnU1+p+B5Wsaw1WT8CfSGh1WElKaBRlnWBD4O
-3A/hSGn2zpXVlCub6occRoBAcFZFonGa2vOfPuN+L/tly5BXllC6/7ioMkohhPhn
-7P74WFN+oGoXqxddOQcI2t06rI/mJDhmtUdJ4bBzjvXyW3DT4yqelZbkww1obQds
-f/hyfnDiNRnMvOxvt55Ha+O++I0aM/Tm6FGq/YYUrIwEB9n+rH4zRFZQ0K1f/sK9
-2An/zLTxoh9mDEKlXR0bBiHhWCORcdvP9Ve5KU0S7PkHXLfFgu+r5cZDspkYInv9
-0PZl2couTDSIvPdb69jS2R48a8SevvWt7xHKDzoDIdBizLkwdZTXz4xRcSAZg2jr
-A8I7Gh0nbX8uVhDg8Ir8WTzld30oDdSrne7MuXr6wPC80K3etlQPedDMJo5o4eZN
-Bi9j1JL4IuYUYZVrTythTMGh59m70MlE8hMqF7/TfqtmgJlHFUJwJ1wgH+Nlr0MW
-04H/okLQ5EKO1LT9iVauSIiDzaLs9cg/U1ORJcnq2KSDyg8ofEaKe9jbEM7GNd1Q
-3egdNd7YADvd/9DHc7983jizNxq+mKyyaY4YZHuUscvVUvxim44=
-=51Em
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp47o4ACgkQ4+MsLN6t
+wN7gVA/+LgXWcBtHxzuOoRtl05kGPWkYiGLisZYm1OFDIkN0UPXG5QwpZIKhs6y9
++ri83UMexq/baWy0US+t5NySGjfTKmhGC5mh2VcitrRFCDv6yobwfqaconHVyEnb
+40Mfq7dz9G+8+L4ZBeGOU/Q6MEW14M3/ojmY9ydXqDocRZnWJroKvqhSOCEJ1uWS
+GRDLkioLKE+c0+r9M8gJsLWQTw8tXhIB1W5P0PQZ7azVymaH41B2s9oSZ0E4dpfP
+jS+tSbtZMyF5xxRBjJUN/hetLnJqznoaWENvXx1mkS40MJ2LeUe9OY9fOE+NKQHY
+hOXGSrDL9wZTAPjNkVLYJ1Lvz2YqNC72PNsjP99d90TFhEwXf46Gk3rwpMyHHeZh
+75pLW1TWkzDmrkJD/LS3Jxepk2xhPviIjujuTRvcHnu/6rzyDeNTcXCpefFJGXe/
+LdXWwjccgCXD0EK62h8DX/1Xr2LLkb4nQ8VScPu4pbBXrjE8O+JG0otiWa8OLQe4
+kRrIZb7YVNFbOjlEgiQ8umQCCuq/BpU33YUQC+0ZabXKOi+ZmuhJxmoGrYrWxLP/
+eSsmfSiBK3JAgbdcs9MomuXIKDAgE1M6lXrhT9Vk7nke9hE8H8kzXkKhqtD2n3t2
+nOAvMfNPjRT9P/LTydJhsPRUbWzvgyMjk94wJOfi2tJP46tDImw=
+=M7Vp
 -----END PGP SIGNATURE-----
 
---zhP4fAd7UXZShWhLn9Sd0IbV600QjE0qa--
+--Y1hOvH8H8T7JIg63Sk7JtEYZy45gzejje--
