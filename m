@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eiaFU-00082u-Fz
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:27:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1eiaLe-0005rw-15
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:33:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eiaFT-00082c-6Q
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:27:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46932)
+	(envelope-from <armbru@redhat.com>) id 1eiaLa-00037k-TW
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:33:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1eiaFS-00080w-UV
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:27:27 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 96B2228202
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 06:27:20 +0000 (UTC)
-Date: Sun, 4 Feb 2018 23:27:16 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180204232716.2872bb64@w520.home>
-In-Reply-To: <20180129202326.9417.71344.stgit@gimli.home>
-References: <20180129202326.9417.71344.stgit@gimli.home>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eiaLa-00037K-KF
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:33:46 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180203084315.20497-1-armbru@redhat.com>
+	<20180203084315.20497-15-armbru@redhat.com>
+	<bbc2cc63-c192-020c-b9ff-78461c0efced@redhat.com>
+Date: Mon, 05 Feb 2018 07:33:43 +0100
+In-Reply-To: <bbc2cc63-c192-020c-b9ff-78461c0efced@redhat.com> (Thomas Huth's
+	message of "Sat, 3 Feb 2018 21:23:31 +0100")
+Message-ID: <87po5kx7w8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vfio/pci: Add option to disable GeForce
- quirks
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 14/14] target: Use qemu_log() instead of
+ fprintf(stderr, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,116 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org, alistair.francis@xilinx.com
 
-On Mon, 29 Jan 2018 13:23:50 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+Thomas Huth <thuth@redhat.com> writes:
 
-> These quirks are necessary for GeForce, but not for Quadro/GRID/Tesla
-> assignment.  Leaving them enabled is fully functional and provides the
-> most compatibility, but due to the unique NVIDIA MSI ACK behavior[1],
-> it also introduces latency in re-triggering the MSI interrupt.  This
-> overhead is typically negligible, but has been shown to adversely
-> affect some (very) high interrupt rate applications.  This adds the
-> vfio-pci device option "x-no-geforce-quirks=" which can be set to
-> "on" to disable this additional overhead.
-> 
-> A follow-on optimization for GeForce might be to make use of an
-> ioeventfd to allow KVM to trigger an irqfd in the kernel vfio-pci
-> driver, avoiding the bounce through userspace to handle this device
-> write.
-> 
-> [1] Background: the NVIDIA driver has been observed to write 0xff to
-> the read-only MSI capability ID register via the MMIO mirror of PCI
-> config space in order for the MSI interrupt to re-trigger.  This PCI
-> config space mirror is virtualized in QEMU for GeForce.
+> On 03.02.2018 09:43, Markus Armbruster wrote:
+>> From: Alistair Francis <alistair.francis@xilinx.com>
+>>=20
+>> Convert fprintf(stderr, ...) to use qemu_log(). Double prints in
+>> target/ppc/translate.c were manually remove. A fprintf() in
+>> target/sh4/translate.c was kept as it's inside a #if 0. The #if 0 and
+>> fflush() was removed around the unimplemented log in
+>> target/sh4/translate.c as well.
+>>=20
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> [Trivial conflict with 6f1c2af641d resolved]
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  target/cris/translate.c      |  2 +-
+>>  target/ppc/translate.c       | 36 ++++++++++--------------------------
+>>  target/sh4/translate.c       |  7 ++-----
+>>  target/unicore32/translate.c |  2 +-
+>>  4 files changed, 14 insertions(+), 33 deletions(-)
+>>=20
+>> diff --git a/target/cris/translate.c b/target/cris/translate.c
+>> index f51a731db9..ff31311ed0 100644
+>> --- a/target/cris/translate.c
+>> +++ b/target/cris/translate.c
+>> @@ -137,7 +137,7 @@ typedef struct DisasContext {
+>>=20=20
+>>  static void gen_BUG(DisasContext *dc, const char *file, int line)
+>>  {
+>> -    fprintf(stderr, "BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>> +    qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>      if (qemu_log_separate()) {
+>>          qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>      }
+>
+> This one is still logging twice now.
 
-In developing the ioeventfd counterpart to this, I've found that this
-footnote description is not entirely accurate.  NVIDIA is still using
-an MSI-ACK write through to the MMIO mirror of config space, but the
-location and data for the write is different now.  I don't know if this
-is driver or hardware changes, but the write is currently observed as a
-4-byte write of value 0x0 to offset 0x704 (0x88704 into BAR0).  Unless
-there are no other comments, I'll update the commit log to reflect the
-following in place of above:
+Hmm.
 
-[1] Background: the NVIDIA driver has been observed to issue a write to
-the MMIO mirror of PCI config space in BAR0 in order to allow the MSI
-interrupt for the device to retrigger.  Older reports indicated a write
-of 0xff to the (read-only) MSI capability ID register, while more
-recently a write of 0x0 is observed at config space offset 0x704,
-non-architected, extended config space of the device (BAR0 offset
-0x88704).  Virtualization of this range is only required for GeForce.
+>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>> index 4132f67bb1..172c9f2001 100644
+>> --- a/target/ppc/translate.c
+>> +++ b/target/ppc/translate.c
+>> @@ -3933,12 +3933,8 @@ static inline void gen_op_mfspr(DisasContext *ctx)
+>>               * allowing userland application to read the PVR
+>>               */
+>>              if (sprn !=3D SPR_PVR) {
+>> -                fprintf(stderr, "Trying to read privileged spr %d (0x%0=
+3x) at "
+>> -                        TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+>> -                if (qemu_log_separate()) {
+>> -                    qemu_log("Trying to read privileged spr %d (0x%03x)=
+ at "
+>> -                             TARGET_FMT_lx "\n", sprn, sprn, ctx->nip -=
+ 4);
+>> -                }
+>> +                qemu_log("Trying to read privileged spr %d (0x%03x) at "
+>> +                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+>
+> I wonder whether that should maybe rather be a
+> qemu_log_mask(LOG_GUEST_ERROR, ...) instead? Well, but maybe that's
+> subject to another patch...
 
-Thanks,
-Alex
+qemu_log_separate() appears to be always used like this
 
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  hw/vfio/pci-quirks.c |    9 ++++++---
->  hw/vfio/pci.c        |    2 ++
->  hw/vfio/pci.h        |    1 +
->  3 files changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 60ad5fb91a83..e5779a7ad35b 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -542,7 +542,8 @@ static void vfio_vga_probe_nvidia_3d0_quirk(VFIOPCIDevice *vdev)
->      VFIOQuirk *quirk;
->      VFIONvidia3d0Quirk *data;
->  
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-> +    if (vdev->no_geforce_quirks ||
-> +        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
->          !vdev->bars[1].region.size) {
->          return;
->      }
-> @@ -660,7 +661,8 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
->      VFIONvidiaBAR5Quirk *bar5;
->      VFIOConfigWindowQuirk *window;
->  
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-> +    if (vdev->no_geforce_quirks ||
-> +        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
->          !vdev->vga || nr != 5 || !vdev->bars[5].ioport) {
->          return;
->      }
-> @@ -754,7 +756,8 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
->      VFIOQuirk *quirk;
->      VFIOConfigMirrorQuirk *mirror;
->  
-> -    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
-> +    if (vdev->no_geforce_quirks ||
-> +        !vfio_pci_is(vdev, PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID) ||
->          !vfio_is_vga(vdev) || nr != 0) {
->          return;
->      }
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 2c7129512563..6d260b92c1e1 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2989,6 +2989,8 @@ static Property vfio_pci_dev_properties[] = {
->      DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
->      DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
->      DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
-> +    DEFINE_PROP_BOOL("x-no-geforce-quirks", VFIOPCIDevice,
-> +                     no_geforce_quirks, false),
->      DEFINE_PROP_UINT32("x-pci-vendor-id", VFIOPCIDevice, vendor_id, PCI_ANY_ID),
->      DEFINE_PROP_UINT32("x-pci-device-id", VFIOPCIDevice, device_id, PCI_ANY_ID),
->      DEFINE_PROP_UINT32("x-pci-sub-vendor-id", VFIOPCIDevice,
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index a8fb3b34222c..7c55087a1c44 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -142,6 +142,7 @@ typedef struct VFIOPCIDevice {
->      bool no_kvm_intx;
->      bool no_kvm_msi;
->      bool no_kvm_msix;
-> +    bool no_geforce_quirks;
->  } VFIOPCIDevice;
->  
->  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-> 
+    fprintf(stderr, ... the message ...);
+    if (qemu_log_separate()) {
+        qemu_log(... the same message ...);
+    }
+
+Are you proposing to replace this pattern by
+
+    qemu_log_mask(LOG_GUEST_ERROR, ...the message ...);
+
+?
+
+>>              }
+>>              gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
+>>          }
+[...]
