@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eiiCj-0006Ol-Kp
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:57:10 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eiiJm-000429-1z
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eiiCg-0005JY-ER
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:57:09 -0500
-Received: from mga04.intel.com ([192.55.52.120]:20501)
+	(envelope-from <imammedo@redhat.com>) id 1eiiJi-0006nH-Qn
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
-	id 1eiiCg-0005Hq-4Q
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:57:06 -0500
-From: Jianfeng Tan <jianfeng.tan@intel.com>
-Date: Mon,  5 Feb 2018 14:58:55 +0000
-Message-Id: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
-Subject: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eiiJi-0006m9-Ha
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:22 -0500
+Date: Mon, 5 Feb 2018 16:04:18 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180205160418.34544e1f@redhat.com>
+In-Reply-To: <1517811767-75958-3-git-send-email-mjc@sifive.com>
+References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
+	<1517811767-75958-3-git-send-email-mjc@sifive.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 03/22] RISC-V CPU Core Definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jianfeng Tan <jianfeng.tan@intel.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-Existing VMs with virtio devices and vhost-kernel as the backend
-are always started with mem config:
+On Mon,  5 Feb 2018 19:22:28 +1300
+Michael Clark <mjc@sifive.com> wrote:
 
-  "-m xG"
-  (with a ram block named "pc.ram")
+> Add CPU state header, CPU definitions and initialization routines
+> 
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
+>  target/riscv/cpu.c      | 385 ++++++++++++++++++++++++++++++++++++++++++++
+>  target/riscv/cpu.h      | 256 +++++++++++++++++++++++++++++
+>  target/riscv/cpu_bits.h | 417 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 1058 insertions(+)
+>  create mode 100644 target/riscv/cpu.c
+>  create mode 100644 target/riscv/cpu.h
+>  create mode 100644 target/riscv/cpu_bits.h
+> 
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> new file mode 100644
+> index 0000000..684b78b
+> --- /dev/null
+> +++ b/target/riscv/cpu.c
+[...]
+> +
+> +static const RISCVCPUInfo riscv_cpus[] = {
+> +#ifdef CONFIG_USER_ONLY
+> +    { TYPE_RISCV_CPU_ANY,                riscv_any_cpu_init },
+> +#else
+> +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09, riscv_imafdcsu_priv1_9_cpu_init },
+> +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10, riscv_imafdcsu_priv1_10_cpu_init },
+> +    { TYPE_RISCV_CPU_IMACU_PRIV_1_10,    riscv_imacu_priv1_10_cpu_init },
+> +    { TYPE_RISCV_CPU_IMAC_PRIV_1_10,     riscv_imac_priv1_10_cpu_init },
+> +#endif
+> +    { NULL, NULL }
+> +};
+> +
+[...]
+> +static void cpu_register(const RISCVCPUInfo *info)
+> +{
+> +    TypeInfo type_info = {
+> +        .name = info->name,
+> +        .parent = TYPE_RISCV_CPU,
+> +        .instance_size = sizeof(RISCVCPU),
+> +        .instance_init = info->initfn,
+> +    };
+> +
+> +    type_register(&type_info);
+> +}
+> +
+> +static const TypeInfo riscv_cpu_type_info = {
+> +    .name = TYPE_RISCV_CPU,
+> +    .parent = TYPE_CPU,
+> +    .instance_size = sizeof(RISCVCPU),
+> +    .instance_init = riscv_cpu_init,
+> +    .abstract = false,
+> +    .class_size = sizeof(RISCVCPUClass),
+> +    .class_init = riscv_cpu_class_init,
+> +};
+[...]
 
-while new VMs with virtio devices and vhost-user as the backend
-are always started with mem config:
+> +static void riscv_cpu_register_types(void)
+> +{
+> +    const RISCVCPUInfo *info = riscv_cpus;
+> +
+> +    type_register_static(&riscv_cpu_type_info);
+> +
+> +    while (info->name) {
+> +        cpu_register(info);
+> +        info++;
+> +    }
+> +}
+> +
+> +type_init(riscv_cpu_register_types)
+For simplistic type definitions like that,
+above parts should use DEFINE_TYPES(), see c6678108 for reference.
 
-  "-m xG -numa node,memdev=pc.ram -object memory-backend-file,id=pc.ram,..."
-  (with a ram block named "/object/pc.ram")
 
-As we migrate from vhost-kernel to vhost-user, it failes as:
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> new file mode 100644
+> index 0000000..8b816ae
+> --- /dev/null
+> +++ b/target/riscv/cpu.h
+[...]
+> +#define TYPE_RISCV_CPU                    "riscv"
+> +#define TYPE_RISCV_CPU_ANY                "riscv-any"
+> +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09 "riscv-imafdcsu-priv1.9"
+> +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10 "riscv-imafdcsu-priv1.10"
+> +#define TYPE_RISCV_CPU_IMACU_PRIV_1_10    "riscv-imacu-priv1.10"
+> +#define TYPE_RISCV_CPU_IMAC_PRIV_1_10     "riscv-imac-priv1.10"
+> +
+> +#define RISCV_CPU_TYPE_PREFIX TYPE_RISCV_CPU "-"
+> +#define RISCV_CPU_TYPE_NAME(name) (RISCV_CPU_TYPE_PREFIX name)
+it still uses prefix notation versus commonly used suffix in form of
+ "targetFOO-cpu"
+this prefix approach would get in the way if we try to generalize
+naming <-> type conversion later[*].
+So it would better to be consistent with approach qemu uses for cpu types
+(I believe power had prefix based pnv types but it has been fixed
+to common suffix based pattern later).
 
-  Unknown ramblock "pc.ram", cannot accept migration
-  error while loading state for instance 0x0 of device 'ram'
-  load of migration failed: Invalid argument
-
-Here are some options to fix this:
-
-1. When we do ram name comparison, we truncate the prefix as this patch shows.
-It cannot cover the corner case: the source VM could have two ram blocks
-with name of "pc.ram" and "/object/pc.ram".
-
-2. We add an alias name to RAMBlock; when we do name comparison, not only
-idstr is compared, but also compared to the alias. But this will add more
-complexity to upper layer stack OpenStack/libvirt.
-
-Any thoughts?
-
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Jianfeng Tan <jianfeng.tan@intel.com>
----
- exec.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/exec.c b/exec.c
-index 4722e52..d294e5c 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2334,13 +2334,24 @@ found:
- RAMBlock *qemu_ram_block_by_name(const char *name)
- {
-     RAMBlock *block;
-+    char *name1, *id1;
-+    char *name2, *id2;
-+
-+    name1 = strdup(name);
-+    id1 = basename(name1);
- 
-     RAMBLOCK_FOREACH(block) {
--        if (!strcmp(name, block->idstr)) {
-+        name2 = strdup(block->idstr);
-+	id2 = basename(name2);
-+        if (!strcmp(id1, id2)) {
-+            free(name1);
-+	    free(name2);
-             return block;
-         }
-+	free(name2);
-     }
- 
-+    free(name1);
-     return NULL;
- }
- 
--- 
-2.7.4
+* discussion on thread "[PATCH v5 0/6]  Add a valid_cpu_types property"
