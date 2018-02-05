@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiXp-00083h-Gc
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:18:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiXv-0008EE-US
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:19:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiXn-0005Vl-PG
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:18:57 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiXu-0005lS-OJ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:19:03 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:12 +0100
-Message-Id: <20180205151835.20812-4-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:13 +0100
+Message-Id: <20180205151835.20812-5-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 03/26] block: Add BDS.backing_overridden
+Subject: [Qemu-devel] [PATCH v8 04/26] iotests: Drop explicit base blockdev
+ in 191
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,132 +23,173 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-If the backing file is overridden, this most probably does change the
-guest-visible data of a BDS. Therefore, we will need to consider this in
-bdrv_refresh_filename().
+Overriding the backing image should result in a json:{} pseudo-filename.
+Then, you can no longer use the commit block job with filename
+parameters.  Therefore, do not explicitly add the base and override the
+middle image in iotest 191, since we do not need to anyway.  This will
+allow us to continue to use the middle image's filename to identify it.
 
-Adding a new field to the BDS is not nice, but it is very simple and
-exactly keeps track of whether the backing file has been overridden.
-
-This commit adds a FIXME which will be remedied by a follow-up commit.
-Until then, the respective piece of code will not result in any behavior
-that is worse than what we currently have.
+In the long run, we want block-commit to accept node names for base and
+top (just like block-stream does).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- include/block/block_int.h |  1 +
- block.c                   | 13 +++++++++++++
- block/mirror.c            |  4 ++++
- blockdev.c                | 16 ++++++++++++++++
- 4 files changed, 34 insertions(+)
+ tests/qemu-iotests/191     |  3 +--
+ tests/qemu-iotests/191.out | 52 +++++++++++++++++++++++-----------------------
+ 2 files changed, 27 insertions(+), 28 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 29cafa4236..b5c124fcbd 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -619,6 +619,7 @@ struct BlockDriverState {
-     char backing_file[PATH_MAX]; /* if non zero, the image is a diff of
-                                     this file image */
-     char backing_format[16]; /* if non-zero and backing_file exists */
-+    bool backing_overridden; /* backing file has been specified by the user */
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+index dfad6555e4..af93e932bf 100755
+--- a/tests/qemu-iotests/191
++++ b/tests/qemu-iotests/191
+@@ -66,8 +66,7 @@ qemu_comm_method="qmp"
+ qmp_pretty="y"
  
-     QDict *full_open_options;
-     char exact_filename[PATH_MAX];
-diff --git a/block.c b/block.c
-index b84aba2d95..66e37219b9 100644
---- a/block.c
-+++ b/block.c
-@@ -2268,6 +2268,11 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-     reference = qdict_get_try_str(parent_options, bdref_key);
-     if (reference || qdict_haskey(options, "file.filename")) {
-         backing_filename[0] = '\0';
-+
-+        /* FIXME: Should also be set to true if @options contains other runtime
-+         *        options which control the data that is read from the backing
-+         *        BDS */
-+        bs->backing_overridden = true;
-     } else if (bs->backing_file[0] == '\0' && qdict_size(options) == 0) {
-         QDECREF(options);
-         goto free_exit;
-@@ -2469,6 +2474,9 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-         goto out;
-     }
- 
-+    bs_snapshot->backing_overridden = true;
-+    bdrv_refresh_filename(bs_snapshot);
-+
- out:
-     QDECREF(snapshot_options);
-     g_free(tmp_filename);
-@@ -2599,6 +2607,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-     backing = qdict_get_try_str(options, "backing");
-     if (backing && *backing == '\0') {
-         flags |= BDRV_O_NO_BACKING;
-+        bs->backing_overridden = true;
-         qdict_del(options, "backing");
-     }
- 
-@@ -5031,6 +5040,10 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-      * refresh those first */
-     QLIST_FOREACH(child, &bs->children, next) {
-         bdrv_refresh_filename(child->bs);
-+
-+        if (child->role == &child_backing && child->bs->backing_overridden) {
-+            bs->backing_overridden = true;
-+        }
-     }
- 
-     if (drv->bdrv_refresh_filename) {
-diff --git a/block/mirror.c b/block/mirror.c
-index 5a627ba589..aa68531352 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -530,6 +530,10 @@ static void mirror_exit(BlockJob *job, void *opaque)
-             error_report_err(local_err);
-             data->ret = -EPERM;
+ _launch_qemu \
+-    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.base,node-name=base" \
+-    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.mid,node-name=mid,backing=base" \
++    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.mid,node-name=mid" \
+     -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG},node-name=top,backing=mid" \
+     -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.ovl2,node-name=top2,backing=mid"
+ h=$QEMU_HANDLE
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+index 190c5f049a..575cd3ea2d 100644
+--- a/tests/qemu-iotests/191.out
++++ b/tests/qemu-iotests/191.out
+@@ -184,33 +184,21 @@ wrote 65536/65536 bytes at offset 1048576
+             "iops_rd": 0,
+             "detect_zeroes": "off",
+             "image": {
+-                "backing-image": {
+-                    "virtual-size": 67108864,
+-                    "filename": "TEST_DIR/t.IMGFMT.base",
+-                    "cluster-size": 65536,
+-                    "format": "IMGFMT",
+-                    "actual-size": SIZE,
+-                    "dirty-flag": false
+-                },
+-                "backing-filename-format": "IMGFMT",
+                 "virtual-size": 67108864,
+-                "filename": "TEST_DIR/t.IMGFMT.mid",
++                "filename": "TEST_DIR/t.IMGFMT.base",
+                 "cluster-size": 65536,
+                 "format": "IMGFMT",
+                 "actual-size": SIZE,
+-                "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
+-                "backing-filename": "TEST_DIR/t.IMGFMT.base",
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+-            "ro": false,
+-            "node-name": "mid",
+-            "backing_file_depth": 1,
++            "ro": true,
++            "node-name": "NODE_NAME",
++            "backing_file_depth": 0,
+             "drv": "IMGFMT",
+             "iops": 0,
+             "bps_wr": 0,
+             "write_threshold": 0,
+-            "backing_file": "TEST_DIR/t.IMGFMT.base",
+             "encrypted": false,
+             "bps": 0,
+             "bps_rd": 0,
+@@ -219,7 +207,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "TEST_DIR/t.IMGFMT.mid",
++            "file": "TEST_DIR/t.IMGFMT.base",
+             "encryption_key_missing": false
+         },
+         {
+@@ -227,13 +215,13 @@ wrote 65536/65536 bytes at offset 1048576
+             "detect_zeroes": "off",
+             "image": {
+                 "virtual-size": 393216,
+-                "filename": "TEST_DIR/t.IMGFMT.mid",
++                "filename": "TEST_DIR/t.IMGFMT.base",
+                 "format": "file",
+                 "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+-            "ro": false,
++            "ro": true,
+             "node-name": "NODE_NAME",
+             "backing_file_depth": 0,
+             "drv": "file",
+@@ -248,28 +236,40 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "TEST_DIR/t.IMGFMT.mid",
++            "file": "TEST_DIR/t.IMGFMT.base",
+             "encryption_key_missing": false
+         },
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
+             "image": {
++                "backing-image": {
++                    "virtual-size": 67108864,
++                    "filename": "TEST_DIR/t.IMGFMT.base",
++                    "cluster-size": 65536,
++                    "format": "IMGFMT",
++                    "actual-size": SIZE,
++                    "dirty-flag": false
++                },
++                "backing-filename-format": "IMGFMT",
+                 "virtual-size": 67108864,
+-                "filename": "TEST_DIR/t.IMGFMT.base",
++                "filename": "TEST_DIR/t.IMGFMT.mid",
+                 "cluster-size": 65536,
+                 "format": "IMGFMT",
+                 "actual-size": SIZE,
++                "full-backing-filename": "TEST_DIR/t.IMGFMT.base",
++                "backing-filename": "TEST_DIR/t.IMGFMT.base",
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+             "ro": false,
+-            "node-name": "base",
+-            "backing_file_depth": 0,
++            "node-name": "mid",
++            "backing_file_depth": 1,
+             "drv": "IMGFMT",
+             "iops": 0,
+             "bps_wr": 0,
+             "write_threshold": 0,
++            "backing_file": "TEST_DIR/t.IMGFMT.base",
+             "encrypted": false,
+             "bps": 0,
+             "bps_rd": 0,
+@@ -278,7 +278,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "TEST_DIR/t.IMGFMT.base",
++            "file": "TEST_DIR/t.IMGFMT.mid",
+             "encryption_key_missing": false
+         },
+         {
+@@ -286,7 +286,7 @@ wrote 65536/65536 bytes at offset 1048576
+             "detect_zeroes": "off",
+             "image": {
+                 "virtual-size": 393216,
+-                "filename": "TEST_DIR/t.IMGFMT.base",
++                "filename": "TEST_DIR/t.IMGFMT.mid",
+                 "format": "file",
+                 "actual-size": SIZE,
+                 "dirty-flag": false
+@@ -307,7 +307,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "TEST_DIR/t.IMGFMT.base",
++            "file": "TEST_DIR/t.IMGFMT.mid",
+             "encryption_key_missing": false
          }
-+
-+        /* The target image's file already has been created with the backing
-+         * file we just set, so there is no need to set backing_overridden or
-+         * call bdrv_refresh_filename(). */
-     }
- 
-     if (s->to_replace) {
-diff --git a/blockdev.c b/blockdev.c
-index 8e977eef11..bbe264c3c0 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1795,6 +1795,8 @@ static void external_snapshot_commit(BlkActionState *common)
- {
-     ExternalSnapshotState *state =
-                              DO_UPCAST(ExternalSnapshotState, common, common);
-+    TransactionAction *action = common->action;
-+    bool image_was_existing = false;
-     AioContext *aio_context;
- 
-     aio_context = bdrv_get_aio_context(state->old_bs);
-@@ -1808,6 +1810,20 @@ static void external_snapshot_commit(BlkActionState *common)
-                     NULL);
-     }
- 
-+    if (action->type == TRANSACTION_ACTION_KIND_BLOCKDEV_SNAPSHOT_SYNC) {
-+        BlockdevSnapshotSync *s = action->u.blockdev_snapshot_sync.data;
-+        if (s->has_mode && s->mode == NEW_IMAGE_MODE_EXISTING) {
-+            image_was_existing = true;
-+        }
-+    } else {
-+        image_was_existing = true;
-+    }
-+
-+    if (image_was_existing) {
-+        state->new_bs->backing_overridden = true;
-+        bdrv_refresh_filename(state->new_bs);
-+    }
-+
-     aio_context_release(aio_context);
- }
- 
+     ]
 -- 
 2.14.3
