@@ -1,41 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eidYK-0008DO-HS
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:59:10 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eidhL-0004qx-NN
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:08:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eidYH-0001dn-FZ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:59:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56728
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eidYH-0001dT-97
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:59:05 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w159wrWI059889
-	for <qemu-devel@nongnu.org>; Mon, 5 Feb 2018 04:59:04 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fxmudgp13-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 04:59:03 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 5 Feb 2018 09:59:01 -0000
-References: <20180205090912.6110-1-david@redhat.com>
-	<d3ce48fe-18a1-2279-f578-8697fec6e4a3@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 5 Feb 2018 10:58:57 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eidhK-00071E-FT
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:08:27 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:51451)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eidhK-00070T-8e
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:08:26 -0500
+Received: by mail-wm0-x244.google.com with SMTP id r71so25042994wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 02:08:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d3ce48fe-18a1-2279-f578-8697fec6e4a3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <1020f035-938b-53d4-ca79-32d7726cf0aa@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/cpumodel: model PTFF subfunctions
- for Multiple-epoch facility
+In-Reply-To: <20180205054725.25634-3-famz@redhat.com>
+References: <20180205054725.25634-1-famz@redhat.com>
+	<20180205054725.25634-3-famz@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 5 Feb 2018 11:08:24 +0100
+Message-ID: <CAJ+F1CKUWStNiz2rO94QquC=yDFxNEeaemJBh-jN4Zci2sZ+ww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] README: Document 'git-publish'
+ workflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,147 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+
+On Mon, Feb 5, 2018 at 6:47 AM, Fam Zheng <famz@redhat.com> wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+
+Looks good, thanks,
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
-
-On 02/05/2018 10:34 AM, David Hildenbrand wrote:
-> On 05.02.2018 10:09, David Hildenbrand wrote:
->> For now, the kernel does not properly indicate configured CPU subfunctions
->> to the guest, but simply uses the host values (as support in KVM is still
->> missing). That's why we missed to model the PTFF subfunctions that come
->> with Multiple-epoch facility.
->>
->> Let's properly add these, along with a new feature group.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/cpu_features.c     |  5 +++++
->>  target/s390x/cpu_features_def.h |  4 ++++
->>  target/s390x/gen-features.c     | 10 ++++++++++
->>  3 files changed, 19 insertions(+)
->>
->> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
->> index 85d10b5710..8606e52ca0 100644
->> --- a/target/s390x/cpu_features.c
->> +++ b/target/s390x/cpu_features.c
->> @@ -156,8 +156,12 @@ static const S390FeatDef s390_features[] = {
->>      FEAT_INIT("ptff-qpc", S390_FEAT_TYPE_PTFF, 3, "PTFF Query Physical Clock"),
->>      FEAT_INIT("ptff-qui", S390_FEAT_TYPE_PTFF, 4, "PTFF Query UTC Information"),
->>      FEAT_INIT("ptff-qtou", S390_FEAT_TYPE_PTFF, 5, "PTFF Query TOD Offset User"),
->> +    FEAT_INIT("ptff-qsie", S390_FEAT_TYPE_PTFF, 10, "PTFF Query Steering Information Extended"),
->> +    FEAT_INIT("ptff-qtoue", S390_FEAT_TYPE_PTFF, 13, "PTFF Query TOD Offset User Extended"),
->>      FEAT_INIT("ptff-sto", S390_FEAT_TYPE_PTFF, 65, "PTFF Set TOD Offset"),
->>      FEAT_INIT("ptff-stou", S390_FEAT_TYPE_PTFF, 69, "PTFF Set TOD Offset User"),
->> +    FEAT_INIT("ptff-stoe", S390_FEAT_TYPE_PTFF, 73, "PTFF Set TOD Offset Extended"),
->> +    FEAT_INIT("ptff-stoue", S390_FEAT_TYPE_PTFF, 77, "PTFF Set TOD Offset User Extended"),
->>  
->>      FEAT_INIT("kmac-dea", S390_FEAT_TYPE_KMAC, 1, "KMAC DEA"),
->>      FEAT_INIT("kmac-tdea-128", S390_FEAT_TYPE_KMAC, 2, "KMAC TDEA-128"),
->> @@ -445,6 +449,7 @@ static S390FeatGroupDef s390_feature_groups[] = {
->>      FEAT_GROUP_INIT("plo", PLO, "Perform-locked-operation facility"),
->>      FEAT_GROUP_INIT("tods", TOD_CLOCK_STEERING, "Tod-clock-steering facility"),
->>      FEAT_GROUP_INIT("gen13ptff", GEN13_PTFF, "PTFF enhancements introduced with z13"),
->> +    FEAT_GROUP_INIT("mepochptff", MEPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
->>      FEAT_GROUP_INIT("msa", MSA, "Message-security-assist facility"),
->>      FEAT_GROUP_INIT("msa1", MSA_EXT_1, "Message-security-assist-extension 1 facility"),
->>      FEAT_GROUP_INIT("msa2", MSA_EXT_2, "Message-security-assist-extension 2 facility"),
->> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
->> index 4d930871b4..7c5915c7b2 100644
->> --- a/target/s390x/cpu_features_def.h
->> +++ b/target/s390x/cpu_features_def.h
->> @@ -151,8 +151,12 @@ typedef enum {
->>      S390_FEAT_PTFF_QPT,
->>      S390_FEAT_PTFF_QUI,
->>      S390_FEAT_PTFF_QTOU,
->> +    S390_FEAT_PTFF_QSIE,
->> +    S390_FEAT_PTFF_QTOUE,
->>      S390_FEAT_PTFF_STO,
->>      S390_FEAT_PTFF_STOU,
->> +    S390_FEAT_PTFF_STOE,
->> +    S390_FEAT_PTFF_STOUE,
->>  
->>      /* KMAC */
->>      S390_FEAT_KMAC_DEA,
->> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->> index 58b6ac484e..8c04ff913f 100644
->> --- a/target/s390x/gen-features.c
->> +++ b/target/s390x/gen-features.c
->> @@ -59,6 +59,12 @@
->>      S390_FEAT_PTFF_QTOU, \
->>      S390_FEAT_PTFF_STOU
->>  
->> +#define S390_FEAT_GROUP_MEPOCH_PTFF \
->> +    S390_FEAT_PTFF_QSIE, \
->> +    S390_FEAT_PTFF_QTOUE, \
->> +    S390_FEAT_PTFF_STOE, \
->> +    S390_FEAT_PTFF_STOUE
->> +
->>  #define S390_FEAT_GROUP_MSA \
->>      S390_FEAT_MSA, \
->>      S390_FEAT_KMAC_DEA, \
->> @@ -219,6 +225,9 @@ static uint16_t group_TOD_CLOCK_STEERING[] = {
->>  static uint16_t group_GEN13_PTFF[] = {
->>      S390_FEAT_GROUP_GEN13_PTFF,
->>  };
->> +static uint16_t group_MEPOCH_PTFF[] = {
->> +    S390_FEAT_GROUP_MEPOCH_PTFF,
->> +};
->>  static uint16_t group_MSA[] = {
->>      S390_FEAT_GROUP_MSA,
->>  };
->> @@ -665,6 +674,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
->>      FEAT_GROUP_INITIALIZER(PLO),
->>      FEAT_GROUP_INITIALIZER(TOD_CLOCK_STEERING),
->>      FEAT_GROUP_INITIALIZER(GEN13_PTFF),
->> +    FEAT_GROUP_INITIALIZER(MEPOCH_PTFF),
->>      FEAT_GROUP_INITIALIZER(MSA),
->>      FEAT_GROUP_INITIALIZER(MSA_EXT_1),
->>      FEAT_GROUP_INITIALIZER(MSA_EXT_2),
->>
-> 
-> Guess this hunk is missing:
-> 
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 8c04ff913f..cfb371dac3 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -475,6 +475,7 @@ static uint16_t full_GEN14_GA1[] = {
->      S390_FEAT_CMM_NT,
->      S390_FEAT_HPMA2,
->      S390_FEAT_SIE_KSS,
-> +    S390_FEAT_GROUP_MEPOCH_PTFF,
->  };
-> 
->  /* Default features (in order of release)
-> 
-> 
-> And we should most probably add this:
-
-Can you do a respin? I can then do a test on a z14.
-
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index bfd14723f1..deb870921b 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2221,6 +2221,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
->          return;
->      }
-> 
-> +    /* PTFF subfunctions might be indicated although kernel support missing */
-> +    if (!test_bit(S390_FEAT_MULTIPLE_EPOCH, model->features)) {
-> +        clear_bit(S390_FEAT_PTFF_QSIE, model->features);
-> +        clear_bit(S390_FEAT_PTFF_QTOUE, model->features);
-> +        clear_bit(S390_FEAT_PTFF_STOE, model->features);
-> +        clear_bit(S390_FEAT_PTFF_STOUE, model->features);
-> +    }
+> ---
+>  README | 30 +++++++++++++++++++++++++++++-
+>  1 file changed, 29 insertions(+), 1 deletion(-)
+>
+> diff --git a/README b/README
+> index b92a07a61a..d1a944ce20 100644
+> --- a/README
+> +++ b/README
+> @@ -56,7 +56,7 @@ The QEMU source code is maintained under the GIT versio=
+n control system.
+>
+>     git clone git://git.qemu.org/qemu.git
+>
+> -When submitting patches, the preferred approach is to use 'git
+> +When submitting patches, one common approach is to use 'git
+>  format-patch' and/or 'git send-email' to format & send the mail to the
+>  qemu-devel@nongnu.org mailing list. All patches submitted must contain
+>  a 'Signed-off-by' line from the author. Patches should follow the
+> @@ -68,6 +68,34 @@ the QEMU website
+>    https://qemu.org/Contribute/SubmitAPatch
+>    https://qemu.org/Contribute/TrivialPatches
+>
+> +A 'git-profile' utility was created to make above process less
+> +cumbersome, and is highly recommended for making regular contributions,
+> +or even just for sending consecutive patch series revisions. It also
+> +requires a working 'git send-email' setup, and by default doesn't
+> +automate everything, so you may want to go through the above steps
+> +manually for once.
 > +
->      /* with cpu model support, CMM is only indicated if really available */
->      if (kvm_s390_cmma_available()) {
->          set_bit(S390_FEAT_CMM, model->features);
-> 
-> 
-> Unfortunately I don't have access to a z14.
-> 
+> +For installation instructions, please go to
+> +
+> +  https://github.com/stefanha/git-publish
+> +
+> +The workflow with 'git-publish' is:
+> +
+> +  $ git checkout master -b my-feature
+> +  $ # work on new commits, add your 'Signed-off-by' lines to each
+> +  $ git publish
+> +
+> +Your patch series will be sent and tagged as my-feature-v1 if you need t=
+o refer
+> +back to it in the future.
+> +
+> +Sending v2:
+> +
+> +  $ git checkout my-feature # same topic branch
+> +  $ # making changes to the commits (using 'git rebase', for example)
+> +  $ git publish
+> +
+> +Your patch series will be sent with 'v2' tag in the subject and the git =
+tip
+> +will be tagged as my-feature-v2.
+>
+>  Bug reporting
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --
+> 2.14.3
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
