@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eiheS-0006rT-5R
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:21:46 -0500
+	(envelope-from <armbru@redhat.com>) id 1eihjP-00036j-UE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eiheN-0003Sq-GB
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:21:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:28275)
+	(envelope-from <armbru@redhat.com>) id 1eihjK-0007Qg-U7
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:26:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37608)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eiheN-0003SC-59
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:21:39 -0500
-Date: Mon, 5 Feb 2018 14:21:27 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180205142127.GA28241@stefanha-x1.localdomain>
-References: <20180205054725.25634-1-famz@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eihjK-0007Q3-Nl
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:26:46 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-13-armbru@redhat.com>
+	<CAMxuvazW5+FzsFPq2+=jyktw+WMabKw0cMtM4N40JRLTz=C_iA@mail.gmail.com>
+Date: Mon, 05 Feb 2018 15:26:38 +0100
+In-Reply-To: <CAMxuvazW5+FzsFPq2+=jyktw+WMabKw0cMtM4N40JRLTz=C_iA@mail.gmail.com>
+	(Marc-Andre Lureau's message of "Mon, 5 Feb 2018 14:45:26 +0100")
+Message-ID: <87y3k7v7fl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="k+w/mQv8wyuph6w0"
-Content-Disposition: inline
-In-Reply-To: <20180205054725.25634-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] Add git-publish config file
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 12/21] qapi: Concentrate
+ QAPISchemaParser.exprs updates in .__init__()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
+To: Marc-Andre Lureau <mlureau@redhat.com>
+Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
+Marc-Andre Lureau <mlureau@redhat.com> writes:
 
---k+w/mQv8wyuph6w0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+> It's not obvious the motivation behind this change (beside behind more
+> elegant), but
 
-On Mon, Feb 05, 2018 at 01:47:23PM +0800, Fam Zheng wrote:
-> v3: Fix trivial hunk placement. [Michael]
->     Fix PPC sub-list. [Michael]
->=20
-> v2: Add README paragraph [Marc-Andr=E9, Stefan]
->     Fix 'trivial' profile [Marc-Andr=E9]
->     Rename profiles [Stefan]
->=20
-> Fam Zheng (2):
->   Add a git-publish configuration file
->   README: Document 'git-publish' workflow
->=20
->  .gitpublish | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++
->  README      | 30 +++++++++++++++++++++++++++++-
->  2 files changed, 87 insertions(+), 1 deletion(-)
->  create mode 100644 .gitpublish
->=20
-> --=20
-> 2.14.3
+At one point during my search for a good way to record includes in the
+parse tree, updating .exprs in two places got in the way, so I cleaned
+it up.  I guess it's not in the way of the solution I eventually chose,
+but I consider it a worthwhile little cleanup on its own.
 
-I fixed two small issues in README when applying:
-s/git-profile/git-publish/ and s/for once/the first time/
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---k+w/mQv8wyuph6w0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaeGhnAAoJEJykq7OBq3PIhacH/3Mnz1cQSs++Exa+VCoaJgkr
-oPtPYmSVVjd87BN4LUZ18AYjFc7DSppWzzqZdzy6P/ezEBu3eYqcJOvtNfvZsvd+
-3I5/xFJcc0aJgKASuukmsjiseW+RTFEg2vzJpE+dgh2utEa/fSQYTcdh8b8vXxTI
-mGZc4O4imw6CYovL2JFAybKktTzXhTzvJt6jhCGGa++cyhZO6+CJqDrEBdL6p73F
-jR1FHi+X59Q7mQg0QvV7s924Y3nI/YDHXYqI7YoTTfDTz+E3VGQ9314tWXKCbBdt
-GH4SunmDNSlBn/f0FTnFL6fiMoaJ+zAoEmrx+To1PwTKzvp4uTJbSuNgv03PL2I=
-=bfT+
------END PGP SIGNATURE-----
-
---k+w/mQv8wyuph6w0--
+Thanks!
