@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eik6b-00026l-1D
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:58:57 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eikGf-0004nk-Rj
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 12:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eik6X-0003pM-VJ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:58:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eik6X-0003mP-Pe
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:58:53 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180111213250.16511-1-marcandre.lureau@redhat.com>
-	<20180111213250.16511-42-marcandre.lureau@redhat.com>
-Date: Mon, 05 Feb 2018 17:58:49 +0100
-In-Reply-To: <20180111213250.16511-42-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 11 Jan 2018
-	22:32:40 +0100")
-Message-ID: <87fu6fid9y.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1eikGe-0002GT-GE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 12:09:21 -0500
+Date: Mon, 5 Feb 2018 18:09:10 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180205180910.16b8a5ba@redhat.com>
+In-Reply-To: <1516694904-64879-26-git-send-email-imammedo@redhat.com>
+References: <1516694904-64879-1-git-send-email-imammedo@redhat.com>
+	<1516694904-64879-26-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 41/51] qapi: add -i/--include filename.h
+Subject: Re: [Qemu-devel] [PATCH v3 25/25] cpu: get rid of cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Tue, 23 Jan 2018 09:08:24 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-> Add a new option to add user-specified #include lines in the generated
-> headers. This will help to split a schema, where one generated header
-> will depend on another.
->
-> Fix some pycodestyle on the way.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> There aren't any users of the helper left, remove it.
+after rebase this patch nor longer does what subj says
+and it should be squashed into 23/25 where cpu_generic_init() is removed,
+so pls ignore this patch I'll post v4 for 23/25 with this squashed in
+and actual removal of not used MachineState::cpu_model
+which I've lost on rebase.
 
-With my alternative way to split up the generated monolith[*], required
-generated headers should be included without the user's help.
-
-We might conceivably need an ability to add includes for other purposes.
-As far as I can tell, this is not the case in your series.
-
-If we need the ability, then I'd rather use a directive in the schema
-than a command line option.
-
-
-[*] [PATCH RFC 00/21] Modularize generated QAPI code
-Message-Id: <20180202130336.24719-1-armbru@redhat.com>
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: Richard Henderson <richard.henderson@linaro.org>
+> CC: "Emilio G. Cota" <cota@braap.org>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+> CC: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> ---
+>  qom/cpu.c | 17 ++---------------
+>  1 file changed, 2 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index aab8437..cf6880d 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -304,22 +304,9 @@ static ObjectClass *cpu_common_class_by_name(const c=
+har *cpu_model)
+>  static void cpu_common_parse_features(const char *typename, char *featur=
+es,
+>                                        Error **errp)
+>  {
+> -    char *featurestr; /* Single "key=3Dvalue" string being parsed */
+>      char *val;
+> -    static bool cpu_globals_initialized;
+> -
+> -    /* TODO: all callers of ->parse_features() need to be changed to
+> -     * call it only once, so we can remove this check (or change it
+> -     * to assert(!cpu_globals_initialized).
+> -     * Current callers of ->parse_features() are:
+> -     * - cpu_generic_init()
+> -     */
+> -    if (cpu_globals_initialized) {
+> -        return;
+> -    }
+> -    cpu_globals_initialized =3D true;
+> -
+> -    featurestr =3D features ? strtok(features, ",") : NULL;
+> +    /* Single "key=3Dvalue" string being parsed */
+> +    char *featurestr =3D features ? strtok(features, ",") : NULL;
+> =20
+>      while (featurestr) {
+>          val =3D strchr(featurestr, '=3D');
