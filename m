@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eiiJm-000429-1z
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:27 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eiiJw-00049i-9V
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eiiJi-0006nH-Qn
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eiiJi-0006m9-Ha
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:22 -0500
-Date: Mon, 5 Feb 2018 16:04:18 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180205160418.34544e1f@redhat.com>
-In-Reply-To: <1517811767-75958-3-git-send-email-mjc@sifive.com>
-References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
-	<1517811767-75958-3-git-send-email-mjc@sifive.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 03/22] RISC-V CPU Core Definition
+	(envelope-from <pm215@archaic.org.uk>) id 1eiiJq-0006wi-EY
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:36 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:46212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eiiJq-0006uY-7w
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:04:30 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  5 Feb 2018 15:04:26 +0000
+Message-Id: <20180205150426.20542-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] hw/core/generic-loader: Allow PC to be set on
+ command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Alistair Francis <alistair.francis@xilinx.com>
 
-On Mon,  5 Feb 2018 19:22:28 +1300
-Michael Clark <mjc@sifive.com> wrote:
+The documentation for the generic loader claims that you can
+set the PC for a CPU with an option of the form
+  -device loader,cpu-num=0,addr=0x10000004
 
-> Add CPU state header, CPU definitions and initialization routines
-> 
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->  target/riscv/cpu.c      | 385 ++++++++++++++++++++++++++++++++++++++++++++
->  target/riscv/cpu.h      | 256 +++++++++++++++++++++++++++++
->  target/riscv/cpu_bits.h | 417 ++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 1058 insertions(+)
->  create mode 100644 target/riscv/cpu.c
->  create mode 100644 target/riscv/cpu.h
->  create mode 100644 target/riscv/cpu_bits.h
-> 
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> new file mode 100644
-> index 0000000..684b78b
-> --- /dev/null
-> +++ b/target/riscv/cpu.c
-[...]
-> +
-> +static const RISCVCPUInfo riscv_cpus[] = {
-> +#ifdef CONFIG_USER_ONLY
-> +    { TYPE_RISCV_CPU_ANY,                riscv_any_cpu_init },
-> +#else
-> +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09, riscv_imafdcsu_priv1_9_cpu_init },
-> +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10, riscv_imafdcsu_priv1_10_cpu_init },
-> +    { TYPE_RISCV_CPU_IMACU_PRIV_1_10,    riscv_imacu_priv1_10_cpu_init },
-> +    { TYPE_RISCV_CPU_IMAC_PRIV_1_10,     riscv_imac_priv1_10_cpu_init },
-> +#endif
-> +    { NULL, NULL }
-> +};
-> +
-[...]
-> +static void cpu_register(const RISCVCPUInfo *info)
-> +{
-> +    TypeInfo type_info = {
-> +        .name = info->name,
-> +        .parent = TYPE_RISCV_CPU,
-> +        .instance_size = sizeof(RISCVCPU),
-> +        .instance_init = info->initfn,
-> +    };
-> +
-> +    type_register(&type_info);
-> +}
-> +
-> +static const TypeInfo riscv_cpu_type_info = {
-> +    .name = TYPE_RISCV_CPU,
-> +    .parent = TYPE_CPU,
-> +    .instance_size = sizeof(RISCVCPU),
-> +    .instance_init = riscv_cpu_init,
-> +    .abstract = false,
-> +    .class_size = sizeof(RISCVCPUClass),
-> +    .class_init = riscv_cpu_class_init,
-> +};
-[...]
+However if you try this QEMU complains:
+  cpu_num must be specified when setting a program counter
 
-> +static void riscv_cpu_register_types(void)
-> +{
-> +    const RISCVCPUInfo *info = riscv_cpus;
-> +
-> +    type_register_static(&riscv_cpu_type_info);
-> +
-> +    while (info->name) {
-> +        cpu_register(info);
-> +        info++;
-> +    }
-> +}
-> +
-> +type_init(riscv_cpu_register_types)
-For simplistic type definitions like that,
-above parts should use DEFINE_TYPES(), see c6678108 for reference.
+This is because we were testing against 0 rather than CPU_NONE.
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I've also noticed that you can't use this to specify that
+the starting address should be in Thumb mode for Arm CPUs,
+but I'm not so sure of the right way to fix that...
 
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> new file mode 100644
-> index 0000000..8b816ae
-> --- /dev/null
-> +++ b/target/riscv/cpu.h
-[...]
-> +#define TYPE_RISCV_CPU                    "riscv"
-> +#define TYPE_RISCV_CPU_ANY                "riscv-any"
-> +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09 "riscv-imafdcsu-priv1.9"
-> +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10 "riscv-imafdcsu-priv1.10"
-> +#define TYPE_RISCV_CPU_IMACU_PRIV_1_10    "riscv-imacu-priv1.10"
-> +#define TYPE_RISCV_CPU_IMAC_PRIV_1_10     "riscv-imac-priv1.10"
-> +
-> +#define RISCV_CPU_TYPE_PREFIX TYPE_RISCV_CPU "-"
-> +#define RISCV_CPU_TYPE_NAME(name) (RISCV_CPU_TYPE_PREFIX name)
-it still uses prefix notation versus commonly used suffix in form of
- "targetFOO-cpu"
-this prefix approach would get in the way if we try to generalize
-naming <-> type conversion later[*].
-So it would better to be consistent with approach qemu uses for cpu types
-(I believe power had prefix based pnv types but it has been fixed
-to common suffix based pattern later).
+ hw/core/generic-loader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-* discussion on thread "[PATCH v5 0/6]  Add a valid_cpu_types property"
+diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+index 46012673c3..cb0e68486d 100644
+--- a/hw/core/generic-loader.c
++++ b/hw/core/generic-loader.c
+@@ -105,7 +105,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
+             error_setg(errp, "data can not be specified when setting a "
+                        "program counter");
+             return;
+-        } else if (!s->cpu_num) {
++        } else if (s->cpu_num == CPU_NONE) {
+             error_setg(errp, "cpu_num must be specified when setting a "
+                        "program counter");
+             return;
+-- 
+2.16.1
