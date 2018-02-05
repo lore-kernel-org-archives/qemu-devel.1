@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eih0Z-0004tb-21
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:40:35 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eih0t-00057s-Cv
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eih0W-0005Ku-0m
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:40:29 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eih0r-0005ex-Tk
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:40:51 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  5 Feb 2018 14:39:19 +0100
-Message-Id: <1517837972-1904-2-git-send-email-eric.auger@redhat.com>
+Date: Mon,  5 Feb 2018 14:39:20 +0100
+Message-Id: <1517837972-1904-3-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1517837972-1904-1-git-send-email-eric.auger@redhat.com>
 References: <1517837972-1904-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 01/14] hw/arm/smmu-common: smmu base device
- and datatypes
+Subject: [Qemu-devel] [PATCH v8 02/14] hw/arm/smmu-common: IOMMU memory
+ region and address space setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,274 +23,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com
 Cc: tn@semihalf.com, mst@redhat.com, christoffer.dall@linaro.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, edgar.iglesias@gmail.com, linuc.decode@gmail.com, peterx@redhat.com
 
-The patch introduces the smmu base device and class for the ARM
-smmu. Devices for specific versions will be derived from this
-base device.
+We enumerate all the PCI devices attached to the SMMU and
+initialize an associated IOMMU memory region and address space.
+This happens on SMMU base instance init.
 
-We also introduce some important datatypes.
+Those info are stored in SMMUDevice objects. The devices are
+grouped according to the PCIBus they belong to. A hash table
+indexed by the PCIBus poinet is used. Also an array indexed by
+the bus number allows to find the list of SMMUDevices.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 
 ---
+
 v7 -> v8:
-- add bus_num property
-- add primary-bus property
-- add realize and remove instance_init
-- rename TYPE and related macros to match naming convention using
-  for GIC
-- add SMMUPageTableWalkEventInfo
-- tt[2] in translation config
-
-v3 -> v4:
-- added smmu_find_as_from_bus_num
-- SMMU_PCI_BUS_MAX and SMMU_PCI_DEVFN_MAX in smmu-common header
-- new fields in SMMUState:
-  - iommu_ops, smmu_as_by_busptr, smmu_as_by_bus_num
-- add aa64[] field in SMMUTransCfg
-
-v3:
-- moved the base code in a separate patch to ease the review.
-- clearer separation between base class and smmuv3 class
-- translate_* only implemented as class methods
-
-Conflicts:
-	default-configs/aarch64-softmmu.mak
+- introduce SMMU_MAX_VA_BITS
+- use PCI bus handle as a key
+- do not clear s->smmu_as_by_bus_num
+- use g_new0 instead of g_malloc0
+- use primary_bus field
 ---
- default-configs/aarch64-softmmu.mak |   1 +
- hw/arm/Makefile.objs                |   1 +
- hw/arm/smmu-common.c                |  71 ++++++++++++++++++++
- include/hw/arm/smmu-common.h        | 126 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 199 insertions(+)
- create mode 100644 hw/arm/smmu-common.c
- create mode 100644 include/hw/arm/smmu-common.h
+ hw/arm/smmu-common.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/smmu-common.h |  6 +++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
-index 9ddccf8..6f790f0 100644
---- a/default-configs/aarch64-softmmu.mak
-+++ b/default-configs/aarch64-softmmu.mak
-@@ -8,3 +8,4 @@ CONFIG_DDC=y
- CONFIG_DPCD=y
- CONFIG_XLNX_ZYNQMP=y
- CONFIG_XLNX_ZYNQMP_ARM=y
-+CONFIG_ARM_SMMUV3=y
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 1c896ba..c84c5ac 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -20,3 +20,4 @@ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
- obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-+obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o
 diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-new file mode 100644
-index 0000000..c2f6b15
---- /dev/null
+index c2f6b15..7bf8e57 100644
+--- a/hw/arm/smmu-common.c
 +++ b/hw/arm/smmu-common.c
-@@ -0,0 +1,71 @@
-+/*
-+ * Copyright (C) 2014-2016 Broadcom Corporation
-+ * Copyright (c) 2017 Red Hat, Inc.
-+ * Written by Prem Mallappa, Eric Auger
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-+ *
-+ * Author: Prem Mallappa <pmallapp@broadcom.com>
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/address-spaces.h"
-+#include "trace.h"
-+#include "exec/target_page.h"
-+#include "qom/cpu.h"
-+#include "hw/qdev-properties.h"
-+#include "qapi/error.h"
-+
-+#include "qemu/error-report.h"
-+#include "hw/arm/smmu-common.h"
-+
-+static void smmu_base_realize(DeviceState *dev, Error **errp)
+@@ -32,8 +32,69 @@
+ #include "qemu/error-report.h"
+ #include "hw/arm/smmu-common.h"
+ 
++SMMUPciBus *smmu_find_as_from_bus_num(SMMUState *s, uint8_t bus_num)
 +{
++    SMMUPciBus *smmu_pci_bus = s->smmu_as_by_bus_num[bus_num];
++
++    if (!smmu_pci_bus) {
++        GHashTableIter iter;
++
++        g_hash_table_iter_init(&iter, s->smmu_as_by_busptr);
++        while (g_hash_table_iter_next(&iter, NULL, (void **)&smmu_pci_bus)) {
++            if (pci_bus_num(smmu_pci_bus->bus) == bus_num) {
++                s->smmu_as_by_bus_num[bus_num] = smmu_pci_bus;
++                return smmu_pci_bus;
++            }
++        }
++    }
++    return smmu_pci_bus;
 +}
 +
-+static Property smmu_dev_properties[] = {
-+    DEFINE_PROP_UINT8("bus_num", SMMUState, bus_num, 0),
-+    DEFINE_PROP_LINK("primary-bus", SMMUState, primary_bus, "PCI", PCIBus *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void smmu_base_class_init(ObjectClass *klass, void *data)
++static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    SMMUBaseClass *sbc = ARM_SMMU_CLASS(klass);
-+
-+    dc->props = smmu_dev_properties;
-+    sbc->parent_realize = dc->realize;
-+    dc->realize = smmu_base_realize;
-+}
-+
-+static const TypeInfo smmu_base_info = {
-+    .name          = TYPE_ARM_SMMU,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SMMUState),
-+    .class_data    = NULL,
-+    .class_size    = sizeof(SMMUBaseClass),
-+    .class_init    = smmu_base_class_init,
-+    .abstract      = true,
-+};
-+
-+static void smmu_base_register_types(void)
-+{
-+    type_register_static(&smmu_base_info);
-+}
-+
-+type_init(smmu_base_register_types)
-+
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-new file mode 100644
-index 0000000..0f9af40
---- /dev/null
-+++ b/include/hw/arm/smmu-common.h
-@@ -0,0 +1,126 @@
-+/*
-+ * ARM SMMU Support
-+ *
-+ * Copyright (C) 2015-2016 Broadcom Corporation
-+ * Copyright (c) 2017 Red Hat, Inc.
-+ * Written by Prem Mallappa, Eric Auger
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_ARM_SMMU_COMMON_H
-+#define HW_ARM_SMMU_COMMON_H
-+
-+#include <hw/sysbus.h>
-+#include "hw/pci/pci.h"
-+
-+#define SMMU_PCI_BUS_MAX      256
-+#define SMMU_PCI_DEVFN_MAX    256
-+
-+#define SMMU_MAX_VA_BITS      48
-+
-+/*
-+ * Page table walk error types
-+ */
-+typedef enum {
-+    SMMU_PTW_ERR_NONE,
-+    SMMU_PTW_ERR_WALK_EABT,   /* Translation walk external abort */
-+    SMMU_PTW_ERR_TRANSLATION, /* Translation fault */
-+    SMMU_PTW_ERR_ADDR_SIZE,   /* Address Size fault */
-+    SMMU_PTW_ERR_ACCESS,      /* Access fault */
-+    SMMU_PTW_ERR_PERMISSION,  /* Permission fault */
-+} SMMUPTWEventType;
-+
-+typedef struct SMMUPTWEventInfo {
-+    SMMUPTWEventType type;
-+    dma_addr_t addr; /* fetched address that induced an abort, if any */
-+} SMMUPTWEventInfo;
-+
-+typedef struct SMMUTransTableInfo {
-+    bool disabled;             /* is the translation table disabled? */
-+    uint64_t ttb;              /* TT base address */
-+    uint8_t tsz;               /* input range, ie. 2^(64 -tsz)*/
-+    uint8_t granule_sz;        /* granule page shift */
-+    uint8_t initial_level;     /* initial lookup level */
-+} SMMUTransTableInfo;
-+
-+/*
-+ * Generic structure populated by derived SMMU devices
-+ * after decoding the configuration information and used as
-+ * input to the page table walk
-+ */
-+typedef struct SMMUTransCfg {
-+    int      stage;            /* translation stage */
-+    bool     aa64;             /* arch64 or aarch32 translation table */
-+    bool     disabled;         /* smmu is disabled */
-+    bool     bypassed;         /* translation is bypassed */
-+    bool     aborted;          /* translation is aborted */
-+    uint64_t ttb;              /* TT base address */
-+    uint8_t oas;               /* output address width */
-+    uint8_t  tbi;              /* Top Byte Ignore */
-+    SMMUTransTableInfo tt[2];
-+} SMMUTransCfg;
-+
-+typedef struct SMMUDevice {
-+    void               *smmu;
-+    PCIBus             *bus;
-+    int                devfn;
-+    IOMMUMemoryRegion  iommu;
-+    AddressSpace       as;
-+} SMMUDevice;
-+
-+typedef struct SMMUNotifierNode {
++    SMMUState *s = opaque;
++    SMMUPciBus *sbus = g_hash_table_lookup(s->smmu_as_by_busptr, &bus);
 +    SMMUDevice *sdev;
-+    QLIST_ENTRY(SMMUNotifierNode) next;
-+} SMMUNotifierNode;
 +
-+typedef struct SMMUPciBus {
-+    PCIBus       *bus;
-+    SMMUDevice   *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
-+} SMMUPciBus;
++    if (!sbus) {
++        sbus = g_malloc0(sizeof(SMMUPciBus) +
++                         sizeof(SMMUDevice *) * SMMU_PCI_DEVFN_MAX);
++        sbus->bus = bus;
++        g_hash_table_insert(s->smmu_as_by_busptr, bus, sbus);
++    }
 +
-+typedef struct SMMUState {
-+    /* <private> */
-+    SysBusDevice  dev;
-+    char *mrtypename;
-+    MemoryRegion iomem;
++    sdev = sbus->pbdev[devfn];
++    if (!sdev) {
++        char *name = g_strdup_printf("%s-%d-%d",
++                                     s->mrtypename,
++                                     pci_bus_num(bus), devfn);
++        sdev = sbus->pbdev[devfn] = g_new0(SMMUDevice, 1);
 +
-+    GHashTable *smmu_as_by_busptr;
-+    SMMUPciBus *smmu_as_by_bus_num[SMMU_PCI_BUS_MAX];
-+    PCIBus *pci_bus;
-+    QLIST_HEAD(, SMMUNotifierNode) notifiers_list;
-+    uint8_t bus_num;
-+    PCIBus *primary_bus;
-+} SMMUState;
++        sdev->smmu = s;
++        sdev->bus = bus;
++        sdev->devfn = devfn;
 +
-+typedef int (*smmu_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
++        memory_region_init_iommu(&sdev->iommu, sizeof(sdev->iommu),
++                                 s->mrtypename,
++                                 OBJECT(s), name, 1ULL << SMMU_MAX_VA_BITS);
++        address_space_init(&sdev->as,
++                           MEMORY_REGION(&sdev->iommu), name);
++    }
 +
-+typedef struct {
-+    /* <private> */
-+    SysBusDeviceClass parent_class;
++    return &sdev->as;
++}
 +
-+    /*< public >*/
+ static void smmu_base_realize(DeviceState *dev, Error **errp)
+ {
++    SMMUState *s = ARM_SMMU(dev);
 +
-+    DeviceRealize parent_realize;
++    s->smmu_as_by_busptr = g_hash_table_new(NULL, NULL);
 +
-+} SMMUBaseClass;
++    if (s->primary_bus) {
++        pci_setup_iommu(s->primary_bus, smmu_find_add_as, s);
++    } else {
++        error_setg(errp, "SMMU is not attached to any PCI bus!");
++    }
+ }
+ 
+ static Property smmu_dev_properties[] = {
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 0f9af40..1495bce 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -123,4 +123,10 @@ typedef struct {
+ #define ARM_SMMU_GET_CLASS(obj)                              \
+     OBJECT_GET_CLASS(SMMUBaseClass, (obj), TYPE_ARm_SMMU)
+ 
++SMMUPciBus *smmu_find_as_from_bus_num(SMMUState *s, uint8_t bus_num);
 +
-+#define TYPE_ARM_SMMU "arm-smmu"
-+#define ARM_SMMU(obj) OBJECT_CHECK(SMMUState, (obj), TYPE_ARM_SMMU)
-+#define ARM_SMMU_CLASS(klass)                                    \
-+    OBJECT_CLASS_CHECK(SMMUBaseClass, (klass), TYPE_ARM_SMMU)
-+#define ARM_SMMU_GET_CLASS(obj)                              \
-+    OBJECT_GET_CLASS(SMMUBaseClass, (obj), TYPE_ARm_SMMU)
-+
-+#endif  /* HW_ARM_SMMU_COMMON */
++static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
++{
++    return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
++}
+ #endif  /* HW_ARM_SMMU_COMMON */
 -- 
 2.5.5
