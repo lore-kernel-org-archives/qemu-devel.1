@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eihBu-0006Du-FA
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:52:16 -0500
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1eihC2-0006JT-Ji
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:52:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eihBq-00047t-FT
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:52:14 -0500
-Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:44357)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eihBq-000455-5J
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:52:10 -0500
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 485509CD89
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 14:52:08 +0100 (CET)
-Date: Mon, 5 Feb 2018 14:19:36 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180205141936.143fe99d@bahia.lan>
-In-Reply-To: <5fdf61c2-cc8d-f115-dab2-813ff278cd04@virtuozzo.com>
-References: <20170922122505.9413-1-quintela@redhat.com>
-	<20170922122505.9413-16-quintela@redhat.com>
-	<20180205104944.26fac450@bahia.lan>
-	<5fdf61c2-cc8d-f115-dab2-813ff278cd04@virtuozzo.com>
+	(envelope-from <anatoly.trosinenko@gmail.com>) id 1eihC1-0004MI-71
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:52:22 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:42102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anatoly.trosinenko@gmail.com>)
+	id 1eihC1-0004LN-18
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:52:21 -0500
+Received: by mail-oi0-x243.google.com with SMTP id c8so21194911oiy.9
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 05:52:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 15/18] migration: split common postcopy out
- of ram postcopy
+In-Reply-To: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
+References: <20180127134908.24095-1-anatoly.trosinenko@gmail.com>
+From: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Date: Mon, 5 Feb 2018 16:52:19 +0300
+Message-ID: <CAE5jQCcDUmaTc0xM6RLppL7xfOmqkAkcirXNAgyTukBFHMaXTA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/1] Fix unaligned reads in the tcg/tci.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,327 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, Anatoly Trosinenko <anatoly.trosinenko@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, 5 Feb 2018 15:11:10 +0300
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+Ping.
+Patchwork link: http://patchwork.ozlabs.org/patch/866732/
+Patchew link:
+http://patchew.org/QEMU/20180127134908.24095-1-anatoly.trosinenko@gmail.com/
 
-> 05.02.2018 12:49, Greg Kurz wrote:
-> > On Fri, 22 Sep 2017 14:25:02 +0200
-> > Juan Quintela <quintela@redhat.com> wrote:
-> >  
-> >> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >>
-> >> Split common postcopy staff from ram postcopy staff.
-> >>
-> >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>   migration/migration.c | 39 ++++++++++++++++++++++++++-------------
-> >>   migration/migration.h |  2 ++
-> >>   migration/savevm.c    | 48 +++++++++++++++++++++++++++++++++++++++---------
-> >>   3 files changed, 67 insertions(+), 22 deletions(-)
-> >>
-> >> diff --git a/migration/migration.c b/migration/migration.c
-> >> index 067dd929c4..266cd39c36 100644
-> >> --- a/migration/migration.c
-> >> +++ b/migration/migration.c
-> >> @@ -1443,6 +1443,11 @@ bool migrate_postcopy_ram(void)
-> >>       return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_RAM];
-> >>   }
-> >>   
-> >> +bool migrate_postcopy(void)
-> >> +{
-> >> +    return migrate_postcopy_ram();
-> >> +}
-> >> +
-> >>   bool migrate_auto_converge(void)
-> >>   {
-> >>       MigrationState *s;
-> >> @@ -1826,9 +1831,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-> >>        * need to tell the destination to throw any pages it's already received
-> >>        * that are dirty
-> >>        */
-> >> -    if (ram_postcopy_send_discard_bitmap(ms)) {
-> >> -        error_report("postcopy send discard bitmap failed");
-> >> -        goto fail;
-> >> +    if (migrate_postcopy_ram()) {
-> >> +        if (ram_postcopy_send_discard_bitmap(ms)) {
-> >> +            error_report("postcopy send discard bitmap failed");
-> >> +            goto fail;
-> >> +        }
-> >>       }
-> >>   
-> >>       /*
-> >> @@ -1837,8 +1844,10 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-> >>        * wrap their state up here
-> >>        */
-> >>       qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
-> >> -    /* Ping just for debugging, helps line traces up */
-> >> -    qemu_savevm_send_ping(ms->to_dst_file, 2);
-> >> +    if (migrate_postcopy_ram()) {
-> >> +        /* Ping just for debugging, helps line traces up */
-> >> +        qemu_savevm_send_ping(ms->to_dst_file, 2);
-> >> +    }
-> >>   
-> >>       /*
-> >>        * While loading the device state we may trigger page transfer
-> >> @@ -1863,7 +1872,9 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-> >>       qemu_savevm_send_postcopy_listen(fb);
-> >>   
-> >>       qemu_savevm_state_complete_precopy(fb, false, false);
-> >> -    qemu_savevm_send_ping(fb, 3);
-> >> +    if (migrate_postcopy_ram()) {
-> >> +        qemu_savevm_send_ping(fb, 3);
-> >> +    }
-> >>   
-> >>       qemu_savevm_send_postcopy_run(fb);
-> >>   
-> >> @@ -1898,11 +1909,13 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-> >>   
-> >>       qemu_mutex_unlock_iothread();
-> >>   
-> >> -    /*
-> >> -     * Although this ping is just for debug, it could potentially be
-> >> -     * used for getting a better measurement of downtime at the source.
-> >> -     */
-> >> -    qemu_savevm_send_ping(ms->to_dst_file, 4);
-> >> +    if (migrate_postcopy_ram()) {
-> >> +        /*
-> >> +         * Although this ping is just for debug, it could potentially be
-> >> +         * used for getting a better measurement of downtime at the source.
-> >> +         */
-> >> +        qemu_savevm_send_ping(ms->to_dst_file, 4);
-> >> +    }
-> >>   
-> >>       if (migrate_release_ram()) {
-> >>           ram_postcopy_migrated_memory_release(ms);
-> >> @@ -2080,7 +2093,7 @@ static void *migration_thread(void *opaque)
-> >>           qemu_savevm_send_ping(s->to_dst_file, 1);
-> >>       }
-> >>   
-> >> -    if (migrate_postcopy_ram()) {
-> >> +    if (migrate_postcopy()) {
-> >>           /*
-> >>            * Tell the destination that we *might* want to do postcopy later;
-> >>            * if the other end can't do postcopy it should fail now, nice and
-> >> @@ -2113,7 +2126,7 @@ static void *migration_thread(void *opaque)
-> >>               if (pending_size && pending_size >= threshold_size) {
-> >>                   /* Still a significant amount to transfer */
-> >>   
-> >> -                if (migrate_postcopy_ram() &&
-> >> +                if (migrate_postcopy() &&
-> >>                       s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE &&
-> >>                       pend_nonpost <= threshold_size &&
-> >>                       atomic_read(&s->start_postcopy)) {
-> >> diff --git a/migration/migration.h b/migration/migration.h
-> >> index 641290f51b..b83cceadc4 100644
-> >> --- a/migration/migration.h
-> >> +++ b/migration/migration.h
-> >> @@ -169,6 +169,8 @@ bool migration_is_blocked(Error **errp);
-> >>   bool migration_in_postcopy(void);
-> >>   MigrationState *migrate_get_current(void);
-> >>   
-> >> +bool migrate_postcopy(void);
-> >> +
-> >>   bool migrate_release_ram(void);
-> >>   bool migrate_postcopy_ram(void);
-> >>   bool migrate_zero_blocks(void);
-> >> diff --git a/migration/savevm.c b/migration/savevm.c
-> >> index 9a48b7b4cb..231474da34 100644
-> >> --- a/migration/savevm.c
-> >> +++ b/migration/savevm.c
-> >> @@ -89,7 +89,7 @@ static struct mig_cmd_args {
-> >>       [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
-> >>       [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name = "OPEN_RETURN_PATH" },
-> >>       [MIG_CMD_PING]             = { .len = sizeof(uint32_t), .name = "PING" },
-> >> -    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name = "POSTCOPY_ADVISE" },
-> >> +    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name = "POSTCOPY_ADVISE" },
-> >>       [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name = "POSTCOPY_LISTEN" },
-> >>       [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
-> >>       [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
-> >> @@ -98,6 +98,23 @@ static struct mig_cmd_args {
-> >>       [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
-> >>   };
-> >>   
-> >> +/* Note for MIG_CMD_POSTCOPY_ADVISE:
-> >> + * The format of arguments is depending on postcopy mode:
-> >> + * - postcopy RAM only
-> >> + *   uint64_t host page size
-> >> + *   uint64_t taget page size
-> >> + *
-> >> + * - postcopy RAM and postcopy dirty bitmaps
-> >> + *   format is the same as for postcopy RAM only
-> >> + *
-> >> + * - postcopy dirty bitmaps only
-> >> + *   Nothing. Command length field is 0.
-> >> + *
-> >> + * Be careful: adding a new postcopy entity with some other parameters should
-> >> + * not break format self-description ability. Good way is to introduce some
-> >> + * generic extendable format with an exception for two old entities.
-> >> + */
-> >> +
-> >>   static int announce_self_create(uint8_t *buf,
-> >>                                   uint8_t *mac_addr)
-> >>   {
-> >> @@ -861,12 +878,17 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
-> >>   /* Send prior to any postcopy transfer */
-> >>   void qemu_savevm_send_postcopy_advise(QEMUFile *f)
-> >>   {
-> >> -    uint64_t tmp[2];
-> >> -    tmp[0] = cpu_to_be64(ram_pagesize_summary());
-> >> -    tmp[1] = cpu_to_be64(qemu_target_page_size());
-> >> +    if (migrate_postcopy_ram()) {
-> >> +        uint64_t tmp[2];
-> >> +        tmp[0] = cpu_to_be64(ram_pagesize_summary());
-> >> +        tmp[1] = cpu_to_be64(qemu_target_page_size());
-> >>   
-> >> -    trace_qemu_savevm_send_postcopy_advise();
-> >> -    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
-> >> +        trace_qemu_savevm_send_postcopy_advise();
-> >> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
-> >> +                                 16, (uint8_t *)tmp);
-> >> +    } else {
-> >> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
-> >> +    }
-> >>   }
-> >>   
-> >>   /* Sent prior to starting the destination running in postcopy, discard pages
-> >> @@ -1354,6 +1376,10 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-> >>           return -1;
-> >>       }
-> >>   
-> >> +    if (!migrate_postcopy_ram()) {
-> >> +        return 0;
-> >> +    }
-> >> +  
-> > If postcopy-ram was set on the source but not on the destination, the source
-> > sends an advise with ram_pagesize_summary() and qemu_target_page_size() but
-> > this return path on the destination doesn't dispose of the two values. This
-> > results in a corrupted stream and confuses qemu_loadvm_state():
-> >
-> > qemu-system-ppc64: Expected vmdescription section, but got 0
-> >
-> > Migration doesn't happen, and worse, the destination may starts execution,
-> > ie, we have two running instances...
-> >
-> > It looks wrong that the parsing of the advise depends on a migration
-> > capability being set by the user. The destination should process the
-> > postcopy-ram advise sent by the source in any case.
-> >
-> > Now that you're about to introduce a new postcopy variant, I guess it
-> > is time to improve the advise format to reflect this, as you already
-> > suggest in a comment above. The format could be something like:
-> > - uin8_t: number of enabled postcopy variants
-> > - for each variant:
-> >    uint8_t: type of the postcopy variant
-> >    per variant arguments
-> >
-> > The destination could then process the advise according to what the source
-> > actually sent.
-> >
-> > In the meantime, I'd suggest to partly revert 58110f0acb1a. At least, the part
-> > that changes the advise format, since it isn't strictly needed right now.
-> >
-> > --- a/migration/savevm.c
-> > +++ b/migration/savevm.c
-> > @@ -98,23 +98,6 @@ static struct mig_cmd_args {
-> >       [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
-> >   };
-> >   
-> > -/* Note for MIG_CMD_POSTCOPY_ADVISE:
-> > - * The format of arguments is depending on postcopy mode:
-> > - * - postcopy RAM only
-> > - *   uint64_t host page size
-> > - *   uint64_t taget page size
-> > - *
-> > - * - postcopy RAM and postcopy dirty bitmaps
-> > - *   format is the same as for postcopy RAM only
-> > - *
-> > - * - postcopy dirty bitmaps only
-> > - *   Nothing. Command length field is 0.
-> > - *
-> > - * Be careful: adding a new postcopy entity with some other parameters should
-> > - * not break format self-description ability. Good way is to introduce some
-> > - * generic extendable format with an exception for two old entities.
-> > - */  
-> 
-> 
-> We already use this format in production. And it was discussed on list, 
-> that capabilities must be enabled on both sides.
-> 
+(Initially forgot to add Richard Henderson to CC.)
 
-I agree with that but it isn't documented anywhere AFAIK and
-the observed behaviour when not setting postcopy-ram at the
-destination is not sane. If there is an agreement that this
-capability MUST be enabled both sides, then it should probably
-be detected and handled in some way (fail migration?).
+2018-01-27 16:49 GMT+03:00 Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+:
 
-With the current format, loadvm_postcopy_handle_advise() should
-probably be be passed the command length to fully parse whatever
-was sent by the source then.
+> The code in tcg/tci.c reads some data from TCI bytecode through
+> pointer dereferencing. As far as I know unaligned reads in such a way are
+> undefined behavior and compiling with -fsanitize=undefined enumerated
+> them as such at run-time.
+>
+> I have replaced such reads with invocations of ld{l,q}_he_p.
+> A comment in include/qemu/bswap.h:310 suggests they should be properly
+> translated by the compiler. I didn't added signed/unsigned casts
+> since bswap.h does contain separate signed/unsigned versions
+> for 16-bit integers but does not for 32- and 64-bit ones, so I supposed
+> the developers of the bswap.h already arranged everything so
+> integer promotions don't mess things up. I can add casts in case I'm
+> not right about it.
+>
+> Anatoly Trosinenko (1):
+>   tci: eliminate UB due to unaligned reads
+>
+>  tcg/tci.c | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
+>
+> --
+> 2.14.1
+>
+>
 
-> 
-> > -
-> >   static int announce_self_create(uint8_t *buf,
-> >                                   uint8_t *mac_addr)
-> >   {
-> > @@ -888,8 +871,6 @@ void qemu_savevm_send_postcopy_advise(QEMUFile *f)
-> >           trace_qemu_savevm_send_postcopy_advise();
-> >           qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
-> >                                    16, (uint8_t *)tmp);
-> > -    } else {
-> > -        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
-> >       }
-> >   }
-> >   
-> > @@ -1387,10 +1368,6 @@ static int loadvm_postcopy_handle_advise(MigrationIncomin
-> >           return -1;
-> >       }
-> >   
-> > -    if (!migrate_postcopy_ram()) {
-> > -        return 0;
-> > -    }
-> > -
-> >       if (!postcopy_ram_supported_by_host(mis)) {
-> >           postcopy_state_set(POSTCOPY_INCOMING_NONE);
-> >           return -1;
-> >
-> >
-> > Cheers,
-> >
-> > --
-> > Greg
-> >  
-> >>       if (!postcopy_ram_supported_by_host()) {
-> >>           postcopy_state_set(POSTCOPY_INCOMING_NONE);
-> >>           return -1;
-> >> @@ -1564,7 +1590,9 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
-> >>            * A rare case, we entered listen without having to do any discards,
-> >>            * so do the setup that's normally done at the time of the 1st discard.
-> >>            */
-> >> -        postcopy_ram_prepare_discard(mis);
-> >> +        if (migrate_postcopy_ram()) {
-> >> +            postcopy_ram_prepare_discard(mis);
-> >> +        }
-> >>       }
-> >>   
-> >>       /*
-> >> @@ -1572,8 +1600,10 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
-> >>        * However, at this point the CPU shouldn't be running, and the IO
-> >>        * shouldn't be doing anything yet so don't actually expect requests
-> >>        */
-> >> -    if (postcopy_ram_enable_notify(mis)) {
-> >> -        return -1;
-> >> +    if (migrate_postcopy_ram()) {
-> >> +        if (postcopy_ram_enable_notify(mis)) {
-> >> +            return -1;
-> >> +        }
-> >>       }
-> >>   
-> >>       if (mis->have_listen_thread) {  
-> 
-> 
+
+-- 
+Best regards,
+Anatoly Trosinenko
