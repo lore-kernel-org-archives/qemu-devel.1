@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eieF1-00082i-2P
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:43:17 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eieSt-00063O-HN
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eieEx-0002zk-Up
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:43:15 -0500
-Resent-Message-Id: <E1eieEx-0002zk-Up@eggs.gnu.org>
-In-Reply-To: <20180205102935.14736-1-david@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151782737560.39.12927396708059778674@bdbb90650ae5>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 5 Feb 2018 02:42:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpumodel: model PTFF subfunctions
- for Multiple-epoch facility
+	(envelope-from <pm215@archaic.org.uk>) id 1eieSs-0007Cp-Mj
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:35 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  5 Feb 2018 10:57:19 +0000
+Message-Id: <20180205105720.14620-8-peter.maydell@linaro.org>
+In-Reply-To: <20180205105720.14620-1-peter.maydell@linaro.org>
+References: <20180205105720.14620-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 7/8] target/arm: Implement writing to
+ CONTROL_NS for v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +20,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@redhat.com
-Cc: famz@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMjA1MTAyOTM1LjE0NzM2LTEtZGF2aWRAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBzMzkweC9jcHVtb2RlbDogbW9kZWwgUFRGRiBzdWJm
-dW5jdGlvbnMgZm9yIE11bHRpcGxlLWVwb2NoIGZhY2lsaXR5Cgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
-bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9
-IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21t
-aXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4g
-MSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWls
-IHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFp
-bGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWls
-ZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9q
-ZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIwNTEwMjY1
-OS42MDU1Mi0xLW1hcmNlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAyMDUxMDI2NTkuNjA1
-NTItMS1tYXJjZWxAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
-LzIwMTgwMjA1MTAyOTM1LjE0NzM2LTEtZGF2aWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgw
-MjA1MTAyOTM1LjE0NzM2LTEtZGF2aWRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCjdjMjc3YTIzYzEgczM5MHgvY3B1bW9kZWw6IG1vZGVsIFBURkYgc3ViZnVuY3Rp
-b25zIGZvciBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
-Y2tpbmcgUEFUQ0ggMS8xOiBzMzkweC9jcHVtb2RlbDogbW9kZWwgUFRGRiBzdWJmdW5jdGlvbnMg
-Zm9yIE11bHRpcGxlLWVwb2NoIGZhY2lsaXR5Li4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojMjU6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNTk6CisgICAgRkVB
-VF9JTklUKCJwdGZmLXFzaWUiLCBTMzkwX0ZFQVRfVFlQRV9QVEZGLCAxMCwgIlBURkYgUXVlcnkg
-U3RlZXJpbmcgSW5mb3JtYXRpb24gRXh0ZW5kZWQiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
-cmFjdGVycwojMjY6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNjA6CisgICAg
-RkVBVF9JTklUKCJwdGZmLXF0b3VlIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgMTMsICJQVEZGIFF1
-ZXJ5IFRPRCBPZmZzZXQgVXNlciBFeHRlbmRlZCIpLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzI5OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTYzOgorICAg
-IEZFQVRfSU5JVCgicHRmZi1zdG9lIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgNzMsICJQVEZGIFNl
-dCBUT0QgT2Zmc2V0IEV4dGVuZGVkIiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojMzA6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNjQ6CisgICAgRkVBVF9J
-TklUKCJwdGZmLXN0b3VlIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgNzcsICJQVEZGIFNldCBUT0Qg
-T2Zmc2V0IFVzZXIgRXh0ZW5kZWQiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-Mzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0NTI6CisgICAgRkVBVF9HUk9V
-UF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5oYW5jZW1l
-bnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKRVJST1I6IE1h
-Y3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNp
-cwojNjc6IEZJTEU6IHRhcmdldC9zMzkweC9nZW4tZmVhdHVyZXMuYzo2MjoKKyNkZWZpbmUgUzM5
-MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYgXAorICAgIFMzOTBfRkVBVF9QVEZGX1FT
-SUUsIFwKKyAgICBTMzkwX0ZFQVRfUFRGRl9RVE9VRSwgXAorICAgIFMzOTBfRkVBVF9QVEZGX1NU
-T0UsIFwKKyAgICBTMzkwX0ZFQVRfUFRGRl9TVE9VRQoKdG90YWw6IDQgZXJyb3JzLCAyIHdhcm5p
-bmdzLCA4MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-ZnJlZWxpc3RzLm9yZw==
+In commit 50f11062d4c896 we added support for MSR/MRS access
+to the NS banked special registers, but we forgot to implement
+the support for writing to CONTROL_NS. Correct the omission.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 3332565101..abb4d94a7f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -10388,6 +10388,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+             }
+             env->v7m.faultmask[M_REG_NS] = val & 1;
+             return;
++        case 0x94: /* CONTROL_NS */
++            if (!env->v7m.secure) {
++                return;
++            }
++            write_v7m_control_spsel_for_secstate(env,
++                                                 val & R_V7M_CONTROL_SPSEL_MASK,
++                                                 M_REG_NS);
++            env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
++            env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
++            return;
+         case 0x98: /* SP_NS */
+         {
+             /* This gives the non-secure SP selected based on whether we're
+-- 
+2.16.1
