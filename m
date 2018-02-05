@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZ7-000108-W0
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:22 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiZJ-0001B4-DW
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZ5-0008NI-9V
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiZB-00009h-OB
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:29 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:21 +0100
-Message-Id: <20180205151835.20812-13-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:22 +0100
+Message-Id: <20180205151835.20812-14-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 12/26] blkverify: Make bdrv_dirname() return
+Subject: [Qemu-devel] [PATCH v8 13/26] quorum: Make bdrv_dirname() return
  NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,45 +23,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-blkverify's BDSs have a file BDS, but we do not want this to be
-preferred over the raw node. There is no way to decide between the two
-(and not really a reason to, either), so just return NULL in blkverify's
-implementation of bdrv_dirname().
+While the common implementation for bdrv_dirname() should return NULL
+for quorum BDSs already (because they do not have a file node and their
+exact_filename field should be empty), there is no reason not to make
+that explicit.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/blkverify.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/quorum.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blkverify.c b/block/blkverify.c
-index b2ed8cd70d..d5233eeaf9 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -309,6 +309,15 @@ static void blkverify_refresh_filename(BlockDriverState *bs, QDict *options)
-     }
+diff --git a/block/quorum.c b/block/quorum.c
+index 2f1a628449..e5a844335e 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1095,6 +1095,16 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
+     bs->full_open_options = opts;
  }
  
-+static char *blkverify_dirname(BlockDriverState *bs, Error **errp)
++static char *quorum_dirname(BlockDriverState *bs, Error **errp)
 +{
-+    /* In general, there are two BDSs with different dirnames below this one;
-+     * so there is no unique dirname we could return (unless both are equal by
-+     * chance). Therefore, to be consistent, just always return NULL. */
-+    error_setg(errp, "Cannot generate a base directory for blkverify nodes");
++    /* In general, there are multiple BDSs with different dirnames below this
++     * one; so there is no unique dirname we could return (unless all are equal
++     * by chance, or there is only one). Therefore, to be consistent, just
++     * always return NULL. */
++    error_setg(errp, "Cannot generate a base directory for quorum nodes");
 +    return NULL;
 +}
 +
- static BlockDriver bdrv_blkverify = {
-     .format_name                      = "blkverify",
-     .protocol_name                    = "blkverify",
-@@ -320,6 +329,7 @@ static BlockDriver bdrv_blkverify = {
-     .bdrv_child_perm                  = bdrv_filter_default_perms,
-     .bdrv_getlength                   = blkverify_getlength,
-     .bdrv_refresh_filename            = blkverify_refresh_filename,
-+    .bdrv_dirname                     = blkverify_dirname,
+ static BlockDriver bdrv_quorum = {
+     .format_name                        = "quorum",
+     .protocol_name                      = "quorum",
+@@ -1104,6 +1114,7 @@ static BlockDriver bdrv_quorum = {
+     .bdrv_file_open                     = quorum_open,
+     .bdrv_close                         = quorum_close,
+     .bdrv_refresh_filename              = quorum_refresh_filename,
++    .bdrv_dirname                       = quorum_dirname,
  
-     .bdrv_co_preadv                   = blkverify_co_preadv,
-     .bdrv_co_pwritev                  = blkverify_co_pwritev,
+     .bdrv_co_flush_to_disk              = quorum_co_flush,
+ 
 -- 
 2.14.3
