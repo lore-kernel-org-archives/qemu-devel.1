@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eiixi-0006JB-Oi
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eiiy6-0006at-C5
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:46:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eiixe-00030Z-4U
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eiixd-0002yl-Pe
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:38 -0500
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-3-armbru@redhat.com>
-	<CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ab5c18b5-b42a-23f6-f893-3de0e64c1c7e@redhat.com>
-Date: Mon, 5 Feb 2018 09:45:34 -0600
+	(envelope-from <no-reply@patchew.org>) id 1eiiy2-0003tY-CF
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:46:06 -0500
+Resent-Message-Id: <E1eiiy2-0003tY-CF@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eiiy2-0003rK-4Q
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:46:02 -0500
+In-Reply-To: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151784553530.66.16068374986829135875@bdbb90650ae5>
 MIME-Version: 1.0
-In-Reply-To: <CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="q6LaZddU8oTlIswiR6rIqtD5voWAxiq93"
-Subject: Re: [Qemu-devel] [PATCH RFC 02/21] qapi: Generate up-to-date
- copyright notice
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 5 Feb 2018 07:45:35 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, marcandre <marcandre.lureau@redhat.com>, mdroth@linux.vnet.ibm.com
+To: jianfeng.tan@intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---q6LaZddU8oTlIswiR6rIqtD5voWAxiq93
-From: Eric Blake <eblake@redhat.com>
-To: Marc-Andre Lureau <mlureau@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>,
- marcandre <marcandre.lureau@redhat.com>, mdroth@linux.vnet.ibm.com
-Message-ID: <ab5c18b5-b42a-23f6-f893-3de0e64c1c7e@redhat.com>
-Subject: Re: [PATCH RFC 02/21] qapi: Generate up-to-date copyright notice
-References: <20180202130336.24719-1-armbru@redhat.com>
- <20180202130336.24719-3-armbru@redhat.com>
- <CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
-In-Reply-To: <CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/05/2018 07:44 AM, Marc-Andre Lureau wrote:
-> Hi
->=20
-> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> w=
-rote:
->> Each generator carries a copyright notice for the generator itself,
->> and another one for the files it generates.  Only the former have been=
-
->> updated along the way, the latter have not, and are all out of date.
->>
->> Fix by copying the generator's copyright notice to the generated files=
-
->> instead.
->=20
-> That makes sense, but we loose the Author lines in the generated
-> files. Not a big deal I guess, but worth to point out, no?
-
-I don't see too much use for author lines as long as you have a 'this
-file is generated' line; you can use git history to learn the authors of
-the generator code.  But yeah, a commit message blurb can't hurt.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---q6LaZddU8oTlIswiR6rIqtD5voWAxiq93
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp4fB4ACgkQp6FrSiUn
-Q2pZjQf9G6SmnI0vioJhxStxMBoFHdTWV/bpz6jhZiDKshIbMZYaxFVnQ3AnUVZ8
-27qMRL5EcyA0nL9RRLD/7zTlVvnv+Y9hArTWqsbWstYDlxUiFbmCxxlwv5OKYfQA
-RfSvnQX9ko1ohFHC6D6nCasaW5UHqArnnGALvRu9/LlKr4kxEJPije7nBt0u2Bix
-Ijm5nPkBIcqT7KB3sot812CDYSRzU92spfH9ceKT5um91UmYhf+QGYs4x3dZj1BF
-5kHaISSk8sUebWsnzuyVdZtYGD9vfRaRZRLrh9qRcbbda2lLHQPl0cOQMv1w0OAt
-IWS/GAjgEULZMK5+d+qUAbxxqhS/Xg==
-=Ppd8
------END PGP SIGNATURE-----
-
---q6LaZddU8oTlIswiR6rIqtD5voWAxiq93--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTc4NDI3MzUtOTAxMS0xLWdpdC1zZW5kLWVtYWlsLWppYW5mZW5nLnRhbkBp
+bnRlbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtSRkNdIGV4ZWM6IGVsaW1pbmF0ZSByYW0g
+bmFtaW5nIGlzc3VlIGFzIG1pZ3JhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
+IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMTUxNzg0MjczNS05MDExLTEtZ2l0LXNl
+bmQtZW1haWwtamlhbmZlbmcudGFuQGludGVsLmNvbSAtPiBwYXRjaGV3LzE1MTc4NDI3MzUtOTAx
+MS0xLWdpdC1zZW5kLWVtYWlsLWppYW5mZW5nLnRhbkBpbnRlbC5jb20KU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwoyYTY0NWYwYmQ0IGV4ZWM6IGVsaW1pbmF0ZSByYW0gbmFtaW5nIGlz
+c3VlIGFzIG1pZ3JhdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8x
+OiBleGVjOiBlbGltaW5hdGUgcmFtIG5hbWluZyBpc3N1ZSBhcyBtaWdyYXRpb24uLi4KRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjE6IEZJTEU6IGV4ZWMuYzoyMzc3
+OgorXklpZDIgPSBiYXNlbmFtZShuYW1lMik7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
+ZXZlciB1c2UgdGFicwojNjQ6IEZJTEU6IGV4ZWMuYzoyMzgwOgorXkkgICAgZnJlZShuYW1lMik7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjc6IEZJTEU6IGV4
+ZWMuYzoyMzgzOgorXklmcmVlKG5hbWUyKTskCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDI1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
+bGlzdHMub3Jn
