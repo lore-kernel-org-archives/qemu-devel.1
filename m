@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSP-0004aZ-2V
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSN-0004ZD-RG
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSN-00053h-Qg
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:37 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36858)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSM-00053O-OX
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:35 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eimSN-00053U-Iy
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:35 -0500
-Received: by mail-wm0-x241.google.com with SMTP id f3so28130267wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:35 -0800 (PST)
+	id 1eimSM-00052r-Ft
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:34 -0500
+Received: by mail-wr0-x241.google.com with SMTP id s5so30857596wra.0
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:34 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  5 Feb 2018 20:28:39 +0100
-Message-Id: <1517858941-5538-26-git-send-email-pbonzini@redhat.com>
+Date: Mon,  5 Feb 2018 20:28:38 +0100
+Message-Id: <1517858941-5538-25-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
 References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 25/47] chardev/char-socket: add POLLHUP handler
+Subject: [Qemu-devel] [PULL 24/47] memory: do explicit cleanup when remove
+ listeners
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +29,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Klim Kireev <klim.kireev@virtuozzo.com>
+Cc: Peter Xu <peterx@redhat.com>
 
-From: Klim Kireev <klim.kireev@virtuozzo.com>
+From: Peter Xu <peterx@redhat.com>
 
-The following behavior was observed for QEMU configured by libvirt
-to use guest agent as usual for the guests without virtio-serial
-driver (Windows or the guest remaining in BIOS stage).
+When unregister memory listeners, we should call, e.g.,
+region_del() (and possibly other undo operations) on every existing
+memory region sections there, otherwise we may leak resources that are
+held during the region_add(). This patch undo the stuff for the
+listeners, which emulates the case when the address space is set from
+current to an empty state.
 
-In QEMU on first connect to listen character device socket
-the listen socket is removed from poll just after the accept().
-virtio_serial_guest_ready() returns 0 and the descriptor
-of the connected Unix socket is removed from poll and it will
-not be present in poll() until the guest will initialize the driver
-and change the state of the serial to "guest connected".
+I found this problem when debugging a refcount leak issue that leads to
+a device unplug event lost (please see the "Bug:" line below).  In that
+case, the leakage of resource is the PCI BAR memory region refcount.
+And since memory regions are not keeping their own refcount but onto
+their owners, so the vfio-pci device's (who is the owner of the PCI BAR
+memory regions) refcount is leaked, and event missing.
 
-In libvirt connect() to guest agent is performed on restart and
-is run under VM state lock. Connect() is blocking and can
-wait forever.
-In this case libvirt can not perform ANY operation on that VM.
+We had encountered similar issues before and fixed in other
+way (ee4c112846, "vhost: Release memory references on cleanup"). This
+patch can be seen as a more high-level fix of similar problems that are
+caused by the resource leaks from memory listeners. So now we can remove
+the explicit unref of memory regions since that'll be done altogether
+during unregistering of listeners now.
 
-The bug can be easily reproduced this way:
-
-Terminal 1:
-qemu-system-x86_64 -m 512 -device pci-serial,chardev=serial1 -chardev socket,id=serial1,path=/tmp/console.sock,server,nowait
-(virtio-serial and isa-serial also fit)
-
-Terminal 2:
-minicom -D unix\#/tmp/console.sock
-(type something and press enter)
-C-a x (to exit)
-
-Do 3 times:
-minicom -D unix\#/tmp/console.sock
-C-a x
-
-It needs 4 connections, because the first one is accepted by QEMU, then two are queued by
-the kernel, and the 4th blocks.
-
-The problem is that QEMU doesn't add a read watcher after succesful read
-until the guest device wants to acquire recieved data, so
-I propose to install a separate pullhup watcher regardless of
-whether the device waits for data or not.
-
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-Message-Id: <20180125135129.9305-1-klim.kireev@virtuozzo.com>
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1531393
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180122060244.29368-5-peterx@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/char-socket.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ hw/virtio/vhost.c |  4 ----
+ memory.c          | 27 +++++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 77cdf48..a340af6 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -42,6 +42,7 @@ typedef struct {
-     QIOChannel *ioc; /* Client I/O channel */
-     QIOChannelSocket *sioc; /* Client master channel */
-     QIONetListener *listener;
-+    GSource *hup_source;
-     QCryptoTLSCreds *tls_creds;
-     int connected;
-     int max_size;
-@@ -352,6 +353,12 @@ static void tcp_chr_free_connection(Chardev *chr)
-         s->read_msgfds_num = 0;
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index c4f654c..d16c0c8 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1368,10 +1368,6 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
+     if (hdev->mem) {
+         /* those are only safe after successful init */
+         memory_listener_unregister(&hdev->memory_listener);
+-        for (i = 0; i < hdev->n_mem_sections; ++i) {
+-            MemoryRegionSection *section = &hdev->mem_sections[i];
+-            memory_region_unref(section->mr);
+-        }
+         QLIST_REMOVE(hdev, entry);
      }
- 
-+    if (s->hup_source != NULL) {
-+        g_source_destroy(s->hup_source);
-+        g_source_unref(s->hup_source);
-+        s->hup_source = NULL;
-+    }
-+
-     tcp_set_msgfds(chr, NULL, 0);
-     remove_fd_in_watch(chr);
-     object_unref(OBJECT(s->sioc));
-@@ -455,6 +462,15 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
-     return TRUE;
+     if (hdev->migration_blocker) {
+diff --git a/memory.c b/memory.c
+index 9e83496..5686698 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2612,6 +2612,32 @@ static void listener_add_address_space(MemoryListener *listener,
+     flatview_unref(view);
  }
  
-+static gboolean tcp_chr_hup(QIOChannel *channel,
-+                               GIOCondition cond,
-+                               void *opaque)
++static void listener_del_address_space(MemoryListener *listener,
++                                       AddressSpace *as)
 +{
-+    Chardev *chr = CHARDEV(opaque);
-+    tcp_chr_disconnect(chr);
-+    return G_SOURCE_REMOVE;
++    FlatView *view;
++    FlatRange *fr;
++
++    if (listener->begin) {
++        listener->begin(listener);
++    }
++    view = address_space_get_flatview(as);
++    FOR_EACH_FLAT_RANGE(fr, view) {
++        MemoryRegionSection section = section_from_flat_range(fr, view);
++
++        if (fr->dirty_log_mask && listener->log_stop) {
++            listener->log_stop(listener, &section, fr->dirty_log_mask, 0);
++        }
++        if (listener->region_del) {
++            listener->region_del(listener, &section);
++        }
++    }
++    if (listener->commit) {
++        listener->commit(listener);
++    }
++    flatview_unref(view);
 +}
 +
- static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+ void memory_listener_register(MemoryListener *listener, AddressSpace *as)
  {
-     SocketChardev *s = SOCKET_CHARDEV(chr);
-@@ -528,6 +544,12 @@ static void tcp_chr_connect(void *opaque)
-                                            tcp_chr_read,
-                                            chr, chr->gcontext);
+     MemoryListener *other = NULL;
+@@ -2652,6 +2678,7 @@ void memory_listener_unregister(MemoryListener *listener)
+         return;
      }
-+
-+    s->hup_source = qio_channel_create_watch(s->ioc, G_IO_HUP);
-+    g_source_set_callback(s->hup_source, (GSourceFunc)tcp_chr_hup,
-+                          chr, NULL);
-+    g_source_attach(s->hup_source, chr->gcontext);
-+
-     qemu_chr_be_event(chr, CHR_EVENT_OPENED);
- }
  
++    listener_del_address_space(listener, listener->address_space);
+     QTAILQ_REMOVE(&memory_listeners, listener, link);
+     QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
+     listener->address_space = NULL;
 -- 
 1.8.3.1
