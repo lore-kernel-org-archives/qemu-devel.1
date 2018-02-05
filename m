@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eiiop-0006BO-G1
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:36:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiirQ-0000FY-4H
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:39:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eiiom-00076g-A3
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:36:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eiiol-000754-Us
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:36:28 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-7-armbru@redhat.com>
-	<CAMxuvawWTd+HWx3seEstJA1YQp3EypH1a7UQ_h-XPR73hXHwTQ@mail.gmail.com>
-Date: Mon, 05 Feb 2018 16:36:20 +0100
-In-Reply-To: <CAMxuvawWTd+HWx3seEstJA1YQp3EypH1a7UQ_h-XPR73hXHwTQ@mail.gmail.com>
-	(Marc-Andre Lureau's message of "Mon, 5 Feb 2018 14:44:58 +0100")
-Message-ID: <871shzjvnv.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1eiirP-0005tT-A1
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:39:12 -0500
+References: <cover.1517840876.git.berto@igalia.com>
+	<20fc0415bf0e011e29f6487ec86eb06a11f37445.1517840877.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <cbfdef0c-f291-a35f-01b6-24e16b206888@redhat.com>
+Date: Mon, 5 Feb 2018 16:38:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 06/21] qapi-gen: New common driver for
- code and doc generators
+In-Reply-To: <20fc0415bf0e011e29f6487ec86eb06a11f37445.1517840877.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OiIhLG6kpXdY51kX8TKItRtfararV9voZ"
+Subject: Re: [Qemu-devel] [PATCH v4 17/39] qcow2: Update l2_allocate() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,790 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-Marc-Andre Lureau <mlureau@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OiIhLG6kpXdY51kX8TKItRtfararV9voZ
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <cbfdef0c-f291-a35f-01b6-24e16b206888@redhat.com>
+Subject: Re: [PATCH v4 17/39] qcow2: Update l2_allocate() to support L2 slices
+References: <cover.1517840876.git.berto@igalia.com>
+ <20fc0415bf0e011e29f6487ec86eb06a11f37445.1517840877.git.berto@igalia.com>
+In-Reply-To: <20fc0415bf0e011e29f6487ec86eb06a11f37445.1517840877.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wro=
-te:
->> Whenever qapi-schema.json changes, we run six programs eleven times to
->> update eleven files.  This is silly.  Replace the six programs by a
->> single program that spits out all eleven files.
->>
->
-> Now we will need documentation update.
+On 2018-02-05 15:33, Alberto Garcia wrote:
+> This patch updates l2_allocate() to support the qcow2 cache returning
+> L2 slices instead of full L2 tables.
+>=20
+> The old code simply gets an L2 table from the cache and initializes it
+> with zeroes or with the contents of an existing table. With a cache
+> that returns slices instead of tables the idea remains the same, but
+> the code must now iterate over all the slices that are contained in an
+> L2 table.
+>=20
+> Since now we're operating with slices the function can no longer
+> return the newly-allocated table, so it's up to the caller to retrieve
+> the appropriate L2 slice after calling l2_allocate() (note that with
+> this patch the caller is still loading full L2 tables, but we'll deal
+> with that in a separate patch).
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2-cluster.c | 56 +++++++++++++++++++++++++++++++------------=
+--------
+>  1 file changed, 34 insertions(+), 22 deletions(-)
 
-Absolutely!  One reason this is RFC.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> Also greping for the renamed files:
->
-> git grep -E 'qapi-commands|qapi2texi|qapi-event.py|qapi-intros|qapi-types=
-.py|qapi-visit.py'
-> docs/devel/qapi-code-gen.txt:=3D=3D=3D scripts/qapi-types.py =3D=3D=3D
-> docs/devel/qapi-code-gen.txt:    $ python scripts/qapi-types.py
-> --output-dir=3D"qapi-generated" \
-> docs/devel/qapi-code-gen.txt:=3D=3D=3D scripts/qapi-visit.py =3D=3D=3D
-> docs/devel/qapi-code-gen.txt:    $ python scripts/qapi-visit.py
-> --output-dir=3D"qapi-generated"
-> docs/devel/qapi-code-gen.txt:=3D=3D=3D scripts/qapi-commands.py =3D=3D=3D
-> docs/devel/qapi-code-gen.txt:                        generated by
-> qapi-visit.py are used to
-> docs/devel/qapi-code-gen.txt:    $ python scripts/qapi-commands.py
-> --output-dir=3D"qapi-generated"
-> docs/devel/qapi-code-gen.txt:=3D=3D=3D scripts/qapi-event.py =3D=3D=3D
-> docs/devel/qapi-code-gen.txt:    $ python scripts/qapi-event.py
-> --output-dir=3D"qapi-generated"
-> docs/devel/qapi-code-gen.txt:=3D=3D=3D scripts/qapi-introspect.py =3D=3D=
-=3D
-> docs/devel/qapi-code-gen.txt:    $ python scripts/qapi-introspect.py
-> --output-dir=3D"qapi-generated"
-> monitor.c: * qapi-introspect.py's output actually conforms to the schema.
-> qapi-schema.json:# Documentation generated with qapi2texi.py is in
-> source order, with
->
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  Makefile                                           | 86 ++++++++++-----=
--------
->>  scripts/qapi-gen.py                                | 41 +++++++++++
->>  scripts/qapi/__init__.py                           |  0
->>  scripts/{qapi-commands.py =3D> qapi/commands.py}     | 23 ++----
->>  scripts/{qapi.py =3D> qapi/common.py}                |  0
->>  scripts/{qapi2texi.py =3D> qapi/doc.py}              | 29 ++------
->>  scripts/{qapi-event.py =3D> qapi/events.py}          | 23 ++----
->>  scripts/{qapi-introspect.py =3D> qapi/introspect.py} | 32 ++------
->>  scripts/{qapi-types.py =3D> qapi/types.py}           | 34 ++-------
->>  scripts/{qapi-visit.py =3D> qapi/visit.py}           | 34 ++-------
->>  tests/Makefile.include                             | 56 +++++++-------
->>  tests/qapi-schema/test-qapi.py                     |  2 +-
->>  12 files changed, 140 insertions(+), 220 deletions(-)
->>  create mode 100755 scripts/qapi-gen.py
->>  create mode 100644 scripts/qapi/__init__.py
->>  rename scripts/{qapi-commands.py =3D> qapi/commands.py} (94%)
->>  rename scripts/{qapi.py =3D> qapi/common.py} (100%)
->>  rename scripts/{qapi2texi.py =3D> qapi/doc.py} (92%)
->>  mode change 100755 =3D> 100644
->>  rename scripts/{qapi-event.py =3D> qapi/events.py} (92%)
->>  rename scripts/{qapi-introspect.py =3D> qapi/introspect.py} (90%)
->>  rename scripts/{qapi-types.py =3D> qapi/types.py} (90%)
->>  rename scripts/{qapi-visit.py =3D> qapi/visit.py} (92%)
->>
->> diff --git a/Makefile b/Makefile
->> index af31e8981f..e02f0c13ef 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -92,6 +92,7 @@ GENERATED_FILES +=3D qmp-commands.h qapi-types.h qapi-=
-visit.h qapi-event.h
->>  GENERATED_FILES +=3D qmp-marshal.c qapi-types.c qapi-visit.c qapi-event=
-.c
->>  GENERATED_FILES +=3D qmp-introspect.h
->>  GENERATED_FILES +=3D qmp-introspect.c
->> +GENERATED_FILES +=3D qapi.texi
->>
->>  GENERATED_FILES +=3D trace/generated-tcg-tracers.h
->>
->> @@ -477,25 +478,26 @@ qemu-ga$(EXESUF): QEMU_CFLAGS +=3D -I qga/qapi-gen=
-erated
->>  qemu-keymap$(EXESUF): LIBS +=3D $(XKBCOMMON_LIBS)
->>  qemu-keymap$(EXESUF): QEMU_CFLAGS +=3D $(XKBCOMMON_CFLAGS)
->>
->> -gen-out-type =3D $(subst .,-,$(suffix $@))
->> +qapi-py =3D $(SRC_PATH)/scripts/qapi/commands.py \
->> +$(SRC_PATH)/scripts/qapi/events.py \
->> +$(SRC_PATH)/scripts/qapi/introspect.py \
->> +$(SRC_PATH)/scripts/qapi/types.py \
->> +$(SRC_PATH)/scripts/qapi/visit.py \
->> +$(SRC_PATH)/scripts/qapi/common.py \
->> +$(SRC_PATH)/scripts/qapi/doc.py \
->> +$(SRC_PATH)/scripts/ordereddict.py \
->> +$(SRC_PATH)/scripts/qapi-gen.py
->>
->> -qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict=
-.py
->> -
->> -qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h=
- :\
->> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qa=
-pi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py=
- \
->> -               $(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
->> -               "GEN","$@")
->> -qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h=
- :\
->> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(qa=
-pi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py=
- \
->> -               $(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
->> -               "GEN","$@")
->> -qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marsha=
-l.c :\
->> -$(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-commands.py $=
-(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands=
-.py \
->> -               $(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
->> -               "GEN","$@")
->> +qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h=
- \
->> +qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h=
- \
->> +qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marsha=
-l.c \
->> +qga/qapi-generated/qga-qapi.texi: \
->> +qga/qapi-generated/qapi-gen-timestamp ;
->> +qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json=
- $(qapi-py)
->> +       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
->> +               -o qga/qapi-generated -p "qga-" $<, \
->> +               "GEN","$(@:%-timestamp=3D%)")
->> +       @>$@
->>
->>  qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.j=
-son \
->>                 $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.=
-json \
->> @@ -512,31 +514,18 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SR=
-C_PATH)/qapi/common.json \
->>                 $(SRC_PATH)/qapi/transaction.json \
->>                 $(SRC_PATH)/qapi/ui.json
->>
->> -qapi-types.c qapi-types.h :\
->> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py=
- \
->> -               $(gen-out-type) -o "." -b $<, \
->> -               "GEN","$@")
->> -qapi-visit.c qapi-visit.h :\
->> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py=
- \
->> -               $(gen-out-type) -o "." -b $<, \
->> -               "GEN","$@")
->> -qapi-event.c qapi-event.h :\
->> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py=
- \
->> -               $(gen-out-type) -o "." $<, \
->> -               "GEN","$@")
->> -qmp-commands.h qmp-marshal.c :\
->> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands=
-.py \
->> -               $(gen-out-type) -o "." $<, \
->> -               "GEN","$@")
->> -qmp-introspect.h qmp-introspect.c :\
->> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspe=
-ct.py \
->> -               $(gen-out-type) -o "." $<, \
->> -               "GEN","$@")
->> +qapi-types.c qapi-types.h \
->> +qapi-visit.c qapi-visit.h \
->> +qmp-commands.h qmp-marshal.c \
->> +qapi-event.c qapi-event.h \
->> +qmp-introspect.h qmp-introspect.c \
->> +qapi.texi: \
->> +qapi-gen-timestamp ;
->> +qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
->> +       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
->> +               -o "." -b $<, \
->> +               "GEN","$(@:%-timestamp=3D%)")
->> +       @>$@
->>
->>  QGALIB_GEN=3D$(addprefix qga/qapi-generated/, qga-qapi-types.h qga-qapi=
--visit.h qga-qmp-commands.h)
->>  $(qga-obj-y): $(QGALIB_GEN)
->> @@ -596,6 +585,7 @@ clean:
->>         rm -f trace/generated-tracers-dtrace.dtrace*
->>         rm -f trace/generated-tracers-dtrace.h*
->>         rm -f $(foreach f,$(GENERATED_FILES),$(f) $(f)-timestamp)
->> +       rm -f qapi-gen-timestamp
->>         rm -rf qapi-generated
->>         rm -rf qga/qapi-generated
->>         for d in $(ALL_SUBDIRS); do \
->> @@ -803,13 +793,11 @@ qemu-monitor-info.texi: $(SRC_PATH)/hmp-commands-i=
-nfo.hx $(SRC_PATH)/scripts/hxt
->>  qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hx=
-tool
->>         $(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,=
-"GEN","$@")
->>
->> -docs/interop/qemu-qmp-qapi.texi docs/interop/qemu-ga-qapi.texi: $(SRC_P=
-ATH)/scripts/qapi2texi.py $(qapi-py)
->> +docs/interop/qemu-qmp-qapi.texi: qapi.texi
->> +       @cp -p $< $@
->>
->> -docs/interop/qemu-qmp-qapi.texi: $(qapi-modules)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py =
-$< > $@,"GEN","$@")
->> -
->> -docs/interop/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py =
-$< > $@,"GEN","$@")
->> +docs/interop/qemu-ga-qapi.texi: qga/qapi-generated/qga-qapi.texi
->> +       @cp -p $< $@
->>
->>  qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-=
-info.texi
->>  qemu.1: qemu-option-trace.texi
->> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
->> new file mode 100755
->> index 0000000000..575c938a1b
->> --- /dev/null
->> +++ b/scripts/qapi-gen.py
->> @@ -0,0 +1,41 @@
->> +#!/usr/bin/env python
->> +# QAPI generator
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
->> +# See the COPYING file in the top-level directory.
->> +
->> +import sys
->> +from qapi.common import parse_command_line, QAPISchema
->> +from qapi.types import gen_types
->> +from qapi.visit import gen_visit
->> +from qapi.commands import gen_commands
->> +from qapi.events import gen_events
->> +from qapi.introspect import gen_introspect
->> +from qapi.doc import gen_doc
->> +
->> +
->> +def main(argv):
->> +    (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
->> +        parse_command_line('bu', ['builtins', 'unmask-non-abi-names'])
->> +
->> +    opt_builtins =3D False
->> +    opt_unmask =3D False
->> +
->> +    for o, a in opts:
->> +        if o in ('-b', '--builtins'):
->> +            opt_builtins =3D True
->> +        if o in ('-u', '--unmask-non-abi-names'):
->> +            opt_unmask =3D True
->> +
->> +    schema =3D QAPISchema(input_file)
->> +
->> +    gen_types(schema, output_dir, prefix, opt_builtins)
->> +    gen_visit(schema, output_dir, prefix, opt_builtins)
->> +    gen_commands(schema, output_dir, prefix)
->> +    gen_events(schema, output_dir, prefix)
->> +    gen_introspect(schema, output_dir, prefix, opt_unmask)
->> +    gen_doc(schema, output_dir, prefix)
->> +
->> +
->> +if __name__ =3D=3D '__main__':
->> +    main(sys.argv)
->> diff --git a/scripts/qapi/__init__.py b/scripts/qapi/__init__.py
->> new file mode 100644
->> index 0000000000..e69de29bb2
->> diff --git a/scripts/qapi-commands.py b/scripts/qapi/commands.py
->> similarity index 94%
->> rename from scripts/qapi-commands.py
->> rename to scripts/qapi/commands.py
->> index 331b58670e..383a4dd426 100644
->> --- a/scripts/qapi-commands.py
->> +++ b/scripts/qapi/commands.py
->> @@ -13,7 +13,7 @@ This work is licensed under the terms of the GNU GPL, =
-version 2.
->>  See the COPYING file in the top-level directory.
->>  """
->>
->> -from qapi import *
->> +from qapi.common import *
->>
->>
->>  def gen_command_decl(name, arg_type, boxed, ret_type):
->> @@ -255,13 +255,8 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor=
-):
->>          self._regy +=3D gen_register_command(name, success_response)
->>
->>
->> -def main(argv):
->> -    (input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_comman=
-d_line()
->> -
->> -    blurb =3D '''
->> - * Schema-defined QAPI/QMP commands
->> -'''
->> -
->> +def gen_commands(schema, output_dir, prefix):
->> +    blurb =3D ' * Schema-defined QAPI/QMP commands'
->>      genc =3D QAPIGenC(blurb, __doc__)
->>      genh =3D QAPIGenH(blurb, __doc__)
->>
->> @@ -290,17 +285,9 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *c=
-mds);
->>  ''',
->>                      prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=
-=3DFalse)))
->>
->> -    schema =3D QAPISchema(input_file)
->>      vis =3D QAPISchemaGenCommandVisitor(prefix)
->>      schema.visit(vis)
->>      genc.body(vis.defn)
->>      genh.body(vis.decl)
->> -
->> -    if do_c:
->> -        genc.write(output_dir, prefix + 'qmp-marshal.c')
->> -    if do_h:
->> -        genh.write(output_dir, prefix + 'qmp-commands.h')
->> -
->> -
->> -if __name__ =3D=3D '__main__':
->> -    main(sys.argv)
->> +    genc.write(output_dir, prefix + 'qmp-marshal.c')
->> +    genh.write(output_dir, prefix + 'qmp-commands.h')
->> diff --git a/scripts/qapi.py b/scripts/qapi/common.py
->> similarity index 100%
->> rename from scripts/qapi.py
->> rename to scripts/qapi/common.py
->> diff --git a/scripts/qapi2texi.py b/scripts/qapi/doc.py
->> old mode 100755
->> new mode 100644
->> similarity index 92%
->> rename from scripts/qapi2texi.py
->> rename to scripts/qapi/doc.py
->> index 924b374cd3..1f57f6e1c2
->> --- a/scripts/qapi2texi.py
->> +++ b/scripts/qapi/doc.py
->> @@ -4,10 +4,9 @@
->>  # This work is licensed under the terms of the GNU LGPL, version 2+.
->>  # See the COPYING file in the top-level directory.
->>  """This script produces the documentation of a qapi schema in texinfo f=
-ormat"""
->> +
->>  import re
->> -import sys
->> -
->> -import qapi
->> +import qapi.common
->>
->>  MSG_FMT =3D """
->>  @deftypefn {type} {{}} {name}
->> @@ -196,7 +195,7 @@ def texi_entity(doc, what, base=3DNone, variants=3DN=
-one,
->>              + texi_sections(doc))
->>
->>
->> -class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
->> +class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
->
-> Would be a bit easier to read and more consitent with a top-level
-> "from qapi.common import QAPISchemaVisitor"
 
-Can do.
+--OiIhLG6kpXdY51kX8TKItRtfararV9voZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->>      def __init__(self):
->>          self.out =3D None
->>          self.cur_doc =3D None
->> @@ -271,20 +270,8 @@ def texi_schema(schema):
->>      return gen.out
->>
->>
->> -def main(argv):
->> -    """Takes schema argument, prints result to stdout"""
->> -    if len(argv) !=3D 2:
->> -        print >>sys.stderr, "%s: need exactly 1 argument: SCHEMA" % arg=
-v[0]
->> -        sys.exit(1)
->> -
->> -    schema =3D qapi.QAPISchema(argv[1])
->> -    if not qapi.doc_required:
->> -        print >>sys.stderr, ("%s: need pragma 'doc-required' "
->> -                             "to generate documentation" % argv[0])
->> -        sys.exit(1)
->> -    print '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n'
->> -    print texi_schema(schema),
->> -
->> -
->> -if __name__ =3D=3D '__main__':
->> -    main(sys.argv)
->> +def gen_doc(schema, output_dir, prefix):
->> +    if qapi.common.doc_required:
->> +        gen =3D qapi.common.QAPIGenDoc()
->> +        gen.body(texi_schema(schema))
->> +        gen.write(output_dir, prefix + 'qapi.texi')
->> diff --git a/scripts/qapi-event.py b/scripts/qapi/events.py
->> similarity index 92%
->> rename from scripts/qapi-event.py
->> rename to scripts/qapi/events.py
->> index 5b33c694d4..1f267686db 100644
->> --- a/scripts/qapi-event.py
->> +++ b/scripts/qapi/events.py
->> @@ -12,7 +12,7 @@ This work is licensed under the terms of the GNU GPL, =
-version 2.
->>  See the COPYING file in the top-level directory.
->>  """
->>
->> -from qapi import *
->> +from qapi.common import *
->>
->>
->>  def build_event_send_proto(name, arg_type, boxed):
->> @@ -171,13 +171,8 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
->>          self._event_names.append(name)
->>
->>
->> -def main(argv):
->> -    (input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_comma=
-nd_line()
->> -
->> -    blurb =3D '''
->> - * Schema-defined QAPI/QMP events
->> -'''
->> -
->> +def gen_events(schema, output_dir, prefix):
->> +    blurb =3D ' * Schema-defined QAPI/QMP events'
->>      genc =3D QAPIGenC(blurb, __doc__)
->>      genh =3D QAPIGenH(blurb, __doc__)
->>
->> @@ -201,17 +196,9 @@ def main(argv):
->>  ''',
->>                      prefix=3Dprefix))
->>
->> -    schema =3D QAPISchema(input_file)
->>      vis =3D QAPISchemaGenEventVisitor(prefix)
->>      schema.visit(vis)
->>      genc.body(vis.defn)
->>      genh.body(vis.decl)
->> -
->> -    if do_c:
->> -        genc.write(output_dir, prefix + 'qapi-event.c')
->> -    if do_h:
->> -        genh.write(output_dir, prefix + 'qapi-event.h')
->> -
->> -
->> -if __name__ =3D=3D '__main__':
->> -    main(sys.argv)
->> +    genc.write(output_dir, prefix + 'qapi-event.c')
->> +    genh.write(output_dir, prefix + 'qapi-event.h')
->> diff --git a/scripts/qapi-introspect.py b/scripts/qapi/introspect.py
->> similarity index 90%
->> rename from scripts/qapi-introspect.py
->> rename to scripts/qapi/introspect.py
->> index 09e7d1f140..2153060f2c 100644
->> --- a/scripts/qapi-introspect.py
->> +++ b/scripts/qapi/introspect.py
->> @@ -10,7 +10,7 @@ This work is licensed under the terms of the GNU GPL, =
-version 2.
->>  See the COPYING file in the top-level directory.
->>  """
->>
->> -from qapi import *
->> +from qapi.common import *
->>
->>
->>  # Caveman's json.dumps() replacement (we're stuck at Python 2.4)
->> @@ -168,22 +168,8 @@ const char %(c_name)s[] =3D %(c_string)s;
->>          self._gen_json(name, 'event', {'arg-type': self._use_type(arg_t=
-ype)})
->>
->>
->> -def main(argv):
->> -    # Debugging aid: unmask QAPI schema's type names
->> -    # We normally mask them, because they're not QMP wire ABI
->> -    opt_unmask =3D False
->> -
->> -    (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
->> -        parse_command_line('u', ['unmask-non-abi-names'])
->> -
->> -    for o, a in opts:
->> -        if o in ('-u', '--unmask-non-abi-names'):
->> -            opt_unmask =3D True
->> -
->> -    blurb =3D '''
->> - * QAPI/QMP schema introspection
->> -'''
->> -
->> +def gen_introspect(schema, output_dir, prefix, opt_unmask):
->> +    blurb =3D ' * QAPI/QMP schema introspection'
->>      genc =3D QAPIGenC(blurb, __doc__)
->>      genh =3D QAPIGenH(blurb, __doc__)
->>
->> @@ -194,17 +180,9 @@ def main(argv):
->>  ''',
->>                      prefix=3Dprefix))
->>
->> -    schema =3D QAPISchema(input_file)
->>      vis =3D QAPISchemaGenIntrospectVisitor(prefix, opt_unmask)
->>      schema.visit(vis)
->>      genc.body(vis.defn)
->>      genh.body(vis.decl)
->> -
->> -    if do_c:
->> -        genc.write(output_dir, prefix + 'qmp-introspect.c')
->> -    if do_h:
->> -        genh.write(output_dir, prefix + 'qmp-introspect.h')
->> -
->> -
->> -if __name__ =3D=3D '__main__':
->> -    main(sys.argv)
->> +    genc.write(output_dir, prefix + 'qmp-introspect.c')
->> +    genh.write(output_dir, prefix + 'qmp-introspect.h')
->> diff --git a/scripts/qapi-types.py b/scripts/qapi/types.py
->> similarity index 90%
->> rename from scripts/qapi-types.py
->> rename to scripts/qapi/types.py
->> index f2ddde94b1..b2095120e0 100644
->> --- a/scripts/qapi-types.py
->> +++ b/scripts/qapi/types.py
->> @@ -13,7 +13,7 @@ This work is licensed under the terms of the GNU GPL, =
-version 2.
->>  # See the COPYING file in the top-level directory.
->>  """
->>
->> -from qapi import *
->> +from qapi.common import *
->>
->>
->>  # variants must be emitted before their container; track what has alrea=
-dy
->> @@ -241,24 +241,8 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
->>          self._gen_type_cleanup(name)
->>
->>
->> -def main(argv):
->> -    # If you link code generated from multiple schemata, you want only =
-one
->> -    # instance of the code for built-in types.  Generate it only when
->> -    # opt_builtins, enabled by command line option -b.  See also
->> -    # QAPISchemaGenTypeVisitor.visit_end().
->> -    opt_builtins =3D False
->> -
->> -    (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
->> -        parse_command_line('b', ['builtins'])
->> -
->> -    for o, a in opts:
->> -        if o in ('-b', '--builtins'):
->> -            opt_builtins =3D True
->> -
->> -    blurb =3D '''
->> - * Schema-defined QAPI types
->> -'''
->> -
->> +def gen_types(schema, output_dir, prefix, opt_builtins):
->> +    blurb =3D ' * Schema-defined QAPI types'
->>      genc =3D QAPIGenC(blurb, __doc__)
->>      genh =3D QAPIGenH(blurb, __doc__)
->>
->> @@ -274,17 +258,9 @@ def main(argv):
->>  #include "qapi/util.h"
->>  '''))
->>
->> -    schema =3D QAPISchema(input_file)
->>      vis =3D QAPISchemaGenTypeVisitor(opt_builtins)
->>      schema.visit(vis)
->>      genc.body(vis.defn)
->>      genh.body(vis.decl)
->> -
->> -    if do_c:
->> -        genc.write(output_dir, prefix + 'qapi-types.c')
->> -    if do_h:
->> -        genh.write(output_dir, prefix + 'qapi-types.h')
->> -
->> -
->> -if __name__ =3D=3D '__main__':
->> -    main(sys.argv)
->> +    genc.write(output_dir, prefix + 'qapi-types.c')
->> +    genh.write(output_dir, prefix + 'qapi-types.h')
->> diff --git a/scripts/qapi-visit.py b/scripts/qapi/visit.py
->> similarity index 92%
->> rename from scripts/qapi-visit.py
->> rename to scripts/qapi/visit.py
->> index 473fa72574..80c0b85f8c 100644
->> --- a/scripts/qapi-visit.py
->> +++ b/scripts/qapi/visit.py
->> @@ -13,7 +13,7 @@ This work is licensed under the terms of the GNU GPL, =
-version 2.
->>  See the COPYING file in the top-level directory.
->>  """
->>
->> -from qapi import *
->> +from qapi.common import *
->>
->>
->>  def gen_visit_decl(name, scalar=3DFalse):
->> @@ -324,24 +324,8 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->>          self.defn +=3D gen_visit_alternate(name, variants)
->>
->>
->> -def main(argv):
->> -    # If you link code generated from multiple schemata, you want only =
-one
->> -    # instance of the code for built-in types.  Generate it only when
->> -    # opt_builtins, enabled by command line option -b.  See also
->> -    # QAPISchemaGenVisitVisitor.visit_end().
->> -    opt_builtins =3D False
->> -
->> -    (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
->> -        parse_command_line('b', ['builtins'])
->> -
->> -    for o, a in opts:
->> -        if o in ('-b', '--builtins'):
->> -            opt_builtins =3D True
->> -
->> -    blurb =3D '''
->> - * Schema-defined QAPI visitors
->> -'''
->> -
->> +def gen_visit(schema, output_dir, prefix, opt_builtins):
->> +    blurb =3D ' * Schema-defined QAPI visitors'
->>      genc =3D QAPIGenC(blurb, __doc__)
->>      genh =3D QAPIGenH(blurb, __doc__)
->>
->> @@ -361,17 +345,9 @@ def main(argv):
->>  ''',
->>                      prefix=3Dprefix))
->>
->> -    schema =3D QAPISchema(input_file)
->>      vis =3D QAPISchemaGenVisitVisitor(opt_builtins)
->>      schema.visit(vis)
->>      genc.body(vis.defn)
->>      genh.body(vis.decl)
->> -
->> -    if do_c:
->> -        genc.write(output_dir, prefix + 'qapi-visit.c')
->> -    if do_h:
->> -        genh.write(output_dir, prefix + 'qapi-visit.h')
->> -
->> -
->> -if __name__ =3D=3D '__main__':
->> -    main(sys.argv)
->> +    genc.write(output_dir, prefix + 'qapi-visit.c')
->> +    genh.write(output_dir, prefix + 'qapi-visit.h')
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 851aafe9d1..768655a810 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -23,7 +23,16 @@ check-help:
->>  ifneq ($(wildcard config-host.mak),)
->>  export SRC_PATH
->>
->> -qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict=
-.py
->> +# TODO don't duplicate $(SRC_PATH)/Makefile's qapi-py here
->
-> hmm, it doesn't look necessary, since the makefile is included from
-> there. Right?
+-----BEGIN PGP SIGNATURE-----
 
-That's what I thought, so I deleted it, breaking my build.  I still
-don't quite understand what's happening here.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp4epISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AvmgH+QHG7nzsm6OXb/8VihXvlRPvXuL4fHTk
+f5+NRnmNb+ddVZGh6l6GovYXoqLowSqRffGzVN6DF4zTmg6Ls/ngxh7ipE0ujbRN
+X9xas1RRIOEg5TqUphdubOgbD5KuHDBRagyYIxWZyk+d591QFB+LfQsMVmg+T8/5
+NuF6ydmELSli87/Kb2/mnOKRgR9PQWkVuBHsDVFKNznxbUBzdNI2DG3JCn5seIP/
+O8YpOaFwac4V2PpG35tGyMMhwBezfCuDXRWp6ynZLxQqaPVQvHsv1L8lxz1yUoGD
+RRBTWIjOs0Lsdg3+5UbqLIgRAYYKH6upzS0A8fGRFy4ge1AT+G68S6s=
+=l8yg
+-----END PGP SIGNATURE-----
 
->> +qapi-py =3D $(SRC_PATH)/scripts/qapi/commands.py \
->> +$(SRC_PATH)/scripts/qapi/events.py \
->> +$(SRC_PATH)/scripts/qapi/introspect.py \
->> +$(SRC_PATH)/scripts/qapi/types.py \
->> +$(SRC_PATH)/scripts/qapi/visit.py \
->> +$(SRC_PATH)/scripts/qapi/common.py \
->> +$(SRC_PATH)/scripts/qapi/doc.py \
->> +$(SRC_PATH)/scripts/ordereddict.py \
->> +$(SRC_PATH)/scripts/qapi-gen.py
->>
->>  # Get the list of all supported sysemu targets
->>  SYSEMU_TARGET_LIST :=3D $(subst -softmmu.mak,,$(notdir \
->> @@ -642,34 +651,24 @@ tests/test-logging$(EXESUF): tests/test-logging.o =
-$(test-util-obj-y)
->>  tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-o=
-bj-y) \
->>         $(test-block-obj-y)
->>
->> -tests/test-qapi-types.c tests/test-qapi-types.h :\
->> -$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts=
-/qapi-types.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py=
- \
->> -               $(gen-out-type) -o tests -p "test-" $<, \
->> -               "GEN","$@")
->> -tests/test-qapi-visit.c tests/test-qapi-visit.h :\
->> -$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts=
-/qapi-visit.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py=
- \
->> -               $(gen-out-type) -o tests -p "test-" $<, \
->> -               "GEN","$@")
->> -tests/test-qmp-commands.h tests/test-qmp-marshal.c :\
->> -$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts=
-/qapi-commands.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands=
-.py \
->> -               $(gen-out-type) -o tests -p "test-" $<, \
->> -               "GEN","$@")
->> -tests/test-qapi-event.c tests/test-qapi-event.h :\
->> -$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts=
-/qapi-event.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py=
- \
->> -               $(gen-out-type) -o tests -p "test-" $<, \
->> -               "GEN","$@")
->> -tests/test-qmp-introspect.c tests/test-qmp-introspect.h :\
->> -$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts=
-/qapi-introspect.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspe=
-ct.py \
->> -               $(gen-out-type) -o tests -p "test-" $<, \
->> -               "GEN","$@")
->> +tests/test-qapi-types.c tests/test-qapi-types.h \
->> +tests/test-qapi-visit.c tests/test-qapi-visit.h \
->> +tests/test-qmp-commands.h tests/test-qmp-marshal.c \
->> +tests/test-qapi-event.c tests/test-qapi-event.h \
->> +tests/test-qmp-introspect.c tests/test-qmp-introspect.h: \
->> +tests/test-qapi-gen-timestamp ;
->> +tests/test-qapi-gen-timestamp: $(SRC_PATH)/tests/qapi-schema/qapi-schem=
-a-test.json $(qapi-py)
->> +       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
->> +               -o tests -p "test-" $<, \
->> +               "GEN","$(@:%-timestamp=3D%)")
->> +       @>$@
->>
->> -tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc=
--good.json $(SRC_PATH)/scripts/qapi2texi.py $(qapi-py)
->> -       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py =
-$< > $@,"GEN","$@")
->> +tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc=
--good.json $(qapi-py)
->> +       $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
->> +               -o tests/qapi-schema -p "doc-good-" $<, \
->> +               "GEN","$@")
->> +       @mv tests/qapi-schema/doc-good-qapi.texi $@
->> +       @rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-schema/=
-doc-good-qmp-*.[ch]
->>
->>  tests/test-string-output-visitor$(EXESUF): tests/test-string-output-vis=
-itor.o $(test-qapi-obj-y)
->>  tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visit=
-or.o $(test-qapi-obj-y)
->> @@ -937,6 +936,7 @@ check-clean:
->>         $(MAKE) -C tests/tcg clean
->>         rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->>         rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qt=
-est-$(target)-y)) $(check-qtest-generic-y))
->> +       rm -f tests/test-qapi-gen-timestamp
->>
->>  clean: check-clean
->>
->> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qap=
-i.py
->> index fe0ca08d78..7772d09919 100644
->> --- a/tests/qapi-schema/test-qapi.py
->> +++ b/tests/qapi-schema/test-qapi.py
->> @@ -10,7 +10,7 @@
->>  # See the COPYING file in the top-level directory.
->>  #
->>
->> -from qapi import *
->> +from qapi.common import *
->>  from pprint import pprint
->>  import os
->>  import sys
->> --
->> 2.13.6
->>
->
-> good to me otherwise,
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Thanks!
+--OiIhLG6kpXdY51kX8TKItRtfararV9voZ--
