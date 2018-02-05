@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eijeC-0001UM-Sh
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:29:40 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eijgm-0003lT-J5
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:32:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eije8-0006Oi-3Y
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:29:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eije7-0006MS-Sv
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:29:32 -0500
-Date: Mon, 5 Feb 2018 17:29:18 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180205172918.62588fd6@redhat.com>
-In-Reply-To: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
-References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
+	(envelope-from <mreitz@redhat.com>) id 1eijgl-0005Pv-IQ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:32:16 -0500
+References: <cover.1517840876.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f441889f-c0a7-8b7b-5125-e9d852896669@redhat.com>
+Date: Mon, 5 Feb 2018 17:31:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="16qHJOJE3BM38GswpyqLTjrKPX2HUsflB"
+Subject: Re: [Qemu-devel] [PATCH v4 00/39] Allow configuring the qcow2 L2
+ cache entry size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,81 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jianfeng Tan <jianfeng.tan@intel.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-On Mon,  5 Feb 2018 14:58:55 +0000
-Jianfeng Tan <jianfeng.tan@intel.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--16qHJOJE3BM38GswpyqLTjrKPX2HUsflB
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <f441889f-c0a7-8b7b-5125-e9d852896669@redhat.com>
+Subject: Re: [PATCH v4 00/39] Allow configuring the qcow2 L2 cache entry size
+References: <cover.1517840876.git.berto@igalia.com>
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Existing VMs with virtio devices and vhost-kernel as the backend
-> are always started with mem config:
-> 
->   "-m xG"
->   (with a ram block named "pc.ram")
-> 
-> while new VMs with virtio devices and vhost-user as the backend
-> are always started with mem config:
-> 
->   "-m xG -numa node,memdev=pc.ram -object memory-backend-file,id=pc.ram,..."
->   (with a ram block named "/object/pc.ram")
-could you elaborate more on what src command line migrating to what dst command line?
+On 2018-02-05 15:33, Alberto Garcia wrote:
+> this is the new revision of the patch series to allow configuring the
+> entry size of the qcow2 L2 cache. Follow this link for the full
+> description from the first version:
+>=20
+>    https://lists.gnu.org/archive/html/qemu-block/2017-10/msg00458.html
+>=20
+> And here are some numbers showing the performance improvements:
+>=20
+>    https://lists.gnu.org/archive/html/qemu-block/2017-12/msg00507.html
+>=20
+> Regards,
+>=20
+> Berto
+
+Looks good to me, and all qcow2 iotests pass when the default L2 slice
+size is changed (in the code) to 512, so it should be good.
+
+I'll still give it a couple of days for others to protest. :-)
+
+Max
 
 
-> As we migrate from vhost-kernel to vhost-user, it failes as:
-> 
->   Unknown ramblock "pc.ram", cannot accept migration
->   error while loading state for instance 0x0 of device 'ram'
->   load of migration failed: Invalid argument
-> 
-> Here are some options to fix this:
-> 
-> 1. When we do ram name comparison, we truncate the prefix as this patch shows.
-> It cannot cover the corner case: the source VM could have two ram blocks
-> with name of "pc.ram" and "/object/pc.ram".
-> 
-> 2. We add an alias name to RAMBlock; when we do name comparison, not only
-> idstr is compared, but also compared to the alias. But this will add more
-> complexity to upper layer stack OpenStack/libvirt.
-> 
-> Any thoughts?
-> 
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Jianfeng Tan <jianfeng.tan@intel.com>
-> ---
->  exec.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 4722e52..d294e5c 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2334,13 +2334,24 @@ found:
->  RAMBlock *qemu_ram_block_by_name(const char *name)
->  {
->      RAMBlock *block;
-> +    char *name1, *id1;
-> +    char *name2, *id2;
-> +
-> +    name1 = strdup(name);
-> +    id1 = basename(name1);
->  
->      RAMBLOCK_FOREACH(block) {
-> -        if (!strcmp(name, block->idstr)) {
-> +        name2 = strdup(block->idstr);
-> +	id2 = basename(name2);
-> +        if (!strcmp(id1, id2)) {
-> +            free(name1);
-> +	    free(name2);
->              return block;
->          }
-> +	free(name2);
->      }
->  
-> +    free(name1);
->      return NULL;
->  }
->  
+--16qHJOJE3BM38GswpyqLTjrKPX2HUsflB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp4hv8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ASFUH/3EPZi1VSClnxoFoo0NkeM+x6UgVr/hF
+bQloYlwGA4I5RUwcvl5d/ZjhTEpqGtiXW9wrfiXw1UZPCTnOL//Xl/MiIGrTMsPq
+XepD2sNp8+dUa167nT8WangCI3nZFFb9W+vklAbEgsPfgeM3W0YTTjL5y3uOEz6h
+rMpHR+Qlqos9xN2jy/7dbternPmSldUYE1eCoueXHQ0sqNu5uyi3lJiBpbtRenti
+Zp2nLzohthM2eDozWZwpr47LhEV4z8pXve6G46XT3epAsCRu0tF6Ldi5naf38RR1
+nJXRgGZclQRfIAcbKRMTP9AqF/GOzwy+gujwV0ozTviwU1ceNwbzwY0=
+=gkSE
+-----END PGP SIGNATURE-----
+
+--16qHJOJE3BM38GswpyqLTjrKPX2HUsflB--
