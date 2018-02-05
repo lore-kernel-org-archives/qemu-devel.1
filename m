@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eima6-0003uy-9v
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:37:35 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eimc0-00067f-Is
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eima3-0003Sa-4n
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:37:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41498)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eima2-0003S7-Sr
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:37:31 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 24F7B28206
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 19:37:30 +0000 (UTC)
-References: <20180205152455.12088-1-berrange@redhat.com>
-	<20180205152455.12088-3-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8ab20df7-a6fe-7dca-d6c3-f3ab33f78550@redhat.com>
-Date: Mon, 5 Feb 2018 13:37:21 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eimbx-0004Zq-Ev
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:39:32 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:39433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eimbx-0004Zc-8h
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:39:29 -0500
+Received: by mail-qk0-x242.google.com with SMTP id d72so3933593qkc.6
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:39:29 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
+	<20180203103727.26457-7-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5c44b1ee-8d6a-094f-6bf6-bad23fdfda91@amsat.org>
+Date: Mon, 5 Feb 2018 16:39:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180205152455.12088-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] cutils: add qemu_strtoi &
- qemu_strtoui parsers for int/unsigned int types
+In-Reply-To: <20180203103727.26457-7-mark.cave-ayland@ilande.co.uk>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="ZtLDYxYwZT5rAzX0dxobVvtL5gZEjwKZQ"
+Subject: Re: [Qemu-devel] [PATCH 06/10] cuda: minor cosmetic tidy-ups to
+ get_next_irq_time()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,92 +36,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, lvivier@redhat.com
 
-On 02/05/2018 09:24 AM, Daniel P. Berrang=C3=A9 wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> There are qemu_strtoNN functions for various sized integers. This adds =
-two
-> more for plain int & unsigned int types, with suitable range checking.
->=20
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZtLDYxYwZT5rAzX0dxobVvtL5gZEjwKZQ
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ lvivier@redhat.com
+Message-ID: <5c44b1ee-8d6a-094f-6bf6-bad23fdfda91@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 06/10] cuda: minor cosmetic tidy-ups to
+ get_next_irq_time()
+References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
+ <20180203103727.26457-7-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180203103727.26457-7-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 02/03/2018 07:37 AM, Mark Cave-Ayland wrote:
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
 > ---
-
-> +++ b/util/cutils.c
-> @@ -297,6 +297,110 @@ static int check_strtox_error(const char *nptr, c=
-har *ep,
->       return -libc_errno;
->   }
->  =20
-> +/**
-> + * Convert string @nptr to a long integer, and store it in @result.
-
-s/a long/an/
-
-> + */
-> +int qemu_strtoi(const char *nptr, const char **endptr, int base,
-> +                int *result)
-> +{
-> +    char *ep;
-> +    long lresult;
-> +
-> +    if (!nptr) {
-> +        if (endptr) {
-> +            *endptr =3D nptr;
-> +        }
-> +        return -EINVAL;
+>  hw/misc/macio/cuda.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+> index a200320e7d..3336ed46b2 100644
+> --- a/hw/misc/macio/cuda.c
+> +++ b/hw/misc/macio/cuda.c
+> @@ -184,36 +184,37 @@ static void set_counter(CUDAState *s, CUDATimer *=
+ti, unsigned int val)
+>      cuda_timer_update(s, ti, ti->load_time);
+>  }
+> =20
+> -static int64_t get_next_irq_time(CUDATimer *s, int64_t current_time)
+> +static int64_t get_next_irq_time(CUDATimer *ti, int64_t current_time)
+>  {
+>      int64_t d, next_time;
+>      unsigned int counter;
+> =20
+>      /* current counter value */
+> -    d =3D muldiv64(current_time - s->load_time,
+> +    d =3D muldiv64(current_time - ti->load_time,
+>                   CUDA_TIMER_FREQ, NANOSECONDS_PER_SECOND);
+>      /* the timer goes down from latch to -1 (period of latch + 2) */
+> -    if (d <=3D (s->counter_value + 1)) {
+> -        counter =3D (s->counter_value - d) & 0xffff;
+> +    if (d <=3D (ti->counter_value + 1)) {
+> +        counter =3D (ti->counter_value - d) & 0xffff;
+>      } else {
+> -        counter =3D (d - (s->counter_value + 1)) % (s->latch + 2);
+> -        counter =3D (s->latch - counter) & 0xffff;
+> +        counter =3D (d - (ti->counter_value + 1)) % (ti->latch + 2);
+> +        counter =3D (ti->latch - counter) & 0xffff;
+>      }
+> =20
+>      /* Note: we consider the irq is raised on 0 */
+>      if (counter =3D=3D 0xffff) {
+> -        next_time =3D d + s->latch + 1;
+> +        next_time =3D d + ti->latch + 1;
+>      } else if (counter =3D=3D 0) {
+> -        next_time =3D d + s->latch + 2;
+> +        next_time =3D d + ti->latch + 2;
+>      } else {
+>          next_time =3D d + counter;
+>      }
+>      CUDA_DPRINTF("latch=3D%d counter=3D%" PRId64 " delta_next=3D%" PRI=
+d64 "\n",
+> -                 s->latch, d, next_time - d);
+> +                 ti->latch, d, next_time - d);
+>      next_time =3D muldiv64(next_time, NANOSECONDS_PER_SECOND, CUDA_TIM=
+ER_FREQ) +
+> -        s->load_time;
+> -    if (next_time <=3D current_time)
+> +                         ti->load_time;
+> +    if (next_time <=3D current_time) {
+>          next_time =3D current_time + 1;
 > +    }
-> +
-> +    errno =3D 0;
-> +    lresult =3D strtol(nptr, &ep, base);
-> +    if (lresult < INT_MIN) {
-> +        *result =3D INT_MIN;
-> +    } else if (lresult > INT_MAX) {
-> +        *result =3D INT_MAX;
-
-On 64-bit platforms, this clamps the result, but does not set errno, for=20
-values beyond int but still within the range of long.  Which is=20
-different than what it does on 32-bit platforms.  Gross.  The testsuite=20
-is missing coverage of this, which ideally would be the same behavior=20
-(setting errno=3DERANGE) on both platforms.
-
-> +    } else {
-> +        *result =3D lresult;
-> +    }
-> +    return check_strtox_error(nptr, ep, endptr, errno);
-> +}
-> +
-> +/**
-> + * Convert string @nptr to an unsigned int, and store it in @result.
-
-> + * Note that a number with a leading minus sign gets converted without
-> + * the minus sign, checked for overflow (see above), then negated (in
-> + * @result's type).  This is exactly how strtoul() works.
-> + */
-> +int qemu_strtoui(const char *nptr, const char **endptr, int base,
-> +                 unsigned int *result)
-> +{
-
-> +
-> +    errno =3D 0;
-> +    lresult =3D strtol(nptr, &ep, base);
-> +    /* Windows returns 1 for negative out-of-range values.  */
-> +    if (errno =3D=3D ERANGE) {
-> +        *result =3D -1;
-> +    } else {
-> +        if (lresult > UINT_MAX) {
-> +            *result =3D UINT_MAX;
-> +        } else if (lresult < INT_MIN) {
-> +            *result =3D UINT_MAX;
-
-Again, an unfortunate difference between 32- and 64-bit platforms on=20
-whether errno is set.
+>      return next_time;
+>  }
+> =20
+>=20
 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--ZtLDYxYwZT5rAzX0dxobVvtL5gZEjwKZQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp4susACgkQ4+MsLN6t
+wN4uNxAAwAMF7Tm05/3TUyYeSaOZW4Qk6kouDp7fZotlHtExuB+4lnLvvmd0y9cD
+aoTi2JvPdopC77drdYtGTUC5p3pWlo/gpHDzW1gIGq2sSvBixxs6d1m7XOMw1oBu
+I0Z4k4uI9mVvnRcaTOQBpMOT1oIL7v/GojDQKKxGlKsrY76dJRG6dkAulngQwPrQ
+G6OY7h77ZBsc1griVIKK/H0dDqfMFBuxbR3k0/fbD5fLA1Wz7pdZz25a827NDGUv
+0MWU34HjzgfCzuZivxL9mpTPxzU5sP2TnDwwIQM37jd2SwtkZPzuck4U4lIr0VSj
+oy8KXBp47IHR3bmzfrqDqKCzd2WJcyzfqYMAW21cBDnSPrUMyJawEoi/qwnzstLp
+luiSPdm1TS51dOnoGenCJA8vPY/ZsoDIBuTCwqrbehpTDzeJOmql/i1O1HmW/RGd
+VaXL6s0ABe6+73xD3apLCl0dHV3oBow3CoDFEk1ZeiGqJ0IW4cDDBl9X4xD3eJcy
+Us6HxeWQS59ypZBQ/fYoA48lq/+hPoqMW2jyXxEqHXxsdGgjPm90KLiZJvtqg/iR
+8+PxKN0nZASp+cfyCSlqmRJA8xnG0xL0V6v9bGwhFoT205WgZWHpNxQw8z7BdXT/
+OD0Q6g/nWlIDXYVEaWy2oqCXcL5f3mNXcr8BIgs8ptEtWfSU+Zw=
+=fzS1
+-----END PGP SIGNATURE-----
+
+--ZtLDYxYwZT5rAzX0dxobVvtL5gZEjwKZQ--
