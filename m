@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eiikF-0001rT-AS
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:31:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1eiimt-0004D8-IE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:34:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eiikB-00062R-6R
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:31:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39602)
+	(envelope-from <armbru@redhat.com>) id 1eiimr-0002sL-OX
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:34:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56684)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eiikA-00060u-Tp
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:31:43 -0500
-Date: Mon, 5 Feb 2018 15:31:40 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180205153140.GD28241@stefanha-x1.localdomain>
-References: <20180202111022.rtnvwmjs4r4jzttq@olga.proxmox.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eiimr-0002qE-GQ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:34:29 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-4-armbru@redhat.com>
+	<CAMxuvaxLJ2TRXBeFRjF=-RP6dMcfXY1F-Hf+2YvMm9Jpoh+D4A@mail.gmail.com>
+Date: Mon, 05 Feb 2018 16:34:13 +0100
+In-Reply-To: <CAMxuvaxLJ2TRXBeFRjF=-RP6dMcfXY1F-Hf+2YvMm9Jpoh+D4A@mail.gmail.com>
+	(Marc-Andre Lureau's message of "Mon, 5 Feb 2018 14:44:47 +0100")
+Message-ID: <877errjvre.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="RhUH2Ysw6aD5utA4"
-Content-Disposition: inline
-In-Reply-To: <20180202111022.rtnvwmjs4r4jzttq@olga.proxmox.com>
-Subject: Re: [Qemu-devel] rate limiting issues
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 03/21] qapi: New classes QAPIGenC,
+ QAPIGenH, QAPIGenDoc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,155 +30,445 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Cc: qemu-devel@nongnu.org
+To: Marc-Andre Lureau <mlureau@redhat.com>
+Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
 
+Marc-Andre Lureau <mlureau@redhat.com> writes:
 
---RhUH2Ysw6aD5utA4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Hi
+>
+> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> These classes encapsulate accumulating and writing output.
+>>
+>> Convert C code generation to QAPIGenC and QAPIGenH.  The conversion is
+>> rather shallow: most of the output accumulation is not converted.
+>> Left for later.
+>>
+>> The indentation machinery uses a single global variable indent_level,
+>> even though we generally interleave creation of a .c and its .h.  It
+>> should become instance variable of QAPIGenC.  Also left for later.
+>>
+>> Documentation generation isn't converted, and QAPIGenDoc isn't used.
+>> This will change shortly.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  scripts/qapi-commands.py   | 27 ++++++-------
+>>  scripts/qapi-event.py      | 26 +++++++------
+>>  scripts/qapi-introspect.py | 22 ++++++-----
+>>  scripts/qapi-types.py      | 26 +++++++------
+>>  scripts/qapi-visit.py      | 26 +++++++------
+>>  scripts/qapi.py            | 96 ++++++++++++++++++++++++++-------------=
+-------
+>>  6 files changed, 122 insertions(+), 101 deletions(-)
+>>
+>> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+>> index a861ac52e7..4be7dbc482 100644
+>> --- a/scripts/qapi-commands.py
+>> +++ b/scripts/qapi-commands.py
+>> @@ -260,12 +260,10 @@ blurb =3D '''
+>>   * Schema-defined QAPI/QMP commands
+>>  '''
+>>
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qmp-marshal.c', 'qmp-commands.h',
+>> -                            blurb, __doc__)
+>> -
+>> -fdef.write(mcgen('''
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>
+>> +genc.body(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "qemu-common.h"
+>>  #include "qemu/module.h"
+>> @@ -279,21 +277,24 @@ fdef.write(mcgen('''
+>>  #include "%(prefix)sqmp-commands.h"
+>>
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +                prefix=3Dprefix))
+>>
+>> -fdecl.write(mcgen('''
+>> +genh.body(mcgen('''
+>>  #include "%(prefix)sqapi-types.h"
+>>  #include "qapi/qmp/qdict.h"
+>>  #include "qapi/qmp/dispatch.h"
+>>
+>>  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+>>  ''',
+>> -                  prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3D=
+False)))
+>> +                prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3DFa=
+lse)))
+>>
+>>  schema =3D QAPISchema(input_file)
+>> -gen =3D QAPISchemaGenCommandVisitor()
+>> -schema.visit(gen)
+>> -fdef.write(gen.defn)
+>> -fdecl.write(gen.decl)
+>> +vis =3D QAPISchemaGenCommandVisitor()
+>> +schema.visit(vis)
+>> +genc.body(vis.defn)
+>> +genh.body(vis.decl)
+>>
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qmp-marshal.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qmp-commands.h')
+>> diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+>> index b1d611c5ea..da3de17c76 100644
+>> --- a/scripts/qapi-event.py
+>> +++ b/scripts/qapi-event.py
+>> @@ -176,11 +176,10 @@ blurb =3D '''
+>>   * Schema-defined QAPI/QMP events
+>>  '''
+>>
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qapi-event.c', 'qapi-event.h',
+>> -                            blurb, __doc__)
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>
+>> -fdef.write(mcgen('''
+>> +genc.body(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "qemu-common.h"
+>>  #include "%(prefix)sqapi-event.h"
+>> @@ -190,22 +189,25 @@ fdef.write(mcgen('''
+>>  #include "qapi/qmp-event.h"
+>>
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +                prefix=3Dprefix))
+>>
+>> -fdecl.write(mcgen('''
+>> +genh.body(mcgen('''
+>>  #include "qapi/util.h"
+>>  #include "qapi/qmp/qdict.h"
+>>  #include "%(prefix)sqapi-types.h"
+>>
+>>  ''',
+>> -                  prefix=3Dprefix))
+>> +                prefix=3Dprefix))
+>>
+>>  event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DFalse)
+>>
+>>  schema =3D QAPISchema(input_file)
+>> -gen =3D QAPISchemaGenEventVisitor()
+>> -schema.visit(gen)
+>> -fdef.write(gen.defn)
+>> -fdecl.write(gen.decl)
+>> +vis =3D QAPISchemaGenEventVisitor()
+>> +schema.visit(vis)
+>> +genc.body(vis.defn)
+>> +genh.body(vis.decl)
+>>
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qapi-event.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qapi-event.h')
+>> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+>> index bd9253a172..c654f8fa94 100644
+>> --- a/scripts/qapi-introspect.py
+>> +++ b/scripts/qapi-introspect.py
+>> @@ -181,21 +181,23 @@ blurb =3D '''
+>>   * QAPI/QMP schema introspection
+>>  '''
+>>
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qmp-introspect.c', 'qmp-introspect.h',
+>> -                            blurb, __doc__)
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>
+>> -fdef.write(mcgen('''
+>> +genc.body(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "%(prefix)sqmp-introspect.h"
+>>
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +                prefix=3Dprefix))
+>>
+>>  schema =3D QAPISchema(input_file)
+>> -gen =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
+>> -schema.visit(gen)
+>> -fdef.write(gen.defn)
+>> -fdecl.write(gen.decl)
+>> +vis =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
+>> +schema.visit(vis)
+>> +genc.body(vis.defn)
+>> +genh.body(vis.decl)
+>>
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qmp-introspect.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qmp-introspect.h')
+>> diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
+>> index 1103dbda2d..97406b3368 100644
+>> --- a/scripts/qapi-types.py
+>> +++ b/scripts/qapi-types.py
+>> @@ -180,7 +180,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>>          self.decl =3D ''
+>>          self.defn =3D ''
+>>          self._fwdecl =3D ''
+>> -        self._btin =3D guardstart('QAPI_TYPES_BUILTIN')
+>> +        self._btin =3D '\n' + guardstart('QAPI_TYPES_BUILTIN')
+>>
+>>      def visit_end(self):
+>>          self.decl =3D self._fwdecl + self.decl
+>> @@ -256,26 +256,28 @@ blurb =3D '''
+>>   * Schema-defined QAPI types
+>>  '''
+>>
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qapi-types.c', 'qapi-types.h',
+>> -                            blurb, __doc__)
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>
+>> -fdef.write(mcgen('''
+>> +genc.body(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "qapi/dealloc-visitor.h"
+>>  #include "%(prefix)sqapi-types.h"
+>>  #include "%(prefix)sqapi-visit.h"
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +                prefix=3Dprefix))
+>>
+>> -fdecl.write(mcgen('''
+>> +genh.body(mcgen('''
+>>  #include "qapi/util.h"
+>>  '''))
+>>
+>>  schema =3D QAPISchema(input_file)
+>> -gen =3D QAPISchemaGenTypeVisitor()
+>> -schema.visit(gen)
+>> -fdef.write(gen.defn)
+>> -fdecl.write(gen.decl)
+>> +vis =3D QAPISchemaGenTypeVisitor()
+>> +schema.visit(vis)
+>> +genc.body(vis.defn)
+>> +genh.body(vis.decl)
+>>
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qapi-types.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qapi-types.h')
+>> diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+>> index 5231f89c36..d1b25daf0d 100644
+>> --- a/scripts/qapi-visit.py
+>> +++ b/scripts/qapi-visit.py
+>> @@ -339,30 +339,32 @@ blurb =3D '''
+>>   * Schema-defined QAPI visitors
+>>  '''
+>>
+>> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+>> -                            'qapi-visit.c', 'qapi-visit.h',
+>> -                            blurb, __doc__)
+>> +genc =3D QAPIGenC(blurb, __doc__)
+>> +genh =3D QAPIGenH(blurb, __doc__)
+>>
+>> -fdef.write(mcgen('''
+>> +genc.body(mcgen('''
+>>  #include "qemu/osdep.h"
+>>  #include "qemu-common.h"
+>>  #include "qapi/error.h"
+>>  #include "%(prefix)sqapi-visit.h"
+>>  ''',
+>> -                 prefix=3Dprefix))
+>> +                prefix=3Dprefix))
+>>
+>> -fdecl.write(mcgen('''
+>> +genh.body(mcgen('''
+>>  #include "qapi/visitor.h"
+>>  #include "qapi/qmp/qerror.h"
+>>  #include "%(prefix)sqapi-types.h"
+>>
+>>  ''',
+>> -                  prefix=3Dprefix))
+>> +                prefix=3Dprefix))
+>>
+>>  schema =3D QAPISchema(input_file)
+>> -gen =3D QAPISchemaGenVisitVisitor()
+>> -schema.visit(gen)
+>> -fdef.write(gen.defn)
+>> -fdecl.write(gen.decl)
+>> +vis =3D QAPISchemaGenVisitVisitor()
+>> +schema.visit(vis)
+>> +genc.body(vis.defn)
+>> +genh.body(vis.decl)
+>>
+>> -close_output(fdef, fdecl)
+>> +if do_c:
+>> +    genc.write(output_dir, prefix + 'qapi-visit.c')
+>> +if do_h:
+>> +    genh.write(output_dir, prefix + 'qapi-visit.h')
+>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>> index d0816f7479..d73ef618e2 100644
+>> --- a/scripts/qapi.py
+>> +++ b/scripts/qapi.py
+>> @@ -2,7 +2,7 @@
+>>  # QAPI helper library
+>>  #
+>>  # Copyright IBM, Corp. 2011
+>> -# Copyright (c) 2013-2016 Red Hat Inc.
+>> +# Copyright (c) 2013-2018 Red Hat Inc.
+>>  #
+>>  # Authors:
+>>  #  Anthony Liguori <aliguori@us.ibm.com>
+>> @@ -1820,7 +1820,6 @@ def guardname(filename):
+>>
+>>  def guardstart(name):
+>>      return mcgen('''
+>> -
+>>  #ifndef %(name)s
+>>  #define %(name)s
+>>
+>> @@ -1832,7 +1831,6 @@ def guardend(name):
+>>      return mcgen('''
+>>
+>>  #endif /* %(name)s */
+>> -
+>>  ''',
+>>                   name=3Dguardname(name))
+>>
+>> @@ -1970,17 +1968,53 @@ def parse_command_line(extra_options=3D'', extra=
+_long_options=3D[]):
+>>
+>>      return (fname, output_dir, do_c, do_h, prefix, extra_opts)
+>>
+>> +
+>>  #
+>> -# Generate output files with boilerplate
+>> +# Accumulate and write output
+>>  #
+>>
+>> +class QAPIGen(object):
+>> +
+>> +    def __init__(self):
+>> +        self._preamble =3D ''
+>> +        self._body =3D ''
+>> +
+>> +    def preamble(self, text):
+>> +        self._preamble +=3D text
+>> +
+>> +    def body(self, text):
+>> +        self._body +=3D text
+>> +
+>> +    def top(self, fname):
+>> +        return ''
+>> +
+>> +    def bottom(self, fname):
+>> +        return ''
+>> +
+>
+> Some methods appends, other return. That's a bit confusing. Why not
+> name them accordingly? add_preamble, add_body, get_top...?
 
-On Fri, Feb 02, 2018 at 12:10:22PM +0100, Wolfgang Bumiller wrote:
-> Summary:
-> Rate limit is effectively halved when the size of written chunks adds up =
-to
-> exceeding the quota of a slice only slightly. This is surprisingly reliab=
-le.
->=20
-> Explanation:
-> The ratelimiting code in include/qemu/ratelimit.h currently uses slices w=
-ith
-> quotas. Finishing up the quota for one slice means it'll wait for the end=
- of
-> this _and_ the next slice before resetting the accounting and start over.
-> If that first slice was exceeded by only a tiny bit, we effectively spend=
- every
-> second slice waiting around. before starting over.
->=20
-> Here if I use a limit of 30000KiB/s I get 30000KiB/s.
-> Increasing the limit to 30700KiB/s gives me 30700KiB/s.
-> Increasing it to 30720KiB/s reliably gives me 15000KiB/s.
->=20
-> Making it wait to the end of only the current slice means the excess data=
- is not
-> counted at all and we may go above the limit (though by at most one write=
--chunk,
-> so I'm not sure if that's fine for most of the users, for backup jobs it =
-seems
-> to be 64k always).
->=20
-> I'd like to fix this and am unsure about which way to go. On the one hand=
- I
-> think the old code (before f14a39ccb922) may be fixable in a better way b=
-y not
-> resetting the accounting completely but subtracting the amount of data the
-> wait-period would have added.
->=20
-> At the same time, though, this could be simplified to not using slices but
-> always comparing the amount of actually written data to the amount of data
-> which should at most have been written.
->=20
-> Here are two approaches which seem to fix my issues:
->=20
-> --- Old code revised:
->=20
-> typedef struct {
->     int64_t next_slice_time;
->     uint64_t slice_quota;
->     uint64_t slice_ns;
->     int64_t dispatched;
-> } RateLimit;
->=20
-> static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_=
-t n)
-> {
->     int64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->=20
->     assert(limit->slice_quota && limit->slice_ns);
->=20
->     if (limit->next_slice_time =3D=3D 0) { /* first call */
->         limit->dispatched =3D 0;
->         limit->next_slice_time =3D now + limit->slice_ns;
->         return 0;
->     }
->=20
->     if (limit->next_slice_time < now) {
->         uint64_t passed_slices =3D DIV_ROUND_UP(now - limit->next_slice_t=
-ime,
->             limit->slice_ns);
->         limit->next_slice_time =3D now + limit->slice_ns;
->         limit->dispatched -=3D passed_slices * limit->slice_quota;
->     }
->     limit->dispatched +=3D n;
->     if (limit->dispatched+n <=3D limit->slice_quota) {
+You're right, the functions called for side effects have less than
+obvious names.  I think I'll keep the noun names for the pure functions.
 
-This looks buggy.  n is added twice?
+>> +    def write(self, output_dir, fname):
+>> +        if output_dir:
+>> +            try:
+>> +                os.makedirs(output_dir)
+>> +            except os.error as e:
+>> +                if e.errno !=3D errno.EEXIST:
+>> +                    raise
+>> +        f =3D open(os.path.join(output_dir, fname), 'w')
+>> +        f.write(self.top(fname) + self._preamble + self._body
+>> +                + self.bottom(fname))
+>> +        f.close()
+>> +
+>> +
+>> +class QAPIGenC(QAPIGen):
+>> +
+>> +    def __init__(self, blurb, pydoc):
+>> +        QAPIGen.__init__(self)
+>> +        self._blurb =3D blurb.strip('\n')
+>> +        self._copyright =3D '\n * '.join(re.findall(r'^Copyright .*', p=
+ydoc,
+>> +                                                  re.MULTILINE))
+>>
+>> -def open_output(output_dir, do_c, do_h, prefix, c_file, h_file, blurb, =
+doc):
+>> -    guard =3D guardname(prefix + h_file)
+>> -    c_file =3D output_dir + prefix + c_file
+>> -    h_file =3D output_dir + prefix + h_file
+>> -    copyright =3D '\n * '.join(re.findall(r'^Copyright .*', doc, re.MUL=
+TILINE))
+>> -    comment =3D mcgen('''/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
+>> +    def top(self, fname):
+>> +        return mcgen('''
+>> +/* AUTOMATICALLY GENERATED, DO NOT MODIFY */
+>>
+>>  /*
+>>  %(blurb)s
+>> @@ -1992,41 +2026,19 @@ def open_output(output_dir, do_c, do_h, prefix, =
+c_file, h_file, blurb, doc):
+>>   */
+>>
+>>  ''',
+>> -                    blurb=3Dblurb.strip('\n'), copyright=3Dcopyright)
+>> +                     blurb=3Dself._blurb, copyright=3Dself._copyright)
+>>
+>> -    if output_dir:
+>> -        try:
+>> -            os.makedirs(output_dir)
+>> -        except os.error as e:
+>> -            if e.errno !=3D errno.EEXIST:
+>> -                raise
+>>
+>> -    def maybe_open(really, name, opt):
+>> -        if really:
+>> -            return open(name, opt)
+>> -        else:
+>> -            import StringIO
+>> -            return StringIO.StringIO()
+>> +class QAPIGenH(QAPIGenC):
+>>
+>> -    fdef =3D maybe_open(do_c, c_file, 'w')
+>> -    fdecl =3D maybe_open(do_h, h_file, 'w')
+>> +    def top(self, fname):
+>> +        return QAPIGenC.top(self, fname) + guardstart(fname)
+>>
+>> -    fdef.write(comment)
+>> -    fdecl.write(comment)
+>> -    fdecl.write(mcgen('''
+>> -#ifndef %(guard)s
+>> -#define %(guard)s
+>> +    def bottom(self, fname):
+>> +        return guardend(fname)
+>>
+>> -''',
+>> -                      guard=3Dguard))
+>>
+>> -    return (fdef, fdecl)
+>> -
+>> -
+>> -def close_output(fdef, fdecl):
+>> -    fdecl.write(mcgen('''
+>> -
+>> -#endif
+>> -'''))
+>> -    fdecl.close()
+>> -    fdef.close()
+>> +class QAPIGenDoc(QAPIGen):
+>> +    def top(self, fname):
+>> +        return (QAPIGen.top(self, fname)
+>> +                + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
+>> --
+>> 2.13.6
+>>
+>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
->         return 0;
->     }
->     return limit->next_slice_time - now;
-> }
->=20
-> static inline void ratelimit_set_speed(RateLimit *limit, uint64_t speed,
->                                        uint64_t slice_ns)
-> {
->     limit->slice_ns =3D slice_ns;
->     limit->slice_quota =3D MAX(((double)speed * slice_ns) / 1000000000ULL=
-, 1);
-> }
->=20
-> ---
->=20
-> And this is a short slice-less version. I wonder if there's any particular
-> reason for sticking to slices?
->=20
-> --- Version without slices:
->=20
-> typedef struct {
->     int64_t last_time;
->     uint64_t speed;
->     int64_t allowed;
-> } RateLimit;
->=20
-> static inline int64_t ratelimit_calculate_delay(RateLimit *limit, uint64_=
-t n)
-> {
->     int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->=20
->     if (limit->last_time =3D=3D 0) { /* first call */
->         limit->allowed =3D -n;
->         limit->last_time =3D now;
->         return (n * 1000000000ULL) / limit->speed;
->     }
->=20
->     delta =3D (now - limit->last_time);
->     limit->allowed +=3D (delta * limit->speed)/1000000000ULL - n;
->     limit->last_time =3D now;
->     if (limit->allowed < 0) {
->         return ((uint64_t)-limit->allowed * 1000000000ULL) / limit->speed;
->     }
->     return 0;
-> }
-
-This does not implement a rate limit, at least not in the way that users
-expect:
-
-Imagine there is no activity for 24 hours.  We accumulate a huge number
-of allowed units and can exceed the rate limit for some time.
-
---RhUH2Ysw6aD5utA4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaeHjcAAoJEJykq7OBq3PIAxwIAJyfcOThUbvYck9QyGgZpBVn
-brDpKlfYf93hAG1tOF3Gamuj4IHjFaxs11PfUB2PSWaTpMbMEsP0UMc0G0a7siyC
-+FgtSIFo1mt7IHAoTv82JZElmoA1CnlS+cBm9nZwWOk8UHqMI+ypshBCwVeTRrlf
-gefcwvEATQj6cj2EMgqrjfDL8Qv+yp3NCX8NGtWZMYnOhISPJkK2DBHNwgi50o6L
-4LBu/XFc2BAzdFZ6exeJnrbkGuDG+6vn8ePGr+mUg9hUL3hUqusF3GsEiCAFPNoK
-sO2fxzWtFwJ/EhlGqjgGDQMfKPLMS56tXgIWKfgBKfFSpnKPl4djsfTDjKw6rXo=
-=xXVQ
------END PGP SIGNATURE-----
-
---RhUH2Ysw6aD5utA4--
+Thanks!
