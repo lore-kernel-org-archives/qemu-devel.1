@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiia4-00021q-KQ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:19 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiia6-00024N-GG
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiia2-0001uB-Fh
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:16 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiia4-0001x0-3i
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:18 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:29 +0100
-Message-Id: <20180205151835.20812-21-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:30 +0100
+Message-Id: <20180205151835.20812-22-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 20/26] block: Generically refresh runtime
- options
+Subject: [Qemu-devel] [PATCH v8 21/26] block: Purify .bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,275 +22,557 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-Instead of having every block driver which implements
-bdrv_refresh_filename() copy all of the significant runtime options over
-to bs->full_open_options, implement this process generically in
-bdrv_refresh_filename().
+Currently, BlockDriver.bdrv_refresh_filename() is supposed to both
+refresh the filename (BDS.exact_filename) and set BDS.full_open_options.
+Now that we have generic code in the central bdrv_refresh_filename() for
+creating BDS.full_open_options, we can drop the latter part from all
+BlockDriver.bdrv_refresh_filename() implementations.
 
-This patch only adds this new generic implementation, it does not remove
-the old functionality. This is done in a follow-up patch.
+This also means that we can drop all of the existing default code for
+this from the global bdrv_refresh_filename() itself.
 
-With this patch, some superfluous information (that should never have
-been there) may be removed from some JSON filenames, as can be seen in
-the change to iotest 110's reference output.  In case of 191, backing
-nodes that have not been overridden are now removed from the filename.
+Furthermore, we now have to call BlockDriver.bdrv_refresh_filename()
+after having set BDS.full_open_options, because the block driver's
+implementation should now be allowed to depend on BDS.full_open_options
+being set correctly.
+
+Finally, with this patch we can drop the @options parameter from
+BlockDriver.bdrv_refresh_filename(); also, add a comment on this
+function's purpose in block/block_int.h while touching its interface.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                    | 116 ++++++++++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/110.out |   2 +-
- tests/qemu-iotests/191.out |  24 +++++-----
- 3 files changed, 128 insertions(+), 14 deletions(-)
+ include/block/block_int.h |   6 +-
+ block.c                   | 145 +++++++---------------------------------------
+ block/blkdebug.c          |  55 +++++++-----------
+ block/blkverify.c         |  16 +----
+ block/commit.c            |   2 +-
+ block/mirror.c            |   2 +-
+ block/nbd.c               |  23 +-------
+ block/nfs.c               |  36 +-----------
+ block/null.c              |  23 +++++---
+ block/quorum.c            |  30 ----------
+ 10 files changed, 66 insertions(+), 272 deletions(-)
 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 5e0bfe70d4..178adde654 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -133,7 +133,11 @@ struct BlockDriver {
+     int (*bdrv_create)(const char *filename, QemuOpts *opts, Error **errp);
+     int (*bdrv_make_empty)(BlockDriverState *bs);
+ 
+-    void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
++    /*
++     * Refreshes the bs->exact_filename field. If that is impossible,
++     * bs->exact_filename has to be left empty.
++     */
++    void (*bdrv_refresh_filename)(BlockDriverState *bs);
+ 
+     /*
+      * Gathers the open options for all children into @target.
 diff --git a/block.c b/block.c
-index f23b35405d..7980090d25 100644
+index 7980090d25..2963cbc921 100644
 --- a/block.c
 +++ b/block.c
-@@ -4999,6 +4999,92 @@ out:
-     return to_replace_bs;
+@@ -5085,47 +5085,6 @@ static bool append_significant_runtime_options(QDict *d, BlockDriverState *bs)
+     return found_any;
  }
  
-+/**
-+ * Iterates through the list of runtime option keys that are said to be
-+ * "significant" for a BDS. An option is called "significant" if it changes a
-+ * BDS's data. For example, the null block driver's "size" and "read-zeroes"
-+ * options are significant, but its "latency-ns" option is not.
-+ *
-+ * If a key returned by this function ends with a dot, all options starting with
-+ * that prefix are significant.
-+ */
-+static const char *const *significant_options(BlockDriverState *bs,
-+                                              const char *const *curopt)
-+{
-+    static const char *const global_options[] = {
-+        "driver", "filename", NULL
-+    };
-+
-+    if (!curopt) {
-+        return &global_options[0];
-+    }
-+
-+    curopt++;
-+    if (curopt == &global_options[ARRAY_SIZE(global_options) - 1] && bs->drv) {
-+        curopt = bs->drv->sgfnt_runtime_opts;
-+    }
-+
-+    return (curopt && *curopt) ? curopt : NULL;
-+}
-+
-+/**
-+ * Copies all significant runtime options from bs->options to the given QDict.
-+ * The set of significant option keys is determined by invoking
-+ * significant_options().
-+ *
-+ * Returns true iff any significant option was present in bs->options (and thus
-+ * copied to the target QDict) with the exception of "filename" and "driver".
-+ * The caller is expected to use this value to decide whether the existence of
-+ * significant options prevents the generation of a plain filename.
-+ */
-+static bool append_significant_runtime_options(QDict *d, BlockDriverState *bs)
-+{
-+    bool found_any = false;
-+    const char *const *option_name = NULL;
-+
-+    if (!bs->drv) {
-+        return false;
-+    }
-+
-+    while ((option_name = significant_options(bs, option_name))) {
-+        bool option_given = false;
-+
-+        assert(strlen(*option_name) > 0);
-+        if ((*option_name)[strlen(*option_name) - 1] != '.') {
-+            QObject *entry = qdict_get(bs->options, *option_name);
-+            if (!entry) {
-+                continue;
-+            }
-+
-+            qobject_incref(entry);
-+            qdict_put_obj(d, *option_name, entry);
-+            option_given = true;
-+        } else {
-+            const QDictEntry *entry;
-+            for (entry = qdict_first(bs->options); entry;
-+                 entry = qdict_next(bs->options, entry))
-+            {
-+                if (strstart(qdict_entry_key(entry), *option_name, NULL)) {
-+                    qobject_incref(qdict_entry_value(entry));
-+                    qdict_put_obj(d, qdict_entry_key(entry),
-+                                  qdict_entry_value(entry));
-+                    option_given = true;
-+                }
-+            }
-+        }
-+
-+        /* While "driver" and "filename" need to be included in a JSON filename,
-+         * their existence does not prohibit generation of a plain filename. */
-+        if (!found_any && option_given &&
-+            strcmp(*option_name, "driver") && strcmp(*option_name, "filename"))
-+        {
-+            found_any = true;
-+        }
-+    }
-+
-+    return found_any;
-+}
-+
- static bool append_open_options(QDict *d, BlockDriverState *bs)
- {
-     const QDictEntry *entry;
-@@ -5153,9 +5239,37 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-         bs->full_open_options = opts;
+-static bool append_open_options(QDict *d, BlockDriverState *bs)
+-{
+-    const QDictEntry *entry;
+-    QemuOptDesc *desc;
+-    BdrvChild *child;
+-    bool found_any = false;
+-    const char *p;
+-
+-    for (entry = qdict_first(bs->options); entry;
+-         entry = qdict_next(bs->options, entry))
+-    {
+-        /* Exclude options for children */
+-        QLIST_FOREACH(child, &bs->children, next) {
+-            if (strstart(qdict_entry_key(entry), child->name, &p)
+-                && (!*p || *p == '.'))
+-            {
+-                break;
+-            }
+-        }
+-        if (child) {
+-            continue;
+-        }
+-
+-        /* And exclude all non-driver-specific options */
+-        for (desc = bdrv_runtime_opts.desc; desc->name; desc++) {
+-            if (!strcmp(qdict_entry_key(entry), desc->name)) {
+-                break;
+-            }
+-        }
+-        if (desc->name) {
+-            continue;
+-        }
+-
+-        qobject_incref(qdict_entry_value(entry));
+-        qdict_put_obj(d, qdict_entry_key(entry), qdict_entry_value(entry));
+-        found_any = true;
+-    }
+-
+-    return found_any;
+-}
+-
+ /* Updates the following BDS fields:
+  *  - exact_filename: A filename which may be used for opening a block device
+  *                    which (mostly) equals the given BDS (even without any
+@@ -5143,6 +5102,8 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+     BlockDriver *drv = bs->drv;
+     BdrvChild *child;
+     QDict *opts;
++    bool generate_json_filename; /* Whether our default implementation should
++                                    fill exact_filename (false) or not (true) */
+ 
+     if (!drv) {
+         return;
+@@ -5158,90 +5119,10 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+         }
      }
  
-+    /* Gather the options QDict */
-+    opts = qdict_new();
-+    append_significant_runtime_options(opts, bs);
+-    if (drv->bdrv_refresh_filename) {
+-        /* Obsolete information is of no use here, so drop the old file name
+-         * information before refreshing it */
+-        bs->exact_filename[0] = '\0';
+-        if (bs->full_open_options) {
+-            QDECREF(bs->full_open_options);
+-            bs->full_open_options = NULL;
+-        }
+-
+-        opts = qdict_new();
+-        append_open_options(opts, bs);
+-        drv->bdrv_refresh_filename(bs, opts);
+-        QDECREF(opts);
+-    } else if (bs->file) {
+-        /* Try to reconstruct valid information from the underlying file */
+-        bool has_open_options;
+-
+-        bs->exact_filename[0] = '\0';
+-        if (bs->full_open_options) {
+-            QDECREF(bs->full_open_options);
+-            bs->full_open_options = NULL;
+-        }
+-
+-        opts = qdict_new();
+-        has_open_options = append_open_options(opts, bs);
+-        has_open_options |= bs->backing_overridden;
+-
+-        /* If no specific options have been given for this BDS, the filename of
+-         * the underlying file should suffice for this one as well */
+-        if (bs->file->bs->exact_filename[0] && !has_open_options) {
+-            strcpy(bs->exact_filename, bs->file->bs->exact_filename);
+-        }
+-        /* Reconstructing the full options QDict is simple for most format block
+-         * drivers, as long as the full options are known for the underlying
+-         * file BDS. The full options QDict of that file BDS should somehow
+-         * contain a representation of the filename, therefore the following
+-         * suffices without querying the (exact_)filename of this BDS. */
+-        if (bs->file->bs->full_open_options &&
+-            (!bs->backing || bs->backing->bs->full_open_options))
+-        {
+-            qdict_put_str(opts, "driver", drv->format_name);
+-            QINCREF(bs->file->bs->full_open_options);
+-            qdict_put(opts, "file", bs->file->bs->full_open_options);
+-
+-            if (bs->backing) {
+-                QINCREF(bs->backing->bs->full_open_options);
+-                qdict_put(opts, "backing", bs->backing->bs->full_open_options);
+-            } else if (bs->backing_overridden) {
+-                qdict_put(opts, "backing", qstring_new());
+-            }
+-
+-            bs->full_open_options = opts;
+-        } else {
+-            QDECREF(opts);
+-        }
+-    } else if (!bs->full_open_options && qdict_size(bs->options)) {
+-        /* There is no underlying file BDS (at least referenced by BDS.file),
+-         * so the full options QDict should be equal to the options given
+-         * specifically for this block device when it was opened (plus the
+-         * driver specification).
+-         * Because those options don't change, there is no need to update
+-         * full_open_options when it's already set. */
+-
+-        opts = qdict_new();
+-        append_open_options(opts, bs);
+-        qdict_put_str(opts, "driver", drv->format_name);
+-
+-        if (bs->exact_filename[0]) {
+-            /* This may not work for all block protocol drivers (some may
+-             * require this filename to be parsed), but we have to find some
+-             * default solution here, so just include it. If some block driver
+-             * does not support pure options without any filename at all or
+-             * needs some special format of the options QDict, it needs to
+-             * implement the driver-specific bdrv_refresh_filename() function.
+-             */
+-            qdict_put_str(opts, "filename", bs->exact_filename);
+-        }
+-
+-        bs->full_open_options = opts;
+-    }
+-
+     /* Gather the options QDict */
+     opts = qdict_new();
+-    append_significant_runtime_options(opts, bs);
++    generate_json_filename = append_significant_runtime_options(opts, bs);
++    generate_json_filename |= bs->backing_overridden;
+ 
+     if (drv->bdrv_gather_child_options) {
+         /* Some block drivers may not want to present all of their children's
+@@ -5267,6 +5148,24 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+     QDECREF(bs->full_open_options);
+     bs->full_open_options = opts;
+ 
++    if (drv->bdrv_refresh_filename) {
++        /* Obsolete information is of no use here, so drop the old file name
++         * information before refreshing it */
++        bs->exact_filename[0] = '\0';
 +
-+    if (drv->bdrv_gather_child_options) {
-+        /* Some block drivers may not want to present all of their children's
-+         * options, or name them differently from BdrvChild.name */
-+        drv->bdrv_gather_child_options(bs, opts);
-+    } else {
-+        QLIST_FOREACH(child, &bs->children, next) {
-+            if (child->role == &child_backing && !bs->backing_overridden) {
-+                /* We can skip the backing BDS if it has not been overridden */
-+                continue;
-+            }
++        drv->bdrv_refresh_filename(bs);
++    } else if (bs->file) {
++        /* Try to reconstruct valid information from the underlying file */
 +
-+            QINCREF(child->bs->full_open_options);
-+            qdict_put(opts, child->name, child->bs->full_open_options);
-+        }
++        bs->exact_filename[0] = '\0';
 +
-+        if (bs->backing_overridden && !bs->backing) {
-+            /* Force no backing file */
-+            qdict_put(opts, "backing", qstring_new());
++        /* If no specific options have been given for this BDS, the filename of
++         * the underlying file should suffice for this one as well */
++        if (bs->file->bs->exact_filename[0] && !generate_json_filename) {
++            strcpy(bs->exact_filename, bs->file->bs->exact_filename);
 +        }
 +    }
-+
-+    QDECREF(bs->full_open_options);
-+    bs->full_open_options = opts;
 +
      if (bs->exact_filename[0]) {
          pstrcpy(bs->filename, sizeof(bs->filename), bs->exact_filename);
--    } else if (bs->full_open_options) {
-+    } else {
-         QString *json = qobject_to_json(QOBJECT(bs->full_open_options));
-         snprintf(bs->filename, sizeof(bs->filename), "json:%s",
-                  qstring_get_str(json));
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index 1d0b2475cc..46e6a60510 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -22,7 +22,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.b
+     } else {
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index f93139da58..7bd0e8d968 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -808,52 +808,37 @@ static int64_t blkdebug_getlength(BlockDriverState *bs)
+     return bdrv_getlength(bs->file->bs);
+ }
  
- === Nodes without a common directory ===
+-static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
++static void blkdebug_refresh_filename(BlockDriverState *bs)
+ {
+     BDRVBlkdebugState *s = bs->opaque;
+-    QDict *opts;
+     const QDictEntry *e;
+-    bool force_json = false;
+-
+-    for (e = qdict_first(options); e; e = qdict_next(options, e)) {
+-        if (strcmp(qdict_entry_key(e), "config") &&
+-            strcmp(qdict_entry_key(e), "x-image"))
+-        {
+-            force_json = true;
+-            break;
+-        }
+-    }
++    int ret;
  
--image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
-+image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "vote-threshold": 1}}
- file format: IMGFMT
- virtual size: 64M (67108864 bytes)
- backing file: t.IMGFMT.base (cannot determine actual path)
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
-index b22471b40a..627ae51106 100644
---- a/tests/qemu-iotests/191.out
-+++ b/tests/qemu-iotests/191.out
-@@ -52,7 +52,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 },
-                 "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+                "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-                 "cluster-size": 65536,
-                 "format": "IMGFMT",
-                 "actual-size": SIZE,
-@@ -77,7 +77,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+            "file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-             "encryption_key_missing": false
-         },
-         {
-@@ -123,7 +123,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 },
-                 "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
-+                "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
-                 "cluster-size": 65536,
-                 "format": "IMGFMT",
-                 "actual-size": SIZE,
-@@ -148,7 +148,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
-+            "file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
-             "encryption_key_missing": false
-         },
-         {
-@@ -392,7 +392,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 },
-                 "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+                "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-                 "cluster-size": 65536,
-                 "format": "IMGFMT",
-                 "actual-size": SIZE,
-@@ -417,7 +417,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+            "file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-             "encryption_key_missing": false
-         },
-         {
-@@ -464,7 +464,7 @@ wrote 65536/65536 bytes at offset 1048576
-                     },
-                     "backing-filename-format": "IMGFMT",
-                     "virtual-size": 67108864,
--                    "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+                    "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-                     "cluster-size": 65536,
-                     "format": "IMGFMT",
-                     "actual-size": SIZE,
-@@ -474,12 +474,12 @@ wrote 65536/65536 bytes at offset 1048576
-                 },
-                 "backing-filename-format": "IMGFMT",
-                 "virtual-size": 67108864,
--                "filename": "json:{"backing": {"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
-+                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
-                 "cluster-size": 65536,
-                 "format": "IMGFMT",
-                 "actual-size": SIZE,
--                "full-backing-filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
--                "backing-filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+                "full-backing-filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+                "backing-filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-                 "dirty-flag": false
-             },
-             "iops_wr": 0,
-@@ -490,7 +490,7 @@ wrote 65536/65536 bytes at offset 1048576
-             "iops": 0,
-             "bps_wr": 0,
-             "write_threshold": 0,
--            "backing_file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-+            "backing_file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
-             "encrypted": false,
-             "bps": 0,
-             "bps_rd": 0,
-@@ -499,7 +499,7 @@ wrote 65536/65536 bytes at offset 1048576
-                 "direct": false,
-                 "writeback": true
-             },
--            "file": "json:{"backing": {"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
-+            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
-             "encryption_key_missing": false
-         },
-         {
+-    if (force_json && !bs->file->bs->full_open_options) {
+-        /* The config file cannot be recreated, so creating a plain filename
+-         * is impossible */
++    if (!bs->file->bs->exact_filename[0]) {
+         return;
+     }
+ 
+-    if (!force_json && bs->file->bs->exact_filename[0]) {
+-        int ret = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+-                           "blkdebug:%s:%s", s->config_file ?: "",
+-                           bs->file->bs->exact_filename);
+-        if (ret >= sizeof(bs->exact_filename)) {
+-            /* An overflow makes the filename unusable, so do not report any */
+-            bs->exact_filename[0] = 0;
++    for (e = qdict_first(bs->full_open_options); e;
++         e = qdict_next(bs->full_open_options, e))
++    {
++        /* Real child options are under "image", but "x-image" may
++         * contain a filename */
++        if (strcmp(qdict_entry_key(e), "config") &&
++            strcmp(qdict_entry_key(e), "image") &&
++            strcmp(qdict_entry_key(e), "x-image") &&
++            strcmp(qdict_entry_key(e), "driver"))
++        {
++            return;
+         }
+     }
+ 
+-    opts = qdict_new();
+-    qdict_put_str(opts, "driver", "blkdebug");
+-
+-    QINCREF(bs->file->bs->full_open_options);
+-    qdict_put(opts, "image", bs->file->bs->full_open_options);
+-
+-    for (e = qdict_first(options); e; e = qdict_next(options, e)) {
+-        if (strcmp(qdict_entry_key(e), "x-image")) {
+-            qobject_incref(qdict_entry_value(e));
+-            qdict_put_obj(opts, qdict_entry_key(e), qdict_entry_value(e));
+-        }
++    ret = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
++                   "blkdebug:%s:%s",
++                   s->config_file ?: "", bs->file->bs->exact_filename);
++    if (ret >= sizeof(bs->exact_filename)) {
++        /* An overflow makes the filename unusable, so do not report any */
++        bs->exact_filename[0] = 0;
+     }
+-
+-    bs->full_open_options = opts;
+ }
+ 
+ static void blkdebug_refresh_limits(BlockDriverState *bs, Error **errp)
+diff --git a/block/blkverify.c b/block/blkverify.c
+index d5233eeaf9..7da2e08a06 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -277,24 +277,10 @@ static bool blkverify_recurse_is_first_non_filter(BlockDriverState *bs,
+     return bdrv_recurse_is_first_non_filter(s->test_file->bs, candidate);
+ }
+ 
+-static void blkverify_refresh_filename(BlockDriverState *bs, QDict *options)
++static void blkverify_refresh_filename(BlockDriverState *bs)
+ {
+     BDRVBlkverifyState *s = bs->opaque;
+ 
+-    if (bs->file->bs->full_open_options
+-        && s->test_file->bs->full_open_options)
+-    {
+-        QDict *opts = qdict_new();
+-        qdict_put_str(opts, "driver", "blkverify");
+-
+-        QINCREF(bs->file->bs->full_open_options);
+-        qdict_put(opts, "raw", bs->file->bs->full_open_options);
+-        QINCREF(s->test_file->bs->full_open_options);
+-        qdict_put(opts, "test", s->test_file->bs->full_open_options);
+-
+-        bs->full_open_options = opts;
+-    }
+-
+     if (bs->file->bs->exact_filename[0]
+         && s->test_file->bs->exact_filename[0])
+     {
+diff --git a/block/commit.c b/block/commit.c
+index 1fa6c9c0e0..1270b2290b 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -239,7 +239,7 @@ static int coroutine_fn bdrv_commit_top_preadv(BlockDriverState *bs,
+     return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
+ }
+ 
+-static void bdrv_commit_top_refresh_filename(BlockDriverState *bs, QDict *opts)
++static void bdrv_commit_top_refresh_filename(BlockDriverState *bs)
+ {
+     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
+             bs->backing->bs->filename);
+diff --git a/block/mirror.c b/block/mirror.c
+index aa68531352..1e3b40c2b8 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1058,7 +1058,7 @@ static int coroutine_fn bdrv_mirror_top_pdiscard(BlockDriverState *bs,
+     return bdrv_co_pdiscard(bs->backing->bs, offset, bytes);
+ }
+ 
+-static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
++static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs)
+ {
+     if (bs->backing == NULL) {
+         /* we can be here after failed bdrv_attach_child in
+diff --git a/block/nbd.c b/block/nbd.c
+index 44a60f59bd..9b74894efb 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -515,12 +515,9 @@ static void nbd_attach_aio_context(BlockDriverState *bs,
+     nbd_client_attach_aio_context(bs, new_context);
+ }
+ 
+-static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
++static void nbd_refresh_filename(BlockDriverState *bs)
+ {
+     BDRVNBDState *s = bs->opaque;
+-    QDict *opts = qdict_new();
+-    QObject *saddr_qdict;
+-    Visitor *ov;
+     const char *host = NULL, *port = NULL, *path = NULL;
+ 
+     if (s->saddr->type == SOCKET_ADDRESS_TYPE_INET) {
+@@ -533,8 +530,6 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+         path = s->saddr->u.q_unix.path;
+     } /* else can't represent as pseudo-filename */
+ 
+-    qdict_put_str(opts, "driver", "nbd");
+-
+     if (path && s->export) {
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+                  "nbd+unix:///%s?socket=%s", s->export, path);
+@@ -548,22 +543,6 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+                  "nbd://%s:%s", host, port);
+     }
+-
+-    ov = qobject_output_visitor_new(&saddr_qdict);
+-    visit_type_SocketAddress(ov, NULL, &s->saddr, &error_abort);
+-    visit_complete(ov, &saddr_qdict);
+-    visit_free(ov);
+-    qdict_put_obj(opts, "server", saddr_qdict);
+-
+-    if (s->export) {
+-        qdict_put_str(opts, "export", s->export);
+-    }
+-    if (s->tlscredsid) {
+-        qdict_put_str(opts, "tls-creds", s->tlscredsid);
+-    }
+-
+-    qdict_flatten(opts);
+-    bs->full_open_options = opts;
+ }
+ 
+ static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+diff --git a/block/nfs.c b/block/nfs.c
+index 298ba7e320..6a9783be39 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -818,14 +818,9 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
+     return 0;
+ }
+ 
+-static void nfs_refresh_filename(BlockDriverState *bs, QDict *options)
++static void nfs_refresh_filename(BlockDriverState *bs)
+ {
+     NFSClient *client = bs->opaque;
+-    QDict *opts = qdict_new();
+-    QObject *server_qdict;
+-    Visitor *ov;
+-
+-    qdict_put_str(opts, "driver", "nfs");
+ 
+     if (client->uid && !client->gid) {
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+@@ -843,35 +838,6 @@ static void nfs_refresh_filename(BlockDriverState *bs, QDict *options)
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+                  "nfs://%s%s", client->server->host, client->path);
+     }
+-
+-    ov = qobject_output_visitor_new(&server_qdict);
+-    visit_type_NFSServer(ov, NULL, &client->server, &error_abort);
+-    visit_complete(ov, &server_qdict);
+-    qdict_put_obj(opts, "server", server_qdict);
+-    qdict_put_str(opts, "path", client->path);
+-
+-    if (client->uid) {
+-        qdict_put_int(opts, "user", client->uid);
+-    }
+-    if (client->gid) {
+-        qdict_put_int(opts, "group", client->gid);
+-    }
+-    if (client->tcp_syncnt) {
+-        qdict_put_int(opts, "tcp-syn-cnt", client->tcp_syncnt);
+-    }
+-    if (client->readahead) {
+-        qdict_put_int(opts, "readahead-size", client->readahead);
+-    }
+-    if (client->pagecache) {
+-        qdict_put_int(opts, "page-cache-size", client->pagecache);
+-    }
+-    if (client->debug) {
+-        qdict_put_int(opts, "debug", client->debug);
+-    }
+-
+-    visit_free(ov);
+-    qdict_flatten(opts);
+-    bs->full_open_options = opts;
+ }
+ 
+ static char *nfs_dirname(BlockDriverState *bs, Error **errp)
+diff --git a/block/null.c b/block/null.c
+index 0fcd2671c8..cca149ce9c 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -240,18 +240,23 @@ static int64_t coroutine_fn null_co_get_block_status(BlockDriverState *bs,
+     }
+ }
+ 
+-static void null_refresh_filename(BlockDriverState *bs, QDict *opts)
++static void null_refresh_filename(BlockDriverState *bs)
+ {
+-    QINCREF(opts);
+-    qdict_del(opts, "filename");
+-
+-    if (!qdict_size(opts)) {
+-        snprintf(bs->exact_filename, sizeof(bs->exact_filename), "%s://",
+-                 bs->drv->format_name);
++    const QDictEntry *e;
++
++    for (e = qdict_first(bs->full_open_options); e;
++         e = qdict_next(bs->full_open_options, e))
++    {
++        /* These options can be ignored */
++        if (strcmp(qdict_entry_key(e), "filename") &&
++            strcmp(qdict_entry_key(e), "driver"))
++        {
++            return;
++        }
+     }
+ 
+-    qdict_put_str(opts, "driver", bs->drv->format_name);
+-    bs->full_open_options = opts;
++    snprintf(bs->exact_filename, sizeof(bs->exact_filename), "%s://",
++             bs->drv->format_name);
+ }
+ 
+ static const char *const null_sgfnt_runtime_opts[] = {
+diff --git a/block/quorum.c b/block/quorum.c
+index 9d680addc6..7e8cccd60b 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1066,35 +1066,6 @@ static void quorum_del_child(BlockDriverState *bs, BdrvChild *child,
+     bdrv_drained_end(bs);
+ }
+ 
+-static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
+-{
+-    BDRVQuorumState *s = bs->opaque;
+-    QDict *opts;
+-    QList *children;
+-    int i;
+-
+-    for (i = 0; i < s->num_children; i++) {
+-        if (!s->children[i]->bs->full_open_options) {
+-            return;
+-        }
+-    }
+-
+-    children = qlist_new();
+-    for (i = 0; i < s->num_children; i++) {
+-        QINCREF(s->children[i]->bs->full_open_options);
+-        qlist_append(children, s->children[i]->bs->full_open_options);
+-    }
+-
+-    opts = qdict_new();
+-    qdict_put_str(opts, "driver", "quorum");
+-    qdict_put_int(opts, QUORUM_OPT_VOTE_THRESHOLD, s->threshold);
+-    qdict_put_bool(opts, QUORUM_OPT_BLKVERIFY, s->is_blkverify);
+-    qdict_put_bool(opts, QUORUM_OPT_REWRITE, s->rewrite_corrupted);
+-    qdict_put(opts, "children", children);
+-
+-    bs->full_open_options = opts;
+-}
+-
+ static void quorum_gather_child_options(BlockDriverState *bs, QDict *target)
+ {
+     BDRVQuorumState *s = bs->opaque;
+@@ -1159,7 +1130,6 @@ static BlockDriver bdrv_quorum = {
+ 
+     .bdrv_file_open                     = quorum_open,
+     .bdrv_close                         = quorum_close,
+-    .bdrv_refresh_filename              = quorum_refresh_filename,
+     .bdrv_gather_child_options          = quorum_gather_child_options,
+     .bdrv_dirname                       = quorum_dirname,
+ 
 -- 
 2.14.3
