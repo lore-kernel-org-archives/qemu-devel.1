@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eiix6-0005iA-EW
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1eiixi-0006JB-Oi
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eiix0-0001J1-Da
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:04 -0500
-Date: Mon, 5 Feb 2018 15:44:46 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180205154446.GI25338@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180205125023.12394-1-vsementsov@virtuozzo.com>
-	<ce6a6439-2a00-57d2-8dea-8a1f03df87bf@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eiixe-00030Z-4U
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eiixd-0002yl-Pe
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:45:38 -0500
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-3-armbru@redhat.com>
+	<CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ab5c18b5-b42a-23f6-f893-3de0e64c1c7e@redhat.com>
+Date: Mon, 5 Feb 2018 09:45:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ce6a6439-2a00-57d2-8dea-8a1f03df87bf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: 205: support only raw format
+In-Reply-To: <CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="q6LaZddU8oTlIswiR6rIqtD5voWAxiq93"
+Subject: Re: [Qemu-devel] [PATCH RFC 02/21] qapi: Generate up-to-date
+ copyright notice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Marc-Andre Lureau <mlureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, marcandre <marcandre.lureau@redhat.com>, mdroth@linux.vnet.ibm.com
 
-On Mon, Feb 05, 2018 at 09:40:20AM -0600, Eric Blake wrote:
-> On 02/05/2018 06:50 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > The test is about qmp interface to NBD server, so there no reasons
-> > to run it for various disk formats. Also it actually do not support
-> > luks format, so, disable all format except raw.
-> > 
-> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > ---
-> >  tests/qemu-iotests/205 | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
-> > index 10388920dc..a78ff37104 100644
-> > --- a/tests/qemu-iotests/205
-> > +++ b/tests/qemu-iotests/205
-> > @@ -153,4 +153,4 @@ class TestNbdServerRemove(iotests.QMPTestCase):
-> >  
-> >  
-> >  if __name__ == '__main__':
-> > -    iotests.main()
-> > +    iotests.main(supported_fmts=['raw'])
-> 
-> Isn't that stricter than necessary?  The test works with qcow2; it was
-> just luks that was special (because we weren't passing in proper
-> secrets).  At any rate, I'm adding Dan in case he has a quick idea of
-> what it would take to get luks working, rather than just disabling it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q6LaZddU8oTlIswiR6rIqtD5voWAxiq93
+From: Eric Blake <eblake@redhat.com>
+To: Marc-Andre Lureau <mlureau@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ marcandre <marcandre.lureau@redhat.com>, mdroth@linux.vnet.ibm.com
+Message-ID: <ab5c18b5-b42a-23f6-f893-3de0e64c1c7e@redhat.com>
+Subject: Re: [PATCH RFC 02/21] qapi: Generate up-to-date copyright notice
+References: <20180202130336.24719-1-armbru@redhat.com>
+ <20180202130336.24719-3-armbru@redhat.com>
+ <CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
+In-Reply-To: <CAMxuvaw1-UtqTSYX1nD8Sh7ypaVv0kXcF3X0K0aw-_ci0d58nA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-For shell based tests it is not too difficult as I've got much fo the
-support work done. This is a python tests though, so would need some
-prep work first. The key is that you need to be able to add extra
-args to QEMU to define the secret with --object, and use the full
-blockdev options based syntax for -drive.
+On 02/05/2018 07:44 AM, Marc-Andre Lureau wrote:
+> Hi
+>=20
+> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> w=
+rote:
+>> Each generator carries a copyright notice for the generator itself,
+>> and another one for the files it generates.  Only the former have been=
 
-I'm not expecting you todo that unless you're actively interested in
-it, so no objection to just disabling it
+>> updated along the way, the latter have not, and are all out of date.
+>>
+>> Fix by copying the generator's copyright notice to the generated files=
 
-I will point out though there is an 'unsupported_fmts' arg to the
-python tests, so a flexible fix would be to invert your patch todo
+>> instead.
+>=20
+> That makes sense, but we loose the Author lines in the generated
+> files. Not a big deal I guess, but worth to point out, no?
 
-  unsupported_fmts=['luks']
+I don't see too much use for author lines as long as you have a 'this
+file is generated' line; you can use git history to learn the authors of
+the generator code.  But yeah, a commit message blurb can't hurt.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--q6LaZddU8oTlIswiR6rIqtD5voWAxiq93
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp4fB4ACgkQp6FrSiUn
+Q2pZjQf9G6SmnI0vioJhxStxMBoFHdTWV/bpz6jhZiDKshIbMZYaxFVnQ3AnUVZ8
+27qMRL5EcyA0nL9RRLD/7zTlVvnv+Y9hArTWqsbWstYDlxUiFbmCxxlwv5OKYfQA
+RfSvnQX9ko1ohFHC6D6nCasaW5UHqArnnGALvRu9/LlKr4kxEJPije7nBt0u2Bix
+Ijm5nPkBIcqT7KB3sot812CDYSRzU92spfH9ceKT5um91UmYhf+QGYs4x3dZj1BF
+5kHaISSk8sUebWsnzuyVdZtYGD9vfRaRZRLrh9qRcbbda2lLHQPl0cOQMv1w0OAt
+IWS/GAjgEULZMK5+d+qUAbxxqhS/Xg==
+=Ppd8
+-----END PGP SIGNATURE-----
+
+--q6LaZddU8oTlIswiR6rIqtD5voWAxiq93--
