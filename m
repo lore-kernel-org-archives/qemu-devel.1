@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eihwq-0008E0-GE
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eihyP-0001GD-9C
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:42:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eihwm-0001JO-EJ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:44 -0500
-Received: from mail-qt0-f181.google.com ([209.85.216.181]:35452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eihwm-0001JA-90
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:40 -0500
-Received: by mail-qt0-f181.google.com with SMTP id g14so39856779qti.2
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 06:40:40 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1eihyJ-0001rY-5u
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:42:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eihyI-0001rG-To
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:42:15 -0500
+Date: Mon, 5 Feb 2018 15:42:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180205154202.7d1269a9@redhat.com>
+In-Reply-To: <20180205135401.GA3300@localhost.localdomain>
+References: <cover.1517532021.git.alistair.francis@xilinx.com>
+	<56ba11cee61d769a9a2816fa990d472ab1480906.1517532021.git.alistair.francis@xilinx.com>
+	<20180202182326.GB22556@localhost.localdomain>
+	<20180205122235.03fdeaad@redhat.com>
+	<20180205135401.GA3300@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <87mv0nv73y.fsf@dusky.pond.sub.org>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-15-armbru@redhat.com>
-	<CAMxuvayFe8fU5PMyX00k2tM=2-=ZQqsxd1PwMUxAFAx26chFRA@mail.gmail.com>
-	<87mv0nv73y.fsf@dusky.pond.sub.org>
-From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Mon, 5 Feb 2018 15:40:39 +0100
-Message-ID: <CAMxuvaw7i8UssX=-kCSRAPaq7b74pY2++aWk4AgD3kwv3C0yKA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 14/21] qapi: Generate in source order
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] machine: Convert the valid cpu
+ types to use cpu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +31,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, marcel@redhat.com, alistair23@gmail.com
 
-On Mon, Feb 5, 2018 at 3:33 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> Marc-Andre Lureau <mlureau@redhat.com> writes:
->
->> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wr=
-ote:
->>> The generators' conversion to visitors (merge commit 9e72681d16)
->>> changed the processing order of entities from source order to
->>> alphabetical order.  The next commit needs source order, so change it
->>> back.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  scripts/qapi/common.py                   |   4 +-
->>>  tests/qapi-schema/comments.out           |   2 +-
->>>  tests/qapi-schema/doc-bad-section.out    |   4 +-
->>>  tests/qapi-schema/doc-good.out           |  32 ++--
->>>  tests/qapi-schema/empty.out              |   2 +-
->>>  tests/qapi-schema/event-case.out         |   2 +-
->>>  tests/qapi-schema/ident-with-escape.out  |   6 +-
->>>  tests/qapi-schema/include-relpath.out    |   2 +-
->>>  tests/qapi-schema/include-repetition.out |   2 +-
->>>  tests/qapi-schema/include-simple.out     |   2 +-
->>>  tests/qapi-schema/indented-expr.out      |   2 +-
->>>  tests/qapi-schema/qapi-schema-test.out   | 320 +++++++++++++++--------=
---------
->>>  12 files changed, 191 insertions(+), 189 deletions(-)
->>>
->>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->>> index d5b93e7381..3b97bf8702 100644
->>> --- a/scripts/qapi/common.py
->>> +++ b/scripts/qapi/common.py
->>> @@ -1471,6 +1471,7 @@ class QAPISchema(object):
->>>          parser =3D QAPISchemaParser(open(fname, 'r'))
->>>          exprs =3D check_exprs(parser.exprs)
->>>          self.docs =3D parser.docs
->>> +        self._entity_list =3D []
->>>          self._entity_dict =3D {}
->>>          self._predefining =3D True
->>>          self._def_predefineds()
->>> @@ -1482,6 +1483,7 @@ class QAPISchema(object):
->>>          # Only the predefined types are allowed to not have info
->>>          assert ent.info or self._predefining
->>>          assert ent.name not in self._entity_dict
->>> +        self._entity_list.append(ent)
->>>          self._entity_dict[ent.name] =3D ent
->>
->> Why not use the OrderedDict instead?
->
-> Fair question!  However, the next patch will create anonymous entities,
-> which get added only to ._entity_list, not _entity_dict.
+On Mon, 5 Feb 2018 11:54:01 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-I see, something we could improve or clarify, but that's ok to me as is:
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> On Mon, Feb 05, 2018 at 12:22:35PM +0100, Igor Mammedov wrote:
+> > On Fri, 2 Feb 2018 16:23:26 -0200
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >   
+> > > On Thu, Feb 01, 2018 at 04:42:05PM -0800, Alistair Francis wrote:  
+> > > > As cpu_type is not a user visible string let's convert the
+> > > > valid_cpu_types to compare against cpu_model instead. This way we have a
+> > > > user friendly string to report back.
+> > > > 
+> > > > Once we have a cpu_type to cpu_model conversion this patch should be
+> > > > reverted and we should use cpu_type instead.
+> > > > 
+> > > > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> > > > ---
+> > > > 
+> > > >  hw/core/machine.c | 11 +++++------
+> > > >  1 file changed, 5 insertions(+), 6 deletions(-)
+> > > > 
+> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > index cdc1163dc6..de5bac1c84 100644
+> > > > --- a/hw/core/machine.c
+> > > > +++ b/hw/core/machine.c
+> > > > @@ -776,13 +776,12 @@ void machine_run_board_init(MachineState *machine)
+> > > >      /* If the machine supports the valid_cpu_types check and the user
+> > > >       * specified a CPU with -cpu check here that the user CPU is supported.
+> > > >       */
+> > > > -    if (machine_class->valid_cpu_types && machine->cpu_type) {
+> > > > -        ObjectClass *class = object_class_by_name(machine->cpu_type);
+> > > > +    if (machine_class->valid_cpu_types && machine->cpu_model) {
+> > > >          int i;
+> > > >  
+> > > >          for (i = 0; machine_class->valid_cpu_types[i]; i++) {
+> > > > -            if (object_class_dynamic_cast(class,
+> > > > -                                          machine_class->valid_cpu_types[i])) {
+> > > > +            if (!strcmp(machine->cpu_model,
+> > > > +                        machine_class->valid_cpu_types[i])) {    
+> > > 
+> > > I would rename valid_cpu_types to valid_cpu_models to make the
+> > > new semantics clearer.
+> > > 
+> > > Anyway, I have bad and good news:
+> > > 
+> > > The bad news is Igor already sent patches last week that remove
+> > > MachineState::cpu_model, so this conflicts with his series.  Now
+> > > parse_cpu_model() will be the only place where the original CPU model name is
+> > > available, but the function needs to work on *-user too.  See:
+> > > "[PATCH v3 23/25] Use cpu_create(type) instead of cpu_init(cpu_model)".
+> > > 
+> > > The good news is that I think we can fix this very easily if
+> > > validation is done at the same place where parse_cpu_model() is
+> > > called.  e.g.:
+> > > 
+> > >     current_machine->cpu_type = machine_class->default_cpu_type;
+> > >     if (cpu_model) {
+> > >         current_machine->cpu_type = parse_cpu_model(cpu_model);
+> > > 
+> > >         if (machine_class->valid_cpu_models) {
+> > >             ObjectClass *class = object_class_by_name(machine->cpu_type);
+> > >             int i;
+> > > 
+> > >             for (i = 0; machine_class->valid_cpu_models[i]; i++) {
+> > >                 const char *valid_model = machine_class->valid_cpu_models[i];
+> > >                 ObjectClass *valid_class = cpu_class_by_name(machine->cpu_type, valid_model);
+> > >                 if (object_class_dynamic_cast(class,
+> > >                                               object_class_get_name(valid_class))) {
+> > >                      /* Valid CPU type, we're good to go */
+> > >                      break;
+> > >                 }
+> > >             }
+> > >             if (!machine_class->valid_cpu_models[i]) {
+> > >                 error_report("Invalid CPU model: %s", cpu_model);
+> > >                 error_printf("The valid CPU models are: %s",
+> > >                              machine_class->valid_cpu_models[0]);
+> > >                 for (i = 1; machine_class->valid_cpu_models[i]; i++) {
+> > >                     error_printf(", %s", machine_class->valid_cpu_models[i]);
+> > >                 }
+> > >                 error_printf("\n");
+> > >                 exit(1);
+> > >             }
+> > >         }
+> > >     }
+> > > 
+> > > This can be done inside main(), or moved inside
+> > > machine_run_board_init() if main() pass cpu_model as argument to
+> > > the function.
+> > > 
+> > > On either case, I think it's a good idea to do validation and
+> > > printing of error messages closer to the code that parses the
+> > > command-line options.  This way we separate parsing/validation
+> > > from initialization.  
+> > I agree it's better like you suggest as at least it prevents
+> > ms->cpu_model creeping back into boards code.
+> > 
+> > But I still dislike (hate) an idea of new code adding non
+> > canonized cpu_model strings back in the boards code.
+> > It's just a matter of time when someone would use them
+> > and cpu_model parsing will creep back into boards.
+> > 
+> > It would be much better to if we add 
+> >    char *MachineClass::cpu_name_by_type_name(char *cpu_type)
+> > callback and let machines in this patchset to set it,
+> > something along following lines which is not much of
+> > refactoring and allows for gradual conversion:
+> > 
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index 9631670..85cca84 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -2885,4 +2885,6 @@ static inline void *arm_get_el_change_hook_opaque(ARMCPU *cpu)
+> >      return cpu->el_change_hook_opaque;
+> >  }
+> >  
+> > +char *arm_cpu_name_by_type_name(const char *typename);
+> > +
+> >  #endif
+> > diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
+> > index f936017..ae6adb7 100644
+> > --- a/hw/arm/netduino2.c
+> > +++ b/hw/arm/netduino2.c
+> > @@ -46,6 +46,7 @@ static void netduino2_machine_init(MachineClass *mc)
+> >      mc->desc = "Netduino 2 Machine";
+> >      mc->init = netduino2_init;
+> >      mc->ignore_memory_transaction_failures = true;
+> > +    mc->cpu_name_by_type_name = arm_cpu_name_by_type_name:  
+> 
+> I really don't want to introduce a new arch-specific hook just
+> for that.  We should move CPU type lookup logic to common code
+> and make it unnecessary to write new hooks.
+unfortunately cpu_model (cpu name part) is target specific
+and it's translation to type and back is target specific mayhem.
 
+So I'd prefer having both back and forth functions together in
+one place. And common code to call them when necessary.
 
->
-> [...]
+We could do global cpu_name_by_type_name() instead of hook,
+which I'd prefer even more but then conversion can't be done
+only for one target but rather for all targets at once.
+ 
+> I agree it would be better if we had a cpu_name_by_type_name()
+> function, but I would like to have it implemented cleanly.
+In some cases(targets) it can be common helper, but in other
+cases it's not so.
+My suggestion though allows to do gradual conversion and
+avoid putting cpu_model names back in board's code (which I just manged to remove).
+Once all targets converted and relevant code is isolated
+we can attempt to generalize it if it's possible or at least
+make of it global per target helper to get rid of
+temporary machine hook.
+
+(seeing this series reposted with cpu_model names in boards code,
+it doesn't looks like author would like to implement tree-wide
+generalization first)
