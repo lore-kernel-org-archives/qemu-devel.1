@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiaCh-0005Dw-2P
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:42 -0500
+	(envelope-from <mjc@sifive.com>) id 1eiaCo-0005Kq-4c
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiaCa-0006R2-RF
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:35 -0500
-Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:44274)
+	(envelope-from <mjc@sifive.com>) id 1eiaCk-0006bK-UV
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:42 -0500
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:44271)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiaCa-0006PB-CI
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:28 -0500
-Received: by mail-pg0-x22e.google.com with SMTP id r1so2071414pgn.11
-	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 22:24:28 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiaCk-0006am-J3
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:38 -0500
+Received: by mail-pg0-x22a.google.com with SMTP id r1so2071725pgn.11
+	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 22:24:38 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Mon,  5 Feb 2018 19:22:33 +1300
-Message-Id: <1517811767-75958-8-git-send-email-mjc@sifive.com>
+Date: Mon,  5 Feb 2018 19:22:36 +1300
+Message-Id: <1517811767-75958-11-git-send-email-mjc@sifive.com>
 In-Reply-To: <1517811767-75958-1-git-send-email-mjc@sifive.com>
 References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v4 08/22] RISC-V TCG Code Generation
+Subject: [Qemu-devel] [PATCH v4 11/22] RISC-V HTIF Console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,2363 +28,800 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-TCG code generation for the RV32IMAFDC and RV64IMAFDC. The QEMU
-RISC-V code generator has complete coverage for the Base ISA v2.2,
-Privileged ISA v1.9.1 and Privileged ISA v1.10:
+HTIF (Host Target Interface) provides console emulation for QEMU. HTIF
+allows identical copies of BBL (Berkeley Boot Loader) and linux to run
+on both Spike and QEMU. BBL provides HTIF console access via the
+SBI (Supervisor Binary Interface) and the linux kernel SBI console.
 
-- RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
+The HTIF interface reads the ELF kernel and locates the 'tohost' and
+'fromhost' symbols which it uses for guest to host console MMIO.
+
+The HTIT chardev implements the pre qom legacy interface consistent
+with the 16550a UART in 'hw/char/serial.c'.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- target/riscv/instmap.h   |  366 +++++++++
- target/riscv/translate.c | 1964 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 2330 insertions(+)
- create mode 100644 target/riscv/instmap.h
- create mode 100644 target/riscv/translate.c
+ hw/riscv/riscv_elf.c          | 244 +++++++++++++++++++++++++++
+ hw/riscv/riscv_htif.c         | 373 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/riscv_elf.h  |  69 ++++++++
+ include/hw/riscv/riscv_htif.h |  62 +++++++
+ 4 files changed, 748 insertions(+)
+ create mode 100644 hw/riscv/riscv_elf.c
+ create mode 100644 hw/riscv/riscv_htif.c
+ create mode 100644 include/hw/riscv/riscv_elf.h
+ create mode 100644 include/hw/riscv/riscv_htif.h
 
-diff --git a/target/riscv/instmap.h b/target/riscv/instmap.h
+diff --git a/hw/riscv/riscv_elf.c b/hw/riscv/riscv_elf.c
 new file mode 100644
-index 0000000..00baba8
+index 0000000..355a5a1
 --- /dev/null
-+++ b/target/riscv/instmap.h
-@@ -0,0 +1,366 @@
++++ b/hw/riscv/riscv_elf.c
+@@ -0,0 +1,244 @@
 +/*
-+ * RISC-V emulation for qemu: Instruction decode helpers
++ * elf.c - A simple package for manipulating symbol tables in elf binaries.
 + *
-+ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Taken from
++ * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/
++ * ftrace/elf.c
 + *
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++#include <sys/mman.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <glib.h>
 +
-+#define MASK_OP_MAJOR(op)  (op & 0x7F)
-+enum {
-+    /* rv32i, rv64i, rv32m */
-+    OPC_RISC_LUI    = (0x37),
-+    OPC_RISC_AUIPC  = (0x17),
-+    OPC_RISC_JAL    = (0x6F),
-+    OPC_RISC_JALR   = (0x67),
-+    OPC_RISC_BRANCH = (0x63),
-+    OPC_RISC_LOAD   = (0x03),
-+    OPC_RISC_STORE  = (0x23),
-+    OPC_RISC_ARITH_IMM  = (0x13),
-+    OPC_RISC_ARITH      = (0x33),
-+    OPC_RISC_FENCE      = (0x0F),
-+    OPC_RISC_SYSTEM     = (0x73),
++#include "hw/riscv/riscv_elf.h"
 +
-+    /* rv64i, rv64m */
-+    OPC_RISC_ARITH_IMM_W = (0x1B),
-+    OPC_RISC_ARITH_W = (0x3B),
-+
-+    /* rv32a, rv64a */
-+    OPC_RISC_ATOMIC = (0x2F),
-+
-+    /* floating point */
-+    OPC_RISC_FP_LOAD = (0x7),
-+    OPC_RISC_FP_STORE = (0x27),
-+
-+    OPC_RISC_FMADD = (0x43),
-+    OPC_RISC_FMSUB = (0x47),
-+    OPC_RISC_FNMSUB = (0x4B),
-+    OPC_RISC_FNMADD = (0x4F),
-+
-+    OPC_RISC_FP_ARITH = (0x53),
-+};
-+
-+#define MASK_OP_ARITH(op)   (MASK_OP_MAJOR(op) | (op & ((0x7 << 12) | \
-+                            (0x7F << 25))))
-+enum {
-+    OPC_RISC_ADD   = OPC_RISC_ARITH | (0x0 << 12) | (0x00 << 25),
-+    OPC_RISC_SUB   = OPC_RISC_ARITH | (0x0 << 12) | (0x20 << 25),
-+    OPC_RISC_SLL   = OPC_RISC_ARITH | (0x1 << 12) | (0x00 << 25),
-+    OPC_RISC_SLT   = OPC_RISC_ARITH | (0x2 << 12) | (0x00 << 25),
-+    OPC_RISC_SLTU  = OPC_RISC_ARITH | (0x3 << 12) | (0x00 << 25),
-+    OPC_RISC_XOR   = OPC_RISC_ARITH | (0x4 << 12) | (0x00 << 25),
-+    OPC_RISC_SRL   = OPC_RISC_ARITH | (0x5 << 12) | (0x00 << 25),
-+    OPC_RISC_SRA   = OPC_RISC_ARITH | (0x5 << 12) | (0x20 << 25),
-+    OPC_RISC_OR    = OPC_RISC_ARITH | (0x6 << 12) | (0x00 << 25),
-+    OPC_RISC_AND   = OPC_RISC_ARITH | (0x7 << 12) | (0x00 << 25),
-+
-+    /* RV64M */
-+    OPC_RISC_MUL    = OPC_RISC_ARITH | (0x0 << 12) | (0x01 << 25),
-+    OPC_RISC_MULH   = OPC_RISC_ARITH | (0x1 << 12) | (0x01 << 25),
-+    OPC_RISC_MULHSU = OPC_RISC_ARITH | (0x2 << 12) | (0x01 << 25),
-+    OPC_RISC_MULHU  = OPC_RISC_ARITH | (0x3 << 12) | (0x01 << 25),
-+
-+    OPC_RISC_DIV    = OPC_RISC_ARITH | (0x4 << 12) | (0x01 << 25),
-+    OPC_RISC_DIVU   = OPC_RISC_ARITH | (0x5 << 12) | (0x01 << 25),
-+    OPC_RISC_REM    = OPC_RISC_ARITH | (0x6 << 12) | (0x01 << 25),
-+    OPC_RISC_REMU   = OPC_RISC_ARITH | (0x7 << 12) | (0x01 << 25),
-+};
-+
-+
-+#define MASK_OP_ARITH_IMM(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_ADDI   = OPC_RISC_ARITH_IMM | (0x0 << 12),
-+    OPC_RISC_SLTI   = OPC_RISC_ARITH_IMM | (0x2 << 12),
-+    OPC_RISC_SLTIU  = OPC_RISC_ARITH_IMM | (0x3 << 12),
-+    OPC_RISC_XORI   = OPC_RISC_ARITH_IMM | (0x4 << 12),
-+    OPC_RISC_ORI    = OPC_RISC_ARITH_IMM | (0x6 << 12),
-+    OPC_RISC_ANDI   = OPC_RISC_ARITH_IMM | (0x7 << 12),
-+    OPC_RISC_SLLI   = OPC_RISC_ARITH_IMM | (0x1 << 12), /* additional part of
-+                                                           IMM */
-+    OPC_RISC_SHIFT_RIGHT_I = OPC_RISC_ARITH_IMM | (0x5 << 12) /* SRAI, SRLI */
-+};
-+
-+#define MASK_OP_BRANCH(op)     (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_BEQ  = OPC_RISC_BRANCH  | (0x0  << 12),
-+    OPC_RISC_BNE  = OPC_RISC_BRANCH  | (0x1  << 12),
-+    OPC_RISC_BLT  = OPC_RISC_BRANCH  | (0x4  << 12),
-+    OPC_RISC_BGE  = OPC_RISC_BRANCH  | (0x5  << 12),
-+    OPC_RISC_BLTU = OPC_RISC_BRANCH  | (0x6  << 12),
-+    OPC_RISC_BGEU = OPC_RISC_BRANCH  | (0x7  << 12)
-+};
-+
-+enum {
-+    OPC_RISC_ADDIW   = OPC_RISC_ARITH_IMM_W | (0x0 << 12),
-+    OPC_RISC_SLLIW   = OPC_RISC_ARITH_IMM_W | (0x1 << 12), /* additional part of
-+                                                              IMM */
-+    OPC_RISC_SHIFT_RIGHT_IW = OPC_RISC_ARITH_IMM_W | (0x5 << 12) /* SRAI, SRLI
-+                                                                  */
-+};
-+
-+enum {
-+    OPC_RISC_ADDW   = OPC_RISC_ARITH_W | (0x0 << 12) | (0x00 << 25),
-+    OPC_RISC_SUBW   = OPC_RISC_ARITH_W | (0x0 << 12) | (0x20 << 25),
-+    OPC_RISC_SLLW   = OPC_RISC_ARITH_W | (0x1 << 12) | (0x00 << 25),
-+    OPC_RISC_SRLW   = OPC_RISC_ARITH_W | (0x5 << 12) | (0x00 << 25),
-+    OPC_RISC_SRAW   = OPC_RISC_ARITH_W | (0x5 << 12) | (0x20 << 25),
-+
-+    /* RV64M */
-+    OPC_RISC_MULW   = OPC_RISC_ARITH_W | (0x0 << 12) | (0x01 << 25),
-+    OPC_RISC_DIVW   = OPC_RISC_ARITH_W | (0x4 << 12) | (0x01 << 25),
-+    OPC_RISC_DIVUW  = OPC_RISC_ARITH_W | (0x5 << 12) | (0x01 << 25),
-+    OPC_RISC_REMW   = OPC_RISC_ARITH_W | (0x6 << 12) | (0x01 << 25),
-+    OPC_RISC_REMUW  = OPC_RISC_ARITH_W | (0x7 << 12) | (0x01 << 25),
-+};
-+
-+#define MASK_OP_LOAD(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_LB   = OPC_RISC_LOAD | (0x0 << 12),
-+    OPC_RISC_LH   = OPC_RISC_LOAD | (0x1 << 12),
-+    OPC_RISC_LW   = OPC_RISC_LOAD | (0x2 << 12),
-+    OPC_RISC_LD   = OPC_RISC_LOAD | (0x3 << 12),
-+    OPC_RISC_LBU  = OPC_RISC_LOAD | (0x4 << 12),
-+    OPC_RISC_LHU  = OPC_RISC_LOAD | (0x5 << 12),
-+    OPC_RISC_LWU  = OPC_RISC_LOAD | (0x6 << 12),
-+};
-+
-+#define MASK_OP_STORE(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_SB   = OPC_RISC_STORE | (0x0 << 12),
-+    OPC_RISC_SH   = OPC_RISC_STORE | (0x1 << 12),
-+    OPC_RISC_SW   = OPC_RISC_STORE | (0x2 << 12),
-+    OPC_RISC_SD   = OPC_RISC_STORE | (0x3 << 12),
-+};
-+
-+#define MASK_OP_JALR(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+/* no enum since OPC_RISC_JALR is the actual value */
-+
-+#define MASK_OP_ATOMIC(op) \
-+    (MASK_OP_MAJOR(op) | (op & ((0x7 << 12) | (0x7F << 25))))
-+#define MASK_OP_ATOMIC_NO_AQ_RL_SZ(op) \
-+    (MASK_OP_MAJOR(op) | (op & (0x1F << 27)))
-+
-+enum {
-+    OPC_RISC_LR          = OPC_RISC_ATOMIC | (0x02 << 27),
-+    OPC_RISC_SC          = OPC_RISC_ATOMIC | (0x03 << 27),
-+    OPC_RISC_AMOSWAP     = OPC_RISC_ATOMIC | (0x01 << 27),
-+    OPC_RISC_AMOADD      = OPC_RISC_ATOMIC | (0x00 << 27),
-+    OPC_RISC_AMOXOR      = OPC_RISC_ATOMIC | (0x04 << 27),
-+    OPC_RISC_AMOAND      = OPC_RISC_ATOMIC | (0x0C << 27),
-+    OPC_RISC_AMOOR       = OPC_RISC_ATOMIC | (0x08 << 27),
-+    OPC_RISC_AMOMIN      = OPC_RISC_ATOMIC | (0x10 << 27),
-+    OPC_RISC_AMOMAX      = OPC_RISC_ATOMIC | (0x14 << 27),
-+    OPC_RISC_AMOMINU     = OPC_RISC_ATOMIC | (0x18 << 27),
-+    OPC_RISC_AMOMAXU     = OPC_RISC_ATOMIC | (0x1C << 27),
-+};
-+
-+#define MASK_OP_SYSTEM(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_ECALL       = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_EBREAK      = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_ERET        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_MRTS        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_MRTH        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_HRTS        = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_WFI         = OPC_RISC_SYSTEM | (0x0 << 12),
-+    OPC_RISC_SFENCEVM    = OPC_RISC_SYSTEM | (0x0 << 12),
-+
-+    OPC_RISC_CSRRW       = OPC_RISC_SYSTEM | (0x1 << 12),
-+    OPC_RISC_CSRRS       = OPC_RISC_SYSTEM | (0x2 << 12),
-+    OPC_RISC_CSRRC       = OPC_RISC_SYSTEM | (0x3 << 12),
-+    OPC_RISC_CSRRWI      = OPC_RISC_SYSTEM | (0x5 << 12),
-+    OPC_RISC_CSRRSI      = OPC_RISC_SYSTEM | (0x6 << 12),
-+    OPC_RISC_CSRRCI      = OPC_RISC_SYSTEM | (0x7 << 12),
-+};
-+
-+#define MASK_OP_FP_LOAD(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_FLW   = OPC_RISC_FP_LOAD | (0x2 << 12),
-+    OPC_RISC_FLD   = OPC_RISC_FP_LOAD | (0x3 << 12),
-+};
-+
-+#define MASK_OP_FP_STORE(op)   (MASK_OP_MAJOR(op) | (op & (0x7 << 12)))
-+enum {
-+    OPC_RISC_FSW   = OPC_RISC_FP_STORE | (0x2 << 12),
-+    OPC_RISC_FSD   = OPC_RISC_FP_STORE | (0x3 << 12),
-+};
-+
-+#define MASK_OP_FP_FMADD(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FMADD_S = OPC_RISC_FMADD | (0x0 << 25),
-+    OPC_RISC_FMADD_D = OPC_RISC_FMADD | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_FMSUB(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FMSUB_S = OPC_RISC_FMSUB | (0x0 << 25),
-+    OPC_RISC_FMSUB_D = OPC_RISC_FMSUB | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_FNMADD(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FNMADD_S = OPC_RISC_FNMADD | (0x0 << 25),
-+    OPC_RISC_FNMADD_D = OPC_RISC_FNMADD | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_FNMSUB(op)   (MASK_OP_MAJOR(op) | (op & (0x3 << 25)))
-+enum {
-+    OPC_RISC_FNMSUB_S = OPC_RISC_FNMSUB | (0x0 << 25),
-+    OPC_RISC_FNMSUB_D = OPC_RISC_FNMSUB | (0x1 << 25),
-+};
-+
-+#define MASK_OP_FP_ARITH(op)   (MASK_OP_MAJOR(op) | (op & (0x7F << 25)))
-+enum {
-+    /* float */
-+    OPC_RISC_FADD_S    = OPC_RISC_FP_ARITH | (0x0 << 25),
-+    OPC_RISC_FSUB_S    = OPC_RISC_FP_ARITH | (0x4 << 25),
-+    OPC_RISC_FMUL_S    = OPC_RISC_FP_ARITH | (0x8 << 25),
-+    OPC_RISC_FDIV_S    = OPC_RISC_FP_ARITH | (0xC << 25),
-+
-+    OPC_RISC_FSGNJ_S   = OPC_RISC_FP_ARITH | (0x10 << 25),
-+    OPC_RISC_FSGNJN_S  = OPC_RISC_FP_ARITH | (0x10 << 25),
-+    OPC_RISC_FSGNJX_S  = OPC_RISC_FP_ARITH | (0x10 << 25),
-+
-+    OPC_RISC_FMIN_S    = OPC_RISC_FP_ARITH | (0x14 << 25),
-+    OPC_RISC_FMAX_S    = OPC_RISC_FP_ARITH | (0x14 << 25),
-+
-+    OPC_RISC_FSQRT_S   = OPC_RISC_FP_ARITH | (0x2C << 25),
-+
-+    OPC_RISC_FEQ_S     = OPC_RISC_FP_ARITH | (0x50 << 25),
-+    OPC_RISC_FLT_S     = OPC_RISC_FP_ARITH | (0x50 << 25),
-+    OPC_RISC_FLE_S     = OPC_RISC_FP_ARITH | (0x50 << 25),
-+
-+    OPC_RISC_FCVT_W_S  = OPC_RISC_FP_ARITH | (0x60 << 25),
-+    OPC_RISC_FCVT_WU_S = OPC_RISC_FP_ARITH | (0x60 << 25),
-+    OPC_RISC_FCVT_L_S  = OPC_RISC_FP_ARITH | (0x60 << 25),
-+    OPC_RISC_FCVT_LU_S = OPC_RISC_FP_ARITH | (0x60 << 25),
-+
-+    OPC_RISC_FCVT_S_W  = OPC_RISC_FP_ARITH | (0x68 << 25),
-+    OPC_RISC_FCVT_S_WU = OPC_RISC_FP_ARITH | (0x68 << 25),
-+    OPC_RISC_FCVT_S_L  = OPC_RISC_FP_ARITH | (0x68 << 25),
-+    OPC_RISC_FCVT_S_LU = OPC_RISC_FP_ARITH | (0x68 << 25),
-+
-+    OPC_RISC_FMV_X_S   = OPC_RISC_FP_ARITH | (0x70 << 25),
-+    OPC_RISC_FCLASS_S  = OPC_RISC_FP_ARITH | (0x70 << 25),
-+
-+    OPC_RISC_FMV_S_X   = OPC_RISC_FP_ARITH | (0x78 << 25),
-+
-+    /* double */
-+    OPC_RISC_FADD_D    = OPC_RISC_FP_ARITH | (0x1 << 25),
-+    OPC_RISC_FSUB_D    = OPC_RISC_FP_ARITH | (0x5 << 25),
-+    OPC_RISC_FMUL_D    = OPC_RISC_FP_ARITH | (0x9 << 25),
-+    OPC_RISC_FDIV_D    = OPC_RISC_FP_ARITH | (0xD << 25),
-+
-+    OPC_RISC_FSGNJ_D   = OPC_RISC_FP_ARITH | (0x11 << 25),
-+    OPC_RISC_FSGNJN_D  = OPC_RISC_FP_ARITH | (0x11 << 25),
-+    OPC_RISC_FSGNJX_D  = OPC_RISC_FP_ARITH | (0x11 << 25),
-+
-+    OPC_RISC_FMIN_D    = OPC_RISC_FP_ARITH | (0x15 << 25),
-+    OPC_RISC_FMAX_D    = OPC_RISC_FP_ARITH | (0x15 << 25),
-+
-+    OPC_RISC_FCVT_S_D = OPC_RISC_FP_ARITH | (0x20 << 25),
-+
-+    OPC_RISC_FCVT_D_S = OPC_RISC_FP_ARITH | (0x21 << 25),
-+
-+    OPC_RISC_FSQRT_D   = OPC_RISC_FP_ARITH | (0x2D << 25),
-+
-+    OPC_RISC_FEQ_D     = OPC_RISC_FP_ARITH | (0x51 << 25),
-+    OPC_RISC_FLT_D     = OPC_RISC_FP_ARITH | (0x51 << 25),
-+    OPC_RISC_FLE_D     = OPC_RISC_FP_ARITH | (0x51 << 25),
-+
-+    OPC_RISC_FCVT_W_D  = OPC_RISC_FP_ARITH | (0x61 << 25),
-+    OPC_RISC_FCVT_WU_D = OPC_RISC_FP_ARITH | (0x61 << 25),
-+    OPC_RISC_FCVT_L_D  = OPC_RISC_FP_ARITH | (0x61 << 25),
-+    OPC_RISC_FCVT_LU_D = OPC_RISC_FP_ARITH | (0x61 << 25),
-+
-+    OPC_RISC_FCVT_D_W  = OPC_RISC_FP_ARITH | (0x69 << 25),
-+    OPC_RISC_FCVT_D_WU = OPC_RISC_FP_ARITH | (0x69 << 25),
-+    OPC_RISC_FCVT_D_L  = OPC_RISC_FP_ARITH | (0x69 << 25),
-+    OPC_RISC_FCVT_D_LU = OPC_RISC_FP_ARITH | (0x69 << 25),
-+
-+    OPC_RISC_FMV_X_D   = OPC_RISC_FP_ARITH | (0x71 << 25),
-+    OPC_RISC_FCLASS_D  = OPC_RISC_FP_ARITH | (0x71 << 25),
-+
-+    OPC_RISC_FMV_D_X   = OPC_RISC_FP_ARITH | (0x79 << 25),
-+};
-+
-+#define GET_B_IMM(inst) ((extract32(inst, 8, 4) << 1) \
-+                         | (extract32(inst, 25, 6) << 5) \
-+                         | (extract32(inst, 7, 1) << 11) \
-+                         | (sextract64(inst, 31, 1) << 12))
-+
-+#define GET_STORE_IMM(inst) ((extract32(inst, 7, 5)) \
-+                             | (sextract64(inst, 25, 7) << 5))
-+
-+#define GET_JAL_IMM(inst) ((extract32(inst, 21, 10) << 1) \
-+                           | (extract32(inst, 20, 1) << 11) \
-+                           | (extract32(inst, 12, 8) << 12) \
-+                           | (sextract64(inst, 31, 1) << 20))
-+
-+#define GET_RM(inst)   extract32(inst, 12, 3)
-+#define GET_RS3(inst)  extract32(inst, 27, 5)
-+#define GET_RS1(inst)  extract32(inst, 15, 5)
-+#define GET_RS2(inst)  extract32(inst, 20, 5)
-+#define GET_RD(inst)   extract32(inst, 7, 5)
-+#define GET_IMM(inst)  sextract64(inst, 20, 12)
-+
-+/* RVC decoding macros */
-+#define GET_C_IMM(inst)             (extract32(inst, 2, 5) \
-+                                    | (sextract64(inst, 12, 1) << 5))
-+#define GET_C_ZIMM(inst)            (extract32(inst, 2, 5) \
-+                                    | (extract32(inst, 12, 1) << 5))
-+#define GET_C_ADDI4SPN_IMM(inst)    ((extract32(inst, 6, 1) << 2) \
-+                                    | (extract32(inst, 5, 1) << 3) \
-+                                    | (extract32(inst, 11, 2) << 4) \
-+                                    | (extract32(inst, 7, 4) << 6))
-+#define GET_C_ADDI16SP_IMM(inst)    ((extract32(inst, 6, 1) << 4) \
-+                                    | (extract32(inst, 2, 1) << 5) \
-+                                    | (extract32(inst, 5, 1) << 6) \
-+                                    | (extract32(inst, 3, 2) << 7) \
-+                                    | (sextract64(inst, 12, 1) << 9))
-+#define GET_C_LWSP_IMM(inst)        ((extract32(inst, 4, 3) << 2) \
-+                                    | (extract32(inst, 12, 1) << 5) \
-+                                    | (extract32(inst, 2, 2) << 6))
-+#define GET_C_LDSP_IMM(inst)        ((extract32(inst, 5, 2) << 3) \
-+                                    | (extract32(inst, 12, 1) << 5) \
-+                                    | (extract32(inst, 2, 3) << 6))
-+#define GET_C_SWSP_IMM(inst)        ((extract32(inst, 9, 4) << 2) \
-+                                    | (extract32(inst, 7, 2) << 6))
-+#define GET_C_SDSP_IMM(inst)        ((extract32(inst, 10, 3) << 3) \
-+                                    | (extract32(inst, 7, 3) << 6))
-+#define GET_C_LW_IMM(inst)          ((extract32(inst, 6, 1) << 2) \
-+                                    | (extract32(inst, 10, 3) << 3) \
-+                                    | (extract32(inst, 5, 1) << 6))
-+#define GET_C_LD_IMM(inst)          ((extract32(inst, 10, 3) << 3) \
-+                                    | (extract32(inst, 5, 2) << 6))
-+#define GET_C_J_IMM(inst)           ((extract32(inst, 3, 3) << 1) \
-+                                    | (extract32(inst, 11, 1) << 4) \
-+                                    | (extract32(inst, 2, 1) << 5) \
-+                                    | (extract32(inst, 7, 1) << 6) \
-+                                    | (extract32(inst, 6, 1) << 7) \
-+                                    | (extract32(inst, 9, 2) << 8) \
-+                                    | (extract32(inst, 8, 1) << 10) \
-+                                    | (sextract64(inst, 12, 1) << 11))
-+#define GET_C_B_IMM(inst)           ((extract32(inst, 3, 2) << 1) \
-+                                    | (extract32(inst, 10, 2) << 3) \
-+                                    | (extract32(inst, 2, 1) << 5) \
-+                                    | (extract32(inst, 5, 2) << 6) \
-+                                    | (sextract64(inst, 12, 1) << 8))
-+#define GET_C_SIMM3(inst)           extract32(inst, 10, 3)
-+#define GET_C_RD(inst)              GET_RD(inst)
-+#define GET_C_RS1(inst)             GET_RD(inst)
-+#define GET_C_RS2(inst)             extract32(inst, 2, 5)
-+#define GET_C_RS1S(inst)            (8 + extract32(inst, 7, 3))
-+#define GET_C_RS2S(inst)            (8 + extract32(inst, 2, 3))
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-new file mode 100644
-index 0000000..a7a809b
---- /dev/null
-+++ b/target/riscv/translate.c
-@@ -0,0 +1,1964 @@
 +/*
-+ * RISC-V emulation for qemu: main translation routines.
++ * elf_open - Map a binary into the address space and extract the
++ * locations of the static and dynamic symbol tables and their string
++ * tables. Return this information in a Elf object file handle that will
++ * be passed to all of the other elf functions.
++ */
++Elf_obj64 *elf_open64(const char *filename)
++{
++    int i, fd;
++    struct stat sbuf;
++    Elf_obj64 *ep;
++    Elf64_Shdr *shdr;
++
++    ep = g_new(Elf_obj64, 1);
++
++    /* Do some consistency checks on the binary */
++    fd = open(filename, O_RDONLY);
++    if (fd == -1) {
++        fprintf(stderr, "Can't open \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (fstat(fd, &sbuf) == -1) {
++        fprintf(stderr, "Can't stat \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (sbuf.st_size < sizeof(Elf64_Ehdr)) {
++        fprintf(stderr, "\"%s\" is not an ELF binary object\n", filename);
++        exit(1);
++    }
++
++    /* It looks OK, so map the Elf binary into our address space */
++    ep->mlen = sbuf.st_size;
++    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
++    if (ep->maddr == (void *)-1) {
++        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    close(fd);
++
++    /* The Elf binary begins with the Elf header */
++    ep->ehdr = ep->maddr;
++
++    /* check we have a 64-bit little-endian RISC-V ELF object */
++    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
++        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
++        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
++        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
++        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS64 ||
++        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
++        ep->ehdr->e_machine != EM_RISCV)
++    {
++        fprintf(stderr, "\"%s\" is not a 64-bit RISC-V ELF object\n", filename);
++        exit(1);
++    }
++
++    /*
++     * Find the static and dynamic symbol tables and their string
++     * tables in the the mapped binary. The sh_link field in symbol
++     * table section headers gives the section index of the string
++     * table for that symbol table.
++     */
++    shdr = (Elf64_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
++    for (i = 0; i < ep->ehdr->e_shnum; i++) {
++        if (shdr[i].sh_type == SHT_SYMTAB) {   /* Static symbol table */
++            ep->symtab = (Elf64_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->symtab_end = (Elf64_Sym *)((char *)ep->symtab +
++                             shdr[i].sh_size);
++            ep->strtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++        if (shdr[i].sh_type == SHT_DYNSYM) {   /* Dynamic symbol table */
++            ep->dsymtab = (Elf64_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->dsymtab_end = (Elf64_Sym *)((char *)ep->dsymtab +
++                              shdr[i].sh_size);
++            ep->dstrtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++    }
++    return ep;
++}
++
++Elf_obj32 *elf_open32(const char *filename)
++{
++    int i, fd;
++    struct stat sbuf;
++    Elf_obj32 *ep;
++    Elf32_Shdr *shdr;
++
++    ep = g_new(Elf_obj32, 1);
++
++    /* Do some consistency checks on the binary */
++    fd = open(filename, O_RDONLY);
++    if (fd == -1) {
++        fprintf(stderr, "Can't open \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (fstat(fd, &sbuf) == -1) {
++        fprintf(stderr, "Can't stat \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (sbuf.st_size < sizeof(Elf32_Ehdr)) {
++        fprintf(stderr, "\"%s\" is not an ELF binary object\n", filename);
++        exit(1);
++    }
++
++    /* It looks OK, so map the Elf binary into our address space */
++    ep->mlen = sbuf.st_size;
++    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
++    if (ep->maddr == (void *)-1) {
++        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    close(fd);
++
++    /* The Elf binary begins with the Elf header */
++    ep->ehdr = ep->maddr;
++
++    /* check we have a 32-bit little-endian RISC-V ELF object */
++    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
++        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
++        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
++        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
++        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS32 ||
++        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
++        ep->ehdr->e_machine != EM_RISCV)
++    {
++        fprintf(stderr, "\"%s\" is not a 32-bit RISC-V ELF object\n", filename);
++        exit(1);
++    }
++
++    /*
++     * Find the static and dynamic symbol tables and their string
++     * tables in the the mapped binary. The sh_link field in symbol
++     * table section headers gives the section index of the string
++     * table for that symbol table.
++     */
++    shdr = (Elf32_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
++    for (i = 0; i < ep->ehdr->e_shnum; i++) {
++        if (shdr[i].sh_type == SHT_SYMTAB) {   /* Static symbol table */
++            ep->symtab = (Elf32_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->symtab_end = (Elf32_Sym *)((char *)ep->symtab +
++                             shdr[i].sh_size);
++            ep->strtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++        if (shdr[i].sh_type == SHT_DYNSYM) {   /* Dynamic symbol table */
++            ep->dsymtab = (Elf32_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->dsymtab_end = (Elf32_Sym *)((char *)ep->dsymtab +
++                              shdr[i].sh_size);
++            ep->dstrtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++    }
++    return ep;
++}
++
++/*
++ * elf_close - Free up the resources of an  elf object
++ */
++void elf_close64(Elf_obj64 *ep)
++{
++    if (munmap(ep->maddr, ep->mlen) < 0) {
++        perror("munmap");
++        exit(1);
++    }
++    free(ep);
++}
++
++void elf_close32(Elf_obj32 *ep)
++{
++    if (munmap(ep->maddr, ep->mlen) < 0) {
++        perror("munmap");
++        exit(1);
++    }
++    free(ep);
++}
++
++/*
++ * elf_symname - Return ASCII name of a static symbol
++ */
++char *elf_symname64(Elf_obj64 *ep, Elf64_Sym *sym)
++{
++    return &ep->strtab[sym->st_name];
++}
++
++char *elf_symname32(Elf_obj32 *ep, Elf32_Sym *sym)
++{
++    return &ep->strtab[sym->st_name];
++}
++
++/*
++ * elf_firstsym - Return ptr to first symbol in static symbol table
++ */
++Elf64_Sym *elf_firstsym64(Elf_obj64 *ep)
++{
++    return ep->symtab;
++}
++
++Elf32_Sym *elf_firstsym32(Elf_obj32 *ep)
++{
++    return ep->symtab;
++}
++
++
++/*
++ * elf_nextsym - Return ptr to next symbol in static symbol table,
++ * or NULL if no more symbols.
++ */
++Elf64_Sym *elf_nextsym64(Elf_obj64 *ep, Elf64_Sym *sym)
++{
++    sym++;
++    if (sym < ep->symtab_end) {
++        return sym;
++    } else {
++        return NULL;
++    }
++}
++
++Elf32_Sym *elf_nextsym32(Elf_obj32 *ep, Elf32_Sym *sym)
++{
++    sym++;
++    if (sym < ep->symtab_end) {
++        return sym;
++    } else {
++        return NULL;
++    }
++}
+diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+new file mode 100644
+index 0000000..66ab1ed
+--- /dev/null
++++ b/hw/riscv/riscv_htif.c
+@@ -0,0 +1,373 @@
++/*
++ * QEMU RISC-V Host Target Interface (HTIF) Emulation
 + *
 + * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
 + *
++ * This provides HTIF device emulation for QEMU. At the moment this allows
++ * for identical copies of bbl/linux to run on both spike and QEMU.
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
 +#include "qemu/osdep.h"
++#include "qapi/error.h"
 +#include "qemu/log.h"
-+#include "cpu.h"
-+#include "tcg-op.h"
-+#include "disas/disas.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/exec-all.h"
-+#include "exec/helper-proto.h"
-+#include "exec/helper-gen.h"
++#include "hw/sysbus.h"
++#include "hw/char/serial.h"
++#include "chardev/char.h"
++#include "chardev/char-fe.h"
++#include "hw/riscv/riscv_htif.h"
++#include "qemu/timer.h"
++#include "exec/address-spaces.h"
++#include "qemu/error-report.h"
++#include "hw/riscv/riscv_elf.h"
 +
-+#include "exec/log.h"
++#define ENABLE_CHARDEV
 +
-+#include "instmap.h"
++#define RISCV_DEBUG_HTIF 0
++#define HTIF_DEBUG(fmt, ...)                                               \
++    do {                                                                   \
++        if (RISCV_DEBUG_HTIF) {                                            \
++            qemu_log_mask(LOG_TRACE, "%s: " fmt, __func__, ##__VA_ARGS__); \
++        }                                                                  \
++    } while (0)
 +
-+/* global register indices */
-+static TCGv cpu_gpr[32], cpu_pc;
-+static TCGv_i64 cpu_fpr[32]; /* assume F and D extensions */
-+static TCGv load_res;
-+static TCGv load_val;
++#ifdef ENABLE_CHARDEV
++/*
++ * Called by the char dev to see if HTIF is ready to accept input.
++ */
++static int htif_can_recv(void *opaque)
++{
++    return 1;
++}
 +
-+#include "exec/gen-icount.h"
++/*
++ * Called by the char dev to supply input to HTIF console.
++ * We assume that we will receive one character at a time.
++ */
++static void htif_recv(void *opaque, const uint8_t *buf, int size)
++{
++    HTIFState *htifstate = opaque;
 +
-+typedef struct DisasContext {
-+    struct TranslationBlock *tb;
-+    target_ulong pc;
-+    target_ulong next_pc;
-+    uint32_t opcode;
-+    uint32_t flags;
-+    uint32_t mem_idx;
-+    int singlestep_enabled;
-+    int bstate;
-+    /* Remember the rounding mode encoded in the previous fp instruction,
-+       which we have already installed into env->fp_status.  Or -1 for
-+       no previous fp instruction.  Note that we exit the TB when writing
-+       to any system register, which includes CSR_FRM, so we do not have
-+       to reset this known value.  */
-+    int frm;
-+} DisasContext;
++    if (size != 1) {
++        return;
++    }
 +
-+enum {
-+    BS_NONE     = 0, /* When seen outside of translation while loop, indicates
-+                     need to exit tb due to end of page. */
-+    BS_STOP     = 1, /* Need to exit tb for syscall, sret, etc. */
-+    BS_BRANCH   = 2, /* Need to exit tb for branch, jal, etc. */
++    /* TODO - we need to check whether mfromhost is zero which indicates
++              the device is ready to receive. The current implementation
++              will drop characters */
++
++    uint64_t val_written = htifstate->pending_read;
++    uint64_t resp = 0x100 | *buf;
++
++    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
++    qemu_irq_raise(htifstate->irq);
++}
++
++/*
++ * Called by the char dev to supply special events to the HTIF console.
++ * Not used for HTIF.
++ */
++static void htif_event(void *opaque, int event)
++{
++    #ifdef DEBUG_CHARDEV
++    fprintf(stderr, "GOT EVENT: %d\n", event);
++    #endif
++}
++
++static int htif_be_change(void *opaque)
++{
++    HTIFState *s = opaque;
++
++    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
++        htif_be_change, s, NULL, true);
++
++    return 0;
++}
++#endif
++
++static void dma_strcopy(HTIFState *htifstate, char *str, hwaddr phys_addr)
++{
++    int i = 0;
++    void *base_copy_addr = htifstate->main_mem_ram_ptr + phys_addr;
++    while (*(str + i)) {
++        stb_p((void *)(base_copy_addr + i), *(str + i));
++        i++;
++    }
++    stb_p((void *)(base_copy_addr + i), 0); /* store null term */
++}
++
++static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
++{
++    HTIF_DEBUG("TOHOST WRITE WITH val 0x%016" PRIx64, val_written);
++
++    uint8_t device = val_written >> 56;
++    uint8_t cmd = val_written >> 48;
++    uint64_t payload = val_written & 0xFFFFFFFFFFFFULL;
++
++    uint64_t addr = payload >> 8;
++    hwaddr real_addr = (hwaddr)addr;
++    uint8_t what = payload & 0xFF;
++    int resp;
++
++    resp = 0; /* stop gcc complaining */
++    HTIF_DEBUG("mtohost write: device: %d cmd: %d what: %02" PRIx64
++        " -payload: %016" PRIx64, device, cmd, payload & 0xFF, payload);
++
++    /*
++     * Currently, there is a fixed mapping of devices:
++     * 0: riscv-tests Pass/Fail Reporting Only (no syscall proxy)
++     * 1: Console
++     */
++    if (unlikely(device == 0x0)) {
++        /* frontend syscall handler, only test pass/fail support */
++        if (cmd == 0x0) {
++            HTIF_DEBUG("frontend syscall handler");
++            if (payload & 0x1) {
++                /* exit code */
++                int exit_code = payload >> 1;
++                if (exit_code) {
++                    qemu_log("*** FAILED *** (tohost = %d)", exit_code);
++                }
++                exit(exit_code);
++            }
++            qemu_log_mask(LOG_UNIMP, "pk syscall proxy not supported");
++        } else if (cmd == 0xFF) {
++            /* use what */
++            if (what == 0xFF) {
++                HTIF_DEBUG("registering name");
++                dma_strcopy(htifstate, (char *)"syscall_proxy", real_addr);
++            } else if (what == 0x0) {
++                HTIF_DEBUG("registering syscall cmd");
++                dma_strcopy(htifstate, (char *)"syscall", real_addr);
++            } else {
++                HTIF_DEBUG("registering end of cmds list");
++                dma_strcopy(htifstate, (char *)"", real_addr);
++            }
++            resp = 0x1; /* write to indicate device name placed */
++        } else {
++            qemu_log("HTIF device %d: UNKNOWN COMMAND", device);
++        }
++    } else if (likely(device == 0x1)) {
++        /* HTIF Console */
++        if (cmd == 0x0) {
++            /* this should be a queue, but not yet implemented as such */
++            htifstate->pending_read = val_written;
++            htifstate->env->mtohost = 0; /* clear to indicate we read */
++            return;
++        } else if (cmd == 0x1) {
++            #ifdef ENABLE_CHARDEV
++            qemu_chr_fe_write(&htifstate->chr, (uint8_t *)&payload, 1);
++            #endif
++            resp = 0x100 | (uint8_t)payload;
++        } else if (cmd == 0xFF) {
++            /* use what */
++            if (what == 0xFF) {
++                HTIF_DEBUG("registering name");
++                dma_strcopy(htifstate, (char *)"bcd", real_addr);
++            } else if (what == 0x0) {
++                HTIF_DEBUG("registering read cmd");
++                dma_strcopy(htifstate, (char *)"read", real_addr);
++            } else if (what == 0x1) {
++                HTIF_DEBUG("registering write cmd");
++                dma_strcopy(htifstate, (char *)"write", real_addr);
++            } else {
++                HTIF_DEBUG("registering end of cmds list");
++                dma_strcopy(htifstate, (char *)"", real_addr);
++            }
++            resp = 0x1; /* write to indicate device name placed */
++        } else {
++            qemu_log("HTIF device %d: UNKNOWN COMMAND", device);
++        }
++    /* all other devices */
++    } else if (device == 0x2 && cmd == 0xFF && what == 0xFF) {
++        HTIF_DEBUG("registering no device as last");
++        stb_p((void *)(htifstate->main_mem_ram_ptr + real_addr), 0);
++        resp = 0x1; /* write to indicate device name placed */
++    } else {
++        qemu_log("HTIF UNKNOWN DEVICE OR COMMAND");
++        HTIF_DEBUG("device: %d cmd: %d what: %02" PRIx64
++            " payload: %016" PRIx64, device, cmd, payload & 0xFF, payload);
++    }
++    /*
++     * - latest bbl does not set fromhost to 0 if there is a value in tohost
++     * - with this code enabled, qemu hangs waiting for fromhost to go to 0
++     * - with this code disabled, qemu works with bbl priv v1.9.1 and v1.10
++     * - HTIF needs protocol documentation and a more complete state machine
++
++        while (!htifstate->fromhost_inprogress &&
++            htifstate->env->mfromhost != 0x0) {
++        }
++    */
++    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
++    htifstate->env->mtohost = 0; /* clear to indicate we read */
++    if (htifstate->env->mfromhost != 0) {
++        /* raise HTIF interrupt */
++        qemu_irq_raise(htifstate->irq);
++    }
++}
++
++#define TOHOST_OFFSET1 (htifstate->tohost_offset)
++#define TOHOST_OFFSET2 (htifstate->tohost_offset + 4)
++#define FROMHOST_OFFSET1 (htifstate->fromhost_offset)
++#define FROMHOST_OFFSET2 (htifstate->fromhost_offset + 4)
++
++/* CPU wants to read an HTIF register */
++static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned size)
++{
++    HTIFState *htifstate = opaque;
++    if (addr == TOHOST_OFFSET1) {
++        return htifstate->env->mtohost & 0xFFFFFFFF;
++    } else if (addr == TOHOST_OFFSET2) {
++        return (htifstate->env->mtohost >> 32) & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET1) {
++        return htifstate->env->mfromhost & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET2) {
++        return (htifstate->env->mfromhost >> 32) & 0xFFFFFFFF;
++    } else {
++        qemu_log("Invalid htif read: address %016" PRIx64,
++            (uint64_t)addr);
++        return 0;
++    }
++}
++
++/* CPU wrote to an HTIF register */
++static void htif_mm_write(void *opaque, hwaddr addr,
++                            uint64_t value, unsigned size)
++{
++    HTIFState *htifstate = opaque;
++    if (addr == TOHOST_OFFSET1) {
++        if (htifstate->env->mtohost == 0x0) {
++            htifstate->allow_tohost = 1;
++            htifstate->env->mtohost = value & 0xFFFFFFFF;
++        } else {
++            htifstate->allow_tohost = 0;
++        }
++    } else if (addr == TOHOST_OFFSET2) {
++        if (htifstate->allow_tohost) {
++            htifstate->env->mtohost |= value << 32;
++            htif_handle_tohost_write(htifstate, htifstate->env->mtohost);
++        }
++    } else if (addr == FROMHOST_OFFSET1) {
++        htifstate->fromhost_inprogress = 1;
++        htifstate->env->mfromhost = value & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET2) {
++        htifstate->env->mfromhost |= value << 32;
++        if (htifstate->env->mfromhost == 0x0) {
++            qemu_irq_lower(htifstate->irq);
++        }
++        htifstate->fromhost_inprogress = 0;
++    } else {
++        qemu_log("Invalid htif write: address %016" PRIx64,
++            (uint64_t)addr);
++    }
++}
++
++static const MemoryRegionOps htif_mm_ops = {
++    .read = htif_mm_read,
++    .write = htif_mm_write,
 +};
 +
-+/* convert riscv funct3 to qemu memop for load/store */
-+static const int tcg_memop_lookup[8] = {
-+    [0 ... 7] = -1,
-+    [0] = MO_SB,
-+    [1] = MO_TESW,
-+    [2] = MO_TESL,
-+    [4] = MO_UB,
-+    [5] = MO_TEUW,
-+#ifdef TARGET_RISCV64
-+    [3] = MO_TEQ,
-+    [6] = MO_TEUL,
-+#endif
-+};
++HTIFState *htif_mm_init(MemoryRegion *address_space,
++    const char *kernel_filename, qemu_irq irq, MemoryRegion *main_mem,
++    CPURISCVState *env, Chardev *chr)
++{
++    uint64_t fromhost_addr = 0, tohost_addr = 0;
 +
-+#ifdef TARGET_RISCV64
-+#define CASE_OP_32_64(X) case X: case glue(X, W)
++    /* get fromhost/tohost addresses from the ELF, as spike/fesvr do */
++    if (kernel_filename) {
++#if defined(TARGET_RISCV64)
++        Elf_obj64 *e = elf_open64(kernel_filename);
 +#else
-+#define CASE_OP_32_64(X) case X
++        Elf_obj32 *e = elf_open32(kernel_filename);
 +#endif
 +
-+static void generate_exception(DisasContext *ctx, int excp)
-+{
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc);
-+    TCGv_i32 helper_tmp = tcg_const_i32(excp);
-+    gen_helper_raise_exception(cpu_env, helper_tmp);
-+    tcg_temp_free_i32(helper_tmp);
-+    ctx->bstate = BS_BRANCH;
-+}
++        const char *fromhost = "fromhost";
++        const char *tohost = "tohost";
 +
-+static void generate_exception_mbadaddr(DisasContext *ctx, int excp)
-+{
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc);
-+    tcg_gen_st_tl(cpu_pc, cpu_env, offsetof(CPURISCVState, badaddr));
-+    TCGv_i32 helper_tmp = tcg_const_i32(excp);
-+    gen_helper_raise_exception(cpu_env, helper_tmp);
-+    tcg_temp_free_i32(helper_tmp);
-+    ctx->bstate = BS_BRANCH;
-+}
-+
-+static void gen_exception_debug(void)
-+{
-+    TCGv_i32 helper_tmp = tcg_const_i32(EXCP_DEBUG);
-+    gen_helper_raise_exception(cpu_env, helper_tmp);
-+    tcg_temp_free_i32(helper_tmp);
-+}
-+
-+static void gen_exception_illegal(DisasContext *ctx)
-+{
-+    generate_exception(ctx, RISCV_EXCP_ILLEGAL_INST);
-+}
-+
-+static void gen_exception_inst_addr_mis(DisasContext *ctx)
-+{
-+    generate_exception_mbadaddr(ctx, RISCV_EXCP_INST_ADDR_MIS);
-+}
-+
-+static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
-+{
-+    if (unlikely(ctx->singlestep_enabled)) {
-+        return false;
-+    }
-+
-+#ifndef CONFIG_USER_ONLY
-+    return (ctx->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
++#if defined(TARGET_RISCV64)
++        Elf64_Sym *curr_sym = elf_firstsym64(e);
 +#else
-+    return true;
++        Elf32_Sym *curr_sym = elf_firstsym32(e);
 +#endif
-+}
++        while (curr_sym) {
++#if defined(TARGET_RISCV64)
++            char *symname = elf_symname64(e, curr_sym);
++#else
++            char *symname = elf_symname32(e, curr_sym);
++#endif
 +
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-+{
-+    if (use_goto_tb(ctx, dest)) {
-+        /* chaining is only allowed when the jump is to the same page */
-+        tcg_gen_goto_tb(n);
-+        tcg_gen_movi_tl(cpu_pc, dest);
-+        tcg_gen_exit_tb((uintptr_t)ctx->tb + n);
-+    } else {
-+        tcg_gen_movi_tl(cpu_pc, dest);
-+        if (ctx->singlestep_enabled) {
-+            gen_exception_debug();
-+        } else {
-+            tcg_gen_exit_tb(0);
++            if (strcmp(fromhost, symname) == 0) {
++                /* get fromhost addr */
++                fromhost_addr = curr_sym->st_value;
++                if (curr_sym->st_size != 8) {
++                    error_report("HTIF fromhost must be 8 bytes");
++                    exit(1);
++                }
++            } else if (strcmp(tohost, symname) == 0) {
++                /* get tohost addr */
++                tohost_addr = curr_sym->st_value;
++                if (curr_sym->st_size != 8) {
++                    error_report("HTIF tohost must be 8 bytes");
++                    exit(1);
++                }
++            }
++#if defined(TARGET_RISCV64)
++            curr_sym = elf_nextsym64(e, curr_sym);
++#else
++            curr_sym = elf_nextsym32(e, curr_sym);
++#endif
 +        }
-+    }
-+}
 +
-+/* Wrapper for getting reg values - need to check of reg is zero since
-+ * cpu_gpr[0] is not actually allocated
++#if defined(TARGET_RISCV64)
++        elf_close64(e);
++#else
++        elf_close32(e);
++#endif
++    }
++
++    uint64_t base = MIN(tohost_addr, fromhost_addr);
++    uint64_t size = MAX(tohost_addr + 8, fromhost_addr + 8) - base;
++    uint64_t tohost_offset = tohost_addr - base;
++    uint64_t fromhost_offset = fromhost_addr - base;
++
++    HTIFState *s = g_malloc0(sizeof(HTIFState));
++    s->irq = irq;
++    s->address_space = address_space;
++    s->main_mem = main_mem;
++    s->main_mem_ram_ptr = memory_region_get_ram_ptr(main_mem);
++    s->env = env;
++    s->tohost_offset = tohost_offset;
++    s->fromhost_offset = fromhost_offset;
++    s->pending_read = 0;
++    s->allow_tohost = 0;
++    s->fromhost_inprogress = 0;
++#ifdef ENABLE_CHARDEV
++    qemu_chr_fe_init(&s->chr, chr, &error_abort);
++    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
++        htif_be_change, s, NULL, true);
++#endif
++    if (base) {
++        memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
++                            TYPE_HTIF_UART, size);
++        memory_region_add_subregion(address_space, base, &s->mmio);
++    }
++
++    return s;
++}
+diff --git a/include/hw/riscv/riscv_elf.h b/include/hw/riscv/riscv_elf.h
+new file mode 100644
+index 0000000..5771829
+--- /dev/null
++++ b/include/hw/riscv/riscv_elf.h
+@@ -0,0 +1,69 @@
++/*
++ * elf.h - A package for manipulating Elf binaries
++ *
++ * Taken from:
++ * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/ftrace/
++ * elf.h
++ *
 + */
-+static inline void gen_get_gpr(TCGv t, int reg_num)
-+{
-+    if (reg_num == 0) {
-+        tcg_gen_movi_tl(t, 0);
-+    } else {
-+        tcg_gen_mov_tl(t, cpu_gpr[reg_num]);
-+    }
-+}
 +
-+/* Wrapper for setting reg values - need to check of reg is zero since
-+ * cpu_gpr[0] is not actually allocated. this is more for safety purposes,
-+ * since we usually avoid calling the OP_TYPE_gen function if we see a write to
-+ * $zero
++#ifndef ELF_H
++#define ELF_H
++
++#include <stdint.h>
++#include <elf.h>
++
++/*
++ * This is a handle that is created by elf_open and then used by every
++ * other function in the elf package
++*/
++typedef struct {
++    void *maddr;            /* Start of mapped Elf binary segment in memory */
++    int mlen;               /* Length in bytes of the mapped Elf segment */
++    Elf64_Ehdr *ehdr;       /* Start of main Elf header (same as maddr) */
++    Elf64_Sym *symtab;      /* Start of symbol table */
++    Elf64_Sym *symtab_end;  /* End of symbol table (symtab + size) */
++    char *strtab;           /* Address of string table */
++    Elf64_Sym *dsymtab;     /* Start of dynamic symbol table */
++    Elf64_Sym *dsymtab_end; /* End of dynamic symbol table (dsymtab + size) */
++    char *dstrtab;          /* Address of dynamic string table */
++} Elf_obj64;
++
++typedef struct {
++    void *maddr;            /* Start of mapped Elf binary segment in memory */
++    int mlen;               /* Length in bytes of the mapped Elf segment */
++    Elf32_Ehdr *ehdr;       /* Start of main Elf header (same as maddr) */
++    Elf32_Sym *symtab;      /* Start of symbol table */
++    Elf32_Sym *symtab_end;  /* End of symbol table (symtab + size) */
++    char *strtab;           /* Address of string table */
++    Elf32_Sym *dsymtab;     /* Start of dynamic symbol table */
++    Elf32_Sym *dsymtab_end; /* End of dynamic symbol table (dsymtab + size) */
++    char *dstrtab;          /* Address of dynamic string table */
++} Elf_obj32;
++
++/*
++ * Create and destroy Elf object handles
 + */
-+static inline void gen_set_gpr(int reg_num_dst, TCGv t)
-+{
-+    if (reg_num_dst != 0) {
-+        tcg_gen_mov_tl(cpu_gpr[reg_num_dst], t);
-+    }
-+}
++Elf_obj64 *elf_open64(const char *filename);
++Elf_obj32 *elf_open32(const char *filename);
 +
-+static void gen_mulhsu(TCGv ret, TCGv arg1, TCGv arg2)
-+{
-+    TCGv rl = tcg_temp_new();
-+    TCGv rh = tcg_temp_new();
++void elf_close64(Elf_obj64 *ep);
++void elf_close32(Elf_obj32 *ep);
 +
-+    tcg_gen_mulu2_tl(rl, rh, arg1, arg2);
-+    /* fix up for one negative */
-+    tcg_gen_sari_tl(rl, arg1, TARGET_LONG_BITS - 1);
-+    tcg_gen_and_tl(rl, rl, arg2);
-+    tcg_gen_sub_tl(ret, rh, rl);
++/*
++ * Functions for manipulating static symbols
++ */
 +
-+    tcg_temp_free(rl);
-+    tcg_temp_free(rh);
-+}
++/* Returns pointer to the first symbol */
++Elf64_Sym *elf_firstsym64(Elf_obj64 *ep);
++Elf32_Sym *elf_firstsym32(Elf_obj32 *ep);
 +
-+static void gen_fsgnj(DisasContext *ctx, uint32_t rd, uint32_t rs1,
-+    uint32_t rs2, int rm, uint64_t min)
-+{
-+    switch (rm) {
-+    case 0: /* fsgnj */
-+        if (rs1 == rs2) { /* FMOV */
-+            tcg_gen_mov_i64(cpu_fpr[rd], cpu_fpr[rs1]);
-+        } else {
-+            tcg_gen_deposit_i64(cpu_fpr[rd], cpu_fpr[rs2], cpu_fpr[rs1],
-+                                0, min == INT32_MIN ? 31 : 63);
-+        }
-+        break;
-+    case 1: /* fsgnjn */
-+        if (rs1 == rs2) { /* FNEG */
-+            tcg_gen_xori_i64(cpu_fpr[rd], cpu_fpr[rs1], min);
-+        } else {
-+            TCGv_i64 t0 = tcg_temp_new_i64();
-+            tcg_gen_not_i64(t0, cpu_fpr[rs2]);
-+            tcg_gen_deposit_i64(cpu_fpr[rd], t0, cpu_fpr[rs1],
-+                                0, min == INT32_MIN ? 31 : 63);
-+            tcg_temp_free_i64(t0);
-+        }
-+        break;
-+    case 2: /* fsgnjx */
-+        if (rs1 == rs2) { /* FABS */
-+            tcg_gen_andi_i64(cpu_fpr[rd], cpu_fpr[rs1], ~min);
-+        } else {
-+            TCGv_i64 t0 = tcg_temp_new_i64();
-+            tcg_gen_andi_i64(t0, cpu_fpr[rs2], min);
-+            tcg_gen_xor_i64(cpu_fpr[rd], cpu_fpr[rs1], t0);
-+            tcg_temp_free_i64(t0);
-+        }
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+    }
-+}
++/* Returns pointer to the next symbol, or NULL if no more symbols */
++Elf64_Sym *elf_nextsym64(Elf_obj64 *ep, Elf64_Sym *sym);
++Elf32_Sym *elf_nextsym32(Elf_obj32 *ep, Elf32_Sym *sym);
 +
-+static void gen_arith(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-+        int rs2)
-+{
-+    TCGv source1, source2, cond1, cond2, zeroreg, resultopt1;
-+    source1 = tcg_temp_new();
-+    source2 = tcg_temp_new();
-+    gen_get_gpr(source1, rs1);
-+    gen_get_gpr(source2, rs2);
++/* Return symbol string name */
++char *elf_symname64(Elf_obj64 *ep, Elf64_Sym *sym);
++char *elf_symname32(Elf_obj32 *ep, Elf32_Sym *sym);
 +
-+    switch (opc) {
-+    CASE_OP_32_64(OPC_RISC_ADD):
-+        tcg_gen_add_tl(source1, source1, source2);
-+        break;
-+    CASE_OP_32_64(OPC_RISC_SUB):
-+        tcg_gen_sub_tl(source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SLLW:
-+        tcg_gen_andi_tl(source2, source2, 0x1F);
-+        tcg_gen_shl_tl(source1, source1, source2);
-+        break;
 +#endif
-+    case OPC_RISC_SLL:
-+        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-+        tcg_gen_shl_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_SLT:
-+        tcg_gen_setcond_tl(TCG_COND_LT, source1, source1, source2);
-+        break;
-+    case OPC_RISC_SLTU:
-+        tcg_gen_setcond_tl(TCG_COND_LTU, source1, source1, source2);
-+        break;
-+    case OPC_RISC_XOR:
-+        tcg_gen_xor_tl(source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SRLW:
-+        /* clear upper 32 */
-+        tcg_gen_ext32u_tl(source1, source1);
-+        tcg_gen_andi_tl(source2, source2, 0x1F);
-+        tcg_gen_shr_tl(source1, source1, source2);
-+        break;
+diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/riscv/riscv_htif.h
+new file mode 100644
+index 0000000..d37291d
+--- /dev/null
++++ b/include/hw/riscv/riscv_htif.h
+@@ -0,0 +1,62 @@
++/*
++ * QEMU RISCV Host Target Interface (HTIF) Emulation
++ *
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#ifndef HW_RISCV_HTIF_H
++#define HW_RISCV_HTIF_H
++
++#include "hw/hw.h"
++#include "chardev/char.h"
++#include "chardev/char-fe.h"
++#include "sysemu/sysemu.h"
++#include "exec/memory.h"
++#include "target/riscv/cpu.h"
++
++#define TYPE_HTIF_UART "riscv.htif.uart"
++
++typedef struct HTIFState {
++    int allow_tohost;
++    int fromhost_inprogress;
++
++    hwaddr tohost_offset;
++    hwaddr fromhost_offset;
++    uint64_t tohost_size;
++    uint64_t fromhost_size;
++    qemu_irq irq; /* host interrupt line */
++    MemoryRegion mmio;
++    MemoryRegion *address_space;
++    MemoryRegion *main_mem;
++    void *main_mem_ram_ptr;
++
++    CPURISCVState *env;
++    CharBackend chr;
++    uint64_t pending_read;
++} HTIFState;
++
++extern const VMStateDescription vmstate_htif;
++extern const MemoryRegionOps htif_io_ops;
++
++/* legacy pre qom */
++HTIFState *htif_mm_init(MemoryRegion *address_space,
++    const char *kernel_filename, qemu_irq irq, MemoryRegion *main_mem,
++    CPURISCVState *env, Chardev *chr);
++
 +#endif
-+    case OPC_RISC_SRL:
-+        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-+        tcg_gen_shr_tl(source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SRAW:
-+        /* first, trick to get it to act like working on 32 bits (get rid of
-+        upper 32, sign extend to fill space) */
-+        tcg_gen_ext32s_tl(source1, source1);
-+        tcg_gen_andi_tl(source2, source2, 0x1F);
-+        tcg_gen_sar_tl(source1, source1, source2);
-+        break;
-+        /* fall through to SRA */
-+#endif
-+    case OPC_RISC_SRA:
-+        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-+        tcg_gen_sar_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_OR:
-+        tcg_gen_or_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_AND:
-+        tcg_gen_and_tl(source1, source1, source2);
-+        break;
-+    CASE_OP_32_64(OPC_RISC_MUL):
-+        tcg_gen_mul_tl(source1, source1, source2);
-+        break;
-+    case OPC_RISC_MULH:
-+        tcg_gen_muls2_tl(source2, source1, source1, source2);
-+        break;
-+    case OPC_RISC_MULHSU:
-+        gen_mulhsu(source1, source1, source2);
-+        break;
-+    case OPC_RISC_MULHU:
-+        tcg_gen_mulu2_tl(source2, source1, source1, source2);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_DIVW:
-+        tcg_gen_ext32s_tl(source1, source1);
-+        tcg_gen_ext32s_tl(source2, source2);
-+        /* fall through to DIV */
-+#endif
-+    case OPC_RISC_DIV:
-+        /* Handle by altering args to tcg_gen_div to produce req'd results:
-+         * For overflow: want source1 in source1 and 1 in source2
-+         * For div by zero: want -1 in source1 and 1 in source2 -> -1 result */
-+        cond1 = tcg_temp_new();
-+        cond2 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)(~0L));
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
-+                            ((target_ulong)1) << (TARGET_LONG_BITS - 1));
-+        tcg_gen_and_tl(cond1, cond1, cond2); /* cond1 = overflow */
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, 0); /* cond2 = div 0 */
-+        /* if div by zero, set source1 to -1, otherwise don't change */
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond2, zeroreg, source1,
-+                resultopt1);
-+        /* if overflow or div by zero, set source2 to 1, else don't change */
-+        tcg_gen_or_tl(cond1, cond1, cond2);
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_div_tl(source1, source1, source2);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(cond2);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_DIVUW:
-+        tcg_gen_ext32u_tl(source1, source1);
-+        tcg_gen_ext32u_tl(source2, source2);
-+        /* fall through to DIVU */
-+#endif
-+    case OPC_RISC_DIVU:
-+        cond1 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)-1);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, source1,
-+                resultopt1);
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_divu_tl(source1, source1, source2);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_REMW:
-+        tcg_gen_ext32s_tl(source1, source1);
-+        tcg_gen_ext32s_tl(source2, source2);
-+        /* fall through to REM */
-+#endif
-+    case OPC_RISC_REM:
-+        cond1 = tcg_temp_new();
-+        cond2 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_movi_tl(resultopt1, 1L);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond2, source2, (target_ulong)-1);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source1,
-+                            (target_ulong)1 << (TARGET_LONG_BITS - 1));
-+        tcg_gen_and_tl(cond2, cond1, cond2); /* cond1 = overflow */
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0); /* cond2 = div 0 */
-+        /* if overflow or div by zero, set source2 to 1, else don't change */
-+        tcg_gen_or_tl(cond2, cond1, cond2);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond2, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_rem_tl(resultopt1, source1, source2);
-+        /* if div by zero, just return the original dividend */
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, resultopt1,
-+                source1);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(cond2);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_REMUW:
-+        tcg_gen_ext32u_tl(source1, source1);
-+        tcg_gen_ext32u_tl(source2, source2);
-+        /* fall through to REMU */
-+#endif
-+    case OPC_RISC_REMU:
-+        cond1 = tcg_temp_new();
-+        zeroreg = tcg_const_tl(0);
-+        resultopt1 = tcg_temp_new();
-+
-+        tcg_gen_movi_tl(resultopt1, (target_ulong)1);
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, cond1, source2, 0);
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source2, cond1, zeroreg, source2,
-+                resultopt1);
-+        tcg_gen_remu_tl(resultopt1, source1, source2);
-+        /* if div by zero, just return the original dividend */
-+        tcg_gen_movcond_tl(TCG_COND_EQ, source1, cond1, zeroreg, resultopt1,
-+                source1);
-+
-+        tcg_temp_free(cond1);
-+        tcg_temp_free(zeroreg);
-+        tcg_temp_free(resultopt1);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    if (opc & 0x8) { /* sign extend for W instructions */
-+        tcg_gen_ext32s_tl(source1, source1);
-+    }
-+
-+    gen_set_gpr(rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-+}
-+
-+static void gen_arith_imm(DisasContext *ctx, uint32_t opc, int rd,
-+        int rs1, target_long imm)
-+{
-+    TCGv source1 = tcg_temp_new();
-+    int shift_len = TARGET_LONG_BITS;
-+    int shift_a;
-+
-+    gen_get_gpr(source1, rs1);
-+
-+    switch (opc) {
-+    case OPC_RISC_ADDI:
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_ADDIW:
-+#endif
-+        tcg_gen_addi_tl(source1, source1, imm);
-+        break;
-+    case OPC_RISC_SLTI:
-+        tcg_gen_setcondi_tl(TCG_COND_LT, source1, source1, imm);
-+        break;
-+    case OPC_RISC_SLTIU:
-+        tcg_gen_setcondi_tl(TCG_COND_LTU, source1, source1, imm);
-+        break;
-+    case OPC_RISC_XORI:
-+        tcg_gen_xori_tl(source1, source1, imm);
-+        break;
-+    case OPC_RISC_ORI:
-+        tcg_gen_ori_tl(source1, source1, imm);
-+        break;
-+    case OPC_RISC_ANDI:
-+        tcg_gen_andi_tl(source1, source1, imm);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SLLIW:
-+        shift_len = 32;
-+        /* FALLTHRU */
-+#endif
-+    case OPC_RISC_SLLI:
-+        if (imm >= shift_len) {
-+            goto do_illegal;
-+        }
-+        tcg_gen_shli_tl(source1, source1, imm);
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_SHIFT_RIGHT_IW:
-+        shift_len = 32;
-+        /* FALLTHRU */
-+#endif
-+    case OPC_RISC_SHIFT_RIGHT_I:
-+        /* differentiate on IMM */
-+        shift_a = imm & 0x400;
-+        imm &= 0x3ff;
-+        if (imm >= shift_len) {
-+            goto do_illegal;
-+        }
-+        if (imm != 0) {
-+            if (shift_a) {
-+                /* SRAI[W] */
-+                tcg_gen_sextract_tl(source1, source1, imm, shift_len - imm);
-+            } else {
-+                /* SRLI[W] */
-+                tcg_gen_extract_tl(source1, source1, imm, shift_len - imm);
-+            }
-+            /* No further sign-extension needed for W instructions.  */
-+            opc &= ~0x8;
-+        }
-+        break;
-+    default:
-+    do_illegal:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    if (opc & 0x8) { /* sign-extend for W instructions */
-+        tcg_gen_ext32s_tl(source1, source1);
-+    }
-+
-+    gen_set_gpr(rd, source1);
-+    tcg_temp_free(source1);
-+}
-+
-+static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
-+                    target_ulong imm)
-+{
-+    target_ulong next_pc;
-+
-+    /* check misaligned: */
-+    next_pc = ctx->pc + imm;
-+    if (!riscv_has_ext(env, RVC)) {
-+        if ((next_pc & 0x3) != 0) {
-+            gen_exception_inst_addr_mis(ctx);
-+            return;
-+        }
-+    }
-+    if (rd != 0) {
-+        tcg_gen_movi_tl(cpu_gpr[rd], ctx->next_pc);
-+    }
-+
-+    gen_goto_tb(ctx, 0, ctx->pc + imm); /* must use this for safety */
-+    ctx->bstate = BS_BRANCH;
-+}
-+
-+static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-+                     int rd, int rs1, target_long imm)
-+{
-+    /* no chaining with JALR */
-+    TCGLabel *misaligned = NULL;
-+    TCGv t0 = tcg_temp_new();
-+
-+    switch (opc) {
-+    case OPC_RISC_JALR:
-+        gen_get_gpr(cpu_pc, rs1);
-+        tcg_gen_addi_tl(cpu_pc, cpu_pc, imm);
-+        tcg_gen_andi_tl(cpu_pc, cpu_pc, (target_ulong)-2);
-+
-+        if (!riscv_has_ext(env, RVC)) {
-+            misaligned = gen_new_label();
-+            tcg_gen_andi_tl(t0, cpu_pc, 0x2);
-+            tcg_gen_brcondi_tl(TCG_COND_NE, t0, 0x0, misaligned);
-+        }
-+
-+        if (rd != 0) {
-+            tcg_gen_movi_tl(cpu_gpr[rd], ctx->next_pc);
-+        }
-+        tcg_gen_exit_tb(0);
-+
-+        if (misaligned) {
-+            gen_set_label(misaligned);
-+            gen_exception_inst_addr_mis(ctx);
-+        }
-+        ctx->bstate = BS_BRANCH;
-+        break;
-+
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+    tcg_temp_free(t0);
-+}
-+
-+static void gen_branch(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-+                       int rs1, int rs2, target_long bimm)
-+{
-+    TCGLabel *l = gen_new_label();
-+    TCGv source1, source2;
-+    source1 = tcg_temp_new();
-+    source2 = tcg_temp_new();
-+    gen_get_gpr(source1, rs1);
-+    gen_get_gpr(source2, rs2);
-+
-+    switch (opc) {
-+    case OPC_RISC_BEQ:
-+        tcg_gen_brcond_tl(TCG_COND_EQ, source1, source2, l);
-+        break;
-+    case OPC_RISC_BNE:
-+        tcg_gen_brcond_tl(TCG_COND_NE, source1, source2, l);
-+        break;
-+    case OPC_RISC_BLT:
-+        tcg_gen_brcond_tl(TCG_COND_LT, source1, source2, l);
-+        break;
-+    case OPC_RISC_BGE:
-+        tcg_gen_brcond_tl(TCG_COND_GE, source1, source2, l);
-+        break;
-+    case OPC_RISC_BLTU:
-+        tcg_gen_brcond_tl(TCG_COND_LTU, source1, source2, l);
-+        break;
-+    case OPC_RISC_BGEU:
-+        tcg_gen_brcond_tl(TCG_COND_GEU, source1, source2, l);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-+
-+    gen_goto_tb(ctx, 1, ctx->next_pc);
-+    gen_set_label(l); /* branch taken */
-+    if (!riscv_has_ext(env, RVC) && ((ctx->pc + bimm) & 0x3)) {
-+        /* misaligned */
-+        gen_exception_inst_addr_mis(ctx);
-+    } else {
-+        gen_goto_tb(ctx, 0, ctx->pc + bimm);
-+    }
-+    ctx->bstate = BS_BRANCH;
-+}
-+
-+static void gen_load(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-+        target_long imm)
-+{
-+    TCGv t0 = tcg_temp_new();
-+    TCGv t1 = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+    int memop = tcg_memop_lookup[(opc >> 12) & 0x7];
-+
-+    if (memop < 0) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, memop);
-+    gen_set_gpr(rd, t1);
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
-+
-+static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
-+        target_long imm)
-+{
-+    TCGv t0 = tcg_temp_new();
-+    TCGv dat = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+    gen_get_gpr(dat, rs2);
-+    int memop = tcg_memop_lookup[(opc >> 12) & 0x7];
-+
-+    if (memop < 0) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    tcg_gen_qemu_st_tl(dat, t0, ctx->mem_idx, memop);
-+    tcg_temp_free(t0);
-+    tcg_temp_free(dat);
-+}
-+
-+static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
-+        int rs1, target_long imm)
-+{
-+    TCGv t0;
-+
-+    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    t0 = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+
-+    switch (opc) {
-+    case OPC_RISC_FLW:
-+        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEUL);
-+        break;
-+    case OPC_RISC_FLD:
-+        tcg_gen_qemu_ld_i64(cpu_fpr[rd], t0, ctx->mem_idx, MO_TEQ);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+    tcg_temp_free(t0);
-+}
-+
-+static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
-+        int rs2, target_long imm)
-+{
-+    TCGv t0;
-+
-+    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+
-+    t0 = tcg_temp_new();
-+    gen_get_gpr(t0, rs1);
-+    tcg_gen_addi_tl(t0, t0, imm);
-+
-+    switch (opc) {
-+    case OPC_RISC_FSW:
-+        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEUL);
-+        break;
-+    case OPC_RISC_FSD:
-+        tcg_gen_qemu_st_i64(cpu_fpr[rs2], t0, ctx->mem_idx, MO_TEQ);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+
-+    tcg_temp_free(t0);
-+}
-+
-+static void gen_atomic(DisasContext *ctx, uint32_t opc,
-+                      int rd, int rs1, int rs2)
-+{
-+    TCGv src1, src2, dat;
-+    TCGLabel *l1, *l2;
-+    TCGMemOp mop;
-+    TCGCond cond;
-+    bool aq, rl;
-+
-+    /* Extract the size of the atomic operation.  */
-+    switch (extract32(opc, 12, 3)) {
-+    case 2: /* 32-bit */
-+        mop = MO_ALIGN | MO_TESL;
-+        break;
-+#if defined(TARGET_RISCV64)
-+    case 3: /* 64-bit */
-+        mop = MO_ALIGN | MO_TEQ;
-+        break;
-+#endif
-+    default:
-+        gen_exception_illegal(ctx);
-+        return;
-+    }
-+    rl = extract32(opc, 25, 1);
-+    aq = extract32(opc, 26, 1);
-+
-+    src1 = tcg_temp_new();
-+    src2 = tcg_temp_new();
-+
-+    switch (MASK_OP_ATOMIC_NO_AQ_RL_SZ(opc)) {
-+    case OPC_RISC_LR:
-+        /* Put addr in load_res, data in load_val.  */
-+        gen_get_gpr(src1, rs1);
-+        if (rl) {
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
-+        }
-+        tcg_gen_qemu_ld_tl(load_val, src1, ctx->mem_idx, mop);
-+        if (aq) {
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
-+        }
-+        tcg_gen_mov_tl(load_res, src1);
-+        gen_set_gpr(rd, load_val);
-+        break;
-+
-+    case OPC_RISC_SC:
-+        l1 = gen_new_label();
-+        l2 = gen_new_label();
-+        dat = tcg_temp_new();
-+
-+        gen_get_gpr(src1, rs1);
-+        tcg_gen_brcond_tl(TCG_COND_NE, load_res, src1, l1);
-+
-+        gen_get_gpr(src2, rs2);
-+        /* Note that the TCG atomic primitives are SC,
-+           so we can ignore AQ/RL along this path.  */
-+        tcg_gen_atomic_cmpxchg_tl(src1, load_res, load_val, src2,
-+                                  ctx->mem_idx, mop);
-+        tcg_gen_setcond_tl(TCG_COND_NE, dat, src1, load_val);
-+        gen_set_gpr(rd, dat);
-+        tcg_gen_br(l2);
-+
-+        gen_set_label(l1);
-+        /* Address comparion failure.  However, we still need to
-+           provide the memory barrier implied by AQ/RL.  */
-+        tcg_gen_mb(TCG_MO_ALL + aq * TCG_BAR_LDAQ + rl * TCG_BAR_STRL);
-+        tcg_gen_movi_tl(dat, 1);
-+        gen_set_gpr(rd, dat);
-+
-+        gen_set_label(l2);
-+        tcg_temp_free(dat);
-+        break;
-+
-+    case OPC_RISC_AMOSWAP:
-+        /* Note that the TCG atomic primitives are SC,
-+           so we can ignore AQ/RL along this path.  */
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_xchg_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOADD:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_add_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOXOR:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_xor_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOAND:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_and_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+    case OPC_RISC_AMOOR:
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        tcg_gen_atomic_fetch_or_tl(src2, src1, src2, ctx->mem_idx, mop);
-+        gen_set_gpr(rd, src2);
-+        break;
-+
-+    case OPC_RISC_AMOMIN:
-+        cond = TCG_COND_LT;
-+        goto do_minmax;
-+    case OPC_RISC_AMOMAX:
-+        cond = TCG_COND_GT;
-+        goto do_minmax;
-+    case OPC_RISC_AMOMINU:
-+        cond = TCG_COND_LTU;
-+        goto do_minmax;
-+    case OPC_RISC_AMOMAXU:
-+        cond = TCG_COND_GTU;
-+        goto do_minmax;
-+    do_minmax:
-+        /* Handle the RL barrier.  The AQ barrier is handled along the
-+           parallel path by the SC atomic cmpxchg.  On the serial path,
-+           of course, barriers do not matter.  */
-+        if (rl) {
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
-+        }
-+        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
-+            l1 = gen_new_label();
-+            gen_set_label(l1);
-+        } else {
-+            l1 = NULL;
-+        }
-+
-+        gen_get_gpr(src1, rs1);
-+        gen_get_gpr(src2, rs2);
-+        if ((mop & MO_SSIZE) == MO_SL) {
-+            /* Sign-extend the register comparison input.  */
-+            tcg_gen_ext32s_tl(src2, src2);
-+        }
-+        dat = tcg_temp_local_new();
-+        tcg_gen_qemu_ld_tl(dat, src1, ctx->mem_idx, mop);
-+        tcg_gen_movcond_tl(cond, src2, dat, src2, dat, src2);
-+
-+        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
-+            /* Parallel context.  Make this operation atomic by verifying
-+               that the memory didn't change while we computed the result.  */
-+            tcg_gen_atomic_cmpxchg_tl(src2, src1, dat, src2, ctx->mem_idx, mop);
-+
-+            /* If the cmpxchg failed, retry. */
-+            /* ??? There is an assumption here that this will eventually
-+               succeed, such that we don't live-lock.  This is not unlike
-+               a similar loop that the compiler would generate for e.g.
-+               __atomic_fetch_and_xor, so don't worry about it.  */
-+            tcg_gen_brcond_tl(TCG_COND_NE, dat, src2, l1);
-+        } else {
-+            /* Serial context.  Directly store the result.  */
-+            tcg_gen_qemu_st_tl(src2, src1, ctx->mem_idx, mop);
-+        }
-+        gen_set_gpr(rd, dat);
-+        tcg_temp_free(dat);
-+        break;
-+
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+
-+    tcg_temp_free(src1);
-+    tcg_temp_free(src2);
-+}
-+
-+static void gen_set_rm(DisasContext *ctx, int rm)
-+{
-+    TCGv_i32 t0;
-+
-+    if (ctx->frm == rm) {
-+        return;
-+    }
-+    ctx->frm = rm;
-+    t0 = tcg_const_i32(rm);
-+    gen_helper_set_rounding_mode(cpu_env, t0);
-+    tcg_temp_free_i32(t0);
-+}
-+
-+static void gen_fp_fmadd(DisasContext *ctx, uint32_t opc, int rd,
-+                         int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FMADD_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FMADD_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_fmsub(DisasContext *ctx, uint32_t opc, int rd,
-+                         int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FMSUB_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FMSUB_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                           cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_fnmsub(DisasContext *ctx, uint32_t opc, int rd,
-+                          int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FNMSUB_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FNMSUB_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_fnmadd(DisasContext *ctx, uint32_t opc, int rd,
-+                          int rs1, int rs2, int rs3, int rm)
-+{
-+    switch (opc) {
-+    case OPC_RISC_FNMADD_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    case OPC_RISC_FNMADD_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fnmadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1],
-+                            cpu_fpr[rs2], cpu_fpr[rs3]);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
-+                         int rs1, int rs2, int rm)
-+{
-+    TCGv t0 = NULL;
-+
-+    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-+        goto do_illegal;
-+    }
-+
-+    switch (opc) {
-+    case OPC_RISC_FADD_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fadd_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSUB_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsub_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FMUL_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmul_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FDIV_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fdiv_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSQRT_S:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsqrt_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+        break;
-+    case OPC_RISC_FSGNJ_S:
-+        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT32_MIN);
-+        break;
-+
-+    case OPC_RISC_FMIN_S:
-+        /* also handles: OPC_RISC_FMAX_S */
-+        switch (rm) {
-+        case 0x0:
-+            gen_helper_fmin_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 0x1:
-+            gen_helper_fmax_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
-+
-+    case OPC_RISC_FEQ_S:
-+        /* also handles: OPC_RISC_FLT_S, OPC_RISC_FLE_S */
-+        t0 = tcg_temp_new();
-+        switch (rm) {
-+        case 0x0:
-+            gen_helper_fle_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 0x1:
-+            gen_helper_flt_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 0x2:
-+            gen_helper_feq_s(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FCVT_W_S:
-+        /* also OPC_RISC_FCVT_WU_S, OPC_RISC_FCVT_L_S, OPC_RISC_FCVT_LU_S */
-+        t0 = tcg_temp_new();
-+        switch (rs2) {
-+        case 0: /* FCVT_W_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 1: /* FCVT_WU_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2: /* FCVT_L_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 3: /* FCVT_LU_S */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FCVT_S_W:
-+        /* also OPC_RISC_FCVT_S_WU, OPC_RISC_FCVT_S_L, OPC_RISC_FCVT_S_LU */
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+        switch (rs2) {
-+        case 0: /* FCVT_S_W */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_w(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 1: /* FCVT_S_WU */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_wu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2: /* FCVT_S_L */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_l(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 3: /* FCVT_S_LU */
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_lu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FMV_X_S:
-+        /* also OPC_RISC_FCLASS_S */
-+        t0 = tcg_temp_new();
-+        switch (rm) {
-+        case 0: /* FMV */
-+#if defined(TARGET_RISCV64)
-+            tcg_gen_ext32s_tl(t0, cpu_fpr[rs1]);
-+#else
-+            tcg_gen_extrl_i64_i32(t0, cpu_fpr[rs1]);
-+#endif
-+            break;
-+        case 1:
-+            gen_helper_fclass_s(t0, cpu_fpr[rs1]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FMV_S_X:
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+#if defined(TARGET_RISCV64)
-+        tcg_gen_mov_i64(cpu_fpr[rd], t0);
-+#else
-+        tcg_gen_extu_i32_i64(cpu_fpr[rd], t0);
-+#endif
-+        tcg_temp_free(t0);
-+        break;
-+
-+    /* double */
-+    case OPC_RISC_FADD_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fadd_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSUB_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsub_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FMUL_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fmul_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FDIV_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fdiv_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+        break;
-+    case OPC_RISC_FSQRT_D:
-+        gen_set_rm(ctx, rm);
-+        gen_helper_fsqrt_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+        break;
-+    case OPC_RISC_FSGNJ_D:
-+        gen_fsgnj(ctx, rd, rs1, rs2, rm, INT64_MIN);
-+        break;
-+
-+    case OPC_RISC_FMIN_D:
-+        /* also OPC_RISC_FMAX_D */
-+        switch (rm) {
-+        case 0:
-+            gen_helper_fmin_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 1:
-+            gen_helper_fmax_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
-+
-+    case OPC_RISC_FCVT_S_D:
-+        switch (rs2) {
-+        case 1:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_s_d(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
-+
-+    case OPC_RISC_FCVT_D_S:
-+        switch (rs2) {
-+        case 0:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_s(cpu_fpr[rd], cpu_env, cpu_fpr[rs1]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
-+
-+    case OPC_RISC_FEQ_D:
-+        /* also OPC_RISC_FLT_D, OPC_RISC_FLE_D */
-+        t0 = tcg_temp_new();
-+        switch (rm) {
-+        case 0:
-+            gen_helper_fle_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 1:
-+            gen_helper_flt_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        case 2:
-+            gen_helper_feq_d(t0, cpu_env, cpu_fpr[rs1], cpu_fpr[rs2]);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FCVT_W_D:
-+        /* also OPC_RISC_FCVT_WU_D, OPC_RISC_FCVT_L_D, OPC_RISC_FCVT_LU_D */
-+        t0 = tcg_temp_new();
-+        switch (rs2) {
-+        case 0:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_w_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 1:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_wu_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_l_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+        case 3:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_lu_d(t0, cpu_env, cpu_fpr[rs1]);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        gen_set_gpr(rd, t0);
-+        tcg_temp_free(t0);
-+        break;
-+
-+    case OPC_RISC_FCVT_D_W:
-+        /* also OPC_RISC_FCVT_D_WU, OPC_RISC_FCVT_D_L, OPC_RISC_FCVT_D_LU */
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+        switch (rs2) {
-+        case 0:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_w(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 1:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_wu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#if defined(TARGET_RISCV64)
-+        case 2:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_l(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+        case 3:
-+            gen_set_rm(ctx, rm);
-+            gen_helper_fcvt_d_lu(cpu_fpr[rd], cpu_env, t0);
-+            break;
-+#endif
-+        default:
-+            goto do_illegal;
-+        }
-+        tcg_temp_free(t0);
-+        break;
-+
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_FMV_X_D:
-+        /* also OPC_RISC_FCLASS_D */
-+        switch (rm) {
-+        case 0: /* FMV */
-+            gen_set_gpr(rd, cpu_fpr[rs1]);
-+            break;
-+        case 1:
-+            t0 = tcg_temp_new();
-+            gen_helper_fclass_d(t0, cpu_fpr[rs1]);
-+            gen_set_gpr(rd, t0);
-+            tcg_temp_free(t0);
-+            break;
-+        default:
-+            goto do_illegal;
-+        }
-+        break;
-+
-+    case OPC_RISC_FMV_D_X:
-+        t0 = tcg_temp_new();
-+        gen_get_gpr(t0, rs1);
-+        tcg_gen_mov_tl(cpu_fpr[rd], t0);
-+        tcg_temp_free(t0);
-+        break;
-+#endif
-+
-+    default:
-+    do_illegal:
-+        if (t0) {
-+            tcg_temp_free(t0);
-+        }
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void gen_system(DisasContext *ctx, uint32_t opc,
-+                      int rd, int rs1, int csr)
-+{
-+    TCGv source1, csr_store, dest, rs1_pass, imm_rs1;
-+    source1 = tcg_temp_new();
-+    csr_store = tcg_temp_new();
-+    dest = tcg_temp_new();
-+    rs1_pass = tcg_temp_new();
-+    imm_rs1 = tcg_temp_new();
-+    gen_get_gpr(source1, rs1);
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc);
-+    tcg_gen_movi_tl(rs1_pass, rs1);
-+    tcg_gen_movi_tl(csr_store, csr); /* copy into temp reg to feed to helper */
-+
-+    switch (opc) {
-+    case OPC_RISC_ECALL:
-+        switch (csr) {
-+        case 0x0: /* ECALL */
-+            /* always generates U-level ECALL, fixed in do_interrupt handler */
-+            generate_exception(ctx, RISCV_EXCP_U_ECALL);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+        case 0x1: /* EBREAK */
-+            generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+#ifndef CONFIG_USER_ONLY
-+        case 0x002: /* URET */
-+            gen_exception_illegal(ctx);
-+            break;
-+        case 0x102: /* SRET */
-+            gen_helper_sret(cpu_pc, cpu_env, cpu_pc);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+        case 0x202: /* HRET */
-+            gen_exception_illegal(ctx);
-+            break;
-+        case 0x302: /* MRET */
-+            gen_helper_mret(cpu_pc, cpu_env, cpu_pc);
-+            tcg_gen_exit_tb(0); /* no chaining */
-+            ctx->bstate = BS_BRANCH;
-+            break;
-+        case 0x7b2: /* DRET */
-+            gen_exception_illegal(ctx);
-+            break;
-+        case 0x105: /* WFI */
-+            tcg_gen_movi_tl(cpu_pc, ctx->next_pc);
-+            gen_helper_wfi(cpu_env);
-+            break;
-+        case 0x104: /* SFENCE.VM */
-+            gen_helper_tlb_flush(cpu_env);
-+            break;
-+        case 0x120: /* SFENCE.VMA */
-+            /* TODO: handle ASID specific fences */
-+            gen_helper_tlb_flush(cpu_env);
-+            break;
-+#endif
-+        default:
-+            gen_exception_illegal(ctx);
-+            break;
-+        }
-+        break;
-+    default:
-+        tcg_gen_movi_tl(imm_rs1, rs1);
-+        switch (opc) {
-+        case OPC_RISC_CSRRW:
-+            gen_helper_csrrw(dest, cpu_env, source1, csr_store);
-+            break;
-+        case OPC_RISC_CSRRS:
-+            gen_helper_csrrs(dest, cpu_env, source1, csr_store, rs1_pass);
-+            break;
-+        case OPC_RISC_CSRRC:
-+            gen_helper_csrrc(dest, cpu_env, source1, csr_store, rs1_pass);
-+            break;
-+        case OPC_RISC_CSRRWI:
-+            gen_helper_csrrw(dest, cpu_env, imm_rs1, csr_store);
-+            break;
-+        case OPC_RISC_CSRRSI:
-+            gen_helper_csrrs(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
-+            break;
-+        case OPC_RISC_CSRRCI:
-+            gen_helper_csrrc(dest, cpu_env, imm_rs1, csr_store, rs1_pass);
-+            break;
-+        default:
-+            gen_exception_illegal(ctx);
-+            return;
-+        }
-+        gen_set_gpr(rd, dest);
-+        /* end tb since we may be changing priv modes, to get mmu_index right */
-+        tcg_gen_movi_tl(cpu_pc, ctx->next_pc);
-+        tcg_gen_exit_tb(0); /* no chaining */
-+        ctx->bstate = BS_BRANCH;
-+        break;
-+    }
-+    tcg_temp_free(source1);
-+    tcg_temp_free(csr_store);
-+    tcg_temp_free(dest);
-+    tcg_temp_free(rs1_pass);
-+    tcg_temp_free(imm_rs1);
-+}
-+
-+static void decode_RV32_64C0(DisasContext *ctx)
-+{
-+    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
-+    uint8_t rd_rs2 = GET_C_RS2S(ctx->opcode);
-+    uint8_t rs1s = GET_C_RS1S(ctx->opcode);
-+
-+    switch (funct3) {
-+    case 0:
-+        /* illegal */
-+        if (ctx->opcode == 0) {
-+            gen_exception_illegal(ctx);
-+        } else {
-+            /* C.ADDI4SPN -> addi rd', x2, zimm[9:2]*/
-+            gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs2, 2,
-+                          GET_C_ADDI4SPN_IMM(ctx->opcode));
-+        }
-+        break;
-+    case 1:
-+        /* C.FLD -> fld rd', offset[7:3](rs1')*/
-+        gen_fp_load(ctx, OPC_RISC_FLD, rd_rs2, rs1s,
-+                    GET_C_LD_IMM(ctx->opcode));
-+        /* C.LQ(RV128) */
-+        break;
-+    case 2:
-+        /* C.LW -> lw rd', offset[6:2](rs1') */
-+        gen_load(ctx, OPC_RISC_LW, rd_rs2, rs1s,
-+                 GET_C_LW_IMM(ctx->opcode));
-+        break;
-+    case 3:
-+#if defined(TARGET_RISCV64)
-+        /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
-+        gen_load(ctx, OPC_RISC_LD, rd_rs2, rs1s,
-+                 GET_C_LD_IMM(ctx->opcode));
-+#else
-+        /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
-+        gen_fp_load(ctx, OPC_RISC_FLW, rd_rs2, rs1s,
-+                    GET_C_LW_IMM(ctx->opcode));
-+#endif
-+        break;
-+    case 4:
-+        /* reserved */
-+        gen_exception_illegal(ctx);
-+        break;
-+    case 5:
-+        /* C.FSD(RV32/64) -> fsd rs2', offset[7:3](rs1') */
-+        gen_fp_store(ctx, OPC_RISC_FSD, rs1s, rd_rs2,
-+                     GET_C_LD_IMM(ctx->opcode));
-+        /* C.SQ (RV128) */
-+        break;
-+    case 6:
-+        /* C.SW -> sw rs2', offset[6:2](rs1')*/
-+        gen_store(ctx, OPC_RISC_SW, rs1s, rd_rs2,
-+                  GET_C_LW_IMM(ctx->opcode));
-+        break;
-+    case 7:
-+#if defined(TARGET_RISCV64)
-+        /* C.SD (RV64/128) -> sd rs2', offset[7:3](rs1')*/
-+        gen_store(ctx, OPC_RISC_SD, rs1s, rd_rs2,
-+                  GET_C_LD_IMM(ctx->opcode));
-+#else
-+        /* C.FSW (RV32) -> fsw rs2', offset[6:2](rs1')*/
-+        gen_fp_store(ctx, OPC_RISC_FSW, rs1s, rd_rs2,
-+                     GET_C_LW_IMM(ctx->opcode));
-+#endif
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
-+{
-+    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
-+    uint8_t rd_rs1 = GET_C_RS1(ctx->opcode);
-+    uint8_t rs1s, rs2s;
-+    uint8_t funct2;
-+
-+    switch (funct3) {
-+    case 0:
-+        /* C.ADDI -> addi rd, rd, nzimm[5:0] */
-+        gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs1, rd_rs1,
-+                      GET_C_IMM(ctx->opcode));
-+        break;
-+    case 1:
-+#if defined(TARGET_RISCV64)
-+        /* C.ADDIW (RV64/128) -> addiw rd, rd, imm[5:0]*/
-+        gen_arith_imm(ctx, OPC_RISC_ADDIW, rd_rs1, rd_rs1,
-+                      GET_C_IMM(ctx->opcode));
-+#else
-+        /* C.JAL(RV32) -> jal x1, offset[11:1] */
-+        gen_jal(env, ctx, 1, GET_C_J_IMM(ctx->opcode));
-+#endif
-+        break;
-+    case 2:
-+        /* C.LI -> addi rd, x0, imm[5:0]*/
-+        gen_arith_imm(ctx, OPC_RISC_ADDI, rd_rs1, 0, GET_C_IMM(ctx->opcode));
-+        break;
-+    case 3:
-+        if (rd_rs1 == 2) {
-+            /* C.ADDI16SP -> addi x2, x2, nzimm[9:4]*/
-+            gen_arith_imm(ctx, OPC_RISC_ADDI, 2, 2,
-+                          GET_C_ADDI16SP_IMM(ctx->opcode));
-+        } else if (rd_rs1 != 0) {
-+            /* C.LUI (rs1/rd =/= {0,2}) -> lui rd, nzimm[17:12]*/
-+            tcg_gen_movi_tl(cpu_gpr[rd_rs1],
-+                            GET_C_IMM(ctx->opcode) << 12);
-+        }
-+        break;
-+    case 4:
-+        funct2 = extract32(ctx->opcode, 10, 2);
-+        rs1s = GET_C_RS1S(ctx->opcode);
-+        switch (funct2) {
-+        case 0: /* C.SRLI(RV32) -> srli rd', rd', shamt[5:0] */
-+            gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, rs1s, rs1s,
-+                               GET_C_ZIMM(ctx->opcode));
-+            /* C.SRLI64(RV128) */
-+            break;
-+        case 1:
-+            /* C.SRAI -> srai rd', rd', shamt[5:0]*/
-+            gen_arith_imm(ctx, OPC_RISC_SHIFT_RIGHT_I, rs1s, rs1s,
-+                            GET_C_ZIMM(ctx->opcode) | 0x400);
-+            /* C.SRAI64(RV128) */
-+            break;
-+        case 2:
-+            /* C.ANDI -> andi rd', rd', imm[5:0]*/
-+            gen_arith_imm(ctx, OPC_RISC_ANDI, rs1s, rs1s,
-+                          GET_C_IMM(ctx->opcode));
-+            break;
-+        case 3:
-+            funct2 = extract32(ctx->opcode, 5, 2);
-+            rs2s = GET_C_RS2S(ctx->opcode);
-+            switch (funct2) {
-+            case 0:
-+                /* C.SUB -> sub rd', rd', rs2' */
-+                if (extract32(ctx->opcode, 12, 1) == 0) {
-+                    gen_arith(ctx, OPC_RISC_SUB, rs1s, rs1s, rs2s);
-+                }
-+#if defined(TARGET_RISCV64)
-+                else {
-+                    gen_arith(ctx, OPC_RISC_SUBW, rs1s, rs1s, rs2s);
-+                }
-+#endif
-+                break;
-+            case 1:
-+                /* C.XOR -> xor rs1', rs1', rs2' */
-+                if (extract32(ctx->opcode, 12, 1) == 0) {
-+                    gen_arith(ctx, OPC_RISC_XOR, rs1s, rs1s, rs2s);
-+                }
-+#if defined(TARGET_RISCV64)
-+                else {
-+                    /* C.ADDW (RV64/128) */
-+                    gen_arith(ctx, OPC_RISC_ADDW, rs1s, rs1s, rs2s);
-+                }
-+#endif
-+                break;
-+            case 2:
-+                /* C.OR -> or rs1', rs1', rs2' */
-+                gen_arith(ctx, OPC_RISC_OR, rs1s, rs1s, rs2s);
-+                break;
-+            case 3:
-+                /* C.AND -> and rs1', rs1', rs2' */
-+                gen_arith(ctx, OPC_RISC_AND, rs1s, rs1s, rs2s);
-+                break;
-+            }
-+            break;
-+        }
-+        break;
-+    case 5:
-+        /* C.J -> jal x0, offset[11:1]*/
-+        gen_jal(env, ctx, 0, GET_C_J_IMM(ctx->opcode));
-+        break;
-+    case 6:
-+        /* C.BEQZ -> beq rs1', x0, offset[8:1]*/
-+        rs1s = GET_C_RS1S(ctx->opcode);
-+        gen_branch(env, ctx, OPC_RISC_BEQ, rs1s, 0, GET_C_B_IMM(ctx->opcode));
-+        break;
-+    case 7:
-+        /* C.BNEZ -> bne rs1', x0, offset[8:1]*/
-+        rs1s = GET_C_RS1S(ctx->opcode);
-+        gen_branch(env, ctx, OPC_RISC_BNE, rs1s, 0, GET_C_B_IMM(ctx->opcode));
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
-+{
-+    uint8_t rd, rs2;
-+    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
-+
-+
-+    rd = GET_RD(ctx->opcode);
-+
-+    switch (funct3) {
-+    case 0: /* C.SLLI -> slli rd, rd, shamt[5:0]
-+               C.SLLI64 -> */
-+        gen_arith_imm(ctx, OPC_RISC_SLLI, rd, rd, GET_C_ZIMM(ctx->opcode));
-+        break;
-+    case 1: /* C.FLDSP(RV32/64DC) -> fld rd, offset[8:3](x2) */
-+        gen_fp_load(ctx, OPC_RISC_FLD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
-+        break;
-+    case 2: /* C.LWSP -> lw rd, offset[7:2](x2) */
-+        gen_load(ctx, OPC_RISC_LW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
-+        break;
-+    case 3:
-+#if defined(TARGET_RISCV64)
-+        /* C.LDSP(RVC64) -> ld rd, offset[8:3](x2) */
-+        gen_load(ctx, OPC_RISC_LD, rd, 2, GET_C_LDSP_IMM(ctx->opcode));
-+#else
-+        /* C.FLWSP(RV32FC) -> flw rd, offset[7:2](x2) */
-+        gen_fp_load(ctx, OPC_RISC_FLW, rd, 2, GET_C_LWSP_IMM(ctx->opcode));
-+#endif
-+        break;
-+    case 4:
-+        rs2 = GET_C_RS2(ctx->opcode);
-+
-+        if (extract32(ctx->opcode, 12, 1) == 0) {
-+            if (rs2 == 0) {
-+                /* C.JR -> jalr x0, rs1, 0*/
-+                gen_jalr(env, ctx, OPC_RISC_JALR, 0, rd, 0);
-+            } else {
-+                /* C.MV -> add rd, x0, rs2 */
-+                gen_arith(ctx, OPC_RISC_ADD, rd, 0, rs2);
-+            }
-+        } else {
-+            if (rd == 0) {
-+                /* C.EBREAK -> ebreak*/
-+                gen_system(ctx, OPC_RISC_ECALL, 0, 0, 0x1);
-+            } else {
-+                if (rs2 == 0) {
-+                    /* C.JALR -> jalr x1, rs1, 0*/
-+                    gen_jalr(env, ctx, OPC_RISC_JALR, 1, rd, 0);
-+                } else {
-+                    /* C.ADD -> add rd, rd, rs2 */
-+                    gen_arith(ctx, OPC_RISC_ADD, rd, rd, rs2);
-+                }
-+            }
-+        }
-+        break;
-+    case 5:
-+        /* C.FSDSP -> fsd rs2, offset[8:3](x2)*/
-+        gen_fp_store(ctx, OPC_RISC_FSD, 2, GET_C_RS2(ctx->opcode),
-+                     GET_C_SDSP_IMM(ctx->opcode));
-+        /* C.SQSP */
-+        break;
-+    case 6: /* C.SWSP -> sw rs2, offset[7:2](x2)*/
-+        gen_store(ctx, OPC_RISC_SW, 2, GET_C_RS2(ctx->opcode),
-+                  GET_C_SWSP_IMM(ctx->opcode));
-+        break;
-+    case 7:
-+#if defined(TARGET_RISCV64)
-+        /* C.SDSP(Rv64/128) -> sd rs2, offset[8:3](x2)*/
-+        gen_store(ctx, OPC_RISC_SD, 2, GET_C_RS2(ctx->opcode),
-+                  GET_C_SDSP_IMM(ctx->opcode));
-+#else
-+        /* C.FSWSP(RV32) -> fsw rs2, offset[7:2](x2) */
-+        gen_fp_store(ctx, OPC_RISC_FSW, 2, GET_C_RS2(ctx->opcode),
-+                     GET_C_SWSP_IMM(ctx->opcode));
-+#endif
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
-+{
-+    uint8_t op = extract32(ctx->opcode, 0, 2);
-+
-+    switch (op) {
-+    case 0:
-+        decode_RV32_64C0(ctx);
-+        break;
-+    case 1:
-+        decode_RV32_64C1(env, ctx);
-+        break;
-+    case 2:
-+        decode_RV32_64C2(env, ctx);
-+        break;
-+    }
-+}
-+
-+static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
-+{
-+    int rs1;
-+    int rs2;
-+    int rd;
-+    uint32_t op;
-+    target_long imm;
-+
-+    /* We do not do misaligned address check here: the address should never be
-+     * misaligned at this point. Instructions that set PC must do the check,
-+     * since epc must be the address of the instruction that caused us to
-+     * perform the misaligned instruction fetch */
-+
-+    op = MASK_OP_MAJOR(ctx->opcode);
-+    rs1 = GET_RS1(ctx->opcode);
-+    rs2 = GET_RS2(ctx->opcode);
-+    rd = GET_RD(ctx->opcode);
-+    imm = GET_IMM(ctx->opcode);
-+
-+    switch (op) {
-+    case OPC_RISC_LUI:
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        tcg_gen_movi_tl(cpu_gpr[rd], sextract64(ctx->opcode, 12, 20) << 12);
-+        break;
-+    case OPC_RISC_AUIPC:
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        tcg_gen_movi_tl(cpu_gpr[rd], (sextract64(ctx->opcode, 12, 20) << 12) +
-+               ctx->pc);
-+        break;
-+    case OPC_RISC_JAL:
-+        imm = GET_JAL_IMM(ctx->opcode);
-+        gen_jal(env, ctx, rd, imm);
-+        break;
-+    case OPC_RISC_JALR:
-+        gen_jalr(env, ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_BRANCH:
-+        gen_branch(env, ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
-+                   GET_B_IMM(ctx->opcode));
-+        break;
-+    case OPC_RISC_LOAD:
-+        gen_load(ctx, MASK_OP_LOAD(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_STORE:
-+        gen_store(ctx, MASK_OP_STORE(ctx->opcode), rs1, rs2,
-+                  GET_STORE_IMM(ctx->opcode));
-+        break;
-+    case OPC_RISC_ARITH_IMM:
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_ARITH_IMM_W:
-+#endif
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        gen_arith_imm(ctx, MASK_OP_ARITH_IMM(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_ARITH:
-+#if defined(TARGET_RISCV64)
-+    case OPC_RISC_ARITH_W:
-+#endif
-+        if (rd == 0) {
-+            break; /* NOP */
-+        }
-+        gen_arith(ctx, MASK_OP_ARITH(ctx->opcode), rd, rs1, rs2);
-+        break;
-+    case OPC_RISC_FP_LOAD:
-+        gen_fp_load(ctx, MASK_OP_FP_LOAD(ctx->opcode), rd, rs1, imm);
-+        break;
-+    case OPC_RISC_FP_STORE:
-+        gen_fp_store(ctx, MASK_OP_FP_STORE(ctx->opcode), rs1, rs2,
-+                     GET_STORE_IMM(ctx->opcode));
-+        break;
-+    case OPC_RISC_ATOMIC:
-+        gen_atomic(ctx, MASK_OP_ATOMIC(ctx->opcode), rd, rs1, rs2);
-+        break;
-+    case OPC_RISC_FMADD:
-+        gen_fp_fmadd(ctx, MASK_OP_FP_FMADD(ctx->opcode), rd, rs1, rs2,
-+                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FMSUB:
-+        gen_fp_fmsub(ctx, MASK_OP_FP_FMSUB(ctx->opcode), rd, rs1, rs2,
-+                     GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FNMSUB:
-+        gen_fp_fnmsub(ctx, MASK_OP_FP_FNMSUB(ctx->opcode), rd, rs1, rs2,
-+                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FNMADD:
-+        gen_fp_fnmadd(ctx, MASK_OP_FP_FNMADD(ctx->opcode), rd, rs1, rs2,
-+                      GET_RS3(ctx->opcode), GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FP_ARITH:
-+        gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
-+                     GET_RM(ctx->opcode));
-+        break;
-+    case OPC_RISC_FENCE:
-+        if (ctx->opcode & 0x1000) { /* FENCE_I */
-+            /* FENCE_I is a nop within QEMU, as we auto-detect
-+               stores that affect translated blocks.  There are
-+               no other implications to global caches.  */
-+        } else {
-+            /* FENCE is a full memory barrier.  */
-+            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-+        }
-+        break;
-+    case OPC_RISC_SYSTEM:
-+        gen_system(ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
-+                   (ctx->opcode & 0xFFF00000) >> 20);
-+        break;
-+    default:
-+        gen_exception_illegal(ctx);
-+        break;
-+    }
-+}
-+
-+static void decode_opc(CPURISCVState *env, DisasContext *ctx)
-+{
-+    /* check for compressed insn */
-+    if (extract32(ctx->opcode, 0, 2) != 3) {
-+        if (!riscv_has_ext(env, RVC)) {
-+            gen_exception_illegal(ctx);
-+        } else {
-+            ctx->next_pc = ctx->pc + 2;
-+            decode_RV32_64C(env, ctx);
-+        }
-+    } else {
-+        ctx->next_pc = ctx->pc + 4;
-+        decode_RV32_64G(env, ctx);
-+    }
-+}
-+
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+{
-+    CPURISCVState *env = cs->env_ptr;
-+    DisasContext ctx;
-+    target_ulong pc_start;
-+    target_ulong next_page_start;
-+    int num_insns;
-+    int max_insns;
-+    pc_start = tb->pc;
-+    next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-+    ctx.pc = pc_start;
-+
-+    /* once we have GDB, the rest of the translate.c implementation should be
-+       ready for singlestep */
-+    ctx.singlestep_enabled = cs->singlestep_enabled;
-+
-+    ctx.tb = tb;
-+    ctx.bstate = BS_NONE;
-+    ctx.flags = tb->flags;
-+    ctx.mem_idx = tb->flags & TB_FLAGS_MMU_MASK;
-+    ctx.frm = -1;  /* unknown rounding mode */
-+
-+    num_insns = 0;
-+    max_insns = tb->cflags & CF_COUNT_MASK;
-+    if (max_insns == 0) {
-+        max_insns = CF_COUNT_MASK;
-+    }
-+    if (max_insns > TCG_MAX_INSNS) {
-+        max_insns = TCG_MAX_INSNS;
-+    }
-+    gen_tb_start(tb);
-+
-+    while (ctx.bstate == BS_NONE) {
-+        tcg_gen_insn_start(ctx.pc);
-+        num_insns++;
-+
-+        if (unlikely(cpu_breakpoint_test(cs, ctx.pc, BP_ANY))) {
-+            tcg_gen_movi_tl(cpu_pc, ctx.pc);
-+            ctx.bstate = BS_BRANCH;
-+            gen_exception_debug();
-+            /* The address covered by the breakpoint must be included in
-+               [tb->pc, tb->pc + tb->size) in order to for it to be
-+               properly cleared -- thus we increment the PC here so that
-+               the logic setting tb->size below does the right thing.  */
-+            ctx.pc += 4;
-+            goto done_generating;
-+        }
-+
-+        if (num_insns == max_insns && (tb->cflags & CF_LAST_IO)) {
-+            gen_io_start();
-+        }
-+
-+        ctx.opcode = cpu_ldl_code(env, ctx.pc);
-+        decode_opc(env, &ctx);
-+        ctx.pc = ctx.next_pc;
-+
-+        if (cs->singlestep_enabled) {
-+            break;
-+        }
-+        if (ctx.pc >= next_page_start) {
-+            break;
-+        }
-+        if (tcg_op_buf_full()) {
-+            break;
-+        }
-+        if (num_insns >= max_insns) {
-+            break;
-+        }
-+        if (singlestep) {
-+            break;
-+        }
-+
-+    }
-+    if (tb->cflags & CF_LAST_IO) {
-+        gen_io_end();
-+    }
-+    switch (ctx.bstate) {
-+    case BS_STOP:
-+        gen_goto_tb(&ctx, 0, ctx.pc);
-+        break;
-+    case BS_NONE: /* handle end of page - DO NOT CHAIN. See gen_goto_tb. */
-+        tcg_gen_movi_tl(cpu_pc, ctx.pc);
-+        if (cs->singlestep_enabled) {
-+            gen_exception_debug();
-+        } else {
-+            tcg_gen_exit_tb(0);
-+        }
-+        break;
-+    case BS_BRANCH: /* ops using BS_BRANCH generate own exit seq */
-+    default:
-+        break;
-+    }
-+done_generating:
-+    gen_tb_end(tb, num_insns);
-+    tb->size = ctx.pc - pc_start;
-+    tb->icount = num_insns;
-+
-+#ifdef DEBUG_DISAS
-+    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-+        && qemu_log_in_addr_range(pc_start)) {
-+        qemu_log("IN: %s\n", lookup_symbol(pc_start));
-+        log_target_disas(cs, pc_start, ctx.pc - pc_start);
-+        qemu_log("\n");
-+    }
-+#endif
-+}
-+
-+void riscv_translate_init(void)
-+{
-+    int i;
-+
-+    /* cpu_gpr[0] is a placeholder for the zero register. Do not use it. */
-+    /* Use the gen_set_gpr and gen_get_gpr helper functions when accessing */
-+    /* registers, unless you specifically block reads/writes to reg 0 */
-+    cpu_gpr[0] = NULL;
-+
-+    for (i = 1; i < 32; i++) {
-+        cpu_gpr[i] = tcg_global_mem_new(cpu_env,
-+            offsetof(CPURISCVState, gpr[i]), riscv_int_regnames[i]);
-+    }
-+
-+    for (i = 0; i < 32; i++) {
-+        cpu_fpr[i] = tcg_global_mem_new_i64(cpu_env,
-+            offsetof(CPURISCVState, fpr[i]), riscv_fpr_regnames[i]);
-+    }
-+
-+    cpu_pc = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, pc), "pc");
-+    load_res = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, load_res),
-+                             "load_res");
-+    load_val = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, load_val),
-+                             "load_val");
-+}
 -- 
 2.7.0
