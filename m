@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5P-0007nC-VK
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:40 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5W-0007tZ-K7
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5O-0000uV-Uv
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:36 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5V-000142-KB
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:42 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  5 Feb 2018 16:33:22 +0200
-Message-Id: <541ac001a7d6b86bab2392554bee53c2b312148c.1517840877.git.berto@igalia.com>
+Date: Mon,  5 Feb 2018 16:33:28 +0200
+Message-Id: <947a91d934053a2dbfef979aeb9568f57ef57c5d.1517840877.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 22/39] qcow2: Update handle_copied() to
- support L2 slices
+Subject: [Qemu-devel] [PATCH v4 28/39] qcow2: Read refcount before L2 table
+ in expand_zero_clusters_in_l1()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +25,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-handle_copied() loads an L2 table and limits the number of checked
-clusters to the amount that fits inside that table. Since we'll be
-loading L2 slices instead of full tables we need to update that limit.
+At the moment it doesn't really make a difference whether we call
+qcow2_get_refcount() before of after reading the L2 table, but if we
+want to support L2 slices we'll need to read the refcount first.
 
-Apart from that, this function doesn't need any additional changes, so
-this patch simply updates the variable name from l2_table to l2_slice.
+This patch simply changes the order of those two operations to prepare
+for that. The patch with the actual semantic changes will be easier to
+read because of this.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ block/qcow2-cluster.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 76e24bcbe0..854035a312 100644
+index 068d1ee0a0..ecfd4e7019 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1120,7 +1120,7 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
-     BDRVQcow2State *s = bs->opaque;
-     int l2_index;
-     uint64_t cluster_offset;
--    uint64_t *l2_table;
-+    uint64_t *l2_slice;
-     uint64_t nb_clusters;
-     unsigned int keep_clusters;
-     int ret;
-@@ -1132,23 +1132,23 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
-                                 == offset_into_cluster(s, *host_offset));
+@@ -1899,6 +1899,12 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
+             goto fail;
+         }
  
-     /*
--     * Calculate the number of clusters to look for. We stop at L2 table
-+     * Calculate the number of clusters to look for. We stop at L2 slice
-      * boundaries to keep things simple.
-      */
-     nb_clusters =
-         size_to_clusters(s, offset_into_cluster(s, guest_offset) + *bytes);
++        ret = qcow2_get_refcount(bs, l2_offset >> s->cluster_bits,
++                                 &l2_refcount);
++        if (ret < 0) {
++            goto fail;
++        }
++
+         if (is_active_l1) {
+             /* get active L2 tables from cache */
+             ret = qcow2_cache_get(bs, s->l2_table_cache, l2_offset,
+@@ -1912,12 +1918,6 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
+             goto fail;
+         }
  
--    l2_index = offset_to_l2_index(s, guest_offset);
--    nb_clusters = MIN(nb_clusters, s->l2_size - l2_index);
-+    l2_index = offset_to_l2_slice_index(s, guest_offset);
-+    nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
-     assert(nb_clusters <= INT_MAX);
- 
-     /* Find L2 entry for the first involved cluster */
--    ret = get_cluster_table(bs, guest_offset, &l2_table, &l2_index);
-+    ret = get_cluster_table(bs, guest_offset, &l2_slice, &l2_index);
-     if (ret < 0) {
-         return ret;
-     }
- 
--    cluster_offset = be64_to_cpu(l2_table[l2_index]);
-+    cluster_offset = be64_to_cpu(l2_slice[l2_index]);
- 
-     /* Check how many clusters are already allocated and don't need COW */
-     if (qcow2_get_cluster_type(cluster_offset) == QCOW2_CLUSTER_NORMAL
-@@ -1176,7 +1176,7 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
-         /* We keep all QCOW_OFLAG_COPIED clusters */
-         keep_clusters =
-             count_contiguous_clusters(nb_clusters, s->cluster_size,
--                                      &l2_table[l2_index],
-+                                      &l2_slice[l2_index],
-                                       QCOW_OFLAG_COPIED | QCOW_OFLAG_ZERO);
-         assert(keep_clusters <= nb_clusters);
- 
-@@ -1191,7 +1191,7 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
- 
-     /* Cleanup */
- out:
--    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
-+    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
- 
-     /* Only return a host offset if we actually made progress. Otherwise we
-      * would make requirements for handle_alloc() that it can't fulfill */
+-        ret = qcow2_get_refcount(bs, l2_offset >> s->cluster_bits,
+-                                 &l2_refcount);
+-        if (ret < 0) {
+-            goto fail;
+-        }
+-
+         for (j = 0; j < s->l2_size; j++) {
+             uint64_t l2_entry = be64_to_cpu(l2_table[j]);
+             int64_t offset = l2_entry & L2E_OFFSET_MASK;
 -- 
 2.11.0
