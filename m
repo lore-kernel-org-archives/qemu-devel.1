@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eieCr-0006V7-6o
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:41:02 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eieF1-00082i-2P
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eieCo-0001bn-4D
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:41:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eieCn-0001a7-T8
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:40:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eieCm-0008LF-N4
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 10:40:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ACCF52E80C8
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 10:40:56 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1eieEx-0002zk-Up
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:43:15 -0500
+Resent-Message-Id: <E1eieEx-0002zk-Up@eggs.gnu.org>
+In-Reply-To: <20180205102935.14736-1-david@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151782737560.39.12927396708059778674@bdbb90650ae5>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Feb 2018 10:27:09 -0000
-From: Toomas Soome <tsoome@me.com>
-Reply-To: Bug 1747393 <1747393@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151782642980.10198.17726074601611845094.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1747393] [NEW] nvme is missing support for
- NVME_ADM_CMD_ASYNC_EV_REQ
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 5 Feb 2018 02:42:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpumodel: model PTFF subfunctions
+ for Multiple-epoch facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: david@redhat.com
+Cc: famz@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
 
-Public bug reported:
-
-NVME_ADM_CMD_ASYNC_EV_REQ is required by specification but apparently we
-will be responded by error when this command is used.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1747393
-
-Title:
-  nvme is missing support for NVME_ADM_CMD_ASYNC_EV_REQ
-
-Status in QEMU:
-  New
-
-Bug description:
-  NVME_ADM_CMD_ASYNC_EV_REQ is required by specification but apparently
-  we will be responded by error when this command is used.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1747393/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjA1MTAyOTM1LjE0NzM2LTEtZGF2aWRAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBzMzkweC9jcHVtb2RlbDogbW9kZWwgUFRGRiBzdWJm
+dW5jdGlvbnMgZm9yIE11bHRpcGxlLWVwb2NoIGZhY2lsaXR5Cgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
+bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9
+IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21t
+aXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4g
+MSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWls
+IHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFp
+bGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWls
+ZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
+ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9q
+ZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDIwNTEwMjY1
+OS42MDU1Mi0xLW1hcmNlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAyMDUxMDI2NTkuNjA1
+NTItMS1tYXJjZWxAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
+LzIwMTgwMjA1MTAyOTM1LjE0NzM2LTEtZGF2aWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgw
+MjA1MTAyOTM1LjE0NzM2LTEtZGF2aWRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCjdjMjc3YTIzYzEgczM5MHgvY3B1bW9kZWw6IG1vZGVsIFBURkYgc3ViZnVuY3Rp
+b25zIGZvciBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
+Y2tpbmcgUEFUQ0ggMS8xOiBzMzkweC9jcHVtb2RlbDogbW9kZWwgUFRGRiBzdWJmdW5jdGlvbnMg
+Zm9yIE11bHRpcGxlLWVwb2NoIGZhY2lsaXR5Li4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMjU6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNTk6CisgICAgRkVB
+VF9JTklUKCJwdGZmLXFzaWUiLCBTMzkwX0ZFQVRfVFlQRV9QVEZGLCAxMCwgIlBURkYgUXVlcnkg
+U3RlZXJpbmcgSW5mb3JtYXRpb24gRXh0ZW5kZWQiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojMjY6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNjA6CisgICAg
+RkVBVF9JTklUKCJwdGZmLXF0b3VlIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgMTMsICJQVEZGIFF1
+ZXJ5IFRPRCBPZmZzZXQgVXNlciBFeHRlbmRlZCIpLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzI5OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTYzOgorICAg
+IEZFQVRfSU5JVCgicHRmZi1zdG9lIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgNzMsICJQVEZGIFNl
+dCBUT0QgT2Zmc2V0IEV4dGVuZGVkIiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMzA6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNjQ6CisgICAgRkVBVF9J
+TklUKCJwdGZmLXN0b3VlIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgNzcsICJQVEZGIFNldCBUT0Qg
+T2Zmc2V0IFVzZXIgRXh0ZW5kZWQiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+Mzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0NTI6CisgICAgRkVBVF9HUk9V
+UF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5oYW5jZW1l
+bnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKRVJST1I6IE1h
+Y3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNp
+cwojNjc6IEZJTEU6IHRhcmdldC9zMzkweC9nZW4tZmVhdHVyZXMuYzo2MjoKKyNkZWZpbmUgUzM5
+MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYgXAorICAgIFMzOTBfRkVBVF9QVEZGX1FT
+SUUsIFwKKyAgICBTMzkwX0ZFQVRfUFRGRl9RVE9VRSwgXAorICAgIFMzOTBfRkVBVF9QVEZGX1NU
+T0UsIFwKKyAgICBTMzkwX0ZFQVRfUFRGRl9TVE9VRQoKdG90YWw6IDQgZXJyb3JzLCAyIHdhcm5p
+bmdzLCA4MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+ZnJlZWxpc3RzLm9yZw==
