@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eih38-0006zA-8L
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:43:12 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eih3A-00071t-NP
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:43:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eih2y-0007nB-Pe
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:43:10 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eih35-0007xn-8J
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:43:12 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  5 Feb 2018 14:39:29 +0100
-Message-Id: <1517837972-1904-12-git-send-email-eric.auger@redhat.com>
+Date: Mon,  5 Feb 2018 14:39:30 +0100
+Message-Id: <1517837972-1904-13-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1517837972-1904-1-git-send-email-eric.auger@redhat.com>
 References: <1517837972-1904-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 11/14] target/arm/kvm: Translate the MSI
- doorbell in kvm_arch_fixup_msi_route
+Subject: [Qemu-devel] [PATCH v8 12/14] hw/arm/virt: Add SMMUv3 to the virt
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +23,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com
 Cc: tn@semihalf.com, mst@redhat.com, christoffer.dall@linaro.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, edgar.iglesias@gmail.com, linuc.decode@gmail.com, peterx@redhat.com
 
-In case the MSI is translated by an IOMMU we need to fixup the
-MSI route with the translated address.
+From: Prem Mallappa <prem.mallappa@broadcom.com>
 
+Add code to instantiate an smmuv3 in virt machine. A new iommu
+integer member is introduced in VirtMachineState to store the type
+of the iommu in use.
+
+Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
+v7 -> v8:
+- integer iommu member
+- add primary-bus property
 
-v5 -> v6:
-- use IOMMUMemoryRegionClass API
+v4 -> v5:
+- add dma-coherent property
 
-It is still unclear to me if we need to register an IOMMUNotifier
-to handle any change in the MSI doorbell which would occur behind
-the scene and would not lead to any call to kvm_arch_fixup_msi_route().
+v2 -> v3:
+- vbi was removed. Use vms instead
+- migrate to new smmu binding format (iommu-map)
+- don't use appendprop anymore
+- add vms->smmu and guard instantiation with this latter
+- interrupts type changed to edge
+
+Conflicts:
+	hw/arm/smmuv3.c
 ---
- target/arm/kvm.c        | 27 +++++++++++++++++++++++++++
- target/arm/trace-events |  3 +++
- 2 files changed, 30 insertions(+)
+ hw/arm/virt.c         | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/arm/virt.h | 10 ++++++++
+ 2 files changed, 73 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 211a7bf..f0bd4d0 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -20,8 +20,13 @@
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
- #include "cpu.h"
-+#include "trace.h"
- #include "internals.h"
- #include "hw/arm/arm.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/msi.h"
-+#include "hw/arm/smmu-common.h"
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index b334c82..a760a68 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -58,6 +58,7 @@
+ #include "hw/smbios/smbios.h"
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
 +#include "hw/arm/smmuv3.h"
- #include "exec/memattrs.h"
- #include "exec/address-spaces.h"
- #include "hw/boards.h"
-@@ -666,6 +671,28 @@ int kvm_arm_vgic_probe(void)
- int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-                              uint64_t address, uint32_t data, PCIDevice *dev)
- {
-+    AddressSpace *as = pci_device_iommu_address_space(dev);
-+    IOMMUMemoryRegionClass *imrc;
-+    IOMMUTLBEntry entry;
-+    SMMUDevice *sdev;
-+
-+    if (as == &address_space_memory) {
-+        return 0;
-+    }
-+
-+    /* MSI doorbell address is translated by an IOMMU */
-+    sdev = container_of(as, SMMUDevice, as);
-+    imrc = IOMMU_MEMORY_REGION_GET_CLASS(&sdev->iommu);
-+
-+    entry = imrc->translate(&sdev->iommu, address, IOMMU_WO);
-+
-+    route->u.msi.address_lo = entry.translated_addr;
-+    route->u.msi.address_hi = entry.translated_addr >> 32;
-+
-+    trace_kvm_arm_fixup_msi_route(address, sdev->devfn,
-+                                  sdev->iommu.parent_obj.name,
-+                                  entry.translated_addr);
-+
-     return 0;
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -141,6 +142,7 @@ static const MemMapEntry a15memmap[] = {
+     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
+     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
++    [VIRT_SMMU] =               { 0x09050000, 0x00020000 }, /* 128K, needed */
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -161,6 +163,7 @@ static const int a15irqmap[] = {
+     [VIRT_SECURE_UART] = 8,
+     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
+     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
++    [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
+     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+ };
+ 
+@@ -1001,7 +1004,57 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                            0x7           /* PCI irq */);
  }
  
-diff --git a/target/arm/trace-events b/target/arm/trace-events
-index 9e37131..8b3c220 100644
---- a/target/arm/trace-events
-+++ b/target/arm/trace-events
-@@ -8,3 +8,6 @@ arm_gt_tval_write(int timer, uint64_t value) "gt_tval_write: timer %d value 0x%"
- arm_gt_ctl_write(int timer, uint64_t value) "gt_ctl_write: timer %d value 0x%" PRIx64
- arm_gt_imask_toggle(int timer, int irqstate) "gt_ctl_write: timer %d IMASK toggle, new irqstate %d"
- arm_gt_cntvoff_write(uint64_t value) "gt_cntvoff_write: value 0x%" PRIx64
+-static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
++static void create_smmu(const VirtMachineState *vms, qemu_irq *pic,
++                        PCIBus *bus)
++{
++    char *node;
++    const char compat[] = "arm,smmu-v3";
++    int irq =  vms->irqmap[VIRT_SMMU];
++    int i;
++    hwaddr base = vms->memmap[VIRT_SMMU].base;
++    hwaddr size = vms->memmap[VIRT_SMMU].size;
++    const char irq_names[] = "eventq\0priq\0cmdq-sync\0gerror";
++    DeviceState *dev;
 +
-+# target/arm/kvm.c
-+kvm_arm_fixup_msi_route(uint64_t iova, uint32_t devid, const char *name, uint64_t gpa) "MSI addr = 0x%"PRIx64" is translated for devfn=%d through %s into 0x%"PRIx64
++    if (vms->iommu != VIRT_IOMMU_SMMUV3 || !vms->iommu_phandle) {
++        return;
++    }
++
++    dev = qdev_create(NULL, "arm-smmuv3");
++
++    object_property_set_link(OBJECT(dev), OBJECT(bus), "primary-bus",
++                             &error_abort);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
++    for (i = 0; i < NUM_SMMU_IRQS; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
++    }
++
++    node = g_strdup_printf("/smmuv3@%" PRIx64, base);
++    qemu_fdt_add_subnode(vms->fdt, node);
++    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
++    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg", 2, base, 2, size);
++
++    qemu_fdt_setprop_cells(vms->fdt, node, "interrupts",
++            GIC_FDT_IRQ_TYPE_SPI, irq    , GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 1, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 2, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 3, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
++
++    qemu_fdt_setprop(vms->fdt, node, "interrupt-names", irq_names,
++                     sizeof(irq_names));
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "clocks", vms->clock_phandle);
++    qemu_fdt_setprop_string(vms->fdt, node, "clock-names", "apb_pclk");
++    qemu_fdt_setprop(vms->fdt, node, "dma-coherent", NULL, 0);
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
++    g_free(node);
++}
++
++static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+ {
+     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
+@@ -1114,6 +1167,15 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
+     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
+ 
++    if (vms->iommu) {
++        vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
++
++        create_smmu(vms, pic, pci->bus);
++
++        qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
++                               0x0, vms->iommu_phandle, 0x0, 0x10000);
++    }
++
+     g_free(nodename);
+ }
+ 
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 33b0ff3..13d3724 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -38,6 +38,7 @@
+ 
+ #define NUM_GICV2M_SPIS       64
+ #define NUM_VIRTIO_TRANSPORTS 32
++#define NUM_SMMU_IRQS          4
+ 
+ #define ARCH_GICV3_MAINT_IRQ  9
+ 
+@@ -59,6 +60,7 @@ enum {
+     VIRT_GIC_V2M,
+     VIRT_GIC_ITS,
+     VIRT_GIC_REDIST,
++    VIRT_SMMU,
+     VIRT_UART,
+     VIRT_MMIO,
+     VIRT_RTC,
+@@ -74,6 +76,12 @@ enum {
+     VIRT_SECURE_MEM,
+ };
+ 
++enum {
++    VIRT_IOMMU_NONE,
++    VIRT_IOMMU_SMMUV3,
++    VIRT_IOMMU_VIRTIO,
++};
++
+ typedef struct MemMapEntry {
+     hwaddr base;
+     hwaddr size;
+@@ -96,6 +104,7 @@ typedef struct {
+     bool its;
+     bool virt;
+     int32_t gic_version;
++    int32_t iommu;
+     struct arm_boot_info bootinfo;
+     const MemMapEntry *memmap;
+     const int *irqmap;
+@@ -105,6 +114,7 @@ typedef struct {
+     uint32_t clock_phandle;
+     uint32_t gic_phandle;
+     uint32_t msi_phandle;
++    uint32_t iommu_phandle;
+     int psci_conduit;
+ } VirtMachineState;
+ 
 -- 
 2.5.5
