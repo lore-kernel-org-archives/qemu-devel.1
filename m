@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eihkI-00044q-MG
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:27:47 -0500
+	(envelope-from <armbru@redhat.com>) id 1eiho3-0007fJ-2V
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eihkD-0007r9-Mb
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:27:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38754)
+	(envelope-from <armbru@redhat.com>) id 1eihny-0003AH-H6
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:31:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eihkD-0007qx-GN
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:27:41 -0500
-References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
-	<20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <d733575d-2825-7d3b-0b2b-2fd125a8b85a@redhat.com>
-Date: Mon, 5 Feb 2018 15:27:38 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eihny-00039n-8o
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:31:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180203084315.20497-1-armbru@redhat.com>
+	<20180203084315.20497-15-armbru@redhat.com>
+	<bbc2cc63-c192-020c-b9ff-78461c0efced@redhat.com>
+	<87po5kx7w8.fsf@dusky.pond.sub.org>
+	<9189012b-c77c-3b7c-8014-bf086d0b75a5@redhat.com>
+Date: Mon, 05 Feb 2018 15:31:20 +0100
+In-Reply-To: <9189012b-c77c-3b7c-8014-bf086d0b75a5@redhat.com> (Thomas Huth's
+	message of "Mon, 5 Feb 2018 07:52:08 +0100")
+Message-ID: <87tvuvv77r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] cuda: don't allow writes to port
- output pins
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 14/14] target: Use qemu_log() instead of
+ fprintf(stderr, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +32,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: alistair.francis@xilinx.com, qemu-devel@nongnu.org, f4bug@amsat.org
 
-On 03/02/2018 11:37, Mark Cave-Ayland wrote:
-> Use the direction registers as a mask to ensure that only input pins are
-> updated upon write.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/misc/macio/cuda.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-> index 23b7e0f5b0..7214e7adcb 100644
-> --- a/hw/misc/macio/cuda.c
-> +++ b/hw/misc/macio/cuda.c
-> @@ -359,11 +359,11 @@ static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
->  
->      switch(addr) {
->      case CUDA_REG_B:
-> -        s->b = val;
-> +        s->b = (s->b & ~s->dirb) | (val & s->dirb);
->          cuda_update(s);
->          break;
->      case CUDA_REG_A:
-> -        s->a = val;
-> +        s->a = (s->a & ~s->dira) | (val & s->dira);
->          break;
->      case CUDA_REG_DIRB:
->          s->dirb = val;
-> 
+Thomas Huth <thuth@redhat.com> writes:
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> On 05.02.2018 07:33, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
+>>=20
+>>> On 03.02.2018 09:43, Markus Armbruster wrote:
+>>>> From: Alistair Francis <alistair.francis@xilinx.com>
+>>>>
+>>>> Convert fprintf(stderr, ...) to use qemu_log(). Double prints in
+>>>> target/ppc/translate.c were manually remove. A fprintf() in
+>>>> target/sh4/translate.c was kept as it's inside a #if 0. The #if 0 and
+>>>> fflush() was removed around the unimplemented log in
+>>>> target/sh4/translate.c as well.
+>>>>
+>>>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>>>> [Trivial conflict with 6f1c2af641d resolved]
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>> ---
+>>>>  target/cris/translate.c      |  2 +-
+>>>>  target/ppc/translate.c       | 36 ++++++++++--------------------------
+>>>>  target/sh4/translate.c       |  7 ++-----
+>>>>  target/unicore32/translate.c |  2 +-
+>>>>  4 files changed, 14 insertions(+), 33 deletions(-)
+>>>>
+>>>> diff --git a/target/cris/translate.c b/target/cris/translate.c
+>>>> index f51a731db9..ff31311ed0 100644
+>>>> --- a/target/cris/translate.c
+>>>> +++ b/target/cris/translate.c
+>>>> @@ -137,7 +137,7 @@ typedef struct DisasContext {
+>>>>=20=20
+>>>>  static void gen_BUG(DisasContext *dc, const char *file, int line)
+>>>>  {
+>>>> -    fprintf(stderr, "BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>>> +    qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>>>      if (qemu_log_separate()) {
+>>>>          qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>>>      }
+>>>
+>>> This one is still logging twice now.
+>>=20
+>> Hmm.
+>>=20
+>>>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>>>> index 4132f67bb1..172c9f2001 100644
+>>>> --- a/target/ppc/translate.c
+>>>> +++ b/target/ppc/translate.c
+>>>> @@ -3933,12 +3933,8 @@ static inline void gen_op_mfspr(DisasContext *c=
+tx)
+>>>>               * allowing userland application to read the PVR
+>>>>               */
+>>>>              if (sprn !=3D SPR_PVR) {
+>>>> -                fprintf(stderr, "Trying to read privileged spr %d (0x=
+%03x) at "
+>>>> -                        TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+>>>> -                if (qemu_log_separate()) {
+>>>> -                    qemu_log("Trying to read privileged spr %d (0x%03=
+x) at "
+>>>> -                             TARGET_FMT_lx "\n", sprn, sprn, ctx->nip=
+ - 4);
+>>>> -                }
+>>>> +                qemu_log("Trying to read privileged spr %d (0x%03x) a=
+t "
+>>>> +                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4=
+);
+>>>
+>>> I wonder whether that should maybe rather be a
+>>> qemu_log_mask(LOG_GUEST_ERROR, ...) instead? Well, but maybe that's
+>>> subject to another patch...
+>>=20
+>> qemu_log_separate() appears to be always used like this
+>>=20
+>>     fprintf(stderr, ... the message ...);
+>>     if (qemu_log_separate()) {
+>>         qemu_log(... the same message ...);
+>>     }
+>>=20
+>> Are you proposing to replace this pattern by
+>>=20
+>>     qemu_log_mask(LOG_GUEST_ERROR, ...the message ...);
+>>=20
+>> ?
+>
+> Not globally, only in target/ppc/translate.c. The wrong accesses to SPR
+> (special purpose registers) there indicate that the guest has likely
+> tried to do something wrong.
+>
+> Globally, I wonder whether it still makes sense to keep the
+> qemu_log_separate() stuff - we rather want to get rid of all fprintfs,
+> don't we?
+
+The qemu_log_separate() pattern feels wrong to me.  If we have a class
+of messages that should go to stderr in addition to the log (unless the
+two are the same), then we should have a log level / mask / function /
+whatever to do that.
+
+To expedite merging of the rest of the series, I'll drop this patch from
+it.
+
+Alistair, would you be willing to work with Thomas to revise this patch?
