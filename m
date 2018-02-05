@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eig4t-00060E-SP
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:40:57 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eig81-0007k7-FB
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:44:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eig4q-0004U1-NU
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:40:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eig4q-0004Tf-DC
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:40:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eig4o-0007RO-KF
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 12:40:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 917022E80CD
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 12:40:50 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eig7y-0006wh-CH
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:44:09 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180205105720.14620-1-peter.maydell@linaro.org>
+	<20180205105720.14620-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4bee993f-c7fb-5b2e-a966-7322ff269870@amsat.org>
+Date: Mon, 5 Feb 2018 09:43:58 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Feb 2018 12:32:25 -0000
-From: Daniel Berrange <1747056@bugs.launchpad.net>
-Reply-To: Bug 1747056 <1747056@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151759534688.10002.1939402860055070584.malonedeb@wampee.canonical.com>
-Message-Id: <151783394578.3738.1311267028053053193.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1747056] Re: FreeDOS / MS-Dos / Windows 3.11
- cannot perform reboot with 'isapc' machine
+In-Reply-To: <20180205105720.14620-2-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="bTqPZxR14QwoL5lYXxKelidQsWWZCwPux"
+Subject: Re: [Qemu-devel] [PATCH 1/8] hw/intc/armv7m_nvic: Don't hardcode M
+ profile ID registers in NVIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +29,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-I bisected seabios and found this seabios change to be the cause of the
-problem
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bTqPZxR14QwoL5lYXxKelidQsWWZCwPux
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
+Message-ID: <4bee993f-c7fb-5b2e-a966-7322ff269870@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 1/8] hw/intc/armv7m_nvic: Don't hardcode M
+ profile ID registers in NVIC
+References: <20180205105720.14620-1-peter.maydell@linaro.org>
+ <20180205105720.14620-2-peter.maydell@linaro.org>
+In-Reply-To: <20180205105720.14620-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-commit b837e68d5a6c1a5945513f1995875445a1594c8a (refs/bisect/bad)
-Author: Kevin O'Connor <kevin@koconnor.net>
-Date:   Mon Nov 9 15:00:19 2015 -0500
+On 02/05/2018 07:57 AM, Peter Maydell wrote:
+> Instead of hardcoding the values of M profile ID registers in the
+> NVIC, use the fields in the CPU struct. This will allow us to
+> give different M profile CPU types different ID register values.
+> This commit includes the addition of the missing ID_ISAR5,
+> which exists as RES0 in both v7M and v8M.
+>=20
+> (The values of the ID registers might be wrong for the M4 --
+> this commit leaves the behaviour there unchanged.)
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-    resume: Make KVM soft reboot loop detection more flexible
-    =
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-    Move the check for soft reboot loops from resume.c to shadow.c and
-    directly check for the case where the copy of the BIOS in flash
-    appears to be a memory alias instead.  This prevents a hang if an
-    external reboot request occurs during the BIOS memcpy.
-    =
+> ---
+>  hw/intc/armv7m_nvic.c | 30 ++++++++++++++++--------------
+>  target/arm/cpu.c      | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index 360889d30b..63da0fee34 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -990,31 +990,33 @@ static uint32_t nvic_readl(NVICState *s, uint32_t=
+ offset, MemTxAttrs attrs)
+>                        "Aux Fault status registers unimplemented\n");
+>          return 0;
+>      case 0xd40: /* PFR0.  */
+> -        return 0x00000030;
+> -    case 0xd44: /* PRF1.  */
+> -        return 0x00000200;
+> +        return cpu->id_pfr0;
+> +    case 0xd44: /* PFR1.  */
+> +        return cpu->id_pfr1;
+>      case 0xd48: /* DFR0.  */
+> -        return 0x00100000;
+> +        return cpu->id_dfr0;
+>      case 0xd4c: /* AFR0.  */
+> -        return 0x00000000;
+> +        return cpu->id_afr0;
+>      case 0xd50: /* MMFR0.  */
+> -        return 0x00000030;
+> +        return cpu->id_mmfr0;
+>      case 0xd54: /* MMFR1.  */
+> -        return 0x00000000;
+> +        return cpu->id_mmfr1;
+>      case 0xd58: /* MMFR2.  */
+> -        return 0x00000000;
+> +        return cpu->id_mmfr2;
+>      case 0xd5c: /* MMFR3.  */
+> -        return 0x00000000;
+> +        return cpu->id_mmfr3;
+>      case 0xd60: /* ISAR0.  */
+> -        return 0x01141110;
+> +        return cpu->id_isar0;
+>      case 0xd64: /* ISAR1.  */
+> -        return 0x02111000;
+> +        return cpu->id_isar1;
+>      case 0xd68: /* ISAR2.  */
+> -        return 0x21112231;
+> +        return cpu->id_isar2;
+>      case 0xd6c: /* ISAR3.  */
+> -        return 0x01111110;
+> +        return cpu->id_isar3;
+>      case 0xd70: /* ISAR4.  */
+> -        return 0x01310102;
+> +        return cpu->id_isar4;
+> +    case 0xd74: /* ISAR5.  */
+> +        return cpu->id_isar5;
+>      /* TODO: Implement debug registers.  */
+>      case 0xd90: /* MPU_TYPE */
+>          /* Unified MPU; if the MPU is not present this value is zero *=
+/
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 9da6ea505c..223361fb50 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1146,6 +1146,20 @@ static void cortex_m3_initfn(Object *obj)
+>      set_feature(&cpu->env, ARM_FEATURE_M);
+>      cpu->midr =3D 0x410fc231;
+>      cpu->pmsav7_dregion =3D 8;
+> +    cpu->id_pfr0 =3D 0x00000030;
+> +    cpu->id_pfr1 =3D 0x00000200;
+> +    cpu->id_dfr0 =3D 0x00100000;
+> +    cpu->id_afr0 =3D 0x00000000;
+> +    cpu->id_mmfr0 =3D 0x00000030;
+> +    cpu->id_mmfr1 =3D 0x00000000;
+> +    cpu->id_mmfr2 =3D 0x00000000;
+> +    cpu->id_mmfr3 =3D 0x00000000;
+> +    cpu->id_isar0 =3D 0x01141110;
+> +    cpu->id_isar1 =3D 0x02111000;
+> +    cpu->id_isar2 =3D 0x21112231;
+> +    cpu->id_isar3 =3D 0x01111110;
+> +    cpu->id_isar4 =3D 0x01310102;
+> +    cpu->id_isar5 =3D 0x00000000;
+>  }
+> =20
+>  static void cortex_m4_initfn(Object *obj)
+> @@ -1157,6 +1171,20 @@ static void cortex_m4_initfn(Object *obj)
+>      set_feature(&cpu->env, ARM_FEATURE_THUMB_DSP);
+>      cpu->midr =3D 0x410fc240; /* r0p0 */
+>      cpu->pmsav7_dregion =3D 8;
+> +    cpu->id_pfr0 =3D 0x00000030;
+> +    cpu->id_pfr1 =3D 0x00000200;
+> +    cpu->id_dfr0 =3D 0x00100000;
+> +    cpu->id_afr0 =3D 0x00000000;
+> +    cpu->id_mmfr0 =3D 0x00000030;
+> +    cpu->id_mmfr1 =3D 0x00000000;
+> +    cpu->id_mmfr2 =3D 0x00000000;
+> +    cpu->id_mmfr3 =3D 0x00000000;
+> +    cpu->id_isar0 =3D 0x01141110;
+> +    cpu->id_isar1 =3D 0x02111000;
+> +    cpu->id_isar2 =3D 0x21112231;
+> +    cpu->id_isar3 =3D 0x01111110;
+> +    cpu->id_isar4 =3D 0x01310102;
+> +    cpu->id_isar5 =3D 0x00000000;
+>  }
+> =20
+>  static void arm_v7m_class_init(ObjectClass *oc, void *data)
+>=20
 
-    Signed-off-by: Kevin O'Connor <kevin@koconnor.net>
 
--- =
+--bTqPZxR14QwoL5lYXxKelidQsWWZCwPux
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1747056
+-----BEGIN PGP SIGNATURE-----
 
-Title:
-  FreeDOS / MS-Dos / Windows 3.11 cannot perform reboot with 'isapc'
-  machine
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp4UY4ACgkQ4+MsLN6t
+wN7k1Q/6AmXe4zDG8Bo8mAcBlY54AGS6B2ZhAeTFFa98JhEFVqbaayt812PcdgJf
+G/PlFToeVF6M5XoEdz2ZS9DO75g7cWYQ9DFaZgUY5wy3jZ+pCffCaHgcYOslVA7V
+twFXZ4LHZBF4ZLNPc3VBepeAMlOtgD82zYzKIFwdsPr2QVqDBZ0uXSGk+qLjA6mc
+1ZSYGFaZR6jB43teXNARzXiZhlayH0IxzZFk5JRg5qd9gaXxkfg9xaKlp/8EWyMd
+1t6dtav5N2Sr9wQep/gaOKZlXxHGwA9/qR9iScjdCurCQI/yivmfU1mqFPQxIGVm
+LkmYRUOkn4mKnb+LsC4+IjLtv5pLMDmZwLES6OFoa17BwMpRMe7GeLw4bAXAUEyt
+4brSGFSIykBCztK7XyVM2wn/sGop/+PZ13jXqYSfu54Q4Me9po4Oj4Xb/i4bNIvO
+JXiESTQLx6AYCbslTkiBQbCrpyzsDFgyUvSrnJ7CNm5S0cfnV/HprZPPXbCKhwu/
+dVOScxHxmWV0c38R+Z1fZ5RWDOFfg+5f5ot7Sbo1m7X4g5Zt5eSqTKyv/3jSJWV2
+t6Hzgo+bObGVWkjMHnQ7LQXtho9GSw5WR1FhC9AF86jgA7CVTRTXJS6OAjhBI1BQ
+hQVIh8CcuCSEHW2PDFSB51f3KCEPXF5aIlmscGEXEHPMBw4HevQ=
+=Veyz
+-----END PGP SIGNATURE-----
 
-Status in QEMU:
-  New
-
-Bug description:
-  I was installing MS-Dos 6.22 + Windows 3.11 in preparation for running
-  Microsoft Bob, and noticed that when they try to perform a reboot,
-  they just get stuck. The console cursor stays flashing on/off, but the
-  DOS prompt no longer responds to input.
-
-  It is fairly easy to reproduce, even FreeDOS is impacted - download
-  the FreeDOS bootable CDROM image, then
-
-  $ qemu-img create demo.img 100MB
-
-  $ qemu-system-x86_64 -machine isapc -cdrom ~/Downloads/FD12CD.iso
-  -hda demo.img  -monitor stdio
-
-  Wait for the installer to startup, and then in the monitor console run
-
-    sendkey ctrl-alt-delete
-
-  It will fail to reboot
-
-  Testing shows this is a regression from QEMU 2.8.0 onwards, and git
-  bisect further narrowed it down to a SEABIOS update
-
-  commit 6e99f5741ff1b408ea76e6caf2bd4f76df4060e9 (HEAD, tag: pull-seabios-=
-20161027-2, tag: pull-seabios-20161027-1, refs/bisect/bad)
-  Author: Gerd Hoffmann <kraxel@redhat.com>
-  Date:   Thu Oct 27 16:42:28 2016 +0200
-
-      seabios: update to 1.10.0 release.
-
-  Note that this seems particular to the "isapc" machine type - with the
-  "pc" machine type, reboot still works
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1747056/+subscriptions
+--bTqPZxR14QwoL5lYXxKelidQsWWZCwPux--
