@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSI-0004TP-PQ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:31 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSK-0004VB-6h
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSH-000509-1y
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:30 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42667)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSJ-00051C-7Y
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:32 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:42668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eimSG-0004zt-Qf
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:28 -0500
-Received: by mail-wr0-x242.google.com with SMTP id 41so29436230wrc.9
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:28 -0800 (PST)
+	id 1eimSJ-00050j-1q
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:31 -0500
+Received: by mail-wr0-x243.google.com with SMTP id 41so29436343wrc.9
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:30 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  5 Feb 2018 20:28:33 +0100
-Message-Id: <1517858941-5538-20-git-send-email-pbonzini@redhat.com>
+Date: Mon,  5 Feb 2018 20:28:35 +0100
+Message-Id: <1517858941-5538-22-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
 References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/47] build-sys: add --enable-sanitizers
+Subject: [Qemu-devel] [PULL 21/47] vhost: add traces for memory listeners
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +28,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-Typical slowdown introduced by AddressSanitizer is 2x.
-UBSan shouldn't have much impact on runtime cost.
+Trace these operations on two memory listeners.  It helps to verify the
+new memory listener fix, and good to keep them there.
 
-Enable it by default when --enable-debug, unless --disable-sanitizers.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180116151152.4040-3-marcandre.lureau@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180122060244.29368-2-peterx@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ hw/virtio/trace-events | 6 ++++++
+ hw/virtio/vhost.c      | 7 +++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/configure b/configure
-index bdbd097..bbfcd9f 100755
---- a/configure
-+++ b/configure
-@@ -342,6 +342,7 @@ rdma=""
- gprof="no"
- debug_tcg="no"
- debug="no"
-+sanitizers=""
- fortify_source=""
- strip_opt="yes"
- tcg_interpreter="no"
-@@ -993,6 +994,10 @@ for opt do
-       strip_opt="no"
-       fortify_source="no"
-   ;;
-+  --enable-sanitizers) sanitizers="yes"
-+  ;;
-+  --disable-sanitizers) sanitizers="no"
-+  ;;
-   --enable-sparse) sparse="yes"
-   ;;
-   --disable-sparse) sparse="no"
-@@ -1474,6 +1479,7 @@ Advanced options (experts only):
-   --firmwarepath=PATH      search PATH for firmware files
-   --with-confsuffix=SUFFIX suffix for QEMU data inside datadir/libdir/sysconfdir [$confsuffix]
-   --enable-debug           enable common debug build options
-+  --enable-sanitizers      enable default sanitizers
-   --disable-strip          disable stripping binaries
-   --disable-werror         disable compilation abort on warning
-   --disable-stack-protector disable compiler-provided stack protection
-@@ -5201,6 +5207,28 @@ if compile_prog "" "" ; then
- fi
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 775461a..2b8f81e 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -25,3 +25,9 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+ virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+ virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+ virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
++
++# hw/virtio/vhost.c
++vhost_region_add(void *p, const char *mr) "dev %p mr %s"
++vhost_region_del(void *p, const char *mr) "dev %p mr %s"
++vhost_iommu_region_add(void *p, const char *mr) "dev %p mr %s"
++vhost_iommu_region_del(void *p, const char *mr) "dev %p mr %s"
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 386aef8..c4f654c 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -27,6 +27,7 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/blocker.h"
+ #include "sysemu/dma.h"
++#include "trace.h"
  
- ##########################################
-+# checks for sanitizers
-+
-+write_c_skeleton
-+
-+have_asan=no
-+have_ubsan=no
-+
-+# enable sanitizers by default if --enable-debug
-+if test "$sanitizers" = "" -a "$debug" = "yes"; then
-+  sanitizers=yes
-+fi
-+
-+if test "$sanitizers" = "yes" ; then
-+  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=address" ""; then
-+      have_asan=yes
-+  fi
-+  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=undefined" ""; then
-+      have_ubsan=yes
-+  fi
-+fi
-+
-+##########################################
- # End of CC checks
- # After here, no more $cc or $ld runs
+ /* enabled until disconnected backend stabilizes */
+ #define _VHOST_DEBUG 1
+@@ -687,6 +688,7 @@ static void vhost_region_add(MemoryListener *listener,
+         return;
+     }
  
-@@ -5224,6 +5252,13 @@ else
-     CFLAGS="-O2 $CFLAGS"
- fi
++    trace_vhost_region_add(dev, section->mr->name ?: NULL);
+     ++dev->n_mem_sections;
+     dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
+                                 dev->n_mem_sections);
+@@ -706,6 +708,7 @@ static void vhost_region_del(MemoryListener *listener,
+         return;
+     }
  
-+if test "$have_asan" = "yes"; then
-+  CFLAGS="-fsanitize=address $CFLAGS"
-+fi
-+if test "$have_ubsan" = "yes"; then
-+  CFLAGS="-fsanitize=undefined $CFLAGS"
-+fi
++    trace_vhost_region_del(dev, section->mr->name ?: NULL);
+     vhost_set_memory(listener, section, false);
+     memory_region_unref(section->mr);
+     for (i = 0; i < dev->n_mem_sections; ++i) {
+@@ -743,6 +746,8 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+         return;
+     }
+ 
++    trace_vhost_iommu_region_add(dev, section->mr->name ?: NULL);
 +
- ##########################################
- # Do we have libnfs
- if test "$libnfs" != "no" ; then
+     iommu = g_malloc0(sizeof(*iommu));
+     end = int128_add(int128_make64(section->offset_within_region),
+                      section->size);
+@@ -771,6 +776,8 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+         return;
+     }
+ 
++    trace_vhost_iommu_region_del(dev, section->mr->name ?: NULL);
++
+     QLIST_FOREACH(iommu, &dev->iommu_list, iommu_next) {
+         if (iommu->mr == section->mr &&
+             iommu->n.start == section->offset_within_region) {
 -- 
 1.8.3.1
