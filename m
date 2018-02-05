@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53792)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eimhp-0003UY-UD
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:45:35 -0500
+	id 1eimpc-00026c-Tj
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eimhm-0001L1-OE
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:45:33 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35511)
+	id 1eimpY-0005AD-0K
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:53:36 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eimhm-0001Kp-Hi
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:45:30 -0500
-Received: by mail-qk0-x242.google.com with SMTP id 69so20967734qkz.2
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:45:30 -0800 (PST)
+	id 1eimpX-00059R-Qv
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:53:31 -0500
+Received: by mail-qt0-x244.google.com with SMTP id x27so41137365qtm.12
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:53:31 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
-	<20180203103727.26457-6-mark.cave-ayland@ilande.co.uk>
+	<20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d7e3dc51-ab88-c30e-10d5-f5a22a9cd7f6@amsat.org>
-Date: Mon, 5 Feb 2018 16:45:26 -0300
+Message-ID: <ede27bd5-033e-ef2d-d8e6-bf6956a2bd80@amsat.org>
+Date: Mon, 5 Feb 2018 16:53:25 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180203103727.26457-6-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
 Content-Type: multipart/signed; micalg=pgp-sha512;
 	protocol="application/pgp-signature";
-	boundary="yYp4gQDZqICmkPw4okV3kIYkezSjwJQwL"
-Subject: Re: [Qemu-devel] [PATCH 05/10] cuda: rename frequency property to
- tb_frequency
+	boundary="sNNx1rBH5F5kmeiJmwrdjglIVeeKgiI1n"
+Subject: Re: [Qemu-devel] [PATCH 02/10] cuda: don't allow writes to port
+ output pins
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,138 +39,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, lvivier@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yYp4gQDZqICmkPw4okV3kIYkezSjwJQwL
+--sNNx1rBH5F5kmeiJmwrdjglIVeeKgiI1n
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
  lvivier@redhat.com
-Message-ID: <d7e3dc51-ab88-c30e-10d5-f5a22a9cd7f6@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 05/10] cuda: rename frequency property to
- tb_frequency
+Message-ID: <ede27bd5-033e-ef2d-d8e6-bf6956a2bd80@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 02/10] cuda: don't allow writes to port
+ output pins
 References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
- <20180203103727.26457-6-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180203103727.26457-6-mark.cave-ayland@ilande.co.uk>
+ <20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 02/03/2018 07:37 AM, Mark Cave-Ayland wrote:
-> This allows us to more easily differentiate between the timebase freque=
-ncy used
-> to calibrate the MacOS timers and the actual frequency of the hardware =
-clock as
-> indicated by CUDA_TIMER_FREQ.
+> Use the direction registers as a mask to ensure that only input pins ar=
+e
+> updated upon write.
 >=20
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
 > ---
->  hw/misc/macio/cuda.c  | 10 +++++-----
->  hw/misc/macio/macio.c |  2 +-
->  hw/ppc/mac.h          |  2 +-
->  3 files changed, 7 insertions(+), 7 deletions(-)
+>  hw/misc/macio/cuda.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
 > diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-> index f036e8d7e1..a200320e7d 100644
+> index 23b7e0f5b0..7214e7adcb 100644
 > --- a/hw/misc/macio/cuda.c
 > +++ b/hw/misc/macio/cuda.c
-> @@ -158,8 +158,8 @@ static unsigned int get_counter(CUDAState *s, CUDAT=
-imer *ti)
->      uint64_t current_time =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> @@ -359,11 +359,11 @@ static void cuda_write(void *opaque, hwaddr addr,=
+ uint64_t val, unsigned size)
 > =20
->      /* Reverse of the tb calculation algorithm that Mac OS X uses on b=
-ootup. */
-> -    tb_diff =3D get_tb(current_time, ti->frequency) - ti->load_time;
-> -    d =3D (tb_diff * 0xBF401675E5DULL) / (ti->frequency << 24);
-> +    tb_diff =3D get_tb(current_time, ti->tb_frequency) - ti->load_time=
-;
-> +    d =3D (tb_diff * 0xBF401675E5DULL) / (ti->tb_frequency << 24);
-> =20
->      if (ti->index =3D=3D 0) {
->          /* the timer goes down from latch to -1 (period of latch + 2) =
-*/
-> @@ -179,7 +179,7 @@ static void set_counter(CUDAState *s, CUDATimer *ti=
-, unsigned int val)
->  {
->      CUDA_DPRINTF("T%d.counter=3D%d\n", 1 + ti->index, val);
->      ti->load_time =3D get_tb(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> -                           s->frequency);
-> +                           s->tb_frequency);
->      ti->counter_value =3D val;
->      cuda_timer_update(s, ti, ti->load_time);
->  }
-> @@ -878,7 +878,7 @@ static void cuda_realizefn(DeviceState *dev, Error =
-**errp)
->      struct tm tm;
-> =20
->      s->timers[0].timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer=
-1, s);
-> -    s->timers[0].frequency =3D s->frequency;
-> +    s->timers[0].frequency =3D s->tb_frequency;
->      s->timers[1].timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_timer=
-2, s);
->      s->timers[1].frequency =3D (SCALE_US * 6000) / 4700;
-> =20
-> @@ -909,7 +909,7 @@ static void cuda_initfn(Object *obj)
->  }
-> =20
->  static Property cuda_properties[] =3D {
-> -    DEFINE_PROP_UINT64("frequency", CUDAState, frequency, 0),
-> +    DEFINE_PROP_UINT64("timebase-frequency", CUDAState, tb_frequency, =
-0),
->      DEFINE_PROP_END_OF_LIST()
->  };
-> =20
-> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index 44f91d1e7f..a639b09e00 100644
-> --- a/hw/misc/macio/macio.c
-> +++ b/hw/misc/macio/macio.c
-> @@ -451,7 +451,7 @@ void macio_init(PCIDevice *d,
->      macio_state->escc_mem =3D escc_mem;
->      /* Note: this code is strongly inspirated from the corresponding c=
-ode
->         in PearPC */
-> -    qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "frequency",
-> +    qdev_prop_set_uint64(DEVICE(&macio_state->cuda), "timebase-frequen=
-cy",
->                           macio_state->frequency);
-> =20
->      qdev_init_nofail(DEVICE(d));
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index b501af1653..fa78115c95 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -99,7 +99,7 @@ typedef struct CUDAState {
->      CUDATimer timers[2];
-> =20
->      uint32_t tick_offset;
-> -    uint64_t frequency;
-> +    uint64_t tb_frequency;
-> =20
->      uint8_t last_b;
->      uint8_t last_acr;
+>      switch(addr) {
+>      case CUDA_REG_B:
+> -        s->b =3D val;
+> +        s->b =3D (s->b & ~s->dirb) | (val & s->dirb);
+
+I personally find it easier to read in 2 lines (&=3D~, |=3D)
+
+It might be useful to log invalid guest values:
+
+           if (val & ~s->dirb) {
+               GUEST_ERROR();
+               val &=3D s->dirb;
+           }
+           s->b |=3D val;
+
+>          cuda_update(s);
+>          break;
+>      case CUDA_REG_A:
+> -        s->a =3D val;
+> +        s->a =3D (s->a & ~s->dira) | (val & s->dira);
+
+Ditto.
+
+Regardless:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+>          break;
+>      case CUDA_REG_DIRB:
+>          s->dirb =3D val;
 >=20
 
 
---yYp4gQDZqICmkPw4okV3kIYkezSjwJQwL
+--sNNx1rBH5F5kmeiJmwrdjglIVeeKgiI1n
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp4tFYACgkQ4+MsLN6t
-wN4zHQ//Xlj2OgQYs4FXIB2ydUvmOX9QQ15f47EJjB8nHgjAXgDFObHhmddcdeiO
-qibJkgnAPM4dWqhaGWkTgqqUxy9QyopFNDtBxT7MZ96Fjg9f+pkc1O/L8yuiM3Ty
-1wMZdYC3P2e3e6qK46mF4q/96BtfarY8b3IXm4cy3f3EVHRO9uKGYy7npQdVR0O7
-Bhz9yzjJYvChthgLeuu59SCiqXN3kUzYRTh7GJBDhTduew+dw78TRhGdt2r0MjvL
-EqMNrPeV8qvEjnHaX3xgns1Qi1lUgs1ExTy2czYpMvPurZmjC//tBVMBR0wuwxy0
-qo4NnlSQzfQdC5jO+KW0GtUKrA/xjLXji3mAH+OwGcv4BsvU1bmd/CdCcKMe+pAF
-dbEpBOUFCDmPcIvQ2uWXmNRw533qalIOdUrwb9bgl6qQZa6kHRCQO0Ptd//BVvYO
-HXxesJ2MdPielbGqHW6/suK6urU6xT+xFSvA6RasyPW9P80b0Q2p7aQq98KDjKrH
-CZ8Ze6X6crHwZ6SwM1xZM4aV9CXpyAuPF3o9K5tNjLXJNGmIhyDqrnCpArYCY2SD
-Llro8Wk9+HQR3vW5HdkkYrWaGyht1ROY+8CUQeszjg5kSHzXbvSY4AABNkhwwjzP
-BmcUy2k/L4fpXarIxYmoIAJc2VnW7sycuapU/Dy1r4wWBlG/JPI=
-=hdsj
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp4tjUACgkQ4+MsLN6t
+wN5BIQ//WnjmEM1rdDy/+J2D3ivzjbNSEMJdSyQiPek7W+evRDtWXqR/fuLbC2iW
+xvY/dUxkT+wnvG33mK1b1SmCQFJidbeoYTr8jf/0A84IPpxLQLGxxZbV3lB3d0oA
+3eh33YrdpoCPYWAJPpmaFFO9P41u0Q/YsRt7OIYA7c59qfjCALmCbc98wvxh9IBZ
++ppdzXDBhm9tbJWYKGKEL/4Fnac7X9W5mgMquSUstyqKpQyHhHPseh8u2qQhzI6+
+5UpN6X28Gx85sdPIpBU313fy+NKrFxonU2PjEMQ7FbeYKDM5dPI+Acq3bQPS0yl8
+oLDuc7YTLhWcz8zYyg9NVlaJOe9QbPRhnKuZ5OF+OjaUTMQfLLnd/eYKiKJ4eiMn
+CP/IPbiVqOk6gfssA65ajgUhKnyzl/cQagHZxBulPR173iEomcdBAZLJiFroKCIP
+a8cZbKB9tEno269AHHeK6OSZt4r0aF9JZXipqbXZ4qV3ff9iS/x+FNjltxm5IzXn
+95ticMu5CjXi1tQmJq0xwKRPCjGEs1i+0mESeTMv59UsoOntkJ+7pKdj1hp+cAHi
++Rmy6tn9IDxFe5Gt/ulmogVrgln4oMCj7kBBlo2vPuxt5MrroBBMXrO53dC3Cowu
+lKo1ppImKHhUvx7jbwV/oQD006BiiF7kQ5eIE3rZlCGpwWs6fFA=
+=pROd
 -----END PGP SIGNATURE-----
 
---yYp4gQDZqICmkPw4okV3kIYkezSjwJQwL--
+--sNNx1rBH5F5kmeiJmwrdjglIVeeKgiI1n--
