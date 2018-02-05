@@ -1,15 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5Z-0007xM-BQ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:47 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5a-0007zN-W9
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5U-00012E-Dp
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:45 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5Z-0001A3-G9
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:47 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  5 Feb 2018 16:33:00 +0200
-Message-Id: <cover.1517840876.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 00/39] Allow configuring the qcow2 L2 cache
- entry size
+Date: Mon,  5 Feb 2018 16:33:19 +0200
+Message-Id: <64cf064c0021ba315d3f3032da0f95db1b615f33.1517840877.git.berto@igalia.com>
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+References: <cover.1517840876.git.berto@igalia.com>
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+References: <cover.1517840876.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v4 19/39] qcow2: Update get_cluster_table() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,177 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-this is the new revision of the patch series to allow configuring the
-entry size of the qcow2 L2 cache. Follow this link for the full
-description from the first version:
+This patch updates get_cluster_table() to return L2 slices instead of
+full L2 tables.
 
-   https://lists.gnu.org/archive/html/qemu-block/2017-10/msg00458.html
+The code itself needs almost no changes, it only needs to call
+offset_to_l2_slice_index() instead of offset_to_l2_index(). This patch
+also renames all the relevant variables and the documentation.
 
-And here are some numbers showing the performance improvements:
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2-cluster.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-   https://lists.gnu.org/archive/html/qemu-block/2017-12/msg00507.html
-
-Regards,
-
-Berto
-
-Changes:
-
-v4:
-- Rebased on top of f24ee107a07f093bd7ed475dd48d7ba57ea3d8fe
-- Patch 17: Fix typo in comment
-- Patch 24: Rename discard_single_l2() to discard_in_l2_slice() [Max]
-- Patch 25: Rename zero_single_l2() to zero_in_l2_slice() [Max]
-- Patch 27: Add comment clarifying the l2_index variable [Max]
-- Patch 30: Remove unneeded void * casts [Eric, Max]
-- Patch 31: Use offset_to_l2_slice_index() instead of doing it manually [Max]
-
-v3: https://lists.gnu.org/archive/html/qemu-block/2018-01/msg00635.html
-- Rebased on top of 1867d97b372d452184c65e8fcc273cfc45937541
-- Patch 2: Use QEMU_IS_ALIGNED() instead of doing the bit operations
-           manually [Eric]
-- Patch 13: Clarify that l2_slice_size means size in entries, not
-            bytes [Eric].
-- Patch 16-17: The previous code has been splitted into patches 16 and
-               17 for clarity.
-- Patch 17: Use slice_size2 for storing the size of the slice in bytes
-            (keeping the existing convention used in l1_size2 or
-            refcount_table_size2)
-- Patch 17: Flush the cache only once [Anton, Eric]
-- Patch 17: Call l2_load() after qcow2_free_clusters() [Anton]
-- Patch 18 [new]: Refactor the l2_load() call in get_cluster_table()
-           [Anton]
-- Patch 19: Fix typo [Eric]
-- Patch 26-27: The previous code has been splitted into patches 26 and
-               27 for clarity.
-- Patch 27: Use slice_size2 for storing the size of the slice in bytes
-- Patch 28-30: The previous code has been splitted into patches 28, 29
-               and 30 for clarity.
-- Patch 30: Use slice_size2 for storing the size of the slice in bytes
-- Patch 30: Replace bdrv_read/write() with bdrv_pread/pwrite() [Eric]
-- Patch 30: Initialize l2_dirty inside the inner loop [Anton]
-- Patch 36: Fix maybe-uninitialized warning of l2_cache_entry_size
-            [Anton]
-- Patch 36: Make MIN_L2_CACHE_SIZE the minimum number of cache
-            entries, not clusters [Anton]
-- Patch 36: Add l2-cache-entry-size to BlockdevOptionsQcow2 [Eric]
-- Patch 37-39: New iotests.
-
-v2: https://lists.gnu.org/archive/html/qemu-block/2017-12/msg00507.html
-- Rebased after the v2.11.0 release.
-- Patch 2: Adjust the unaligned access check introduce by Max in 4efb1f7c612
-- Patch 18: Prevent overflow when computing bytes_available in
-  qcow2_get_cluster_offset()
-- Patch 31: Fix typo in error message in read_cache_sizes()
-- Patch 32 [new]: Add test for l2-cache-entry-size'
-
-v1: https://lists.gnu.org/archive/html/qemu-block/2017-10/msg00458.html
-- Initial version
-
-Here's the ouput of git backport-diff against v3:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/39:[----] [--] 'qcow2: Fix documentation of get_cluster_table()'
-002/39:[----] [--] 'qcow2: Add table size field to Qcow2Cache'
-003/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_get_table_addr()'
-004/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_get_table_idx()'
-005/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_table_release()'
-006/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_entry_mark_dirty()'
-007/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_put()'
-008/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_destroy()'
-009/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_clean_unused()'
-010/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_discard()'
-011/39:[----] [--] 'qcow2: Remove BDS parameter from qcow2_cache_is_table_offset()'
-012/39:[----] [--] 'qcow2: Add offset_to_l1_index()'
-013/39:[----] [--] 'qcow2: Add l2_slice_size field to BDRVQcow2State'
-014/39:[----] [--] 'qcow2: Add offset_to_l2_slice_index()'
-015/39:[----] [--] 'qcow2: Update l2_load() to support L2 slices'
-016/39:[----] [--] 'qcow2: Prepare l2_allocate() for adding L2 slice support'
-017/39:[0002] [FC] 'qcow2: Update l2_allocate() to support L2 slices'
-018/39:[----] [--] 'qcow2: Refactor get_cluster_table()'
-019/39:[----] [--] 'qcow2: Update get_cluster_table() to support L2 slices'
-020/39:[----] [--] 'qcow2: Update qcow2_get_cluster_offset() to support L2 slices'
-021/39:[----] [--] 'qcow2: Update qcow2_alloc_cluster_link_l2() to support L2 slices'
-022/39:[----] [--] 'qcow2: Update handle_copied() to support L2 slices'
-023/39:[----] [--] 'qcow2: Update handle_alloc() to support L2 slices'
-024/39:[0012] [FC] 'qcow2: Update discard_single_l2() to support L2 slices'
-025/39:[0008] [FC] 'qcow2: Update zero_single_l2() to support L2 slices'
-026/39:[----] [--] 'qcow2: Prepare qcow2_update_snapshot_refcount() for adding L2 slice support'
-027/39:[0001] [FC] 'qcow2: Update qcow2_update_snapshot_refcount() to support L2 slices'
-028/39:[----] [--] 'qcow2: Read refcount before L2 table in expand_zero_clusters_in_l1()'
-029/39:[----] [--] 'qcow2: Prepare expand_zero_clusters_in_l1() for adding L2 slice support'
-030/39:[0005] [FC] 'qcow2: Update expand_zero_clusters_in_l1() to support L2 slices'
-031/39:[0003] [FC] 'qcow2: Update qcow2_truncate() to support L2 slices'
-032/39:[----] [--] 'qcow2: Rename l2_table in qcow2_alloc_compressed_cluster_offset()'
-033/39:[----] [--] 'qcow2: Rename l2_table in count_contiguous_clusters()'
-034/39:[----] [--] 'qcow2: Rename l2_table in count_contiguous_clusters_unallocated()'
-035/39:[----] [--] 'qcow2: Rename l2_table in count_cow_clusters()'
-036/39:[----] [--] 'qcow2: Allow configuring the L2 slice size'
-037/39:[----] [--] 'iotests: Test valid values of l2-cache-entry-size'
-038/39:[----] [--] 'iotests: Test downgrading an image using a small L2 slice size'
-039/39:[----] [--] 'iotests: Add l2-cache-entry-size to iotest 137'
-
-Alberto Garcia (39):
-  qcow2: Fix documentation of get_cluster_table()
-  qcow2: Add table size field to Qcow2Cache
-  qcow2: Remove BDS parameter from qcow2_cache_get_table_addr()
-  qcow2: Remove BDS parameter from qcow2_cache_get_table_idx()
-  qcow2: Remove BDS parameter from qcow2_cache_table_release()
-  qcow2: Remove BDS parameter from qcow2_cache_entry_mark_dirty()
-  qcow2: Remove BDS parameter from qcow2_cache_put()
-  qcow2: Remove BDS parameter from qcow2_cache_destroy()
-  qcow2: Remove BDS parameter from qcow2_cache_clean_unused()
-  qcow2: Remove BDS parameter from qcow2_cache_discard()
-  qcow2: Remove BDS parameter from qcow2_cache_is_table_offset()
-  qcow2: Add offset_to_l1_index()
-  qcow2: Add l2_slice_size field to BDRVQcow2State
-  qcow2: Add offset_to_l2_slice_index()
-  qcow2: Update l2_load() to support L2 slices
-  qcow2: Prepare l2_allocate() for adding L2 slice support
-  qcow2: Update l2_allocate() to support L2 slices
-  qcow2: Refactor get_cluster_table()
-  qcow2: Update get_cluster_table() to support L2 slices
-  qcow2: Update qcow2_get_cluster_offset() to support L2 slices
-  qcow2: Update qcow2_alloc_cluster_link_l2() to support L2 slices
-  qcow2: Update handle_copied() to support L2 slices
-  qcow2: Update handle_alloc() to support L2 slices
-  qcow2: Update discard_single_l2() to support L2 slices
-  qcow2: Update zero_single_l2() to support L2 slices
-  qcow2: Prepare qcow2_update_snapshot_refcount() for adding L2 slice
-    support
-  qcow2: Update qcow2_update_snapshot_refcount() to support L2 slices
-  qcow2: Read refcount before L2 table in expand_zero_clusters_in_l1()
-  qcow2: Prepare expand_zero_clusters_in_l1() for adding L2 slice
-    support
-  qcow2: Update expand_zero_clusters_in_l1() to support L2 slices
-  qcow2: Update qcow2_truncate() to support L2 slices
-  qcow2: Rename l2_table in qcow2_alloc_compressed_cluster_offset()
-  qcow2: Rename l2_table in count_contiguous_clusters()
-  qcow2: Rename l2_table in count_contiguous_clusters_unallocated()
-  qcow2: Rename l2_table in count_cow_clusters()
-  qcow2: Allow configuring the L2 slice size
-  iotests: Test valid values of l2-cache-entry-size
-  iotests: Test downgrading an image using a small L2 slice size
-  iotests: Add l2-cache-entry-size to iotest 137
-
- block/qcow2-cache.c        |  80 +++----
- block/qcow2-cluster.c      | 511 ++++++++++++++++++++++++---------------------
- block/qcow2-refcount.c     | 200 +++++++++---------
- block/qcow2.c              |  61 ++++--
- block/qcow2.h              |  31 ++-
- qapi/block-core.json       |   6 +
- tests/qemu-iotests/061     |  16 ++
- tests/qemu-iotests/061.out |  61 ++++++
- tests/qemu-iotests/103     |  17 ++
- tests/qemu-iotests/103.out |   3 +
- tests/qemu-iotests/137     |   5 +
- tests/qemu-iotests/137.out |   2 +
- 12 files changed, 585 insertions(+), 408 deletions(-)
-
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 9311dafccd..de22685b21 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -660,20 +660,20 @@ fail:
+  * get_cluster_table
+  *
+  * for a given disk offset, load (and allocate if needed)
+- * the l2 table.
++ * the appropriate slice of its l2 table.
+  *
+- * the cluster index in the l2 table is given to the caller.
++ * the cluster index in the l2 slice is given to the caller.
+  *
+  * Returns 0 on success, -errno in failure case
+  */
+ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+-                             uint64_t **new_l2_table,
++                             uint64_t **new_l2_slice,
+                              int *new_l2_index)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     unsigned int l2_index;
+     uint64_t l1_index, l2_offset;
+-    uint64_t *l2_table = NULL;
++    uint64_t *l2_slice = NULL;
+     int ret;
+ 
+     /* seek to the l2 offset in the l1 table */
+@@ -713,17 +713,17 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+         assert(offset_into_cluster(s, l2_offset) == 0);
+     }
+ 
+-    /* load the l2 table in memory */
+-    ret = l2_load(bs, offset, l2_offset, &l2_table);
++    /* load the l2 slice in memory */
++    ret = l2_load(bs, offset, l2_offset, &l2_slice);
+     if (ret < 0) {
+         return ret;
+     }
+ 
+     /* find the cluster offset for the given disk offset */
+ 
+-    l2_index = offset_to_l2_index(s, offset);
++    l2_index = offset_to_l2_slice_index(s, offset);
+ 
+-    *new_l2_table = l2_table;
++    *new_l2_slice = l2_slice;
+     *new_l2_index = l2_index;
+ 
+     return 0;
 -- 
 2.11.0
