@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintc-0005ko-0J
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:52 -0500
+	(envelope-from <mreitz@redhat.com>) id 1einui-0006c1-1y
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:02:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintY-0003Tc-Lv
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57522
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eintY-0003TI-Ge
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:44 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w15KxU1h130276
-	for <qemu-devel@nongnu.org>; Mon, 5 Feb 2018 16:01:43 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fxvv1verc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 16:01:42 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Mon, 5 Feb 2018 16:01:42 -0500
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Mon,  5 Feb 2018 15:57:24 -0500
-In-Reply-To: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1517864246-11101-11-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 10/12] s390-ccw: read user input for boot
- index via the SCLP console
+	(envelope-from <mreitz@redhat.com>) id 1einuh-000422-29
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:02:56 -0500
+References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7e60b588-249e-4961-1556-b56c76342ddb@redhat.com>
+Date: Mon, 5 Feb 2018 22:02:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180202160752.143796-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sn9qQipEEDmaz2uWBcPWSARdgevD4hRCY"
+Subject: Re: [Qemu-devel] [PATCH v3] block: maintain persistent disabled
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,263 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
-Implements an sclp_read function to capture input from the
-console and a wrapper function that handles parsing certain
-characters and adding input to a buffer. The input is checked
-for any erroneous values and is handled appropriately.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sn9qQipEEDmaz2uWBcPWSARdgevD4hRCY
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com,
+ mnestratov@virtuozzo.com
+Message-ID: <7e60b588-249e-4961-1556-b56c76342ddb@redhat.com>
+Subject: Re: [PATCH v3] block: maintain persistent disabled bitmaps
+References: <20180202160752.143796-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20180202160752.143796-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-A prompt will persist until input is entered or the timeout
-expires (if one was set). Example:
+On 2018-02-02 17:07, Vladimir Sementsov-Ogievskiy wrote:
+> To maintain load/store disabled bitmap there is new approach:
+>=20
+>  - deprecate @autoload flag of block-dirty-bitmap-add, make it ignored
+>  - store enabled bitmaps as "auto" to qcow2
+>  - store disabled bitmaps without "auto" flag to qcow2
+>  - on qcow2 open load "auto" bitmaps as enabled and others
+>    as disabled (except in_use bitmaps)
+>=20
+> Also, adjust iotests 165 and 176 appropriately.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-    Please choose (default will boot in 10 seconds):
+Thanks, applied to my block tree:
 
-Correct input will boot the respective boot index. If the
-user's input is empty, 0, or if the timeout expires, then
-the default zipl entry will be chosen. If the input is
-within the range of available boot entries, then the
-selection will be booted. Any erroneous input will cancel
-the timeout and re-prompt the user.
+https://github.com/XanClic/qemu/commits/block
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/menu.c     | 150 +++++++++++++++++++++++++++++++++++++++++++-
- pc-bios/s390-ccw/s390-ccw.h |   3 +
- pc-bios/s390-ccw/sclp.c     |  19 ++++++
- pc-bios/s390-ccw/virtio.c   |   2 +-
- 4 files changed, 170 insertions(+), 4 deletions(-)
+Max
 
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index e9e283f..85d285f 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -12,16 +12,160 @@
- #include "menu.h"
- #include "s390-ccw.h"
- 
--static uint8_t flags;
--static uint64_t timeout;
-+#define KEYCODE_NO_INP '\0'
-+#define KEYCODE_ESCAPE '\033'
-+#define KEYCODE_BACKSP '\177'
-+#define KEYCODE_ENTER  '\r'
- 
- /* Offsets from zipl fields to zipl banner start */
- #define ZIPL_TIMEOUT_OFFSET 138
- #define ZIPL_FLAG_OFFSET    140
- 
-+#define TOD_CLOCK_SECOND      0xf4240000
-+
-+static uint8_t flags;
-+static uint64_t timeout;
-+
-+static inline void enable_clock_int(void)
-+{
-+    uint64_t tmp = 0;
-+
-+    asm volatile(
-+        "stctg      0,0,%0\n"
-+        "oi         6+%0, 0x8\n"
-+        "lctlg      0,0,%0"
-+        : : "Q" (tmp) : "memory"
-+    );
-+}
-+
-+static inline void disable_clock_int(void)
-+{
-+    uint64_t tmp = 0;
-+
-+    asm volatile(
-+        "stctg      0,0,%0\n"
-+        "ni         6+%0, 0xf7\n"
-+        "lctlg      0,0,%0"
-+        : : "Q" (tmp) : "memory"
-+    );
-+}
-+
-+static inline void set_clock_comparator(uint64_t time)
-+{
-+    asm volatile("sckc %0" : : "Q" (time));
-+}
-+
-+static inline bool check_clock_int(void)
-+{
-+    uint16_t *code = (uint16_t *)0x86; /* low-core external interrupt code */
-+
-+    consume_sclp_int();
-+
-+    return *code == 0x1004;
-+}
-+
-+static int read_prompt(char *buf, size_t len)
-+{
-+    char inp[2] = {};
-+    uint8_t idx = 0;
-+    uint64_t time;
-+
-+    if (timeout) {
-+        time = get_clock() + timeout * TOD_CLOCK_SECOND;
-+        set_clock_comparator(time);
-+        enable_clock_int();
-+        timeout = 0;
-+    }
-+
-+    while (!check_clock_int()) {
-+
-+        sclp_read(inp, 1); /* Process only one character at a time */
-+
-+        switch (inp[0]) {
-+        case KEYCODE_NO_INP:
-+        case KEYCODE_ESCAPE:
-+            continue;
-+        case KEYCODE_BACKSP:
-+            if (idx > 0) {
-+                buf[--idx] = 0;
-+                sclp_print("\b \b");
-+            }
-+            continue;
-+        case KEYCODE_ENTER:
-+            disable_clock_int();
-+            return idx;
-+        default:
-+            /* Echo input and add to buffer */
-+            if (idx < len) {
-+                buf[idx++] = inp[0];
-+                sclp_print(inp);
-+            }
-+        }
-+    }
-+
-+    disable_clock_int();
-+    *buf = 0;
-+
-+    return 0;
-+}
-+
-+static int get_index(void)
-+{
-+    char buf[10];
-+    int len;
-+    int i;
-+
-+    memset(buf, 0, sizeof(buf));
-+
-+    len = read_prompt(buf, sizeof(buf));
-+
-+    /* If no input, boot default */
-+    if (len == 0) {
-+        return 0;
-+    }
-+
-+    /* Check for erroneous input */
-+    for (i = 0; i < len; i++) {
-+        if (!isdigit(buf[i])) {
-+            return -1;
-+        }
-+    }
-+
-+    return atoui(buf);
-+}
-+
-+static void boot_menu_prompt(bool retry)
-+{
-+    char tmp[6];
-+
-+    if (retry) {
-+        sclp_print("\nError: undefined configuration"
-+                   "\nPlease choose:\n");
-+    } else if (timeout > 0) {
-+        sclp_print("Please choose (default will boot in ");
-+        sclp_print(itostr(timeout, tmp, sizeof(tmp)));
-+        sclp_print(" seconds):\n");
-+    } else {
-+        sclp_print("Please choose:\n");
-+    }
-+}
-+
- static int get_boot_index(int entries)
- {
--    return 0; /* Implemented next patch */
-+    int boot_index;
-+    bool retry = false;
-+    char tmp[5];
-+
-+    do {
-+        boot_menu_prompt(retry);
-+        boot_index = get_index();
-+        retry = true;
-+    } while (boot_index < 0 || boot_index >= entries);
-+
-+    sclp_print("\nBooting entry #");
-+    sclp_print(itostr(boot_index, tmp, sizeof(tmp)));
-+
-+    return boot_index;
- }
- 
- static void zipl_println(const char *data, size_t len)
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 25d4d21..9249cb2 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -71,6 +71,8 @@ unsigned int get_loadparm_index(void);
- void sclp_print(const char *string);
- void sclp_setup(void);
- void sclp_get_loadparm_ascii(char *loadparm);
-+int sclp_read(char *str, size_t count);
-+void sclp_clear_write_mask(void);
- 
- /* virtio.c */
- unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
-@@ -79,6 +81,7 @@ bool virtio_is_supported(SubChannelId schid);
- void virtio_blk_setup_device(SubChannelId schid);
- int virtio_read(ulong sector, void *load_addr);
- int enable_mss_facility(void);
-+u64 get_clock(void);
- ulong get_second(void);
- 
- /* bootmap.c */
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index 486fce1..5902d5b 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -101,3 +101,22 @@ void sclp_get_loadparm_ascii(char *loadparm)
-         ebcdic_to_ascii((char *) sccb->loadparm, loadparm, 8);
-     }
- }
-+
-+int sclp_read(char *str, size_t count)
-+{
-+    ReadEventData *sccb = (void *)_sccb;
-+    char *buf = (char *)(&sccb->ebh) + 7;
-+
-+    /* If count exceeds max buffer size, then restrict it to the max size */
-+    if (count > SCCB_SIZE - 8) {
-+        count = SCCB_SIZE - 8;
-+    }
-+
-+    sccb->h.length = SCCB_SIZE;
-+    sccb->h.function_code = SCLP_UNCONDITIONAL_READ;
-+
-+    sclp_service_call(SCLP_CMD_READ_EVENT_DATA, sccb);
-+    memcpy(str, buf, count);
-+
-+    return sccb->ebh.length - 7;
-+}
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index c890a03..817e7f5 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -176,7 +176,7 @@ void vring_send_buf(VRing *vr, void *p, int len, int flags)
-     }
- }
- 
--static u64 get_clock(void)
-+u64 get_clock(void)
- {
-     u64 r;
- 
--- 
-2.7.4
+
+--sn9qQipEEDmaz2uWBcPWSARdgevD4hRCY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlp4xmUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AfWIH/3Rs67fjylIIzcYH9T9x74y2CXSRcwfZ
+7MWgAeIzwCclXDMa23VYvdGU5gvmTzwGNHV822oeAKuMMd0C3Afb7Z172Bui7rtX
+ZuVE9PC3zZs/5bl+6cA/w+OM4czLewo6XLY1j0dV1ZQpDfi/0gjwA6tQneR1rb52
+HjKTdX0rUyEQz3BwlZU9FSBN9zoEOGnevslCqz6vpzJpvuHzTNFYd41zSNkyckQU
+dmfXwn+hfGlBtePLex9QnVUZFAIQV8/iA7Hx5bmixKK1kfoerkKuCWzVeuH8baFd
+2rT7le1KYTTJcEuGokVzSnzzzNnYMHw0oidIQlR6ekvDd2UR9ujHhPc=
+=g051
+-----END PGP SIGNATURE-----
+
+--sn9qQipEEDmaz2uWBcPWSARdgevD4hRCY--
