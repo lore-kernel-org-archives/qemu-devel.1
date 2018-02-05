@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eihrI-0002At-8p
+	(envelope-from <berto@igalia.com>) id 1eihrI-0002As-82
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:35:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eihrD-0006CQ-6B
+	(envelope-from <berto@igalia.com>) id 1eihrD-0006Ca-78
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:35:00 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  5 Feb 2018 16:33:05 +0200
-Message-Id: <7c1b262344375d52544525f85bbbf0548d5ba575.1517840876.git.berto@igalia.com>
+Date: Mon,  5 Feb 2018 16:33:24 +0200
+Message-Id: <1cb44a5b68be5334cb01b97a3db3a3c5a43396e5.1517840877.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 05/39] qcow2: Remove BDS parameter from
- qcow2_cache_table_release()
+Subject: [Qemu-devel] [PATCH v4 24/39] qcow2: Update discard_single_l2() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +25,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-This function was only using the BlockDriverState parameter to get the
-cache table size (since it was equal to the cluster size). This is no
-longer necessary so this parameter can be removed.
+discard_single_l2() limits the number of clusters to be discarded
+to the amount that fits inside an L2 table. Since we'll be loading
+L2 slices instead of full tables we need to update that limit. The
+function is renamed to discard_in_l2_slice() for clarity.
+
+Apart from that, this function doesn't need any additional changes, so
+this patch simply updates the variable name from l2_table to l2_slice.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cache.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ block/qcow2-cluster.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 3749d55595..5ff2cbf5c5 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -71,8 +71,7 @@ static inline const char *qcow2_cache_get_name(BDRVQcow2State *s, Qcow2Cache *c)
-     }
- }
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index e09df478c1..95419eff38 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1632,32 +1632,32 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
  
--static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
--                                      int i, int num_tables)
-+static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
+ /*
+  * This discards as many clusters of nb_clusters as possible at once (i.e.
+- * all clusters in the same L2 table) and returns the number of discarded
++ * all clusters in the same L2 slice) and returns the number of discarded
+  * clusters.
+  */
+-static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
+-                             uint64_t nb_clusters, enum qcow2_discard_type type,
+-                             bool full_discard)
++static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
++                               uint64_t nb_clusters,
++                               enum qcow2_discard_type type, bool full_discard)
  {
- /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
- #ifdef CONFIG_LINUX
-@@ -114,7 +113,7 @@ void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
-         }
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t *l2_table;
++    uint64_t *l2_slice;
+     int l2_index;
+     int ret;
+     int i;
  
-         if (to_clean > 0) {
--            qcow2_cache_table_release(bs, c, i - to_clean, to_clean);
-+            qcow2_cache_table_release(c, i - to_clean, to_clean);
-         }
+-    ret = get_cluster_table(bs, offset, &l2_table, &l2_index);
++    ret = get_cluster_table(bs, offset, &l2_slice, &l2_index);
+     if (ret < 0) {
+         return ret;
      }
  
-@@ -306,7 +305,7 @@ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c)
-         c->entries[i].lru_counter = 0;
+-    /* Limit nb_clusters to one L2 table */
+-    nb_clusters = MIN(nb_clusters, s->l2_size - l2_index);
++    /* Limit nb_clusters to one L2 slice */
++    nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
+     assert(nb_clusters <= INT_MAX);
+ 
+     for (i = 0; i < nb_clusters; i++) {
+         uint64_t old_l2_entry;
+ 
+-        old_l2_entry = be64_to_cpu(l2_table[l2_index + i]);
++        old_l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
+ 
+         /*
+          * If full_discard is false, make sure that a discarded area reads back
+@@ -1695,18 +1695,18 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
+         }
+ 
+         /* First remove L2 entries */
+-        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
++        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+         if (!full_discard && s->qcow_version >= 3) {
+-            l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
++            l2_slice[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
+         } else {
+-            l2_table[l2_index + i] = cpu_to_be64(0);
++            l2_slice[l2_index + i] = cpu_to_be64(0);
+         }
+ 
+         /* Then decrease the refcount */
+         qcow2_free_any_clusters(bs, old_l2_entry, 1, type);
      }
  
--    qcow2_cache_table_release(bs, c, 0, c->size);
-+    qcow2_cache_table_release(c, 0, c->size);
+-    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
++    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
  
-     c->lru_counter = 0;
- 
-@@ -453,5 +452,5 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
-     c->entries[i].lru_counter = 0;
-     c->entries[i].dirty = false;
- 
--    qcow2_cache_table_release(bs, c, i, 1);
-+    qcow2_cache_table_release(c, i, 1);
+     return nb_clusters;
  }
+@@ -1730,10 +1730,10 @@ int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
+ 
+     s->cache_discards = true;
+ 
+-    /* Each L2 table is handled by its own loop iteration */
++    /* Each L2 slice is handled by its own loop iteration */
+     while (nb_clusters > 0) {
+-        cleared = discard_single_l2(bs, offset, nb_clusters, type,
+-                                    full_discard);
++        cleared = discard_in_l2_slice(bs, offset, nb_clusters, type,
++                                      full_discard);
+         if (cleared < 0) {
+             ret = cleared;
+             goto fail;
 -- 
 2.11.0
