@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eiZd4-0000uk-HE
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 00:47:47 -0500
+	(envelope-from <famz@redhat.com>) id 1eiZd5-0000vD-OZ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 00:47:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eiZd2-0006pv-Oy
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 00:47:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40352)
+	(envelope-from <famz@redhat.com>) id 1eiZd4-0006qV-MM
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 00:47:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eiZd2-0006pk-Ig
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 00:47:44 -0500
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eiZd4-0006qE-G1
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 00:47:46 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Mon,  5 Feb 2018 13:47:24 +0800
-Message-Id: <20180205054725.25634-2-famz@redhat.com>
+Date: Mon,  5 Feb 2018 13:47:25 +0800
+Message-Id: <20180205054725.25634-3-famz@redhat.com>
 In-Reply-To: <20180205054725.25634-1-famz@redhat.com>
 References: <20180205054725.25634-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/2] Add a git-publish configuration file
+Subject: [Qemu-devel] [PATCH v3 2/2] README: Document 'git-publish' workflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +26,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com, stefanha@redhat.com
 
-git-publish [1] is a convenient tool to send patches and has been
-popular among QEMU developers.  Recently it has been made available in
-Fedora official repo thanks to Stefan's work.
-
-One nice feature of the tool is a per-project configuration with
-profiles, especially in which the cccmd option is a handy method to
-create the Cc list.
-
-[1]: https://github.com/stefanha/git-publish
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- .gitpublish | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
- create mode 100644 .gitpublish
+ README | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/.gitpublish b/.gitpublish
-new file mode 100644
-index 0000000000..ed48f6e52c
---- /dev/null
-+++ b/.gitpublish
-@@ -0,0 +1,58 @@
-+#
-+# Common git-publish profiles that can be used to send patches to QEMU upstream.
-+#
-+# See https://github.com/stefanha/git-publish for more information
-+#
-+[gitpublishprofile "default"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+diff --git a/README b/README
+index b92a07a61a..d1a944ce20 100644
+--- a/README
++++ b/README
+@@ -56,7 +56,7 @@ The QEMU source code is maintained under the GIT version control system.
+ 
+    git clone git://git.qemu.org/qemu.git
+ 
+-When submitting patches, the preferred approach is to use 'git
++When submitting patches, one common approach is to use 'git
+ format-patch' and/or 'git send-email' to format & send the mail to the
+ qemu-devel@nongnu.org mailing list. All patches submitted must contain
+ a 'Signed-off-by' line from the author. Patches should follow the
+@@ -68,6 +68,34 @@ the QEMU website
+   https://qemu.org/Contribute/SubmitAPatch
+   https://qemu.org/Contribute/TrivialPatches
+ 
++A 'git-profile' utility was created to make above process less
++cumbersome, and is highly recommended for making regular contributions,
++or even just for sending consecutive patch series revisions. It also
++requires a working 'git send-email' setup, and by default doesn't
++automate everything, so you may want to go through the above steps
++manually for once.
 +
-+[gitpublishprofile "rfc"]
-+base = master
-+prefix = RFC PATCH
-+to = qemu-devel@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
++For installation instructions, please go to
 +
-+[gitpublishprofile "stable"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-stable@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
++  https://github.com/stefanha/git-publish
 +
-+[gitpublishprofile "trivial"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-trivial@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
++The workflow with 'git-publish' is:
 +
-+[gitpublishprofile "block"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-block@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
++  $ git checkout master -b my-feature
++  $ # work on new commits, add your 'Signed-off-by' lines to each
++  $ git publish
 +
-+[gitpublishprofile "arm"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-arm@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
++Your patch series will be sent and tagged as my-feature-v1 if you need to refer
++back to it in the future.
 +
-+[gitpublishprofile "s390"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-s390@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
++Sending v2:
 +
-+[gitpublishprofile "ppc"]
-+base = master
-+prefix = PATCH
-+to = qemu-devel@nongnu.org
-+cc = qemu-ppc@nongnu.org
-+cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
++  $ git checkout my-feature # same topic branch
++  $ # making changes to the commits (using 'git rebase', for example)
++  $ git publish
++
++Your patch series will be sent with 'v2' tag in the subject and the git tip
++will be tagged as my-feature-v2.
+ 
+ Bug reporting
+ =============
 -- 
 2.14.3
