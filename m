@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eiXUZ-0000Wb-GM
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 22:30:54 -0500
+	(envelope-from <bounces@canonical.com>) id 1eiYLq-0004ec-31
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eiXUV-0001yo-AE
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 22:30:51 -0500
-Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:37028)
+	(envelope-from <bounces@canonical.com>) id 1eiYLm-0001I5-IL
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47598)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eiXUV-0001yG-12
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 22:30:47 -0500
-Received: by mail-pg0-x236.google.com with SMTP id o1so3107674pgn.4
-	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 19:30:46 -0800 (PST)
-References: <20180119050906.18930-1-aik@ozlabs.ru>
-	<871si6vt8n.fsf@dusky.pond.sub.org>
-	<e3aca639-0c5c-8d10-a9f4-05a62284fb10@ozlabs.ru>
-	<87r2q3n8oe.fsf@dusky.pond.sub.org>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <8d3a65e6-e62b-6506-fb43-bb83f5ee7828@ozlabs.ru>
-Date: Mon, 5 Feb 2018 14:30:39 +1100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eiYLm-0001Fv-CB
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eiYLk-0007Ze-3l
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 04:25:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 079FB2E80C8
+	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 04:25:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87r2q3n8oe.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] qmp: Add qom-list-properties to
- list QOM object properties
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 05 Feb 2018 04:17:32 -0000
+From: Launchpad Bug Tracker <1736655@bugs.launchpad.net>
+Reply-To: Bug 1736655 <1736655@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151253983521.3178.4021889730911467554.malonedeb@gac.canonical.com>
+Message-Id: <151780425249.21638.13122500290814851574.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1736655] Re: 2k3/xp guests w/virtio-net randomly
+ DHCP fail on boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,164 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 02/02/18 18:37, Markus Armbruster wrote:
-> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-> 
->> On 01/02/18 04:22, Markus Armbruster wrote:
->>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
->>>
->>>> There is already 'device-list-properties' which does most of the job,
->>>> however it does not handle everything returned by qom-list-types such
->>>> as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
->>>>
->>>> This adds a new qom-list-properties command which prints properties
->>>> of a specific class and its instance. It is pretty much a simplified copy
->>>> of the device-list-properties handler.
->>>>
->>>> Since it creates an object instance, device properties should appear
->>>> in the output as they are copied to QOM properties at the instance_init
->>>> hook.
->>>>
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>
->>> Related: qom-list, which lists "any properties of a object given a path
->>> in the object model."  qom-list-properties takes a type name, which
->>> qom-list takes the path to an instance.  In other words,
->>> qom-list-properties is like instantiate with default configuration and
->>> without realizing + qom-list + destroy.
->>
->>
->> True. Same as device-list-properties.
-> 
-> device-list-properties does a bit more, like skipping "uninteresting"
-> properties, and special magic for qdev properties (that's the
-> make_device_property_info() you asked about below).  But that's detail.
+[Expired for QEMU because there has been no activity for 60 days.]
 
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-It is not clear at all why would we want to skip some properties (yes,
-question to Stefan, not you) but this does not explain
-make_device_property_info() - this thing walks through the device
-properties even though they are already copied to the Object properties and
-we could enumerate those, all of them, I compared device-list-properties
-and qom-list-properties:
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1736655
 
--*** Sending {"execute": "device-list-properties", "arguments":
-{"typename": "vfio-pci"}}
-+*** Sending {"arguments": {"typename": "vfio-pci"}, "execute":
-"qom-list-properties"}
- >>>>>>>>>>>>>>>>
+Title:
+  2k3/xp guests w/virtio-net randomly DHCP fail on boot
 
- {   'return': [   {   'description': 'on/off',
-                       'name': 'x-igd-opregion',
-                       'type': 'bool'},
-+                  {'name': 'legacy-addr', 'type': 'str'},
-                   {'name': 'x-pci-vendor-id', 'type': 'uint32'},
-+                  {'name': 'type', 'type': 'string'},
-                   {'name': 'x-pci-sub-device-id', 'type': 'uint32'},
-                   {'name': 'rombar', 'type': 'uint32'},
-                   {   'description': 'on/off',
-@@ -19,10 +21,13 @@
-                                      'host device, example: 04:10.0',
-                       'name': 'host',
-                       'type': 'str'},
-+                  {'name': 'realized', 'type': 'bool'},
-                   {'name': 'x-no-kvm-msix', 'type': 'bool'},
-                   {   'description': 'on/off',
-                       'name': 'command_serr_enable',
-                       'type': 'bool'},
-+                  {'name': 'parent_bus', 'type': 'link<bus>'},
-+                  {'name': 'hotplugged', 'type': 'bool'},
-                   {'name': 'x-pci-sub-vendor-id', 'type': 'uint32'},
-                   {'name': 'x-pci-device-id', 'type': 'uint32'},
-                   {   'description': 'on/off',
-@@ -45,6 +50,7 @@
-                       'type': 'bool'},
-                   {'name': 'x-no-mmap', 'type': 'bool'},
-                   {'name': 'bootindex', 'type': 'int32'},
-+                  {'name': 'hotpluggable', 'type': 'bool'},
-                   {'name': 'sysfsdev', 'type': 'str'},
-                   {'description': 'on/off', 'name': 'x-vga', 'type': 'bool'},
-                   {'name': 'romfile', 'type': 'str'}]}
+Status in QEMU:
+  Expired
+Status in qemu package in Ubuntu:
+  Expired
 
+Bug description:
+  Host:
+  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
+  QEMU 2.10.1
 
-The difference is "uninteresting" props and one suspicious "legacy-addr"
-(which I have no idea what is that but it is offtopic here).
+  Guest:
+  Windows 2003 Standard SP2 (x64)
+  Windows XP SP3 (i386)
 
+  QEMU command line:
+  http://cfp.vim-cn.com/cbdF3
 
+  Description:
+  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
+XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
+ess on boot. When it fails, cycle disable/enable the connection in Control =
+Panel could make it connect successfully. As an immediate workaround, I swi=
+tched to the RTL8139 NIC which works fine. Further investigation showed tha=
+t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
+op of 2.10.1 "fixed" the problem.
 
-> 
->>> We need to instantiate because QOM properties are dynamic: they aren't
->>> specified by data (which qom-list-properties could simply read), they
->>> are created by (instantiation) code (which qom-list-properties has to
->>> run).
->>
->> Correct.
->>
->>> Properties created only after instantiation (by realize, perhaps) aren't
->>> visible in qom-list-properties.  Do such properties exist?
->>
->> No idea but if they do, then this issue already exists in
->> device-list-properties.
->>
->>> Properties created only in non-default configuration aren't visible
->>> either.  Such properties have to exist, or else dynamic property
->>> creation would be idiotic.
-> 
-> Thus, qom-list-properties design limitation: the result need not reflect
-> properties of instantiated objects.  It usually does, as most QOM
-> properties behave as if they were static.  But when it doesn't, what
-> then?  How are users of qom-list-properties supposed to deal with such
-> inaccurate / incorrect information?  Do they just have to know which
-> properties aren't visible in qom-list-properties, and which properties
-> are, but cannot be trusted?
-> 
-> I posit that right now *nobody* knows.
-> 
-> Would such a command be useful anyway?
+  Here are the bisect test results:
+  git branch 97cd965: 17 boots, 5 failures  (Feb 18)
+  git branch 77424a4: 27 boots, 0 failure   (Jan 09)
+  git branch c25d97c: 7 boots, 2 failures   (Feb 01)
+  git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
+  git branch 39f099e: 60 boots, 0 failure   (Jan 18)
+  2.10.1 with revert: 194 boots, 0 failure
+  2.10.1 without revert: 30 boots, 4 failures
 
-
-qom-list-properties? yes, we want it to let libvirt a way to know if a
-machine supports certain properties, if a machine was derived from a
-device, then we would not need it.
-
-
-> 
->>> Likewise for properties created differently (say with a different type)
->>> in non-default configuration.  We can hope that no such beasts exist.
->>> Since properties get created by code, and code can do anything, we're
->>> reduced to hope.  Data is so much easier to reason about than code.
->>>
->>> Three building blocks: instantiate, qom-list, destroy.  Do we want the
->>> building blocks, or do we want their combination qom-list-properties?
->>
->>
->> Building blocks as QEMU internal helpers to split my
->> qmp_qom_list_properties() into? These are not going to be huge and
->> "destroy" is literally object_unref(obj) which does not seem very useful.
->> Or I missed the point here?
-> 
-> My question is whether the QMP interface should provide the building
-> blocks, or only compositions.
-
-
-instantiate but not realize? Not sure we have users for that.
-
-
-> 
->>>> ---
->>>>
->>>> I am missing the point of make_device_property_info().
->>>> qmp_device_list_properties() creates the instance which copies everything
->>>> to QOM properties hashtable and commenting out the do{}while() in
->>>> make_device_property_info() does not seem to change a thing, what case
->>>> am I missing here?
->>>
->>> git-blame points to Stefan.  Stefan, can you help?
-
-
--- 
-Alexey
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1736655/+subscriptions
