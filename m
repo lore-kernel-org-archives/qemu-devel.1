@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintZ-0005iS-0c
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:46 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintZ-0005jC-EK
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintV-0003Qa-OU
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintY-0003Ss-0X
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54718)
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36952
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eintV-0003PN-EP
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:41 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w15KxSUZ005338
-	for <qemu-devel@nongnu.org>; Mon, 5 Feb 2018 16:01:40 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fxxkbrhjf-1
+	id 1eintX-0003SM-KJ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:43 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w15KxSbS079842
+	for <qemu-devel@nongnu.org>; Mon, 5 Feb 2018 16:01:41 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fxwe037cn-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 16:01:40 -0500
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 16:01:39 -0500
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Mon, 5 Feb 2018 16:01:38 -0500
+	Mon, 5 Feb 2018 16:01:35 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Mon,  5 Feb 2018 15:57:19 -0500
+Date: Mon,  5 Feb 2018 15:57:15 -0500
 In-Reply-To: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1517864246-11101-6-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 05/12] s390-ccw: move auxiliary IPL data to
- separate location
+Message-Id: <1517864246-11101-2-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 01/12] s390-ccw: refactor boot map table code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,173 +41,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
-The s390-ccw firmware needs some information in support of the
-boot process which is not available on the native machine.
-Examples are the netboot firmware load address and now the
-boot menu parameters.
+- replace ScsiMbr in ECKD code with BootMapTable
+- fix read_block messages to reflect BMT
+- reduce ipl_scsi code with BMT struct
 
-While storing that data in unused fields of the IPL parameter block
-works, that approach could create problems if the parameter block
-definition should change in the future. Because then a guest could
-overwrite these fields using the set IPLB diagnose.
-
-In fact the data in question is of more global nature and not really
-tied to an IPL device, so separating it is rather logical.
-
-This commit introduces a new structure to hold firmware relevant
-IPL parameters set by QEMU. The data is stored at location 204 (dec)
-and can contain up to 7 32-bit words. This area is available to
-programming in the z/Architecture Principles of Operation and
-can thus safely be used by the firmware until the IPL has completed.
-
-Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
 ---
- hw/s390x/ipl.c          | 18 +++++++++++++++++-
- hw/s390x/ipl.h          | 11 +++++++++--
- pc-bios/s390-ccw/iplb.h | 12 ++++++++++--
- pc-bios/s390-ccw/main.c |  6 +++++-
- 4 files changed, 41 insertions(+), 6 deletions(-)
+ pc-bios/s390-ccw/bootmap.c | 53 ++++++++++++++++++----------------------------
+ pc-bios/s390-ccw/bootmap.h |  9 +++++++-
+ 2 files changed, 29 insertions(+), 33 deletions(-)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 0d06fc1..3e3c3b8 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -399,6 +399,20 @@ void s390_reipl_request(void)
-     qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 67a6123..8ee9056 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -182,13 +182,13 @@ static block_number_t load_eckd_segments(block_number_t blk, uint64_t *address)
+     return block_nr;
  }
  
-+static void s390_ipl_prepare_qipl(S390CPU *cpu)
-+{
-+    S390IPLState *ipl = get_ipl_device();
-+    uint8_t *addr;
-+    uint64_t len = 4096;
-+
-+    addr = cpu_physical_memory_map(cpu->env.psa, &len, 1);
-+    if (!addr || len < 204 + sizeof(QemuIplParameters)) {
-+        error_report("Cannot set QEMU IPL parameters");
-+    }
-+    memcpy(addr + 204, &ipl->iplb.qipl, sizeof(QemuIplParameters));
-+    cpu_physical_memory_unmap(addr, len, 1, len);
-+}
-+
- void s390_ipl_prepare_cpu(S390CPU *cpu)
+-static void run_eckd_boot_script(block_number_t mbr_block_nr)
++static void run_eckd_boot_script(block_number_t bmt_block_nr)
  {
-     S390IPLState *ipl = get_ipl_device();
-@@ -418,8 +432,10 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
-             error_report_err(err);
-             vm_stop(RUN_STATE_INTERNAL_ERROR);
-         }
--        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-+        ipl->iplb.qipl.netboot_start_addr = cpu_to_be64(ipl->start_addr);
-     }
-+    s390_ipl_prepare_qipl(cpu);
-+
+     int i;
+     unsigned int loadparm = get_loadparm_index();
+     block_number_t block_nr;
+     uint64_t address;
+-    ScsiMbr *bte = (void *)sec; /* Eckd bootmap table entry */
++    BootMapTable *bmt = (void *)sec;
+     BootMapScript *bms = (void *)sec;
+ 
+     debug_print_int("loadparm", loadparm);
+@@ -196,10 +196,10 @@ static void run_eckd_boot_script(block_number_t mbr_block_nr)
+                " maximum number of boot entries allowed");
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+-    read_block(mbr_block_nr, sec, "Cannot read MBR");
++    read_block(bmt_block_nr, sec, "Cannot read Boot Map Table");
+ 
+-    block_nr = eckd_block_num((void *)&(bte->blockptr[loadparm]));
+-    IPL_assert(block_nr != -1, "No Boot Map");
++    block_nr = eckd_block_num((void *)&bmt->bte[loadparm]);
++    IPL_assert(block_nr != -1, "Cannot find Boot Map Table Entry");
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(block_nr, sec, "Cannot read Boot Map Script");
+@@ -223,7 +223,7 @@ static void ipl_eckd_cdl(void)
+     XEckdMbr *mbr;
+     Ipl2 *ipl2 = (void *)sec;
+     IplVolumeLabel *vlbl = (void *)sec;
+-    block_number_t block_nr;
++    block_number_t bmt_block_nr;
+ 
+     /* we have just read the block #0 and recognized it as "IPL1" */
+     sclp_print("CDL\n");
+@@ -238,8 +238,8 @@ static void ipl_eckd_cdl(void)
+     IPL_assert(mbr->dev_type == DEV_TYPE_ECKD,
+                "Non-ECKD device type in zIPL section of IPL2 record.");
+ 
+-    /* save pointer to Boot Script */
+-    block_nr = eckd_block_num((void *)&(mbr->blockptr));
++    /* save pointer to Boot Map Table */
++    bmt_block_nr = eckd_block_num((void *)&mbr->blockptr);
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(2, vlbl, "Cannot read Volume Label at block 2");
+@@ -249,7 +249,7 @@ static void ipl_eckd_cdl(void)
+                "Invalid magic of volser block");
+     print_volser(vlbl->f.volser);
+ 
+-    run_eckd_boot_script(block_nr);
++    run_eckd_boot_script(bmt_block_nr);
+     /* no return */
  }
  
- static void s390_ipl_reset(DeviceState *dev)
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 8a705e0..68dcaf8 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -16,8 +16,7 @@
- #include "cpu.h"
+@@ -280,7 +280,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
  
- struct IplBlockCcw {
--    uint64_t netboot_start_addr;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[85];
-     uint8_t  ssid;
-     uint16_t devno;
-     uint8_t  vm_flags;
-@@ -59,6 +58,13 @@ typedef struct IplBlockQemuScsi IplBlockQemuScsi;
+ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+ {
+-    block_number_t block_nr;
++    block_number_t bmt_block_nr;
+     BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
  
- #define DIAG308_FLAGS_LP_VALID 0x80
+     if (mode != ECKD_LDL_UNLABELED) {
+@@ -299,8 +299,10 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+     }
+     verify_boot_info(bip);
  
-+struct QemuIplParameters {
-+    uint8_t  reserved1[4];
-+    uint64_t netboot_start_addr;
-+    uint8_t  reserved2[16];
-+} QEMU_PACKED;
-+typedef struct QemuIplParameters QemuIplParameters;
+-    block_nr = eckd_block_num((void *)&(bip->bp.ipl.bm_ptr.eckd.bptr));
+-    run_eckd_boot_script(block_nr);
++    /* save pointer to Boot Map Table */
++    bmt_block_nr = eckd_block_num((void *)&bip->bp.ipl.bm_ptr.eckd.bptr);
 +
- union IplParameterBlock {
-     struct {
-         uint32_t len;
-@@ -74,6 +80,7 @@ union IplParameterBlock {
-             IplBlockFcp fcp;
-             IplBlockQemuScsi scsi;
-         };
-+        QemuIplParameters qipl;
-     } QEMU_PACKED;
-     struct {
-         uint8_t  reserved1[110];
-diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-index 890aed9..12f6e40 100644
---- a/pc-bios/s390-ccw/iplb.h
-+++ b/pc-bios/s390-ccw/iplb.h
-@@ -13,8 +13,7 @@
- #define IPLB_H
++    run_eckd_boot_script(bmt_block_nr);
+     /* no return */
+ }
  
- struct IplBlockCcw {
--    uint64_t netboot_start_addr;
--    uint8_t  reserved0[77];
-+    uint8_t  reserved0[85];
-     uint8_t  ssid;
-     uint16_t devno;
-     uint8_t  vm_flags;
-@@ -73,6 +72,15 @@ typedef struct IplParameterBlock IplParameterBlock;
+@@ -325,7 +327,7 @@ static void print_eckd_msg(void)
  
- extern IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static void ipl_eckd(void)
+ {
+-    ScsiMbr *mbr = (void *)sec;
++    XEckdMbr *mbr = (void *)sec;
+     LDL_VTOC *vlbl = (void *)sec;
  
-+struct QemuIplParameters {
-+    uint8_t  reserved1[4];
-+    uint64_t netboot_start_addr;
-+    uint8_t  reserved2[16];
-+} __attribute__ ((packed));
-+typedef struct QemuIplParameters QemuIplParameters;
+     print_eckd_msg();
+@@ -449,10 +451,8 @@ static void zipl_run(ScsiBlockPtr *pte)
+ static void ipl_scsi(void)
+ {
+     ScsiMbr *mbr = (void *)sec;
+-    uint8_t *ns, *ns_end;
+     int program_table_entries = 0;
+-    const int pte_len = sizeof(ScsiBlockPtr);
+-    ScsiBlockPtr *prog_table_entry = NULL;
++    BootMapTable *bmt = (void *)sec;
+     unsigned int loadparm = get_loadparm_index();
+ 
+     /* Grab the MBR */
+@@ -467,34 +467,23 @@ static void ipl_scsi(void)
+     debug_print_int("MBR Version", mbr->version_id);
+     IPL_check(mbr->version_id == 1,
+               "Unknown MBR layout version, assuming version 1");
+-    debug_print_int("program table", mbr->blockptr[0].blockno);
+-    IPL_assert(mbr->blockptr[0].blockno, "No Program Table");
++    debug_print_int("program table", mbr->bmt.blockno);
++    IPL_assert(mbr->bmt.blockno, "No Program Table");
+ 
+     /* Parse the program table */
+-    read_block(mbr->blockptr[0].blockno, sec,
+-               "Error reading Program Table");
++    read_block(mbr->bmt.blockno, sec, "Error reading Program Table");
+ 
+     IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
+ 
+     debug_print_int("loadparm index", loadparm);
+-    ns_end = sec + virtio_get_block_size();
+-    for (ns = (sec + pte_len); (ns + pte_len) < ns_end; ns += pte_len) {
+-        prog_table_entry = (ScsiBlockPtr *)ns;
+-        if (!prog_table_entry->blockno) {
+-            break;
+-        }
+ 
++    while (bmt->bte[program_table_entries].scsi.blockno) {
+         program_table_entries++;
+-        if (program_table_entries == loadparm + 1) {
+-            break; /* selected entry found */
+-        }
+     }
+ 
+     debug_print_int("program table entries", program_table_entries);
+ 
+-    IPL_assert(program_table_entries != 0, "Empty Program Table");
+-
+-    zipl_run(prog_table_entry); /* no return */
++    zipl_run(&bmt->bte[loadparm].scsi); /* no return */
+ }
+ 
+ /***********************************************************************
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index cf99a4c..77d56db 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -53,6 +53,13 @@ typedef union BootMapPointer {
+     ExtEckdBlockPtr xeckd;
+ } __attribute__ ((packed)) BootMapPointer;
+ 
++/* aka Program Table */
++typedef struct BootMapTable {
++    uint8_t magic[4];
++    uint8_t reserved[12];
++    BootMapPointer bte[];
++} __attribute__ ((packed)) BootMapTable;
 +
-+extern QemuIplParameters qipl;
-+
- #define S390_IPL_TYPE_FCP 0x00
- #define S390_IPL_TYPE_CCW 0x02
- #define S390_IPL_TYPE_QEMU_SCSI 0xff
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index e857ce4..825a1a3 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -16,6 +16,7 @@ char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- static SubChannelId blk_schid = { .one = 1 };
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-+QemuIplParameters qipl;
+ typedef struct ComponentEntry {
+     ScsiBlockPtr data;
+     uint8_t pad[7];
+@@ -70,7 +77,7 @@ typedef struct ScsiMbr {
+     uint8_t magic[4];
+     uint32_t version_id;
+     uint8_t reserved[8];
+-    ScsiBlockPtr blockptr[];
++    ScsiBlockPtr bmt;
+ } __attribute__ ((packed)) ScsiMbr;
  
- /*
-  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
-@@ -81,6 +82,7 @@ static void virtio_setup(void)
-     uint16_t dev_no;
-     char ldp[] = "LOADPARM=[________]\n";
-     VDev *vdev = virtio_get_device();
-+    QemuIplParameters *early_qipl = (QemuIplParameters *)204;
- 
-     /*
-      * We unconditionally enable mss support. In every sane configuration,
-@@ -93,6 +95,8 @@ static void virtio_setup(void)
-     memcpy(ldp + 10, loadparm, 8);
-     sclp_print(ldp);
- 
-+    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-+
-     if (store_iplb(&iplb)) {
-         switch (iplb.pbt) {
-         case S390_IPL_TYPE_CCW:
-@@ -127,7 +131,7 @@ static void virtio_setup(void)
- 
-     if (virtio_get_device_type() == VIRTIO_ID_NET) {
-         sclp_print("Network boot device detected\n");
--        vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
-+        vdev->netboot_start_addr = qipl.netboot_start_addr;
-     } else {
-         virtio_blk_setup_device(blk_schid);
- 
+ #define ZIPL_MAGIC              "zIPL"
 -- 
 2.7.4
