@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiaH-0002B3-G2
+	(envelope-from <mreitz@redhat.com>) id 1eiiaG-0002AQ-Pz
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiaC-0002C6-JP
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:29 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiaA-00029E-UY
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:27 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:32 +0100
-Message-Id: <20180205151835.20812-24-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:31 +0100
+Message-Id: <20180205151835.20812-23-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 23/26] block: Fix FIXME from "Add
- BDS.backing_overridden"
+Subject: [Qemu-devel] [PATCH v8 22/26] block: Do not copy exact_filename
+ from format file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,158 +23,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-Said commit introduced a FIXME stating that bdrv_open_backing_file()
-should set bs->backing_overridden to true not only if the file.filename
-option was set, but if the "options" QDict contained any option that is
-significant for any node in the BDS tree emerging from the backing BDS.
-This behavior is implemented by this patch.
+If a format BDS's file BDS is in turn a format BDS, we cannot simply use
+the same filename, because when opening a BDS tree based on a filename
+alone, qemu will create only one format node on top of one protocol node
+(disregarding a potential backing file).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 75 insertions(+), 6 deletions(-)
+ block.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/block.c b/block.c
-index 664f87bad4..640015e1f7 100644
+index 2963cbc921..664f87bad4 100644
 --- a/block.c
 +++ b/block.c
-@@ -73,6 +73,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-                                            const BdrvChildRole *child_role,
-                                            Error **errp);
+@@ -5159,9 +5159,20 @@ void bdrv_refresh_filename(BlockDriverState *bs)
  
-+static bool has_significant_runtime_options(BlockDriverState *bs,
-+                                            const QDict *d);
-+
- /* If non-zero, use only whitelisted block drivers */
- static int use_bdrv_whitelist;
+         bs->exact_filename[0] = '\0';
  
-@@ -2249,6 +2252,42 @@ out:
-     bdrv_refresh_limits(bs, NULL);
- }
- 
-+/**
-+ * Checks whether @options contains any significant option for any of the nodes
-+ * in the BDS tree emerging from @bs.
-+ */
-+static bool is_significant_option_tree(BlockDriverState *bs, QDict *options)
-+{
-+    BdrvChild *child;
-+
-+    if (!qdict_size(options)) {
-+        /* No need to recurse */
-+        return false;
-+    }
-+
-+    if (has_significant_runtime_options(bs, options)) {
-+        return true;
-+    }
-+
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        QDict *child_options;
-+        char *option_prefix;
-+
-+        option_prefix = g_strdup_printf("%s.", child->name);
-+        qdict_extract_subqdict(options, &child_options, option_prefix);
-+        g_free(option_prefix);
-+
-+        if (is_significant_option_tree(child->bs, child_options)) {
-+            QDECREF(child_options);
-+            return true;
-+        }
-+
-+        QDECREF(child_options);
-+    }
-+
-+    return false;
-+}
-+
- /*
-  * Opens the backing file for a BlockDriverState if not yet open
-  *
-@@ -2267,7 +2306,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-     const char *reference = NULL;
-     int ret = 0;
-     BlockDriverState *backing_hd;
--    QDict *options;
-+    QDict *options, *cloned_options = NULL;
-     QDict *tmp_parent_options = NULL;
-     Error *local_err = NULL;
- 
-@@ -2297,11 +2336,6 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-     reference = qdict_get_try_str(parent_options, bdref_key);
-     if (reference || qdict_haskey(options, "file.filename")) {
-         /* keep backing_filename NULL */
--
--        /* FIXME: Should also be set to true if @options contains other runtime
--         *        options which control the data that is read from the backing
--         *        BDS */
--        bs->backing_overridden = true;
-     } else if (bs->backing_file[0] == '\0' && qdict_size(options) == 0) {
-         QDECREF(options);
-         goto free_exit;
-@@ -2322,6 +2356,8 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-         goto free_exit;
+-        /* If no specific options have been given for this BDS, the filename of
+-         * the underlying file should suffice for this one as well */
+-        if (bs->file->bs->exact_filename[0] && !generate_json_filename) {
++        /* We can use the underlying file's filename if:
++         * - it has a filename,
++         * - the file is a protocol BDS, and
++         * - opening that file (as this BDS's format) will automatically create
++         *   the BDS tree we have right now, that is:
++         *   - the user did not significantly change this BDS's behavior with
++         *     some explicit options
++         *   - no non-file child of this BDS has been overridden by the user
++         *   Both of these conditions are represented by generate_json_filename.
++         */
++        if (bs->file->bs->exact_filename[0] &&
++            bs->file->bs->drv->bdrv_file_open &&
++            !generate_json_filename)
++        {
+             strcpy(bs->exact_filename, bs->file->bs->exact_filename);
+         }
      }
- 
-+    cloned_options = qdict_clone_shallow(options);
-+
-     if (!reference &&
-         bs->backing_format[0] != '\0' && !qdict_haskey(options, "driver")) {
-         qdict_put_str(options, "driver", bs->backing_format);
-@@ -2337,6 +2373,10 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-     }
-     bdrv_set_aio_context(backing_hd, bdrv_get_aio_context(bs));
- 
-+    if (reference || is_significant_option_tree(backing_hd, cloned_options)) {
-+        bs->backing_overridden = true;
-+    }
-+
-     /* Hook up the backing file link; drop our reference, bs owns the
-      * backing_hd reference now */
-     bdrv_set_backing_hd(bs, backing_hd, &local_err);
-@@ -2352,6 +2392,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
- free_exit:
-     g_free(backing_filename);
-     QDECREF(tmp_parent_options);
-+    QDECREF(cloned_options);
-     return ret;
- }
- 
-@@ -5027,6 +5068,34 @@ static const char *const *significant_options(BlockDriverState *bs,
-     return (curopt && *curopt) ? curopt : NULL;
- }
- 
-+/**
-+ * Returns true if @d contains any options the block driver of @bs considers to
-+ * be significant runtime options.
-+ */
-+static bool has_significant_runtime_options(BlockDriverState *bs,
-+                                            const QDict *d)
-+{
-+    const char *const *option_name = NULL;
-+
-+    while ((option_name = significant_options(bs, option_name))) {
-+        assert(strlen(*option_name) > 0);
-+        if ((*option_name)[strlen(*option_name) - 1] != '.') {
-+            if (qdict_haskey(d, *option_name)) {
-+                return true;
-+            }
-+        } else {
-+            const QDictEntry *entry;
-+            for (entry = qdict_first(d); entry; entry = qdict_next(d, entry)) {
-+                if (strstart(qdict_entry_key(entry), *option_name, NULL)) {
-+                    return true;
-+                }
-+            }
-+        }
-+    }
-+
-+    return false;
-+}
-+
- /**
-  * Copies all significant runtime options from bs->options to the given QDict.
-  * The set of significant option keys is determined by invoking
 -- 
 2.14.3
