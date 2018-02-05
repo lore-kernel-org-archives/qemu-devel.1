@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5W-0007tE-2N
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:43 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5X-0007ve-V7
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5R-0000yQ-Ix
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:42 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5W-00016F-TM
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:44 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  5 Feb 2018 16:33:14 +0200
-Message-Id: <a1c45c5c5a76146dd1712d8d1e7b409ad539c718.1517840877.git.berto@igalia.com>
+Date: Mon,  5 Feb 2018 16:33:21 +0200
+Message-Id: <f9846a1c2efc51938e877e2a25852d9ab14797ff.1517840877.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 14/39] qcow2: Add offset_to_l2_slice_index()
+Subject: [Qemu-devel] [PATCH v4 21/39] qcow2: Update
+ qcow2_alloc_cluster_link_l2() to support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-Similar to offset_to_l2_index(), this function takes a guest offset
-and returns the index in the L2 slice that contains its L2 entry.
+There's a loop in this function that iterates over the L2 entries in a
+table, so now we need to assert that it remains within the limits of
+an L2 slice.
 
-An L2 slice has currently the same size as an L2 table (one cluster),
-so both functions return the same value for now.
+Apart from that, this function doesn't need any additional changes, so
+this patch simply updates the variable name from l2_table to l2_slice.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/qcow2-cluster.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index e0aee88811..87b5c4063e 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -474,6 +474,11 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
-     return (offset >> s->cluster_bits) & (s->l2_size - 1);
- }
- 
-+static inline int offset_to_l2_slice_index(BDRVQcow2State *s, int64_t offset)
-+{
-+    return (offset >> s->cluster_bits) & (s->l2_slice_size - 1);
-+}
-+
- static inline int64_t align_offset(int64_t offset, int n)
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 9cd9cfff67..76e24bcbe0 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -923,7 +923,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
  {
-     offset = (offset + n - 1) & ~(n - 1);
+     BDRVQcow2State *s = bs->opaque;
+     int i, j = 0, l2_index, ret;
+-    uint64_t *old_cluster, *l2_table;
++    uint64_t *old_cluster, *l2_slice;
+     uint64_t cluster_offset = m->alloc_offset;
+ 
+     trace_qcow2_cluster_link_l2(qemu_coroutine_self(), m->nb_clusters);
+@@ -950,13 +950,13 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+                                    s->refcount_block_cache);
+     }
+ 
+-    ret = get_cluster_table(bs, m->offset, &l2_table, &l2_index);
++    ret = get_cluster_table(bs, m->offset, &l2_slice, &l2_index);
+     if (ret < 0) {
+         goto err;
+     }
+-    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
++    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+ 
+-    assert(l2_index + m->nb_clusters <= s->l2_size);
++    assert(l2_index + m->nb_clusters <= s->l2_slice_size);
+     for (i = 0; i < m->nb_clusters; i++) {
+         /* if two concurrent writes happen to the same unallocated cluster
+          * each write allocates separate cluster and writes data concurrently.
+@@ -964,16 +964,16 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+          * cluster the second one has to do RMW (which is done above by
+          * perform_cow()), update l2 table with its cluster pointer and free
+          * old cluster. This is what this loop does */
+-        if (l2_table[l2_index + i] != 0) {
+-            old_cluster[j++] = l2_table[l2_index + i];
++        if (l2_slice[l2_index + i] != 0) {
++            old_cluster[j++] = l2_slice[l2_index + i];
+         }
+ 
+-        l2_table[l2_index + i] = cpu_to_be64((cluster_offset +
++        l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
+                     (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
+      }
+ 
+ 
+-    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
++    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+ 
+     /*
+      * If this was a COW, we need to decrease the refcount of the old cluster.
 -- 
 2.11.0
