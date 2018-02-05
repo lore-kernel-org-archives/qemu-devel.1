@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eimRu-00046R-CY
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:08 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimRy-00049u-Iq
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eimRt-0004oM-4E
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:06 -0500
-References: <153D07A7-F411-4EF4-A48D-D244621E97E9@gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <af357239-5670-fca5-d9ec-ee0a10f4e00e@redhat.com>
-Date: Mon, 5 Feb 2018 14:28:55 -0500
-MIME-Version: 1.0
-In-Reply-To: <153D07A7-F411-4EF4-A48D-D244621E97E9@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block/mirror: change the semantic of
- 'force' of block-job-cancel
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimRw-0004pW-CD
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:10 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1eimRw-0004p2-1C
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:08 -0500
+Received: by mail-wm0-x231.google.com with SMTP id f3so28128122wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:07 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  5 Feb 2018 20:28:15 +0100
+Message-Id: <1517858941-5538-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
+References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 01/47] memory: update comments and fix some typos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,200 +27,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liang Li <liliang.opensource@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Liang Li <liliangleo@didichuxing.com>, Huaitong Han <huanhuaitong@didichuxing.com>
+To: qemu-devel@nongnu.org
+Cc: Jay Zhou <jianjay.zhou@huawei.com>
 
+From: Jay Zhou <jianjay.zhou@huawei.com>
 
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+Message-Id: <1515043788-38300-1-git-send-email-jianjay.zhou@huawei.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/exec/memory.h | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-On 01/31/2018 09:19 PM, Liang Li wrote:
-> On Tue, Jan 30, 2018 at 03:18:31PM -0500, John Snow wrote:
->>
->>
->> On 01/30/2018 03:38 AM, Liang Li wrote:
->>> When doing drive mirror to a low speed shared storage, if there was heavy
->>> BLK IO write workload in VM after the 'ready' event, drive mirror block job
->>> can't be canceled immediately, it would keep running until the heavy BLK IO
->>> workload stopped in the VM.
->>>
->>> Because libvirt depends on block-job-cancel for block live migration, the
->>> current block-job-cancel has the semantic to make sure data is in sync after
->>> the 'ready' event.  This semantic can't meet some requirement, for example,
->>> people may use drive mirror for realtime backup while need the ability of
->>> block live migration. If drive mirror can't not be cancelled immediately,
->>> it means block live migration need to wait, because libvirt make use drive
->>> mirror to implement block live migration and only one drive mirror block
->>> job is allowed at the same time for a give block dev.
->>>
->>> We need a new interface for 'force cancel', which could quit block job
->>> immediately if don't care about whether data is in sync or not.
->>>
->>> 'force' is not used by libvirt currently, to make things simple, change
->>> it's semantic slightly, hope it will not break some use case which need its
->>> original semantic.
->>>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Jeff Cody <jcody@redhat.com>
->>> Cc: Kevin Wolf <kwolf@redhat.com>
->>> Cc: Max Reitz <mreitz@redhat.com>
->>> Cc: Eric Blake <eblake@redhat.com>
->>> Cc: John Snow <jsnow@redhat.com>
->>> Reported-by: Huaitong Han <huanhuaitong@didichuxing.com>
->>> Signed-off-by: Huaitong Han <huanhuaitong@didichuxing.com>
->>> Signed-off-by: Liang Li <liliangleo@didichuxing.com>
->>> ---
->>> block/mirror.c            |  9 +++------
->>> blockdev.c                |  4 ++--
->>> blockjob.c                | 11 ++++++-----
->>> hmp-commands.hx           |  3 ++-
->>> include/block/blockjob.h  |  9 ++++++++-
->>> qapi/block-core.json      |  6 ++++--
->>> tests/test-blockjob-txn.c |  8 ++++----
->>> 7 files changed, 29 insertions(+), 21 deletions(-)
->>>
->>> diff --git a/block/mirror.c b/block/mirror.c
->>> index c9badc1..c22dff9 100644
->>> --- a/block/mirror.c
->>> +++ b/block/mirror.c
->>> @@ -869,11 +869,8 @@ static void coroutine_fn mirror_run(void *opaque)
->>>
->>>         ret = 0;
->>>         trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
->>> -        if (!s->synced) {
->>> -            block_job_sleep_ns(&s->common, delay_ns);
->>> -            if (block_job_is_cancelled(&s->common)) {
->>> -                break;
->>> -            }
->>> +        if (block_job_is_cancelled(&s->common) && s->common.force) {
->>> +            break;
->>
->> what's the justification for removing the sleep in the case that
->> !s->synced && !block_job_is_cancelled(...) ?
->>
-> if !block_job_is_cancelled() satisfied, the code in 'if (!should_complete) {}'
-> will execute, there is a block_job_sleep_ns there.
-> 
-> block_job_sleep_ns is for rate throttling, if there is no more data to sync, 
-> sleep is not needed, right?
-> 
->>>         } else if (!should_complete) {
->>>             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
->>>             block_job_sleep_ns(&s->common, delay_ns);
->>> @@ -887,7 +884,7 @@ immediate_exit:
->>>          * or it was cancelled prematurely so that we do not guarantee that
->>>          * the target is a copy of the source.
->>>          */
->>> -        assert(ret < 0 || (!s->synced && block_job_is_cancelled(&s->common)));
->>> +        assert(ret < 0 || block_job_is_cancelled(&s->common));
->>
->> This assertion gets weaker in the case where force isn't provided, is
->> that desired?
->>
-> yes. if force quit is used, the following condition can be true
-> 
-> (ret >= 0) && (s->synced) && (block_job_is_cancelled(&s->common)) 
-> 
-> so the above assert should be changed, or it will be failed.
-> 
-
-What I mean is that when we *don't* use force quit, the assertion here
-is weakened. You can work the force conditional in here:
-
-ret < 0 || (block_job_is_cancelled(job) && (job->force || !s->synced))
-
-which preserves the stricter assertion when force isn't provided.
-
->>>         assert(need_drain);
->>>         mirror_wait_for_all_io(s);
->>>     }
->>> diff --git a/blockdev.c b/blockdev.c
->>> index 8e977ee..039f156 100644
->>> --- a/blockdev.c
->>> +++ b/blockdev.c
->>> @@ -145,7 +145,7 @@ void blockdev_mark_auto_del(BlockBackend *blk)
->>>         aio_context_acquire(aio_context);
->>>
->>>         if (bs->job) {
->>> -            block_job_cancel(bs->job);
->>> +            block_job_cancel(bs->job, false);
->>>         }
->>>
->>>         aio_context_release(aio_context);
->>> @@ -3802,7 +3802,7 @@ void qmp_block_job_cancel(const char *device,
->>>     }
->>>
->>>     trace_qmp_block_job_cancel(job);
->>> -    block_job_cancel(job);
->>> +    block_job_cancel(job, force);
->>> out:
->>>     aio_context_release(aio_context);
->>> }
->>> diff --git a/blockjob.c b/blockjob.c
->>> index f5cea84..0aacb50 100644
->>> --- a/blockjob.c
->>> +++ b/blockjob.c
->>> @@ -365,7 +365,7 @@ static void block_job_completed_single(BlockJob *job)
->>>     block_job_unref(job);
->>> }
->>>
->>> -static void block_job_cancel_async(BlockJob *job)
->>> +static void block_job_cancel_async(BlockJob *job, bool force)
->>> {
->>>     if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
->>>         block_job_iostatus_reset(job);
->>> @@ -376,6 +376,7 @@ static void block_job_cancel_async(BlockJob *job)
->>>         job->pause_count--;
->>>     }
->>>     job->cancelled = true;
->>> +    job->force = force;
->>> }
->>>
->>
->> I suppose this is okay; we're setting a permanent property of the job as
->> part of a limited operation.
->>
->> Granted, the job should disappear afterwards, so it should never
->> conflict, but it made me wonder for a moment.
->>
->> What happens if we cancel with force = true and then immediately cancel
->> again with force = false? What happens? Can it cause issues?
->>
-> 
-> Indeed. It can be fixed by:
-> 
-> if (!job->force)
->    job->force = force
-> 
-> it's that ok ?
-> 
-
-I think so, yes. or job->force |= force, or your preferred equivalent
-for only allowing false-->true here.
-
->>> static int block_job_finish_sync(BlockJob *job,
->>> @@ -437,7 +438,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
->>>      * on the caller, so leave it. */
->>>     QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
->>>         if (other_job != job) {
->>> -            block_job_cancel_async(other_job);
->>> +            block_job_cancel_async(other_job, true);
->>
->> What's the rationale for deciding that transactional cancellations are
->> always force=true?
->>
-> 
-> no particular reason, just try to speed up the abort process. :)
-> 
-
-I'd prefer we not change the semantics of how transactions fail without
-a stronger justification than wanting to make it faster!
-
->> Granted, this doesn't matter currently because mirror isn't a
->> transactional job, but that makes the decision all the more curious.
->>
->>>         }
->>>     }
-> 
-> Thanks for your comments.
-> 
-> Liang
-> 
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 07c5d6d..67e4ee3 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -324,7 +324,7 @@ FlatView *address_space_to_flatview(AddressSpace *as);
+  * MemoryRegionSection: describes a fragment of a #MemoryRegion
+  *
+  * @mr: the region, or %NULL if empty
+- * @address_space: the address space the region is mapped in
++ * @fv: the flat view of the address space the region is mapped in
+  * @offset_within_region: the beginning of the section, relative to @mr's start
+  * @size: the size of the section; will not exceed @mr's boundaries
+  * @offset_within_address_space: the address of the first byte of the section
+@@ -610,6 +610,7 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+  * @ops: callbacks for write access handling (must not be NULL).
++ * @opaque: passed to the read and write callbacks of the @ops structure.
+  * @name: Region name, becomes part of RAMBlock name used in migration stream
+  *        must be unique within any device
+  * @size: size of the region.
+@@ -653,11 +654,10 @@ static inline void memory_region_init_reservation(MemoryRegion *mr,
+  * An IOMMU region translates addresses and forwards accesses to a target
+  * memory region.
+  *
+- * @typename: QOM class name
+  * @_iommu_mr: the #IOMMUMemoryRegion to be initialized
+  * @instance_size: the IOMMUMemoryRegion subclass instance size
++ * @mrtypename: the type name of the #IOMMUMemoryRegion
+  * @owner: the object that tracks the region's reference count
+- * @ops: a function that translates addresses into the @target region
+  * @name: used for debugging; not visible to the user or ABI
+  * @size: size of the region.
+  */
+@@ -827,8 +827,8 @@ static inline IOMMUMemoryRegion *memory_region_get_iommu(MemoryRegion *mr)
+  * memory_region_get_iommu_class_nocheck: returns iommu memory region class
+  *   if an iommu or NULL if not
+  *
+- * Returns pointer to IOMMUMemoryRegioniClass if a memory region is an iommu,
+- * otherwise NULL. This is fast path avoinding QOM checking, use with caution.
++ * Returns pointer to IOMMUMemoryRegionClass if a memory region is an iommu,
++ * otherwise NULL. This is fast path avoiding QOM checking, use with caution.
+  *
+  * @mr: the memory region being queried
+  */
+@@ -993,7 +993,8 @@ int memory_region_get_fd(MemoryRegion *mr);
+  * protecting the pointer, such as a reference to the region that includes
+  * the incoming ram_addr_t.
+  *
+- * @mr: the memory region being queried.
++ * @ptr: the host pointer to be converted
++ * @offset: the offset within memory region
+  */
+ MemoryRegion *memory_region_from_host(void *ptr, ram_addr_t *offset);
+ 
+@@ -1270,7 +1271,7 @@ void memory_region_clear_global_locking(MemoryRegion *mr);
+  * @size: the size of the access to trigger the eventfd
+  * @match_data: whether to match against @data, instead of just @addr
+  * @data: the data to match against the guest write
+- * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
++ * @e: event notifier to be triggered when @addr, @size, and @data all match.
+  **/
+ void memory_region_add_eventfd(MemoryRegion *mr,
+                                hwaddr addr,
+@@ -1290,7 +1291,7 @@ void memory_region_add_eventfd(MemoryRegion *mr,
+  * @size: the size of the access to trigger the eventfd
+  * @match_data: whether to match against @data, instead of just @addr
+  * @data: the data to match against the guest write
+- * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
++ * @e: event notifier to be triggered when @addr, @size, and @data all match.
+  */
+ void memory_region_del_eventfd(MemoryRegion *mr,
+                                hwaddr addr,
+@@ -1526,7 +1527,7 @@ bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
+  * will need to request the pointer again.
+  *
+  * @mr: #MemoryRegion associated to the pointer.
+- * @addr: address within that region
++ * @offset: offset within the memory region
+  * @size: size of that area.
+  */
+ void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
+@@ -1595,6 +1596,7 @@ void address_space_destroy(AddressSpace *as);
+  * @addr: address within that address space
+  * @attrs: memory transaction attributes
+  * @buf: buffer with the data transferred
++ * @len: the number of bytes to read or write
+  * @is_write: indicates the transfer direction
+  */
+ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+@@ -1612,6 +1614,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+  * @addr: address within that address space
+  * @attrs: memory transaction attributes
+  * @buf: buffer with the data transferred
++ * @len: the number of bytes to write
+  */
+ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+                                 MemTxAttrs attrs,
+@@ -1810,7 +1813,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+  * called from an RCU critical section, to avoid that the last reference
+  * to the returned region disappears after address_space_translate returns.
+  *
+- * @as: #AddressSpace to be accessed
++ * @fv: #FlatView to be accessed
+  * @addr: address within that address space
+  * @xlat: pointer to address within the returned memory region section's
+  * #MemoryRegion.
+@@ -1868,7 +1871,7 @@ void *address_space_map(AddressSpace *as, hwaddr addr,
+  * the amount of memory that was actually read or written by the caller.
+  *
+  * @as: #AddressSpace used
+- * @addr: address within that address space
++ * @buffer: host pointer as returned by address_space_map()
+  * @len: buffer length as returned by address_space_map()
+  * @access_len: amount of data actually transferred
+  * @is_write: indicates the transfer direction
+@@ -1905,7 +1908,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+  * or failed (eg unassigned memory, device rejected the transaction,
+  * IOMMU fault).
+  *
+- * @as: #AddressSpace to be accessed
++ * @fv: #FlatView to be accessed
+  * @addr: address within that address space
+  * @attrs: memory transaction attributes
+  * @buf: buffer with the data transferred
+-- 
+1.8.3.1
