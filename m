@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZZ-0001Nj-Fk
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiZn-0001i9-EX
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZT-0000tA-G2
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:45 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiZi-0001L8-LC
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:59 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:23 +0100
-Message-Id: <20180205151835.20812-15-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:25 +0100
+Message-Id: <20180205151835.20812-17-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 14/26] block/nbd: Make bdrv_dirname() return
- NULL
+Subject: [Qemu-devel] [PATCH v8 16/26] block: Use bdrv_dirname() for
+ relative filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +23,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-The generic bdrv_dirname() implementation would be able to generate some
-form of directory name for many NBD nodes, but it would be always wrong.
-Therefore, we have to explicitly make it an error (until NBD has some
-form of specification for export paths, if it ever will).
+bdrv_get_full_backing_filename_from_filename() breaks down when it comes
+to JSON filenames. Using bdrv_dirname() as the basis is better because
+since we have BDS, we can descend through the BDS tree to the protocol
+layer, which gives us a greater probability of finding a non-JSON name;
+also, bdrv_dirname() is more correct as it allows block drivers to
+override the generation of that directory name in a protocol-specific
+way.
+
+We still need to keep bdrv_get_full_backing_filename_from_filename(),
+though, because it has valid callers which need it during image creation
+when no BDS is available yet.
+
+This makes a test case in qemu-iotest 110, which was supposed to fail,
+work. That is actually good, but we need to change the reference output
+(and the comment in 110) accordingly.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/nbd.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block.c                    | 20 +++++++++++++++-----
+ tests/qemu-iotests/110     |  3 ++-
+ tests/qemu-iotests/110.out |  2 +-
+ 3 files changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index 94220f6d14..dcea7ffaef 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -574,6 +574,16 @@ static int nbd_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-     return 0;
+diff --git a/block.c b/block.c
+index 8957a3d4dc..f23b35405d 100644
+--- a/block.c
++++ b/block.c
+@@ -311,12 +311,22 @@ char *bdrv_get_full_backing_filename_from_filename(const char *backed,
+ static char *bdrv_make_absolute_filename(BlockDriverState *relative_to,
+                                          const char *filename, Error **errp)
+ {
+-    char *bs_filename = relative_to->exact_filename[0]
+-                        ? relative_to->exact_filename
+-                        : relative_to->filename;
++    char *dir, *full_name;
+ 
+-    return bdrv_get_full_backing_filename_from_filename(bs_filename,
+-                                                        filename ?: "", errp);
++    if (!filename || filename[0] == '\0') {
++        return NULL;
++    } else if (path_has_protocol(filename) || path_is_absolute(filename)) {
++        return g_strdup(filename);
++    }
++
++    dir = bdrv_dirname(relative_to, errp);
++    if (!dir) {
++        return NULL;
++    }
++
++    full_name = g_strconcat(dir, filename, NULL);
++    g_free(dir);
++    return full_name;
  }
  
-+static char *nbd_dirname(BlockDriverState *bs, Error **errp)
-+{
-+    /* The generic bdrv_dirname() implementation is able to work out some
-+     * directory name for NBD nodes, but that would be wrong. So far there is no
-+     * specification for how "export paths" would work, so NBD does not have
-+     * directory names. */
-+    error_setg(errp, "Cannot generate a base directory for NBD nodes");
-+    return NULL;
-+}
-+
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -592,6 +602,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_get_info              = nbd_get_info,
-+    .bdrv_dirname               = nbd_dirname,
- };
+ char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
+diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
+index 9de7369f3a..ba1b3c6c7d 100755
+--- a/tests/qemu-iotests/110
++++ b/tests/qemu-iotests/110
+@@ -61,7 +61,8 @@ echo '=== Non-reconstructable filename ==='
+ echo
  
- static BlockDriver bdrv_nbd_tcp = {
-@@ -612,6 +623,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_get_info              = nbd_get_info,
-+    .bdrv_dirname               = nbd_dirname,
- };
+ # Across blkdebug without a config file, you cannot reconstruct filenames, so
+-# qemu is incapable of knowing the directory of the top image
++# qemu is incapable of knowing the directory of the top image from the filename
++# alone. However, using bdrv_dirname(), it should still work.
+ TEST_IMG="json:{
+     'driver': '$IMGFMT',
+     'file': {
+diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
+index b3584ff87f..5370bc1d26 100644
+--- a/tests/qemu-iotests/110.out
++++ b/tests/qemu-iotests/110.out
+@@ -14,7 +14,7 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
+ image: json:{"driver": "IMGFMT", "file": {"set-state.0.event": "read_aio", "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driver": "blkdebug", "set-state.0.new_state": 42}}
+ file format: IMGFMT
+ virtual size: 64M (67108864 bytes)
+-backing file: t.IMGFMT.base (cannot determine actual path)
++backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
  
- static BlockDriver bdrv_nbd_unix = {
-@@ -632,6 +644,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_get_info              = nbd_get_info,
-+    .bdrv_dirname               = nbd_dirname,
- };
+ === Backing name is always relative to the backed image ===
  
- static void bdrv_nbd_init(void)
 -- 
 2.14.3
