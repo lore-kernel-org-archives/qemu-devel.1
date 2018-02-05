@@ -1,34 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eidWl-0006aY-TG
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:57:33 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eidYK-0008DO-HS
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:59:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eidWi-0000lx-Np
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:57:31 -0500
-Received: from mga01.intel.com ([192.55.52.88]:23980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eidWi-0000kf-Es
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:57:28 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Mon, 5 Feb 2018 09:57:23 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F73942A470@shsmsx102.ccr.corp.intel.com>
-References: <20180119130653.24044-1-stefanha@redhat.com>
-	<5A65C652.6080307@intel.com>
-	<20180123111238.GC6565@stefanha-x1.localdomain>
-	<5A673369.6050408@intel.com>
-	<20180124114055.GC17193@stefanha-x1.localdomain>
-	<5A69AF21.5000209@intel.com>
-	<20180126144429.GD17788@stefanha-x1.localdomain>
-	<5A70606F.3030307@intel.com>
-	<20180202152538.GA16064@stefanha-x1.localdomain>
-In-Reply-To: <20180202152538.GA16064@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <borntraeger@de.ibm.com>) id 1eidYH-0001dn-FZ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:59:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56728
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eidYH-0001dT-97
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:59:05 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w159wrWI059889
+	for <qemu-devel@nongnu.org>; Mon, 5 Feb 2018 04:59:04 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fxmudgp13-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 04:59:03 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 5 Feb 2018 09:59:01 -0000
+References: <20180205090912.6110-1-david@redhat.com>
+	<d3ce48fe-18a1-2279-f578-8697fec6e4a3@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 5 Feb 2018 10:58:57 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
- device
+In-Reply-To: <d3ce48fe-18a1-2279-f578-8697fec6e4a3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1020f035-938b-53d4-ca79-32d7726cf0aa@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/cpumodel: model PTFF subfunctions
+ for Multiple-epoch facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +44,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-On Friday, February 2, 2018 11:26 PM, Stefan Hajnoczi wrote:
-> On Tue, Jan 30, 2018 at 08:09:19PM +0800, Wei Wang wrote:
-> > Background:
-> > The vhost-user negotiation is split into 2 phases currently. The 1st
-> > phase happens when the connection is established, and we can find
-> > what's done in the 1st phase in vhost_user_init(). The 2nd phase
-> > happens when the master driver is loaded (e.g. run of virtio-net pmd)
-> > and set status to the device, and we can find what's done in the 2nd
-> > phase in vhost_dev_start(), which includes sending the memory info and
-> > virtqueue info. The socket is connected, till one of the QEMU devices
-> > exits, so pmd exiting won't end the QEMU side socket connection.
-> >
-> > Issues:
-> > Suppose we have both the vhost and virtio-net set up, and vhost pmd
-> > <-> virtio-net pmd communication works well. Now, vhost pmd exits
-> > (virtio-net pmd is still there). Some time later, we re-run vhost pmd,
-> > the vhost pmd doesn't know the virtqueue addresses of the virtio-net
-> > pmd, unless the virtio-net pmd reloads to start the 2nd phase of the
-> > vhost-user protocol. So the second run of the vhost pmd won't work.
->=20
-> This isn't a problem for virtio-vhost-user since the vhost-pmd resets the
-> virtio-vhost-user device when it restarts.  The vhost-user AF_UNIX socket
-> reconnects and negotiation restarts.
 
-I'm not sure if you've agreed that vhost-user negotiation is split into two=
- phases as described above. If not, it's also not difficult to check, thank=
-s to the RTE_LOG put at the vhost_user_msg_handler:
-RTE_LOG(INFO, VHOST_CONFIG, "read message %s\n",
-                        vhost_message_str[msg.request.master]);
-It tells us what messages are received and when they are received.=20
 
-Before trying the virtio-vhost-user setup, please make sure the virtio-net =
-side VM doesn't have the virtio-net kernel driver loaded (blacklist the mod=
-ule or disable it in .config).
-VM1: the VM with virtio-vhost-user
-VM2: the VM with virtio-net
+On 02/05/2018 10:34 AM, David Hildenbrand wrote:
+> On 05.02.2018 10:09, David Hildenbrand wrote:
+>> For now, the kernel does not properly indicate configured CPU subfunctions
+>> to the guest, but simply uses the host values (as support in KVM is still
+>> missing). That's why we missed to model the PTFF subfunctions that come
+>> with Multiple-epoch facility.
+>>
+>> Let's properly add these, along with a new feature group.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/cpu_features.c     |  5 +++++
+>>  target/s390x/cpu_features_def.h |  4 ++++
+>>  target/s390x/gen-features.c     | 10 ++++++++++
+>>  3 files changed, 19 insertions(+)
+>>
+>> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+>> index 85d10b5710..8606e52ca0 100644
+>> --- a/target/s390x/cpu_features.c
+>> +++ b/target/s390x/cpu_features.c
+>> @@ -156,8 +156,12 @@ static const S390FeatDef s390_features[] = {
+>>      FEAT_INIT("ptff-qpc", S390_FEAT_TYPE_PTFF, 3, "PTFF Query Physical Clock"),
+>>      FEAT_INIT("ptff-qui", S390_FEAT_TYPE_PTFF, 4, "PTFF Query UTC Information"),
+>>      FEAT_INIT("ptff-qtou", S390_FEAT_TYPE_PTFF, 5, "PTFF Query TOD Offset User"),
+>> +    FEAT_INIT("ptff-qsie", S390_FEAT_TYPE_PTFF, 10, "PTFF Query Steering Information Extended"),
+>> +    FEAT_INIT("ptff-qtoue", S390_FEAT_TYPE_PTFF, 13, "PTFF Query TOD Offset User Extended"),
+>>      FEAT_INIT("ptff-sto", S390_FEAT_TYPE_PTFF, 65, "PTFF Set TOD Offset"),
+>>      FEAT_INIT("ptff-stou", S390_FEAT_TYPE_PTFF, 69, "PTFF Set TOD Offset User"),
+>> +    FEAT_INIT("ptff-stoe", S390_FEAT_TYPE_PTFF, 73, "PTFF Set TOD Offset Extended"),
+>> +    FEAT_INIT("ptff-stoue", S390_FEAT_TYPE_PTFF, 77, "PTFF Set TOD Offset User Extended"),
+>>  
+>>      FEAT_INIT("kmac-dea", S390_FEAT_TYPE_KMAC, 1, "KMAC DEA"),
+>>      FEAT_INIT("kmac-tdea-128", S390_FEAT_TYPE_KMAC, 2, "KMAC TDEA-128"),
+>> @@ -445,6 +449,7 @@ static S390FeatGroupDef s390_feature_groups[] = {
+>>      FEAT_GROUP_INIT("plo", PLO, "Perform-locked-operation facility"),
+>>      FEAT_GROUP_INIT("tods", TOD_CLOCK_STEERING, "Tod-clock-steering facility"),
+>>      FEAT_GROUP_INIT("gen13ptff", GEN13_PTFF, "PTFF enhancements introduced with z13"),
+>> +    FEAT_GROUP_INIT("mepochptff", MEPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
+>>      FEAT_GROUP_INIT("msa", MSA, "Message-security-assist facility"),
+>>      FEAT_GROUP_INIT("msa1", MSA_EXT_1, "Message-security-assist-extension 1 facility"),
+>>      FEAT_GROUP_INIT("msa2", MSA_EXT_2, "Message-security-assist-extension 2 facility"),
+>> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+>> index 4d930871b4..7c5915c7b2 100644
+>> --- a/target/s390x/cpu_features_def.h
+>> +++ b/target/s390x/cpu_features_def.h
+>> @@ -151,8 +151,12 @@ typedef enum {
+>>      S390_FEAT_PTFF_QPT,
+>>      S390_FEAT_PTFF_QUI,
+>>      S390_FEAT_PTFF_QTOU,
+>> +    S390_FEAT_PTFF_QSIE,
+>> +    S390_FEAT_PTFF_QTOUE,
+>>      S390_FEAT_PTFF_STO,
+>>      S390_FEAT_PTFF_STOU,
+>> +    S390_FEAT_PTFF_STOE,
+>> +    S390_FEAT_PTFF_STOUE,
+>>  
+>>      /* KMAC */
+>>      S390_FEAT_KMAC_DEA,
+>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+>> index 58b6ac484e..8c04ff913f 100644
+>> --- a/target/s390x/gen-features.c
+>> +++ b/target/s390x/gen-features.c
+>> @@ -59,6 +59,12 @@
+>>      S390_FEAT_PTFF_QTOU, \
+>>      S390_FEAT_PTFF_STOU
+>>  
+>> +#define S390_FEAT_GROUP_MEPOCH_PTFF \
+>> +    S390_FEAT_PTFF_QSIE, \
+>> +    S390_FEAT_PTFF_QTOUE, \
+>> +    S390_FEAT_PTFF_STOE, \
+>> +    S390_FEAT_PTFF_STOUE
+>> +
+>>  #define S390_FEAT_GROUP_MSA \
+>>      S390_FEAT_MSA, \
+>>      S390_FEAT_KMAC_DEA, \
+>> @@ -219,6 +225,9 @@ static uint16_t group_TOD_CLOCK_STEERING[] = {
+>>  static uint16_t group_GEN13_PTFF[] = {
+>>      S390_FEAT_GROUP_GEN13_PTFF,
+>>  };
+>> +static uint16_t group_MEPOCH_PTFF[] = {
+>> +    S390_FEAT_GROUP_MEPOCH_PTFF,
+>> +};
+>>  static uint16_t group_MSA[] = {
+>>      S390_FEAT_GROUP_MSA,
+>>  };
+>> @@ -665,6 +674,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
+>>      FEAT_GROUP_INITIALIZER(PLO),
+>>      FEAT_GROUP_INITIALIZER(TOD_CLOCK_STEERING),
+>>      FEAT_GROUP_INITIALIZER(GEN13_PTFF),
+>> +    FEAT_GROUP_INITIALIZER(MEPOCH_PTFF),
+>>      FEAT_GROUP_INITIALIZER(MSA),
+>>      FEAT_GROUP_INITIALIZER(MSA_EXT_1),
+>>      FEAT_GROUP_INITIALIZER(MSA_EXT_2),
+>>
+> 
+> Guess this hunk is missing:
+> 
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 8c04ff913f..cfb371dac3 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -475,6 +475,7 @@ static uint16_t full_GEN14_GA1[] = {
+>      S390_FEAT_CMM_NT,
+>      S390_FEAT_HPMA2,
+>      S390_FEAT_SIE_KSS,
+> +    S390_FEAT_GROUP_MEPOCH_PTFF,
+>  };
+> 
+>  /* Default features (in order of release)
+> 
+> 
+> And we should most probably add this:
 
-1) After we boot VM1 and the virtio-vhost-user pmd, we boot VM2, and we wil=
-l see the following log in VM1:
-VHOST_CONFIG: new device, handle is 0
-VHOST_CONFIG: read message VHOST_USER_GET_FEATURES
-VHOST_CONFIG: read message VHOST_USER_GET_PROTOCOL_FEATURES
-VHOST_CONFIG: read message VHOST_USER_SET_PROTOCOL_FEATURES
-VHOST_CONFIG: read message VHOST_USER_GET_QUEUE_NUM
-VHOST_CONFIG: read message VHOST_USER_SET_OWNER
-VHOST_CONFIG: read message VHOST_USER_GET_FEATURES
-VHOST_CONFIG: read message VHOST_USER_SET_VRING_CALL
-VHOST_CONFIG: vring call idx:0 file:-1
-VHOST_CONFIG: read message VHOST_USER_SET_VRING_CALL
-VHOST_CONFIG: vring call idx:1 file:-1
+Can you do a respin? I can then do a test on a z14.
 
-Those messages are what I called phase1 negotiation. They are negotiated wh=
-en the AF_UNIX socket connects.
-
-2) Then in VM2 we load the virtio-net pmd, we will see phase2 messages show=
-ing up in VM1, like:
-VHOST_CONFIG: read message VHOST_USER_SET_VRING_NUM
-VHOST_CONFIG: read message VHOST_USER_SET_VRING_BASE
-VHOST_CONFIG: read message VHOST_USER_SET_VRING_ADDR
-...
-Those messages are sent to virtio-vhost-user only when the VM2's virtio-net=
- pmd loads.
-
-AF_UNIX socket reconnection only triggers phase1 negotiation. If virtio-net=
- pmd in VM2 doesn't reload, virtio-vhost-user pmd won't get the above phase=
-2 messages. Do you agree with the issue?
-
-Best,
-Wei=20
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index bfd14723f1..deb870921b 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2221,6 +2221,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>          return;
+>      }
+> 
+> +    /* PTFF subfunctions might be indicated although kernel support missing */
+> +    if (!test_bit(S390_FEAT_MULTIPLE_EPOCH, model->features)) {
+> +        clear_bit(S390_FEAT_PTFF_QSIE, model->features);
+> +        clear_bit(S390_FEAT_PTFF_QTOUE, model->features);
+> +        clear_bit(S390_FEAT_PTFF_STOE, model->features);
+> +        clear_bit(S390_FEAT_PTFF_STOUE, model->features);
+> +    }
+> +
+>      /* with cpu model support, CMM is only indicated if really available */
+>      if (kvm_s390_cmma_available()) {
+>          set_bit(S390_FEAT_CMM, model->features);
+> 
+> 
+> Unfortunately I don't have access to a z14.
+> 
