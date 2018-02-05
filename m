@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiaCW-000536-1V
+	(envelope-from <mjc@sifive.com>) id 1eiaCX-00054T-LH
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiaCS-0006Jo-R5
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:24 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37833)
+	(envelope-from <mjc@sifive.com>) id 1eiaCW-0006LI-0r
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:25 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:38207)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiaCS-0006Iy-I0
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:20 -0500
-Received: by mail-pg0-x242.google.com with SMTP id o1so3449234pgn.4
-	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 22:24:20 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiaCV-0006Kx-QQ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:24:23 -0500
+Received: by mail-pl0-x243.google.com with SMTP id 13so11148755plb.5
+	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 22:24:23 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Mon,  5 Feb 2018 19:22:31 +1300
-Message-Id: <1517811767-75958-6-git-send-email-mjc@sifive.com>
+Date: Mon,  5 Feb 2018 19:22:32 +1300
+Message-Id: <1517811767-75958-7-git-send-email-mjc@sifive.com>
 In-Reply-To: <1517811767-75958-1-git-send-email-mjc@sifive.com>
 References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v4 06/22] RISC-V FPU Support
+Subject: [Qemu-devel] [PATCH v4 07/22] RISC-V GDB Stub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +28,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-Helper routines for FPU instructions and NaN definitions.
+GDB Register read and write routines.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- fpu/softfloat-specialize.h |   7 +-
- target/riscv/fpu_helper.c  | 375 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 379 insertions(+), 3 deletions(-)
- create mode 100644 target/riscv/fpu_helper.c
+ target/riscv/gdbstub.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+ create mode 100644 target/riscv/gdbstub.c
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index de2c5d5..49ee578 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -114,7 +114,8 @@ float32 float32_default_nan(float_status *status)
- #if defined(TARGET_SPARC) || defined(TARGET_M68K)
-     return const_float32(0x7FFFFFFF);
- #elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
--      defined(TARGET_XTENSA) || defined(TARGET_S390X) || defined(TARGET_TRICORE)
-+      defined(TARGET_XTENSA) || defined(TARGET_S390X) || \
-+      defined(TARGET_TRICORE) || defined(TARGET_RISCV)
-     return const_float32(0x7FC00000);
- #elif defined(TARGET_HPPA)
-     return const_float32(0x7FA00000);
-@@ -139,7 +140,7 @@ float64 float64_default_nan(float_status *status)
- #if defined(TARGET_SPARC) || defined(TARGET_M68K)
-     return const_float64(LIT64(0x7FFFFFFFFFFFFFFF));
- #elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
--      defined(TARGET_S390X)
-+      defined(TARGET_S390X) || defined(TARGET_RISCV)
-     return const_float64(LIT64(0x7FF8000000000000));
- #elif defined(TARGET_HPPA)
-     return const_float64(LIT64(0x7FF4000000000000));
-@@ -189,7 +190,7 @@ float128 float128_default_nan(float_status *status)
-         r.high = LIT64(0x7FFF7FFFFFFFFFFF);
-     } else {
-         r.low = LIT64(0x0000000000000000);
--#if defined(TARGET_S390X) || defined(TARGET_PPC)
-+#if defined(TARGET_S390X) || defined(TARGET_PPC) || defined(TARGET_RISCV)
-         r.high = LIT64(0x7FFF800000000000);
- #else
-         r.high = LIT64(0xFFFF800000000000);
-diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
+diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
 new file mode 100644
-index 0000000..42d3633
+index 0000000..500bd5f
 --- /dev/null
-+++ b/target/riscv/fpu_helper.c
-@@ -0,0 +1,375 @@
++++ b/target/riscv/gdbstub.c
+@@ -0,0 +1,60 @@
 +/*
-+ * RISC-V FPU Emulation Helpers for QEMU.
++ * RISC-V GDB Server Stub
 + *
 + * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
 + *
@@ -96,359 +64,44 @@ index 0000000..42d3633
 + */
 +
 +#include "qemu/osdep.h"
-+#include <stdlib.h>
++#include "qemu-common.h"
++#include "exec/gdbstub.h"
 +#include "cpu.h"
-+#include "qemu/host-utils.h"
-+#include "exec/exec-all.h"
-+#include "exec/helper-proto.h"
 +
-+target_ulong cpu_riscv_get_fflags(CPURISCVState *env)
++int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
 +{
-+    int soft = get_float_exception_flags(&env->fp_status);
-+    target_ulong hard = 0;
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    CPURISCVState *env = &cpu->env;
 +
-+    hard |= (soft & float_flag_inexact) ? FPEXC_NX : 0;
-+    hard |= (soft & float_flag_underflow) ? FPEXC_UF : 0;
-+    hard |= (soft & float_flag_overflow) ? FPEXC_OF : 0;
-+    hard |= (soft & float_flag_divbyzero) ? FPEXC_DZ : 0;
-+    hard |= (soft & float_flag_invalid) ? FPEXC_NV : 0;
-+
-+    return hard;
-+}
-+
-+void cpu_riscv_set_fflags(CPURISCVState *env, target_ulong hard)
-+{
-+    int soft = 0;
-+
-+    soft |= (hard & FPEXC_NX) ? float_flag_inexact : 0;
-+    soft |= (hard & FPEXC_UF) ? float_flag_underflow : 0;
-+    soft |= (hard & FPEXC_OF) ? float_flag_overflow : 0;
-+    soft |= (hard & FPEXC_DZ) ? float_flag_divbyzero : 0;
-+    soft |= (hard & FPEXC_NV) ? float_flag_invalid : 0;
-+
-+    set_float_exception_flags(soft, &env->fp_status);
-+}
-+
-+void helper_set_rounding_mode(CPURISCVState *env, uint32_t rm)
-+{
-+    int softrm;
-+
-+    if (rm == 7) {
-+        rm = env->frm;
++    if (n < 32) {
++        return gdb_get_regl(mem_buf, env->gpr[n]);
++    } else if (n == 32) {
++        return gdb_get_regl(mem_buf, env->pc);
++    } else if (n < 65) {
++        return gdb_get_reg64(mem_buf, env->fpr[n - 33]);
 +    }
-+    switch (rm) {
-+    case 0:
-+        softrm = float_round_nearest_even;
-+        break;
-+    case 1:
-+        softrm = float_round_to_zero;
-+        break;
-+    case 2:
-+        softrm = float_round_down;
-+        break;
-+    case 3:
-+        softrm = float_round_up;
-+        break;
-+    case 4:
-+        softrm = float_round_ties_away;
-+        break;
-+    default:
-+        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    return 0;
++}
++
++int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    CPURISCVState *env = &cpu->env;
++
++    if (n == 0) {
++        /* discard writes to x0 */
++        return sizeof(target_ulong);
++    } else if (n < 32) {
++        env->gpr[n] = ldtul_p(mem_buf);
++        return sizeof(target_ulong);
++    } else if (n == 32) {
++        env->pc = ldtul_p(mem_buf);
++        return sizeof(target_ulong);
++    } else if (n < 65) {
++        env->fpr[n - 33] = ldq_p(mem_buf); /* always 64-bit */
++        return sizeof(uint64_t);
 +    }
-+
-+    set_float_rounding_mode(softrm, &env->fp_status);
-+}
-+
-+uint64_t helper_fmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                        uint64_t frs3)
-+{
-+    return float32_muladd(frs1, frs2, frs3, 0, &env->fp_status);
-+}
-+
-+uint64_t helper_fmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                        uint64_t frs3)
-+{
-+    return float64_muladd(frs1, frs2, frs3, 0, &env->fp_status);
-+}
-+
-+uint64_t helper_fmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                        uint64_t frs3)
-+{
-+    return float32_muladd(frs1, frs2, frs3 ^ (uint32_t)INT32_MIN, 0,
-+                          &env->fp_status);
-+}
-+
-+uint64_t helper_fmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                        uint64_t frs3)
-+{
-+    return float64_muladd(frs1, frs2, frs3 ^ (uint64_t)INT64_MIN, 0,
-+                          &env->fp_status);
-+}
-+
-+uint64_t helper_fnmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                         uint64_t frs3)
-+{
-+    return float32_muladd(frs1 ^ (uint32_t)INT32_MIN, frs2, frs3, 0,
-+                          &env->fp_status);
-+}
-+
-+uint64_t helper_fnmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                         uint64_t frs3)
-+{
-+    return float64_muladd(frs1 ^ (uint64_t)INT64_MIN, frs2, frs3, 0,
-+                          &env->fp_status);
-+}
-+
-+uint64_t helper_fnmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                         uint64_t frs3)
-+{
-+    return float32_muladd(frs1 ^ (uint32_t)INT32_MIN, frs2,
-+                          frs3 ^ (uint32_t)INT32_MIN, 0, &env->fp_status);
-+}
-+
-+uint64_t helper_fnmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                         uint64_t frs3)
-+{
-+    return float64_muladd(frs1 ^ (uint64_t)INT64_MIN, frs2,
-+                          frs3 ^ (uint64_t)INT64_MIN, 0, &env->fp_status);
-+}
-+
-+uint64_t helper_fadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_add(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_sub(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fmul_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_mul(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fdiv_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_div(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fmin_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_minnum(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fmax_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_maxnum(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fsqrt_s(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float32_sqrt(frs1, &env->fp_status);
-+}
-+
-+target_ulong helper_fle_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_le(frs1, frs2, &env->fp_status);
-+}
-+
-+target_ulong helper_flt_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_lt(frs1, frs2, &env->fp_status);
-+}
-+
-+target_ulong helper_feq_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float32_eq_quiet(frs1, frs2, &env->fp_status);
-+}
-+
-+target_ulong helper_fcvt_w_s(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float32_to_int32(frs1, &env->fp_status);
-+}
-+
-+target_ulong helper_fcvt_wu_s(CPURISCVState *env, uint64_t frs1)
-+{
-+    return (int32_t)float32_to_uint32(frs1, &env->fp_status);
-+}
-+
-+#if defined(TARGET_RISCV64)
-+uint64_t helper_fcvt_l_s(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float32_to_int64(frs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_lu_s(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float32_to_uint64(frs1, &env->fp_status);
-+}
-+#endif
-+
-+uint64_t helper_fcvt_s_w(CPURISCVState *env, target_ulong rs1)
-+{
-+    return int32_to_float32((int32_t)rs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_s_wu(CPURISCVState *env, target_ulong rs1)
-+{
-+    return uint32_to_float32((uint32_t)rs1, &env->fp_status);
-+}
-+
-+#if defined(TARGET_RISCV64)
-+uint64_t helper_fcvt_s_l(CPURISCVState *env, uint64_t rs1)
-+{
-+    return int64_to_float32(rs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_s_lu(CPURISCVState *env, uint64_t rs1)
-+{
-+    return uint64_to_float32(rs1, &env->fp_status);
-+}
-+#endif
-+
-+target_ulong helper_fclass_s(uint64_t frs1)
-+{
-+    float32 f = frs1;
-+    bool sign = float32_is_neg(f);
-+
-+    if (float32_is_infinity(f)) {
-+        return sign ? 1 << 0 : 1 << 7;
-+    } else if (float32_is_zero(f)) {
-+        return sign ? 1 << 3 : 1 << 4;
-+    } else if (float32_is_zero_or_denormal(f)) {
-+        return sign ? 1 << 2 : 1 << 5;
-+    } else if (float32_is_any_nan(f)) {
-+        float_status s = { }; /* for snan_bit_is_one */
-+        return float32_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
-+    } else {
-+        return sign ? 1 << 1 : 1 << 6;
-+    }
-+}
-+
-+uint64_t helper_fadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_add(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_sub(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fmul_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_mul(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fdiv_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_div(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fmin_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_minnum(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fmax_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_maxnum(frs1, frs2, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_s_d(CPURISCVState *env, uint64_t rs1)
-+{
-+    rs1 = float64_to_float32(rs1, &env->fp_status);
-+    return float32_maybe_silence_nan(rs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_d_s(CPURISCVState *env, uint64_t rs1)
-+{
-+    rs1 = float32_to_float64(rs1, &env->fp_status);
-+    return float64_maybe_silence_nan(rs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fsqrt_d(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float64_sqrt(frs1, &env->fp_status);
-+}
-+
-+target_ulong helper_fle_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_le(frs1, frs2, &env->fp_status);
-+}
-+
-+target_ulong helper_flt_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_lt(frs1, frs2, &env->fp_status);
-+}
-+
-+target_ulong helper_feq_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-+{
-+    return float64_eq_quiet(frs1, frs2, &env->fp_status);
-+}
-+
-+target_ulong helper_fcvt_w_d(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float64_to_int32(frs1, &env->fp_status);
-+}
-+
-+target_ulong helper_fcvt_wu_d(CPURISCVState *env, uint64_t frs1)
-+{
-+    return (int32_t)float64_to_uint32(frs1, &env->fp_status);
-+}
-+
-+#if defined(TARGET_RISCV64)
-+uint64_t helper_fcvt_l_d(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float64_to_int64(frs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_lu_d(CPURISCVState *env, uint64_t frs1)
-+{
-+    return float64_to_uint64(frs1, &env->fp_status);
-+}
-+#endif
-+
-+uint64_t helper_fcvt_d_w(CPURISCVState *env, target_ulong rs1)
-+{
-+    return int32_to_float64((int32_t)rs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_d_wu(CPURISCVState *env, target_ulong rs1)
-+{
-+    return uint32_to_float64((uint32_t)rs1, &env->fp_status);
-+}
-+
-+#if defined(TARGET_RISCV64)
-+uint64_t helper_fcvt_d_l(CPURISCVState *env, uint64_t rs1)
-+{
-+    return int64_to_float64(rs1, &env->fp_status);
-+}
-+
-+uint64_t helper_fcvt_d_lu(CPURISCVState *env, uint64_t rs1)
-+{
-+    return uint64_to_float64(rs1, &env->fp_status);
-+}
-+#endif
-+
-+target_ulong helper_fclass_d(uint64_t frs1)
-+{
-+    float64 f = frs1;
-+    bool sign = float64_is_neg(f);
-+
-+    if (float64_is_infinity(f)) {
-+        return sign ? 1 << 0 : 1 << 7;
-+    } else if (float64_is_zero(f)) {
-+        return sign ? 1 << 3 : 1 << 4;
-+    } else if (float64_is_zero_or_denormal(f)) {
-+        return sign ? 1 << 2 : 1 << 5;
-+    } else if (float64_is_any_nan(f)) {
-+        float_status s = { }; /* for snan_bit_is_one */
-+        return float64_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
-+    } else {
-+        return sign ? 1 << 1 : 1 << 6;
-+    }
++    return 0;
 +}
 -- 
 2.7.0
