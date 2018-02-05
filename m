@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eifHV-00048A-1B
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 06:49:54 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eifHS-0008Df-MU
+	(envelope-from <berrange@redhat.com>) id 1eifHV-00048B-29
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 06:49:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60612)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1eifHQ-0008Co-12
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 06:49:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eifHS-0008DY-HQ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 06:49:50 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eifHP-0008CV-RB
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 06:49:47 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B8DC8285BA
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 11:49:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5382A81DE4
+	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 11:49:46 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon,  5 Feb 2018 11:49:37 +0000
-Message-Id: <20180205114938.15784-4-berrange@redhat.com>
-In-Reply-To: <20180205114938.15784-1-berrange@redhat.com>
-References: <20180205114938.15784-1-berrange@redhat.com>
+Date: Mon,  5 Feb 2018 11:49:34 +0000
+Message-Id: <20180205114938.15784-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/4] ui: check VNC audio frequency limit at
- time of reading from client
+Subject: [Qemu-devel] [PATCH 0/4] Misc VNC fixes / sanity checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,77 +33,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-The 'vs->as.freq' value is a signed integer, which is read from an
-unsigned 32-bit int field on the wire. There is thus a risk of overflow
-on 32-bit platforms. Move the frequency limit checking to be done at
-time of read before casting to a signed integer.
+A few VNC changes suggested by Laszlo when reviewing my recent VNC patche=
+s
 
-Reported-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- ui/vnc.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+Daniel P. Berrang=C3=A9 (4):
+  ui: avoid risk of 32-bit int overflow in VNC buffer check
+  ui: avoid 'local_err' variable shadowing in VNC SASL auth
+  ui: check VNC audio frequency limit at time of reading from client
+  ui: extend VNC trottling tracing to SASL codepaths
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index e14e524764..79ac9eccde 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -982,14 +982,7 @@ static void vnc_update_throttle_offset(VncState *vs)
-         vs->client_width * vs->client_height * vs->client_pf.bytes_per_p=
-ixel;
-=20
-     if (vs->audio_cap) {
--        int freq =3D vs->as.freq;
--        /* We don't limit freq when reading settings from client, so
--         * it could be upto MAX_INT in size. 48khz is a sensible
--         * upper bound for trustworthy clients */
-         int bps;
--        if (freq > 48000) {
--            freq =3D 48000;
--        }
-         switch (vs->as.fmt) {
-         default:
-         case  AUD_FMT_U8:
-@@ -1005,7 +998,7 @@ static void vnc_update_throttle_offset(VncState *vs)
-             bps =3D 4;
-             break;
-         }
--        offset +=3D freq * bps * vs->as.nchannels;
-+        offset +=3D vs->as.freq * bps * vs->as.nchannels;
-     }
-=20
-     /* Put a floor of 1MB on offset, so that if we have a large pending
-@@ -2279,6 +2272,7 @@ static int protocol_client_msg(VncState *vs, uint8_=
-t *data, size_t len)
- {
-     int i;
-     uint16_t limit;
-+    uint32_t freq;
-     VncDisplay *vd =3D vs->vd;
-=20
-     if (data[0] > 3) {
-@@ -2398,7 +2392,17 @@ static int protocol_client_msg(VncState *vs, uint8=
-_t *data, size_t len)
-                     vnc_client_error(vs);
-                     break;
-                 }
--                vs->as.freq =3D read_u32(data, 6);
-+                freq =3D read_u32(data, 6);
-+                /* No official limit for protocol, but 48khz is a sensib=
-le
-+                 * upper bound for trustworthy clients, and this limit
-+                 * protects calculations involving 'vs->as.freq' later.
-+                 */
-+                if (freq > 48000) {
-+                    VNC_DEBUG("Invalid audio frequency %u > 48000", freq=
-);
-+                    vnc_client_error(vs);
-+                    break;
-+                }
-+                vs->as.freq =3D freq;
-                 break;
-             default:
-                 VNC_DEBUG("Invalid audio message %d\n", read_u8(data, 4)=
-);
+ ui/vnc-auth-sasl.c | 13 +++++++++++--
+ ui/vnc.c           | 26 +++++++++++++++-----------
+ 2 files changed, 26 insertions(+), 13 deletions(-)
+
 --=20
 2.14.3
