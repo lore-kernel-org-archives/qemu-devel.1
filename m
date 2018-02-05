@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eid7x-0007Rs-2F
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:31:54 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eid8x-00081g-3I
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:32:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eid7r-0000zc-DY
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:31:53 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:38496)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eid7r-0000z3-74
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:31:47 -0500
-Received: by mail-ot0-x241.google.com with SMTP id v5so26309995oth.5
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 01:31:46 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1eid8s-0001Ix-8a
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:32:55 -0500
+Resent-Message-Id: <E1eid8s-0001Ix-8a@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21135)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eid8s-0001GS-1U
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 04:32:50 -0500
+In-Reply-To: <20180205090912.6110-1-david@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151782311449.39.5592936461161821599@bdbb90650ae5>
 MIME-Version: 1.0
-In-Reply-To: <20180202071751.16316-1-kraxel@redhat.com>
-References: <20180202071751.16316-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Feb 2018 09:31:25 +0000
-Message-ID: <CAFEAcA9L0+GMxo7ZZxvH_KvvOYQH2VeoBEJvmq3WH-Zw4Yu9-A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/3] Ui 20180202 patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 5 Feb 2018 01:31:55 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] s390x/cpumodel: model PTFF subfunctions
+ for Multiple-epoch facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: david@redhat.com
+Cc: famz@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
 
-On 2 February 2018 at 07:17, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 11ed801d3df3c6e46b2f1f97dcfbf4ca3a2a2f=
-4f:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-reques=
-t' into staging (2018-01-30 09:47:51 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20180202-pull-request
->
-> for you to fetch changes up to 627ebec208a8809818589e17f4fce55a59420ad2:
->
->   ui: correctly advance output buffer when writing SASL data (2018-02-02 =
-07:48:18 +0100)
->
-> ----------------------------------------------------------------
-> ui: use QIONetListener in vnc, bugfixes for sdl1 and vnc.
->
-> ----------------------------------------------------------------
->
-> Daniel P. Berrange (1):
->   ui: convert VNC server to QIONetListener
->
-> Daniel P. Berrang=C3=A9 (2):
->   ui: fix mixup between qnum and qcode in SDL1 key handling
->   ui: correctly advance output buffer when writing SASL data
->
->  ui/vnc.h           |   9 +--
->  ui/sdl.c           |   9 ++-
->  ui/vnc-auth-sasl.c |   2 +-
->  ui/vnc.c           | 195 +++++++++++++++--------------------------------=
-------
->  4 files changed, 67 insertions(+), 148 deletions(-)
->
-
-Applied, thanks.
-
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMjA1MDkwOTEyLjYxMTAtMS1kYXZpZEByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0hdIHMzOTB4L2NwdW1vZGVsOiBtb2RlbCBQVEZGIHN1YmZ1bmN0
+aW9ucyBmb3IgTXVsdGlwbGUtZXBvY2ggZmFjaWxpdHkKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
+QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
+aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
+IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
+Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
+MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ2MDVjODE2
+ZGMgczM5MHgvY3B1bW9kZWw6IG1vZGVsIFBURkYgc3ViZnVuY3Rpb25zIGZvciBNdWx0aXBsZS1l
+cG9jaCBmYWNpbGl0eQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBz
+MzkweC9jcHVtb2RlbDogbW9kZWwgUFRGRiBzdWJmdW5jdGlvbnMgZm9yIE11bHRpcGxlLWVwb2No
+IGZhY2lsaXR5Li4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjU6IEZJTEU6IHRh
+cmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNTk6CisgICAgRkVBVF9JTklUKCJwdGZmLXFzaWUi
+LCBTMzkwX0ZFQVRfVFlQRV9QVEZGLCAxMCwgIlBURkYgUXVlcnkgU3RlZXJpbmcgSW5mb3JtYXRp
+b24gRXh0ZW5kZWQiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjY6IEZJTEU6
+IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNjA6CisgICAgRkVBVF9JTklUKCJwdGZmLXF0
+b3VlIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgMTMsICJQVEZGIFF1ZXJ5IFRPRCBPZmZzZXQgVXNl
+ciBFeHRlbmRlZCIpLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI5OiBGSUxF
+OiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTYzOgorICAgIEZFQVRfSU5JVCgicHRmZi1z
+dG9lIiwgUzM5MF9GRUFUX1RZUEVfUFRGRiwgNzMsICJQVEZGIFNldCBUT0QgT2Zmc2V0IEV4dGVu
+ZGVkIiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHRhcmdl
+dC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxNjQ6CisgICAgRkVBVF9JTklUKCJwdGZmLXN0b3VlIiwg
+UzM5MF9GRUFUX1RZUEVfUFRGRiwgNzcsICJQVEZGIFNldCBUT0QgT2Zmc2V0IFVzZXIgRXh0ZW5k
+ZWQiKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzg6IEZJTEU6IHRhcmdldC9z
+MzkweC9jcHVfZmVhdHVyZXMuYzo0NTI6CisgICAgRkVBVF9HUk9VUF9JTklUKCJtZXBvY2hwdGZm
+IiwgTUVQT0NIX1BURkYsICJQVEZGIGVuaGFuY2VtZW50cyBpbnRyb2R1Y2VkIHdpdGggTXVsdGlw
+bGUtZXBvY2ggZmFjaWxpdHkiKSwKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBz
+aG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzY3OiBGSUxFOiB0YXJnZXQvczM5MHgv
+Z2VuLWZlYXR1cmVzLmM6NjI6CisjZGVmaW5lIFMzOTBfRkVBVF9HUk9VUF9NRVBPQ0hfUFRGRiBc
+CisgICAgUzM5MF9GRUFUX1BURkZfUVNJRSwgXAorICAgIFMzOTBfRkVBVF9QVEZGX1FUT1VFLCBc
+CisgICAgUzM5MF9GRUFUX1BURkZfU1RPRSwgXAorICAgIFMzOTBfRkVBVF9QVEZGX1NUT1VFCgp0
+b3RhbDogNCBlcnJvcnMsIDIgd2FybmluZ3MsIDU5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
