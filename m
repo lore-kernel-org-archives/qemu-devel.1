@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1einHp-0004qe-5n
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:22:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1einHs-0004vB-Is
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1einHn-0006z1-Mm
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:22:45 -0500
+	(envelope-from <mreitz@redhat.com>) id 1einHp-000709-Qq
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 15:22:48 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 21:22:31 +0100
-Message-Id: <20180205202232.19254-2-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 21:22:32 +0100
+Message-Id: <20180205202232.19254-3-mreitz@redhat.com>
 In-Reply-To: <20180205202232.19254-1-mreitz@redhat.com>
 References: <20180205202232.19254-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] block/ssh: Implement
- .bdrv_refresh_filename()
+Subject: [Qemu-devel] [PATCH 2/2] block/ssh: Implement .bdrv_dirname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,121 +22,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+ssh_bdrv_dirname() is basically the generic bdrv_dirname(), except it
+takes care not to silently chop off any query string (i.e.,
+host_key_check).
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/ssh.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 46 insertions(+), 7 deletions(-)
+ block/ssh.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/block/ssh.c b/block/ssh.c
-index c31b2686c3..a5b7e831a4 100644
+index a5b7e831a4..7dbe55cec1 100644
 --- a/block/ssh.c
 +++ b/block/ssh.c
-@@ -75,6 +75,12 @@ typedef struct BDRVSSHState {
- 
-     /* Used to warn if 'flush' is not supported. */
-     bool unsafe_flush_warning;
-+
-+    /* Store the user name for ssh_refresh_filename() because the
-+     * default depends on the system you are on -- therefore, when we
-+     * generate a filename, it should always contain the user name we
-+     * are actually using */
-+    char *user;
- } BDRVSSHState;
- 
- static void ssh_state_init(BDRVSSHState *s)
-@@ -86,6 +92,8 @@ static void ssh_state_init(BDRVSSHState *s)
- 
- static void ssh_state_free(BDRVSSHState *s)
- {
-+    g_free(s->user);
-+
-     if (s->attrs) {
-         sftp_attributes_free(s->attrs);
+@@ -1194,6 +1194,24 @@ static void ssh_refresh_filename(BlockDriverState *bs)
      }
-@@ -569,7 +577,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-     int r, ret;
-     QemuOpts *opts = NULL;
-     Error *local_err = NULL;
--    const char *user, *path, *host_key_check;
-+    const char *path, *host_key_check;
-     long port = 0;
-     unsigned long portU = 0;
-     int new_sock = -1;
-@@ -594,10 +602,10 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-         goto err;
-     }
- 
--    user = qemu_opt_get(opts, "user");
--    if (!user) {
--        user = g_get_user_name();
--        if (!user) {
-+    s->user = g_strdup(qemu_opt_get(opts, "user"));
-+    if (!s->user) {
-+        s->user = g_strdup(g_get_user_name());
-+        if (!s->user) {
-             error_setg_errno(errp, errno, "Can't get user name");
-             ret = -errno;
-             goto err;
-@@ -642,7 +650,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-      */
-     ssh_set_blocking(s->session, 1);
- 
--    r = ssh_options_set(s->session, SSH_OPTIONS_USER, user);
-+    r = ssh_options_set(s->session, SSH_OPTIONS_USER, s->user);
-     if (r < 0) {
-         ret = -EINVAL;
-         session_error_setg(errp, s,
-@@ -704,7 +712,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
-     }
- 
-     /* Authenticate. */
--    ret = authenticate(s, user, errp);
-+    ret = authenticate(s, s->user, errp);
-     if (ret < 0) {
-         goto err;
-     }
-@@ -1156,6 +1164,36 @@ static int64_t ssh_getlength(BlockDriverState *bs)
-     return length;
  }
  
-+static void ssh_refresh_filename(BlockDriverState *bs)
++static char *ssh_bdrv_dirname(BlockDriverState *bs, Error **errp)
 +{
-+    BDRVSSHState *s = bs->opaque;
-+    const char *path, *host_key_check;
-+    int ret;
-+
-+    /* None of these options can be represented in a plain "host:port"
-+     * format, so if any was given, we have to abort */
-+    if (s->inet->has_ipv4 || s->inet->has_ipv6 || s->inet->has_to ||
-+        s->inet->has_numeric)
-+    {
-+        return;
++    if (qdict_haskey(bs->full_open_options, "host_key_check")) {
++        /* We cannot generate a simple prefix if we would have to
++         * append a query string */
++        error_setg(errp,
++                   "Cannot generate a base directory with host_key_check set");
++        return NULL;
 +    }
 +
-+    path = qdict_get_try_str(bs->full_open_options, "path");
-+    assert(path); /* mandatory option */
-+
-+    host_key_check = qdict_get_try_str(bs->full_open_options, "host_key_check");
-+
-+    ret = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-+                   "ssh://%s@%s:%s%s%s%s",
-+                   s->user, s->inet->host, s->inet->port, path,
-+                   host_key_check ? "?host_key_check=" : "",
-+                   host_key_check ?: "");
-+    if (ret >= sizeof(bs->exact_filename)) {
-+        /* An overflow makes the filename unusable, so do not report any */
-+        bs->exact_filename[0] = '\0';
++    if (bs->exact_filename[0] == '\0') {
++        error_setg(errp, "Cannot generate a base directory for this ssh node");
++        return NULL;
 +    }
++
++    return path_combine(bs->exact_filename, "");
 +}
 +
  static const char *const ssh_sgfnt_runtime_opts[] = {
      "host",
      "port",
-@@ -1180,6 +1218,7 @@ static BlockDriver bdrv_ssh = {
-     .bdrv_co_writev               = ssh_co_writev,
+@@ -1219,6 +1237,7 @@ static BlockDriver bdrv_ssh = {
      .bdrv_getlength               = ssh_getlength,
      .bdrv_co_flush_to_disk        = ssh_co_flush,
-+    .bdrv_refresh_filename        = ssh_refresh_filename,
+     .bdrv_refresh_filename        = ssh_refresh_filename,
++    .bdrv_dirname                 = ssh_bdrv_dirname,
      .create_opts                  = &ssh_create_opts,
      .sgfnt_runtime_opts           = ssh_sgfnt_runtime_opts,
  };
