@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eihZz-0002YH-Cu
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:17:08 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eihc6-0004be-M3
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eihZw-0007qn-5y
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:17:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:28830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eihZv-0007qM-VZ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:17:04 -0500
-References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
-	<20180203103727.26457-2-mark.cave-ayland@ilande.co.uk>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <1f833824-3bb4-3ac7-71c4-4d2db47b82f5@redhat.com>
-Date: Mon, 5 Feb 2018 15:17:00 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1eihc3-0001X2-FX
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:19:18 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:32832)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eihc3-0001WO-9f
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:19:15 -0500
+Received: by mail-pg0-x244.google.com with SMTP id u1so18645243pgr.0
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 06:19:15 -0800 (PST)
+References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
+	<1517811767-75958-22-git-send-email-mjc@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fa6614d4-2c97-326b-7c58-782a3b65dc61@linaro.org>
+Date: Mon, 5 Feb 2018 06:19:10 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180203103727.26457-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1517811767-75958-22-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/10] cuda: do not use old_mmio accesses
+Subject: Re: [Qemu-devel] [PATCH v4 22/22] RISC-V Build Infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On 03/02/2018 11:37, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/misc/macio/cuda.c | 40 ++++++++--------------------------------
->  1 file changed, 8 insertions(+), 32 deletions(-)
+On 02/04/2018 10:22 PM, Michael Clark wrote:
+> This adds RISC-V into the build system enabling the following targets:
 > 
-> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-> index 008d8bd4d5..23b7e0f5b0 100644
-> --- a/hw/misc/macio/cuda.c
-> +++ b/hw/misc/macio/cuda.c
-> @@ -275,7 +275,7 @@ static void cuda_delay_set_sr_int(CUDAState *s)
->      timer_mod(s->sr_delay_timer, expire);
->  }
->  
-> -static uint32_t cuda_readb(void *opaque, hwaddr addr)
-> +static uint64_t cuda_read(void *opaque, hwaddr addr, unsigned size)
->  {
->      CUDAState *s = opaque;
->      uint32_t val;
-> @@ -350,7 +350,7 @@ static uint32_t cuda_readb(void *opaque, hwaddr addr)
->      return val;
->  }
->  
-> -static void cuda_writeb(void *opaque, hwaddr addr, uint32_t val)
-> +static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
->  {
->      CUDAState *s = opaque;
->  
-> @@ -780,38 +780,14 @@ static void cuda_receive_packet_from_host(CUDAState *s,
->      }
->  }
->  
-> -static void cuda_writew (void *opaque, hwaddr addr, uint32_t value)
-> -{
-> -}
-> -
-> -static void cuda_writel (void *opaque, hwaddr addr, uint32_t value)
-> -{
-> -}
-> -
-> -static uint32_t cuda_readw (void *opaque, hwaddr addr)
-> -{
-> -    return 0;
-> -}
-> -
-> -static uint32_t cuda_readl (void *opaque, hwaddr addr)
-> -{
-> -    return 0;
-> -}
-> -
->  static const MemoryRegionOps cuda_ops = {
-> -    .old_mmio = {
-> -        .write = {
-> -            cuda_writeb,
-> -            cuda_writew,
-> -            cuda_writel,
-> -        },
-> -        .read = {
-> -            cuda_readb,
-> -            cuda_readw,
-> -            cuda_readl,
-> -        },
-> -    },
-> +    .read = cuda_read,
-> +    .write = cuda_write,
->      .endianness = DEVICE_NATIVE_ENDIAN,
+> - riscv32-softmmu
+> - riscv64-softmmu
+> - riscv32-linux-user
+> - riscv64-linux-user
+> 
+> This adds defaults configs for RISC-V, enables the build for the RISC-V
+> CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
+> script is updated to add the RISC-V ELF magic.
+> 
+> Expected checkpatch errors for consistency reasons:
+> 
+> ERROR: line over 90 characters
+> FILE: scripts/qemu-binfmt-conf.sh
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
 
-As CUDA Macintoshes are all big-endian, I think you should use
-DEVICE_BIG_ENDIAN here, except if you are aware of a little-endian
-machine using it in little-endian mode.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Thanks,
-Laurent
+
+r~
