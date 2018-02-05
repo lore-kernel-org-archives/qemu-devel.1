@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eig1U-00044B-Vc
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:37:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1eig4t-00060E-SP
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eig1R-0000PS-TO
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:37:25 -0500
-References: <20180205102935.14736-1-david@redhat.com>
-	<8c8fc2e6-24b2-5206-9a75-9d5595623d9a@de.ibm.com>
-	<d63f7e05-648a-fb3a-aa9e-0a0dc1925276@redhat.com>
-	<20180205132213.1f06d09c.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ee01d23d-5bbc-9b57-d6a5-25ef8d792374@redhat.com>
-Date: Mon, 5 Feb 2018 13:37:17 +0100
+	(envelope-from <bounces@canonical.com>) id 1eig4q-0004U1-NU
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:40:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50372)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eig4q-0004Tf-DC
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 07:40:52 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eig4o-0007RO-KF
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 12:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 917022E80CD
+	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 12:40:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180205132213.1f06d09c.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpumodel: model PTFF subfunctions
- for Multiple-epoch facility
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 05 Feb 2018 12:32:25 -0000
+From: Daniel Berrange <1747056@bugs.launchpad.net>
+Reply-To: Bug 1747056 <1747056@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151759534688.10002.1939402860055070584.malonedeb@wampee.canonical.com>
+Message-Id: <151783394578.3738.1311267028053053193.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1747056] Re: FreeDOS / MS-Dos / Windows 3.11
+ cannot perform reboot with 'isapc' machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 05.02.2018 13:22, Cornelia Huck wrote:
-> On Mon, 5 Feb 2018 12:27:33 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 05.02.2018 12:22, Christian Borntraeger wrote:
->>> Looks sane on a z14.
->>> Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>
->>>
->>> On 02/05/2018 11:29 AM, David Hildenbrand wrote:  
->>>> --- a/target/s390x/kvm.c
->>>> +++ b/target/s390x/kvm.c
->>>> @@ -2221,6 +2221,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
->>>>          return;
->>>>      }
->>>>
->>>> +    /* PTFF subfunctions might be indicated although kernel support missing */
->>>> +    if (!test_bit(S390_FEAT_MULTIPLE_EPOCH, model->features)) {
->>>> +        clear_bit(S390_FEAT_PTFF_QSIE, model->features);
->>>> +        clear_bit(S390_FEAT_PTFF_QTOUE, model->features);
->>>> +        clear_bit(S390_FEAT_PTFF_STOE, model->features);
->>>> +        clear_bit(S390_FEAT_PTFF_STOUE, model->features);
->>>> +    }
->>>> +
->>>>      /* with cpu model support, CMM is only indicated if really available */
->>>>      if (kvm_s390_cmma_available()) {
->>>>          set_bit(S390_FEAT_CMM, model->features);
->>>>  
->>>
->>> Do you also want to add something to check_consistency ?
->>>
->>> Right now the following user error 
->>> -cpu z14,mepoch=off,mepochptff=on
->>> is accepted.
->>> On the other hand we also have no consistency checks for other subfunctions.
->>>   
->>
->> Thought about that, but that implies that a CPU model runable now, will
->> not run without warnings. Especially if migrating. We could add such
->> checks if we would push this into stable.
->>
-> 
-> So, adding this check for the z14 stuff would work iff pushed into
-> stable - but for the other subfunctions the ship has already sailed?
-> 
+I bisected seabios and found this seabios change to be the cause of the
+problem
 
-I don't know if we really have problems with other subfunctions. We
-could also add consistency checks there (the problem here is that we
-actually have to add missing subfunctions). So it is easier to check for
-consistency with already existing subfunctions.
+commit b837e68d5a6c1a5945513f1995875445a1594c8a (refs/bisect/bad)
+Author: Kevin O'Connor <kevin@koconnor.net>
+Date:   Mon Nov 9 15:00:19 2015 -0500
 
--- 
+    resume: Make KVM soft reboot loop detection more flexible
+    =
 
-Thanks,
+    Move the check for soft reboot loops from resume.c to shadow.c and
+    directly check for the case where the copy of the BIOS in flash
+    appears to be a memory alias instead.  This prevents a hang if an
+    external reboot request occurs during the BIOS memcpy.
+    =
 
-David / dhildenb
+    Signed-off-by: Kevin O'Connor <kevin@koconnor.net>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1747056
+
+Title:
+  FreeDOS / MS-Dos / Windows 3.11 cannot perform reboot with 'isapc'
+  machine
+
+Status in QEMU:
+  New
+
+Bug description:
+  I was installing MS-Dos 6.22 + Windows 3.11 in preparation for running
+  Microsoft Bob, and noticed that when they try to perform a reboot,
+  they just get stuck. The console cursor stays flashing on/off, but the
+  DOS prompt no longer responds to input.
+
+  It is fairly easy to reproduce, even FreeDOS is impacted - download
+  the FreeDOS bootable CDROM image, then
+
+  $ qemu-img create demo.img 100MB
+
+  $ qemu-system-x86_64 -machine isapc -cdrom ~/Downloads/FD12CD.iso
+  -hda demo.img  -monitor stdio
+
+  Wait for the installer to startup, and then in the monitor console run
+
+    sendkey ctrl-alt-delete
+
+  It will fail to reboot
+
+  Testing shows this is a regression from QEMU 2.8.0 onwards, and git
+  bisect further narrowed it down to a SEABIOS update
+
+  commit 6e99f5741ff1b408ea76e6caf2bd4f76df4060e9 (HEAD, tag: pull-seabios-=
+20161027-2, tag: pull-seabios-20161027-1, refs/bisect/bad)
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Thu Oct 27 16:42:28 2016 +0200
+
+      seabios: update to 1.10.0 release.
+
+  Note that this seems particular to the "isapc" machine type - with the
+  "pc" machine type, reboot still works
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1747056/+subscriptions
