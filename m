@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiia3-00020V-Md
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:16 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiia4-00021q-KQ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZz-0001p6-JI
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:15 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiia2-0001uB-Fh
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:16 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:26 +0100
-Message-Id: <20180205151835.20812-18-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:29 +0100
+Message-Id: <20180205151835.20812-21-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 17/26] iotests: Add quorum case to test 110
+Subject: [Qemu-devel] [PATCH v8 20/26] block: Generically refresh runtime
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +23,275 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-Test 110 tests relative backing filenames for complex BDS trees.  Now
-that the originally supposedly failing test passes, let us add a new
-failing test: Quorum can never work automatically (without detecting
-whether all child nodes have the same base directory, but that would be
-rather inconsistent behavior).
+Instead of having every block driver which implements
+bdrv_refresh_filename() copy all of the significant runtime options over
+to bs->full_open_options, implement this process generically in
+bdrv_refresh_filename().
+
+This patch only adds this new generic implementation, it does not remove
+the old functionality. This is done in a follow-up patch.
+
+With this patch, some superfluous information (that should never have
+been there) may be removed from some JSON filenames, as can be seen in
+the change to iotest 110's reference output.  In case of 191, backing
+nodes that have not been overridden are now removed from the filename.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- tests/qemu-iotests/110     | 26 ++++++++++++++++++++++++++
- tests/qemu-iotests/110.out |  7 +++++++
- 2 files changed, 33 insertions(+)
+ block.c                    | 116 ++++++++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/110.out |   2 +-
+ tests/qemu-iotests/191.out |  24 +++++-----
+ 3 files changed, 128 insertions(+), 14 deletions(-)
 
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index ba1b3c6c7d..08976c8a61 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -30,6 +30,7 @@ status=1	# failure is the default!
- _cleanup()
- {
- 	_cleanup_test_img
-+        rm -f "$TEST_IMG.copy"
+diff --git a/block.c b/block.c
+index f23b35405d..7980090d25 100644
+--- a/block.c
++++ b/block.c
+@@ -4999,6 +4999,92 @@ out:
+     return to_replace_bs;
  }
- trap "_cleanup; exit \$status" 0 1 2 3 15
  
-@@ -87,6 +88,31 @@ echo
- # omit the image size; it should work anyway
- _make_test_img -b "$TEST_IMG_REL.base"
- 
-+echo
-+echo '=== Nodes without a common directory ==='
-+echo
++/**
++ * Iterates through the list of runtime option keys that are said to be
++ * "significant" for a BDS. An option is called "significant" if it changes a
++ * BDS's data. For example, the null block driver's "size" and "read-zeroes"
++ * options are significant, but its "latency-ns" option is not.
++ *
++ * If a key returned by this function ends with a dot, all options starting with
++ * that prefix are significant.
++ */
++static const char *const *significant_options(BlockDriverState *bs,
++                                              const char *const *curopt)
++{
++    static const char *const global_options[] = {
++        "driver", "filename", NULL
++    };
 +
-+cp "$TEST_IMG" "$TEST_IMG.copy"
-+
-+# Should inform us that the actual path of the backing file cannot be determined
-+TEST_IMG="json:{
-+    'driver': '$IMGFMT',
-+    'file': {
-+        'driver': 'quorum',
-+        'vote-threshold': 1,
-+        'children': [
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG'
-+            },
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG.copy'
-+            }
-+        ]
++    if (!curopt) {
++        return &global_options[0];
 +    }
-+}" _img_info | _filter_img_info
 +
++    curopt++;
++    if (curopt == &global_options[ARRAY_SIZE(global_options) - 1] && bs->drv) {
++        curopt = bs->drv->sgfnt_runtime_opts;
++    }
++
++    return (curopt && *curopt) ? curopt : NULL;
++}
++
++/**
++ * Copies all significant runtime options from bs->options to the given QDict.
++ * The set of significant option keys is determined by invoking
++ * significant_options().
++ *
++ * Returns true iff any significant option was present in bs->options (and thus
++ * copied to the target QDict) with the exception of "filename" and "driver".
++ * The caller is expected to use this value to decide whether the existence of
++ * significant options prevents the generation of a plain filename.
++ */
++static bool append_significant_runtime_options(QDict *d, BlockDriverState *bs)
++{
++    bool found_any = false;
++    const char *const *option_name = NULL;
++
++    if (!bs->drv) {
++        return false;
++    }
++
++    while ((option_name = significant_options(bs, option_name))) {
++        bool option_given = false;
++
++        assert(strlen(*option_name) > 0);
++        if ((*option_name)[strlen(*option_name) - 1] != '.') {
++            QObject *entry = qdict_get(bs->options, *option_name);
++            if (!entry) {
++                continue;
++            }
++
++            qobject_incref(entry);
++            qdict_put_obj(d, *option_name, entry);
++            option_given = true;
++        } else {
++            const QDictEntry *entry;
++            for (entry = qdict_first(bs->options); entry;
++                 entry = qdict_next(bs->options, entry))
++            {
++                if (strstart(qdict_entry_key(entry), *option_name, NULL)) {
++                    qobject_incref(qdict_entry_value(entry));
++                    qdict_put_obj(d, qdict_entry_key(entry),
++                                  qdict_entry_value(entry));
++                    option_given = true;
++                }
++            }
++        }
++
++        /* While "driver" and "filename" need to be included in a JSON filename,
++         * their existence does not prohibit generation of a plain filename. */
++        if (!found_any && option_given &&
++            strcmp(*option_name, "driver") && strcmp(*option_name, "filename"))
++        {
++            found_any = true;
++        }
++    }
++
++    return found_any;
++}
++
+ static bool append_open_options(QDict *d, BlockDriverState *bs)
+ {
+     const QDictEntry *entry;
+@@ -5153,9 +5239,37 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+         bs->full_open_options = opts;
+     }
  
- # success, all done
- echo '*** done'
++    /* Gather the options QDict */
++    opts = qdict_new();
++    append_significant_runtime_options(opts, bs);
++
++    if (drv->bdrv_gather_child_options) {
++        /* Some block drivers may not want to present all of their children's
++         * options, or name them differently from BdrvChild.name */
++        drv->bdrv_gather_child_options(bs, opts);
++    } else {
++        QLIST_FOREACH(child, &bs->children, next) {
++            if (child->role == &child_backing && !bs->backing_overridden) {
++                /* We can skip the backing BDS if it has not been overridden */
++                continue;
++            }
++
++            QINCREF(child->bs->full_open_options);
++            qdict_put(opts, child->name, child->bs->full_open_options);
++        }
++
++        if (bs->backing_overridden && !bs->backing) {
++            /* Force no backing file */
++            qdict_put(opts, "backing", qstring_new());
++        }
++    }
++
++    QDECREF(bs->full_open_options);
++    bs->full_open_options = opts;
++
+     if (bs->exact_filename[0]) {
+         pstrcpy(bs->filename, sizeof(bs->filename), bs->exact_filename);
+-    } else if (bs->full_open_options) {
++    } else {
+         QString *json = qobject_to_json(QOBJECT(bs->full_open_options));
+         snprintf(bs->filename, sizeof(bs->filename), "json:%s",
+                  qstring_get_str(json));
 diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index 5370bc1d26..1d0b2475cc 100644
+index 1d0b2475cc..46e6a60510 100644
 --- a/tests/qemu-iotests/110.out
 +++ b/tests/qemu-iotests/110.out
-@@ -19,4 +19,11 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
- === Backing name is always relative to the backed image ===
+@@ -22,7 +22,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.b
  
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.base
-+
-+=== Nodes without a common directory ===
-+
-+image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: t.IMGFMT.base (cannot determine actual path)
- *** done
+ === Nodes without a common directory ===
+ 
+-image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
++image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "vote-threshold": 1}}
+ file format: IMGFMT
+ virtual size: 64M (67108864 bytes)
+ backing file: t.IMGFMT.base (cannot determine actual path)
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+index b22471b40a..627ae51106 100644
+--- a/tests/qemu-iotests/191.out
++++ b/tests/qemu-iotests/191.out
+@@ -52,7 +52,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 },
+                 "backing-filename-format": "IMGFMT",
+                 "virtual-size": 67108864,
+-                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++                "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+                 "cluster-size": 65536,
+                 "format": "IMGFMT",
+                 "actual-size": SIZE,
+@@ -77,7 +77,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++            "file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+             "encryption_key_missing": false
+         },
+         {
+@@ -123,7 +123,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 },
+                 "backing-filename-format": "IMGFMT",
+                 "virtual-size": 67108864,
+-                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
++                "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
+                 "cluster-size": 65536,
+                 "format": "IMGFMT",
+                 "actual-size": SIZE,
+@@ -148,7 +148,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
++            "file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}",
+             "encryption_key_missing": false
+         },
+         {
+@@ -392,7 +392,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 },
+                 "backing-filename-format": "IMGFMT",
+                 "virtual-size": 67108864,
+-                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++                "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+                 "cluster-size": 65536,
+                 "format": "IMGFMT",
+                 "actual-size": SIZE,
+@@ -417,7 +417,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++            "file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+             "encryption_key_missing": false
+         },
+         {
+@@ -464,7 +464,7 @@ wrote 65536/65536 bytes at offset 1048576
+                     },
+                     "backing-filename-format": "IMGFMT",
+                     "virtual-size": 67108864,
+-                    "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++                    "filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+                     "cluster-size": 65536,
+                     "format": "IMGFMT",
+                     "actual-size": SIZE,
+@@ -474,12 +474,12 @@ wrote 65536/65536 bytes at offset 1048576
+                 },
+                 "backing-filename-format": "IMGFMT",
+                 "virtual-size": 67108864,
+-                "filename": "json:{"backing": {"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
++                "filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
+                 "cluster-size": 65536,
+                 "format": "IMGFMT",
+                 "actual-size": SIZE,
+-                "full-backing-filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+-                "backing-filename": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++                "full-backing-filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++                "backing-filename": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -490,7 +490,7 @@ wrote 65536/65536 bytes at offset 1048576
+             "iops": 0,
+             "bps_wr": 0,
+             "write_threshold": 0,
+-            "backing_file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
++            "backing_file": "json:{"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}",
+             "encrypted": false,
+             "bps": 0,
+             "bps_rd": 0,
+@@ -499,7 +499,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "direct": false,
+                 "writeback": true
+             },
+-            "file": "json:{"backing": {"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
++            "file": "json:{"backing": {"backing": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.mid"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl2"}}, "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.ovl3"}}",
+             "encryption_key_missing": false
+         },
+         {
 -- 
 2.14.3
