@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eia5Q-0000sM-76
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:17:05 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eia5U-0000ug-T1
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:17:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eia5L-0000Qf-9Y
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:17:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48686)
+	(envelope-from <ppandit@redhat.com>) id 1eia5T-0000TX-U0
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:17:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eia5L-0000PG-3O
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:16:59 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180111213250.16511-1-marcandre.lureau@redhat.com>
-	<20180111213250.16511-7-marcandre.lureau@redhat.com>
-Date: Mon, 05 Feb 2018 07:16:54 +0100
-In-Reply-To: <20180111213250.16511-7-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Thu, 11 Jan 2018 22:32:05 +0100")
-Message-ID: <87efm0yn8p.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eia5T-0000Ss-Oq
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:17:07 -0500
+Date: Mon, 5 Feb 2018 11:47:00 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20180202193559.GC660@flask>
+Message-ID: <nycvar.YSQ.7.76.1802051143330.17566@wniryva>
+References: <20180202045153.1916-1-ppandit@redhat.com>
+	<20180202193559.GC660@flask>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-ID: <nycvar.YSQ.7.76.1802051144370.17566@wniryva>
+Content-Type: text/plain; CHARSET=ISO-8859-2
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 06/51] qapi: pass 'if' condition into
- QAPISchemaEntity objects
+Subject: Re: [Qemu-devel] [PATCH] kvm: check dev parameter when updating msi
+ route
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>
+To: =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Guoxiang Niu <niuguoxiang@huawei.com>, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+  Hello Radim,
 
-> Built-in objects remain unconditional.  Explicitly defined objects
-> use the condition specified in the schema.  Implicitly defined
-> objects inherit their condition from their users.  For most of them,
-> there is exactly one user, so the condition to use is obvious.  The
-> exception is the wrapped type's generated for simple union variants,
++-- On Fri, 2 Feb 2018, Radim Kr=E8m=E1=F8 wrote --+
+| This should primarily go to the qemu devel list.  I've Cc'd it, but
+| reposting would be safer, thanks.
 
-Editing accident: you changed "is the wrapper types" to "is the wrapped
-type's" here instead of
+  Ah, Okay. I did think qemu-devel would be better, but MAINTAINERS file =
+lists=20
+kvm@vger.kernel.org address for accel/kvm/.
 
-> which can be shared by any number of simple unions.  The tight
-> condition would be the disjunction of the conditions of these simple
-> unions.  For now, use wrapped type's condition instead.  Much
-
-changing "use wrapped type's"  to "use the wrapped type's" here.  Can
-touch up on commit.
-
-> simpler and good enough for now.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-R-by stands.
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
