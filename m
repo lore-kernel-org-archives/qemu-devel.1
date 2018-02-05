@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eij7k-0006Lr-KA
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:56:08 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eij9X-0007uH-4u
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:57:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eij7h-00052m-HG
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:56:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59596)
+	(envelope-from <stefanha@redhat.com>) id 1eij9U-00021y-2R
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:57:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eij7h-00050S-6x
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:56:01 -0500
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-10-armbru@redhat.com>
-	<1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
-	<878tca4ez9.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <13b80daf-db39-8183-2836-a13b2d4ef21b@redhat.com>
-Date: Mon, 5 Feb 2018 09:55:54 -0600
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eij9T-000204-PQ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:57:51 -0500
+Date: Mon, 5 Feb 2018 15:57:34 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180205155734.GG28241@stefanha-x1.localdomain>
+References: <20180119130653.24044-1-stefanha@redhat.com>
+	<5A65C652.6080307@intel.com>
+	<20180123111238.GC6565@stefanha-x1.localdomain>
+	<5A673369.6050408@intel.com>
+	<20180124114055.GC17193@stefanha-x1.localdomain>
+	<5A69AF21.5000209@intel.com>
+	<20180126144429.GD17788@stefanha-x1.localdomain>
+	<5A70606F.3030307@intel.com>
+	<20180202152538.GA16064@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73942A470@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <878tca4ez9.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO"
-Subject: Re: [Qemu-devel] [PATCH RFC 09/21] qapi: Don't absolutize include
- file name in error messages
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DNUSDXU7R7AVVM8C"
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F73942A470@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [RFC 0/2] virtio-vhost-user: add virtio-vhost-user
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +37,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com,
- mdroth@linux.vnet.ibm.com
-Message-ID: <13b80daf-db39-8183-2836-a13b2d4ef21b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 09/21] qapi: Don't absolutize include
- file name in error messages
-References: <20180202130336.24719-1-armbru@redhat.com>
- <20180202130336.24719-10-armbru@redhat.com>
- <1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
- <878tca4ez9.fsf@dusky.pond.sub.org>
-In-Reply-To: <878tca4ez9.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+
+--DNUSDXU7R7AVVM8C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 02/03/2018 03:08 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+On Mon, Feb 05, 2018 at 09:57:23AM +0000, Wang, Wei W wrote:
+> On Friday, February 2, 2018 11:26 PM, Stefan Hajnoczi wrote:
+> > On Tue, Jan 30, 2018 at 08:09:19PM +0800, Wei Wang wrote:
+> > > Background:
+> > > The vhost-user negotiation is split into 2 phases currently. The 1st
+> > > phase happens when the connection is established, and we can find
+> > > what's done in the 1st phase in vhost_user_init(). The 2nd phase
+> > > happens when the master driver is loaded (e.g. run of virtio-net pmd)
+> > > and set status to the device, and we can find what's done in the 2nd
+> > > phase in vhost_dev_start(), which includes sending the memory info and
+> > > virtqueue info. The socket is connected, till one of the QEMU devices
+> > > exits, so pmd exiting won't end the QEMU side socket connection.
+> > >
+> > > Issues:
+> > > Suppose we have both the vhost and virtio-net set up, and vhost pmd
+> > > <-> virtio-net pmd communication works well. Now, vhost pmd exits
+> > > (virtio-net pmd is still there). Some time later, we re-run vhost pmd,
+> > > the vhost pmd doesn't know the virtqueue addresses of the virtio-net
+> > > pmd, unless the virtio-net pmd reloads to start the 2nd phase of the
+> > > vhost-user protocol. So the second run of the vhost pmd won't work.
+> >=20
+> > This isn't a problem for virtio-vhost-user since the vhost-pmd resets t=
+he
+> > virtio-vhost-user device when it restarts.  The vhost-user AF_UNIX sock=
+et
+> > reconnects and negotiation restarts.
 >=20
->> On 02/02/2018 07:03 AM, Markus Armbruster wrote:
->>> Error messages print absolute filenames of included files even gave a=
+> I'm not sure if you've agreed that vhost-user negotiation is split into t=
+wo phases as described above. If not, it's also not difficult to check, tha=
+nks to the RTE_LOG put at the vhost_user_msg_handler:
+> RTE_LOG(INFO, VHOST_CONFIG, "read message %s\n",
+>                         vhost_message_str[msg.request.master]);
+> It tells us what messages are received and when they are received.=20
+>=20
+> Before trying the virtio-vhost-user setup, please make sure the virtio-ne=
+t side VM doesn't have the virtio-net kernel driver loaded (blacklist the m=
+odule or disable it in .config).
+> VM1: the VM with virtio-vhost-user
+> VM2: the VM with virtio-net
+>=20
+> 1) After we boot VM1 and the virtio-vhost-user pmd, we boot VM2, and we w=
+ill see the following log in VM1:
+> VHOST_CONFIG: new device, handle is 0
+> VHOST_CONFIG: read message VHOST_USER_GET_FEATURES
+> VHOST_CONFIG: read message VHOST_USER_GET_PROTOCOL_FEATURES
+> VHOST_CONFIG: read message VHOST_USER_SET_PROTOCOL_FEATURES
+> VHOST_CONFIG: read message VHOST_USER_GET_QUEUE_NUM
+> VHOST_CONFIG: read message VHOST_USER_SET_OWNER
+> VHOST_CONFIG: read message VHOST_USER_GET_FEATURES
+> VHOST_CONFIG: read message VHOST_USER_SET_VRING_CALL
+> VHOST_CONFIG: vring call idx:0 file:-1
+> VHOST_CONFIG: read message VHOST_USER_SET_VRING_CALL
+> VHOST_CONFIG: vring call idx:1 file:-1
+>=20
+> Those messages are what I called phase1 negotiation. They are negotiated =
+when the AF_UNIX socket connects.
+>=20
+> 2) Then in VM2 we load the virtio-net pmd, we will see phase2 messages sh=
+owing up in VM1, like:
+> VHOST_CONFIG: read message VHOST_USER_SET_VRING_NUM
+> VHOST_CONFIG: read message VHOST_USER_SET_VRING_BASE
+> VHOST_CONFIG: read message VHOST_USER_SET_VRING_ADDR
+> ...
+> Those messages are sent to virtio-vhost-user only when the VM2's virtio-n=
+et pmd loads.
+>=20
+> AF_UNIX socket reconnection only triggers phase1 negotiation. If virtio-n=
+et pmd in VM2 doesn't reload, virtio-vhost-user pmd won't get the above pha=
+se2 messages. Do you agree with the issue?
 
->>
->> s/even gave/even when given/
->=20
-> I meant to write "even if the user gave".  Is that okay?
+I'll reply on the subthread with Michael where you posted a similar
+response.
 
-Yes, that works too.
+Stefan
 
->=20
->>> relative one on the command line:
->>>
->>>      PYTHONPATH=3Dscripts python -B tests/qapi-schema/test-qapi.py te=
-sts/qapi-schema/include-cycle.json
->>>     In file included from tests/qapi-schema/include-cycle.json:1:
->>>     In file included from /work/armbru/qemu/tests/qapi-schema/include=
--cycle-b.json:1:
->>>     /work/armbru/qemu/tests/qapi-schema/include-cycle-c.json:1: Inclu=
-sion loop for include-cycle.json
->>>
->>> Improve this to
->>>
->>>     In file included from tests/qapi-schema/include-cycle.json:1:
->>>     In file included from tests/qapi-schema/include-cycle-b.json:1:
->>>     tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for incl=
-ude-cycle.json
->>
->> Nice, and makes developing new qapi tests a little less painful since
->> it's less modification to qapi-schema/*.err additions.
->=20
-> Probably not, as our make rule strips off $(SRC_PATH):
->=20
-> 	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -q $(SRC_PATH)/=
-$*.err -
->=20
-> I've kept that, because it might also occur in stack backtraces.  I
-> think.
-
-I still recall having to hand-edit .err files when doing a naive "run
-the test to get the failure, then 'mv' the bad files into the expected
-filenames, then rerun the tests"; so I'm not sure if our make rule was
-properly munging absolute names out of the file in the first place.  I'm
-not too fussed about it, though, as adding new tests is less frequent
-and it's still fairly easy to learn if you did it right or not by
-whether 'make check' succeeds.
-
->=20
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  scripts/qapi/common.py                | 12 ++++++------
->>>  tests/qapi-schema/include-no-file.err |  2 +-
->>>  2 files changed, 7 insertions(+), 7 deletions(-)
->>>
->>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> Thanks!
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO
+--DNUSDXU7R7AVVM8C
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp4fooACgkQp6FrSiUn
-Q2oYRAgAn+SpDOmF+O4+b2IB2Ilr6iy1UoHShk517HcFTDqwS0hafCFygPw89Olp
-W4aTA8rk+ALD74FVZXNRYWgBybGvkeM4f7TmYgW3/Fh6sTFJOSpvQA1XuI1+SKJp
-qbD/MJlq8Tjy3dUqS9xYXNcbvFrSeUh3vUroWAZPOBwQHd1AHX4zpLBGOGZOgEAA
-OaUNSzVP6xbCeVPbO1F2IaMJGWWkmlyex5u1TVyb0ZbbgSwc9Hh2DFbaIYWmQgka
-cQo6KWC6UGQLa0v4lQ7VaT+LZ8r4Ajp4+oyF34dbEz9dObgCJ61/hNGiGzhIIh6z
-+UmsRr0mWwFut8jjjykMgHFs8xwyUw==
-=ALMB
+iQEcBAEBAgAGBQJaeH7uAAoJEJykq7OBq3PI3VMH/jCIOsqsoxHf2C+dC1OjBEy3
+IFHZ1kQyv0g0uNI0V000iGy9UP++F8Rgo1nmHFTO6izuUgXBJwrXfsMWzLpUxdmC
+GMoc3hwdm8DK/Ny7Ipc4Hqr2KyL0x0QtKFcV3BgW/VzpoAIyCdlVqPuUXeogCsrZ
+kTewpwLl9hFOh6x8mKjLb62mcKjFCvix+9wwYCe5EGwY2dYLVA3Wh9NjOlL+yfZU
+uhgKYczJdut3qBdR+1xJbkUuhGGM7ow6LTEUS4j1y8c7+xWM5l0WApvv/jq879Ae
+p04Yi33paSiCXcnPoFBf+We+tfABs0kq3U0HxGNbjeEJo0z776HsBzK2SebfD+k=
+=s9le
 -----END PGP SIGNATURE-----
 
---K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO--
+--DNUSDXU7R7AVVM8C--
