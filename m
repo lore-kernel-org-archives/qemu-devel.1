@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiia6-00024h-QJ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiaD-00029F-58
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZz-0001ox-Gb
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:18 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiaB-0002Aw-U2
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:25 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:27 +0100
-Message-Id: <20180205151835.20812-19-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:33 +0100
+Message-Id: <20180205151835.20812-25-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 18/26] block: Add sgfnt_runtime_opts to
- BlockDriver
+Subject: [Qemu-devel] [PATCH v8 24/26] block/curl: Harmonize option defaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,738 +22,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-This new field can be set by block drivers to list the runtime options
-they accept that may influence the contents of the respective BDS. As of
-a follow-up patch, this list will be used by the common
-bdrv_refresh_filename() implementation to decide which options to put
-into BDS.full_open_options (and consequently whether a JSON filename has
-to be created), thus freeing the drivers of having to implement that
-logic themselves.
+Both of the defaults we currently have in the curl driver are named
+based on a slightly different schema, let's unify that and call both
+CURL_BLOCK_OPT_${NAME}_DEFAULT.
 
-Additionally, this patch adds the field to all of the block drivers that
-need it and sets it accordingly.
+While at it, we can add a macro for the third option for which a default
+exists, namely "sslverify".
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h |  7 +++++++
- block/blkdebug.c          | 17 +++++++++++++++++
- block/crypto.c            |  8 ++++++++
- block/curl.c              | 21 +++++++++++++++++++++
- block/gluster.c           | 19 +++++++++++++++++++
- block/iscsi.c             | 18 ++++++++++++++++++
- block/nbd.c               | 14 ++++++++++++++
- block/nfs.c               | 11 +++++++++++
- block/null.c              |  9 +++++++++
- block/qcow.c              |  7 +++++++
- block/qcow2.c             |  7 +++++++
- block/quorum.c            | 11 +++++++++++
- block/raw-format.c        | 10 +++++++++-
- block/rbd.c               | 14 ++++++++++++++
- block/replication.c       |  8 ++++++++
- block/sheepdog.c          | 12 ++++++++++++
- block/ssh.c               | 12 ++++++++++++
- block/throttle.c          |  7 +++++++
- block/vpc.c               |  7 +++++++
- block/vvfat.c             | 12 ++++++++++++
- block/vxhs.c              | 11 +++++++++++
- 21 files changed, 241 insertions(+), 1 deletion(-)
+ block/curl.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8b0413e3df..9e6800d42e 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -454,6 +454,13 @@ struct BlockDriver {
-                                                 Error **errp);
- 
-     QLIST_ENTRY(BlockDriver) list;
-+
-+    /* Pointer to a NULL-terminated array of names of significant options that
-+     * can be specified for bdrv_open(). A significant option is one that
-+     * changes the data of a BDS.
-+     * If this pointer is NULL, the array is considered empty.
-+     * "filename" and "driver" are always considered significant. */
-+    const char *const *sgfnt_runtime_opts;
- };
- 
- typedef struct BlockLimits {
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index e21669979d..f93139da58 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -886,6 +886,21 @@ static int blkdebug_reopen_prepare(BDRVReopenState *reopen_state,
-     return 0;
- }
- 
-+static const char *const blkdebug_sgfnt_runtime_opts[] = {
-+    "config",
-+    "inject-error.",
-+    "set-state.",
-+    "suspend.",
-+    "align",
-+    "max-transfer",
-+    "opt-write-zero",
-+    "max-write-zero",
-+    "opt-discard",
-+    "max-discard",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_blkdebug = {
-     .format_name            = "blkdebug",
-     .protocol_name          = "blkdebug",
-@@ -915,6 +930,8 @@ static BlockDriver bdrv_blkdebug = {
-                                 = blkdebug_debug_remove_breakpoint,
-     .bdrv_debug_resume          = blkdebug_debug_resume,
-     .bdrv_debug_is_suspended    = blkdebug_debug_is_suspended,
-+
-+    .sgfnt_runtime_opts         = blkdebug_sgfnt_runtime_opts,
- };
- 
- static void bdrv_blkdebug_init(void)
-diff --git a/block/crypto.c b/block/crypto.c
-index 60ddf8623e..492e64e922 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -609,6 +609,12 @@ block_crypto_get_specific_info_luks(BlockDriverState *bs)
-     return spec_info;
- }
- 
-+static const char *const block_crypto_sgfnt_runtime_opts[] = {
-+    BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_crypto_luks = {
-     .format_name        = "luks",
-     .instance_size      = sizeof(BlockCrypto),
-@@ -626,6 +632,8 @@ BlockDriver bdrv_crypto_luks = {
-     .bdrv_getlength     = block_crypto_getlength,
-     .bdrv_get_info      = block_crypto_get_info_luks,
-     .bdrv_get_specific_info = block_crypto_get_specific_info_luks,
-+
-+    .sgfnt_runtime_opts = block_crypto_sgfnt_runtime_opts,
- };
- 
- static void block_crypto_init(void)
 diff --git a/block/curl.c b/block/curl.c
-index 35cf417f59..7c5418324f 100644
+index 7c5418324f..4790c7dad5 100644
 --- a/block/curl.c
 +++ b/block/curl.c
-@@ -969,6 +969,19 @@ static int64_t curl_getlength(BlockDriverState *bs)
-     return s->len;
- }
+@@ -72,8 +72,6 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
  
-+static const char *const curl_sgfnt_runtime_opts[] = {
-+    CURL_BLOCK_OPT_URL,
-+    CURL_BLOCK_OPT_SSLVERIFY,
-+    CURL_BLOCK_OPT_COOKIE,
-+    CURL_BLOCK_OPT_COOKIE_SECRET,
-+    CURL_BLOCK_OPT_USERNAME,
-+    CURL_BLOCK_OPT_PASSWORD_SECRET,
-+    CURL_BLOCK_OPT_PROXY_USERNAME,
-+    CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET,
+ #define CURL_NUM_STATES 8
+ #define CURL_NUM_ACB    8
+-#define READ_AHEAD_DEFAULT (256 * 1024)
+-#define CURL_TIMEOUT_DEFAULT 5
+ #define CURL_TIMEOUT_MAX 10000
+ 
+ #define CURL_BLOCK_OPT_URL       "url"
+@@ -87,6 +85,10 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+ #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
+ #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
+ 
++#define CURL_BLOCK_OPT_READAHEAD_DEFAULT (256 * 1024)
++#define CURL_BLOCK_OPT_SSLVERIFY_DEFAULT true
++#define CURL_BLOCK_OPT_TIMEOUT_DEFAULT 5
 +
-+    NULL
-+};
-+
- static BlockDriver bdrv_http = {
-     .format_name                = "http",
-     .protocol_name              = "http",
-@@ -983,6 +996,8 @@ static BlockDriver bdrv_http = {
+ struct BDRVCURLState;
  
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
-+
-+    .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_https = {
-@@ -999,6 +1014,8 @@ static BlockDriver bdrv_https = {
- 
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
-+
-+    .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_ftp = {
-@@ -1015,6 +1032,8 @@ static BlockDriver bdrv_ftp = {
- 
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
-+
-+    .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_ftps = {
-@@ -1031,6 +1050,8 @@ static BlockDriver bdrv_ftps = {
- 
-     .bdrv_detach_aio_context    = curl_detach_aio_context,
-     .bdrv_attach_aio_context    = curl_attach_aio_context,
-+
-+    .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
- };
- 
- static void curl_block_init(void)
-diff --git a/block/gluster.c b/block/gluster.c
-index 0f4265a3a4..e47bda97df 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1414,6 +1414,21 @@ static int64_t coroutine_fn qemu_gluster_co_get_block_status(
- }
- 
- 
-+static const char *const gluster_sgfnt_open_opts[] = {
-+    GLUSTER_OPT_VOLUME,
-+    GLUSTER_OPT_PATH,
-+    GLUSTER_OPT_TYPE,
-+    GLUSTER_OPT_SERVER_PATTERN,
-+    GLUSTER_OPT_HOST,
-+    GLUSTER_OPT_PORT,
-+    GLUSTER_OPT_TO,
-+    GLUSTER_OPT_IPV4,
-+    GLUSTER_OPT_IPV6,
-+    GLUSTER_OPT_SOCKET,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_gluster = {
-     .format_name                  = "gluster",
-     .protocol_name                = "gluster",
-@@ -1440,6 +1455,7 @@ static BlockDriver bdrv_gluster = {
- #endif
-     .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-     .create_opts                  = &qemu_gluster_create_opts,
-+    .sgfnt_runtime_opts           = gluster_sgfnt_open_opts,
- };
- 
- static BlockDriver bdrv_gluster_tcp = {
-@@ -1468,6 +1484,7 @@ static BlockDriver bdrv_gluster_tcp = {
- #endif
-     .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-     .create_opts                  = &qemu_gluster_create_opts,
-+    .sgfnt_runtime_opts           = gluster_sgfnt_open_opts,
- };
- 
- static BlockDriver bdrv_gluster_unix = {
-@@ -1496,6 +1513,7 @@ static BlockDriver bdrv_gluster_unix = {
- #endif
-     .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-     .create_opts                  = &qemu_gluster_create_opts,
-+    .sgfnt_runtime_opts           = gluster_sgfnt_open_opts,
- };
- 
- /* rdma is deprecated (actually never supported for volfile fetch).
-@@ -1530,6 +1548,7 @@ static BlockDriver bdrv_gluster_rdma = {
- #endif
-     .bdrv_co_get_block_status     = qemu_gluster_co_get_block_status,
-     .create_opts                  = &qemu_gluster_create_opts,
-+    .sgfnt_runtime_opts           = gluster_sgfnt_open_opts,
- };
- 
- static void bdrv_gluster_init(void)
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 6a1c53711a..f77acf68af 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2183,6 +2183,20 @@ static QemuOptsList iscsi_create_opts = {
+ static bool libcurl_initialized;
+@@ -714,7 +716,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
      }
- };
  
-+static const char *const iscsi_sgfnt_runtime_opts[] = {
-+    "transport",
-+    "portal",
-+    "target",
-+    "user",
-+    "password",
-+    "password-secret",
-+    "lun",
-+    "initiator-name",
-+    "header-digest",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_iscsi = {
-     .format_name     = "iscsi",
-     .protocol_name   = "iscsi",
-@@ -2215,6 +2229,8 @@ static BlockDriver bdrv_iscsi = {
- 
-     .bdrv_detach_aio_context = iscsi_detach_aio_context,
-     .bdrv_attach_aio_context = iscsi_attach_aio_context,
-+
-+    .sgfnt_runtime_opts = iscsi_sgfnt_runtime_opts,
- };
- 
- #if LIBISCSI_API_VERSION >= (20160603)
-@@ -2250,6 +2266,8 @@ static BlockDriver bdrv_iser = {
- 
-     .bdrv_detach_aio_context = iscsi_detach_aio_context,
-     .bdrv_attach_aio_context = iscsi_attach_aio_context,
-+
-+    .sgfnt_runtime_opts = iscsi_sgfnt_runtime_opts,
- };
- #endif
- 
-diff --git a/block/nbd.c b/block/nbd.c
-index dcea7ffaef..44a60f59bd 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -584,6 +584,17 @@ static char *nbd_dirname(BlockDriverState *bs, Error **errp)
-     return NULL;
- }
- 
-+static const char *const nbd_sgfnt_runtime_opts[] = {
-+    "path",
-+    "host",
-+    "port",
-+    "export",
-+    "tls-creds",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -603,6 +614,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_get_info              = nbd_get_info,
-     .bdrv_dirname               = nbd_dirname,
-+    .sgfnt_runtime_opts         = nbd_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_nbd_tcp = {
-@@ -624,6 +636,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_get_info              = nbd_get_info,
-     .bdrv_dirname               = nbd_dirname,
-+    .sgfnt_runtime_opts         = nbd_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_nbd_unix = {
-@@ -645,6 +658,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_get_info              = nbd_get_info,
-     .bdrv_dirname               = nbd_dirname,
-+    .sgfnt_runtime_opts         = nbd_sgfnt_runtime_opts,
- };
- 
- static void bdrv_nbd_init(void)
-diff --git a/block/nfs.c b/block/nfs.c
-index ee1160980a..298ba7e320 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -896,6 +896,15 @@ static void nfs_invalidate_cache(BlockDriverState *bs,
- }
- #endif
- 
-+static const char *nfs_sgfnt_runtime_opts[] = {
-+    "path",
-+    "user",
-+    "group",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_nfs = {
-     .format_name                    = "nfs",
-     .protocol_name                  = "nfs",
-@@ -922,6 +931,8 @@ static BlockDriver bdrv_nfs = {
-     .bdrv_refresh_filename          = nfs_refresh_filename,
-     .bdrv_dirname                   = nfs_dirname,
- 
-+    .sgfnt_runtime_opts             = nfs_sgfnt_runtime_opts,
-+
- #ifdef LIBNFS_FEATURE_PAGECACHE
-     .bdrv_invalidate_cache          = nfs_invalidate_cache,
- #endif
-diff --git a/block/null.c b/block/null.c
-index 0cdabaa440..0fcd2671c8 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -254,6 +254,13 @@ static void null_refresh_filename(BlockDriverState *bs, QDict *opts)
-     bs->full_open_options = opts;
- }
- 
-+static const char *const null_sgfnt_runtime_opts[] = {
-+    BLOCK_OPT_SIZE,
-+    NULL_OPT_ZEROES,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_null_co = {
-     .format_name            = "null-co",
-     .protocol_name          = "null-co",
-@@ -272,6 +279,7 @@ static BlockDriver bdrv_null_co = {
-     .bdrv_co_get_block_status   = null_co_get_block_status,
- 
-     .bdrv_refresh_filename  = null_refresh_filename,
-+    .sgfnt_runtime_opts     = null_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_null_aio = {
-@@ -292,6 +300,7 @@ static BlockDriver bdrv_null_aio = {
-     .bdrv_co_get_block_status   = null_co_get_block_status,
- 
-     .bdrv_refresh_filename  = null_refresh_filename,
-+    .sgfnt_runtime_opts     = null_sgfnt_runtime_opts,
- };
- 
- static void bdrv_null_init(void)
-diff --git a/block/qcow.c b/block/qcow.c
-index d552a6eba8..1b8c7378db 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -1113,6 +1113,12 @@ static QemuOptsList qcow_create_opts = {
+     s->readahead_size = qemu_opt_get_size(opts, CURL_BLOCK_OPT_READAHEAD,
+-                                          READ_AHEAD_DEFAULT);
++                                          CURL_BLOCK_OPT_READAHEAD_DEFAULT);
+     if ((s->readahead_size & 0x1ff) != 0) {
+         error_setg(errp, "HTTP_READAHEAD_SIZE %zd is not a multiple of 512",
+                    s->readahead_size);
+@@ -722,13 +724,14 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
      }
- };
  
-+static const char *const qcow_sgfnt_runtime_opts[] = {
-+    "encrypt." BLOCK_CRYPTO_OPT_QCOW_KEY_SECRET,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_qcow = {
-     .format_name	= "qcow",
-     .instance_size	= sizeof(BDRVQcowState),
-@@ -1134,6 +1140,7 @@ static BlockDriver bdrv_qcow = {
-     .bdrv_get_info          = qcow_get_info,
- 
-     .create_opts            = &qcow_create_opts,
-+    .sgfnt_runtime_opts     = qcow_sgfnt_runtime_opts,
- };
- 
- static void bdrv_qcow_init(void)
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 1f80961e1b..c61933aa2e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4315,6 +4315,12 @@ static QemuOptsList qcow2_create_opts = {
+     s->timeout = qemu_opt_get_number(opts, CURL_BLOCK_OPT_TIMEOUT,
+-                                     CURL_TIMEOUT_DEFAULT);
++                                     CURL_BLOCK_OPT_TIMEOUT_DEFAULT);
+     if (s->timeout > CURL_TIMEOUT_MAX) {
+         error_setg(errp, "timeout parameter is too large or negative");
+         goto out_noclean;
      }
- };
  
-+static const char *const qcow2_sgfnt_runtime_opts[] = {
-+    "encrypt." BLOCK_CRYPTO_OPT_QCOW_KEY_SECRET,
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_qcow2 = {
-     .format_name        = "qcow2",
-     .instance_size      = sizeof(BDRVQcow2State),
-@@ -4360,6 +4366,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_inactivate            = qcow2_inactivate,
+-    s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
++    s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY,
++                                     CURL_BLOCK_OPT_SSLVERIFY_DEFAULT);
  
-     .create_opts         = &qcow2_create_opts,
-+    .sgfnt_runtime_opts  = qcow2_sgfnt_runtime_opts,
-     .bdrv_check          = qcow2_check,
-     .bdrv_amend_options  = qcow2_amend_options,
- 
-diff --git a/block/quorum.c b/block/quorum.c
-index e5a844335e..4b38201aa2 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1105,6 +1105,15 @@ static char *quorum_dirname(BlockDriverState *bs, Error **errp)
-     return NULL;
- }
- 
-+static const char *const quorum_sgfnt_runtime_opts[] = {
-+    QUORUM_OPT_VOTE_THRESHOLD,
-+    QUORUM_OPT_BLKVERIFY,
-+    QUORUM_OPT_REWRITE,
-+    QUORUM_OPT_READ_PATTERN,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_quorum = {
-     .format_name                        = "quorum",
-     .protocol_name                      = "quorum",
-@@ -1130,6 +1139,8 @@ static BlockDriver bdrv_quorum = {
- 
-     .is_filter                          = true,
-     .bdrv_recurse_is_first_non_filter   = quorum_recurse_is_first_non_filter,
-+
-+    .sgfnt_runtime_opts                 = quorum_sgfnt_runtime_opts,
- };
- 
- static void bdrv_quorum_init(void)
-diff --git a/block/raw-format.c b/block/raw-format.c
-index ab552c0954..f09b707b0d 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -481,6 +481,13 @@ static int raw_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
-     return bdrv_probe_geometry(bs->file->bs, geo);
- }
- 
-+static const char *const raw_sgfnt_runtime_opts[] = {
-+    "offset",
-+    "size",
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_raw = {
-     .format_name          = "raw",
-     .instance_size        = sizeof(BDRVRawState),
-@@ -509,7 +516,8 @@ BlockDriver bdrv_raw = {
-     .bdrv_lock_medium     = &raw_lock_medium,
-     .bdrv_co_ioctl        = &raw_co_ioctl,
-     .create_opts          = &raw_create_opts,
--    .bdrv_has_zero_init   = &raw_has_zero_init
-+    .bdrv_has_zero_init   = &raw_has_zero_init,
-+    .sgfnt_runtime_opts   = raw_sgfnt_runtime_opts,
- };
- 
- static void bdrv_raw_init(void)
-diff --git a/block/rbd.c b/block/rbd.c
-index a76a5e8755..389f006bea 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1122,6 +1122,18 @@ static QemuOptsList qemu_rbd_create_opts = {
-     }
- };
- 
-+static const char *const qemu_rbd_sgfnt_runtime_opts[] = {
-+    "pool",
-+    "image",
-+    "conf",
-+    "snapshot",
-+    "user",
-+    "server.",
-+    "password-secret",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_rbd = {
-     .format_name            = "rbd",
-     .instance_size          = sizeof(BDRVRBDState),
-@@ -1157,6 +1169,8 @@ static BlockDriver bdrv_rbd = {
- #ifdef LIBRBD_SUPPORTS_INVALIDATE
-     .bdrv_invalidate_cache  = qemu_rbd_invalidate_cache,
- #endif
-+
-+    .sgfnt_runtime_opts     = qemu_rbd_sgfnt_runtime_opts,
- };
- 
- static void bdrv_rbd_init(void)
-diff --git a/block/replication.c b/block/replication.c
-index b1ea3caa4b..12f57c9676 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -701,6 +701,13 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
-     aio_context_release(aio_context);
- }
- 
-+static const char *const replication_sgfnt_runtime_opts[] = {
-+    REPLICATION_MODE,
-+    REPLICATION_TOP_ID,
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_replication = {
-     .format_name                = "replication",
-     .protocol_name              = "replication",
-@@ -718,6 +725,7 @@ BlockDriver bdrv_replication = {
-     .bdrv_recurse_is_first_non_filter = replication_recurse_is_first_non_filter,
- 
-     .has_variable_length        = true,
-+    .sgfnt_runtime_opts         = replication_sgfnt_runtime_opts,
- };
- 
- static void bdrv_replication_init(void)
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index f684477328..2425a0775b 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -3076,6 +3076,15 @@ static QemuOptsList sd_create_opts = {
-     }
- };
- 
-+static const char *const sd_sgfnt_runtime_opts[] = {
-+    "vdi",
-+    "snap-id",
-+    "tag",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_sheepdog = {
-     .format_name                  = "sheepdog",
-     .protocol_name                = "sheepdog",
-@@ -3110,6 +3119,7 @@ static BlockDriver bdrv_sheepdog = {
-     .bdrv_attach_aio_context      = sd_attach_aio_context,
- 
-     .create_opts                  = &sd_create_opts,
-+    .sgfnt_runtime_opts           = sd_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_sheepdog_tcp = {
-@@ -3146,6 +3156,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
-     .bdrv_attach_aio_context      = sd_attach_aio_context,
- 
-     .create_opts                  = &sd_create_opts,
-+    .sgfnt_runtime_opts           = sd_sgfnt_runtime_opts,
- };
- 
- static BlockDriver bdrv_sheepdog_unix = {
-@@ -3182,6 +3193,7 @@ static BlockDriver bdrv_sheepdog_unix = {
-     .bdrv_attach_aio_context      = sd_attach_aio_context,
- 
-     .create_opts                  = &sd_create_opts,
-+    .sgfnt_runtime_opts           = sd_sgfnt_runtime_opts,
- };
- 
- static void bdrv_sheepdog_init(void)
-diff --git a/block/ssh.c b/block/ssh.c
-index 8890a0c4ba..905fc44142 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -1196,6 +1196,17 @@ static int64_t ssh_getlength(BlockDriverState *bs)
-     return length;
- }
- 
-+static const char *const ssh_sgfnt_runtime_opts[] = {
-+    "host",
-+    "port",
-+    "path",
-+    "user",
-+    "host_key_check",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_ssh = {
-     .format_name                  = "ssh",
-     .protocol_name                = "ssh",
-@@ -1210,6 +1221,7 @@ static BlockDriver bdrv_ssh = {
-     .bdrv_getlength               = ssh_getlength,
-     .bdrv_co_flush_to_disk        = ssh_co_flush,
-     .create_opts                  = &ssh_create_opts,
-+    .sgfnt_runtime_opts           = ssh_sgfnt_runtime_opts,
- };
- 
- static void bdrv_ssh_init(void)
-diff --git a/block/throttle.c b/block/throttle.c
-index 833175ac77..efdc57616b 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -212,6 +212,12 @@ static void coroutine_fn throttle_co_drain_end(BlockDriverState *bs)
-     atomic_dec(&tgm->io_limits_disabled);
- }
- 
-+static const char *const throttle_sgfnt_runtime_opts[] = {
-+    QEMU_OPT_THROTTLE_GROUP_NAME,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_throttle = {
-     .format_name                        =   "throttle",
-     .protocol_name                      =   "throttle",
-@@ -245,6 +251,7 @@ static BlockDriver bdrv_throttle = {
-     .bdrv_co_drain_end                  =   throttle_co_drain_end,
- 
-     .is_filter                          =   true,
-+    .sgfnt_runtime_opts                 =   throttle_sgfnt_runtime_opts,
- };
- 
- static void bdrv_throttle_init(void)
-diff --git a/block/vpc.c b/block/vpc.c
-index 1576d7b595..a0a30b6e33 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -1084,6 +1084,12 @@ static QemuOptsList vpc_create_opts = {
-     }
- };
- 
-+static const char *const vpc_sgfnt_runtime_opts[] = {
-+    VPC_OPT_SIZE_CALC,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_vpc = {
-     .format_name    = "vpc",
-     .instance_size  = sizeof(BDRVVPCState),
-@@ -1103,6 +1109,7 @@ static BlockDriver bdrv_vpc = {
- 
-     .create_opts            = &vpc_create_opts,
-     .bdrv_has_zero_init     = vpc_has_zero_init,
-+    .sgfnt_runtime_opts     = vpc_sgfnt_runtime_opts,
- };
- 
- static void bdrv_vpc_init(void)
-diff --git a/block/vvfat.c b/block/vvfat.c
-index a690595f2c..76a91f97cb 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -3242,6 +3242,16 @@ static void vvfat_close(BlockDriverState *bs)
-     }
- }
- 
-+static const char *const vvfat_sgfnt_runtime_opts[] = {
-+    "dir",
-+    "fat-type",
-+    "floppy",
-+    "label",
-+    "rw",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_vvfat = {
-     .format_name            = "vvfat",
-     .protocol_name          = "fat",
-@@ -3256,6 +3266,8 @@ static BlockDriver bdrv_vvfat = {
-     .bdrv_co_preadv         = vvfat_co_preadv,
-     .bdrv_co_pwritev        = vvfat_co_pwritev,
-     .bdrv_co_get_block_status = vvfat_co_get_block_status,
-+
-+    .sgfnt_runtime_opts     = vvfat_sgfnt_runtime_opts,
- };
- 
- static void bdrv_vvfat_init(void)
-diff --git a/block/vxhs.c b/block/vxhs.c
-index 75cc6c8672..4d6dc5fe4c 100644
---- a/block/vxhs.c
-+++ b/block/vxhs.c
-@@ -555,6 +555,16 @@ static int64_t vxhs_getlength(BlockDriverState *bs)
-     return vdisk_size;
- }
- 
-+static const char *const vxhs_sgfnt_runtime_opts[] = {
-+    VXHS_OPT_VDISK_ID,
-+    "tls-creds",
-+    VXHS_OPT_HOST,
-+    VXHS_OPT_PORT,
-+    VXHS_OPT_SERVER".",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_vxhs = {
-     .format_name                  = "vxhs",
-     .protocol_name                = "vxhs",
-@@ -565,6 +575,7 @@ static BlockDriver bdrv_vxhs = {
-     .bdrv_getlength               = vxhs_getlength,
-     .bdrv_aio_readv               = vxhs_aio_readv,
-     .bdrv_aio_writev              = vxhs_aio_writev,
-+    .sgfnt_runtime_opts           = vxhs_sgfnt_runtime_opts,
- };
- 
- static void bdrv_vxhs_init(void)
+     cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
+     cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
 -- 
 2.14.3
