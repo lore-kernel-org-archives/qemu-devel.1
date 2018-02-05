@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eieSy-000685-BF
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:41 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eieT0-0006AM-A4
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eieSx-0007H6-N5
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:40 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eieSz-0007IN-E5
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:42 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  5 Feb 2018 10:57:14 +0000
-Message-Id: <20180205105720.14620-3-peter.maydell@linaro.org>
+Date: Mon,  5 Feb 2018 10:57:16 +0000
+Message-Id: <20180205105720.14620-5-peter.maydell@linaro.org>
 In-Reply-To: <20180205105720.14620-1-peter.maydell@linaro.org>
 References: <20180205105720.14620-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/8] hw/intc/armv7m_nvic: Fix ICSR
- PENDNMISET/CLR handling
+Subject: [Qemu-devel] [PATCH 4/8] hw/intc/armv7m_nvic: Implement v8M CPPWR
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The PENDNMISET/CLR bits in the ICSR should be RAZ/WI from
-NonSecure state if the AIRCR.BFHFNMINS bit is zero. We had
-misimplemented this as making the bits RAZ/WI from both
-Secure and NonSecure states. Fix this bug by checking
-attrs.secure so that Secure code can pend and unpend NMIs.
+The Coprocessor Power Control Register (CPPWR) is new in v8M.
+It allows software to control whether coprocessors are allowed
+to power down and lose their state. QEMU doesn't have any
+notion of power control, so we choose the IMPDEF option of
+making the whole register RAZ/WI (indicating that no coprocessors
+can ever power down and lose state).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/armv7m_nvic.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/intc/armv7m_nvic.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 63da0fee34..06b9598fbe 100644
+index 74b25ce92c..eb49fd77c7 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -830,8 +830,8 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-             }
-         }
-         /* NMIPENDSET */
--        if ((cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) &&
--            s->vectors[ARMV7M_EXCP_NMI].pending) {
-+        if ((attrs.secure || (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK))
-+            && s->vectors[ARMV7M_EXCP_NMI].pending) {
-             val |= (1 << 31);
-         }
-         /* ISRPREEMPT: RES0 when halting debug not implemented */
-@@ -1193,7 +1193,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         break;
-     }
-     case 0xd04: /* Interrupt Control State (ICSR) */
--        if (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) {
-+        if (attrs.secure || cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) {
-             if (value & (1 << 31)) {
-                 armv7m_nvic_set_pending(s, ARMV7M_EXCP_NMI, false);
-             } else if (value & (1 << 30) &&
+@@ -776,6 +776,14 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+     switch (offset) {
+     case 4: /* Interrupt Control Type.  */
+         return ((s->num_irq - NVIC_FIRST_IRQ) / 32) - 1;
++    case 0xc: /* CPPWR */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            goto bad_offset;
++        }
++        /* We make the IMPDEF choice that nothing can ever go into a
++         * non-retentive power state, which allows us to RAZ/WI this.
++         */
++        return 0;
+     case 0x380 ... 0x3bf: /* NVIC_ITNS<n> */
+     {
+         int startvec = 8 * (offset - 0x380) + NVIC_FIRST_IRQ;
+@@ -1175,6 +1183,12 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+     ARMCPU *cpu = s->cpu;
+ 
+     switch (offset) {
++    case 0xc: /* CPPWR */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            goto bad_offset;
++        }
++        /* Make the IMPDEF choice to RAZ/WI this. */
++        break;
+     case 0x380 ... 0x3bf: /* NVIC_ITNS<n> */
+     {
+         int startvec = 8 * (offset - 0x380) + NVIC_FIRST_IRQ;
 -- 
 2.16.1
