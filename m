@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSN-0004ZD-RG
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:39 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSS-0004eE-OR
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSM-00053O-OX
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:35 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33340)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSR-000553-FH
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:40 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55659)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eimSM-00052r-Ft
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:34 -0500
-Received: by mail-wr0-x241.google.com with SMTP id s5so30857596wra.0
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:34 -0800 (PST)
+	id 1eimSR-00054g-7n
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:29:39 -0500
+Received: by mail-wm0-x244.google.com with SMTP id 143so28225646wma.5
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:29:39 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  5 Feb 2018 20:28:38 +0100
-Message-Id: <1517858941-5538-25-git-send-email-pbonzini@redhat.com>
+Date: Mon,  5 Feb 2018 20:28:42 +0100
+Message-Id: <1517858941-5538-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
 References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 24/47] memory: do explicit cleanup when remove
- listeners
+Subject: [Qemu-devel] [PULL 28/47] ivshmem: Improve MSI irqfd error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +28,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
+Cc: Ladi Prosek <lprosek@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
 
-When unregister memory listeners, we should call, e.g.,
-region_del() (and possibly other undo operations) on every existing
-memory region sections there, otherwise we may leak resources that are
-held during the region_add(). This patch undo the stuff for the
-listeners, which emulates the case when the address space is set from
-current to an empty state.
+Adds a rollback path to ivshmem_enable_irqfd() and fixes
+ivshmem_disable_irqfd() to bail if irqfd has not been enabled.
 
-I found this problem when debugging a refcount leak issue that leads to
-a device unplug event lost (please see the "Bug:" line below).  In that
-case, the leakage of resource is the PCI BAR memory region refcount.
-And since memory regions are not keeping their own refcount but onto
-their owners, so the vfio-pci device's (who is the owner of the PCI BAR
-memory regions) refcount is leaked, and event missing.
+To reproduce, run:
 
-We had encountered similar issues before and fixed in other
-way (ee4c112846, "vhost: Release memory references on cleanup"). This
-patch can be seen as a more high-level fix of similar problems that are
-caused by the resource leaks from memory listeners. So now we can remove
-the explicit unref of memory regions since that'll be done altogether
-during unregistering of listeners now.
+  ivshmem-server -n 0
 
-Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1531393
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180122060244.29368-5-peterx@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+and QEMU with:
+
+  -device ivshmem-doorbell,chardev=iv
+  -chardev socket,path=/tmp/ivshmem_socket,id=iv
+
+then load, unload, and load again the Windows driver, at the time of writing
+available at:
+
+https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
+
+The issue is believed to have been masked by other guest drivers, notably
+Linux ones, not enabling MSI-X on the device.
+
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20171211072110.9058-4-lprosek@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/virtio/vhost.c |  4 ----
- memory.c          | 27 +++++++++++++++++++++++++++
- 2 files changed, 27 insertions(+), 4 deletions(-)
+ hw/misc/ivshmem.c | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index c4f654c..d16c0c8 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1368,10 +1368,6 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
-     if (hdev->mem) {
-         /* those are only safe after successful init */
-         memory_listener_unregister(&hdev->memory_listener);
--        for (i = 0; i < hdev->n_mem_sections; ++i) {
--            MemoryRegionSection *section = &hdev->mem_sections[i];
--            memory_region_unref(section->mr);
--        }
-         QLIST_REMOVE(hdev, entry);
-     }
-     if (hdev->migration_blocker) {
-diff --git a/memory.c b/memory.c
-index 9e83496..5686698 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2612,6 +2612,32 @@ static void listener_add_address_space(MemoryListener *listener,
-     flatview_unref(view);
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index 95e85e4..fe1d8d1 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -785,6 +785,20 @@ static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
+     return 0;
  }
  
-+static void listener_del_address_space(MemoryListener *listener,
-+                                       AddressSpace *as)
++static void ivshmem_remove_kvm_msi_virq(IVShmemState *s, int vector)
 +{
-+    FlatView *view;
-+    FlatRange *fr;
++    IVSHMEM_DPRINTF("ivshmem_remove_kvm_msi_virq vector:%d\n", vector);
 +
-+    if (listener->begin) {
-+        listener->begin(listener);
++    if (s->msi_vectors[vector].pdev == NULL) {
++        return;
 +    }
-+    view = address_space_get_flatview(as);
-+    FOR_EACH_FLAT_RANGE(fr, view) {
-+        MemoryRegionSection section = section_from_flat_range(fr, view);
 +
-+        if (fr->dirty_log_mask && listener->log_stop) {
-+            listener->log_stop(listener, &section, fr->dirty_log_mask, 0);
-+        }
-+        if (listener->region_del) {
-+            listener->region_del(listener, &section);
-+        }
-+    }
-+    if (listener->commit) {
-+        listener->commit(listener);
-+    }
-+    flatview_unref(view);
++    /* it was cleaned when masked in the frontend. */
++    kvm_irqchip_release_virq(kvm_state, s->msi_vectors[vector].virq);
++
++    s->msi_vectors[vector].pdev = NULL;
 +}
 +
- void memory_listener_register(MemoryListener *listener, AddressSpace *as)
+ static void ivshmem_enable_irqfd(IVShmemState *s)
  {
-     MemoryListener *other = NULL;
-@@ -2652,6 +2678,7 @@ void memory_listener_unregister(MemoryListener *listener)
-         return;
+     PCIDevice *pdev = PCI_DEVICE(s);
+@@ -796,7 +810,7 @@ static void ivshmem_enable_irqfd(IVShmemState *s)
+         ivshmem_add_kvm_msi_virq(s, i, &err);
+         if (err) {
+             error_report_err(err);
+-            /* TODO do we need to handle the error? */
++            goto undo;
+         }
      }
  
-+    listener_del_address_space(listener, listener->address_space);
-     QTAILQ_REMOVE(&memory_listeners, listener, link);
-     QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
-     listener->address_space = NULL;
+@@ -805,21 +819,14 @@ static void ivshmem_enable_irqfd(IVShmemState *s)
+                                   ivshmem_vector_mask,
+                                   ivshmem_vector_poll)) {
+         error_report("ivshmem: msix_set_vector_notifiers failed");
++        goto undo;
+     }
+-}
++    return;
+ 
+-static void ivshmem_remove_kvm_msi_virq(IVShmemState *s, int vector)
+-{
+-    IVSHMEM_DPRINTF("ivshmem_remove_kvm_msi_virq vector:%d\n", vector);
+-
+-    if (s->msi_vectors[vector].pdev == NULL) {
+-        return;
++undo:
++    while (--i >= 0) {
++        ivshmem_remove_kvm_msi_virq(s, i);
+     }
+-
+-    /* it was cleaned when masked in the frontend. */
+-    kvm_irqchip_release_virq(kvm_state, s->msi_vectors[vector].virq);
+-
+-    s->msi_vectors[vector].pdev = NULL;
+ }
+ 
+ static void ivshmem_disable_irqfd(IVShmemState *s)
+@@ -827,6 +834,10 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
+     PCIDevice *pdev = PCI_DEVICE(s);
+     int i;
+ 
++    if (!pdev->msix_vector_use_notifier) {
++        return;
++    }
++
+     msix_unset_vector_notifiers(pdev);
+ 
+     for (i = 0; i < s->peers[s->vm_id].nb_eventfds; i++) {
 -- 
 1.8.3.1
