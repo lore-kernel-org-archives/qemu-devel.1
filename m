@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eiYLq-0004ec-31
+	(envelope-from <bounces@canonical.com>) id 1eiYLq-0004ed-3e
 	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eiYLm-0001I5-IL
+	(envelope-from <bounces@canonical.com>) id 1eiYLm-0001Ht-4f
 	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47598)
+Received: from indium.canonical.com ([91.189.90.7]:47486)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eiYLm-0001Fv-CB
+	id 1eiYLl-00017P-Ux
 	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:50 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eiYLk-0007Ze-3l
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 04:25:48 +0000
+	id 1eiYLi-0007Xk-D2
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 04:25:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 079FB2E80C8
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 04:25:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4DEAA2E806D
+	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 04:25:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Feb 2018 04:17:32 -0000
+Date: Mon, 05 Feb 2018 04:17:30 -0000
 From: Launchpad Bug Tracker <1736655@bugs.launchpad.net>
 Reply-To: Bug 1736655 <1736655@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151253983521.3178.4021889730911467554.malonedeb@gac.canonical.com>
-Message-Id: <151780425249.21638.13122500290814851574.malone@loganberry.canonical.com>
+Message-Id: <151780425105.21638.6867575919110632998.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1736655] Re: 2k3/xp guests w/virtio-net randomly
  DHCP fail on boot
@@ -39,9 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+[Expired for qemu (Ubuntu) because there has been no activity for 60
+days.]
 
-** Changed in: qemu
+** Changed in: qemu (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
