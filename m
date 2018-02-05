@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiaG-0002AQ-Pz
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:32 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiaV-0002MV-Ai
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiaA-00029E-UY
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:27 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiiaR-0002Za-6q
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:43 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:31 +0100
-Message-Id: <20180205151835.20812-23-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:34 +0100
+Message-Id: <20180205151835.20812-26-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 22/26] block: Do not copy exact_filename
- from format file
+Subject: [Qemu-devel] [PATCH v8 25/26] block/curl: Implement
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +23,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-If a format BDS's file BDS is in turn a format BDS, we cannot simply use
-the same filename, because when opening a BDS tree based on a filename
-alone, qemu will create only one format node on top of one protocol node
-(disregarding a potential backing file).
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ block/curl.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/block.c b/block.c
-index 2963cbc921..664f87bad4 100644
---- a/block.c
-+++ b/block.c
-@@ -5159,9 +5159,20 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+diff --git a/block/curl.c b/block/curl.c
+index 4790c7dad5..f4053e207c 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -972,6 +972,23 @@ static int64_t curl_getlength(BlockDriverState *bs)
+     return s->len;
+ }
  
-         bs->exact_filename[0] = '\0';
++static void curl_refresh_filename(BlockDriverState *bs)
++{
++    BDRVCURLState *s = bs->opaque;
++
++    /* "readahead" and "timeout" do not change the guest-visible data,
++     * so ignore them */
++    if (s->sslverify != CURL_BLOCK_OPT_SSLVERIFY_DEFAULT ||
++        s->cookie || s->username || s->password || s->proxyusername ||
++        s->proxypassword)
++    {
++        return;
++    }
++
++    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), s->url);
++}
++
++
+ static const char *const curl_sgfnt_runtime_opts[] = {
+     CURL_BLOCK_OPT_URL,
+     CURL_BLOCK_OPT_SSLVERIFY,
+@@ -1000,6 +1017,7 @@ static BlockDriver bdrv_http = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
  
--        /* If no specific options have been given for this BDS, the filename of
--         * the underlying file should suffice for this one as well */
--        if (bs->file->bs->exact_filename[0] && !generate_json_filename) {
-+        /* We can use the underlying file's filename if:
-+         * - it has a filename,
-+         * - the file is a protocol BDS, and
-+         * - opening that file (as this BDS's format) will automatically create
-+         *   the BDS tree we have right now, that is:
-+         *   - the user did not significantly change this BDS's behavior with
-+         *     some explicit options
-+         *   - no non-file child of this BDS has been overridden by the user
-+         *   Both of these conditions are represented by generate_json_filename.
-+         */
-+        if (bs->file->bs->exact_filename[0] &&
-+            bs->file->bs->drv->bdrv_file_open &&
-+            !generate_json_filename)
-+        {
-             strcpy(bs->exact_filename, bs->file->bs->exact_filename);
-         }
-     }
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
+@@ -1018,6 +1036,7 @@ static BlockDriver bdrv_https = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
+@@ -1036,6 +1055,7 @@ static BlockDriver bdrv_ftp = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
+@@ -1054,6 +1074,7 @@ static BlockDriver bdrv_ftps = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .sgfnt_runtime_opts         = curl_sgfnt_runtime_opts,
+ };
+ 
 -- 
 2.14.3
