@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eijUJ-0000fN-5s
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:19:24 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eijaT-0006VP-Gr
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eijUG-0002zD-0h
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:19:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eijUF-0002x7-QS
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:19:19 -0500
-References: <1517842735-9011-1-git-send-email-jianfeng.tan@intel.com>
-	<1b6a1999-95bb-5eac-70e1-39e6ba5b22fc@redhat.com>
-	<6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <502bbdba-0c35-e35a-6600-dfca739d0ea3@redhat.com>
-Date: Mon, 5 Feb 2018 17:19:09 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eijaS-0004fC-Ao
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:25:45 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:34212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eijaS-0004dm-5a
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 11:25:44 -0500
+Received: by mail-ot0-x242.google.com with SMTP id l10so1916794oth.1
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 08:25:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <6716e932-9ce5-3d97-41cb-f33ea94ad4ce@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <3659e9bc-4b71-4785-22c7-e4cb97d7b241@amsat.org>
+References: <20180205105720.14620-1-peter.maydell@linaro.org>
+	<20180205105720.14620-9-peter.maydell@linaro.org>
+	<3659e9bc-4b71-4785-22c7-e4cb97d7b241@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Feb 2018 16:25:23 +0000
+Message-ID: <CAFEAcA9oCtpGWJhuV-j8tn=gK8NMJwm-wcA5L6J91xyDU-ATKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] exec: eliminate ram naming issue as migration
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 8/8] hw/intc/armv7m_nvic: Fix
+ byte-to-interrupt number conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tan, Jianfeng" <jianfeng.tan@intel.com>, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 05/02/2018 17:12, Tan, Jianfeng wrote:
-> Hi Paolo,
->=20
-> On 2/5/2018 11:53 PM, Paolo Bonzini wrote:
->> On 05/02/2018 15:58, Jianfeng Tan wrote:
->>> Here are some options to fix this:
->>>
->>> 1. When we do ram name comparison, we truncate the prefix as this
->>> patch shows.
->>> It cannot cover the corner case: the source VM could have two ram blo=
-cks
->>> with name of "pc.ram" and "/object/pc.ram".
->> That shouldn't happen ("pc.ram" exists even in the "-numa
->> node,memdev=3D..." case, but it has no RAM block).
->=20
-> Suppose we have a VM started with "-m xG", and then hot plugged with a
-> ram block:
-> =C2=A0 (qemu) object_add
-> memory-backend-file,id=3Dpc.ram,size=3D1G,mem-path=3D/dev/hugepages
-> =C2=A0 (qemu) device_add pc-dimm,id=3Dpc.ram,memdev=3Dpc.ram
->=20
-> Then we would have both ram block named pc.ram:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 Block Name=C2=A0=C2=A0=C2=A0 PSize
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pc.ram=C2=A0=C2=A0=
-=C2=A0=C2=A0 4 KiB
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /objects/pc.ram=C2=A0=C2=A0=C2=A0 2 MiB
->=20
-> But I assume it's a corner case which not really happen.
-
-Yeah, you're right. :/  I hadn't thought of hotplug.  It can happen indee=
-d.
-
->> However, note that
+On 5 February 2018 at 16:16, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> Hi Peter,
+>
+> On 02/05/2018 07:57 AM, Peter Maydell wrote:
+>> In many of the NVIC registers relating to interrupts, we
+>> have to convert from a byte offset within a register set
+>> into the number of the first interrupt which is affected.
+>> We were getting this wrong for:
+>>  * reads of NVIC_ISPR<n>, NVIC_ISER<n>, NVIC_ICPR<n>, NVIC_ICER<n>,
+>>    NVIC_IABR<n> -- in all these cases we were missing the "* 8"
+>>    needed to convert from the byte offset to the interrupt number
+>>    (since all these registers use one bit per interrupt)
+>>  * writes of NVIC_IPR<n> had the opposite problem of a spurious
+>>    "* 8" (since these registers use one byte per interrupt)
+>
+> What about using inline function (suggested) with those comments to ease
+> code review, since this code is kinda confusing at first.
+>
 >>
->> =C2=A0=C2=A0 -m xG -numa node,memdev=3Dpc.ram \
->> =C2=A0=C2=A0 -object memory-backend-file,id=3Dpc.ram,...
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> at any rate:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>> ---
+>>  hw/intc/armv7m_nvic.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
 >>
->> works for both vhost-kernel and vhost-user, so I'd rather consider thi=
-s
->> a configuration problem and not do anything.
->=20
-> That configuration indeed works for both. But in the production env,
-> lots of VMs are already started with previous mem config. If we do
-> nothing, it will take a long time (shutdown/start for each VM) to
-> migrate to the new setup. This patch is to make this process more smoot=
-h
-> without any bad effect if possible.
+>> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+>> index 8726be796e..9433efd1b8 100644
+>> --- a/hw/intc/armv7m_nvic.c
+>> +++ b/hw/intc/armv7m_nvic.c
+>> @@ -1721,7 +1721,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, =
+hwaddr addr,
+>>          /* fall through */
+>>      case 0x180 ... 0x1bf: /* NVIC Clear enable */
+>>          val =3D 0;
+>> -        startvec =3D offset - 0x180 + NVIC_FIRST_IRQ; /* vector # */
+>> +        startvec =3D 8 * (offset - 0x180) + NVIC_FIRST_IRQ; /* vector #=
+ */
+>
+> static uint32_t off2vec_rd(uint32_t offset, uint32_t base)
+> {
+>     return 8 * (offset - base) + NVIC_FIRST_IRQ;
+> }
 
-I understand.  However it's not as bad as "there's no possibility at all
-to migrate from vhost-kernel to vhost-user".  There are cases that are
-more problematic: for example, there's no possibility at all to add
-memory NUMA policy during a live migration, unless -object
-memory-backend-* was used on the source.
+This function name suggests that it's for reads, which isn't
+what's going on here. The 8 * version is for registers which
+have 1 bit per interrupt. The version without 8* is for
+registers which have 8 bits per interrupt. It just happens
+that we got the reads wrong for a bunch of 1-bit-per-interrupt
+registers and the writes wrong for an 8-bit-per-interrupt reg.
+(I have a feeling this is something I noticed at some point in
+code review of the original author's patches, and then didn't
+realize had been not quite corrected in all the places it needed
+to be, and overcorrected in one spot.)
 
-Paolo
+Also, if you hide the "8 *" inside a function here, you lose
+the fact that it parallels the multiplication in "end =3D size * 8"
+in each of these loops. So I agree that it's confusing, but
+overall I think it's better to have all the logic in one
+place so you can read the whole loop easily.
+
+thanks
+-- PMM
