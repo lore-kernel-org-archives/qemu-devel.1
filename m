@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii55-0007Rk-Vl
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:17 -0500
+	(envelope-from <berto@igalia.com>) id 1eii57-0007T8-4j
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii55-0000Qk-17
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:16 -0500
+	(envelope-from <berto@igalia.com>) id 1eii56-0000Sy-CE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:17 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  5 Feb 2018 16:33:03 +0200
-Message-Id: <e1f943a9e89e1deb876f45de1bb22419ccdb6ad3.1517840876.git.berto@igalia.com>
+Date: Mon,  5 Feb 2018 16:33:01 +0200
+Message-Id: <b498733b6706a859a03678d74ecbd26aeba129aa.1517840876.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 03/39] qcow2: Remove BDS parameter from
- qcow2_cache_get_table_addr()
+Subject: [Qemu-devel] [PATCH v4 01/39] qcow2: Fix documentation of
+ get_cluster_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +25,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-This function was only using the BlockDriverState parameter to get the
-cache table size (since it was equal to the cluster size). This is no
-longer necessary so this parameter can be removed.
+This function has not been returning the offset of the L2 table since
+commit 3948d1d4876065160583e79533bf604481063833
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cache.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ block/qcow2-cluster.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 38c03770b4..a481ef499a 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -46,8 +46,7 @@ struct Qcow2Cache {
-     uint64_t                cache_clean_lru_counter;
- };
- 
--static inline void *qcow2_cache_get_table_addr(BlockDriverState *bs,
--                    Qcow2Cache *c, int table)
-+static inline void *qcow2_cache_get_table_addr(Qcow2Cache *c, int table)
- {
-     return (uint8_t *) c->table_array + (size_t) table * c->table_size;
- }
-@@ -78,7 +77,7 @@ static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
- {
- /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
- #ifdef CONFIG_LINUX
--    void *t = qcow2_cache_get_table_addr(bs, c, i);
-+    void *t = qcow2_cache_get_table_addr(c, i);
-     int align = getpagesize();
-     size_t mem_size = (size_t) c->table_size * num_tables;
-     size_t offset = QEMU_ALIGN_UP((uintptr_t) t, align) - (uintptr_t) t;
-@@ -222,7 +221,7 @@ static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i)
-     }
- 
-     ret = bdrv_pwrite(bs->file, c->entries[i].offset,
--                      qcow2_cache_get_table_addr(bs, c, i), c->table_size);
-+                      qcow2_cache_get_table_addr(c, i), c->table_size);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -378,7 +377,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
-         }
- 
-         ret = bdrv_pread(bs->file, offset,
--                         qcow2_cache_get_table_addr(bs, c, i),
-+                         qcow2_cache_get_table_addr(c, i),
-                          c->table_size);
-         if (ret < 0) {
-             return ret;
-@@ -390,7 +389,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
-     /* And return the right table */
- found:
-     c->entries[i].ref++;
--    *table = qcow2_cache_get_table_addr(bs, c, i);
-+    *table = qcow2_cache_get_table_addr(c, i);
- 
-     trace_qcow2_cache_get_done(qemu_coroutine_self(),
-                                c == s->l2_table_cache, i);
-@@ -439,7 +438,7 @@ void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
- 
-     for (i = 0; i < c->size; i++) {
-         if (c->entries[i].offset == offset) {
--            return qcow2_cache_get_table_addr(bs, c, i);
-+            return qcow2_cache_get_table_addr(c, i);
-         }
-     }
-     return NULL;
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index a3fec27bf9..8163983d28 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -648,8 +648,7 @@ fail:
+  * for a given disk offset, load (and allocate if needed)
+  * the l2 table.
+  *
+- * the l2 table offset in the qcow2 file and the cluster index
+- * in the l2 table are given to the caller.
++ * the cluster index in the l2 table is given to the caller.
+  *
+  * Returns 0 on success, -errno in failure case
+  */
 -- 
 2.11.0
