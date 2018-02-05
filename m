@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSp-00053I-DZ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:30:07 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eimSv-0005BE-Kv
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:30:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eimSo-0005Fo-5Q
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:30:03 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35844)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eimSr-0005JB-Nq
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:30:09 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36381)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eimSn-0005En-RC
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:30:02 -0500
-Received: by mail-wm0-x242.google.com with SMTP id f3so28132387wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:30:01 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  5 Feb 2018 20:29:01 +0100
-Message-Id: <1517858941-5538-48-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
-References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 47/47] Add the WHPX acceleration enlightenments
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eimSr-0005Io-HY
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 14:30:05 -0500
+Received: by mail-qk0-x242.google.com with SMTP id 15so5788696qkl.3
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 11:30:05 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180205150426.20542-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7d26c4fc-1b4d-c841-6be6-7d94e879bc38@amsat.org>
+Date: Mon, 5 Feb 2018 16:29:59 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180205150426.20542-1-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="hcdQmPwbcmruNwTBBcKvPKmpHx8uEwAUf"
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Allow PC to be set
+ on command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,196 +35,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Justin Terry (VM)" <juterry@microsoft.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, patches@linaro.org
 
-From: "Justin Terry (VM)" <juterry@microsoft.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hcdQmPwbcmruNwTBBcKvPKmpHx8uEwAUf
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, patches@linaro.org
+Message-ID: <7d26c4fc-1b4d-c841-6be6-7d94e879bc38@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Allow PC to be set
+ on command line
+References: <20180205150426.20542-1-peter.maydell@linaro.org>
+In-Reply-To: <20180205150426.20542-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Implements the WHPX accelerator cpu enlightenments to actually use the whpx-all
-accelerator on Windows platforms.
+On 02/05/2018 12:04 PM, Peter Maydell wrote:
+> The documentation for the generic loader claims that you can
+> set the PC for a CPU with an option of the form
+>   -device loader,cpu-num=3D0,addr=3D0x10000004
+>=20
+> However if you try this QEMU complains:
+>   cpu_num must be specified when setting a program counter
+>=20
+> This is because we were testing against 0 rather than CPU_NONE.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I've also noticed that you can't use this to specify that
+> the starting address should be in Thumb mode for Arm CPUs,
+> but I'm not so sure of the right way to fix that...
 
-Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
-Message-Id: <1516655269-1785-5-git-send-email-juterry@microsoft.com>
-[Register/unregister VCPU thread with RCU. - Paolo]
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- cpus.c                    | 69 ++++++++++++++++++++++++++++++++++++++++++++++-
- include/sysemu/hw_accel.h | 13 +++++++++
- target/i386/helper.c      |  2 +-
- 3 files changed, 82 insertions(+), 2 deletions(-)
+Can using an impair addr work? (no arch-specific parser)
 
-diff --git a/cpus.c b/cpus.c
-index 8d8bb7c..6825fe1 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -38,6 +38,7 @@
- #include "sysemu/kvm.h"
- #include "sysemu/hax.h"
- #include "sysemu/hvf.h"
-+#include "sysemu/whpx.h"
- #include "qmp-commands.h"
- #include "exec/exec-all.h"
- 
-@@ -1545,6 +1546,49 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
-     return NULL;
- }
- 
-+static void *qemu_whpx_cpu_thread_fn(void *arg)
-+{
-+    CPUState *cpu = arg;
-+    int r;
-+
-+    rcu_register_thread();
-+
-+    qemu_mutex_lock_iothread();
-+    qemu_thread_get_self(cpu->thread);
-+    cpu->thread_id = qemu_get_thread_id();
-+    current_cpu = cpu;
-+
-+    r = whpx_init_vcpu(cpu);
-+    if (r < 0) {
-+        fprintf(stderr, "whpx_init_vcpu failed: %s\n", strerror(-r));
-+        exit(1);
-+    }
-+
-+    /* signal CPU creation */
-+    cpu->created = true;
-+    qemu_cond_signal(&qemu_cpu_cond);
-+
-+    do {
-+        if (cpu_can_run(cpu)) {
-+            r = whpx_vcpu_exec(cpu);
-+            if (r == EXCP_DEBUG) {
-+                cpu_handle_guest_debug(cpu);
-+            }
-+        }
-+        while (cpu_thread_is_idle(cpu)) {
-+            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-+        }
-+        qemu_wait_io_event_common(cpu);
-+    } while (!cpu->unplug || cpu_can_run(cpu));
-+
-+    whpx_destroy_vcpu(cpu);
-+    cpu->created = false;
-+    qemu_cond_signal(&qemu_cpu_cond);
-+    qemu_mutex_unlock_iothread();
-+    rcu_unregister_thread();
-+    return NULL;
-+}
-+
- #ifdef _WIN32
- static void CALLBACK dummy_apc_func(ULONG_PTR unused)
- {
-@@ -1635,7 +1679,9 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
-     }
- #else /* _WIN32 */
-     if (!qemu_cpu_is_self(cpu)) {
--        if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
-+        if (whpx_enabled()) {
-+            whpx_vcpu_kick(cpu);
-+        } else if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
-             fprintf(stderr, "%s: QueueUserAPC failed with error %lu\n",
-                     __func__, GetLastError());
-             exit(1);
-@@ -1877,6 +1923,25 @@ static void qemu_hvf_start_vcpu(CPUState *cpu)
-     }
- }
- 
-+static void qemu_whpx_start_vcpu(CPUState *cpu)
-+{
-+    char thread_name[VCPU_THREAD_NAME_SIZE];
-+
-+    cpu->thread = g_malloc0(sizeof(QemuThread));
-+    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-+    qemu_cond_init(cpu->halt_cond);
-+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/WHPX",
-+             cpu->cpu_index);
-+    qemu_thread_create(cpu->thread, thread_name, qemu_whpx_cpu_thread_fn,
-+                       cpu, QEMU_THREAD_JOINABLE);
-+#ifdef _WIN32
-+    cpu->hThread = qemu_thread_get_handle(cpu->thread);
-+#endif
-+    while (!cpu->created) {
-+        qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
-+    }
-+}
-+
- static void qemu_dummy_start_vcpu(CPUState *cpu)
- {
-     char thread_name[VCPU_THREAD_NAME_SIZE];
-@@ -1915,6 +1980,8 @@ void qemu_init_vcpu(CPUState *cpu)
-         qemu_hvf_start_vcpu(cpu);
-     } else if (tcg_enabled()) {
-         qemu_tcg_init_vcpu(cpu);
-+    } else if (whpx_enabled()) {
-+        qemu_whpx_start_vcpu(cpu);
-     } else {
-         qemu_dummy_start_vcpu(cpu);
-     }
-diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-index 469ffda..d2ddfb5 100644
---- a/include/sysemu/hw_accel.h
-+++ b/include/sysemu/hw_accel.h
-@@ -14,6 +14,7 @@
- #include "qom/cpu.h"
- #include "sysemu/hax.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/whpx.h"
- 
- static inline void cpu_synchronize_state(CPUState *cpu)
- {
-@@ -23,6 +24,9 @@ static inline void cpu_synchronize_state(CPUState *cpu)
-     if (hax_enabled()) {
-         hax_cpu_synchronize_state(cpu);
-     }
-+    if (whpx_enabled()) {
-+        whpx_cpu_synchronize_state(cpu);
-+    }
- }
- 
- static inline void cpu_synchronize_post_reset(CPUState *cpu)
-@@ -33,6 +37,9 @@ static inline void cpu_synchronize_post_reset(CPUState *cpu)
-     if (hax_enabled()) {
-         hax_cpu_synchronize_post_reset(cpu);
-     }
-+    if (whpx_enabled()) {
-+        whpx_cpu_synchronize_post_reset(cpu);
-+    }
- }
- 
- static inline void cpu_synchronize_post_init(CPUState *cpu)
-@@ -43,6 +50,9 @@ static inline void cpu_synchronize_post_init(CPUState *cpu)
-     if (hax_enabled()) {
-         hax_cpu_synchronize_post_init(cpu);
-     }
-+    if (whpx_enabled()) {
-+        whpx_cpu_synchronize_post_init(cpu);
-+    }
- }
- 
- static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
-@@ -53,6 +63,9 @@ static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
-     if (hax_enabled()) {
-         hax_cpu_synchronize_pre_loadvm(cpu);
-     }
-+    if (whpx_enabled()) {
-+        whpx_cpu_synchronize_pre_loadvm(cpu);
-+    }
- }
- 
- #endif /* QEMU_HW_ACCEL_H */
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index f63eb3d..9fba146 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -986,7 +986,7 @@ void cpu_report_tpr_access(CPUX86State *env, TPRAccess access)
-     X86CPU *cpu = x86_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
- 
--    if (kvm_enabled()) {
-+    if (kvm_enabled() || whpx_enabled()) {
-         env->tpr_access_type = access;
- 
-         cpu_interrupt(cs, CPU_INTERRUPT_TPR);
--- 
-1.8.3.1
+>=20
+>  hw/core/generic-loader.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+> index 46012673c3..cb0e68486d 100644
+> --- a/hw/core/generic-loader.c
+> +++ b/hw/core/generic-loader.c
+> @@ -105,7 +105,7 @@ static void generic_loader_realize(DeviceState *dev=
+, Error **errp)
+>              error_setg(errp, "data can not be specified when setting a=
+ "
+>                         "program counter");
+>              return;
+> -        } else if (!s->cpu_num) {
+> +        } else if (s->cpu_num =3D=3D CPU_NONE) {
+>              error_setg(errp, "cpu_num must be specified when setting a=
+ "
+>                         "program counter");
+>              return;
+>=20
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+
+--hcdQmPwbcmruNwTBBcKvPKmpHx8uEwAUf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlp4sLcACgkQ4+MsLN6t
+wN71mRAAnGS17m1l8cZl5Lk2XCBgyCpvnJ0hQmUvhAXUoaDsrc7C5M6ya7cl25Ta
+0c3IQLWddQS/IJX3RzOto1DVLFT7HLMUAKHCCLQEta9HvJisQkChKy6pvZYt//Sf
+1ZcsLGBpfd4x9OmkzVgG092fsYAULCaCJYYRTNLxpkLGp7xBksJCn0pNKE2tuEBC
+vAZkvJ2aMld1NlkYA05Sc1BRr9BjFkgrQaY0AcyOYONKVFAFKiygnRqB6UhtlzSr
+pRcLYBD2nmSSptt56WcyRYJUMgL9VCPXbIWnKM9Aiz/p8WO1Lg/h4hUg/lqikbXn
+ET2/HDfe+XBGrCNWhpC83RWwXUgtDk4YQCqN+jjA244WuUrK0cxT91m3hXMe0SgR
+rXaHGsnSRi9XkRZ3kPAGJC4bzi2WzSjSMA7uOuNe8DL6e6qBPZwFf6lXL9XeZWBo
+sEtADE9xXM81Ot2gjP81pej+tN7QK/rfZSgrCdQSHBEzOR5+DNkBQaKoVYZgnlAh
+eaFaGFogAwoKU9Q66awOFolkEJL0KqagXn5hBKOU7AkPWKz4bm332xLg5pZ83Yl+
+GpPG20S52Vdc0v3GP3oFzvZMO6ur/JY3bwqDl61suMNbWMEZOwwzirqMqYEdP3Ew
+NzBkw4e24KlX3mEhmHBE531tQsFLa8WDeBArNurh+EFzKP/T0VE=
+=q/wQ
+-----END PGP SIGNATURE-----
+
+--hcdQmPwbcmruNwTBBcKvPKmpHx8uEwAUf--
