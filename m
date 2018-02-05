@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eilAp-0005uO-RV
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:07:26 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eilBC-00067l-4C
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:07:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eilAl-0004dy-RQ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:07:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:15670)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eilAl-0004dP-IE
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:07:19 -0500
-Date: Mon, 5 Feb 2018 18:06:52 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180205180651.GE2316@work-vm>
-References: <20180131201633.28446-1-dgilbert@redhat.com>
-	<93b45cc9-113c-6185-a4eb-14478fcf6bb9@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1eilBA-00058r-TS
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:07:46 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:42313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eilBA-00058F-Hb
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 13:07:44 -0500
+Received: by mail-lf0-x241.google.com with SMTP id q17so43009407lfa.9
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 10:07:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <93b45cc9-113c-6185-a4eb-14478fcf6bb9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/migration: Add source to PC boot
- block
+Sender: alistair23@gmail.com
+In-Reply-To: <87tvuvv77r.fsf@dusky.pond.sub.org>
+References: <20180203084315.20497-1-armbru@redhat.com>
+	<20180203084315.20497-15-armbru@redhat.com>
+	<bbc2cc63-c192-020c-b9ff-78461c0efced@redhat.com>
+	<87po5kx7w8.fsf@dusky.pond.sub.org>
+	<9189012b-c77c-3b7c-8014-bf086d0b75a5@redhat.com>
+	<87tvuvv77r.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 5 Feb 2018 10:07:12 -0800
+Message-ID: <CAKmqyKPaTGnqddcQ7SJw9PaEf2cVg2YMbEzcgwKfWZp39vfSxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 14/14] target: Use qemu_log() instead of
+ fprintf(stderr, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,294 +36,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-* Wei Huang (wei@redhat.com) wrote:
-> 
-> 
-> On 01/31/2018 02:16 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > The boot block used in the migration test is currently only
-> > shipped as a hex (with the source in the git commit message),
-> > change this to actually include the source.
-> > 
-> > A makefile rule is added, but the expectation is that
-> > the generated hex is shipped as well as the .s, so that
-> > there's no requirement to have just the right assembler etc.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  tests/Makefile.include              | 18 ++++++++
-> >  tests/migration-test.c              | 46 +------------------
-> >  tests/migration/x86-a-b-bootblock.h | 52 +++++++++++++++++++++
-> >  tests/migration/x86-a-b-bootblock.s | 92 +++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 163 insertions(+), 45 deletions(-)
-> >  create mode 100644 tests/migration/x86-a-b-bootblock.h
-> >  create mode 100644 tests/migration/x86-a-b-bootblock.s
-> > 
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index 851aafe9d1..2a0889479c 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -831,6 +831,24 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
-> >  	rm $(INITRD_WORK_DIR)/init
-> >  	rmdir $(INITRD_WORK_DIR)
-> >  
-> > +ASM_WORK_DIR=tests/asm-temp
-> > +$(SRC_PATH)/tests/migration/x86-a-b-bootblock.h: $(SRC_PATH)/tests/migration/x86-a-b-bootblock.s
-> > +	mkdir $(ASM_WORK_DIR)
-> > +	as --32 -march=i486 $< -o $(ASM_WORK_DIR).o
-> > +	objcopy -O binary $(ASM_WORK_DIR).o $(ASM_WORK_DIR).boot
-> > +	dd if=$(ASM_WORK_DIR).boot of=$(ASM_WORK_DIR).bootsect bs=256 count=2 skip=124
-> > +	xxd -i $(ASM_WORK_DIR).bootsect | \
-> > +            sed -e 's/tests_asm_temp_bootsect/bootsect/' -e 's/.*int.*//' > $(ASM_WORK_DIR).hex
-> > +	echo -e "/* This file is automatically generated from\n" \
-> > +             " * tests/migration/x86-a-b-bootblock.s, edit that and then\n" \
-> > +             " * make tests/migration/x86-a-b-bootblock.h to update,\n" \
-> > +             " * and then remember to send both in your patch submission.\n" \
-> > +             " */\n" | cat - $(ASM_WORK_DIR).hex > $@
-> > +	rm $(ASM_WORK_DIR).hex $(ASM_WORK_DIR).bootsect $(ASM_WORK_DIR).boot
-> > +	rm $(ASM_WORK_DIR).o
-> > +	rmdir $(ASM_WORK_DIR)
-> > +
-> > +
-> 
-> Could we create a new Makefile.include under tests/migration/ and move
-> the code above there? The code above is very large and can distract
-> people working on tests/Makefile.include.
-
-I've split that out into a separate script and removed the Makefile
-entry altogether; that way it also doesn't accidentally become a
-dependency if the times on the .s/.h get screwed up.
-
-> >  ifeq ($(CONFIG_POSIX),y)
-> >  LIBS += -lutil
-> >  endif
-> > diff --git a/tests/migration-test.c b/tests/migration-test.c
-> > index 799e24ebc6..7550fd8d56 100644
-> > --- a/tests/migration-test.c
-> > +++ b/tests/migration-test.c
-> > @@ -79,51 +79,7 @@ static const char *tmpfs;
-> >  /* A simple PC boot sector that modifies memory (1-100MB) quickly
-> >   * outputing a 'B' every so often if it's still running.
-> >   */
-> > -unsigned char bootsect[] = {
-> > -  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-> > -  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
-> > -  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
-> > -  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
-> > -  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
-> > -  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
-> > -  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
-> > -  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > -  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
-> > -};
-> > +#include "tests/migration/x86-a-b-bootblock.h"
-> >  
-> >  static void init_bootfile_x86(const char *bootpath)
-> >  {
-> > diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86-a-b-bootblock.h
-> > new file mode 100644
-> > index 0000000000..e45c8dd5b3
-> > --- /dev/null
-> > +++ b/tests/migration/x86-a-b-bootblock.h
-> > @@ -0,0 +1,52 @@
-> > +/* This file is automatically generated from
-> > +  * tests/migration/x86-a-b-bootblock.s, edit that and then
-> > +  * make tests/migration/x86-a-b-bootblock.h to update,
-> > +  * and then remember to send both in your patch submission.
-> > +  */
-> > +
-> > +unsigned char bootsect[] = {
-> 
-> Given that this is arch-dependent, I think it will be better to add
-> "x86_" as prefix to this variable.
-
-Done.
-
-V2 coming up.
-
-Dave
-
-> > +  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-> > +  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
-> > +  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
-> > +  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
-> > +  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
-> > +  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
-> > +  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
-> > +  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
-> > +};
-> > +
-> > diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.s
-> > new file mode 100644
-> > index 0000000000..7f290014af
-> > --- /dev/null
-> > +++ b/tests/migration/x86-a-b-bootblock.s
-> > @@ -0,0 +1,92 @@
-> > +# x86 bootblock used in migration test
-> > +#  repeatedly increments the first byte of each page in a 100MB
-> > +#  range.
-> > +#  Outputs an initial 'A' on serial followed by repeated 'B's
-> > +#
-> > +# run   make tests/migration/x86-a-b-bootblock.h
-> > +#   to regenerate the hex, and remember to include both the .h and .s
-> > +#   in any patches.
-> > +#
-> > +# Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > +# See the COPYING file in the top-level directory.
-> > +#
-> > +# Author: dgilbert@redhat.com
-> > +
-> > +
-> > +.code16
-> > +.org 0x7c00
-> > +        .file   "fill.s"
-> > +        .text
-> > +        .globl  start
-> > +        .type   start, @function
-> > +start:             # at 0x7c00 ?
-> > +        cli
-> > +        lgdt gdtdesc
-> > +        mov $1,%eax
-> > +        mov %eax,%cr0  # Protected mode enable
-> > +        data32 ljmp $8,$0x7c20
-> > +
-> > +.org 0x7c20
-> > +.code32
-> > +        # A20 enable - not sure I actually need this
-> > +        inb $0x92,%al
-> > +        or  $2,%al
-> > +        outb %al, $0x92
-> > +
-> > +        # set up DS for the whole of RAM (needed on KVM)
-> > +        mov $16,%eax
-> > +        mov %eax,%ds
-> > +
-> > +        mov $65,%ax
-> > +        mov $0x3f8,%dx
-> > +        outb %al,%dx
-> > +
-> > +        # bl keeps a counter so we limit the output speed
-> > +        mov $0, %bl
-> > +mainloop:
-> > +        # Start from 1MB
-> > +        mov $(1024*1024),%eax
-> > +innerloop:
-> > +        incb (%eax)
-> > +        add $4096,%eax
-> > +        cmp $(100*1024*1024),%eax
-> > +        jl innerloop
-> > +
-> > +        inc %bl
-> > +        jnz mainloop
-> > +
-> > +        mov $66,%ax
-> > +        mov $0x3f8,%dx
-> > +        outb %al,%dx
-> > +
-> > +        jmp mainloop
-> > +
-> > +        # GDT magic from old (GPLv2)  Grub startup.S
-> > +        .p2align        2       /* force 4-byte alignment */
-> > +gdt:
-> > +        .word   0, 0
-> > +        .byte   0, 0, 0, 0
-> > +
-> > +        /* -- code segment --
-> > +         * base = 0x00000000, limit = 0xFFFFF (4 KiB Granularity), present
-> > +         * type = 32bit code execute/read, DPL = 0
-> > +         */
-> > +        .word   0xFFFF, 0
-> > +        .byte   0, 0x9A, 0xCF, 0
-> > +
-> > +        /* -- data segment --
-> > +         * base = 0x00000000, limit 0xFFFFF (4 KiB Granularity), present
-> > +         * type = 32 bit data read/write, DPL = 0
-> > +         */
-> > +        .word   0xFFFF, 0
-> > +        .byte   0, 0x92, 0xCF, 0
-> > +
-> > +gdtdesc:
-> > +        .word   0x27                    /* limit */
-> > +        .long   gdt                     /* addr */
-> > +
-> > +/* I'm a bootable disk */
-> > +.org 0x7dfe
-> > +        .byte 0x55
-> > +        .byte 0xAA
-> > 
+On Mon, Feb 5, 2018 at 6:31 AM, Markus Armbruster <armbru@redhat.com> wrote=
+:
+> Thomas Huth <thuth@redhat.com> writes:
+>
+>> On 05.02.2018 07:33, Markus Armbruster wrote:
+>>> Thomas Huth <thuth@redhat.com> writes:
+>>>
+>>>> On 03.02.2018 09:43, Markus Armbruster wrote:
+>>>>> From: Alistair Francis <alistair.francis@xilinx.com>
+>>>>>
+>>>>> Convert fprintf(stderr, ...) to use qemu_log(). Double prints in
+>>>>> target/ppc/translate.c were manually remove. A fprintf() in
+>>>>> target/sh4/translate.c was kept as it's inside a #if 0. The #if 0 and
+>>>>> fflush() was removed around the unimplemented log in
+>>>>> target/sh4/translate.c as well.
+>>>>>
+>>>>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>>>>> [Trivial conflict with 6f1c2af641d resolved]
+>>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>>> ---
+>>>>>  target/cris/translate.c      |  2 +-
+>>>>>  target/ppc/translate.c       | 36 ++++++++++------------------------=
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>>  target/sh4/translate.c       |  7 ++-----
+>>>>>  target/unicore32/translate.c |  2 +-
+>>>>>  4 files changed, 14 insertions(+), 33 deletions(-)
+>>>>>
+>>>>> diff --git a/target/cris/translate.c b/target/cris/translate.c
+>>>>> index f51a731db9..ff31311ed0 100644
+>>>>> --- a/target/cris/translate.c
+>>>>> +++ b/target/cris/translate.c
+>>>>> @@ -137,7 +137,7 @@ typedef struct DisasContext {
+>>>>>
+>>>>>  static void gen_BUG(DisasContext *dc, const char *file, int line)
+>>>>>  {
+>>>>> -    fprintf(stderr, "BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>>>> +    qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>>>>      if (qemu_log_separate()) {
+>>>>>          qemu_log("BUG: pc=3D%x %s %d\n", dc->pc, file, line);
+>>>>>      }
+>>>>
+>>>> This one is still logging twice now.
+>>>
+>>> Hmm.
+>>>
+>>>>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>>>>> index 4132f67bb1..172c9f2001 100644
+>>>>> --- a/target/ppc/translate.c
+>>>>> +++ b/target/ppc/translate.c
+>>>>> @@ -3933,12 +3933,8 @@ static inline void gen_op_mfspr(DisasContext *=
+ctx)
+>>>>>               * allowing userland application to read the PVR
+>>>>>               */
+>>>>>              if (sprn !=3D SPR_PVR) {
+>>>>> -                fprintf(stderr, "Trying to read privileged spr %d (0=
+x%03x) at "
+>>>>> -                        TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4=
+);
+>>>>> -                if (qemu_log_separate()) {
+>>>>> -                    qemu_log("Trying to read privileged spr %d (0x%0=
+3x) at "
+>>>>> -                             TARGET_FMT_lx "\n", sprn, sprn, ctx->ni=
+p - 4);
+>>>>> -                }
+>>>>> +                qemu_log("Trying to read privileged spr %d (0x%03x) =
+at "
+>>>>> +                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - =
+4);
+>>>>
+>>>> I wonder whether that should maybe rather be a
+>>>> qemu_log_mask(LOG_GUEST_ERROR, ...) instead? Well, but maybe that's
+>>>> subject to another patch...
+>>>
+>>> qemu_log_separate() appears to be always used like this
+>>>
+>>>     fprintf(stderr, ... the message ...);
+>>>     if (qemu_log_separate()) {
+>>>         qemu_log(... the same message ...);
+>>>     }
+>>>
+>>> Are you proposing to replace this pattern by
+>>>
+>>>     qemu_log_mask(LOG_GUEST_ERROR, ...the message ...);
+>>>
+>>> ?
+>>
+>> Not globally, only in target/ppc/translate.c. The wrong accesses to SPR
+>> (special purpose registers) there indicate that the guest has likely
+>> tried to do something wrong.
+>>
+>> Globally, I wonder whether it still makes sense to keep the
+>> qemu_log_separate() stuff - we rather want to get rid of all fprintfs,
+>> don't we?
+>
+> The qemu_log_separate() pattern feels wrong to me.  If we have a class
+> of messages that should go to stderr in addition to the log (unless the
+> two are the same), then we should have a log level / mask / function /
+> whatever to do that.
+>
+> To expedite merging of the rest of the series, I'll drop this patch from
+> it.
+>
+> Alistair, would you be willing to work with Thomas to revise this patch?
+
+Yeah, I'm happy to.
+
+What do we think then? Just swap to qemu_log_mask() and
+error_report()? Or do we need something more?
+
+Alistair
+
+>
