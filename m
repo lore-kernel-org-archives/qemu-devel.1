@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eihjP-00036j-UE
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:26:52 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eihkI-00044q-MG
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:27:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eihjK-0007Qg-U7
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:26:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37608)
+	(envelope-from <lvivier@redhat.com>) id 1eihkD-0007r9-Mb
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:27:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eihjK-0007Q3-Nl
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:26:46 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-13-armbru@redhat.com>
-	<CAMxuvazW5+FzsFPq2+=jyktw+WMabKw0cMtM4N40JRLTz=C_iA@mail.gmail.com>
-Date: Mon, 05 Feb 2018 15:26:38 +0100
-In-Reply-To: <CAMxuvazW5+FzsFPq2+=jyktw+WMabKw0cMtM4N40JRLTz=C_iA@mail.gmail.com>
-	(Marc-Andre Lureau's message of "Mon, 5 Feb 2018 14:45:26 +0100")
-Message-ID: <87y3k7v7fl.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eihkD-0007qx-GN
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:27:41 -0500
+References: <20180203103727.26457-1-mark.cave-ayland@ilande.co.uk>
+	<20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <d733575d-2825-7d3b-0b2b-2fd125a8b85a@redhat.com>
+Date: Mon, 5 Feb 2018 15:27:38 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180203103727.26457-3-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 12/21] qapi: Concentrate
- QAPISchemaParser.exprs updates in .__init__()
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 02/10] cuda: don't allow writes to port
+ output pins
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
 
-Marc-Andre Lureau <mlureau@redhat.com> writes:
+On 03/02/2018 11:37, Mark Cave-Ayland wrote:
+> Use the direction registers as a mask to ensure that only input pins are
+> updated upon write.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/misc/macio/cuda.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+> index 23b7e0f5b0..7214e7adcb 100644
+> --- a/hw/misc/macio/cuda.c
+> +++ b/hw/misc/macio/cuda.c
+> @@ -359,11 +359,11 @@ static void cuda_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+>  
+>      switch(addr) {
+>      case CUDA_REG_B:
+> -        s->b = val;
+> +        s->b = (s->b & ~s->dirb) | (val & s->dirb);
+>          cuda_update(s);
+>          break;
+>      case CUDA_REG_A:
+> -        s->a = val;
+> +        s->a = (s->a & ~s->dira) | (val & s->dira);
+>          break;
+>      case CUDA_REG_DIRB:
+>          s->dirb = val;
+> 
 
-> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wro=
-te:
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> It's not obvious the motivation behind this change (beside behind more
-> elegant), but
-
-At one point during my search for a good way to record includes in the
-parse tree, updating .exprs in two places got in the way, so I cleaned
-it up.  I guess it's not in the way of the solution I eventually chose,
-but I consider it a worthwhile little cleanup on its own.
-
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Thanks!
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
