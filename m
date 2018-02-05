@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eii1r-0004cc-4t
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:45:59 -0500
+	(envelope-from <berto@igalia.com>) id 1eii4b-0006w4-I7
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:48:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eii1q-0005SR-Bf
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:45:55 -0500
-Date: Mon, 5 Feb 2018 14:45:32 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180205144532.GC28241@stefanha-x1.localdomain>
-References: <20180202111022.rtnvwmjs4r4jzttq@olga.proxmox.com>
-	<89ac21c9-7d29-9333-6fe3-557b13ccf4e6@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xesSdrSSBC0PokLI"
-Content-Disposition: inline
-In-Reply-To: <89ac21c9-7d29-9333-6fe3-557b13ccf4e6@redhat.com>
-Subject: Re: [Qemu-devel] rate limiting issues
+	(envelope-from <berto@igalia.com>) id 1eii4W-00087o-PE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:48:45 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon,  5 Feb 2018 16:33:11 +0200
+Message-Id: <eb0ed90affcf302e5a954bafb5931b5215483d3a.1517840877.git.berto@igalia.com>
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+References: <cover.1517840876.git.berto@igalia.com>
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+References: <cover.1517840876.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v4 11/39] qcow2: Remove BDS parameter from
+ qcow2_cache_is_table_offset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +22,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Wolfgang Bumiller <w.bumiller@proxmox.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
+This function was only using the BlockDriverState parameter to pass it
+to qcow2_cache_get_table_addr(). This is no longer necessary so this
+parameter can be removed.
 
---xesSdrSSBC0PokLI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2-cache.c    | 3 +--
+ block/qcow2-refcount.c | 6 +++---
+ block/qcow2.h          | 3 +--
+ 3 files changed, 5 insertions(+), 7 deletions(-)
 
-On Fri, Feb 02, 2018 at 04:52:00PM -0500, John Snow wrote:
-> CCing qemu-block and Berto
-
-To avoid confusion: ratelimit.h is only used by block jobs.  It is
-unrelated to throttle.h, which Berto maintains.
-
-Unifying the two came up in the past as a cleanup task.  No one has
-attempted it yet.
-
---xesSdrSSBC0PokLI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaeG4MAAoJEJykq7OBq3PIqu4IAMGTQjxoXvIjxnMkn9WfZmO4
-4wBN+kxFV6vd51qazCCAd4FNdc5QDbGqpa5xQ+1ryBYm+xeW4PVZhP4eaQHze4Lm
-GmSlT+Y2Q9QH3YoSGLYoDsbj4nQsaIRLN7bYvP9yu0OW5ffoPPOlFKwRcY8zcPdT
-7YrPm/3+FWk+wyYem+ZRZSV0cdGmPkEqfm/V842jHhyNEU/HBshV5q+++nMgkfJ2
-SwXynHN3+wT8rq3nsQumWI0Ep2mwzn+5E7UnnPAWqav0qC7XqN/+DKU7YVOluyAA
-2tMM8k4BciOl4rOB8jyVBLM488bvkbuKVKi8WRG3b7wbUdah2jHJrKYxcZJz4F4=
-=rkfD
------END PGP SIGNATURE-----
-
---xesSdrSSBC0PokLI--
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 8d0b65e671..b1aa42477e 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -428,8 +428,7 @@ void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table)
+     c->entries[i].dirty = true;
+ }
+ 
+-void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
+-                                  uint64_t offset)
++void *qcow2_cache_is_table_offset(Qcow2Cache *c, uint64_t offset)
+ {
+     int i;
+ 
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 361b39d5cc..9df380d52c 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -871,14 +871,14 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+         if (refcount == 0) {
+             void *table;
+ 
+-            table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
++            table = qcow2_cache_is_table_offset(s->refcount_block_cache,
+                                                 offset);
+             if (table != NULL) {
+                 qcow2_cache_put(s->refcount_block_cache, &refcount_block);
+                 qcow2_cache_discard(s->refcount_block_cache, table);
+             }
+ 
+-            table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
++            table = qcow2_cache_is_table_offset(s->l2_table_cache, offset);
+             if (table != NULL) {
+                 qcow2_cache_discard(s->l2_table_cache, table);
+             }
+@@ -3186,7 +3186,7 @@ static int qcow2_discard_refcount_block(BlockDriverState *bs,
+         s->free_cluster_index = cluster_index;
+     }
+ 
+-    refblock = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
++    refblock = qcow2_cache_is_table_offset(s->refcount_block_cache,
+                                            discard_block_offs);
+     if (refblock) {
+         /* discard refblock from the cache if refblock is cached */
+diff --git a/block/qcow2.h b/block/qcow2.h
+index f6552fe9c3..cb8dd784fa 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -654,8 +654,7 @@ int qcow2_cache_get(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+     void **table);
+ void qcow2_cache_put(Qcow2Cache *c, void **table);
+-void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
+-                                  uint64_t offset);
++void *qcow2_cache_is_table_offset(Qcow2Cache *c, uint64_t offset);
+ void qcow2_cache_discard(Qcow2Cache *c, void *table);
+ 
+ /* qcow2-bitmap.c functions */
+-- 
+2.11.0
