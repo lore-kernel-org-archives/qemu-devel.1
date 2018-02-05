@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZn-0001i9-EX
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiia2-0001yl-9W
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eiiZi-0001L8-LC
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:20:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eiia0-0001rW-T0
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:21:14 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  5 Feb 2018 16:18:25 +0100
-Message-Id: <20180205151835.20812-17-mreitz@redhat.com>
+Date: Mon,  5 Feb 2018 16:18:28 +0100
+Message-Id: <20180205151835.20812-20-mreitz@redhat.com>
 In-Reply-To: <20180205151835.20812-1-mreitz@redhat.com>
 References: <20180205151835.20812-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 16/26] block: Use bdrv_dirname() for
- relative filenames
+Subject: [Qemu-devel] [PATCH v8 19/26] block: Add
+ BlockDriver.bdrv_gather_child_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,88 +23,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-bdrv_get_full_backing_filename_from_filename() breaks down when it comes
-to JSON filenames. Using bdrv_dirname() as the basis is better because
-since we have BDS, we can descend through the BDS tree to the protocol
-layer, which gives us a greater probability of finding a non-JSON name;
-also, bdrv_dirname() is more correct as it allows block drivers to
-override the generation of that directory name in a protocol-specific
-way.
+Some follow-up patches will rework the way bs->full_open_options is
+refreshed in bdrv_refresh_filename(). The new implementation will remove
+the need for the block drivers' bdrv_refresh_filename() implementations
+to set bs->full_open_options; instead, it will be generic and use static
+information from each block driver.
 
-We still need to keep bdrv_get_full_backing_filename_from_filename(),
-though, because it has valid callers which need it during image creation
-when no BDS is available yet.
+However, by implementing bdrv_gather_child_options(), block drivers will
+still be able to override the way the full_open_options of their
+children are incorporated into their own.
 
-This makes a test case in qemu-iotest 110, which was supposed to fail,
-work. That is actually good, but we need to change the reference output
-(and the comment in 110) accordingly.
+We need to implement this function for VMDK because we have to prevent
+the generic implementation from gathering the options of all children:
+It is not possible to specify options for the extents through the
+runtime options.
+
+For quorum, the child names that would be used by the generic
+implementation and the ones that we actually (currently) want to use
+differ. See quorum_gather_child_options() for more information.
+
+Note that both of these are cases which are not ideal: In case of VMDK
+it would probably be nice to be able to specify options for all extents.
+In case of quorum, the current runtime option structure is simply broken
+and needs to be fixed (but that is left for another patch).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c                    | 20 +++++++++++++++-----
- tests/qemu-iotests/110     |  3 ++-
- tests/qemu-iotests/110.out |  2 +-
- 3 files changed, 18 insertions(+), 7 deletions(-)
+ include/block/block_int.h | 17 +++++++++++++++++
+ block/quorum.c            | 38 ++++++++++++++++++++++++++++++++++++++
+ block/vmdk.c              | 13 +++++++++++++
+ 3 files changed, 68 insertions(+)
 
-diff --git a/block.c b/block.c
-index 8957a3d4dc..f23b35405d 100644
---- a/block.c
-+++ b/block.c
-@@ -311,12 +311,22 @@ char *bdrv_get_full_backing_filename_from_filename(const char *backed,
- static char *bdrv_make_absolute_filename(BlockDriverState *relative_to,
-                                          const char *filename, Error **errp)
- {
--    char *bs_filename = relative_to->exact_filename[0]
--                        ? relative_to->exact_filename
--                        : relative_to->filename;
-+    char *dir, *full_name;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 9e6800d42e..5e0bfe70d4 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -135,6 +135,23 @@ struct BlockDriver {
  
--    return bdrv_get_full_backing_filename_from_filename(bs_filename,
--                                                        filename ?: "", errp);
-+    if (!filename || filename[0] == '\0') {
-+        return NULL;
-+    } else if (path_has_protocol(filename) || path_is_absolute(filename)) {
-+        return g_strdup(filename);
-+    }
+     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
+ 
++    /*
++     * Gathers the open options for all children into @target.
++     * A simple format driver (without backing file support) might
++     * implement this function like this:
++     *
++     *     QINCREF(bs->file->bs->full_open_options);
++     *     qdict_put(target, "file", bs->file->bs->full_open_options);
++     *
++     * If not specified, the generic implementation will simply put
++     * all children's options under their respective name.
++     *
++     * Note that ideally this function would not be needed.  Every
++     * block driver which implements it is probably doing something
++     * shady regarding its runtime option structure.
++     */
++    void (*bdrv_gather_child_options)(BlockDriverState *bs, QDict *target);
 +
-+    dir = bdrv_dirname(relative_to, errp);
-+    if (!dir) {
-+        return NULL;
-+    }
-+
-+    full_name = g_strconcat(dir, filename, NULL);
-+    g_free(dir);
-+    return full_name;
+     /*
+      * Returns an allocated string which is the directory name of this BDS: It
+      * will be used to make relative filenames absolute by prepending this
+diff --git a/block/quorum.c b/block/quorum.c
+index 4b38201aa2..9d680addc6 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1095,6 +1095,43 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
+     bs->full_open_options = opts;
  }
  
- char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index 9de7369f3a..ba1b3c6c7d 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -61,7 +61,8 @@ echo '=== Non-reconstructable filename ==='
- echo
++static void quorum_gather_child_options(BlockDriverState *bs, QDict *target)
++{
++    BDRVQuorumState *s = bs->opaque;
++    QList *children_list;
++    int i;
++
++    /* The generic implementation for gathering child options in
++     * bdrv_refresh_filename() would use the names of the children
++     * as specified for bdrv_open_child() or bdrv_attach_child(),
++     * which is "children.%u" with %u being a value
++     * (s->next_child_index) that is incremented each time a new child
++     * is added (and never decremented).  Since children can be
++     * deleted at runtime, there may be gaps in that enumeration.
++     * When creating a new quorum BDS and specifying the children for
++     * it through runtime options, the enumeration used there may not
++     * have any gaps, though.
++     *
++     * Therefore, we have to create a new gap-less enumeration here
++     * (which we can achieve by simply putting all of the children's
++     * full_open_options into a QList).
++     *
++     * XXX: Note that there are issues with the current child option
++     *      structure quorum uses (such as the fact that children do
++     *      not really have unique permanent names).  Therefore, this
++     *      is going to have to change in the future and ideally we
++     *      want quorum to be covered by the generic implementation.
++     */
++
++    children_list = qlist_new();
++    qdict_put(target, "children", children_list);
++
++    for (i = 0; i < s->num_children; i++) {
++        QINCREF(s->children[i]->bs->full_open_options);
++        qlist_append(children_list, s->children[i]->bs->full_open_options);
++    }
++}
++
+ static char *quorum_dirname(BlockDriverState *bs, Error **errp)
+ {
+     /* In general, there are multiple BDSs with different dirnames below this
+@@ -1123,6 +1160,7 @@ static BlockDriver bdrv_quorum = {
+     .bdrv_file_open                     = quorum_open,
+     .bdrv_close                         = quorum_close,
+     .bdrv_refresh_filename              = quorum_refresh_filename,
++    .bdrv_gather_child_options          = quorum_gather_child_options,
+     .bdrv_dirname                       = quorum_dirname,
  
- # Across blkdebug without a config file, you cannot reconstruct filenames, so
--# qemu is incapable of knowing the directory of the top image
-+# qemu is incapable of knowing the directory of the top image from the filename
-+# alone. However, using bdrv_dirname(), it should still work.
- TEST_IMG="json:{
-     'driver': '$IMGFMT',
-     'file': {
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index b3584ff87f..5370bc1d26 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -14,7 +14,7 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
- image: json:{"driver": "IMGFMT", "file": {"set-state.0.event": "read_aio", "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driver": "blkdebug", "set-state.0.new_state": 42}}
- file format: IMGFMT
- virtual size: 64M (67108864 bytes)
--backing file: t.IMGFMT.base (cannot determine actual path)
-+backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
+     .bdrv_co_flush_to_disk              = quorum_co_flush,
+diff --git a/block/vmdk.c b/block/vmdk.c
+index e61d15bc92..caa6131712 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -2343,6 +2343,18 @@ static int vmdk_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+     return 0;
+ }
  
- === Backing name is always relative to the backed image ===
++static void vmdk_gather_child_options(BlockDriverState *bs, QDict *target)
++{
++    /* No children but file and backing can be explicitly specified (TODO) */
++    QINCREF(bs->file->bs->full_open_options);
++    qdict_put(target, "file", bs->file->bs->full_open_options);
++
++    if (bs->backing && bs->backing_overridden) {
++        QINCREF(bs->backing->bs->full_open_options);
++        qdict_put(target, "backing", bs->backing->bs->full_open_options);
++    }
++}
++
+ static QemuOptsList vmdk_create_opts = {
+     .name = "vmdk-create-opts",
+     .head = QTAILQ_HEAD_INITIALIZER(vmdk_create_opts.head),
+@@ -2413,6 +2425,7 @@ static BlockDriver bdrv_vmdk = {
+     .bdrv_get_specific_info       = vmdk_get_specific_info,
+     .bdrv_refresh_limits          = vmdk_refresh_limits,
+     .bdrv_get_info                = vmdk_get_info,
++    .bdrv_gather_child_options    = vmdk_gather_child_options,
  
+     .supports_backing             = true,
+     .create_opts                  = &vmdk_create_opts,
 -- 
 2.14.3
