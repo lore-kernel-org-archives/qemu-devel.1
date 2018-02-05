@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eieSt-00063O-HN
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:36 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eieSr-00062E-PA
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eieSs-0007Cp-Mj
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:35 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eieSq-0007BL-R1
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:33 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  5 Feb 2018 10:57:19 +0000
-Message-Id: <20180205105720.14620-8-peter.maydell@linaro.org>
-In-Reply-To: <20180205105720.14620-1-peter.maydell@linaro.org>
-References: <20180205105720.14620-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 7/8] target/arm: Implement writing to
- CONTROL_NS for v8M
+Date: Mon,  5 Feb 2018 10:57:12 +0000
+Message-Id: <20180205105720.14620-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/8] v8m: minor missing regs and bugfixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +20,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-In commit 50f11062d4c896 we added support for MSR/MRS access
-to the NS banked special registers, but we forgot to implement
-the support for writing to CONTROL_NS. Correct the omission.
+This patchset is the result of comparing the registers
+listed in the v8M Arm ARM against what QEMU was implementing.
+It adds a collection of generally unexciting missing registers
+(most of which we can simply NOP or make reads-as-written).
+There are also a couple of bug fixes in there, of which the
+worst is the byte-to-interrupt-number conversions being
+completely wrong in several places. I think we didn't notice
+that before because if you only deal with the bottom 32
+interrupts then they're all in the first register in the
+enable/pend/etc banks...
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+These patches sit on top of the derived-exceptions patchset,
+but any conflicts should be purely textual.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3332565101..abb4d94a7f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10388,6 +10388,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-             }
-             env->v7m.faultmask[M_REG_NS] = val & 1;
-             return;
-+        case 0x94: /* CONTROL_NS */
-+            if (!env->v7m.secure) {
-+                return;
-+            }
-+            write_v7m_control_spsel_for_secstate(env,
-+                                                 val & R_V7M_CONTROL_SPSEL_MASK,
-+                                                 M_REG_NS);
-+            env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
-+            env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
-+            return;
-         case 0x98: /* SP_NS */
-         {
-             /* This gives the non-secure SP selected based on whether we're
+Based-on: <1517324542-6607-1-git-send-email-peter.maydell@linaro.org>
+
+thanks
+-- PMM
+
+Peter Maydell (8):
+  hw/intc/armv7m_nvic: Don't hardcode M profile ID registers in NVIC
+  hw/intc/armv7m_nvic: Fix ICSR PENDNMISET/CLR handling
+  hw/intc/armv7m_nvic: Implement M profile cache maintenance ops
+  hw/intc/armv7m_nvic: Implement v8M CPPWR register
+  hw/intc/armv7m_nvic: Implement cache ID registers
+  hw/intc/armv7m_nvic: Implement SCR
+  target/arm: Implement writing to CONTROL_NS for v8M
+  hw/intc/armv7m_nvic: Fix byte-to-interrupt number conversions
+
+ target/arm/cpu.h      | 16 +++++++++
+ hw/intc/armv7m_nvic.c | 95 +++++++++++++++++++++++++++++++++++++--------------
+ target/arm/cpu.c      | 28 +++++++++++++++
+ target/arm/helper.c   | 10 ++++++
+ target/arm/machine.c  | 48 ++++++++++++++++++++++++++
+ 5 files changed, 172 insertions(+), 25 deletions(-)
+
 -- 
 2.16.1
