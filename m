@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eihwI-0007eM-9y
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:15 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eihwq-0008E0-GE
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eihwC-0000vx-D6
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:10 -0500
-Date: Mon, 5 Feb 2018 14:39:49 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180205143949.GB28241@stefanha-x1.localdomain>
-References: <20180203153935.8056-1-pbonzini@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1eihwm-0001JO-EJ
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:44 -0500
+Received: from mail-qt0-f181.google.com ([209.85.216.181]:35452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eihwm-0001JA-90
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:40:40 -0500
+Received: by mail-qt0-f181.google.com with SMTP id g14so39856779qti.2
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 06:40:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5/uDoXvLw7AC5HRs"
-Content-Disposition: inline
-In-Reply-To: <20180203153935.8056-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] coroutine-lock: polymorphic CoQueue
+In-Reply-To: <87mv0nv73y.fsf@dusky.pond.sub.org>
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-15-armbru@redhat.com>
+	<CAMxuvayFe8fU5PMyX00k2tM=2-=ZQqsxd1PwMUxAFAx26chFRA@mail.gmail.com>
+	<87mv0nv73y.fsf@dusky.pond.sub.org>
+From: Marc-Andre Lureau <mlureau@redhat.com>
+Date: Mon, 5 Feb 2018 15:40:39 +0100
+Message-ID: <CAMxuvaw7i8UssX=-kCSRAPaq7b74pY2++aWk4AgD3kwv3C0yKA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 14/21] qapi: Generate in source order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+
+On Mon, Feb 5, 2018 at 3:33 PM, Markus Armbruster <armbru@redhat.com> wrote=
+:
+> Marc-Andre Lureau <mlureau@redhat.com> writes:
+>
+>> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>>> The generators' conversion to visitors (merge commit 9e72681d16)
+>>> changed the processing order of entities from source order to
+>>> alphabetical order.  The next commit needs source order, so change it
+>>> back.
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>  scripts/qapi/common.py                   |   4 +-
+>>>  tests/qapi-schema/comments.out           |   2 +-
+>>>  tests/qapi-schema/doc-bad-section.out    |   4 +-
+>>>  tests/qapi-schema/doc-good.out           |  32 ++--
+>>>  tests/qapi-schema/empty.out              |   2 +-
+>>>  tests/qapi-schema/event-case.out         |   2 +-
+>>>  tests/qapi-schema/ident-with-escape.out  |   6 +-
+>>>  tests/qapi-schema/include-relpath.out    |   2 +-
+>>>  tests/qapi-schema/include-repetition.out |   2 +-
+>>>  tests/qapi-schema/include-simple.out     |   2 +-
+>>>  tests/qapi-schema/indented-expr.out      |   2 +-
+>>>  tests/qapi-schema/qapi-schema-test.out   | 320 +++++++++++++++--------=
+--------
+>>>  12 files changed, 191 insertions(+), 189 deletions(-)
+>>>
+>>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+>>> index d5b93e7381..3b97bf8702 100644
+>>> --- a/scripts/qapi/common.py
+>>> +++ b/scripts/qapi/common.py
+>>> @@ -1471,6 +1471,7 @@ class QAPISchema(object):
+>>>          parser =3D QAPISchemaParser(open(fname, 'r'))
+>>>          exprs =3D check_exprs(parser.exprs)
+>>>          self.docs =3D parser.docs
+>>> +        self._entity_list =3D []
+>>>          self._entity_dict =3D {}
+>>>          self._predefining =3D True
+>>>          self._def_predefineds()
+>>> @@ -1482,6 +1483,7 @@ class QAPISchema(object):
+>>>          # Only the predefined types are allowed to not have info
+>>>          assert ent.info or self._predefining
+>>>          assert ent.name not in self._entity_dict
+>>> +        self._entity_list.append(ent)
+>>>          self._entity_dict[ent.name] =3D ent
+>>
+>> Why not use the OrderedDict instead?
+>
+> Fair question!  However, the next patch will create anonymous entities,
+> which get added only to ._entity_list, not _entity_dict.
+
+I see, something we could improve or clarify, but that's ok to me as is:
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
---5/uDoXvLw7AC5HRs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Feb 03, 2018 at 10:39:30AM -0500, Paolo Bonzini wrote:
-> There are cases in which a queued coroutine must be restarted from
-> non-coroutine context (with qemu_co_enter_next).  In this cases,
-> qemu_co_enter_next also needs to be thread-safe, but it cannot use a
-> CoMutex and so cannot qemu_co_queue_wait.  This happens in curl (which
-> right now is rolling its own list of Coroutines) and will happen in
-> Fam's NVMe driver as well.
->=20
-> This series extracts the idea of a polymorphic lockable object
-> from my "scoped lock guard" proposal, and applies it to CoQueue.
-> The implementation of QemuLockable is similar to C11 _Generic, but
-> redone using the preprocessor and GCC builtins for compatibility.
->=20
-> In general, while a bit on the esoteric side, the functionality used
-> to emulate _Generic is fairly old in GCC, and the builtins are already
-> used by include/qemu/atomic.h; the series was tested with Fedora 27 (boot
-> Damn Small Linux via http) and CentOS 6 (compiled only).
->=20
-> Paolo
->=20
-> v4->v5: fix checkpatch complaints
->=20
-> v3->v4: fix -O0 compilation [Fam]
->         typos and copyright dates [Eric, Fam]
->         improve CoQueue comments [Stefan]
->=20
-> Paolo Bonzini (5):
->   test-coroutine: add simple CoMutex test
->   lockable: add QemuLockable
->   coroutine-lock: convert CoQueue to use QemuLockable
->   coroutine-lock: make qemu_co_enter_next thread-safe
->   curl: convert to CoQueue
->=20
->  block/curl.c                | 20 ++--------
->  fsdev/qemu-fsdev-throttle.c |  4 +-
->  include/qemu/compiler.h     | 40 +++++++++++++++++++
->  include/qemu/coroutine.h    | 29 +++++++++-----
->  include/qemu/lockable.h     | 96 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  include/qemu/thread.h       |  5 +--
->  include/qemu/typedefs.h     |  4 ++
->  tests/test-coroutine.c      | 75 ++++++++++++++++++++++++++++++++++-
->  util/qemu-coroutine-lock.c  | 22 +++++++----
->  9 files changed, 256 insertions(+), 39 deletions(-)
->  create mode 100644 include/qemu/lockable.h
->=20
-> --=20
-> 2.14.3
->=20
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---5/uDoXvLw7AC5HRs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaeGy1AAoJEJykq7OBq3PIbJ0IAJ39fiooM28+YPKKFBTKxr3F
-NUQa3Ne8d+2rrKQjp8vrON51vrQ28x2dIVzS8QAg0ZOpl4lFuxdVKBw/Gec926gb
-pGiDS+08TncA6MOysEXhTZjLPV+fKk5r+GsobPifGvFZmQijbwaQ2Dy+P4u9lOTf
-kkG6YRGgrpZvzKX8lgEaKVsymUqmiglWayupSUv9yy3BURSDido/cxB/BE+jXZvm
-i0iMXSqlhR37hYLwNs9VkPrE711ysbeQQyISJVGlg0gOlpCikeADMJD4HgxbEel1
-H6icy/DLRWnOzsng4vFh8lQJ3urR2BJyXTpoFTXtq3i+7ETfySSQ2oCXK2Uq6P4=
-=pwhR
------END PGP SIGNATURE-----
-
---5/uDoXvLw7AC5HRs--
+>
+> [...]
