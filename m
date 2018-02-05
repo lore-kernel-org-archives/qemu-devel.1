@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eihqJ-0001Jf-87
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:34:00 -0500
+	(envelope-from <berto@igalia.com>) id 1eihrI-0002At-8p
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:35:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eihqE-00051E-IE
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:33:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eihqE-000510-CC
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:33:54 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-15-armbru@redhat.com>
-	<CAMxuvayFe8fU5PMyX00k2tM=2-=ZQqsxd1PwMUxAFAx26chFRA@mail.gmail.com>
-Date: Mon, 05 Feb 2018 15:33:37 +0100
-In-Reply-To: <CAMxuvayFe8fU5PMyX00k2tM=2-=ZQqsxd1PwMUxAFAx26chFRA@mail.gmail.com>
-	(Marc-Andre Lureau's message of "Mon, 5 Feb 2018 14:45:35 +0100")
-Message-ID: <87mv0nv73y.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 14/21] qapi: Generate in source order
+	(envelope-from <berto@igalia.com>) id 1eihrD-0006CQ-6B
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:35:00 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon,  5 Feb 2018 16:33:05 +0200
+Message-Id: <7c1b262344375d52544525f85bbbf0548d5ba575.1517840876.git.berto@igalia.com>
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+References: <cover.1517840876.git.berto@igalia.com>
+In-Reply-To: <cover.1517840876.git.berto@igalia.com>
+References: <cover.1517840876.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v4 05/39] qcow2: Remove BDS parameter from
+ qcow2_cache_table_release()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andre Lureau <mlureau@redhat.com>
-Cc: marcandre <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-Marc-Andre Lureau <mlureau@redhat.com> writes:
+This function was only using the BlockDriverState parameter to get the
+cache table size (since it was equal to the cluster size). This is no
+longer necessary so this parameter can be removed.
 
-> On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wrote:
->> The generators' conversion to visitors (merge commit 9e72681d16)
->> changed the processing order of entities from source order to
->> alphabetical order.  The next commit needs source order, so change it
->> back.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  scripts/qapi/common.py                   |   4 +-
->>  tests/qapi-schema/comments.out           |   2 +-
->>  tests/qapi-schema/doc-bad-section.out    |   4 +-
->>  tests/qapi-schema/doc-good.out           |  32 ++--
->>  tests/qapi-schema/empty.out              |   2 +-
->>  tests/qapi-schema/event-case.out         |   2 +-
->>  tests/qapi-schema/ident-with-escape.out  |   6 +-
->>  tests/qapi-schema/include-relpath.out    |   2 +-
->>  tests/qapi-schema/include-repetition.out |   2 +-
->>  tests/qapi-schema/include-simple.out     |   2 +-
->>  tests/qapi-schema/indented-expr.out      |   2 +-
->>  tests/qapi-schema/qapi-schema-test.out   | 320 +++++++++++++++----------------
->>  12 files changed, 191 insertions(+), 189 deletions(-)
->>
->> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->> index d5b93e7381..3b97bf8702 100644
->> --- a/scripts/qapi/common.py
->> +++ b/scripts/qapi/common.py
->> @@ -1471,6 +1471,7 @@ class QAPISchema(object):
->>          parser = QAPISchemaParser(open(fname, 'r'))
->>          exprs = check_exprs(parser.exprs)
->>          self.docs = parser.docs
->> +        self._entity_list = []
->>          self._entity_dict = {}
->>          self._predefining = True
->>          self._def_predefineds()
->> @@ -1482,6 +1483,7 @@ class QAPISchema(object):
->>          # Only the predefined types are allowed to not have info
->>          assert ent.info or self._predefining
->>          assert ent.name not in self._entity_dict
->> +        self._entity_list.append(ent)
->>          self._entity_dict[ent.name] = ent
->
-> Why not use the OrderedDict instead?
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2-cache.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Fair question!  However, the next patch will create anonymous entities,
-which get added only to ._entity_list, not _entity_dict.
-
-[...]
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 3749d55595..5ff2cbf5c5 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -71,8 +71,7 @@ static inline const char *qcow2_cache_get_name(BDRVQcow2State *s, Qcow2Cache *c)
+     }
+ }
+ 
+-static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
+-                                      int i, int num_tables)
++static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
+ {
+ /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
+ #ifdef CONFIG_LINUX
+@@ -114,7 +113,7 @@ void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
+         }
+ 
+         if (to_clean > 0) {
+-            qcow2_cache_table_release(bs, c, i - to_clean, to_clean);
++            qcow2_cache_table_release(c, i - to_clean, to_clean);
+         }
+     }
+ 
+@@ -306,7 +305,7 @@ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c)
+         c->entries[i].lru_counter = 0;
+     }
+ 
+-    qcow2_cache_table_release(bs, c, 0, c->size);
++    qcow2_cache_table_release(c, 0, c->size);
+ 
+     c->lru_counter = 0;
+ 
+@@ -453,5 +452,5 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
+     c->entries[i].lru_counter = 0;
+     c->entries[i].dirty = false;
+ 
+-    qcow2_cache_table_release(bs, c, i, 1);
++    qcow2_cache_table_release(c, i, 1);
+ }
+-- 
+2.11.0
