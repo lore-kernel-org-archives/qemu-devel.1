@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiaDE-0005mI-7G
+	(envelope-from <mjc@sifive.com>) id 1eiaDE-0005mV-Fy
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:25:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiaDC-0006zl-Mb
+	(envelope-from <mjc@sifive.com>) id 1eiaD9-0006x5-8I
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:25:08 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:44334)
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44332)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiaDC-0006zE-EZ
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:25:06 -0500
-Received: by mail-pg0-x244.google.com with SMTP id r1so2072512pgn.11
-	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 22:25:06 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiaD8-0006wZ-Vh
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 01:25:03 -0500
+Received: by mail-pg0-x242.google.com with SMTP id r1so2072432pgn.11
+	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 22:25:02 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Mon,  5 Feb 2018 19:22:44 +1300
-Message-Id: <1517811767-75958-19-git-send-email-mjc@sifive.com>
+Date: Mon,  5 Feb 2018 19:22:43 +1300
+Message-Id: <1517811767-75958-18-git-send-email-mjc@sifive.com>
 In-Reply-To: <1517811767-75958-1-git-send-email-mjc@sifive.com>
 References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v4 19/22] SiFive RISC-V Test Finisher
+Subject: [Qemu-devel] [PATCH v4 18/22] SiFive RISC-V PRCI Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +28,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-Test finisher memory mapped device used to exit simulation.
+Simple model of the PRCI  (Power, Reset, Clock, Interrupt) to emulate
+register reads made by the SDK BSP.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_test.c         | 99 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_test.h | 48 ++++++++++++++++++++
- 2 files changed, 147 insertions(+)
- create mode 100644 hw/riscv/sifive_test.c
- create mode 100644 include/hw/riscv/sifive_test.h
+ hw/riscv/sifive_prci.c         | 95 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_prci.h | 43 +++++++++++++++++++
+ 2 files changed, 138 insertions(+)
+ create mode 100644 hw/riscv/sifive_prci.c
+ create mode 100644 include/hw/riscv/sifive_prci.h
 
-diff --git a/hw/riscv/sifive_test.c b/hw/riscv/sifive_test.c
+diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
 new file mode 100644
-index 0000000..9696f15
+index 0000000..fc19089
 --- /dev/null
-+++ b/hw/riscv/sifive_test.c
-@@ -0,0 +1,99 @@
++++ b/hw/riscv/sifive_prci.c
+@@ -0,0 +1,95 @@
 +/*
-+ * QEMU SiFive Test Finisher
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
 + *
-+ * Copyright (c) 2018 SiFive, Inc.
++ * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * Test finisher memory mapped device used to exit simulation
++ * Simple model of the PRCI to emulate register reads made by the SDK BSP
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -73,35 +74,31 @@ index 0000000..9696f15
 +#include "qemu/osdep.h"
 +#include "hw/sysbus.h"
 +#include "target/riscv/cpu.h"
-+#include "hw/riscv/sifive_test.h"
++#include "hw/riscv/sifive_prci.h"
 +
-+static uint64_t sifive_test_read(void *opaque, hwaddr addr, unsigned int size)
++/* currently implements enough to mock freedom-e-sdk BSP clock programming */
++
++static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
 +{
++    if (addr == 0 /* PRCI_HFROSCCFG */) {
++        return 1 << 31; /* ROSC_RDY */
++    }
++    if (addr == 8 /* PRCI_PLLCFG    */) {
++        return 1 << 31; /* PLL_LOCK */
++    }
++    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
 +    return 0;
 +}
 +
-+static void sifive_test_write(void *opaque, hwaddr addr,
++static void sifive_prci_write(void *opaque, hwaddr addr,
 +           uint64_t val64, unsigned int size)
 +{
-+    if (addr == 0) {
-+        int status = val64 & 0xffff;
-+        int code = (val64 >> 16) & 0xffff;
-+        switch (status) {
-+        case FINISHER_FAIL:
-+            exit(code);
-+        case FINISHER_PASS:
-+            exit(0);
-+        default:
-+            break;
-+        }
-+    }
-+    hw_error("%s: write: addr=0x%x val=0x%016" PRIx64 "\n",
-+        __func__, (int)addr, val64);
++    /* discard writes */
 +}
 +
-+static const MemoryRegionOps sifive_test_ops = {
-+    .read = sifive_test_read,
-+    .write = sifive_test_write,
++static const MemoryRegionOps sifive_prci_ops = {
++    .read = sifive_prci_read,
++    .write = sifive_prci_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .valid = {
 +        .min_access_size = 4,
@@ -109,50 +106,50 @@ index 0000000..9696f15
 +    }
 +};
 +
-+static void sifive_test_init(Object *obj)
++static void sifive_prci_init(Object *obj)
 +{
-+    SiFiveTestState *s = SIFIVE_TEST(obj);
++    SiFivePRCIState *s = SIFIVE_PRCI(obj);
 +
-+    memory_region_init_io(&s->mmio, obj, &sifive_test_ops, s,
-+                          TYPE_SIFIVE_TEST, 0x1000);
++    memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
++                          TYPE_SIFIVE_PRCI, 0x8000);
 +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
 +}
 +
-+static const TypeInfo sifive_test_info = {
-+    .name          = TYPE_SIFIVE_TEST,
++static const TypeInfo sifive_prci_info = {
++    .name          = TYPE_SIFIVE_PRCI,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SiFiveTestState),
-+    .instance_init = sifive_test_init,
++    .instance_size = sizeof(SiFivePRCIState),
++    .instance_init = sifive_prci_init,
 +};
 +
-+static void sifive_test_register_types(void)
++static void sifive_prci_register_types(void)
 +{
-+    type_register_static(&sifive_test_info);
++    type_register_static(&sifive_prci_info);
 +}
 +
-+type_init(sifive_test_register_types)
++type_init(sifive_prci_register_types)
 +
 +
 +/*
-+ * Create Test device.
++ * Create PRCI device.
 + */
-+DeviceState *sifive_test_create(hwaddr addr)
++DeviceState *sifive_prci_create(hwaddr addr)
 +{
-+    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_TEST);
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
 +    qdev_init_nofail(dev);
 +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
 +    return dev;
 +}
-diff --git a/include/hw/riscv/sifive_test.h b/include/hw/riscv/sifive_test.h
+diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
 new file mode 100644
-index 0000000..6a0f5bb
+index 0000000..0e032e5
 --- /dev/null
-+++ b/include/hw/riscv/sifive_test.h
-@@ -0,0 +1,48 @@
++++ b/include/hw/riscv/sifive_prci.h
+@@ -0,0 +1,43 @@
 +/*
-+ * QEMU Test Finisher interface
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
 + *
-+ * Copyright (c) 2018 SiFive, Inc.
++ * Copyright (c) 2017 SiFive, Inc.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -173,28 +170,23 @@ index 0000000..6a0f5bb
 + * THE SOFTWARE.
 + */
 +
-+#ifndef HW_SIFIVE_TEST_H
-+#define HW_SIFIVE_TEST_H
++#ifndef HW_SIFIVE_PRCI_H
++#define HW_SIFIVE_PRCI_H
 +
-+#define TYPE_SIFIVE_TEST "riscv.sifive.test"
++#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
 +
-+#define SIFIVE_TEST(obj) \
-+    OBJECT_CHECK(SiFiveTestState, (obj), TYPE_SIFIVE_TEST)
++#define SIFIVE_PRCI(obj) \
++    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
 +
-+typedef struct SiFiveTestState {
++typedef struct SiFivePRCIState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
 +    MemoryRegion mmio;
-+} SiFiveTestState;
++} SiFivePRCIState;
 +
-+enum {
-+    FINISHER_FAIL = 0x3333,
-+    FINISHER_PASS = 0x5555
-+};
-+
-+DeviceState *sifive_test_create(hwaddr addr);
++DeviceState *sifive_prci_create(hwaddr addr);
 +
 +#endif
 -- 
