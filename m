@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintU-0005fK-72
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:41 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintV-0005fa-GK
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintR-0003MU-5X
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38766
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eintS-0003Nw-DF
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:41 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58278)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eintQ-0003LT-W0
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:37 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w15KxUVL128197
-	for <qemu-devel@nongnu.org>; Mon, 5 Feb 2018 16:01:34 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fxuj87k1e-1
+	id 1eintS-0003Mh-3Y
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 16:01:38 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w15L12qm113934
+	for <qemu-devel@nongnu.org>; Mon, 5 Feb 2018 16:01:36 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fxwfbbbdm-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 16:01:32 -0500
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 16:01:36 -0500
 Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Mon, 5 Feb 2018 16:01:32 -0500
+	Mon, 5 Feb 2018 16:01:35 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Mon,  5 Feb 2018 15:57:14 -0500
-Message-Id: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 00/12]Interactive Boot Menu for DASD and
- SCSI Guests on s390x
+Date: Mon,  5 Feb 2018 15:57:17 -0500
+In-Reply-To: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
+References: <1517864246-11101-1-git-send-email-walling@linux.vnet.ibm.com>
+Message-Id: <1517864246-11101-4-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 03/12] s390-ccw: refactor IPL structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,105 +40,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com, eblake@redhat.com, mihajlov@linux.vnet.ibm.com
 
---- [v5] ---
+ECKD DASDs have different IPL structures for CDL and LDL
+formats. The current Ipl1 and Ipl2 structs follow the CDL
+format, so we prepend "EckdCdl" to them. Boot info for LDL
+has been moved to a new struct: EckdLdlIpl1.
 
-Note: some areas outside of this patch series could use some 
-cleanup/refactoring/revisiting, but I'd like to defer that to a different
-series that touches on those areas (if we try to address them all, then
-this series will never be finished!)
+Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/bootmap.c | 12 ++++++------
+ pc-bios/s390-ccw/bootmap.h | 37 +++++++++++++++++++++----------------
+ 2 files changed, 27 insertions(+), 22 deletions(-)
 
-As for the irq drain solution introduced with this version, it is invoked 
-where the possibility of pending irqs is most likely. Ideally we'd like 
-to call this somewhere toward the end of the IPL process, but it requires 
-some refactoring of code that is better suited for another patch series.
-
-*** - introduced Viktor's patch which includes a QEMU IPLB
-      - boot menu options are stored here
-*** - we now drain all pending irqs after getting boot index
-*** - lib.c functions will not handle negative numbers and are documented as such
-      - reason: negative number conversions are not needed in s390-ccw bios
-      - it just bloats the code -- it's easier to just maintain the cases we need
-      - removed wrapper for itostr and placed asserts inside itostr
-    - various code cleanups
-      - removed superfluous parens
-      - eckd_block_num now uses CHS ptr
-      - cleaned up read_prompt (moved buffer add and echo to default case)
-      - cleaned up zipl configuration parameter logic
-      - condensed scsi program table entries counter
-      - moved stage1, 1b, and seekarg structs to patch "read stage2 boot..."
-      - s/BOOT_MENU_FLAG_BOOT_OPTS/BOOT_MENU_FLAG_CMD_OPTS
-        - this makes a little more sense as to where these fields came from
-      - moved loadparm defines to main.c, as that is the only file that needs them
-      - s/2017/2018 :)
-
-
---- [Summary] ---
-
-These patches implement a boot menu for ECKD DASD and SCSI guests on s390x. 
-The menu will only appear if the disk has been configured for IPL with the 
-zIPL tool and with the following QEMU command line options:
-
-    -boot menu=on[,splash-time=X] and/or -machine loadparm='prompt'
-
-The following must be specified for the device to be IPL'd from:
-
-    -device ...,bootindex=1
-
-or via the following libvirt domain xml:
-
-    <os>
-      <bootmenu enable='yes' timeout='X'/>
-    </os>
-
-    or
-	
-    <disk>
-      ...
-      <boot order='1' loadparm='PROMPT'/>
-    </disk>
-
-Where X is some positive integer representing time in milliseconds.
-
-<boot order='1' ... > must be specified for the device to be IPL'd from
-
-A loadparm other than 'prompt' will disable the menu and just boot 
-the specified entry.
-
-If no boot options are specified, we will attempt to use the values
-provided by zipl (ECKD DASD only).
-
-Collin L. Walling (12):
-  s390-ccw: refactor boot map table code
-  s390-ccw: refactor eckd_block_num to use CHS
-  s390-ccw: refactor IPL structs
-  s390-ccw: update libc
-  s390-ccw: move auxiliary IPL data to separate location
-  s390-ccw: parse and set boot menu options
-  s390-ccw: set up interactive boot menu parameters
-  s390-ccw: read stage2 boot loader data to find menu
-  s390-ccw: print zipl boot menu
-  s390-ccw: read user input for boot index via the SCLP console
-  s390-ccw: clear pending irqs
-  s390-ccw: interactive boot menu for scsi
-
- hw/s390x/ipl.c              |  70 +++++++++++-
- hw/s390x/ipl.h              |  16 ++-
- pc-bios/s390-ccw/Makefile   |   2 +-
- pc-bios/s390-ccw/bootmap.c  | 175 +++++++++++++++++++++---------
- pc-bios/s390-ccw/bootmap.h  |  89 ++++++++++------
- pc-bios/s390-ccw/iplb.h     |  14 ++-
- pc-bios/s390-ccw/libc.c     |  91 ++++++++++++++++
- pc-bios/s390-ccw/libc.h     |  35 +++++-
- pc-bios/s390-ccw/main.c     |  48 ++++++---
- pc-bios/s390-ccw/menu.c     | 252 ++++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/menu.h     |  25 +++++
- pc-bios/s390-ccw/s390-ccw.h |   3 +
- pc-bios/s390-ccw/sclp.c     |  41 +++++--
- pc-bios/s390-ccw/virtio.c   |   2 +-
- 14 files changed, 746 insertions(+), 117 deletions(-)
- create mode 100644 pc-bios/s390-ccw/libc.c
- create mode 100644 pc-bios/s390-ccw/menu.c
- create mode 100644 pc-bios/s390-ccw/menu.h
-
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 9b9696e..c97f136 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -221,7 +221,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr)
+ static void ipl_eckd_cdl(void)
+ {
+     XEckdMbr *mbr;
+-    Ipl2 *ipl2 = (void *)sec;
++    EckdCdlIpl2 *ipl2 = (void *)sec;
+     IplVolumeLabel *vlbl = (void *)sec;
+     block_number_t bmt_block_nr;
+ 
+@@ -231,7 +231,7 @@ static void ipl_eckd_cdl(void)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
+ 
+-    mbr = &ipl2->u.x.mbr;
++    mbr = &ipl2->mbr;
+     IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
+     IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
+                "Bad block size in zIPL section of IPL2 record.");
+@@ -281,7 +281,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+ {
+     block_number_t bmt_block_nr;
+-    BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
++    EckdLdlIpl1 *ipl1 = (void *)sec;
+ 
+     if (mode != ECKD_LDL_UNLABELED) {
+         print_eckd_ldl_msg(mode);
+@@ -292,15 +292,15 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(0, sec, "Cannot read block 0 to grab boot info.");
+     if (mode == ECKD_LDL_UNLABELED) {
+-        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
++        if (!magic_match(ipl1->bip.magic, ZIPL_MAGIC)) {
+             return; /* not applicable layout */
+         }
+         sclp_print("unlabeled LDL.\n");
+     }
+-    verify_boot_info(bip);
++    verify_boot_info(&ipl1->bip);
+ 
+     /* save pointer to Boot Map Table */
+-    bmt_block_nr = eckd_block_num(&bip->bp.ipl.bm_ptr.eckd.bptr.chs);
++    bmt_block_nr = eckd_block_num(&ipl1->bip.bp.ipl.bm_ptr.eckd.bptr.chs);
+ 
+     run_eckd_boot_script(bmt_block_nr);
+     /* no return */
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index 260ac2a..cfe9ddd 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -237,22 +237,27 @@ typedef struct BootInfo {          /* @ 0x70, record #0    */
+     } bp;
+ } __attribute__ ((packed)) BootInfo; /* see also XEckdMbr   */
+ 
+-typedef struct Ipl1 {
+-    unsigned char key[4]; /* == "IPL1" */
+-    unsigned char data[24];
+-} __attribute__((packed)) Ipl1;
+-
+-typedef struct Ipl2 {
+-    unsigned char key[4]; /* == "IPL2" */
+-    union {
+-        unsigned char data[144];
+-        struct {
+-            unsigned char reserved1[92-4];
+-            XEckdMbr mbr;
+-            unsigned char reserved2[144-(92-4)-sizeof(XEckdMbr)];
+-        } x;
+-    } u;
+-} __attribute__((packed)) Ipl2;
++/*
++ * Structs for IPL
++ */
++#define STAGE2_BLK_CNT_MAX  24 /* Stage 1b can load up to 24 blocks */
++
++typedef struct EckdCdlIpl1 {
++    uint8_t key[4]; /* == "IPL1" */
++    uint8_t data[24];
++} __attribute__((packed)) EckdCdlIpl1;
++
++typedef struct EckdCdlIpl2 {
++    uint8_t key[4]; /* == "IPL2" */
++    uint8_t reserved0[88];
++    XEckdMbr mbr;
++    uint8_t reserved[24];
++} __attribute__((packed)) EckdCdlIpl2;
++
++typedef struct EckdLdlIpl1 {
++    uint8_t reserved[112];
++    BootInfo bip; /* BootInfo is MBR for LDL */
++} __attribute__((packed)) EckdLdlIpl1;
+ 
+ typedef struct IplVolumeLabel {
+     unsigned char key[4]; /* == "VOL1" */
 -- 
 2.7.4
