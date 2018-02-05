@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiopF-0006o3-G5
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 17:01:22 -0500
+	(envelope-from <mjc@sifive.com>) id 1eioxb-0002Al-8q
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 17:10:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eiopE-0006Dj-Ag
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 17:01:21 -0500
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:44478)
+	(envelope-from <mjc@sifive.com>) id 1eioxZ-0003uG-RM
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 17:09:59 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eiopE-0006DH-1g
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 17:01:20 -0500
-Received: by mail-oi0-x230.google.com with SMTP id b3so19393874oib.11
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 14:01:19 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eioxZ-0003tH-Jx
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 17:09:57 -0500
+Received: by mail-ot0-x242.google.com with SMTP id a7so25476686otk.9
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 14:09:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <ce17e6a5-7e22-a73e-36f5-89c81bcb60a6@linaro.org>
+In-Reply-To: <20180205160418.34544e1f@redhat.com>
 References: <1517811767-75958-1-git-send-email-mjc@sifive.com>
-	<1517811767-75958-6-git-send-email-mjc@sifive.com>
-	<ce17e6a5-7e22-a73e-36f5-89c81bcb60a6@linaro.org>
+	<1517811767-75958-3-git-send-email-mjc@sifive.com>
+	<20180205160418.34544e1f@redhat.com>
 From: Michael Clark <mjc@sifive.com>
-Date: Tue, 6 Feb 2018 11:01:18 +1300
-Message-ID: <CAHNT7NsoC36h9nT5E_GLb5WzQ8ga4uc5waKHvFo5hMzQqnqbNA@mail.gmail.com>
+Date: Tue, 6 Feb 2018 11:09:56 +1300
+Message-ID: <CAHNT7NsBQvruhfUpH2aP2BLfiASDU=b7Bsncqpih1ADohxo7cQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 06/22] RISC-V FPU Support
+Subject: Re: [Qemu-devel] [PATCH v4 03/22] RISC-V CPU Core Definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On Tue, Feb 6, 2018 at 3:01 AM, Richard Henderson <
-richard.henderson@linaro.org> wrote:
+On Tue, Feb 6, 2018 at 4:04 AM, Igor Mammedov <imammedo@redhat.com> wrote:
 
-> On 02/04/2018 10:22 PM, Michael Clark wrote:
-> > +uint64_t helper_fmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t
-> frs2,
-> > +                        uint64_t frs3)
+> On Mon,  5 Feb 2018 19:22:28 +1300
+> Michael Clark <mjc@sifive.com> wrote:
+>
+> > Add CPU state header, CPU definitions and initialization routines
+> >
+> > Signed-off-by: Michael Clark <mjc@sifive.com>
+> > ---
+> >  target/riscv/cpu.c      | 385 ++++++++++++++++++++++++++++++
+> ++++++++++++++
+> >  target/riscv/cpu.h      | 256 +++++++++++++++++++++++++++++
+> >  target/riscv/cpu_bits.h | 417 ++++++++++++++++++++++++++++++
+> ++++++++++++++++++
+> >  3 files changed, 1058 insertions(+)
+> >  create mode 100644 target/riscv/cpu.c
+> >  create mode 100644 target/riscv/cpu.h
+> >  create mode 100644 target/riscv/cpu_bits.h
+> >
+> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > new file mode 100644
+> > index 0000000..684b78b
+> > --- /dev/null
+> > +++ b/target/riscv/cpu.c
+> [...]
+> > +
+> > +static const RISCVCPUInfo riscv_cpus[] = {
+> > +#ifdef CONFIG_USER_ONLY
+> > +    { TYPE_RISCV_CPU_ANY,                riscv_any_cpu_init },
+> > +#else
+> > +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09, riscv_imafdcsu_priv1_9_cpu_init
+> },
+> > +    { TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10, riscv_imafdcsu_priv1_10_cpu_init
+> },
+> > +    { TYPE_RISCV_CPU_IMACU_PRIV_1_10,    riscv_imacu_priv1_10_cpu_init
+> },
+> > +    { TYPE_RISCV_CPU_IMAC_PRIV_1_10,     riscv_imac_priv1_10_cpu_init },
+> > +#endif
+> > +    { NULL, NULL }
+> > +};
+> > +
+> [...]
+> > +static void cpu_register(const RISCVCPUInfo *info)
 > > +{
-> > +    return float32_muladd(frs1, frs2, frs3 ^ (uint32_t)INT32_MIN, 0,
-> > +                          &env->fp_status);
+> > +    TypeInfo type_info = {
+> > +        .name = info->name,
+> > +        .parent = TYPE_RISCV_CPU,
+> > +        .instance_size = sizeof(RISCVCPU),
+> > +        .instance_init = info->initfn,
+> > +    };
+> > +
+> > +    type_register(&type_info);
+> > +}
+> > +
+> > +static const TypeInfo riscv_cpu_type_info = {
+> > +    .name = TYPE_RISCV_CPU,
+> > +    .parent = TYPE_CPU,
+> > +    .instance_size = sizeof(RISCVCPU),
+> > +    .instance_init = riscv_cpu_init,
+> > +    .abstract = false,
+> > +    .class_size = sizeof(RISCVCPUClass),
+> > +    .class_init = riscv_cpu_class_init,
+> > +};
+> [...]
 >
-> Missing the requested change to use float32_chs or
-> float_muladd_negate_product
-> et al throughout the fma family of helpers.
+> > +static void riscv_cpu_register_types(void)
+> > +{
+> > +    const RISCVCPUInfo *info = riscv_cpus;
+> > +
+> > +    type_register_static(&riscv_cpu_type_info);
+> > +
+> > +    while (info->name) {
+> > +        cpu_register(info);
+> > +        info++;
+> > +    }
+> > +}
+> > +
+> > +type_init(riscv_cpu_register_types)
+> For simplistic type definitions like that,
+> above parts should use DEFINE_TYPES(), see c6678108 for reference.
 >
-> Probably float_muladd_* since you've re-enabled default_nan_mode.
+>
+> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> > new file mode 100644
+> > index 0000000..8b816ae
+> > --- /dev/null
+> > +++ b/target/riscv/cpu.h
+> [...]
+> > +#define TYPE_RISCV_CPU                    "riscv"
+> > +#define TYPE_RISCV_CPU_ANY                "riscv-any"
+> > +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09 "riscv-imafdcsu-priv1.9"
+> > +#define TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10 "riscv-imafdcsu-priv1.10"
+> > +#define TYPE_RISCV_CPU_IMACU_PRIV_1_10    "riscv-imacu-priv1.10"
+> > +#define TYPE_RISCV_CPU_IMAC_PRIV_1_10     "riscv-imac-priv1.10"
+> > +
+> > +#define RISCV_CPU_TYPE_PREFIX TYPE_RISCV_CPU "-"
+> > +#define RISCV_CPU_TYPE_NAME(name) (RISCV_CPU_TYPE_PREFIX name)
+> it still uses prefix notation versus commonly used suffix in form of
+>  "targetFOO-cpu"
+> this prefix approach would get in the way if we try to generalize
+> naming <-> type conversion later[*].
+> So it would better to be consistent with approach qemu uses for cpu types
+> (I believe power had prefix based pnv types but it has been fixed
+> to common suffix based pattern later).
+>
+> * discussion on thread "[PATCH v5 0/6]  Add a valid_cpu_types property"
+>
 
+I can reverse them if needed, just it seems a little odd to have riscv on
+the right-hand side of the extensions. I can do this in the v5 spin...
 
-I'll go through your comments again. I wasn't sure whether you had some of
-these changes in your tree
-
-I was previously a little hesitant about change floating point stuff but
-now i've got riscv-tests running i'm less worried.
-
-We are currently failing several floating point tests.
-
-rv64ua-v-amoadd_d
-rv64ua-v-amoadd_w
-rv64ua-v-amoand_d
-rv64ua-v-amoand_w
-rv64ua-v-amomax_d
-rv64ua-v-amomax_w
-rv64ua-v-amomaxu_d
-rv64ua-v-amomaxu_w
-rv64ua-v-amomin_d
-rv64ua-v-amomin_w
-rv64ua-v-amominu_d
-rv64ua-v-amominu_w
-rv64ua-v-amoor_d
-rv64ua-v-amoor_w
-rv64ua-v-amoswap_d
-rv64ua-v-amoswap_w
-rv64ua-v-amoxor_d
-rv64ua-v-amoxor_w
-rv64ua-v-lrsc
-rv64uc-v-rvc
-rv64ud-v-fadd
-rv64ud-v-fclass
-rv64ud-v-fcmp
-rv64ud-v-fcvt
-rv64ud-v-fcvt_w
-rv64ud-v-fdiv
-rv64ud-v-fmadd
-rv64ud-v-fmin
-*** FAILED *** (tohost = 20
-)rv64ud-v-ldst
-*** FAILED *** (tohost = 6)
-rv64ud-v-move
-*** FAILED *** (tohost = 40)
-rv64ud-v-recoding
-rv64ud-v-structural
-rv64uf-v-fadd
-rv64uf-v-fclass
-rv64uf-v-fcmp
-rv64uf-v-fcvt
-rv64uf-v-fcvt_w
-rv64uf-v-fdiv
-rv64uf-v-fmadd
-rv64uf-v-fmin
-*** FAILED *** (tohost = 20)
-rv64uf-v-ldst
-rv64uf-v-move
-rv64uf-v-recoding
-rv64ui-v-add
-rv64ui-v-addi
-rv64ui-v-addiw
-rv64ui-v-addw
-rv64ui-v-and
-rv64ui-v-andi
-rv64ui-v-auipc
-rv64ui-v-beq
-rv64ui-v-bge
-rv64ui-v-bgeu
-rv64ui-v-blt
-rv64ui-v-bltu
-rv64ui-v-bne
-rv64ui-v-fence_i
-rv64ui-v-jal
-rv64ui-v-jalr
-rv64ui-v-lb
-rv64ui-v-lbu
-rv64ui-v-ld
-rv64ui-v-lh
-rv64ui-v-lhu
-rv64ui-v-lui
-rv64ui-v-lw
-rv64ui-v-lwu
-rv64ui-v-or
-rv64ui-v-ori
-rv64ui-v-sb
-rv64ui-v-sd
-rv64ui-v-sh
-rv64ui-v-simple
-rv64ui-v-sll
-rv64ui-v-slli
-rv64ui-v-slliw
-rv64ui-v-sllw
-rv64ui-v-slt
-rv64ui-v-slti
-rv64ui-v-sltiu
-rv64ui-v-sltu
-rv64ui-v-sra
-rv64ui-v-srai
-rv64ui-v-sraiw
-rv64ui-v-sraw
-rv64ui-v-srl
-rv64ui-v-srli
-rv64ui-v-srliw
-rv64ui-v-srlw
-rv64ui-v-sub
-rv64ui-v-subw
-rv64ui-v-sw
-rv64ui-v-xor
-rv64ui-v-xori
-rv64um-v-div
-rv64um-v-divu
-rv64um-v-divuw
-rv64um-v-divw
-rv64um-v-mul
-rv64um-v-mulh
-rv64um-v-mulhsu
-rv64um-v-mulhu
-rv64um-v-mulw
-rv64um-v-rem
-rv64um-v-remu
-rv64um-v-remuw
-rv64um-v-remw
+It may make more sense once we have actual CPU models. Currently, we have
+sets of extensions and privilege ISA versions. I guess these will become
+implicit properties of a specific CPU model and the extensions will be
+visible in the initialization function.
