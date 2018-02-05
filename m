@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eij76-0005p7-DY
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:55:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1eij7k-0006Lr-KA
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:56:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eij75-0002if-3k
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:55:24 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:43450)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eij74-0002e3-Fb
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:55:22 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id q12so9977355otg.10
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 07:55:22 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1eij7h-00052m-HG
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:56:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eij7h-00050S-6x
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 10:56:01 -0500
+References: <20180202130336.24719-1-armbru@redhat.com>
+	<20180202130336.24719-10-armbru@redhat.com>
+	<1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
+	<878tca4ez9.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <13b80daf-db39-8183-2836-a13b2d4ef21b@redhat.com>
+Date: Mon, 5 Feb 2018 09:55:54 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180205155108.GF28241@stefanha-x1.localdomain>
-References: <CAPHFV4=P3viF0m0PtqFZZ8_JNxy7G6kXdysYAfSsOJZe=2j7gw@mail.gmail.com>
-	<20180202100843.GD13090@stefanha-x1.localdomain>
-	<CAFEAcA-5PwhJw9epXh+0_oe3E-vsVKkQDX3s1Go-FBzO=FA3zA@mail.gmail.com>
-	<20180205155108.GF28241@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Feb 2018 15:55:01 +0000
-Message-ID: <CAFEAcA-vd3vEJ0i=2LtaR-NQjHoJVYWCNDHOmh3iREPcQsqR4A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu Trace
+In-Reply-To: <878tca4ez9.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO"
+Subject: Re: [Qemu-devel] [PATCH RFC 09/21] qapi: Don't absolutize include
+ file name in error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Nesrine Zouari <nesrine.zouari@enis.tn>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 5 February 2018 at 15:51, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The point of the instrumentation plugin API is for online analysis
-> (stuff that cannot be post-processed offline) with the ability for the
-> plugin to control QEMU (e.g. affect translation during a run).  That is
-> not necessary for Nesrine's use case.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com,
+ mdroth@linux.vnet.ibm.com
+Message-ID: <13b80daf-db39-8183-2836-a13b2d4ef21b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 09/21] qapi: Don't absolutize include
+ file name in error messages
+References: <20180202130336.24719-1-armbru@redhat.com>
+ <20180202130336.24719-10-armbru@redhat.com>
+ <1ec446ca-a469-7950-bea1-c832cbaf9fa3@redhat.com>
+ <878tca4ez9.fsf@dusky.pond.sub.org>
+In-Reply-To: <878tca4ez9.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-...but it hugely overlaps, because the most interesting
-reason for having a trace plugin is to be able to do things
-like tracing instruction flow, memory access and so on.
+On 02/03/2018 03:08 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+>> On 02/02/2018 07:03 AM, Markus Armbruster wrote:
+>>> Error messages print absolute filenames of included files even gave a=
 
-> I see two main requirements in Nesrine's use case:
->
-> 1. Instruction flow, memory access, and task switch trace.  This doesn't
-> exist today and requires adding new trace events.
->
-> 2. An external interface for processing traces.  There seems to be a
-> requirement for doing it online and not by post-processing trace files.
-> Therefore I suggested looking into LTTng UST, which has an efficient
-> interface and libraries for tracing processes.  I think no QEMU changes
-> are necessary here.
+>>
+>> s/even gave/even when given/
+>=20
+> I meant to write "even if the user gave".  Is that okay?
 
-...and "online processing of traces" is pretty much exactly
-what an instrumentation plugin API is for.
+Yes, that works too.
 
-It would also let you put the logic of "how do we know what a
-guest OS task switch is anyway" somewhere other than QEMU,
-which is nice because that's very guest-OS specific.
+>=20
+>>> relative one on the command line:
+>>>
+>>>      PYTHONPATH=3Dscripts python -B tests/qapi-schema/test-qapi.py te=
+sts/qapi-schema/include-cycle.json
+>>>     In file included from tests/qapi-schema/include-cycle.json:1:
+>>>     In file included from /work/armbru/qemu/tests/qapi-schema/include=
+-cycle-b.json:1:
+>>>     /work/armbru/qemu/tests/qapi-schema/include-cycle-c.json:1: Inclu=
+sion loop for include-cycle.json
+>>>
+>>> Improve this to
+>>>
+>>>     In file included from tests/qapi-schema/include-cycle.json:1:
+>>>     In file included from tests/qapi-schema/include-cycle-b.json:1:
+>>>     tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for incl=
+ude-cycle.json
+>>
+>> Nice, and makes developing new qapi tests a little less painful since
+>> it's less modification to qapi-schema/*.err additions.
+>=20
+> Probably not, as our make rule strips off $(SRC_PATH):
+>=20
+> 	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -q $(SRC_PATH)/=
+$*.err -
+>=20
+> I've kept that, because it might also occur in stack backtraces.  I
+> think.
 
-thanks
--- PMM
+I still recall having to hand-edit .err files when doing a naive "run
+the test to get the failure, then 'mv' the bad files into the expected
+filenames, then rerun the tests"; so I'm not sure if our make rule was
+properly munging absolute names out of the file in the first place.  I'm
+not too fussed about it, though, as adding new tests is less frequent
+and it's still fairly easy to learn if you did it right or not by
+whether 'make check' succeeds.
+
+>=20
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>  scripts/qapi/common.py                | 12 ++++++------
+>>>  tests/qapi-schema/include-no-file.err |  2 +-
+>>>  2 files changed, 7 insertions(+), 7 deletions(-)
+>>>
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Thanks!
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlp4fooACgkQp6FrSiUn
+Q2oYRAgAn+SpDOmF+O4+b2IB2Ilr6iy1UoHShk517HcFTDqwS0hafCFygPw89Olp
+W4aTA8rk+ALD74FVZXNRYWgBybGvkeM4f7TmYgW3/Fh6sTFJOSpvQA1XuI1+SKJp
+qbD/MJlq8Tjy3dUqS9xYXNcbvFrSeUh3vUroWAZPOBwQHd1AHX4zpLBGOGZOgEAA
+OaUNSzVP6xbCeVPbO1F2IaMJGWWkmlyex5u1TVyb0ZbbgSwc9Hh2DFbaIYWmQgka
+cQo6KWC6UGQLa0v4lQ7VaT+LZ8r4Ajp4+oyF34dbEz9dObgCJ61/hNGiGzhIIh6z
++UmsRr0mWwFut8jjjykMgHFs8xwyUw==
+=ALMB
+-----END PGP SIGNATURE-----
+
+--K2sRP1oQtNAAczdKM5eRVPhv02KBPGxsO--
