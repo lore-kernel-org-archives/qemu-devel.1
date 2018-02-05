@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eidzZ-0006G8-O7
+	(envelope-from <marcel@redhat.com>) id 1eidzZ-0006G6-8I
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eidzX-0006Po-FC
+	(envelope-from <marcel@redhat.com>) id 1eidzV-0006LJ-9I
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:27:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38696)
+Received: from mx1.redhat.com ([209.132.183.28]:44940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eidzX-0006OA-7F
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:27:15 -0500
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eidzV-0006Iu-1V
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:27:13 -0500
 From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Mon,  5 Feb 2018 12:26:56 +0200
-Message-Id: <20180205102659.60552-2-marcel@redhat.com>
-In-Reply-To: <20180205102659.60552-1-marcel@redhat.com>
-References: <20180205102659.60552-1-marcel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] mem: add share parameter to
- memory-backend-ram
+Date: Mon,  5 Feb 2018 12:26:55 +0200
+Message-Id: <20180205102659.60552-1-marcel@redhat.com>
+Subject: [Qemu-devel]  [PULL 0/4] RDMA patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,458 +24,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, ehabkost@redhat.com, yuval.shaia@oracle.com, marcel@redhat.com, mst@redhat.com, dotanb@mellanox.com
 
-Currently only file backed memory backend can
-be created with a "share" flag in order to allow
-sharing guest RAM with other processes in the host.
+The following changes since commit f24ee107a07f093bd7ed475dd48d7ba57ea3d8fe:
 
-Add the "share" flag also to RAM Memory Backend
-in order to allow remapping parts of the guest RAM
-to different host virtual addresses. This is needed
-by the RDMA devices in order to remap non-contiguous
-QEMU virtual addresses to a contiguous virtual address range.
+  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180202-pull-request' into staging (2018-02-02 18:54:11 +0000)
 
-Moved the "share" flag to the Host Memory base class,
-modified phys_mem_alloc to include the new parameter
-and a new interface memory_region_init_ram_shared_nomigrate.
+are available in the git repository at:
 
-There are no functional changes if the new flag is not used.
+  https://github.com/marcel-apf/qemu tags/rdma-pull-request
 
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- backends/hostmem-file.c  | 25 +------------------------
- backends/hostmem-ram.c   |  4 ++--
- backends/hostmem.c       | 21 +++++++++++++++++++++
- exec.c                   | 26 +++++++++++++++-----------
- include/exec/memory.h    | 23 +++++++++++++++++++++++
- include/exec/ram_addr.h  |  3 ++-
- include/qemu/osdep.h     |  2 +-
- include/sysemu/hostmem.h |  2 +-
- include/sysemu/kvm.h     |  2 +-
- memory.c                 | 16 +++++++++++++---
- qemu-options.hx          | 10 +++++++++-
- target/s390x/kvm.c       |  4 ++--
- util/oslib-posix.c       |  4 ++--
- util/oslib-win32.c       |  2 +-
- 14 files changed, 94 insertions(+), 50 deletions(-)
+for you to fetch changes up to f172ba1b02724fb66dabd69cd553cfa625b413e5:
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index e319ec1ad8..134b08d63a 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -31,7 +31,6 @@ typedef struct HostMemoryBackendFile HostMemoryBackendFile;
- struct HostMemoryBackendFile {
-     HostMemoryBackend parent_obj;
- 
--    bool share;
-     bool discard_data;
-     char *mem_path;
-     uint64_t align;
-@@ -59,7 +58,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-         path = object_get_canonical_path(OBJECT(backend));
-         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-                                  path,
--                                 backend->size, fb->align, fb->share,
-+                                 backend->size, fb->align, backend->share,
-                                  fb->mem_path, errp);
-         g_free(path);
-     }
-@@ -86,25 +85,6 @@ static void set_mem_path(Object *o, const char *str, Error **errp)
-     fb->mem_path = g_strdup(str);
- }
- 
--static bool file_memory_backend_get_share(Object *o, Error **errp)
--{
--    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
--
--    return fb->share;
--}
--
--static void file_memory_backend_set_share(Object *o, bool value, Error **errp)
--{
--    HostMemoryBackend *backend = MEMORY_BACKEND(o);
--    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
--
--    if (host_memory_backend_mr_inited(backend)) {
--        error_setg(errp, "cannot change property value");
--        return;
--    }
--    fb->share = value;
--}
--
- static bool file_memory_backend_get_discard_data(Object *o, Error **errp)
- {
-     return MEMORY_BACKEND_FILE(o)->discard_data;
-@@ -171,9 +151,6 @@ file_backend_class_init(ObjectClass *oc, void *data)
-     bc->alloc = file_backend_memory_alloc;
-     oc->unparent = file_backend_unparent;
- 
--    object_class_property_add_bool(oc, "share",
--        file_memory_backend_get_share, file_memory_backend_set_share,
--        &error_abort);
-     object_class_property_add_bool(oc, "discard-data",
-         file_memory_backend_get_discard_data, file_memory_backend_set_discard_data,
-         &error_abort);
-diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
-index 38977be73e..7ddd08d370 100644
---- a/backends/hostmem-ram.c
-+++ b/backends/hostmem-ram.c
-@@ -28,8 +28,8 @@ ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-     }
- 
-     path = object_get_canonical_path_component(OBJECT(backend));
--    memory_region_init_ram_nomigrate(&backend->mr, OBJECT(backend), path,
--                           backend->size, errp);
-+    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend), path,
-+                           backend->size, backend->share, errp);
-     g_free(path);
- }
- 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index ee2c2d5bfd..1daf13bd2e 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -369,6 +369,24 @@ static void set_id(Object *o, const char *str, Error **errp)
-     backend->id = g_strdup(str);
- }
- 
-+static bool host_memory_backend_get_share(Object *o, Error **errp)
-+{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-+
-+    return backend->share;
-+}
-+
-+static void host_memory_backend_set_share(Object *o, bool value, Error **errp)
-+{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-+
-+    if (host_memory_backend_mr_inited(backend)) {
-+        error_setg(errp, "cannot change property value");
-+        return;
-+    }
-+    backend->share = value;
-+}
-+
- static void
- host_memory_backend_class_init(ObjectClass *oc, void *data)
- {
-@@ -399,6 +417,9 @@ host_memory_backend_class_init(ObjectClass *oc, void *data)
-         host_memory_backend_get_policy,
-         host_memory_backend_set_policy, &error_abort);
-     object_class_property_add_str(oc, "id", get_id, set_id, &error_abort);
-+    object_class_property_add_bool(oc, "share",
-+        host_memory_backend_get_share, host_memory_backend_set_share,
-+        &error_abort);
- }
- 
- static void host_memory_backend_finalize(Object *o)
-diff --git a/exec.c b/exec.c
-index 629a508385..5e56efefeb 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1285,7 +1285,7 @@ static int subpage_register (subpage_t *mmio, uint32_t start, uint32_t end,
-                              uint16_t section);
- static subpage_t *subpage_init(FlatView *fv, hwaddr base);
- 
--static void *(*phys_mem_alloc)(size_t size, uint64_t *align) =
-+static void *(*phys_mem_alloc)(size_t size, uint64_t *align, bool shared) =
-                                qemu_anon_ram_alloc;
- 
- /*
-@@ -1293,7 +1293,7 @@ static void *(*phys_mem_alloc)(size_t size, uint64_t *align) =
-  * Accelerators with unusual needs may need this.  Hopefully, we can
-  * get rid of it eventually.
-  */
--void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align))
-+void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align, bool shared))
- {
-     phys_mem_alloc = alloc;
- }
-@@ -1921,7 +1921,7 @@ static void dirty_memory_extend(ram_addr_t old_ram_size,
-     }
- }
- 
--static void ram_block_add(RAMBlock *new_block, Error **errp)
-+static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
- {
-     RAMBlock *block;
-     RAMBlock *last_block = NULL;
-@@ -1944,7 +1944,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-             }
-         } else {
-             new_block->host = phys_mem_alloc(new_block->max_length,
--                                             &new_block->mr->align);
-+                                             &new_block->mr->align, shared);
-             if (!new_block->host) {
-                 error_setg_errno(errp, errno,
-                                  "cannot set up guest memory '%s'",
-@@ -2049,7 +2049,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-         return NULL;
-     }
- 
--    ram_block_add(new_block, &local_err);
-+    ram_block_add(new_block, &local_err, share);
-     if (local_err) {
-         g_free(new_block);
-         error_propagate(errp, local_err);
-@@ -2091,7 +2091,7 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
-                                   void (*resized)(const char*,
-                                                   uint64_t length,
-                                                   void *host),
--                                  void *host, bool resizeable,
-+                                  void *host, bool resizeable, bool share,
-                                   MemoryRegion *mr, Error **errp)
- {
-     RAMBlock *new_block;
-@@ -2114,7 +2114,7 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
-     if (resizeable) {
-         new_block->flags |= RAM_RESIZEABLE;
-     }
--    ram_block_add(new_block, &local_err);
-+    ram_block_add(new_block, &local_err, share);
-     if (local_err) {
-         g_free(new_block);
-         error_propagate(errp, local_err);
-@@ -2126,12 +2126,15 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
- RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-                                    MemoryRegion *mr, Error **errp)
- {
--    return qemu_ram_alloc_internal(size, size, NULL, host, false, mr, errp);
-+    return qemu_ram_alloc_internal(size, size, NULL, host, false,
-+                                   false, mr, errp);
- }
- 
--RAMBlock *qemu_ram_alloc(ram_addr_t size, MemoryRegion *mr, Error **errp)
-+RAMBlock *qemu_ram_alloc(ram_addr_t size, bool share,
-+                         MemoryRegion *mr, Error **errp)
- {
--    return qemu_ram_alloc_internal(size, size, NULL, NULL, false, mr, errp);
-+    return qemu_ram_alloc_internal(size, size, NULL, NULL, false,
-+                                   share, mr, errp);
- }
- 
- RAMBlock *qemu_ram_alloc_resizeable(ram_addr_t size, ram_addr_t maxsz,
-@@ -2140,7 +2143,8 @@ RAMBlock *qemu_ram_alloc_resizeable(ram_addr_t size, ram_addr_t maxsz,
-                                                      void *host),
-                                      MemoryRegion *mr, Error **errp)
- {
--    return qemu_ram_alloc_internal(size, maxsz, resized, NULL, true, mr, errp);
-+    return qemu_ram_alloc_internal(size, maxsz, resized, NULL, true,
-+                                   false, mr, errp);
- }
- 
- static void reclaim_ramblock(RAMBlock *block)
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 07c5d6d597..1b02bbd334 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -428,6 +428,29 @@ void memory_region_init_ram_nomigrate(MemoryRegion *mr,
-                                       Error **errp);
- 
- /**
-+ * memory_region_init_ram_shared_nomigrate:  Initialize RAM memory region.
-+ *                                           Accesses into the region will
-+ *                                           modify memory directly.
-+ *
-+ * @mr: the #MemoryRegion to be initialized.
-+ * @owner: the object that tracks the region's reference count
-+ * @name: Region name, becomes part of RAMBlock name used in migration stream
-+ *        must be unique within any device
-+ * @size: size of the region.
-+ * @share: allow remapping RAM to different addresses
-+ * @errp: pointer to Error*, to store an error if it happens.
-+ *
-+ * Note that this function is similar to memory_region_init_ram_nomigrate.
-+ * The only difference is part of the RAM region can be remapped.
-+ */
-+void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
-+                                             struct Object *owner,
-+                                             const char *name,
-+                                             uint64_t size,
-+                                             bool share,
-+                                             Error **errp);
-+
-+/**
-  * memory_region_init_resizeable_ram:  Initialize memory region with resizeable
-  *                                     RAM.  Accesses into the region will
-  *                                     modify memory directly.  Only an initial
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 7633ef6342..cf2446a176 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -80,7 +80,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-                                  Error **errp);
- RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-                                   MemoryRegion *mr, Error **errp);
--RAMBlock *qemu_ram_alloc(ram_addr_t size, MemoryRegion *mr, Error **errp);
-+RAMBlock *qemu_ram_alloc(ram_addr_t size, bool share, MemoryRegion *mr,
-+                         Error **errp);
- RAMBlock *qemu_ram_alloc_resizeable(ram_addr_t size, ram_addr_t max_size,
-                                     void (*resized)(const char*,
-                                                     uint64_t length,
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index adb3758275..41658060a7 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -255,7 +255,7 @@ extern int daemon(int, int);
- int qemu_daemon(int nochdir, int noclose);
- void *qemu_try_memalign(size_t alignment, size_t size);
- void *qemu_memalign(size_t alignment, size_t size);
--void *qemu_anon_ram_alloc(size_t size, uint64_t *align);
-+void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared);
- void qemu_vfree(void *ptr);
- void qemu_anon_ram_free(void *ptr, size_t size);
- 
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index ed6a437f4d..4d8f859f03 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -55,7 +55,7 @@ struct HostMemoryBackend {
-     char *id;
-     uint64_t size;
-     bool merge, dump;
--    bool prealloc, force_prealloc, is_mapped;
-+    bool prealloc, force_prealloc, is_mapped, share;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-     HostMemPolicy policy;
- 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index bbf12a1723..85002ac49a 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -248,7 +248,7 @@ int kvm_on_sigbus(int code, void *addr);
- 
- /* interface with exec.c */
- 
--void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align));
-+void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align, bool shared));
- 
- /* internal API */
- 
-diff --git a/memory.c b/memory.c
-index 449a1429b9..3211fdc15f 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1538,11 +1538,21 @@ void memory_region_init_ram_nomigrate(MemoryRegion *mr,
-                                       uint64_t size,
-                                       Error **errp)
- {
-+    memory_region_init_ram_shared_nomigrate(mr, owner, name, size, false, errp);
-+}
-+
-+void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
-+                                             Object *owner,
-+                                             const char *name,
-+                                             uint64_t size,
-+                                             bool share,
-+                                             Error **errp)
-+{
-     memory_region_init(mr, owner, name, size);
-     mr->ram = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
--    mr->ram_block = qemu_ram_alloc(size, mr, errp);
-+    mr->ram_block = qemu_ram_alloc(size, share, mr, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
- }
- 
-@@ -1653,7 +1663,7 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
-     mr->readonly = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
--    mr->ram_block = qemu_ram_alloc(size, mr, errp);
-+    mr->ram_block = qemu_ram_alloc(size, false, mr, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
- }
- 
-@@ -1672,7 +1682,7 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-     mr->terminates = true;
-     mr->rom_device = true;
-     mr->destructor = memory_region_destructor_ram;
--    mr->ram_block = qemu_ram_alloc(size, mr, errp);
-+    mr->ram_block = qemu_ram_alloc(size, false,  mr, errp);
- }
- 
- void memory_region_init_iommu(void *_iommu_mr,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 8ce427da78..61497ce136 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3975,6 +3975,14 @@ The @option{share} boolean option determines whether the memory
- region is marked as private to QEMU, or shared. The latter allows
- a co-operating external process to access the QEMU memory region.
- 
-+The @option{share} is also required for pvrdma devices due to
-+limitations in the RDMA API provided by Linux.
-+
-+Setting share=on might affect the ability to configure NUMA
-+bindings for the memory backend under some circumstances, see
-+Documentation/vm/numa_memory_policy.txt on the Linux kernel
-+source tree for additional details.
-+
- Setting the @option{discard-data} boolean option to @var{on}
- indicates that file contents can be destroyed when QEMU exits,
- to avoid unnecessarily flushing data to the backing file.  Note
-@@ -4017,7 +4025,7 @@ requires an alignment different than the default one used by QEMU, eg
- the device DAX /dev/dax0.0 requires 2M alignment rather than 4K. In
- such cases, users can specify the required alignment via this option.
- 
--@item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
-+@item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
- 
- Creates a memory backend object, which can be used to back the guest RAM.
- Memory backend objects offer more control than the @option{-m} option that is
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 8736001156..e4599dd870 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -144,7 +144,7 @@ static int cap_gs;
- 
- static int active_cmma;
- 
--static void *legacy_s390_alloc(size_t size, uint64_t *align);
-+static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared);
- 
- static int kvm_s390_query_mem_limit(uint64_t *memory_limit)
- {
-@@ -752,7 +752,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
-  * to grow. We also have to use MAP parameters that avoid
-  * read-only mapping of guest pages.
-  */
--static void *legacy_s390_alloc(size_t size, uint64_t *align)
-+static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
- {
-     void *mem;
- 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 77369c92ce..0cf3548778 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -127,10 +127,10 @@ void *qemu_memalign(size_t alignment, size_t size)
- }
- 
- /* alloc shared memory pages */
--void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment)
-+void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
- {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, false);
-+    void *ptr = qemu_ram_mmap(-1, size, align, shared);
- 
-     if (ptr == MAP_FAILED) {
-         return NULL;
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index 69a6286d50..bb5ad28bd3 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -67,7 +67,7 @@ void *qemu_memalign(size_t alignment, size_t size)
-     return qemu_oom_check(qemu_try_memalign(alignment, size));
- }
- 
--void *qemu_anon_ram_alloc(size_t size, uint64_t *align)
-+void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared)
- {
-     void *ptr;
- 
+  MAINTAINERS: add entry for hw/rdma (2018-02-05 11:53:00 +0200)
+
+----------------------------------------------------------------
+PVRDMA implementation
+
+----------------------------------------------------------------
+Marcel Apfelbaum (3):
+      mem: add share parameter to memory-backend-ram
+      docs: add pvrdma device documentation.
+      MAINTAINERS: add entry for hw/rdma
+
+Yuval Shaia (1):
+      pvrdma: initial implementation
+
+ MAINTAINERS                   |   8 +
+ Makefile.objs                 |   2 +
+ backends/hostmem-file.c       |  25 +-
+ backends/hostmem-ram.c        |   4 +-
+ backends/hostmem.c            |  21 ++
+ configure                     |   9 +-
+ docs/pvrdma.txt               | 255 +++++++++++++
+ exec.c                        |  26 +-
+ hw/Makefile.objs              |   1 +
+ hw/rdma/Makefile.objs         |   5 +
+ hw/rdma/rdma_backend.c        | 818 ++++++++++++++++++++++++++++++++++++++++++
+ hw/rdma/rdma_backend.h        |  99 +++++
+ hw/rdma/rdma_backend_defs.h   |  62 ++++
+ hw/rdma/rdma_rm.c             | 544 ++++++++++++++++++++++++++++
+ hw/rdma/rdma_rm.h             |  69 ++++
+ hw/rdma/rdma_rm_defs.h        | 104 ++++++
+ hw/rdma/rdma_utils.c          |  52 +++
+ hw/rdma/rdma_utils.h          |  43 +++
+ hw/rdma/trace-events          |   5 +
+ hw/rdma/vmw/pvrdma.h          | 122 +++++++
+ hw/rdma/vmw/pvrdma_cmd.c      | 656 +++++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_api.h  | 602 +++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_ring.c | 140 ++++++++
+ hw/rdma/vmw/pvrdma_dev_ring.h |  42 +++
+ hw/rdma/vmw/pvrdma_ib_verbs.h | 433 ++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_main.c     | 653 +++++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.c   | 212 +++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.h   |  27 ++
+ hw/rdma/vmw/pvrdma_ring.h     | 134 +++++++
+ hw/rdma/vmw/trace-events      |   5 +
+ hw/rdma/vmw/vmw_pvrdma-abi.h  | 311 ++++++++++++++++
+ include/exec/memory.h         |  23 ++
+ include/exec/ram_addr.h       |   3 +-
+ include/hw/pci/pci_ids.h      |   3 +
+ include/qemu/osdep.h          |   2 +-
+ include/sysemu/hostmem.h      |   2 +-
+ include/sysemu/kvm.h          |   2 +-
+ memory.c                      |  16 +-
+ qemu-options.hx               |  10 +-
+ target/s390x/kvm.c            |   4 +-
+ util/oslib-posix.c            |   4 +-
+ util/oslib-win32.c            |   2 +-
+ 42 files changed, 5506 insertions(+), 54 deletions(-)
+ create mode 100644 docs/pvrdma.txt
+ create mode 100644 hw/rdma/Makefile.objs
+ create mode 100644 hw/rdma/rdma_backend.c
+ create mode 100644 hw/rdma/rdma_backend.h
+ create mode 100644 hw/rdma/rdma_backend_defs.h
+ create mode 100644 hw/rdma/rdma_rm.c
+ create mode 100644 hw/rdma/rdma_rm.h
+ create mode 100644 hw/rdma/rdma_rm_defs.h
+ create mode 100644 hw/rdma/rdma_utils.c
+ create mode 100644 hw/rdma/rdma_utils.h
+ create mode 100644 hw/rdma/trace-events
+ create mode 100644 hw/rdma/vmw/pvrdma.h
+ create mode 100644 hw/rdma/vmw/pvrdma_cmd.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_api.h
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ib_verbs.h
+ create mode 100644 hw/rdma/vmw/pvrdma_main.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ring.h
+ create mode 100644 hw/rdma/vmw/trace-events
+ create mode 100644 hw/rdma/vmw/vmw_pvrdma-abi.h
+
 -- 
 2.13.5
