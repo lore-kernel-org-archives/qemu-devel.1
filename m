@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eih4q-0000AG-33
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:44:57 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eih4v-0000Hc-Uf
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eih4l-0002gR-Pe
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:44:56 -0500
-Received: from mail-qk0-f195.google.com ([209.85.220.195]:43152)
+	(envelope-from <mlureau@redhat.com>) id 1eih4q-0002ll-BY
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:45:02 -0500
+Received: from mail-qk0-f172.google.com ([209.85.220.172]:42851)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eih4l-0002fT-JN
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:44:51 -0500
-Received: by mail-qk0-f195.google.com with SMTP id a5so32565982qkg.10
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 05:44:51 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eih4q-0002lW-5H
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 08:44:56 -0500
+Received: by mail-qk0-f172.google.com with SMTP id f68so12278899qke.9
+	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 05:44:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180202130336.24719-5-armbru@redhat.com>
+In-Reply-To: <20180202130336.24719-6-armbru@redhat.com>
 References: <20180202130336.24719-1-armbru@redhat.com>
-	<20180202130336.24719-5-armbru@redhat.com>
+	<20180202130336.24719-6-armbru@redhat.com>
 From: Marc-Andre Lureau <mlureau@redhat.com>
-Date: Mon, 5 Feb 2018 14:44:50 +0100
-Message-ID: <CAMxuvawmzY4mbm_24VYQ6xjS+o0fSuTdEPq4c=hc_x6tGc+5yg@mail.gmail.com>
+Date: Mon, 5 Feb 2018 14:44:54 +0100
+Message-ID: <CAMxuvaxt0FYPjz6CeJ-VQoqtqDGULDzmMzyKSJ9uW0wbxj7JSQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 04/21] qapi: Reduce use of global
- variables in generators some
+Subject: Re: [Qemu-devel] [PATCH RFC 05/21] qapi: Turn generators into
+ modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,8 +35,12 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, marcandre <marcandre.lureau@redhat.com>,
 
 On Fri, Feb 2, 2018 at 2:03 PM, Markus Armbruster <armbru@redhat.com> wrote=
 :
-> In preparation of the next commit, which will turn the generators into
-> modules.  These global variables will become local to main() then.
+> The next commit will introduce a common driver program for all
+> generators.  The generators need to be modules for that.  qapi2texi.py
+> already is.  Make the other generators follow suit.
+>
+> The changes are actually trivial.  Obvious in the diffs once you view
+> them with whitespace changes ignored.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
@@ -44,287 +48,407 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  scripts/qapi-commands.py   |  9 +++++----
->  scripts/qapi-event.py      | 15 +++++++--------
->  scripts/qapi-introspect.py |  7 ++++---
->  scripts/qapi-types.py      | 17 +++++++++--------
->  scripts/qapi-visit.py      | 17 +++++++++--------
->  5 files changed, 34 insertions(+), 31 deletions(-)
+>  scripts/qapi-commands.py   | 43 ++++++++++++++++++--------------
+>  scripts/qapi-event.py      | 43 ++++++++++++++++++--------------
+>  scripts/qapi-introspect.py | 54 ++++++++++++++++++++++------------------
+>  scripts/qapi-types.py      | 56 ++++++++++++++++++++++------------------=
+-
+>  scripts/qapi-visit.py      | 62 +++++++++++++++++++++++++---------------=
+------
+>  5 files changed, 143 insertions(+), 115 deletions(-)
 >
 > diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-> index 4be7dbc482..d229537659 100644
+> index d229537659..331b58670e 100644
 > --- a/scripts/qapi-commands.py
 > +++ b/scripts/qapi-commands.py
-> @@ -207,7 +207,7 @@ def gen_register_command(name, success_response):
->      return ret
+> @@ -255,16 +255,17 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor=
+):
+>          self._regy +=3D gen_register_command(name, success_response)
 >
 >
-> -def gen_registry(registry):
-> +def gen_registry(registry, prefix):
->      ret =3D mcgen('''
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command_lin=
+e()
+> +def main(argv):
+> +    (input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command=
+_line()
 >
->  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)
-> @@ -224,7 +224,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmd=
-s)
+> -blurb =3D '''
+> +    blurb =3D '''
+>   * Schema-defined QAPI/QMP commands
+>  '''
 >
+> -genc =3D QAPIGenC(blurb, __doc__)
+> -genh =3D QAPIGenH(blurb, __doc__)
+> +    genc =3D QAPIGenC(blurb, __doc__)
+> +    genh =3D QAPIGenH(blurb, __doc__)
 >
->  class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-> -    def __init__(self):
-> +    def __init__(self, prefix):
-> +        self._prefix =3D prefix
->          self.decl =3D None
->          self.defn =3D None
->          self._regy =3D None
-> @@ -237,7 +238,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
->          self._visited_ret_types =3D set()
+> -genc.body(mcgen('''
+> +    genc.body(mcgen('''
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "qemu/module.h"
+> @@ -278,24 +279,28 @@ genc.body(mcgen('''
+>  #include "%(prefix)sqmp-commands.h"
 >
->      def visit_end(self):
-> -        self.defn +=3D gen_registry(self._regy)
-> +        self.defn +=3D gen_registry(self._regy, self._prefix)
->          self._regy =3D None
->          self._visited_ret_types =3D None
+>  ''',
+> -                prefix=3Dprefix))
+> +                    prefix=3Dprefix))
 >
-> @@ -289,7 +290,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmd=
-s);
->                  prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3DFal=
+> -genh.body(mcgen('''
+> +    genh.body(mcgen('''
+>  #include "%(prefix)sqapi-types.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/dispatch.h"
+>
+>  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+>  ''',
+> -                prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3DFal=
 se)))
->
->  schema =3D QAPISchema(input_file)
-> -vis =3D QAPISchemaGenCommandVisitor()
-> +vis =3D QAPISchemaGenCommandVisitor(prefix)
->  schema.visit(vis)
->  genc.body(vis.defn)
->  genh.body(vis.decl)
+> -
+> -schema =3D QAPISchema(input_file)
+> -vis =3D QAPISchemaGenCommandVisitor(prefix)
+> -schema.visit(vis)
+> -genc.body(vis.defn)
+> -genh.body(vis.decl)
+> -
+> -if do_c:
+> -    genc.write(output_dir, prefix + 'qmp-marshal.c')
+> -if do_h:
+> -    genh.write(output_dir, prefix + 'qmp-commands.h')
+> +                    prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=
+=3DFalse)))
+> +
+> +    schema =3D QAPISchema(input_file)
+> +    vis =3D QAPISchemaGenCommandVisitor(prefix)
+> +    schema.visit(vis)
+> +    genc.body(vis.defn)
+> +    genh.body(vis.decl)
+> +
+> +    if do_c:
+> +        genc.write(output_dir, prefix + 'qmp-marshal.c')
+> +    if do_h:
+> +        genh.write(output_dir, prefix + 'qmp-commands.h')
+> +
+> +
+> +if __name__ =3D=3D '__main__':
+> +    main(sys.argv)
 > diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-> index da3de17c76..1af21b580a 100644
+> index 1af21b580a..5b33c694d4 100644
 > --- a/scripts/qapi-event.py
 > +++ b/scripts/qapi-event.py
-> @@ -58,7 +58,7 @@ def gen_param_var(typ):
->      return ret
->
->
-> -def gen_event_send(name, arg_type, boxed):
-> +def gen_event_send(name, arg_type, boxed, event_enum_name):
->      # FIXME: Our declaration of local variables (and of 'errp' in the
->      # parameter list) can collide with exploded members of the event's
->      # data type passed in as parameters.  If this collision ever hits in
-> @@ -149,7 +149,8 @@ out:
->
->
->  class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
-> -    def __init__(self):
-> +    def __init__(self, prefix):
-> +        self._enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DFalse=
-)
->          self.decl =3D None
->          self.defn =3D None
->          self._event_names =3D None
-> @@ -160,13 +161,13 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
->          self._event_names =3D []
->
->      def visit_end(self):
-> -        self.decl +=3D gen_enum(event_enum_name, self._event_names)
-> -        self.defn +=3D gen_enum_lookup(event_enum_name, self._event_name=
-s)
-> +        self.decl +=3D gen_enum(self._enum_name, self._event_names)
-> +        self.defn +=3D gen_enum_lookup(self._enum_name, self._event_name=
-s)
->          self._event_names =3D None
->
->      def visit_event(self, name, info, arg_type, boxed):
->          self.decl +=3D gen_event_send_decl(name, arg_type, boxed)
-> -        self.defn +=3D gen_event_send(name, arg_type, boxed)
-> +        self.defn +=3D gen_event_send(name, arg_type, boxed, self._enum_=
-name)
+> @@ -171,16 +171,17 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
 >          self._event_names.append(name)
 >
 >
-> @@ -199,10 +200,8 @@ genh.body(mcgen('''
->  ''',
->                  prefix=3Dprefix))
+> -(input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_command_li=
+ne()
+> +def main(argv):
+> +    (input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_comman=
+d_line()
 >
-> -event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DFalse)
+> -blurb =3D '''
+> +    blurb =3D '''
+>   * Schema-defined QAPI/QMP events
+>  '''
+>
+> -genc =3D QAPIGenC(blurb, __doc__)
+> -genh =3D QAPIGenH(blurb, __doc__)
+> +    genc =3D QAPIGenC(blurb, __doc__)
+> +    genh =3D QAPIGenH(blurb, __doc__)
+>
+> -genc.body(mcgen('''
+> +    genc.body(mcgen('''
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "%(prefix)sqapi-event.h"
+> @@ -190,23 +191,27 @@ genc.body(mcgen('''
+>  #include "qapi/qmp-event.h"
+>
+>  ''',
+> -                prefix=3Dprefix))
+> +                    prefix=3Dprefix))
+>
+> -genh.body(mcgen('''
+> +    genh.body(mcgen('''
+>  #include "qapi/util.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "%(prefix)sqapi-types.h"
+>
+>  ''',
+> -                prefix=3Dprefix))
 > -
->  schema =3D QAPISchema(input_file)
-> -vis =3D QAPISchemaGenEventVisitor()
-> +vis =3D QAPISchemaGenEventVisitor(prefix)
->  schema.visit(vis)
->  genc.body(vis.defn)
->  genh.body(vis.decl)
+> -schema =3D QAPISchema(input_file)
+> -vis =3D QAPISchemaGenEventVisitor(prefix)
+> -schema.visit(vis)
+> -genc.body(vis.defn)
+> -genh.body(vis.decl)
+> -
+> -if do_c:
+> -    genc.write(output_dir, prefix + 'qapi-event.c')
+> -if do_h:
+> -    genh.write(output_dir, prefix + 'qapi-event.h')
+> +                    prefix=3Dprefix))
+> +
+> +    schema =3D QAPISchema(input_file)
+> +    vis =3D QAPISchemaGenEventVisitor(prefix)
+> +    schema.visit(vis)
+> +    genc.body(vis.defn)
+> +    genh.body(vis.decl)
+> +
+> +    if do_c:
+> +        genc.write(output_dir, prefix + 'qapi-event.c')
+> +    if do_h:
+> +        genh.write(output_dir, prefix + 'qapi-event.h')
+> +
+> +
+> +if __name__ =3D=3D '__main__':
+> +    main(sys.argv)
 > diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-> index c654f8fa94..8d4e3c1c3a 100644
+> index 8d4e3c1c3a..09e7d1f140 100644
 > --- a/scripts/qapi-introspect.py
 > +++ b/scripts/qapi-introspect.py
-> @@ -41,7 +41,8 @@ def to_c_string(string):
+> @@ -167,38 +167,44 @@ const char %(c_name)s[] =3D %(c_string)s;
+>          arg_type =3D arg_type or self._schema.the_empty_object_type
+>          self._gen_json(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)})
 >
+> -# Debugging aid: unmask QAPI schema's type names
+> -# We normally mask them, because they're not QMP wire ABI
+> -opt_unmask =3D False
 >
->  class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
-> -    def __init__(self, unmask):
-> +    def __init__(self, prefix, unmask):
-> +        self._prefix =3D prefix
->          self._unmask =3D unmask
->          self.defn =3D None
->          self.decl =3D None
-> @@ -65,7 +66,7 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor)=
-:
->          # generate C
->          # TODO can generate awfully long lines
->          jsons.extend(self._jsons)
-> -        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_json'
-> +        name =3D c_name(self._prefix, protect=3DFalse) + 'qmp_schema_jso=
-n'
->          self.decl =3D mcgen('''
->  extern const char %(c_name)s[];
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> -    parse_command_line('u', ['unmask-non-abi-names'])
+> +def main(argv):
+> +    # Debugging aid: unmask QAPI schema's type names
+> +    # We normally mask them, because they're not QMP wire ABI
+> +    opt_unmask =3D False
+>
+> -for o, a in opts:
+> -    if o in ('-u', '--unmask-non-abi-names'):
+> -        opt_unmask =3D True
+> +    (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> +        parse_command_line('u', ['unmask-non-abi-names'])
+>
+> -blurb =3D '''
+> +    for o, a in opts:
+> +        if o in ('-u', '--unmask-non-abi-names'):
+> +            opt_unmask =3D True
+> +
+> +    blurb =3D '''
+>   * QAPI/QMP schema introspection
+>  '''
+>
+> -genc =3D QAPIGenC(blurb, __doc__)
+> -genh =3D QAPIGenH(blurb, __doc__)
+> +    genc =3D QAPIGenC(blurb, __doc__)
+> +    genh =3D QAPIGenH(blurb, __doc__)
+>
+> -genc.body(mcgen('''
+> +    genc.body(mcgen('''
+>  #include "qemu/osdep.h"
+>  #include "%(prefix)sqmp-introspect.h"
+>
 >  ''',
-> @@ -192,7 +193,7 @@ genc.body(mcgen('''
->                  prefix=3Dprefix))
->
->  schema =3D QAPISchema(input_file)
-> -vis =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
-> +vis =3D QAPISchemaGenIntrospectVisitor(prefix, opt_unmask)
->  schema.visit(vis)
->  genc.body(vis.defn)
->  genh.body(vis.decl)
+> -                prefix=3Dprefix))
+> -
+> -schema =3D QAPISchema(input_file)
+> -vis =3D QAPISchemaGenIntrospectVisitor(prefix, opt_unmask)
+> -schema.visit(vis)
+> -genc.body(vis.defn)
+> -genh.body(vis.decl)
+> -
+> -if do_c:
+> -    genc.write(output_dir, prefix + 'qmp-introspect.c')
+> -if do_h:
+> -    genh.write(output_dir, prefix + 'qmp-introspect.h')
+> +                    prefix=3Dprefix))
+> +
+> +    schema =3D QAPISchema(input_file)
+> +    vis =3D QAPISchemaGenIntrospectVisitor(prefix, opt_unmask)
+> +    schema.visit(vis)
+> +    genc.body(vis.defn)
+> +    genh.body(vis.decl)
+> +
+> +    if do_c:
+> +        genc.write(output_dir, prefix + 'qmp-introspect.c')
+> +    if do_h:
+> +        genh.write(output_dir, prefix + 'qmp-introspect.h')
+> +
+> +
+> +if __name__ =3D=3D '__main__':
+> +    main(sys.argv)
 > diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-> index 97406b3368..2d711b137b 100644
+> index 2d711b137b..f2ddde94b1 100644
 > --- a/scripts/qapi-types.py
 > +++ b/scripts/qapi-types.py
-> @@ -168,7 +168,8 @@ void qapi_free_%(c_name)s(%(c_name)s *obj)
+> @@ -240,45 +240,51 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>          self.decl +=3D gen_object(name, None, [variants.tag_member], var=
+iants)
+>          self._gen_type_cleanup(name)
 >
+> -# If you link code generated from multiple schemata, you want only one
+> -# instance of the code for built-in types.  Generate it only when
+> -# opt_builtins, enabled by command line option -b.  See also
+> -# QAPISchemaGenTypeVisitor.visit_end().
+> -opt_builtins =3D False
 >
->  class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-> -    def __init__(self):
-> +    def __init__(self, opt_builtins):
-> +        self._opt_builtins =3D opt_builtins
->          self.decl =3D None
->          self.defn =3D None
->          self._fwdecl =3D None
-> @@ -187,7 +188,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
->          self._fwdecl =3D None
->          # To avoid header dependency hell, we always generate
->          # declarations for built-in types in our header files and
-> -        # simply guard them.  See also do_builtins (command line
-> +        # simply guard them.  See also opt_builtins (command line
->          # option -b).
->          self._btin +=3D guardend('QAPI_TYPES_BUILTIN')
->          self.decl =3D self._btin + self.decl
-> @@ -202,7 +203,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
->          # TODO use something cleaner than existence of info
->          if not info:
->              self._btin +=3D gen_enum(name, values, prefix)
-> -            if do_builtins:
-> +            if self._opt_builtins:
->                  self.defn +=3D gen_enum_lookup(name, values, prefix)
->          else:
->              self._fwdecl +=3D gen_enum(name, values, prefix)
-> @@ -213,7 +214,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
->              self._btin +=3D gen_fwd_object_or_array(name)
->              self._btin +=3D gen_array(name, element_type)
->              self._btin +=3D gen_type_cleanup_decl(name)
-> -            if do_builtins:
-> +            if self._opt_builtins:
->                  self.defn +=3D gen_type_cleanup(name)
->          else:
->              self._fwdecl +=3D gen_fwd_object_or_array(name)
-> @@ -241,16 +242,16 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> -    parse_command_line('b', ['builtins'])
+> +def main(argv):
+> +    # If you link code generated from multiple schemata, you want only o=
+ne
+> +    # instance of the code for built-in types.  Generate it only when
+> +    # opt_builtins, enabled by command line option -b.  See also
+> +    # QAPISchemaGenTypeVisitor.visit_end().
+> +    opt_builtins =3D False
 >
->  # If you link code generated from multiple schemata, you want only one
->  # instance of the code for built-in types.  Generate it only when
-> -# do_builtins, enabled by command line option -b.  See also
-> +# opt_builtins, enabled by command line option -b.  See also
->  # QAPISchemaGenTypeVisitor.visit_end().
-> -do_builtins =3D False
-> +opt_builtins =3D False
+> -for o, a in opts:
+> -    if o in ('-b', '--builtins'):
+> -        opt_builtins =3D True
+> +    (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> +        parse_command_line('b', ['builtins'])
 >
->  (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
->      parse_command_line('b', ['builtins'])
->
->  for o, a in opts:
->      if o in ('-b', '--builtins'):
-> -        do_builtins =3D True
-> +        opt_builtins =3D True
->
->  blurb =3D '''
+> -blurb =3D '''
+> +    for o, a in opts:
+> +        if o in ('-b', '--builtins'):
+> +            opt_builtins =3D True
+> +
+> +    blurb =3D '''
 >   * Schema-defined QAPI types
-> @@ -272,7 +273,7 @@ genh.body(mcgen('''
+>  '''
+>
+> -genc =3D QAPIGenC(blurb, __doc__)
+> -genh =3D QAPIGenH(blurb, __doc__)
+> +    genc =3D QAPIGenC(blurb, __doc__)
+> +    genh =3D QAPIGenH(blurb, __doc__)
+>
+> -genc.body(mcgen('''
+> +    genc.body(mcgen('''
+>  #include "qemu/osdep.h"
+>  #include "qapi/dealloc-visitor.h"
+>  #include "%(prefix)sqapi-types.h"
+>  #include "%(prefix)sqapi-visit.h"
+>  ''',
+> -                prefix=3Dprefix))
+> +                    prefix=3Dprefix))
+>
+> -genh.body(mcgen('''
+> +    genh.body(mcgen('''
+>  #include "qapi/util.h"
 >  '''))
 >
->  schema =3D QAPISchema(input_file)
-> -vis =3D QAPISchemaGenTypeVisitor()
-> +vis =3D QAPISchemaGenTypeVisitor(opt_builtins)
->  schema.visit(vis)
->  genc.body(vis.defn)
->  genh.body(vis.decl)
+> -schema =3D QAPISchema(input_file)
+> -vis =3D QAPISchemaGenTypeVisitor(opt_builtins)
+> -schema.visit(vis)
+> -genc.body(vis.defn)
+> -genh.body(vis.decl)
+> +    schema =3D QAPISchema(input_file)
+> +    vis =3D QAPISchemaGenTypeVisitor(opt_builtins)
+> +    schema.visit(vis)
+> +    genc.body(vis.defn)
+> +    genh.body(vis.decl)
+>
+> -if do_c:
+> -    genc.write(output_dir, prefix + 'qapi-types.c')
+> -if do_h:
+> -    genh.write(output_dir, prefix + 'qapi-types.h')
+> +    if do_c:
+> +        genc.write(output_dir, prefix + 'qapi-types.c')
+> +    if do_h:
+> +        genh.write(output_dir, prefix + 'qapi-types.h')
+> +
+> +
+> +if __name__ =3D=3D '__main__':
+> +    main(sys.argv)
 > diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-> index d1b25daf0d..79dc6cae48 100644
+> index 79dc6cae48..473fa72574 100644
 > --- a/scripts/qapi-visit.py
 > +++ b/scripts/qapi-visit.py
-> @@ -264,7 +264,8 @@ out:
+> @@ -323,49 +323,55 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
+>          self.decl +=3D gen_visit_decl(name)
+>          self.defn +=3D gen_visit_alternate(name, variants)
 >
+> -# If you link code generated from multiple schemata, you want only one
+> -# instance of the code for built-in types.  Generate it only when
+> -# opt_builtins, enabled by command line option -b.  See also
+> -# QAPISchemaGenVisitVisitor.visit_end().
+> -opt_builtins =3D False
 >
->  class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-> -    def __init__(self):
-> +    def __init__(self, opt_builtins):
-> +        self._opt_builtins =3D opt_builtins
->          self.decl =3D None
->          self.defn =3D None
->          self._btin =3D None
-> @@ -277,7 +278,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->      def visit_end(self):
->          # To avoid header dependency hell, we always generate
->          # declarations for built-in types in our header files and
-> -        # simply guard them.  See also do_builtins (command line
-> +        # simply guard them.  See also opt_builtins (command line
->          # option -b).
->          self._btin +=3D guardend('QAPI_VISIT_BUILTIN')
->          self.decl =3D self._btin + self.decl
-> @@ -288,7 +289,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->          # TODO use something cleaner than existence of info
->          if not info:
->              self._btin +=3D gen_visit_decl(name, scalar=3DTrue)
-> -            if do_builtins:
-> +            if self._opt_builtins:
->                  self.defn +=3D gen_visit_enum(name)
->          else:
->              self.decl +=3D gen_visit_decl(name, scalar=3DTrue)
-> @@ -299,7 +300,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->          defn =3D gen_visit_list(name, element_type)
->          if isinstance(element_type, QAPISchemaBuiltinType):
->              self._btin +=3D decl
-> -            if do_builtins:
-> +            if self._opt_builtins:
->                  self.defn +=3D defn
->          else:
->              self.decl +=3D decl
-> @@ -324,16 +325,16 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> -    parse_command_line('b', ['builtins'])
+> +def main(argv):
+> +    # If you link code generated from multiple schemata, you want only o=
+ne
+> +    # instance of the code for built-in types.  Generate it only when
+> +    # opt_builtins, enabled by command line option -b.  See also
+> +    # QAPISchemaGenVisitVisitor.visit_end().
+> +    opt_builtins =3D False
 >
->  # If you link code generated from multiple schemata, you want only one
->  # instance of the code for built-in types.  Generate it only when
-> -# do_builtins, enabled by command line option -b.  See also
-> +# opt_builtins, enabled by command line option -b.  See also
->  # QAPISchemaGenVisitVisitor.visit_end().
-> -do_builtins =3D False
-> +opt_builtins =3D False
+> -for o, a in opts:
+> -    if o in ('-b', '--builtins'):
+> -        opt_builtins =3D True
+> +    (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> +        parse_command_line('b', ['builtins'])
 >
->  (input_file, output_dir, do_c, do_h, prefix, opts) =3D \
->      parse_command_line('b', ['builtins'])
->
->  for o, a in opts:
->      if o in ('-b', '--builtins'):
-> -        do_builtins =3D True
-> +        opt_builtins =3D True
->
->  blurb =3D '''
+> -blurb =3D '''
+> +    for o, a in opts:
+> +        if o in ('-b', '--builtins'):
+> +            opt_builtins =3D True
+> +
+> +    blurb =3D '''
 >   * Schema-defined QAPI visitors
-> @@ -359,7 +360,7 @@ genh.body(mcgen('''
->                  prefix=3Dprefix))
+>  '''
 >
->  schema =3D QAPISchema(input_file)
-> -vis =3D QAPISchemaGenVisitVisitor()
-> +vis =3D QAPISchemaGenVisitVisitor(opt_builtins)
->  schema.visit(vis)
->  genc.body(vis.defn)
->  genh.body(vis.decl)
+> -genc =3D QAPIGenC(blurb, __doc__)
+> -genh =3D QAPIGenH(blurb, __doc__)
+> +    genc =3D QAPIGenC(blurb, __doc__)
+> +    genh =3D QAPIGenH(blurb, __doc__)
+>
+> -genc.body(mcgen('''
+> +    genc.body(mcgen('''
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "qapi/error.h"
+>  #include "%(prefix)sqapi-visit.h"
+>  ''',
+> -                prefix=3Dprefix))
+> +                    prefix=3Dprefix))
+>
+> -genh.body(mcgen('''
+> +    genh.body(mcgen('''
+>  #include "qapi/visitor.h"
+>  #include "qapi/qmp/qerror.h"
+>  #include "%(prefix)sqapi-types.h"
+>
+>  ''',
+> -                prefix=3Dprefix))
+> -
+> -schema =3D QAPISchema(input_file)
+> -vis =3D QAPISchemaGenVisitVisitor(opt_builtins)
+> -schema.visit(vis)
+> -genc.body(vis.defn)
+> -genh.body(vis.decl)
+> -
+> -if do_c:
+> -    genc.write(output_dir, prefix + 'qapi-visit.c')
+> -if do_h:
+> -    genh.write(output_dir, prefix + 'qapi-visit.h')
+> +                    prefix=3Dprefix))
+> +
+> +    schema =3D QAPISchema(input_file)
+> +    vis =3D QAPISchemaGenVisitVisitor(opt_builtins)
+> +    schema.visit(vis)
+> +    genc.body(vis.defn)
+> +    genh.body(vis.decl)
+> +
+> +    if do_c:
+> +        genc.write(output_dir, prefix + 'qapi-visit.c')
+> +    if do_h:
+> +        genh.write(output_dir, prefix + 'qapi-visit.h')
+> +
+> +
+> +if __name__ =3D=3D '__main__':
+> +    main(sys.argv)
 > --
 > 2.13.6
 >
