@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eieSs-00062s-Li
+	(envelope-from <pm215@archaic.org.uk>) id 1eieSx-000678-El
 	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eieSr-0007CH-RC
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:34 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eieSw-0007GE-Nb
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 05:57:39 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  5 Feb 2018 10:57:20 +0000
-Message-Id: <20180205105720.14620-9-peter.maydell@linaro.org>
+Date: Mon,  5 Feb 2018 10:57:15 +0000
+Message-Id: <20180205105720.14620-4-peter.maydell@linaro.org>
 In-Reply-To: <20180205105720.14620-1-peter.maydell@linaro.org>
 References: <20180205105720.14620-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 8/8] hw/intc/armv7m_nvic: Fix byte-to-interrupt
- number conversions
+Subject: [Qemu-devel] [PATCH 3/8] hw/intc/armv7m_nvic: Implement M profile
+ cache maintenance ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-In many of the NVIC registers relating to interrupts, we
-have to convert from a byte offset within a register set
-into the number of the first interrupt which is affected.
-We were getting this wrong for:
- * reads of NVIC_ISPR<n>, NVIC_ISER<n>, NVIC_ICPR<n>, NVIC_ICER<n>,
-   NVIC_IABR<n> -- in all these cases we were missing the "* 8"
-   needed to convert from the byte offset to the interrupt number
-   (since all these registers use one bit per interrupt)
- * writes of NVIC_IPR<n> had the opposite problem of a spurious
-   "* 8" (since these registers use one byte per interrupt)
+For M profile cores, cache maintenance operations are done by
+writing to special registers in the system register space.
+For QEMU, cache operations are always NOPs, since we don't
+implement the cache. Implementing these explicitly avoids
+a spurious LOG_GUEST_ERROR when the guest uses them.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/armv7m_nvic.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/intc/armv7m_nvic.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 8726be796e..9433efd1b8 100644
+index 06b9598fbe..74b25ce92c 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -1721,7 +1721,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         /* fall through */
-     case 0x180 ... 0x1bf: /* NVIC Clear enable */
-         val = 0;
--        startvec = offset - 0x180 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x180) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].enabled &&
-@@ -1735,7 +1735,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         /* fall through */
-     case 0x280 ... 0x2bf: /* NVIC Clear pend */
-         val = 0;
--        startvec = offset - 0x280 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x280) + NVIC_FIRST_IRQ; /* vector # */
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].pending &&
-                 (attrs.secure || s->itns[startvec + i])) {
-@@ -1745,7 +1745,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+@@ -1594,6 +1594,18 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+         }
          break;
-     case 0x300 ... 0x33f: /* NVIC Active */
-         val = 0;
--        startvec = offset - 0x300 + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = 8 * (offset - 0x300) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-             if (s->vectors[startvec + i].active &&
-@@ -1860,7 +1860,7 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-     case 0x300 ... 0x33f: /* NVIC Active */
-         return MEMTX_OK; /* R/O */
-     case 0x400 ... 0x5ef: /* NVIC Priority */
--        startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
-+        startvec = (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0; i < size && startvec + i < s->num_irq; i++) {
-             if (attrs.secure || s->itns[startvec + i]) {
+     }
++    case 0xf50: /* ICIALLU */
++    case 0xf58: /* ICIMVAU */
++    case 0xf5c: /* DCIMVAC */
++    case 0xf60: /* DCISW */
++    case 0xf64: /* DCCMVAU */
++    case 0xf68: /* DCCMVAC */
++    case 0xf6c: /* DCCSW */
++    case 0xf70: /* DCCIMVAC */
++    case 0xf74: /* DCCISW */
++    case 0xf78: /* BPIALL */
++        /* Cache and branch predictor maintenance: for QEMU these always NOP */
++        break;
+     default:
+     bad_offset:
+         qemu_log_mask(LOG_GUEST_ERROR,
 -- 
 2.16.1
