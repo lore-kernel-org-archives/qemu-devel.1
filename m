@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eiYLq-0004ed-3e
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:55 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eiYqo-0008Gx-N1
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:57:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eiYLm-0001Ht-4f
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47486)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eiYLl-00017P-Ux
-	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:25:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eiYLi-0007Xk-D2
-	for <qemu-devel@nongnu.org>; Mon, 05 Feb 2018 04:25:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4DEAA2E806D
-	for <qemu-devel@nongnu.org>; Mon,  5 Feb 2018 04:25:46 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eiYql-0008SV-KO
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:57:54 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33938
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1eiYql-0008OY-EZ
+	for qemu-devel@nongnu.org; Sun, 04 Feb 2018 23:57:51 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w154s7LF008215
+	for <qemu-devel@nongnu.org>; Sun, 4 Feb 2018 23:57:50 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fxdbdwjxd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 04 Feb 2018 23:57:49 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Sun, 4 Feb 2018 23:57:49 -0500
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Feb 2018 04:17:30 -0000
-From: Launchpad Bug Tracker <1736655@bugs.launchpad.net>
-Reply-To: Bug 1736655 <1736655@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151253983521.3178.4021889730911467554.malonedeb@gac.canonical.com>
-Message-Id: <151780425105.21638.6867575919110632998.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1736655] Re: 2k3/xp guests w/virtio-net randomly
- DHCP fail on boot
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20180202063412.22466-2-famz@redhat.com>
+References: <20180202063412.22466-1-famz@redhat.com>
+	<20180202063412.22466-2-famz@redhat.com>
+Date: Sun, 04 Feb 2018 22:55:28 -0600
+Message-Id: <151780652875.30594.1924586523823645179@sif>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Add a git-publish configuration file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +42,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@gmail.com, stefanha@redhat.com
 
-[Expired for qemu (Ubuntu) because there has been no activity for 60
-days.]
+Quoting Fam Zheng (2018-02-02 00:34:11)
+> git-publish [1] is a convenient tool to send patches and has been
+> popular among QEMU developers.  Recently it has been made available in
+> Fedora official repo thanks to Stefan's work.
+> =
 
-** Changed in: qemu (Ubuntu)
-       Status: Incomplete =3D> Expired
+> One nice feature of the tool is a per-project configuration with
+> profiles, especially in which the cccmd option is a handy method to
+> create the Cc list.
+> =
 
--- =
+> [1]: https://github.com/stefanha/git-publish
+> =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1736655
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  .gitpublish | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++
+>  1 file changed, 57 insertions(+)
+>  create mode 100644 .gitpublish
+> =
 
-Title:
-  2k3/xp guests w/virtio-net randomly DHCP fail on boot
+> diff --git a/.gitpublish b/.gitpublish
+> new file mode 100644
+> index 0000000000..170bd2ed48
+> --- /dev/null
+> +++ b/.gitpublish
+> @@ -0,0 +1,57 @@
+> +#
+> +# Common git-publish profiles that can be used to send patches to QEMU u=
+pstream.
+> +#
+> +# See https://github.com/stefanha/git-publish for more information
+> +#
+> +[gitpublishprofile "default"]
+> +base =3D master
+> +prefix =3D PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "rfc"]
+> +base =3D master
+> +prefix =3D RFC PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "stable"]
+> +base =3D master
+> +prefix =3D PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cc =3D qemu-stable@nongnu.org
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "trivial"]
+> +base =3D master
+> +prefix =3D PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
 
-Status in QEMU:
-  Expired
-Status in qemu package in Ubuntu:
-  Expired
+Someone previously suggested +cc =3D qemu-trivial@nongnu.org
 
-Bug description:
-  Host:
-  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
-  QEMU 2.10.1
+> +
+> +[gitpublishprofile "block"]
+> +base =3D master
+> +prefix =3D PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cc =3D qemu-block@nongnu.org
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "arm"]
+> +base =3D master
+> +prefix =3D PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cc =3D qemu-arm@nongnu.org
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "s390"]
+> +base =3D master
+> +prefix =3D PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cc =3D qemu-s390@nongnu.org
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+> +
+> +[gitpublishprofile "ppc"]
+> +base =3D master
+> +prefix =3D PATCH
+> +to =3D qemu-devel@nongnu.org
+> +cc =3D qemu-pcc@nongnu.org
 
-  Guest:
-  Windows 2003 Standard SP2 (x64)
-  Windows XP SP3 (i386)
+should be qemu-ppc@nongnu.org
 
-  QEMU command line:
-  http://cfp.vim-cn.com/cbdF3
+> +cccmd =3D scripts/get_maintainer.pl --noroles --norolestats --nogit --no=
+git-fallback 2>/dev/null
+> -- =
 
-  Description:
-  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
-XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
-ess on boot. When it fails, cycle disable/enable the connection in Control =
-Panel could make it connect successfully. As an immediate workaround, I swi=
-tched to the RTL8139 NIC which works fine. Further investigation showed tha=
-t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
-op of 2.10.1 "fixed" the problem.
+> 2.14.3
+> =
 
-  Here are the bisect test results:
-  git branch 97cd965: 17 boots, 5 failures  (Feb 18)
-  git branch 77424a4: 27 boots, 0 failure   (Jan 09)
-  git branch c25d97c: 7 boots, 2 failures   (Feb 01)
-  git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
-  git branch 39f099e: 60 boots, 0 failure   (Jan 18)
-  2.10.1 with revert: 194 boots, 0 failure
-  2.10.1 without revert: 30 boots, 4 failures
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1736655/+subscriptions
+>=20
