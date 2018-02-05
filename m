@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5G-0007ev-KG
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:31 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5L-0007gh-K1
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eii5F-0000gk-Lf
-	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:26 -0500
+	(envelope-from <berto@igalia.com>) id 1eii5H-0000ir-03
+	for qemu-devel@nongnu.org; Mon, 05 Feb 2018 09:49:31 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  5 Feb 2018 16:33:33 +0200
-Message-Id: <812b0c3505bb1687e51285dccf1a94f0cecb1f74.1517840877.git.berto@igalia.com>
+Date: Mon,  5 Feb 2018 16:33:39 +0200
+Message-Id: <3d3b7d2dbfc020deaef60fb58739b0801eb9517c.1517840877.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
 In-Reply-To: <cover.1517840876.git.berto@igalia.com>
 References: <cover.1517840876.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v4 33/39] qcow2: Rename l2_table in
- count_contiguous_clusters()
+Subject: [Qemu-devel] [PATCH v4 39/39] iotests: Add l2-cache-entry-size to
+ iotest 137
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +25,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-This function doesn't need any changes to support L2 slices, but since
-it's now dealing with slices intead of full tables, the l2_table
-variable is renamed for clarity.
+This test tries reopening a qcow2 image with valid and invalid
+options. This patch adds l2-cache-entry-size to the set.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/137     | 5 +++++
+ tests/qemu-iotests/137.out | 2 ++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 54d435ca7d..f049e0e00e 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -371,19 +371,19 @@ fail:
- }
- 
- /*
-- * Checks how many clusters in a given L2 table are contiguous in the image
-+ * Checks how many clusters in a given L2 slice are contiguous in the image
-  * file. As soon as one of the flags in the bitmask stop_flags changes compared
-  * to the first cluster, the search is stopped and the cluster is not counted
-  * as contiguous. (This allows it, for example, to stop at the first compressed
-  * cluster which may require a different handling)
-  */
- static int count_contiguous_clusters(int nb_clusters, int cluster_size,
--        uint64_t *l2_table, uint64_t stop_flags)
-+        uint64_t *l2_slice, uint64_t stop_flags)
- {
-     int i;
-     QCow2ClusterType first_cluster_type;
-     uint64_t mask = stop_flags | L2E_OFFSET_MASK | QCOW_OFLAG_COMPRESSED;
--    uint64_t first_entry = be64_to_cpu(l2_table[0]);
-+    uint64_t first_entry = be64_to_cpu(l2_slice[0]);
-     uint64_t offset = first_entry & mask;
- 
-     if (!offset) {
-@@ -396,7 +396,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
-            first_cluster_type == QCOW2_CLUSTER_ZERO_ALLOC);
- 
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
-+        uint64_t l2_entry = be64_to_cpu(l2_slice[i]) & mask;
-         if (offset + (uint64_t) i * cluster_size != l2_entry) {
-             break;
-         }
+diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+index 5a01250005..87965625d8 100755
+--- a/tests/qemu-iotests/137
++++ b/tests/qemu-iotests/137
+@@ -83,6 +83,9 @@ $QEMU_IO \
+     -c "reopen -o overlap-check.inactive-l2=off" \
+     -c "reopen -o cache-size=1M" \
+     -c "reopen -o l2-cache-size=512k" \
++    -c "reopen -o l2-cache-entry-size=512" \
++    -c "reopen -o l2-cache-entry-size=4k" \
++    -c "reopen -o l2-cache-entry-size=64k" \
+     -c "reopen -o refcount-cache-size=128k" \
+     -c "reopen -o cache-clean-interval=5" \
+     -c "reopen -o cache-clean-interval=0" \
+@@ -107,6 +110,8 @@ $QEMU_IO \
+     -c "reopen -o cache-size=1M,l2-cache-size=2M" \
+     -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
+     -c "reopen -o l2-cache-size=256T" \
++    -c "reopen -o l2-cache-entry-size=33k" \
++    -c "reopen -o l2-cache-entry-size=128k" \
+     -c "reopen -o refcount-cache-size=256T" \
+     -c "reopen -o overlap-check=constant,overlap-check.template=all" \
+     -c "reopen -o overlap-check=blubb" \
+diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
+index 05efd74d17..e28e1eadba 100644
+--- a/tests/qemu-iotests/137.out
++++ b/tests/qemu-iotests/137.out
+@@ -20,6 +20,8 @@ cache-size, l2-cache-size and refcount-cache-size may not be set the same time
+ l2-cache-size may not exceed cache-size
+ refcount-cache-size may not exceed cache-size
+ L2 cache size too big
++L2 cache entry size must be a power of two between 512 and the cluster size (65536)
++L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+ L2 cache size too big
+ Conflicting values for qcow2 options 'overlap-check' ('constant') and 'overlap-check.template' ('all')
+ Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
 -- 
 2.11.0
